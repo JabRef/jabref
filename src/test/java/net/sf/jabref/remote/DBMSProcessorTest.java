@@ -27,27 +27,27 @@ import org.junit.runners.Parameterized.Parameters;
 public class DBMSProcessorTest {
 
     private static Connection connection;
-    private DBMSProcessor dbProcessor;
-    private DBMSHelper dbHelper;
+    private DBMSProcessor dbmsProcessor;
+    private DBMSHelper dbmsHelper;
 
     @Parameter
-    public DBMSType dbType;
+    public DBMSType dbmsType;
 
 
     @Before
     public void setUp() {
 
         // Get only one connection for each parameter
-        if (TestConnector.currentConnectionType != dbType) {
+        if (TestConnector.currentConnectionType != dbmsType) {
             try {
-                connection = TestConnector.getTestConnection(dbType);
+                connection = TestConnector.getTestConnection(dbmsType);
             } catch (Exception e) {
                 Assert.fail(e.getMessage());
             }
         }
-        dbHelper = new DBMSHelper(connection);
-        dbProcessor = new DBMSProcessor(dbHelper, dbType);
-        dbProcessor.setUpRemoteDatabase();
+        dbmsHelper = new DBMSHelper(connection);
+        dbmsProcessor = new DBMSProcessor(dbmsHelper, dbmsType);
+        dbmsProcessor.setUpRemoteDatabase();
 
     }
 
@@ -58,16 +58,16 @@ public class DBMSProcessorTest {
 
     @Test
     public void testCheckBaseIntegrity() {
-        Assert.assertTrue(dbProcessor.checkBaseIntegrity());
+        Assert.assertTrue(dbmsProcessor.checkBaseIntegrity());
         clear();
-        Assert.assertFalse(dbProcessor.checkBaseIntegrity());
+        Assert.assertFalse(dbmsProcessor.checkBaseIntegrity());
     }
 
     @Test
     public void testSetUpRemoteDatabase() {
         clear();
-        dbProcessor.setUpRemoteDatabase();
-        Assert.assertTrue(dbProcessor.checkBaseIntegrity());
+        dbmsProcessor.setUpRemoteDatabase();
+        Assert.assertTrue(dbmsProcessor.checkBaseIntegrity());
     }
 
     @Test
@@ -82,11 +82,11 @@ public class DBMSProcessorTest {
         realEntry.setCiteKey("nanoproc1994");
         realEntry.setRemoteId(1);
 
-        dbProcessor.insertEntry(realEntry);
+        dbmsProcessor.insertEntry(realEntry);
 
         BibEntry emptyEntry = new BibEntry();
         emptyEntry.setRemoteId(1);
-        dbProcessor.insertEntry(emptyEntry); // does not insert, due to same remoteId.
+        dbmsProcessor.insertEntry(emptyEntry); // does not insert, due to same remoteId.
 
         try (ResultSet resultSet = selectFrom(DBMSProcessor.ENTRY)) {
 
@@ -107,7 +107,7 @@ public class DBMSProcessorTest {
     @Test
     public void testUpdateEntry() {
         BibEntry bibEntry = getBibEntryExample();
-        dbProcessor.insertEntry(bibEntry);
+        dbmsProcessor.insertEntry(bibEntry);
 
         try {
             try (ResultSet resultSet = selectFrom(DBMSProcessor.ENTRY)) {
@@ -122,7 +122,7 @@ public class DBMSProcessorTest {
             bibEntry.setType("booklet");
             bibEntry.setField("author", "Brad L and Gilson, Kent L");
             bibEntry.setField("title", "The nano multiplexer");
-            dbProcessor.updateEntry(bibEntry);
+            dbmsProcessor.updateEntry(bibEntry);
 
             try (ResultSet resultSet = selectFrom(DBMSProcessor.ENTRY)) {
                 Assert.assertTrue(resultSet.next());
@@ -140,8 +140,8 @@ public class DBMSProcessorTest {
     @Test
     public void testRemoveEntry() {
         BibEntry bibEntry = getBibEntryExample();
-        dbProcessor.insertEntry(bibEntry);
-        dbProcessor.removeEntry(bibEntry);
+        dbmsProcessor.insertEntry(bibEntry);
+        dbmsProcessor.removeEntry(bibEntry);
 
         try (ResultSet resultSet = selectFrom(DBMSProcessor.ENTRY)) {
             Assert.assertFalse(resultSet.next());
@@ -154,8 +154,8 @@ public class DBMSProcessorTest {
     public void testPrepareEntryTableStructure() {
         BibEntry bibEntry = getBibEntryExample();
 
-        dbProcessor.prepareEntryTableStructure(bibEntry);
-        Set<String> actualColumns = dbHelper.allToUpperCase(dbHelper.getColumnNames(DBMSProcessor.ENTRY));
+        dbmsProcessor.prepareEntryTableStructure(bibEntry);
+        Set<String> actualColumns = dbmsHelper.allToUpperCase(dbmsHelper.getColumnNames(DBMSProcessor.ENTRY));
 
         Set<String> expectedColumns = new HashSet<>();
         expectedColumns.add(DBMSProcessor.ENTRY_REMOTE_ID);
@@ -172,10 +172,10 @@ public class DBMSProcessorTest {
 
         BibEntry bibEntry = getBibEntryExampleWithEmptyFields();
 
-        dbProcessor.insertEntry(bibEntry);
-        dbProcessor.normalizeEntryTable();
+        dbmsProcessor.insertEntry(bibEntry);
+        dbmsProcessor.normalizeEntryTable();
 
-        Set<String> actualColumns = dbHelper.allToUpperCase(dbHelper.getColumnNames(DBMSProcessor.ENTRY));
+        Set<String> actualColumns = dbmsHelper.allToUpperCase(dbmsHelper.getColumnNames(DBMSProcessor.ENTRY));
         Set<String> expectedColumns = new HashSet<>();
 
         expectedColumns.add(DBMSProcessor.ENTRY_REMOTE_ID);
@@ -190,10 +190,10 @@ public class DBMSProcessorTest {
     public void testGetRemoteEntries() {
         BibEntry bibEntry = getBibEntryExampleWithEmptyFields();
 
-        dbProcessor.insertEntry(bibEntry);
+        dbmsProcessor.insertEntry(bibEntry);
 
         List<BibEntry> expectedEntries = Arrays.asList(bibEntry);
-        List<BibEntry> actualEntries = dbProcessor.getRemoteEntries();
+        List<BibEntry> actualEntries = dbmsProcessor.getRemoteEntries();
 
         Assert.assertEquals(expectedEntries, actualEntries);
     }
@@ -206,7 +206,7 @@ public class DBMSProcessorTest {
         insertMetaData("saveOrderConfig", "specified;author;false;title;false;year;true;");
 
         Map<String, String> expectedMetaData = getMetaDataExample();
-        Map<String, String> actualMetaData = dbProcessor.getRemoteMetaData();
+        Map<String, String> actualMetaData = dbmsProcessor.getRemoteMetaData();
 
         Assert.assertEquals(expectedMetaData, actualMetaData);
 
@@ -215,9 +215,9 @@ public class DBMSProcessorTest {
     @Test
     public void testSetRemoteMetaData() {
         Map<String, String> expectedMetaData = getMetaDataExample();
-        dbProcessor.setRemoteMetaData(expectedMetaData);
+        dbmsProcessor.setRemoteMetaData(expectedMetaData);
 
-        Map<String, String> actualMetaData = dbProcessor.getRemoteMetaData();
+        Map<String, String> actualMetaData = dbmsProcessor.getRemoteMetaData();
 
         Assert.assertEquals(expectedMetaData, actualMetaData);
     }
@@ -225,15 +225,15 @@ public class DBMSProcessorTest {
     @Test
     public void testEscape() {
 
-        if (dbType == DBMSType.MYSQL) {
-            Assert.assertEquals("`TABLE`", dbProcessor.escape("TABLE"));
-            Assert.assertEquals("`TABLE`", DBMSProcessor.escape("TABLE", dbType));
-        } else if (dbType == DBMSType.POSTGRESQL) {
-            Assert.assertEquals("TABLE", dbProcessor.escape("TABLE"));
-            Assert.assertEquals("TABLE", DBMSProcessor.escape("TABLE", dbType));
-        } else if (dbType == DBMSType.ORACLE) {
-            Assert.assertEquals("\"TABLE\"", dbProcessor.escape("TABLE"));
-            Assert.assertEquals("\"TABLE\"", DBMSProcessor.escape("TABLE", dbType));
+        if (dbmsType == DBMSType.MYSQL) {
+            Assert.assertEquals("`TABLE`", dbmsProcessor.escape("TABLE"));
+            Assert.assertEquals("`TABLE`", DBMSProcessor.escape("TABLE", dbmsType));
+        } else if (dbmsType == DBMSType.POSTGRESQL) {
+            Assert.assertEquals("TABLE", dbmsProcessor.escape("TABLE"));
+            Assert.assertEquals("TABLE", DBMSProcessor.escape("TABLE", dbmsType));
+        } else if (dbmsType == DBMSType.ORACLE) {
+            Assert.assertEquals("\"TABLE\"", dbmsProcessor.escape("TABLE"));
+            Assert.assertEquals("\"TABLE\"", DBMSProcessor.escape("TABLE", dbmsType));
         }
 
         Assert.assertEquals("TABLE", DBMSProcessor.escape("TABLE", null));
@@ -295,7 +295,7 @@ public class DBMSProcessorTest {
     }
 
     private String escape(String expression) {
-        return dbProcessor.escape(expression);
+        return dbmsProcessor.escape(expression);
     }
 
     private String escapeValue(String value) {
@@ -305,10 +305,10 @@ public class DBMSProcessorTest {
     @After
     public void clear() {
         try {
-            if ((dbType == DBMSType.MYSQL) || (dbType == DBMSType.POSTGRESQL)) {
+            if ((dbmsType == DBMSType.MYSQL) || (dbmsType == DBMSType.POSTGRESQL)) {
                 connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape(DBMSProcessor.ENTRY));
                 connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape(DBMSProcessor.METADATA));
-            } else if (dbType == DBMSType.ORACLE) {
+            } else if (dbmsType == DBMSType.ORACLE) {
                 connection.createStatement().executeUpdate(
                             "BEGIN\n" +
                             "EXECUTE IMMEDIATE 'DROP TABLE " + escape(DBMSProcessor.ENTRY) + "';\n" +

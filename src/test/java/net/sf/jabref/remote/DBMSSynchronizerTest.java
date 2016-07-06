@@ -27,13 +27,13 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class DBMSSynchronizerTest {
 
-    private DBMSSynchronizer dbSynchronizer;
+    private DBMSSynchronizer dbmsSynchronizer;
     private Connection connection;
-    private DBMSProcessor dbProcessor;
+    private DBMSProcessor dbmsProcessor;
     private BibDatabase bibDatabase;
 
     @Parameter
-    public DBMSType dbType;
+    public DBMSType dbmsType;
 
 
     @Before
@@ -42,18 +42,18 @@ public class DBMSSynchronizerTest {
         Globals.prefs = JabRefPreferences.getInstance();
 
         try {
-            connection = TestConnector.getTestConnection(dbType);
+            connection = TestConnector.getTestConnection(dbmsType);
         } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
 
         bibDatabase = new BibDatabase();
-        dbSynchronizer = new DBMSSynchronizer(bibDatabase, new MetaData());
-        dbProcessor = new DBMSProcessor(new DBMSHelper(connection), dbType);
+        dbmsSynchronizer = new DBMSSynchronizer(bibDatabase, new MetaData());
+        dbmsProcessor = new DBMSProcessor(new DBMSHelper(connection), dbmsType);
 
-        bibDatabase.registerListener(dbSynchronizer);
+        bibDatabase.registerListener(dbmsSynchronizer);
 
-        dbSynchronizer.openRemoteDatabase(connection, dbType, "TEST");
+        dbmsSynchronizer.openRemoteDatabase(connection, dbmsType, "TEST");
     }
 
     @Parameters(name = "Test with {0} database system")
@@ -70,7 +70,7 @@ public class DBMSSynchronizerTest {
         // should not add remotely.
         bibDatabase.insertEntry(furtherEntry, EntryEventSource.REMOTE);
 
-        List<BibEntry> actualEntries = dbProcessor.getRemoteEntries();
+        List<BibEntry> actualEntries = dbmsProcessor.getRemoteEntries();
 
         Assert.assertEquals(1, actualEntries.size());
         Assert.assertEquals(expectedEntry, actualEntries.get(0));
@@ -79,13 +79,13 @@ public class DBMSSynchronizerTest {
     @Test
     public void testFieldChangedEventListener() {
         BibEntry expectedEntry = getBibEntryExample(1);
-        expectedEntry.registerListener(dbSynchronizer);
+        expectedEntry.registerListener(dbmsSynchronizer);
 
         bibDatabase.insertEntry(expectedEntry);
         expectedEntry.setField("author", "Brad L and Gilson");
         expectedEntry.setField("title", "The micro multiplexer", EntryEventSource.REMOTE);
 
-        List<BibEntry> actualEntries = dbProcessor.getRemoteEntries();
+        List<BibEntry> actualEntries = dbmsProcessor.getRemoteEntries();
         Assert.assertEquals(1, actualEntries.size());
         Assert.assertEquals(expectedEntry.getFieldOptional("author"), actualEntries.get(0).getFieldOptional("author"));
         Assert.assertEquals("The nano processor1", actualEntries.get(0).getFieldOptional("title").get());
@@ -97,19 +97,19 @@ public class DBMSSynchronizerTest {
         BibEntry bibEntry = getBibEntryExample(1);
         bibDatabase.insertEntry(bibEntry);
 
-        List<BibEntry> actualEntries = dbProcessor.getRemoteEntries();
+        List<BibEntry> actualEntries = dbmsProcessor.getRemoteEntries();
         Assert.assertEquals(1, actualEntries.size());
         Assert.assertEquals(bibEntry, actualEntries.get(0));
 
         bibDatabase.removeEntry(bibEntry);
-        actualEntries = dbProcessor.getRemoteEntries();
+        actualEntries = dbmsProcessor.getRemoteEntries();
 
         Assert.assertEquals(0, actualEntries.size());
 
         bibDatabase.insertEntry(bibEntry);
         bibDatabase.removeEntry(bibEntry, EntryEventSource.REMOTE);
 
-        actualEntries = dbProcessor.getRemoteEntries();
+        actualEntries = dbmsProcessor.getRemoteEntries();
         Assert.assertEquals(1, actualEntries.size());
         Assert.assertEquals(bibEntry, actualEntries.get(0));
     }
@@ -117,12 +117,12 @@ public class DBMSSynchronizerTest {
     @Test
     public void testMetaDataChangedEventListener() {
         MetaData testMetaData = new MetaData();
-        testMetaData.registerListener(dbSynchronizer);
-        dbSynchronizer.setMetaData(testMetaData);
+        testMetaData.registerListener(dbmsSynchronizer);
+        dbmsSynchronizer.setMetaData(testMetaData);
         testMetaData.putData("databaseType", Arrays.asList("bibtex"));
 
         Map<String, String> expectedMap = testMetaData.getAsStringMap();
-        Map<String, String> actualMap = dbProcessor.getRemoteMetaData();
+        Map<String, String> actualMap = dbmsProcessor.getRemoteMetaData();
 
         Assert.assertEquals(expectedMap, actualMap);
     }
@@ -130,30 +130,30 @@ public class DBMSSynchronizerTest {
     @Test
     public void testInitializeDatabases() {
         clear();
-        dbSynchronizer.initializeDatabases();
-        Assert.assertTrue(dbProcessor.checkBaseIntegrity());
-        dbSynchronizer.initializeDatabases();
-        Assert.assertTrue(dbProcessor.checkBaseIntegrity());
+        dbmsSynchronizer.initializeDatabases();
+        Assert.assertTrue(dbmsProcessor.checkBaseIntegrity());
+        dbmsSynchronizer.initializeDatabases();
+        Assert.assertTrue(dbmsProcessor.checkBaseIntegrity());
     }
 
     @Test
     public void testSynchronizeLocalDatabase() {
         List<BibEntry> expectedBibEntries = Arrays.asList(getBibEntryExample(1), getBibEntryExample(2));
 
-        dbProcessor.insertEntry(expectedBibEntries.get(0));
-        dbProcessor.insertEntry(expectedBibEntries.get(1));
+        dbmsProcessor.insertEntry(expectedBibEntries.get(0));
+        dbmsProcessor.insertEntry(expectedBibEntries.get(1));
 
         Assert.assertTrue(bibDatabase.getEntries().isEmpty());
 
-        dbSynchronizer.synchronizeLocalDatabase();
+        dbmsSynchronizer.synchronizeLocalDatabase();
 
         Assert.assertEquals(expectedBibEntries, bibDatabase.getEntries());
 
-        dbProcessor.removeEntry(expectedBibEntries.get(0));
-        dbProcessor.removeEntry(expectedBibEntries.get(1));
+        dbmsProcessor.removeEntry(expectedBibEntries.get(0));
+        dbmsProcessor.removeEntry(expectedBibEntries.get(1));
         expectedBibEntries = new ArrayList<>();
 
-        dbSynchronizer.synchronizeLocalDatabase();
+        dbmsSynchronizer.synchronizeLocalDatabase();
 
         Assert.assertEquals(expectedBibEntries, bibDatabase.getEntries());
     }
@@ -165,9 +165,9 @@ public class DBMSSynchronizerTest {
 
         MetaData testMetaData = new MetaData();
         testMetaData.putData("saveActions", Arrays.asList("enabled", "author[lower_case]"));
-        dbSynchronizer.setMetaData(testMetaData);
+        dbmsSynchronizer.setMetaData(testMetaData);
 
-        dbSynchronizer.applyMetaData();
+        dbmsSynchronizer.applyMetaData();
 
         Assert.assertEquals("wirthlin, michael j1", bibEntry.getFieldOptional("author").get());
 
@@ -183,16 +183,16 @@ public class DBMSSynchronizerTest {
     }
 
     private String escape(String expression) {
-        return dbProcessor.escape(expression);
+        return dbmsProcessor.escape(expression);
     }
 
     @After
     public void clear() {
         try {
-            if ((dbType == DBMSType.MYSQL) || (dbType == DBMSType.POSTGRESQL)) {
+            if ((dbmsType == DBMSType.MYSQL) || (dbmsType == DBMSType.POSTGRESQL)) {
                 connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape(DBMSProcessor.ENTRY));
                 connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape(DBMSProcessor.METADATA));
-            } else if (dbType == DBMSType.ORACLE) {
+            } else if (dbmsType == DBMSType.ORACLE) {
                 connection.createStatement()
                         .executeUpdate("BEGIN\n" + "EXECUTE IMMEDIATE 'DROP TABLE " + escape(DBMSProcessor.ENTRY) + "';\n"
                                 + "EXECUTE IMMEDIATE 'DROP TABLE " + escape(DBMSProcessor.METADATA) + "';\n"

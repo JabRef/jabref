@@ -20,20 +20,20 @@ import org.junit.runners.Parameterized.Parameters;
 public class DBMSHelperTest {
 
     private Connection connection;
-    private DBMSHelper dbHelper;
+    private DBMSHelper dbmsHelper;
 
     @Parameter
-    public DBMSType dbType;
+    public DBMSType dbmsType;
 
 
     @Before
     public void setUp() {
         try {
-            connection = TestConnector.getTestConnection(dbType);
-            dbHelper = new DBMSHelper(connection);
+            connection = TestConnector.getTestConnection(dbmsType);
+            dbmsHelper = new DBMSHelper(connection);
             connection.createStatement().executeUpdate(
                     "CREATE TABLE " + escape("TEST") + " (" + escape("A") + " INT, " + escape("B") + " "
-                            + (dbType == DBMSType.ORACLE ? "CLOB" : "TEXT") + ")");
+                            + (dbmsType == DBMSType.ORACLE ? "CLOB" : "TEXT") + ")");
         } catch (Exception e) {
             Assert.fail(e.getMessage());
         }
@@ -46,7 +46,7 @@ public class DBMSHelperTest {
 
     @Test
     public void testGetColumnNames() {
-        Set<String> columns = dbHelper.allToUpperCase(dbHelper.getColumnNames("TEST"));
+        Set<String> columns = dbmsHelper.allToUpperCase(dbmsHelper.getColumnNames("TEST"));
         Assert.assertTrue(columns.remove("A"));
         Assert.assertTrue(columns.remove("B"));
         Assert.assertEquals(0, columns.size());
@@ -54,7 +54,7 @@ public class DBMSHelperTest {
 
     @Test
     public void testGetColumnNamesFailure() {
-        Set<String> columns = dbHelper.getColumnNames(escape("XXX"));
+        Set<String> columns = dbmsHelper.getColumnNames(escape("XXX"));
         Assert.assertTrue(columns.isEmpty());
     }
 
@@ -68,7 +68,7 @@ public class DBMSHelperTest {
 
             try (ResultSet expectedResultSet = connection.createStatement().executeQuery(
                     "SELECT " + escape("B") + " FROM " + escape("TEST") + " WHERE " + escape("A") + " = 0");
-                    ResultSet actualResultSet = dbHelper.query(
+                    ResultSet actualResultSet = dbmsHelper.query(
                             "SELECT " + escape("B") + " FROM " + escape("TEST") + " WHERE " + escape("A") + " = 0",
                             ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_READ_ONLY)) {
                 if (expectedResultSet.next()) {
@@ -101,7 +101,7 @@ public class DBMSHelperTest {
         set.add("AA");
         set.add("B0");
 
-        Set<String> actualSet = dbHelper.allToUpperCase(set);
+        Set<String> actualSet = dbmsHelper.allToUpperCase(set);
         expectedSet.remove(actualSet);
 
         Assert.assertTrue(expectedSet.isEmpty());
@@ -112,7 +112,7 @@ public class DBMSHelperTest {
         try {
             connection.createStatement().executeUpdate(
                     "INSERT INTO " + escape("TEST") + "(" + escape("A") + ", " + escape("B") + ") VALUES(0, 'test')");
-            dbHelper.clearTables(escape("TEST"), escape("XXX"));
+            dbmsHelper.clearTables(escape("TEST"), escape("XXX"));
 
             try (ResultSet resultSet = connection.createStatement()
                     .executeQuery(
@@ -135,7 +135,7 @@ public class DBMSHelperTest {
     }
 
     public String escape(String expression) {
-        return DBMSProcessor.escape(expression, dbType);
+        return DBMSProcessor.escape(expression, dbmsType);
     }
 
 }

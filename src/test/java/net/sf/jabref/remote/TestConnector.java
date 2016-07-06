@@ -10,35 +10,35 @@ public class TestConnector {
     public static DBMSType currentConnectionType;
 
 
-    public static Connection getTestConnection(DBMSType dbType) throws ClassNotFoundException, SQLException {
+    public static Connection getTestConnection(DBMSType dbmsType) throws ClassNotFoundException, SQLException {
         String user = "root";
         String password = "";
         String database = "jabref";
 
-        if (dbType == DBMSType.POSTGRESQL) {
+        if (dbmsType == DBMSType.POSTGRESQL) {
             user = "postgres";
-        } else if (dbType == DBMSType.ORACLE) {
+        } else if (dbmsType == DBMSType.ORACLE) {
             user = "travis";
             password = "travis";
             database = "xe";
         }
-        currentConnectionType = dbType;
+        currentConnectionType = dbmsType;
 
-        return DBMSConnector.getNewConnection(dbType, "localhost", database, user, password);
+        return DBMSConnector.getNewConnection(dbmsType, "localhost", database, user, password);
     }
 
     public static Set<DBMSType> getAvailableDBMSTypes() {
-        Set<DBMSType> dbTypes = new HashSet<>();
+        Set<DBMSType> dbmsTypes = new HashSet<>();
 
         for (DBMSType dbms : DBMSType.values()) {
             try {
                 Class.forName(dbms.getDriverClassPath());
-                dbTypes.add(dbms);
+                dbmsTypes.add(dbms);
             } catch (ClassNotFoundException e) {
                 // In case that the driver is not available do not perform tests for this system.
                 System.out.println(dbms + " driver not available. Skipping tests for this system...");
             }
         }
-        return dbTypes;
+        return dbmsTypes;
     }
 }

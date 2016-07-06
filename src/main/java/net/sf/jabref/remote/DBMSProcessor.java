@@ -42,8 +42,8 @@ public class DBMSProcessor {
 
     private static final Log LOGGER = LogFactory.getLog(DBMSConnector.class);
 
-    private DBMSType dbType;
-    private final DBMSHelper dbHelper;
+    private DBMSType dbmsType;
+    private final DBMSHelper dbmsHelper;
 
     public static final String ENTRY = "ENTRY";
     public static final String METADATA = "METADATA";
@@ -63,11 +63,11 @@ public class DBMSProcessor {
 
     /**
      * @param connection Working SQL connection
-     * @param dbType Instance of {@link DBMSType}
+     * @param dbmsType Instance of {@link DBMSType}
      */
-    public DBMSProcessor(DBMSHelper dbmsHelper, DBMSType dbType) {
-        this.dbType = dbType;
-        this.dbHelper = dbmsHelper;
+    public DBMSProcessor(DBMSHelper dbmsHelper, DBMSType dbmsType) {
+        this.dbmsType = dbmsType;
+        this.dbmsHelper = dbmsHelper;
     }
 
     /**
@@ -77,7 +77,7 @@ public class DBMSProcessor {
     public boolean checkBaseIntegrity() {
         List<String> requiredTables = new ArrayList<>(ALL_TABLES);
         try {
-            DatabaseMetaData databaseMetaData = dbHelper.getMetaData();
+            DatabaseMetaData databaseMetaData = dbmsHelper.getMetaData();
 
             // ...getTables(null, ...): no restrictions
             try (ResultSet databaseMetaDataResultSet = databaseMetaData.getTables(null, null, null, null)) {
@@ -99,32 +99,32 @@ public class DBMSProcessor {
      * Creates and sets up the needed tables and columns according to the database type.
      */
     public void setUpRemoteDatabase() {
-        if (dbType == DBMSType.MYSQL) {
-            dbHelper.executeUpdate("CREATE TABLE IF NOT EXISTS " + ENTRY + " ("
+        if (dbmsType == DBMSType.MYSQL) {
+            dbmsHelper.executeUpdate("CREATE TABLE IF NOT EXISTS " + ENTRY + " ("
                     + ENTRY_REMOTE_ID + " INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,"
                     + ENTRY_ENTRYTYPE + " VARCHAR(255) DEFAULT NULL"
                     + ") ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;");
-            dbHelper.executeUpdate("CREATE TABLE IF NOT EXISTS " + METADATA + " ("
+            dbmsHelper.executeUpdate("CREATE TABLE IF NOT EXISTS " + METADATA + " ("
                     + METADATA_KEY + " varchar(255) NOT NULL,"
                     + METADATA_VALUE + " text NOT NULL"
                     + ") ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;");
-        } else if (dbType == DBMSType.POSTGRESQL) {
-            dbHelper.executeUpdate("CREATE TABLE IF NOT EXISTS " + ENTRY + " ("
+        } else if (dbmsType == DBMSType.POSTGRESQL) {
+            dbmsHelper.executeUpdate("CREATE TABLE IF NOT EXISTS " + ENTRY + " ("
                     + ENTRY_REMOTE_ID + " SERIAL PRIMARY KEY,"
                     + ENTRY_ENTRYTYPE + " VARCHAR);");
-            dbHelper.executeUpdate("CREATE TABLE IF NOT EXISTS " + METADATA + " ("
+            dbmsHelper.executeUpdate("CREATE TABLE IF NOT EXISTS " + METADATA + " ("
                     + METADATA_KEY + " VARCHAR,"
                     + METADATA_VALUE + " TEXT);");
-        } else if (dbType == DBMSType.ORACLE) {
-            dbHelper.executeUpdate("CREATE TABLE \"" + ENTRY + "\" (" + "\""
+        } else if (dbmsType == DBMSType.ORACLE) {
+            dbmsHelper.executeUpdate("CREATE TABLE \"" + ENTRY + "\" (" + "\""
                     + ENTRY_REMOTE_ID + "\"  NUMBER NOT NULL," + "\""
                     + ENTRY_ENTRYTYPE + "\"  VARCHAR2(255) NULL,"
                     + "CONSTRAINT  \"" + ENTRY + "_PK\" PRIMARY KEY (\"" + ENTRY_REMOTE_ID + "\"))");
-            dbHelper.executeUpdate("CREATE SEQUENCE \"" + ENTRY + "_SEQ\"");
-            dbHelper.executeUpdate("CREATE TRIGGER \"BI_" + ENTRY + "\" BEFORE INSERT ON \"" + ENTRY + "\" "
+            dbmsHelper.executeUpdate("CREATE SEQUENCE \"" + ENTRY + "_SEQ\"");
+            dbmsHelper.executeUpdate("CREATE TRIGGER \"BI_" + ENTRY + "\" BEFORE INSERT ON \"" + ENTRY + "\" "
                     + "FOR EACH ROW BEGIN " + "SELECT \"" + ENTRY + "_SEQ\".NEXTVAL INTO :NEW."
                     + ENTRY_REMOTE_ID.toLowerCase(Locale.ENGLISH) + " FROM DUAL; " + "END;");
-            dbHelper.executeUpdate("CREATE TABLE \"" + METADATA + "\" (" + "\""
+            dbmsHelper.executeUpdate("CREATE TABLE \"" + METADATA + "\" (" + "\""
                     + METADATA_KEY + "\"  VARCHAR2(255) NULL," + "\""
                     + METADATA_VALUE + "\"  CLOB NOT NULL)");
         }
@@ -144,7 +144,7 @@ public class DBMSProcessor {
         // Check if already exists
         int remote_id = bibEntry.getRemoteId();
         if (remote_id != -1) {
-            try (ResultSet resultSet = dbHelper.query(
+            try (ResultSet resultSet = dbmsHelper.query(
                     "SELECT * FROM " + escape(ENTRY) + " WHERE " + escape(ENTRY_REMOTE_ID) + " = " + remote_id)) {
                 if (resultSet.next()) {
                     return;
@@ -167,7 +167,7 @@ public class DBMSProcessor {
         }
         query = query + escapeValue(bibEntry.getType()) + ")";
 
-        try (PreparedStatement preparedStatement = dbHelper.prepareStatement(query,
+        try (PreparedStatement preparedStatement = dbmsHelper.prepareStatement(query,
                 ENTRY_REMOTE_ID.toLowerCase(Locale.ENGLISH))) { // This is the only method to get generated keys which is accepted by MySQL, PostgreSQL and Oracle.
             preparedStatement.executeUpdate();
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
@@ -209,7 +209,7 @@ public class DBMSProcessor {
         }
 
         query = query + " WHERE " + escape(ENTRY_REMOTE_ID) + " = " + bibEntry.getRemoteId();
-        dbHelper.executeUpdate(query);
+        dbmsHelper.executeUpdate(query);
         LOGGER.info("SQL UPDATE: " + query);
     }
 
@@ -220,7 +220,7 @@ public class DBMSProcessor {
     public void removeEntry(BibEntry bibEntry) {
         String query = "DELETE FROM " + escape(ENTRY) + " WHERE " + escape(ENTRY_REMOTE_ID) + " = "
                 + bibEntry.getRemoteId();
-        dbHelper.executeUpdate(query);
+        dbmsHelper.executeUpdate(query);
         LOGGER.info("SQL DELETE: " + query);
         normalizeEntryTable();
     }
@@ -233,13 +233,13 @@ public class DBMSProcessor {
      *
      */
     public void prepareEntryTableStructure(BibEntry bibEntry) {
-        Set<String> fieldNames = dbHelper.allToUpperCase(bibEntry.getFieldNames());
-        fieldNames.removeAll(dbHelper.allToUpperCase(dbHelper.getColumnNames(escape(ENTRY))));
+        Set<String> fieldNames = dbmsHelper.allToUpperCase(bibEntry.getFieldNames());
+        fieldNames.removeAll(dbmsHelper.allToUpperCase(dbmsHelper.getColumnNames(escape(ENTRY))));
 
-        String columnType = dbType == DBMSType.ORACLE ? " CLOB NULL" : " TEXT NULL DEFAULT NULL";
+        String columnType = dbmsType == DBMSType.ORACLE ? " CLOB NULL" : " TEXT NULL DEFAULT NULL";
 
         for (String fieldName : fieldNames) {
-            dbHelper.executeUpdate("ALTER TABLE " + escape(ENTRY) + " ADD " + escape(fieldName) + columnType);
+            dbmsHelper.executeUpdate("ALTER TABLE " + escape(ENTRY) + " ADD " + escape(fieldName) + columnType);
         }
     }
 
@@ -249,11 +249,11 @@ public class DBMSProcessor {
     public void normalizeEntryTable() {
         ArrayList<String> columnsToRemove = new ArrayList<>();
 
-        columnsToRemove.addAll(dbHelper.allToUpperCase(dbHelper.getColumnNames(escape(ENTRY))));
+        columnsToRemove.addAll(dbmsHelper.allToUpperCase(dbmsHelper.getColumnNames(escape(ENTRY))));
         columnsToRemove.remove(ENTRY_REMOTE_ID); // essential column
         columnsToRemove.remove(ENTRY_ENTRYTYPE); // essential column
 
-        try (ResultSet resultSet = dbHelper.query("SELECT * FROM " + escape(ENTRY))) {
+        try (ResultSet resultSet = dbmsHelper.query("SELECT * FROM " + escape(ENTRY))) {
             while (resultSet.next()) {
                 for (int i = 0; i < columnsToRemove.size(); i++) {
                     if (resultSet.getObject(columnsToRemove.get(i)) != null) {
@@ -294,9 +294,9 @@ public class DBMSProcessor {
      */
     private List<BibEntry> getRemoteEntries(int remoteId) {
         List<BibEntry> remoteEntries = new ArrayList<>();
-        try (ResultSet resultSet = dbHelper.query("SELECT * FROM " + escape(ENTRY)
+        try (ResultSet resultSet = dbmsHelper.query("SELECT * FROM " + escape(ENTRY)
                 + (remoteId != 0 ? " WHERE " + ENTRY_REMOTE_ID + " = " + remoteId : ""))) {
-            Set<String> columns = dbHelper.allToUpperCase(dbHelper.getColumnNames(escape(ENTRY)));
+            Set<String> columns = dbmsHelper.allToUpperCase(dbmsHelper.getColumnNames(escape(ENTRY)));
 
             while (resultSet.next()) {
                 BibEntry bibEntry = new BibEntry();
@@ -328,7 +328,7 @@ public class DBMSProcessor {
 
         String query = "SELECT * FROM " + escape(METADATA);
 
-        try (ResultSet resultSet = dbHelper.query(query)) {
+        try (ResultSet resultSet = dbmsHelper.query(query)) {
             while(resultSet.next()) {
                 data.put(resultSet.getString(METADATA_KEY), resultSet.getString(METADATA_VALUE));
             }
@@ -344,10 +344,10 @@ public class DBMSProcessor {
      * @param metaData JabRef meta data.
      */
     public void setRemoteMetaData(Map<String, String> data) {
-        dbHelper.clearTables(METADATA);
+        dbmsHelper.clearTables(METADATA);
 
         for (Map.Entry<String, String> metaEntry : data.entrySet()) {
-            dbHelper.executeUpdate("INSERT INTO " + escape(METADATA) + "(" +
+            dbmsHelper.executeUpdate("INSERT INTO " + escape(METADATA) + "(" +
                     escape(METADATA_KEY) + ", " + escape(METADATA_VALUE) + ") VALUES(" +
                     escapeValue(metaEntry.getKey()) + ", " + escapeValue(metaEntry.getValue()) + ")");
         }
@@ -360,7 +360,7 @@ public class DBMSProcessor {
     private void dropColumns(List<String> columnsToRemove) {
         String columnExpression = "";
         String expressionPrefix = "";
-        if ((dbType == dbType.MYSQL) || (dbType == dbType.POSTGRESQL)) {
+        if ((dbmsType == dbmsType.MYSQL) || (dbmsType == dbmsType.POSTGRESQL)) {
             expressionPrefix = "DROP ";
         }
 
@@ -370,12 +370,12 @@ public class DBMSProcessor {
             columnExpression = i < (columnsToRemove.size() - 1) ? columnExpression + ", " : columnExpression;
         }
 
-        if (dbType == dbType.ORACLE) {
+        if (dbmsType == dbmsType.ORACLE) {
             columnExpression = "DROP (" + columnExpression + ")"; // DROP command in Oracle differs from the other systems.
         }
 
         if (columnsToRemove.size() > 0) {
-            dbHelper.executeUpdate("ALTER TABLE " + escape(ENTRY) + " " + columnExpression);
+            dbmsHelper.executeUpdate("ALTER TABLE " + escape(ENTRY) + " " + columnExpression);
         }
     }
 
@@ -397,12 +397,12 @@ public class DBMSProcessor {
 
     /**
      * Escapes parts of SQL expressions like table or field name to match the conventions
-     * of the database system using the current dbType.
+     * of the database system using the current dbmsType.
      * @param expression Table or field name
      * @return Correctly escape expression
      */
     public String escape(String expression) {
-        return escape(expression, dbType);
+        return escape(expression, dbmsType);
     }
 
     /**
@@ -428,12 +428,12 @@ public class DBMSProcessor {
         return "NULL";
     }
 
-    public void setDBType(DBMSType dbType) {
-        this.dbType = dbType;
+    public void setDBType(DBMSType dbmsType) {
+        this.dbmsType = dbmsType;
     }
 
     public DBMSType getDBType() {
-        return this.dbType;
+        return this.dbmsType;
     }
 
 }

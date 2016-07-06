@@ -34,7 +34,7 @@ public class DBMSConnector {
      * Determines the suitable driver and retrieves a working SQL Connection in normal case.
      * A default port is going to be taken.
      *
-     * @param dbType Enum entry of {@link DBMSType} which determines the driver
+     * @param dbmsType Enum entry of {@link DBMSType} which determines the driver
      * @param host Hostname, Domain or IP address
      * @param database An already existent database name.
      * @param user Username
@@ -43,15 +43,15 @@ public class DBMSConnector {
      * @throws ClassNotFoundException Thrown if no suitable drivers were found
      * @throws SQLException Thrown if connection has failed
      */
-    public static Connection getNewConnection(DBMSType dbType, String host, String database, String user, String password)
+    public static Connection getNewConnection(DBMSType dbmsType, String host, String database, String user, String password)
             throws ClassNotFoundException, SQLException {
-        return getNewConnection(dbType, host, getDefaultPort(dbType), database, user, password);
+        return getNewConnection(dbmsType, host, getDefaultPort(dbmsType), database, user, password);
     }
 
     /**
      * Determines the suitable driver and retrieves a working SQL Connection in normal case.
      *
-     * @param dbType Enum entry of {@link DBMSType} which determines the driver
+     * @param dbmsType Enum entry of {@link DBMSType} which determines the driver
      * @param host Hostname, Domain or IP address
      * @param port Port number the server is listening on
      * @param database An already existent database name.
@@ -61,13 +61,13 @@ public class DBMSConnector {
      * @throws ClassNotFoundException Thrown if no suitable drivers were found
      * @throws SQLException Thrown if connection has failed
      */
-    public static Connection getNewConnection(DBMSType dbType, String host, int port, String database, String user,
+    public static Connection getNewConnection(DBMSType dbmsType, String host, int port, String database, String user,
             String password) throws ClassNotFoundException, SQLException {
 
         String url = "jdbc:";
 
         try {
-            switch (dbType) {
+            switch (dbmsType) {
             case MYSQL:
                 url = url + "mysql://" + host + ":" + port + "/" + database;
                 break;
@@ -93,14 +93,14 @@ public class DBMSConnector {
     /**
      * Retrieves the port number dependent on the type of the database system.
      */
-    public static int getDefaultPort(DBMSType dbType) {
-        if (dbType == DBMSType.MYSQL) {
+    public static int getDefaultPort(DBMSType dbmsType) {
+        if (dbmsType == DBMSType.MYSQL) {
             return 3306;
         }
-        if (dbType == DBMSType.POSTGRESQL) {
+        if (dbmsType == DBMSType.POSTGRESQL) {
             return 5432;
         }
-        if (dbType == DBMSType.ORACLE) {
+        if (dbmsType == DBMSType.ORACLE) {
             return 1521;
         }
         return -1;

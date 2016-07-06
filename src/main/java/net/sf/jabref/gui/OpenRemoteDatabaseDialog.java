@@ -69,7 +69,7 @@ public class OpenRemoteDatabaseDialog extends JDialog {
     private final JTextField databaseField = new JTextField(14);
 
     private final JPasswordField passwordField = new JPasswordField(14);
-    private final JComboBox<DBMSType> dbTypeDropDown = new JComboBox<>(new DBMSType[] {DBMSType.MYSQL, DBMSType.ORACLE, DBMSType.POSTGRESQL});
+    private final JComboBox<DBMSType> dbmsTypeDropDown = new JComboBox<>(new DBMSType[] {DBMSType.MYSQL, DBMSType.ORACLE, DBMSType.POSTGRESQL});
 
     private final JButton connectButton = new JButton(Localization.lang("Connect"));
     private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
@@ -108,7 +108,7 @@ public class OpenRemoteDatabaseDialog extends JDialog {
                     BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode),
                             DatabaseLocation.REMOTE);
 
-                    DBMSType selectedType = (DBMSType) dbTypeDropDown.getSelectedItem();
+                    DBMSType selectedType = (DBMSType) dbmsTypeDropDown.getSelectedItem();
                     String host = hostField.getText();
                     int port = Integer.parseInt(portField.getText());
                     String database = databaseField.getText();
@@ -147,16 +147,16 @@ public class OpenRemoteDatabaseDialog extends JDialog {
         cancelButton.addActionListener(cancelAction);
 
         /**
-         * Set up a listener which updates the default port number once the selection in dbTypeDropDown has changed.
+         * Set up a listener which updates the default port number once the selection in dbmsTypeDropDown has changed.
          */
-        Action dbTypeDropDownAction = new AbstractAction() {
+        Action dbmsTypeDropDownAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 portField.setText(
-                        Integer.toString(DBMSConnector.getDefaultPort((DBMSType) dbTypeDropDown.getSelectedItem())));
+                        Integer.toString(DBMSConnector.getDefaultPort((DBMSType) dbmsTypeDropDown.getSelectedItem())));
             }
         };
-        dbTypeDropDown.addActionListener(dbTypeDropDownAction);
+        dbmsTypeDropDown.addActionListener(dbmsTypeDropDownAction);
 
         // Add enter button action listener
         connectButton.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0),
@@ -176,7 +176,7 @@ public class OpenRemoteDatabaseDialog extends JDialog {
         Optional<String> remoteUser = Globals.prefs.getAsOptional(REMOTE_USER);
 
         if (remoteDatabaseType.isPresent()) {
-            dbTypeDropDown.setSelectedItem(DBMSType.fromString(remoteDatabaseType.get()));
+            dbmsTypeDropDown.setSelectedItem(DBMSType.fromString(remoteDatabaseType.get()));
         }
 
         if (remoteHost.isPresent()) {
@@ -186,7 +186,7 @@ public class OpenRemoteDatabaseDialog extends JDialog {
         if (remotePort.isPresent()) {
             portField.setText(remotePort.get());
         } else {
-            portField.setText(Integer.toString(DBMSConnector.getDefaultPort((DBMSType) dbTypeDropDown.getSelectedItem())));
+            portField.setText(Integer.toString(DBMSConnector.getDefaultPort((DBMSType) dbmsTypeDropDown.getSelectedItem())));
         }
 
         if (remoteDatabase.isPresent()) {
@@ -236,7 +236,7 @@ public class OpenRemoteDatabaseDialog extends JDialog {
 
         gridBagConstraints.gridx = 1;
         gridBagConstraints.gridy = 0;
-        connectionPanel.add(dbTypeDropDown, gridBagConstraints);
+        connectionPanel.add(dbmsTypeDropDown, gridBagConstraints);
 
         gridBagConstraints.gridy = 1;
         gridBagConstraints.gridwidth = 1; // the hostField is smaller than the others.
@@ -287,7 +287,7 @@ public class OpenRemoteDatabaseDialog extends JDialog {
      * Saves the data from this dialog persistently to facilitate the usage.
      */
     public void setGlobalPrefs() {
-        Globals.prefs.put(REMOTE_DATABASE_TYPE, ((DBMSType) dbTypeDropDown.getSelectedItem()).toString());
+        Globals.prefs.put(REMOTE_DATABASE_TYPE, ((DBMSType) dbmsTypeDropDown.getSelectedItem()).toString());
         Globals.prefs.put(REMOTE_HOST, hostField.getText());
         Globals.prefs.put(REMOTE_PORT, portField.getText());
         Globals.prefs.put(REMOTE_DATABASE, databaseField.getText());

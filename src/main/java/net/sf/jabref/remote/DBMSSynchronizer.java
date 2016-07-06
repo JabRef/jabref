@@ -45,8 +45,8 @@ public class DBMSSynchronizer {
 
     private static final Log LOGGER = LogFactory.getLog(DBMSConnector.class);
 
-    private DBMSProcessor dbProcessor;
-    private DBMSType dbType;
+    private DBMSProcessor dbmsProcessor;
+    private DBMSType dbmsType;
     private String dbName;
     private MetaData metaData;
     private final BibDatabase bibDatabase;
@@ -65,7 +65,7 @@ public class DBMSSynchronizer {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntryEvents may be posted.
         // In this case DBSynchronizer should not try to insert the bibEntry entry again (but it would not harm).
         if (isInEventLocation(event)) {
-            dbProcessor.insertEntry(event.getBibEntry());
+            dbmsProcessor.insertEntry(event.getBibEntry());
             synchronizeLocalMetaData();
             synchronizeLocalDatabase(); // Pull remote changes for the case that there where some
         }
@@ -82,7 +82,7 @@ public class DBMSSynchronizer {
         if (isInEventLocation(event)) {
             synchronizeLocalMetaData();
             BibDatabaseWriter.applySaveActions(event.getBibEntry(), metaData);
-            dbProcessor.updateEntry(event.getBibEntry());
+            dbmsProcessor.updateEntry(event.getBibEntry());
             //synchronizeLocalDatabase(); // Pull remote changes for the case that there where some
         }
     }
@@ -96,7 +96,7 @@ public class DBMSSynchronizer {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntryEvents may be posted.
         // In this case DBSynchronizer should not try to delete the bibEntry entry again (but it would not harm).
         if (isInEventLocation(event)) {
-            dbProcessor.removeEntry(event.getBibEntry());
+            dbmsProcessor.removeEntry(event.getBibEntry());
             synchronizeLocalMetaData();
             synchronizeLocalDatabase(); // Pull remote changes for the case that there where some
         }
@@ -119,9 +119,9 @@ public class DBMSSynchronizer {
      */
     public void initializeDatabases() {
 
-        if (!dbProcessor.checkBaseIntegrity()) {
+        if (!dbmsProcessor.checkBaseIntegrity()) {
             LOGGER.info(Localization.lang("Integrity check failed. Fixing..."));
-            dbProcessor.setUpRemoteDatabase();
+            dbmsProcessor.setUpRemoteDatabase();
         }
         synchronizeLocalMetaData();
         synchronizeLocalDatabase();
@@ -132,10 +132,10 @@ public class DBMSSynchronizer {
      * Possible update types are removal, update or insert of a {@link BibEntry}.
      */
     public void synchronizeLocalDatabase() {
-        dbProcessor.normalizeEntryTable(); // remove unused columns
+        dbmsProcessor.normalizeEntryTable(); // remove unused columns
 
         List<BibEntry> localEntries = bibDatabase.getEntries();
-        List<BibEntry> remoteEntries = dbProcessor.getRemoteEntries();
+        List<BibEntry> remoteEntries = dbmsProcessor.getRemoteEntries();
 
         for (int i = 0; i < localEntries.size(); i++) {
             BibEntry localEntry = localEntries.get(i);
@@ -176,7 +176,7 @@ public class DBMSSynchronizer {
      */
     public void synchronizeLocalMetaData() {
         try {
-            metaData.setData(dbProcessor.getRemoteMetaData());
+            metaData.setData(dbmsProcessor.getRemoteMetaData());
         } catch (ParseException e) {
             LOGGER.error("Parse error", e);
         }
@@ -186,7 +186,7 @@ public class DBMSSynchronizer {
      * Synchronizes all meta data remotely.
      */
     public void synchronizeRemoteMetaData(MetaData data) {
-        dbProcessor.setRemoteMetaData(data.getAsStringMap());
+        dbmsProcessor.setRemoteMetaData(data.getAsStringMap());
     }
 
     /**
@@ -195,7 +195,7 @@ public class DBMSSynchronizer {
     public void applyMetaData() {
         for (BibEntry entry : bibDatabase.getEntries()) {
             BibDatabaseWriter.applySaveActions(entry, metaData);
-            dbProcessor.updateEntry(entry);
+            dbmsProcessor.updateEntry(entry);
         }
     }
 
@@ -210,9 +210,9 @@ public class DBMSSynchronizer {
     }
 
     public void openRemoteDatabase(Connection connection, DBMSType type, String name) {
-        this.dbType = type;
+        this.dbmsType = type;
         this.dbName = name;
-        this.dbProcessor = new DBMSProcessor(new DBMSHelper(connection), type);
+        this.dbmsProcessor = new DBMSProcessor(new DBMSHelper(connection), type);
         initializeDatabases();
     }
 
@@ -226,11 +226,11 @@ public class DBMSSynchronizer {
     }
 
     public DBMSType getDBType() {
-        return this.dbType;
+        return this.dbmsType;
     }
 
     public DBMSProcessor getDBProcessor() {
-        return dbProcessor;
+        return dbmsProcessor;
     }
 
     public void setMetaData(MetaData metaData) {
