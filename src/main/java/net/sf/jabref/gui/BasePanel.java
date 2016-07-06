@@ -133,6 +133,7 @@ import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.remote.DBMSSynchronizer;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -558,7 +559,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 .openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile()));
 
         actions.put(Actions.PULL_REMOTE_CHANGES, (BaseAction) () -> {
-            frame.getCurrentBasePanel().getBibDatabaseContext().getDBSynchronizer().synchronizeLocalDatabase();
+            DBMSSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBSynchronizer();
+            dbmsSynchronizer.synchronizeLocalDatabase();
+            dbmsSynchronizer.synchronizeLocalMetaData();
+            dbmsSynchronizer.applyMetaData();
         });
 
         actions.put(Actions.OPEN_URL, new OpenURLAction());
