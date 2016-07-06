@@ -5,10 +5,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -60,18 +58,7 @@ public class DBMSSynchronizerTest {
 
     @Parameters(name = "Test with {0} database system")
     public static Collection<DBMSType> getTestingDatabaseSystems() {
-        Set<DBMSType> dbTypes = new HashSet<>();
-        dbTypes.add(DBMSType.MYSQL);
-        dbTypes.add(DBMSType.POSTGRESQL);
-
-        try {
-            Class.forName("oracle.jdbc.driver.OracleDriver");
-            dbTypes.add(DBMSType.ORACLE);
-        } catch (ClassNotFoundException e) {
-            // In case that Oracle interface is not available do not perform tests for this system.
-            System.out.println("Oracle driver not available. Skipping tests for this system...");
-        }
-        return dbTypes;
+        return TestConnector.getAvailableDBMSTypes();
     }
 
     @Test

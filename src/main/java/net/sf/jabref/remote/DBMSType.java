@@ -45,4 +45,15 @@ public enum DBMSType {
         }
         return null;
     }
+
+    public String getDriverClassPath() {
+        if (type.equals(DBMSType.MYSQL.toString())) {
+            return "com.mysql.jdbc.Driver";
+        } else if (type.equals(DBMSType.ORACLE.toString())) {
+            return "oracle.jdbc.driver.OracleDriver";
+        } else if (type.equals(DBMSType.POSTGRESQL.toString())) {
+            return "org.postgresql.Driver";
+        }
+        return "";
+    }
 }
