@@ -83,7 +83,6 @@ public class DBMSSynchronizer {
             synchronizeLocalMetaData();
             BibDatabaseWriter.applySaveActions(event.getBibEntry(), metaData);
             dbmsProcessor.updateEntry(event.getBibEntry());
-            //synchronizeLocalDatabase(); // Pull remote changes for the case that there where some
         }
     }
 

@@ -16,7 +16,7 @@
 package net.sf.jabref.remote;
 
 /**
- * Enumerates all supported database systems (DBS) by JabRef.
+ * Enumerates all supported database systems (DBMS) by JabRef.
  */
 public enum DBMSType {
 
@@ -46,6 +46,9 @@ public enum DBMSType {
         return null;
     }
 
+    /**
+     * @return Java Class path for establishing JDBC connection.
+     */
     public String getDriverClassPath() {
         if (type.equals(DBMSType.MYSQL.toString())) {
             return "com.mysql.jdbc.Driver";

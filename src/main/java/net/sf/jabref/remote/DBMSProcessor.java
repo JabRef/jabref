@@ -317,7 +317,7 @@ public class DBMSProcessor {
     }
 
     /**
-     * Fetches all remotely present meta data.
+     * Fetches and returns all remotely present meta data.
      */
     public Map<String, String> getRemoteMetaData() {
         Map<String, String> data = new HashMap<>();

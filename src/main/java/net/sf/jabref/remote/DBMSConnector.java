@@ -110,6 +110,9 @@ public class DBMSConnector {
         return -1;
     }
 
+    /**
+     * Returns a Set of {@link DBMSType} which is supported by available drivers.
+     */
     public static Set<DBMSType> getAvailableDBMSTypes() {
         Set<DBMSType> dbmsTypes = new HashSet<>();
 
