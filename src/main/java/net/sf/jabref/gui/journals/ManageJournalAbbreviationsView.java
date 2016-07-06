@@ -169,6 +169,8 @@ public class ManageJournalAbbreviationsView extends FXMLView {
                 Localization.lang("Journal abbreviations"));
         journalAbbreviationsDialog.setResizable(true);
         journalAbbreviationsDialog.setDialogPane((DialogPane) this.getView());
+        ((Stage) this.getView().getScene().getWindow()).setMinHeight(400);
+        ((Stage) this.getView().getScene().getWindow()).setMinWidth(600);
         journalAbbreviationsDialog.showAndWait();
     }
 
