@@ -21,6 +21,8 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.sf.jabref.logic.l10n.Localization;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -117,7 +119,7 @@ public class DBMSConnector {
                 dbmsTypes.add(dbms);
             } catch (ClassNotFoundException e) {
                 // In case that the driver is not available do not perform tests for this system.
-                System.out.println(dbms + " driver not available. Skipping tests for this system...");
+                LOGGER.info(Localization.lang("%0 driver not available.", dbms.toString()));
             }
         }
         return dbmsTypes;
