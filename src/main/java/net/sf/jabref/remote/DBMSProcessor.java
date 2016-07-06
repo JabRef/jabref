@@ -180,8 +180,6 @@ public class DBMSProcessor {
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
         }
-
-        LOGGER.info("SQL INSERT: " + query);
     }
 
     /**
@@ -210,7 +208,6 @@ public class DBMSProcessor {
 
         query = query + " WHERE " + escape(ENTRY_REMOTE_ID) + " = " + bibEntry.getRemoteId();
         dbmsHelper.executeUpdate(query);
-        LOGGER.info("SQL UPDATE: " + query);
     }
 
     /**
@@ -221,7 +218,6 @@ public class DBMSProcessor {
         String query = "DELETE FROM " + escape(ENTRY) + " WHERE " + escape(ENTRY_REMOTE_ID) + " = "
                 + bibEntry.getRemoteId();
         dbmsHelper.executeUpdate(query);
-        LOGGER.info("SQL DELETE: " + query);
         normalizeEntryTable();
     }
 
