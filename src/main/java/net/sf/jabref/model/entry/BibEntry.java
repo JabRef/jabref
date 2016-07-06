@@ -22,8 +22,10 @@ import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -35,6 +37,7 @@ import java.util.TreeSet;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.event.FieldChangedEvent;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 
@@ -50,11 +53,15 @@ public class BibEntry implements Cloneable {
     public static final String KEY_FIELD = "bibtexkey";
     protected static final String ID_FIELD = "id";
     public static final String KEYWORDS_FIELD = "keywords";
-    public static final String DEFAULT_TYPE = "misc";
+    private static final String DEFAULT_TYPE = "misc";
 
     private String id;
     private String type;
     private Map<String, String> fields = new HashMap<>();
+    /*
+     * Map to store the words in every field
+     */
+    private Map<String, Set<String>> fieldsAsWords = new HashMap<>();
 
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit;
@@ -362,6 +369,7 @@ public class BibEntry implements Cloneable {
         changed = true;
 
         fields.put(fieldName, value);
+        fieldsAsWords.remove(fieldName);
 
         FieldChange change = new FieldChange(this, fieldName, oldValue, value);
         eventBus.post(new FieldChangedEvent(change));
@@ -389,6 +397,7 @@ public class BibEntry implements Cloneable {
         changed = true;
 
         fields.remove(fieldName);
+        fieldsAsWords.remove(fieldName);
         FieldChange change = new FieldChange(this, fieldName, oldValue.get(), null);
         eventBus.post(new FieldChangedEvent(change));
         return Optional.of(change);
@@ -619,5 +628,22 @@ public class BibEntry implements Cloneable {
     public BibEntry withField(String field, String value) {
         setField(field, value);
         return this;
+    }
+
+    public Set<String> getFieldAsWords(String field) {
+        String fieldName = toLowerCase(field);
+        Set<String> storedList = fieldsAsWords.get(fieldName);
+        if (storedList != null) {
+            return storedList;
+        } else {
+            String fieldValue = fields.get(fieldName);
+            if (fieldValue == null) {
+                return Collections.emptySet();
+            } else {
+                HashSet<String> words = new HashSet<>(StringUtil.getStringAsWords(fieldValue));
+                fieldsAsWords.put(fieldName, words);
+                return words;
+            }
+        }
     }
 }

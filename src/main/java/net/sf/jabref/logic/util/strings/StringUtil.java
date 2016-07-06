@@ -16,6 +16,7 @@
 package net.sf.jabref.logic.util.strings;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -653,4 +654,14 @@ public class StringUtil {
 
     }
 
+    /**
+     * Returns a list of words contained in the given text.
+     * Whitespace, comma and semicolon are considered as separator between words.
+     *
+     * @param text the input
+     * @return a list of words
+     */
+    public static List<String> getStringAsWords(String text) {
+        return Arrays.asList(text.split("[\\s,;]+"));
+    }
 }

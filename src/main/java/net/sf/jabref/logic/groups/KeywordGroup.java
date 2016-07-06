@@ -18,6 +18,7 @@ package net.sf.jabref.logic.groups;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
@@ -45,6 +46,7 @@ public class KeywordGroup extends AbstractGroup {
     private final boolean caseSensitive;
     private final boolean regExp;
     private Pattern pattern;
+    private List<String> searchWords;
 
     private static final Log LOGGER = LogFactory.getLog(KeywordGroup.class);
 
@@ -63,6 +65,7 @@ public class KeywordGroup extends AbstractGroup {
         if (this.regExp) {
             compilePattern();
         }
+        this.searchWords = StringUtil.getStringAsWords(searchExpression);
     }
 
     private void compilePattern() throws ParseException {
@@ -197,17 +200,41 @@ public class KeywordGroup extends AbstractGroup {
 
     @Override
     public boolean contains(BibEntry entry) {
-        if (!entry.hasField(searchField)) {
-            return false;
-        }
-        String content = entry.getField(searchField);
         if (regExp) {
+            String content = entry.getField(searchField);
+            if (content == null) {
+                return false;
+            }
             return pattern.matcher(content).find();
         }
-        if (caseSensitive) {
-            return KeywordGroup.containsWord(searchExpression, content);
+
+        Set<String> words = entry.getFieldAsWords(searchField);
+        if (words.isEmpty()) {
+            return false;
         }
-        return KeywordGroup.containsWord(searchExpression.toLowerCase(), content.toLowerCase());
+
+        if (caseSensitive) {
+            return words.containsAll(searchWords);
+        }
+        return containsCaseInsensitive(searchWords, words);
+    }
+
+    private boolean containsCaseInsensitive(List<String> searchText, Set<String> words) {
+        for (String searchWord : searchText) {
+            if (!containsCaseInsensitive(searchWord, words)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean containsCaseInsensitive(String text, Set<String> words) {
+        for (String word : words) {
+            if (word.equalsIgnoreCase(text)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
