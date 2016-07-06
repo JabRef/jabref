@@ -50,17 +50,17 @@ public class MetaData implements Iterable<String> {
 
     private static final Log LOGGER = LogFactory.getLog(MetaData.class);
     public static final String META_FLAG = "jabref-meta: ";
-    public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
+    private static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
 
-    public static final String SAVE_ACTIONS = "saveActions";
-    public static final String PREFIX_KEYPATTERN = "keypattern_";
-    public static final String KEYPATTERNDEFAULT = "keypatterndefault";
-    public static final String DATABASE_TYPE = "databaseType";
+    private static final String SAVE_ACTIONS = "saveActions";
+    private static final String PREFIX_KEYPATTERN = "keypattern_";
+    private static final String KEYPATTERNDEFAULT = "keypatterndefault";
+    private static final String DATABASE_TYPE = "databaseType";
 
     private static final String GROUPSTREE = "groupstree";
-    public static final String FILE_DIRECTORY = Globals.FILE_FIELD + Globals.DIR_SUFFIX;
+    private static final String FILE_DIRECTORY = Globals.FILE_FIELD + Globals.DIR_SUFFIX;
     public static final String SELECTOR_META_PREFIX = "selector_";
-    public static final String PROTECTED_FLAG_META = "protectedFlag";
+    private static final String PROTECTED_FLAG_META = "protectedFlag";
 
     private final Map<String, List<String>> metaData = new HashMap<>();
     private GroupTreeNode groupsRoot;
