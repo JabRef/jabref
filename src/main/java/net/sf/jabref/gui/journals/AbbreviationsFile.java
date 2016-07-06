@@ -9,12 +9,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Objects;
 
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-
-import javafx.beans.property.SimpleListProperty;
-import javafx.collections.FXCollections;
 
 public class AbbreviationsFile {
 

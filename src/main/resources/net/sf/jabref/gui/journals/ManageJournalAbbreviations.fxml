@@ -6,9 +6,12 @@
 <?import javafx.scene.control.DialogPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
 
-<DialogPane prefHeight="400.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sf.jabref.gui.journals.ManageJournalAbbreviationsView">
+<DialogPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sf.jabref.gui.journals.ManageJournalAbbreviationsView">
    <content>
       <BorderPane prefHeight="200.0" prefWidth="200.0">
          <center>
@@ -36,19 +39,23 @@
       </BorderPane>
    </content>
    <header>
-      <BorderPane>
-         <center>
-            <ComboBox fx:id="journalFilesBox" onAction="#fileChanged" styleClass="journal-lists" BorderPane.alignment="CENTER_LEFT" />
-         </center>
-         <right>
-            <ButtonBar prefHeight="40.0" styleClass="custom-buttons" BorderPane.alignment="CENTER">
-              <buttons>
-                  <Button fx:id="addNewJournalFileButton" mnemonicParsing="false" onAction="#addNewFile" text="%Create new list" />
-                <Button fx:id="addJournalFileButton" mnemonicParsing="false" onAction="#openFile" text="%Add existing file" />
-                  <Button fx:id="removeJournalAbbreviationsButton" mnemonicParsing="false" onAction="#removeList" text="%Remove list" />
-              </buttons>
-            </ButtonBar>
-         </right>
-      </BorderPane>
+      <HBox spacing="10.0" styleClass="custom-header">
+         <children>
+            <ComboBox fx:id="journalFilesBox" minWidth="100.0" onAction="#fileChanged" styleClass="journal-lists" HBox.hgrow="ALWAYS" />
+            <Pane HBox.hgrow="ALWAYS" />
+            <Button fx:id="addNewJournalFileButton" mnemonicParsing="false" onAction="#addNewFile">
+               <tooltip>
+                  <Tooltip autoHide="true" text="%Add existing file" />
+               </tooltip></Button>
+          <Button fx:id="addJournalFileButton" mnemonicParsing="false" onAction="#openFile">
+               <tooltip>
+                  <Tooltip autoHide="true" text="%Create new list" />
+               </tooltip></Button>
+            <Button fx:id="removeJournalAbbreviationsButton" mnemonicParsing="false" onAction="#removeList">
+               <tooltip>
+                  <Tooltip autoHide="true" text="%Remove list" />
+               </tooltip></Button>
+         </children>
+      </HBox>
    </header>
 </DialogPane>

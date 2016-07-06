@@ -7,6 +7,18 @@
 	-fx-table-cell-border-color: transparent;
 }
 
+.custom-header {
+    -fx-margin-top: 10px;
+    -fx-padding: 10px;
+    -fx-spacing: 5px;
+}
+
+.custom-header > .button {
+    -fx-font-family: 'Material Design Icons';
+    -fx-font-size: 16;
+    -fx-fill: #5e5f5e;
+}
+
 .table-row-cell:empty {
     visibility: hidden;
 }

@@ -17,16 +17,8 @@ package net.sf.jabref.gui.journals;
 
 import java.io.File;
 import java.util.Optional;
-
-import net.sf.jabref.JabRefException;
-import net.sf.jabref.gui.FXAlert;
-import net.sf.jabref.gui.FXDialogs;
-import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.logic.journals.Abbreviation;
-import net.sf.jabref.logic.l10n.Localization;
-
-import com.airhacks.afterburner.views.FXMLView;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
@@ -41,7 +33,15 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-import javafx.scene.control.Alert.AlertType;
+
+import net.sf.jabref.JabRefException;
+import net.sf.jabref.gui.FXAlert;
+import net.sf.jabref.gui.FXDialogs;
+import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.logic.journals.Abbreviation;
+import net.sf.jabref.logic.l10n.Localization;
+
+import com.airhacks.afterburner.views.FXMLView;
 
 public class ManageJournalAbbreviationsView extends FXMLView {
 
@@ -82,6 +82,16 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     private void initialize() {
         setUpTable();
         setBindings();
+        journalFilesBox.setPromptText(Localization.lang("No abbreviation files loaded"));
+        Text addJournalFileButtonGraphic = new Text(IconTheme.JabRefIcon.OPEN.getCode());
+        addJournalFileButtonGraphic.getStyleClass().add("icon");
+        addJournalFileButton.setGraphic(addJournalFileButtonGraphic);
+        Text addNewJournalFileButtonGraphic = new Text(IconTheme.JabRefIcon.NEW.getCode());
+        addNewJournalFileButtonGraphic.getStyleClass().add("icon");
+        addNewJournalFileButton.setGraphic(addNewJournalFileButtonGraphic);
+        Text removeJournalAbbreviationsButtonGraphic = new Text(IconTheme.JabRefIcon.CLOSE.getCode());
+        removeJournalAbbreviationsButtonGraphic.getStyleClass().add("icon");
+        removeJournalAbbreviationsButton.setGraphic(removeJournalAbbreviationsButtonGraphic);
         viewModel.createFileObjects();
         journalFilesBox.getSelectionModel().selectLast();
     }

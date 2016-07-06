@@ -19,10 +19,10 @@ import java.awt.event.ActionEvent;
 
 import javax.swing.Action;
 
+import javafx.application.Platform;
+
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.logic.l10n.Localization;
-
-import javafx.application.Platform;
 
 public class ManageJournalsAction extends MnemonicAwareAction {
 

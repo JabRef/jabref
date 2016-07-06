@@ -24,13 +24,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 
+import javafx.beans.property.SimpleListProperty;
+import javafx.collections.FXCollections;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefException;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.journals.Abbreviation;
 
-import javafx.beans.property.SimpleListProperty;
-import javafx.collections.FXCollections;
 import org.assertj.core.util.Files;
 import org.junit.AfterClass;
 import org.junit.Assert;
