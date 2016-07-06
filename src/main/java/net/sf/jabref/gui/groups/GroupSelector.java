@@ -495,7 +495,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             moveNodeRightPopupAction.setNode(node);
             // add/remove entries to/from group
             List<BibEntry> selection = frame.getCurrentBasePanel().getSelectedEntries();
-            if (selection.size() > 0) {
+            if (!selection.isEmpty()) {
                 if (node.canAddEntries(selection)) {
                     addToGroup.setNode(node);
                     addToGroup.setBasePanel(panel);
@@ -722,7 +722,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
     private void setGroups(GroupTreeNode groupsRoot) {
         this.groupsRoot = new GroupTreeNodeViewModel(groupsRoot);
-        this.groupsRoot.subscribeToDescendantChanged(source -> groupsTreeModel.nodeStructureChanged(source));
+        this.groupsRoot.subscribeToDescendantChanged(groupsTreeModel::nodeStructureChanged);
         groupsTreeModel = new DefaultTreeModel(this.groupsRoot);
         groupsTree.setModel(groupsTreeModel);
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_EXPAND_TREE)) {
