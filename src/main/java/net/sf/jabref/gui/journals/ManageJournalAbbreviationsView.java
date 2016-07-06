@@ -39,6 +39,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert.AlertType;
 
@@ -164,6 +165,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     @FXML
     private void addNewFile() {
         FileChooser chooser = new FileChooser();
+        chooser.getExtensionFilters().add(new ExtensionFilter("TXT files (*.txt)", "*.txt"));
         File file = chooser.showSaveDialog(null);
         if (file != null) {
             try {
@@ -178,6 +180,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     @FXML
     private void openFile() {
         FileChooser chooser = new FileChooser();
+        chooser.getExtensionFilters().add(new ExtensionFilter("TXT files (*.txt)", "*.txt"));
         File file = chooser.showOpenDialog(null);
         if (file != null) {
             try {
@@ -201,10 +204,11 @@ public class ManageJournalAbbreviationsView extends FXMLView {
 
     @FXML
     private void addAbbreviation() {
-        GridPane content = createDialogContent();
+        GridPane content = createDialogContent("", "");
 
         DialogPane pane = new DialogPane();
         pane.setContent(content);
+        pane.setMinWidth(300);
         Optional<ButtonType> result = FXDialogs.showCustomDialogAndWait(
                 Localization.lang("Create journal abbreviation"), pane, ButtonType.OK, ButtonType.CANCEL);
         result.ifPresent((response -> {
@@ -222,10 +226,12 @@ public class ManageJournalAbbreviationsView extends FXMLView {
 
     @FXML
     private void editAbbreviation() {
-        GridPane content = createDialogContent();
+        Abbreviation currentAbbreviation = viewModel.currentAbbreviationProperty().get();
+        GridPane content = createDialogContent(currentAbbreviation.getName(), currentAbbreviation.getAbbreviation());
 
         DialogPane pane = new DialogPane();
         pane.setContent(content);
+        pane.setMinWidth(300);
         Optional<ButtonType> result = FXDialogs.showCustomDialogAndWait(Localization.lang("Edit journal abbreviation"),
                 pane, ButtonType.OK, ButtonType.CANCEL);
         result.ifPresent((response -> {
@@ -241,13 +247,11 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         }));
     }
 
-    private GridPane createDialogContent() {
-        Abbreviation abbreviation = viewModel.currentAbbreviationProperty().get();
-
-        TextField abbreviationField = new TextField(abbreviation.getAbbreviation());
+    private GridPane createDialogContent(String name, String abbreviation) {
+        TextField abbreviationField = new TextField(abbreviation);
         abbreviationField.setPromptText(Localization.lang("Abbreviation"));
 
-        TextField nameField = new TextField(abbreviation.getName());
+        TextField nameField = new TextField(name);
         nameField.setPromptText(Localization.lang("Name"));
         nameField.requestFocus();
 

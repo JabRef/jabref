@@ -16,9 +16,12 @@
               <columns>
                 <TableColumn fx:id="journalTableNameColumn" prefWidth="200.0" text="%Full journal name" />
                 <TableColumn fx:id="journalTableAbbreviationColumn" prefWidth="200.0" text="%Abbreviation name" />
-                  <TableColumn fx:id="journalTableEditColumn" prefWidth="40.0" />
-                  <TableColumn fx:id="journalTableDeleteColumn" prefWidth="40.0" />
+                  <TableColumn fx:id="journalTableEditColumn" maxWidth="40" minWidth="40.0" prefWidth="40.0" />
+                  <TableColumn fx:id="journalTableDeleteColumn" maxWidth="40" minWidth="40.0" prefWidth="40.0" />
               </columns>
+               <columnResizePolicy>
+                  <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+               </columnResizePolicy>
             </TableView>
          </center>
          <bottom>
