@@ -4,14 +4,14 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Objects;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-
-import org.apache.commons.lang.builder.HashCodeBuilder;
 
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
@@ -24,7 +24,7 @@ public class AbbreviationsFile {
 
 
     public AbbreviationsFile(String filePath) {
-        path = FileSystems.getDefault().getPath(filePath.replaceAll("\\\\", "/"));
+        path = Paths.get(filePath);
     }
 
     public void readAbbreviations() throws FileNotFoundException {
@@ -66,13 +66,13 @@ public class AbbreviationsFile {
 
     @Override
     public int hashCode() {
-        return new HashCodeBuilder().append(path).toHashCode();
+        return Objects.hash(path);
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof AbbreviationsFile) {
-            return this.path.equals(((AbbreviationsFile) obj).getPath());
+            return Objects.equals(this.path, ((AbbreviationsFile) obj).getPath());
         } else {
             return false;
         }
