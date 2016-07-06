@@ -488,6 +488,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final List<Object> severalDatabasesOnlyActions = new LinkedList<>();
     private final List<Object> openAndSavedDatabasesOnlyActions = new LinkedList<>();
     private final List<Object> remoteDatabasesOnlyActions = new LinkedList<>();
+    private final List<Object> noRemoteDatabasesActions = new LinkedList<>();
 
 
     private class EditModeAction extends AbstractAction {
@@ -1521,6 +1522,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         openAndSavedDatabasesOnlyActions.addAll(Collections.singletonList(openConsole));
         remoteDatabasesOnlyActions.addAll(Collections.singletonList(pullRemoteChanges));
+        noRemoteDatabasesActions.addAll(Arrays.asList(save, saveAll, addToGroup, removeFromGroup, toggleGroups, moveToGroup,
+                        toggleHighlightAny, toggleHighlightAll, toggleHighlightDisable));
 
         tabbedPane.addChangeListener(event -> updateEnabledState());
 
@@ -1569,8 +1572,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 boolean saved = current.getBibDatabaseContext().getDatabaseFile() != null;
                 setEnabled(openAndSavedDatabasesOnlyActions, saved);
             }
-            setEnabled(remoteDatabasesOnlyActions,
-                    current.getBibDatabaseContext().getLocation() == DatabaseLocation.REMOTE);
+            boolean isRemote = current.getBibDatabaseContext().getLocation() == DatabaseLocation.REMOTE;
+            setEnabled(remoteDatabasesOnlyActions, isRemote);
+            setEnabled(noRemoteDatabasesActions, !isRemote);
         }
     }
 

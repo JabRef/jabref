@@ -39,6 +39,7 @@ import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.DatabaseLocation;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.specialfields.Printed;
@@ -254,6 +255,12 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             groupRemove.setEnabled(true);
             groupMoveTo.setEnabled(true);
         }
+
+        boolean isLocal = panel.getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL;
+
+        groupAdd.setEnabled(isLocal);
+        groupRemove.setEnabled(isLocal);
+        groupMoveTo.setEnabled(isLocal);
     }
 
 
