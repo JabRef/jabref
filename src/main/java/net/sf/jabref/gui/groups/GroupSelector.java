@@ -722,7 +722,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
     private void setGroups(GroupTreeNode groupsRoot) {
         this.groupsRoot = new GroupTreeNodeViewModel(groupsRoot);
-        this.groupsRoot.subscribeToDescendantChanged(groupsTreeModel::nodeStructureChanged);
+        // refactor notice: groupsTreeModel::nodeStructureChanged cannot be used, because an NPE will be risen if no groupsTreeModel exists
+        this.groupsRoot.subscribeToDescendantChanged(source -> groupsTreeModel.nodeStructureChanged(source));
         groupsTreeModel = new DefaultTreeModel(this.groupsRoot);
         groupsTree.setModel(groupsTreeModel);
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_EXPAND_TREE)) {
