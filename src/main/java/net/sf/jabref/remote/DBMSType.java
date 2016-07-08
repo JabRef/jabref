@@ -49,7 +49,7 @@ public enum DBMSType {
     /**
      * @return Java Class path for establishing JDBC connection.
      */
-    public String getDriverClassPath() {
+    public String getDriverClassPath() throws Error {
         if (type.equals(DBMSType.MYSQL.toString())) {
             return "com.mysql.jdbc.Driver";
         } else if (type.equals(DBMSType.ORACLE.toString())) {
@@ -57,6 +57,6 @@ public enum DBMSType {
         } else if (type.equals(DBMSType.POSTGRESQL.toString())) {
             return "org.postgresql.Driver";
         }
-        return "";
+        throw new Error();
     }
 }
