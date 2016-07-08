@@ -189,10 +189,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // AutoCompleter used in the search bar
     private AutoCompleter<String> searchAutoCompleter;
     // The undo manager.
-    private final CountingUndoManager undoManager = new CountingUndoManager(this);
     private final UndoAction undoAction = new UndoAction();
-
     private final RedoAction redoAction = new RedoAction();
+    private final CountingUndoManager undoManager = new CountingUndoManager(this);
+
     private final List<BibEntry> previousEntries = new ArrayList<>();
 
     private final List<BibEntry> nextEntries = new ArrayList<>();

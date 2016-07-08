@@ -2277,4 +2277,20 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     public PushToApplications getPushApplications() {
         return pushApplications;
     }
+
+    public void setUndoText(String undoPresentationName) {
+        undo.putValue(Action.SHORT_DESCRIPTION, undoPresentationName);
+    }
+
+    public void setRedoText(String undoPresentationName) {
+        redo.putValue(Action.SHORT_DESCRIPTION, undoPresentationName);
+    }
+
+    public void enableUndo(boolean value) {
+        undo.setEnabled(value);
+    }
+
+    public void enableRedo(boolean value) {
+        redo.setEnabled(value);
+    }
 }

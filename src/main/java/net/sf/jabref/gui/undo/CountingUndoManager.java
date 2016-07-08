@@ -15,11 +15,14 @@
 */
 package net.sf.jabref.gui.undo;
 
+import java.util.Objects;
+
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.logic.l10n.Localization;
 
 public class CountingUndoManager extends UndoManager {
 
@@ -30,19 +33,23 @@ public class CountingUndoManager extends UndoManager {
 
     public CountingUndoManager(BasePanel basePanel) {
         super();
-        panel = basePanel;
+        panel = Objects.requireNonNull(basePanel);
+        updateTexts();
     }
 
     @Override
     public synchronized boolean addEdit(UndoableEdit edit) {
         current++;
-        return super.addEdit(edit);
+        boolean returnvalue = super.addEdit(edit);
+        updateTexts();
+        return returnvalue;
     }
 
     @Override
     public synchronized void undo() throws CannotUndoException {
         super.undo();
         current--;
+        updateTexts();
         panel.updateEntryEditorIfShowing();
     }
 
@@ -50,6 +57,7 @@ public class CountingUndoManager extends UndoManager {
     public synchronized void redo() throws CannotUndoException {
         super.redo();
         current++;
+        updateTexts();
         panel.updateEntryEditorIfShowing();
     }
 
@@ -59,5 +67,25 @@ public class CountingUndoManager extends UndoManager {
 
     public synchronized boolean hasChanged() {
         return (current != unchangedPoint);
+    }
+
+    private void updateTexts() {
+        if (panel.frame() != null) {
+            if (super.canUndo()) {
+                panel.frame().setUndoText(super.editToBeUndone().getUndoPresentationName());
+                panel.frame().enableUndo(true);
+            } else {
+                panel.frame().setUndoText(Localization.lang("Undo"));
+                panel.frame().enableUndo(false);
+            }
+
+            if (super.canRedo()) {
+                panel.frame().setRedoText(super.editToBeRedone().getRedoPresentationName());
+                panel.frame().enableRedo(true);
+            } else {
+                panel.frame().setRedoText(Localization.lang("Redo"));
+                panel.frame().enableRedo(false);
+            }
+        }
     }
 }
