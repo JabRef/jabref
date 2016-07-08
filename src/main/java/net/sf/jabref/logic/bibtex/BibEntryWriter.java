@@ -58,24 +58,10 @@ public class BibEntryWriter {
     }
 
     private void writeUserComments(BibEntry entry, Writer out) throws IOException {
-        String parsedSerialization = entry.getParsedSerialization();
+        String userComments = entry.getUserComments();
 
-        if(parsedSerialization != null) {
-
-            try {
-                // get the text before the entry
-                String prolog = entry.getParsedSerialization().substring(0, entry.getParsedSerialization().indexOf('@'));
-
-                // delete trailing whitespaces (between entry and text)
-                prolog = prolog.replaceFirst("\\s+$", "");
-
-                // if there is any non whitespace text, write it
-                if (prolog.length() > 0) {
-                    out.write(prolog + Globals.NEWLINE);
-                }
-            } catch(StringIndexOutOfBoundsException ignore) {
-                // if this occurs a broken parsed serialization has been set, so just do nothing
-            }
+        if(!userComments.isEmpty()) {
+            out.write(userComments + Globals.NEWLINE);
         }
     }
 
