@@ -357,23 +357,8 @@ public class BibDatabaseWriter {
     }
 
     private void writeUserCommentsForString(BibtexString string, Writer out) throws IOException {
-        String parsedSerialization = string.getParsedSerialization();
-
-        if(parsedSerialization != null) {
-
-            try {
-                // get the text before the string
-                String prolog = string.getParsedSerialization().substring(0, string.getParsedSerialization().indexOf('@'));
-
-                // delete trailing whitespaces (between string and text)
-                prolog = prolog.replaceFirst("\\s+$", "");
-                // if there is any non whitespace text, write it with proper line separation
-                if (prolog.length() > 0) {
-                    out.write(prolog + Globals.NEWLINE);
-                }
-            } catch(StringIndexOutOfBoundsException ignore) {
-                // if this occurs a broken parsed serialization has been set, so just do nothing
-            }
+        if(!string.getUserComments().isEmpty()) {
+            out.write(string.getUserComments() + Globals.NEWLINE);
         }
     }
 
