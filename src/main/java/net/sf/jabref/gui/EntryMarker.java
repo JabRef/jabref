@@ -196,8 +196,6 @@ public class EntryMarker {
     }
 
     public static boolean shouldMarkEntries() {
-        return (Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES)
-                && (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)
-                        || Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP)));
+        return Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES);
     }
 }
