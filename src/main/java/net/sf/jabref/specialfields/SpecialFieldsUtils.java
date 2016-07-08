@@ -85,14 +85,14 @@ public class SpecialFieldsUtils {
         UpdateField.updateField(be, e.getFieldName(), value, nullFieldIfValueIsTheSame)
                 .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
         // we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
-        SpecialFieldsUtils.exportFieldToKeywords(e, be.getFieldOptional(e.getFieldName()), be, ce);
+        SpecialFieldsUtils.exportFieldToKeywords(e, be.getFieldOptional(e.getFieldName()).orElse(null), be, ce);
     }
 
     private static void exportFieldToKeywords(SpecialField e, BibEntry be, NamedCompound ce) {
-        SpecialFieldsUtils.exportFieldToKeywords(e, be.getFieldOptional(e.getFieldName()), be, ce);
+        SpecialFieldsUtils.exportFieldToKeywords(e, be.getFieldOptional(e.getFieldName()).orElse(null), be, ce);
     }
 
-    private static void exportFieldToKeywords(SpecialField e, Optional<String> newValue, BibEntry entry,
+    private static void exportFieldToKeywords(SpecialField e, String newValue, BibEntry entry,
             NamedCompound ce) {
         if (!SpecialFieldsUtils.keywordSyncEnabled()) {
             return;
@@ -111,18 +111,18 @@ public class SpecialFieldsUtils {
             }
         }
 
-        if (newValue.isPresent()) {
+        if (newValue != null) {
             if (foundPos == -1) {
-                keywordList.add(newValue.get());
+                keywordList.add(newValue);
             } else {
-                keywordList.add(foundPos, newValue.get());
+                keywordList.add(foundPos, newValue);
             }
         }
 
 
         Optional<FieldChange> change = entry.putKeywords(keywordList);
-        if ((ce != null) && change.isPresent()) {
-            ce.addEdit(new UndoableFieldChange(change.get()));
+        if (ce != null){
+            change.ifPresent(changeValue -> ce.addEdit(new UndoableFieldChange(changeValue)));
         }
     }
 
