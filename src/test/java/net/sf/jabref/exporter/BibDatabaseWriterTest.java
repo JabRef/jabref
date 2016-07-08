@@ -329,7 +329,7 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void roundtripWithUserCommentBeforeString() throws IOException {
-        Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithUserCommentBeforeString.bib");
+        Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding));
 
@@ -345,12 +345,16 @@ public class BibDatabaseWriterTest {
 
     @Test
     public void roundtripWithUserCommentBeforeStringAndChange() throws IOException {
-        Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithUserCommentBeforeString.bib");
+        Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding));
 
         BibtexString string = result.getDatabase().getStringValues().iterator().next();
-        string.setContent("my first string");
+        if(string.getContent().isEmpty()) {
+            // do nothing
+        } else {
+            string.setContent("my first string");
+        }
 
         SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
