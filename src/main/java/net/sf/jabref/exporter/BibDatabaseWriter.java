@@ -357,8 +357,10 @@ public class BibDatabaseWriter {
     }
 
     private void writeUserCommentsForString(BibtexString string, Writer out) throws IOException {
-        if(!string.getUserComments().isEmpty()) {
-            out.write(string.getUserComments() + Globals.NEWLINE);
+        String userComments = string.getUserComments();
+
+        if(!userComments.isEmpty()) {
+            out.write(userComments + Globals.NEWLINE);
         }
     }
 
