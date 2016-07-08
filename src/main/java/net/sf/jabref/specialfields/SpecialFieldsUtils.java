@@ -163,8 +163,7 @@ public class SpecialFieldsUtils {
         if (!be.hasField(KEYWORDS_FIELD)) {
             return;
         }
-        Set<String> keywordList = net.sf.jabref.model.entry.EntryUtil
-                .getSeparatedKeywords(be.getField(KEYWORDS_FIELD));
+        Set<String> keywordList = net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(be);
         SpecialFieldsUtils.importKeywordsForField(keywordList, Priority.getInstance(), be, ce);
         SpecialFieldsUtils.importKeywordsForField(keywordList, Rank.getInstance(), be, ce);
         SpecialFieldsUtils.importKeywordsForField(keywordList, Quality.getInstance(), be, ce);

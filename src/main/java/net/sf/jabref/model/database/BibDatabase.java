@@ -353,15 +353,6 @@ public class BibDatabase {
     }
 
     /**
-     * Resolves any references to strings contained in this field content,
-     * if possible.
-     */
-    public String resolveForStrings(Optional<String> content) {
-        Objects.requireNonNull(content, "Content for resolveForStrings must not be null.");
-        return resolveContent(content.orElse(null), new HashSet<>());
-    }
-
-    /**
      * Take the given collection of BibEntry and resolve any string
      * references.
      *
@@ -405,7 +396,8 @@ public class BibDatabase {
         }
 
         for (String field : resultingEntry.getFieldNames()) {
-            resultingEntry.setField(field, this.resolveForStrings(resultingEntry.getFieldOptional(field)));
+            resultingEntry.getFieldOptional(field)
+                    .ifPresent(fieldValue -> resultingEntry.setField(field, this.resolveForStrings(fieldValue)));
         }
         return resultingEntry;
     }

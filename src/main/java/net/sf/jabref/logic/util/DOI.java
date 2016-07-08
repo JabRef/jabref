@@ -107,23 +107,6 @@ public class DOI {
     }
 
     /**
-     * Creates an Optional<DOI> from various schemes including URL, URN, and plain DOIs.
-     *
-     * Useful for suppressing the <c>IllegalArgumentException</c> of the Constructor
-     * and checking for Optional.isPresent() instead.
-     *
-     * @param doi the DOI string
-     * @return an Optional containing the DOI or an empty Optional
-     */
-    public static Optional<DOI> build(Optional<String> doi) {
-        if (doi.isPresent()) {
-            return DOI.build(doi.get());
-        } else {
-            return Optional.empty();
-        }
-    }
-
-    /**
      * Tries to find a DOI inside the given text.
      *
      * @param text the Text which might contain a DOI

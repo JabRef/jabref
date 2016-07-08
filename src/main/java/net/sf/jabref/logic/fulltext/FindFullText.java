@@ -44,7 +44,7 @@ public class FindFullText {
         BibEntry clonedEntry = (BibEntry) entry.clone();
         Optional<String> doi = clonedEntry.getFieldOptional("doi");
 
-        if (!doi.isPresent() || !DOI.build(doi).isPresent()) {
+        if (!doi.isPresent() || !DOI.build(doi.get()).isPresent()) {
             CrossRef.findDOI(clonedEntry).ifPresent(e -> clonedEntry.setField("doi", e.getDOI()));
         }
 

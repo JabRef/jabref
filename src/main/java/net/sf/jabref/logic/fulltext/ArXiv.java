@@ -40,7 +40,7 @@ public class ArXiv implements FullTextFinder {
         Optional<URL> pdfLink = Optional.empty();
 
         // 1. DOI
-        Optional<DOI> doi = DOI.build(entry.getFieldOptional("doi"));
+        Optional<DOI> doi = entry.getFieldOptional("doi").flatMap(DOI::build);
         // 2. Eprint
         Optional<String> eprint = entry.getFieldOptional("eprint");
 

@@ -77,11 +77,8 @@ public class SynchronizeFileField extends AbstractWorker {
 
     private int entriesChangedCount;
 
-    private final Object[] brokenLinkOptions = {
-            Localization.lang("Ignore"),
-            Localization.lang("Assign new file"),
-            Localization.lang("Remove link"),
-            Localization.lang("Remove all broken links"),
+    private final Object[] brokenLinkOptions = {Localization.lang("Ignore"), Localization.lang("Assign new file"),
+            Localization.lang("Remove link"), Localization.lang("Remove all broken links"),
             Localization.lang("Quit synchronization")};
 
     private boolean goOn = true;
@@ -301,14 +298,10 @@ public class SynchronizeFileField extends AbstractWorker {
         private final JButton cancel = new JButton(Localization.lang("Cancel"));
         private boolean canceled = true;
         private final BibDatabaseContext databaseContext;
-        private final JRadioButton autoSetUnset = new JRadioButton(
-                Localization.lang("Automatically set file links") + ". "
-                        + Localization.lang("Do not overwrite existing links."),
-                true);
-        private final JRadioButton autoSetAll = new JRadioButton(
-                Localization.lang("Automatically set file links") + ". "
-                        + Localization.lang("Allow overwriting existing links."),
-                false);
+        private final JRadioButton autoSetUnset = new JRadioButton(Localization.lang("Automatically set file links")
+                + ". " + Localization.lang("Do not overwrite existing links."), true);
+        private final JRadioButton autoSetAll = new JRadioButton(Localization.lang("Automatically set file links")
+                + ". " + Localization.lang("Allow overwriting existing links."), false);
         private final JRadioButton autoSetNone = new JRadioButton(Localization.lang("Do not automatically set"), false);
         private final JCheckBox checkLinks = new JCheckBox(Localization.lang("Check existing file links"), true);
 
@@ -341,11 +334,13 @@ public class SynchronizeFileField extends AbstractWorker {
             bg.add(autoSetNone);
             bg.add(autoSetAll);
 
-            FormLayout layout = new FormLayout("fill:pref", "pref, 2dlu, pref, 2dlu, pref, pref, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
+            FormLayout layout = new FormLayout("fill:pref",
+                    "pref, 2dlu, pref, 2dlu, pref, pref, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
             FormBuilder builder = FormBuilder.create().layout(layout);
-            JLabel description = new JLabel("<HTML>" + Localization.lang(
-                    "Attempt to automatically set file links for your entries. Automatically setting works if "
-                            + "a file in your file directory<BR>or a subdirectory is named identically to an entry's BibTeX key, plus extension.")
+            JLabel description = new JLabel("<HTML>"
+                    + Localization
+                            .lang("Attempt to automatically set file links for your entries. Automatically setting works if "
+                                    + "a file in your file directory<BR>or a subdirectory is named identically to an entry's BibTeX key, plus extension.")
                     + "</HTML>");
 
             builder.addSeparator(Localization.lang("Automatically set file links")).xy(1, 1);

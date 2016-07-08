@@ -48,19 +48,16 @@ public class IEEE implements FullTextFinder {
 
         // If not, try DOI
         if (stampString.isEmpty()) {
-            Optional<String> doiString = entry.getFieldOptional("doi");
-            if (doiString.isPresent()) {
-                Optional<DOI> doi = DOI.build(doiString.get());
-                if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI) && doi.get().getURI().isPresent()) {
-                    // Download the HTML page from IEEE
-                    String resolvedDOIPage = new URLDownload(doi.get().getURI().get().toURL())
-                            .downloadToString(StandardCharsets.UTF_8);
-                    // Try to find the link
-                    Matcher matcher = STAMP_PATTERN.matcher(resolvedDOIPage);
-                    if (matcher.find()) {
-                        // Found it
-                        stampString = matcher.group(1);
-                    }
+            Optional<DOI> doi = entry.getFieldOptional("doi").flatMap(DOI::build);
+            if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI) && doi.get().getURI().isPresent()) {
+                // Download the HTML page from IEEE
+                String resolvedDOIPage = new URLDownload(doi.get().getURI().get().toURL())
+                        .downloadToString(StandardCharsets.UTF_8);
+                // Try to find the link
+                Matcher matcher = STAMP_PATTERN.matcher(resolvedDOIPage);
+                if (matcher.find()) {
+                    // Found it
+                    stampString = matcher.group(1);
                 }
             }
         }
