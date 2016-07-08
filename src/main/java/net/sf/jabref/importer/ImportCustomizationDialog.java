@@ -105,7 +105,7 @@ public class ImportCustomizationDialog extends JDialog {
             String chosenFileStr = null;
             if (importer.getBasePath() != null) {
                 chosenFileStr = FileDialogs.getNewFile(frame, importer.getFileFromBasePath(),
-                        Collections.singletonList(".class"), Localization.lang("Select new ImportFormat Subclass"),
+                        Collections.singletonList(".class"), Localization.lang("Select new ImportFormat subclass"),
                         JFileChooser.CUSTOM_DIALOG, false);
             }
             if (chosenFileStr != null) {

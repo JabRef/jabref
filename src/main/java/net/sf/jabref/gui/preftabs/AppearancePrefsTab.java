@@ -56,7 +56,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     private boolean oldOverrideFontSize;
     private final JTextField fontSize;
     private final JTextField rowPadding;
-    // Look & Feel
+    // look and feel
     private final JComboBox<String> classNamesLAF;
     private String currentLAF = "";
     private boolean useDefaultLAF;
