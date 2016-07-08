@@ -12,7 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
-- JabRef does no longer delete user comments outside of BibTeX entries [#1026]
+- [#1026](https://github.com/JabRef/jabref/issues/1026) JabRef does no longer delete user comments outside of BibTeX entries and strings
 - [#1485](https://github.com/JabRef/jabref/issues/1485) Biblatex field shorttitle is now exported/imported as standard field ShortTitle to Word bibliography
 
 ### Fixed
