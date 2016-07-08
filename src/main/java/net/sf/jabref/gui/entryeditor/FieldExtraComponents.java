@@ -276,7 +276,7 @@ public class FieldExtraComponents {
                 if (type == BibDatabaseMode.BIBLATEX) {
                     fieldEditor.setText(String.valueOf(monthnumber));
                 } else {
-                    fieldEditor.setText("#" + (MonthUtil.getMonthByNumber(monthnumber).bibtexFormat) + "#");
+                    fieldEditor.setText(MonthUtil.getMonthByNumber(monthnumber).bibtexFormat);
                 }
             } else {
                 fieldEditor.setText("");
