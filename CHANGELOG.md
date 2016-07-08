@@ -17,6 +17,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#1431](https://github.com/JabRef/jabref/issues/1431): Import dialog shows file extensions and filters the view
 - Updated German translation
 - When resolving duplicate BibTeX-keys there is now an "Ignore" button. "Cancel" and close key now quits the resolving.
+- The [online forum](http://discourse.jabref.org/) is now directly accessible via the "Help" menu
 
 ### Fixed
 - Fixed [#405](https://github.com/JabRef/jabref/issues/405): Added more {} around capital letters in Unicode/HTML to LaTeX conversion to preserve them

@@ -170,6 +170,7 @@ public class IconTheme {
         CASE_SENSITIVE("\uf02c"), /* css: mdi-alphabetical */
         REG_EX("\uf451"), /*css: mdi-regex */
         CONSOLE("\uf18d"), /*css: console */
+        FORUM("\uF28C"), /* css: forum */
         // STILL MISSING:
         GROUP_REGULAR("\uF4E6", Color.RED);
 
