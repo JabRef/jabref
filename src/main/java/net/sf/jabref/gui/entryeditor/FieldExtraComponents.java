@@ -520,6 +520,7 @@ public class FieldExtraComponents {
         };
 
         crossref.getDocument().addDocumentListener(documentListener);
+
         return Optional.of(button);
 
     }

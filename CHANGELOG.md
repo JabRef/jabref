@@ -18,7 +18,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Updated German translation
 - When resolving duplicate BibTeX-keys there is now an "Ignore" button. "Cancel" and close key now quits the resolving.
 - The [online forum](http://discourse.jabref.org/) is now directly accessible via the "Help" menu
-- Implemented [#1338](https://github.com/JabRef/jabref/issues/1338) partly: Added a button in the entry editor to select the crossref parent entry.
+- Implemented [#1338](https://github.com/JabRef/jabref/issues/1338): clicking on a crossref in the main table selects the parent entry and added a button in the entry editor to select the parent entry.
 
 ### Fixed
 - Fixed [#405](https://github.com/JabRef/jabref/issues/405): Added more {} around capital letters in Unicode/HTML to LaTeX conversion to preserve them
