@@ -120,6 +120,20 @@ public class BibDatabase {
         return internalIDs.contains(id);
     }
 
+    /**
+     * Returns whether an entry with the given bibtex key exists.
+     */
+    public synchronized boolean containsEntryWithKey(String key) {
+        int keyHash = key.hashCode(); // key hash for better performance
+
+        for (BibEntry entry : entries) {
+            if ((entry != null) && (entry.getCiteKey() != null) && (keyHash == entry.getCiteKey().hashCode())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public List<BibEntry> getEntries() {
         return Collections.unmodifiableList(entries);
     }

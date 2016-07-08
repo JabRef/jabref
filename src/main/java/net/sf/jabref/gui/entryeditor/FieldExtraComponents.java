@@ -474,4 +474,54 @@ public class FieldExtraComponents {
         return Optional.of(gender);
 
     }
+
+    /**
+     * Return a button which sets the owner if the field for fields with EXTRA_SET_OWNER
+     * @param fieldEditor
+     * @param storeFieldAction
+     * @return
+     */
+
+    public static Optional<JComponent> getCrossrefExtraComponent(FieldEditor fieldEditor,
+            BasePanel panel) {
+        JButton button = new JButton(Localization.lang("Select"));
+        JTextComponent crossref = (JTextComponent) fieldEditor;
+
+        button.addActionListener(actionEvent -> {
+            panel.highlightEntry(panel.getDatabase().getEntryByKey(crossref.getText()));
+        });
+
+        // enable/disable button
+
+        DocumentListener documentListener = new DocumentListener() {
+
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+                checkUrl();
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                checkUrl();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent documentEvent) {
+                checkUrl();
+            }
+
+            private void checkUrl() {
+                if (panel.getDatabase().containsEntryWithKey(crossref.getText())) {
+                    button.setEnabled(true);
+                } else {
+                    button.setEnabled(false);
+                }
+            }
+        };
+
+        crossref.getDocument().addDocumentListener(documentListener);
+        return Optional.of(button);
+
+    }
+
 }
