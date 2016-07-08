@@ -74,8 +74,8 @@ public class Util {
     /**
      * Warns the user of undesired side effects of an explicit assignment/removal of entries to/from this group.
      * Currently there are four types of groups: AllEntriesGroup, SearchGroup - do not support explicit assignment.
-     * ExplicitGroup - never modifies entries. KeywordGroup - only this modifies entries upon assignment/removal.
-     * Modifications are acceptable unless they affect a standard field (such as "author") besides the "keywords" field.
+     * ExplicitGroup and KeywordGroup - this modifies entries upon assignment/removal.
+     * Modifications are acceptable unless they affect a standard field (such as "author") besides the "keywords" or "groups' field.
      *
      * @param parent The Component used as a parent when displaying a confirmation dialog.
      * @return true if the assignment has no undesired side effects, or the user chose to perform it anyway. false
@@ -87,7 +87,7 @@ public class Util {
             if (group instanceof KeywordGroup) {
                 KeywordGroup kg = (KeywordGroup) group;
                 String field = kg.getSearchField().toLowerCase();
-                if ("keywords".equals(field)) {
+                if ("keywords".equals(field) || "groups".equals(field)) {
                     continue; // this is not undesired
                 }
                 int len = InternalBibtexFields.numberOfPublicFields();

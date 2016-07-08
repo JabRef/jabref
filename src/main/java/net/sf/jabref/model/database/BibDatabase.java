@@ -347,9 +347,7 @@ public class BibDatabase {
      * if possible.
      */
     public String resolveForStrings(String content) {
-        if (content == null) {
-            throw new IllegalArgumentException("Content for resolveForStrings must not be null.");
-        }
+        Objects.requireNonNull(content, "Content for resolveForStrings must not be null.");
         return resolveContent(content, new HashSet<>());
     }
 
@@ -364,9 +362,7 @@ public class BibDatabase {
      * @return a list of bibtexentries, with all strings resolved. It is dependent on the value of inPlace whether copies are made or the given BibtexEntries are modified.
      */
     public List<BibEntry> resolveForStrings(Collection<BibEntry> entries, boolean inPlace) {
-        if (entries == null) {
-            throw new IllegalArgumentException("entries must not be null");
-        }
+        Objects.requireNonNull(entries, "entries must not be null.");
 
         List<BibEntry> results = new ArrayList<>(entries.size());
 

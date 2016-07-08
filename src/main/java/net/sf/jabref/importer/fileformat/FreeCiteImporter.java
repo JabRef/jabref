@@ -1,4 +1,4 @@
-/*  Copyright (C) 2012, 2015 JabRef contributors.
+/*  Copyright (C) 2012, 2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -25,6 +25,7 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
@@ -234,12 +235,12 @@ public class FreeCiteImporter extends ImportFormat {
 
     @Override
     public List<String> getExtensions() {
-        return null;
+        return Arrays.asList(".txt",".xml");
     }
 
     @Override
     public String getDescription() {
-        return null;
+        return "This importer parses text format citations using the online API of FreeCite.";
     }
 
 }

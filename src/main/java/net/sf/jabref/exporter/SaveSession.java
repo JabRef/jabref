@@ -24,10 +24,10 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.FieldChange;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -17,7 +17,6 @@ package net.sf.jabref.gui.help;
 
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
 
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -25,7 +24,6 @@ import javax.swing.JButton;
 import javax.swing.KeyStroke;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
@@ -83,12 +81,7 @@ public class HelpAction extends MnemonicAwareAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        try {
-            JabRefDesktop.openBrowser("http://help.jabref.org/" + Globals.prefs.get(JabRefPreferences.LANGUAGE) + "/"
-                    + helpPage.getPageName());
-        } catch (IOException ex) {
-            LOGGER.warn("Could not open browser", ex);
-            JabRefGUI.getMainFrame().getCurrentBasePanel().output(Localization.lang("Could not open browser."));
-        }
+        String url = "http://help.jabref.org/" + Globals.prefs.get(JabRefPreferences.LANGUAGE) + "/" + helpPage.getPageName();
+        JabRefDesktop.openBrowserShowPopup(url);
     }
 }

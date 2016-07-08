@@ -1,3 +1,18 @@
+/*  Copyright (C) 2003-2016 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
 package net.sf.jabref.gui.desktop;
 
 import java.io.File;
@@ -12,10 +27,12 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypeEntryEditor;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.FileListTableModel;
@@ -263,6 +280,27 @@ public class JabRefDesktop {
     public static void openBrowser(String url) throws IOException {
         Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance().getExternalFileTypeByExt("html");
         openExternalFilePlatformIndependent(fileType, url);
+    }
+
+    /**
+     * Opens the url with the users standard Browser.
+     * If that fails a popup will be shown to instruct the user to open the link manually
+     * and the link gets copied to the clipboard
+     * @param url
+     */
+    public static void openBrowserShowPopup(String url) {
+        try {
+            openBrowser(url);
+        } catch (IOException exception) {
+            new ClipBoardManager().setClipboardContents(url);
+            LOGGER.error("Could not open browser", exception);
+            String couldNotOpenBrowser = Localization.lang("Could not open browser.");
+            String openManually = Localization.lang("Please open %0 manually.", url);
+            String copiedToClipboard = Localization.lang("The_link_has_been_copied_to_the_clipboard.");
+            JabRefGUI.getMainFrame().output(couldNotOpenBrowser);
+            JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(), couldNotOpenBrowser + "\n" + openManually +"\n"+
+                    copiedToClipboard, couldNotOpenBrowser, JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public static void openConsole(File file) throws IOException {

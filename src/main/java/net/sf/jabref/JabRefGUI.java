@@ -36,12 +36,15 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.ParserResultWarningDialog;
 import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.worker.VersionWorker;
 import net.sf.jabref.importer.AutosaveStartupPrompter;
 import net.sf.jabref.importer.OpenDatabaseAction;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.util.Version;
+import net.sf.jabref.logic.util.VersionPreferences;
 import net.sf.jabref.migrations.PreferencesMigrations;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
@@ -65,6 +68,13 @@ public class JabRefGUI {
         this.loaded = loaded;
         this.isBlank = isBlank;
         openWindow();
+        JabRefGUI.checkForNewVersion(false);
+    }
+
+    public static void checkForNewVersion(boolean manualExecution) {
+        Version toBeIgnored = new VersionPreferences(Globals.prefs).getIgnoredVersion();
+        Version currentVersion = Globals.BUILD_INFO.getVersion();
+        new VersionWorker(JabRefGUI.getMainFrame(), manualExecution, currentVersion, toBeIgnored).execute();
     }
 
     private void openWindow() {

@@ -9,7 +9,7 @@ import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
@@ -53,7 +53,7 @@ public class RenamePdfCleanupTest {
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationRepository.class));
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationLoader.class));
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot.tmp", "");
@@ -69,7 +69,7 @@ public class RenamePdfCleanupTest {
         entry.setField("file", FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""),
                 new ParsedFileField("", tempFile.getAbsolutePath(), ""), new ParsedFileField("","",""))));
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationRepository.class));
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationLoader.class));
         cleanup.cleanup(entry);
 
         assertEquals(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""),
@@ -84,7 +84,7 @@ public class RenamePdfCleanupTest {
         entry.setField("file", FileField.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationRepository.class));
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationLoader.class));
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot - test title.tmp", "");
@@ -99,7 +99,7 @@ public class RenamePdfCleanupTest {
         entry.setField("file", FileField.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationRepository.class));
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationLoader.class));
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot - test title.pdf", "PDF");

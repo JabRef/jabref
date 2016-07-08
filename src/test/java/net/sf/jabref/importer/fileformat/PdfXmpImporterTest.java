@@ -38,6 +38,16 @@ public class PdfXmpImporterTest {
     }
 
     @Test
+    public void testsGetExtensions() {
+        assertEquals(".pdf", importer.getExtensions().get(0));
+    }
+
+    @Test
+    public void testGetDescription() {
+        assertEquals("Wraps the XMPUtility function to be used as an ImportFormat.", importer.getDescription());
+    }
+
+    @Test
     public void importEncryptedFileReturnsError() throws IOException, URISyntaxException {
         Path file = Paths.get(PdfXmpImporterTest.class.getResource("/pdfs/encrypted.pdf").toURI());
         ParserResult result = importer.importDatabase(file, Charset.defaultCharset());

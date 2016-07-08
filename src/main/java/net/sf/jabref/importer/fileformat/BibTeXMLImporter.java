@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -18,6 +18,7 @@ package net.sf.jabref.importer.fileformat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -33,10 +34,10 @@ import org.apache.commons.logging.LogFactory;
 import org.xml.sax.InputSource;
 
 /**
- * Importer for the Refer/Endnote format.
- *
+ * Importer for the BibTeXML format.
+ * <p>
  * check here for details on the format
- * http://www.ecst.csuchico.edu/~jacobsd/bib/formats/endnote.html
+ * http://bibtexml.sourceforge.net/
  */
 public class BibTeXMLImporter extends ImportFormat {
 
@@ -51,12 +52,12 @@ public class BibTeXMLImporter extends ImportFormat {
 
     @Override
     public List<String> getExtensions() {
-        return null;
+        return Collections.singletonList(".xml");
     }
 
     @Override
     public String getDescription() {
-        return null;
+        return "Importer for the BibTeXML format.";
     }
 
     @Override

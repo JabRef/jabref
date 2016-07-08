@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.Globals;
@@ -91,11 +92,12 @@ public class RepecNepImporterTest {
     }
 
     @Test
+    public void testGetExtension() {
+        Assert.assertEquals(Collections.singletonList(".txt"), testImporter.getExtensions());
+    }
+
+    @Test
     public final void testGetDescription() {
-        Assert.assertEquals("Imports a New Economics Papers-Message (see http://nep.repec.org)\n"
-                + "from the REPEC-NEP Service (see http://www.repec.org).\n"
-                + "To import papers either save a NEP message as a text file and then import or\n"
-                + "copy&paste the papers you want to import and make sure, one of the first lines\n"
-                + "contains the line \"nep.repec.org\".", testImporter.getDescription());
+        Assert.assertEquals("Imports a New Economics Papers-Message from the REPEC-NEP Service.", testImporter.getDescription());
     }
 }

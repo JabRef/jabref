@@ -4,8 +4,8 @@ import java.util.Optional;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.util.UpdateField;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 
 public class TimeStamp {

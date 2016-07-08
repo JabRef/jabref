@@ -3,6 +3,7 @@ package net.sf.jabref.importer.fileformat;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 
 import net.sf.jabref.Globals;
@@ -14,30 +15,40 @@ import org.junit.Test;
 
 public class BiblioscapeImporterTest {
 
-    private BiblioscapeImporter bsImporter;
+    private BiblioscapeImporter importer;
+
 
     @Before
     public void setUp() throws Exception {
         Globals.prefs = JabRefPreferences.getInstance();
-        bsImporter = new BiblioscapeImporter();
+        importer = new BiblioscapeImporter();
     }
 
     @Test
     public void testGetFormatName() {
-        BiblioscapeImporter importer = new BiblioscapeImporter();
         Assert.assertEquals(importer.getFormatName(), "Biblioscape");
     }
 
     @Test
+    public void testsGetExtensions() {
+        Assert.assertEquals(Arrays.asList(".txt"), importer.getExtensions());
+    }
+
+    @Test
+    public void testGetDescription() {
+        Assert.assertEquals("Imports a Biblioscape Tag File.\n" +
+                "Several Biblioscape field types are ignored. Others are only included in the BibTeX field \"comment\".", importer.getDescription());
+    }
+
+    @Test
     public void testGetCLIID() {
-        BiblioscapeImporter importer = new BiblioscapeImporter();
         Assert.assertEquals(importer.getId(), "biblioscape");
     }
 
     @Test
     public void testImportEntriesAbortion() throws Throwable {
         Path file = Paths.get(BiblioscapeImporter.class.getResource("BiblioscapeImporterTestCorrupt.txt").toURI());
-        Assert.assertEquals(Collections.emptyList(), bsImporter.importDatabase(file, Charset.defaultCharset())
-                .getDatabase().getEntries());
+        Assert.assertEquals(Collections.emptyList(),
+                importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries());
     }
 }

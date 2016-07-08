@@ -1,4 +1,4 @@
-package net.sf.jabref.importer.fileformat;
+package net.sf.jabref.importer.fetcher;
 
 import java.io.IOException;
 
@@ -7,7 +7,6 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import net.sf.jabref.importer.OAI2Handler;
-import net.sf.jabref.importer.fetcher.OAI2Fetcher;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IdGenerator;
 
@@ -24,7 +23,7 @@ import org.xml.sax.SAXException;
  * @author Christian Kopf
  * @author Christopher Oezbek
  */
-public class OAI2ImportTest {
+public class OAI2HandlerFetcherTest {
 
     protected OAI2Handler handler;
 

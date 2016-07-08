@@ -269,7 +269,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         showOverlappingGroups.addActionListener(e -> valueChanged(null));
         autoGroup.addActionListener(e -> {
             AutoGroupDialog gd = new AutoGroupDialog(frame, panel, groupsRoot,
-                    Globals.prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD), " .,", ",");
+                    Globals.prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD), " .,",
+                    Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
             gd.setVisible(true);
             // gd does the operation itself
         });
@@ -494,7 +495,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             moveNodeRightPopupAction.setNode(node);
             // add/remove entries to/from group
             List<BibEntry> selection = frame.getCurrentBasePanel().getSelectedEntries();
-            if (selection.size() > 0) {
+            if (!selection.isEmpty()) {
                 if (node.canAddEntries(selection)) {
                     addToGroup.setNode(node);
                     addToGroup.setBasePanel(panel);
@@ -685,7 +686,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      */
     private void revalidateGroups(TreePath[] selectionPaths, Enumeration<TreePath> expandedNodes,
             GroupTreeNodeViewModel node) {
-        groupsTreeModel.reload();
         groupsTree.clearSelection();
         if (selectionPaths != null) {
             groupsTree.setSelectionPaths(selectionPaths);
@@ -722,6 +722,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
     private void setGroups(GroupTreeNode groupsRoot) {
         this.groupsRoot = new GroupTreeNodeViewModel(groupsRoot);
+        // refactor notice: groupsTreeModel::nodeStructureChanged cannot be used, because an NPE will be risen if no groupsTreeModel exists
         this.groupsRoot.subscribeToDescendantChanged(source -> groupsTreeModel.nodeStructureChanged(source));
         groupsTreeModel = new DefaultTreeModel(this.groupsRoot);
         groupsTree.setModel(groupsTreeModel);

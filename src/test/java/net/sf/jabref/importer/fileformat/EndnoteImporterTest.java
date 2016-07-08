@@ -7,6 +7,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,6 +41,22 @@ public class EndnoteImporterTest {
     @Test
     public void testGetCLIId() {
         assertEquals("refer", importer.getId());
+    }
+
+    @Test
+    public void testsGetExtensions() {
+        EndnoteImporter importer = new EndnoteImporter();
+        List<String> extensions = new ArrayList<>();
+        extensions.add(".enw");
+
+        assertEquals(extensions.get(0), importer.getExtensions().get(0));
+    }
+
+    @Test
+    public void testGetDescription() {
+        EndnoteImporter importer = new EndnoteImporter();
+        assertEquals("Importer for the Refer/Endnote format." +
+                " Modified to use article number for pages if pages are missing.", importer.getDescription());
     }
 
     @Test

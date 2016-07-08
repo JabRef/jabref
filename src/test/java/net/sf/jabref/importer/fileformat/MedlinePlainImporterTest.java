@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -35,6 +36,21 @@ public class MedlinePlainImporterTest {
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
         importer = new MedlinePlainImporter();
+    }
+
+    @Test
+    public void testsGetExtensions() {
+        List<String> extensions = new ArrayList<>();
+        extensions.add(".nbib");
+        extensions.add(".txt");
+
+        assertEquals(extensions.get(0), importer.getExtensions().get(0));
+        assertEquals(extensions.get(1), importer.getExtensions().get(1));
+    }
+
+    @Test
+    public void testGetDescription() {
+        assertEquals("Importer for the MedlinePlain format.", importer.getDescription());
     }
 
     @Test

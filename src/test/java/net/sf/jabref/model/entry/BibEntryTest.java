@@ -1,6 +1,9 @@
 package net.sf.jabref.model.entry;
 
+import java.util.Optional;
+
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,5 +28,12 @@ public class BibEntryTest {
     @Test(expected = IllegalArgumentException.class)
     public void notClearReservedFields() {
         entry.clearField(BibEntry.ID_FIELD);
+    }
+
+    @Test
+    public void getFieldIsCaseInsensitive() throws Exception {
+        entry.setField("TeSt", "value");
+
+        Assert.assertEquals(Optional.of("value"), entry.getFieldOptional("tEsT"));
     }
 }

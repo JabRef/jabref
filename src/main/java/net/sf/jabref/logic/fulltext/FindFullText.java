@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.importer.fetcher.CrossRef;
-import net.sf.jabref.logic.io.MimeTypeDetector;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
 

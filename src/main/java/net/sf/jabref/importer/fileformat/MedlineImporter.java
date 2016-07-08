@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -20,6 +20,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -34,10 +35,10 @@ import org.apache.commons.logging.LogFactory;
 import org.xml.sax.InputSource;
 
 /**
- * Importer for the Refer/Endnote format.
+ * Importer for the Medline format.
  *
  * check here for details on the format
- * http://www.ecst.csuchico.edu/~jacobsd/bib/formats/endnote.html
+ * http://www.nlm.nih.gov/bsd/mms/medlineelements.html
  */
 public class MedlineImporter extends ImportFormat {
 
@@ -51,7 +52,7 @@ public class MedlineImporter extends ImportFormat {
 
     @Override
     public List<String> getExtensions() {
-        return null;
+        return Arrays.asList(".nbib", ".xml");
     }
 
     @Override
@@ -61,7 +62,7 @@ public class MedlineImporter extends ImportFormat {
 
     @Override
     public String getDescription() {
-        return null;
+        return "Importer for the Medline format.";
     }
 
     @Override

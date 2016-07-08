@@ -24,6 +24,8 @@ import org.junit.rules.ExpectedException;
  */
 public class IsiImporterTest {
 
+    private final IsiImporter importer = new IsiImporter();
+
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
@@ -40,23 +42,27 @@ public class IsiImporterTest {
 
     @Test
     public void testGetFormatName() {
-        IsiImporter importer = new IsiImporter();
-
         Assert.assertEquals(importer.getFormatName(), "ISI");
     }
 
     @Test
     public void testGetCLIId() {
-        IsiImporter importer = new IsiImporter();
-
         Assert.assertEquals(importer.getId(), "isi");
     }
 
     @Test
+    public void testsGetExtensions() {
+        Assert.assertEquals(Arrays.asList(".isi",".txt"), importer.getExtensions());
+    }
+
+    @Test
+    public void testGetDescription() {
+        Assert.assertEquals("Importer for the ISI Web of Science, INSPEC and Medline format.",
+                importer.getDescription());
+    }
+
+    @Test
     public void testIsRecognizedFormatAccepted() throws IOException, URISyntaxException {
-
-        IsiImporter importer = new IsiImporter();
-
         List<String> list = Arrays.asList("IsiImporterTest1.isi", "IsiImporterTest2.isi", "IsiImporterTestInspec.isi",
                 "IsiImporterTestWOS.isi", "IsiImporterTestMedline.isi");
 
@@ -68,9 +74,6 @@ public class IsiImporterTest {
 
     @Test
     public void testIsRecognizedFormatRejected() throws IOException, URISyntaxException {
-
-        IsiImporter importer = new IsiImporter();
-
         List<String> list = Arrays.asList("IsiImporterTestEmpty.isi");
 
         for (String str : list) {
@@ -126,7 +129,6 @@ public class IsiImporterTest {
 
     @Test
     public void testImportEntries1() throws IOException, URISyntaxException {
-        IsiImporter importer = new IsiImporter();
         Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTest1.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
         Assert.assertEquals(1, entries.size());
@@ -146,7 +148,6 @@ public class IsiImporterTest {
 
     @Test
     public void testImportEntries2() throws IOException, URISyntaxException {
-        IsiImporter importer = new IsiImporter();
         Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTest2.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
         Assert.assertEquals(3, entries.size());
@@ -163,7 +164,6 @@ public class IsiImporterTest {
 
     @Test
     public void testImportEntriesINSPEC() throws IOException, URISyntaxException {
-        IsiImporter importer = new IsiImporter();
         Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTestInspec.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
 
@@ -183,16 +183,13 @@ public class IsiImporterTest {
                 a.getField("title"));
         Assert.assertEquals("article", a.getType());
 
-        Assert.assertEquals("Degl'Innocenti, R. and Guarino, A. and Poberaj, G. and Gunter, P.",
-                a.getField("author"));
+        Assert.assertEquals("Degl'Innocenti, R. and Guarino, A. and Poberaj, G. and Gunter, P.", a.getField("author"));
         Assert.assertEquals("Applied Physics Letters", a.getField("journal"));
         Assert.assertEquals("2006", a.getField("year"));
         Assert.assertEquals("#jul#", a.getField("month"));
         Assert.assertEquals("89", a.getField("volume"));
         Assert.assertEquals("4", a.getField("number"));
-        Assert.assertEquals(
-                "Lorem ipsum abstract",
-                a.getField("abstract"));
+        Assert.assertEquals("Lorem ipsum abstract", a.getField("abstract"));
         Assert.assertEquals("Aip", a.getField("publisher"));
 
         Assert.assertEquals("Optical and photoelectric spectroscopy of photorefractive Sn$_2$P$_2$S$_6$ crystals",
@@ -202,7 +199,6 @@ public class IsiImporterTest {
 
     @Test
     public void testImportEntriesWOS() throws IOException, URISyntaxException {
-        IsiImporter importer = new IsiImporter();
         Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTestWOS.isi").toURI());
         List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
 
@@ -260,7 +256,6 @@ public class IsiImporterTest {
 
     @Test
     public void testImportIEEEExport() throws IOException, URISyntaxException {
-        IsiImporter importer = new IsiImporter();
         Path file = Paths.get(IsiImporterTest.class.getResource("IEEEImport1.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
 
@@ -269,8 +264,8 @@ public class IsiImporterTest {
         Assert.assertEquals("article", a.getType());
         Assert.assertEquals("Geoscience and Remote Sensing Letters, IEEE", a.getField("journal"));
         Assert.assertEquals("Improving Urban Road Extraction in High-Resolution "
-                + "Images Exploiting Directional Filtering, Perceptual "
-                + "Grouping, and Simple Topological Concepts", a.getField("title"));
+                + "Images Exploiting Directional Filtering, Perceptual " + "Grouping, and Simple Topological Concepts",
+                a.getField("title"));
         Assert.assertEquals("4", a.getField("volume"));
         Assert.assertEquals("3", a.getField("number"));
         Assert.assertEquals("1545-598X", a.getField("SN"));
@@ -283,7 +278,6 @@ public class IsiImporterTest {
 
     @Test
     public void testIEEEImport() throws IOException, URISyntaxException {
-        IsiImporter importer = new IsiImporter();
         Path file = Paths.get(IsiImporterTest.class.getResource("IEEEImport1.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
 
@@ -307,7 +301,6 @@ public class IsiImporterTest {
 
     @Test
     public void testImportEntriesMedline() throws IOException, URISyntaxException {
-        IsiImporter importer = new IsiImporter();
         Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTestMedline.isi").toURI());
 
         List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
@@ -344,7 +337,6 @@ public class IsiImporterTest {
 
     @Test
     public void testImportEntriesEmpty() throws IOException, URISyntaxException {
-        IsiImporter importer = new IsiImporter();
         Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTestEmpty.isi").toURI());
 
         List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();

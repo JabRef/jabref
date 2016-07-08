@@ -39,7 +39,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.util.OS;
@@ -386,15 +386,16 @@ public class FileUtil {
      *
      * @param database the database, where the entry is located
      * @param entry    the entry to which the file should be linked to
-     * @param repository
+     * @param repositoryLoader
      * @return a suggested fileName
      */
-    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, JournalAbbreviationRepository repository) {
+    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry,
+            JournalAbbreviationLoader repositoryLoader) {
         String targetName = entry.getCiteKey() == null ? "default" : entry.getCiteKey();
         StringReader sr = new StringReader(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
         Layout layout = null;
         try {
-            layout = new LayoutHelper(sr, repository).getLayoutFromText();
+            layout = new LayoutHelper(sr, repositoryLoader).getLayoutFromText();
         } catch (IOException e) {
             LOGGER.info("Wrong format " + e.getMessage(), e);
         }

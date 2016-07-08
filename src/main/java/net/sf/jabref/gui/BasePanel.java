@@ -112,7 +112,6 @@ import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.gui.worker.SendAsEMailAction;
 import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.importer.AppendDatabaseAction;
-import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
@@ -125,6 +124,7 @@ import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
@@ -990,8 +990,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     "\\bibtexkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
             Layout layout;
             try {
-                layout = new LayoutHelper(sr, Globals.journalAbbreviationLoader.getRepository())
-                        .getLayoutFromText();
+                layout = new LayoutHelper(sr, Globals.journalAbbreviationLoader).getLayoutFromText();
             } catch (IOException e) {
                 LOGGER.info("Could not get layout", e);
                 return;
@@ -1321,11 +1320,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 JabRefExecutorService.INSTANCE.submit(timerTask, 200);
             }
         }
-
-        @Subscribe
-        public void listen(EntryChangedEvent entryChangedEvent) {
-            scheduleUpdate();
-        }
     }
 
     /**
@@ -1583,7 +1577,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             this.getDatabase().registerListener(new AutoCompleteListener());
         } else {
             // create empty ContentAutoCompleters() if autoCompletion is deactivated
-            autoCompleters = new ContentAutoCompleters(Globals.journalAbbreviationLoader);
+            autoCompleters = new ContentAutoCompleters();
         }
 
         // restore floating search result
@@ -1603,7 +1597,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private void instantiateSearchAutoCompleter() {
         AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
-        AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(autoCompletePreferences);
+        AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(autoCompletePreferences,
+                Globals.journalAbbreviationLoader);
         searchAutoCompleter = autoCompleterFactory.getPersonAutoCompleter();
         for (BibEntry entry : database.getEntries()) {
             searchAutoCompleter.addBibtexEntry(entry);

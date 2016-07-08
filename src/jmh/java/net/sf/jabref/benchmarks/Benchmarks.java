@@ -17,7 +17,10 @@ import net.sf.jabref.exporter.BibDatabaseWriter;
 import net.sf.jabref.exporter.SavePreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import net.sf.jabref.logic.groups.GroupHierarchyType;
+import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.layout.format.HTMLChars;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.search.SearchQuery;
@@ -52,6 +55,7 @@ public class Benchmarks {
             entry.setField("title", "This is my title " + i);
             entry.setField("author", "Firstname Lastname and FirstnameA LastnameA and FirstnameB LastnameB" + i);
             entry.setField("journal", "Journal Title " + i);
+            entry.setField("keyword", "testkeyword");
             entry.setField("year", "1" + i);
             entry.setField("rnd", "2" + randomizer.nextInt());
             database.insertEntry(entry);
@@ -117,6 +121,18 @@ public class Benchmarks {
     public String htmlToLatexConversion() {
         HtmlToLatexFormatter f = new HtmlToLatexFormatter();
         return f.format(htmlConversionString);
+    }
+
+    @Benchmark
+    public boolean keywordGroupContains() throws ParseException {
+        KeywordGroup group = new KeywordGroup("testGroup", "keyword", "testkeyword", false, false,
+                GroupHierarchyType.INDEPENDENT);
+        return group.containsAll(database.getEntries());
+    }
+
+    @Benchmark
+    public boolean keywordGroupContainsWord() throws ParseException {
+        return KeywordGroup.containsWord("testWord", "Some longer test string containing testWord the test word");
     }
 
     public static void main(String[] args) throws IOException, RunnerException {

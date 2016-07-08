@@ -1,7 +1,20 @@
 language: java
-jdk:
-  - oraclejdk8
-sudo: false
+
+# we test at Ubuntu Trusty (Ubuntu 14.04 LTS)
+# see https://docs.travis-ci.com/user/trusty-ci-environment/
+sudo: required
+dist: trusty
+
+# update to latest Java8 as described at https://github.com/travis-ci/travis-ci/issues/4042#issuecomment-109756980
+addons:
+  apt:
+    packages:
+      # most recent Java8 - this makes the DK switcher obsolete - see https://github.com/travis-ci/travis-ci/issues/5897#issuecomment-218354129
+      - oracle-java8-installer
+      # MySQL 5.6 as desccribed at https://docs.travis-ci.com/user/database-setup/#MySQL-5.6
+      - mysql-server-5.6
+      - mysql-client-core-5.6
+      - mysql-client-5.6
 
 services:
   - postgresql
@@ -12,16 +25,30 @@ install: true
 
 # allow gui testing on travis
 before_script:
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-  - sleep 3 # give xvfb some time to start
   - psql -c 'create database jabref;' -U postgres
 
 script:
   - ./gradlew check
   # Integration tests currently often fail with "Process 'Gradle Test Executor 1' finished with non-zero exit value 137"
   # They should run, but the result is ignored
-  - ./gradlew integrationTest --info || exit 0
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+  - sleep 3 # give xvfb some time to start
+  # no need for databases for the integrationTest -> save memory
+  - sudo service mysql stop
+  - sudo service postgresql stop
+  # following services identified by "sudo service --status-all" do not need to run, too
+  # excluded: rsyslog (feels wrong), udev (feels wrong), friendly-recovery ("Unkonwn instance" error)
+  - sudo service acpid stop
+  - sudo service atd stop
+  - sudo service cron stop
+  - sudo service memcached stop
+  - sudo service ntp stop
+  - sudo service rabbitmq-server stop
+  - sudo service resolvconf stop
+  - sudo service sshguard stop
+  - sudo service ssh stop
+  - ./gradlew integrationTest --info || true
 
 after_script:
   # enable codecov report

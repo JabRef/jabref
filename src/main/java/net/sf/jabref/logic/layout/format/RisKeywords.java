@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.logic.layout.format;
 
-import java.util.List;
+import java.util.Set;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.layout.LayoutFormatter;
@@ -28,13 +28,15 @@ public class RisKeywords implements LayoutFormatter {
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        List<String> keywords = net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(s);
-        for (int i = 0; i < keywords.size(); i++) {
+        Set<String> keywords = net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(s);
+        int i = 0;
+        for (String keyword : keywords) {
             sb.append("KW  - ");
-            sb.append(keywords.get(i));
+            sb.append(keyword);
             if (i < (keywords.size() - 1)) {
                 sb.append(Globals.NEWLINE);
             }
+            i++;
         }
         return sb.toString();
     }

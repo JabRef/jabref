@@ -19,13 +19,14 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.fileformat.ImportFormat;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -49,7 +50,7 @@ public class OOBibStyleTest {
     @Test
     public void testAuthorYear() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
         assertTrue(style.isValid());
         assertTrue(style.isFromResource());
         assertFalse(style.isBibtexKeyCiteMarkers());
@@ -66,7 +67,7 @@ public class OOBibStyleTest {
         File defFile = Paths.get(JabRefMain.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                 .toFile();
 
-        OOBibStyle style = new OOBibStyle(defFile, mock(JournalAbbreviationRepository.class),
+        OOBibStyle style = new OOBibStyle(defFile, mock(JournalAbbreviationLoader.class),
                 Globals.prefs.getDefaultEncoding());
         assertTrue(style.isValid());
         assertFalse(style.isFromResource());
@@ -82,7 +83,7 @@ public class OOBibStyleTest {
     public void testNumerical() throws IOException {
 
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
         assertTrue(style.isValid());
         assertFalse(style.isBibtexKeyCiteMarkers());
         assertFalse(style.isBoldCitations());
@@ -96,7 +97,7 @@ public class OOBibStyleTest {
     @Test
     public void testGetNumCitationMarker() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
         assertEquals("[1] ", style.getNumCitationMarker(Arrays.asList(1), -1, true));
         assertEquals("[1]", style.getNumCitationMarker(Arrays.asList(1), -1, false));
         assertEquals("[1] ", style.getNumCitationMarker(Arrays.asList(1), 0, true));
@@ -113,7 +114,7 @@ public class OOBibStyleTest {
     @Test
     public void testGetNumCitationMarkerUndefined() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
         assertEquals("[" + OOBibStyle.UNDEFINED_CITATION_MARKER + "; 2-4] ",
                 style.getNumCitationMarker(Arrays.asList(4, 2, 3, 0), 1, true));
 
@@ -131,7 +132,7 @@ public class OOBibStyleTest {
     @Test
     public void testGetCitProperty() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
         assertEquals(", ", style.getStringCitProperty("AuthorSeparator"));
         assertEquals(3, style.getIntCitProperty("MaxAuthors"));
         assertTrue(style.getBooleanCitProperty(OOBibStyle.MULTI_CITE_CHRONOLOGICAL));
@@ -146,7 +147,7 @@ public class OOBibStyleTest {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, StandardCharsets.UTF_8));
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         BibDatabase db = result.getDatabase();
         for (BibEntry entry : db.getEntries()) {
@@ -167,7 +168,7 @@ public class OOBibStyleTest {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, StandardCharsets.UTF_8));
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
         BibDatabase db = result.getDatabase();
 
         Layout l = style.getReferenceFormat("default");
@@ -187,7 +188,7 @@ public class OOBibStyleTest {
     @Test
     public void testInstitutionAuthor() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
         BibDatabase database = new BibDatabase();
 
         Layout l = style.getReferenceFormat("article");
@@ -206,7 +207,7 @@ public class OOBibStyleTest {
     @Test
     public void testVonAuthor() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
         BibDatabase database = new BibDatabase();
 
         Layout l = style.getReferenceFormat("article");
@@ -225,7 +226,7 @@ public class OOBibStyleTest {
     @Test
     public void testInstitutionAuthorMarker() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -245,7 +246,7 @@ public class OOBibStyleTest {
     @Test
     public void testVonAuthorMarker() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -265,7 +266,7 @@ public class OOBibStyleTest {
     @Test
     public void testNullAuthorMarker() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -283,7 +284,7 @@ public class OOBibStyleTest {
     @Test
     public void testNullYearMarker() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -301,7 +302,7 @@ public class OOBibStyleTest {
     @Test
     public void testEmptyEntryMarker() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -318,7 +319,7 @@ public class OOBibStyleTest {
     @Test
     public void testGetCitationMarkerInParenthesisUniquefiers() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -354,7 +355,7 @@ public class OOBibStyleTest {
     @Test
     public void testGetCitationMarkerInTextUniquefiers() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -390,7 +391,7 @@ public class OOBibStyleTest {
     @Test
     public void testGetCitationMarkerInParenthesisUniquefiersThreeSameAuthor() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -425,7 +426,7 @@ public class OOBibStyleTest {
     @Test
     public void testGetCitationMarkerInTextUniquefiersThreeSameAuthor() throws IOException {
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
 
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
@@ -461,9 +462,9 @@ public class OOBibStyleTest {
     // TODO: equals only work when initialized from file, not from reader
     public void testEquals() throws IOException {
         OOBibStyle style1 = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
         OOBibStyle style2 = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
         assertEquals(style1, style2);
     }
 
@@ -471,35 +472,36 @@ public class OOBibStyleTest {
     // TODO: equals only work when initialized from file, not from reader
     public void testNotEquals() throws IOException {
         OOBibStyle style1 = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
         OOBibStyle style2 = new OOBibStyle(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
         assertNotEquals(style1, style2);
     }
 
     @Test
     public void testCompareToEqual() throws IOException {
         OOBibStyle style1 = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
         OOBibStyle style2 = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
         assertEquals(0, style1.compareTo(style2));
     }
 
     @Test
     public void testCompareToNotEqual() throws IOException {
         OOBibStyle style1 = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
         OOBibStyle style2 = new OOBibStyle(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH,
-                mock(JournalAbbreviationRepository.class));
+                mock(JournalAbbreviationLoader.class));
         assertTrue(style1.compareTo(style2) > 0);
         assertFalse(style2.compareTo(style1) > 0);
     }
 
-
+    @Test
+    @Ignore
     public void testEmptyStringPropertyAndOxfordComma() throws URISyntaxException, IOException {
         String fileName = Paths.get(OOBibStyleTest.class.getResource("test.jstyle").toURI()).toString();
-        OOBibStyle style = new OOBibStyle(fileName, mock(JournalAbbreviationRepository.class));
+        OOBibStyle style = new OOBibStyle(fileName, mock(JournalAbbreviationLoader.class));
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
         List<BibEntry> entries = new ArrayList<>();
         BibDatabase database = new BibDatabase();

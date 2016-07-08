@@ -13,7 +13,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 - [#1026](https://github.com/JabRef/jabref/issues/1026) JabRef does no longer delete user comments outside of BibTeX entries and strings
-- [#1485](https://github.com/JabRef/jabref/issues/1485) Biblatex field shorttitle is now exported/imported as standard field ShortTitle to Word bibliography
+- Implemented [#661](https://github.com/JabRef/jabref/issues/661): Introducing a "check for updates" mechnism (manually/automatic at startup)
+- [#1485](https://github.com/JabRef/jabref/issues/1485): Biblatex field shorttitle is now exported/imported as standard field ShortTitle to Word bibliography
+- [#1431](https://github.com/JabRef/jabref/issues/1431): Import dialog shows file extensions and filters the view
+- Updated German translation
+- When resolving duplicate BibTeX-keys there is now an "Ignore" button. "Cancel" and close key now quits the resolving.
+- The [online forum](http://discourse.jabref.org/) is now directly accessible via the "Help" menu
 
 ### Fixed
 - Fixed [#405](https://github.com/JabRef/jabref/issues/405): Added more {} around capital letters in Unicode/HTML to LaTeX conversion to preserve them
@@ -21,7 +26,11 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1476](https://github.com/JabRef/jabref/issues/1476): NPE when importing from SQL DB because of missing DatabaseMode
 - Fixed [#1481](https://github.com/JabRef/jabref/issues/1481): Mac OS X binary seems broken for JabRef 3.4 release
 - Fixed [#1430](https://github.com/JabRef/jabref/issues/1430): "review changes" did misinterpret changes
-
+- Fixed [#1434](https://github.com/JabRef/jabref/issues/1434): Static groups are now longer displayed as dynamic ones
+- Fixed [#1482](https://github.com/JabRef/jabref/issues/1482): Correct number of matched entries is displayed for refining subgroups
+- Fixed [#1444](https://github.com/JabRef/jabref/issues/1444): Implement getExtension and getDescription for importers.
+- Fixed [#1507](https://github.com/JabRef/jabref/issues/1507): Keywords are now separated by the delimiter specified in the preferences
+- Fixed [#1484](https://github.com/JabRef/jabref/issues/1484): HTML export handles some UTF characters wrong
 
 ### Removed
 

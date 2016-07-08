@@ -38,7 +38,7 @@ public class HtmlExportFormatTest {
         ExportFormats.initAllExports();
         exportFormat = ExportFormats.getExportFormat("html");
 
-        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader(Globals.prefs);
+        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
         databaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
         charset = Charsets.UTF_8;
         BibEntry entry = new BibEntry();

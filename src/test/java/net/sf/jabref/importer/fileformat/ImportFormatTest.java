@@ -6,7 +6,6 @@ import java.util.Collection;
 import java.util.regex.Pattern;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -38,7 +37,6 @@ public class ImportFormatTest {
     }
 
     @Test
-    @Ignore
     public void getExtensionsDoesNotReturnNull() {
         Assert.assertNotNull(format.getExtensions());
     }
@@ -62,7 +60,6 @@ public class ImportFormatTest {
     }
 
     @Test
-    @Ignore
     public void getDescriptionDoesNotReturnNull() {
         Assert.assertNotNull(format.getDescription());
     }

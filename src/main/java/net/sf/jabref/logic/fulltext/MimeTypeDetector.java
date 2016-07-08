@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.io;
+package net.sf.jabref.logic.fulltext;
 
 import java.io.IOException;
 import java.net.URL;

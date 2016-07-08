@@ -218,4 +218,20 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
     public static GroupTreeNode parse(List<String> orderedData) throws ParseException {
         return GroupsParser.importGroups(orderedData);
     }
+
+    /**
+     * Determines the number of entries in the specified list which are matched by this group.
+     * @param entries list of entries to be searched
+     * @return number of hits
+     */
+    public int numberOfHits(List<BibEntry> entries) {
+        int hits = 0;
+        SearchMatcher matcher = getSearchRule();
+        for (BibEntry entry : entries) {
+            if (matcher.isMatch(entry)) {
+                hits++;
+            }
+        }
+        return hits;
+    }
 }

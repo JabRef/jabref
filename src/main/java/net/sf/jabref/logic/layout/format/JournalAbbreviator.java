@@ -29,7 +29,7 @@ package net.sf.jabref.logic.layout.format;
 
 import java.util.Objects;
 
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 
 /**
@@ -49,15 +49,15 @@ import net.sf.jabref.logic.layout.LayoutFormatter;
  */
 public class JournalAbbreviator implements LayoutFormatter {
 
-    private final JournalAbbreviationRepository repostiory;
+    private final JournalAbbreviationLoader repostioryLoader;
 
 
-    public JournalAbbreviator(JournalAbbreviationRepository repostiory) {
-        this.repostiory = Objects.requireNonNull(repostiory);
+    public JournalAbbreviator(JournalAbbreviationLoader repostioryLoader) {
+        this.repostioryLoader = Objects.requireNonNull(repostioryLoader);
     }
 
     @Override
     public String format(String fieldText) {
-        return repostiory.getIsoAbbreviation(fieldText).orElse(fieldText);
+        return repostioryLoader.getRepository().getIsoAbbreviation(fieldText).orElse(fieldText);
     }
 }

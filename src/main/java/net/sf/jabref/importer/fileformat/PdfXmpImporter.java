@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -19,6 +19,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,7 +39,7 @@ public class PdfXmpImporter extends ImportFormat {
 
     @Override
     public List<String> getExtensions() {
-        return null;
+        return Collections.singletonList(".pdf");
     }
 
     @Override
@@ -84,7 +85,7 @@ public class PdfXmpImporter extends ImportFormat {
 
     @Override
     public String getDescription() {
-        return null;
+        return "Wraps the XMPUtility function to be used as an ImportFormat.";
     }
 
 }

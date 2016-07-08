@@ -68,7 +68,7 @@ public class JabRefMain {
         ExportFormats.initAllExports();
 
         // Read list(s) of journal names and abbreviations
-        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader(Globals.prefs);
+        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
 
         // Check for running JabRef
         RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);
