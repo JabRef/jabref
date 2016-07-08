@@ -10,7 +10,7 @@ import net.sf.jabref.gui.desktop.JabRefDesktop;
 
 public class OpenBrowserAction extends AbstractAction {
 
-    private String urlToOpen;
+    private final String urlToOpen;
 
     /**
      * OpenBrowserAction without icons - only to be used for menus
