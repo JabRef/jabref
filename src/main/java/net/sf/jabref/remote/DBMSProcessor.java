@@ -55,9 +55,7 @@ public class DBMSProcessor {
     public static final String ENTRY_REMOTE_ID = "REMOTE_ID";
     public static final String ENTRY_ENTRYTYPE = "ENTRYTYPE";
 
-    public static final String METADATA_SORT_ID = "SORT_ID";
     public static final String METADATA_KEY = "META_KEY";
-    public static final String METADATA_FIELD = "FIELD";
     public static final String METADATA_VALUE = "META_VALUE";
 
 
@@ -87,7 +85,7 @@ public class DBMSProcessor {
                     requiredTables.remove(tableName); // Remove matching tables to check requiredTables for emptiness
                 }
 
-                return requiredTables.size() == 0;
+                return requiredTables.isEmpty();
             }
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
@@ -102,12 +100,10 @@ public class DBMSProcessor {
         if (dbmsType == DBMSType.MYSQL) {
             dbmsHelper.executeUpdate("CREATE TABLE IF NOT EXISTS " + ENTRY + " ("
                     + ENTRY_REMOTE_ID + " INT(11) NOT NULL PRIMARY KEY AUTO_INCREMENT,"
-                    + ENTRY_ENTRYTYPE + " VARCHAR(255) DEFAULT NULL"
-                    + ") ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;");
+                    + ENTRY_ENTRYTYPE + " VARCHAR(255) DEFAULT NULL)");
             dbmsHelper.executeUpdate("CREATE TABLE IF NOT EXISTS " + METADATA + " ("
                     + METADATA_KEY + " varchar(255) NOT NULL,"
-                    + METADATA_VALUE + " text NOT NULL"
-                    + ") ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;");
+                    + METADATA_VALUE + " text NOT NULL)");
         } else if (dbmsType == DBMSType.POSTGRESQL) {
             dbmsHelper.executeUpdate("CREATE TABLE IF NOT EXISTS " + ENTRY + " ("
                     + ENTRY_REMOTE_ID + " SERIAL PRIMARY KEY,"
@@ -144,8 +140,7 @@ public class DBMSProcessor {
         // Check if already exists
         int remote_id = bibEntry.getRemoteId();
         if (remote_id != -1) {
-            try (ResultSet resultSet = dbmsHelper.query(
-                    "SELECT * FROM " + escape(ENTRY) + " WHERE " + escape(ENTRY_REMOTE_ID) + " = " + remote_id)) {
+            try (ResultSet resultSet = selectFromEntryTable(remote_id)) {
                 if (resultSet.next()) {
                     return;
                 }
@@ -154,20 +149,30 @@ public class DBMSProcessor {
             }
         }
 
+        StringBuilder query = new StringBuilder();
+        query.append("INSERT INTO ");
+        query.append(escape(ENTRY));
+        query.append("(");
 
-        String query = "INSERT INTO " + escape(ENTRY) + "(";
-        ArrayList<String> fieldNames = new ArrayList<>(bibEntry.getFieldNames());
+        List<String> fieldNames = new ArrayList<>(bibEntry.getFieldNames());
 
-        for (int i = 0; i < fieldNames.size(); i++) {
-            query = query + escape(fieldNames.get(i).toUpperCase()) + ", ";
+        for (String fieldName : fieldNames) {
+            query.append(escape(fieldName.toUpperCase()));
+            query.append(", ");
         }
-        query = query + escape(ENTRY_ENTRYTYPE) + ") VALUES(";
-        for (int i = 0; i < fieldNames.size(); i++) {
-            query = query + escapeValue(bibEntry.getFieldOptional(fieldNames.get(i))) + ", ";
-        }
-        query = query + escapeValue(bibEntry.getType()) + ")";
 
-        try (PreparedStatement preparedStatement = dbmsHelper.prepareStatement(query,
+        query.append(escape(ENTRY_ENTRYTYPE));
+        query.append(") VALUES(");
+
+        for (String fieldName : fieldNames) {
+            query.append(escapeValue(bibEntry.getFieldOptional(fieldName)));
+            query.append(", ");
+        }
+
+        query.append(escapeValue(bibEntry.getType()));
+        query.append(")");
+
+        try (PreparedStatement preparedStatement = dbmsHelper.prepareStatement(query.toString(),
                 ENTRY_REMOTE_ID.toLowerCase(Locale.ENGLISH))) { // This is the only method to get generated keys which is accepted by MySQL, PostgreSQL and Oracle.
             preparedStatement.executeUpdate();
             try (ResultSet generatedKeys = preparedStatement.getGeneratedKeys()) {
@@ -190,24 +195,38 @@ public class DBMSProcessor {
     public void updateEntry(BibEntry bibEntry) {
         prepareEntryTableStructure(bibEntry);
 
-        String query = "UPDATE " + escape(ENTRY) + " SET " + escape(ENTRY_ENTRYTYPE) + " = "
-                + escapeValue(bibEntry.getType());
+        StringBuilder query = new StringBuilder();
+
+        query.append("UPDATE ");
+        query.append(escape(ENTRY));
+        query.append(" SET ");
+        query.append(escape(ENTRY_ENTRYTYPE));
+        query.append(" = ");
+        query.append(escapeValue(bibEntry.getType()));
+
 
         Set<String> fields = bibEntry.getFieldNames();
         Set<String> emptyFields = getRemoteEntry(bibEntry.getRemoteId()).getFieldNames();
         emptyFields.removeAll(fields); // emptyFields now contains only fields which should be null.
 
         for (String emptyField : emptyFields) {
-            query = query + ", " + escape(emptyField.toUpperCase(Locale.ENGLISH)) + " = NULL";
+            query.append(", ");
+            query.append(escape(emptyField.toUpperCase(Locale.ENGLISH)));
+            query.append(" = NULL");
         }
 
         for (String field : fields) {
-            query = query + ", " + escape(field.toUpperCase(Locale.ENGLISH)) + " = "
-                    + escapeValue(bibEntry.getFieldOptional(field));
+            query.append(", ");
+            query.append(escape(field.toUpperCase(Locale.ENGLISH)));
+            query.append(" = ");
+            query.append(escapeValue(bibEntry.getFieldOptional(field)));
         }
 
-        query = query + " WHERE " + escape(ENTRY_REMOTE_ID) + " = " + bibEntry.getRemoteId();
-        dbmsHelper.executeUpdate(query);
+        query.append(" WHERE ");
+        query.append(escape(ENTRY_REMOTE_ID));
+        query.append(" = ");
+        query.append(bibEntry.getRemoteId());
+        dbmsHelper.executeUpdate(query.toString());
     }
 
     /**
@@ -249,7 +268,7 @@ public class DBMSProcessor {
         columnsToRemove.remove(ENTRY_REMOTE_ID); // essential column
         columnsToRemove.remove(ENTRY_ENTRYTYPE); // essential column
 
-        try (ResultSet resultSet = dbmsHelper.query("SELECT * FROM " + escape(ENTRY))) {
+        try (ResultSet resultSet = selectFromEntryTable()) {
             while (resultSet.next()) {
                 for (int i = 0; i < columnsToRemove.size(); i++) {
                     if (resultSet.getObject(columnsToRemove.get(i)) != null) {
@@ -290,8 +309,7 @@ public class DBMSProcessor {
      */
     private List<BibEntry> getRemoteEntries(int remoteId) {
         List<BibEntry> remoteEntries = new ArrayList<>();
-        try (ResultSet resultSet = dbmsHelper.query("SELECT * FROM " + escape(ENTRY)
-                + (remoteId != 0 ? " WHERE " + ENTRY_REMOTE_ID + " = " + remoteId : ""))) {
+        try (ResultSet resultSet = remoteId == 0 ? selectFromEntryTable() : selectFromEntryTable(remoteId)) {
             Set<String> columns = dbmsHelper.allToUpperCase(dbmsHelper.getColumnNames(escape(ENTRY)));
 
             while (resultSet.next()) {
@@ -322,9 +340,7 @@ public class DBMSProcessor {
     public Map<String, String> getRemoteMetaData() {
         Map<String, String> data = new HashMap<>();
 
-        String query = "SELECT * FROM " + escape(METADATA);
-
-        try (ResultSet resultSet = dbmsHelper.query(query)) {
+        try (ResultSet resultSet = selectFromMetaDataTable()) {
             while(resultSet.next()) {
                 data.put(resultSet.getString(METADATA_KEY), resultSet.getString(METADATA_VALUE));
             }
@@ -373,6 +389,28 @@ public class DBMSProcessor {
         if (columnsToRemove.size() > 0) {
             dbmsHelper.executeUpdate("ALTER TABLE " + escape(ENTRY) + " " + columnExpression);
         }
+    }
+
+    /**
+     * Helping method for SQL selection retrieving a {@link ResultSet}
+     */
+    private ResultSet selectFromEntryTable() throws SQLException {
+        return dbmsHelper.query("SELECT * FROM " + escape(ENTRY));
+    }
+
+    /**
+     * Helping method for SQL selection retrieving a {@link ResultSet}
+     * @param id remoteId of {@link BibEntry}
+     */
+    private ResultSet selectFromEntryTable(int id) throws SQLException {
+        return dbmsHelper.query("SELECT * FROM " + escape(ENTRY) + " WHERE " + escape(ENTRY_REMOTE_ID) + " = " + id);
+    }
+
+    /**
+     * Helping method for SQL selection retrieving a {@link ResultSet}
+     */
+    private ResultSet selectFromMetaDataTable() throws SQLException {
+        return dbmsHelper.query("SELECT * FROM " + escape(METADATA));
     }
 
     /**
