@@ -112,7 +112,7 @@ public class Listener {
 import com.google.common.eventbus.EventBus;
 
 public class Main {
-   private EventBus eventBus = new EventBus();
+   private static EventBus eventBus = new EventBus();
    
    public static void main(String[] args) {
       Main main = new Main();
