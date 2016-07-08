@@ -20,6 +20,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - The [online forum](http://discourse.jabref.org/) is now directly accessible via the "Help" menu
 
 ### Fixed
+- Springer fetcher now fetches the requested number of entries (not one less as before)
 - Fixed [#405](https://github.com/JabRef/jabref/issues/405): Added more {} around capital letters in Unicode/HTML to LaTeX conversion to preserve them
 - Alleviate multiuser concurrency issue when near simultaneous saves occur to a shared database file
 - Fixed [#1476](https://github.com/JabRef/jabref/issues/1476): NPE when importing from SQL DB because of missing DatabaseMode
