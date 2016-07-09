@@ -47,11 +47,4 @@ public class DBMSConnectorTest {
         }
     }
 
-    @Test
-    public void testGetDefaultPort() {
-        Assert.assertEquals(3306, DBMSConnector.getDefaultPort(DBMSType.MYSQL));
-        Assert.assertEquals(5432, DBMSConnector.getDefaultPort(DBMSType.POSTGRESQL));
-        Assert.assertEquals(1521, DBMSConnector.getDefaultPort(DBMSType.ORACLE));
-        Assert.assertEquals(-1, DBMSConnector.getDefaultPort(null));
-    }
 }

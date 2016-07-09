@@ -157,7 +157,7 @@ public class DBMSProcessor {
         List<String> fieldNames = new ArrayList<>(bibEntry.getFieldNames());
 
         for (String fieldName : fieldNames) {
-            query.append(escape(fieldName.toUpperCase()));
+            query.append(escape(fieldName.toUpperCase(Locale.ENGLISH)));
             query.append(", ");
         }
 

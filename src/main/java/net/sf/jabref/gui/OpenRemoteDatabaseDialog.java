@@ -154,8 +154,7 @@ public class OpenRemoteDatabaseDialog extends JDialog {
         Action dbmsTypeDropDownAction = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                portField.setText(
-                        Integer.toString(DBMSConnector.getDefaultPort((DBMSType) dbmsTypeDropDown.getSelectedItem())));
+                portField.setText(Integer.toString(((DBMSType) dbmsTypeDropDown.getSelectedItem()).getDefaultPort()));
             }
         };
         dbmsTypeDropDown.addActionListener(dbmsTypeDropDownAction);
@@ -191,7 +190,7 @@ public class OpenRemoteDatabaseDialog extends JDialog {
         if (remotePort.isPresent()) {
             portField.setText(remotePort.get());
         } else {
-            portField.setText(Integer.toString(DBMSConnector.getDefaultPort((DBMSType) dbmsTypeDropDown.getSelectedItem())));
+            portField.setText(Integer.toString(((DBMSType) dbmsTypeDropDown.getSelectedItem()).getDefaultPort()));
         }
 
         if (remoteDatabase.isPresent()) {

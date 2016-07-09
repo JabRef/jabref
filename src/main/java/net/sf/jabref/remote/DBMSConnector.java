@@ -49,7 +49,7 @@ public class DBMSConnector {
      */
     public static Connection getNewConnection(DBMSType dbmsType, String host, String database, String user, String password)
             throws ClassNotFoundException, SQLException {
-        return getNewConnection(dbmsType, host, getDefaultPort(dbmsType), database, user, password);
+        return getNewConnection(dbmsType, host, dbmsType.getDefaultPort(), database, user, password);
     }
 
     /**
@@ -68,46 +68,16 @@ public class DBMSConnector {
     public static Connection getNewConnection(DBMSType dbmsType, String host, int port, String database, String user,
             String password) throws ClassNotFoundException, SQLException {
 
-        String url = "jdbc:";
-
         try {
-            switch (dbmsType) {
-            case MYSQL:
-                url = url + "mysql://" + host + ":" + port + "/" + database;
-                break;
-            case ORACLE:
-                url = url + "oracle:thin:@" + host + ":" + port + ":" + database;
-                break;
-            case POSTGRESQL:
-                url = url + "postgresql://" + host + ":" + port + "/" + database;
-                break;
-            }
             DriverManager.setLoginTimeout(3);
-            return DriverManager.getConnection(url, user, password);
+            return DriverManager.getConnection(dbmsType.getUrl(host, port, database), user, password);
         } catch (SQLException e) {
             // Some systems like PostgreSQL retrieves 0 to every exception.
             // Therefore a stable error determination is not possible.
-            LOGGER.error("Could not connect to database: " +
-                    e.getMessage() + " - Error code: " + e.getErrorCode());
+            LOGGER.error("Could not connect to database: " + e.getMessage() + " - Error code: " + e.getErrorCode());
 
             throw e;
         }
-    }
-
-    /**
-     * Retrieves the port number dependent on the type of the database system.
-     */
-    public static int getDefaultPort(DBMSType dbmsType) {
-        if (dbmsType == DBMSType.MYSQL) {
-            return 3306;
-        }
-        if (dbmsType == DBMSType.POSTGRESQL) {
-            return 5432;
-        }
-        if (dbmsType == DBMSType.ORACLE) {
-            return 1521;
-        }
-        return -1;
     }
 
     /**

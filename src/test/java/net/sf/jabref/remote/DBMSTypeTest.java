@@ -28,4 +28,18 @@ public class DBMSTypeTest {
         Assert.assertEquals(DBMSType.POSTGRESQL, DBMSType.fromString("PostgreSQL").get());
         Assert.assertEquals(Optional.empty(), DBMSType.fromString("XXX"));
     }
+
+    @Test
+    public void testGetUrl() {
+        Assert.assertEquals("jdbc:mysql://localhost:3306/xe", DBMSType.MYSQL.getUrl("localhost", 3306, "xe"));
+        Assert.assertEquals("jdbc:oracle:thin:@localhost:1521:xe", DBMSType.ORACLE.getUrl("localhost", 1521, "xe"));
+        Assert.assertEquals("jdbc:postgresql://localhost:5432/xe", DBMSType.POSTGRESQL.getUrl("localhost", 5432, "xe"));
+    }
+
+    @Test
+    public void testGetDefaultPort() {
+        Assert.assertEquals(3306, DBMSType.MYSQL.getDefaultPort());
+        Assert.assertEquals(5432, DBMSType.POSTGRESQL.getDefaultPort());
+        Assert.assertEquals(1521, DBMSType.ORACLE.getDefaultPort());
+    }
 }
