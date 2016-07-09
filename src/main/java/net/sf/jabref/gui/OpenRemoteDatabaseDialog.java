@@ -178,7 +178,10 @@ public class OpenRemoteDatabaseDialog extends JDialog {
         Optional<String> remoteUser = Globals.prefs.getAsOptional(REMOTE_USER);
 
         if (remoteDatabaseType.isPresent()) {
-            dbmsTypeDropDown.setSelectedItem(DBMSType.fromString(remoteDatabaseType.get()));
+            Optional<DBMSType> dbmsType = DBMSType.fromString(remoteDatabaseType.get());
+            if (dbmsType.isPresent()) {
+                dbmsTypeDropDown.setSelectedItem(dbmsType.get());
+            }
         }
 
         if (remoteHost.isPresent()) {

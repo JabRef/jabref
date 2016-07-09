@@ -15,19 +15,24 @@
 */
 package net.sf.jabref.remote;
 
+import java.util.EnumSet;
+import java.util.Optional;
+
 /**
  * Enumerates all supported database systems (DBMS) by JabRef.
  */
 public enum DBMSType {
 
-    MYSQL("MySQL"),
-    ORACLE("Oracle"),
-    POSTGRESQL("PostgreSQL");
+    MYSQL("MySQL", "com.mysql.jdbc.Driver"),
+    ORACLE("Oracle", "oracle.jdbc.driver.OracleDriver"),
+    POSTGRESQL("PostgreSQL", "org.postgresql.Driver");
 
     private String type;
+    private String driverPath;
 
-    private DBMSType(String type) {
+    private DBMSType(String type, String driverPath) {
         this.type = type;
+        this.driverPath = driverPath;
     }
 
     @Override
@@ -35,28 +40,21 @@ public enum DBMSType {
         return this.type;
     }
 
-    public static DBMSType fromString(String type) {
-        if (type.equals(DBMSType.MYSQL.toString())) {
-            return DBMSType.MYSQL;
-        } else if (type.equals(DBMSType.ORACLE.toString())) {
-            return DBMSType.ORACLE;
-        } else if (type.equals(DBMSType.POSTGRESQL.toString())) {
-            return DBMSType.POSTGRESQL;
-        }
-        return null;
-    }
-
     /**
      * @return Java Class path for establishing JDBC connection.
      */
     public String getDriverClassPath() throws Error {
-        if (type.equals(DBMSType.MYSQL.toString())) {
-            return "com.mysql.jdbc.Driver";
-        } else if (type.equals(DBMSType.ORACLE.toString())) {
-            return "oracle.jdbc.driver.OracleDriver";
-        } else if (type.equals(DBMSType.POSTGRESQL.toString())) {
-            return "org.postgresql.Driver";
-        }
-        throw new Error();
+        return this.driverPath;
     }
+
+    public static Optional<DBMSType> fromString(String typeName) {
+        for (DBMSType dbmsType : EnumSet.allOf(DBMSType.class)) {
+            if (typeName.equals(dbmsType.toString())) {
+                return Optional.ofNullable(dbmsType);
+            }
+        }
+        return Optional.empty();
+    }
+
+
 }
