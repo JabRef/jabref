@@ -9,19 +9,28 @@ public class TestConnector {
 
 
     public static Connection getTestConnection(DBMSType dbmsType) throws ClassNotFoundException, SQLException {
-        String user = "root";
-        String password = "";
-        String database = "jabref";
-
-        if (dbmsType == DBMSType.POSTGRESQL) {
-            user = "postgres";
-        } else if (dbmsType == DBMSType.ORACLE) {
-            user = "travis";
-            password = "travis";
-            database = "xe";
-        }
         currentConnectionType = dbmsType;
 
-        return DBMSConnector.getNewConnection(dbmsType, "localhost", database, user, password);
+        TestConnectionData connectionData = getTestConnectionData(dbmsType);
+
+        return DBMSConnector.getNewConnection(dbmsType, connectionData.getHost(), connectionData.getDatabase(),
+                connectionData.getUser(), connectionData.getPassord());
+    }
+
+    public static TestConnectionData getTestConnectionData(DBMSType dbmsType) {
+
+        if (dbmsType == DBMSType.MYSQL) {
+            return new TestConnectionData("localhost", "jabref", "root", "");
+        }
+
+        if (dbmsType == DBMSType.POSTGRESQL) {
+            return new TestConnectionData("localhost", "jabref", "postgres", "");
+        }
+
+        if (dbmsType == DBMSType.ORACLE) {
+            return new TestConnectionData("localhost", "xe", "travis", "travis");
+        }
+
+        return new TestConnectionData();
     }
 }
