@@ -273,4 +273,48 @@ public class BibDatabaseTest {
         assertEquals(database.getNumberOfKeyOccurrences("AAA"), 1);
     }
 
+    @Test
+    public void circularStringResolving() {
+        BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "#BBB#");
+        database.addString(string);
+        string = new BibtexString(IdGenerator.next(), "BBB", "#AAA#");
+        database.addString(string);
+        assertEquals(database.resolveForStrings("#AAA#"), "AAA");
+        assertEquals(database.resolveForStrings("#BBB#"), "BBB");
+    }
+
+    @Test
+    public void circularStringResolvingLongerCycle() {
+        BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "#BBB#");
+        database.addString(string);
+        string = new BibtexString(IdGenerator.next(), "BBB", "#CCC#");
+        database.addString(string);
+        string = new BibtexString(IdGenerator.next(), "CCC", "#DDD#");
+        database.addString(string);
+        string = new BibtexString(IdGenerator.next(), "DDD", "#AAA#");
+        database.addString(string);
+        assertEquals(database.resolveForStrings("#AAA#"), "AAA");
+        assertEquals(database.resolveForStrings("#BBB#"), "BBB");
+        assertEquals(database.resolveForStrings("#CCC#"), "CCC");
+        assertEquals(database.resolveForStrings("#DDD#"), "DDD");
+    }
+
+    @Test
+    public void resolveForStringsMonth() {
+        assertEquals(database.resolveForStrings("#jan#"), "January");
+    }
+
+    @Test
+    public void resolveForStringsSurroundingContent() {
+        BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "aaa");
+        database.addString(string);
+        assertEquals(database.resolveForStrings("aa#AAA#AAA"), "aaaaaAAA");
+    }
+
+    @Test
+    public void resolveForStringsOddHashMarkAtTheEnd() {
+        BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "aaa");
+        database.addString(string);
+        assertEquals(database.resolveForStrings("AAA#AAA#AAA#"), "AAAaaaAAA#");
+    }
 }
