@@ -580,7 +580,7 @@ public class BibEntry implements Cloneable {
     }
 
     public Set<String> getKeywords() {
-        return net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(this.getField(KEYWORDS_FIELD));
+        return net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(this);
     }
 
     public Collection<String> getFieldValues() {

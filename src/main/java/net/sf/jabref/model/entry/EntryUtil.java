@@ -43,4 +43,12 @@ public class EntryUtil {
         }
         return keywords;
     }
+
+    /**
+     * @param entry a BibEntry
+     * @return an List containing the keywords of the entry. An empty list if keywords are null or empty
+     */
+    public static Set<String> getSeparatedKeywords(BibEntry entry) {
+        return getSeparatedKeywords(entry.getFieldOptional(BibEntry.KEYWORDS_FIELD).orElse(null));
+    }
 }

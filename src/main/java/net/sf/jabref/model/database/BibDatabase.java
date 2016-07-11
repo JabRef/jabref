@@ -37,6 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -395,7 +396,8 @@ public class BibDatabase {
         }
 
         for (String field : resultingEntry.getFieldNames()) {
-            resultingEntry.setField(field, this.resolveForStrings(resultingEntry.getField(field)));
+            resultingEntry.getFieldOptional(field)
+                    .ifPresent(fieldValue -> resultingEntry.setField(field, this.resolveForStrings(fieldValue)));
         }
         return resultingEntry;
     }
@@ -522,12 +524,16 @@ public class BibDatabase {
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry: Do not do this for the bibtex key.
         if ((o == null) && (database != null) && database.followCrossrefs && !field.equals(BibEntry.KEY_FIELD)) {
-            if (entry.hasField("crossref")) {
-                BibEntry referred = database.getEntryByKey(entry.getField("crossref"));
+            Optional<String> crossrefKey = entry.getFieldOptional("crossref");
+            if (crossrefKey.isPresent()) {
+                BibEntry referred = database.getEntryByKey(crossrefKey.get());
                 if (referred != null) {
                     // Ok, we found the referred entry. Get the field value from that
                     // entry. If it is unset there, too, stop looking:
-                    o = referred.getField(field);
+                    Optional<String> crossrefContent = referred.getFieldOptional(field);
+                    if (crossrefContent.isPresent()) {
+                        o = crossrefContent.get();
+                    }
                 }
             }
         }

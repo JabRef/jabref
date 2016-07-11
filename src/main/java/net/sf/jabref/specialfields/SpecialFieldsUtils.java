@@ -26,6 +26,7 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryUtil;
 
 import static net.sf.jabref.model.entry.BibEntry.KEYWORDS_FIELD;
 
@@ -85,14 +86,15 @@ public class SpecialFieldsUtils {
         UpdateField.updateField(be, e.getFieldName(), value, nullFieldIfValueIsTheSame)
                 .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
         // we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
-        SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()), be, ce);
+        SpecialFieldsUtils.exportFieldToKeywords(e, be.getFieldOptional(e.getFieldName()).orElse(null), be, ce);
     }
 
     private static void exportFieldToKeywords(SpecialField e, BibEntry be, NamedCompound ce) {
-        SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()), be, ce);
+        SpecialFieldsUtils.exportFieldToKeywords(e, be.getFieldOptional(e.getFieldName()).orElse(null), be, ce);
     }
 
-    private static void exportFieldToKeywords(SpecialField e, String newValue, BibEntry entry, NamedCompound ce) {
+    private static void exportFieldToKeywords(SpecialField e, String newValue, BibEntry entry,
+            NamedCompound ce) {
         if (!SpecialFieldsUtils.keywordSyncEnabled()) {
             return;
         }
@@ -120,8 +122,8 @@ public class SpecialFieldsUtils {
 
 
         Optional<FieldChange> change = entry.putKeywords(keywordList);
-        if (ce != null && change.isPresent()) {
-            ce.addEdit(new UndoableFieldChange(change.get()));
+        if (ce != null){
+            change.ifPresent(changeValue -> ce.addEdit(new UndoableFieldChange(changeValue)));
         }
     }
 
@@ -162,8 +164,7 @@ public class SpecialFieldsUtils {
         if (!be.hasField(KEYWORDS_FIELD)) {
             return;
         }
-        Set<String> keywordList = net.sf.jabref.model.entry.EntryUtil
-                .getSeparatedKeywords(be.getField(KEYWORDS_FIELD));
+        Set<String> keywordList = EntryUtil.getSeparatedKeywords(be);
         SpecialFieldsUtils.importKeywordsForField(keywordList, Priority.getInstance(), be, ce);
         SpecialFieldsUtils.importKeywordsForField(keywordList, Rank.getInstance(), be, ce);
         SpecialFieldsUtils.importKeywordsForField(keywordList, Quality.getInstance(), be, ce);
