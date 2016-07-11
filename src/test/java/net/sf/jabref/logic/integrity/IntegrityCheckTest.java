@@ -41,6 +41,7 @@ public class IntegrityCheckTest {
     public void testUrlChecks() {
         assertCorrect(createContext("url", "http://www.google.com"));
         assertCorrect(createContext("url", "file://c:/asdf/asdf"));
+        assertCorrect(createContext("url", "http://scikit-learn.org/stable/modules/ensemble.html#random-forests"));
 
         assertWrong(createContext("url", "www.google.com"));
         assertWrong(createContext("url", "google.com"));
