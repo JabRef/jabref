@@ -31,6 +31,7 @@ apply plugin: 'checkstyle'
 
 apply from: 'eclipse.gradle'
 apply from: 'localization.gradle'
+apply from: 'medline.gradle'
 
 group = "net.sf.jabref"
 version = "3.5dev"
@@ -373,29 +374,3 @@ jmh {
     iterations = 10
     fork = 2
 }
-
-configurations {
- xjc
-}
- 
-dependencies {
- xjc group: 'com.sun.xml.bind', name: 'jaxb-xjc', version: '2.2.4-1'
-}
-
- def schemaTargetDir = new File ('src/main/gen')
-
-task createDirs () {
- schemaTargetDir.mkdirs()
-}
- 
-task xjc () { 
- ant.taskdef(name: 'xjc', classname: 'com.sun.tools.xjc.XJCTask', classpath: configurations.xjc.asPath)
- 
- ant.xjc(
-  destdir: schemaTargetDir,
-  schema: 'src/main/resources/xjc/medline.xsd'
- )
-}
- 
- xjc.dependsOn createDirs
- compileJava.dependsOn xjc
