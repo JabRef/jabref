@@ -56,7 +56,6 @@ import net.sf.jabref.logic.groups.EntriesGroupChange;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.MoveGroupChange;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
 
 public class GroupsTree extends JTree implements DragSourceListener,
         DropTargetListener, DragGestureListener {
@@ -302,7 +301,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
                 // warn if assignment has undesired side effects (modifies a
                 // field != keywords)
-                if (!Util.warnAssignmentSideEffects(group, groupSelector.frame))
+                if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(group, groupSelector.frame))
                  {
                     return; // user aborted operation
                 }

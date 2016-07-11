@@ -65,7 +65,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -483,7 +482,7 @@ class GroupDialog extends JDialog {
             }
         }
         if (!list.isEmpty()) {
-            if (!Util.warnAssignmentSideEffects(mResultingGroup, this)) {
+            if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(mResultingGroup, this)) {
                 return;
             }
             // the undo information for a conversion to an ExplicitGroup is
