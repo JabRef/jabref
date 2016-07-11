@@ -28,8 +28,8 @@ public class WarnAssignmentSideEffects {
         List<String> affectedFields = new ArrayList<>();
         for (AbstractGroup group : groups) {
             if (group instanceof KeywordGroup) {
-                KeywordGroup kg = (KeywordGroup) group;
-                String field = kg.getSearchField().toLowerCase();
+                KeywordGroup keywordGroup = (KeywordGroup) group;
+                String field = keywordGroup.getSearchField().toLowerCase();
                 if ("keywords".equals(field) || "groups".equals(field)) {
                     continue; // this is not undesired
                 }
@@ -45,7 +45,7 @@ public class WarnAssignmentSideEffects {
         if (affectedFields.isEmpty()) {
             return true; // no side effects
         }
-    
+
         // show a warning, then return
         StringBuilder message = new StringBuilder(
                 Localization.lang("This action will modify the following field(s) in at least one entry each:"))
@@ -59,7 +59,7 @@ public class WarnAssignmentSideEffects {
         int choice = JOptionPane.showConfirmDialog(parent, message, Localization.lang("Warning"),
                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         return choice != JOptionPane.NO_OPTION;
-    
+
         // if (groups instanceof KeywordGroup) {
         // KeywordGroup kg = (KeywordGroup) groups;
         // String field = kg.getSearchField().toLowerCase();
