@@ -26,6 +26,7 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryUtil;
 
 import static net.sf.jabref.model.entry.BibEntry.KEYWORDS_FIELD;
 
@@ -163,7 +164,7 @@ public class SpecialFieldsUtils {
         if (!be.hasField(KEYWORDS_FIELD)) {
             return;
         }
-        Set<String> keywordList = net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(be);
+        Set<String> keywordList = EntryUtil.getSeparatedKeywords(be);
         SpecialFieldsUtils.importKeywordsForField(keywordList, Priority.getInstance(), be, ce);
         SpecialFieldsUtils.importKeywordsForField(keywordList, Rank.getInstance(), be, ce);
         SpecialFieldsUtils.importKeywordsForField(keywordList, Quality.getInstance(), be, ce);
