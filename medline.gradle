@@ -1,0 +1,18 @@
+
+configurations {
+ xjc
+} 
+
+dependencies {
+ xjc group: 'com.sun.xml.bind', name: 'jaxb-xjc', version: '2.2.4-1'
+}
+
+task xjc () << { 
+ ant.taskdef(name: 'xjc', classname: 'com.sun.tools.xjc.XJCTask', classpath: configurations.xjc.asPath)
+ 
+ ant.xjc(destdir: 'src/main/gen/', package: 'net.sf.jabref.importer.fileformat.medline'){
+  schema(dir: 'src/main/resources/xjc/medline', includes: 'medline.xsd')
+  }
+}
+
+tasks. compileJava.dependsOn xjc
