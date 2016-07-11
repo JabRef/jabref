@@ -23,6 +23,7 @@ import java.util.List;
 
 import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
@@ -45,6 +46,7 @@ public class Formatters {
 
     public static final List<Formatter> CONVERTERS = Arrays.asList(
             new HtmlToLatexFormatter(),
+            new HtmlToUnicodeFormatter(),
             new LatexToUnicodeFormatter(),
             new UnicodeToLatexFormatter()
     );

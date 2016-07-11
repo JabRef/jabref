@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Implemented [#1356](https://github.com/JabRef/jabref/issues/1356): Added a formatter for converting HTML to Unicode
 - Implemented [#661](https://github.com/JabRef/jabref/issues/661): Introducing a "check for updates" mechnism (manually/automatic at startup)
 - [#1485](https://github.com/JabRef/jabref/issues/1485): Biblatex field shorttitle is now exported/imported as standard field ShortTitle to Word bibliography
 - [#1431](https://github.com/JabRef/jabref/issues/1431): Import dialog shows file extensions and filters the view

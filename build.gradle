@@ -103,6 +103,8 @@ dependencies {
 
     compile 'commons-logging:commons-logging:1.2'
 
+    compile 'org.apache.commons:commons-lang3:3.4'
+
     compile 'org.jsoup:jsoup:1.9.2'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
     compile 'info.debatty:java-string-similarity:0.13'
