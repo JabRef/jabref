@@ -16,6 +16,7 @@
 package net.sf.jabref.logic.openoffice;
 
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -87,7 +88,7 @@ public class OOUtil {
                     WrappedTargetException, IllegalArgumentException {
 
         // Backup the value of the uniq field, just in case the entry already has it:
-        String oldUniqVal = entry.getField(UNIQUEFIER_FIELD);
+        Optional<String> oldUniqVal = entry.getFieldOptional(UNIQUEFIER_FIELD);
 
 
         // Set the uniq field with the supplied uniquefier:
@@ -101,10 +102,10 @@ public class OOUtil {
         String lText = layout.doLayout(entry, database);
 
         // Afterwards, reset the old value:
-        if (oldUniqVal == null) {
-            entry.clearField(UNIQUEFIER_FIELD);
+        if (oldUniqVal.isPresent()) {
+            entry.setField(UNIQUEFIER_FIELD, oldUniqVal.get());
         } else {
-            entry.setField(UNIQUEFIER_FIELD, oldUniqVal);
+            entry.clearField(UNIQUEFIER_FIELD);
         }
 
         // Insert the formatted text:

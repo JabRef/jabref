@@ -16,6 +16,7 @@
 package net.sf.jabref.gui.menus;
 
 import java.awt.event.ActionEvent;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.Icon;
@@ -106,9 +107,9 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             add(markSpecific);
             add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entries"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon()));
         } else if (be != null) {
-            String marked = be.getField(InternalBibtexFields.MARKED);
+            Optional<String> marked = be.getFieldOptional(InternalBibtexFields.MARKED);
             // We have to check for "" too as the marked field may be empty
-            if ((marked == null) || marked.isEmpty()) {
+            if ((!marked.isPresent()) || marked.get().isEmpty()) {
                 add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entry"), IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon()));
                 add(markSpecific);
             } else {
