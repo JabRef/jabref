@@ -122,7 +122,7 @@ public class MedlineImporter extends ImportFormat {
 
         List<BibEntry> bibItems = new ArrayList<>();
         try {
-            JAXBContext context = JAXBContext.newInstance("importer.fileformat.medline");
+            JAXBContext context = JAXBContext.newInstance("net.sf.jabref.importer.fileformat.medline");
             Unmarshaller unmarshaller = context.createUnmarshaller();
             Object unmarshalledObject = unmarshaller.unmarshal(reader);
 
