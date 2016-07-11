@@ -26,6 +26,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
+import net.sf.jabref.gui.keyboard.EmacsKeyBindings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
@@ -37,7 +38,6 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
 
 /**
  * Static variables for graphics files and keyboard shortcuts.
