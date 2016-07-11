@@ -21,6 +21,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Fixed
 - Fixed [#1530](https://github.com/JabRef/jabref/issues/1530): Unescaped hashes in the url field are ignored by the integrity checker
+- Springer fetcher now fetches the requested number of entries (not one less as before)
 - Fixed [#405](https://github.com/JabRef/jabref/issues/405): Added more {} around capital letters in Unicode/HTML to LaTeX conversion to preserve them
 - Alleviate multiuser concurrency issue when near simultaneous saves occur to a shared database file
 - Fixed [#1476](https://github.com/JabRef/jabref/issues/1476): NPE when importing from SQL DB because of missing DatabaseMode
@@ -31,6 +32,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1444](https://github.com/JabRef/jabref/issues/1444): Implement getExtension and getDescription for importers.
 - Fixed [#1507](https://github.com/JabRef/jabref/issues/1507): Keywords are now separated by the delimiter specified in the preferences
 - Fixed [#1484](https://github.com/JabRef/jabref/issues/1484): HTML export handles some UTF characters wrong
+- Fixed [#1534](https://github.com/JabRef/jabref/issues/1534): "Mark entries imported into database" does not work correctly
 
 ### Removed
 

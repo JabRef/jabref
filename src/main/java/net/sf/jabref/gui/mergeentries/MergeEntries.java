@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -236,9 +237,9 @@ public class MergeEntries {
         for (String field : allFields) {
             JLabel label = boldFontLabel(new SentenceCaseFormatter().format(field));
             mergePanel.add(label, cc.xy(1, (2 * row) - 1, "left, top"));
-            String leftString = leftEntry.getField(field);
-            String rightString = rightEntry.getField(field);
-            if (Objects.equals(leftString, rightString)) {
+            Optional<String> leftString = leftEntry.getFieldOptional(field);
+            Optional<String> rightString = rightEntry.getFieldOptional(field);
+            if (leftString.equals(rightString)) {
                 identicalFields.add(field);
             } else {
                 differentFields.add(field);
@@ -247,7 +248,7 @@ public class MergeEntries {
             maxLabelWidth = Math.max(maxLabelWidth, label.getPreferredSize().width);
 
             // Left text pane
-            if (leftString != null) {
+            if (leftString.isPresent()) {
                 JTextPane tf = getStyledTextPane();
                 mergePanel.add(tf, cc.xy(3, (2 * row) - 1, "f, f"));
                 leftTextPanes.put(field, tf);
@@ -255,7 +256,7 @@ public class MergeEntries {
 
             // Add radio buttons if the two entries do not have identical fields
             if (identicalFields.contains(field)) {
-                mergedEntry.setField(field, leftString);
+                mergedEntry.setField(field, leftString.get()); // Will only happen if both entries have the field and the content is identical
             } else {
                 ButtonGroup group = new ButtonGroup();
                 List<JRadioButton> list = new ArrayList<>(3);
@@ -267,19 +268,19 @@ public class MergeEntries {
                     list.add(button);
                 }
                 radioButtons.put(field, list);
-                if (leftString == null) {
-                    list.get(0).setEnabled(false);
-                    list.get(2).setSelected(true);
-                } else {
+                if (leftString.isPresent()) {
                     list.get(0).setSelected(true);
-                    if (rightString == null) {
+                    if (!rightString.isPresent()) {
                         list.get(2).setEnabled(false);
                     }
+                } else {
+                    list.get(0).setEnabled(false);
+                    list.get(2).setSelected(true);
                 }
             }
 
             // Right text pane
-            if (rightString != null) {
+            if (rightString.isPresent()) {
                 JTextPane tf = getStyledTextPane();
                 mergePanel.add(tf, cc.xy(11, (2 * row) - 1, "f, f"));
                 rightTextPanes.put(field, tf);
@@ -364,8 +365,8 @@ public class MergeEntries {
     private void updateTextPanes(Collection<String> fields) {
         int oldScrollPaneValue = scrollPane.getVerticalScrollBar().getValue();
         for (String field : fields) {
-            String leftString = leftEntry.getField(field);
-            String rightString = rightEntry.getField(field);
+            String leftString = leftEntry.getFieldOptional(field).orElse("");
+            String rightString = rightEntry.getFieldOptional(field).orElse("");
             switch (diffMode.getSelectedIndex()) {
             case 0: // Plain text
                 break;
@@ -521,9 +522,9 @@ public class MergeEntries {
         // Check the potentially different fields
         for (String field : differentFields) {
             if (radioButtons.get(field).get(0).isSelected()) {
-                mergedEntry.setField(field, leftEntry.getField(field));
+                mergedEntry.setField(field, leftEntry.getFieldOptional(field).get()); // Will only happen if field exists
             } else if (radioButtons.get(field).get(2).isSelected()) {
-                mergedEntry.setField(field, rightEntry.getField(field));
+                mergedEntry.setField(field, rightEntry.getFieldOptional(field).get()); // Will only happen if field exists
             } else {
                 mergedEntry.clearField(field);
             }
