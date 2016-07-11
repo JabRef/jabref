@@ -50,7 +50,6 @@ import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.specialfields.SpecialField;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
@@ -348,19 +347,20 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
      * @param columnName the name of the specialfield column
      */
     private void handleSpecialFieldLeftClick(MouseEvent e, String columnName) {
-        SpecialField field = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(columnName);
-        if ((e.getClickCount() == 1) && (field != null)) {
-            // special field found
-            if (field.isSingleValueField()) {
-                // directly execute toggle action instead of showing a menu with one action
-                field.getValues().get(0).getAction(panel.frame()).action();
-            } else {
-                JPopupMenu menu = new JPopupMenu();
-                for (SpecialFieldValue val : field.getValues()) {
-                    menu.add(val.getMenuAction(panel.frame()));
+        if ((e.getClickCount() == 1)) {
+            SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(columnName).ifPresent(field -> {
+                // special field found
+                if (field.isSingleValueField()) {
+                    // directly execute toggle action instead of showing a menu with one action
+                    field.getValues().get(0).getAction(panel.frame()).action();
+                } else {
+                    JPopupMenu menu = new JPopupMenu();
+                    for (SpecialFieldValue val : field.getValues()) {
+                        menu.add(val.getMenuAction(panel.frame()));
+                    }
+                    menu.show(table, e.getX(), e.getY());
                 }
-                menu.show(table, e.getX(), e.getY());
-            }
+            });
         }
     }
 

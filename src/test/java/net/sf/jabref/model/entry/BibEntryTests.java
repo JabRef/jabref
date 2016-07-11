@@ -120,23 +120,24 @@ public class BibEntryTests {
 
         Assert.assertEquals("2003-02",
                 (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }"))
-                        .getPublicationDate());
+                        .getPublicationDate().get());
 
         Assert.assertEquals("2003-03",
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = 3 }")).getPublicationDate());
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = 3 }")).getPublicationDate()
+                        .get());
 
         Assert.assertEquals("2003",
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}}")).getPublicationDate());
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}}")).getPublicationDate().get());
 
-        Assert.assertEquals(null,
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, month = 3 }")).getPublicationDate());
+        Assert.assertFalse(
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, month = 3 }")).getPublicationDate().isPresent());
 
-        Assert.assertEquals(null,
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, author={bla}}")).getPublicationDate());
+        Assert.assertFalse(
+                (BibtexParser.singleFromString("@ARTICLE{HipKro03, author={bla}}")).getPublicationDate().isPresent());
 
         Assert.assertEquals("2003-12",
                 (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #DEC# }"))
-                        .getPublicationDate());
+                        .getPublicationDate().get());
 
     }
 

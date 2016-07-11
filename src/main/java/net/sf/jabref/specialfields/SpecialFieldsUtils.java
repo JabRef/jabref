@@ -177,21 +177,21 @@ public class SpecialFieldsUtils {
      * @param fieldName the fieldName
      * @return an instance of that field. The returned object is a singleton. null is returned if fieldName does not indicate a special field
      */
-    public static SpecialField getSpecialFieldInstanceFromFieldName(String fieldName) {
+    public static Optional<SpecialField> getSpecialFieldInstanceFromFieldName(String fieldName) {
         if (fieldName.equals(SpecialFieldsUtils.FIELDNAME_PRIORITY)) {
-            return Priority.getInstance();
+            return Optional.of(Priority.getInstance());
         } else if (fieldName.equals(SpecialFieldsUtils.FIELDNAME_QUALITY)) {
-            return Quality.getInstance();
+            return Optional.of(Quality.getInstance());
         } else if (fieldName.equals(SpecialFieldsUtils.FIELDNAME_RANKING)) {
-            return Rank.getInstance();
+            return Optional.of(Rank.getInstance());
         } else if (fieldName.equals(SpecialFieldsUtils.FIELDNAME_RELEVANCE)) {
-            return Relevance.getInstance();
+            return Optional.of(Relevance.getInstance());
         } else if (fieldName.equals(SpecialFieldsUtils.FIELDNAME_READ)) {
-            return ReadStatus.getInstance();
+            return Optional.of(ReadStatus.getInstance());
         } else if (fieldName.equals(SpecialFieldsUtils.FIELDNAME_PRINTED)) {
-            return Printed.getInstance();
+            return Optional.of(Printed.getInstance());
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 
@@ -200,7 +200,7 @@ public class SpecialFieldsUtils {
      * @return true if given field is a special field, false otherwise
      */
     public static boolean isSpecialField(String fieldName) {
-        return SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(fieldName) != null;
+        return SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(fieldName).isPresent();
     }
 
     public static boolean keywordSyncEnabled() {
