@@ -507,7 +507,7 @@ public class FieldExtraComponents {
             }
 
             private void checkValidKey() {
-                if (panel.getDatabase().containsEntryWithKey(crossref.getText())) {
+                if (panel.getDatabase().getEntryByKey(crossref.getText()) != null) {
                     button.setEnabled(true);
                 } else {
                     button.setEnabled(false);
