@@ -143,33 +143,26 @@ public class BibDatabase {
      */
     @Deprecated
     public synchronized BibEntry getEntryByKey(String key) {
-        BibEntry back = null;
-
-        int keyHash = key.hashCode(); // key hash for better performance
-
         for (BibEntry entry : entries) {
-            if ((entry != null) && (entry.getCiteKey() != null) && (keyHash == entry.getCiteKey().hashCode())) {
-                back = entry;
+            if (key.equals(entry.getCiteKey())) {
+                return entry;
             }
         }
-        return back;
+        return null;
     }
 
     /**
      * Returns the entry with the given bibtex key.
      */
     public synchronized Optional<BibEntry> getEntryByKeyOptional(String key) {
-        BibEntry back = null;
-
-        int keyHash = key.hashCode(); // key hash for better performance
-
         for (BibEntry entry : entries) {
-            if ((entry != null) && (entry.getCiteKey() != null) && (keyHash == entry.getCiteKey().hashCode())) {
-                back = entry;
+            if (key.equals(entry.getCiteKey())) {
+                return Optional.of(entry);
             }
         }
-        return Optional.ofNullable(back);
+        return Optional.empty();
     }
+
     public synchronized List<BibEntry> getEntriesByKey(String key) {
         List<BibEntry> result = new ArrayList<>();
 
