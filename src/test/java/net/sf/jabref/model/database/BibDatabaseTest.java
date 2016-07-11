@@ -197,4 +197,80 @@ public class BibDatabaseTest {
 
         assertEquals(entry, tel.getBibEntry());
     }
+
+    @Test
+    public void correctKeyCountOne() {
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("AAA");
+        database.insertEntry(entry);
+        assertEquals(database.getNumberOfKeyOccurrences("AAA"), 1);
+    }
+
+    @Test
+    public void correctKeyCountTwo() {
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("AAA");
+        database.insertEntry(entry);
+        entry = new BibEntry();
+        entry.setCiteKey("AAA");
+        database.insertEntry(entry);
+        assertEquals(database.getNumberOfKeyOccurrences("AAA"), 2);
+    }
+
+    @Test
+    public void setCiteKeySameKeySameEntry() {
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("AAA");
+        database.insertEntry(entry);
+        assertFalse(database.setCiteKeyForEntry(entry, "AAA"));
+        assertEquals(database.getNumberOfKeyOccurrences("AAA"), 1);
+    }
+
+    @Test
+    public void setCiteKeyRemoveKey() {
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("AAA");
+        database.insertEntry(entry);
+        assertFalse(database.setCiteKeyForEntry(entry, null));
+        assertEquals(database.getNumberOfKeyOccurrences("AAA"), 0);
+        assertNull(entry.getCiteKey());
+    }
+
+    @Test
+    public void setCiteKeyDifferentKeySameEntry() {
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("AAA");
+        database.insertEntry(entry);
+        assertFalse(database.setCiteKeyForEntry(entry, "BBB"));
+        assertEquals(database.getNumberOfKeyOccurrences("AAA"), 0);
+        assertEquals(database.getNumberOfKeyOccurrences("BBB"), 1);
+    }
+
+
+    @Test
+    public void setCiteKeySameKeyDifferentEntries() {
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("AAA");
+        database.insertEntry(entry);
+        entry = new BibEntry();
+        entry.setCiteKey("BBB");
+        database.insertEntry(entry);
+        assertTrue(database.setCiteKeyForEntry(entry, "AAA"));
+        assertEquals(entry.getCiteKey(), "AAA");
+        assertEquals(database.getNumberOfKeyOccurrences("AAA"), 2);
+        assertEquals(database.getNumberOfKeyOccurrences("BBB"), 0);
+    }
+
+    @Test
+    public void correctKeyCountAfterRemoving() {
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("AAA");
+        database.insertEntry(entry);
+        entry = new BibEntry();
+        entry.setCiteKey("AAA");
+        database.insertEntry(entry);
+        database.removeEntry(entry);
+        assertEquals(database.getNumberOfKeyOccurrences("AAA"), 1);
+    }
+
 }
