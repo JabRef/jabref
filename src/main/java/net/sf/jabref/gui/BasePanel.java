@@ -585,7 +585,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // Run third, on EDT:
             @Override
             public void update() {
-                database.setFollowCrossrefs(true);
                 if (canceled) {
                     frame.unblock();
                     return;
