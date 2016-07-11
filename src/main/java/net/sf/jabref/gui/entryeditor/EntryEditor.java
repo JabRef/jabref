@@ -542,7 +542,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         source.setTabSize(Globals.prefs.getInt(JabRefPreferences.INDENT));
         source.addFocusListener(new FieldEditorFocusListener());
         // Add the global focus listener, so a menu item can see if this field was focused when an action was called.
-        source.addFocusListener(Globals.focusListener);
+        source.addFocusListener(Globals.getFocusListener());
         source.setFont(new Font("Monospaced", Font.PLAIN, Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
         setupJTextComponent(source);
         updateSource();
@@ -693,7 +693,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * Makes sure the current edit is stored.
      */
     public void storeCurrentEdit() {
-        Component comp = Globals.focusListener.getFocused();
+        Component comp = Globals.getFocusListener().getFocused();
         if (Objects.equals(comp, source) || ((comp instanceof FieldEditor) && this.isAncestorOf(comp))) {
             if (comp instanceof FieldEditor) {
                 ((FieldEditor) comp).clearAutoCompleteSuggestion();

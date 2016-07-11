@@ -132,7 +132,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                 success = saveDatabase(panel.getBibDatabaseContext().getDatabaseFile(), false,
                         panel.getBibDatabaseContext().getMetaData().getEncoding());
 
-                Globals.fileUpdateMonitor.updateTimeStamp(panel.getFileMonitorHandle());
+                Globals.getFileUpdateMonitor().updateTimeStamp(panel.getFileMonitorHandle());
             } else {
                 // No file lock
                 success = false;
@@ -331,7 +331,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         }
         // Register so we get notifications about outside changes to the file.
         try {
-            panel.setFileMonitorHandle(Globals.fileUpdateMonitor.addUpdateListener(panel,
+            panel.setFileMonitorHandle(Globals.getFileUpdateMonitor().addUpdateListener(panel,
                     panel.getBibDatabaseContext().getDatabaseFile()));
         } catch (IOException ex) {
             LOGGER.error("Problem registering file change notifications", ex);
@@ -368,7 +368,7 @@ public class SaveDatabaseAction extends AbstractWorker {
      */
     private boolean checkExternalModification() {
         // Check for external modifications:
-        if (panel.isUpdatedExternally() || Globals.fileUpdateMonitor.hasBeenModified(panel.getFileMonitorHandle())) {
+        if (panel.isUpdatedExternally() || Globals.getFileUpdateMonitor().hasBeenModified(panel.getFileMonitorHandle())) {
             String[] opts = new String[] {Localization.lang("Review changes"), Localization.lang("Save"),
                     Localization.lang("Cancel")};
             int answer = JOptionPane.showOptionDialog(panel.frame(),

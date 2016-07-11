@@ -233,7 +233,7 @@ public class SearchBar extends JPanel {
         autoCompleteSupport.install();
 
         // Add the global focus listener, so a menu item can see if this field was focused when an action was called.
-        searchField.addFocusListener(Globals.focusListener);
+        searchField.addFocusListener(Globals.getFocusListener());
 
         // Search if user press enter
         searchField.addActionListener(e -> performSearch());
