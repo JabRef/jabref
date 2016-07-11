@@ -43,7 +43,7 @@ public class BibEntryTests {
         // we have to use `getType("misc")` in the case of biblatex mode
         Assert.assertEquals("misc", entry.getType());
         Assert.assertNotNull(entry.getId());
-        Assert.assertNull(entry.getField("author"));
+        Assert.assertFalse(entry.getFieldOptional("author").isPresent());
     }
 
     @Test
@@ -144,63 +144,63 @@ public class BibEntryTests {
     public void getFieldOrAliasDateWithYearNumericalMonthString() {
         emptyEntry.setField("year", "2003");
         emptyEntry.setField("month", "3");
-        Assert.assertEquals("2003-03", emptyEntry.getFieldOrAlias("date"));
+        Assert.assertEquals("2003-03", emptyEntry.getFieldOrAlias("date").get());
     }
 
     @Test
     public void getFieldOrAliasDateWithYearAbbreviatedMonth() {
         emptyEntry.setField("year", "2003");
         emptyEntry.setField("month", "#mar#");
-        Assert.assertEquals("2003-03", emptyEntry.getFieldOrAlias("date"));
+        Assert.assertEquals("2003-03", emptyEntry.getFieldOrAlias("date").get());
     }
 
     @Test
     public void getFieldOrAliasDateWithYearAbbreviatedMonthString() {
         emptyEntry.setField("year", "2003");
         emptyEntry.setField("month", "mar");
-        Assert.assertEquals("2003-03", emptyEntry.getFieldOrAlias("date"));
+        Assert.assertEquals("2003-03", emptyEntry.getFieldOrAlias("date").get());
     }
 
     @Test
     public void getFieldOrAliasDateWithOnlyYear() {
         emptyEntry.setField("year", "2003");
-        Assert.assertEquals("2003", emptyEntry.getFieldOrAlias("date"));
+        Assert.assertEquals("2003", emptyEntry.getFieldOrAlias("date").get());
     }
 
     @Test
     public void getFieldOrAliasYearWithDateYYYY() {
         emptyEntry.setField("date", "2003");
-        Assert.assertEquals("2003", emptyEntry.getFieldOrAlias("year"));
+        Assert.assertEquals("2003", emptyEntry.getFieldOrAlias("year").get());
     }
 
     @Test
     public void getFieldOrAliasYearWithDateYYYYMM() {
         emptyEntry.setField("date", "2003-03");
-        Assert.assertEquals("2003", emptyEntry.getFieldOrAlias("year"));
+        Assert.assertEquals("2003", emptyEntry.getFieldOrAlias("year").get());
     }
 
     @Test
     public void getFieldOrAliasYearWithDateYYYYMMDD() {
         emptyEntry.setField("date", "2003-03-30");
-        Assert.assertEquals("2003", emptyEntry.getFieldOrAlias("year"));
+        Assert.assertEquals("2003", emptyEntry.getFieldOrAlias("year").get());
     }
 
     @Test
     public void getFieldOrAliasMonthWithDateYYYYReturnsNull() {
         emptyEntry.setField("date", "2003");
-        Assert.assertNull(emptyEntry.getFieldOrAlias("month"));
+        Assert.assertFalse(emptyEntry.getFieldOrAlias("month").isPresent());
     }
 
     @Test
     public void getFieldOrAliasMonthWithDateYYYYMM() {
         emptyEntry.setField("date", "2003-03");
-        Assert.assertEquals("3", emptyEntry.getFieldOrAlias("month"));
+        Assert.assertEquals("3", emptyEntry.getFieldOrAlias("month").get());
     }
 
     @Test
     public void getFieldOrAliasMonthWithDateYYYYMMDD() {
         emptyEntry.setField("date", "2003-03-30");
-        Assert.assertEquals("3", emptyEntry.getFieldOrAlias("month"));
+        Assert.assertEquals("3", emptyEntry.getFieldOrAlias("month").get());
     }
 
     @Test(expected = NullPointerException.class)
@@ -381,9 +381,9 @@ public class BibEntryTests {
         be.setCiteKey("Einstein1931");
         Assert.assertTrue(be.hasCiteKey());
         Assert.assertEquals("Einstein1931", be.getCiteKey());
-        Assert.assertEquals("Albert Einstein", be.getField("author"));
+        Assert.assertEquals("Albert Einstein", be.getFieldOptional("author").get());
         be.clearField("author");
-        Assert.assertNull(be.getField("author"));
+        Assert.assertFalse(be.getFieldOptional("author").isPresent());
 
         String id = IdGenerator.next();
         be.setId(id);

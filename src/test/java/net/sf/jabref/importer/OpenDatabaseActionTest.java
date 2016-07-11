@@ -74,7 +74,7 @@ public class OpenDatabaseActionTest {
 
         // Entry
         Assert.assertEquals(1, db.getEntryCount());
-        Assert.assertEquals("2014", db.getEntryByKey("1").getField("year"));
+        Assert.assertEquals("2014", db.getEntryByKeyOptional("1").get().getFieldOptional("year").get());
     }
 
     @Test
@@ -84,7 +84,7 @@ public class OpenDatabaseActionTest {
 
         // Entry
         Assert.assertEquals(1, db.getEntryCount());
-        Assert.assertEquals("2014", db.getEntryByKey("1").getField("year"));
+        Assert.assertEquals("2014", db.getEntryByKeyOptional("1").get().getFieldOptional("year").get());
     }
 
     @Test
@@ -94,7 +94,7 @@ public class OpenDatabaseActionTest {
 
         // Entry
         Assert.assertEquals(1, db.getEntryCount());
-        Assert.assertEquals("2014", db.getEntryByKey("1").getField("year"));
+        Assert.assertEquals("2014", db.getEntryByKeyOptional("1").get().getFieldOptional("year").get());
     }
 
     /**

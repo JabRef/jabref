@@ -154,7 +154,7 @@ public class OOBibStyleTest {
             entryDBMap.put(entry, db);
         }
 
-        BibEntry entry = db.getEntryByKey("1137631");
+        BibEntry entry = db.getEntryByKeyOptional("1137631").get();
         assertEquals("[Boström et al., 2006]",
                 style.getCitationMarker(Arrays.asList(entry), entryDBMap, true, null, null));
         assertEquals("Boström et al. [2006]",
@@ -173,7 +173,7 @@ public class OOBibStyleTest {
 
         Layout l = style.getReferenceFormat("default");
         l.setPostFormatter(new OOPreFormatter());
-        BibEntry entry = db.getEntryByKey("1137631");
+        BibEntry entry = db.getEntryByKeyOptional("1137631").get();
         assertEquals(
                 "Boström, G.; Wäyrynen, J.; Bodén, M.; Beznosov, K. and Kruchten, P. (<b>2006</b>). <i>Extending XP practices to support security requirements engineering</i>,   : 11-18.",
                 l.doLayout(entry, db));

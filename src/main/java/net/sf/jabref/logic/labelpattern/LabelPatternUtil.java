@@ -746,9 +746,9 @@ public class LabelPatternUtil {
             } else if ("veryshorttitle".equals(val)) {
                 return getTitleWords(1, entry.getField("title"));
             } else if ("shortyear".equals(val)) {
-                String ss = entry.getFieldOrAlias("year");
-                if (ss == null) {
-                    return "";
+                String ss = entry.getFieldOrAlias("year").orElse("");
+                if (ss.isEmpty()) {
+                    return ss;
                 } else if (ss.startsWith("in") || ss.startsWith("sub")) {
                     return "IP";
                 } else if (ss.length() > 2) {
@@ -808,8 +808,7 @@ public class LabelPatternUtil {
      * @return The field value.
      */
     private static String getField(BibEntry entry, String field) {
-        String s = entry.getFieldOrAlias(field);
-        return s == null ? "" : s;
+        return entry.getFieldOrAlias(field).orElse("");
     }
 
     /**
