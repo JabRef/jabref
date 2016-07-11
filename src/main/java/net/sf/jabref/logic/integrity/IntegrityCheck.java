@@ -400,7 +400,12 @@ public class IntegrityCheck {
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
             List<IntegrityMessage> results = new ArrayList<>();
-            for (Map.Entry<String, String> field : entry.getFieldMap().entrySet()) {
+
+            Map<String, String> fields = entry.getFieldMap();
+            // the url field should not be checked for hashes, as they are legal in this field
+            fields.remove("url");
+
+            for (Map.Entry<String, String> field : fields.entrySet()) {
                 Matcher hashMatcher = UNESCAPED_HASH.matcher(field.getValue());
                 int hashCount = 0;
                 while (hashMatcher.find()) {
