@@ -134,7 +134,7 @@ public class FieldExtraComponents {
         // enable/disable button
         JTextComponent url = (JTextComponent) fieldEditor;
 
-        DocumentListener documentListener = new DocumentListener() {
+        url.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void changedUpdate(DocumentEvent documentEvent) {
                 checkUrl();
@@ -157,8 +157,7 @@ public class FieldExtraComponents {
                     button.setEnabled(false);
                 }
             }
-        };
-        url.getDocument().addDocumentListener(documentListener);
+        });
 
         return Optional.of(controls);
     }
@@ -205,7 +204,7 @@ public class FieldExtraComponents {
         // enable/disable button
         JTextComponent doi = (JTextComponent) fieldEditor;
 
-        DocumentListener documentListener = new DocumentListener() {
+        doi.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void changedUpdate(DocumentEvent documentEvent) {
                 checkDoi();
@@ -231,8 +230,7 @@ public class FieldExtraComponents {
                     fetchButton.setEnabled(false);
                 }
             }
-        };
-        doi.getDocument().addDocumentListener(documentListener);
+        });
 
         return Optional.of(controls);
     }
@@ -476,9 +474,9 @@ public class FieldExtraComponents {
     }
 
     /**
-     * Return a button which sets the owner if the field for fields with EXTRA_SET_OWNER
-     * @param fieldEditor
-     * @param storeFieldAction
+     * Return a button which allows to go to the parent entry of the crossref field
+     * @param fieldEditor The FieldEditor component to get the entry key from
+     * @param panel The current BasePanel
      * @return
      */
 
@@ -487,39 +485,35 @@ public class FieldExtraComponents {
         JButton button = new JButton(Localization.lang("Select"));
         JTextComponent crossref = (JTextComponent) fieldEditor;
 
-        button.addActionListener(actionEvent -> {
-            panel.highlightEntry(panel.getDatabase().getEntryByKey(crossref.getText()));
-        });
+        button.addActionListener(
+                actionEvent -> panel.highlightEntry(panel.getDatabase().getEntryByKey(crossref.getText())));
 
         // enable/disable button
-
-        DocumentListener documentListener = new DocumentListener() {
+        crossref.getDocument().addDocumentListener(new DocumentListener() {
 
             @Override
             public void changedUpdate(DocumentEvent documentEvent) {
-                checkUrl();
+                checkValidKey();
             }
 
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
-                checkUrl();
+                checkValidKey();
             }
 
             @Override
             public void removeUpdate(DocumentEvent documentEvent) {
-                checkUrl();
+                checkValidKey();
             }
 
-            private void checkUrl() {
+            private void checkValidKey() {
                 if (panel.getDatabase().containsEntryWithKey(crossref.getText())) {
                     button.setEnabled(true);
                 } else {
                     button.setEnabled(false);
                 }
             }
-        };
-
-        crossref.getDocument().addDocumentListener(documentListener);
+        });
 
         return Optional.of(button);
 
