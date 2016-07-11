@@ -31,6 +31,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1444](https://github.com/JabRef/jabref/issues/1444): Implement getExtension and getDescription for importers.
 - Fixed [#1507](https://github.com/JabRef/jabref/issues/1507): Keywords are now separated by the delimiter specified in the preferences
 - Fixed [#1484](https://github.com/JabRef/jabref/issues/1484): HTML export handles some UTF characters wrong
+- Fixed [#1534](https://github.com/JabRef/jabref/issues/1534): "Mark entries imported into database" does not work correctly
 
 ### Removed
 
