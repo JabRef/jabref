@@ -24,6 +24,10 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import net.sf.jabref.logic.exporter.SaveException;
+import net.sf.jabref.logic.exporter.SaveSession;
+import net.sf.jabref.logic.exporter.VerifyingWriter;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

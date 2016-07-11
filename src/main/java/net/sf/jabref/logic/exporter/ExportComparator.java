@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -13,24 +13,16 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.logic.layout.format;
+package net.sf.jabref.logic.exporter;
 
-import net.sf.jabref.logic.exporter.ExportFormats;
-import net.sf.jabref.logic.layout.ParamLayoutFormatter;
+import java.util.Comparator;
+import java.util.List;
 
-/**
- * Formatter that outputs a sequence number for the current entry. The sequence number is
- * tied to the entry's position in the order, not to the number of calls to this formatter.
- */
-public class Number implements ParamLayoutFormatter {
+public class ExportComparator implements Comparator<List<String>> {
 
     @Override
-    public void setArgument(String arg) {
-        // No effect currently.
+    public int compare(List<String> s1, List<String> s2) {
+        return s1.get(0).compareTo(s2.get(0));
     }
 
-    @Override
-    public String format(String fieldText) {
-        return String.valueOf(ExportFormats.entryNumber);
-    }
 }

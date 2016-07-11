@@ -20,9 +20,9 @@ import java.net.Authenticator;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.cli.ArgumentProcessor;
-import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.logic.CustomEntryTypesManager;
+import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.ProxyAuthenticator;

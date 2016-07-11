@@ -40,7 +40,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
      *
      * @param group the group underlying this node
      */
-    private GroupTreeNode(AbstractGroup group) {
+    public GroupTreeNode(AbstractGroup group) {
         super(GroupTreeNode.class);
         setGroup(group);
     }
@@ -85,7 +85,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         if (shouldKeepPreviousAssignments && newGroup.supportsAdd()) {
             List<BibEntry> entriesMatchedByOldGroup = entriesInDatabase.stream().filter(oldGroup::isMatch)
                     .collect(Collectors.toList());
-            if (oldGroup instanceof ExplicitGroup && newGroup instanceof ExplicitGroup) {
+            if ((oldGroup instanceof ExplicitGroup) && (newGroup instanceof ExplicitGroup)) {
                 // Rename of explicit group, so remove old group assignment
                 oldGroup.remove(entriesMatchedByOldGroup);
             }
@@ -170,7 +170,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
         GroupTreeNode that = (GroupTreeNode) o;

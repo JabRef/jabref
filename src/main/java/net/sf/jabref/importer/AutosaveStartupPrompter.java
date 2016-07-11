@@ -26,10 +26,10 @@ import javax.swing.JOptionPane;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.exporter.AutoSaveManager;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.ParserResultWarningDialog;
+import net.sf.jabref.gui.exporter.AutoSaveManager;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**

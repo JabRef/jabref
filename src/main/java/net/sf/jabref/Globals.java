@@ -18,9 +18,9 @@ package net.sf.jabref;
 import java.util.Optional;
 
 import net.sf.jabref.collab.FileUpdateMonitor;
-import net.sf.jabref.exporter.AutoSaveManager;
 import net.sf.jabref.gui.GlobalFocusListener;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.exporter.AutoSaveManager;
 import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.logic.error.StreamEavesdropper;

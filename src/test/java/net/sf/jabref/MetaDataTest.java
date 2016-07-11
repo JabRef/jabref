@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 
 import org.junit.Before;

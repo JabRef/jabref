@@ -24,6 +24,9 @@ import java.nio.file.Path;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.exporter.SaveException;
+import net.sf.jabref.logic.exporter.SaveSession;
+import net.sf.jabref.logic.exporter.VerifyingWriter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -54,7 +57,7 @@ public class FileSaveSession extends SaveSession {
     private static final String TEMP_PREFIX = "jabref";
     private static final String TEMP_SUFFIX = "save.bib";
     private final boolean useLockFile;
-    private Path temporaryFile;
+    private final Path temporaryFile;
 
     public FileSaveSession(Charset encoding, boolean backup) throws SaveException {
         this(encoding, backup, createTemporaryFile());
