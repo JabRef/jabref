@@ -197,11 +197,6 @@ public class DbImportAction extends AbstractWorker {
         frame.output(Localization.lang("Imported %0 databases successfully", Integer.toString(databases.size())));
     }
 
-    /**
-     * Run using Spin features to put each method on the correct thread.
-     *
-     * @throws Throwable
-     */
     private void runInSeparateThread() throws Throwable {
         // This part uses Spin's features:
         Worker wrk = this.getWorker();
