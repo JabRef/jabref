@@ -85,11 +85,6 @@ public class BibDatabase {
     private final Set<String> internalIDs = new HashSet<>();
 
 
-    /**
-     * Configuration
-     */
-    private boolean followCrossrefs = true;
-
     private final EventBus eventBus = new EventBus();
 
     /**
@@ -523,7 +518,7 @@ public class BibDatabase {
 
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry: Do not do this for the bibtex key.
-        if ((o == null) && (database != null) && database.followCrossrefs && !field.equals(BibEntry.KEY_FIELD)) {
+        if ((o == null) && (database != null) && !field.equals(BibEntry.KEY_FIELD)) {
             Optional<String> crossrefKey = entry.getFieldOptional("crossref");
             if (crossrefKey.isPresent()) {
                 BibEntry referred = database.getEntryByKey(crossrefKey.get());
@@ -553,10 +548,6 @@ public class BibDatabase {
             return database.resolveForStrings(toResolve);
         }
         return toResolve;
-    }
-
-    public void setFollowCrossrefs(boolean followCrossrefs) {
-        this.followCrossrefs = followCrossrefs;
     }
 
     public void setEpilog(String epilog) {
