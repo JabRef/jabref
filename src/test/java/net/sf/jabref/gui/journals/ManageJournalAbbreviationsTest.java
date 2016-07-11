@@ -23,9 +23,9 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefException;
@@ -246,6 +246,17 @@ public class ManageJournalAbbreviationsTest {
         Assert.assertEquals(4, viewModel.abbreviationsProperty().size());
         // check some abbreviation
         Assert.assertTrue(viewModel.abbreviationsProperty().contains(testAbbreviation2));
+    }
+
+    @Test
+    public void testBuiltInLists() {
+        viewModel.addBuiltInLists();
+        Assert.assertEquals(2, viewModel.journalFilesProperty().getSize());
+        viewModel.changeActiveFile(viewModel.journalFilesProperty().get(0));
+        ObservableList<Abbreviation> expected = FXCollections
+                .observableArrayList(Globals.journalAbbreviationLoader.getBuiltInAbbreviations());
+        ObservableList<Abbreviation> actual = viewModel.abbreviationsProperty().get();
+        Assert.assertEquals(expected, actual);
     }
 
     @Test

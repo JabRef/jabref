@@ -4,8 +4,10 @@
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -33,6 +35,7 @@
                 <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#closeDialog" text="%Cancel" />
                   <Button fx:id="saveButton" defaultButton="true" mnemonicParsing="false" onAction="#saveAbbreviations" text="%Save changes" />
                   <Button fx:id="addAbbreviationButton" disable="true" mnemonicParsing="false" onAction="#addAbbreviation" text="%Add" />
+                  <ToggleButton fx:id="builtInListsToggleButton" mnemonicParsing="false" onAction="#showJabRefBuiltInLists" text="%JabRef lists" />
               </buttons>
             </ButtonBar>
          </bottom>

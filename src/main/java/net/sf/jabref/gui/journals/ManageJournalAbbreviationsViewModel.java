@@ -57,6 +57,28 @@ public class ManageJournalAbbreviationsViewModel {
     }
 
     /**
+     * This will wrap the built in and ieee abbreviations in pseudo abbreviation files
+     * and add them to the list of journal abbreviation files.
+     */
+    public void addBuiltInLists() {
+        List<Abbreviation> builtInList = Globals.journalAbbreviationLoader.getBuiltInAbbreviations();
+        AbbreviationsFile builtInFile = new AbbreviationsFile(builtInList, "JabRef built in list");
+        journalFiles.add(builtInFile);
+        List<Abbreviation> ieeeList;
+        if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
+            ieeeList = Globals.journalAbbreviationLoader.getOfficialIEEEAbbreviations();
+        } else {
+            ieeeList = Globals.journalAbbreviationLoader.getStandardIEEEAbbreviations();
+        }
+        AbbreviationsFile ieeeFile = new AbbreviationsFile(ieeeList, "IEEE built in list");
+        journalFiles.add(ieeeFile);
+    }
+
+    public void removeBuiltInLists() {
+        journalFiles.removeIf(item -> item.isPseudoFileProperty().get());
+    }
+
+    /**
      * Read all saved file paths and read their abbreviations
      */
     public void createFileObjects() {
@@ -223,12 +245,14 @@ public class ManageJournalAbbreviationsViewModel {
 
     /**
      * This method stores all file paths of the files in the journalFiles property
-     * to the global JabRef preferences.
+     * to the global JabRef preferences. Pseudo abbreviation files will not be stored.
      */
     public void saveExternalFilesList() {
         List<String> extFiles = new ArrayList<>();
         journalFiles.forEach(file -> {
-            extFiles.add(file.getAbsolutePath());
+            if (!file.isPseudoFileProperty().get()) {
+                extFiles.add(file.getAbsolutePath());
+            }
         });
         Globals.prefs.putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, extFiles);
     }

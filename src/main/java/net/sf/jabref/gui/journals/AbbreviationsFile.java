@@ -7,8 +7,11 @@ import java.io.OutputStreamWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Objects;
 
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
@@ -20,31 +23,49 @@ public class AbbreviationsFile {
 
     private final SimpleListProperty<Abbreviation> abbreviations = new SimpleListProperty<>(
             FXCollections.observableArrayList());
+    private final ReadOnlyBooleanProperty isPseudoFile;
+    private final String name;
     private final Path path;
 
 
     public AbbreviationsFile(String filePath) {
-        path = Paths.get(filePath);
+        this.path = Paths.get(filePath);
+        this.name = path.toString();
+        this.isPseudoFile = new SimpleBooleanProperty(false);
+    }
+
+    /**
+     * This constructor should only be called to create a pseudo abbreviation file for built in lists.
+     * This means it is a placeholder and it's path will be null meaning it has no place on the filesystem.
+     * It's isPseudoFile property will therefore be set to true.
+     */
+    public AbbreviationsFile(List<Abbreviation> abbreviations, String name) {
+        this.abbreviations.addAll(abbreviations);
+        this.name = name;
+        this.path = null;
+        this.isPseudoFile = new SimpleBooleanProperty(true);
     }
 
     public void readAbbreviations() throws FileNotFoundException {
         abbreviations.addAll(JournalAbbreviationLoader.readJournalListFromFile(path.toFile()));
     }
 
-    public SimpleListProperty<Abbreviation> abbreviationsProperty() {
-        return this.abbreviations;
-    }
-
     public void WriteOrCreate() throws IOException {
-        try (OutputStream outStream = Files.newOutputStream(path);
-                OutputStreamWriter writer = new OutputStreamWriter(outStream, Globals.prefs.getDefaultEncoding())) {
-            for (Abbreviation entry : abbreviations.get()) {
-                writer.write(entry.getName());
-                writer.write(" = ");
-                writer.write(entry.getAbbreviation());
-                writer.write(Globals.NEWLINE);
+        if (!isPseudoFile.get()) {
+            try (OutputStream outStream = Files.newOutputStream(path);
+                    OutputStreamWriter writer = new OutputStreamWriter(outStream, Globals.prefs.getDefaultEncoding())) {
+                for (Abbreviation entry : abbreviations.get()) {
+                    writer.write(entry.getName());
+                    writer.write(" = ");
+                    writer.write(entry.getAbbreviation());
+                    writer.write(Globals.NEWLINE);
+                }
             }
         }
+    }
+
+    public SimpleListProperty<Abbreviation> abbreviationsProperty() {
+        return this.abbreviations;
     }
 
     public boolean exists() {
@@ -55,24 +76,24 @@ public class AbbreviationsFile {
         return path.toString();
     }
 
-    private Path getPath() {
-        return this.path;
+    public ReadOnlyBooleanProperty isPseudoFileProperty() {
+        return this.isPseudoFile;
     }
 
     @Override
     public String toString() {
-        return path.toString();
+        return this.name;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(path);
+        return Objects.hash(name);
     }
 
     @Override
     public boolean equals(Object obj) {
         if (obj instanceof AbbreviationsFile) {
-            return Objects.equals(this.path, ((AbbreviationsFile) obj).getPath());
+            return Objects.equals(this.name, ((AbbreviationsFile) obj).name);
         } else {
             return false;
         }

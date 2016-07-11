@@ -17,9 +17,14 @@ package net.sf.jabref.gui.journals;
 
 import java.io.File;
 import java.util.Optional;
+
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DialogPane;
@@ -27,6 +32,7 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
@@ -46,6 +52,7 @@ import com.airhacks.afterburner.views.FXMLView;
 public class ManageJournalAbbreviationsView extends FXMLView {
 
     private final ManageJournalAbbreviationsViewModel viewModel = new ManageJournalAbbreviationsViewModel();
+    private final BooleanProperty isEditableAndRemovable = new SimpleBooleanProperty(true);
 
     @FXML
     private TableView<Abbreviation> journalAbbreviationsTable;
@@ -54,9 +61,9 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     @FXML
     private TableColumn<Abbreviation, String> journalTableAbbreviationColumn;
     @FXML
-    private TableColumn<Abbreviation, String> journalTableEditColumn;
+    private TableColumn<Abbreviation, Boolean> journalTableEditColumn;
     @FXML
-    private TableColumn<Abbreviation, String> journalTableDeleteColumn;
+    private TableColumn<Abbreviation, Boolean> journalTableDeleteColumn;
     @FXML
     private Button cancelButton;
     @FXML
@@ -71,6 +78,8 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     private Button addNewJournalFileButton;
     @FXML
     private Button removeJournalAbbreviationsButton;
+    @FXML
+    private ToggleButton builtInListsToggleButton;
 
 
     public ManageJournalAbbreviationsView() {
@@ -82,6 +91,12 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     private void initialize() {
         setUpTable();
         setBindings();
+        setButtonStyles();
+        viewModel.createFileObjects();
+        journalFilesBox.getSelectionModel().selectLast();
+    }
+
+    private void setButtonStyles() {
         journalFilesBox.setPromptText(Localization.lang("No abbreviation files loaded"));
         Text addJournalFileButtonGraphic = new Text(IconTheme.JabRefIcon.OPEN.getCode());
         addJournalFileButtonGraphic.getStyleClass().add("icon");
@@ -92,41 +107,50 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         Text removeJournalAbbreviationsButtonGraphic = new Text(IconTheme.JabRefIcon.CLOSE.getCode());
         removeJournalAbbreviationsButtonGraphic.getStyleClass().add("icon");
         removeJournalAbbreviationsButton.setGraphic(removeJournalAbbreviationsButtonGraphic);
-        viewModel.createFileObjects();
-        journalFilesBox.getSelectionModel().selectLast();
+        ButtonBar.setButtonData(builtInListsToggleButton, ButtonData.LEFT);
     }
 
     private void setUpTable() {
         journalTableNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         journalTableAbbreviationColumn.setCellValueFactory(cellData -> cellData.getValue().abbreviationProperty());
-        journalTableEditColumn.setCellFactory(column -> new TableCell<Abbreviation, String>() {
+        journalTableEditColumn.setCellValueFactory(cellData -> isEditableAndRemovable);
+        journalTableDeleteColumn.setCellValueFactory(cellData -> isEditableAndRemovable);
+        journalTableEditColumn.setCellFactory(column -> new TableCell<Abbreviation, Boolean>() {
 
             @Override
-            protected void updateItem(String item, boolean isEmpty) {
-                super.updateItem(item, isEmpty);
+            protected void updateItem(Boolean isEditable, boolean isEmpty) {
+                super.updateItem(isEditable, isEmpty);
                 if (!isEmpty) {
                     Text graphic = new Text(IconTheme.JabRefIcon.EDIT.getCode());
                     graphic.getStyleClass().add("icon");
                     setGraphic(graphic);
-                    setOnMouseClicked(evt -> {
-                        editAbbreviation();
-                    });
+                    if (isEditable) {
+                        setOnMouseClicked(evt -> {
+                            editAbbreviation();
+                        });
+                    } else {
+                        setDisable(true);
+                    }
                 }
                 journalAbbreviationsTable.refresh();
             }
         });
-        journalTableDeleteColumn.setCellFactory(column -> new TableCell<Abbreviation, String>() {
+        journalTableDeleteColumn.setCellFactory(column -> new TableCell<Abbreviation, Boolean>() {
 
             @Override
-            protected void updateItem(String item, boolean isEmpty) {
-                super.updateItem(item, isEmpty);
+            protected void updateItem(Boolean isRemovable, boolean isEmpty) {
+                super.updateItem(isRemovable, isEmpty);
                 if (!isEmpty) {
                     Text graphic = new Text(IconTheme.JabRefIcon.DELETE_ENTRY.getCode());
                     graphic.getStyleClass().add("icon");
                     setGraphic(graphic);
-                    setOnMouseClicked(evt -> {
-                        removeAbbreviation();
-                    });
+                    if (isRemovable) {
+                        setOnMouseClicked(evt -> {
+                            removeAbbreviation();
+                        });
+                    } else {
+                        setDisable(true);
+                    }
                 }
                 journalAbbreviationsTable.refresh();
             }
@@ -137,8 +161,8 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     private void setBindings() {
         viewModel.currentFileProperty().addListener((observable, oldvalue, newvalue) -> {
             journalFilesBox.getSelectionModel().select(newvalue);
-            addAbbreviationButton.setDisable(newvalue == null);
-            removeJournalAbbreviationsButton.setDisable(newvalue == null);
+            addAbbreviationButton.setDisable((newvalue == null) || !isEditableAndRemovable.get());
+            removeJournalAbbreviationsButton.setDisable((newvalue == null) || !isEditableAndRemovable.get());
         });
         viewModel.currentAbbreviationProperty().addListener((observable, oldvalue, newvalue) -> {
             journalAbbreviationsTable.getSelectionModel().select(newvalue);
@@ -161,6 +185,10 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         });
         journalAbbreviationsTable.itemsProperty().addListener((observable, oldvalue, newvalue) -> {
             viewModel.abbreviationsProperty().set(newvalue);
+        });
+        isEditableAndRemovable.addListener((observable, oldvalue, newvalue) -> {
+            addAbbreviationButton.setDisable(!newvalue.booleanValue());
+            removeJournalAbbreviationsButton.setDisable(!newvalue.booleanValue());
         });
     }
 
@@ -312,6 +340,17 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         viewModel.saveJournalAbbreviationFiles();
         viewModel.updateAbbreviationsAutoComplete();
         closeDialog();
+    }
+
+    @FXML
+    public void showJabRefBuiltInLists() {
+        if (builtInListsToggleButton.isSelected()) {
+            isEditableAndRemovable.set(false);
+            viewModel.addBuiltInLists();
+        } else {
+            viewModel.removeBuiltInLists();
+            isEditableAndRemovable.set(true);
+        }
     }
 
 }
