@@ -560,9 +560,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.PULL_REMOTE_CHANGES, (BaseAction) () -> {
             DBMSSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBSynchronizer();
-            dbmsSynchronizer.synchronizeLocalDatabase();
-            dbmsSynchronizer.synchronizeLocalMetaData();
-            dbmsSynchronizer.applyMetaData();
+            dbmsSynchronizer.pullChanges();
         });
 
         actions.put(Actions.OPEN_URL, new OpenURLAction());

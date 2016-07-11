@@ -1631,13 +1631,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             String uniqPath = paths.get(i);
             File file = getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile();
 
-            if ((file != null) && !uniqPath.equals(file.getName())) {
-                // remove filename
-                uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
-                tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
-            } else if ((file != null) && uniqPath.equals(file.getName())) {
-                // set original filename (again)
+            if (file == null) {
                 tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle());
+            } else {
+                if (!uniqPath.equals(file.getName())) {
+                    // remove filename
+                    uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
+                    tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
+                } else {
+                    // set original filename (again)
+                    tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle());
+                }
             }
             tabbedPane.setToolTipTextAt(i, file == null ? null : file.getAbsolutePath());
         }
@@ -2141,6 +2145,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         output(Localization.lang("Closed database") + '.');
         // update tab titles
         updateAllTabTitles();
+    }
+
+    public void closeCurrentTab() {
+        removeTab(getCurrentBasePanel());
     }
 
     public ManageKeywordsAction getManageKeywords() {

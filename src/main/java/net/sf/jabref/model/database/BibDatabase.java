@@ -576,6 +576,14 @@ public class BibDatabase {
         this.eventBus.register(listener);
     }
 
+    /**
+     * Unregisters an listener object.
+     * @param listener listener (subscriber) to remove
+     */
+    public void unregisterListener(Object listener) {
+        this.eventBus.unregister(listener);
+    }
+
     @Subscribe
     private void relayEntryChangeEvent(FieldChangedEvent event) {
         eventBus.post(event);

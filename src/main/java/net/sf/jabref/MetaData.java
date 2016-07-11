@@ -469,4 +469,12 @@ public class MetaData implements Iterable<String> {
     public void registerListener(Object listener) {
         this.eventBus.register(listener);
     }
+
+    /**
+     * Unregisters an listener object.
+     * @param listener listener (subscriber) to remove
+     */
+    public void unregisterListener(Object listener) {
+        this.eventBus.unregister(listener);
+    }
 }

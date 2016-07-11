@@ -25,7 +25,7 @@ public class BibDatabaseContext {
     /** The file where this database was last saved to. */
     private File file;
     private DBMSSynchronizer dbmsSynchronizer;
-    private final DatabaseLocation location;
+    private DatabaseLocation location;
 
     public BibDatabaseContext() {
         this(new Defaults());
@@ -51,13 +51,8 @@ public class BibDatabaseContext {
         this.defaults = Objects.requireNonNull(defaults);
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
-        this.location = Objects.requireNonNull(location);
 
-        if (this.location == DatabaseLocation.REMOTE) {
-            this.dbmsSynchronizer = new DBMSSynchronizer(database, metaData);
-            this.database.registerListener(dbmsSynchronizer);
-            this.metaData.registerListener(dbmsSynchronizer);
-        }
+        updateDatabaseLocation(location);
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData) {
@@ -204,5 +199,21 @@ public class BibDatabaseContext {
 
     public DatabaseLocation getLocation() {
         return this.location;
+    }
+
+    public void updateDatabaseLocation(DatabaseLocation newLocation) {
+
+        if ((this.location == DatabaseLocation.REMOTE) && (newLocation == DatabaseLocation.LOCAL)) {
+            this.database.unregisterListener(dbmsSynchronizer);
+            this.metaData.unregisterListener(dbmsSynchronizer);
+        }
+
+        if (newLocation == DatabaseLocation.REMOTE) {
+            this.dbmsSynchronizer = new DBMSSynchronizer(this);
+            this.database.registerListener(dbmsSynchronizer);
+            this.metaData.registerListener(dbmsSynchronizer);
+        }
+
+        this.location = newLocation;
     }
 }

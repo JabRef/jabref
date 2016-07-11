@@ -20,12 +20,14 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.event.EntryAddedEvent;
 import net.sf.jabref.event.EntryEvent;
 import net.sf.jabref.event.EntryRemovedEvent;
 import net.sf.jabref.event.FieldChangedEvent;
 import net.sf.jabref.event.MetaDataChangedEvent;
+import net.sf.jabref.event.RemoteConnectionLostEvent;
 import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.exporter.BibDatabaseWriter;
@@ -33,6 +35,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
+import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -48,12 +51,18 @@ public class DBMSSynchronizer {
     private DBMSProcessor dbmsProcessor;
     private DBMSType dbmsType;
     private String dbName;
+    private final BibDatabaseContext bibDatabaseContext;
     private MetaData metaData;
     private final BibDatabase bibDatabase;
+    private final EventBus eventBus;
+    private Connection currentConnection;
 
-    public DBMSSynchronizer(BibDatabase bibDatabase, MetaData metaData) {
-        this.bibDatabase = bibDatabase;
-        this.metaData = metaData;
+
+    public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext) {
+        this.bibDatabaseContext = bibDatabaseContext;
+        this.bibDatabase = bibDatabaseContext.getDatabase();
+        this.metaData = bibDatabaseContext.getMetaData();
+        this.eventBus = new EventBus();
     }
 
     /**
@@ -64,7 +73,7 @@ public class DBMSSynchronizer {
     public void listen(EntryAddedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntryEvents may be posted.
         // In this case DBSynchronizer should not try to insert the bibEntry entry again (but it would not harm).
-        if (isInEventLocation(event)) {
+        if (isInEventLocation(event) && checkCurrentConnection()) {
             dbmsProcessor.insertEntry(event.getBibEntry());
             synchronizeLocalMetaData();
             synchronizeLocalDatabase(); // Pull remote changes for the case that there where some
@@ -79,7 +88,7 @@ public class DBMSSynchronizer {
     public void listen(FieldChangedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntryEvents may be posted.
         // In this case DBSynchronizer should not try to update the bibEntry entry again (but it would not harm).
-        if (isInEventLocation(event)) {
+        if (isInEventLocation(event) && checkCurrentConnection()) {
             synchronizeLocalMetaData();
             BibDatabaseWriter.applySaveActions(event.getBibEntry(), metaData);
             dbmsProcessor.updateEntry(event.getBibEntry());
@@ -94,7 +103,7 @@ public class DBMSSynchronizer {
     public void listen(EntryRemovedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntryEvents may be posted.
         // In this case DBSynchronizer should not try to delete the bibEntry entry again (but it would not harm).
-        if (isInEventLocation(event)) {
+        if (isInEventLocation(event) && checkCurrentConnection()) {
             dbmsProcessor.removeEntry(event.getBibEntry());
             synchronizeLocalMetaData();
             synchronizeLocalDatabase(); // Pull remote changes for the case that there where some
@@ -107,8 +116,10 @@ public class DBMSSynchronizer {
      */
     @Subscribe
     public void listen(MetaDataChangedEvent event) {
-        synchronizeRemoteMetaData(event.getMetaData());
-        applyMetaData();
+        if (checkCurrentConnection()) {
+            synchronizeRemoteMetaData(event.getMetaData());
+            applyMetaData();
+        }
     }
 
     /**
@@ -131,6 +142,10 @@ public class DBMSSynchronizer {
      * Possible update types are removal, update or insert of a {@link BibEntry}.
      */
     public void synchronizeLocalDatabase() {
+        if (!checkCurrentConnection()) {
+            return;
+        }
+
         dbmsProcessor.normalizeEntryTable(); // remove unused columns
 
         List<BibEntry> localEntries = bibDatabase.getEntries();
@@ -174,6 +189,10 @@ public class DBMSSynchronizer {
      * Synchronizes all meta data locally.
      */
     public void synchronizeLocalMetaData() {
+        if (!checkCurrentConnection()) {
+            return;
+        }
+
         try {
             metaData.setData(dbmsProcessor.getRemoteMetaData());
         } catch (ParseException e) {
@@ -185,6 +204,10 @@ public class DBMSSynchronizer {
      * Synchronizes all meta data remotely.
      */
     public void synchronizeRemoteMetaData(MetaData data) {
+        if (!checkCurrentConnection()) {
+            return;
+        }
+
         dbmsProcessor.setRemoteMetaData(data.getAsStringMap());
     }
 
@@ -192,9 +215,46 @@ public class DBMSSynchronizer {
      * Applies the {@link MetaData} on all local and remote BibEntries.
      */
     public void applyMetaData() {
+        if (!checkCurrentConnection()) {
+            return;
+        }
+
         for (BibEntry entry : bibDatabase.getEntries()) {
             BibDatabaseWriter.applySaveActions(entry, metaData);
             dbmsProcessor.updateEntry(entry);
+        }
+    }
+
+    /**
+     * Synchronizes the local BibEntries and applies the fetched MetaData on them.
+     */
+    public void pullChanges() {
+        if (!checkCurrentConnection()) {
+            return;
+        }
+
+        synchronizeLocalDatabase();
+        synchronizeLocalMetaData();
+        applyMetaData();
+    }
+
+    /**
+     *  Checks whether the current SQL connection is valid.
+     *  In case that the connection is not valid a new {@link RemoteConnectionLostEvent} is going to be sent.
+     *
+     *  @return <code>true</code> if the connection is valid, else <code>false</code>.
+     */
+    public boolean checkCurrentConnection() {
+        try {
+            boolean isValid = currentConnection.isValid(0);
+            if (!isValid) {
+                eventBus.post(new RemoteConnectionLostEvent(bibDatabaseContext));
+            }
+            return isValid;
+
+        } catch (SQLException e) {
+            LOGGER.error("SQL Error:", e);
+            return false;
         }
     }
 
@@ -212,6 +272,7 @@ public class DBMSSynchronizer {
         this.dbmsType = type;
         this.dbName = name;
         this.dbmsProcessor = new DBMSProcessor(new DBMSHelper(connection), type);
+        this.currentConnection = connection;
         initializeDatabases();
     }
 
@@ -234,5 +295,9 @@ public class DBMSSynchronizer {
 
     public void setMetaData(MetaData metaData) {
         this.metaData = metaData;
+    }
+
+    public void registerListener(Object listener) {
+        eventBus.register(listener);
     }
 }

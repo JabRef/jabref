@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
@@ -48,7 +49,10 @@ public class DBMSSynchronizerTest {
         }
 
         bibDatabase = new BibDatabase();
-        dbmsSynchronizer = new DBMSSynchronizer(bibDatabase, new MetaData());
+        BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
+
+
+        dbmsSynchronizer = new DBMSSynchronizer(context);
         dbmsProcessor = new DBMSProcessor(new DBMSHelper(connection), dbmsType);
 
         bibDatabase.registerListener(dbmsSynchronizer);
