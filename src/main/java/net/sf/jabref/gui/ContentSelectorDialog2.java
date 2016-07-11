@@ -100,7 +100,7 @@ class ContentSelectorDialog2 extends JDialog {
      */
     public ContentSelectorDialog2(Window owner, JabRefFrame frame, BasePanel panel, boolean modal,
             String fieldName) {
-        super(owner, Localization.lang("Setup selectors"));
+        super(owner, Localization.lang("Manage content selectors"));
         this.setModal(modal);
         this.metaData = panel.getBibDatabaseContext().getMetaData();
         this.frame = frame;
@@ -190,7 +190,7 @@ class ContentSelectorDialog2 extends JDialog {
                 applyChanges();
                 dispose();
             } catch (Exception ex) {
-                LOGGER.info("Could not apply changes in \"Setup selectors\"", ex);
+                LOGGER.info("Could not apply changes in \"Manage content selectors\"", ex);
                 JOptionPane.showMessageDialog(frame, Localization.lang("Could not apply changes."));
             }
         });
@@ -203,7 +203,7 @@ class ContentSelectorDialog2 extends JDialog {
             try {
                 applyChanges();
             } catch (Exception ex) {
-                LOGGER.info("Could not apply changes in \"Setup selectors\"", ex);
+                LOGGER.info("Could not apply changes in \"Manage content selectors\"", ex);
                 JOptionPane.showMessageDialog(frame, Localization.lang("Could not apply changes."));
             }
         });

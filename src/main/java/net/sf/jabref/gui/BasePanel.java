@@ -1958,7 +1958,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             msg = Localization.lang("Really delete the selected entry?");
             String title = Localization.lang("Delete entry");
             if (numberOfEntries > 1) {
-                msg = Localization.lang("Really delete the selected %0 entries?", Integer.toString(numberOfEntries));
+                msg = Localization.lang("Really delete the %0 selected entries?", Integer.toString(numberOfEntries));
                 title = Localization.lang("Delete multiple entries");
             }
 
