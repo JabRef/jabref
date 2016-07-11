@@ -127,7 +127,7 @@ public class MainTable extends JTable {
         super();
         this.model = model;
 
-        addFocusListener(Globals.focusListener);
+        addFocusListener(Globals.getFocusListener());
         setAutoResizeMode(Globals.prefs.getInt(JabRefPreferences.AUTO_RESIZE_MODE));
 
         this.tableFormat = tableFormat;

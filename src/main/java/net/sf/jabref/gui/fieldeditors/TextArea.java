@@ -52,7 +52,7 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
         // Add the global focus listener, so a menu item can see if this field
         // was focused when an action was called.
-        addFocusListener(Globals.focusListener);
+        addFocusListener(Globals.getFocusListener());
         addFocusListener(new FieldEditorFocusListener());
         scrollPane = new JScrollPane(this, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);

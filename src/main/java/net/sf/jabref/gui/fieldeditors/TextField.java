@@ -58,7 +58,7 @@ public class TextField extends JTextField implements FieldEditor {
         // Add the global focus listener, so a menu item can see if this field
         // was focused when
         // an action was called.
-        addFocusListener(Globals.focusListener);
+        addFocusListener(Globals.getFocusListener());
         if (changeColorOnFocus) {
             addFocusListener(new FieldEditorFocusListener());
         }

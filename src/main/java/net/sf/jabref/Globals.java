@@ -15,6 +15,8 @@
 */
 package net.sf.jabref;
 
+import java.util.Optional;
+
 import net.sf.jabref.collab.FileUpdateMonitor;
 import net.sf.jabref.exporter.AutoSaveManager;
 import net.sf.jabref.gui.GlobalFocusListener;
@@ -64,8 +66,18 @@ public class Globals {
      */
     public static JournalAbbreviationLoader journalAbbreviationLoader;
 
+    // Key binding preferences
     private static KeyBindingPreferences keyPrefs;
 
+    // Background tasks
+    private static GlobalFocusListener focusListener;
+    private static FileUpdateMonitor fileUpdateMonitor;
+    private static StreamEavesdropper streamEavesdropper;
+
+    // Autosave manager
+    private static AutoSaveManager autoSaveManager;
+
+    // Key binding preferences
     public static KeyBindingPreferences getKeyPrefs() {
         if (keyPrefs == null) {
             keyPrefs = new KeyBindingPreferences(prefs);
@@ -75,23 +87,29 @@ public class Globals {
 
 
     // Background tasks
-    public static GlobalFocusListener focusListener;
-    public static FileUpdateMonitor fileUpdateMonitor;
-    public static StreamEavesdropper streamEavesdropper;
-
     public static void startBackgroundTasks() {
         Globals.focusListener = new GlobalFocusListener();
 
         Globals.streamEavesdropper = StreamEavesdropper.eavesdropOnSystem();
 
         Globals.fileUpdateMonitor = new FileUpdateMonitor();
-        JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(Globals.fileUpdateMonitor, "FileUpdateMonitor");
+        JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThread(Globals.fileUpdateMonitor,
+                "FileUpdateMonitor");
     }
 
+    public static GlobalFocusListener getFocusListener() {
+        return focusListener;
+    }
+
+    public static FileUpdateMonitor getFileUpdateMonitor() {
+        return fileUpdateMonitor;
+    }
+
+    public static StreamEavesdropper getStreamEavesdropper() {
+        return streamEavesdropper;
+    }
 
     // Autosave manager
-    public static AutoSaveManager autoSaveManager;
-
     public static void startAutoSaveManager(JabRefFrame frame) {
         Globals.autoSaveManager = new AutoSaveManager(frame);
         Globals.autoSaveManager.startAutoSaveTimer();
@@ -104,5 +122,9 @@ public class Globals {
             Globals.autoSaveManager.clearAutoSaves();
             Globals.autoSaveManager = null;
         }
+    }
+
+    public static Optional<AutoSaveManager> getAutoSaveManager() {
+        return Optional.ofNullable(Globals.autoSaveManager);
     }
 }
