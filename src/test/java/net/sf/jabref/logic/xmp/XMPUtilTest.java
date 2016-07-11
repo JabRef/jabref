@@ -1356,7 +1356,7 @@ public class XMPUtilTest {
                     "Patterson, David and Arvind and Asanov\\'\\i{}c, Krste and Chiou, Derek and Hoe, James and Kozyrakis, Christos and Lu, S{hih-Lien} and Oskin, Mark and Rabaey, Jan and Wawrzynek, John");
 
             try {
-                XMPUtil.writeXMP(pdfFile, result.getDatabase().getEntryByKeyOptional("Patterson06").get(),
+                XMPUtil.writeXMP(pdfFile, result.getDatabase().getEntryByKey("Patterson06").get(),
                         result.getDatabase());
 
                 // Test whether we the main function can load the bibtex correctly

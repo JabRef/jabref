@@ -1257,7 +1257,7 @@ public class XMPUtil {
 
             ParserResult result = BibtexParser.parse(new FileReader(args[1]));
 
-            Optional<BibEntry> bibEntry = result.getDatabase().getEntryByKeyOptional(args[0]);
+            Optional<BibEntry> bibEntry = result.getDatabase().getEntryByKey(args[0]);
 
             if (bibEntry.isPresent()) {
                 XMPUtil.writeXMP(new File(args[2]), bibEntry.get(), result.getDatabase());

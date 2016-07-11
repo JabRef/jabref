@@ -127,7 +127,7 @@ public class AuxParser {
      */
     private void resolveTags(AuxParserResult result) {
         for (String key : result.getUniqueKeys()) {
-            Optional<BibEntry> entry = masterDatabase.getEntryByKeyOptional(key);
+            Optional<BibEntry> entry = masterDatabase.getEntryByKey(key);
 
             if (entry.isPresent()) {
                 insertEntry(entry.get(), result);
@@ -150,7 +150,7 @@ public class AuxParser {
     private void resolveCrossReferences(BibEntry entry, AuxParserResult result) {
         entry.getFieldOptional("crossref").ifPresent(crossref -> {
             if (!result.getUniqueKeys().contains(crossref)) {
-                Optional<BibEntry> refEntry = masterDatabase.getEntryByKeyOptional(crossref);
+                Optional<BibEntry> refEntry = masterDatabase.getEntryByKey(crossref);
 
                 if (refEntry.isPresent()) {
                     insertEntry(refEntry.get(), result);

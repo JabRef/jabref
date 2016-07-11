@@ -141,20 +141,7 @@ public class BibDatabase {
     /**
      * Returns the entry with the given bibtex key.
      */
-    @Deprecated
-    public synchronized BibEntry getEntryByKey(String key) {
-        for (BibEntry entry : entries) {
-            if (key.equals(entry.getCiteKey())) {
-                return entry;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Returns the entry with the given bibtex key.
-     */
-    public synchronized Optional<BibEntry> getEntryByKeyOptional(String key) {
+    public synchronized Optional<BibEntry> getEntryByKey(String key) {
         for (BibEntry entry : entries) {
             if (key.equals(entry.getCiteKey())) {
                 return Optional.of(entry);
@@ -529,7 +516,7 @@ public class BibDatabase {
         if (!result.isPresent() && (database != null) && !field.equals(BibEntry.KEY_FIELD)) {
             Optional<String> crossrefKey = entry.getFieldOptional("crossref");
             if (crossrefKey.isPresent()) {
-                Optional<BibEntry> referred = database.getEntryByKeyOptional(crossrefKey.get());
+                Optional<BibEntry> referred = database.getEntryByKey(crossrefKey.get());
                 if (referred.isPresent()) {
                     // Ok, we found the referred entry. Get the field value from that
                     // entry. If it is unset there, too, stop looking:

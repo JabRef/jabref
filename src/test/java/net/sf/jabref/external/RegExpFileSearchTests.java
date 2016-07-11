@@ -66,7 +66,7 @@ public class RegExpFileSearchTests {
         result = parser.parse();
 
         database = result.getDatabase();
-        entry = database.getEntryByKeyOptional("HipKro03").get();
+        entry = database.getEntryByKey("HipKro03").get();
 
         Assert.assertNotNull(database);
         Assert.assertNotNull(entry);

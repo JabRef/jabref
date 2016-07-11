@@ -488,7 +488,7 @@ class OOBibBase {
                     BibDatabase database = linkSourceBase.get(keys[j]);
                     Optional<BibEntry> tmpEntry = Optional.empty();
                     if (database != null) {
-                        tmpEntry = database.getEntryByKeyOptional(keys[j]);
+                        tmpEntry = database.getEntryByKey(keys[j]);
                     }
                     if (tmpEntry.isPresent()) {
                         cEntries[j] = tmpEntry.get();
@@ -643,28 +643,31 @@ class OOBibBase {
                         seenBefore.add(currentKey);
                     }
                     String uniq = uniquefiers.get(currentKey);
+                    Optional<BibEntry> tmpEntry = Optional.empty();
                     if (uniq == null) {
                         if (firstLimAuthors[k] > 0) {
                             needsChange = true;
                             BibDatabase database = linkSourceBase.get(currentKey);
                             if (database != null) {
-                                cEntries[k] = database.getEntryByKey(currentKey);
+                                tmpEntry = database.getEntryByKey(currentKey);
                             }
-                            uniquif[k] = "";
                         } else {
                             BibDatabase database = linkSourceBase.get(currentKey);
                             if (database != null) {
-                                cEntries[k] = database.getEntryByKey(currentKey);
+                                tmpEntry = database.getEntryByKey(currentKey);
                             }
-                            uniquif[k] = "";
                         }
+                        uniquif[k] = "";
                     } else {
                         needsChange = true;
                         BibDatabase database = linkSourceBase.get(currentKey);
                         if (database != null) {
-                            cEntries[k] = database.getEntryByKey(currentKey);
+                            tmpEntry = database.getEntryByKey(currentKey);
                         }
                         uniquif[k] = uniq;
+                    }
+                    if (tmpEntry.isPresent()) {
+                        cEntries[k] = tmpEntry.get();
                     }
                 }
                 if (needsChange) {
@@ -800,7 +803,7 @@ class OOBibBase {
         for (String key : keys) {
             boolean found = false;
             for (BibDatabase database : databases) {
-                Optional<BibEntry> entry = database.getEntryByKeyOptional(key);
+                Optional<BibEntry> entry = database.getEntryByKey(key);
                 if (entry.isPresent()) {
                     entries.put(entry.get(), database);
                     linkSourceBase.put(key, database);
@@ -849,7 +852,7 @@ class OOBibBase {
                     BibDatabase database = linkSourceBase.get(key);
                     Optional<BibEntry> origEntry = Optional.empty();
                     if (database != null) {
-                        origEntry = database.getEntryByKeyOptional(key);
+                        origEntry = database.getEntryByKey(key);
                     }
                     if (origEntry.isPresent()) {
                         if (!newList.containsKey(origEntry.get())) {
@@ -1204,7 +1207,7 @@ class OOBibBase {
                 List<BibEntry> entries = new ArrayList<>();
                 for (String key : keys) {
                     for (BibDatabase database : databases) {
-                        Optional<BibEntry> entry = database.getEntryByKeyOptional(key);
+                        Optional<BibEntry> entry = database.getEntryByKey(key);
                         if (entry.isPresent()) {
                             entries.add(entry.get());
                             break;
