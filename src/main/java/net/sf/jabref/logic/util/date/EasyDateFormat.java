@@ -1,6 +1,8 @@
 package net.sf.jabref.logic.util.date;
 
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 import net.sf.jabref.Globals;
@@ -11,8 +13,8 @@ public class EasyDateFormat {
     /**
      * The formatter objects
      */
-    private SimpleDateFormat dateFormatter;
-
+    private DateTimeFormatter dateFormatter;
+    private boolean isISOFormat;
 
     /**
      * Creates a String containing the current date (and possibly time),
@@ -22,7 +24,18 @@ public class EasyDateFormat {
      * @return The date string.
      */
     public String getCurrentDate() {
-        return getDateAt(new Date());
+        return getCurrentDate(false);
+    }
+
+    /**
+     * Creates a String containing the current date (and possibly time),
+     * formatted according to the format set in preferences under the key
+     * "timeStampFormat".
+     *
+     * @return The date string.
+     */
+    public String getCurrentDate(boolean isoFormat) {
+        return getDateAt(LocalDate.now(), isoFormat);
     }
 
     /**
@@ -31,12 +44,27 @@ public class EasyDateFormat {
      *
      * @return The formatted date string.
      */
-    public String getDateAt(Date date) {
+    public String getDateAt(Date date, boolean isoFormat) {
+        return getDateAt(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), isoFormat);
+    }
+
+    /**
+     * Creates a readable Date string from the parameter date. The format is set
+     * in preferences under the key "timeStampFormat".
+     *
+     * @return The formatted date string.
+     */
+    public String getDateAt(LocalDate localDate, boolean isoFormat) {
         // first use, create an instance
-        if (dateFormatter == null) {
-            String format = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT);
-            dateFormatter = new SimpleDateFormat(format);
+        if ((dateFormatter == null) || (isoFormat != isISOFormat)) {
+            if (isoFormat) {
+                dateFormatter = DateTimeFormatter.ISO_LOCAL_DATE;
+            } else {
+                String format = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT);
+                dateFormatter = DateTimeFormatter.ofPattern(format);
+            }
+            isISOFormat = isoFormat;
         }
-        return dateFormatter.format(date);
+        return localDate.format(dateFormatter);
     }
 }

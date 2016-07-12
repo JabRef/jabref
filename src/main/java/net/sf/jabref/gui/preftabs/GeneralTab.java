@@ -18,7 +18,7 @@ package net.sf.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -278,7 +278,7 @@ class GeneralTab extends JPanel implements PrefsTab {
     public boolean validateSettings() {
         try {
             // Test if date format is legal:
-            new SimpleDateFormat(timeStampFormat.getText());
+            DateTimeFormatter.ofPattern(timeStampFormat.getText());
 
         } catch (IllegalArgumentException ex2) {
             JOptionPane.showMessageDialog

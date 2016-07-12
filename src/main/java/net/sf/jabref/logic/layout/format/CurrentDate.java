@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2005-2015 Andreas Rudert, Oscar Gustafsson
+ Copyright (C) 2005-2016 Andreas Rudert, Oscar Gustafsson
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as
@@ -25,15 +25,15 @@
 */
 package net.sf.jabref.logic.layout.format;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
 
 /**
  * Inserts the current date (the time a database is being exported).
  *
- * <p>If a fieldText is given, it must be a valid {@link SimpleDateFormat} pattern.
+ * <p>If a fieldText is given, it must be a valid {@link DateTimeFormatter} pattern.
  * If none is given, the format pattern will be <code>yyyy-MM-dd hh:mm:ss z</code>.
  * This follows ISO-8601. Reason: <a href="https://xkcd.com/1179/">https://xkcd.com/1179/</a>.</p>
  *
@@ -55,6 +55,6 @@ public class CurrentDate implements LayoutFormatter {
         if ((fieldText != null) && (fieldText.trim() != null) && !fieldText.trim().isEmpty()) {
             format = fieldText;
         }
-        return new SimpleDateFormat(format).format(new Date());
+        return LocalDate.now().format(DateTimeFormatter.ofPattern(format));
     }
 }

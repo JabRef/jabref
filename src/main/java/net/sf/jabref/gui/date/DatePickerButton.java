@@ -1,4 +1,5 @@
 /*  Copyright (C) 2003-2011 Raik Nagel
+ * 2016 JabRef Contributors
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -37,9 +38,11 @@ public class DatePickerButton implements ActionListener {
     private final DatePicker datePicker = new DatePicker();
     private final JPanel panel = new JPanel();
     private final FieldEditor editor;
+    private final boolean isoFormat;
 
 
-    public DatePickerButton(FieldEditor pEditor) {
+    public DatePickerButton(FieldEditor pEditor, Boolean isoFormat) {
+        this.isoFormat = isoFormat;
         datePicker.showButtonOnly(true);
         datePicker.addActionListener(this);
         datePicker.setShowTodayButton(true);
@@ -52,7 +55,7 @@ public class DatePickerButton implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         Date date = datePicker.getDate();
         if (date != null) {
-            editor.setText(new EasyDateFormat().getDateAt(date));
+            editor.setText(new EasyDateFormat().getDateAt(date, isoFormat));
             // Set focus to editor component after changing its text:
             new FocusRequester(editor.getTextComponent());
         }

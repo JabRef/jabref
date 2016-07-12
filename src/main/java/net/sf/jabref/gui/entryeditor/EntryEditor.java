@@ -503,7 +503,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 || fieldExtras.contains(FieldProperties.DATE)) {
             // double click AND datefield => insert the current date (today)
             return FieldExtraComponents.getDateTimeExtraComponent(editor,
-                    fieldExtras.contains(FieldProperties.DATE));
+                    fieldExtras.contains(FieldProperties.DATE), fieldExtras.contains(FieldProperties.ISO_DATE));
         } else if (fieldExtras.contains(FieldProperties.EXTERNAL)) {
             return FieldExtraComponents.getExternalExtraComponent(panel, editor);
         } else if (fieldExtras.contains(FieldProperties.JOURNAL_NAME)) {

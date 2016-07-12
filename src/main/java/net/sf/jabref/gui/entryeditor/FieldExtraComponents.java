@@ -349,13 +349,14 @@ public class FieldExtraComponents {
      * @param isDatePicker
      * @return
      */
-    public static Optional<JComponent> getDateTimeExtraComponent(FieldEditor editor, Boolean isDatePicker) {
+    public static Optional<JComponent> getDateTimeExtraComponent(FieldEditor editor, Boolean isDatePicker,
+            Boolean isoFormat) {
         ((JTextArea) editor).addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {// double click
-                    String date = new EasyDateFormat().getCurrentDate();
+                    String date = new EasyDateFormat().getCurrentDate(isoFormat);
                     editor.setText(date);
                 }
             }
@@ -363,7 +364,7 @@ public class FieldExtraComponents {
 
         // insert a datepicker, if the extras field contains this command
         if (isDatePicker) {
-            DatePickerButton datePicker = new DatePickerButton(editor);
+            DatePickerButton datePicker = new DatePickerButton(editor, isoFormat);
             return Optional.of(datePicker.getDatePicker());
         } else {
             return Optional.empty();
