@@ -273,8 +273,9 @@ public class XMPUtilTest {
 
         Assert.assertNotNull(e);
         Assert.assertEquals("OezbekC06", e.getCiteKey());
-        Assert.assertEquals("2003", e.getFieldOptional("year").get());
-        Assert.assertEquals("Beach sand convolution by surf-wave optimzation", e.getFieldOptional("title").get());
+        Assert.assertEquals(Optional.of("2003"), e.getFieldOptional("year"));
+        Assert.assertEquals(Optional.of("Beach sand convolution by surf-wave optimzation"),
+                e.getFieldOptional("title"));
         Assert.assertEquals("misc", e.getType());
     }
 
@@ -297,8 +298,8 @@ public class XMPUtilTest {
 
         Assert.assertNotNull(e);
         Assert.assertEquals("OezbekC06", e.getCiteKey());
-        Assert.assertEquals("2003", e.getFieldOptional("year").get());
-        Assert.assertEquals("�pt�mz�t��n", e.getFieldOptional("title").get());
+        Assert.assertEquals(Optional.of("2003"), e.getFieldOptional("year"));
+        Assert.assertEquals(Optional.of("�pt�mz�t��n"), e.getFieldOptional("title"));
         Assert.assertEquals("misc", e.getType());
     }
 
