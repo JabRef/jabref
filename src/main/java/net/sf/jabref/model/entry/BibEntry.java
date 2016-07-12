@@ -497,17 +497,18 @@ public class BibEntry implements Cloneable {
      *
      * @return will return the publication date of the entry or null if no year was found.
      */
-    public String getPublicationDate() {
+    public Optional<String> getPublicationDate() {
         if (!hasField("year")) {
-            return null;
+            return Optional.empty();
         }
 
-        String year = getField("year");
+        Optional<String> year = getFieldOptional("year");
 
-        if (hasField("month")) {
-            MonthUtil.Month month = MonthUtil.getMonth(getField("month"));
+        Optional<String> monthString = getFieldOptional("month");
+        if (monthString.isPresent()) {
+            MonthUtil.Month month = MonthUtil.getMonth(monthString.get());
             if (month.isValid()) {
-                return year + "-" + month.twoDigitNumber;
+                return Optional.of(year.orElse("") + "-" + month.twoDigitNumber);
             }
         }
         return year;

@@ -695,10 +695,8 @@ public class XMPUtil {
                  *
                  * Bibtex-Fields used: year, month
                  */
-                String publicationDate = entry.getPublicationDate();
-                if (publicationDate != null) {
-                    dcSchema.addSequenceValue("dc:date", publicationDate);
-                }
+                entry.getPublicationDate()
+                        .ifPresent(publicationDate -> dcSchema.addSequenceValue("dc:date", publicationDate));
                 continue;
             }
             /**

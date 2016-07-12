@@ -27,6 +27,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import net.sf.jabref.MetaData;
 import net.sf.jabref.importer.ParserResult;
@@ -280,12 +281,12 @@ public class BibtexParser {
                 .equals(CustomEntryType.ENTRYTYPE_FLAG)) {
             // A custom entry type can also be stored in a
             // "@comment"
-            CustomEntryType typ = CustomEntryType.parse(comment);
-            if(typ == null) {
+            Optional<CustomEntryType> typ = CustomEntryType.parse(comment);
+            if (typ.isPresent()) {
+                entryTypes.put(typ.get().getName(), typ.get());
+            } else {
                 parserResult.addWarning(Localization.lang("Ill-formed entrytype comment in bib file") + ": " +
                         comment);
-            } else {
-                entryTypes.put(typ.getName(), typ);
             }
 
             // custom entry types are always re-written by JabRef and not stored in the file
