@@ -1,7 +1,5 @@
 package net.sf.jabref.logic.formatter;
 
-
-import net.sf.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import org.junit.Before;
 import org.junit.Test;
 

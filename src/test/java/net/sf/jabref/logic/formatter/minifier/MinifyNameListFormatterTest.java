@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.formatter.minifier;
 
-import net.sf.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
