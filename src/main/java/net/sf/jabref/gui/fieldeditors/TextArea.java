@@ -26,6 +26,7 @@ import javax.swing.ScrollPaneConstants;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
+import net.sf.jabref.gui.entryeditor.EntryEditorTab;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
 import net.sf.jabref.model.entry.EntryUtil;
 
@@ -43,8 +44,9 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
     private AutoCompleteListener autoCompleteListener;
 
+    private final EntryEditorTab entryTab;
 
-    public TextArea(String fieldName, String content) {
+    public TextArea(String fieldName, String content, EntryEditorTab entryTab) {
         super(content);
 
 
@@ -70,6 +72,7 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
         FieldTextMenu popMenu = new FieldTextMenu(this);
         this.addMouseListener(popMenu);
         label.addMouseListener(popMenu);
+        this.entryTab = entryTab;
     }
 
     @Override
@@ -156,5 +159,10 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
         if (autoCompleteListener != null) {
             autoCompleteListener.clearCurrentSuggestion(this);
         }
+    }
+
+    @Override
+    public EntryEditorTab getEntryEditorTab() {
+        return this.entryTab;
     }
 }

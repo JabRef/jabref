@@ -32,6 +32,7 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
+import net.sf.jabref.gui.entryeditor.EntryEditorTab;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
 import net.sf.jabref.model.entry.EntryUtil;
 
@@ -45,9 +46,10 @@ public class TextField extends JTextField implements FieldEditor {
     private final JLabel label;
     private UndoManager undo;
     private AutoCompleteListener autoCompleteListener;
+    private final EntryEditorTab entryTab;
 
 
-    public TextField(String fieldName, String content, boolean changeColorOnFocus) {
+    public TextField(String fieldName, String content, boolean changeColorOnFocus, EntryEditorTab entryTab) {
         super(content);
 
         setupPasteListener();
@@ -70,6 +72,8 @@ public class TextField extends JTextField implements FieldEditor {
         FieldTextMenu popMenu = new FieldTextMenu(this);
         this.addMouseListener(popMenu);
         label.addMouseListener(popMenu);
+
+        this.entryTab = entryTab;
     }
 
     @Override
@@ -170,6 +174,11 @@ public class TextField extends JTextField implements FieldEditor {
         getActionMap().put(Actions.PASTE, new PasteAction(this));
         // Bind paste command to KeyBinds.PASTE
         getInputMap().put(Globals.getKeyPrefs().getKey(net.sf.jabref.gui.keyboard.KeyBinding.PASTE), Actions.PASTE);
+    }
+
+    @Override
+    public EntryEditorTab getEntryEditorTab() {
+        return this.entryTab;
     }
 
     private void setupUndoRedo() {
