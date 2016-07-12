@@ -38,10 +38,15 @@ public class HtmlToUnicodeFormatterTest {
     }
 
     @Test
-    public void testHTML() {
+    public void testUmlauts() {
         assertEquals("ä", formatter.format("&auml;"));
         assertEquals("ä", formatter.format("&#228;"));
         assertEquals("ä", formatter.format("&#xe4;"));
+
+    }
+
+    @Test
+    public void testGreekLetter() {
         assertEquals("Ε", formatter.format("&Epsilon;"));
     }
 
