@@ -10,11 +10,11 @@ import static org.junit.Assert.assertEquals;
 
 public class HtmlToUnicodeFormatterTest {
 
-    private final HtmlToUnicodeFormatter formatter = new HtmlToUnicodeFormatter();
+    private HtmlToUnicodeFormatter formatter;
 
     @Before
-    public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
+    public void setUp() {
+        formatter = new HtmlToUnicodeFormatter();
     }
 
     @Test

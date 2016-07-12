@@ -1,6 +1,8 @@
 package net.sf.jabref.logic.formatter.minifier;
 
+import net.sf.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -8,7 +10,12 @@ import org.junit.Test;
  */
 public class MinifyNameListFormatterTest {
 
-    private final MinifyNameListFormatter formatter = new MinifyNameListFormatter();
+    private MinifyNameListFormatter formatter;
+
+    @Before
+    public void setUp() {
+        formatter = new MinifyNameListFormatter();
+    }
 
     @Test
     public void minifyAuthorNames() {

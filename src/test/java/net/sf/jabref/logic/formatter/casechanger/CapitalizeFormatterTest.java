@@ -1,6 +1,8 @@
 package net.sf.jabref.logic.formatter.casechanger;
 
+import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -8,7 +10,12 @@ import org.junit.Test;
  */
 public class CapitalizeFormatterTest {
 
-    private final CapitalizeFormatter formatter = new CapitalizeFormatter();
+    private CapitalizeFormatter formatter;
+
+    @Before
+    public void setUp() {
+        formatter = new CapitalizeFormatter();
+    }
 
     @Test
     public void test() {

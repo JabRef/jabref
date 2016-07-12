@@ -1,6 +1,8 @@
 package net.sf.jabref.logic.formatter;
 
 
+import net.sf.jabref.logic.formatter.casechanger.UpperCaseFormatter;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -10,7 +12,12 @@ import static org.junit.Assert.assertEquals;
  */
 public class IdentityFormatterTest {
 
-    private final IdentityFormatter formatter = new IdentityFormatter();
+    private IdentityFormatter formatter;
+
+    @Before
+    public void setUp() {
+        formatter = new IdentityFormatter();
+    }
 
     @Test
     public void formatExample() {

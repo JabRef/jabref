@@ -1,5 +1,6 @@
 package net.sf.jabref.logic.formatter.casechanger;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -10,7 +11,12 @@ import static org.junit.Assert.assertEquals;
  */
 public class ProtectTermsFormatterTest {
 
-    private final ProtectTermsFormatter formatter = new ProtectTermsFormatter();
+    private ProtectTermsFormatter formatter;
+
+    @Before
+    public void setUp() {
+        formatter = new ProtectTermsFormatter();
+    }
 
     @Test
     public void test() {

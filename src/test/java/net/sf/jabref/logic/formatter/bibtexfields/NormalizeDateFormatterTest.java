@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -8,7 +9,12 @@ import org.junit.Test;
  */
 public class NormalizeDateFormatterTest {
 
-    private final NormalizeDateFormatter formatter = new NormalizeDateFormatter();
+    private NormalizeDateFormatter formatter;
+
+    @Before
+    public void setUp() {
+        formatter = new NormalizeDateFormatter();
+    }
 
     @Test
     public void formatDateYYYYMM0D() {
