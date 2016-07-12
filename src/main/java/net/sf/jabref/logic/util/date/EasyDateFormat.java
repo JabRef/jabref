@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.util.date;
 
-import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -35,7 +35,7 @@ public class EasyDateFormat {
      * @return The date string.
      */
     public String getCurrentDate(boolean isoFormat) {
-        return getDateAt(LocalDate.now(), isoFormat);
+        return getDateAt(ZonedDateTime.now(), isoFormat);
     }
 
     /**
@@ -45,7 +45,7 @@ public class EasyDateFormat {
      * @return The formatted date string.
      */
     public String getDateAt(Date date, boolean isoFormat) {
-        return getDateAt(date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate(), isoFormat);
+        return getDateAt(date.toInstant().atZone(ZoneId.systemDefault()), isoFormat);
     }
 
     /**
@@ -54,7 +54,7 @@ public class EasyDateFormat {
      *
      * @return The formatted date string.
      */
-    public String getDateAt(LocalDate localDate, boolean isoFormat) {
+    public String getDateAt(ZonedDateTime dateTime, boolean isoFormat) {
         // first use, create an instance
         if ((dateFormatter == null) || (isoFormat != isISOFormat)) {
             if (isoFormat) {
@@ -65,6 +65,6 @@ public class EasyDateFormat {
             }
             isISOFormat = isoFormat;
         }
-        return localDate.format(dateFormatter);
+        return dateTime.format(dateFormatter);
     }
 }

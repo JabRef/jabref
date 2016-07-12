@@ -25,7 +25,7 @@
 */
 package net.sf.jabref.logic.layout.format;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
@@ -55,6 +55,6 @@ public class CurrentDate implements LayoutFormatter {
         if ((fieldText != null) && (fieldText.trim() != null) && !fieldText.trim().isEmpty()) {
             format = fieldText;
         }
-        return LocalDate.now().format(DateTimeFormatter.ofPattern(format));
+        return ZonedDateTime.now().format(DateTimeFormatter.ofPattern(format));
     }
 }

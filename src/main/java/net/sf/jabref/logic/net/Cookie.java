@@ -16,7 +16,7 @@
 package net.sf.jabref.logic.net;
 
 import java.net.URI;
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Locale;
@@ -27,12 +27,12 @@ class Cookie {
     private final String name;
     private final String value;
     private String domain;
-    private LocalDate expires;
+    private ZonedDateTime expires;
     private String path;
 
-    private final DateTimeFormatter whiteSpaceFormat = DateTimeFormatter.ofPattern("E, dd MMM yyyy k:m:s 'GMT'",
+    private final DateTimeFormatter whiteSpaceFormat = DateTimeFormatter.ofPattern("E, dd MMM yyyy k:m:s z",
             Locale.US);
-    private final DateTimeFormatter hyphenFormat = DateTimeFormatter.ofPattern("E, dd-MMM-yyyy k:m:s 'GMT'", Locale.US);
+    private final DateTimeFormatter hyphenFormat = DateTimeFormatter.ofPattern("E, dd-MMM-yyyy k:m:s z", Locale.US);
 
 
     /**
@@ -78,10 +78,10 @@ class Cookie {
                 this.path = value;
             } else if ("expires".equalsIgnoreCase(name)) {
                 try {
-                    this.expires = LocalDate.parse(value, whiteSpaceFormat);
+                    this.expires = ZonedDateTime.parse(value, whiteSpaceFormat);
                 } catch (DateTimeParseException e) {
                     try {
-                        this.expires = LocalDate.parse(value, hyphenFormat);
+                        this.expires = ZonedDateTime.parse(value, hyphenFormat);
                     } catch (DateTimeParseException e2) {
                         throw new IllegalArgumentException(
                                 "Bad date format in header: " + value);
@@ -95,7 +95,7 @@ class Cookie {
         if (expires == null) {
             return false;
         }
-        return LocalDate.now().isAfter(expires);
+        return ZonedDateTime.now().isAfter(expires);
     }
 
     /**
