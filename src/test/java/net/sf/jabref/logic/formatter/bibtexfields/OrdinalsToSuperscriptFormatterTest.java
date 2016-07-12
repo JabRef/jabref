@@ -1,7 +1,4 @@
-package net.sf.jabref.logic.formatter;
-
-
-import net.sf.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
+package net.sf.jabref.logic.formatter.bibtexfields;
 
 import org.junit.Assert;
 import org.junit.Before;
