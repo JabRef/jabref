@@ -2,6 +2,16 @@
 
 Describes relevant information about the code structure of JabRef in a very precise and succinct way. 
 
+We are currently transitioning from a spaghetti to an onion architecture with the `model` in the center, and the `logic` as an intermediate layer towards the `gui` which is the outer shell. The dependencies are only directed towards the center. We have JUnit tests to detect violations, and the build will fail automatically in these cases.
+
+The `model` can only represent the most important data structures and has only a little bit of logic attached. The `logic` is responsible for reading/writing/importing/exporting and manipulating the `model`, and it is structured often as an API the `gui` can call and use. Only the `gui` knows the user and his preferences, and can interact with him to help him solve tasks. For each onion layer, we form packages according to their responsibility, i.e., vertical structuring.
+
+We use an event bus to publish events from the `model` to the other onion layers.
+This allows us to keep the onion architecture but still react upon changes within the core in the outer layers.
+
+
+
+
 ## Package Structure
 
 ```
