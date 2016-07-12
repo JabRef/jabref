@@ -1126,6 +1126,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     ce.addEdit(undoableKeyChange);
                     TimeStamp.doUpdateTimeStamp(entry)
                             .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
+                    ce.end();
                     panel.getUndoManager().addEdit(ce);
                 } else {
                     panel.getUndoManager().addEdit(undoableKeyChange);
@@ -1193,8 +1194,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                             TimeStamp.doUpdateTimeStamp(entry)
                                     .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
+                            ce.end();
 
                             panel.getUndoManager().addEdit(ce);
+
                         } else {
                             panel.getUndoManager().addEdit(undoableFieldChange);
                         }
