@@ -95,7 +95,9 @@ public class InternalBibtexFields {
         add(new BibtexSingleField("author", true, BibtexSingleField.MEDIUM_W, 280));
         add(new BibtexSingleField("booktitle", true, 175));
         add(new BibtexSingleField("chapter", true, BibtexSingleField.SMALL_W));
-        add(new BibtexSingleField("crossref", true, BibtexSingleField.SMALL_W));
+        dummy = new BibtexSingleField("crossref", true, BibtexSingleField.SMALL_W);
+        dummy.setExtras(EnumSet.of(FieldProperties.CROSSREF));
+        add(dummy);
         add(new BibtexSingleField("edition", true, BibtexSingleField.SMALL_W));
         add(new BibtexSingleField("editor", true, BibtexSingleField.MEDIUM_W, 280));
         add(new BibtexSingleField("howpublished", true, BibtexSingleField.MEDIUM_W));
