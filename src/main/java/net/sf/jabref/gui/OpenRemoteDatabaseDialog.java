@@ -332,11 +332,6 @@ public class OpenRemoteDatabaseDialog extends JDialog {
             userField.requestFocus();
             throw new JabRefException(Localization.lang("Required_field_\"%0\"_is_empty.", Localization.lang("User")));
         }
-        if (isEmptyField(passwordField)) {
-            passwordField.requestFocus();
-            throw new JabRefException(Localization.lang("Required_field_\"%0\"_is_empty.", Localization.lang("Password")));
-        }
-
     }
 
 }
