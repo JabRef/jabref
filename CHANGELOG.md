@@ -14,6 +14,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Changed
 
 ### Fixed
+- Fixed [#1264](https://github.com/JabRef/jabref/issues/1264): S with caron does not render correctly
+- LaTeX to Unicode converter now handles combining accents
 
 ### Removed
 

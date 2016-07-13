@@ -39,10 +39,9 @@ public class UnicodeToLatexFormatter implements LayoutFormatter, Formatter {
         }
 
         // Standard symbols
-        Set<Character> chars = HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP.keySet();
-        for (Character character : chars) {
-            result = result.replace(character.toString(),
-                    HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP.get(character));
+        Set<String> strings = HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP.keySet();
+        for (String string : strings) {
+            result = result.replace(string, HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP.get(string));
         }
 
         // Combining accents

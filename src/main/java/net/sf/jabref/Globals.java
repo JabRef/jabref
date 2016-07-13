@@ -54,7 +54,7 @@ public class Globals {
 
 
 
-    public static final String SPECIAL_COMMAND_CHARS = "\"`^~'c=";
+    public static final String SPECIAL_COMMAND_CHARS = "\"`^~'=.|"; // "\"`^~'c="
 
     // In the main program, this field is initialized in JabRef.java
     // Each test case initializes this field if required

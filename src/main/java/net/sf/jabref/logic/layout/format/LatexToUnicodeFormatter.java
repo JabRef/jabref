@@ -31,6 +31,7 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
 
     private static final Map<String, String> CHARS = HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP;
+    private static final Map<String, String> ACCENTS = HTMLUnicodeConversionMaps.UNICODE_ESCAPED_ACCENTS;
 
     @Override
     public String getName() {
@@ -74,6 +75,7 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
                     } else {
                         sb.append((String) result);
                     }
+
                 }
                 escaped = true;
                 incommand = true;
@@ -109,7 +111,15 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
                         }
                         Object result = LatexToUnicodeFormatter.CHARS.get(command + combody);
 
-                        if (result != null) {
+                        if (result == null) {
+                            // Use combining accents if argument is single character or empty
+                            if (combody.length() <= 1) {
+                                String accent = LatexToUnicodeFormatter.ACCENTS.get(command);
+                                if (accent != null) {
+                                    sb.append(combody).append(accent);
+                                }
+                            }
+                        } else {
                             sb.append((String) result);
                         }
 
@@ -152,28 +162,43 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
                         if (argument != null) {
                             // handle common case of general latex command
                             Object result = LatexToUnicodeFormatter.CHARS.get(command + argument);
+
                             // If found, then use translated version. If not, then keep
                             // the
                             // text of the parameter intact.
                             if (result == null) {
-                                sb.append(argument);
+                                // Use combining accents if argument is single character or empty
+                                if (argument.length() <= 1) {
+                                    String accent = LatexToUnicodeFormatter.ACCENTS.get(command);
+                                    if (accent != null) {
+                                        sb.append(argument).append(accent);
+                                    } else {
+                                        sb.append(argument);
+                                    }
+                                } else {
+                                    sb.append(argument);
+                                }
                             } else {
                                 sb.append((String) result);
                             }
+
                         }
                     } else if (c == '}') {
                         // This end brace terminates a command. This can be the case in
                         // constructs like {\aa}. The correct behaviour should be to
                         // substitute the evaluated command and swallow the brace:
                         Object result = LatexToUnicodeFormatter.CHARS.get(command);
+
                         if (result == null) {
                             // If the command is unknown, just print it:
                             sb.append(command);
                         } else {
                             sb.append((String) result);
                         }
+
                     } else {
                         Object result = LatexToUnicodeFormatter.CHARS.get(command);
+
                         if (result == null) {
                             sb.append(command);
                         } else {
