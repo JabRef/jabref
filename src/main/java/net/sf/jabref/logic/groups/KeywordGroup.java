@@ -201,11 +201,8 @@ public class KeywordGroup extends AbstractGroup {
     @Override
     public boolean contains(BibEntry entry) {
         if (regExp) {
-            String content = entry.getField(searchField);
-            if (content == null) {
-                return false;
-            }
-            return pattern.matcher(content).find();
+            Optional<String> content = entry.getFieldOptional(searchField);
+            return content.map(value -> pattern.matcher(value).find()).orElse(false);
         }
 
         Set<String> words = entry.getFieldAsWords(searchField);
