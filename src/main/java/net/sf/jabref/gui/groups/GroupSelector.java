@@ -81,7 +81,6 @@ import net.sf.jabref.logic.search.matchers.MatcherSet;
 import net.sf.jabref.logic.search.matchers.MatcherSets;
 import net.sf.jabref.logic.search.matchers.NotMatcher;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -795,7 +794,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                         Localization.lang("Change of Grouping Method"),
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
                 boolean keepPreviousAssignments = i == JOptionPane.YES_OPTION &&
-                        Util.warnAssignmentSideEffects(newGroup, panel.frame());
+                        WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
 
                 AbstractUndoableEdit undoAddPreviousEntries = null;
                 UndoableModifyGroup undo = new UndoableModifyGroup(GroupSelector.this, groupsRoot, node, newGroup);
