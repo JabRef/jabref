@@ -61,4 +61,16 @@ public class LatexToUnicodeFormatterTest {
     public void formatExample() {
         assertEquals("Mönch", formatter.format(formatter.getExampleInput()));
     }
+
+    @Test
+    public void testEarlierProblems() {
+        assertEquals("Š", formatter.format("{\\v{S}}"));
+        assertEquals("χ", formatter.format("$\\chi$"));
+    }
+
+    @Test
+    public void testCombiningAccents() {
+        assertEquals("ḩ", formatter.format("{\\c{h}}"));
+        assertEquals("a͍", formatter.format("\\spreadlips{a}"));
+    }
 }
