@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -8,7 +9,12 @@ import org.junit.Test;
  */
 public class NormalizePagesFormatterTest {
 
-    private final NormalizePagesFormatter formatter = new NormalizePagesFormatter();
+    private NormalizePagesFormatter formatter;
+
+    @Before
+    public void setUp() {
+        formatter = new NormalizePagesFormatter();
+    }
 
     @Test
     public void formatSinglePageResultsInNoChange() {

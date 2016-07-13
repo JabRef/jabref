@@ -7,6 +7,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
@@ -105,6 +106,7 @@ public class FormatterTest {
                 new Object[]{new CapitalizeFormatter()},
                 new Object[]{new ClearFormatter()},
                 new Object[]{new HtmlToLatexFormatter()},
+                new Object[]{new HtmlToUnicodeFormatter()},
                 new Object[]{new IdentityFormatter()},
                 new Object[]{new LatexCleanupFormatter()},
                 new Object[]{new LatexToUnicodeFormatter()},

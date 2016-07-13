@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.formatter.casechanger;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 
@@ -9,7 +10,12 @@ import org.junit.Test;
  */
 public class SentenceCaseFormatterTest {
 
-    private final SentenceCaseFormatter formatter = new SentenceCaseFormatter();
+    private SentenceCaseFormatter formatter;
+
+    @Before
+    public void setUp() {
+        formatter = new SentenceCaseFormatter();
+    }
 
     @Test
     public void test() {
