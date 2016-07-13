@@ -41,7 +41,7 @@ More information on this can be found via `man git-shortlog`.
 
 
 ### Modify the header
-The headers of each `.java` file states "JabREf contributors".
+The headers of each `.java` file states "JabRef contributors".
 Author credits are given using the `AUTHORS` file and by using the `git blame` functionality.
 
 For instance,
