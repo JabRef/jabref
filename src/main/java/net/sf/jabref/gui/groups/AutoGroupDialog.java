@@ -93,7 +93,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 dispose();
 
                 try {
-                    GroupTreeNode autoGroupsRoot = new GroupTreeNode(
+                    GroupTreeNode autoGroupsRoot = GroupTreeNode.fromGroup(
                             new ExplicitGroup(Localization.lang("Automatically created groups"), GroupHierarchyType.INCLUDING));
                     Set<String> hs;
                     String fieldText = field.getText();
@@ -121,7 +121,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                     for (String keyword : hs) {
                         KeywordGroup group = new KeywordGroup(keyword, fieldText, keyword, false, false,
                                 GroupHierarchyType.INDEPENDENT);
-                        autoGroupsRoot.addChild(new GroupTreeNode(group));
+                        autoGroupsRoot.addChild(GroupTreeNode.fromGroup(group));
                     }
 
                     autoGroupsRoot.moveTo(m_groupsRoot.getNode());
