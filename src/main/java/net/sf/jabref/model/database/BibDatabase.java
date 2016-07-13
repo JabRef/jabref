@@ -167,7 +167,7 @@ public class BibDatabase {
      * Inserts the entry, given that its ID is not already in use.
      * use Util.createId(...) to make up a unique ID for an entry.
      *
-     * @param entry BibEntry to insert insert into the database
+     * @param entry BibEntry to insert into the database
      * @return false if the insert was done without a duplicate warning
      * @throws KeyCollisionException thrown if the entry id ({@link BibEntry#getId()}) is already  present in the database
      */

@@ -34,14 +34,12 @@ public class DBMSConnectorTest {
         }
     }
 
-    @Test
-    public void testGetNewConnectionFail() {
+    @Test(expected = SQLException.class)
+    public void testGetNewConnectionFail() throws SQLException {
         try {
             DBMSConnector.getNewConnection(dbmsType, "XXXX", "XXXX", "XXXX", "XXXX");
         } catch (ClassNotFoundException e) {
             Assert.fail(e.getMessage());
-        } catch (SQLException e) {
-            Assert.assertEquals(0, e.getErrorCode());
         }
     }
 }

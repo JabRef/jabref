@@ -42,6 +42,7 @@ import javax.swing.KeyStroke;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.DatabaseLocation;
@@ -93,6 +94,7 @@ public class OpenRemoteDatabaseDialog extends JDialog {
         applyGlobalPrefs();
         setupActions();
         pack();
+        setLocationRelativeTo(frame);
     }
 
     /**
@@ -133,7 +135,7 @@ public class OpenRemoteDatabaseDialog extends JDialog {
                 } catch (SQLException exception) {
                     JOptionPane.showMessageDialog(OpenRemoteDatabaseDialog.this, exception.getMessage(),
                             Localization.lang("Connection error"), JOptionPane.ERROR_MESSAGE);
-                } catch (Exception exception) {
+                } catch (JabRefException exception) {
                     JOptionPane.showMessageDialog(OpenRemoteDatabaseDialog.this, exception.getMessage(),
                             Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
                 }
@@ -312,26 +314,27 @@ public class OpenRemoteDatabaseDialog extends JDialog {
     /**
      * Checks every required text field for emptiness.
      */
-    private void checkFields() throws Exception {
+    private void checkFields() throws JabRefException {
         if (isEmptyField(hostField)) {
             hostField.requestFocus();
-            throw new Exception(Localization.lang("Required_field_\"%0\"_is_empty.", Localization.lang("Host")));
+            throw new JabRefException(Localization.lang("Required_field_\"%0\"_is_empty.", Localization.lang("Host")));
         }
         if (isEmptyField(portField)) {
             portField.requestFocus();
-            throw new Exception(Localization.lang("Required_field_\"%0\"_is_empty.", Localization.lang("Port")));
+            throw new JabRefException(Localization.lang("Required_field_\"%0\"_is_empty.", Localization.lang("Port")));
         }
         if (isEmptyField(databaseField)) {
             databaseField.requestFocus();
-            throw new Exception(Localization.lang("Required_field_\"%0\"_is_empty.", Localization.lang("Database")));
+            throw new JabRefException(
+                    Localization.lang("Required_field_\"%0\"_is_empty.", Localization.lang("Database")));
         }
         if (isEmptyField(userField)) {
             userField.requestFocus();
-            throw new Exception(Localization.lang("Required_field_\"%0\"_is_empty.", Localization.lang("User")));
+            throw new JabRefException(Localization.lang("Required_field_\"%0\"_is_empty.", Localization.lang("User")));
         }
         if (isEmptyField(passwordField)) {
             passwordField.requestFocus();
-            throw new Exception(Localization.lang("Required_field_\"%0\"_is_empty.", Localization.lang("Password")));
+            throw new JabRefException(Localization.lang("Required_field_\"%0\"_is_empty.", Localization.lang("Password")));
         }
 
     }

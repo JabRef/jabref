@@ -34,7 +34,6 @@ public class RemoteConnectionLostDialog {
         if (answer == 0) {
             jabRefFrame.closeCurrentTab();
             OpenRemoteDatabaseDialog openRemoteDBDialog = new OpenRemoteDatabaseDialog(jabRefFrame);
-            openRemoteDBDialog.setLocationRelativeTo(jabRefFrame);
             openRemoteDBDialog.setVisible(true);
         } else if (answer == 1) {
             connectionLostEvent.getBibDatabaseContext().updateDatabaseLocation(DatabaseLocation.LOCAL);
