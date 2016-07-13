@@ -117,14 +117,10 @@
             <preActivation />
             <postActivation />
             <actions>
-              <action name="" id="311" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RequestPrivilegesAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+              <action name="" id="13" customizedId="" beanClass="com.install4j.runtime.beans.actions.misc.RequestPrivilegesAction" enabled="true" commentSet="false" comment="" actionElevationType="none" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
-                    <object class="com.install4j.runtime.beans.actions.misc.RequestPrivilegesAction">
-                      <void property="failIfNotObtainedWin">
-                        <boolean>false</boolean>
-                      </void>
-                    </object>
+                    <object class="com.install4j.runtime.beans.actions.misc.RequestPrivilegesAction" />
                   </java>
                 </serializedBean>
                 <condition />
@@ -161,14 +157,14 @@
                 </serializedBean>
                 <condition>context.getBooleanVariable("sys.confirmedUpdateInstallation")</condition>
               </action>
-              <action name="InstallationDirectory" id="184" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
+              <action name="" id="184" customizedId="" beanClass="com.install4j.runtime.beans.actions.control.RunScriptAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="true" failureStrategy="1" errorMessage="">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.actions.control.RunScriptAction">
                       <void property="script">
                         <object class="com.install4j.api.beans.ScriptProperty">
                           <void property="value">
-                            <string>if (Util.hasFullAdminRights()) {
+                            <string>if (Util.hasFullAdminRights() || Util.isAdminGroup()) {
   context.setInstallationDirectory(context.getInstallationDirectory());
 } else {
   if (Util.isAtLeastWindowsVista()) {
@@ -403,7 +399,7 @@ return true;</string>
                         </object>
                       </java>
                     </serializedBean>
-                    <condition>Util.hasFullAdminRights()</condition>
+                    <condition>Util.hasFullAdminRights() || Util.isAdminGroup()</condition>
                   </action>
                   <action name="PathUnprivileged" id="240" customizedId="" beanClass="com.install4j.runtime.beans.actions.registry.SetRegistryValueAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
@@ -427,7 +423,7 @@ return true;</string>
                         </object>
                       </java>
                     </serializedBean>
-                    <condition>!Util.hasFullAdminRights()</condition>
+                    <condition>!(Util.hasFullAdminRights() || Util.isAdminGroup())</condition>
                   </action>
                 </beans>
               </group>
@@ -617,14 +613,14 @@ return true;</string>
                 </serializedBean>
                 <condition />
               </action>
-              <group name="Registry" id="312" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="elevated">
+              <group name="Registry" id="284" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="elevated">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.groups.ActionGroup" />
                   </java>
                 </serializedBean>
                 <beans>
-                  <action name="PathAdmin" id="280" customizedId="" beanClass="com.install4j.runtime.beans.actions.registry.DeleteRegistryItemAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="PathAdmin" id="282" customizedId="" beanClass="com.install4j.runtime.beans.actions.registry.DeleteRegistryItemAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.registry.DeleteRegistryItemAction">
@@ -643,9 +639,9 @@ return true;</string>
                         </object>
                       </java>
                     </serializedBean>
-                    <condition>Util.hasFullAdminRights()</condition>
+                    <condition>Util.hasFullAdminRights() || Util.isAdminGroup()</condition>
                   </action>
-                  <action name="PathUnprivileged" id="281" customizedId="" beanClass="com.install4j.runtime.beans.actions.registry.DeleteRegistryItemAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
+                  <action name="PathUnprivileged" id="283" customizedId="" beanClass="com.install4j.runtime.beans.actions.registry.DeleteRegistryItemAction" enabled="true" commentSet="false" comment="" actionElevationType="elevated" rollbackBarrier="false" multiExec="false" failureStrategy="1" errorMessage="">
                     <serializedBean>
                       <java class="java.beans.XMLDecoder">
                         <object class="com.install4j.runtime.beans.actions.registry.DeleteRegistryItemAction">
@@ -664,7 +660,7 @@ return true;</string>
                         </object>
                       </java>
                     </serializedBean>
-                    <condition>!Util.hasFullAdminRights()</condition>
+                    <condition>!(Util.hasFullAdminRights() || Util.isAdminGroup())</condition>
                   </action>
                 </beans>
               </group>
