@@ -37,7 +37,6 @@ import java.util.TreeSet;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.event.FieldChangedEvent;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 
@@ -640,7 +639,7 @@ public class BibEntry implements Cloneable {
             if (fieldValue == null) {
                 return Collections.emptySet();
             } else {
-                HashSet<String> words = new HashSet<>(StringUtil.getStringAsWords(fieldValue));
+                HashSet<String> words = new HashSet<>(EntryUtil.getStringAsWords(fieldValue));
                 fieldsAsWords.put(fieldName, words);
                 return words;
             }

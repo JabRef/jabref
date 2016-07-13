@@ -654,14 +654,4 @@ public class StringUtil {
 
     }
 
-    /**
-     * Returns a list of words contained in the given text.
-     * Whitespace, comma and semicolon are considered as separator between words.
-     *
-     * @param text the input
-     * @return a list of words
-     */
-    public static List<String> getStringAsWords(String text) {
-        return Arrays.asList(text.split("[\\s,;]+"));
-    }
 }
