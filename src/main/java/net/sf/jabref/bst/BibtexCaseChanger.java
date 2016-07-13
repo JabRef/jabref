@@ -280,7 +280,7 @@ public final class BibtexCaseChanger {
 
     /**
      * Determine whether there starts a special char at pos (e.g., oe, AE). Return it as string.
-     * If nothing found, return null
+     * If nothing found, return Optional.empty()
      *
      * Also used by BibtexPurify
      *

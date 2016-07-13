@@ -95,7 +95,7 @@ public class ChangeScanner implements Runnable {
         try {
 
             // Parse the temporary file.
-            File tempFile = Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle());
+            File tempFile = Globals.getFileUpdateMonitor().getTempFile(panel.fileMonitorHandle());
             ParserResult pr = OpenDatabaseAction.loadDatabase(tempFile, Globals.prefs.getDefaultEncoding());
             inTemp = pr.getDatabase();
             mdInTemp = pr.getMetaData();
@@ -166,7 +166,7 @@ public class ChangeScanner implements Runnable {
                         .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
                 BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
                 SaveSession ss = databaseWriter.saveDatabase(new BibDatabaseContext(inTemp, mdInTemp, defaults), prefs);
-                ss.commit(Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()));
+                ss.commit(Globals.getFileUpdateMonitor().getTempFile(panel.fileMonitorHandle()));
             } catch (SaveException ex) {
                 LOGGER.warn("Problem updating tmp file after accepting external changes", ex);
             }

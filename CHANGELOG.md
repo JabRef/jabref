@@ -19,6 +19,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Updated German translation
 - When resolving duplicate BibTeX-keys there is now an "Ignore" button. "Cancel" and close key now quits the resolving.
 - The [online forum](http://discourse.jabref.org/) is now directly accessible via the "Help" menu
+- Implemented [#1338](https://github.com/JabRef/jabref/issues/1338): clicking on a crossref in the main table selects the parent entry and added a button in the entry editor to select the parent entry.
 
 ### Fixed
 - Fixed [#1530](https://github.com/JabRef/jabref/issues/1530): Unescaped hashes in the url field are ignored by the integrity checker
@@ -34,6 +35,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1507](https://github.com/JabRef/jabref/issues/1507): Keywords are now separated by the delimiter specified in the preferences
 - Fixed [#1484](https://github.com/JabRef/jabref/issues/1484): HTML export handles some UTF characters wrong
 - Fixed [#1534](https://github.com/JabRef/jabref/issues/1534): "Mark entries imported into database" does not work correctly
+- Fixed [#1500](https://github.com/JabRef/jabref/issues/1500): Renaming of explicit groups now changes entries accordingly
+- Fixed issue where field changes were not undoable if the time stamp was updated on editing
 
 ### Removed
 

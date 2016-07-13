@@ -36,6 +36,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
 import java.util.prefs.InvalidPreferencesFormatException;
@@ -1013,10 +1014,10 @@ public class JabRefPreferences {
 
         StringReader rd = new StringReader(names);
         List<String> res = new ArrayList<>();
-        String rs;
+        Optional<String> rs;
         try {
-            while ((rs = getNextUnit(rd)) != null) {
-                res.add(rs);
+            while ((rs = getNextUnit(rd)).isPresent()) {
+                res.add(rs.get());
             }
         } catch (IOException ignored) {
             // Ignored
@@ -1205,7 +1206,7 @@ public class JabRefPreferences {
     }
 
 
-    private static String getNextUnit(Reader data) throws IOException {
+    private static Optional<String> getNextUnit(Reader data) throws IOException {
         // character last read
         // -1 if end of stream
         // initialization necessary, because of Java compiler
@@ -1240,12 +1241,12 @@ public class JabRefPreferences {
             }
         }
         if (res.length() > 0) {
-            return res.toString();
+            return Optional.of(res.toString());
         } else if (c == -1) {
             // end of stream
-            return null;
+            return Optional.empty();
         } else {
-            return "";
+            return Optional.of("");
         }
     }
 
@@ -1265,22 +1266,22 @@ public class JabRefPreferences {
     /**
      * Retrieves all information about the entry type in preferences, with the tag given by number.
      */
-    public CustomEntryType getCustomEntryType(int number) {
+    public Optional<CustomEntryType> getCustomEntryType(int number) {
         String nr = String.valueOf(number);
         String name = get(JabRefPreferences.CUSTOM_TYPE_NAME + nr);
         if (name == null) {
-            return null;
+            return Optional.empty();
         }
         List<String> req = getStringList(JabRefPreferences.CUSTOM_TYPE_REQ + nr);
         List<String> opt = getStringList(JabRefPreferences.CUSTOM_TYPE_OPT + nr);
         List<String> priOpt = getStringList(JabRefPreferences.CUSTOM_TYPE_PRIOPT + nr);
         if (priOpt.isEmpty()) {
-            return new CustomEntryType(EntryUtil.capitalizeFirst(name), req, opt);
+            return Optional.of(new CustomEntryType(EntryUtil.capitalizeFirst(name), req, opt));
         }
         List<String> secondary = new ArrayList<>(opt);
         secondary.removeAll(priOpt);
 
-        return new CustomEntryType(EntryUtil.capitalizeFirst(name), req, priOpt, secondary);
+        return Optional.of(new CustomEntryType(EntryUtil.capitalizeFirst(name), req, priOpt, secondary));
 
     }
 
@@ -1295,17 +1296,6 @@ public class JabRefPreferences {
         purgeSeries(JabRefPreferences.CUSTOM_TYPE_REQ, number);
         purgeSeries(JabRefPreferences.CUSTOM_TYPE_OPT, number);
         purgeSeries(JabRefPreferences.CUSTOM_TYPE_PRIOPT, number);
-    }
-
-    public void purgeCustomEntryTypes() {
-        int number = 0;
-        if(getCustomEntryType(number) != null) {
-            number++;
-        }
-
-        for(int i = 0; i < number; i++) {
-            purgeCustomEntryTypes(i);
-        }
     }
 
     /**

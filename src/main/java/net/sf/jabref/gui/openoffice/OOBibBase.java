@@ -486,11 +486,13 @@ class OOBibBase {
                 BibEntry[] cEntries = new BibEntry[keys.length];
                 for (int j = 0; j < cEntries.length; j++) {
                     BibDatabase database = linkSourceBase.get(keys[j]);
-                    cEntries[j] = null;
+                    Optional<BibEntry> tmpEntry = Optional.empty();
                     if (database != null) {
-                        cEntries[j] = database.getEntryByKey(keys[j]);
+                        tmpEntry = database.getEntryByKey(keys[j]);
                     }
-                    if (cEntries[j] == null) {
+                    if (tmpEntry.isPresent()) {
+                        cEntries[j] = tmpEntry.get();
+                    } else {
                         LOGGER.info("BibTeX key not found: '" + keys[j] + '\'');
                         LOGGER.info("Problem with reference mark: '" + names.get(i) + '\'');
                         cEntries[j] = new UndefinedBibtexEntry(keys[j]);
@@ -641,28 +643,31 @@ class OOBibBase {
                         seenBefore.add(currentKey);
                     }
                     String uniq = uniquefiers.get(currentKey);
+                    Optional<BibEntry> tmpEntry = Optional.empty();
                     if (uniq == null) {
                         if (firstLimAuthors[k] > 0) {
                             needsChange = true;
                             BibDatabase database = linkSourceBase.get(currentKey);
                             if (database != null) {
-                                cEntries[k] = database.getEntryByKey(currentKey);
+                                tmpEntry = database.getEntryByKey(currentKey);
                             }
-                            uniquif[k] = "";
                         } else {
                             BibDatabase database = linkSourceBase.get(currentKey);
                             if (database != null) {
-                                cEntries[k] = database.getEntryByKey(currentKey);
+                                tmpEntry = database.getEntryByKey(currentKey);
                             }
-                            uniquif[k] = "";
                         }
+                        uniquif[k] = "";
                     } else {
                         needsChange = true;
                         BibDatabase database = linkSourceBase.get(currentKey);
                         if (database != null) {
-                            cEntries[k] = database.getEntryByKey(currentKey);
+                            tmpEntry = database.getEntryByKey(currentKey);
                         }
                         uniquif[k] = uniq;
+                    }
+                    if (tmpEntry.isPresent()) {
+                        cEntries[k] = tmpEntry.get();
                     }
                 }
                 if (needsChange) {
@@ -798,9 +803,9 @@ class OOBibBase {
         for (String key : keys) {
             boolean found = false;
             for (BibDatabase database : databases) {
-                BibEntry entry = database.getEntryByKey(key);
-                if (entry != null) {
-                    entries.put(entry, database);
+                Optional<BibEntry> entry = database.getEntryByKey(key);
+                if (entry.isPresent()) {
+                    entries.put(entry.get(), database);
                     linkSourceBase.put(key, database);
                     found = true;
                     break;
@@ -845,18 +850,18 @@ class OOBibBase {
                 String[] keys = m.group(2).split(",");
                 for (String key : keys) {
                     BibDatabase database = linkSourceBase.get(key);
-                    BibEntry origEntry = null;
+                    Optional<BibEntry> origEntry = Optional.empty();
                     if (database != null) {
                         origEntry = database.getEntryByKey(key);
                     }
-                    if (origEntry == null) {
+                    if (origEntry.isPresent()) {
+                        if (!newList.containsKey(origEntry.get())) {
+                            newList.put(origEntry.get(), database);
+                        }
+                    } else {
                         LOGGER.info("BibTeX key not found: '" + key + "'");
                         LOGGER.info("Problem with reference mark: '" + name + "'");
                         newList.put(new UndefinedBibtexEntry(key), null);
-                    } else {
-                        if (!newList.containsKey(origEntry)) {
-                            newList.put(origEntry, database);
-                        }
                     }
                 }
             }
@@ -1202,9 +1207,9 @@ class OOBibBase {
                 List<BibEntry> entries = new ArrayList<>();
                 for (String key : keys) {
                     for (BibDatabase database : databases) {
-                        BibEntry entry = database.getEntryByKey(key);
-                        if (entry != null) {
-                            entries.add(entry);
+                        Optional<BibEntry> entry = database.getEntryByKey(key);
+                        if (entry.isPresent()) {
+                            entries.add(entry.get());
                             break;
                         }
                     }

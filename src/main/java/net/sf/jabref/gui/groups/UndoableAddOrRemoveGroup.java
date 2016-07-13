@@ -71,7 +71,7 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
         // storing a backup of the whole subtree is not required when children
         // are kept
         m_subtreeBackup = editType != UndoableAddOrRemoveGroup.REMOVE_NODE_KEEP_CHILDREN ? editedNode.getNode()
-                .copySubtree() : new GroupTreeNode(editedNode.getNode().getGroup().deepCopy());
+                .copySubtree() : GroupTreeNode.fromGroup(editedNode.getNode().getGroup().deepCopy());
         // remember path to edited node. this cannot be stored as a reference,
         // because the reference itself might change. the method below is more
         // robust.

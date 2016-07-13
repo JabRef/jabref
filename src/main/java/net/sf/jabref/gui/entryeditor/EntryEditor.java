@@ -529,6 +529,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
             return FieldExtraComponents.getPaginationExtraComponent(editor, this);
         } else if (fieldExtras.contains(FieldProperties.TYPE)) {
             return FieldExtraComponents.getTypeExtraComponent(editor, this, "patent".equalsIgnoreCase(entry.getType()));
+        } else if (fieldExtras.contains(FieldProperties.CROSSREF)) {
+            return FieldExtraComponents.getCrossrefExtraComponent(editor, frame.getCurrentBasePanel());
         }
         return Optional.empty();
     }
@@ -542,7 +544,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         source.setTabSize(Globals.prefs.getInt(JabRefPreferences.INDENT));
         source.addFocusListener(new FieldEditorFocusListener());
         // Add the global focus listener, so a menu item can see if this field was focused when an action was called.
-        source.addFocusListener(Globals.focusListener);
+        source.addFocusListener(Globals.getFocusListener());
         source.setFont(new Font("Monospaced", Font.PLAIN, Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
         setupJTextComponent(source);
         updateSource();
@@ -693,7 +695,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * Makes sure the current edit is stored.
      */
     public void storeCurrentEdit() {
-        Component comp = Globals.focusListener.getFocused();
+        Component comp = Globals.getFocusListener().getFocused();
         if (Objects.equals(comp, source) || ((comp instanceof FieldEditor) && this.isAncestorOf(comp))) {
             if (comp instanceof FieldEditor) {
                 ((FieldEditor) comp).clearAutoCompleteSuggestion();
@@ -1124,6 +1126,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     ce.addEdit(undoableKeyChange);
                     TimeStamp.doUpdateTimeStamp(entry)
                             .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
+                    ce.end();
                     panel.getUndoManager().addEdit(ce);
                 } else {
                     panel.getUndoManager().addEdit(undoableKeyChange);
@@ -1191,8 +1194,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                             TimeStamp.doUpdateTimeStamp(entry)
                                     .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
+                            ce.end();
 
                             panel.getUndoManager().addEdit(ce);
+
                         } else {
                             panel.getUndoManager().addEdit(undoableFieldChange);
                         }

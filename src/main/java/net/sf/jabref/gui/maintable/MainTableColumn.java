@@ -112,9 +112,13 @@ public class MainTableColumn {
             if (field.equals(BibEntry.TYPE_HEADER)) {
                 content = EntryUtil.capitalizeFirst(entry.getType());
             } else {
-                content = entry.getFieldOrAlias(field);
-                if (database.isPresent() && "Author".equalsIgnoreCase(columnName) && (content != null)) {
-                    content = database.get().resolveForStrings(content);
+                Optional<String> newContent = entry.getFieldOrAlias(field);
+                if (newContent.isPresent()) {
+                    if (database.isPresent() && "Author".equalsIgnoreCase(columnName)) {
+                        content = database.get().resolveForStrings(newContent.get());
+                    } else {
+                        content = newContent.get();
+                    }
                 }
             }
             if (content != null) {

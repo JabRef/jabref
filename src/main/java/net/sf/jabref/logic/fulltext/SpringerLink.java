@@ -49,7 +49,7 @@ public class SpringerLink implements FullTextFinder {
         Optional<URL> pdfLink = Optional.empty();
 
         // Try unique DOI first
-        Optional<DOI> doi = DOI.build(entry.getField("doi"));
+        Optional<DOI> doi = entry.getFieldOptional("doi").flatMap(DOI::build);
 
         if(doi.isPresent()) {
             // Available in catalog?

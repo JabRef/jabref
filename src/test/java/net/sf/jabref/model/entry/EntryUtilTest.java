@@ -24,5 +24,12 @@ public class EntryUtilTest {
         Assert.assertEquals(new LinkedHashSet<>(Arrays.asList("w1", "w2a w2b", "w3")), separatedKeywords);
     }
 
-
+    @Test
+    public void getSeparatedKeywordsEntry() {
+        String keywords = "w1, w2a w2b, w3";
+        BibEntry entry = new BibEntry();
+        entry.setField(BibEntry.KEYWORDS_FIELD, keywords);
+        Set<String> separatedKeywords = EntryUtil.getSeparatedKeywords(entry);
+        Assert.assertEquals(new LinkedHashSet<>(Arrays.asList("w1", "w2a w2b", "w3")), separatedKeywords);
+    }
 }
