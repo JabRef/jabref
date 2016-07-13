@@ -369,7 +369,7 @@ return true;</string>
                 </serializedBean>
                 <condition>context.getBooleanVariable("addToDockAction")</condition>
               </action>
-              <group name="Registry" id="239" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="inherit">
+              <group name="Registry" id="239" customizedId="" beanClass="com.install4j.runtime.beans.groups.ActionGroup" enabled="true" commentSet="false" comment="" actionElevationType="elevated">
                 <serializedBean>
                   <java class="java.beans.XMLDecoder">
                     <object class="com.install4j.runtime.beans.groups.ActionGroup" />
