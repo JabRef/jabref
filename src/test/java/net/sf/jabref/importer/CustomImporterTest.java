@@ -1,8 +1,6 @@
 package net.sf.jabref.importer;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -15,131 +13,117 @@ import net.sf.jabref.importer.fileformat.OvidImporter;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CustomImporterTest {
 
-    private CustomImporter importer1;
-    private CustomImporter importer2;
-    private CustomImporter importer3;
+    private CustomImporter importer;
 
     @Before
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
-
-        BibTeXMLImporter bibtexml = new BibTeXMLImporter();
-        importer1 = new CustomImporter();
-        importer1.setName(bibtexml.getFormatName());
-        importer1.setCliId(bibtexml.getId());
-        importer1.setClassName(bibtexml.getClass().getName());
-        importer1.setBasePath("src/main/java/net/sf/jabref/importer/fileformat/BibTeXMLImporter.java");
-
-        OvidImporter ovid = new OvidImporter();
-
-        List<String> dataTest = Arrays.asList(ovid.getFormatName(), ovid.getId(), ovid.getClass().getName(), "src/main/java/net/sf/jabref/importer/fileformat/OvidImporter.java");
-        importer2 = new CustomImporter(dataTest);
-
-        CopacImporter copac = new CopacImporter();
-        importer3 = new CustomImporter(copac.getFormatName(), copac.getId(), copac.getClass().getName(), "src/main/java/net/sf/jabref/importer/fileformat/CopacImporter.java");
+        importer = new CustomImporter(new CopacImporter());
     }
 
     @Test
     public void testGetName() {
-        assertEquals("BibTeXML", importer1.getName());
-        assertEquals("Ovid", importer2.getName());
-        assertEquals("Copac", importer3.getName());
+        assertEquals("Copac", importer.getName());
     }
 
     @Test
     public void testGetCliId() {
-        assertEquals("bibtexml", importer1.getClidId());
-        assertEquals("ovid", importer2.getClidId());
-        assertEquals("cpc", importer3.getClidId());
+        assertEquals("cpc", importer.getClidId());
     }
 
     @Test
     public void testGetClassName() {
-        assertEquals("net.sf.jabref.importer.fileformat.BibTeXMLImporter", importer1.getClassName());
-        assertEquals("net.sf.jabref.importer.fileformat.OvidImporter", importer2.getClassName());
-        assertEquals("net.sf.jabref.importer.fileformat.CopacImporter", importer3.getClassName());
+        assertEquals("net.sf.jabref.importer.fileformat.CopacImporter", importer.getClassName());
     }
 
     @Test
     public void testGetBasePath() {
-        assertEquals("src/main/java/net/sf/jabref/importer/fileformat/BibTeXMLImporter.java", importer1.getBasePath());
-        assertEquals("src/main/java/net/sf/jabref/importer/fileformat/OvidImporter.java", importer2.getBasePath());
-        assertEquals("src/main/java/net/sf/jabref/importer/fileformat/CopacImporter.java", importer3.getBasePath());
+        assertEquals("src/main/java/net/sf/jabref/importer/fileformat/CopacImporter.java", importer.getBasePath());
     }
 
     @Test
-    public void testGetInstance() throws IOException, ClassNotFoundException,
-            InstantiationException, IllegalAccessException {
-        assertEquals(new BibTeXMLImporter(), importer1.getInstance());
-        assertEquals(new OvidImporter(), importer2.getInstance());
-        assertEquals(new CopacImporter(), importer3.getInstance());
+    public void testGetInstance() throws Exception {
+        assertEquals(new CopacImporter(), importer.getInstance());
     }
 
     @Test
     public void testGetFileFromBasePath() {
-        assertEquals(new File(importer1.getBasePath()), importer1.getFileFromBasePath());
-        assertEquals(new File(importer2.getBasePath()), importer2.getFileFromBasePath());
-        assertEquals(new File(importer3.getBasePath()), importer3.getFileFromBasePath());
+        assertEquals(new File("src/main/java/net/sf/jabref/importer/fileformat/CopacImporter.java"), importer.getFileFromBasePath());
     }
 
     @Test
-    public void testGetBasePathUrl() throws MalformedURLException {
-        assertEquals(new File(importer1.getBasePath()).toURI().toURL(), importer1.getBasePathUrl());
-        assertEquals(new File(importer2.getBasePath()).toURI().toURL(), importer2.getBasePathUrl());
-        assertEquals(new File(importer3.getBasePath()).toURI().toURL(), importer3.getBasePathUrl());
+    public void testGetBasePathUrl() throws Exception {
+        assertEquals(new File("src/main/java/net/sf/jabref/importer/fileformat/CopacImporter.java").toURI().toURL(), importer.getBasePathUrl());
     }
 
     @Test
     public void testGetAsStringList() {
-        assertEquals(importer1.getName(), importer1.getAsStringList().get(0));
-        assertEquals(importer1.getClidId(), importer1.getAsStringList().get(1));
-        assertEquals(importer1.getClassName(), importer1.getAsStringList().get(2));
-        assertEquals(importer1.getBasePath(), importer1.getAsStringList().get(3));
-
-        assertEquals(importer2.getName(), importer2.getAsStringList().get(0));
-        assertEquals(importer2.getClidId(), importer2.getAsStringList().get(1));
-        assertEquals(importer2.getClassName(), importer2.getAsStringList().get(2));
-        assertEquals(importer2.getBasePath(), importer2.getAsStringList().get(3));
-
-        assertEquals(importer3.getName(), importer3.getAsStringList().get(0));
-        assertEquals(importer3.getClidId(), importer3.getAsStringList().get(1));
-        assertEquals(importer3.getClassName(), importer3.getAsStringList().get(2));
-        assertEquals(importer3.getBasePath(), importer3.getAsStringList().get(3));
+        assertEquals("Copac", importer.getAsStringList().get(0));
+        assertEquals("cpc", importer.getAsStringList().get(1));
+        assertEquals("net.sf.jabref.importer.fileformat.CopacImporter", importer.getAsStringList().get(2));
+        assertEquals("src/main/java/net/sf/jabref/importer/fileformat/CopacImporter.java", importer.getAsStringList().get(3));
     }
 
     @Test
-    public void testEquals() {
-        boolean test1 = importer1.equals(importer1);
-        boolean test2 = importer1.equals(importer2);
-        boolean test3 = importer3.equals(importer1);
-        
-        assertTrue(test1);
-        assertFalse(test2);
-        assertFalse(test3);
+    public void testEqualsTrue() {
+        assertEquals(importer, importer);
     }
 
     @Test
-    public void testHashCode() {
-        assertEquals(646299595, importer1.hashCode());
-        assertEquals(2470242, importer2.hashCode());
-        assertEquals(65293446, importer3.hashCode());
+    public void testEqualsFalse() {
+        assertNotEquals(new CopacImporter(), importer);
     }
 
     @Test
-    public void testCompareTo() {
-        assertEquals(0, importer1.compareTo(importer1));
-        assertTrue(importer1.compareTo(importer2) < 0);
-        assertTrue(importer3.compareTo(importer1) > 0);
+    public void testCompareToSmaller() {
+        CustomImporter ovidImporter = new CustomImporter(new OvidImporter());
+
+        assertTrue(importer.compareTo(ovidImporter) < 0);
+    }
+
+    @Test
+    public void testCompareToGreater() {
+        CustomImporter bibtexmlImporter = new CustomImporter(new BibTeXMLImporter());
+        CustomImporter ovidImporter = new CustomImporter(new OvidImporter());
+
+        assertTrue(ovidImporter.compareTo(bibtexmlImporter) > 0);
+    }
+
+    @Test
+    public void testCompareToEven() {
+        assertEquals(0, importer.compareTo(importer));
     }
 
     @Test
     public void testToString() {
-        assertEquals("BibTeXML", importer1.toString());
-        assertEquals("Ovid", importer2.toString());
-        assertEquals("Copac", importer3.toString());
+        assertEquals("Copac", importer.toString());
+    }
+
+    @Test
+    public void testClassicConstructor() {
+        CustomImporter customImporter = new CustomImporter("Copac", "cpc", "net.sf.jabref.importer.fileformat.CopacImporter", "src/main/java/net/sf/jabref/importer/fileformat/CopacImporter.java");
+
+        assertEquals(customImporter.getName(), importer.getName());
+        assertEquals(customImporter.getClidId(), importer.getClidId());
+        assertEquals(customImporter.getBasePath(), importer.getBasePath());
+        assertEquals(customImporter.getClassName(), importer.getClassName());
+    }
+
+    @Test
+    public void testListConstructor() {
+        List<String> dataTest = Arrays.asList("Ovid", "ovid", "net.sf.jabref.importer.fileformat.OvidImporter", "src/main/java/net/sf/jabref/importer/fileformat/OvidImporter.java");
+        CustomImporter customImporter = new CustomImporter(dataTest);
+        CustomImporter customOvidImporter = new CustomImporter(new OvidImporter());
+
+        assertEquals(customImporter.getName(), customOvidImporter.getName());
+        assertEquals(customImporter.getClidId(), customOvidImporter.getClidId());
+        assertEquals(customImporter.getBasePath(), customOvidImporter.getBasePath());
+        assertEquals(customImporter.getClassName(), customOvidImporter.getClassName());
     }
 }
