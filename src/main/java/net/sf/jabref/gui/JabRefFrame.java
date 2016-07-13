@@ -1477,6 +1477,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.add(pushExternalButton.getComponent());
         tlb.addSeparator();
         tlb.add(donationAction);
+        tlb.add(forkMeOnGitHubAction);
     }
 
     /**
