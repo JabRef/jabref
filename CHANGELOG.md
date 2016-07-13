@@ -9,23 +9,21 @@ Here, the categories "Changed" for added and changed functionality,
 We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#NUM`.
 
 
-## [Unreleased]
+## [3.5] - 2016-07-13
 
 ### Changed
 - Implemented [#1356](https://github.com/JabRef/jabref/issues/1356): Added a formatter for converting HTML to Unicode
 - Implemented [#661](https://github.com/JabRef/jabref/issues/661): Introducing a "check for updates" mechnism (manually/automatic at startup)
-- [#1485](https://github.com/JabRef/jabref/issues/1485): Biblatex field shorttitle is now exported/imported as standard field ShortTitle to Word bibliography
-- [#1431](https://github.com/JabRef/jabref/issues/1431): Import dialog shows file extensions and filters the view
-- Updated German translation
+- Implemented [#1338](https://github.com/JabRef/jabref/issues/1338): clicking on a crossref in the main table selects the parent entry and added a button in the entry editor to select the parent entry.
+- Implemented [#1485](https://github.com/JabRef/jabref/issues/1485): Biblatex field shorttitle is now exported/imported as standard field ShortTitle to Word bibliography
+- Implemented [#1431](https://github.com/JabRef/jabref/issues/1431): Import dialog shows file extensions and filters the view
 - When resolving duplicate BibTeX-keys there is now an "Ignore" button. "Cancel" and close key now quits the resolving.
 - The [online forum](http://discourse.jabref.org/) is now directly accessible via the "Help" menu
-- Implemented [#1338](https://github.com/JabRef/jabref/issues/1338): clicking on a crossref in the main table selects the parent entry and added a button in the entry editor to select the parent entry.
+- Updated German translation
 
 ### Fixed
 - Fixed [#1530](https://github.com/JabRef/jabref/issues/1530): Unescaped hashes in the url field are ignored by the integrity checker
-- Springer fetcher now fetches the requested number of entries (not one less as before)
 - Fixed [#405](https://github.com/JabRef/jabref/issues/405): Added more {} around capital letters in Unicode/HTML to LaTeX conversion to preserve them
-- Alleviate multiuser concurrency issue when near simultaneous saves occur to a shared database file
 - Fixed [#1476](https://github.com/JabRef/jabref/issues/1476): NPE when importing from SQL DB because of missing DatabaseMode
 - Fixed [#1481](https://github.com/JabRef/jabref/issues/1481): Mac OS X binary seems broken for JabRef 3.4 release
 - Fixed [#1430](https://github.com/JabRef/jabref/issues/1430): "review changes" did misinterpret changes
@@ -37,37 +35,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1534](https://github.com/JabRef/jabref/issues/1534): "Mark entries imported into database" does not work correctly
 - Fixed [#1500](https://github.com/JabRef/jabref/issues/1500): Renaming of explicit groups now changes entries accordingly
 - Fixed issue where field changes were not undoable if the time stamp was updated on editing
-
-### Removed
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+- Springer fetcher now fetches the requested number of entries (not one less as before)
+- Alleviate multiuser concurrency issue when near simultaneous saves occur to a shared database file
 
 
 ## [3.4] - 2016-06-02
@@ -428,7 +397,7 @@ Since much functionality has changed during development, a release of this versi
 
 The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/dev_2.11/CHANGELOG) in the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
 
-[Unreleased]: https://github.com/JabRef/jabref/compare/v3.4...HEAD
+[3.5]: https://github.com/JabRef/jabref/compare/v3.4...v3.5
 [3.4]: https://github.com/JabRef/jabref/compare/v3.3...v3.4
 [3.3]: https://github.com/JabRef/jabref/compare/v3.2...v3.3
 [3.2]: https://github.com/JabRef/jabref/compare/v3.1...v3.2

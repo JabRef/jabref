@@ -33,8 +33,8 @@ apply from: 'eclipse.gradle'
 apply from: 'localization.gradle'
 
 group = "net.sf.jabref"
-version = "3.5dev"
-project.ext.threeDotVersion = "3.4.0.1"
+version = "3.5"
+project.ext.threeDotVersion = "3.5.0.0"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
