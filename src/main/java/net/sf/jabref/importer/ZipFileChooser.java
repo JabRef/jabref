@@ -29,8 +29,12 @@ package net.sf.jabref.importer;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Enumeration;
@@ -150,7 +154,7 @@ class ZipFileChooser extends JDialog {
      * @param zipFile  Zip-File
      * @return  entries that can be selected
      */
-    private static ZipEntry[] getSelectableZipEntries(ZipFile zipFile) {
+    private static List<ZipEntry> getSelectableZipEntries(ZipFile zipFile) {
         List<ZipEntry> entries = new ArrayList<>();
         Enumeration<? extends ZipEntry> e = zipFile.entries();
         for (ZipEntry entry : Collections.list(e)) {
@@ -158,7 +162,7 @@ class ZipFileChooser extends JDialog {
                 entries.add(entry);
             }
         }
-        return entries.toArray(new ZipEntry[entries.size()]);
+        return entries;
     }
 
     /*
@@ -188,13 +192,13 @@ class ZipFileChooser extends JDialog {
      */
     private static class ZipFileChooserTableModel extends AbstractTableModel {
 
-        private final String[] columnNames = new String[] {Localization.lang("Name"),
-                Localization.lang("Last modified"), Localization.lang("Size")};
-        private final ZipEntry[] rows;
+        private final List<String> columnNames = Arrays.asList(Localization.lang("Name"),
+                Localization.lang("Last modified"), Localization.lang("Size"));
+        private final List<ZipEntry> rows;
         private final ZipFile zipFile;
 
 
-        ZipFileChooserTableModel(ZipFile zipFile, ZipEntry[] rows) {
+        ZipFileChooserTableModel(ZipFile zipFile, List<ZipEntry> rows) {
             super();
             this.rows = rows;
             this.zipFile = zipFile;
@@ -206,7 +210,7 @@ class ZipFileChooser extends JDialog {
          */
         @Override
         public int getColumnCount() {
-            return columnNames.length;
+            return columnNames.size();
         }
 
         /*
@@ -215,7 +219,7 @@ class ZipFileChooser extends JDialog {
          */
         @Override
         public int getRowCount() {
-            return this.rows.length;
+            return this.rows.size();
         }
 
         /*
@@ -224,7 +228,7 @@ class ZipFileChooser extends JDialog {
          */
         @Override
         public String getColumnName(int col) {
-            return columnNames[col];
+            return columnNames.get(col);
         }
 
         /**
@@ -234,7 +238,7 @@ class ZipFileChooser extends JDialog {
          * @return  Zip file entry
          */
         public ZipEntry getZipEntry(int rowIndex) {
-            return this.rows[rowIndex];
+            return this.rows.get(rowIndex);
         }
 
         /**
@@ -257,7 +261,9 @@ class ZipFileChooser extends JDialog {
             if (columnIndex == 0) {
                 value = entry.getName();
             } else if (columnIndex == 1) {
-                value = SimpleDateFormat.getDateTimeInstance().format(new Date(entry.getTime()));
+                value = ZonedDateTime.ofInstant(new Date(entry.getTime()).toInstant(),
+                        ZoneId.systemDefault())
+                        .format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM));
             } else if (columnIndex == 2) {
                 value = entry.getSize();
             }
