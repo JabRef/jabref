@@ -225,14 +225,14 @@ public class BibEntry implements Cloneable {
      * <p>
      * The following aliases are considered (old bibtex <-> new biblatex) based
      * on the BibLatex documentation, chapter 2.2.5:
-     * address 		<-> location
-     * annote			<-> annotation
-     * archiveprefix 	<-> eprinttype
-     * journal 		<-> journaltitle
-     * key				<-> sortkey
-     * pdf 			<-> file
-     * primaryclass 	<-> eprintclass
-     * school 			<-> institution
+     * address      <-> location
+     * annote           <-> annotation
+     * archiveprefix    <-> eprinttype
+     * journal      <-> journaltitle
+     * key              <-> sortkey
+     * pdf          <-> file
+     * primaryclass     <-> eprintclass
+     * school           <-> institution
      * These work bidirectional.
      * <p>
      * Special attention is paid to dates: (see the BibLatex documentation,
@@ -241,10 +241,10 @@ public class BibEntry implements Cloneable {
      * field is empty. Conversely, getFieldOrAlias("year") also tries to
      * extract the year from the 'date' field (analogously for 'month').
      */
-    public String getFieldOrAlias(String name) {
-        String fieldValue = getField(toLowerCase(name));
+    public Optional<String> getFieldOrAlias(String name) {
+        Optional<String> fieldValue = getFieldOptional(toLowerCase(name));
 
-        if (!Strings.isNullOrEmpty(fieldValue)) {
+        if (fieldValue.isPresent() && !fieldValue.get().isEmpty()) {
             return fieldValue;
         }
 
@@ -252,7 +252,7 @@ public class BibEntry implements Cloneable {
         String aliasForField = EntryConverter.FIELD_ALIASES.get(name);
 
         if (aliasForField != null) {
-            return getField(aliasForField);
+            return getFieldOptional(aliasForField);
         }
 
         // Finally, handle dates
@@ -261,16 +261,16 @@ public class BibEntry implements Cloneable {
             MonthUtil.Month month = MonthUtil.getMonth(getField("month"));
             if (year != null) {
                 if (month.isValid()) {
-                    return year + '-' + month.twoDigitNumber;
+                    return Optional.of(year + '-' + month.twoDigitNumber);
                 } else {
-                    return year;
+                    return Optional.of(year);
                 }
             }
         }
         if ("year".equals(name) || "month".equals(name)) {
-            String date = getField("date");
-            if (date == null) {
-                return null;
+            Optional<String> date = getFieldOptional("date");
+            if (!date.isPresent()) {
+                return Optional.empty();
             }
 
             // Create date format matching dates with year and month
@@ -280,7 +280,6 @@ public class BibEntry implements Cloneable {
                 static final String FORMAT2 = "yyyy-MM";
                 final SimpleDateFormat sdf1 = new SimpleDateFormat(FORMAT1);
                 final SimpleDateFormat sdf2 = new SimpleDateFormat(FORMAT2);
-
 
                 @Override
                 public StringBuffer format(Date dDate, StringBuffer toAppendTo, FieldPosition fieldPosition) {
@@ -297,33 +296,33 @@ public class BibEntry implements Cloneable {
             };
 
             try {
-                Date parsedDate = df.parse(date);
+                Date parsedDate = df.parse(date.get());
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(parsedDate);
                 if ("year".equals(name)) {
-                    return Integer.toString(calendar.get(Calendar.YEAR));
+                    return Optional.of(Integer.toString(calendar.get(Calendar.YEAR)));
                 }
                 if ("month".equals(name)) {
-                    return Integer.toString(calendar.get(Calendar.MONTH) + 1); // Shift by 1 since in this calendar Jan = 0
+                    return Optional.of(Integer.toString(calendar.get(Calendar.MONTH) + 1)); // Shift by 1 since in this calendar Jan = 0
                 }
             } catch (ParseException e) {
                 // So not a date with year and month, try just to parse years
                 df = new SimpleDateFormat("yyyy");
 
                 try {
-                    Date parsedDate = df.parse(date);
+                    Date parsedDate = df.parse(date.get());
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(parsedDate);
                     if ("year".equals(name)) {
-                        return Integer.toString(calendar.get(Calendar.YEAR));
+                        return Optional.of(Integer.toString(calendar.get(Calendar.YEAR)));
                     }
                 } catch (ParseException e2) {
                     LOGGER.warn("Could not parse entry " + name, e2);
-                    return null; // Date field not in valid format
+                    return Optional.empty(); // Date field not in valid format
                 }
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     /**

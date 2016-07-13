@@ -1255,15 +1255,14 @@ public class XMPUtil {
 
             ParserResult result = BibtexParser.parse(new FileReader(args[1]));
 
-            BibEntry bibEntry = result.getDatabase().getEntryByKey(args[0]);
+            Optional<BibEntry> bibEntry = result.getDatabase().getEntryByKey(args[0]);
 
-            if (bibEntry == null) {
-                System.err.println("Could not find BibEntry " + args[0]
-                        + " in " + args[0]);
-            } else {
-                XMPUtil.writeXMP(new File(args[2]), bibEntry, result.getDatabase());
+            if (bibEntry.isPresent()) {
+                XMPUtil.writeXMP(new File(args[2]), bibEntry.get(), result.getDatabase());
 
                 System.out.println("XMP written.");
+            } else {
+                System.err.println("Could not find BibEntry " + args[0] + " in " + args[0]);
             }
             break;
 

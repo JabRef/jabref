@@ -141,17 +141,13 @@ public class BibDatabase {
     /**
      * Returns the entry with the given bibtex key.
      */
-    public synchronized BibEntry getEntryByKey(String key) {
-        BibEntry back = null;
-
-        int keyHash = key.hashCode(); // key hash for better performance
-
+    public synchronized Optional<BibEntry> getEntryByKey(String key) {
         for (BibEntry entry : entries) {
-            if ((entry != null) && (entry.getCiteKey() != null) && (keyHash == entry.getCiteKey().hashCode())) {
-                back = entry;
+            if (key.equals(entry.getCiteKey())) {
+                return Optional.of(entry);
             }
         }
-        return back;
+        return Optional.empty();
     }
 
     public synchronized List<BibEntry> getEntriesByKey(String key) {
@@ -390,9 +386,8 @@ public class BibDatabase {
             resultingEntry = (BibEntry) entry.clone();
         }
 
-        for (String field : resultingEntry.getFieldNames()) {
-            resultingEntry.getFieldOptional(field)
-                    .ifPresent(fieldValue -> resultingEntry.setField(field, this.resolveForStrings(fieldValue)));
+        for (Map.Entry<String, String> field : resultingEntry.getFieldMap().entrySet()) {
+            resultingEntry.setField(field.getKey(), this.resolveForStrings(field.getValue()));
         }
         return resultingEntry;
     }
@@ -514,26 +509,23 @@ public class BibDatabase {
         // TODO: Changed this to also consider alias fields, which is the expected
         // behavior for the preview layout and for the check whatever all fields are present.
         // But there might be unwanted side-effects?!
-        Object o = entry.getFieldOrAlias(field);
+        Optional<String> result = entry.getFieldOrAlias(field);
 
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry: Do not do this for the bibtex key.
-        if ((o == null) && (database != null) && !field.equals(BibEntry.KEY_FIELD)) {
+        if (!result.isPresent() && (database != null) && !field.equals(BibEntry.KEY_FIELD)) {
             Optional<String> crossrefKey = entry.getFieldOptional("crossref");
             if (crossrefKey.isPresent()) {
-                BibEntry referred = database.getEntryByKey(crossrefKey.get());
-                if (referred != null) {
+                Optional<BibEntry> referred = database.getEntryByKey(crossrefKey.get());
+                if (referred.isPresent()) {
                     // Ok, we found the referred entry. Get the field value from that
                     // entry. If it is unset there, too, stop looking:
-                    Optional<String> crossrefContent = referred.getFieldOptional(field);
-                    if (crossrefContent.isPresent()) {
-                        o = crossrefContent.get();
-                    }
+                    result = referred.get().getFieldOptional(field);
                 }
             }
         }
 
-        return BibDatabase.getText((String) o, database);
+        return BibDatabase.getText(result.orElse(null), database);
     }
 
     /**

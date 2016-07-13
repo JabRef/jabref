@@ -21,6 +21,7 @@ import java.text.RuleBasedCollator;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.config.SaveOrderConfig;
@@ -170,9 +171,9 @@ public class FieldComparator implements Comparator<BibEntry> {
 
     private String getField(BibEntry entry) {
         for (String aField : field) {
-            String o = entry.getFieldOrAlias(aField);
-            if (o != null) {
-                return o;
+            Optional<String> o = entry.getFieldOrAlias(aField);
+            if (o.isPresent()) {
+                return o.get();
             }
         }
         return null;

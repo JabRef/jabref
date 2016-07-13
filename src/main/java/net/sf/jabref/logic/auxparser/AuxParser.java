@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -126,13 +127,13 @@ public class AuxParser {
      */
     private void resolveTags(AuxParserResult result) {
         for (String key : result.getUniqueKeys()) {
-            BibEntry entry = masterDatabase.getEntryByKey(key);
+            Optional<BibEntry> entry = masterDatabase.getEntryByKey(key);
 
-            if (entry == null) {
-                result.getUnresolvedKeys().add(key);
+            if (entry.isPresent()) {
+                insertEntry(entry.get(), result);
+                resolveCrossReferences(entry.get(), result);
             } else {
-                insertEntry(entry, result);
-                resolveCrossReferences(entry, result);
+                result.getUnresolvedKeys().add(key);
             }
         }
 
@@ -149,13 +150,13 @@ public class AuxParser {
     private void resolveCrossReferences(BibEntry entry, AuxParserResult result) {
         entry.getFieldOptional("crossref").ifPresent(crossref -> {
             if (!result.getUniqueKeys().contains(crossref)) {
-                BibEntry refEntry = masterDatabase.getEntryByKey(crossref);
+                Optional<BibEntry> refEntry = masterDatabase.getEntryByKey(crossref);
 
-                if (refEntry == null) {
-                    result.getUnresolvedKeys().add(crossref);
-                } else {
-                    insertEntry(refEntry, result);
+                if (refEntry.isPresent()) {
+                    insertEntry(refEntry.get(), result);
                     result.increaseCrossRefEntriesCounter();
+                } else {
+                    result.getUnresolvedKeys().add(crossref);
                 }
             }
         });
