@@ -486,7 +486,8 @@ public class FieldExtraComponents {
         JTextComponent crossref = (JTextComponent) fieldEditor;
 
         button.addActionListener(
-                actionEvent -> panel.highlightEntry(panel.getDatabase().getEntryByKey(crossref.getText())));
+                actionEvent -> panel.getDatabase().getEntryByKey(crossref.getText()).ifPresent(e -> panel.highlightEntry(e))
+        );
 
         // enable/disable button
         crossref.getDocument().addDocumentListener(new DocumentListener() {

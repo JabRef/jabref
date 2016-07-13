@@ -338,7 +338,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             });
         } else if (modelColumn.getBibtexFields().contains("crossref")) { // Clicking on crossref column
             tableRows.get(row).getFieldOptional("crossref")
-                    .ifPresent(crossref -> panel.highlightEntry(panel.getDatabase().getEntryByKey(crossref)));
+                    .ifPresent(crossref -> panel.getDatabase().getEntryByKey(crossref).ifPresent(entry -> panel.highlightEntry(entry)));
         }
     }
 
