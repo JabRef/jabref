@@ -95,10 +95,6 @@ public class MainTable extends JTable {
     private final PersistenceTableColumnListener tableColumnListener;
     private final MainTableDataModel model;
 
-    public MainTableDataModel getTableModel() {
-        return model;
-    }
-
     // Enum used to define how a cell should be rendered.
     private enum CellRendererMode {
         REQUIRED,
@@ -131,7 +127,7 @@ public class MainTable extends JTable {
         super();
         this.model = model;
 
-        addFocusListener(Globals.focusListener);
+        addFocusListener(Globals.getFocusListener());
         setAutoResizeMode(Globals.prefs.getInt(JabRefPreferences.AUTO_RESIZE_MODE));
 
         this.tableFormat = tableFormat;
@@ -188,6 +184,10 @@ public class MainTable extends JTable {
         return pane;
     }
 
+    public MainTableDataModel getTableModel() {
+        return model;
+    }
+
     @Override
     public String getToolTipText(MouseEvent e) {
 
@@ -216,10 +216,12 @@ public class MainTable extends JTable {
 
         CellRendererMode status = getCellStatus(row, column);
 
-        if (!(model.getSearchState() == MainTableDataModel.DisplayOption.FLOAT) || matches(row, model.getSearchState() != MainTableDataModel.DisplayOption.DISABLED ? SearchMatcher.INSTANCE : null)) {
+        if ((model.getSearchState() != MainTableDataModel.DisplayOption.FLOAT) || matches(row,
+                model.getSearchState() != MainTableDataModel.DisplayOption.DISABLED ? SearchMatcher.INSTANCE : null)) {
             score++;
         }
-        if (!(model.getGroupingState() == MainTableDataModel.DisplayOption.FLOAT) || matches(row, model.getGroupingState() != MainTableDataModel.DisplayOption.DISABLED ? GroupMatcher.INSTANCE : null)) {
+        if ((model.getGroupingState() != MainTableDataModel.DisplayOption.FLOAT) || matches(row,
+                model.getGroupingState() != MainTableDataModel.DisplayOption.DISABLED ? GroupMatcher.INSTANCE : null)) {
             score += 2;
         }
 
@@ -549,7 +551,8 @@ public class MainTable extends JTable {
     public void ensureVisible(int row) {
         JScrollBar vert = pane.getVerticalScrollBar();
         int y = row * getRowHeight();
-        if ((y < vert.getValue()) || ((y > (vert.getValue() + vert.getVisibleAmount())) && !(model.getSearchState() == MainTableDataModel.DisplayOption.FLOAT))) {
+        if ((y < vert.getValue()) || ((y > (vert.getValue() + vert.getVisibleAmount()))
+                && (model.getSearchState() != MainTableDataModel.DisplayOption.FLOAT))) {
             scrollToCenter(row, 1);
         }
 

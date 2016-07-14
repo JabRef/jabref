@@ -72,6 +72,7 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.groups.AbstractGroup;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
+import net.sf.jabref.logic.groups.EntriesGroupChange;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.MoveGroupChange;
 import net.sf.jabref.logic.l10n.Localization;
@@ -353,7 +354,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK));
 
 
-        setGroups(new GroupTreeNode(new AllEntriesGroup()));
+        setGroups(GroupTreeNode.fromGroup(new AllEntriesGroup()));
     }
 
     private void definePopup() {
@@ -722,9 +723,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
     private void setGroups(GroupTreeNode groupsRoot) {
         this.groupsRoot = new GroupTreeNodeViewModel(groupsRoot);
-        // refactor notice: groupsTreeModel::nodeStructureChanged cannot be used, because an NPE will be risen if no groupsTreeModel exists
-        this.groupsRoot.subscribeToDescendantChanged(source -> groupsTreeModel.nodeStructureChanged(source));
         groupsTreeModel = new DefaultTreeModel(this.groupsRoot);
+        this.groupsRoot.subscribeToDescendantChanged(groupsTreeModel::nodeStructureChanged);
         groupsTree.setModel(groupsTreeModel);
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_EXPAND_TREE)) {
             this.groupsRoot.expandSubtree(groupsTree);
@@ -787,10 +787,25 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             gd.setVisible(true);
             if (gd.okPressed()) {
                 AbstractGroup newGroup = gd.getResultingGroup();
-                AbstractUndoableEdit undoAddPreviousEntries = gd.getUndoForAddPreviousEntries();
+
+                int i = JOptionPane.showConfirmDialog(panel.frame(),
+                        Localization.lang("Assign the original group's entries to this group?"),
+                        Localization.lang("Change of Grouping Method"),
+                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
+                boolean keepPreviousAssignments = i == JOptionPane.YES_OPTION &&
+                        WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
+
+                AbstractUndoableEdit undoAddPreviousEntries = null;
                 UndoableModifyGroup undo = new UndoableModifyGroup(GroupSelector.this, groupsRoot, node, newGroup);
-                node.getNode().setGroup(newGroup);
+                Optional<EntriesGroupChange> addChange = node.getNode().setGroup(newGroup, keepPreviousAssignments,
+                        panel.getDatabase().getEntries());
+                if (addChange.isPresent()) {
+                    undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange.get());
+                }
+
+                groupsTreeModel.reload();
                 revalidateGroups(node);
+
                 // Store undo information.
                 if (undoAddPreviousEntries == null) {
                     panel.getUndoManager().addEdit(undo);
@@ -821,7 +836,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 return; // ignore
             }
             final AbstractGroup newGroup = gd.getResultingGroup();
-            final GroupTreeNode newNode = new GroupTreeNode(newGroup);
+            final GroupTreeNode newNode = GroupTreeNode.fromGroup(newGroup);
             final GroupTreeNodeViewModel node = getNodeToUse();
             if (node == null) {
                 groupsRoot.getNode().addChild(newNode);
@@ -852,7 +867,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 return; // ignore
             }
             final AbstractGroup newGroup = gd.getResultingGroup();
-            final GroupTreeNode newNode = new GroupTreeNode(newGroup);
+            final GroupTreeNode newNode = GroupTreeNode.fromGroup(newGroup);
             final GroupTreeNodeViewModel node = getNodeToUse();
             node.getNode().addChild(newNode);
             UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(groupsRoot,
@@ -1202,7 +1217,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         }
         MetaData metaData = panel.getBibDatabaseContext().getMetaData();
         if (metaData.getGroups() == null) {
-            GroupTreeNode newGroupsRoot = new GroupTreeNode(new AllEntriesGroup());
+            GroupTreeNode newGroupsRoot = GroupTreeNode.fromGroup(new AllEntriesGroup());
             metaData.setGroups(newGroupsRoot);
             setGroups(newGroupsRoot);
         } else {

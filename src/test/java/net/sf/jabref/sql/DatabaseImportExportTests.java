@@ -178,7 +178,7 @@ public class DatabaseImportExportTests {
     private BibDatabaseContext createContextWithSingleEntrySingleGroup() throws ParseException {
         BibDatabaseContext databaseContext = createContextWithSingleEntry();
 
-        GroupTreeNode root = new GroupTreeNode(new AllEntriesGroup());
+        GroupTreeNode root = GroupTreeNode.fromGroup(new AllEntriesGroup());
         KeywordGroup group = new KeywordGroup("test", "asdf", "fdas", false, true, GroupHierarchyType.INCLUDING);
         root.addSubgroup(group);
         databaseContext.getMetaData().setGroups(root);

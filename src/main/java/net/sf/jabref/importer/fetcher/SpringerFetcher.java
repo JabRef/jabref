@@ -93,7 +93,7 @@ public class SpringerFetcher implements EntryFetcher {
                         break;
                     }
 
-                    int noToFetch = Math.min(MAX_PER_PAGE, numberToFetch - startItem);
+                    int noToFetch = Math.min(MAX_PER_PAGE, (numberToFetch - startItem) + 1);
                     jsonResponse = Unirest
                             .get(API_URL + encodedQuery + "&api_key=" + API_KEY + "&p=" + noToFetch + "&s=" + startItem)
                             .header("accept", "application/json").asJson();

@@ -22,7 +22,8 @@ public enum FieldProperties {
     DOI,
     EDITOR_TYPE,
     PAGINATION,
-    TYPE;
+    TYPE,
+    CROSSREF;
 
     public static final Set<FieldProperties> ALL_OPTS = EnumSet.allOf(FieldProperties.class);
 

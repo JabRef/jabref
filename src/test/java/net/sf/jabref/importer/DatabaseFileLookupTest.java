@@ -40,8 +40,8 @@ public class DatabaseFileLookupTest {
             database = result.getDatabase();
             entries = database.getEntries();
 
-            entry1 = database.getEntryByKey("entry1");
-            entry2 = database.getEntryByKey("entry2");
+            entry1 = database.getEntryByKey("entry1").get();
+            entry2 = database.getEntryByKey("entry2").get();
         }
     }
 

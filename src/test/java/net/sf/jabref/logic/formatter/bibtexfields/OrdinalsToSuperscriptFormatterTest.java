@@ -1,9 +1,7 @@
-package net.sf.jabref.logic.formatter;
-
-
-import net.sf.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
+package net.sf.jabref.logic.formatter.bibtexfields;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -13,7 +11,12 @@ import static org.junit.Assert.assertEquals;
  */
 public class OrdinalsToSuperscriptFormatterTest {
 
-    private final OrdinalsToSuperscriptFormatter formatter = new OrdinalsToSuperscriptFormatter();
+    private OrdinalsToSuperscriptFormatter formatter;
+
+    @Before
+    public void setUp() {
+        formatter = new OrdinalsToSuperscriptFormatter();
+    }
 
     @Test
     public void replacesSuperscript() {

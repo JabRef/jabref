@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -10,7 +11,12 @@ import static org.junit.Assert.assertEquals;
  */
 public class NormalizeNamesFormatterTest {
 
-    private final NormalizeNamesFormatter formatter = new NormalizeNamesFormatter();
+    private NormalizeNamesFormatter formatter;
+
+    @Before
+    public void setUp() {
+        formatter = new NormalizeNamesFormatter();
+    }
 
     @Test
     public void testNormalizeAuthorList() {

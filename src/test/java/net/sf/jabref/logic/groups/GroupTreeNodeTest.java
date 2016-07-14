@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.search.matchers.AndMatcher;
 import net.sf.jabref.logic.search.matchers.OrMatcher;
@@ -14,15 +16,23 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class GroupTreeNodeTest {
 
     private List<BibEntry> entries = new ArrayList<>();
+    private BibEntry entry;
 
     @Before
     public void setUp() throws Exception {
+        entries.clear();
+        entry = new BibEntry();
+        entries.add(entry);
         entries.add(new BibEntry().withField("author", "author1 and author2"));
         entries.add(new BibEntry().withField("author", "author1"));
+
+        Globals.prefs = JabRefPreferences.getInstance();
     }
 
 
@@ -33,14 +43,14 @@ public class GroupTreeNodeTest {
      *      A ExplicitParent, Independent (= parent)
      *          B ExplicitNode, Refining (<-- this)
      */
-    public GroupTreeNode getNodeInSimpleTree(GroupTreeNode root) throws ParseException {
+    private GroupTreeNode getNodeInSimpleTree(GroupTreeNode root) throws ParseException {
         root.addSubgroup(new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING));
         GroupTreeNode parent = root.addSubgroup(new ExplicitGroup("ExplicitParent", GroupHierarchyType.INDEPENDENT));
         GroupTreeNode node = parent.addSubgroup(new ExplicitGroup("ExplicitNode", GroupHierarchyType.REFINING));
         return node;
     }
 
-    public GroupTreeNode getNodeInSimpleTree() throws ParseException {
+    private GroupTreeNode getNodeInSimpleTree() throws ParseException {
         return getNodeInSimpleTree(getRoot());
     }
 
@@ -61,7 +71,7 @@ public class GroupTreeNodeTest {
      *          B KeywordB
      *      A KeywordA
      */
-    public GroupTreeNode getNodeInComplexTree(GroupTreeNode root) throws ParseException {
+    private GroupTreeNode getNodeInComplexTree(GroupTreeNode root) throws ParseException {
         root.addSubgroup(getSearchGroup("SearchA"));
         root.addSubgroup(new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING));
         GroupTreeNode grandParent = root.addSubgroup(new ExplicitGroup("ExplicitGrandParent", GroupHierarchyType.INDEPENDENT));
@@ -117,9 +127,8 @@ public class GroupTreeNodeTest {
         return node;
     }
     */
-
-    public GroupTreeNode getRoot() {
-        return new GroupTreeNode(new AllEntriesGroup());
+    private GroupTreeNode getRoot() {
+        return GroupTreeNode.fromGroup(new AllEntriesGroup());
     }
 
     @Test
@@ -162,13 +171,13 @@ public class GroupTreeNodeTest {
 
     @Test
     public void getSearchRuleForIndependentGroupReturnsGroupAsMatcher() throws ParseException {
-        GroupTreeNode node = new GroupTreeNode(new ExplicitGroup("node", GroupHierarchyType.INDEPENDENT));
+        GroupTreeNode node = GroupTreeNode.fromGroup(new ExplicitGroup("node", GroupHierarchyType.INDEPENDENT));
         assertEquals(node.getGroup(), node.getSearchRule());
     }
 
     @Test
     public void getSearchRuleForRefiningGroupReturnsParentAndGroupAsMatcher() throws ParseException {
-        GroupTreeNode parent = new GroupTreeNode(new ExplicitGroup("parent", GroupHierarchyType.INDEPENDENT));
+        GroupTreeNode parent = GroupTreeNode.fromGroup(new ExplicitGroup("parent", GroupHierarchyType.INDEPENDENT));
         GroupTreeNode node = parent.addSubgroup(new ExplicitGroup("node", GroupHierarchyType.REFINING));
 
         AndMatcher matcher = new AndMatcher();
@@ -179,7 +188,7 @@ public class GroupTreeNodeTest {
 
     @Test
     public void getSearchRuleForIncludingGroupReturnsGroupOrSubgroupAsMatcher() throws ParseException {
-        GroupTreeNode node = new GroupTreeNode(new ExplicitGroup("node", GroupHierarchyType.INCLUDING));
+        GroupTreeNode node = GroupTreeNode.fromGroup(new ExplicitGroup("node", GroupHierarchyType.INCLUDING));
         GroupTreeNode child = node.addSubgroup(new ExplicitGroup("child", GroupHierarchyType.INDEPENDENT));
 
         OrMatcher matcher = new OrMatcher();
@@ -227,5 +236,75 @@ public class GroupTreeNodeTest {
         GroupTreeNode node = parent.addSubgroup(
                 new KeywordGroup("node", "author", "author1", true, false, GroupHierarchyType.INDEPENDENT));
         assertEquals(2, node.numberOfHits(entries));
+    }
+
+    @Test
+    public void setGroupChangesUnderlyingGroup() throws Exception {
+        GroupTreeNode node = getNodeInSimpleTree();
+        AbstractGroup newGroup = new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT);
+
+        node.setGroup(newGroup, true, entries);
+
+        assertEquals(newGroup, node.getGroup());
+    }
+
+    @Test
+    public void setGroupAddsPreviousAssignmentsExplicitToExplicit() throws Exception {
+        AbstractGroup oldGroup = new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT);
+        oldGroup.add(entry);
+        GroupTreeNode node = GroupTreeNode.fromGroup(oldGroup);
+        AbstractGroup newGroup = new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT);
+
+        node.setGroup(newGroup, true, entries);
+
+        assertTrue(newGroup.isMatch(entry));
+    }
+
+    @Test
+    public void setGroupWithFalseDoesNotAddsPreviousAssignments() throws Exception {
+        AbstractGroup oldGroup = new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT);
+        oldGroup.add(entry);
+        GroupTreeNode node = GroupTreeNode.fromGroup(oldGroup);
+        AbstractGroup newGroup = new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT);
+
+        node.setGroup(newGroup, false, entries);
+
+        assertFalse(newGroup.isMatch(entry));
+    }
+
+    @Test
+    public void setGroupAddsOnlyPreviousAssignments() throws Exception {
+        AbstractGroup oldGroup = new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT);
+        assertFalse(oldGroup.isMatch(entry));
+        GroupTreeNode node = GroupTreeNode.fromGroup(oldGroup);
+        AbstractGroup newGroup = new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT);
+
+        node.setGroup(newGroup, true, entries);
+
+        assertFalse(newGroup.isMatch(entry));
+    }
+
+    @Test
+    public void setGroupExplicitToSearchDoesNotKeepPreviousAssignments() throws Exception {
+        AbstractGroup oldGroup = new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT);
+        oldGroup.add(entry);
+        GroupTreeNode node = GroupTreeNode.fromGroup(oldGroup);
+        AbstractGroup newGroup = new SearchGroup("NewGroup", "test", false, false, GroupHierarchyType.INDEPENDENT);
+
+        node.setGroup(newGroup, true, entries);
+
+        assertFalse(newGroup.isMatch(entry));
+    }
+
+    @Test
+    public void setGroupExplicitToExplicitIsRenameAndSoRemovesPreviousAssignment() throws Exception {
+        AbstractGroup oldGroup = new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT);
+        oldGroup.add(entry);
+        GroupTreeNode node = GroupTreeNode.fromGroup(oldGroup);
+        AbstractGroup newGroup = new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT);
+
+        node.setGroup(newGroup, true, entries);
+
+        assertFalse(oldGroup.isMatch(entry));
     }
 }

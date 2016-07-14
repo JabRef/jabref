@@ -91,7 +91,8 @@ public class WriteXMPAction extends AbstractWorker {
 
             if (entries.isEmpty()) {
 
-                JOptionPane.showMessageDialog(panel, Localization.lang("This operation requires at least one entry."),
+                JOptionPane.showMessageDialog(panel,
+                        Localization.lang("This operation requires one or more entries to be selected."),
                         Localization.lang("Write XMP-metadata"), JOptionPane.ERROR_MESSAGE);
                 goOn = false;
                 return;

@@ -18,8 +18,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
-import com.google.common.base.Strings;
-
 
 public class BibEntryWriter {
 
@@ -145,14 +143,14 @@ public class BibEntryWriter {
      * @throws IOException In case of an IO error
      */
     private void writeField(BibEntry entry, Writer out, String name, int indentation) throws IOException {
-        String field = entry.getField(name);
-        // only write field if is is not empty or if empty fields should be included
-        // the first condition mirrors mirror behavior of com.jgoodies.common.base.Strings.isNotBlank(str)
-        if (!Strings.nullToEmpty(field).trim().isEmpty()) {
+        Optional<String> field = entry.getFieldOptional(name);
+        // only write field if is is not empty
+        // field.ifPresent does not work as an IOException may be thrown
+        if (field.isPresent() && !field.get().trim().isEmpty()) {
             out.write("  " + getFieldDisplayName(name, indentation));
 
             try {
-                out.write(fieldFormatter.format(field, name));
+                out.write(fieldFormatter.format(field.get(), name));
                 out.write(',' + Globals.NEWLINE);
             } catch (IOException ex) {
                 throw new IOException("Error in field '" + name + "': " + ex.getMessage());

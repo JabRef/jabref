@@ -4,6 +4,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -13,11 +14,16 @@ import static org.junit.Assert.assertEquals;
  */
 public class HtmlToLatexFormatterTest {
 
-    private final HtmlToLatexFormatter formatter = new HtmlToLatexFormatter();
+    private HtmlToLatexFormatter formatter;
+
+    @BeforeClass
+    public static void setUpBeforeClass() throws Exception {
+        Globals.prefs = JabRefPreferences.getInstance();
+    }
 
     @Before
-    public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
+    public void setUp() {
+        formatter = new HtmlToLatexFormatter();
     }
 
     @Test

@@ -197,4 +197,124 @@ public class BibDatabaseTest {
 
         assertEquals(entry, tel.getBibEntry());
     }
+
+    @Test
+    public void correctKeyCountOne() {
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("AAA");
+        database.insertEntry(entry);
+        assertEquals(database.getNumberOfKeyOccurrences("AAA"), 1);
+    }
+
+    @Test
+    public void correctKeyCountTwo() {
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("AAA");
+        database.insertEntry(entry);
+        entry = new BibEntry();
+        entry.setCiteKey("AAA");
+        database.insertEntry(entry);
+        assertEquals(database.getNumberOfKeyOccurrences("AAA"), 2);
+    }
+
+    @Test
+    public void setCiteKeySameKeySameEntry() {
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("AAA");
+        database.insertEntry(entry);
+        assertFalse(database.setCiteKeyForEntry(entry, "AAA"));
+        assertEquals(database.getNumberOfKeyOccurrences("AAA"), 1);
+    }
+
+    @Test
+    public void setCiteKeyRemoveKey() {
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("AAA");
+        database.insertEntry(entry);
+        assertFalse(database.setCiteKeyForEntry(entry, null));
+        assertEquals(database.getNumberOfKeyOccurrences("AAA"), 0);
+        assertNull(entry.getCiteKey());
+    }
+
+    @Test
+    public void setCiteKeyDifferentKeySameEntry() {
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("AAA");
+        database.insertEntry(entry);
+        assertFalse(database.setCiteKeyForEntry(entry, "BBB"));
+        assertEquals(database.getNumberOfKeyOccurrences("AAA"), 0);
+        assertEquals(database.getNumberOfKeyOccurrences("BBB"), 1);
+    }
+
+
+    @Test
+    public void setCiteKeySameKeyDifferentEntries() {
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("AAA");
+        database.insertEntry(entry);
+        entry = new BibEntry();
+        entry.setCiteKey("BBB");
+        database.insertEntry(entry);
+        assertTrue(database.setCiteKeyForEntry(entry, "AAA"));
+        assertEquals(entry.getCiteKey(), "AAA");
+        assertEquals(database.getNumberOfKeyOccurrences("AAA"), 2);
+        assertEquals(database.getNumberOfKeyOccurrences("BBB"), 0);
+    }
+
+    @Test
+    public void correctKeyCountAfterRemoving() {
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("AAA");
+        database.insertEntry(entry);
+        entry = new BibEntry();
+        entry.setCiteKey("AAA");
+        database.insertEntry(entry);
+        database.removeEntry(entry);
+        assertEquals(database.getNumberOfKeyOccurrences("AAA"), 1);
+    }
+
+    @Test
+    public void circularStringResolving() {
+        BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "#BBB#");
+        database.addString(string);
+        string = new BibtexString(IdGenerator.next(), "BBB", "#AAA#");
+        database.addString(string);
+        assertEquals(database.resolveForStrings("#AAA#"), "AAA");
+        assertEquals(database.resolveForStrings("#BBB#"), "BBB");
+    }
+
+    @Test
+    public void circularStringResolvingLongerCycle() {
+        BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "#BBB#");
+        database.addString(string);
+        string = new BibtexString(IdGenerator.next(), "BBB", "#CCC#");
+        database.addString(string);
+        string = new BibtexString(IdGenerator.next(), "CCC", "#DDD#");
+        database.addString(string);
+        string = new BibtexString(IdGenerator.next(), "DDD", "#AAA#");
+        database.addString(string);
+        assertEquals(database.resolveForStrings("#AAA#"), "AAA");
+        assertEquals(database.resolveForStrings("#BBB#"), "BBB");
+        assertEquals(database.resolveForStrings("#CCC#"), "CCC");
+        assertEquals(database.resolveForStrings("#DDD#"), "DDD");
+    }
+
+    @Test
+    public void resolveForStringsMonth() {
+        assertEquals(database.resolveForStrings("#jan#"), "January");
+    }
+
+    @Test
+    public void resolveForStringsSurroundingContent() {
+        BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "aaa");
+        database.addString(string);
+        assertEquals(database.resolveForStrings("aa#AAA#AAA"), "aaaaaAAA");
+    }
+
+    @Test
+    public void resolveForStringsOddHashMarkAtTheEnd() {
+        BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "aaa");
+        database.addString(string);
+        assertEquals(database.resolveForStrings("AAA#AAA#AAA#"), "AAAaaaAAA#");
+    }
 }

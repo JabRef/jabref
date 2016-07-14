@@ -97,7 +97,7 @@ public class JabRefGUI {
         // "lcd" instead of "on" because of http://wiki.netbeans.org/FaqFontRendering and http://docs.oracle.com/javase/6/docs/technotes/guides/2d/flags.html#aaFonts
         System.setProperty("awt.useSystemAAFontSettings", "lcd");
 
-        // Look & Feel. This MUST be the first thing to do before loading any Swing-specific code!
+        // look and feel. This MUST be the first thing to do before loading any Swing-specific code!
         setLookAndFeel();
 
         // If the option is enabled, open the last edited databases, if any.
@@ -274,9 +274,9 @@ public class JabRefGUI {
                     // notify the user
                     JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(),
                             Localization
-                                    .lang("Unable to find the requested Look & Feel and thus the default one is used."),
+                                    .lang("Unable to find the requested look and feel and thus the default one is used."),
                             Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
-                    LOGGER.warn("Unable to find requested Look and Feel", e);
+                    LOGGER.warn("Unable to find requested look and feel", e);
                 }
             }
         } catch (Exception e) {

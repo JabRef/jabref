@@ -416,7 +416,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction manageJournals = new ManageJournalsAction(this);
     private final AbstractAction databaseProperties = new DatabasePropertiesAction();
     private final AbstractAction bibtexKeyPattern = new BibtexKeyPatternAction();
-    private final AbstractAction errorConsole = new ErrorConsoleAction(this, Globals.streamEavesdropper, GuiAppender.CACHE);
+    private final AbstractAction errorConsole = new ErrorConsoleAction(this, Globals.getStreamEavesdropper(), GuiAppender.CACHE);
 
     private final AbstractAction dbConnect = new GeneralAction(Actions.DB_CONNECT,
             Localization.menuTitle("Connect to external SQL database"),
@@ -633,7 +633,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
             previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
             fetcherToggle.setSelected(sidePaneManager.isComponentVisible(generalFetcher.getTitle()));
-            Globals.focusListener.setFocused(bp.getMainTable());
+            Globals.getFocusListener().setFocused(bp.getMainTable());
             setWindowTitle();
             editModeAction.initName();
             // Update search autocompleter with information for the correct database:
@@ -781,9 +781,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         CustomEntryTypesManager.saveCustomEntryTypes(prefs);
 
         // Clear autosave files:
-        if (Globals.autoSaveManager != null) {
-            Globals.autoSaveManager.clearAutoSaves();
-        }
+        // TODO: Is this really needed since clearAutoSave() is called in stopAutoSaveManager() a few rows below?
+        Globals.getAutoSaveManager().ifPresent(manager -> manager.clearAutoSaves());
 
         prefs.flush();
 
@@ -793,9 +792,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
 
         // shutdown any timers that are may be active
-        if (Globals.autoSaveManager != null) {
-            Globals.stopAutoSaveManager();
-        }
+        Globals.stopAutoSaveManager();
     }
 
     /**
@@ -1480,6 +1477,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.add(pushExternalButton.getComponent());
         tlb.addSeparator();
         tlb.add(donationAction);
+        tlb.add(forkMeOnGitHubAction);
     }
 
     /**
@@ -1870,8 +1868,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override public void actionPerformed(ActionEvent e) {
 
-            LOGGER.debug(Globals.focusListener.getFocused().toString());
-            JComponent source = Globals.focusListener.getFocused();
+            LOGGER.debug(Globals.getFocusListener().getFocused().toString());
+            JComponent source = Globals.getFocusListener().getFocused();
             Action action = source.getActionMap().get(command);
             if (action != null) {
                 action.actionPerformed(new ActionEvent(source, 0, command));

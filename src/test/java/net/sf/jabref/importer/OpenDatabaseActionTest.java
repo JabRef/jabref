@@ -7,6 +7,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Optional;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -74,7 +75,7 @@ public class OpenDatabaseActionTest {
 
         // Entry
         Assert.assertEquals(1, db.getEntryCount());
-        Assert.assertEquals("2014", db.getEntryByKey("1").getField("year"));
+        Assert.assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getFieldOptional("year"));
     }
 
     @Test
@@ -84,7 +85,7 @@ public class OpenDatabaseActionTest {
 
         // Entry
         Assert.assertEquals(1, db.getEntryCount());
-        Assert.assertEquals("2014", db.getEntryByKey("1").getField("year"));
+        Assert.assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getFieldOptional("year"));
     }
 
     @Test
@@ -94,7 +95,7 @@ public class OpenDatabaseActionTest {
 
         // Entry
         Assert.assertEquals(1, db.getEntryCount());
-        Assert.assertEquals("2014", db.getEntryByKey("1").getField("year"));
+        Assert.assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getFieldOptional("year"));
     }
 
     /**

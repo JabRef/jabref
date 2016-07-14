@@ -388,7 +388,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
             fileChooser = new JFileChooser();
             fileChooser.setAutoscrolls(true);
             fileChooser.setDialogTitle(Localization.lang("Select directory"));
-            fileChooser.setApproveButtonText(Localization.lang("Choose Directory"));
+            fileChooser.setApproveButtonText(Localization.lang("Choose directory"));
             fileChooser.setApproveButtonToolTipText(
                     Localization.lang("Use the selected directory to start with the search."));
             fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -654,7 +654,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private void setupActions() {
 
         /**
-         * Stores the selected Directory.
+         * Stores the selected directory.
          */
         buttonBrowse.addActionListener(e -> {
             Path selectedDirectory = chooseDirectory();

@@ -85,9 +85,9 @@ public class MetaData implements Iterable<String> {
             List<String> orderedData = new ArrayList<>();
             // We must allow for ; and \ in escape sequences.
             try {
-                String unit;
-                while ((unit = getNextUnit(data)) != null) {
-                    orderedData.add(unit);
+                Optional<String> unit;
+                while ((unit = getNextUnit(data)).isPresent()) {
+                    orderedData.add(unit.get());
                 }
             } catch (IOException ex) {
                 LOGGER.error("Weird error while parsing meta data.", ex);
@@ -200,7 +200,7 @@ public class MetaData implements Iterable<String> {
     /**
      * Reads the next unit. Units are delimited by ';'.
      */
-    private static String getNextUnit(Reader reader) throws IOException {
+    private static Optional<String> getNextUnit(Reader reader) throws IOException {
         int c;
         boolean escape = false;
         StringBuilder res = new StringBuilder();
@@ -217,9 +217,9 @@ public class MetaData implements Iterable<String> {
             }
         }
         if (res.length() > 0) {
-            return res.toString();
+            return Optional.of(res.toString());
         }
-        return null;
+        return Optional.empty();
     }
 
     public DBStrings getDBStrings() {

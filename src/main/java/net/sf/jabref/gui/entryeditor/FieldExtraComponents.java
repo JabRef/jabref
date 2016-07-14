@@ -134,7 +134,7 @@ public class FieldExtraComponents {
         // enable/disable button
         JTextComponent url = (JTextComponent) fieldEditor;
 
-        DocumentListener documentListener = new DocumentListener() {
+        url.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void changedUpdate(DocumentEvent documentEvent) {
                 checkUrl();
@@ -157,8 +157,7 @@ public class FieldExtraComponents {
                     button.setEnabled(false);
                 }
             }
-        };
-        url.getDocument().addDocumentListener(documentListener);
+        });
 
         return Optional.of(controls);
     }
@@ -205,7 +204,7 @@ public class FieldExtraComponents {
         // enable/disable button
         JTextComponent doi = (JTextComponent) fieldEditor;
 
-        DocumentListener documentListener = new DocumentListener() {
+        doi.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void changedUpdate(DocumentEvent documentEvent) {
                 checkDoi();
@@ -231,8 +230,7 @@ public class FieldExtraComponents {
                     fetchButton.setEnabled(false);
                 }
             }
-        };
-        doi.getDocument().addDocumentListener(documentListener);
+        });
 
         return Optional.of(controls);
     }
@@ -276,7 +274,7 @@ public class FieldExtraComponents {
                 if (type == BibDatabaseMode.BIBLATEX) {
                     fieldEditor.setText(String.valueOf(monthnumber));
                 } else {
-                    fieldEditor.setText("#" + (MonthUtil.getMonthByNumber(monthnumber).bibtexFormat) + "#");
+                    fieldEditor.setText(MonthUtil.getMonthByNumber(monthnumber).bibtexFormat);
                 }
             } else {
                 fieldEditor.setText("");
@@ -474,4 +472,52 @@ public class FieldExtraComponents {
         return Optional.of(gender);
 
     }
+
+    /**
+     * Return a button which allows to go to the parent entry of the crossref field
+     * @param fieldEditor The FieldEditor component to get the entry key from
+     * @param panel The current BasePanel
+     * @return
+     */
+
+    public static Optional<JComponent> getCrossrefExtraComponent(FieldEditor fieldEditor,
+            BasePanel panel) {
+        JButton button = new JButton(Localization.lang("Select"));
+        JTextComponent crossref = (JTextComponent) fieldEditor;
+
+        button.addActionListener(
+                actionEvent -> panel.getDatabase().getEntryByKey(crossref.getText()).ifPresent(e -> panel.highlightEntry(e))
+        );
+
+        // enable/disable button
+        crossref.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+                checkValidKey();
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                checkValidKey();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent documentEvent) {
+                checkValidKey();
+            }
+
+            private void checkValidKey() {
+                if (panel.getDatabase().getEntryByKey(crossref.getText()) != null) {
+                    button.setEnabled(true);
+                } else {
+                    button.setEnabled(false);
+                }
+            }
+        });
+
+        return Optional.of(button);
+
+    }
+
 }

@@ -253,7 +253,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         } else {
             // Register so we get notifications about outside changes to the file.
             try {
-                fileMonitorHandle = Globals.fileUpdateMonitor.addUpdateListener(this, file);
+                fileMonitorHandle = Globals.getFileUpdateMonitor().addUpdateListener(this, file);
             } catch (IOException ex) {
                 LOGGER.warn("Could not register FileUpdateMonitor", ex);
             }
@@ -585,7 +585,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // Run third, on EDT:
             @Override
             public void update() {
-                database.setFollowCrossrefs(true);
                 if (canceled) {
                     frame.unblock();
                     return;
@@ -1958,7 +1957,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             msg = Localization.lang("Really delete the selected entry?");
             String title = Localization.lang("Delete entry");
             if (numberOfEntries > 1) {
-                msg = Localization.lang("Really delete the selected %0 entries?", Integer.toString(numberOfEntries));
+                msg = Localization.lang("Really delete the %0 selected entries?", Integer.toString(numberOfEntries));
                 title = Localization.lang("Delete multiple entries");
             }
 
@@ -2030,7 +2029,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         @Override
         public void action() {
             try {
-                JComponent focused = Globals.focusListener.getFocused();
+                JComponent focused = Globals.getFocusListener().getFocused();
                 if ((focused != null) && (focused instanceof FieldEditor) && focused.hasFocus()) {
                     // User is currently editing a field:
                     // Check if it is the preamble:
@@ -2118,7 +2117,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         public void action() {
             try {
 
-                JComponent focused = Globals.focusListener.getFocused();
+                JComponent focused = Globals.getFocusListener().getFocused();
                 if ((focused != null) && (focused instanceof FieldEditor) && focused.hasFocus()) {
                     // User is currently editing a field:
                     storeCurrentEdit();
@@ -2175,7 +2174,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // The file is locked even after the maximum wait. Do nothing.
             LOGGER.error("File updated externally, but change scan failed because the file is locked.");
             // Perturb the stored timestamp so successive checks are made:
-            Globals.fileUpdateMonitor.perturbTimestamp(getFileMonitorHandle());
+            Globals.getFileUpdateMonitor().perturbTimestamp(getFileMonitorHandle());
             return;
         }
 
@@ -2215,7 +2214,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public void cleanUp() {
         if (fileMonitorHandle != null) {
-            Globals.fileUpdateMonitor.removeUpdateListener(fileMonitorHandle);
+            Globals.getFileUpdateMonitor().removeUpdateListener(fileMonitorHandle);
         }
         // Check if there is a FileUpdatePanel for this BasePanel being shown. If so,
         // remove it:
