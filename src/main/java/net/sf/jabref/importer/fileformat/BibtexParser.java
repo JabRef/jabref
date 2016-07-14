@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.bibtex.FieldContentParser;
@@ -323,29 +324,23 @@ public class BibtexParser {
         // if there is no entry found, simply return the content (necessary to parse text remaining after the last entry)
         if (indexOfAt == -1) {
             return purgeEOFCharacters(result);
-        } else {
-
-            //skip all text except newlines and whitespaces before first @. This is necessary to remove the file header
-            int runningIndex = indexOfAt - 1;
-            while (runningIndex >= 0) {
-                if (!Character.isWhitespace(result.charAt(runningIndex))) {
+        } else if(result.contains(Globals.ENCODING_PREFIX)) {
+            // purge the encoding line if it exists
+            int runningIndex = result.indexOf(Globals.ENCODING_PREFIX);
+            while(runningIndex < indexOfAt) {
+                if(result.charAt(runningIndex) == '\n') {
+                    break;
+                } else if(result.charAt(runningIndex) == '\r') {
+                    if(result.charAt(runningIndex + 1) == '\n') {
+                        runningIndex++;
+                    }
                     break;
                 }
-                runningIndex--;
+                runningIndex++;
             }
-
-            if(runningIndex > -1) {
-                // We have to ignore some text at the beginning
-                // so we view the first line break as the end of the previous text and don't store it
-                if(result.charAt(runningIndex + 1) == '\r') {
-                    runningIndex++;
-                }
-                if(result.charAt(runningIndex + 1) == '\n') {
-                    runningIndex++;
-                }
-            }
-
             return result.substring(runningIndex + 1);
+        } else {
+            return result;
         }
     }
 

@@ -629,6 +629,31 @@ public class BibEntry implements Cloneable {
         return this;
     }
 
+    /*
+    * Returns user comments (arbitrary text before the entry), if they exist. If not, returns the empty String
+     */
+    public String getUserComments() {
+
+        if (parsedSerialization != null) {
+
+            try {
+                // get the text before the entry
+                String prolog = parsedSerialization.substring(0, parsedSerialization.indexOf('@'));
+
+                // delete trailing whitespaces (between entry and text)
+                prolog = prolog.replaceFirst("\\s+$", "");
+
+                // if there is any non whitespace text, write it
+                if (prolog.length() > 0) {
+                    return prolog;
+                }
+            } catch (StringIndexOutOfBoundsException ignore) {
+                // if this occurs a broken parsed serialization has been set, so just do nothing
+            }
+        }
+        return "";
+    }
+
     public Set<String> getFieldAsWords(String field) {
         String fieldName = toLowerCase(field);
         Set<String> storedList = fieldsAsWords.get(fieldName);

@@ -317,6 +317,8 @@ public class BibDatabaseWriter {
             return;
         }
 
+        writeUserCommentsForString(bs, fw);
+
         if(isFirstStringInType) {
             fw.write(Globals.NEWLINE);
         }
@@ -352,6 +354,14 @@ public class BibDatabaseWriter {
         }
 
         fw.write("}" + Globals.NEWLINE);
+    }
+
+    private void writeUserCommentsForString(BibtexString string, Writer out) throws IOException {
+        String userComments = string.getUserComments();
+
+        if(!userComments.isEmpty()) {
+            out.write(userComments + Globals.NEWLINE);
+        }
     }
 
     /**
