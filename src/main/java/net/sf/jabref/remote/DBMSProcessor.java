@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -204,9 +205,9 @@ public class DBMSProcessor {
         query.append(" = ");
         query.append(escapeValue(bibEntry.getType()));
 
-
+        Optional<BibEntry> remoteBibEntry = getRemoteEntry(bibEntry.getRemoteId());
         Set<String> fields = bibEntry.getFieldNames();
-        Set<String> emptyFields = getRemoteEntry(bibEntry.getRemoteId()).getFieldNames();
+        Set<String> emptyFields = remoteBibEntry.isPresent() ? remoteBibEntry.get().getFieldNames() : new HashSet<>();
         emptyFields.removeAll(fields); // emptyFields now contains only fields which should be null.
 
         for (String emptyField : emptyFields) {
@@ -295,12 +296,9 @@ public class DBMSProcessor {
      * @param remoteId Entry ID
      * @return instance of {@link BibEntry}
      */
-    public BibEntry getRemoteEntry(int remoteId) {
+    public Optional<BibEntry> getRemoteEntry(int remoteId) {
         List<BibEntry> entries = getRemoteEntries(remoteId);
-        if (entries.size() > 0) {
-            return entries.get(0);
-        }
-        return null;
+        return entries.isEmpty() ? Optional.empty() : Optional.of(entries.get(0));
     }
 
     /**
