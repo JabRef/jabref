@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Collection;
-import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.Globals;
