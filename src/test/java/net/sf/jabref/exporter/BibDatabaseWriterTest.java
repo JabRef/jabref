@@ -326,7 +326,7 @@ public class BibDatabaseWriterTest {
             assertEquals(scanner.useDelimiter("\\A").next(), stringWriter.toString());
         }
     }
-    
+
     @Test
     public void roundtripWithUserCommentBeforeStringAndChange() throws IOException {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
