@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.Globals;
@@ -151,7 +152,7 @@ public class BibEntryWriterTest {
 
         Set<String> fields = entry.getFieldNames();
         assertTrue(fields.contains("author"));
-        assertEquals("BlaBla", entry.getFieldOptional("author").get());
+        assertEquals(Optional.of("BlaBla"), entry.getFieldOptional("author"));
 
         // write out bibtex string
         StringWriter stringWriter = new StringWriter();
