@@ -68,6 +68,7 @@ public class IntegrityCheck {
         result.addAll(new HTMLCharacterChecker().check(entry));
         result.addAll(new BooktitleChecker().check(entry));
         result.addAll(new ISSNChecker().check(entry));
+        result.addAll(new ISBNChecker().check(entry));
 
         return result;
     }
