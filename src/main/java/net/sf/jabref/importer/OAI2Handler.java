@@ -15,6 +15,8 @@
 */
 package net.sf.jabref.importer;
 
+import java.util.Optional;
+
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.xml.sax.Attributes;
@@ -90,8 +92,8 @@ public class OAI2Handler extends DefaultHandler {
             pages = pages.replace(" ", "");
             entry.setField("pages", pages);
         } else if ("datestamp".equals(qualifiedName)) {
-            String year = entry.getField("year");
-            if ((year == null) || year.isEmpty()) {
+            Optional<String> year = entry.getFieldOptional("year");
+            if (!year.isPresent() || year.get().isEmpty()) {
                 entry.setField("year", content.replaceFirst("-.*", ""));
             }
         } else if ("title".equals(qualifiedName)) {

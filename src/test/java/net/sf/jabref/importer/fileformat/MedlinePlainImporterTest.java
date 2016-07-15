@@ -92,7 +92,7 @@ public class MedlinePlainImporterTest {
 
         BibEntry testEntry = entries.get(0);
         assertEquals("article", testEntry.getType());
-        Assert.assertEquals(Optional.empty(), testEntry.getFieldOptional("month"));
+        assertEquals(Optional.empty(), testEntry.getFieldOptional("month"));
         assertEquals(Optional.of("Long, Vicky and Marland, Hilary"), testEntry.getFieldOptional("author"));
         assertEquals(
                 Optional.of(
@@ -102,8 +102,8 @@ public class MedlinePlainImporterTest {
         testEntry = entries.get(1);
         assertEquals("conference", testEntry.getType());
         assertEquals(Optional.of("06"), testEntry.getFieldOptional("month"));
-        Assert.assertEquals(Optional.empty(), testEntry.getFieldOptional("author"));
-        Assert.assertEquals(Optional.empty(), testEntry.getFieldOptional("title"));
+        assertEquals(Optional.empty(), testEntry.getFieldOptional("author"));
+        assertEquals(Optional.empty(), testEntry.getFieldOptional("title"));
 
         testEntry = entries.get(2);
         assertEquals("book", testEntry.getType());

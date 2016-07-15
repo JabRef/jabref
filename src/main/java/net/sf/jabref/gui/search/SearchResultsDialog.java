@@ -348,7 +348,7 @@ public class SearchResultsDialog {
                 case FILE_COL:
                     if (entry.hasField(Globals.FILE_FIELD)) {
                         FileListTableModel tableModel = new FileListTableModel();
-                        tableModel.setContent(entry.getField(Globals.FILE_FIELD));
+                        entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(tableModel::setContent);
                         if (tableModel.getRowCount() == 0) {
                             return;
                         }
@@ -388,7 +388,7 @@ public class SearchResultsDialog {
             if (col == FILE_COL) {
                 // We use a FileListTableModel to parse the field content:
                 FileListTableModel fileList = new FileListTableModel();
-                fileList.setContent(entry.getField(Globals.FILE_FIELD));
+                entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(fileList::setContent);
                 // If there are one or more links, open the first one:
                 for (int i = 0; i < fileList.getRowCount(); i++) {
                     FileListEntry flEntry = fileList.getEntry(i);
@@ -458,7 +458,7 @@ public class SearchResultsDialog {
                 case FILE_COL:
                     if (entry.hasField(Globals.FILE_FIELD)) {
                         FileListTableModel tmpModel = new FileListTableModel();
-                        tmpModel.setContent(entry.getField(Globals.FILE_FIELD));
+                        entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(tmpModel::setContent);
                         fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
                         if (tmpModel.getRowCount() > 0) {
                             if (tmpModel.getEntry(0).type.isPresent()) {
@@ -473,7 +473,7 @@ public class SearchResultsDialog {
                     }
                 case URL_COL:
                     if (entry.hasField("url")) {
-                        urlLabel.setToolTipText(entry.getField("url"));
+                        urlLabel.setToolTipText(entry.getFieldOptional("url").get());
                         return urlLabel;
                     } else {
                         return null;

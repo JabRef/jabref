@@ -467,22 +467,22 @@ public class TextInputDialog extends JDialog {
                     markedTextStore.appendPosition(fieldName, selectionStart, selectionEnd);
 
                     // get old text from BibTeX tag
-                    String old = entry.getField(fieldName);
+                    Optional<String> old = entry.getFieldOptional(fieldName);
 
                     // merge old and selected text
-                    if (old == null) {
-                        // "null"+"txt" Strings forbidden
-                        entry.setField(fieldName, txt);
-                    } else {
+                    if (old.isPresent()) {
                         // insert a new name with an additional "and"
                         if (InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.PERSON_NAMES)) {
-                            entry.setField(fieldName, old + " and " + txt);
+                            entry.setField(fieldName, old.get() + " and " + txt);
                         } else if ("keywords".equals(fieldName)) {
                             // Add keyword
                                 entry.addKeyword(txt);
                         } else {
-                            entry.setField(fieldName, old + txt);
+                            entry.setField(fieldName, old.get() + txt);
                         }
+                    } else {
+                        // "null"+"txt" Strings forbidden
+                        entry.setField(fieldName, txt);
                     }
                 }
                 // make the new data in BibTeX source code visible
