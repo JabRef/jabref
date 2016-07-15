@@ -63,3 +63,8 @@ cache:
   directories:
   - $HOME/.gradle/caches/
   - $HOME/.gradle/wrapper/
+
+# enable slack notifications
+notifications:
+  slack:
+    secure: B5LGefXS1Jt+d7tUzzmakoz+/ZnFUzmmmYuBXaikTUPDuxXacIrVTv4Vx+tcagxDrPQ3A20oi3+0t6p8xagytjLI9u3abACyWwO3+CbywuJDLBzxADVhg/+mKssfTmemRlZoBUrBlHZVk69LIJvqXFR5l5zAiBtDL1dWPeMEEvI=
