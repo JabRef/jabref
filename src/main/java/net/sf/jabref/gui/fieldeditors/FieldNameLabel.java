@@ -54,7 +54,7 @@ public class FieldNameLabel extends JLabel {
             return " URL ";
         } else if ("uri".equalsIgnoreCase(fieldName)) {
             return " URI ";
-        } else if ("ISSN".equalsIgnoreCase(fieldName)) {
+        } else if ("issn".equalsIgnoreCase(fieldName)) {
             return " ISSN ";
         } else if("doi".equalsIgnoreCase(fieldName)) {
             return " DOI ";
