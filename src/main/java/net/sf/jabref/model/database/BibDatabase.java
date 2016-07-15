@@ -50,6 +50,7 @@ import net.sf.jabref.event.FieldChangedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
 
 import com.google.common.eventbus.EventBus;
@@ -127,7 +128,7 @@ public class BibDatabase {
         }
         Set<String> toberemoved = new TreeSet<>();
         for (String field : allFields) {
-            if (field.startsWith("__")) {
+            if (InternalBibtexFields.isInternalField(field)) {
                 toberemoved.add(field);
             }
         }
