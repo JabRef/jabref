@@ -17,6 +17,9 @@ package net.sf.jabref.gui.desktop;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +31,7 @@ import javax.swing.JOptionPane;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypeEntryEditor;
 import net.sf.jabref.external.ExternalFileTypes;
@@ -303,13 +307,30 @@ public class JabRefDesktop {
         }
     }
 
+    /**
+     * Opens a new console starting on the given file location
+     *
+     * If no terminal emulator is specified in {@link Globals},
+     * the default system console will be executed.
+     *
+     * @param file Location the console should be opened at.
+     */
     public static void openConsole(File file) throws IOException {
         if (file == null) {
             return;
         }
 
         String absolutePath = file.toPath().toAbsolutePath().getParent().toString();
-        NATIVE_DESKTOP.openConsole(absolutePath);
+        Path path = Paths.get(Globals.prefs.get(JabRefPreferences.CONSOLE_APPLICATION));
+        boolean usingDefault = Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION);
+
+        if (usingDefault) {
+            NATIVE_DESKTOP.openConsole(absolutePath);
+        } else if (Files.exists(path) && !Files.isDirectory(path) && path.isAbsolute()) {
+            ProcessBuilder process = new ProcessBuilder(path.toString());
+            process.directory(new File(absolutePath));
+            process.start();
+        }
     }
 
     // TODO: Move to OS.java
