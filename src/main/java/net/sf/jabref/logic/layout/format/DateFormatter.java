@@ -15,7 +15,6 @@ public class DateFormatter implements ParamLayoutFormatter {
     public String format(String fieldText) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(formatString);
         LocalDate date = LocalDate.parse(fieldText, DateTimeFormatter.ISO_LOCAL_DATE);
-        // TODO Auto-generated method stub
         return date.format(formatter);
     }
 
