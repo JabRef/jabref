@@ -68,6 +68,9 @@ public class CleanupWorker {
         if (preset.isCleanUpDOI()) {
             jobs.add(new DoiCleanup());
         }
+        if (preset.isCleanUpISSN()) {
+            jobs.add(new ISSNCleanup());
+        }
         if (preset.isFixFileLinks()) {
             jobs.add(new FileLinksCleanup());
         }

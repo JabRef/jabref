@@ -168,6 +168,36 @@ public class CleanupWorkerTest {
     }
 
     @Test
+    public void cleanupISSNReturnsCorrectISSN() {
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_ISSN);
+        BibEntry entry = new BibEntry();
+        entry.setField("issn", "0123-4567");
+
+        worker.cleanup(preset, entry);
+        Assert.assertEquals(Optional.of("0123-4567"), entry.getFieldOptional("issn"));
+    }
+
+    @Test
+    public void cleanupISSNAddsMissingDash() {
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_ISSN);
+        BibEntry entry = new BibEntry();
+        entry.setField("issn", "01234567");
+
+        worker.cleanup(preset, entry);
+        Assert.assertEquals(Optional.of("0123-4567"), entry.getFieldOptional("issn"));
+    }
+
+    @Test
+    public void cleanupISSNJunkStaysJunk() {
+        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_ISSN);
+        BibEntry entry = new BibEntry();
+        entry.setField("issn", "Banana");
+
+        worker.cleanup(preset, entry);
+        Assert.assertEquals(Optional.of("Banana"), entry.getFieldOptional("issn"));
+    }
+
+    @Test
     public void cleanupMonthChangesNumberToBibtex() {
         CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true,
                 Collections.singletonList(new FieldFormatterCleanup("month", new NormalizeMonthFormatter()))));

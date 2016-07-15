@@ -344,6 +344,7 @@ public class JabRefPreferences {
 
     public static final String AKS_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP_DOI = "CleanUpDOI";
+    public static final String CLEANUP_ISSN = "CleanUpISSN";
     public static final String CLEANUP_MOVE_PDF = "CleanUpMovePDF";
     public static final String CLEANUP_MAKE_PATHS_RELATIVE = "CleanUpMakePathsRelative";
     public static final String CLEANUP_RENAME_PDF = "CleanUpRenamePDF";
@@ -1386,6 +1387,7 @@ public class JabRefPreferences {
 
     private static void insertCleanupPreset(Map<String, Object> storage, CleanupPreset preset) {
         storage.put(CLEANUP_DOI, preset.isCleanUpDOI());
+        storage.put(CLEANUP_ISSN, preset.isCleanUpISSN());
         storage.put(CLEANUP_MOVE_PDF, preset.isMovePDF());
         storage.put(CLEANUP_MAKE_PATHS_RELATIVE, preset.isMakePathsRelative());
         storage.put(CLEANUP_RENAME_PDF, preset.isRenamePDF());
