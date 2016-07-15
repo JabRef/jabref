@@ -14,7 +14,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 // $Id$
-package net.sf.jabref.bst;
+package net.sf.jabref.logic.bst;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

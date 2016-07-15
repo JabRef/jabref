@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.bst.BibtexNameFormatter;
+import net.sf.jabref.logic.bst.BibtexNameFormatter;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.model.entry.AuthorList;
 

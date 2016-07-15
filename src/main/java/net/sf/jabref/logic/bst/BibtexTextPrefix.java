@@ -14,7 +14,7 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 // $Id$
-package net.sf.jabref.bst;
+package net.sf.jabref.logic.bst;
 
 /**
  * The |built_in| function {\.{text.prefix\$}} pops the top two literals (the
