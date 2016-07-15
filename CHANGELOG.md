@@ -13,6 +13,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 - [#1026](https://github.com/JabRef/jabref/issues/1026) JabRef does no longer delete user comments outside of BibTeX entries and strings
+- [#1249](https://github.com/JabRef/jabref/issues/1249) Date layout formatter added
 
 ### Fixed
 - Fixed [#1264](https://github.com/JabRef/jabref/issues/1264): S with caron does not render correctly
