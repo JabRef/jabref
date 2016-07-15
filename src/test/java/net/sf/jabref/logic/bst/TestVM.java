@@ -1,4 +1,4 @@
-package net.sf.jabref.bst;
+package net.sf.jabref.logic.bst;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,10 +9,10 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bst.VM.BstEntry;
-import net.sf.jabref.bst.VM.StackFunction;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.bst.VM.BstEntry;
+import net.sf.jabref.logic.bst.VM.StackFunction;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.antlr.runtime.RecognitionException;
@@ -30,7 +30,7 @@ public class TestVM {
 
     @Test
     public void testAbbrv() throws RecognitionException, IOException {
-        VM vm = new VM(new File("src/test/resources/net/sf/jabref/bst/abbrv.bst"));
+        VM vm = new VM(new File("src/test/resources/net/sf/jabref/logic/bst/abbrv.bst"));
         List<BibEntry> v = new ArrayList<>();
         v.add(t1BibtexEntry());
 
@@ -664,7 +664,7 @@ public class TestVM {
 
     @Test
     public void testHypthenatedName() throws RecognitionException, IOException {
-        VM vm = new VM(new File("src/test/resources/net/sf/jabref/bst/abbrv.bst"));
+        VM vm = new VM(new File("src/test/resources/net/sf/jabref/logic/bst/abbrv.bst"));
         List<BibEntry> v = new ArrayList<>();
         v.add(TestVM.bibtexString2BibtexEntry("@article{canh05, author = \"Jean-Paul Sartre\" }"));
         Assert.assertTrue(vm.run(v).contains("J.-P. Sartre"));

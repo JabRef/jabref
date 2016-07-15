@@ -1,4 +1,4 @@
-package net.sf.jabref.bst;
+package net.sf.jabref.logic.bst;
 
 import net.sf.jabref.model.entry.AuthorList;
 
