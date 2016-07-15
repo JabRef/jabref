@@ -3,6 +3,7 @@ package net.sf.jabref.logic.cleanup;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
@@ -60,7 +61,8 @@ public class MoveFilesCleanupTest {
         File fileAfter = new File(pdfFolder, "test.pdf");
         assertTrue(fileAfter.exists());
 
-        assertEquals(FileField.getStringRepresentation(new ParsedFileField("", fileAfter.getName(), "")), entry.getField("file"));
+        assertEquals(Optional.of(FileField.getStringRepresentation(new ParsedFileField("", fileAfter.getName(), ""))),
+                entry.getFieldOptional("file"));
     }
 
     @Test
@@ -80,7 +82,9 @@ public class MoveFilesCleanupTest {
         File fileAfter = new File(pdfFolder, "test.pdf");
         assertTrue(fileAfter.exists());
 
-        assertEquals(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""),
-                new ParsedFileField("", fileAfter.getName(), ""), new ParsedFileField("","",""))), entry.getField("file"));
+        assertEquals(
+                Optional.of(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("", "", ""),
+                        new ParsedFileField("", fileAfter.getName(), ""), new ParsedFileField("", "", "")))),
+                entry.getFieldOptional("file"));
     }
 }

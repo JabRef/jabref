@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
@@ -62,10 +63,10 @@ public class PdfXmpImporterTest {
         assertEquals(1, bibEntries.size());
 
         BibEntry be0 = bibEntries.get(0);
-        assertEquals("how to annotate a pdf", be0.getField("abstract"));
-        assertEquals("Chris", be0.getField("author"));
-        assertEquals("pdf, annotation", be0.getField("keywords"));
-        assertEquals("The best Pdf ever", be0.getField("title"));
+        assertEquals(Optional.of("how to annotate a pdf"), be0.getFieldOptional("abstract"));
+        assertEquals(Optional.of("Chris"), be0.getFieldOptional("author"));
+        assertEquals(Optional.of("pdf, annotation"), be0.getFieldOptional("keywords"));
+        assertEquals(Optional.of("The best Pdf ever"), be0.getFieldOptional("title"));
     }
 
     @Test

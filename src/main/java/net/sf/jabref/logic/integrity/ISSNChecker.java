@@ -21,7 +21,7 @@ public class ISSNChecker implements Checker {
         }
 
         // Check that the ISSN is on the correct form
-        String issn = entry.getField("issn").trim();
+        String issn = entry.getFieldOptional("issn").get().trim();
         Matcher issnMatcher = ISSN_PATTERN.matcher(issn);
         if (!issnMatcher.matches()) {
             return Collections.singletonList(

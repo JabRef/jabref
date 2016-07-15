@@ -198,12 +198,12 @@ public class FreeCiteImporter extends ImportFormat {
                     }
 
                     if (noteSB.length() > 0) {
-                        String note = e.getField("note");
-                        if (note == null) {
-                            note = noteSB.toString();
-                        } else {
+                        String note;
+                        if (e.hasField("note")) {
                             // "note" could have been set during the parsing as FreeCite also returns "note"
-                            note = note.concat(Globals.NEWLINE).concat(noteSB.toString());
+                            note = e.getFieldOptional("note").get().concat(Globals.NEWLINE).concat(noteSB.toString());
+                        } else {
+                            note = noteSB.toString();
                         }
                         e.setField("note", note);
                     }

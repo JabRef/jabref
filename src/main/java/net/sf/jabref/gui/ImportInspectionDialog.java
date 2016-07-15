@@ -907,7 +907,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 if (col == FILE_COL) {
                     if (entry.hasField(Globals.FILE_FIELD)) {
                         FileListTableModel tableModel = new FileListTableModel();
-                        tableModel.setContent(entry.getField(Globals.FILE_FIELD));
+                        entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(tableModel::setContent);
                         if (tableModel.getRowCount() == 0) {
                             return;
                         }
@@ -1129,7 +1129,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             }
             BibEntry entry = selectionModel.getSelected().get(0);
             String result = JOptionPane.showInputDialog(ImportInspectionDialog.this, Localization.lang("Enter URL"),
-                    entry.getField(URL_FIELD));
+                    entry.getFieldOptional(URL_FIELD).orElse(""));
             entries.getReadWriteLock().writeLock().lock();
             try {
                 if (result != null) {
@@ -1425,7 +1425,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 case FILE_COL:
                     if (entry.hasField(Globals.FILE_FIELD)) {
                         FileListTableModel model = new FileListTableModel();
-                        model.setContent(entry.getField(Globals.FILE_FIELD));
+                        entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(model::setContent);
                         fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
                         if (model.getRowCount() > 0) {
                             fileLabel.setIcon(model.getEntry(0).type.get().getIcon());
@@ -1436,7 +1436,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     }
                 case URL_COL:
                     if (entry.hasField(URL_FIELD)) {
-                        urlLabel.setToolTipText(entry.getField(URL_FIELD));
+                        urlLabel.setToolTipText(entry.getFieldOptional(URL_FIELD).orElse(""));
                         return urlLabel;
                     } else {
                         return null;
@@ -1449,7 +1449,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
                     return entry.getFieldOptional(field).map(AuthorList::fixAuthorNatbib).orElse("");
                 } else {
-                    return entry.getField(field);
+                    return entry.getFieldOptional(field).orElse(null);
                 }
             }
         }

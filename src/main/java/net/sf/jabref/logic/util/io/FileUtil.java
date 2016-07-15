@@ -372,10 +372,12 @@ public class FileUtil {
 
         List<File> result = new ArrayList<>();
         for (BibEntry entry : bes) {
-            List<ParsedFileField> fileList = FileField.parse(entry.getField(Globals.FILE_FIELD));
-            for (ParsedFileField file : fileList) {
-                expandFilename(file.getLink(), fileDirs).ifPresent(result::add);
-            }
+            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(fileField -> {
+                List<ParsedFileField> fileList = FileField.parse(fileField);
+                for (ParsedFileField file : fileList) {
+                    expandFilename(file.getLink(), fileDirs).ifPresent(result::add);
+                }
+            });
         }
 
         return result;

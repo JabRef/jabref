@@ -3,6 +3,7 @@ package net.sf.jabref.logic.cleanup;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
@@ -57,7 +58,7 @@ public class RenamePdfCleanupTest {
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot.tmp", "");
-        assertEquals(FileField.getStringRepresentation(newFileField), entry.getField("file"));
+        assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getFieldOptional("file"));
     }
 
     @Test
@@ -72,8 +73,10 @@ public class RenamePdfCleanupTest {
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationLoader.class));
         cleanup.cleanup(entry);
 
-        assertEquals(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""),
-                new ParsedFileField("", "Toot - test title.tmp", ""), new ParsedFileField("","",""))), entry.getField("file"));
+        assertEquals(
+                Optional.of(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("", "", ""),
+                        new ParsedFileField("", "Toot - test title.tmp", ""), new ParsedFileField("", "", "")))),
+                entry.getFieldOptional("file"));
     }
 
     @Test
@@ -88,7 +91,7 @@ public class RenamePdfCleanupTest {
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot - test title.tmp", "");
-        assertEquals(FileField.getStringRepresentation(newFileField), entry.getField("file"));
+        assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getFieldOptional("file"));
     }
 
     @Test
@@ -103,6 +106,6 @@ public class RenamePdfCleanupTest {
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot - test title.pdf", "PDF");
-        assertEquals(FileField.getStringRepresentation(newFileField), entry.getField("file"));
+        assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getFieldOptional("file"));
     }
 }

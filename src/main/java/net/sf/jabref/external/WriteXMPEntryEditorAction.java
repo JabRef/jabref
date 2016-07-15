@@ -76,7 +76,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
         dirs = panel.getBibDatabaseContext().getFileDirectory();
         if (entry.hasField(Globals.FILE_FIELD)) {
             FileListTableModel tm = new FileListTableModel();
-            tm.setContent(entry.getField(Globals.FILE_FIELD));
+            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(tm::setContent);
             for (int j = 0; j < tm.getRowCount(); j++) {
                 FileListEntry flEntry = tm.getEntry(j);
                 if ((flEntry.type.isPresent()) && "pdf".equalsIgnoreCase(flEntry.type.get().getName())) {

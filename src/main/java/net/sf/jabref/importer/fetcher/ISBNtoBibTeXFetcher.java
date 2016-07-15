@@ -90,8 +90,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
             BibEntry entry = BibtexParser.singleFromString(bibtexString);
             if (entry != null) {
                 // Optionally add curly brackets around key words to keep the case
-                String title = entry.getField("title");
-                if (title != null) {
+                entry.getFieldOptional("title").ifPresent(title -> {
                     // Unit formatting
                     if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
                         title = unitsToLatexFormatter.format(title);
@@ -102,8 +101,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
                         title = protectTermsFormatter.format(title);
                     }
                     entry.setField("title", title);
-                }
-
+                });
                 inspector.addEntry(entry);
                 return true;
             }
