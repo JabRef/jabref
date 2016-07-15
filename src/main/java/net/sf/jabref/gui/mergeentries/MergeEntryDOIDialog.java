@@ -33,6 +33,7 @@ import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -181,7 +182,7 @@ public class MergeEntryDOIDialog extends JDialog {
 
             // Remove fields which are not in the merged entry, unless they are internal fields
             for (String field : originalFields) {
-                if (!jointFields.contains(field) && !field.startsWith("__")) {
+                if (!jointFields.contains(field) && !InternalBibtexFields.isInternalField(field)) {
                     Optional<String> originalString = originalEntry.getFieldOptional(field);
                     originalEntry.clearField(field);
                     ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString.get(), null)); // originalString always present

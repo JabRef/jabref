@@ -52,6 +52,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.DiffHighlighting;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.ColumnSpec;
@@ -345,10 +346,10 @@ public class MergeEntries {
         allFields.addAll(leftEntry.getFieldNames());
         allFields.addAll(rightEntry.getFieldNames());
 
-        // Remove field starting with __
+        // Remove internal fields
         Set<String> toberemoved = new TreeSet<>();
         for (String field : allFields) {
-            if (field.startsWith("__")) {
+            if (InternalBibtexFields.isInternalField(field)) {
                 toberemoved.add(field);
             }
         }

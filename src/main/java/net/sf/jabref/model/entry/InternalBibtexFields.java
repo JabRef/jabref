@@ -423,6 +423,10 @@ public class InternalBibtexFields {
         return sField.isPresent() && sField.get().isNumeric();
     }
 
+    public static boolean isInternalField(String field) {
+        return field.startsWith("__");
+    }
+
     /**
      * returns a List with all fieldnames
      */
