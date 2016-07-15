@@ -58,6 +58,8 @@ public class FieldNameLabel extends JLabel {
             return " ISSN ";
         } else if("doi".equalsIgnoreCase(fieldName)) {
             return " DOI ";
+        } else if("isrn".equalsIgnoreCase(fieldName)) {
+            return " ISRN ";
         }
 
         // otherwise capitalize
