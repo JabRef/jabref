@@ -19,14 +19,11 @@ import java.awt.Font;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -41,6 +38,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
+import javax.swing.SwingUtilities;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
@@ -51,6 +49,7 @@ import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.DiffHighlighting;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -58,8 +57,6 @@ import com.jgoodies.forms.layout.CellConstraints;
 import com.jgoodies.forms.layout.ColumnSpec;
 import com.jgoodies.forms.layout.FormLayout;
 import com.jgoodies.forms.layout.RowSpec;
-import difflib.Delta;
-import difflib.DiffUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -89,10 +86,6 @@ public class MergeEntries {
             Localization.lang("Show symmetric diff") + " - " + Localization.lang("word"),
             Localization.lang("Show symmetric diff") + " - " + Localization.lang("character")};
 
-    private static final String ADDITION_START = "<span class=add>";
-    private static final String REMOVAL_START = "<span class=del>";
-    private static final String CHANGE_START = "<span class=change>";
-    private static final String TAG_END = "</span>";
     private static final String HTML_START = "<html><body>";
     private static final String HTML_END = "</body></html>";
     private static final String BODY_STYLE = "body{font:sans-serif}";
@@ -371,19 +364,19 @@ public class MergeEntries {
             case 0: // Plain text
                 break;
             case 1: // Latexdiff style - word
-                rightString = generateDiffHighlighting(leftString, rightString, " ");
+                rightString = DiffHighlighting.generateDiffHighlighting(leftString, rightString, " ");
                 break;
             case 2: // Latexdiff style - character
-                rightString = generateDiffHighlighting(leftString, rightString, "");
+                rightString = DiffHighlighting.generateDiffHighlighting(leftString, rightString, "");
                 break;
             case 3: // Symmetric style - word
-                String tmpLeftString = generateSymmetricHighlighting(leftString, rightString, " ");
-                rightString = generateSymmetricHighlighting(rightString, leftString, " ");
+                String tmpLeftString = DiffHighlighting.generateSymmetricHighlighting(leftString, rightString, " ");
+                rightString = DiffHighlighting.generateSymmetricHighlighting(rightString, leftString, " ");
                 leftString = tmpLeftString;
                 break;
             case 4: // Symmetric style - character
-                tmpLeftString = generateSymmetricHighlighting(leftString, rightString, "");
-                rightString = generateSymmetricHighlighting(rightString, leftString, "");
+                tmpLeftString = DiffHighlighting.generateSymmetricHighlighting(leftString, rightString, "");
+                rightString = DiffHighlighting.generateSymmetricHighlighting(rightString, leftString, "");
                 leftString = tmpLeftString;
                 break;
             default: // Shouldn't happen
@@ -396,7 +389,7 @@ public class MergeEntries {
                 rightTextPanes.get(field).setText(HTML_START + rightString + HTML_END);
             }
         }
-        javax.swing.SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar()
+        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar()
                 .setValue(Math.min(scrollPane.getVerticalScrollBar().getMaximum(), oldScrollPaneValue)));
     }
 
@@ -410,84 +403,6 @@ public class MergeEntries {
         sheet.addRule(CHANGE_STYLE);
         pane.setEditable(false);
         return pane;
-    }
-
-    public static String generateDiffHighlighting(String baseString, String modifiedString, String separator) {
-        Objects.requireNonNull(separator);
-        if ((baseString != null) && (modifiedString != null)) {
-            List<String> stringList = new ArrayList<>(Arrays.asList(baseString.split(separator)));
-            List<Delta<String>> deltaList = new ArrayList<>(
-                    DiffUtils.diff(stringList, Arrays.asList(modifiedString.split(separator))).getDeltas());
-            Collections.reverse(deltaList);
-            for (Delta<String> delta : deltaList) {
-                int startPos = delta.getOriginal().getPosition();
-                List<String> lines = delta.getOriginal().getLines();
-                int offset = 0;
-                switch (delta.getType()) {
-                case CHANGE:
-                    for (String line : lines) {
-                        stringList.set(startPos + offset, (offset == 0 ? REMOVAL_START : "") + line);
-                        offset++;
-                    }
-                    stringList.set((startPos + offset) - 1,
-                            stringList.get((startPos + offset) - 1) + TAG_END + separator + ADDITION_START
-                                    + String.join(separator, delta.getRevised().getLines()) + TAG_END);
-                    break;
-                case DELETE:
-                    for (String line : lines) {
-                        stringList.set(startPos + offset, (offset == 0 ? REMOVAL_START : "") + line);
-                        offset++;
-                    }
-                    stringList.set((startPos + offset) - 1,
-                            stringList.get((startPos + offset) - 1) + TAG_END);
-                    break;
-                case INSERT:
-                    stringList.add(delta.getOriginal().getPosition(),
-                            ADDITION_START + String.join(separator, delta.getRevised().getLines()) + TAG_END);
-                    break;
-                default:
-                    break;
-                }
-            }
-            return String.join(separator, stringList);
-        }
-        return modifiedString;
-    }
-
-    public static String generateSymmetricHighlighting(String baseString, String modifiedString, String separator) {
-        if ((baseString != null) && (modifiedString != null)) {
-            List<String> stringList = new ArrayList<>(Arrays.asList(baseString.split(separator)));
-            List<Delta<String>> deltaList = new ArrayList<>(DiffUtils
-                    .diff(stringList, new ArrayList<>(Arrays.asList(modifiedString.split(separator)))).getDeltas());
-            Collections.reverse(deltaList);
-            for (Delta<String> delta : deltaList) {
-                int startPos = delta.getOriginal().getPosition();
-                List<String> lines = delta.getOriginal().getLines();
-                int offset = 0;
-                switch (delta.getType()) {
-                case CHANGE:
-                    for (String line : lines) {
-                        stringList.set(startPos + offset, (offset == 0 ? CHANGE_START : "") + line);
-                        offset++;
-                    }
-                    stringList.set((startPos + offset) - 1, stringList.get((startPos + offset) - 1) + TAG_END);
-                    break;
-                case DELETE:
-                    for (String line : lines) {
-                        stringList.set(startPos + offset, (offset == 0 ? ADDITION_START : "") + line);
-                        offset++;
-                    }
-                    stringList.set((startPos + offset) - 1, stringList.get((startPos + offset) - 1) + TAG_END);
-                    break;
-                case INSERT:
-                    break;
-                default:
-                    break;
-                }
-            }
-            return String.join(separator, stringList);
-        }
-        return modifiedString;
     }
 
     /**

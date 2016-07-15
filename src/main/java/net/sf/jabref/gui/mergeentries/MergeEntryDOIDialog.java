@@ -15,6 +15,7 @@
  */
 package net.sf.jabref.gui.mergeentries;
 
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -62,7 +63,8 @@ public class MergeEntryDOIDialog extends JDialog {
         this.panel = panel;
 
         if (panel.getSelectedEntries().size() != 1) {
-            JOptionPane.showMessageDialog(panel.frame(), Localization.lang("Select one entry."),
+            JOptionPane.showMessageDialog(panel.frame(),
+                    Localization.lang("This operation requires exactly one item to be selected."),
                     Localization.lang("Merge entry with DOI information"), JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             return;
@@ -70,12 +72,17 @@ public class MergeEntryDOIDialog extends JDialog {
 
         this.originalEntry = panel.getSelectedEntries().get(0);
         panel.output(Localization.lang("Fetching info based on DOI"));
-        this.doiEntry = doiFetcher.getEntryFromDOI(this.originalEntry.getField("doi")).orElse(null);
+        Optional<String> doi = this.originalEntry.getFieldOptional("doi");
+
+        if (doi.isPresent()) {
+            this.doiEntry = doiFetcher.getEntryFromDOI(doi.get()).orElse(null);
+        }
 
         if (this.doiEntry == null) {
             panel.output("");
             JOptionPane.showMessageDialog(panel.frame(),
-                    Localization.lang("Cannot get info based on given DOI: %0", this.originalEntry.getField("doi")),
+                    Localization.lang("Cannot get info based on given DOI: %0",
+                            doi.orElse(Localization.lang("No DOI found"))),
                     Localization.lang("Merge entry with DOI information"), JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             return;
@@ -162,21 +169,22 @@ public class MergeEntryDOIDialog extends JDialog {
 
             // fields
             for (String field : jointFields) {
-                String originalString = originalEntry.getField(field);
-                String mergedString = mergedEntry.getField(field);
-                if ((originalString == null) || !originalString.equals(mergedEntry.getField(field))) {
-                    originalEntry.setField(field, mergedString);
-                    ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString, mergedString));
+                Optional<String> originalString = originalEntry.getFieldOptional(field);
+                Optional<String> mergedString = mergedEntry.getFieldOptional(field);
+                if (!originalString.isPresent() || !originalString.equals(mergedString)) {
+                    originalEntry.setField(field, mergedString.get()); // mergedString always present
+                    ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString.orElse(null),
+                            mergedString.get()));
                     edited = true;
                 }
             }
 
-            // Remove fields which are not in the merged entry
+            // Remove fields which are not in the merged entry, unless they are internal fields
             for (String field : originalFields) {
-                if (!jointFields.contains(field)) {
-                    String originalString = originalEntry.getField(field);
+                if (!jointFields.contains(field) && !field.startsWith("__")) {
+                    Optional<String> originalString = originalEntry.getFieldOptional(field);
                     originalEntry.clearField(field);
-                    ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString, null));
+                    ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString.get(), null)); // originalString always present
                     edited = true;
                 }
             }
