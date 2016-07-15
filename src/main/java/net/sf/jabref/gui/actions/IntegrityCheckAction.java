@@ -2,10 +2,8 @@ package net.sf.jabref.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -52,7 +50,6 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
         if (messages.isEmpty()) {
             JOptionPane.showMessageDialog(frame.getCurrentBasePanel(), Localization.lang("No problems found."));
         } else {
-            Set<String> messageVariants = new HashSet<>();
             Map<String, Boolean> showMessage = new HashMap<>();
             // prepare data model
             Object[][] model = new Object[messages.size()][3];
@@ -61,7 +58,6 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
                 model[i][0] = message.getEntry().getCiteKey();
                 model[i][1] = message.getFieldName();
                 model[i][2] = message.getMessage();
-                messageVariants.add(message.getMessage());
                 showMessage.put(message.getMessage(), true);
                 i++;
             }
@@ -90,9 +86,9 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
             selectionModel.addListSelectionListener(event -> {
                 if (!event.getValueIsAdjusting()) {
                     try {
-                    String citeKey = (String) model[table.convertRowIndexToModel(table.getSelectedRow())][0];
-                    String fieldName = (String) model[table.convertRowIndexToModel(table.getSelectedRow())][1];
-                    frame.getCurrentBasePanel().editEntryByKeyAndFocusField(citeKey, fieldName);
+                        String citeKey = (String) model[table.convertRowIndexToModel(table.getSelectedRow())][0];
+                        String fieldName = (String) model[table.convertRowIndexToModel(table.getSelectedRow())][1];
+                        frame.getCurrentBasePanel().editEntryByKeyAndFocusField(citeKey, fieldName);
                     } catch (ArrayIndexOutOfBoundsException exception) {
                         // Ignore -- most likely caused by filtering out the earlier selected row
                     }
