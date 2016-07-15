@@ -100,7 +100,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         this.databaseContext = databaseContext;
         this.fieldName = fieldName;
         this.entryEditor = entryEditor;
-        label = new FieldNameLabel(" " + EntryUtil.capitalizeFirst(fieldName) + " ");
+        label = new FieldNameLabel(fieldName);
         tableModel = new FileListTableModel();
         setText(content);
         setModel(tableModel);

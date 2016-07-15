@@ -63,7 +63,7 @@ public class TextField extends JTextField implements FieldEditor {
             addFocusListener(new FieldEditorFocusListener());
         }
         this.fieldName = fieldName;
-        label = new FieldNameLabel(' ' + EntryUtil.capitalizeFirst(this.fieldName) + ' ');
+        label = new FieldNameLabel(this.fieldName);
         setBackground(GUIGlobals.validFieldBackgroundColor);
         setForeground(GUIGlobals.editorTextColor);
 

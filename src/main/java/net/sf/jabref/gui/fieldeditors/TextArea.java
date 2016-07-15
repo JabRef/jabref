@@ -62,7 +62,7 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
         setWrapStyleWord(true);
         this.fieldName = fieldName;
 
-        label = new FieldNameLabel(' ' + EntryUtil.capitalizeFirst(this.fieldName) + ' ');
+        label = new FieldNameLabel(fieldName);
         setBackground(GUIGlobals.validFieldBackgroundColor);
         setForeground(GUIGlobals.editorTextColor);
 
