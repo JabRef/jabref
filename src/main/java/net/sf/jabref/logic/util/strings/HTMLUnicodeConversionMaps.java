@@ -509,14 +509,14 @@ public class HTMLUnicodeConversionMaps {
             {"", "VerticalLine", "|"}, // Vertical bar
             {"125", "rbrace", "\\}"}, // Right curly bracket
             {"", "rcub", "\\}"}, // Right curly bracket
-            {"138", "", "{{\\v{S}}}"}, // Line tabulation set
+            // {"138", "", "{{\\v{S}}}"}, // Line tabulation set
             // {"141", "", ""}, // Reverse line feed
             {"145", "", "`"}, // Apostrophe
             {"146", "", "'"}, // Apostrophe
             {"147", "", "``"}, // Quotation mark
             {"148", "", "''"}, // Quotation mark
             {"150", "", "--"}, // En dash
-            {"154", "", "{\\v{s}}"}, // Single character introducer
+            // {"154", "", "{\\v{s}}"}, // Single character introducer
             {"260", "Aogon", "{{\\k{A}}}"}, // capital A with ogonek
             {"261", "aogon", "{\\k{a}}"}, // small a with ogonek
             {"262", "Cacute", "{{\\'{C}}}"}, // capital C with acute
@@ -574,7 +574,7 @@ public class HTMLUnicodeConversionMaps {
             {"", "Hacek", "{\\v{}}"}, // Caron
             {"728", "breve", "{\\u{}}"}, // Breve
             {"", "Breve", "{\\u{}}"}, // Breve
-            {"729", "dot", "{\\\\.{}}"}, // Dot above
+            {"729", "dot", "{\\.{}}"}, // Dot above
             {"730", "ring", "{\\r{}}"}, // Ring above
             {"731", "ogon", "{\\k{}}"}, // Ogonek
             {"733", "dblac", "{{\\H{}}}"}, // Double acute
@@ -744,8 +744,9 @@ public class HTMLUnicodeConversionMaps {
 
     public static final Map<String, String> HTML_LATEX_CONVERSION_MAP = new HashMap<>();
     public static final Map<Integer, String> ESCAPED_ACCENTS = new HashMap<>();
+    public static final Map<String, String> UNICODE_ESCAPED_ACCENTS = new HashMap<>();
     public static final Map<Integer, String> NUMERICAL_LATEX_CONVERSION_MAP = new HashMap<>();
-    public static final Map<Character, String> UNICODE_LATEX_CONVERSION_MAP = new HashMap<>();
+    public static final Map<String, String> UNICODE_LATEX_CONVERSION_MAP = new HashMap<>();
     public static final Map<String, String> LATEX_HTML_CONVERSION_MAP = new HashMap<>();
     public static final Map<String, String> LATEX_UNICODE_CONVERSION_MAP = new HashMap<>();
 
@@ -765,10 +766,10 @@ public class HTMLUnicodeConversionMaps {
                 if (!(aConversionList[0].isEmpty())) {
                     NUMERICAL_LATEX_CONVERSION_MAP.put(Integer.decode(aConversionList[0]), aConversionList[2]);
                     if (Integer.decode(aConversionList[0]) > 128) {
-                        Character c = (char) Integer.decode(aConversionList[0]).intValue();
-                        UNICODE_LATEX_CONVERSION_MAP.put(c, aConversionList[2]);
+                        String unicodeSymbol = String.valueOf(Character.toChars(Integer.decode(aConversionList[0])));
+                        UNICODE_LATEX_CONVERSION_MAP.put(unicodeSymbol, aConversionList[2]);
                         if (!strippedLaTeX.isEmpty()) {
-                            LATEX_UNICODE_CONVERSION_MAP.put(strippedLaTeX, c.toString());
+                            LATEX_UNICODE_CONVERSION_MAP.put(strippedLaTeX, unicodeSymbol);
                         }
                     }
                 }
@@ -776,6 +777,8 @@ public class HTMLUnicodeConversionMaps {
         }
         for (String[] anAccentList : ACCENT_LIST) {
             ESCAPED_ACCENTS.put(Integer.decode(anAccentList[0]), anAccentList[1]);
+            UNICODE_ESCAPED_ACCENTS.put(anAccentList[1],
+                    String.valueOf(Character.toChars(Integer.decode(anAccentList[0]))));
         }
         // Manually added values which are killed by cleanLaTeX
         LATEX_HTML_CONVERSION_MAP.put("$", "&dollar;");
@@ -784,6 +787,12 @@ public class HTMLUnicodeConversionMaps {
         // Manual corrections
         LATEX_HTML_CONVERSION_MAP.put("AA", "&Aring;"); // Overwritten by &angst; which is less supported
         LATEX_UNICODE_CONVERSION_MAP.put("AA", "Å"); // Overwritten by Ångstrom symbol
+
+        // Manual additions
+        // Support relax to the extent that it is simply removed
+        LATEX_HTML_CONVERSION_MAP.put("relax", "");
+        LATEX_UNICODE_CONVERSION_MAP.put("relax", "");
+
     }
 
     private static String cleanLaTeX(String escapedString) {

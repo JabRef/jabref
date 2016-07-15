@@ -51,14 +51,50 @@ public class LatexToUnicodeFormatterTest {
     }
 
     @Test
-    public void testEquations() {
+    public void testFormatTextit() {
+        // See #1464
+        assertEquals("text", formatter.format("\\textit{text}"));
+    }
+
+    @Test
+    public void testEscapedDollarSign() {
         assertEquals("$", formatter.format("\\$"));
+    }
+
+    @Test
+    public void testEquationsSingleSymbol() {
         assertEquals("σ", formatter.format("$\\sigma$"));
+    }
+
+    @Test
+    public void testEquationsMoreComplicatedFormatting() {
         assertEquals("A 32\u00A0mA ΣΔ-modulator", formatter.format("A 32~{mA} {$\\Sigma\\Delta$}-modulator"));
     }
 
     @Test
     public void formatExample() {
         assertEquals("Mönch", formatter.format(formatter.getExampleInput()));
+    }
+
+    @Test
+    public void testChi() {
+        // See #1464
+        assertEquals("χ", formatter.format("$\\chi$"));
+    }
+
+    @Test
+    public void testSWithCaron() {
+        // Bug #1264
+        assertEquals("Š", formatter.format("{\\v{S}}"));
+    }
+
+    @Test
+    public void testCombiningAccentsCase1() {
+        assertEquals("ḩ", formatter.format("{\\c{h}}"));
+    }
+
+    @Test
+    public void testCombiningAccentsCase2() {
+        assertEquals("a͍", formatter.format("\\spreadlips{a}"));
     }
 }
