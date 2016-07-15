@@ -53,8 +53,8 @@ public class Globals {
     public static final ImportFormatReader IMPORT_FORMAT_READER = new ImportFormatReader();
 
 
-
-    public static final String SPECIAL_COMMAND_CHARS = "\"`^~'=.|"; // "\"`^~'c="
+    // Non-letters which are used to denote accents in LaTeX-commands, e.g., in {\"{a}}
+    public static final String SPECIAL_COMMAND_CHARS = "\"`^~'=.|";
 
     // In the main program, this field is initialized in JabRef.java
     // Each test case initializes this field if required

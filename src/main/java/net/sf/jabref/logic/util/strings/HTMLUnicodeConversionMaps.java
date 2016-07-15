@@ -766,10 +766,10 @@ public class HTMLUnicodeConversionMaps {
                 if (!(aConversionList[0].isEmpty())) {
                     NUMERICAL_LATEX_CONVERSION_MAP.put(Integer.decode(aConversionList[0]), aConversionList[2]);
                     if (Integer.decode(aConversionList[0]) > 128) {
-                        String s = String.valueOf(Character.toChars(Integer.decode(aConversionList[0])));
-                        UNICODE_LATEX_CONVERSION_MAP.put(s, aConversionList[2]);
+                        String unicodeSymbol = String.valueOf(Character.toChars(Integer.decode(aConversionList[0])));
+                        UNICODE_LATEX_CONVERSION_MAP.put(unicodeSymbol, aConversionList[2]);
                         if (!strippedLaTeX.isEmpty()) {
-                            LATEX_UNICODE_CONVERSION_MAP.put(strippedLaTeX, s);
+                            LATEX_UNICODE_CONVERSION_MAP.put(strippedLaTeX, unicodeSymbol);
                         }
                     }
                 }
@@ -787,6 +787,12 @@ public class HTMLUnicodeConversionMaps {
         // Manual corrections
         LATEX_HTML_CONVERSION_MAP.put("AA", "&Aring;"); // Overwritten by &angst; which is less supported
         LATEX_UNICODE_CONVERSION_MAP.put("AA", "Å"); // Overwritten by Ångstrom symbol
+
+        // Manual additions
+        // Support relax to the extent that it is simply removed
+        LATEX_HTML_CONVERSION_MAP.put("relax", "");
+        LATEX_UNICODE_CONVERSION_MAP.put("relax", "");
+
     }
 
     private static String cleanLaTeX(String escapedString) {

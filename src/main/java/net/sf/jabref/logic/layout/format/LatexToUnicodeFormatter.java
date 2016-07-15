@@ -90,33 +90,31 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
                     sb.append(c);
                 } else {
                     currentCommand.append(c);
-                    testCharCom: if ((currentCommand.length() == 1)
-                            && Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
+                    if ((currentCommand.length() == 1)
+                            && Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())
+                            && !(i >= (field.length() - 1))) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
-                        if (i >= (field.length() - 1)) {
-                            break testCharCom;
-                        }
 
                         String command = currentCommand.toString();
                         i++;
                         c = field.charAt(i);
-                        String combody;
+                        String commandBody;
                         if (c == '{') {
                             String part = StringUtil.getPart(field, i, false);
                             i += part.length();
-                            combody = part;
+                            commandBody = part;
                         } else {
-                            combody = field.substring(i, i + 1);
+                            commandBody = field.substring(i, i + 1);
                         }
-                        Object result = LatexToUnicodeFormatter.CHARS.get(command + combody);
+                        Object result = LatexToUnicodeFormatter.CHARS.get(command + commandBody);
 
                         if (result == null) {
                             // Use combining accents if argument is single character or empty
-                            if (combody.length() <= 1) {
+                            if (commandBody.length() <= 1) {
                                 String accent = LatexToUnicodeFormatter.ACCENTS.get(command);
                                 if (accent != null) {
-                                    sb.append(combody).append(accent);
+                                    sb.append(commandBody).append(accent);
                                 }
                             }
                         } else {
