@@ -24,16 +24,15 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.model.entry.EntryUtil;
 
 public class FieldNameLabel extends JLabel {
 
     public FieldNameLabel(String name) {
-        super(name, SwingConstants.LEFT);
+        super(FieldNameLabel.getFieldNameLabelText(name), SwingConstants.LEFT);
+
         setVerticalAlignment(SwingConstants.TOP);
-        //setFont(GUIGlobals.fieldNameFont);
         setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
-        //  setBorder(BorderFactory.createMatteBorder(1,0,0,0, Color.GRAY));
-        //setBorder(BorderFactory.createEtchedBorder());
         setBorder(BorderFactory.createEmptyBorder());
     }
 
@@ -46,5 +45,26 @@ public class FieldNameLabel extends JLabel {
                 RenderingHints.VALUE_RENDER_QUALITY);
         super.paintComponent(g2);
     }
+
+    private static String getFieldNameLabelText(String fieldName) {
+        // selected terms should be uppercase
+        if("isbn".equalsIgnoreCase(fieldName)) {
+            return " ISBN ";
+        } else if ("url".equalsIgnoreCase(fieldName)){
+            return " URL ";
+        } else if ("uri".equalsIgnoreCase(fieldName)) {
+            return " URI ";
+        } else if ("issn".equalsIgnoreCase(fieldName)) {
+            return " ISSN ";
+        } else if("doi".equalsIgnoreCase(fieldName)) {
+            return " DOI ";
+        } else if("isrn".equalsIgnoreCase(fieldName)) {
+            return " ISRN ";
+        }
+
+        // otherwise capitalize
+        return ' ' + EntryUtil.capitalizeFirst(fieldName) + ' ';
+    }
+
 
 }

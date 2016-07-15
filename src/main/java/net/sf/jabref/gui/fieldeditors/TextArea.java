@@ -27,7 +27,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
-import net.sf.jabref.model.entry.EntryUtil;
 
 /**
  * An implementation of the FieldEditor backed by a JTextArea.
@@ -62,7 +61,7 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
         setWrapStyleWord(true);
         this.fieldName = fieldName;
 
-        label = new FieldNameLabel(' ' + EntryUtil.capitalizeFirst(this.fieldName) + ' ');
+        label = new FieldNameLabel(fieldName);
         setBackground(GUIGlobals.validFieldBackgroundColor);
         setForeground(GUIGlobals.editorTextColor);
 

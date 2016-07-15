@@ -69,7 +69,6 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryUtil;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -100,7 +99,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         this.databaseContext = databaseContext;
         this.fieldName = fieldName;
         this.entryEditor = entryEditor;
-        label = new FieldNameLabel(" " + EntryUtil.capitalizeFirst(fieldName) + " ");
+        label = new FieldNameLabel(fieldName);
         tableModel = new FileListTableModel();
         setText(content);
         setModel(tableModel);
