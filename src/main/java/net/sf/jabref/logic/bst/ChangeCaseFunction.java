@@ -13,13 +13,13 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.bst;
+package net.sf.jabref.logic.bst;
 
 import java.util.Stack;
 
-import net.sf.jabref.bst.BibtexCaseChanger.FORMAT_MODE;
-import net.sf.jabref.bst.VM.BstEntry;
-import net.sf.jabref.bst.VM.BstFunction;
+import net.sf.jabref.logic.bst.BibtexCaseChanger.FORMAT_MODE;
+import net.sf.jabref.logic.bst.VM.BstEntry;
+import net.sf.jabref.logic.bst.VM.BstFunction;
 
 /**
  * From the Bibtex manual:
