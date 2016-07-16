@@ -45,7 +45,7 @@ public class CleanupPresetPanel {
     private void init() {
         cleanUpDOI = new JCheckBox(
                 Localization.lang("Move DOIs from note and URL field to DOI field and remove http prefix"));
-        cleanUpISSN = new JCheckBox(Localization.lang("Add possibly missing dash to ISSN"));
+        cleanUpISSN = new JCheckBox(Localization.lang("Reformat ISSN"));
         if (databaseContext.getMetaData().getDefaultFileDirectory().isPresent()) {
             cleanUpMovePDF = new JCheckBox(Localization.lang("Move linked files to default file directory %0",
                     databaseContext.getMetaData().getDefaultFileDirectory().get()));

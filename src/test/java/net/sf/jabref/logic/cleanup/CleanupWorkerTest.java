@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
@@ -165,36 +164,6 @@ public class CleanupWorkerTest {
         changeList.add(new FieldChange(entry, "doi", null, "10.1016/0001-8708(80)90035-3"));
         changeList.add(new FieldChange(entry, "url", "http://dx.doi.org/10.1016/0001-8708(80)90035-3", null));
         Assert.assertEquals(changeList, changes);
-    }
-
-    @Test
-    public void cleanupISSNReturnsCorrectISSN() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_ISSN);
-        BibEntry entry = new BibEntry();
-        entry.setField("issn", "0123-4567");
-
-        worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("0123-4567"), entry.getFieldOptional("issn"));
-    }
-
-    @Test
-    public void cleanupISSNAddsMissingDash() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_ISSN);
-        BibEntry entry = new BibEntry();
-        entry.setField("issn", "01234567");
-
-        worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("0123-4567"), entry.getFieldOptional("issn"));
-    }
-
-    @Test
-    public void cleanupISSNJunkStaysJunk() {
-        CleanupPreset preset = new CleanupPreset(CleanupPreset.CleanupStep.CLEAN_UP_ISSN);
-        BibEntry entry = new BibEntry();
-        entry.setField("issn", "Banana");
-
-        worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("Banana"), entry.getFieldOptional("issn"));
     }
 
     @Test
