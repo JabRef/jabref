@@ -28,7 +28,7 @@ import javax.swing.JTextField;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.remote.RemotePreferences;
@@ -82,7 +82,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
         JPanel p = new JPanel();
         p.add(useRemoteServer);
         p.add(remoteServerPort);
-        p.add(new HelpAction(HelpFiles.REMOTE).getHelpButton());
+        p.add(new HelpAction(HelpFile.REMOTE).getHelpButton());
         builder.append(p);
 
         // IEEE

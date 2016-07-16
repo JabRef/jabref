@@ -20,7 +20,7 @@ package net.sf.jabref.gui.help;
  *
  * @see <a href=https://github.com/JabRef/help.jabref.org>help.jabref.org@github</a>
  */
-public enum HelpFiles {
+public enum HelpFile {
     COMMAND_LINE(""),
     //Empty because it refers to the TOC/index
     CONTENTS(""),
@@ -70,7 +70,7 @@ public enum HelpFiles {
      *
      * @param pageName the URL path part of the help page
      */
-    HelpFiles(String pageName) {
+    HelpFile(String pageName) {
         this.pageName = pageName;
     }
 

@@ -49,7 +49,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
@@ -88,7 +88,7 @@ class StringDialog extends JDialog {
 
         sortStrings();
 
-        helpAction = new HelpAction(Localization.lang("Help"), HelpFiles.STRING_EDITOR);
+        helpAction = new HelpAction(Localization.lang("Help"), HelpFile.STRING_EDITOR);
 
         addWindowListener(new WindowAdapter() {
 

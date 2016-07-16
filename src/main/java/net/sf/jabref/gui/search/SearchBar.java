@@ -40,7 +40,7 @@ import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.WrapLayout;
 import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.util.component.JTextFieldWithUnfocusedText;
 import net.sf.jabref.gui.worker.AbstractWorker;
@@ -172,7 +172,7 @@ public class SearchBar extends JPanel {
         globalSearch.setEnabled(false);
         toolBar.add(globalSearch);
         toolBar.addSeparator();
-        toolBar.add(new HelpAction(HelpFiles.SEARCH));
+        toolBar.add(new HelpAction(HelpFile.SEARCH));
 
         this.add(toolBar);
         this.add(currentResults);

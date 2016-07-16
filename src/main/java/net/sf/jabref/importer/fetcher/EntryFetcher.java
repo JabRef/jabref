@@ -18,7 +18,7 @@ package net.sf.jabref.importer.fetcher;
 import javax.swing.JPanel;
 
 import net.sf.jabref.gui.ImportInspectionDialog;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 
@@ -68,9 +68,9 @@ public interface EntryFetcher extends ImportInspectionDialog.CallBack {
      * If given, a question mark is displayed in the side pane which leads to
      * the help page.
      *
-     * @return The {@link HelpFiles} enum constant for the help page
+     * @return The {@link HelpFile} enum constant for the help page
      */
-    HelpFiles getHelpPage();
+    HelpFile getHelpPage();
 
     /**
      * If this activeFetcher requires additional options, a panel for setting up these

@@ -40,7 +40,7 @@ import javax.swing.table.TableColumnModel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
@@ -141,7 +141,7 @@ public class ExportCustomizationDialog extends JDialog {
         JButton close = new JButton(Localization.lang("Close"));
         close.addActionListener(closeAction);
 
-        JButton help = new HelpAction(HelpFiles.CUSTOM_EXPORTS).getHelpButton();
+        JButton help = new HelpAction(HelpFile.CUSTOM_EXPORTS).getHelpButton();
 
         // Key bindings:
         JPanel main = new JPanel();

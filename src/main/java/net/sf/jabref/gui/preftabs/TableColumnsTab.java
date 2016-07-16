@@ -53,7 +53,7 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexSingleField;
 import net.sf.jabref.model.entry.InternalBibtexFields;
@@ -305,7 +305,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         /*** begin: special table columns and special fields ***/
 
         JButton helpButton = new HelpAction(Localization.lang("Help on special fields"),
-                HelpFiles.SPECIAL_FIELDS).getHelpButton();
+                HelpFile.SPECIAL_FIELDS).getHelpButton();
 
         rankingColumn = new JCheckBox(Localization.lang("Show rank"));
         qualityColumn = new JCheckBox(Localization.lang("Show quality"));

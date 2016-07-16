@@ -44,7 +44,7 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
@@ -442,7 +442,7 @@ class ContentSelectorDialog2 extends JDialog {
         bsb.addButton(apply);
         bsb.addButton(cancel);
         bsb.addRelatedGap();
-        bsb.addButton(new HelpAction(HelpFiles.CONTENT_SELECTOR).getHelpButton());
+        bsb.addButton(new HelpAction(HelpFile.CONTENT_SELECTOR).getHelpButton());
         bsb.addGlue();
 
         // Add panels to dialog:

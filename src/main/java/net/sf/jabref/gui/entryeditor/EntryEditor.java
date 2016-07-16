@@ -81,7 +81,7 @@ import net.sf.jabref.gui.fieldeditors.FileListEditor;
 import net.sf.jabref.gui.fieldeditors.JTextAreaWithHighlighting;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -214,7 +214,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         displayedBibEntryType = entry.getType();
 
-        helpAction = new HelpAction(HelpFiles.ENTRY_EDITOR, IconTheme.JabRefIcon.HELP.getIcon());
+        helpAction = new HelpAction(HelpFile.ENTRY_EDITOR, IconTheme.JabRefIcon.HELP.getIcon());
         closeAction = new CloseAction();
         generateKeyAction = new GenerateKeyAction();
         storeFieldAction = new StoreFieldAction();
