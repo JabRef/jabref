@@ -40,7 +40,8 @@ public class FileUtilTest {
         entry.setCiteKey("1234");
         entry.setField("title", "mytitle");
 
-        assertEquals("1234 - mytitle", FileUtil.createFileNameFromPattern(null, entry, mock(JournalAbbreviationLoader.class)));
+        assertEquals("1234 - mytitle",
+                FileUtil.createFileNameFromPattern(null, entry, mock(JournalAbbreviationLoader.class), Globals.prefs));
     }
 
     @Test
@@ -52,7 +53,8 @@ public class FileUtilTest {
         entry.setCiteKey("1234");
         entry.setField("title", "mytitle");
 
-        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, mock(JournalAbbreviationLoader.class)));
+        assertEquals("1234",
+                FileUtil.createFileNameFromPattern(null, entry, mock(JournalAbbreviationLoader.class), Globals.prefs));
     }
 
     @Test
@@ -128,5 +130,5 @@ public class FileUtilTest {
         assertEquals(uniqPath, result);
     }
 
-    
+
 }

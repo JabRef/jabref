@@ -1189,7 +1189,7 @@ public class XMPUtil {
                 // Read from pdf and write as BibTex
                 List<BibEntry> l = XMPUtil.readXMP(new File(args[0]));
 
-                BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), false);
+                BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(Globals.prefs), false);
 
                 for (BibEntry entry : l) {
                     StringWriter sw = new StringWriter();

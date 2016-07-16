@@ -104,7 +104,7 @@ public class AutoSetLinks {
                     String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                     result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
                 } else {
-                    result = FileUtil.findAssociatedFiles(entries, extensions, dirs);
+                    result = FileUtil.findAssociatedFiles(entries, extensions, dirs, Globals.prefs);
                 }
 
                 boolean foundAny = false;

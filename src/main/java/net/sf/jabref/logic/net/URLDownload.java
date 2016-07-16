@@ -36,8 +36,6 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.jabref.Globals;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -143,14 +141,10 @@ public class URLDownload {
     }
 
     /**
-     * Encoding will be determined from JabRefPreferences.DEFAULT_ENCODING
      *
      * @return the downloaded string
      * @throws IOException
      */
-    public String downloadToString() throws IOException {
-        return downloadToString(Globals.prefs.getDefaultEncoding());
-    }
 
     public String downloadToString(Charset encoding) throws IOException {
 

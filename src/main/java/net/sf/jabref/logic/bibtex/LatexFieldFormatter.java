@@ -45,28 +45,30 @@ public class LatexFieldFormatter {
     private final char valueDelimiterEndOfValue;
     private final List<String> doNotResolveStringsFors;
     private final int lineLength;
+    private final JabRefPreferences prefs;
 
     private final FieldContentParser parser;
 
 
-    public LatexFieldFormatter() {
-        this(true);
+    public LatexFieldFormatter(JabRefPreferences prefs) {
+        this(true, prefs);
     }
 
-    private LatexFieldFormatter(boolean neverFailOnHashes) {
+    private LatexFieldFormatter(boolean neverFailOnHashes, JabRefPreferences prefs) {
         this.neverFailOnHashes = neverFailOnHashes;
+        this.prefs = prefs;
 
-        this.resolveStringsAllFields = Globals.prefs.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS);
-        valueDelimiterStartOfValue = Globals.prefs.getValueDelimiters(0);
-        valueDelimiterEndOfValue = Globals.prefs.getValueDelimiters(1);
-        doNotResolveStringsFors = Globals.prefs.getStringList(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR);
-        lineLength = Globals.prefs.getInt(JabRefPreferences.LINE_LENGTH);
+        this.resolveStringsAllFields = prefs.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS);
+        valueDelimiterStartOfValue = prefs.getValueDelimiters(0);
+        valueDelimiterEndOfValue = prefs.getValueDelimiters(1);
+        doNotResolveStringsFors = prefs.getStringList(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR);
+        lineLength = prefs.getInt(JabRefPreferences.LINE_LENGTH);
 
-        parser = new FieldContentParser();
+        parser = new FieldContentParser(prefs);
     }
 
-    public static LatexFieldFormatter buildIgnoreHashes() {
-        return new LatexFieldFormatter(true);
+    public static LatexFieldFormatter buildIgnoreHashes(JabRefPreferences prefs) {
+        return new LatexFieldFormatter(true, prefs);
     }
 
     /**

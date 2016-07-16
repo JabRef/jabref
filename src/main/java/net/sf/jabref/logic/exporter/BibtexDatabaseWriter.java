@@ -109,7 +109,8 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
                 getWriter().write("{}");
             } else {
                 try {
-                    String formatted = new LatexFieldFormatter().format(bibtexString.getContent(), LatexFieldFormatter.BIBTEX_STRING);
+                    String formatted = new LatexFieldFormatter(Globals.prefs).format(bibtexString.getContent(),
+                            LatexFieldFormatter.BIBTEX_STRING);
                     getWriter().write(formatted);
                 } catch (IllegalArgumentException ex) {
                     throw new IllegalArgumentException(
@@ -154,7 +155,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
 
     @Override
     protected void writeEntry(BibEntry entry, BibDatabaseMode mode, Boolean isReformatFile) throws SaveException {
-        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(Globals.prefs), true);
         try {
             bibtexEntryWriter.write(entry, getWriter(), mode, isReformatFile);
         } catch (IOException e) {

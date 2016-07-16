@@ -592,7 +592,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     public static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
-        LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes();
+        LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes(Globals.prefs);
         new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter, type);
 
         return stringWriter.getBuffer().toString();
@@ -813,7 +813,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 String newValue = newEntry.getField(field);
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
-                    new LatexFieldFormatter().format(newValue, field);
+                    new LatexFieldFormatter(Globals.prefs).format(newValue, field);
 
                     compound.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
                     entry.setField(field, newValue);
@@ -1167,7 +1167,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         // properly formatted. If that happens, the field
                         // is not stored and the textarea turns red.
                         if (toSet != null) {
-                            new LatexFieldFormatter().format(toSet, fieldEditor.getFieldName());
+                            new LatexFieldFormatter(Globals.prefs).format(toSet, fieldEditor.getFieldName());
                         }
 
                         String oldValue = entry.getField(fieldEditor.getFieldName());

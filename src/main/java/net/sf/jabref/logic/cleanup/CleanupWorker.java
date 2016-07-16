@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
@@ -28,11 +29,15 @@ public class CleanupWorker {
 
     private final BibDatabaseContext databaseContext;
     private final JournalAbbreviationLoader repositoryLoader;
+    private final JabRefPreferences prefs;
     private int unsuccessfulRenames;
 
-    public CleanupWorker(BibDatabaseContext databaseContext, JournalAbbreviationLoader repositoryLoader) {
+
+    public CleanupWorker(BibDatabaseContext databaseContext, JournalAbbreviationLoader repositoryLoader,
+            JabRefPreferences prefs) {
         this.databaseContext = databaseContext;
         this.repositoryLoader = repositoryLoader;
+        this.prefs = prefs;
     }
 
     public int getUnsuccessfulRenames() {
@@ -73,7 +78,7 @@ public class CleanupWorker {
         }
         if (preset.isRenamePDF()) {
             RenamePdfCleanup cleaner = new RenamePdfCleanup(preset.isRenamePdfOnlyRelativePaths(), databaseContext,
-                    repositoryLoader);
+                    repositoryLoader, prefs);
             jobs.add(cleaner);
             unsuccessfulRenames += cleaner.getUnsuccessfulRenames();
         }

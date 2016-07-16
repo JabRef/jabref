@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
@@ -79,7 +80,7 @@ public class SendAsEMailAction extends AbstractWorker {
         List<BibEntry> bes = panel.getSelectedEntries();
 
         // write the entries using sw, which is used later to form the email content
-        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), true);
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(Globals.prefs), true);
 
         for (BibEntry entry : bes) {
             try {

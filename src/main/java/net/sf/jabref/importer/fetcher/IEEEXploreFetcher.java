@@ -156,7 +156,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
 
             //fetch the raw Bibtex results from IEEEXplore
-            String bibtexPage = new URLDownload(createBibtexQueryURL(searchResultsJson)).downloadToString();
+            String bibtexPage = new URLDownload(createBibtexQueryURL(searchResultsJson))
+                    .downloadToString(Globals.prefs.getDefaultEncoding());
 
             //preprocess the result (eg. convert HTML escaped characters to latex and do other formatting not performed by BibtexParser)
             bibtexPage = preprocessBibtexResultsPage(bibtexPage);

@@ -266,7 +266,7 @@ class StringDialog extends JDialog {
 
                 if (!value.equals(subject.getContent())) {
                     try {
-                        new LatexFieldFormatter().format((String) value, "__dummy");
+                        new LatexFieldFormatter(Globals.prefs).format((String) value, "__dummy");
                     } catch (IllegalArgumentException ex) {
                         return;
                     }

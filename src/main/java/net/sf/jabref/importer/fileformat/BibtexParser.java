@@ -70,7 +70,7 @@ public class BibtexParser {
     private Map<String, EntryType> entryTypes;
     private boolean eof;
     private int line = 1;
-    private final FieldContentParser fieldContentParser = new FieldContentParser();
+    private final FieldContentParser fieldContentParser = new FieldContentParser(Globals.prefs);
     private ParserResult parserResult;
     private static final Integer LOOKAHEAD = 64;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();

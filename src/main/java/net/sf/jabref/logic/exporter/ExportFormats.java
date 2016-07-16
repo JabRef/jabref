@@ -20,7 +20,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 
 public class ExportFormats {
@@ -31,7 +31,7 @@ public class ExportFormats {
     public static int entryNumber;
 
 
-    public static void initAllExports() {
+    public static void initAllExports(JabRefPreferences prefs) {
 
         ExportFormats.EXPORT_FORMATS.clear();
 
@@ -66,7 +66,7 @@ public class ExportFormats {
         ExportFormats.putFormat(new ModsExportFormat());
 
         // Now add custom export formats
-        Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats();
+        Map<String, ExportFormat> customFormats = prefs.customExports.getCustomExportFormats();
         for (IExportFormat format : customFormats.values()) {
             ExportFormats.putFormat(format);
         }

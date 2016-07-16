@@ -390,7 +390,7 @@ public class ArgumentProcessor {
         try {
             Globals.prefs.importPreferences(cli.getPreferencesImport());
             CustomEntryTypesManager.loadCustomEntryTypes(Globals.prefs);
-            ExportFormats.initAllExports();
+            ExportFormats.initAllExports(Globals.prefs);
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }

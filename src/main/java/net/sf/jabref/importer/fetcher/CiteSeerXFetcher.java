@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 
 import javax.swing.JPanel;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
@@ -127,7 +128,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
     }
 
     private static String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
-        String cont = new URLDownload(urlQuery).downloadToString();
+        String cont = new URLDownload(urlQuery).downloadToString(Globals.prefs.getDefaultEncoding());
         Matcher m = CiteSeerXFetcher.CITE_LINK_PATTERN.matcher(cont);
         while (m.find()) {
             ids.add(CiteSeerXFetcher.URL_START + m.group(1));

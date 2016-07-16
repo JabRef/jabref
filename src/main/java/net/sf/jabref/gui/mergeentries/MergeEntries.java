@@ -452,7 +452,7 @@ public class MergeEntries {
         // Update the BibTeX source view
         StringWriter writer = new StringWriter();
         try {
-            new BibEntryWriter(new LatexFieldFormatter(), false).write(mergedEntry, writer, databaseType);
+            new BibEntryWriter(new LatexFieldFormatter(Globals.prefs), false).write(mergedEntry, writer, databaseType);
         } catch (IOException ex) {
             LOGGER.error("Error in entry", ex);
         }

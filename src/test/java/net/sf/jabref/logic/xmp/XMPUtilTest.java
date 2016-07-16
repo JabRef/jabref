@@ -141,7 +141,7 @@ public class XMPUtilTest {
 
     public static String bibtexEntry2BibtexString(BibEntry e) throws IOException {
         StringWriter sw = new StringWriter();
-        new BibEntryWriter(new LatexFieldFormatter(), false).write(e, sw, BibDatabaseMode.BIBTEX);
+        new BibEntryWriter(new LatexFieldFormatter(Globals.prefs), false).write(e, sw, BibDatabaseMode.BIBTEX);
         return sw.getBuffer().toString();
     }
 
