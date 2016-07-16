@@ -105,7 +105,7 @@ public class DBMSProcessorTest {
     }
 
     @Test
-    public void testUpdateEntry() {
+    public void testUpdateField() {
         BibEntry bibEntry = getBibEntryExample();
         dbmsProcessor.insertEntry(bibEntry);
 
@@ -115,20 +115,19 @@ public class DBMSProcessorTest {
                 Assert.assertTrue(resultSet.next());
                 Assert.assertEquals(bibEntry.getType(), resultSet.getString("ENTRYTYPE"));
                 Assert.assertEquals(bibEntry.getFieldOptional("author").get(), resultSet.getString("AUTHOR"));
-                Assert.assertEquals(bibEntry.getFieldOptional("title").get(), resultSet.getString("TITLE"));
                 Assert.assertFalse(resultSet.next());
             }
 
             bibEntry.setType("booklet");
             bibEntry.setField("author", "Brad L and Gilson, Kent L");
-            bibEntry.setField("title", "The nano multiplexer");
-            dbmsProcessor.updateEntry(bibEntry);
+
+            dbmsProcessor.updateField(bibEntry, BibEntry.TYPE_HEADER, "booklet");
+            dbmsProcessor.updateField(bibEntry, "author", "Brad L and Gilson, Kent L");
 
             try (ResultSet resultSet = selectFrom(DBMSProcessor.ENTRY)) {
                 Assert.assertTrue(resultSet.next());
                 Assert.assertEquals(bibEntry.getType(), resultSet.getString("ENTRYTYPE"));
                 Assert.assertEquals(bibEntry.getFieldOptional("author").get(), resultSet.getString("AUTHOR"));
-                Assert.assertEquals(bibEntry.getFieldOptional("title").get(), resultSet.getString("TITLE"));
                 Assert.assertFalse(resultSet.next());
             }
 

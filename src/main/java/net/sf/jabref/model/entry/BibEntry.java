@@ -67,7 +67,7 @@ public class BibEntry implements Cloneable {
     /*
      * Map to store the words in every field
      */
-    private Map<String, Set<String>> fieldsAsWords = new HashMap<>();
+    private final Map<String, Set<String>> fieldsAsWords = new HashMap<>();
 
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit;
@@ -408,6 +408,17 @@ public class BibEntry implements Cloneable {
      * @param name The field to clear.
      */
     public Optional<FieldChange> clearField(String name) {
+        return clearField(name, EntryEventSource.LOCAL);
+    }
+
+    /**
+     * Remove the mapping for the field name, and notify listeners about
+     * the change including the {@link EntryEventSource}.
+     *
+     * @param name The field to clear.
+     * @param eventSource the source a new {@link FieldChangedEvent} should be posten from.
+     */
+    public Optional<FieldChange> clearField(String name, EntryEventSource eventSource) {
         String fieldName = toLowerCase(name);
 
         if (BibEntry.ID_FIELD.equals(fieldName)) {
@@ -424,7 +435,7 @@ public class BibEntry implements Cloneable {
         fields.remove(fieldName);
         fieldsAsWords.remove(fieldName);
         FieldChange change = new FieldChange(this, fieldName, oldValue.get(), null);
-        eventBus.post(new FieldChangedEvent(change));
+        eventBus.post(new FieldChangedEvent(change, eventSource));
         return Optional.of(change);
     }
 

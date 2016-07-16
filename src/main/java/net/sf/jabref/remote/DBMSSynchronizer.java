@@ -32,6 +32,7 @@ import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.exporter.BibDatabaseWriter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -90,8 +91,15 @@ public class DBMSSynchronizer {
         // In this case DBSynchronizer should not try to update the bibEntry entry again (but it would not harm).
         if (isInEventLocation(event) && checkCurrentConnection()) {
             synchronizeLocalMetaData();
-            BibDatabaseWriter.applySaveActions(event.getBibEntry(), metaData);
-            dbmsProcessor.updateEntry(event.getBibEntry());
+
+            List<FieldChange> changes = BibDatabaseWriter.applySaveActions(event.getBibEntry(), metaData);
+            for (FieldChange change : changes) {
+                dbmsProcessor.updateField(change.getEntry(), change.getField(), change.getNewValue());
+            }
+
+            if (changes.isEmpty()) { // If no FieldChanges were applied, update the field usually.
+                dbmsProcessor.updateField(event.getBibEntry(), event.getFieldName(), event.getNewValue());
+            }
             synchronizeLocalDatabase(); // Pull remote changes for the case that there where some
         }
     }
@@ -174,9 +182,20 @@ public class DBMSSynchronizer {
                 BibEntry localEntry = localEntries.get(j);
                 if (remoteEntry.getRemoteId() == localEntry.getRemoteId()) {
                     match = true;
-                    Set<String> fields = remoteEntry.getFieldNames();
-                    for (String field : fields) {
-                        localEntry.setField(field, remoteEntry.getFieldOptional(field), EntryEventSource.REMOTE); // Should not reach the listeners above.
+                    Set<String> remoteEntryFields = remoteEntry.getFieldNames();
+
+                    // update fields
+                    for (String field : remoteEntryFields) {
+                        localEntry.setField(field, remoteEntry.getFieldOptional(field),
+                                EntryEventSource.REMOTE); // Should not reach the listeners above.
+                    }
+
+                    Set<String> redundantLocalEntryFields = localEntry.getFieldNames();
+                    redundantLocalEntryFields.removeAll(remoteEntryFields);
+
+                    // remove not existing fields
+                    for (String redundantField : redundantLocalEntryFields) {
+                        localEntry.clearField(redundantField, EntryEventSource.REMOTE); // Should not reach the listeners above.
                     }
                 }
             }
@@ -221,8 +240,10 @@ public class DBMSSynchronizer {
         }
 
         for (BibEntry entry : bibDatabase.getEntries()) {
-            BibDatabaseWriter.applySaveActions(entry, metaData);
-            dbmsProcessor.updateEntry(entry);
+            List<FieldChange> changes = BibDatabaseWriter.applySaveActions(entry, metaData);
+            for (FieldChange change : changes) {
+                dbmsProcessor.updateField(change.getEntry(), change.getField(), change.getNewValue());
+            }
         }
     }
 

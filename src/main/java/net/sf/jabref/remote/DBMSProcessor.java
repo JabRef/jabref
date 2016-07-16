@@ -22,7 +22,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -189,44 +188,26 @@ public class DBMSProcessor {
     }
 
     /**
-     * Updates the whole bibEntry remotely.
+     * Updates the given field of an {@link BibEntry} remotely.
      *
      * @param bibEntry {@link BibEntry} affected by changes
      */
-    public void updateEntry(BibEntry bibEntry) {
+    public void updateField(BibEntry bibEntry, String field, String newValue) {
         prepareEntryTableStructure(bibEntry);
-
         StringBuilder query = new StringBuilder();
 
+        field = field.equals(BibEntry.TYPE_HEADER) ? ENTRY_ENTRYTYPE : field;
         query.append("UPDATE ");
         query.append(escape(ENTRY));
         query.append(" SET ");
-        query.append(escape(ENTRY_ENTRYTYPE));
+        query.append(escape(field.toUpperCase(Locale.ENGLISH)));
         query.append(" = ");
-        query.append(escapeValue(bibEntry.getType()));
-
-        Optional<BibEntry> remoteBibEntry = getRemoteEntry(bibEntry.getRemoteId());
-        Set<String> fields = bibEntry.getFieldNames();
-        Set<String> emptyFields = remoteBibEntry.isPresent() ? remoteBibEntry.get().getFieldNames() : new HashSet<>();
-        emptyFields.removeAll(fields); // emptyFields now contains only fields which should be null.
-
-        for (String emptyField : emptyFields) {
-            query.append(", ");
-            query.append(escape(emptyField.toUpperCase(Locale.ENGLISH)));
-            query.append(" = NULL");
-        }
-
-        for (String field : fields) {
-            query.append(", ");
-            query.append(escape(field.toUpperCase(Locale.ENGLISH)));
-            query.append(" = ");
-            query.append(escapeValue(bibEntry.getFieldOptional(field)));
-        }
-
+        query.append(escapeValue(newValue));
         query.append(" WHERE ");
         query.append(escape(ENTRY_REMOTE_ID));
         query.append(" = ");
         query.append(bibEntry.getRemoteId());
+
         dbmsHelper.executeUpdate(query.toString());
     }
 
