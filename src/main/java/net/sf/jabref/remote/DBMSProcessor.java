@@ -196,7 +196,10 @@ public class DBMSProcessor {
         prepareEntryTableStructure(bibEntry);
         StringBuilder query = new StringBuilder();
 
-        field = field.equals(BibEntry.TYPE_HEADER) ? ENTRY_ENTRYTYPE : field;
+        if (field.equals(BibEntry.TYPE_HEADER)) {
+            field = ENTRY_ENTRYTYPE;
+        }
+
         query.append("UPDATE ");
         query.append(escape(ENTRY));
         query.append(" SET ");
@@ -382,7 +385,18 @@ public class DBMSProcessor {
      * @param id remoteId of {@link BibEntry}
      */
     private ResultSet selectFromEntryTable(int id) throws SQLException {
-        return dbmsHelper.query("SELECT * FROM " + escape(ENTRY) + " WHERE " + escape(ENTRY_REMOTE_ID) + " = " + id);
+        StringBuilder query = new StringBuilder();
+
+        query.append("SELECT * FROM ");
+        query.append(escape(ENTRY));
+        query.append(" WHERE ");
+        query.append(escape(ENTRY_REMOTE_ID));
+        query.append(" = ");
+        query.append(id);
+        query.append(" ORDER BY ");
+        query.append(escape(ENTRY_REMOTE_ID));
+
+        return dbmsHelper.query(query.toString());
     }
 
     /**
