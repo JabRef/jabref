@@ -139,12 +139,12 @@ public class MedlineImporter extends ImportFormat {
 
         List<BibEntry> bibItems = new ArrayList<>();
 
+        //skip lines, till we reach the first element
         int toSkip = SkipReaderToFirstElement(reader);
-        if (toSkip > -1) {
-            for (int i = 0; i < toSkip; i++) {
-                reader.readLine();
-            }
+        for (int i = 0; i < toSkip; i++) {
+            reader.readLine();
         }
+
         try {
             JAXBContext context = JAXBContext.newInstance("net.sf.jabref.importer.fileformat.medline");
             Unmarshaller unmarshaller = context.createUnmarshaller();
@@ -183,6 +183,12 @@ public class MedlineImporter extends ImportFormat {
         return new ParserResult(bibItems);
     }
 
+    /**
+     * reads line of the given reader and looks, how many lines has to be skipped till we reach the first element
+     * that is pubmedarticle, pubmedarticleset, pubmedbookarticle or pubmedbookarticleset
+     * @param reader
+     * @return how many lines have to be skipped till the first element is reached
+     */
     private int SkipReaderToFirstElement(BufferedReader reader) {
         try {
             int BUFFER_SIZE = 1000;
