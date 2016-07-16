@@ -38,13 +38,13 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.SaveOrderConfigDisplay;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.cleanup.FieldFormatterCleanupsPanel;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.config.SaveOrderConfig;
+import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 

@@ -16,7 +16,7 @@
 package net.sf.jabref.cli;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.exporter.ExportFormats;
+import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.l10n.Localization;
 
 import org.apache.commons.cli.CommandLine;

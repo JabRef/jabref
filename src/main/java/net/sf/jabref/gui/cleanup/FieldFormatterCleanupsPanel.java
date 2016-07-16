@@ -41,8 +41,8 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 import net.sf.jabref.MetaData;
-import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;

@@ -20,7 +20,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.exporter.FieldFormatterCleanups;
+import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 
 public class CleanupPreset {
 

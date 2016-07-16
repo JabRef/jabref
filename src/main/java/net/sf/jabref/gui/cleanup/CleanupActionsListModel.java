@@ -8,8 +8,8 @@ import javax.swing.ListModel;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 
 public class CleanupActionsListModel implements ListModel<FieldFormatterCleanup> {
 

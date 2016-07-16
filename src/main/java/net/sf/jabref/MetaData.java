@@ -31,9 +31,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.Vector;
 
-import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.config.SaveOrderConfig;
+import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;

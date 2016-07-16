@@ -41,12 +41,12 @@ import net.sf.jabref.JabRefException;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.JabRefPreferencesFilter;
 import net.sf.jabref.JabRefPreferencesFilterDialog;
-import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.gui.maintable.MainTable;
+import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.l10n.Localization;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;

@@ -74,11 +74,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.HighlightMatchingGroupPreferences;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.exporter.AutoSaveManager;
-import net.sf.jabref.exporter.ExportCustomizationDialog;
-import net.sf.jabref.exporter.ExportFormats;
-import net.sf.jabref.exporter.SaveAllAction;
-import net.sf.jabref.exporter.SaveDatabaseAction;
 import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.external.push.PushToApplicationButton;
 import net.sf.jabref.external.push.PushToApplications;
@@ -96,6 +91,11 @@ import net.sf.jabref.gui.actions.OpenBrowserAction;
 import net.sf.jabref.gui.actions.SearchForUpdateAction;
 import net.sf.jabref.gui.actions.SortTabsAction;
 import net.sf.jabref.gui.dbproperties.DatabasePropertiesDialog;
+import net.sf.jabref.gui.exporter.AutoSaveManager;
+import net.sf.jabref.gui.exporter.ExportAction;
+import net.sf.jabref.gui.exporter.ExportCustomizationDialog;
+import net.sf.jabref.gui.exporter.SaveAllAction;
+import net.sf.jabref.gui.exporter.SaveDatabaseAction;
 import net.sf.jabref.gui.groups.EntryTableTransferHandler;
 import net.sf.jabref.gui.groups.GroupSelector;
 import net.sf.jabref.gui.help.AboutAction;
@@ -239,8 +239,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction saveSelectedAsPlain = new GeneralAction(Actions.SAVE_SELECTED_AS_PLAIN,
             Localization.menuTitle("Save selected as plain BibTeX..."),
             Localization.lang("Save selected as plain BibTeX..."));
-    private final AbstractAction exportAll = ExportFormats.getExportAction(this, false);
-    private final AbstractAction exportSelected = ExportFormats.getExportAction(this, true);
+    private final AbstractAction exportAll = ExportAction.getExportAction(this, false);
+    private final AbstractAction exportSelected = ExportAction.getExportAction(this, true);
     private final AbstractAction importCurrent = ImportFormats.getImportAction(this, false);
     private final AbstractAction importNew = ImportFormats.getImportAction(this, true);
     public final AbstractAction nextTab = new ChangeTabAction(true);

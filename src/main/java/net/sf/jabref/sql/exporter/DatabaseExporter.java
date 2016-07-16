@@ -30,9 +30,9 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.exporter.BibDatabaseWriter;
-import net.sf.jabref.exporter.SavePreferences;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.logic.exporter.BibDatabaseWriter;
+import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.groups.AbstractGroup;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.ExplicitGroup;
