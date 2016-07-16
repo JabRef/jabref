@@ -62,6 +62,14 @@ public class SaveException extends Exception {
         this.entry = entry;
     }
 
+    public SaveException(Exception base) {
+        this(base.getMessage(), base.getLocalizedMessage());
+    }
+
+    public SaveException(Exception base, BibEntry entry) {
+        this(base.getMessage(), base.getLocalizedMessage(), entry);
+    }
+
     public int getStatus() {
         return status;
     }

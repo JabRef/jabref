@@ -44,7 +44,7 @@ public class MsBibExportFormatTest {
     }
 
     @Test
-    public final void testPerformExportWithNoEntry() throws IOException {
+    public final void testPerformExportWithNoEntry() throws IOException, SaveException {
         List<BibEntry> entries = Collections.emptyList();
         String tempFileName = tempFile.getCanonicalPath();
         msBibExportFormat.performExport(databaseContext, tempFileName, charset, entries);

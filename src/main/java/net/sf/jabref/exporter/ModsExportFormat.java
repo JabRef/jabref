@@ -15,10 +15,10 @@
 */
 package net.sf.jabref.exporter;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,14 +45,14 @@ class ModsExportFormat extends ExportFormat {
 
     @Override
     public void performExport(final BibDatabaseContext databaseContext, final String file,
-            final Charset encoding, List<BibEntry> entries) throws IOException {
+            final Charset encoding, List<BibEntry> entries) throws SaveException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (entries.isEmpty()) { // Only export if entries exist
             return;
         }
 
-        SaveSession ss = new SaveSession(StandardCharsets.UTF_8, false);
+        SaveSession ss = new FileSaveSession(StandardCharsets.UTF_8, false);
         try (VerifyingWriter ps = ss.getWriter()) {
             MODSDatabase md = new MODSDatabase(databaseContext.getDatabase(), entries);
 
@@ -65,9 +65,9 @@ class ModsExportFormat extends ExportFormat {
             } catch (TransformerException | IllegalArgumentException | TransformerFactoryConfigurationError e) {
                 throw new Error(e);
             }
-            finalizeSaveSession(ss, new File(file));
-        } catch (SaveException | IOException ex) {
-            throw new IOException(ex.getMessage());
+            finalizeSaveSession(ss, Paths.get(file));
+        } catch (IOException ex) {
+            throw new SaveException(ex);
         }
     }
 }

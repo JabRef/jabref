@@ -20,7 +20,9 @@ import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.exporter.BibDatabaseWriter;
+import net.sf.jabref.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.exporter.ExportFormats;
+import net.sf.jabref.exporter.FileSaveSession;
 import net.sf.jabref.exporter.IExportFormat;
 import net.sf.jabref.exporter.SaveException;
 import net.sf.jabref.exporter.SavePreferences;
@@ -286,7 +288,7 @@ public class ArgumentProcessor {
                 try {
                     System.out.println(Localization.lang("Saving") + ": " + subName);
                     SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
-                    BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+                    BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
                     Defaults defaults = new Defaults(BibDatabaseMode
                             .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
                     SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults),
@@ -300,7 +302,7 @@ public class ArgumentProcessor {
                                         session.getEncoding().displayName())
                                 + " " + session.getWriter().getProblemCharacters());
                     }
-                    session.commit(new File(subName));
+                    session.commit(subName);
                 } catch (SaveException ex) {
                     System.err.println(
                             Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());
@@ -330,7 +332,7 @@ public class ArgumentProcessor {
                         SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
                         Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(
                                 Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-                        BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+                        BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
                         SaveSession session = databaseWriter.saveDatabase(
                                 new BibDatabaseContext(pr.getDatabase(), pr.getMetaData(), defaults), prefs);
 
@@ -342,7 +344,7 @@ public class ArgumentProcessor {
                                             session.getEncoding().displayName())
                                     + " " + session.getWriter().getProblemCharacters());
                         }
-                        session.commit(new File(data[0]));
+                        session.commit(data[0]);
                     } catch (SaveException ex) {
                         System.err.println(
                                 Localization.lang("Could not save file.") + "\n" + ex.getLocalizedMessage());

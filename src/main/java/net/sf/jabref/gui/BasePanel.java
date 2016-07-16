@@ -63,8 +63,9 @@ import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.event.EntryAddedEvent;
 import net.sf.jabref.event.EntryChangedEvent;
-import net.sf.jabref.exporter.BibDatabaseWriter;
+import net.sf.jabref.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.exporter.ExportToClipboardAction;
+import net.sf.jabref.exporter.FileSaveSession;
 import net.sf.jabref.exporter.SaveDatabaseAction;
 import net.sf.jabref.exporter.SaveException;
 import net.sf.jabref.exporter.SavePreferences;
@@ -1104,9 +1105,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(enc)
                     .withSaveType(saveType);
-            BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
             if (selectedOnly) {
-                session = databaseWriter.savePartOfDatabase(bibDatabaseContext, prefs, mainTable.getSelectedEntries());
+                session = databaseWriter.savePartOfDatabase(bibDatabaseContext, mainTable.getSelectedEntries(), prefs);
             } else {
                 session = databaseWriter.saveDatabase(bibDatabaseContext, prefs);
             }
@@ -1173,7 +1174,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
         if (commit) {
-            session.commit(file);
+            session.commit(file.toPath());
             this.bibDatabaseContext.getMetaData().setEncoding(enc); // Make sure to remember which encoding we used.
         } else {
             session.cancel();
@@ -2170,7 +2171,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         // Test: running scan automatically in background
         if ((getBibDatabaseContext().getDatabaseFile() != null)
-                && !FileBasedLock.waitForFileLock(getBibDatabaseContext().getDatabaseFile(), 10)) {
+                && !FileBasedLock.waitForFileLock(getBibDatabaseContext().getDatabaseFile().toPath(), 10)) {
             // The file is locked even after the maximum wait. Do nothing.
             LOGGER.error("File updated externally, but change scan failed because the file is locked.");
             // Perturb the stored timestamp so successive checks are made:

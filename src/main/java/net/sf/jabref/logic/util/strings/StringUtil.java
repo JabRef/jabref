@@ -653,4 +653,7 @@ public class StringUtil {
 
     }
 
+    public static boolean isNullOrEmpty(String toTest) {
+        return (toTest == null || toTest.isEmpty());
+    }
 }

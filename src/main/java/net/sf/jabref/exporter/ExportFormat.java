@@ -24,6 +24,7 @@ import java.io.Reader;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -186,19 +187,19 @@ public class ExportFormat implements IExportFormat {
         if (entries.isEmpty()) { // Do not export if no entries to export -- avoids exports with only template text
             return;
         }
-        File outFile = new File(file);
+        Path outFile = Paths.get(file);
         SaveSession ss = null;
         if (this.encoding != null) {
             try {
-                ss = new SaveSession(this.encoding, false);
-            } catch (IOException ex) {
+                ss = new FileSaveSession(this.encoding, false);
+            } catch (SaveException ex) {
                 // Perhaps the overriding encoding doesn't work?
                 // We will fall back on the default encoding.
                 LOGGER.warn("Can not get save session.", ex);
             }
         }
         if (ss == null) {
-            ss = new SaveSession(encoding, false);
+            ss = new FileSaveSession(encoding, false);
         }
 
         try (VerifyingWriter ps = ss.getWriter()) {
@@ -369,7 +370,7 @@ public class ExportFormat implements IExportFormat {
         return fileFilter;
     }
 
-    public void finalizeSaveSession(final SaveSession ss, File file) throws SaveException, IOException {
+    public void finalizeSaveSession(final SaveSession ss, Path file) throws SaveException, IOException {
         ss.getWriter().flush();
         ss.getWriter().close();
 

@@ -96,9 +96,9 @@ public class AutoSaveManager {
                     .withMakeBackup(false)
                     .withEncoding(panel.getBibDatabaseContext().getMetaData().getEncoding());
 
-            BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
             SaveSession ss = databaseWriter.saveDatabase(panel.getBibDatabaseContext(), prefs);
-            ss.commit(backupFile);
+            ss.commit(backupFile.toPath());
         } catch (SaveException e) {
             LOGGER.error("Problem with automatic save", e);
             return false;

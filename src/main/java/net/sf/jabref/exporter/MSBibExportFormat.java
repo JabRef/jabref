@@ -15,10 +15,10 @@
 */
 package net.sf.jabref.exporter;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 
@@ -45,7 +45,7 @@ class MSBibExportFormat extends ExportFormat {
 
     @Override
     public void performExport(final BibDatabaseContext databaseContext, final String file,
-            final Charset encoding, List<BibEntry> entries) throws IOException {
+            final Charset encoding, List<BibEntry> entries) throws SaveException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
 
@@ -53,7 +53,7 @@ class MSBibExportFormat extends ExportFormat {
             return;
         }
         // forcing to use UTF8 output format for some problems with xml export in other encodings
-        SaveSession session = new SaveSession(StandardCharsets.UTF_8, false);
+        SaveSession session = new FileSaveSession(StandardCharsets.UTF_8, false);
         MSBibDatabase msBibDatabase = new MSBibDatabase(databaseContext.getDatabase(), entries);
 
         try (VerifyingWriter ps = session.getWriter()) {
@@ -66,9 +66,9 @@ class MSBibExportFormat extends ExportFormat {
             } catch (TransformerException | IllegalArgumentException | TransformerFactoryConfigurationError e) {
                 throw new Error(e);
             }
-            finalizeSaveSession(session, new File(file));
-        } catch (SaveException | IOException ex) {
-            throw new IOException(ex.getMessage());
+            finalizeSaveSession(session, Paths.get(file));
+        } catch (IOException ex) {
+            throw new SaveException(ex);
         }
     }
 }
