@@ -69,7 +69,7 @@ public class MoveFilesCleanupTest {
     public void movesFileFromSubfolderMultiple() throws IOException {
         File subfolder = bibFolder.newFolder();
         File fileBefore = new File(subfolder, "test.pdf");
-        assertTrue(fileBefore.createNewFile());;
+        assertTrue(fileBefore.createNewFile());
         assertTrue(fileBefore.exists());
 
         BibEntry entry = new BibEntry();

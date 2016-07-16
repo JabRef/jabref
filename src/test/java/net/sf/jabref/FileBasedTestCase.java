@@ -1,15 +1,16 @@
 package net.sf.jabref;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.After;
-import org.junit.Assert;
 import org.junit.Before;
+import static org.junit.Assert.assertTrue;
 
 /**
  * A base class for Testing in JabRef that comes along with some useful
@@ -19,7 +20,7 @@ public class FileBasedTestCase {
 
     protected BibDatabase database;
     protected BibEntry entry;
-    protected File root;
+    protected Path rootDir;
 
     private String oldPdfDirectory;
     private boolean oldUseRegExp;
@@ -39,78 +40,55 @@ public class FileBasedTestCase {
         database = BibtexTestData.getBibtexDatabase();
         entry = database.getEntries().iterator().next();
 
-        root = FileBasedTestHelper.createTempDir("UtilFindFileTest");
+        rootDir = Files.createTempDirectory("UtilFindFileTest");
 
-        Assert.assertNotNull(root);
+        Globals.prefs.put("pdfDirectory", rootDir.toAbsolutePath().toString());
 
-        Globals.prefs.put("pdfDirectory", root.getPath());
+        Path subDir = Files.createDirectory(rootDir.resolve("Organization Science"));
+        Path pdfSubDir = Files.createDirectory(rootDir.resolve("pdfs"));
 
-        File subDir1 = new File(root, "Organization Science");
-        Assert.assertTrue(subDir1.mkdir());
+        assertTrue(Files.exists(Files.createFile(subDir.resolve("HipKro03 - Hello.pdf"))));
+        assertTrue(Files.exists(Files.createFile(rootDir.resolve("HipKro03 - Hello.pdf"))));
 
-        File pdf1 = new File(subDir1, "HipKro03 - Hello.pdf");
-        Assert.assertTrue(pdf1.createNewFile());
+        Path pdfSubSubDir = Files.createDirectory(pdfSubDir.resolve("sub"));
+        assertTrue(Files.exists(Files.createFile(pdfSubSubDir.resolve("HipKro03-sub.pdf"))));
 
-        File pdf1a = new File(root, "HipKro03 - Hello.pdf");
-        Assert.assertTrue(pdf1a.createNewFile());
+        Files.createDirectory(rootDir.resolve("2002"));
+        Path dir2003 = Files.createDirectory(rootDir.resolve("2003"));
+        assertTrue(Files.exists(Files.createFile(dir2003.resolve("Paper by HipKro03.pdf"))));
 
-        File subDir2 = new File(root, "pdfs");
-        Assert.assertTrue(subDir2.mkdir());
+        Path dirTest = Files.createDirectory(rootDir.resolve("test"));
+        assertTrue(Files.exists(Files.createFile(dirTest.resolve(".TEST"))));
+        assertTrue(Files.exists(Files.createFile(dirTest.resolve("TEST["))));
+        assertTrue(Files.exists(Files.createFile(dirTest.resolve("TE.ST"))));
+        assertTrue(Files.exists(Files.createFile(dirTest.resolve("foo.dat"))));
 
-        File subsubDir1 = new File(subDir2, "sub");
-        Assert.assertTrue(subsubDir1.mkdir());
+        Path graphicsDir = Files.createDirectory(rootDir.resolve("graphicsDir"));
+        Path graphicsSubDir = Files.createDirectories(graphicsDir.resolve("subDir"));
 
-        File pdf2 = new File(subsubDir1, "HipKro03-sub.pdf");
-        Assert.assertTrue(pdf2.createNewFile());
-
-        File dir2002 = new File(root, "2002");
-        Assert.assertTrue(dir2002.mkdir());
-
-        File dir2003 = new File(root, "2003");
-        Assert.assertTrue(dir2003.mkdir());
-
-        File pdf3 = new File(dir2003, "Paper by HipKro03.pdf");
-        Assert.assertTrue(pdf3.createNewFile());
-
-        File dirTest = new File(root, "test");
-        Assert.assertTrue(dirTest.mkdir());
-
-        File pdf4 = new File(dirTest, "HipKro03.pdf");
-        Assert.assertTrue(pdf4.createNewFile());
-
-        File pdf5 = new File(dirTest, ".TEST");
-        Assert.assertTrue(pdf5.createNewFile());
-
-        File pdf6 = new File(dirTest, "TEST[");
-        Assert.assertTrue(pdf6.createNewFile());
-
-        File pdf7 = new File(dirTest, "TE.ST");
-        Assert.assertTrue(pdf7.createNewFile());
-
-        File foo = new File(dirTest, "foo.dat");
-        Assert.assertTrue(foo.createNewFile());
-
-        File graphicsDir = new File(root, "graphicsDir");
-        Assert.assertTrue(graphicsDir.mkdir());
-
-        File graphicsSubDir = new File(graphicsDir, "subDir");
-        Assert.assertTrue(graphicsSubDir.mkdir());
-
-        File jpg = new File(graphicsSubDir, "HipKro03test.jpg");
-        Assert.assertTrue(jpg.createNewFile());
-
-        File png = new File(graphicsSubDir, "HipKro03test.png");
-        Assert.assertTrue(png.createNewFile());
+        assertTrue(Files.exists(Files.createFile(graphicsSubDir.resolve("HipKro03test.jpg"))));
+        assertTrue(Files.exists(Files.createFile(graphicsSubDir.resolve("HipKro03test.png"))));
 
     }
 
     @After
     public void tearDown() {
-        FileBasedTestHelper.deleteRecursive(root);
+
+        try {
+            for (Path p : Files.walk(rootDir).sorted((a, b) -> b.compareTo(a)). // reverse; files before dirs
+                    toArray(Path[]::new)) {
+                Files.delete(p);
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         Globals.prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, oldAutoLinkExcatKeyOnly);
         Globals.prefs.putBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY, oldUseRegExp);
         Globals.prefs.put("pdfDirectory", oldPdfDirectory);
         // TODO: This is not a great way to do this, sure ;-)
+
     }
 
 }
