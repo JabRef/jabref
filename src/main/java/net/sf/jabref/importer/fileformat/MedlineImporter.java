@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import javax.xml.bind.JAXBContext;
@@ -93,6 +94,8 @@ public class MedlineImporter extends ImportFormat {
     private static final Log LOGGER = LogFactory.getLog(MedlineImporter.class);
     private static final String KEYWORD_SEPARATOR = "; ";
 
+    private static final Locale ENGLISH = Locale.ENGLISH;
+
 
     @Override
     public String getFormatName() {
@@ -120,7 +123,8 @@ public class MedlineImporter extends ImportFormat {
         int i = 0;
         while (((str = reader.readLine()) != null) && (i < 50)) {
 
-            if (str.toLowerCase().contains("<pubmedarticle>") || str.toLowerCase().contains("<pubmedbookarticle>")) {
+            if (str.toLowerCase(ENGLISH).contains("<pubmedarticle>")
+                    || str.toLowerCase(ENGLISH).contains("<pubmedbookarticle>")) {
                 return true;
             }
 
@@ -134,6 +138,13 @@ public class MedlineImporter extends ImportFormat {
         Objects.requireNonNull(reader);
 
         List<BibEntry> bibItems = new ArrayList<>();
+
+        int toSkip = SkipReaderToFirstElement(reader);
+        if (toSkip > -1) {
+            for (int i = 0; i < toSkip; i++) {
+                reader.readLine();
+            }
+        }
         try {
             JAXBContext context = JAXBContext.newInstance("net.sf.jabref.importer.fileformat.medline");
             Unmarshaller unmarshaller = context.createUnmarshaller();
@@ -170,6 +181,33 @@ public class MedlineImporter extends ImportFormat {
         }
 
         return new ParserResult(bibItems);
+    }
+
+    private int SkipReaderToFirstElement(BufferedReader reader) {
+        try {
+            int BUFFER_SIZE = 1000;
+            reader.mark(BUFFER_SIZE);
+            int counter = 0;
+            String currentLine;
+            while ((currentLine = reader.readLine()) != null) {
+                if (!currentLine.toLowerCase(ENGLISH).contains("<pubmedarticle>")
+                        && !currentLine.toLowerCase(ENGLISH).contains("<pubmedarticleset>")
+                        && !currentLine.toLowerCase(ENGLISH).contains("<pubmedbookarticle>")
+                        && !currentLine.toLowerCase(ENGLISH).contains("<pubmedbookarticleset>")) {
+                    reader.mark(BUFFER_SIZE);
+                    reader.readLine();
+                    counter++;
+                } else {
+                    break;
+                }
+            }
+
+            reader.reset();
+            return counter;
+        } catch (IOException e) {
+            LOGGER.debug("something went wrong with reading the file");
+        }
+        return -1;
     }
 
     private void parseBookArticle(PubmedBookArticle currentArticle, List<BibEntry> bibItems) {
