@@ -22,6 +22,7 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -41,7 +42,7 @@ public class Layout {
     private static final Log LOGGER = LogFactory.getLog(Layout.class);
 
 
-    public Layout(List<StringInt> parsedEntries, JournalAbbreviationLoader repositoryLoader) {
+    public Layout(List<StringInt> parsedEntries, JabRefPreferences prefs, JournalAbbreviationLoader repositoryLoader) {
         List<LayoutEntry> tmpEntries = new ArrayList<>(parsedEntries.size());
 
         List<StringInt> blockEntries = null;
@@ -67,7 +68,7 @@ public class Layout {
                         blockEntries.add(parsedEntry);
                         le = new LayoutEntry(blockEntries,
                                 parsedEntry.i == LayoutHelper.IS_FIELD_END ? LayoutHelper.IS_FIELD_START : LayoutHelper.IS_GROUP_START,
-                                repositoryLoader);
+                                prefs, repositoryLoader);
                         tmpEntries.add(le);
                         blockEntries = null;
                     } else {
@@ -82,7 +83,7 @@ public class Layout {
             }
 
             if (blockEntries == null) {
-                tmpEntries.add(new LayoutEntry(parsedEntry, repositoryLoader));
+                tmpEntries.add(new LayoutEntry(parsedEntry, prefs, repositoryLoader));
             } else {
                 blockEntries.add(parsedEntry);
             }

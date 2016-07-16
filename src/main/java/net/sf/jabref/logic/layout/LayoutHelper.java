@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 
 /**
@@ -51,12 +52,14 @@ public class LayoutHelper {
     private final PushbackReader in;
     private final List<StringInt> parsedEntries = new ArrayList<>();
     private final JournalAbbreviationLoader repositoryLoader;
+    private final JabRefPreferences prefs;
     private boolean endOfFile;
 
 
-    public LayoutHelper(Reader in, JournalAbbreviationLoader repositoryLoader) {
+    public LayoutHelper(Reader in, JabRefPreferences prefs, JournalAbbreviationLoader repositoryLoader) {
         this.in = new PushbackReader(Objects.requireNonNull(in));
         this.repositoryLoader = Objects.requireNonNull(repositoryLoader);
+        this.prefs = Objects.requireNonNull(prefs);
     }
 
     public Layout getLayoutFromText() throws IOException {
@@ -70,7 +73,7 @@ public class LayoutHelper {
             }
         }
 
-        return new Layout(parsedEntries, repositoryLoader);
+        return new Layout(parsedEntries, prefs, repositoryLoader);
     }
 
     public static String getCurrentGroup() {

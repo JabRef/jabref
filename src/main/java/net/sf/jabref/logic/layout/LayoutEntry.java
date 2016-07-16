@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
@@ -118,8 +119,12 @@ class LayoutEntry {
 
     private final JournalAbbreviationLoader repositoryLoader;
 
-    public LayoutEntry(StringInt si, JournalAbbreviationLoader repositoryLoader) {
+    private final JabRefPreferences prefs;
+
+
+    public LayoutEntry(StringInt si, JabRefPreferences prefs, JournalAbbreviationLoader repositoryLoader) {
         this.repositoryLoader = repositoryLoader;
+        this.prefs = prefs;
         type = si.i;
         switch (type) {
         case LayoutHelper.IS_LAYOUT_TEXT:
@@ -138,8 +143,10 @@ class LayoutEntry {
         }
     }
 
-    public LayoutEntry(List<StringInt> parsedEntries, int layoutType, JournalAbbreviationLoader repositoryLoader) {
+    public LayoutEntry(List<StringInt> parsedEntries, int layoutType, JabRefPreferences prefs,
+            JournalAbbreviationLoader repositoryLoader) {
         this.repositoryLoader = repositoryLoader;
+        this.prefs = prefs;
         List<LayoutEntry> tmpEntries = new ArrayList<>();
         String blockStart = parsedEntries.get(0).s;
         String blockEnd = parsedEntries.get(parsedEntries.size() - 1).s;
@@ -164,7 +171,7 @@ class LayoutEntry {
                     blockEntries.add(parsedEntry);
                     int groupType = parsedEntry.i == LayoutHelper.IS_GROUP_END ? LayoutHelper.IS_GROUP_START :
                             LayoutHelper.IS_FIELD_START;
-                    LayoutEntry le = new LayoutEntry(blockEntries, groupType, repositoryLoader);
+                    LayoutEntry le = new LayoutEntry(blockEntries, groupType, prefs, repositoryLoader);
                     tmpEntries.add(le);
                     blockEntries = null;
                 } else {
@@ -180,7 +187,7 @@ class LayoutEntry {
             }
 
             if (blockEntries == null) {
-                tmpEntries.add(new LayoutEntry(parsedEntry, repositoryLoader));
+                tmpEntries.add(new LayoutEntry(parsedEntry, prefs, repositoryLoader));
             } else {
                 blockEntries.add(parsedEntry);
             }
@@ -544,7 +551,7 @@ class LayoutEntry {
         case "Default":
             return new Default();
         case "FileLink":
-            return new FileLink();
+            return new FileLink(prefs);
         case "Number":
             return new Number();
         case "RisAuthors":
@@ -558,7 +565,7 @@ class LayoutEntry {
         case "WrapContent":
             return new WrapContent();
         case "WrapFileLinks":
-            return new WrapFileLinks();
+            return new WrapFileLinks(prefs);
         default:
             return new NotFoundFormatter(name);
         }
