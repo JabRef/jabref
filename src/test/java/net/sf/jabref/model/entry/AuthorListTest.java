@@ -31,8 +31,8 @@ public class AuthorListTest {
     public void testGetAuthorList() {
         // Test caching in authorCache.
         AuthorList al = AuthorList.parse("John Smith");
-        Assert.assertTrue(al == AuthorList.parse("John Smith"));
-        Assert.assertFalse(al == AuthorList.parse("Smith"));
+        Assert.assertEquals(al, AuthorList.parse("John Smith"));
+        Assert.assertFalse(al.equals(AuthorList.parse("Smith")));
     }
 
     @SuppressWarnings("unused")
