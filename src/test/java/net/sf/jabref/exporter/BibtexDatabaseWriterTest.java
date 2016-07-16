@@ -277,7 +277,7 @@ public class BibtexDatabaseWriterTest {
     }
 
     @Test
-    public void roundtripWithUserComment() throws IOException {
+    public void roundtripWithUserComment() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding));
@@ -286,14 +286,14 @@ public class BibtexDatabaseWriterTest {
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
                 new Defaults(BibDatabaseMode.BIBTEX));
 
-        databaseWriter.writePartOfDatabase(stringWriter, context, result.getDatabase().getEntries(), preferences);
+        StringSaveSession session = databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries(), preferences);
         try (Scanner scanner = new Scanner(testBibtexFile,encoding.name())) {
-            assertEquals(scanner.useDelimiter("\\A").next(), stringWriter.toString());
+            assertEquals(scanner.useDelimiter("\\A").next(), session.getStringValue());
         }
     }
 
     @Test
-    public void roundtripWithUserCommentAndEntryChange() throws IOException {
+    public void roundtripWithUserCommentAndEntryChange() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding));
@@ -305,39 +305,37 @@ public class BibtexDatabaseWriterTest {
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
                 new Defaults(BibDatabaseMode.BIBTEX));
 
-        databaseWriter.writePartOfDatabase(stringWriter, context, result.getDatabase().getEntries(), preferences);
+        StringSaveSession session = databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries(), preferences);
 
         try (Scanner scanner = new Scanner(Paths.get("src/test/resources/testbib/bibWithUserCommentAndEntryChange.bib"),encoding.name())) {
-            assertEquals(scanner.useDelimiter("\\A").next(), stringWriter.toString());
+            assertEquals(scanner.useDelimiter("\\A").next(), session.getStringValue());
         }
     }
 
     @Test
-    public void roundtripWithUserCommentBeforeStringAndChange() throws IOException {
+    public void roundtripWithUserCommentBeforeStringAndChange() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
         ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding));
 
-        BibtexString string = result.getDatabase().getStringValues().iterator().next();
-        if(string.getContent().isEmpty()) {
-            // do nothing
-        } else {
-            string.setContent("my first string");
+        for (BibtexString string : result.getDatabase().getStringValues()) {
+            // Mark them as changed
+            string.setContent(string.getContent());
         }
 
         SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
                 new Defaults(BibDatabaseMode.BIBTEX));
 
-        databaseWriter.writePartOfDatabase(stringWriter, context, result.getDatabase().getEntries(), preferences);
+        StringSaveSession session = databaseWriter.savePartOfDatabase(context, result.getDatabase().getEntries(), preferences);
 
         try (Scanner scanner = new Scanner(testBibtexFile,encoding.name())) {
-            assertEquals(scanner.useDelimiter("\\A").next(), stringWriter.toString());
+            assertEquals(scanner.useDelimiter("\\A").next(), session.getStringValue());
         }
     }
 
     @Test
-    public void writeSavedSerializationOfEntryIfUnchanged() throws IOException {
+    public void writeSavedSerializationOfEntryIfUnchanged() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setType(BibtexEntryTypes.ARTICLE);
         entry.setField("author", "Mr. author");

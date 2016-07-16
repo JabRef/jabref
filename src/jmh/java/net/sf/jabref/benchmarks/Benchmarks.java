@@ -45,7 +45,7 @@ public class Benchmarks {
     private String htmlConversionString;
 
     @Setup
-    public void init() throws IOException {
+    public void init() throws Exception {
         Globals.prefs = JabRefPreferences.getInstance();
 
         Random randomizer = new Random();
@@ -79,7 +79,7 @@ public class Benchmarks {
     }
 
     @Benchmark
-    public String write() throws SaveException {
+    public String write() throws Exception {
         BibtexDatabaseWriter<StringSaveSession> databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new);
         StringSaveSession saveSession = databaseWriter.savePartOfDatabase(
                 new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries(),

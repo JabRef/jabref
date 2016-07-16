@@ -87,10 +87,16 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
     @Override
     protected void writeString(BibtexString bibtexString, boolean isFirstString, int maxKeyLength, Boolean reformatFile) throws SaveException {
         try {
-            //if the string has not been modified, write it back as it was
+            // If the string has not been modified, write it back as it was
             if (!reformatFile && !bibtexString.hasChanged()) {
                 getWriter().write(bibtexString.getParsedSerialization());
                 return;
+            }
+
+            // Write user comments
+            String userComments = bibtexString.getUserComments();
+            if(!userComments.isEmpty()) {
+                getWriter().write(userComments + Globals.NEWLINE);
             }
 
             if (isFirstString) {

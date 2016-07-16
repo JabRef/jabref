@@ -69,12 +69,12 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
         List<FieldChange> changes = new ArrayList<>();
 
         Optional<FieldFormatterCleanups> saveActions = metaData.getSaveActions();
-        if (saveActions.isPresent()) {
+        saveActions.ifPresent(actions -> {
             // save actions defined -> apply for every entry
             for (BibEntry entry : toChange) {
-                changes.addAll(saveActions.get().applySaveActions(entry));
+                changes.addAll(actions.applySaveActions(entry));
             }
-        }
+        });
 
         return changes;
     }
@@ -104,11 +104,11 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
     }
 
     /*
-         * We have begun to use getSortedEntries() for both database save operations
-         * and non-database save operations.  In a non-database save operation
-         * (such as the exportDatabase call), we do not wish to use the
-         * global preference of saving in standard order.
-         */
+     * We have begun to use getSortedEntries() for both database save operations
+     * and non-database save operations.  In a non-database save operation
+     * (such as the exportDatabase call), we do not wish to use the
+     * global preference of saving in standard order.
+    */
     public static List<BibEntry> getSortedEntries(BibDatabaseContext bibDatabaseContext, List<BibEntry> entriesToSort,
             SavePreferences preferences) {
         Objects.requireNonNull(bibDatabaseContext);
@@ -241,14 +241,6 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
     protected abstract void writeMetaDataItem(Map.Entry<String, String> metaItem) throws SaveException;
 
     protected abstract void writePreamble(String preamble) throws SaveException;
-
-    private void writeUserCommentsForString(BibtexString string, Writer out) throws IOException {
-        String userComments = string.getUserComments();
-
-        if(!userComments.isEmpty()) {
-            out.write(userComments + Globals.NEWLINE);
-        }
-    }
 
     /**
      * Write all strings in alphabetical order, modified to produce a safe (for
