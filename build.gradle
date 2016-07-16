@@ -217,6 +217,7 @@ javadoc {
 }
 
 test {
+	systemProperty "file.encoding", "utf-8"
     testLogging {
         events "failed"
         exceptionFormat "full"
