@@ -58,8 +58,8 @@ public class PdfImporter {
 
     private final JabRefFrame frame;
     private final BasePanel panel;
-    private MainTable entryTable;
-    private int dropRow;
+    private final MainTable entryTable;
+    private final int dropRow;
 
     private static final Log LOGGER = LogFactory.getLog(PdfImporter.class);
 
@@ -250,7 +250,8 @@ public class PdfImporter {
         // insert entry to database and link file
         panel.getDatabase().insertEntry(entry);
         panel.markBaseChanged();
-        LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry);
+        LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
+                Globals.prefs);
         DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
         dfh.linkPdfToEntry(fileName, entry);
         panel.highlightEntry(entry);

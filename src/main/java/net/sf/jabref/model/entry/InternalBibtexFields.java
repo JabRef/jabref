@@ -321,8 +321,8 @@ public class InternalBibtexFields {
      * sorting for all fields listed in the array. If an unknown field name is included,
      * add a field descriptor for the new field.
      */
-    public static void setNumericFieldsFromPrefs() {
-        List<String> numFields = Globals.prefs.getStringList(JabRefPreferences.NUMERIC_FIELDS);
+    public static void setNumericFieldsFromPrefs(JabRefPreferences prefs) {
+        List<String> numFields = prefs.getStringList(JabRefPreferences.NUMERIC_FIELDS);
         if (numFields.isEmpty()) {
             return;
         }

@@ -31,6 +31,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.InternalBibtexFields;
@@ -300,7 +301,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         }
         if (!Objects.equals(oldVal, newVal)) {
             prefs.put(JabRefPreferences.NUMERIC_FIELDS, newVal);
-            InternalBibtexFields.setNumericFieldsFromPrefs();
+            InternalBibtexFields.setNumericFieldsFromPrefs(Globals.prefs);
         }
 
     }

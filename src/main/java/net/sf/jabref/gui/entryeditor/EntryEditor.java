@@ -1362,7 +1362,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
             }
 
-            LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry);
+            LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
+                    Globals.prefs);
 
             // Store undo information:
             panel.getUndoManager().addEdit(new UndoableKeyChange(panel.getDatabase(), entry, (String) oldValue, entry.getCiteKey()));

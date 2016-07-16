@@ -575,7 +575,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // Finally, set the new keys:
                 for (BibEntry entry : entries) {
                     bes = entry;
-                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes);
+                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes, Globals.prefs);
                     ce.addEdit(new UndoableKeyChange(database, bes, (String) oldvals.get(bes),
                             bes.getCiteKey()));
                 }
@@ -1987,7 +1987,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             for (BibEntry bes : database.getEntries()) {
                 String oldKey = bes.getCiteKey();
                 if ((oldKey == null) || oldKey.isEmpty()) {
-                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes);
+                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes, Globals.prefs);
                     ce.addEdit(new UndoableKeyChange(database, bes, null, bes.getCiteKey()));
                     any = true;
                 }

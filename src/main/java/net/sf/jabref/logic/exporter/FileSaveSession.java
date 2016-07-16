@@ -56,13 +56,11 @@ public class FileSaveSession extends SaveSession {
     private final boolean useLockFile;
     private final Path temporaryFile;
 
-
     public FileSaveSession(Charset encoding, boolean backup) throws SaveException {
         this(encoding, backup, createTemporaryFile());
     }
 
-    public FileSaveSession(Charset encoding, boolean backup, Path temporaryFile)
-            throws SaveException {
+    public FileSaveSession(Charset encoding, boolean backup, Path temporaryFile) throws SaveException {
         super(encoding, backup, getWriterForFile(encoding, temporaryFile));
         this.temporaryFile = temporaryFile;
         this.useLockFile = Globals.prefs.getBoolean(JabRefPreferences.USE_LOCK_FILES);

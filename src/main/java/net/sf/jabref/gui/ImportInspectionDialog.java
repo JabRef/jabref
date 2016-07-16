@@ -461,7 +461,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             database.insertEntry(entry);
 
             // Generate a unique key:
-            LabelPatternUtil.makeLabel(localMetaData, database, entry);
+            LabelPatternUtil.makeLabel(localMetaData, database, entry, Globals.prefs);
             // Remove the entry from the database again, since we only added it in
             // order to
             // make sure the key was unique:
@@ -502,7 +502,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 entry.setId(IdGenerator.next());
                 database.insertEntry(entry);
 
-                LabelPatternUtil.makeLabel(localMetaData, database, entry);
+                LabelPatternUtil.makeLabel(localMetaData, database, entry, Globals.prefs);
                 // Add the generated key to our list:
                 keys.add(entry.getCiteKey());
             }

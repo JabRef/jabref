@@ -45,7 +45,6 @@ public class LatexFieldFormatter {
     private final char valueDelimiterEndOfValue;
     private final List<String> doNotResolveStringsFors;
     private final int lineLength;
-    private final JabRefPreferences prefs;
 
     private final FieldContentParser parser;
 
@@ -56,7 +55,6 @@ public class LatexFieldFormatter {
 
     private LatexFieldFormatter(boolean neverFailOnHashes, JabRefPreferences prefs) {
         this.neverFailOnHashes = neverFailOnHashes;
-        this.prefs = prefs;
 
         this.resolveStringsAllFields = prefs.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS);
         valueDelimiterStartOfValue = prefs.getValueDelimiters(0);

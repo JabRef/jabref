@@ -74,7 +74,7 @@ public class JournalAbbreviationLoader {
         if ((personalJournalList != null) && !personalJournalList.trim().isEmpty()) {
             try {
                 journalAbbrev.addEntries(
-                        readJournalListFromFile(new File(personalJournalList), Globals.prefs.getDefaultEncoding()));
+                        readJournalListFromFile(new File(personalJournalList), jabRefPreferences.getDefaultEncoding()));
             } catch (FileNotFoundException e) {
                 LOGGER.info("Personal journal list file '" + personalJournalList + "' not found.", e);
             }

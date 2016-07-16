@@ -26,7 +26,6 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
@@ -427,7 +426,7 @@ public class LabelPatternUtil {
      * @param entry a <code>BibEntry</code>
      * @return modified BibEntry
      */
-    public static void makeLabel(MetaData metaData, BibDatabase dBase, BibEntry entry) {
+    public static void makeLabel(MetaData metaData, BibDatabase dBase, BibEntry entry, JabRefPreferences prefs) {
         database = dBase;
         String key;
         StringBuilder stringBuilder = new StringBuilder();
@@ -474,9 +473,9 @@ public class LabelPatternUtil {
         key = checkLegalKey(stringBuilder.toString());
 
         // Remove Regular Expressions while generating Keys
-        String regex = Globals.prefs.get(JabRefPreferences.KEY_PATTERN_REGEX);
+        String regex = prefs.get(JabRefPreferences.KEY_PATTERN_REGEX);
         if ((regex != null) && !regex.trim().isEmpty()) {
-            String replacement = Globals.prefs.get(JabRefPreferences.KEY_PATTERN_REPLACEMENT);
+            String replacement = prefs.get(JabRefPreferences.KEY_PATTERN_REPLACEMENT);
             key = key.replaceAll(regex, replacement);
         }
 
@@ -494,8 +493,8 @@ public class LabelPatternUtil {
             occurrences--; // No change, so we can accept one dupe.
         }
 
-        boolean alwaysAddLetter = Globals.prefs.getBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER);
-        boolean firstLetterA = Globals.prefs.getBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A);
+        boolean alwaysAddLetter = prefs.getBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER);
+        boolean firstLetterA = prefs.getBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A);
 
         if (!alwaysAddLetter && (occurrences == 0)) {
             // No dupes found, so we can just go ahead.

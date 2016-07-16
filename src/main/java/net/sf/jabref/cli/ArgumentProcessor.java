@@ -435,7 +435,7 @@ public class ArgumentProcessor {
                 LOGGER.info(Localization.lang("Regenerating BibTeX keys according to metadata"));
                 for (BibEntry entry : database.getEntries()) {
                     // try to make a new label
-                    LabelPatternUtil.makeLabel(metaData, database, entry);
+                    LabelPatternUtil.makeLabel(metaData, database, entry, Globals.prefs);
                 }
             } else {
                 LOGGER.info(Localization.lang("No meta data present in bibfile. Cannot regenerate BibTeX keys"));
