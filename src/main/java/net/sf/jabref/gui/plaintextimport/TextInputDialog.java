@@ -476,7 +476,7 @@ public class TextInputDialog extends JDialog {
                             entry.setField(fieldName, old.get() + " and " + txt);
                         } else if ("keywords".equals(fieldName)) {
                             // Add keyword
-                                entry.addKeyword(txt);
+                            entry.addKeyword(txt, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                         } else {
                             entry.setField(fieldName, old.get() + txt);
                         }

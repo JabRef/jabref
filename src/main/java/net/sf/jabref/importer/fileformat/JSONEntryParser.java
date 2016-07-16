@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.MonthUtil;
 
@@ -111,7 +113,7 @@ public class JSONEntryParser {
                     keywordList.add(keywords.getString(i));
                 }
             }
-            entry.putKeywords(keywordList);
+            entry.putKeywords(keywordList, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
         }
 
         // Identifiers

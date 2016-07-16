@@ -66,7 +66,7 @@ public class JabRefMain {
         /* Build list of Import and Export formats */
         Globals.IMPORT_FORMAT_READER.resetImportFormats();
         CustomEntryTypesManager.loadCustomEntryTypes(preferences);
-        ExportFormats.initAllExports(Globals.prefs);
+        ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats());
 
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();

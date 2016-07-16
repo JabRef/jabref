@@ -149,7 +149,7 @@ public class PdfImporter {
         for (String fileName : fileNames) {
             if (!neverShow && !doNotShowAgain) {
                 importDialog = new ImportDialog(dropRow >= 0, fileName);
-                if (!XMPUtil.hasMetadata(Paths.get(fileName))) {
+                if (!XMPUtil.hasMetadata(Paths.get(fileName), Globals.prefs)) {
                     importDialog.disableXMPChoice();
                 }
                 importDialog.setLocationRelativeTo(frame);

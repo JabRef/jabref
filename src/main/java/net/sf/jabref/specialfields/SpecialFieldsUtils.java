@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.util.UpdateField;
@@ -121,7 +122,8 @@ public class SpecialFieldsUtils {
         }
 
 
-        Optional<FieldChange> change = entry.putKeywords(keywordList);
+        Optional<FieldChange> change = entry.putKeywords(keywordList,
+                Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
         if (ce != null){
             change.ifPresent(changeValue -> ce.addEdit(new UndoableFieldChange(changeValue)));
         }

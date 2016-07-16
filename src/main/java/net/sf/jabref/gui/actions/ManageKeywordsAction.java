@@ -44,6 +44,7 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
@@ -321,7 +322,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             keywords.addAll(keywordsToAdd);
 
             // put keywords back
-            Optional<FieldChange> change = entry.putKeywords(keywords);
+            Optional<FieldChange> change = entry.putKeywords(keywords,
+                    Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
             if (change.isPresent()) {
                 ce.addEdit(new UndoableFieldChange(change.get()));
             }

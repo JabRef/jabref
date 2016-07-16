@@ -32,6 +32,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -350,7 +352,8 @@ public class RepecNepImporter extends ImportFormat {
             if ("Keywords".equals(keyword)) {
                 String content = readMultipleLines(in);
                 String[] keywords = content.split("[,;]");
-                be.addKeywords(new LinkedHashSet<>(Arrays.asList(keywords)));
+                be.addKeywords(new LinkedHashSet<>(Arrays.asList(keywords)),
+                        Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                 // parse JEL field
             } else if ("JEL".equals(keyword)) {
                 be.setField("jel", readMultipleLines(in));

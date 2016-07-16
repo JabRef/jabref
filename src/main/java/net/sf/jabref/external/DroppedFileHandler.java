@@ -233,7 +233,7 @@ public class DroppedFileHandler {
 
         List<BibEntry> xmpEntriesInFile;
         try {
-            xmpEntriesInFile = XMPUtil.readXMP(fileName);
+            xmpEntriesInFile = XMPUtil.readXMP(fileName, Globals.prefs);
         } catch (IOException e) {
             LOGGER.warn("Problem reading XMP", e);
             return false;

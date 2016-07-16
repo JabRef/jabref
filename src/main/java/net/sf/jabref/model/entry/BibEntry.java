@@ -34,11 +34,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.event.FieldChangedEvent;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
@@ -539,7 +537,7 @@ public class BibEntry implements Cloneable {
         this.changed = changed;
     }
 
-    public Optional<FieldChange> putKeywords(Collection<String> keywords) {
+    public Optional<FieldChange> putKeywords(Collection<String> keywords, String separator) {
         Objects.requireNonNull(keywords);
         Optional<String> oldValue = this.getFieldOptional(KEYWORDS_FIELD);
 
@@ -553,7 +551,7 @@ public class BibEntry implements Cloneable {
         }
 
         // Set new keyword field
-        String newValue = String.join(Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR), keywords);
+        String newValue = String.join(separator, keywords);
         return this.setField(KEYWORDS_FIELD, newValue);
     }
 
@@ -562,7 +560,7 @@ public class BibEntry implements Cloneable {
      *
      * @param keyword Keyword to add
      */
-    public void addKeyword(String keyword) {
+    public void addKeyword(String keyword, String separator) {
         Objects.requireNonNull(keyword, "keyword must not be null");
 
         if (keyword.isEmpty()) {
@@ -571,7 +569,7 @@ public class BibEntry implements Cloneable {
 
         Set<String> keywords = this.getKeywords();
         keywords.add(keyword);
-        this.putKeywords(keywords);
+        this.putKeywords(keywords, separator);
     }
 
     /**
@@ -579,11 +577,11 @@ public class BibEntry implements Cloneable {
      *
      * @param keywords Keywords to add
      */
-    public void addKeywords(Collection<String> keywords) {
+    public void addKeywords(Collection<String> keywords, String separator) {
         Objects.requireNonNull(keywords);
 
         for (String keyword : keywords) {
-            this.addKeyword(keyword);
+            this.addKeyword(keyword, separator);
         }
     }
 

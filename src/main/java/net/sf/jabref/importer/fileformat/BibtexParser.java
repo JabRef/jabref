@@ -30,6 +30,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.bibtex.FieldContentParser;
@@ -562,7 +563,7 @@ public class BibtexParser {
                     entry.setField(key, entry.getFieldOptional(key).get() + " and " + content);
                 } else if ("keywords".equals(key)) {
                     //multiple keywords fields should be combined to one
-                    entry.addKeyword(content);
+                    entry.addKeyword(content, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                 }
             } else {
                 entry.setField(key, content);

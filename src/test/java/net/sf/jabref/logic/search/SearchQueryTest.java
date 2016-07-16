@@ -1,5 +1,7 @@
 package net.sf.jabref.logic.search;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Test;
@@ -33,7 +35,7 @@ public class SearchQueryTest {
     @Test
     public void testGrammarSearch() {
         BibEntry entry = new BibEntry();
-        entry.addKeyword("one two");
+        entry.addKeyword("one two", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
         SearchQuery searchQuery = new SearchQuery("keywords=\"one two\"", false, false);
         assertTrue(searchQuery.isMatch(entry));
     }
