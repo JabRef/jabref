@@ -15,7 +15,6 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.fileformat.ParseException;
-import net.sf.jabref.logic.exporter.BibDatabaseWriter;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.StringSaveSession;
