@@ -21,11 +21,11 @@ import java.util.TimerTask;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.exporter.BibtexDatabaseWriter;
-import net.sf.jabref.exporter.FileSaveSession;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.exporter.BibDatabaseWriter;
+import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
+import net.sf.jabref.logic.exporter.FileSaveSession;
 import net.sf.jabref.logic.exporter.SaveException;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.SaveSession;

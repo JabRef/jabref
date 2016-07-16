@@ -33,7 +33,6 @@ import java.util.Objects;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.exporter.FileSaveSession;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.model.entry.BibEntry;

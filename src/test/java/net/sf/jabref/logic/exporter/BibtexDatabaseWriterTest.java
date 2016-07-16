@@ -1,4 +1,4 @@
-package net.sf.jabref.exporter;
+package net.sf.jabref.logic.exporter;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -19,9 +19,11 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.config.SaveOrderConfig;
+import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.exporter.SaveException;
 import net.sf.jabref.logic.exporter.SavePreferences;
+import net.sf.jabref.logic.exporter.StringSaveSession;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.ExplicitGroup;

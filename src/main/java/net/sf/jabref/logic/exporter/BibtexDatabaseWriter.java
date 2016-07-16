@@ -13,7 +13,7 @@
  with this program; if not, write to the Free Software Foundation, Inc.,
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.exporter;
+package net.sf.jabref.logic.exporter;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -25,9 +25,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
-import net.sf.jabref.logic.exporter.BibDatabaseWriter;
-import net.sf.jabref.logic.exporter.SaveException;
-import net.sf.jabref.logic.exporter.SaveSession;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;

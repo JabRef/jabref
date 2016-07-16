@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.exporter;
+package net.sf.jabref.logic.exporter;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -24,9 +24,6 @@ import java.nio.file.Path;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.logic.exporter.SaveException;
-import net.sf.jabref.logic.exporter.SaveSession;
-import net.sf.jabref.logic.exporter.VerifyingWriter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
