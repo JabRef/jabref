@@ -55,7 +55,7 @@ public class DatePickerButton implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         Date date = datePicker.getDate();
         if (date != null) {
-            editor.setText(new EasyDateFormat().getDateAt(date, isoFormat));
+            editor.setText(EasyDateFormat.isoDateFormat().getDateAt(date));
             // Set focus to editor component after changing its text:
             new FocusRequester(editor.getTextComponent());
         }

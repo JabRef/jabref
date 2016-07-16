@@ -522,7 +522,7 @@ public class TextInputDialog extends JDialog {
         if (importedEntries.isEmpty()) {
             return false;
         } else {
-            UpdateField.setAutomaticFields(importedEntries, false, false);
+            UpdateField.setAutomaticFields(importedEntries, false, false, Globals.prefs);
             boolean markEntries = EntryMarker.shouldMarkEntries();
 
             for (BibEntry e : importedEntries) {

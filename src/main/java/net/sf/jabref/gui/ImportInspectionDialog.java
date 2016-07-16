@@ -707,7 +707,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             // Set owner/timestamp if options are enabled:
             UpdateField.setAutomaticFields(selected, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
-                    Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
+                    Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs);
 
             // Mark entries if we should
             if (EntryMarker.shouldMarkEntries()) {

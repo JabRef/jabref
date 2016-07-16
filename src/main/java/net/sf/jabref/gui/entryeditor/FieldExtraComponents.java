@@ -356,7 +356,7 @@ public class FieldExtraComponents {
             @Override
             public void mouseClicked(MouseEvent e) {
                 if (e.getClickCount() == 2) {// double click
-                    String date = new EasyDateFormat().getCurrentDate(isoFormat);
+                    String date = EasyDateFormat.isoDateFormat().getCurrentDate();
                     editor.setText(date);
                 }
             }
