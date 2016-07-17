@@ -29,6 +29,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.medline.Abstract;
@@ -139,16 +142,18 @@ public class MedlineImporter extends ImportFormat {
 
         List<BibEntry> bibItems = new ArrayList<>();
 
-        //skip lines, till we reach the first element
-        int toSkip = SkipReaderToFirstElement(reader);
-        for (int i = 0; i < toSkip; i++) {
-            reader.readLine();
-        }
-
         try {
             JAXBContext context = JAXBContext.newInstance("net.sf.jabref.importer.fileformat.medline");
+            XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+            XMLStreamReader xmlStreamReader = xmlInputFactory.createXMLStreamReader(reader);
+
+            //go to the root element
+            while (!xmlStreamReader.isStartElement()) {
+                xmlStreamReader.next();
+            }
+
             Unmarshaller unmarshaller = context.createUnmarshaller();
-            Object unmarshalledObject = unmarshaller.unmarshal(reader);
+            Object unmarshalledObject = unmarshaller.unmarshal(xmlStreamReader);
 
             //check whether we have an article set, an article, a book article or a book article set
             if (unmarshalledObject instanceof PubmedArticleSet) {
@@ -178,42 +183,12 @@ public class MedlineImporter extends ImportFormat {
         } catch (JAXBException e1) {
             LOGGER.debug("could not parse document", e1);
             return ParserResult.fromErrorMessage(e1.getLocalizedMessage());
+        } catch (XMLStreamException e) {
+            LOGGER.debug("could not parse document", e);
+            return ParserResult.fromErrorMessage(e.getLocalizedMessage());
         }
 
         return new ParserResult(bibItems);
-    }
-
-    /**
-     * reads line of the given reader and looks, how many lines has to be skipped till we reach the first element
-     * that is pubmedarticle, pubmedarticleset, pubmedbookarticle or pubmedbookarticleset
-     * @param reader
-     * @return how many lines have to be skipped till the first element is reached
-     */
-    private int SkipReaderToFirstElement(BufferedReader reader) {
-        try {
-            int BUFFER_SIZE = 1000;
-            reader.mark(BUFFER_SIZE);
-            int counter = 0;
-            String currentLine;
-            while ((currentLine = reader.readLine()) != null) {
-                if (!currentLine.toLowerCase(ENGLISH).contains("<pubmedarticle>")
-                        && !currentLine.toLowerCase(ENGLISH).contains("<pubmedarticleset>")
-                        && !currentLine.toLowerCase(ENGLISH).contains("<pubmedbookarticle>")
-                        && !currentLine.toLowerCase(ENGLISH).contains("<pubmedbookarticleset>")) {
-                    reader.mark(BUFFER_SIZE);
-                    reader.readLine();
-                    counter++;
-                } else {
-                    break;
-                }
-            }
-
-            reader.reset();
-            return counter;
-        } catch (IOException e) {
-            LOGGER.debug("something went wrong with reading the file");
-        }
-        return -1;
     }
 
     private void parseBookArticle(PubmedBookArticle currentArticle, List<BibEntry> bibItems) {
