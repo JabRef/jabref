@@ -64,7 +64,6 @@ class ExternalTab extends JPanel implements PrefsTab {
     private final JTextField consoleEmulatorPath;
     private final JTextField consoleCommand;
     private final JFileChooser consoleChooser;
-    private final JLabel commandDescription;
     private final JButton browseButton;
 
 
@@ -84,12 +83,13 @@ class ExternalTab extends JPanel implements PrefsTab {
         consoleEmulatorPath = new JTextField();
         consoleCommand = new JTextField();
         consoleChooser = new JFileChooser();
-        commandDescription = new JLabel(
+        browseButton = new JButton(Localization.lang("Browse"));
+
+        JLabel commandDescription = new JLabel(
                 "<html>" +
                         Localization.lang("<u>Note</u>: Use the placeholder <i>%0</i>" +
                                 " for the location of the current database file.", "%DIR") +
                 "</html>");
-        browseButton = new JButton(Localization.lang("Browse"));
 
         ButtonGroup consoleOptions = new ButtonGroup();
         consoleOptions.add(defaultConsole);
