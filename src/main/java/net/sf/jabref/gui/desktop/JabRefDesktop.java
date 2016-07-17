@@ -330,10 +330,17 @@ public class JabRefDesktop {
             NATIVE_DESKTOP.openConsole(absolutePath);
         } else if (usingCommand) {
             String command = Globals.prefs.get(JabRefPreferences.CONSOLE_COMMAND);
+            command = command.trim();
+
             if (!command.isEmpty()) {
-                command = command.replace("%DIR", absolutePath); // replace the placeholder if used
+
                 command = command.replaceAll("\\s+", " "); // normalize white spaces
                 String[] subcommands = command.split(" ");
+
+                for (int i = 0; i < subcommands.length; i++) {
+                    subcommands[i] = subcommands[i].replace("%DIR", absolutePath); // replace the placeholder if used
+                }
+
                 new ProcessBuilder(subcommands).start();
             }
         } else if (usingSpecified && Files.exists(path) && !Files.isDirectory(path) && path.isAbsolute()) {
