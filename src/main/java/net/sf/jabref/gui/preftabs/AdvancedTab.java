@@ -80,7 +80,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
         useUnitFormatterOnSearch = new JCheckBox(Localization.lang("Format units by adding non-breaking separators and keeping the correct case on search"));
 
         defaultConsole = new JRadioButton(Localization.lang("Use default terminal emulator"));
-        specifiedConsole = new JRadioButton(Localization.lang("Specify terminal emulator:"));
+        specifiedConsole = new JRadioButton(Localization.lang("Specify terminal emulator") + ":");
         consoleEmulatorPath = new JTextField(25);
         consoleChooser = new JFileChooser();
         browseButton = new JButton(Localization.lang("Browse"));
