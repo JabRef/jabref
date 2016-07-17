@@ -55,7 +55,6 @@ class ExternalTab extends JPanel implements PrefsTab {
     private final JRadioButton defaultConsole;
     private final JRadioButton executeConsole;
     private final JTextField consoleCommand;
-    private final JFileChooser consoleChooser;
     private final JButton browseButton;
 
 
@@ -72,7 +71,6 @@ class ExternalTab extends JPanel implements PrefsTab {
         defaultConsole = new JRadioButton(Localization.lang("Use default terminal emulator"));
         executeConsole = new JRadioButton(Localization.lang("Execute command") + ":");
         consoleCommand = new JTextField();
-        consoleChooser = new JFileChooser();
         browseButton = new JButton(Localization.lang("Browse"));
 
         JLabel commandDescription = new JLabel(Localization.lang(
@@ -210,6 +208,7 @@ class ExternalTab extends JPanel implements PrefsTab {
     }
 
     private void showConsoleChooser() {
+        JFileChooser consoleChooser = new JFileChooser();
         int answer = consoleChooser.showOpenDialog(ExternalTab.this);
         if (answer == JFileChooser.APPROVE_OPTION) {
             consoleCommand.setText(consoleChooser.getSelectedFile().getAbsolutePath());
