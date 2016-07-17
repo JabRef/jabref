@@ -22,9 +22,6 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -32,7 +29,6 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
@@ -59,9 +55,7 @@ class ExternalTab extends JPanel implements PrefsTab {
     private final JCheckBox openFoldersOfAttachedFiles;
 
     private final JRadioButton defaultConsole;
-    private final JRadioButton specifiedConsole;
     private final JRadioButton executeConsole;
-    private final JTextField consoleEmulatorPath;
     private final JTextField consoleCommand;
     private final JFileChooser consoleChooser;
     private final JButton browseButton;
@@ -78,29 +72,22 @@ class ExternalTab extends JPanel implements PrefsTab {
 
 
         defaultConsole = new JRadioButton(Localization.lang("Use default terminal emulator"));
-        specifiedConsole = new JRadioButton(Localization.lang("Specify terminal emulator") + ":");
-        executeConsole = new JRadioButton(Localization.lang("Execute command") + ":");
-        consoleEmulatorPath = new JTextField();
+        executeConsole = new JRadioButton(Localization.lang("Execute") + ":");
         consoleCommand = new JTextField();
         consoleChooser = new JFileChooser();
         browseButton = new JButton(Localization.lang("Browse"));
 
-        JLabel commandDescription = new JLabel(
-                "<html>" +
-                        Localization.lang("<u>Note</u>: Use the placeholder <i>%0</i>" +
-                                " for the location of the opened database file.", "%DIR") +
-                "</html>");
+        JLabel commandDescription = new JLabel(Localization.lang(
+                "Note: Use the placeholder %0 for the location of the opened database file.", "%DIR"));
 
         ButtonGroup consoleOptions = new ButtonGroup();
         consoleOptions.add(defaultConsole);
-        consoleOptions.add(specifiedConsole);
         consoleOptions.add(executeConsole);
 
         JPanel consoleOptionPanel = new JPanel(new GridBagLayout());
         GridBagConstraints layoutConstraints = new GridBagConstraints();
 
         defaultConsole.addActionListener(new ConsoleRadioButtonActionListener());
-        specifiedConsole.addActionListener(new ConsoleRadioButtonActionListener());
         executeConsole.addActionListener(new ConsoleRadioButtonActionListener());
         browseButton.addActionListener(new BrowseButtonActionListener());
 
@@ -112,23 +99,18 @@ class ExternalTab extends JPanel implements PrefsTab {
         consoleOptionPanel.add(defaultConsole, layoutConstraints);
 
         layoutConstraints.gridy = 1;
-        consoleOptionPanel.add(specifiedConsole, layoutConstraints);
-
-        layoutConstraints.gridx = 1;
-        consoleOptionPanel.add(consoleEmulatorPath, layoutConstraints);
-        layoutConstraints.gridx = 2;
-        layoutConstraints.insets = new Insets(0, 4, 6, 0);
-        consoleOptionPanel.add(browseButton, layoutConstraints);
-
-        layoutConstraints.gridy = 2;
-        layoutConstraints.gridx = 0;
         layoutConstraints.insets = new Insets(0, 0, 6, 0);
         consoleOptionPanel.add(executeConsole, layoutConstraints);
 
         layoutConstraints.gridx = 1;
         consoleOptionPanel.add(consoleCommand, layoutConstraints);
 
-        layoutConstraints.gridy = 3;
+        layoutConstraints.gridx = 2;
+        layoutConstraints.insets = new Insets(0, 4, 6, 0);
+        consoleOptionPanel.add(browseButton, layoutConstraints);
+
+        layoutConstraints.gridx = 1;
+        layoutConstraints.gridy = 2;
         consoleOptionPanel.add(commandDescription, layoutConstraints);
 
         FormLayout layout = new FormLayout(
@@ -197,16 +179,10 @@ class ExternalTab extends JPanel implements PrefsTab {
 
         citeCommand.setText(prefs.get(JabRefPreferences.CITE_COMMAND));
 
-        if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONSOLE_COMMAND)) {
-            executeConsole.setSelected(true);
-        } else if (Globals.prefs.getBoolean(JabRefPreferences.USE_SPECIFIED_CONSOLE_APPLICATION)) {
-            specifiedConsole.setSelected(true);
-        } else {
-            defaultConsole.setSelected(true);
-        }
+        defaultConsole.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION));
+        executeConsole.setSelected(!Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION));
 
         consoleCommand.setText(Globals.prefs.get(JabRefPreferences.CONSOLE_COMMAND));
-        consoleEmulatorPath.setText(Globals.prefs.get(JabRefPreferences.CONSOLE_APPLICATION));
 
         updateEnableStatus();
     }
@@ -217,24 +193,11 @@ class ExternalTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES, openFoldersOfAttachedFiles.isSelected());
         prefs.put(JabRefPreferences.CITE_COMMAND, citeCommand.getText());
         prefs.putBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION, defaultConsole.isSelected());
-        prefs.putBoolean(JabRefPreferences.USE_SPECIFIED_CONSOLE_APPLICATION, specifiedConsole.isSelected());
-        prefs.putBoolean(JabRefPreferences.USE_CONSOLE_COMMAND, executeConsole.isSelected());
-        prefs.put(JabRefPreferences.CONSOLE_APPLICATION, consoleEmulatorPath.getText());
         prefs.put(JabRefPreferences.CONSOLE_COMMAND, consoleCommand.getText());
     }
 
     @Override
     public boolean validateSettings() {
-        if (!consoleEmulatorPath.getText().trim().isEmpty()) {
-            Path path = Paths.get(consoleEmulatorPath.getText());
-
-            if (!Files.exists(path) || Files.isDirectory(path) || !path.isAbsolute()) {
-                JOptionPane.showMessageDialog(null,
-                        Localization.lang("Please enter the absolute path to an existing terminal emulator."),
-                        Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-                return false;
-            }
-        }
         return true;
     }
 
@@ -250,7 +213,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         public void actionPerformed(ActionEvent e) {
             int answer = consoleChooser.showOpenDialog(ExternalTab.this);
             if (answer == JFileChooser.APPROVE_OPTION) {
-                consoleEmulatorPath.setText(consoleChooser.getSelectedFile().getAbsolutePath());
+                consoleCommand.setText(consoleChooser.getSelectedFile().getAbsolutePath());
             }
         }
     }
@@ -265,8 +228,7 @@ class ExternalTab extends JPanel implements PrefsTab {
 
 
     private void updateEnableStatus() {
-        consoleEmulatorPath.setEnabled(specifiedConsole.isSelected());
-        browseButton.setEnabled(specifiedConsole.isSelected());
+        browseButton.setEnabled(executeConsole.isSelected());
         consoleCommand.setEnabled(executeConsole.isSelected());
     }
 }

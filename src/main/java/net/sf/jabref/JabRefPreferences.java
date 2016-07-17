@@ -278,11 +278,8 @@ public class JabRefPreferences {
     public static final String KEY_PATTERN_REGEX = "KeyPatternRegex";
     public static final String KEY_PATTERN_REPLACEMENT = "KeyPatternReplacement";
 
-    public static final String CONSOLE_APPLICATION = "consoleApplication";
     public static final String CONSOLE_COMMAND = "consoleCommand";
     public static final String USE_DEFAULT_CONSOLE_APPLICATION = "useDefaultConsoleApplication";
-    public static final String USE_SPECIFIED_CONSOLE_APPLICATION = "useSpecifiedConsoleApplication";
-    public static final String USE_CONSOLE_COMMAND = "useConsoleCommand";
 
     // Currently, it is not possible to specify defaults for specific entry types
     // When this should be made possible, the code to inspect is net.sf.jabref.gui.preftabs.LabelPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getLabelPattern(); etc
@@ -871,9 +868,6 @@ public class JabRefPreferences {
         defaults.put(INDENT, 4);
 
         defaults.put(USE_DEFAULT_CONSOLE_APPLICATION, Boolean.TRUE);
-        defaults.put(USE_SPECIFIED_CONSOLE_APPLICATION, Boolean.FALSE);
-        defaults.put(USE_CONSOLE_COMMAND, Boolean.FALSE);
-        defaults.put(CONSOLE_APPLICATION, "");
         defaults.put(CONSOLE_COMMAND, "");
 
         //versioncheck defaults

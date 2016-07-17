@@ -17,9 +17,6 @@ package net.sf.jabref.gui.desktop;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -310,7 +307,7 @@ public class JabRefDesktop {
     /**
      * Opens a new console starting on the given file location
      *
-     * If no terminal emulator is specified in {@link Globals},
+     * If no command is specified in {@link Globals},
      * the default system console will be executed.
      *
      * @param file Location the console should be opened at.
@@ -321,32 +318,42 @@ public class JabRefDesktop {
         }
 
         String absolutePath = file.toPath().toAbsolutePath().getParent().toString();
-        Path path = Paths.get(Globals.prefs.get(JabRefPreferences.CONSOLE_APPLICATION));
         boolean usingDefault = Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION);
-        boolean usingCommand = Globals.prefs.getBoolean(JabRefPreferences.USE_CONSOLE_COMMAND);
-        boolean usingSpecified = Globals.prefs.getBoolean(JabRefPreferences.USE_SPECIFIED_CONSOLE_APPLICATION);
 
         if (usingDefault) {
             NATIVE_DESKTOP.openConsole(absolutePath);
-        } else if (usingCommand) {
+        } else {
             String command = Globals.prefs.get(JabRefPreferences.CONSOLE_COMMAND);
             command = command.trim();
 
             if (!command.isEmpty()) {
-
                 command = command.replaceAll("\\s+", " "); // normalize white spaces
                 String[] subcommands = command.split(" ");
+                StringBuilder commandLoggingText = new StringBuilder();
 
                 for (int i = 0; i < subcommands.length; i++) {
                     subcommands[i] = subcommands[i].replace("%DIR", absolutePath); // replace the placeholder if used
+                    commandLoggingText.append(subcommands[i]);
+                    if (i < (subcommands.length - 1)) {
+                        commandLoggingText.append(" ");
+                    }
                 }
 
-                new ProcessBuilder(subcommands).start();
+                JabRefGUI.getMainFrame().output(Localization.lang("Executing the command \"%0\"...", commandLoggingText.toString()));
+                LOGGER.info(Localization.lang("Executing the command \"%0\"...", commandLoggingText.toString()));
+
+                try {
+                    new ProcessBuilder(subcommands).start();
+                } catch (IOException exception) {
+                    LOGGER.error(Localization.lang("Open console"), exception);
+
+                    JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(),
+                            Localization.lang("Error_occured_while_executing_the_command_\"%0\".", commandLoggingText.toString()),
+                            Localization.lang("Open console") + " - " + Localization.lang("Error"),
+                            JOptionPane.ERROR_MESSAGE);
+                    JabRefGUI.getMainFrame().output(null);
+                }
             }
-        } else if (usingSpecified && Files.exists(path) && !Files.isDirectory(path) && path.isAbsolute()) {
-            ProcessBuilder process = new ProcessBuilder(path.toString());
-            process.directory(new File(absolutePath));
-            process.start();
         }
     }
 
