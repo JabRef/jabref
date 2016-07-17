@@ -27,6 +27,7 @@ import java.util.Date;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
@@ -55,7 +56,11 @@ public class DatePickerButton implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         Date date = datePicker.getDate();
         if (date != null) {
-            editor.setText(EasyDateFormat.isoDateFormat().getDateAt(date));
+            if (isoFormat) {
+                editor.setText(EasyDateFormat.isoDateFormat().getDateAt(date));
+            } else {
+                editor.setText(EasyDateFormat.fromPreferences(Globals.prefs).getDateAt(date));
+            }
             // Set focus to editor component after changing its text:
             new FocusRequester(editor.getTextComponent());
         }
