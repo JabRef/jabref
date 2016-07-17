@@ -868,7 +868,11 @@ public class JabRefPreferences {
         defaults.put(INDENT, 4);
 
         defaults.put(USE_DEFAULT_CONSOLE_APPLICATION, Boolean.TRUE);
-        defaults.put(CONSOLE_COMMAND, "");
+        if (OS.WINDOWS) {
+            defaults.put(CONSOLE_COMMAND, "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\"");
+        } else {
+            defaults.put(CONSOLE_COMMAND, "");
+        }
 
         //versioncheck defaults
         defaults.put(VersionPreferences.VERSION_IGNORED_UPDATE, "");

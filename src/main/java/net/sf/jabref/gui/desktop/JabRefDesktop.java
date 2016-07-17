@@ -339,13 +339,13 @@ public class JabRefDesktop {
                     }
                 }
 
-                JabRefGUI.getMainFrame().output(Localization.lang("Executing the command \"%0\"...", commandLoggingText.toString()));
-                LOGGER.info(Localization.lang("Executing the command \"%0\"...", commandLoggingText.toString()));
+                JabRefGUI.getMainFrame().output(Localization.lang("Executing command \"%0\"...", commandLoggingText.toString()));
+                LOGGER.info("Executing command \"" + commandLoggingText.toString() + "\"...");
 
                 try {
                     new ProcessBuilder(subcommands).start();
                 } catch (IOException exception) {
-                    LOGGER.error(Localization.lang("Open console"), exception);
+                    LOGGER.error("Open console", exception);
 
                     JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(),
                             Localization.lang("Error_occured_while_executing_the_command_\"%0\".", commandLoggingText.toString()),

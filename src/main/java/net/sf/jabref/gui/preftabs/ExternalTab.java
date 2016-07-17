@@ -72,7 +72,7 @@ class ExternalTab extends JPanel implements PrefsTab {
 
 
         defaultConsole = new JRadioButton(Localization.lang("Use default terminal emulator"));
-        executeConsole = new JRadioButton(Localization.lang("Execute") + ":");
+        executeConsole = new JRadioButton(Localization.lang("Execute command") + ":");
         consoleCommand = new JTextField();
         consoleChooser = new JFileChooser();
         browseButton = new JButton(Localization.lang("Browse"));
