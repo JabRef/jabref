@@ -261,7 +261,8 @@ public class CleanupWorkerTest {
     @Test
     public void cleanupHtmlToLatexConvertsEpsilonToLatex() {
         CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true,
-                Collections.singletonList(new FieldFormatterCleanup("title", new HtmlToLatexFormatter()))));
+                Collections.singletonList(new FieldFormatterCleanup("title", new HtmlToLatexFormatter(
+                        Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION))))));
         BibEntry entry = new BibEntry();
         entry.setField("title", "&Epsilon;");
 

@@ -18,7 +18,6 @@ package net.sf.jabref.logic.groups;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
@@ -42,14 +41,17 @@ public class SearchGroup extends AbstractGroup {
 
     private static final Log LOGGER = LogFactory.getLog(SearchGroup.class);
 
+    private final JabRefPreferences jabRefPreferences;
 
     /**
      * Creates a SearchGroup with the specified properties.
      */
-    public SearchGroup(String name, String searchExpression, boolean caseSensitive, boolean regExp, GroupHierarchyType context) {
+    public SearchGroup(String name, String searchExpression, boolean caseSensitive, boolean regExp,
+            GroupHierarchyType context, JabRefPreferences jabRefPreferences) {
         super(name, context);
 
         this.query = new SearchQuery(searchExpression, caseSensitive, regExp);
+        this.jabRefPreferences = jabRefPreferences;
     }
 
     /**
@@ -58,7 +60,7 @@ public class SearchGroup extends AbstractGroup {
      * @param s The String representation obtained from
      *          SearchGroup.toString(), or null if incompatible
      */
-    public static AbstractGroup fromString(String s) {
+    public static AbstractGroup fromString(String s, JabRefPreferences jabRefPreferences) {
         if (!s.startsWith(SearchGroup.ID)) {
             throw new IllegalArgumentException("SearchGroup cannot be created from \"" + s + "\".");
         }
@@ -74,7 +76,7 @@ public class SearchGroup extends AbstractGroup {
         // fields; these are ignored now, all fields are always searched
         return new SearchGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR),
                 StringUtil.unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
-                GroupHierarchyType.getByNumber(context));
+                GroupHierarchyType.getByNumber(context), jabRefPreferences);
     }
 
     @Override
@@ -141,7 +143,7 @@ public class SearchGroup extends AbstractGroup {
     public AbstractGroup deepCopy() {
         try {
             return new SearchGroup(getName(), getSearchExpression(), isCaseSensitive(),
-                    isRegExp(), getHierarchicalContext());
+                    isRegExp(), getHierarchicalContext(), jabRefPreferences);
         } catch (Throwable t) {
             // this should never happen, because the constructor obviously
             // succeeded in creating _this_ instance!
@@ -173,7 +175,7 @@ public class SearchGroup extends AbstractGroup {
     public String getShortDescription() {
         StringBuilder sb = new StringBuilder();
         sb.append("<b>");
-        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC)) {
+        if (jabRefPreferences.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC)) {
             sb.append("<i>").append(StringUtil.quoteForHTML(getName())).append("</i>");
         } else {
             sb.append(StringUtil.quoteForHTML(getName()));

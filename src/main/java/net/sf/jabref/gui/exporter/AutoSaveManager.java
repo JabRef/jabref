@@ -102,7 +102,7 @@ public class AutoSaveManager {
                     .withMakeBackup(false)
                     .withEncoding(panel.getBibDatabaseContext().getMetaData().getEncoding());
 
-            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
+            BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new, Globals.prefs);
             SaveSession ss = databaseWriter.saveDatabase(panel.getBibDatabaseContext(), prefs);
             ss.commit(backupFile.toPath());
         } catch (SaveException e) {

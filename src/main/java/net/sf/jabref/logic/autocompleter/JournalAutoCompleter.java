@@ -20,16 +20,21 @@ package net.sf.jabref.logic.autocompleter;
 import java.util.List;
 import java.util.Objects;
 
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 
 public class JournalAutoCompleter extends EntireFieldAutoCompleter {
 
     private final JournalAbbreviationLoader abbreviationLoader;
+    private final JabRefPreferences jabRefPreferences;
 
-    JournalAutoCompleter(String fieldName, AutoCompletePreferences preferences, JournalAbbreviationLoader abbreviationLoader) {
+
+    JournalAutoCompleter(String fieldName, AutoCompletePreferences preferences,
+            JournalAbbreviationLoader abbreviationLoader, JabRefPreferences jabRefPreferences) {
         super(fieldName, preferences);
         this.abbreviationLoader = Objects.requireNonNull(abbreviationLoader);
+        this.jabRefPreferences = Objects.requireNonNull(jabRefPreferences);
     }
 
     @Override
@@ -37,7 +42,7 @@ public class JournalAutoCompleter extends EntireFieldAutoCompleter {
         List<String> completions = super.complete(toComplete);
 
         // Also return journal names in the journal abbreviation list
-        for (Abbreviation abbreviation : abbreviationLoader.getRepository().getAbbreviations()) {
+        for (Abbreviation abbreviation : abbreviationLoader.getRepository(jabRefPreferences).getAbbreviations()) {
             if (abbreviation.getName().startsWith(toComplete)) {
                 completions.add(abbreviation.getName());
             }

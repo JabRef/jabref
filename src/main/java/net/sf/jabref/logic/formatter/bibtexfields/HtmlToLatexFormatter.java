@@ -20,12 +20,10 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,6 +39,12 @@ public class HtmlToLatexFormatter implements LayoutFormatter, Formatter {
     private static final Pattern ESCAPED_PATTERN3 = Pattern.compile("&#([x]*)([0]*)(\\p{XDigit}+);");
     private static final Pattern ESCAPED_PATTERN4 = Pattern.compile("&(\\w+);");
 
+    private final boolean convertToEquation;
+
+
+    public HtmlToLatexFormatter(boolean convertToEquation) {
+        this.convertToEquation = convertToEquation;
+    }
 
     @Override
     public String format(String text) {
@@ -54,7 +58,7 @@ public class HtmlToLatexFormatter implements LayoutFormatter, Formatter {
         // Deal with the form <sup>k</sup>and <sub>k</sub>
         // If the result is in text or equation form can be controlled
         // From the "Advanced settings" tab
-        if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
+        if (convertToEquation) {
             result = result.replaceAll("<[ ]?sup>([^<]+)</sup>", "\\$\\^\\{$1\\}\\$");
             result = result.replaceAll("<[ ]?sub>([^<]+)</sub>", "\\$_\\{$1\\}\\$");
         } else {

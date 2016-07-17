@@ -22,7 +22,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -94,9 +93,9 @@ public class JournalAbbreviationLoader {
         return readJournalListFromResource(JOURNALS_FILE_BUILTIN);
     }
 
-    public JournalAbbreviationRepository getRepository() {
+    public JournalAbbreviationRepository getRepository(JabRefPreferences jabRefPreferences) {
         if (journalAbbrev == null) {
-            update(Globals.prefs);
+            update(jabRefPreferences);
         }
         return journalAbbrev;
     }

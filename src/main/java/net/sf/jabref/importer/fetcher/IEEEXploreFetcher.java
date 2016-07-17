@@ -81,7 +81,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
     private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
     private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
-    private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
+    private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter(
+            Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION));
     private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);
 
     private boolean shouldContinue;
@@ -444,7 +445,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
                 fullName = fullName.trim();
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
-                    fullName = abbreviationLoader.getRepository().getMedlineAbbreviation(fullName).orElse(fullName);
+                    fullName = abbreviationLoader.getRepository(Globals.prefs).getMedlineAbbreviation(fullName)
+                            .orElse(fullName);
                 }
             }
             if ("inproceedings".equals(type)) {

@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
@@ -42,11 +43,12 @@ public class ExplicitGroup extends KeywordGroup {
 
     private static final Log LOGGER = LogFactory.getLog(ExplicitGroup.class);
 
-    public ExplicitGroup(String name, GroupHierarchyType context) throws ParseException {
-        super(name, "groups", name, true, false, context);
+    public ExplicitGroup(String name, GroupHierarchyType context, JabRefPreferences jabRefPreferences)
+            throws ParseException {
+        super(name, "groups", name, true, false, context, jabRefPreferences);
     }
 
-    public static ExplicitGroup fromString(String s) throws ParseException {
+    public static ExplicitGroup fromString(String s, JabRefPreferences jabRefPreferences) throws ParseException {
         if (!s.startsWith(ExplicitGroup.ID)) {
             throw new IllegalArgumentException("ExplicitGroup cannot be created from \"" + s + "\".");
         }
@@ -55,7 +57,7 @@ public class ExplicitGroup extends KeywordGroup {
 
         String name = tok.nextToken();
         int context = Integer.parseInt(tok.nextToken());
-        ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumber(context));
+        ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumber(context), jabRefPreferences);
         newGroup.addLegacyEntryKeys(tok);
         return newGroup;
     }
@@ -80,7 +82,7 @@ public class ExplicitGroup extends KeywordGroup {
     @Override
     public AbstractGroup deepCopy() {
         try {
-            ExplicitGroup copy = new ExplicitGroup(getName(), getContext());
+            ExplicitGroup copy = new ExplicitGroup(getName(), getContext(), jabRefPreferences);
             copy.legacyEntryKeys.addAll(legacyEntryKeys);
             return copy;
         } catch (ParseException exception) {

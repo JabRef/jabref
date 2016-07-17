@@ -50,7 +50,7 @@ public class UnabbreviateAction extends AbstractWorker {
         }
 
         UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(
-                Globals.journalAbbreviationLoader.getRepository());
+                Globals.journalAbbreviationLoader.getRepository(Globals.prefs));
 
         NamedCompound ce = new NamedCompound(Localization.lang("Unabbreviate journal names"));
         int count = 0;

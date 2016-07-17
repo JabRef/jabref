@@ -93,7 +93,8 @@ public class FieldExtraComponents {
         button.setToolTipText(ABBREVIATION_TOOLTIP_TEXT);
         button.addActionListener(actionEvent -> {
             String text = editor.getText();
-            JournalAbbreviationRepository abbreviationRepository = Globals.journalAbbreviationLoader.getRepository();
+            JournalAbbreviationRepository abbreviationRepository = Globals.journalAbbreviationLoader
+                    .getRepository(Globals.prefs);
             if (abbreviationRepository.isKnownName(text)) {
                 String s = abbreviationRepository.getNextAbbreviation(text).orElse(text);
 

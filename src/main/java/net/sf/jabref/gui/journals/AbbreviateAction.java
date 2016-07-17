@@ -52,7 +52,7 @@ public class AbbreviateAction extends AbstractWorker {
         }
 
         UndoableAbbreviator undoableAbbreviator = new UndoableAbbreviator(
-                Globals.journalAbbreviationLoader.getRepository(), iso);
+                Globals.journalAbbreviationLoader.getRepository(Globals.prefs), iso);
 
         NamedCompound ce = new NamedCompound(Localization.lang("Abbreviate journal names"));
         int count = 0;

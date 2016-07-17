@@ -22,6 +22,7 @@ import java.util.Map;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
@@ -37,8 +38,10 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
     private static final String COMMENT_PREFIX = "@Comment";
     private static final String PREAMBLE_PREFIX = "@Preamble";
 
-    public BibtexDatabaseWriter(SaveSessionFactory<E> saveSessionFactory) {
+    private final JabRefPreferences jabRefPreferences;
+    public BibtexDatabaseWriter(SaveSessionFactory<E> saveSessionFactory, JabRefPreferences jabRefPreferences) {
         super(saveSessionFactory);
+        this.jabRefPreferences = jabRefPreferences;
     }
 
     @Override
@@ -109,7 +112,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
                 getWriter().write("{}");
             } else {
                 try {
-                    String formatted = new LatexFieldFormatter(Globals.prefs).format(bibtexString.getContent(),
+                    String formatted = new LatexFieldFormatter(jabRefPreferences).format(bibtexString.getContent(),
                             LatexFieldFormatter.BIBTEX_STRING);
                     getWriter().write(formatted);
                 } catch (IllegalArgumentException ex) {
@@ -155,7 +158,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
 
     @Override
     protected void writeEntry(BibEntry entry, BibDatabaseMode mode, Boolean isReformatFile) throws SaveException {
-        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(Globals.prefs), true);
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(jabRefPreferences), true);
         try {
             bibtexEntryWriter.write(entry, getWriter(), mode, isReformatFile);
         } catch (IOException e) {

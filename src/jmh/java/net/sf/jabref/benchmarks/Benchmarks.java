@@ -60,7 +60,8 @@ public class Benchmarks {
             entry.setField("rnd", "2" + randomizer.nextInt());
             database.insertEntry(entry);
         }
-        BibtexDatabaseWriter<StringSaveSession> databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new);
+        BibtexDatabaseWriter<StringSaveSession> databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new,
+                Globals.prefs);
         StringSaveSession saveSession = databaseWriter.savePartOfDatabase(
                 new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries(),
                 new SavePreferences());
@@ -80,7 +81,8 @@ public class Benchmarks {
 
     @Benchmark
     public String write() throws Exception {
-        BibtexDatabaseWriter<StringSaveSession> databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new);
+        BibtexDatabaseWriter<StringSaveSession> databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new,
+                Globals.prefs);
         StringSaveSession saveSession = databaseWriter.savePartOfDatabase(
                 new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries(),
                 new SavePreferences());
@@ -115,14 +117,15 @@ public class Benchmarks {
 
     @Benchmark
     public String htmlToLatexConversion() {
-        HtmlToLatexFormatter f = new HtmlToLatexFormatter();
+        HtmlToLatexFormatter f = new HtmlToLatexFormatter(
+                Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION));
         return f.format(htmlConversionString);
     }
 
     @Benchmark
     public boolean keywordGroupContains() throws ParseException {
         KeywordGroup group = new KeywordGroup("testGroup", "keyword", "testkeyword", false, false,
-                GroupHierarchyType.INDEPENDENT);
+                GroupHierarchyType.INDEPENDENT, Globals.prefs);
         return group.containsAll(database.getEntries());
     }
 

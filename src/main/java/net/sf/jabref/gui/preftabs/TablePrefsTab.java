@@ -301,7 +301,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         }
         if (!Objects.equals(oldVal, newVal)) {
             prefs.put(JabRefPreferences.NUMERIC_FIELDS, newVal);
-            InternalBibtexFields.setNumericFieldsFromPrefs(Globals.prefs);
+            InternalBibtexFields.setNumericFields(Globals.prefs.getStringList(JabRefPreferences.NUMERIC_FIELDS));
         }
 
     }

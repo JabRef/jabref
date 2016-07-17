@@ -440,7 +440,7 @@ class LayoutEntry {
         switch (name) {
         case "HTMLToLatexFormatter": // For backward compatibility
         case "HtmlToLatex":
-            return new HtmlToLatexFormatter();
+            return new HtmlToLatexFormatter(prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION));
         case "UnicodeToLatexFormatter": // For backward compatibility
         case "UnicodeToLatex":
             return new UnicodeToLatexFormatter();
@@ -513,7 +513,7 @@ class LayoutEntry {
         case "Iso690NamesAuthors":
             return new Iso690NamesAuthors();
         case "JournalAbbreviator":
-            return new JournalAbbreviator(repositoryLoader);
+            return new JournalAbbreviator(repositoryLoader, prefs);
         case "LastPage":
             return new LastPage();
         case "FormatChars": // For backward compatibility

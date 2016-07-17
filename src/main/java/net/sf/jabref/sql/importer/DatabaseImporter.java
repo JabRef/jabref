@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.groups.AbstractGroup;
@@ -228,7 +229,7 @@ public class DatabaseImporter {
                         break;
                     case ExplicitGroup.ID:
                         group = new ExplicitGroup(rsGroups.getString("label"),
-                                GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
+                                GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")), Globals.prefs);
                         break;
                     case KeywordGroup.ID:
                         LOGGER.debug("Keyw: " + rsGroups.getBoolean("case_sensitive"));
@@ -236,14 +237,14 @@ public class DatabaseImporter {
                                 StringUtil.unquote(rsGroups.getString("search_field"), '\\'),
                                 StringUtil.unquote(rsGroups.getString("search_expression"), '\\'),
                                 rsGroups.getBoolean("case_sensitive"), rsGroups.getBoolean("reg_exp"),
-                                GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
+                                GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")), Globals.prefs);
                         break;
                     case SearchGroup.ID:
                         LOGGER.debug("Search: " + rsGroups.getBoolean("case_sensitive"));
                         group = new SearchGroup(rsGroups.getString("label"),
                                 StringUtil.unquote(rsGroups.getString("search_expression"), '\\'),
                                 rsGroups.getBoolean("case_sensitive"), rsGroups.getBoolean("reg_exp"),
-                                GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
+                                GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")), Globals.prefs);
                         break;
                     default:
                         break;

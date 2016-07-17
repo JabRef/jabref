@@ -21,7 +21,7 @@ public class SearchGroupTest {
     @Test
     public void testContains() {
         SearchGroup group = new SearchGroup("myExplicitGroup", "review",
-                true, true, GroupHierarchyType.INDEPENDENT);
+                true, true, GroupHierarchyType.INDEPENDENT, Globals.prefs);
         assertEquals("SearchGroup:myExplicitGroup;0;review;1;1;", group.toString());
 
         BibEntry entry = new BibEntry();
@@ -34,14 +34,14 @@ public class SearchGroupTest {
     @Test
     public void testToStringSimple() {
         SearchGroup group = new SearchGroup("myExplicitGroup", "author=harrer",
-                true, true, GroupHierarchyType.INDEPENDENT);
+                true, true, GroupHierarchyType.INDEPENDENT, Globals.prefs);
         assertEquals("SearchGroup:myExplicitGroup;0;author=harrer;1;1;", group.toString());
     }
 
     @Test
     public void testToStringComplex() {
         SearchGroup group = new SearchGroup("myExplicitGroup", "author=\"harrer\"", true, false,
-                GroupHierarchyType.INCLUDING);
+                GroupHierarchyType.INCLUDING, Globals.prefs);
         assertEquals("SearchGroup:myExplicitGroup;2;author=\"harrer\";1;0;", group.toString());
     }
 

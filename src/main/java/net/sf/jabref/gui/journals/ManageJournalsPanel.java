@@ -185,7 +185,7 @@ class ManageJournalsPanel extends JPanel {
 
         viewBuiltin.addActionListener(e -> {
             JTable table = new JTable(JournalAbbreviationsUtil
-                    .getTableModel(Globals.journalAbbreviationLoader.getRepository().getAbbreviations()));
+                    .getTableModel(Globals.journalAbbreviationLoader.getRepository(Globals.prefs).getAbbreviations()));
             JScrollPane pane = new JScrollPane(table);
             JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"),
                     JOptionPane.INFORMATION_MESSAGE);

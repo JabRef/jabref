@@ -1,5 +1,7 @@
 package net.sf.jabref.logic.autocompleter;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 
 import org.junit.Assert;
@@ -17,12 +19,13 @@ public class AutoCompleterFactoryTest {
     public void setUp() throws Exception {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         abbreviationLoader = mock(JournalAbbreviationLoader.class);
-        autoCompleterFactory = new AutoCompleterFactory(preferences, abbreviationLoader);
+        Globals.prefs = JabRefPreferences.getInstance();
+        autoCompleterFactory = new AutoCompleterFactory(preferences, abbreviationLoader, Globals.prefs);
     }
 
     @Test(expected = NullPointerException.class)
     public void initFactoryWithNullPreferenceThrowsException() {
-        new AutoCompleterFactory(null, abbreviationLoader);
+        new AutoCompleterFactory(null, abbreviationLoader, Globals.prefs);
     }
 
     @Test
