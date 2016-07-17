@@ -523,7 +523,7 @@ class OOBibBase {
                             } else {
                                 num.add(j, lastNum + 1);
                                 if (numbers.containsKey(keys[j])) {
-                                    num.add(j, numbers.get(keys[j]));
+                                    num.set(j, numbers.get(keys[j]));
                                 } else {
                                     numbers.put(keys[j], num.get(j));
                                     lastNum = num.get(j);
