@@ -16,25 +16,13 @@
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Optional;
 
 import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
@@ -61,12 +49,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
     private final JCheckBox useUnitFormatterOnSearch;
     private final RemotePreferences remotePreferences;
 
-    private final JRadioButton defaultConsole;
-    private final JRadioButton specifiedConsole;
-    private final JTextField consoleEmulatorPath;
-    private final JFileChooser consoleChooser;
-    private final JButton browseButton;
-
 
     public AdvancedTab(JabRefPreferences prefs) {
         preferences = prefs;
@@ -78,39 +60,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
         useConvertToEquation = new JCheckBox(Localization.lang("Prefer converting subscripts and superscripts to equations rather than text"));
         useCaseKeeperOnSearch = new JCheckBox(Localization.lang("Add {} to specified title words on search to keep the correct case"));
         useUnitFormatterOnSearch = new JCheckBox(Localization.lang("Format units by adding non-breaking separators and keeping the correct case on search"));
-
-        defaultConsole = new JRadioButton(Localization.lang("Use default terminal emulator"));
-        specifiedConsole = new JRadioButton(Localization.lang("Specify terminal emulator") + ":");
-        consoleEmulatorPath = new JTextField(25);
-        consoleChooser = new JFileChooser();
-        browseButton = new JButton(Localization.lang("Browse"));
-
-        ButtonGroup consoleOptions = new ButtonGroup();
-        consoleOptions.add(defaultConsole);
-        consoleOptions.add(specifiedConsole);
-
-        JPanel consoleOptionPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints layoutConstraints = new GridBagConstraints();
-
-        defaultConsole.addActionListener(new ConsoleRadioButtonActionListener());
-        specifiedConsole.addActionListener(new ConsoleRadioButtonActionListener());
-        browseButton.addActionListener(new BrowseButtonActionListener());
-
-        layoutConstraints.fill = GridBagConstraints.HORIZONTAL;
-
-        layoutConstraints.gridx = 0;
-        layoutConstraints.gridy = 0;
-        layoutConstraints.insets = new Insets(0, 0, 6, 0);
-        consoleOptionPanel.add(defaultConsole, layoutConstraints);
-
-        layoutConstraints.gridy = 1;
-        consoleOptionPanel.add(specifiedConsole, layoutConstraints);
-
-        layoutConstraints.gridx = 1;
-        consoleOptionPanel.add(consoleEmulatorPath, layoutConstraints);
-        layoutConstraints.gridx = 2;
-        layoutConstraints.insets = new Insets(0, 4, 6, 0);
-        consoleOptionPanel.add(browseButton, layoutConstraints);
 
         FormLayout layout = new FormLayout
                 ("1dlu, 8dlu, left:pref, 4dlu, fill:3dlu",//, 4dlu, fill:pref",// 4dlu, left:pref, 4dlu",
@@ -154,12 +103,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.append(pan);
         builder.append(useUnitFormatterOnSearch);
-        builder.nextLine();
-
-        builder.appendSeparator(Localization.lang("Open console"));
-        builder.nextLine();
-        builder.append(new JPanel());
-        builder.append(consoleOptionPanel);
 
         pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
@@ -176,11 +119,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
         useConvertToEquation.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION));
         useCaseKeeperOnSearch.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH));
         useUnitFormatterOnSearch.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH));
-        defaultConsole.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION));
-        specifiedConsole.setSelected(!Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION));
-        consoleEmulatorPath.setText(Globals.prefs.get(JabRefPreferences.CONSOLE_APPLICATION));
-
-        updateEnableStatus();
     }
 
     @Override
@@ -194,8 +132,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
         preferences.putBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION, useConvertToEquation.isSelected());
         preferences.putBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH, useCaseKeeperOnSearch.isSelected());
         preferences.putBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH, useUnitFormatterOnSearch.isSelected());
-        preferences.putBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION, defaultConsole.isSelected());
-        preferences.put(JabRefPreferences.CONSOLE_APPLICATION, consoleEmulatorPath.getText());
     }
 
     private void storeRemoteSettings() {
@@ -228,35 +164,13 @@ class AdvancedTab extends JPanel implements PrefsTab {
         }
     }
 
-    private class BrowseButtonActionListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int answer = consoleChooser.showOpenDialog(AdvancedTab.this);
-            if (answer == JFileChooser.APPROVE_OPTION) {
-                consoleEmulatorPath.setText(consoleChooser.getSelectedFile().getAbsolutePath());
-            }
-        }
-    }
-
-    private class ConsoleRadioButtonActionListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            updateEnableStatus();
-        }
-    }
-
-    private void updateEnableStatus() {
-        consoleEmulatorPath.setEnabled(specifiedConsole.isSelected());
-        browseButton.setEnabled(specifiedConsole.isSelected());
-    }
-
     @Override
     public boolean validateSettings() {
-        boolean isValid = true;
-
         try {
             int portNumber = Integer.parseInt(remoteServerPort.getText());
-            if (!RemoteUtil.isUserPort(portNumber)) {
+            if (RemoteUtil.isUserPort(portNumber)) {
+                return true;
+            } else {
                 throw new NumberFormatException();
             }
         } catch (NumberFormatException ex) {
@@ -264,21 +178,8 @@ class AdvancedTab extends JPanel implements PrefsTab {
                     Localization.lang("You must enter an integer value in the interval 1025-65535 in the text field for")
                             + " '" + Localization.lang("Remote server port") + '\'',
                     Localization.lang("Remote server port"), JOptionPane.ERROR_MESSAGE);
-            isValid = false;
+            return false;
         }
-
-        if (!consoleEmulatorPath.getText().trim().isEmpty()) {
-            Path path = Paths.get(consoleEmulatorPath.getText());
-
-            if (!Files.exists(path) || Files.isDirectory(path) || !path.isAbsolute()) {
-                JOptionPane.showMessageDialog(null,
-                        Localization.lang("Please type in the absolute path to an existing terminal emulator."),
-                        Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-                isValid = false;
-            }
-        }
-
-        return isValid;
     }
 
     @Override
