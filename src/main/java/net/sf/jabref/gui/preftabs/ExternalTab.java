@@ -88,7 +88,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         JLabel commandDescription = new JLabel(
                 "<html>" +
                         Localization.lang("<u>Note</u>: Use the placeholder <i>%0</i>" +
-                                " for the location of the current database file.", "%DIR") +
+                                " for the location of the opened database file.", "%DIR") +
                 "</html>");
 
         ButtonGroup consoleOptions = new ButtonGroup();
