@@ -78,7 +78,7 @@ public class ExportFormatTest {
     public static Collection<Object[]> exportFormats() {
         Collection<Object[]> result = new ArrayList<>();
         Globals.prefs = JabRefPreferences.getInstance();
-        ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats());
+        ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
         for (IExportFormat format : ExportFormats.getExportFormats().values()) {
             result.add(new Object[] {format, format.getDisplayName()});
         }

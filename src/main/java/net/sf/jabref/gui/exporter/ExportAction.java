@@ -59,7 +59,7 @@ public class ExportAction {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats());
+                ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
                 JFileChooser fc = ExportAction
                         .createExportFileChooser(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
                 fc.showSaveDialog(frame);

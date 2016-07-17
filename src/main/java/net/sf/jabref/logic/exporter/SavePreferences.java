@@ -2,7 +2,6 @@ package net.sf.jabref.logic.exporter;
 
 import java.nio.charset.Charset;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -32,10 +31,10 @@ public class SavePreferences {
     }
 
     public static SavePreferences loadForExportFromPreferences(JabRefPreferences preferences) {
-        Boolean saveInOriginalOrder = Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
+        Boolean saveInOriginalOrder = preferences.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
         SaveOrderConfig saveOrder = null;
         if (!saveInOriginalOrder) {
-            if (Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
+            if (preferences.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
                 saveOrder = SaveOrderConfig.loadExportSaveOrderFromPreferences(preferences);
             } else {
                 saveOrder = SaveOrderConfig.loadTableSaveOrderFromPreferences(preferences);

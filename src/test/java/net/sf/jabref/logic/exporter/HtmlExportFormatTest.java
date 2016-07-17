@@ -35,7 +35,7 @@ public class HtmlExportFormatTest {
     @Before
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
-        ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats());
+        ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
         exportFormat = ExportFormats.getExportFormat("html");
 
         Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();

@@ -1393,7 +1393,7 @@ public class BibtexParserTest {
 
         AbstractLabelPattern labelPattern = result.getMetaData().getLabelPattern();
 
-        AbstractLabelPattern expectedPattern = new DatabaseLabelPattern();
+        AbstractLabelPattern expectedPattern = new DatabaseLabelPattern(Globals.prefs);
         expectedPattern.setDefaultValue("test");
         expectedPattern.addLabelPattern("article", "articleTest");
 

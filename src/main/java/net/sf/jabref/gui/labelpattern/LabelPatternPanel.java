@@ -245,7 +245,7 @@ public class LabelPatternPanel extends JPanel {
     }
 
     public DatabaseLabelPattern getLabelPatternAsDatabaseLabelPattern() {
-        DatabaseLabelPattern res = new DatabaseLabelPattern();
+        DatabaseLabelPattern res = new DatabaseLabelPattern(Globals.prefs);
         fillPatternUsingPanelData(res);
         return res;
     }

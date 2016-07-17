@@ -155,7 +155,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeMetadata() throws Exception {
-        DatabaseLabelPattern labelPattern = new DatabaseLabelPattern();
+        DatabaseLabelPattern labelPattern = new DatabaseLabelPattern(Globals.prefs);
         labelPattern.setDefaultValue("test");
         metaData.setLabelPattern(labelPattern);
 
@@ -168,7 +168,7 @@ public class BibtexDatabaseWriterTest {
     @Test
     public void writeMetadataAndEncoding() throws Exception {
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
-        DatabaseLabelPattern labelPattern = new DatabaseLabelPattern();
+        DatabaseLabelPattern labelPattern = new DatabaseLabelPattern(Globals.prefs);
         labelPattern.setDefaultValue("test");
         metaData.setLabelPattern(labelPattern);
 
@@ -420,7 +420,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeCustomKeyPattern() throws Exception {
-        AbstractLabelPattern pattern = new DatabaseLabelPattern();
+        AbstractLabelPattern pattern = new DatabaseLabelPattern(Globals.prefs);
         pattern.setDefaultValue("test");
         pattern.addLabelPattern("article", "articleTest");
         metaData.setLabelPattern(pattern);

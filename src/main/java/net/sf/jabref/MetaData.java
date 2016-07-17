@@ -238,7 +238,7 @@ public class MetaData implements Iterable<String> {
             return labelPattern;
         }
 
-        labelPattern = new DatabaseLabelPattern();
+        labelPattern = new DatabaseLabelPattern(Globals.prefs);
 
         // read the data from the metadata and store it into the labelPattern
         for (String key : this) {
