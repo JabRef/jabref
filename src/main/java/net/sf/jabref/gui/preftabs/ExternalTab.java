@@ -20,8 +20,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -87,9 +85,9 @@ class ExternalTab extends JPanel implements PrefsTab {
         JPanel consoleOptionPanel = new JPanel(new GridBagLayout());
         GridBagConstraints layoutConstraints = new GridBagConstraints();
 
-        defaultConsole.addActionListener(new ConsoleRadioButtonActionListener());
-        executeConsole.addActionListener(new ConsoleRadioButtonActionListener());
-        browseButton.addActionListener(new BrowseButtonActionListener());
+        defaultConsole.addActionListener(e -> updateExecuteConsoleButtonAndFieldEnabledState());
+        executeConsole.addActionListener(e -> updateExecuteConsoleButtonAndFieldEnabledState());
+        browseButton.addActionListener(e -> showConsoleChooser());
 
         layoutConstraints.fill = GridBagConstraints.HORIZONTAL;
 
@@ -184,7 +182,7 @@ class ExternalTab extends JPanel implements PrefsTab {
 
         consoleCommand.setText(Globals.prefs.get(JabRefPreferences.CONSOLE_COMMAND));
 
-        updateEnableStatus();
+        updateExecuteConsoleButtonAndFieldEnabledState();
     }
 
     @Override
@@ -206,29 +204,15 @@ class ExternalTab extends JPanel implements PrefsTab {
         return Localization.lang("External programs");
     }
 
-
-    private class BrowseButtonActionListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int answer = consoleChooser.showOpenDialog(ExternalTab.this);
-            if (answer == JFileChooser.APPROVE_OPTION) {
-                consoleCommand.setText(consoleChooser.getSelectedFile().getAbsolutePath());
-            }
-        }
-    }
-
-    private class ConsoleRadioButtonActionListener implements ActionListener {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            updateEnableStatus();
-        }
-    }
-
-
-    private void updateEnableStatus() {
+    private void updateExecuteConsoleButtonAndFieldEnabledState() {
         browseButton.setEnabled(executeConsole.isSelected());
         consoleCommand.setEnabled(executeConsole.isSelected());
+    }
+
+    private void showConsoleChooser() {
+        int answer = consoleChooser.showOpenDialog(ExternalTab.this);
+        if (answer == JFileChooser.APPROVE_OPTION) {
+            consoleCommand.setText(consoleChooser.getSelectedFile().getAbsolutePath());
+        }
     }
 }
