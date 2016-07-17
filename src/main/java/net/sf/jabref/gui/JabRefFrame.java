@@ -101,7 +101,7 @@ import net.sf.jabref.gui.groups.GroupSelector;
 import net.sf.jabref.gui.help.AboutAction;
 import net.sf.jabref.gui.help.AboutDialog;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.gui.journals.ManageJournalsAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.keyboard.KeyBindingRepository;
@@ -220,7 +220,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction openForumAction = new OpenBrowserAction("http://discourse.jabref.org/",
             Localization.menuTitle("Online help forum"), Localization.lang("Online help forum"), IconTheme.JabRefIcon.FORUM.getSmallIcon(), IconTheme.JabRefIcon.FORUM.getIcon());
     private final AbstractAction help = new HelpAction(Localization.menuTitle("Online help"), Localization.lang("Online help"),
-            HelpFiles.CONTENTS, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
+            HelpFile.CONTENTS, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
     private final AbstractAction about = new AboutAction(Localization.menuTitle("About JabRef"), aboutDiag,
             Localization.lang("About JabRef"), IconTheme.getImage("about"));
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, Localization.menuTitle("Edit entry"),

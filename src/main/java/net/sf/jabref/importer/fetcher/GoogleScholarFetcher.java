@@ -33,7 +33,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.jabref.gui.FetcherPreviewDialog;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.ParserResult;
@@ -149,8 +149,8 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     }
 
     @Override
-    public HelpFiles getHelpPage() {
-        return HelpFiles.FETCHER_GOOGLE_SCHOLAR;
+    public HelpFile getHelpPage() {
+        return HelpFile.FETCHER_GOOGLE_SCHOLAR;
     }
 
     @Override

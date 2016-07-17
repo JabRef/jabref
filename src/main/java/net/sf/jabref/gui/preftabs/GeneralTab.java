@@ -35,7 +35,7 @@ import javax.swing.JTextField;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -144,7 +144,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(overwriteOwner);
         builder.append(new JPanel(), 3);
 
-        JButton help = new HelpAction(HelpFiles.OWNER).getHelpButton();
+        JButton help = new HelpAction(HelpFile.OWNER).getHelpButton();
         builder.append(help);
         builder.nextLine();
 
@@ -154,7 +154,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(Localization.lang("Field name") + ':');
         builder.append(timeStampField);
 
-        help = new HelpAction(HelpFiles.TIMESTAMP).getHelpButton();
+        help = new HelpAction(HelpFile.TIMESTAMP).getHelpButton();
         builder.append(help);
         builder.nextLine();
 

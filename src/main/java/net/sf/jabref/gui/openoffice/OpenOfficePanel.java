@@ -53,7 +53,7 @@ import net.sf.jabref.gui.SidePaneComponent;
 import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
@@ -98,7 +98,7 @@ public class OpenOfficePanel extends AbstractWorker {
     private final JButton manageCitations = new JButton(Localization.lang("Manage citations"));
     private final JButton settingsB = new JButton(Localization.lang("Settings"));
     private final JButton help = new HelpAction(Localization.lang("OpenOffice/LibreOffice integration"),
-            HelpFiles.OPENOFFICE_LIBREOFFICE).getHelpButton();
+            HelpFile.OPENOFFICE_LIBREOFFICE).getHelpButton();
     private OOBibBase ooBase;
     private JabRefFrame frame;
     private SidePaneManager manager;

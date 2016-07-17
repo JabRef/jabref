@@ -66,7 +66,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.SidePaneComponent;
 import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
@@ -242,7 +242,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         newButton.setPreferredSize(butDim);
         newButton.setMinimumSize(butDim);
-        JButton helpButton = new HelpAction(Localization.lang("Help on groups"), HelpFiles.GROUP)
+        JButton helpButton = new HelpAction(Localization.lang("Help on groups"), HelpFile.GROUP)
                 .getHelpButton();
         helpButton.setPreferredSize(butDim);
         helpButton.setMinimumSize(butDim);

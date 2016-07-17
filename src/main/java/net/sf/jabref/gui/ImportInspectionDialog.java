@@ -77,7 +77,7 @@ import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
 import net.sf.jabref.gui.groups.UndoableChangeEntriesOfGroup;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -262,7 +262,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         JButton cancel = new JButton(Localization.lang("Cancel"));
         bb.addButton(cancel);
         bb.addRelatedGap();
-        JButton help = new HelpAction(HelpFiles.IMPORT_INSPECTION).getHelpButton();
+        JButton help = new HelpAction(HelpFile.IMPORT_INSPECTION).getHelpButton();
         bb.addButton(help);
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));

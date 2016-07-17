@@ -36,7 +36,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -167,7 +167,7 @@ class FileTab extends JPanel implements PrefsTab {
         builder.append(regExpTextField);
 
         builder.append(new HelpAction(Localization.lang("Help on Regular Expression Search"),
-                HelpFiles.REGEX_SEARCH)
+                HelpFile.REGEX_SEARCH)
                 .getHelpButton());
         builder.nextLine();
         builder.append(runAutoFileSearch, 3);
@@ -177,7 +177,7 @@ class FileTab extends JPanel implements PrefsTab {
 
         builder.appendSeparator(Localization.lang("Autosave"));
         builder.append(autoSave, 1);
-        JButton help = new HelpAction(HelpFiles.AUTOSAVE).getHelpButton();
+        JButton help = new HelpAction(HelpFile.AUTOSAVE).getHelpButton();
         help.setPreferredSize(new Dimension(24, 24));
         JPanel hPan = new JPanel();
         hPan.setLayout(new BorderLayout());

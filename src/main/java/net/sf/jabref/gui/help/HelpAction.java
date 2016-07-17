@@ -40,30 +40,30 @@ import org.apache.commons.logging.LogFactory;
 public class HelpAction extends MnemonicAwareAction {
 
     private static final Log LOGGER = LogFactory.getLog(HelpAction.class);
-    private HelpFiles helpPage;
+    private HelpFile helpPage;
 
 
-    public HelpAction(String title, String tooltip, HelpFiles helpPage, KeyStroke key) {
+    public HelpAction(String title, String tooltip, HelpFile helpPage, KeyStroke key) {
         this(title, tooltip, helpPage, IconTheme.JabRefIcon.HELP.getSmallIcon());
         putValue(Action.ACCELERATOR_KEY, key);
     }
 
-    private HelpAction(String title, String tooltip, HelpFiles helpPage, Icon icon) {
+    private HelpAction(String title, String tooltip, HelpFile helpPage, Icon icon) {
         super(icon);
         this.helpPage = helpPage;
         putValue(Action.NAME, title);
         putValue(Action.SHORT_DESCRIPTION, tooltip);
     }
 
-    public HelpAction(String tooltip, HelpFiles helpPage) {
+    public HelpAction(String tooltip, HelpFile helpPage) {
         this(Localization.lang("Help"), tooltip, helpPage, IconTheme.JabRefIcon.HELP.getSmallIcon());
     }
 
-    public HelpAction(HelpFiles helpPage, Icon icon) {
+    public HelpAction(HelpFile helpPage, Icon icon) {
         this(Localization.lang("Help"), Localization.lang("Help"), helpPage, icon);
     }
 
-    public HelpAction(HelpFiles helpPage) {
+    public HelpAction(HelpFile helpPage) {
         this(Localization.lang("Help"), Localization.lang("Help"), helpPage, IconTheme.JabRefIcon.HELP.getSmallIcon());
     }
 
@@ -75,7 +75,7 @@ public class HelpAction extends MnemonicAwareAction {
         return button;
     }
 
-    public void setHelpFile(HelpFiles urlPart) {
+    public void setHelpFile(HelpFile urlPart) {
         this.helpPage = urlPart;
     }
 

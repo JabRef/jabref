@@ -8,11 +8,11 @@ import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;
 
-public class HelpFilesTest {
+public class HelpFileTest {
     private final String jabrefHelp = "http://help.jabref.org/en/";
     @Test
     public void referToValidPage() throws IOException {
-        for (HelpFiles help : HelpFiles.values()) {
+        for (HelpFile help : HelpFile.values()) {
             URL url = new URL(jabrefHelp + help.getPageName());
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             assertEquals(200, http.getResponseCode());

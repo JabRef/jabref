@@ -19,7 +19,7 @@ import java.util.Map;
 import javax.swing.JPanel;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -62,8 +62,8 @@ public class GVKFetcher implements EntryFetcher {
     }
 
     @Override
-    public HelpFiles getHelpPage() {
-        return HelpFiles.FETCHER_GVK;
+    public HelpFile getHelpPage() {
+        return HelpFile.FETCHER_GVK;
     }
 
     @Override

@@ -39,7 +39,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
@@ -67,7 +67,7 @@ public class GenFieldsCustomizer extends JDialog {
     public GenFieldsCustomizer(JabRefFrame frame) {
         super(frame, Localization.lang("Set general fields"), false);
         parentFrame = frame;
-        helpBut = new HelpAction(HelpFiles.GENERAL_FIELDS).getHelpButton();
+        helpBut = new HelpAction(HelpFile.GENERAL_FIELDS).getHelpButton();
         jbInit();
         setSize(new Dimension(650, 300));
     }
