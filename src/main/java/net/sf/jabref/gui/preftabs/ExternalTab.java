@@ -60,8 +60,11 @@ class ExternalTab extends JPanel implements PrefsTab {
 
     private final JRadioButton defaultConsole;
     private final JRadioButton specifiedConsole;
+    private final JRadioButton executeConsole;
     private final JTextField consoleEmulatorPath;
+    private final JTextField consoleCommand;
     private final JFileChooser consoleChooser;
+    private final JLabel commandDescription;
     private final JButton browseButton;
 
 
@@ -74,21 +77,31 @@ class ExternalTab extends JPanel implements PrefsTab {
         citeCommand = new JTextField(25);
         editFileTypes.addActionListener(ExternalFileTypeEditor.getAction(prefsDiag));
 
+
         defaultConsole = new JRadioButton(Localization.lang("Use default terminal emulator"));
         specifiedConsole = new JRadioButton(Localization.lang("Specify terminal emulator") + ":");
-        consoleEmulatorPath = new JTextField(25);
+        executeConsole = new JRadioButton(Localization.lang("Execute command") + ":");
+        consoleEmulatorPath = new JTextField();
+        consoleCommand = new JTextField();
         consoleChooser = new JFileChooser();
+        commandDescription = new JLabel(
+                "<html>" +
+                        Localization.lang("<u>Note</u>: Use the placeholder <i>%0</i>" +
+                                " for the location of the current database file.", "%DIR") +
+                "</html>");
         browseButton = new JButton(Localization.lang("Browse"));
 
         ButtonGroup consoleOptions = new ButtonGroup();
         consoleOptions.add(defaultConsole);
         consoleOptions.add(specifiedConsole);
+        consoleOptions.add(executeConsole);
 
         JPanel consoleOptionPanel = new JPanel(new GridBagLayout());
         GridBagConstraints layoutConstraints = new GridBagConstraints();
 
         defaultConsole.addActionListener(new ConsoleRadioButtonActionListener());
         specifiedConsole.addActionListener(new ConsoleRadioButtonActionListener());
+        executeConsole.addActionListener(new ConsoleRadioButtonActionListener());
         browseButton.addActionListener(new BrowseButtonActionListener());
 
         layoutConstraints.fill = GridBagConstraints.HORIZONTAL;
@@ -106,6 +119,17 @@ class ExternalTab extends JPanel implements PrefsTab {
         layoutConstraints.gridx = 2;
         layoutConstraints.insets = new Insets(0, 4, 6, 0);
         consoleOptionPanel.add(browseButton, layoutConstraints);
+
+        layoutConstraints.gridy = 2;
+        layoutConstraints.gridx = 0;
+        layoutConstraints.insets = new Insets(0, 0, 6, 0);
+        consoleOptionPanel.add(executeConsole, layoutConstraints);
+
+        layoutConstraints.gridx = 1;
+        consoleOptionPanel.add(consoleCommand, layoutConstraints);
+
+        layoutConstraints.gridy = 3;
+        consoleOptionPanel.add(commandDescription, layoutConstraints);
 
         FormLayout layout = new FormLayout(
                 "1dlu, 8dlu, left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", "");
@@ -173,8 +197,15 @@ class ExternalTab extends JPanel implements PrefsTab {
 
         citeCommand.setText(prefs.get(JabRefPreferences.CITE_COMMAND));
 
-        defaultConsole.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION));
-        specifiedConsole.setSelected(!Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION));
+        if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONSOLE_COMMAND)) {
+            executeConsole.setSelected(true);
+        } else if (Globals.prefs.getBoolean(JabRefPreferences.USE_SPECIFIED_CONSOLE_APPLICATION)) {
+            specifiedConsole.setSelected(true);
+        } else {
+            defaultConsole.setSelected(true);
+        }
+
+        consoleCommand.setText(Globals.prefs.get(JabRefPreferences.CONSOLE_COMMAND));
         consoleEmulatorPath.setText(Globals.prefs.get(JabRefPreferences.CONSOLE_APPLICATION));
 
         updateEnableStatus();
@@ -186,7 +217,10 @@ class ExternalTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES, openFoldersOfAttachedFiles.isSelected());
         prefs.put(JabRefPreferences.CITE_COMMAND, citeCommand.getText());
         prefs.putBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION, defaultConsole.isSelected());
+        prefs.putBoolean(JabRefPreferences.USE_SPECIFIED_CONSOLE_APPLICATION, specifiedConsole.isSelected());
+        prefs.putBoolean(JabRefPreferences.USE_CONSOLE_COMMAND, executeConsole.isSelected());
         prefs.put(JabRefPreferences.CONSOLE_APPLICATION, consoleEmulatorPath.getText());
+        prefs.put(JabRefPreferences.CONSOLE_COMMAND, consoleCommand.getText());
     }
 
     @Override
@@ -233,5 +267,6 @@ class ExternalTab extends JPanel implements PrefsTab {
     private void updateEnableStatus() {
         consoleEmulatorPath.setEnabled(specifiedConsole.isSelected());
         browseButton.setEnabled(specifiedConsole.isSelected());
+        consoleCommand.setEnabled(executeConsole.isSelected());
     }
 }

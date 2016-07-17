@@ -323,10 +323,20 @@ public class JabRefDesktop {
         String absolutePath = file.toPath().toAbsolutePath().getParent().toString();
         Path path = Paths.get(Globals.prefs.get(JabRefPreferences.CONSOLE_APPLICATION));
         boolean usingDefault = Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION);
+        boolean usingCommand = Globals.prefs.getBoolean(JabRefPreferences.USE_CONSOLE_COMMAND);
+        boolean usingSpecified = Globals.prefs.getBoolean(JabRefPreferences.USE_SPECIFIED_CONSOLE_APPLICATION);
 
         if (usingDefault) {
             NATIVE_DESKTOP.openConsole(absolutePath);
-        } else if (Files.exists(path) && !Files.isDirectory(path) && path.isAbsolute()) {
+        } else if (usingCommand) {
+            String command = Globals.prefs.get(JabRefPreferences.CONSOLE_COMMAND);
+            if (!command.isEmpty()) {
+                command = command.replace("%DIR", absolutePath); // replace the placeholder if used
+                command = command.replaceAll("\\s+", " "); // normalize white spaces
+                String[] subcommands = command.split(" ");
+                new ProcessBuilder(subcommands).start();
+            }
+        } else if (usingSpecified && Files.exists(path) && !Files.isDirectory(path) && path.isAbsolute()) {
             ProcessBuilder process = new ProcessBuilder(path.toString());
             process.directory(new File(absolutePath));
             process.start();
