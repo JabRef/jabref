@@ -35,6 +35,7 @@ Please read https://github.com/cxxr/better-java
 
 - try not to abbreviate names of variables, classes or methods
 - use lowerCamelCase instead of snake_case
+- name enums in singular, e.g. `Weekday` instead of `Weekdays` (except if they represent flags)
 
 ## Error Handling in JabRef
 
