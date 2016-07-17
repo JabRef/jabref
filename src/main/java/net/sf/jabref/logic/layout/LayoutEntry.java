@@ -26,7 +26,6 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
@@ -582,15 +581,15 @@ class LayoutEntry {
 
         List<LayoutFormatter> results = new ArrayList<>(formatterStrings.size());
 
-        Map<String, String> userNameFormatter = NameFormatter.getNameFormatters();
+        Map<String, String> userNameFormatter = NameFormatter.getNameFormatters(prefs);
 
         for (List<String> strings : formatterStrings) {
 
             String className = strings.get(0).trim();
 
             // Check if this is a name formatter defined by this export filter:
-            if (Globals.prefs.customExportNameFormatters != null) {
-                String contents = Globals.prefs.customExportNameFormatters.get(className);
+            if (prefs.customExportNameFormatters != null) {
+                String contents = prefs.customExportNameFormatters.get(className);
                 if (contents != null) {
                     NameFormatter nf = new NameFormatter();
                     nf.setParameter(contents);
