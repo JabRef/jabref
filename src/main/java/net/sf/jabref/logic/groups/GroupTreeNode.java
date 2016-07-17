@@ -21,6 +21,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.logic.search.matchers.MatcherSet;
@@ -248,8 +249,9 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         return GroupTreeNode.fromGroup(group);
     }
 
-    public static GroupTreeNode parse(List<String> orderedData) throws ParseException {
-        return GroupsParser.importGroups(orderedData);
+    public static GroupTreeNode parse(List<String> orderedData, JabRefPreferences jabRefPreferences)
+            throws ParseException {
+        return GroupsParser.importGroups(orderedData, jabRefPreferences);
     }
 
     /**

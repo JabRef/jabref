@@ -36,7 +36,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.JabRefMain;
 import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.Layout;
@@ -172,7 +171,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         this.prefs = Objects.requireNonNull(prefs);
         this.encoding = StandardCharsets.UTF_8;
         setDefaultProperties();
-        initialize(JabRefMain.class.getResource(resourcePath).openStream());
+        initialize(OOBibStyle.class.getResource(resourcePath).openStream());
         fromResource = true;
         path = resourcePath;
     }
