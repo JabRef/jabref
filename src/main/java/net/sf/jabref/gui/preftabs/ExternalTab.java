@@ -196,7 +196,7 @@ class ExternalTab extends JPanel implements PrefsTab {
 
             if (!Files.exists(path) || Files.isDirectory(path) || !path.isAbsolute()) {
                 JOptionPane.showMessageDialog(null,
-                        Localization.lang("Please type in the absolute path to an existing terminal emulator."),
+                        Localization.lang("Please enter the absolute path to an existing terminal emulator."),
                         Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                 return false;
             }
