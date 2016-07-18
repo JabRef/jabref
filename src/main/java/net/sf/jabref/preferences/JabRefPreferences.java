@@ -338,7 +338,6 @@ public class JabRefPreferences {
     public static final String CUSTOM_TAB_FIELDS = "customTabFields_";
     public static final String USE_UNIT_FORMATTER_ON_SEARCH = "useUnitFormatterOnSearch";
     public static final String USE_CASE_KEEPER_ON_SEARCH = "useCaseKeeperOnSearch";
-    public static final String USE_CONVERT_TO_EQUATION = "useConvertToEquation";
     public static final String USE_IEEE_ABRV = "useIEEEAbrv";
 
     public static final String AKS_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";

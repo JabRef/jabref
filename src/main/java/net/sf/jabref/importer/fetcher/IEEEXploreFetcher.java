@@ -73,11 +73,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private static final Pattern SUB_DETECTION_1 = Pattern.compile("/sub ([^/]+)/");
     private static final Pattern SUB_DETECTION_2 = Pattern.compile("\\(sub\\)([^(]+)\\(/sub\\)");
     private static final String SUB_TEXT_RESULT = "\\\\textsubscript\\{$1\\}";
-    private static final String SUB_EQ_RESULT = "\\$_\\{$1\\}\\$";
     private static final Pattern SUPER_DETECTION_1 = Pattern.compile("/sup ([^/]+)/");
     private static final Pattern SUPER_DETECTION_2 = Pattern.compile("\\(sup\\)([^(]+)\\(/sup\\)");
     private static final String SUPER_TEXT_RESULT = "\\\\textsuperscript\\{$1\\}";
-    private static final String SUPER_EQ_RESULT = "\\$\\^\\{$1\\}\\$";
 
     private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
     private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
