@@ -95,7 +95,7 @@ dependencies {
     // VersionEye states that 6.0.3 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
     compile 'mysql:mysql-connector-java:5.1.39'
 
-    compile 'org.postgresql:postgresql:9.4.1208'
+    compile 'org.postgresql:postgresql:9.4.1209'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['*.jar'])
@@ -116,7 +116,7 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile 'com.github.tomakehurst:wiremock:2.1.6'
+    testCompile 'com.github.tomakehurst:wiremock:2.1.7'
     testCompile 'org.assertj:assertj-swing-junit:3.4.0'
 }
 
