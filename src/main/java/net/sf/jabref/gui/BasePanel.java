@@ -2056,8 +2056,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private class OpenURLAction implements BaseAction {
 
-        private static final String URL_FIELD = "url";
-        private static final String DOI_FIELD = "doi";
         private static final String PS_FIELD = "ps";
         private static final String PDF_FIELD = "pdf";
 
@@ -2066,11 +2064,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         public void action() {
             final List<BibEntry> bes = mainTable.getSelectedEntries();
             if (bes.size() == 1) {
-                String field = DOI_FIELD;
-                Optional<String> link = bes.get(0).getFieldOptional(DOI_FIELD);
-                if (bes.get(0).hasField(URL_FIELD)) {
-                    link = bes.get(0).getFieldOptional(URL_FIELD);
-                    field = URL_FIELD;
+                String field = FieldName.DOI_FIELD;
+                Optional<String> link = bes.get(0).getFieldOptional(FieldName.DOI_FIELD);
+                if (bes.get(0).hasField(FieldName.URL_FIELD)) {
+                    link = bes.get(0).getFieldOptional(FieldName.URL_FIELD);
+                    field = FieldName.URL_FIELD;
                 }
                 if (link.isPresent()) {
                     try {
@@ -2084,14 +2082,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     // Look for web links in the "file" field as a fallback:
                     FileListEntry entry = null;
                     FileListTableModel tm = new FileListTableModel();
-<<<<<<< 90044ac423016f8b5931ea6a4067ff314ed3047a
-                    bes.get(0).getFieldOptional(Globals.FILE_FIELD).ifPresent(tm::setContent);
-=======
-                    tm.setContent(bes.get(0).getField(FieldName.FILE_FIELD));
->>>>>>> Added model.entry.FieldName that contains field name constants
+                    bes.get(0).getFieldOptional(FieldName.FILE_FIELD).ifPresent(tm::setContent);
                     for (int i = 0; i < tm.getRowCount(); i++) {
                         FileListEntry flEntry = tm.getEntry(i);
-                        if (URL_FIELD.equalsIgnoreCase(flEntry.type.get().getName())
+                        if (FieldName.URL_FIELD.equalsIgnoreCase(flEntry.type.get().getName())
                                 || PS_FIELD.equalsIgnoreCase(flEntry.type.get().getName())
                                 || PDF_FIELD.equalsIgnoreCase(flEntry.type.get().getName())) {
                             entry = flEntry;

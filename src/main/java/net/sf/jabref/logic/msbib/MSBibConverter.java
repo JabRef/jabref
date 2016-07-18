@@ -60,11 +60,11 @@ public class MSBibConverter {
         }
 
         result.standardNumber = "";
-        if (entry.hasField("isbn")) {
-            result.standardNumber += " ISBN: " + entry.getField("isbn");
+        if (entry.hasField(FieldName.ISBN_FIELD)) {
+            result.standardNumber += " ISBN: " + entry.getField(FieldName.ISBN_FIELD);
         }
-        if (entry.hasField("issn")) {
-            result.standardNumber += " ISSN: " + entry.getField("issn");
+        if (entry.hasField(FieldName.ISSN_FIELD)) {
+            result.standardNumber += " ISSN: " + entry.getField(FieldName.ISSN_FIELD);
         }
         if (entry.hasField("lccn")) {
             result.standardNumber += " LCCN: " + entry.getField("lccn");
@@ -72,8 +72,8 @@ public class MSBibConverter {
         if (entry.hasField("mrnumber")) {
             result.standardNumber += " MRN: " + entry.getField("mrnumber");
         }
-        if (entry.hasField("doi")) {
-            result.standardNumber += " DOI: " + entry.getField("doi");
+        if (entry.hasField(FieldName.DOI_FIELD)) {
+            result.standardNumber += " DOI: " + entry.getField(FieldName.DOI_FIELD);
         }
         if (result.standardNumber.isEmpty()) {
             result.standardNumber = null;

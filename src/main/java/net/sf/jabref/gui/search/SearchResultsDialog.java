@@ -241,7 +241,7 @@ public class SearchResultsDialog {
             if (i == FILE_COL) {
                 comparators.add(new IconComparator(Collections.singletonList(FieldName.FILE_FIELD)));
             } else if (i == URL_COL) {
-                comparators.add(new IconComparator(Collections.singletonList("url")));
+                comparators.add(new IconComparator(Collections.singletonList(FieldName.URL_FIELD)));
             }
 
         }
@@ -359,8 +359,8 @@ public class SearchResultsDialog {
                     }
                     break;
                 case URL_COL:
-                    entry.getFieldOptional("url").ifPresent(link -> { try {
-                        JabRefDesktop.openExternalViewer(p.getBibDatabaseContext(), link, "url");
+                    entry.getFieldOptional(FieldName.URL_FIELD).ifPresent(link -> { try {
+                        JabRefDesktop.openExternalViewer(p.getBibDatabaseContext(), link, FieldName.URL_FIELD);
                     } catch (IOException ex) {
                             LOGGER.warn("Could not open viewer", ex);
                         }
@@ -473,8 +473,8 @@ public class SearchResultsDialog {
                         return null;
                     }
                 case URL_COL:
-                    if (entry.hasField("url")) {
-                        urlLabel.setToolTipText(entry.getFieldOptional("url").get());
+                    if (entry.hasField(FieldName.URL_FIELD)) {
+                        urlLabel.setToolTipText(entry.getFieldOptional(FieldName.URL_FIELD).get());
                         return urlLabel;
                     } else {
                         return null;

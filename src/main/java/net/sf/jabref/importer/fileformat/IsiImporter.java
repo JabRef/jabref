@@ -102,7 +102,7 @@ public class IsiImporter extends ImportFormat {
 
     public static void processSubSup(Map<String, String> map) {
 
-        String[] subsup = {"title", FieldName.ABSTRACT_FIELD, "review", "notes"};
+        String[] subsup = {"title", FieldName.ABSTRACT_FIELD, FieldName.REVIEW_FIELD, "notes"};
 
         for (String aSubsup : subsup) {
             if (map.containsKey(aSubsup)) {
@@ -278,7 +278,7 @@ public class IsiImporter extends ImportFormat {
                 } else if ("PU".equals(beg)) {
                     hm.put("publisher", value);
                 } else if ("DI".equals(beg)) {
-                    hm.put("doi", value);
+                    hm.put(FieldName.DOI_FIELD, value);
                 } else if ("PD".equals(beg)) {
 
                     String month = IsiImporter.parseMonth(value);

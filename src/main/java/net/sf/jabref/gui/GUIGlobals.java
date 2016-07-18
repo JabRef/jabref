@@ -101,7 +101,7 @@ public class GUIGlobals {
 
         label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " URL");
-        GUIGlobals.TABLE_ICONS.put("url", label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.URL_FIELD, label);
 
         label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " CiteSeer URL");
@@ -113,7 +113,7 @@ public class GUIGlobals {
 
         label = new JLabel(IconTheme.JabRefIcon.DOI.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " DOI " + Localization.lang("web link"));
-        GUIGlobals.TABLE_ICONS.put("doi", label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.DOI_FIELD, label);
 
         label = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " PS");

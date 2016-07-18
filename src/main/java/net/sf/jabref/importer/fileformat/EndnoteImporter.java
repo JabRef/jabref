@@ -178,7 +178,7 @@ public class EndnoteImporter extends ImportFormat {
                 } else if ("D".equals(prefix)) {
                     hm.put(FieldName.YEAR_FIELD, val);
                 } else if ("8".equals(prefix)) {
-                    hm.put("date", val);
+                    hm.put(FieldName.DATE_FIELD, val);
                 } else if ("J".equals(prefix)) {
                     // "Alternate journal. Let's set it only if no journal
                     // has been set with %B.
@@ -209,13 +209,13 @@ public class EndnoteImporter extends ImportFormat {
                 } else if ("N".equals(prefix)) {
                     hm.put("number", val);
                 } else if ("U".equals(prefix)) {
-                    hm.put("url", val);
+                    hm.put(FieldName.URL_FIELD, val);
                 } else if ("R".equals(prefix)) {
                     String doi = val;
                     if (doi.startsWith("doi:")) {
                         doi = doi.substring(4);
                     }
-                    hm.put("doi", doi);
+                    hm.put(FieldName.DOI_FIELD, doi);
                 } else if ("O".equals(prefix)) {
                     // Notes may contain Article number
                     if (val.startsWith("Artn")) {

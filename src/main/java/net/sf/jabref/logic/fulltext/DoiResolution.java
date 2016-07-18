@@ -24,6 +24,7 @@ import java.util.Optional;
 
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,7 +45,7 @@ public class DoiResolution implements FullTextFinder {
         Objects.requireNonNull(entry);
         Optional<URL> pdfLink = Optional.empty();
 
-        Optional<DOI> doi = entry.getFieldOptional("doi").flatMap(DOI::build);
+        Optional<DOI> doi = entry.getFieldOptional(FieldName.DOI_FIELD).flatMap(DOI::build);
 
         if(doi.isPresent()) {
             String sciLink = doi.get().getURIAsASCIIString();

@@ -12,6 +12,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.Unirest;
@@ -40,7 +41,7 @@ public class ArXiv implements FullTextFinder {
         Optional<URL> pdfLink = Optional.empty();
 
         // 1. DOI
-        Optional<DOI> doi = entry.getFieldOptional("doi").flatMap(DOI::build);
+        Optional<DOI> doi = entry.getFieldOptional(FieldName.DOI_FIELD).flatMap(DOI::build);
         // 2. Eprint
         Optional<String> eprint = entry.getFieldOptional("eprint");
 

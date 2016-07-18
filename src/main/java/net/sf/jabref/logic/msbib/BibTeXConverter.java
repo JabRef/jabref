@@ -104,10 +104,10 @@ public class BibTeXConverter {
         if (standardNum == null) {
             return;
         }
-        parseSingleStandardNumber("ISBN", "isbn", standardNum, map);
-        parseSingleStandardNumber("ISSN", "issn", standardNum, map);
+        parseSingleStandardNumber("ISBN", FieldName.ISBN_FIELD, standardNum, map);
+        parseSingleStandardNumber("ISSN", FieldName.ISSN_FIELD, standardNum, map);
         parseSingleStandardNumber("LCCN", "lccn", standardNum, map);
         parseSingleStandardNumber("MRN", "mrnumber", standardNum, map);
-        parseSingleStandardNumber("DOI", "doi", standardNum, map);
+        parseSingleStandardNumber("DOI", FieldName.DOI_FIELD, standardNum, map);
     }
 }

@@ -192,13 +192,13 @@ class OpenDocumentRepresentation {
                 addTableCell(result, row, getField(e, "volume"));
                 addTableCell(result, row, getField(e, FieldName.YEAR_FIELD));
                 addTableCell(result, row, getField(e, "yearfiled"));
-                addTableCell(result, row, getField(e, "url"));
+                addTableCell(result, row, getField(e, FieldName.URL_FIELD));
                 addTableCell(result, row, "");
                 addTableCell(result, row, "");
                 addTableCell(result, row, "");
                 addTableCell(result, row, "");
                 addTableCell(result, row, "");
-                addTableCell(result, row, getField(e, "isbn"));
+                addTableCell(result, row, getField(e, FieldName.ISBN_FIELD));
                 table.appendChild(row);
             }
 

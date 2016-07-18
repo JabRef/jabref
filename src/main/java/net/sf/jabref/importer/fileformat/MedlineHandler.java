@@ -175,7 +175,7 @@ class MedlineHandler extends DefaultHandler {
         } else if ("ArticleId".equals(localName)) {
             for (int i = 0; i < atts.getLength(); i++) {
                 String value = atts.getValue(i);
-                if ("doi".equals(value)) {
+                if (FieldName.DOI_FIELD.equals(value)) {
                     inDoi = true;
                 } else if ("pii".equals(value)) {
                     inPii = true;
@@ -270,8 +270,8 @@ class MedlineHandler extends DefaultHandler {
             }
 
             if (!"".equals(doi)) {
-                b.setField("doi", doi);
-                b.setField("url", "http://dx.doi.org/" + doi);
+                b.setField(FieldName.DOI_FIELD, doi);
+                b.setField(FieldName.URL_FIELD, "http://dx.doi.org/" + doi);
             }
             if (!"".equals(pii)) {
                 b.setField("pii", pii);

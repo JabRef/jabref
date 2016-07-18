@@ -68,7 +68,7 @@ public class InternalBibtexFields {
             "ctlnames_show_etal", "ctlalt_stretch_factor");
     public static final List<String> IEEETRANBSTCTL_YES_NO_FIELDS = Arrays.asList("ctluse_article_number",
             "ctluse_paper", "ctluse_url", "ctluse_forced_etal", "ctluse_alt_spacing", "ctldash_repeated_names");
-    public static final List<String> BIBLATEX_DATE_FIELDS = Arrays.asList("date", "eventdate", "origdate", "urldate");
+    public static final List<String> BIBLATEX_DATE_FIELDS = Arrays.asList(FieldName.DATE_FIELD, "eventdate", "origdate", "urldate");
     public static final List<String> BIBLATEX_PERSON_NAME_FIELDS = Arrays.asList(FieldName.AUTHOR_FIELD, FieldName.EDITOR_FIELD, "editora",
             "editorb", "editorc", "translator", "annotator", "commentator", "introduction", "foreword", "afterword",
             "bookauthor", "holder", "shortauthor", "shorteditor", "sortname");
@@ -179,12 +179,12 @@ public class InternalBibtexFields {
         dummy.setPrivate();
         add(dummy);
 
-        dummy = new BibtexSingleField("doi", true, BibtexSingleField.SMALL_W);
+        dummy = new BibtexSingleField(FieldName.DOI_FIELD, true, BibtexSingleField.SMALL_W);
         dummy.setExtras(EnumSet.of(FieldProperties.DOI));
         add(dummy);
         add(new BibtexSingleField("eid", true, BibtexSingleField.SMALL_W));
 
-        dummy = new BibtexSingleField("date", true);
+        dummy = new BibtexSingleField(FieldName.DATE_FIELD, true);
         dummy.setPrivate();
         add(dummy);
 
@@ -194,7 +194,7 @@ public class InternalBibtexFields {
         add(new BibtexSingleField("location", false));
         add(new BibtexSingleField(FieldName.ABSTRACT_FIELD, false, BibtexSingleField.LARGE_W, 400));
 
-        dummy = new BibtexSingleField("url", false, BibtexSingleField.SMALL_W);
+        dummy = new BibtexSingleField(FieldName.URL_FIELD, false, BibtexSingleField.SMALL_W);
         dummy.setExtras(EnumSet.of(FieldProperties.EXTERNAL));
         add(dummy);
 

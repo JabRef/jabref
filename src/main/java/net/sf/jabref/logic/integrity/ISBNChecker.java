@@ -7,6 +7,7 @@ import net.sf.jabref.logic.integrity.IntegrityCheck.Checker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.ISBN;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 
 public class ISBNChecker implements Checker {
@@ -14,21 +15,21 @@ public class ISBNChecker implements Checker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        if (!entry.hasField("isbn")) {
+        if (!entry.hasField(FieldName.ISBN_FIELD)) {
             return Collections.emptyList();
         }
 
         // Check that the ISBN is on the correct form
-        ISBN isbn = new ISBN(entry.getFieldOptional("isbn").get());
+        ISBN isbn = new ISBN(entry.getFieldOptional(FieldName.ISBN_FIELD).get());
 
         if (!isbn.isValidFormat()) {
             return Collections.singletonList(
-                    new IntegrityMessage(Localization.lang("incorrect format"), entry, "isbn"));
+                    new IntegrityMessage(Localization.lang("incorrect format"), entry, FieldName.ISBN_FIELD));
         }
 
         if (!isbn.isValidChecksum()) {
             return Collections
-                    .singletonList(new IntegrityMessage(Localization.lang("incorrect control digit"), entry, "isbn"));
+                    .singletonList(new IntegrityMessage(Localization.lang("incorrect control digit"), entry, FieldName.ISBN_FIELD));
         }
 
         return Collections.emptyList();

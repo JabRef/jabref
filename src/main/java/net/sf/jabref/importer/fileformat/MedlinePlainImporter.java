@@ -275,7 +275,7 @@ public class MedlinePlainImporter extends ImportFormat {
 
     private void addStandardNumber(Map<String, String> hm, String lab, String value) {
         if ("IS".equals(lab)) {
-            String key = "issn";
+            String key = FieldName.ISSN_FIELD;
             //it is possible to have two issn, one for electronic and for print
             //if there are two then it comes at the end in brackets (electronic) or (print)
             //so search for the brackets
@@ -289,7 +289,7 @@ public class MedlinePlainImporter extends ImportFormat {
                 hm.put(key, value);
             }
         } else if ("ISBN".equals(lab)) {
-            hm.put("isbn", value);
+            hm.put(FieldName.ISBN_FIELD, value);
         }
     }
 
@@ -306,7 +306,7 @@ public class MedlinePlainImporter extends ImportFormat {
             String idValue = value;
             if (value.startsWith("doi:")) {
                 idValue = idValue.replaceAll("(?i)doi:", "").trim();
-                key = "doi";
+                key = FieldName.DOI_FIELD;
             } else if (value.indexOf('[') > 0) {
                 int startOfIdentifier = value.indexOf('[');
                 int endOfIdentifier = value.indexOf(']');

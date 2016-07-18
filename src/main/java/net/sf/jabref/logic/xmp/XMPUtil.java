@@ -368,7 +368,7 @@ public class XMPUtil {
          */
         s = dcSchema.getIdentifier();
         if (s != null) {
-            entry.setField("doi", s);
+            entry.setField(FieldName.DOI_FIELD, s);
         }
 
         /**
@@ -735,7 +735,7 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: doi
              */
-            if ("doi".equals(field)) {
+            if (FieldName.DOI_FIELD.equals(field)) {
                 String o = resolvedEntry.getField(field);
                 dcSchema.setIdentifier(o);
                 continue;

@@ -42,6 +42,7 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -276,10 +277,10 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
                     entry.clearField(BibEntry.KEY_FIELD);
                     // If the entry's url field is not set, and we have stored an url for this
                     // entry, set it:
-                    if (!entry.hasField("url")) {
+                    if (!entry.hasField(FieldName.URL_FIELD)) {
                         String storedUrl = entryLinks.get(link);
                         if (storedUrl != null) {
-                            entry.setField("url", storedUrl);
+                            entry.setField(FieldName.URL_FIELD, storedUrl);
                         }
                     }
 

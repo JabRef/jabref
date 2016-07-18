@@ -400,10 +400,10 @@ public class GVKParser {
             result.setField("edition", edition);
         }
         if (isbn != null) {
-            result.setField("isbn", isbn);
+            result.setField(FieldName.ISBN_FIELD, isbn);
         }
         if (issn != null) {
-            result.setField("issn", issn);
+            result.setField(FieldName.ISSN_FIELD, issn);
         }
         if (number != null) {
             result.setField("number", number);
@@ -424,7 +424,7 @@ public class GVKParser {
             result.setField("ppn_GVK", ppn);
         }
         if (url != null) {
-            result.setField("url", url);
+            result.setField(FieldName.URL_FIELD, url);
         }
         if (note != null) {
             result.setField("note", note);

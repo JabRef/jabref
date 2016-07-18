@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -38,7 +39,7 @@ public class ACS implements FullTextFinder {
         Optional<URL> pdfLink = Optional.empty();
 
         // DOI search
-        Optional<DOI> doi = entry.getFieldOptional("doi").flatMap(DOI::build);
+        Optional<DOI> doi = entry.getFieldOptional(FieldName.DOI_FIELD).flatMap(DOI::build);
 
         if(doi.isPresent()) {
             String source = String.format(SOURCE, doi.get().getDOI());

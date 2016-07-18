@@ -184,7 +184,7 @@ public class RisImporter extends ImportFormat {
                             endPage = "--" + endPage;
                         }
                     } else if ("SN".equals(lab)) {
-                        hm.put("issn", val);
+                        hm.put(FieldName.ISSN_FIELD, val);
                     } else if ("VL".equals(lab)) {
                         hm.put("volume", val);
                     } else if ("IS".equals(lab)) {
@@ -197,7 +197,7 @@ public class RisImporter extends ImportFormat {
                             hm.put(FieldName.ABSTRACT_FIELD, oldAb + Globals.NEWLINE + val);
                         }
                     } else if ("UR".equals(lab)) {
-                        hm.put("url", val);
+                        hm.put(FieldName.URL_FIELD, val);
                     } else if (("Y1".equals(lab) || "PY".equals(lab)) && (val.length() >= 4)) {
                         String[] parts = val.split("/");
                         hm.put(FieldName.YEAR_FIELD, parts[0]);
@@ -233,7 +233,7 @@ public class RisImporter extends ImportFormat {
                         String doi = val;
                         if (doi.startsWith("doi:")) {
                             doi = doi.replaceAll("(?i)doi:", "").trim();
-                            hm.put("doi", doi);
+                            hm.put(FieldName.DOI_FIELD, doi);
                         }
                     }
                 }

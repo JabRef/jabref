@@ -260,7 +260,7 @@ public class BibEntry implements Cloneable {
         }
 
         // Finally, handle dates
-        if ("date".equals(name)) {
+        if (FieldName.DATE_FIELD.equals(name)) {
             Optional<String> year = getFieldOptional(FieldName.YEAR_FIELD);
             if (year.isPresent()) {
                 MonthUtil.Month month = MonthUtil.getMonth(getFieldOptional("month").orElse(""));
@@ -272,7 +272,7 @@ public class BibEntry implements Cloneable {
             }
         }
         if (FieldName.YEAR_FIELD.equals(name) || "month".equals(name)) {
-            Optional<String> date = getFieldOptional("date");
+            Optional<String> date = getFieldOptional(FieldName.DATE_FIELD);
             if (!date.isPresent()) {
                 return Optional.empty();
             }

@@ -48,17 +48,17 @@ public class BiblatexCleanup implements CleanupJob {
         }
 
         // Dates: create date out of year and month, save it and delete old fields
-        entry.getFieldOptional("date").ifPresent(date -> {
+        entry.getFieldOptional(FieldName.DATE_FIELD).ifPresent(date -> {
             if (date.isEmpty()) {
-                entry.getFieldOrAlias("date").ifPresent(newDate -> {
+                entry.getFieldOrAlias(FieldName.DATE_FIELD).ifPresent(newDate -> {
                     Optional<String> oldYear = entry.getFieldOptional(FieldName.YEAR_FIELD);
                     Optional<String> oldMonth = entry.getFieldOptional("month");
 
-                    entry.setField("date", newDate);
+                    entry.setField(FieldName.DATE_FIELD, newDate);
                     entry.clearField(FieldName.YEAR_FIELD);
                     entry.clearField("month");
 
-                    changes.add(new FieldChange(entry, "date", null, newDate));
+                    changes.add(new FieldChange(entry, FieldName.DATE_FIELD, null, newDate));
                     changes.add(new FieldChange(entry, FieldName.YEAR_FIELD, oldYear.orElse(null), null));
                     changes.add(new FieldChange(entry, "month", oldMonth.orElse(null), null));
                 });

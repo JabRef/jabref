@@ -203,7 +203,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         PreviewPrefsTab.entry.setField("pdf", "conceicao1997.pdf");
         PreviewPrefsTab.entry.setField("pages", "255--265");
         PreviewPrefsTab.entry.setField("keywords", "energetics, artemia, metabolism, amino acid, turbot");
-        PreviewPrefsTab.entry.setField("url", "http://ejournals.ebsco.com/direct.asp?ArticleID=TYY4NT82XA9H7R8PFPPV");
+        PreviewPrefsTab.entry.setField(FieldName.URL_FIELD, "http://ejournals.ebsco.com/direct.asp?ArticleID=TYY4NT82XA9H7R8PFPPV");
         PreviewPrefsTab.entry.setField(FieldName.ABSTRACT_FIELD,
                 "Abstract The present paper studied the influence of different food regimes "
                         + "on the free amino acid (FAA) pool, the rate of protein turnover, the flux of amino acids, and "

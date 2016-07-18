@@ -131,7 +131,7 @@ public class MetaData implements Iterable<String> {
         metaData.put(SELECTOR_META_PREFIX + FieldName.AUTHOR_FIELD, new Vector<>());
         metaData.put(SELECTOR_META_PREFIX + "journal", new Vector<>());
         metaData.put(SELECTOR_META_PREFIX + "publisher", new Vector<>());
-        metaData.put(SELECTOR_META_PREFIX + "review", new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + FieldName.REVIEW_FIELD, new Vector<>());
     }
 
     /**

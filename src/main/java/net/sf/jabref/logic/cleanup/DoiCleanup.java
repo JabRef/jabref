@@ -22,6 +22,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * Formats the DOI (e.g. removes http part) and also moves DOIs from note, url or ee field to the doi field.
@@ -31,7 +32,7 @@ public class DoiCleanup implements CleanupJob {
     /**
      * Fields to check for DOIs.
      */
-    private static final String[] FIELDS = {"note", "url", "ee"};
+    private static final String[] FIELDS = {"note", FieldName.URL_FIELD, "ee"};
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
@@ -39,17 +40,17 @@ public class DoiCleanup implements CleanupJob {
         List<FieldChange> changes = new ArrayList<>();
 
         // First check if the Doi Field is empty
-        if (entry.hasField("doi")) {
-            String doiFieldValue = entry.getField("doi");
+        if (entry.hasField(FieldName.DOI_FIELD)) {
+            String doiFieldValue = entry.getField(FieldName.DOI_FIELD);
 
             Optional<DOI> doi = DOI.build(doiFieldValue);
 
             if (doi.isPresent()) {
                 String newValue = doi.get().getDOI();
                 if (!doiFieldValue.equals(newValue)) {
-                    entry.setField("doi", newValue);
+                    entry.setField(FieldName.DOI_FIELD, newValue);
 
-                    FieldChange change = new FieldChange(entry, "doi", doiFieldValue, newValue);
+                    FieldChange change = new FieldChange(entry, FieldName.DOI_FIELD, doiFieldValue, newValue);
                     changes.add(change);
                 }
 
@@ -65,12 +66,12 @@ public class DoiCleanup implements CleanupJob {
 
                 if (doi.isPresent()) {
                     // update Doi
-                    String oldValue = entry.getField("doi");
+                    String oldValue = entry.getField(FieldName.DOI_FIELD);
                     String newValue = doi.get().getDOI();
 
-                    entry.setField("doi", newValue);
+                    entry.setField(FieldName.DOI_FIELD, newValue);
 
-                    FieldChange change = new FieldChange(entry, "doi", oldValue, newValue);
+                    FieldChange change = new FieldChange(entry, FieldName.DOI_FIELD, oldValue, newValue);
                     changes.add(change);
 
                     removeFieldValue(entry, field, changes);

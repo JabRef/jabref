@@ -506,8 +506,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // Clean up url
-        entry.getFieldOptional("url")
-                .ifPresent(url -> entry.setField("url", "http://ieeexplore.ieee.org" + url.replace("tp=&", "")));
+        entry.getFieldOptional(FieldName.URL_FIELD)
+                .ifPresent(url -> entry.setField(FieldName.URL_FIELD, "http://ieeexplore.ieee.org" + url.replace("tp=&", "")));
 
         // Replace ; as keyword separator
         entry.getFieldOptional("keywords").ifPresent(keys -> entry.setField("keywords",

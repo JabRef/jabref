@@ -166,7 +166,7 @@ public class FreeCiteImporter extends ImportFormat {
                                 type = BibtexEntryTypes.TECHREPORT;
                                 // the content of the "tech" field seems to contain the number of the technical report
                                 e.setField("number", parser.getElementText());
-                            } else if ("doi".equals(ln)
+                            } else if (FieldName.DOI_FIELD.equals(ln)
                                     || "institution".equals(ln)
                                     || "location".equals(ln)
                                     || "number".equals(ln)

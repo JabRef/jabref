@@ -173,7 +173,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(new GeneralAction(Actions.OPEN_URL, Localization.lang("Open URL or DOI"), IconTheme.JabRefIcon.WWW.getSmallIcon()) {
             {
-                if(!(isFieldSetForSelectedEntry("url") || isFieldSetForSelectedEntry("doi"))) {
+                if(!(isFieldSetForSelectedEntry(FieldName.URL_FIELD) || isFieldSetForSelectedEntry(FieldName.DOI_FIELD))) {
                     this.setEnabled(false);
                 }
             }
@@ -185,7 +185,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(new GeneralAction(Actions.MERGE_DOI, Localization.lang("Get BibTeX data from DOI")) {
             {
-                if (!(isFieldSetForSelectedEntry("doi"))) {
+                if (!(isFieldSetForSelectedEntry(FieldName.DOI_FIELD))) {
                     this.setEnabled(false);
                 }
             }

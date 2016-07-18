@@ -123,11 +123,11 @@ public class JSONEntryParser {
             for (int i = 0; i < identifiers.length(); i++) {
                 String type = identifiers.getJSONObject(i).getString("type");
                 if ("doi".equals(type)) {
-                    entry.setField("doi", identifiers.getJSONObject(i).getString("id"));
+                    entry.setField(FieldName.DOI_FIELD, identifiers.getJSONObject(i).getString("id"));
                 } else if ("pissn".equals(type)) {
-                    entry.setField("issn", identifiers.getJSONObject(i).getString("id"));
+                    entry.setField(FieldName.ISSN_FIELD, identifiers.getJSONObject(i).getString("id"));
                 } else if ("eissn".equals(type)) {
-                    entry.setField("issn", identifiers.getJSONObject(i).getString("id"));
+                    entry.setField(FieldName.ISSN_FIELD, identifiers.getJSONObject(i).getString("id"));
                 }
             }
         }
@@ -139,7 +139,7 @@ public class JSONEntryParser {
                 if (links.getJSONObject(i).has("type")) {
                     String type = links.getJSONObject(i).getString("type");
                     if ("fulltext".equals(type) && links.getJSONObject(i).has("url")) {
-                        entry.setField("url", links.getJSONObject(i).getString("url"));
+                        entry.setField(FieldName.URL_FIELD, links.getJSONObject(i).getString("url"));
                     }
                 }
             }
@@ -156,7 +156,7 @@ public class JSONEntryParser {
      */
     public static BibEntry parseSpringerJSONtoBibtex(JSONObject springerJsonEntry) {
         // Fields that are directly accessible at the top level Json object
-        String[] singleFieldStrings = {"issn", "volume", FieldName.ABSTRACT_FIELD, "doi", "title", "number",
+        String[] singleFieldStrings = {FieldName.ISSN_FIELD, "volume", FieldName.ABSTRACT_FIELD, FieldName.DOI_FIELD, "title", "number",
                 "publisher"};
 
         BibEntry entry = new BibEntry();
@@ -172,7 +172,7 @@ public class JSONEntryParser {
             // Probably book chapter or from proceeding, go for book chapter
             entry.setType("incollection");
             nametype = "booktitle";
-            entry.setField("isbn", isbn);
+            entry.setField(FieldName.ISBN_FIELD, isbn);
         }
 
         // Authors
@@ -220,16 +220,16 @@ public class JSONEntryParser {
         if (springerJsonEntry.has("url")) {
             JSONArray urlarray = springerJsonEntry.optJSONArray("url");
             if (urlarray == null) {
-                entry.setField("url", springerJsonEntry.optString("url"));
+                entry.setField(FieldName.URL_FIELD, springerJsonEntry.optString("url"));
             } else {
-                entry.setField("url", urlarray.getJSONObject(0).optString("value"));
+                entry.setField(FieldName.URL_FIELD, urlarray.getJSONObject(0).optString("value"));
             }
         }
 
         // Date
         if (springerJsonEntry.has("publicationDate")) {
             String date = springerJsonEntry.getString("publicationDate");
-            entry.setField("date", date); // For BibLatex
+            entry.setField(FieldName.DATE_FIELD, date); // For BibLatex
             String[] dateparts = date.split("-");
             entry.setField(FieldName.YEAR_FIELD, dateparts[0]);
             entry.setField("month", MonthUtil.getMonthByNumber(Integer.parseInt(dateparts[1])).bibtexFormat);

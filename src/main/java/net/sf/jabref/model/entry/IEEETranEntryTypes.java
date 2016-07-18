@@ -21,7 +21,7 @@ public class IEEETranEntryTypes {
 
         {
             addAllOptional(FieldName.AUTHOR_FIELD, "month", FieldName.YEAR_FIELD, "title", "language", "howpublished", "organization", "address",
-                    "note", "url");
+                    "note", FieldName.URL_FIELD);
 
         }
 
@@ -59,7 +59,7 @@ public class IEEETranEntryTypes {
 
         {
             addAllRequired("title", FieldName.YEAR_FIELD);
-            addAllOptional(FieldName.EDITOR_FIELD, "language", "series", "volume", "number", "organization", "month", "note", "url");
+            addAllOptional(FieldName.EDITOR_FIELD, "language", "series", "volume", "number", "organization", "month", "note", FieldName.URL_FIELD);
         }
 
         @Override
@@ -79,7 +79,7 @@ public class IEEETranEntryTypes {
         {
             addAllRequired("nationality", "number", "year/yearfiled");
             addAllOptional(FieldName.AUTHOR_FIELD, "title", "language", "assignee", "address", "type", "number", "day", "dayfiled",
-                    "month", "monthfiled", "note", "url");
+                    "month", "monthfiled", "note", FieldName.URL_FIELD);
         }
 
         @Override
@@ -99,7 +99,7 @@ public class IEEETranEntryTypes {
         {
             addAllRequired("title", "organization/institution");
             addAllOptional(FieldName.AUTHOR_FIELD, "language", "howpublished", "type", "number", "revision", "address", "month",
-                    FieldName.YEAR_FIELD, "note", "url");
+                    FieldName.YEAR_FIELD, "note", FieldName.URL_FIELD);
         }
 
         @Override

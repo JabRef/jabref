@@ -173,13 +173,13 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional("url");
+            Optional<String> value = entry.getFieldOptional(FieldName.URL_FIELD);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
 
             if (!value.get().contains("://")) {
-                return Collections.singletonList(new IntegrityMessage(Localization.lang("should contain a protocol") + ": http[s]://, file://, ftp://, ...", entry, "url"));
+                return Collections.singletonList(new IntegrityMessage(Localization.lang("should contain a protocol") + ": http[s]://, file://, ftp://, ...", entry, FieldName.URL_FIELD));
             }
 
             return Collections.emptyList();
@@ -404,7 +404,7 @@ public class IntegrityCheck {
 
             Map<String, String> fields = entry.getFieldMap();
             // the url field should not be checked for hashes, as they are legal in this field
-            fields.remove("url");
+            fields.remove(FieldName.URL_FIELD);
 
             for (Map.Entry<String, String> field : fields.entrySet()) {
                 Matcher hashMatcher = UNESCAPED_HASH.matcher(field.getValue());

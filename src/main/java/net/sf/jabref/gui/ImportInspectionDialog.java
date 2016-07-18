@@ -184,7 +184,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     private static final int FILE_COL = 2;
     private static final int URL_COL = 3;
     private static final int PAD = 4;
-    private static final String URL_FIELD = "url";
+    private static final String URL_FIELD = FieldName.URL_FIELD;
 
 
     /**

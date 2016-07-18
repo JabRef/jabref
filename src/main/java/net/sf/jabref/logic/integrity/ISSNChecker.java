@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.logic.integrity.IntegrityCheck.Checker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 
 public class ISSNChecker implements Checker {
@@ -16,16 +17,16 @@ public class ISSNChecker implements Checker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        if (!entry.hasField("issn")) {
+        if (!entry.hasField(FieldName.ISSN_FIELD)) {
             return Collections.emptyList();
         }
 
         // Check that the ISSN is on the correct form
-        String issn = entry.getFieldOptional("issn").get().trim();
+        String issn = entry.getFieldOptional(FieldName.ISSN_FIELD).get().trim();
         Matcher issnMatcher = ISSN_PATTERN.matcher(issn);
         if (!issnMatcher.matches()) {
             return Collections.singletonList(
-                    new IntegrityMessage(Localization.lang("incorrect format"), entry, "issn"));
+                    new IntegrityMessage(Localization.lang("incorrect format"), entry, FieldName.ISSN_FIELD));
         }
 
         // Check that the control digit is correct, see e.g. https://en.wikipedia.org/wiki/International_Standard_Serial_Number
@@ -44,7 +45,7 @@ public class ISSNChecker implements Checker {
             return Collections.emptyList();
         } else {
             return Collections
-                    .singletonList(new IntegrityMessage(Localization.lang("incorrect control digit"), entry, "issn"));
+                    .singletonList(new IntegrityMessage(Localization.lang("incorrect control digit"), entry, FieldName.ISSN_FIELD));
         }
     }
 

@@ -143,7 +143,7 @@ public class BiblioscapeImporter extends ImportFormat {
                         comments
                         .add("Quaternary Title: " + entry.getValue());
                     } else if ("IS".equals(entry.getKey())) {
-                        hm.put("isbn", entry
+                        hm.put(FieldName.ISBN_FIELD, entry
                                 .getValue().toString());
                     } else if ("AB".equals(entry.getKey())) {
                         hm.put(FieldName.ABSTRACT_FIELD, entry
@@ -159,7 +159,7 @@ public class BiblioscapeImporter extends ImportFormat {
                                 .toString();
                     } else if ("UR".equals(entry.getKey()) || "AT".equals(entry.getKey())) {
                         String s = entry.getValue().toString().trim();
-                        hm.put(s.startsWith("http://") || s.startsWith("ftp://") ? "url"
+                        hm.put(s.startsWith("http://") || s.startsWith("ftp://") ? FieldName.URL_FIELD
                                 : "pdf", entry.getValue().toString());
                     } else if ("C1".equals(entry.getKey())) {
                         comments.add("Custom1: "

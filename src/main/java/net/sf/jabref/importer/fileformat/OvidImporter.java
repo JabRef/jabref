@@ -189,9 +189,9 @@ public class OvidImporter extends ImportFormat {
                     content = content.replace(";", ",").replace("  ", " ");
                     h.put("keywords", content);
                 } else if (fieldName.startsWith("ISSN")) {
-                    h.put("issn", content);
+                    h.put(FieldName.ISSN_FIELD, content);
                 } else if (fieldName.startsWith("DOI Number")) {
-                    h.put("doi", content);
+                    h.put(FieldName.DOI_FIELD, content);
                 }
             }
 

@@ -156,7 +156,7 @@ class OOCalcDatabase {
             for (BibEntry e : entries) {
                 row = result.createElement("table:table-row");
                 addTableCell(result, row, new GetOpenOfficeType().format(e.getType()));
-                addTableCell(result, row, getField(e, "isbn"));
+                addTableCell(result, row, getField(e, FieldName.ISBN_FIELD));
                 addTableCell(result, row, getField(e, BibEntry.KEY_FIELD));
                 addTableCell(result, row, getField(e, FieldName.AUTHOR_FIELD));//new AuthorLastFirst().format(getField(e, FieldName.AUTHOR_FIELD)));
                 addTableCell(result, row, new RemoveWhitespace().format(new RemoveBrackets().format(getField(e, "title"))));
@@ -168,7 +168,7 @@ class OOCalcDatabase {
                 addTableCell(result, row, getField(e, FieldName.YEAR_FIELD));
                 addTableCell(result, row, getField(e, "address"));
                 addTableCell(result, row, getField(e, "note"));
-                addTableCell(result, row, getField(e, "url"));
+                addTableCell(result, row, getField(e, FieldName.URL_FIELD));
                 addTableCell(result, row, getField(e, "booktitle"));
                 addTableCell(result, row, getField(e, "chapter"));
                 addTableCell(result, row, getField(e, "edition"));

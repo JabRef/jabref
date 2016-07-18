@@ -390,7 +390,7 @@ public class PdfContentImporter extends ImportFormat {
                     if (DOI == null) {
                         pos = curString.indexOf("DOI");
                         if (pos < 0) {
-                            pos = curString.indexOf("doi");
+                            pos = curString.indexOf(FieldName.DOI_FIELD);
                         }
                         if (pos >= 0) {
                             pos += 3;
@@ -461,7 +461,7 @@ public class PdfContentImporter extends ImportFormat {
                 entry.setField("booktitle", conference);
             }
             if (DOI != null) {
-                entry.setField("doi", DOI);
+                entry.setField(FieldName.DOI_FIELD, DOI);
             }
             if (series != null) {
                 entry.setField("series", series);

@@ -392,7 +392,7 @@ public class RepecNepImporter extends ImportFormat {
                     content = this.lastLine;
                     readLine(in);
                 }
-                be.setField("url", content);
+                be.setField(FieldName.URL_FIELD, content);
 
                 // authors field
             } else if (keyword.startsWith("By")) {

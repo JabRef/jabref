@@ -134,7 +134,7 @@ public class CopacImporter extends ImportFormat {
                 } else if ("SE- ".equals(code)) {
                     setOrAppend(b, "series", line.substring(4).trim(), ", ");
                 } else if ("IS- ".equals(code)) {
-                    setOrAppend(b, "isbn", line.substring(4).trim(), ", ");
+                    setOrAppend(b, FieldName.ISBN_FIELD, line.substring(4).trim(), ", ");
                 } else if ("KW- ".equals(code)) {
                     setOrAppend(b, "keywords", line.substring(4).trim(), ", ");
                 } else if ("NT- ".equals(code)) {

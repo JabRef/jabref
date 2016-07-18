@@ -360,7 +360,7 @@ public class JabRefPreferences {
 
         List<FieldFormatterCleanup> activeFormatterCleanups = new ArrayList<>();
         activeFormatterCleanups.add(new FieldFormatterCleanup("pages", new NormalizePagesFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("date", new NormalizeDateFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.DATE_FIELD, new NormalizeDateFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup("month", new NormalizeMonthFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup("title", new ProtectTermsFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup("title", new UnitsToLatexFormatter()));
@@ -770,7 +770,7 @@ public class JabRefPreferences {
 
         // TODO: Currently not possible to edit this setting:
         defaults.put(PREVIEW_PRINT_BUTTON, Boolean.FALSE);
-        defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, "url");
+        defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, FieldName.URL_FIELD);
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file");
         defaults.put(GENERATE_KEYS_AFTER_INSPECTION, Boolean.TRUE);
@@ -917,7 +917,7 @@ public class JabRefPreferences {
         defaults.put(CUSTOM_TAB_NAME + "_def1", Localization.lang("Abstract"));
 
         // Entry editor tab 2: Review Field - used for research comments, etc.
-        defaults.put(CUSTOM_TAB_FIELDS + "_def2", "review");
+        defaults.put(CUSTOM_TAB_FIELDS + "_def2", FieldName.REVIEW_FIELD);
         defaults.put(CUSTOM_TAB_NAME + "_def2", Localization.lang("Review"));
 
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));

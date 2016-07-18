@@ -105,8 +105,8 @@ public class OAI2Handler extends DefaultHandler {
             entry.setField("comments", content);
         } else if ("report-no".equals(qualifiedName)) {
             entry.setField("reportno", content);
-        } else if("doi".equals(qualifiedName)) {
-          entry.setField("doi", content);
+        } else if(FieldName.DOI_FIELD.equals(qualifiedName)) {
+          entry.setField(FieldName.DOI_FIELD, content);
         } else if (FieldName.AUTHOR_FIELD.equals(qualifiedName)) {
             String author = forenames + " " + keyname;
             if (authors.length() > 0) {

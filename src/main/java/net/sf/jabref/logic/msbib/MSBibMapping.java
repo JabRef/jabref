@@ -33,8 +33,8 @@ public class MSBibMapping {
         bibtexToMSBib.put("number", "Issue");
         bibtexToMSBib.put("school", "Department");
         bibtexToMSBib.put("institution", "Institution");
-        bibtexToMSBib.put("doi", "DOI");
-        bibtexToMSBib.put("url", "URL");
+        bibtexToMSBib.put(FieldName.DOI_FIELD, "DOI");
+        bibtexToMSBib.put(FieldName.URL_FIELD, "URL");
         // BibTeX/Biblatex only fields
         bibtexToMSBib.put("series", BIBTEX_PREFIX + "Series");
         bibtexToMSBib.put(FieldName.ABSTRACT_FIELD, BIBTEX_PREFIX + "Abstract");

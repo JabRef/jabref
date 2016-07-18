@@ -95,15 +95,15 @@ public class JabRefDesktop {
                     fieldName = "ps";
                 }
             }
-        } else if ("doi".equals(fieldName)) {
+        } else if (FieldName.DOI_FIELD.equals(fieldName)) {
             Optional<DOI> doiUrl = DOI.build(link);
             if (doiUrl.isPresent()) {
                 link = doiUrl.get().getURIAsASCIIString();
             }
             // should be opened in browser
-            fieldName = "url";
+            fieldName = FieldName.URL_FIELD;
         } else if ("eprint".equals(fieldName)) {
-            fieldName = "url";
+            fieldName = FieldName.URL_FIELD;
 
             // Check to see if link field already contains a well formated URL
             if (!link.startsWith("http://")) {
@@ -111,7 +111,7 @@ public class JabRefDesktop {
             }
         }
 
-        if ("url".equals(fieldName)) { // html
+        if (FieldName.URL_FIELD.equals(fieldName)) { // html
             try {
                 openBrowser(link);
             } catch (IOException e) {
