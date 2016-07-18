@@ -197,11 +197,20 @@ public class IntegrityCheckTest {
     @Test
     public void testISSNChecks() {
         assertCorrect(createContext("issn", "0020-7217"));
-        assertCorrect(createContext("issn", "0020-7217"));
         assertCorrect(createContext("issn", "1687-6180"));
         assertCorrect(createContext("issn", "2434-561x"));
         assertWrong(createContext("issn", "Some other stuff"));
         assertWrong(createContext("issn", "0020-7218"));
+    }
+
+    @Test
+    public void testISBNChecks() {
+        assertCorrect(createContext("isbn", "0-201-53082-1"));
+        assertCorrect(createContext("isbn", "0-9752298-0-X"));
+        assertCorrect(createContext("isbn", "978-0-306-40615-7"));
+        assertWrong(createContext("isbn", "Some other stuff"));
+        assertWrong(createContext("isbn", "0-201-53082-2"));
+        assertWrong(createContext("isbn", "978-0-306-40615-8"));
     }
 
     private BibDatabaseContext createContext(String field, String value, String type) {
