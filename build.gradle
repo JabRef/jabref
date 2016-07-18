@@ -16,7 +16,8 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '1.2.3'
     // TODO replaced by spotless plugin, needs to be updated
     id "com.github.youribonnaffe.gradle.format" version "1.5"
-    id "net.ltgt.errorprone" version "0.0.8"
+    //Removed for now as it does not work anymore on windows
+    //id "net.ltgt.errorprone" version "0.0.8"
     id 'me.champeau.gradle.jmh' version '0.3.0'
 }
 
