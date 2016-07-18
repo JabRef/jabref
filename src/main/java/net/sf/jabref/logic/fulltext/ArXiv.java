@@ -43,11 +43,11 @@ import org.xml.sax.SAXException;
  *
  * @see <a href="http://arxiv.org/help/api/index">ArXiv API</a> for an overview of the API
  * @see <a href="http://arxiv.org/help/api/user-manual#_calling_the_api">ArXiv API User's Manual</a> for a detailed
- *      description on how to use the API
+ * description on how to use the API
  *
  * Similar implementions:
- *      <a href="https://github.com/nathangrigg/arxiv2bib">arxiv2bib</a> which is <a href="https://arxiv2bibtex.org/">live</a>
- *      <a herf="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
+ * <a href="https://github.com/nathangrigg/arxiv2bib">arxiv2bib</a> which is <a href="https://arxiv2bibtex.org/">live</a>
+ * <a herf="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
  */
 public class ArXiv implements FullTextFinder, SearchBasedFetcher, IdBasedFetcher {
 
@@ -90,7 +90,6 @@ public class ArXiv implements FullTextFinder, SearchBasedFetcher, IdBasedFetcher
             }
         }
 
-
         return Optional.empty();
     }
 
@@ -130,13 +129,13 @@ public class ArXiv implements FullTextFinder, SearchBasedFetcher, IdBasedFetcher
      * If only {@code searchQuery} is given, then the API will return results for each article that matches the query.
      * If only {@code ids} is given, then the API will return results for each article in the list.
      * If both {@code searchQuery} and {@code ids} are given, then the API will return each article in
-     *         {@code ids} that matches {@code searchQuery}. This allows the API to act as a results filter.
+     * {@code ids} that matches {@code searchQuery}. This allows the API to act as a results filter.
      *
      * @param searchQuery the search query used to find articles;
      *                    <a href="http://arxiv.org/help/api/user-manual#query_details">details</a>
-     * @param ids a list of arXiv identifiers
-     * @param start the index of the first returned result (zero-based)
-     * @param maxResults the number of maximal results (has to be smaller than 2000)
+     * @param ids         a list of arXiv identifiers
+     * @param start       the index of the first returned result (zero-based)
+     * @param maxResults  the number of maximal results (has to be smaller than 2000)
      * @return the response from the API as a XML document (Atom 1.0)
      * @throws FetcherException if there was a problem while building the URL or the API was not accessible
      */
@@ -161,7 +160,7 @@ public class ArXiv implements FullTextFinder, SearchBasedFetcher, IdBasedFetcher
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
 
-            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
             if (connection.getResponseCode() == 400) {
                 // Bad request error from server, try to get more information
                 throw getException(builder.parse(connection.getErrorStream()));
@@ -243,7 +242,8 @@ public class ArXiv implements FullTextFinder, SearchBasedFetcher, IdBasedFetcher
             publishedDate = XMLUtil.getNodeContent(item, "published");
 
             // Abstract of the article
-            abstractText = XMLUtil.getNodeContent(item, "summary").map(OAI2Fetcher::correctLineBreaks).map(String::trim);
+            abstractText = XMLUtil.getNodeContent(item, "summary").map(OAI2Fetcher::correctLineBreaks).map(
+                    String::trim);
 
             // Authors of the article
             authorNames = new ArrayList<>();
@@ -336,8 +336,8 @@ public class ArXiv implements FullTextFinder, SearchBasedFetcher, IdBasedFetcher
             getDate().ifPresent(date -> bibEntry.setField("date", date));
             primaryCategory.ifPresent(category -> bibEntry.setField("eprintclass", category));
             journalReferenceText.ifPresent(journal -> bibEntry.setField("journaltitle", journal));
-            getPdfUrl().ifPresent(url -> (new TypedBibEntry(bibEntry, BibDatabaseMode.BIBLATEX)).setFiles(
-                    Collections.singletonList(new ParsedFileField("online", url, "pdf"))));
+            getPdfUrl().ifPresent(url -> (new TypedBibEntry(bibEntry, BibDatabaseMode.BIBLATEX))
+                    .setFiles(Collections.singletonList(new ParsedFileField("online", url, "pdf"))));
 
             return bibEntry;
         }
