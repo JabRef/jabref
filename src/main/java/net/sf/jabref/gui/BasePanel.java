@@ -1572,7 +1572,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // Set up AutoCompleters for this panel:
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE)) {
             autoCompleters = new ContentAutoCompleters(getDatabase(), bibDatabaseContext.getMetaData(),
-                    autoCompletePreferences, Globals.journalAbbreviationLoader, Globals.prefs);
+                    autoCompletePreferences, Globals.journalAbbreviationLoader);
             // ensure that the autocompleters are in sync with entries
             this.getDatabase().registerListener(new AutoCompleteListener());
         } else {
@@ -1598,7 +1598,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private void instantiateSearchAutoCompleter() {
         AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
         AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(autoCompletePreferences,
-                Globals.journalAbbreviationLoader, Globals.prefs);
+                Globals.journalAbbreviationLoader);
         searchAutoCompleter = autoCompleterFactory.getPersonAutoCompleter();
         for (BibEntry entry : database.getEntries()) {
             searchAutoCompleter.addBibtexEntry(entry);

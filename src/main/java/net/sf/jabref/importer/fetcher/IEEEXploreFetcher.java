@@ -44,6 +44,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
@@ -435,7 +436,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
                 fullName = fullName.trim();
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
-                    fullName = abbreviationLoader.getRepository(Globals.prefs).getMedlineAbbreviation(fullName)
+                    fullName = abbreviationLoader
+                            .getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs))
+                            .getMedlineAbbreviation(fullName)
                             .orElse(fullName);
                 }
             }

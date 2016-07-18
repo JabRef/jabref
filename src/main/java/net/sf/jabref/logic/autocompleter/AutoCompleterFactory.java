@@ -18,8 +18,8 @@ package net.sf.jabref.logic.autocompleter;
 import java.util.Arrays;
 import java.util.Objects;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
@@ -32,13 +32,11 @@ public class AutoCompleterFactory {
 
     private final AutoCompletePreferences preferences;
     private final JournalAbbreviationLoader abbreviationLoader;
-    private final JabRefPreferences jabRefPreferences;
 
-    public AutoCompleterFactory(AutoCompletePreferences preferences, JournalAbbreviationLoader abbreviationLoader,
-            JabRefPreferences jabRefPreferences) {
+
+    public AutoCompleterFactory(AutoCompletePreferences preferences, JournalAbbreviationLoader abbreviationLoader) {
         this.preferences = Objects.requireNonNull(preferences);
         this.abbreviationLoader = Objects.requireNonNull(abbreviationLoader);
-        this.jabRefPreferences = Objects.requireNonNull(jabRefPreferences);
     }
 
     public AutoCompleter<String> getFor(String fieldName) {
@@ -49,7 +47,7 @@ public class AutoCompleterFactory {
         } else if ("crossref".equals(fieldName)) {
             return new BibtexKeyAutoCompleter(preferences);
         } else if ("journal".equals(fieldName) || "publisher".equals(fieldName)) {
-            return new JournalAutoCompleter(fieldName, preferences, abbreviationLoader, jabRefPreferences);
+            return new JournalAutoCompleter(fieldName, preferences, abbreviationLoader);
         } else {
             return new DefaultAutoCompleter(fieldName, preferences);
         }

@@ -29,8 +29,8 @@ package net.sf.jabref.logic.layout.format;
 
 import java.util.Objects;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 
 /**
@@ -51,15 +51,18 @@ import net.sf.jabref.logic.layout.LayoutFormatter;
 public class JournalAbbreviator implements LayoutFormatter {
 
     private final JournalAbbreviationLoader repostioryLoader;
-    private final JabRefPreferences jabRefPreferences;
+    private final JournalAbbreviationPreferences journalAbbreviationPreferences;
 
-    public JournalAbbreviator(JournalAbbreviationLoader repostioryLoader, JabRefPreferences jabRefPreferences) {
+
+    public JournalAbbreviator(JournalAbbreviationLoader repostioryLoader,
+            JournalAbbreviationPreferences journalAbbreviationPreferences) {
         this.repostioryLoader = Objects.requireNonNull(repostioryLoader);
-        this.jabRefPreferences = Objects.requireNonNull(jabRefPreferences);
+        this.journalAbbreviationPreferences = Objects.requireNonNull(journalAbbreviationPreferences);
     }
 
     @Override
     public String format(String fieldText) {
-        return repostioryLoader.getRepository(jabRefPreferences).getIsoAbbreviation(fieldText).orElse(fieldText);
+        return repostioryLoader.getRepository(journalAbbreviationPreferences)
+                .getIsoAbbreviation(fieldText).orElse(fieldText);
     }
 }

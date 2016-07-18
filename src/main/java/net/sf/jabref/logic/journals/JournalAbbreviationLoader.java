@@ -22,8 +22,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.preferences.JabRefPreferences;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -37,7 +35,8 @@ public class JournalAbbreviationLoader {
     private static final String JOURNALS_IEEE_ABBREVIATION_LIST_WITH_TEXT = "/journals/IEEEJournalListText.txt";
     private JournalAbbreviationRepository journalAbbrev;
 
-    public void update(JabRefPreferences jabRefPreferences) {
+
+    public void update(JournalAbbreviationPreferences journalAbbreviationPreferences) {
         journalAbbrev = new JournalAbbreviationRepository();
 
         // the order of reading the journal lists is important
@@ -48,14 +47,14 @@ public class JournalAbbreviationLoader {
         journalAbbrev.addEntries(readJournalListFromResource(JOURNALS_FILE_BUILTIN));
 
         // read IEEE list
-        if (jabRefPreferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
+        if (journalAbbreviationPreferences.isUseIEEEAbbreviations()) {
             journalAbbrev.addEntries(getOfficialIEEEAbbreviations());
         } else {
             journalAbbrev.addEntries(getStandardIEEEAbbreviations());
         }
 
         // Read external lists
-        List<String> lists = jabRefPreferences.getStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
+        List<String> lists = journalAbbreviationPreferences.getExternalJournalLists();
         if (!(lists.isEmpty())) {
             Collections.reverse(lists);
             for (String filename : lists) {
@@ -69,11 +68,12 @@ public class JournalAbbreviationLoader {
         }
 
         // Read personal list
-        String personalJournalList = jabRefPreferences.get(JabRefPreferences.PERSONAL_JOURNAL_LIST);
+        String personalJournalList = journalAbbreviationPreferences.getPersonalJournalLists();
         if ((personalJournalList != null) && !personalJournalList.trim().isEmpty()) {
             try {
                 journalAbbrev.addEntries(
-                        readJournalListFromFile(new File(personalJournalList), jabRefPreferences.getDefaultEncoding()));
+                        readJournalListFromFile(new File(personalJournalList),
+                                journalAbbreviationPreferences.getDefaultEncoding()));
             } catch (FileNotFoundException e) {
                 LOGGER.info("Personal journal list file '" + personalJournalList + "' not found.", e);
             }
@@ -93,9 +93,9 @@ public class JournalAbbreviationLoader {
         return readJournalListFromResource(JOURNALS_FILE_BUILTIN);
     }
 
-    public JournalAbbreviationRepository getRepository(JabRefPreferences jabRefPreferences) {
+    public JournalAbbreviationRepository getRepository(JournalAbbreviationPreferences journalAbbreviationPreferences) {
         if (journalAbbrev == null) {
-            update(jabRefPreferences);
+            update(journalAbbreviationPreferences);
         }
         return journalAbbrev;
     }

@@ -20,12 +20,12 @@ public class AutoCompleterFactoryTest {
         AutoCompletePreferences preferences = mock(AutoCompletePreferences.class);
         abbreviationLoader = mock(JournalAbbreviationLoader.class);
         Globals.prefs = JabRefPreferences.getInstance();
-        autoCompleterFactory = new AutoCompleterFactory(preferences, abbreviationLoader, Globals.prefs);
+        autoCompleterFactory = new AutoCompleterFactory(preferences, abbreviationLoader);
     }
 
     @Test(expected = NullPointerException.class)
     public void initFactoryWithNullPreferenceThrowsException() {
-        new AutoCompleterFactory(null, abbreviationLoader, Globals.prefs);
+        new AutoCompleterFactory(null, abbreviationLoader);
     }
 
     @Test

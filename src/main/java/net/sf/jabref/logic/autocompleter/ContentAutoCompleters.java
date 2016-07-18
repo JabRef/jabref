@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.database.BibDatabase;
@@ -15,11 +14,10 @@ public class ContentAutoCompleters extends AutoCompleters {
     }
 
     public ContentAutoCompleters(BibDatabase database, MetaData metaData, AutoCompletePreferences preferences,
-            JournalAbbreviationLoader abbreviationLoader, JabRefPreferences jabRefPreferences) {
+            JournalAbbreviationLoader abbreviationLoader) {
         Objects.requireNonNull(preferences);
 
-        AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(preferences, abbreviationLoader,
-                jabRefPreferences);
+        AutoCompleterFactory autoCompleterFactory = new AutoCompleterFactory(preferences, abbreviationLoader);
         List<String> completeFields = preferences.getCompleteNames();
         for (String field : completeFields) {
             AutoCompleter<String> autoCompleter = autoCompleterFactory.getFor(field);

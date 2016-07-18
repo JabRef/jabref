@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 
 public class AutoCompletePreferences {
 
@@ -97,5 +98,9 @@ public class AutoCompletePreferences {
 
     public void setCompleteNames(String value) {
         preferences.put(PREF_COMPLETE_FIELDS, value);
+    }
+
+    public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
+        return JournalAbbreviationPreferences.fromPreferences(preferences);
     }
 }

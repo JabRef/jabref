@@ -30,6 +30,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.layout.format.AuthorAbbreviator;
 import net.sf.jabref.logic.layout.format.AuthorAndsCommaReplacer;
 import net.sf.jabref.logic.layout.format.AuthorAndsReplacer;
@@ -513,7 +514,7 @@ class LayoutEntry {
         case "Iso690NamesAuthors":
             return new Iso690NamesAuthors();
         case "JournalAbbreviator":
-            return new JournalAbbreviator(repositoryLoader, prefs);
+            return new JournalAbbreviator(repositoryLoader, JournalAbbreviationPreferences.fromPreferences(prefs));
         case "LastPage":
             return new LastPage();
         case "FormatChars": // For backward compatibility
