@@ -29,6 +29,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.MonthUtil;
 
 /**
@@ -101,7 +102,7 @@ public class IsiImporter extends ImportFormat {
 
     public static void processSubSup(Map<String, String> map) {
 
-        String[] subsup = {"title", "abstract", "review", "notes"};
+        String[] subsup = {"title", FieldName.ABSTRACT_FIELD, "review", "notes"};
 
         for (String aSubsup : subsup) {
             if (map.containsKey(aSubsup)) {
@@ -231,11 +232,11 @@ public class IsiImporter extends ImportFormat {
                     String author = IsiImporter.isiAuthorsConvert(value.replace("EOLEOL", " and "));
 
                     // if there is already someone there then append with "and"
-                    if (hm.get("author") != null) {
-                        author = hm.get("author") + " and " + author;
+                    if (hm.get(FieldName.AUTHOR_FIELD) != null) {
+                        author = hm.get(FieldName.AUTHOR_FIELD) + " and " + author;
                     }
 
-                    hm.put("author", author);
+                    hm.put(FieldName.AUTHOR_FIELD, author);
                 } else if ("TI".equals(beg)) {
                     hm.put("title", value.replace("EOLEOL", " "));
                 } else if ("SO".equals(beg) || "JA".equals(beg)) {
@@ -252,7 +253,7 @@ public class IsiImporter extends ImportFormat {
                     hm.put("keywords", existingKeywords);
 
                 } else if ("AB".equals(beg)) {
-                    hm.put("abstract", value.replace("EOLEOL", " "));
+                    hm.put(FieldName.ABSTRACT_FIELD, value.replace("EOLEOL", " "));
                 } else if ("BP".equals(beg) || "BR".equals(beg) || "SP".equals(beg)) {
                     pages = value;
                 } else if ("EP".equals(beg)) {
@@ -271,7 +272,7 @@ public class IsiImporter extends ImportFormat {
                 } else if ("IS".equals(beg)) {
                     hm.put("number", value);
                 } else if ("PY".equals(beg)) {
-                    hm.put("year", value);
+                    hm.put(FieldName.YEAR_FIELD, value);
                 } else if ("VL".equals(beg)) {
                     hm.put("volume", value);
                 } else if ("PU".equals(beg)) {

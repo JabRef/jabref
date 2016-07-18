@@ -1,6 +1,5 @@
 package net.sf.jabref.external;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListEntryEditor;
@@ -9,6 +8,7 @@ import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * Created by IntelliJ IDEA.
@@ -39,13 +39,13 @@ public class AttachFileAction implements BaseAction {
         editor.setVisible(true, true);
         if (editor.okPressed()) {
             FileListTableModel model = new FileListTableModel();
-            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(model::setContent);
+            entry.getFieldOptional(FieldName.FILE_FIELD).ifPresent(model::setContent);
             model.addEntry(model.getRowCount(), flEntry);
             String newVal = model.getStringRepresentation();
 
-            UndoableFieldChange ce = new UndoableFieldChange(entry, Globals.FILE_FIELD,
-                    entry.getFieldOptional(Globals.FILE_FIELD).orElse(null), newVal);
-            entry.setField(Globals.FILE_FIELD, newVal);
+            UndoableFieldChange ce = new UndoableFieldChange(entry, FieldName.FILE_FIELD,
+                    entry.getFieldOptional(FieldName.FILE_FIELD).orElse(null), newVal);
+            entry.setField(FieldName.FILE_FIELD, newVal);
             panel.getUndoManager().addEdit(ce);
             panel.markBaseChanged();
         }

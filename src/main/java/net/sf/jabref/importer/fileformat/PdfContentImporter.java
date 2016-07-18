@@ -37,6 +37,7 @@ import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 
 import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -442,13 +443,13 @@ public class PdfContentImporter extends ImportFormat {
             // TODO: institution parsing missing
 
             if (author != null) {
-                entry.setField("author", author);
+                entry.setField(FieldName.AUTHOR_FIELD, author);
             }
             if (editor != null) {
-                entry.setField("editor", editor);
+                entry.setField(FieldName.EDITOR_FIELD, editor);
             }
             if (abstractT != null) {
-                entry.setField("abstract", abstractT);
+                entry.setField(FieldName.ABSTRACT_FIELD, abstractT);
             }
             if (!Strings.isNullOrEmpty(keywords)) {
                 entry.setField("keywords", keywords);
@@ -475,7 +476,7 @@ public class PdfContentImporter extends ImportFormat {
                 entry.setField("pages", pages);
             }
             if (year != null) {
-                entry.setField("year", year);
+                entry.setField(FieldName.YEAR_FIELD, year);
             }
             if (publisher != null) {
                 entry.setField("publisher", publisher);

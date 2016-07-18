@@ -29,12 +29,12 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType ARTICLE = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(
-                Arrays.asList("subtitle", "editor", "series", "volume", "number", "eid", "issue", "pages",
+                Arrays.asList("subtitle", FieldName.EDITOR_FIELD, "series", "volume", "number", "eid", "issue", "pages",
                         "note", "issn", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
 
         {
-            addAllRequired("author", "title", "journaltitle", "year/date");
-            addAllOptional("translator", "annotator", "commentator", "subtitle", "titleaddon", "editor", "editora",
+            addAllRequired(FieldName.AUTHOR_FIELD, "title", "journaltitle", "year/date");
+            addAllOptional("translator", "annotator", "commentator", "subtitle", "titleaddon", FieldName.EDITOR_FIELD, "editora",
                     "editorb", "editorc", "journalsubtitle", "issuetitle", "issuesubtitle", "language", "origlanguage",
                     "series", "volume", "number", "eid", "issue", "month", "pages", "version", "note", "issn",
                     "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
@@ -54,14 +54,14 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType BOOK = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList("editor", "subtitle", "titleaddon", "maintitle",
+                .unmodifiableList(Arrays.asList(FieldName.EDITOR_FIELD, "subtitle", "titleaddon", "maintitle",
                         "mainsubtitle", "maintitleaddon", "volume", "edition", "publisher", "isbn", "chapter", "pages",
                         "pagetotal", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
 
 
         {
-            addAllRequired("author", "title", "year/date");
-            addAllOptional("editor", "editora", "editorb", "editorc", "translator", "annotator", "commentator",
+            addAllRequired(FieldName.AUTHOR_FIELD, "title", "year/date");
+            addAllOptional(FieldName.EDITOR_FIELD, "editora", "editorb", "editorc", "translator", "annotator", "commentator",
                     "introduction", "foreword", "afterword", "subtitle", "titleaddon", "maintitle", "mainsubtitle",
                     "maintitleaddon", "language", "origlanguage", "volume", "part", "edition", "volumes", "series",
                     "number", "note", "publisher", "location", "isbn", "chapter", "pages", "pagetotal",
@@ -82,12 +82,12 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType MVBOOK = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList("editor", "subtitle", "titleaddon", "edition", "publisher", "isbn", "pagetotal",
+                .unmodifiableList(Arrays.asList(FieldName.EDITOR_FIELD, "subtitle", "titleaddon", "edition", "publisher", "isbn", "pagetotal",
                         "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
 
         {
-            addAllRequired("author", "title", "year/date");
-            addAllOptional("editor", "editora", "editorb", "editorc", "translator", "annotator", "commentator",
+            addAllRequired(FieldName.AUTHOR_FIELD, "title", "year/date");
+            addAllOptional(FieldName.EDITOR_FIELD, "editora", "editorb", "editorc", "translator", "annotator", "commentator",
                     "introduction", "foreword", "afterword", "subtitle", "titleaddon", "language", "origlanguage",
                     "edition", "volumes", "series", "number", "note", "publisher", "location", "isbn", "pagetotal",
                     "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
@@ -107,14 +107,14 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType INBOOK = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays
-                .asList("bookauthor", "editor", "subtitle", "titleaddon", "maintitle", "mainsubtitle",
+                .asList("bookauthor", FieldName.EDITOR_FIELD, "subtitle", "titleaddon", "maintitle", "mainsubtitle",
                         "maintitleaddon", "booksubtitle", "booktitleaddon", "volume", "edition", "publisher", "isbn",
                         "chapter", "pages", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
 
 
         {
-            addAllRequired("author", "title", "booktitle", "year/date");
-            addAllOptional("bookauthor", "editor", "editora", "editorb", "editorc", "translator", "annotator",
+            addAllRequired(FieldName.AUTHOR_FIELD, "title", "booktitle", "year/date");
+            addAllOptional("bookauthor", FieldName.EDITOR_FIELD, "editora", "editorb", "editorc", "translator", "annotator",
                     "commentator", "introduction", "foreword", "afterword", "subtitle", "titleaddon", "maintitle",
                     "mainsubtitle", "maintitleaddon", "booksubtitle", "booktitleaddon", "language", "origlanguage",
                     "volume", "part", "edition", "volumes", "series", "number", "note", "publisher", "location", "isbn",
@@ -214,7 +214,7 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired("editor", "title", "year/date");
+            addAllRequired(FieldName.EDITOR_FIELD, "title", "year/date");
             addAllOptional("editora", "editorb", "editorc", "translator", "annotator", "commentator", "introduction",
                     "foreword", "afterword", "subtitle", "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon",
                     "language", "origlanguage", "volume", "part", "edition", "volumes", "series", "number", "note",
@@ -241,7 +241,7 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired("editor", "title", "year/date");
+            addAllRequired(FieldName.EDITOR_FIELD, "title", "year/date");
             addAllOptional("editora", "editorb", "editorc", "translator", "annotator", "commentator", "introduction",
                     "foreword", "afterword", "subtitle", "titleaddon", "language", "origlanguage", "edition", "volumes", "series", "number", "note",
                     "publisher", "location", "isbn", "pagetotal", "addendum", "pubstate", "doi",
@@ -268,8 +268,8 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired("author", "title", "booktitle", "year/date");
-            addAllOptional("editor", "editora", "editorb", "editorc", "translator", "annotator", "commentator", "introduction",
+            addAllRequired(FieldName.AUTHOR_FIELD, "title", "booktitle", "year/date");
+            addAllOptional(FieldName.EDITOR_FIELD, "editora", "editorb", "editorc", "translator", "annotator", "commentator", "introduction",
                     "foreword", "afterword", "subtitle", "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon",
                     "booksubtitle", "booktitleaddon", "language", "origlanguage", "volume", "part", "edition",
                     "volumes", "series", "number", "note", "publisher", "location", "isbn", "chapter", "pages",
@@ -390,7 +390,7 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired("author", "title", "number", "year/date");
+            addAllRequired(FieldName.AUTHOR_FIELD, "title", "number", "year/date");
             addAllOptional("holder", "subtitle", "titleaddon", "type", "version", "location", "note", "month",
                     "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
         }
@@ -414,7 +414,7 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired("editor", "title", "year/date");
+            addAllRequired(FieldName.EDITOR_FIELD, "title", "year/date");
             addAllOptional("editora", "editorb", "editorc", "subtitle", "issuetitle", "issuesubtitle", "language",
                     "series", "volume", "number", "issue", "month", "note", "issn", "addendum", "pubstate",
                     "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
@@ -465,9 +465,9 @@ public class BibLatexEntryTypes {
 
         {
             addAllRequired("title", "year/date");
-            addAllOptional("editor", "subtitle", "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon", "eventtitle",
+            addAllOptional(FieldName.EDITOR_FIELD, "subtitle", "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon", "eventtitle",
                     "eventtitleaddon", "eventdate", "venue", "language", "volume", "part", "volumes", "series", "number", "note",
-                    "organization", "publisher", "location", "month", "year", "isbn", "chapter", "pages", "pagetotal",
+                    "organization", "publisher", "location", "month", FieldName.YEAR_FIELD, "isbn", "chapter", "pages", "pagetotal",
                     "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
         }
 
@@ -492,7 +492,7 @@ public class BibLatexEntryTypes {
 
         {
             addAllRequired("title", "year/date");
-            addAllOptional("editor", "subtitle", "titleaddon", "eventtitle",
+            addAllOptional(FieldName.EDITOR_FIELD, "subtitle", "titleaddon", "eventtitle",
                     "eventtitleaddon", "eventdate", "venue", "language", "volumes", "series", "number", "note",
                     "organization", "publisher", "location", "month", "isbn", "pagetotal",
                     "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
@@ -518,8 +518,8 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired("author", "title", "booktitle", "year/date");
-            addAllOptional("editor", "subtitle", "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon", "booksubtitle",
+            addAllRequired(FieldName.AUTHOR_FIELD, "title", "booktitle", "year/date");
+            addAllOptional(FieldName.EDITOR_FIELD, "subtitle", "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon", "booksubtitle",
                     "booktitleaddon", "eventtitle", "eventtitleaddon", "eventdate", "venue", "language", "volume", "part", "volumes",
                     "series", "number", "note", "organization", "publisher", "location", "month", "isbn",
                     "chapter", "pages", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
@@ -617,7 +617,7 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired("author", "title", "type", "institution", "year/date");
+            addAllRequired(FieldName.AUTHOR_FIELD, "title", "type", "institution", "year/date");
             addAllOptional("subtitle", "titleaddon", "language", "number", "version", "note", "location", "month",
                     "isrn", "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint",
                     "eprintclass", "eprinttype", "url", "urldate");
@@ -653,7 +653,7 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired("author", "title", "type", "institution", "year/date");
+            addAllRequired(FieldName.AUTHOR_FIELD, "title", "type", "institution", "year/date");
             addAllOptional("subtitle", "titleaddon", "language", "note", "location", "month", "isbn", "chapter",
                     "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
                     "urldate");
@@ -677,7 +677,7 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired("author", "title", "year/date");
+            addAllRequired(FieldName.AUTHOR_FIELD, "title", "year/date");
             addAllOptional("subtitle", "titleaddon", "language", "howpublished", "note", "location", "month",
                     "addendum", "pubstate", "url", "urldate");
         }
@@ -752,7 +752,7 @@ public class BibLatexEntryTypes {
 
         {
             // Treated as alias of "THESIS", except "type" field is optional
-            addAllRequired("author", "title", "institution", "year/date");
+            addAllRequired(FieldName.AUTHOR_FIELD, "title", "institution", "year/date");
             addAllOptional("type", "subtitle", "titleaddon", "language", "note", "location", "month", "isbn", "chapter",
                     "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
                     "urldate");
@@ -778,7 +778,7 @@ public class BibLatexEntryTypes {
 
         {
             // Treated as alias of "THESIS", except "type" field is optional
-            addAllRequired("author", "title", "institution", "year/date");
+            addAllRequired(FieldName.AUTHOR_FIELD, "title", "institution", "year/date");
             addAllOptional("type", "subtitle", "titleaddon", "language", "note", "location", "month", "isbn", "chapter",
                     "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
                     "urldate");
@@ -804,7 +804,7 @@ public class BibLatexEntryTypes {
 
         {
             // Treated as alias of "REPORT", except "type" field is optional
-            addAllRequired("author", "title", "institution", "year/date");
+            addAllRequired(FieldName.AUTHOR_FIELD, "title", "institution", "year/date");
             addAllOptional("type", "subtitle", "titleaddon", "language", "number", "version", "note", "location", "month",
                     "isrn", "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint",
                     "eprintclass", "eprinttype", "url", "urldate");

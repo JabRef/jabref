@@ -18,6 +18,7 @@ package net.sf.jabref.importer;
 import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -85,28 +86,28 @@ public class OAI2Handler extends DefaultHandler {
             entry.setField("volume", volume);
             String year = content.replaceFirst(".*?\\(", "");
             year = year.replaceFirst("\\).*", "");
-            entry.setField("year", year);
+            entry.setField(FieldName.YEAR_FIELD, year);
             String pages = content.replaceFirst(journal, "");
             pages = pages.replaceFirst(volume, "");
             pages = pages.replaceFirst("\\(" + year + "\\)", "");
             pages = pages.replace(" ", "");
             entry.setField("pages", pages);
         } else if ("datestamp".equals(qualifiedName)) {
-            Optional<String> year = entry.getFieldOptional("year");
+            Optional<String> year = entry.getFieldOptional(FieldName.YEAR_FIELD);
             if (!year.isPresent() || year.get().isEmpty()) {
-                entry.setField("year", content.replaceFirst("-.*", ""));
+                entry.setField(FieldName.YEAR_FIELD, content.replaceFirst("-.*", ""));
             }
         } else if ("title".equals(qualifiedName)) {
             entry.setField("title", content);
         } else if ("abstract".equals(qualifiedName)) {
-            entry.setField("abstract", content);
+            entry.setField(FieldName.ABSTRACT_FIELD, content);
         } else if ("comments".equals(qualifiedName)) {
             entry.setField("comments", content);
         } else if ("report-no".equals(qualifiedName)) {
             entry.setField("reportno", content);
         } else if("doi".equals(qualifiedName)) {
           entry.setField("doi", content);
-        } else if ("author".equals(qualifiedName)) {
+        } else if (FieldName.AUTHOR_FIELD.equals(qualifiedName)) {
             String author = forenames + " " + keyname;
             if (authors.length() > 0) {
                 authors.append(" and ");
@@ -117,7 +118,7 @@ public class OAI2Handler extends DefaultHandler {
 
     @Override
     public void endDocument() throws SAXException {
-        entry.setField("author", authors.toString());
+        entry.setField(FieldName.AUTHOR_FIELD, authors.toString());
     }
 
 }

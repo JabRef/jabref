@@ -47,6 +47,7 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -159,7 +160,7 @@ public class ADSFetcher implements EntryFetcher {
             while (reader.hasNext()) {
                 reader.next();
                 if (reader.isStartElement() &&
-                        "abstract".equals(reader.getLocalName())) {
+                        FieldName.ABSTRACT_FIELD.equals(reader.getLocalName())) {
                     isAbstract = true;
                 }
                 if (isAbstract && reader.isCharacters()) {
@@ -171,7 +172,7 @@ public class ADSFetcher implements EntryFetcher {
             }
             String abstractText = abstractSB.toString();
             abstractText = abstractText.replace("\n", " ");
-            entry.setField("abstract", abstractText);
+            entry.setField(FieldName.ABSTRACT_FIELD, abstractText);
         } catch (XMLStreamException e) {
             status.showMessage(Localization.lang("An Error occurred while parsing abstract"), getTitle(),
                     JOptionPane.ERROR_MESSAGE);

@@ -26,6 +26,7 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
@@ -61,8 +62,8 @@ public class DuplicateCheck {
 
 
     static {
-        DuplicateCheck.FIELD_WEIGHTS.put("author", 2.5);
-        DuplicateCheck.FIELD_WEIGHTS.put("editor", 2.5);
+        DuplicateCheck.FIELD_WEIGHTS.put(FieldName.AUTHOR_FIELD, 2.5);
+        DuplicateCheck.FIELD_WEIGHTS.put(FieldName.EDITOR_FIELD, 2.5);
         DuplicateCheck.FIELD_WEIGHTS.put("title", 3.);
         DuplicateCheck.FIELD_WEIGHTS.put("journal", 2.);
     }

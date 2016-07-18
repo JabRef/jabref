@@ -48,6 +48,7 @@ import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -301,8 +302,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up author
-        if (entry.hasField("author")) {
-            String author = entry.getField("author");
+        if (entry.hasField(FieldName.AUTHOR_FIELD)) {
+            String author = entry.getField(FieldName.AUTHOR_FIELD);
             author = author.replaceAll("\\s+", " ");
 
             //reorder the "Jr." "Sr." etc to the correct ordering
@@ -317,7 +318,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                     .replace(" ,", ",").replace("  ", " ");
             author = author.replaceAll("[ ,;]+$", "");
             //TODO: remove trailing commas
-            entry.setField("author", author);
+            entry.setField(FieldName.AUTHOR_FIELD, author);
         }
 
         // clean up month
@@ -382,7 +383,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 int ind = fullName.indexOf(": Accepted for future publication");
                 if (ind > 0) {
                     fullName = fullName.substring(0, ind);
-                    entry.setField("year", "to be published");
+                    entry.setField(FieldName.YEAR_FIELD, "to be published");
                     entry.clearField("month");
                     entry.clearField("pages");
                     entry.clearField("number");
@@ -394,7 +395,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 }
                 String note = entry.getField("note");
                 if ("Early Access".equals(note)) {
-                    entry.setField("year", "to be published");
+                    entry.setField(FieldName.YEAR_FIELD, "to be published");
                     entry.clearField("month");
                     entry.clearField("pages");
                     entry.clearField("number");
@@ -471,7 +472,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 fullName = fullName.trim();
 
                 fullName = fullName.replaceAll("^[tT]he ", "").replaceAll("^\\d{4} ", "").replaceAll("[,.]$", "");
-                String year = entry.getField("year");
+                String year = entry.getField(FieldName.YEAR_FIELD);
                 if (year != null) {
                     fullName = fullName.replaceAll(", " + year + "\\.?", "");
                 }
@@ -485,8 +486,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up abstract
-        if (entry.hasField("abstract")) {
-            String abstr = entry.getField("abstract");
+        if (entry.hasField(FieldName.ABSTRACT_FIELD)) {
+            String abstr = entry.getField(FieldName.ABSTRACT_FIELD);
             // Try to sort out most of the /spl / conversions
             // Deal with this specific nested type first
             abstr = abstr.replaceAll("/sub /spl infin//", "\\$_\\\\infty\\$");
@@ -501,7 +502,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             // Replace \infin with \infty
             abstr = abstr.replace("\\infin", "\\infty");
             // Write back
-            entry.setField("abstract", abstr);
+            entry.setField(FieldName.ABSTRACT_FIELD, abstr);
         }
 
         // Clean up url

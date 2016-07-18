@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * Importer for COPAC format.
@@ -125,9 +126,9 @@ public class CopacImporter extends ImportFormat {
                 if ("TI- ".equals(code)) {
                     setOrAppend(b, "title", line.substring(4).trim(), ", ");
                 } else if ("AU- ".equals(code)) {
-                    setOrAppend(b, "author", line.substring(4).trim(), " and ");
+                    setOrAppend(b, FieldName.AUTHOR_FIELD, line.substring(4).trim(), " and ");
                 } else if ("PY- ".equals(code)) {
-                    setOrAppend(b, "year", line.substring(4).trim(), ", ");
+                    setOrAppend(b, FieldName.YEAR_FIELD, line.substring(4).trim(), ", ");
                 } else if ("PU- ".equals(code)) {
                     setOrAppend(b, "publisher", line.substring(4).trim(), ", ");
                 } else if ("SE- ".equals(code)) {

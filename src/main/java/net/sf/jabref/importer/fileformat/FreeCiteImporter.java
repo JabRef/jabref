@@ -43,6 +43,7 @@ import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -152,7 +153,7 @@ public class FreeCiteImporter extends ImportFormat {
                                     // current tag is either begin:author or
                                     // end:authors
                                 }
-                                e.setField("author", sb.toString());
+                                e.setField(FieldName.AUTHOR_FIELD, sb.toString());
                             } else if ("journal".equals(ln)) {
                                 // we guess that the entry is a journal
                                 // the alternative way is to parse
@@ -174,7 +175,7 @@ public class FreeCiteImporter extends ImportFormat {
                                     || "pages".equals(ln)
                                     || "publisher".equals(ln)
                                     || "volume".equals(ln)
-                                    || "year".equals(ln)) {
+                                    || FieldName.YEAR_FIELD.equals(ln)) {
                                 e.setField(ln, parser.getElementText());
                             } else if ("booktitle".equals(ln)) {
                                 String booktitle = parser.getElementText();

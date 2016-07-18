@@ -45,6 +45,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -189,7 +190,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
         // Set default properties for the citation marker:
         citProperties.put(AUTHOR_FIELD, "author/editor");
-        citProperties.put(YEAR_FIELD, "year");
+        citProperties.put(YEAR_FIELD, FieldName.YEAR_FIELD);
         citProperties.put(MAX_AUTHORS, 3);
         citProperties.put(MAX_AUTHORS_FIRST, -1);
         citProperties.put(AUTHOR_SEPARATOR, ", ");

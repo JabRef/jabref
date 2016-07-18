@@ -32,6 +32,7 @@ import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
 
 import org.apache.commons.logging.Log;
@@ -152,19 +153,19 @@ public class CiteSeerXFetcher implements EntryFetcher {
             m = CiteSeerXFetcher.AUTHOR_PATTERN.matcher(cont);
             if (m.find()) {
                 String authors = m.group(1);
-                entry.setField("author", new NormalizeNamesFormatter().format(authors));
+                entry.setField(FieldName.AUTHOR_FIELD, new NormalizeNamesFormatter().format(authors));
             }
 
             // Find year:
             m = CiteSeerXFetcher.YEAR_PATTERN.matcher(cont);
             if (m.find()) {
-                entry.setField("year", m.group(1));
+                entry.setField(FieldName.YEAR_FIELD, m.group(1));
             }
 
             // Find abstract:
             m = CiteSeerXFetcher.ABSTRACT_PATTERN.matcher(cont);
             if (m.find()) {
-                entry.setField("abstract", m.group(1));
+                entry.setField(FieldName.ABSTRACT_FIELD, m.group(1));
             }
 
             return entry;

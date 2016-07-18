@@ -126,6 +126,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.event.EntryAddedEvent;
 import net.sf.jabref.model.event.EntryChangedEvent;
@@ -1034,13 +1035,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
 
             final BibEntry entry = bes.get(0);
-            if (!entry.hasField(Globals.FILE_FIELD)) {
+            if (!entry.hasField(FieldName.FILE_FIELD)) {
                 // no bibtex field
                 new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
                 return;
             }
             FileListTableModel tableModel = new FileListTableModel();
-            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(tableModel::setContent);
+            entry.getFieldOptional(FieldName.FILE_FIELD).ifPresent(tableModel::setContent);
             if (tableModel.getRowCount() == 0) {
                 // content in bibtex field is not readable
                 new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
@@ -2083,7 +2084,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     // Look for web links in the "file" field as a fallback:
                     FileListEntry entry = null;
                     FileListTableModel tm = new FileListTableModel();
+<<<<<<< 90044ac423016f8b5931ea6a4067ff314ed3047a
                     bes.get(0).getFieldOptional(Globals.FILE_FIELD).ifPresent(tm::setContent);
+=======
+                    tm.setContent(bes.get(0).getField(FieldName.FILE_FIELD));
+>>>>>>> Added model.entry.FieldName that contains field name constants
                     for (int i = 0; i < tm.getRowCount(); i++) {
                         FileListEntry flEntry = tm.getEntry(i);
                         if (URL_FIELD.equalsIgnoreCase(flEntry.type.get().getName())

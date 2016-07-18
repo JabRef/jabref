@@ -21,7 +21,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
@@ -29,6 +28,7 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
 
@@ -88,7 +88,7 @@ public class TypedBibEntry {
      */
     public List<ParsedFileField> getFiles() {
         //Extract the path
-        Optional<String> oldValue = entry.getFieldOptional(Globals.FILE_FIELD);
+        Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE_FIELD);
         if (!oldValue.isPresent()) {
             return new ArrayList<>();
         }
@@ -98,14 +98,14 @@ public class TypedBibEntry {
 
     public Optional<FieldChange> setFiles(List<ParsedFileField> files) {
 
-        Optional<String> oldValue = entry.getFieldOptional(Globals.FILE_FIELD);
+        Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE_FIELD);
         String newValue = FileField.getStringRepresentation(files);
 
         if(oldValue.isPresent() && oldValue.get().equals(newValue)) {
             return Optional.empty();
         }
 
-        entry.setField(Globals.FILE_FIELD, newValue);
-        return Optional.of(new FieldChange(entry, Globals.FILE_FIELD, oldValue.orElse(""), newValue));
+        entry.setField(FieldName.FILE_FIELD, newValue);
+        return Optional.of(new FieldChange(entry, FieldName.FILE_FIELD, oldValue.orElse(""), newValue));
     }
 }

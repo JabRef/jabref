@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * Imports a SilverPlatter exported file. This is a poor format to parse,
@@ -105,14 +106,14 @@ public class SilverPlatterImporter extends ImportFormat {
                     if (frest.trim().endsWith("(ed)")) {
                         String ed = frest.trim();
                         ed = ed.substring(0, ed.length() - 4);
-                        h.put("editor",
+                        h.put(FieldName.EDITOR_FIELD,
                                 AuthorList.fixAuthorLastNameFirst(ed.replace(",-", ", ").replace(";", " and ")));
                     } else {
-                        h.put("author",
+                        h.put(FieldName.AUTHOR_FIELD,
                                 AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
                     }
                 } else if ("AB".equals(f3)) {
-                    h.put("abstract", frest);
+                    h.put(FieldName.ABSTRACT_FIELD, frest);
                 } else if ("DE".equals(f3)) {
                     String kw = frest.replace("-;", ",").toLowerCase();
                     h.put("keywords", kw.substring(0, kw.length() - 1));
@@ -125,7 +126,7 @@ public class SilverPlatterImporter extends ImportFormat {
                         m = frest.indexOf(';');
                         if (m >= 5) {
                             String yr = frest.substring(m - 5, m).trim();
-                            h.put("year", yr);
+                            h.put(FieldName.YEAR_FIELD, yr);
                             frest = frest.substring(m);
                             m = frest.indexOf(':');
                             int issueIndex = frest.indexOf('(');
@@ -149,7 +150,7 @@ public class SilverPlatterImporter extends ImportFormat {
                             String yr = frest.substring(m + 2).trim();
                             try {
                                 Integer.parseInt(yr);
-                                h.put("year", yr);
+                                h.put(FieldName.YEAR_FIELD, yr);
                             } catch (NumberFormatException ex) {
                                 // Let's assume that this wasn't a number, since it
                                 // couldn't be parsed as an integer.

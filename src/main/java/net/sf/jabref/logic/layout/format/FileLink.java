@@ -24,6 +24,7 @@ import java.util.Optional;
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.layout.ParamLayoutFormatter;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -82,7 +83,7 @@ public class FileLink implements ParamLayoutFormatter {
         // ugly hack, the export routine has set a global variable before
         // starting the export, which contains the database's file directory:
         if (prefs.fileDirForDatabase == null) {
-            dirs = Collections.singletonList(prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX));
+            dirs = Collections.singletonList(prefs.get(FieldName.FILE_FIELD + Globals.DIR_SUFFIX));
         } else {
             dirs = prefs.fileDirForDatabase;
         }

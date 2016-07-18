@@ -8,6 +8,7 @@ import net.sf.jabref.logic.layout.format.RemoveBrackets;
 import net.sf.jabref.logic.mods.PageNumbers;
 import net.sf.jabref.logic.mods.PersonName;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 public class MSBibConverter {
     private static final String MSBIB_PREFIX = "msbib-";
@@ -108,11 +109,11 @@ public class MSBibConverter {
             result.publicationTitle = entry.getField("title");
         }
 
-        if (entry.hasField("author")) {
-            result.authors = getAuthors(entry.getField("author"));
+        if (entry.hasField(FieldName.AUTHOR_FIELD)) {
+            result.authors = getAuthors(entry.getField(FieldName.AUTHOR_FIELD));
         }
-        if (entry.hasField("editor")) {
-            result.editors = getAuthors(entry.getField("editor"));
+        if (entry.hasField(FieldName.EDITOR_FIELD)) {
+            result.editors = getAuthors(entry.getField(FieldName.EDITOR_FIELD));
         }
 
         return result;

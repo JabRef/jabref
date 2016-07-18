@@ -40,6 +40,7 @@ import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.sql.DBStrings;
 
 import org.apache.commons.logging.Log;
@@ -57,7 +58,7 @@ public class MetaData implements Iterable<String> {
     private static final String DATABASE_TYPE = "databaseType";
 
     private static final String GROUPSTREE = "groupstree";
-    private static final String FILE_DIRECTORY = Globals.FILE_FIELD + Globals.DIR_SUFFIX;
+    private static final String FILE_DIRECTORY = FieldName.FILE_FIELD + Globals.DIR_SUFFIX;
     public static final String SELECTOR_META_PREFIX = "selector_";
     private static final String PROTECTED_FLAG_META = "protectedFlag";
 
@@ -127,7 +128,7 @@ public class MetaData implements Iterable<String> {
      */
     public void initializeNewDatabase() {
         metaData.put(SELECTOR_META_PREFIX + "keywords", new Vector<>());
-        metaData.put(SELECTOR_META_PREFIX + "author", new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + FieldName.AUTHOR_FIELD, new Vector<>());
         metaData.put(SELECTOR_META_PREFIX + "journal", new Vector<>());
         metaData.put(SELECTOR_META_PREFIX + "publisher", new Vector<>());
         metaData.put(SELECTOR_META_PREFIX + "review", new Vector<>());

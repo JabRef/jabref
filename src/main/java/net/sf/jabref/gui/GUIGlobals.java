@@ -27,6 +27,7 @@ import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.keyboard.EmacsKeyBindings;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
@@ -120,11 +121,11 @@ public class GUIGlobals {
 
         label = new JLabel(IconTheme.JabRefIcon.FOLDER.getSmallIcon());
         label.setToolTipText(Localization.lang("Open folder"));
-        GUIGlobals.TABLE_ICONS.put(Globals.FOLDER_FIELD, label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.FOLDER_FIELD, label);
 
         label = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
         label.setToolTipText(Localization.lang("Open file"));
-        GUIGlobals.TABLE_ICONS.put(Globals.FILE_FIELD, label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.FILE_FIELD, label);
 
         for (ExternalFileType fileType : ExternalFileTypes.getInstance().getExternalFileTypeSelection()) {
             label = new JLabel(fileType.getIcon());

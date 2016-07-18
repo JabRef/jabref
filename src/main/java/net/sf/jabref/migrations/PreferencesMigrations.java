@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public class PreferencesMigrations {
@@ -17,10 +18,10 @@ public class PreferencesMigrations {
         // Jabref 1.55 moves the abstract to its own tab.
         String genFields = Globals.prefs.get(JabRefPreferences.GENERAL_FIELDS);
 
-        if (genFields.contains("abstract")) {
+        if (genFields.contains(FieldName.ABSTRACT_FIELD)) {
 
             String newGen;
-            if ("abstract".equals(genFields)) {
+            if (FieldName.ABSTRACT_FIELD.equals(genFields)) {
                 newGen = "";
             } else if (genFields.contains(";abstract;")) {
                 newGen = genFields.replace(";abstract;", ";");
@@ -86,9 +87,9 @@ public class PreferencesMigrations {
         if (prefs.get(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, null) == null) {
             if (prefs.getBoolean("exportInStandardOrder", false)) {
                 prefs.putBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, true);
-                prefs.put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, "author");
-                prefs.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, "editor");
-                prefs.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, "year");
+                prefs.put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, FieldName.AUTHOR_FIELD);
+                prefs.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, FieldName.EDITOR_FIELD);
+                prefs.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, FieldName.YEAR_FIELD);
                 prefs.putBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, false);
                 prefs.putBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, false);
                 prefs.putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, false);
@@ -96,8 +97,8 @@ public class PreferencesMigrations {
                 // exportInTitleOrder => title, author, editor
                 prefs.putBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, true);
                 prefs.put(JabRefPreferences.EXPORT_PRIMARY_SORT_FIELD, "title");
-                prefs.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, "author");
-                prefs.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, "editor");
+                prefs.put(JabRefPreferences.EXPORT_SECONDARY_SORT_FIELD, FieldName.AUTHOR_FIELD);
+                prefs.put(JabRefPreferences.EXPORT_TERTIARY_SORT_FIELD, FieldName.EDITOR_FIELD);
                 prefs.putBoolean(JabRefPreferences.EXPORT_PRIMARY_SORT_DESCENDING, false);
                 prefs.putBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, false);
                 prefs.putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, false);

@@ -31,8 +31,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 
 public class Globals {
 
-    public static final String FILE_FIELD = "file";
-    public static final String FOLDER_FIELD = "folder";
     public static final String DIR_SUFFIX = "Directory";
 
     // JabRef version info

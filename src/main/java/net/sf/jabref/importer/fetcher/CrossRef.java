@@ -8,6 +8,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -67,14 +68,14 @@ public class CrossRef {
     private static String enhanceQuery(String query, BibEntry entry) {
         StringBuilder enhancedQuery = new StringBuilder(query);
         // author
-        entry.getFieldOptional("author").ifPresent(author -> {
+        entry.getFieldOptional(FieldName.AUTHOR_FIELD).ifPresent(author -> {
             if (!author.isEmpty()) {
                 enhancedQuery.append('+').append(author);
             }
         });
 
         // year
-        entry.getFieldOptional("year").ifPresent(year -> {
+        entry.getFieldOptional(FieldName.YEAR_FIELD).ifPresent(year -> {
             if (!year.isEmpty()) {
                 enhancedQuery.append('+').append(year);
             }

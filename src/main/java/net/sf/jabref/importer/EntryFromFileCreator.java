@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
@@ -29,6 +28,7 @@ import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * The interface EntryFromFileCreator does twice: <br>
@@ -162,7 +162,7 @@ public abstract class EntryFromFileCreator implements FileFilter {
         FileListTableModel model = new FileListTableModel();
         model.addEntry(0, fileListEntry);
 
-        entry.setField(Globals.FILE_FIELD, model.getStringRepresentation());
+        entry.setField(FieldName.FILE_FIELD, model.getStringRepresentation());
     }
 
     protected void appendToField(BibEntry entry, String field, String value) {

@@ -78,6 +78,7 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
@@ -535,9 +536,9 @@ public class JabRefPreferences {
         defaults.put(LANGUAGE, Locale.getDefault().getLanguage());
 
         // Sorting preferences
-        defaults.put(TABLE_PRIMARY_SORT_FIELD, "author");
+        defaults.put(TABLE_PRIMARY_SORT_FIELD, FieldName.AUTHOR_FIELD);
         defaults.put(TABLE_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(TABLE_SECONDARY_SORT_FIELD, "year");
+        defaults.put(TABLE_SECONDARY_SORT_FIELD, FieldName.YEAR_FIELD);
         defaults.put(TABLE_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
         defaults.put(TABLE_TERTIARY_SORT_FIELD, "title");
         defaults.put(TABLE_TERTIARY_SORT_DESCENDING, Boolean.FALSE);
@@ -551,7 +552,7 @@ public class JabRefPreferences {
         // export order: if EXPORT_IN_SPECIFIED_ORDER, then use following criteria
         defaults.put(EXPORT_PRIMARY_SORT_FIELD, "bibtexkey");
         defaults.put(EXPORT_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(EXPORT_SECONDARY_SORT_FIELD, "author");
+        defaults.put(EXPORT_SECONDARY_SORT_FIELD, FieldName.AUTHOR_FIELD);
         defaults.put(EXPORT_SECONDARY_SORT_DESCENDING, Boolean.FALSE);
         defaults.put(EXPORT_TERTIARY_SORT_FIELD, "title");
         defaults.put(EXPORT_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
@@ -912,7 +913,7 @@ public class JabRefPreferences {
                 + "comment;owner;timestamp");
 
         // Entry editor tab 1:
-        defaults.put(CUSTOM_TAB_FIELDS + "_def1", "abstract");
+        defaults.put(CUSTOM_TAB_FIELDS + "_def1", FieldName.ABSTRACT_FIELD);
         defaults.put(CUSTOM_TAB_NAME + "_def1", Localization.lang("Abstract"));
 
         // Entry editor tab 2: Review Field - used for research comments, etc.

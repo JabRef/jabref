@@ -261,7 +261,7 @@ public class BibEntry implements Cloneable {
 
         // Finally, handle dates
         if ("date".equals(name)) {
-            Optional<String> year = getFieldOptional("year");
+            Optional<String> year = getFieldOptional(FieldName.YEAR_FIELD);
             if (year.isPresent()) {
                 MonthUtil.Month month = MonthUtil.getMonth(getFieldOptional("month").orElse(""));
                 if (month.isValid()) {
@@ -271,7 +271,7 @@ public class BibEntry implements Cloneable {
                 }
             }
         }
-        if ("year".equals(name) || "month".equals(name)) {
+        if (FieldName.YEAR_FIELD.equals(name) || "month".equals(name)) {
             Optional<String> date = getFieldOptional("date");
             if (!date.isPresent()) {
                 return Optional.empty();
@@ -303,7 +303,7 @@ public class BibEntry implements Cloneable {
                 Date parsedDate = df.parse(date.get());
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(parsedDate);
-                if ("year".equals(name)) {
+                if (FieldName.YEAR_FIELD.equals(name)) {
                     return Optional.of(Integer.toString(calendar.get(Calendar.YEAR)));
                 }
                 if ("month".equals(name)) {
@@ -317,7 +317,7 @@ public class BibEntry implements Cloneable {
                     Date parsedDate = df.parse(date.get());
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(parsedDate);
-                    if ("year".equals(name)) {
+                    if (FieldName.YEAR_FIELD.equals(name)) {
                         return Optional.of(Integer.toString(calendar.get(Calendar.YEAR)));
                     }
                 } catch (ParseException e2) {
@@ -487,8 +487,8 @@ public class BibEntry implements Cloneable {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[] {getFieldOptional("author").orElse("N/A"), getFieldOptional("title").orElse("N/A"),
-                getFieldOptional("year").orElse("N/A")};
+        String[] s = new String[] {getFieldOptional(FieldName.AUTHOR_FIELD).orElse("N/A"), getFieldOptional("title").orElse("N/A"),
+                getFieldOptional(FieldName.YEAR_FIELD).orElse("N/A")};
 
         String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
         if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
@@ -503,11 +503,11 @@ public class BibEntry implements Cloneable {
      * @return will return the publication date of the entry or null if no year was found.
      */
     public Optional<String> getPublicationDate() {
-        if (!hasField("year")) {
+        if (!hasField(FieldName.YEAR_FIELD)) {
             return Optional.empty();
         }
 
-        Optional<String> year = getFieldOptional("year");
+        Optional<String> year = getFieldOptional(FieldName.YEAR_FIELD);
 
         Optional<String> monthString = getFieldOptional("month");
         if (monthString.isPresent()) {

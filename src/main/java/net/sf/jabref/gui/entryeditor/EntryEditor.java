@@ -107,6 +107,7 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryConverter;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.event.FieldChangedEvent;
@@ -260,7 +261,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 addOptionalTab(type);
 
                 Set<String> deprecatedFields = new HashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
-                deprecatedFields.add("year");
+                deprecatedFields.add(FieldName.YEAR_FIELD);
                 deprecatedFields.add("month");
                 List<String> secondaryOptionalFields = type.getSecondaryOptionalFields();
                 List<String> optionalFieldsNotPrimaryOrDeprecated = new ArrayList<>(secondaryOptionalFields);

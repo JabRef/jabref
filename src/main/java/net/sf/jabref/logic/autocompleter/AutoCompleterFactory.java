@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
@@ -53,7 +54,7 @@ public class AutoCompleterFactory {
     }
 
     public AutoCompleter<String> getPersonAutoCompleter() {
-        return new NameFieldAutoCompleter(Arrays.asList("author", "editor"), true, preferences);
+        return new NameFieldAutoCompleter(Arrays.asList(FieldName.AUTHOR_FIELD, FieldName.EDITOR_FIELD), true, preferences);
     }
 
 }

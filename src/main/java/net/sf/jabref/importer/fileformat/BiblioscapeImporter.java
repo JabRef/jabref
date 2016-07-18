@@ -26,6 +26,7 @@ import java.util.Objects;
 
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
@@ -82,7 +83,7 @@ public class BiblioscapeImporter extends ImportFormat {
                 // add item
                 for (Map.Entry<String, StringBuilder> entry : lines.entrySet()) {
                     if ("AU".equals(entry.getKey())) {
-                        hm.put("author", entry.getValue()
+                        hm.put(FieldName.AUTHOR_FIELD, entry.getValue()
                                 .toString());
                     } else if ("TI".equals(entry.getKey())) {
                         titleTI = entry.getValue()
@@ -91,7 +92,7 @@ public class BiblioscapeImporter extends ImportFormat {
                         titleST = entry.getValue()
                                 .toString();
                     } else if ("YP".equals(entry.getKey())) {
-                        hm.put("year", entry
+                        hm.put(FieldName.YEAR_FIELD, entry
                                 .getValue().toString());
                     } else if ("VL".equals(entry.getKey())) {
                         hm.put("volume", entry
@@ -145,7 +146,7 @@ public class BiblioscapeImporter extends ImportFormat {
                         hm.put("isbn", entry
                                 .getValue().toString());
                     } else if ("AB".equals(entry.getKey())) {
-                        hm.put("abstract", entry
+                        hm.put(FieldName.ABSTRACT_FIELD, entry
                                 .getValue().toString());
                     } else if ("AD".equals(entry.getKey())) {
                         address = entry.getValue()

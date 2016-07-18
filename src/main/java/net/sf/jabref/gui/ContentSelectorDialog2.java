@@ -48,6 +48,7 @@ import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.FieldName;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
@@ -320,7 +321,7 @@ class ContentSelectorDialog2 extends JDialog {
         }
         if (contents.isEmpty()) {
             // if nothing was added, put the default fields (as described in the help)
-            fieldListModel.addElement("author");
+            fieldListModel.addElement(FieldName.AUTHOR_FIELD);
             fieldListModel.addElement("journal");
             fieldListModel.addElement("keywords");
             fieldListModel.addElement("publisher");

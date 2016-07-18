@@ -22,6 +22,7 @@ import java.util.Optional;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryConverter;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * Converts the entry to BibLatex format.
@@ -50,15 +51,15 @@ public class BiblatexCleanup implements CleanupJob {
         entry.getFieldOptional("date").ifPresent(date -> {
             if (date.isEmpty()) {
                 entry.getFieldOrAlias("date").ifPresent(newDate -> {
-                    Optional<String> oldYear = entry.getFieldOptional("year");
+                    Optional<String> oldYear = entry.getFieldOptional(FieldName.YEAR_FIELD);
                     Optional<String> oldMonth = entry.getFieldOptional("month");
 
                     entry.setField("date", newDate);
-                    entry.clearField("year");
+                    entry.clearField(FieldName.YEAR_FIELD);
                     entry.clearField("month");
 
                     changes.add(new FieldChange(entry, "date", null, newDate));
-                    changes.add(new FieldChange(entry, "year", oldYear.orElse(null), null));
+                    changes.add(new FieldChange(entry, FieldName.YEAR_FIELD, oldYear.orElse(null), null));
                     changes.add(new FieldChange(entry, "month", oldMonth.orElse(null), null));
                 });
             }

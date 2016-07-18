@@ -14,10 +14,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.InternalBibtexFields;
@@ -147,7 +147,7 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(Globals.FILE_FIELD);
+            Optional<String> value = entry.getFieldOptional(FieldName.FILE_FIELD);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -161,7 +161,7 @@ public class IntegrityCheck {
                 if ((!file.isPresent()) || !file.get().exists()) {
                     return Collections.singletonList(
                             new IntegrityMessage(Localization.lang("link should refer to a correct file path"), entry,
-                                    Globals.FILE_FIELD));
+                                    FieldName.FILE_FIELD));
                 }
             }
 
@@ -298,13 +298,13 @@ public class IntegrityCheck {
          */
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional("year");
+            Optional<String> value = entry.getFieldOptional(FieldName.YEAR_FIELD);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
 
             if (!CONTAINS_FOUR_DIGIT.test(value.get().trim())) {
-                return Collections.singletonList(new IntegrityMessage(Localization.lang("should contain a four digit number"), entry, "year"));
+                return Collections.singletonList(new IntegrityMessage(Localization.lang("should contain a four digit number"), entry, FieldName.YEAR_FIELD));
             }
 
             return Collections.emptyList();

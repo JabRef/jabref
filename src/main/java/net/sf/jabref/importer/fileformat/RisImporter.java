@@ -28,6 +28,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.MonthUtil;
 
 /**
@@ -189,17 +190,17 @@ public class RisImporter extends ImportFormat {
                     } else if ("IS".equals(lab)) {
                         hm.put("number", val);
                     } else if ("N2".equals(lab) || "AB".equals(lab)) {
-                        String oldAb = hm.get("abstract");
+                        String oldAb = hm.get(FieldName.ABSTRACT_FIELD);
                         if (oldAb == null) {
-                            hm.put("abstract", val);
+                            hm.put(FieldName.ABSTRACT_FIELD, val);
                         } else {
-                            hm.put("abstract", oldAb + Globals.NEWLINE + val);
+                            hm.put(FieldName.ABSTRACT_FIELD, oldAb + Globals.NEWLINE + val);
                         }
                     } else if ("UR".equals(lab)) {
                         hm.put("url", val);
                     } else if (("Y1".equals(lab) || "PY".equals(lab)) && (val.length() >= 4)) {
                         String[] parts = val.split("/");
-                        hm.put("year", parts[0]);
+                        hm.put(FieldName.YEAR_FIELD, parts[0]);
                         if ((parts.length > 1) && !parts[1].isEmpty()) {
                             try {
 
@@ -239,11 +240,11 @@ public class RisImporter extends ImportFormat {
                 // fix authors
                 if (!author.isEmpty()) {
                     author = AuthorList.fixAuthorLastNameFirst(author);
-                    hm.put("author", author);
+                    hm.put(FieldName.AUTHOR_FIELD, author);
                 }
                 if (!editor.isEmpty()) {
                     editor = AuthorList.fixAuthorLastNameFirst(editor);
-                    hm.put("editor", editor);
+                    hm.put(FieldName.EDITOR_FIELD, editor);
                 }
                 if (!comment.isEmpty()) {
                     hm.put("comment", comment);

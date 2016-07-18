@@ -17,6 +17,7 @@ package net.sf.jabref.gui.openoffice;
 
 import net.sf.jabref.logic.openoffice.OOBibStyle;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
 
 /**
@@ -31,7 +32,7 @@ class UndefinedBibtexEntry extends BibEntry {
     public UndefinedBibtexEntry(String key) {
         super(IdGenerator.next());
         this.key = key;
-        setField("author", OOBibStyle.UNDEFINED_CITATION_MARKER);
+        setField(FieldName.AUTHOR_FIELD, OOBibStyle.UNDEFINED_CITATION_MARKER);
     }
 
     public String getKey() {

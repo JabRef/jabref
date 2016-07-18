@@ -29,6 +29,7 @@ import net.sf.jabref.logic.layout.format.RemoveBrackets;
 import net.sf.jabref.logic.layout.format.RemoveWhitespace;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,8 +52,8 @@ class OOCalcDatabase {
     public OOCalcDatabase(BibDatabase bibtex, List<BibEntry> entries) {
         // Make a list of comparators for sorting the entries:
         List<FieldComparator> comparators = new ArrayList<>();
-        comparators.add(new FieldComparator("author"));
-        comparators.add(new FieldComparator("year"));
+        comparators.add(new FieldComparator(FieldName.AUTHOR_FIELD));
+        comparators.add(new FieldComparator(FieldName.YEAR_FIELD));
         comparators.add(new FieldComparator(BibEntry.KEY_FIELD));
         // Use glazed lists to get a sorted view of the entries:
         List<BibEntry> entryList = new ArrayList<>();
@@ -157,14 +158,14 @@ class OOCalcDatabase {
                 addTableCell(result, row, new GetOpenOfficeType().format(e.getType()));
                 addTableCell(result, row, getField(e, "isbn"));
                 addTableCell(result, row, getField(e, BibEntry.KEY_FIELD));
-                addTableCell(result, row, getField(e, "author"));//new AuthorLastFirst().format(getField(e, "author")));
+                addTableCell(result, row, getField(e, FieldName.AUTHOR_FIELD));//new AuthorLastFirst().format(getField(e, FieldName.AUTHOR_FIELD)));
                 addTableCell(result, row, new RemoveWhitespace().format(new RemoveBrackets().format(getField(e, "title"))));
                 addTableCell(result, row, getField(e, "journal"));
                 addTableCell(result, row, getField(e, "volume"));
                 addTableCell(result, row, getField(e, "number"));
                 addTableCell(result, row, getField(e, "month"));
                 addTableCell(result, row, getField(e, "pages"));
-                addTableCell(result, row, getField(e, "year"));
+                addTableCell(result, row, getField(e, FieldName.YEAR_FIELD));
                 addTableCell(result, row, getField(e, "address"));
                 addTableCell(result, row, getField(e, "note"));
                 addTableCell(result, row, getField(e, "url"));
@@ -172,7 +173,7 @@ class OOCalcDatabase {
                 addTableCell(result, row, getField(e, "chapter"));
                 addTableCell(result, row, getField(e, "edition"));
                 addTableCell(result, row, getField(e, "series"));
-                addTableCell(result, row, getField(e, "editor"));//new AuthorLastFirst().format(getField(e, "editor")));
+                addTableCell(result, row, getField(e, FieldName.EDITOR_FIELD));//new AuthorLastFirst().format(getField(e, FieldName.EDITOR_FIELD)));
                 addTableCell(result, row, getField(e, "publisher"));
                 addTableCell(result, row, getField(e, "reporttype"));
                 addTableCell(result, row, getField(e, "howpublished"));

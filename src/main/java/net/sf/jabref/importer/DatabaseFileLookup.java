@@ -23,11 +23,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
 
@@ -80,7 +80,7 @@ class DatabaseFileLookup {
     private List<File> parseFileField(BibEntry entry) {
         Objects.requireNonNull(entry);
 
-        List<ParsedFileField> entries = FileField.parse(entry.getFieldOptional(Globals.FILE_FIELD).orElse(null));
+        List<ParsedFileField> entries = FileField.parse(entry.getFieldOptional(FieldName.FILE_FIELD).orElse(null));
 
         List<File> fileLinks = new ArrayList<>();
         for (ParsedFileField field : entries) {

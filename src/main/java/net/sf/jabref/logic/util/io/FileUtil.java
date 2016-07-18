@@ -37,13 +37,13 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -373,7 +373,7 @@ public class FileUtil {
 
         List<File> result = new ArrayList<>();
         for (BibEntry entry : bes) {
-            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(fileField -> {
+            entry.getFieldOptional(FieldName.FILE_FIELD).ifPresent(fileField -> {
                 List<ParsedFileField> fileList = FileField.parse(fileField);
                 for (ParsedFileField file : fileList) {
                     expandFilename(file.getLink(), fileDirs).ifPresent(result::add);

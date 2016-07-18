@@ -32,6 +32,7 @@ import javax.swing.SwingConstants;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -190,11 +191,11 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         }
         PreviewPrefsTab.entry = new BibEntry(IdGenerator.next(), "article");
         PreviewPrefsTab.entry.setCiteKey("conceicao1997");
-        PreviewPrefsTab.entry.setField("author",
+        PreviewPrefsTab.entry.setField(FieldName.AUTHOR_FIELD,
                 "Luis E. C. Conceic{\\~a}o and Terje van der Meeren and Johan A. J. Verreth and M S. Evjen and D. F. Houlihan and H. J. Fyhn");
         PreviewPrefsTab.entry.setField("title",
                 "Amino acid metabolism and protein turnover in larval turbot (Scophthalmus maximus) fed natural zooplankton or Artemia");
-        PreviewPrefsTab.entry.setField("year", "1997");
+        PreviewPrefsTab.entry.setField(FieldName.YEAR_FIELD, "1997");
         PreviewPrefsTab.entry.setField("journal", "Marine Biology");
         PreviewPrefsTab.entry.setField("month", "January");
         PreviewPrefsTab.entry.setField("number", "2");
@@ -203,7 +204,7 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         PreviewPrefsTab.entry.setField("pages", "255--265");
         PreviewPrefsTab.entry.setField("keywords", "energetics, artemia, metabolism, amino acid, turbot");
         PreviewPrefsTab.entry.setField("url", "http://ejournals.ebsco.com/direct.asp?ArticleID=TYY4NT82XA9H7R8PFPPV");
-        PreviewPrefsTab.entry.setField("abstract",
+        PreviewPrefsTab.entry.setField(FieldName.ABSTRACT_FIELD,
                 "Abstract The present paper studied the influence of different food regimes "
                         + "on the free amino acid (FAA) pool, the rate of protein turnover, the flux of amino acids, and "
                         + "their relation to growth of larval turbot (Scophthalmus maximus L.) from first feeding until "

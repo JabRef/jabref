@@ -22,6 +22,7 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -42,7 +43,7 @@ public class JSONEntryParser {
      */
     public BibEntry parseBibJSONtoBibtex(JSONObject bibJsonEntry) {
         // Fields that are directly accessible at the top level BibJson object
-        String[] singleFieldStrings = {"year", "title", "abstract", "month"};
+        String[] singleFieldStrings = {FieldName.YEAR_FIELD, "title", FieldName.ABSTRACT_FIELD, "month"};
 
         // Fields that are accessible in the journal part of the BibJson object
         String[] journalSingleFieldStrings = {"publisher", "number", "volume"};
@@ -63,7 +64,7 @@ public class JSONEntryParser {
                     LOGGER.info("Empty author name.");
                 }
             }
-            entry.setField("author", String.join(" and ", authorList));
+            entry.setField(FieldName.AUTHOR_FIELD, String.join(" and ", authorList));
         } else {
             LOGGER.info("No author found.");
         }
@@ -155,7 +156,7 @@ public class JSONEntryParser {
      */
     public static BibEntry parseSpringerJSONtoBibtex(JSONObject springerJsonEntry) {
         // Fields that are directly accessible at the top level Json object
-        String[] singleFieldStrings = {"issn", "volume", "abstract", "doi", "title", "number",
+        String[] singleFieldStrings = {"issn", "volume", FieldName.ABSTRACT_FIELD, "doi", "title", "number",
                 "publisher"};
 
         BibEntry entry = new BibEntry();
@@ -185,7 +186,7 @@ public class JSONEntryParser {
                     LOGGER.info("Empty author name.");
                 }
             }
-            entry.setField("author", String.join(" and ", authorList));
+            entry.setField(FieldName.AUTHOR_FIELD, String.join(" and ", authorList));
         } else {
             LOGGER.info("No author found.");
         }
@@ -230,14 +231,14 @@ public class JSONEntryParser {
             String date = springerJsonEntry.getString("publicationDate");
             entry.setField("date", date); // For BibLatex
             String[] dateparts = date.split("-");
-            entry.setField("year", dateparts[0]);
+            entry.setField(FieldName.YEAR_FIELD, dateparts[0]);
             entry.setField("month", MonthUtil.getMonthByNumber(Integer.parseInt(dateparts[1])).bibtexFormat);
         }
 
         // Clean up abstract (often starting with Abstract)
-        entry.getFieldOptional("abstract").ifPresent(abstractContents -> {
+        entry.getFieldOptional(FieldName.ABSTRACT_FIELD).ifPresent(abstractContents -> {
             if (abstractContents.startsWith("Abstract")) {
-                entry.setField("abstract", abstractContents.substring(8));
+                entry.setField(FieldName.ABSTRACT_FIELD, abstractContents.substring(8));
             }
         });
 

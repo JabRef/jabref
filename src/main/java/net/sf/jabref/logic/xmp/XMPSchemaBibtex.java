@@ -28,6 +28,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
@@ -53,7 +54,7 @@ public class XMPSchemaBibtex extends XMPSchema {
 
 
     static {
-        XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add("abstract");
+        XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add(FieldName.ABSTRACT_FIELD);
         XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add("note");
         XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add("review");
     }

@@ -17,9 +17,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
 
@@ -30,7 +30,7 @@ public class FileLinksCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        Optional<String> oldValue = entry.getFieldOptional(Globals.FILE_FIELD);
+        Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE_FIELD);
         if (!oldValue.isPresent()) {
             return Collections.emptyList();
         }
@@ -40,8 +40,8 @@ public class FileLinksCleanup implements CleanupJob {
         // Parsing automatically moves a single description to link, so we just need to write the fileList back again
         String newValue = FileField.getStringRepresentation(fileList);
         if (!oldValue.get().equals(newValue)) {
-            entry.setField(Globals.FILE_FIELD, newValue);
-            FieldChange change = new FieldChange(entry, Globals.FILE_FIELD, oldValue.get(), newValue);
+            entry.setField(FieldName.FILE_FIELD, newValue);
+            FieldChange change = new FieldChange(entry, FieldName.FILE_FIELD, oldValue.get(), newValue);
             return Collections.singletonList(change);
         }
         return Collections.emptyList();

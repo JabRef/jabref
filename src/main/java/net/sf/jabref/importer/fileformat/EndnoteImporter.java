@@ -28,6 +28,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -175,7 +176,7 @@ public class EndnoteImporter extends ImportFormat {
                 } else if ("C".equals(prefix)) {
                     hm.put("address", val);
                 } else if ("D".equals(prefix)) {
-                    hm.put("year", val);
+                    hm.put(FieldName.YEAR_FIELD, val);
                 } else if ("8".equals(prefix)) {
                     hm.put("date", val);
                 } else if ("J".equals(prefix)) {
@@ -226,7 +227,7 @@ public class EndnoteImporter extends ImportFormat {
                 } else if ("K".equals(prefix)) {
                     hm.put("keywords", val);
                 } else if ("X".equals(prefix)) {
-                    hm.put("abstract", val);
+                    hm.put(FieldName.ABSTRACT_FIELD, val);
                 } else if ("9".equals(prefix)) {
                     if (val.indexOf("Ph.D.") == 0) {
                         type = "phdthesis";
@@ -248,10 +249,10 @@ public class EndnoteImporter extends ImportFormat {
 
             //fixauthorscomma
             if (!"".equals(author)) {
-                hm.put("author", fixAuthor(author));
+                hm.put(FieldName.AUTHOR_FIELD, fixAuthor(author));
             }
             if (!"".equals(editor)) {
-                hm.put("editor", fixAuthor(editor));
+                hm.put(FieldName.EDITOR_FIELD, fixAuthor(editor));
             }
             //if pages missing and article number given, use the article number
             if (((hm.get("pages") == null) || "-".equals(hm.get("pages"))) && !"".equals(artnum)) {

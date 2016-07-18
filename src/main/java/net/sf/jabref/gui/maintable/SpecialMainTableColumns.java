@@ -6,12 +6,12 @@ import java.util.Optional;
 
 import javax.swing.JLabel;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
@@ -99,14 +99,14 @@ public class SpecialMainTableColumns {
             new JLabel(Quality.getInstance().getRepresentingIcon()));
 
 
-    public static final MainTableColumn FILE_COLUMN = new MainTableColumn(Globals.FILE_FIELD,
-            Collections.singletonList(Globals.FILE_FIELD), new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon())) {
+    public static final MainTableColumn FILE_COLUMN = new MainTableColumn(FieldName.FILE_FIELD,
+            Collections.singletonList(FieldName.FILE_FIELD), new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon())) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
             // We use a FileListTableModel to parse the field content:
             FileListTableModel fileList = new FileListTableModel();
-            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(fileList::setContent);
+            entry.getFieldOptional(FieldName.FILE_FIELD).ifPresent(fileList::setContent);
             if (fileList.getRowCount() > 1) {
                 return new JLabel(IconTheme.JabRefIcon.FILE_MULTIPLE.getSmallIcon());
             } else if (fileList.getRowCount() == 1) {
@@ -167,7 +167,7 @@ public class SpecialMainTableColumns {
 
 
 
-        return new MainTableColumn(externalFileTypeName, Collections.singletonList(Globals.FILE_FIELD), new JLabel()) {
+        return new MainTableColumn(externalFileTypeName, Collections.singletonList(FieldName.FILE_FIELD), new JLabel()) {
 
             @Override
             public boolean isFileFilter() {
@@ -185,7 +185,7 @@ public class SpecialMainTableColumns {
                 boolean iconFound = false;
                 JLabel iconLabel = null;
                 FileListTableModel fileList = new FileListTableModel();
-                entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(fileList::setContent);
+                entry.getFieldOptional(FieldName.FILE_FIELD).ifPresent(fileList::setContent);
                 for (int i = 0; i < fileList.getRowCount(); i++) {
                     if ((fileList.getEntry(i).type.isPresent())
                             && externalFileTypeName.equalsIgnoreCase(fileList.getEntry(i).type.get().getName())) {

@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * INSPEC format importer.
@@ -93,12 +94,12 @@ public class InspecImporter extends ImportFormat {
                 if ("TI".equals(f3)) {
                     h.put("title", frest);
                 } else if ("PY".equals(f3)) {
-                    h.put("year", frest);
+                    h.put(FieldName.YEAR_FIELD, frest);
                 } else if ("AU".equals(f3)) {
-                    h.put("author",
+                    h.put(FieldName.AUTHOR_FIELD,
                             AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
                 } else if ("AB".equals(f3)) {
-                    h.put("abstract", frest);
+                    h.put(FieldName.ABSTRACT_FIELD, frest);
                 } else if ("ID".equals(f3)) {
                     h.put("keywords", frest);
                 } else if ("SO".equals(f3)) {
@@ -110,7 +111,7 @@ public class InspecImporter extends ImportFormat {
                         m = frest.indexOf(';');
                         if (m >= 5) {
                             String yr = frest.substring(m - 5, m).trim();
-                            h.put("year", yr);
+                            h.put(FieldName.YEAR_FIELD, yr);
                             frest = frest.substring(m);
                             m = frest.indexOf(':');
                             if (m >= 0) {

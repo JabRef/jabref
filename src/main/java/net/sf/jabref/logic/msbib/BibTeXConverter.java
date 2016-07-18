@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.mods.PersonName;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 public class BibTeXConverter {
     private static final String MSBIB_PREFIX = "msbib-";
@@ -31,7 +32,7 @@ public class BibTeXConverter {
             String msField = field.getKey();
             String value = field.getValue();
 
-            if (value != null && MSBibMapping.getBibTeXField(msField) != null) {
+            if ((value != null) && (MSBibMapping.getBibTeXField(msField) != null)) {
                 fieldValues.put(MSBibMapping.getBibTeXField(msField), value);
             }
         }
@@ -42,9 +43,9 @@ public class BibTeXConverter {
             fieldValues.put("language", MSBibMapping.getLanguage(lcid));
         }
 
-        addAuthor(fieldValues, "author", entry.authors);
+        addAuthor(fieldValues, FieldName.AUTHOR_FIELD, entry.authors);
         addAuthor(fieldValues, MSBIB_PREFIX + "bookauthor", entry.bookAuthors);
-        addAuthor(fieldValues, "editor", entry.editors);
+        addAuthor(fieldValues, FieldName.EDITOR_FIELD, entry.editors);
         addAuthor(fieldValues, MSBIB_PREFIX + "translator", entry.translators);
         addAuthor(fieldValues, MSBIB_PREFIX + "producername", entry.producerNames);
         addAuthor(fieldValues, MSBIB_PREFIX + "composer", entry.composers);

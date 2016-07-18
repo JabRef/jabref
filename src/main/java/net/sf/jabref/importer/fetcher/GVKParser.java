@@ -13,6 +13,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
 
 import com.google.common.base.Strings;
@@ -364,10 +365,10 @@ public class GVKParser {
 
         // Zuordnung der Felder in Abhängigkeit vom Dokumenttyp
         if (author != null) {
-            result.setField("author", author);
+            result.setField(FieldName.AUTHOR_FIELD, author);
         }
         if (editor != null) {
-            result.setField("editor", editor);
+            result.setField(FieldName.EDITOR_FIELD, editor);
         }
         if (title != null) {
             result.setField("title", title);
@@ -387,7 +388,7 @@ public class GVKParser {
             result.setField("publisher", publisher);
         }
         if (year != null) {
-            result.setField("year", year);
+            result.setField(FieldName.YEAR_FIELD, year);
         }
         if (address != null) {
             result.setField("address", address);

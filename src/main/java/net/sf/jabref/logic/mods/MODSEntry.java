@@ -35,6 +35,7 @@ import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.format.XMLChars;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -124,8 +125,8 @@ class MODSEntry {
 
         date = getDate(bibtex);
         genre = getMODSgenre(bibtex);
-        if (bibtex.hasField("author")) {
-            authors = getAuthors(bibtex.getField("author"));
+        if (bibtex.hasField(FieldName.AUTHOR_FIELD)) {
+            authors = getAuthors(bibtex.getField(FieldName.AUTHOR_FIELD));
         }
         if ("article".equals(bibtex.getType()) || "inproceedings".equals(bibtex.getType())) {
             host = new MODSEntry();
@@ -179,7 +180,7 @@ class MODSEntry {
     /* construct a MODS date object */
     private static String getDate(BibEntry bibtex) {
         StringBuilder result = new StringBuilder();
-        bibtex.getFieldOptional("year").ifPresent(result::append);
+        bibtex.getFieldOptional(FieldName.YEAR_FIELD).ifPresent(result::append);
         bibtex.getFieldOptional("month").ifPresent(result.append('-')::append);
         return result.toString();
     }

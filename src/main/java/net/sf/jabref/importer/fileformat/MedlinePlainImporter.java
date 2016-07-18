@@ -31,6 +31,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * Importer for the MEDLINE Plain format.
@@ -213,8 +214,8 @@ public class MedlinePlainImporter extends ImportFormat {
                     comment = comment + value;
                 }
             }
-            fixAuthors(fields, author, "author");
-            fixAuthors(fields, editor, "editor");
+            fixAuthors(fields, author, FieldName.AUTHOR_FIELD);
+            fixAuthors(fields, editor, FieldName.EDITOR_FIELD);
             if (!comment.isEmpty()) {
                 fields.put("comment", comment);
             }
@@ -371,11 +372,11 @@ public class MedlinePlainImporter extends ImportFormat {
             } else {
                 abstractValue = value;
             }
-            String oldAb = hm.get("abstract");
+            String oldAb = hm.get(FieldName.ABSTRACT_FIELD);
             if (oldAb == null) {
-                hm.put("abstract", abstractValue);
+                hm.put(FieldName.ABSTRACT_FIELD, abstractValue);
             } else {
-                hm.put("abstract", oldAb + Globals.NEWLINE + abstractValue);
+                hm.put(FieldName.ABSTRACT_FIELD, oldAb + Globals.NEWLINE + abstractValue);
             }
         } else if ("OAB".equals(lab) || "OABL".equals(lab)) {
             hm.put("other-abstract", value);
@@ -395,7 +396,7 @@ public class MedlinePlainImporter extends ImportFormat {
             hm.put("revised", val);
         } else if ("DP".equals(lab)) {
             String[] parts = val.split(" ");
-            hm.put("year", parts[0]);
+            hm.put(FieldName.YEAR_FIELD, parts[0]);
             if ((parts.length > 1) && !parts[1].isEmpty()) {
                 hm.put("month", parts[1]);
             }

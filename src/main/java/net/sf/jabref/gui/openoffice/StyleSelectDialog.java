@@ -64,6 +64,7 @@ import net.sf.jabref.logic.openoffice.OOBibStyle;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -372,11 +373,11 @@ class StyleSelectDialog {
     }
 
     private void setupPrevEntry() {
-        prevEntry.setField("author", "Smith, Bill and Jones, Bob and Williams, Jeff");
-        prevEntry.setField("editor", "Taylor, Phil");
+        prevEntry.setField(FieldName.AUTHOR_FIELD, "Smith, Bill and Jones, Bob and Williams, Jeff");
+        prevEntry.setField(FieldName.EDITOR_FIELD, "Taylor, Phil");
         prevEntry.setField("title", "Title of the test entry for reference styles");
         prevEntry.setField("volume", "34");
-        prevEntry.setField("year", "2008");
+        prevEntry.setField(FieldName.YEAR_FIELD, "2008");
         prevEntry.setField("journal", "BibTeX journal");
         prevEntry.setField("publisher", "JabRef publishing");
         prevEntry.setField("address", "Trondheim");

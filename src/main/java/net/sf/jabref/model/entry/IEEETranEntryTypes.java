@@ -20,7 +20,7 @@ public class IEEETranEntryTypes {
     public static final EntryType ELECTRONIC = new BibtexEntryType() {
 
         {
-            addAllOptional("author", "month", "year", "title", "language", "howpublished", "organization", "address",
+            addAllOptional(FieldName.AUTHOR_FIELD, "month", FieldName.YEAR_FIELD, "title", "language", "howpublished", "organization", "address",
                     "note", "url");
 
         }
@@ -58,8 +58,8 @@ public class IEEETranEntryTypes {
     public static final EntryType PERIODICAL = new BibtexEntryType() {
 
         {
-            addAllRequired("title", "year");
-            addAllOptional("editor", "language", "series", "volume", "number", "organization", "month", "note", "url");
+            addAllRequired("title", FieldName.YEAR_FIELD);
+            addAllOptional(FieldName.EDITOR_FIELD, "language", "series", "volume", "number", "organization", "month", "note", "url");
         }
 
         @Override
@@ -78,7 +78,7 @@ public class IEEETranEntryTypes {
 
         {
             addAllRequired("nationality", "number", "year/yearfiled");
-            addAllOptional("author", "title", "language", "assignee", "address", "type", "number", "day", "dayfiled",
+            addAllOptional(FieldName.AUTHOR_FIELD, "title", "language", "assignee", "address", "type", "number", "day", "dayfiled",
                     "month", "monthfiled", "note", "url");
         }
 
@@ -98,8 +98,8 @@ public class IEEETranEntryTypes {
 
         {
             addAllRequired("title", "organization/institution");
-            addAllOptional("author", "language", "howpublished", "type", "number", "revision", "address", "month",
-                    "year", "note", "url");
+            addAllOptional(FieldName.AUTHOR_FIELD, "language", "howpublished", "type", "number", "revision", "address", "month",
+                    FieldName.YEAR_FIELD, "note", "url");
         }
 
         @Override

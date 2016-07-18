@@ -9,6 +9,7 @@ import java.util.Optional;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
@@ -177,6 +178,6 @@ public class BibDatabaseContext {
     }
 
     public List<String> getFileDirectory() {
-        return getFileDirectory(Globals.FILE_FIELD);
+        return getFileDirectory(FieldName.FILE_FIELD);
     }
 }
