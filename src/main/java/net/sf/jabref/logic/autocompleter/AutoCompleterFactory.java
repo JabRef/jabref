@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 

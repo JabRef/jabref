@@ -100,7 +100,7 @@ public class GroupTreeNodeTest {
     }
 
     private AbstractGroup getSearchGroup(String name) {
-        return new SearchGroup(name, "searchExpression", true, false, GroupHierarchyType.INCLUDING, Globals.prefs);
+        return new SearchGroup(name, "searchExpression", true, false, GroupHierarchyType.INCLUDING);
     }
 
     private AbstractGroup getExplict(String name) throws ParseException {
@@ -302,8 +302,7 @@ public class GroupTreeNodeTest {
         AbstractGroup oldGroup = new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT, Globals.prefs);
         oldGroup.add(entry);
         GroupTreeNode node = GroupTreeNode.fromGroup(oldGroup);
-        AbstractGroup newGroup = new SearchGroup("NewGroup", "test", false, false, GroupHierarchyType.INDEPENDENT,
-                Globals.prefs);
+        AbstractGroup newGroup = new SearchGroup("NewGroup", "test", false, false, GroupHierarchyType.INDEPENDENT);
 
         node.setGroup(newGroup, true, entries);
 

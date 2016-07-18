@@ -293,7 +293,7 @@ class GroupDialog extends JDialog {
                         // disabled
                         // therefore I don't catch anything here
                         resultingGroup = new SearchGroup(nameField.getText().trim(), searchGroupSearchExpression.getText().trim(),
-                                isCaseSensitive(), isRegex(), getContext(), Globals.prefs);
+                                isCaseSensitive(), isRegex(), getContext());
                     } catch (Exception e1) {
                         // should never happen
                     }

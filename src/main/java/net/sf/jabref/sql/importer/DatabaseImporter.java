@@ -244,7 +244,7 @@ public class DatabaseImporter {
                         group = new SearchGroup(rsGroups.getString("label"),
                                 StringUtil.unquote(rsGroups.getString("search_expression"), '\\'),
                                 rsGroups.getBoolean("case_sensitive"), rsGroups.getBoolean("reg_exp"),
-                                GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")), Globals.prefs);
+                                GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
                         break;
                     default:
                         break;

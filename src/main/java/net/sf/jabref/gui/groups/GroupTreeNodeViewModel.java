@@ -191,7 +191,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
         sb.append(group.getName());
 
         if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS)
-                && JabRefGUI.getMainFrame() != null) {
+                && (JabRefGUI.getMainFrame() != null)) {
             BasePanel currentBasePanel = JabRefGUI.getMainFrame().getCurrentBasePanel();
             if (currentBasePanel != null) {
                 sb.append(" [").append(node.numberOfHits(currentBasePanel.getDatabase().getEntries())).append(']');
@@ -202,7 +202,9 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     }
 
     public String getDescription() {
-        return "<html>" + node.getGroup().getShortDescription() + "</html>";
+        return "<html>"
+                + node.getGroup().getShortDescription(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC))
+                + "</html>";
     }
 
     public Icon getIcon() {

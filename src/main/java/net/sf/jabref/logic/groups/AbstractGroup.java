@@ -71,7 +71,7 @@ public abstract class AbstractGroup implements SearchMatcher {
             return AllEntriesGroup.fromString(s);
         }
         if (s.startsWith(SearchGroup.ID)) {
-            return SearchGroup.fromString(s, jabRefPreferences);
+            return SearchGroup.fromString(s);
         }
         if (s.startsWith(ExplicitGroup.ID)) {
             return ExplicitGroup.fromString(s, jabRefPreferences);
@@ -209,7 +209,7 @@ public abstract class AbstractGroup implements SearchMatcher {
     /**
      * Returns a short description of the group in HTML (for a tooltip).
      */
-    public abstract String getShortDescription();
+    public abstract String getShortDescription(boolean showDynamic);
 
     // by general AbstractGroup contract, toString() must return
     // something from which this object can be reconstructed

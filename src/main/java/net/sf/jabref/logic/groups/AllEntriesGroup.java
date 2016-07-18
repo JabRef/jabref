@@ -94,7 +94,7 @@ public class AllEntriesGroup extends AbstractGroup {
     }
 
     @Override
-    public String getShortDescription() {
+    public String getShortDescription(boolean showDynamic) {
         return Localization.lang("<b>All Entries</b> (this group cannot be edited or removed)");
     }
 

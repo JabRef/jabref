@@ -368,10 +368,10 @@ public class KeywordGroup extends AbstractGroup {
     }
 
     @Override
-    public String getShortDescription() {
+    public String getShortDescription(boolean showDynamic) {
         StringBuilder sb = new StringBuilder();
         sb.append("<b>");
-        if (jabRefPreferences.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC)) {
+        if (showDynamic) {
             sb.append("<i>").append(StringUtil.quoteForHTML(getName())).append("</i>");
         } else {
             sb.append(StringUtil.quoteForHTML(getName()));

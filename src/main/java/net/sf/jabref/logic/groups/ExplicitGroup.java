@@ -145,7 +145,7 @@ public class ExplicitGroup extends KeywordGroup {
     }
 
     @Override
-    public String getShortDescription() {
+    public String getShortDescription(boolean showDynamic) {
         StringBuilder sb = new StringBuilder();
         sb.append("<b>").append(getName()).append("</b> -").append(Localization.lang("static group"));
         switch (getHierarchicalContext()) {
