@@ -119,11 +119,10 @@ The only difference is that the version contains the keyword *snapshot*, the *da
 
 ## License
 
-JabRef is free software: you can redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free Software
-Foundation, either version 2 of the License, or (at your option) any later
-version.
-See the [LICENSE](LICENSE) for full details.
+We are currently in transition from [GPL](https://tldrlegal.com/license/gnu-general-public-license-v2) to the [MIT license](https://tldrlegal.com/license/mit-license).
+Thus, all new contributions are considered being made under MIT license.
+
+See the [LICENSE.md](LICENSE.md) for the full MIT license.
 
 JabRef also uses libraries distributed by other parties.
 See [external libraries](external-libraries.txt) for details.
