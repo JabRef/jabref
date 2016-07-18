@@ -65,7 +65,6 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.model.event.FieldChangedEvent;
 import net.sf.jabref.external.WriteXMPEntryEditorAction;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryContainer;
@@ -110,6 +109,7 @@ import net.sf.jabref.model.entry.EntryConverter;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.event.FieldChangedEvent;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 
 import com.google.common.eventbus.Subscribe;
