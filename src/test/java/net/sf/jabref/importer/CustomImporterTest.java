@@ -109,10 +109,7 @@ public class CustomImporterTest {
     public void testClassicConstructor() {
         CustomImporter customImporter = new CustomImporter("Copac", "cpc", "net.sf.jabref.importer.fileformat.CopacImporter", "src/main/java/net/sf/jabref/importer/fileformat/CopacImporter.java");
 
-        assertEquals(customImporter.getName(), importer.getName());
-        assertEquals(customImporter.getClidId(), importer.getClidId());
-        assertEquals(customImporter.getBasePath(), importer.getBasePath());
-        assertEquals(customImporter.getClassName(), importer.getClassName());
+        assertEquals(importer, customImporter);
     }
 
     @Test
@@ -121,9 +118,19 @@ public class CustomImporterTest {
         CustomImporter customImporter = new CustomImporter(dataTest);
         CustomImporter customOvidImporter = new CustomImporter(new OvidImporter());
 
-        assertEquals(customImporter.getName(), customOvidImporter.getName());
-        assertEquals(customImporter.getClidId(), customOvidImporter.getClidId());
-        assertEquals(customImporter.getBasePath(), customOvidImporter.getBasePath());
-        assertEquals(customImporter.getClassName(), customOvidImporter.getClassName());
+        assertEquals(customImporter, customOvidImporter);
+    }
+
+    @Test
+    public void testEmptyConstructor() {
+        CustomImporter customImporter = new CustomImporter();
+        customImporter.setName("Ovid");
+        customImporter.setCliId("ovid");
+        customImporter.setClassName("net.sf.jabref.importer.fileformat.OvidImporter");
+        customImporter.setBasePath("src/main/java/net/sf/jabref/importer/fileformat/OvidImporter.java");
+
+        CustomImporter customOvidImporter = new CustomImporter(new OvidImporter());
+
+        assertEquals(customImporter, customOvidImporter);
     }
 }
