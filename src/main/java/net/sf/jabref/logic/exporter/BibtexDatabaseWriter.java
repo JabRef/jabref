@@ -26,6 +26,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
@@ -112,7 +113,9 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
                 getWriter().write("{}");
             } else {
                 try {
-                    String formatted = new LatexFieldFormatter(jabRefPreferences).format(bibtexString.getContent(),
+                    String formatted = new LatexFieldFormatter(
+                            LatexFieldFormatterPreferences.fromPreferences(jabRefPreferences))
+                                    .format(bibtexString.getContent(),
                             LatexFieldFormatter.BIBTEX_STRING);
                     getWriter().write(formatted);
                 } catch (IllegalArgumentException ex) {
@@ -158,7 +161,8 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
 
     @Override
     protected void writeEntry(BibEntry entry, BibDatabaseMode mode, Boolean isReformatFile) throws SaveException {
-        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(jabRefPreferences), true);
+        BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
+                new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(jabRefPreferences)), true);
         try {
             bibtexEntryWriter.write(entry, getWriter(), mode, isReformatFile);
         } catch (IOException e) {

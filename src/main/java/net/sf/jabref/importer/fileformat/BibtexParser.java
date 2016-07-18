@@ -34,6 +34,7 @@ import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.bibtex.FieldContentParser;
+import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
@@ -71,7 +72,8 @@ public class BibtexParser {
     private Map<String, EntryType> entryTypes;
     private boolean eof;
     private int line = 1;
-    private final FieldContentParser fieldContentParser = new FieldContentParser(Globals.prefs);
+    private final FieldContentParser fieldContentParser = new FieldContentParser(
+            FieldContentParserPreferences.fromPreferences(Globals.prefs));
     private ParserResult parserResult;
     private static final Integer LOOKAHEAD = 64;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();

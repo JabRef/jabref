@@ -47,6 +47,7 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.Author;
@@ -1190,7 +1191,8 @@ public class XMPUtil {
                 // Read from pdf and write as BibTex
                 List<BibEntry> l = XMPUtil.readXMP(new File(args[0]), Globals.prefs);
 
-                BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(Globals.prefs), false);
+                BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
+                        new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)), false);
 
                 for (BibEntry entry : l) {
                     StringWriter sw = new StringWriter();

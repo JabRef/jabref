@@ -96,6 +96,7 @@ import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
@@ -592,7 +593,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     public static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
-        LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes(Globals.prefs);
+        LatexFieldFormatter formatter = LatexFieldFormatter
+                .buildIgnoreHashes(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs));
         new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter, type);
 
         return stringWriter.getBuffer().toString();
@@ -813,7 +815,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 String newValue = newEntry.getField(field);
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
-                    new LatexFieldFormatter(Globals.prefs).format(newValue, field);
+                    new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs))
+                            .format(newValue, field);
 
                     compound.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
                     entry.setField(field, newValue);
@@ -1167,7 +1170,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         // properly formatted. If that happens, the field
                         // is not stored and the textarea turns red.
                         if (toSet != null) {
-                            new LatexFieldFormatter(Globals.prefs).format(toSet, fieldEditor.getFieldName());
+                            new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs))
+                                    .format(toSet, fieldEditor.getFieldName());
                         }
 
                         String oldValue = entry.getField(fieldEditor.getFieldName());

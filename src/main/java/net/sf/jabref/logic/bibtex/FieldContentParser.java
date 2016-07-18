@@ -16,7 +16,6 @@
 package net.sf.jabref.logic.bibtex;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -34,14 +33,13 @@ public class FieldContentParser {
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");
 
 
-    public FieldContentParser(JabRefPreferences prefs) {
+    public FieldContentParser(FieldContentParserPreferences prefs) {
         multiLineFields = new HashSet<>();
         // the following two are also coded in net.sf.jabref.logic.bibtex.LatexFieldFormatter.format(String, String)
         multiLineFields.add("abstract");
         multiLineFields.add("review");
         // the file field should not be formatted, therefore we treat it as a multi line field
-        List<String> nonWrappableFields = prefs.getStringList(JabRefPreferences.NON_WRAPPABLE_FIELDS);
-        multiLineFields.addAll(nonWrappableFields);
+        multiLineFields.addAll(prefs.getNonWrappableFields());
     }
 
     /**

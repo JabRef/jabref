@@ -39,7 +39,8 @@ public class BibEntryWriterTest {
 
     @Before
     public void setUpWriter() {
-        writer = new BibEntryWriter(new LatexFieldFormatter(Globals.prefs), true);
+        writer = new BibEntryWriter(
+                new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)), true);
     }
 
     @Test

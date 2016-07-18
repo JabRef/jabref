@@ -31,6 +31,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
@@ -141,7 +142,8 @@ public class XMPUtilTest {
 
     public static String bibtexEntry2BibtexString(BibEntry e) throws IOException {
         StringWriter sw = new StringWriter();
-        new BibEntryWriter(new LatexFieldFormatter(Globals.prefs), false).write(e, sw, BibDatabaseMode.BIBTEX);
+        new BibEntryWriter(new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)),
+                false).write(e, sw, BibDatabaseMode.BIBTEX);
         return sw.getBuffer().toString();
     }
 

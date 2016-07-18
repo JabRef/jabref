@@ -20,7 +20,7 @@ public class FieldContentParserTest {
 
     @Before
     public void setUp() throws Exception {
-        parser = new FieldContentParser(Globals.prefs);
+        parser = new FieldContentParser(FieldContentParserPreferences.fromPreferences(Globals.prefs));
     }
 
     @Test
