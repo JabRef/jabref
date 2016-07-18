@@ -277,6 +277,8 @@ public class MedlineImporter extends ImportFormat {
                 for (AuthorList authorList : authorLists) {
                     handleAuthors(fields, authorList);
                 }
+            } else {
+                LOGGER.info(String.format("Size of authorlist was %s", authorLists.size()));
             }
         }
 
@@ -297,14 +299,14 @@ public class MedlineImporter extends ImportFormat {
 
     private void putStringFromSerializableList(HashMap<String, String> fields, String medlineKey,
             List<Serializable> contentList) {
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for (Serializable content : contentList) {
             if (content instanceof String) {
-                result += (String) content;
+                result.append((String) content);
             }
         }
-        if (!"".equals(result)) {
-            fields.put(medlineKey, result);
+        if (result.length() > 0) {
+            fields.put(medlineKey, result.toString());
         }
     }
 
@@ -343,7 +345,7 @@ public class MedlineImporter extends ImportFormat {
             if (medlineCitation.getDateCompleted() != null) {
                 DateCompleted dateCompleted = medlineCitation.getDateCompleted();
                 fields.put("completed",
-                        dateCompleted.getYear() + "-" + dateCompleted.getMonth() + "-" + dateCompleted.getDay());
+                        convertToDateFormat(dateCompleted.getYear(), dateCompleted.getMonth(), dateCompleted.getDay()));
             }
 
             fields.put("pmid", medlineCitation.getPMID().getContent());
@@ -647,12 +649,13 @@ public class MedlineImporter extends ImportFormat {
         }
     }
 
-    // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added fixPageRange method
-    //   Convert medline page ranges from short form to full form.
-    //   Medline reports page ranges in a shorthand format.
-    //   The last page is reported using only the digits which
-    //   differ from the first page.
-    //      i.e. 12345-51 refers to the actual range 12345-12351
+    /**
+     * Convert medline page ranges from short form to full form.
+     * Medline reports page ranges in a shorthand format.
+     * The last page is reported using only the digits which
+     * differ from the first page.
+     *    i.e. 12345-51 refers to the actual range 12345-12351
+     */
     private String fixPageRange(String pageRange) {
         int minusPos = pageRange.indexOf('-');
         if (minusPos < 0) {
