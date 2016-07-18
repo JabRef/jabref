@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.fulltext;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -15,13 +16,19 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.jabref.importer.fetcher.GeneralFetcher;
+import net.sf.jabref.gui.help.HelpFile;
+import net.sf.jabref.importer.fetcher.IdBasedFetcher;
+import net.sf.jabref.importer.fetcher.OAI2Fetcher;
+import net.sf.jabref.importer.fetcher.SearchBasedFetcher;
+import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.fetcher.FetcherException;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.io.XMLUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.ParsedFileField;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -29,7 +36,6 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.utils.URIBuilder;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -40,10 +46,10 @@ import org.xml.sax.SAXException;
  *      description on how to use the API
  *
  * Similar implementions:
- *      <a href="https://github.com/nathangrigg/arxiv2bib">arxiv2bib</a>
+ *      <a href="https://github.com/nathangrigg/arxiv2bib">arxiv2bib</a> which is <a href="https://arxiv2bibtex.org/">live</a>
  *      <a herf="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
  */
-public class ArXiv implements FullTextFinder {
+public class ArXiv implements FullTextFinder, SearchBasedFetcher, IdBasedFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(ArXiv.class);
 
@@ -106,11 +112,16 @@ public class ArXiv implements FullTextFinder {
         }
     }
 
+    private List<ArXivEntry> searchForEntries(String searchQuery) throws FetcherException {
+        return queryApi(searchQuery, Collections.emptyList(), 0, 10);
+    }
+
     private List<ArXivEntry> queryApi(String searchQuery, List<String> ids, int start, int maxResults)
             throws FetcherException {
         Document result = callApi(searchQuery, ids, start, maxResults);
-        NodeList entries = result.getElementsByTagName("entry");
-        return XMLUtil.asList(entries).stream().map(ArXivEntry::new).collect(Collectors.toList());
+        List<Node> entries = XMLUtil.asList(result.getElementsByTagName("entry"));
+
+        return entries.stream().map(ArXivEntry::new).collect(Collectors.toList());
     }
 
     /**
@@ -136,8 +147,13 @@ public class ArXiv implements FullTextFinder {
 
         try {
             URIBuilder uriBuilder = new URIBuilder(API_URL);
-            uriBuilder.addParameter("search_query", searchQuery);
-            uriBuilder.addParameter("id_list", StringUtils.join(ids, ','));
+            // The arXiv API has problems with accents, so we remove them (i.e. Fréchet -> Frechet)
+            if (StringUtils.isNotBlank(searchQuery)) {
+                uriBuilder.addParameter("search_query", StringUtils.stripAccents(searchQuery));
+            }
+            if (!ids.isEmpty()) {
+                uriBuilder.addParameter("id_list", StringUtils.join(ids, ','));
+            }
             uriBuilder.addParameter("start", String.valueOf(start));
             uriBuilder.addParameter("max_results", String.valueOf(maxResults));
             URL url = uriBuilder.build().toURL();
@@ -145,10 +161,59 @@ public class ArXiv implements FullTextFinder {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = factory.newDocumentBuilder();
 
-            return builder.parse(url.openStream());
+            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+            if (connection.getResponseCode() == 400) {
+                // Bad request error from server, try to get more information
+                throw getException(builder.parse(connection.getErrorStream()));
+            } else {
+                return builder.parse(connection.getInputStream());
+            }
         } catch (SAXException | ParserConfigurationException | IOException | URISyntaxException exception) {
             throw new FetcherException("arXiv API request failed", exception);
         }
+    }
+
+    private FetcherException getException(Document error) {
+        List<Node> entries = XMLUtil.asList(error.getElementsByTagName("entry"));
+
+        // Check if the API returned an error
+        // In case of an error, only one entry will be returned with the error information. For example:
+        // http://export.arxiv.org/api/query?id_list=0307015
+        // <entry>
+        //      <id>http://arxiv.org/api/errors#incorrect_id_format_for_0307015</id>
+        //      <title>Error</title>
+        //      <summary>incorrect id format for 0307015</summary>
+        // </entry>
+        if (entries.size() == 1) {
+            Node node = entries.get(0);
+            Optional<String> id = XMLUtil.getNodeContent(node, "id");
+            Boolean isError = id.map(idContent -> idContent.startsWith("http://arxiv.org/api/errors")).orElse(false);
+            if (isError) {
+                String errorMessage = XMLUtil.getNodeContent(node, "summary").orElse("Unknown error");
+                return new FetcherException(errorMessage);
+            }
+        }
+        return new FetcherException("arXiv API request failed");
+    }
+
+    @Override
+    public String getName() {
+        return "ArXiv";
+    }
+
+    @Override
+    public HelpFile getHelpPage() {
+        return HelpFile.FETCHER_OAI2_ARXIV;
+    }
+
+    @Override
+    public List<BibEntry> performShallowSearch(String query) throws FetcherException {
+        return searchForEntries(query).stream().map(ArXivEntry::toBibEntry).collect(Collectors.toList());
+    }
+
+    @Override
+    public Optional<BibEntry> performSearch(String identifier) throws FetcherException {
+        return searchForEntryById(identifier).map(ArXivEntry::toBibEntry);
     }
 
     private static class ArXivEntry {
@@ -160,14 +225,16 @@ public class ArXiv implements FullTextFinder {
         private final List<String> authorNames;
         private final List<String> categories;
         private final Optional<URL> pdfUrl;
-        private final Optional<String> doiUrl;
+        private final Optional<String> doi;
         private final Optional<String> journalReferenceText;
+        private final Optional<String> primaryCategory;
 
         public ArXivEntry(Node item) {
             // see http://arxiv.org/help/api/user-manual#_details_of_atom_results_returned
 
             // Title of the article
-            title = XMLUtil.getNodeContent(item, "title");
+            // The result from the arXiv contains hard line breaks, try to remove them
+            title = XMLUtil.getNodeContent(item, "title").map(OAI2Fetcher::correctLineBreaks);
 
             // The url leading to the abstract page
             urlAbstractPage = XMLUtil.getNodeContent(item, "id");
@@ -176,25 +243,24 @@ public class ArXiv implements FullTextFinder {
             publishedDate = XMLUtil.getNodeContent(item, "published");
 
             // Abstract of the article
-            abstractText = XMLUtil.getNodeContent(item, "summary");
+            abstractText = XMLUtil.getNodeContent(item, "summary").map(OAI2Fetcher::correctLineBreaks).map(String::trim);
 
             // Authors of the article
             authorNames = new ArrayList<>();
             for (Node authorNode : XMLUtil.getNodesByName(item, "author")) {
-                Optional<String> authorName = XMLUtil.getNodeContent(authorNode, "name");
+                Optional<String> authorName = XMLUtil.getNodeContent(authorNode, "name").map(String::trim);
                 authorName.ifPresent(authorNames::add);
             }
 
             // Categories (arXiv, ACM, or MSC classification)
             categories = new ArrayList<>();
             for (Node categoryNode : XMLUtil.getNodesByName(item, "category")) {
-                Optional<String> category = XMLUtil.getAttributeContent(categoryNode, "name");
+                Optional<String> category = XMLUtil.getAttributeContent(categoryNode, "term");
                 category.ifPresent(categories::add);
             }
 
             // Links
             Optional<URL> pdfUrlParsed = Optional.empty();
-            Optional<String> doiParsed = Optional.empty();
             for (Node linkNode : XMLUtil.getNodesByName(item, "link")) {
                 Optional<String> linkTitle = XMLUtil.getAttributeContent(linkNode, "title");
                 if (linkTitle.equals(Optional.of("pdf"))) {
@@ -205,16 +271,20 @@ public class ArXiv implements FullTextFinder {
                             return null;
                         }
                     });
-                } else if (linkTitle.equals(Optional.of("doi"))) {
-                    // Associated DOI url
-                    doiParsed = XMLUtil.getAttributeContent(linkNode, "href");
                 }
             }
             pdfUrl = pdfUrlParsed;
-            doiUrl = doiParsed;
+
+            // Associated DOI
+            doi = XMLUtil.getNodeContent(item, "arxiv:doi");
 
             // Journal reference (as provided by the author)
             journalReferenceText = XMLUtil.getNodeContent(item, "arxiv:journal_ref");
+
+            // Primary category
+            // Ex: <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
+            primaryCategory = XMLUtil.getNode(item, "arxiv:primary_category").flatMap(
+                    node -> XMLUtil.getAttributeContent(node, "term"));
         }
 
         /**
@@ -239,24 +309,36 @@ public class ArXiv implements FullTextFinder {
             });
         }
 
+        /**
+         * Returns the date when the first version was put on the arXiv
+         */
+        public Optional<String> getDate() {
+            // Publication string also contains time, e.g. 2014-05-09T14:49:43Z
+            return publishedDate.map(date -> {
+                if (date.length() < 10) {
+                    return null;
+                } else {
+                    return date.substring(0, 10);
+                }
+            });
+        }
+
         public BibEntry toBibEntry() {
             BibEntry bibEntry = new BibEntry();
             bibEntry.setType(BibtexEntryTypes.ARTICLE);
+            bibEntry.setField("eprinttype", "arXiv");
             bibEntry.setField("author", StringUtils.join(authorNames, " and "));
+            bibEntry.setField("keywords", StringUtils.join(categories, ", "));
             getId().ifPresent(id -> bibEntry.setField("eprint", id));
             title.ifPresent(title -> bibEntry.setField("title", title));
-            doiUrl.ifPresent(doi -> bibEntry.setField("doi", doi));
-            /*
-            ("ArchivePrefix", "arXiv"),
-            ("PrimaryClass", self.category),
-            ("Abstract", self.summary),
-            y, m = published[:4], published[5:7]
-            ("Year", self.year),
-            ("Month", self.month),
-            ("Note", self.note),
-            ("Url", self.url),
-            ("File", self.id + ".pdf"),
-            */
+            doi.ifPresent(doi -> bibEntry.setField("doi", doi));
+            abstractText.ifPresent(abstractText -> bibEntry.setField("abstract", abstractText));
+            getDate().ifPresent(date -> bibEntry.setField("date", date));
+            primaryCategory.ifPresent(category -> bibEntry.setField("eprintclass", category));
+            journalReferenceText.ifPresent(journal -> bibEntry.setField("journaltitle", journal));
+            getPdfUrl().ifPresent(url -> (new TypedBibEntry(bibEntry, BibDatabaseMode.BIBLATEX)).setFiles(
+                    Collections.singletonList(new ParsedFileField("online", url, "pdf"))));
+
             return bibEntry;
         }
     }

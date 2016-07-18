@@ -17,19 +17,14 @@
 
 package net.sf.jabref.logic.fetcher;
 
-import java.util.Objects;
+public class FetcherException extends Exception {
 
-public class FetcherException extends Throwable {
 
-    private final String errorMessage;
-    private final Exception exception;
-
-    public FetcherException(String errorMessage, Exception exception) {
-        this.errorMessage = Objects.requireNonNull(errorMessage);
-        this.exception = exception;
+    public FetcherException(String errorMessage, Exception cause) {
+        super(errorMessage, cause);
     }
 
     public FetcherException(String errorMessage) {
-        this(errorMessage, null);
+        super(errorMessage);
     }
 }

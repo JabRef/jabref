@@ -19,6 +19,7 @@ package net.sf.jabref.importer.fetcher;
 
 import java.util.Optional;
 
+import net.sf.jabref.logic.fetcher.FetcherException;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -32,5 +33,5 @@ public interface IdBasedFetcher extends WebFetcher {
      * @param identifier a string which uniquely identifies the item
      * @return a {@link BibEntry} containing the bibliographic information (or an empty optional if no data was found)
      */
-    Optional<BibEntry> performSearch(String identifier);
+    Optional<BibEntry> performSearch(String identifier) throws FetcherException;
 }

@@ -1,5 +1,6 @@
 package net.sf.jabref.model.entry;
 
+import java.net.URL;
 import java.util.Objects;
 
 public class ParsedFileField {
@@ -14,6 +15,10 @@ public class ParsedFileField {
         this.description = Objects.requireNonNull(description);
         this.link = Objects.requireNonNull(link);
         this.fileType = Objects.requireNonNull(fileType);
+    }
+
+    public ParsedFileField(String description, URL link, String fileType) {
+        this(description, Objects.requireNonNull(link).toString(), fileType);
     }
 
     public String getFileType() {

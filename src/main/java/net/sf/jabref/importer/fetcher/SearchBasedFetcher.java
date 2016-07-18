@@ -19,6 +19,7 @@ package net.sf.jabref.importer.fetcher;
 
 import java.util.List;
 
+import net.sf.jabref.logic.fetcher.FetcherException;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -34,8 +35,9 @@ public interface SearchBasedFetcher extends WebFetcher {
      * @param query search string
      * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
      */
-    List<BibEntry> performShallowSearch(String query);
+    List<BibEntry> performShallowSearch(String query) throws FetcherException;
 
+    /*
     /**
      * Enriches the given {@link BibEntry} (which is usually an entry found by
      * {@link #performShallowSearch(String)}) by additional information.
@@ -43,5 +45,7 @@ public interface SearchBasedFetcher extends WebFetcher {
      * @param entry the entry to be completed
      * @return a {@link BibEntry} containing the enriched bibliographic information
      */
+    /*
     BibEntry performDeepSearch(BibEntry entry);
+    */
 }

@@ -96,6 +96,18 @@ public class XMLUtil {
         return asList(nodes);
     }
 
+    /**
+     * Gets a the first subnode with the specified tag name.
+     * For example,
+     * <item>
+     *     <node>hit</node>
+     *     <node>second hit, but not returned</node>
+     * </item>
+     */
+    public static Optional<Node> getNode(Node item, String nodeName) {
+        return getNodesByName(item, nodeName).stream().findFirst();
+    }
+
     // Wrapper to make NodeList iterable,
     // taken from <a href="http://stackoverflow.com/questions/19589231/can-i-iterate-through-a-nodelist-using-for-each-in-java">StackOverflow Answer</a>.
     private static final class NodeListWrapper extends AbstractList<Node> implements RandomAccess {
