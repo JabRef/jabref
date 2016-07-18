@@ -18,6 +18,7 @@ package net.sf.jabref.logic.util.strings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,6 +26,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.Globals;
 
 import com.google.common.base.CharMatcher;
+import org.apache.commons.lang3.StringUtils;
 
 public class StringUtil {
 
@@ -655,5 +657,13 @@ public class StringUtil {
 
     public static boolean isNullOrEmpty(String toTest) {
         return (toTest == null || toTest.isEmpty());
+    }
+
+    public static boolean isNotBlank(Optional<String> string) {
+        return string.isPresent() && isNotBlank(string.get());
+    }
+
+    public static boolean isNotBlank(String string) {
+        return StringUtils.isNotBlank(string);
     }
 }

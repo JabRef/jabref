@@ -51,6 +51,8 @@ import org.xml.sax.helpers.DefaultHandler;
  * This class can be used to access any archive offering an OAI2 interface. By
  * default it will access ArXiv.org
  *
+ * @see <a href="http://arxiv.org/help/oa/index"></a>
+ *
  * @author Ulrich St&auml;rk
  * @author Christian Kopf
  */
