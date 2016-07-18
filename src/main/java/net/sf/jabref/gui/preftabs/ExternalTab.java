@@ -95,7 +95,6 @@ class ExternalTab extends JPanel implements PrefsTab {
         consoleOptionPanel.add(defaultConsole, layoutConstraints);
 
         layoutConstraints.gridy = 1;
-        layoutConstraints.insets = new Insets(0, 0, 6, 0);
         consoleOptionPanel.add(executeConsole, layoutConstraints);
 
         layoutConstraints.gridx = 1;
