@@ -15,9 +15,9 @@
  */
 package net.sf.jabref.gui.maintable;
 
-import net.sf.jabref.event.EntryAddedEvent;
-import net.sf.jabref.event.EntryChangedEvent;
-import net.sf.jabref.event.EntryRemovedEvent;
+import net.sf.jabref.model.event.EntryAddedEvent;
+import net.sf.jabref.model.event.EntryChangedEvent;
+import net.sf.jabref.model.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 
 import ca.odell.glazedlists.EventList;

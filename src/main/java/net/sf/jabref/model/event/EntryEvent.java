@@ -1,4 +1,4 @@
-package net.sf.jabref.event;
+package net.sf.jabref.model.event;
 
 import net.sf.jabref.model.entry.BibEntry;
 

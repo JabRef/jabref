@@ -18,7 +18,7 @@ package net.sf.jabref.specialfields;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.event.FieldChangedEvent;
+import net.sf.jabref.model.event.FieldChangedEvent;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.model.entry.BibEntry;
 

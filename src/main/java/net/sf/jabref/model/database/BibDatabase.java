@@ -43,10 +43,10 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.event.EntryAddedEvent;
-import net.sf.jabref.event.EntryChangedEvent;
-import net.sf.jabref.event.EntryRemovedEvent;
-import net.sf.jabref.event.FieldChangedEvent;
+import net.sf.jabref.model.event.EntryAddedEvent;
+import net.sf.jabref.model.event.EntryChangedEvent;
+import net.sf.jabref.model.event.EntryRemovedEvent;
+import net.sf.jabref.model.event.FieldChangedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryUtil;

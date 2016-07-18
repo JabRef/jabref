@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.specialfields;
 
-import net.sf.jabref.event.EntryAddedEvent;
+import net.sf.jabref.model.event.EntryAddedEvent;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
