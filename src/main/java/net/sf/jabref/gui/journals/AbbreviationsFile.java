@@ -19,6 +19,12 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 
+/**
+ * This class provides a model for abbreviation files.
+ * It actually doesn't save the files as objects but rather saves
+ * their paths. This also allows to specify pseudo files as placeholder objects.
+ *
+ */
 public class AbbreviationsFile {
 
     private final SimpleListProperty<Abbreviation> abbreviations = new SimpleListProperty<>(
