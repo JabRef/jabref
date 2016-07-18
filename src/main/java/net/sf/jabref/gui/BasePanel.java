@@ -1105,7 +1105,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(enc)
                     .withSaveType(saveType);
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new, Globals.prefs);
+            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
             if (selectedOnly) {
                 session = databaseWriter.savePartOfDatabase(bibDatabaseContext, mainTable.getSelectedEntries(), prefs);
             } else {

@@ -1,8 +1,8 @@
 package net.sf.jabref.logic.autocompleter;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;

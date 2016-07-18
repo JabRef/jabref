@@ -44,7 +44,6 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
@@ -55,6 +54,7 @@ import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;

@@ -26,7 +26,6 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
@@ -96,6 +95,7 @@ import net.sf.jabref.logic.search.MatchesHighlighter;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -22,11 +22,11 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.layout.ParamLayoutFormatter;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

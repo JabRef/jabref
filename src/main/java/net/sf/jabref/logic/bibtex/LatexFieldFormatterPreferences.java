@@ -1,8 +1,9 @@
 package net.sf.jabref.logic.bibtex;
 
+import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class LatexFieldFormatterPreferences {
 
@@ -23,6 +24,11 @@ public class LatexFieldFormatterPreferences {
         this.doNotResolveStringsFor = doNotResolveStringsFor;
         this.lineLength = lineLength;
         this.fieldContentParserPreferences = fieldContentParserPreferences;
+    }
+
+    public LatexFieldFormatterPreferences() {
+        // This constructor is only to allow an empty constructor in SavePreferences
+        this(true, '{', '}', Collections.emptyList(), 0, new FieldContentParserPreferences());
     }
 
     public static LatexFieldFormatterPreferences fromPreferences(JabRefPreferences prefs) {

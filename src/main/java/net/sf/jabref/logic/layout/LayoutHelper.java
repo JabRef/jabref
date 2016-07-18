@@ -22,8 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * Helper class to get a Layout object.

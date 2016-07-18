@@ -3,7 +3,7 @@ package net.sf.jabref.logic.journals;
 import java.nio.charset.Charset;
 import java.util.List;
 
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class JournalAbbreviationPreferences {
 

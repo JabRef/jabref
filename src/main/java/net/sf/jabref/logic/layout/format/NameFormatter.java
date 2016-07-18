@@ -19,10 +19,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.bst.BibtexNameFormatter;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * This layout formatter uses the Bibtex name.format$ method and provides ultimate flexibility:

@@ -21,13 +21,13 @@ import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import static net.sf.jabref.model.entry.BibEntry.KEYWORDS_FIELD;
 

@@ -22,7 +22,6 @@ import java.util.Map;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
@@ -39,10 +38,9 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
     private static final String COMMENT_PREFIX = "@Comment";
     private static final String PREAMBLE_PREFIX = "@Preamble";
 
-    private final JabRefPreferences jabRefPreferences;
-    public BibtexDatabaseWriter(SaveSessionFactory<E> saveSessionFactory, JabRefPreferences jabRefPreferences) {
+
+    public BibtexDatabaseWriter(SaveSessionFactory<E> saveSessionFactory) {
         super(saveSessionFactory);
-        this.jabRefPreferences = jabRefPreferences;
     }
 
     @Override
@@ -89,9 +87,10 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
     }
 
     @Override
-    protected void writeString(BibtexString bibtexString, boolean isFirstString, int maxKeyLength, Boolean reformatFile) throws SaveException {
+    protected void writeString(BibtexString bibtexString, boolean isFirstString, int maxKeyLength, Boolean reformatFile,
+            LatexFieldFormatterPreferences latexFieldFormatterPreferences) throws SaveException {
         try {
-            // If the string has not been modified, write it back as it was
+            // If the string has not been modified, write it back as it wass
             if (!reformatFile && !bibtexString.hasChanged()) {
                 getWriter().write(bibtexString.getParsedSerialization());
                 return;
@@ -113,8 +112,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
                 getWriter().write("{}");
             } else {
                 try {
-                    String formatted = new LatexFieldFormatter(
-                            LatexFieldFormatterPreferences.fromPreferences(jabRefPreferences))
+                    String formatted = new LatexFieldFormatter(latexFieldFormatterPreferences)
                                     .format(bibtexString.getContent(),
                             LatexFieldFormatter.BIBTEX_STRING);
                     getWriter().write(formatted);
@@ -160,9 +158,10 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
     }
 
     @Override
-    protected void writeEntry(BibEntry entry, BibDatabaseMode mode, Boolean isReformatFile) throws SaveException {
+    protected void writeEntry(BibEntry entry, BibDatabaseMode mode, Boolean isReformatFile,
+            LatexFieldFormatterPreferences latexFieldFormatterPreferences) throws SaveException {
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
-                new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(jabRefPreferences)), true);
+                new LatexFieldFormatter(latexFieldFormatterPreferences), true);
         try {
             bibtexEntryWriter.write(entry, getWriter(), mode, isReformatFile);
         } catch (IOException e) {

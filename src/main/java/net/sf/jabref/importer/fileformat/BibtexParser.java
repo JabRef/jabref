@@ -30,7 +30,6 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.bibtex.FieldContentParser;
@@ -45,6 +44,7 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

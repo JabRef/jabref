@@ -21,11 +21,11 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

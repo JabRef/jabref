@@ -34,6 +34,7 @@ import java.util.stream.Collectors;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.logic.bibtex.comparator.CrossRefEntryComparator;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
@@ -178,7 +179,8 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
         writePreamble(bibDatabaseContext.getDatabase().getPreamble());
 
         // Write strings if there are any.
-        writeStrings(bibDatabaseContext.getDatabase(), preferences.isReformatFile());
+        writeStrings(bibDatabaseContext.getDatabase(), preferences.isReformatFile(),
+                preferences.getLatexFieldFormatterPreferences());
 
         // Write database entries.
         List<BibEntry> sortedEntries = getSortedEntries(bibDatabaseContext, entries, preferences);
@@ -196,7 +198,8 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
                         entryType -> typesToWrite.put(entryType.getName(), entryType));
             }
 
-            writeEntry(entry, bibDatabaseContext.getMode(), preferences.isReformatFile());
+            writeEntry(entry, bibDatabaseContext.getMode(), preferences.isReformatFile(),
+                    preferences.getLatexFieldFormatterPreferences());
         }
 
         if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
@@ -220,7 +223,8 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
 
     protected abstract void writePrelogue(BibDatabaseContext bibDatabaseContext, Charset encoding) throws SaveException;
 
-    protected abstract void writeEntry(BibEntry entry, BibDatabaseMode mode, Boolean isReformatFile) throws SaveException;
+    protected abstract void writeEntry(BibEntry entry, BibDatabaseMode mode, Boolean isReformatFile,
+            LatexFieldFormatterPreferences latexFieldFormatterPreferences) throws SaveException;
 
     protected abstract void writeEpilogue(String epilogue) throws SaveException;
 
@@ -247,7 +251,8 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
      *
      * @param database The database whose strings we should write.
      */
-    private void writeStrings(BibDatabase database, Boolean reformatFile) throws SaveException {
+    private void writeStrings(BibDatabase database, Boolean reformatFile,
+            LatexFieldFormatterPreferences latexFieldFormatterPreferences) throws SaveException {
         List<BibtexString> strings = database.getStringKeySet().stream().map(database::getString).collect(
                 Collectors.toList());
         strings.sort(new BibtexStringComparator(true));
@@ -263,7 +268,8 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
             boolean isFirstStringInType = true;
             for (BibtexString bs : strings) {
                 if (remaining.containsKey(bs.getName()) && (bs.getType() == t)) {
-                    writeString(bs, isFirstStringInType, remaining, maxKeyLength, reformatFile);
+                    writeString(bs, isFirstStringInType, remaining, maxKeyLength, reformatFile,
+                            latexFieldFormatterPreferences);
                     isFirstStringInType = false;
                 }
             }
@@ -271,7 +277,7 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
     }
 
     protected void writeString(BibtexString bibtexString, boolean isFirstString, Map<String, BibtexString> remaining, int maxKeyLength,
-            Boolean reformatFile)
+            Boolean reformatFile, LatexFieldFormatterPreferences latexFieldFormatterPreferences)
             throws SaveException {
         // First remove this from the "remaining" list so it can't cause problem with circular refs:
         remaining.remove(bibtexString.getName());
@@ -290,14 +296,16 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
             // If the label we found exists as a key in the "remaining" Map, we go on and write it now:
             if (remaining.containsKey(label)) {
                 BibtexString referred = remaining.get(label);
-                writeString(referred, isFirstString, remaining, maxKeyLength, reformatFile);
+                writeString(referred, isFirstString, remaining, maxKeyLength, reformatFile,
+                        latexFieldFormatterPreferences);
             }
         }
 
-        writeString(bibtexString, isFirstString, maxKeyLength, reformatFile);
+        writeString(bibtexString, isFirstString, maxKeyLength, reformatFile, latexFieldFormatterPreferences);
     }
 
-    protected abstract void writeString(BibtexString bibtexString, boolean isFirstString, int maxKeyLength, Boolean reformatFile)
+    protected abstract void writeString(BibtexString bibtexString, boolean isFirstString, int maxKeyLength,
+            Boolean reformatFile, LatexFieldFormatterPreferences latexFieldFormatterPreferences)
             throws SaveException;
 
     protected void writeEntryTypeDefinitions(Map<String, EntryType> types) throws SaveException {

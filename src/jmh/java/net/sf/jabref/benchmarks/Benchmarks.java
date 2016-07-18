@@ -60,8 +60,7 @@ public class Benchmarks {
             entry.setField("rnd", "2" + randomizer.nextInt());
             database.insertEntry(entry);
         }
-        BibtexDatabaseWriter<StringSaveSession> databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new,
-                Globals.prefs);
+        BibtexDatabaseWriter<StringSaveSession> databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new);
         StringSaveSession saveSession = databaseWriter.savePartOfDatabase(
                 new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries(),
                 new SavePreferences());
@@ -81,8 +80,7 @@ public class Benchmarks {
 
     @Benchmark
     public String write() throws Exception {
-        BibtexDatabaseWriter<StringSaveSession> databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new,
-                Globals.prefs);
+        BibtexDatabaseWriter<StringSaveSession> databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new);
         StringSaveSession saveSession = databaseWriter.savePartOfDatabase(
                 new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries(),
                 new SavePreferences());

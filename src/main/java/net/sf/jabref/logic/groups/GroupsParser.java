@@ -19,9 +19,9 @@ package net.sf.jabref.logic.groups;
 
 import java.util.List;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * Converts string representation of groups to a parsed {@link GroupTreeNode}.
