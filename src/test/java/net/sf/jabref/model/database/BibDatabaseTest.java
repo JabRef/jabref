@@ -8,12 +8,12 @@ import java.util.Collections;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.event.TestEventListener;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.model.event.TestEventListener;
 
 import org.junit.Before;
 import org.junit.Rule;
