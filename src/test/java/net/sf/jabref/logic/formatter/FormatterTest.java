@@ -105,7 +105,7 @@ public class FormatterTest {
         return Arrays.asList(
                 new Object[]{new CapitalizeFormatter()},
                 new Object[]{new ClearFormatter()},
-                new Object[]{new HtmlToLatexFormatter(Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION))},
+                new Object[]{new HtmlToLatexFormatter()},
                 new Object[]{new HtmlToUnicodeFormatter()},
                 new Object[]{new IdentityFormatter()},
                 new Object[]{new LatexCleanupFormatter()},

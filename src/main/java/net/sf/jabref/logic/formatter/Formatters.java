@@ -45,7 +45,7 @@ import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 public class Formatters {
 
     public static final List<Formatter> CONVERTERS = Arrays.asList(
-            new HtmlToLatexFormatter(false), // TODO: Get the correct value from USE_CONVERT_TO_EQUATION
+            new HtmlToLatexFormatter(),
             new HtmlToUnicodeFormatter(),
             new LatexToUnicodeFormatter(),
             new UnicodeToLatexFormatter()

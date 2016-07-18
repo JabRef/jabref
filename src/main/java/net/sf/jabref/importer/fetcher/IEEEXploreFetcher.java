@@ -81,8 +81,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
     private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
     private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
-    private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter(
-            Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION));
+    private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
     private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);
 
     private boolean shouldContinue;
@@ -281,17 +280,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
             // Replace general expressions
             title = title.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
             // Deal with subscripts and superscripts
-            if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
-                title = SUPER_DETECTION_1.matcher(title).replaceAll(SUPER_EQ_RESULT);
-                title = SUB_DETECTION_1.matcher(title).replaceAll(SUB_EQ_RESULT);
-                title = SUPER_DETECTION_2.matcher(title).replaceAll(SUPER_EQ_RESULT);
-                title = SUB_DETECTION_2.matcher(title).replaceAll(SUB_EQ_RESULT);
-            } else {
-                title = SUPER_DETECTION_1.matcher(title).replaceAll(SUPER_TEXT_RESULT);
-                title = SUB_DETECTION_1.matcher(title).replaceAll(SUB_TEXT_RESULT);
-                title = SUPER_DETECTION_2.matcher(title).replaceAll(SUPER_TEXT_RESULT);
-                title = SUB_DETECTION_2.matcher(title).replaceAll(SUB_TEXT_RESULT);
-            }
+            title = SUPER_DETECTION_1.matcher(title).replaceAll(SUPER_TEXT_RESULT);
+            title = SUB_DETECTION_1.matcher(title).replaceAll(SUB_TEXT_RESULT);
+            title = SUPER_DETECTION_2.matcher(title).replaceAll(SUPER_TEXT_RESULT);
+            title = SUB_DETECTION_2.matcher(title).replaceAll(SUB_TEXT_RESULT);
 
             // Replace \infin with \infty
             title = title.replaceAll("\\\\infin", "\\\\infty");
@@ -501,17 +493,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
             // Replace general expressions
             abstr = abstr.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
             // Deal with subscripts and superscripts
-            if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
-                abstr = SUPER_DETECTION_1.matcher(abstr).replaceAll(SUPER_EQ_RESULT);
-                abstr = SUB_DETECTION_1.matcher(abstr).replaceAll(SUB_EQ_RESULT);
-                abstr = SUPER_DETECTION_2.matcher(abstr).replaceAll(SUPER_EQ_RESULT);
-                abstr = SUB_DETECTION_2.matcher(abstr).replaceAll(SUB_EQ_RESULT);
-            } else {
-                abstr = SUPER_DETECTION_1.matcher(abstr).replaceAll(SUPER_TEXT_RESULT);
-                abstr = SUB_DETECTION_1.matcher(abstr).replaceAll(SUB_TEXT_RESULT);
-                abstr = SUPER_DETECTION_2.matcher(abstr).replaceAll(SUPER_TEXT_RESULT);
-                abstr = SUB_DETECTION_2.matcher(abstr).replaceAll(SUB_TEXT_RESULT);
-            }
+            abstr = SUPER_DETECTION_1.matcher(abstr).replaceAll(SUPER_TEXT_RESULT);
+            abstr = SUB_DETECTION_1.matcher(abstr).replaceAll(SUB_TEXT_RESULT);
+            abstr = SUPER_DETECTION_2.matcher(abstr).replaceAll(SUPER_TEXT_RESULT);
+            abstr = SUB_DETECTION_2.matcher(abstr).replaceAll(SUB_TEXT_RESULT);
             // Replace \infin with \infty
             abstr = abstr.replace("\\infin", "\\infty");
             // Write back

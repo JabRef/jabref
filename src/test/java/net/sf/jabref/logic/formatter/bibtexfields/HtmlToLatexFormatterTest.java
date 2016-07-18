@@ -23,7 +23,7 @@ public class HtmlToLatexFormatterTest {
 
     @Before
     public void setUp() {
-        formatter = new HtmlToLatexFormatter(Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION));
+        formatter = new HtmlToLatexFormatter();
     }
 
     @Test

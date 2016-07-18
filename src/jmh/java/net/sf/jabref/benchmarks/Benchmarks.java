@@ -117,8 +117,7 @@ public class Benchmarks {
 
     @Benchmark
     public String htmlToLatexConversion() {
-        HtmlToLatexFormatter f = new HtmlToLatexFormatter(
-                Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION));
+        HtmlToLatexFormatter f = new HtmlToLatexFormatter();
         return f.format(htmlConversionString);
     }
 

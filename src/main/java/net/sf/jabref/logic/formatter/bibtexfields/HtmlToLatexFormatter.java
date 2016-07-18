@@ -39,13 +39,6 @@ public class HtmlToLatexFormatter implements LayoutFormatter, Formatter {
     private static final Pattern ESCAPED_PATTERN3 = Pattern.compile("&#([x]*)([0]*)(\\p{XDigit}+);");
     private static final Pattern ESCAPED_PATTERN4 = Pattern.compile("&(\\w+);");
 
-    private final boolean convertToEquation;
-
-
-    public HtmlToLatexFormatter(boolean convertToEquation) {
-        this.convertToEquation = convertToEquation;
-    }
-
     @Override
     public String format(String text) {
         String result = Objects.requireNonNull(text);
@@ -56,15 +49,8 @@ public class HtmlToLatexFormatter implements LayoutFormatter, Formatter {
 
         StringBuilder sb = new StringBuilder();
         // Deal with the form <sup>k</sup>and <sub>k</sub>
-        // If the result is in text or equation form can be controlled
-        // From the "Advanced settings" tab
-        if (convertToEquation) {
-            result = result.replaceAll("<[ ]?sup>([^<]+)</sup>", "\\$\\^\\{$1\\}\\$");
-            result = result.replaceAll("<[ ]?sub>([^<]+)</sub>", "\\$_\\{$1\\}\\$");
-        } else {
-            result = result.replaceAll("<[ ]?sup>([^<]+)</sup>", "\\\\textsuperscript\\{$1\\}");
-            result = result.replaceAll("<[ ]?sub>([^<]+)</sub>", "\\\\textsubscript\\{$1\\}");
-        }
+        result = result.replaceAll("<[ ]?sup>([^<]+)</sup>", "\\\\textsuperscript\\{$1\\}");
+        result = result.replaceAll("<[ ]?sub>([^<]+)</sub>", "\\\\textsubscript\\{$1\\}");
 
         // TODO: maybe rewrite this based on regular expressions instead
         // Note that (at least) the IEEE Xplore fetcher must be fixed as it relies on the current way to

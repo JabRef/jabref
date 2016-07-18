@@ -440,7 +440,7 @@ class LayoutEntry {
         switch (name) {
         case "HTMLToLatexFormatter": // For backward compatibility
         case "HtmlToLatex":
-            return new HtmlToLatexFormatter(prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION));
+            return new HtmlToLatexFormatter();
         case "UnicodeToLatexFormatter": // For backward compatibility
         case "UnicodeToLatex":
             return new UnicodeToLatexFormatter();

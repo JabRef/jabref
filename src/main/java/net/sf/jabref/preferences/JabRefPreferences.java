@@ -365,7 +365,7 @@ public class JabRefPreferences {
         activeFormatterCleanups.add(new FieldFormatterCleanup("title", new ProtectTermsFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup("title", new UnitsToLatexFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup("title", new LatexCleanupFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new HtmlToLatexFormatter(false))); // TODO: Get the actual value USE_CONVERT_TO_EQUATION
+        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new HtmlToLatexFormatter()));
         FieldFormatterCleanups formatterCleanups = new FieldFormatterCleanups(true, activeFormatterCleanups);
         CLEANUP_DEFAULT_PRESET = new CleanupPreset(EnumSet.complementOf(deactivedJobs), formatterCleanups);
     }
@@ -862,7 +862,6 @@ public class JabRefPreferences {
         defaults.put(REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(AUTOLINK_USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
         defaults.put(USE_IEEE_ABRV, Boolean.FALSE);
-        defaults.put(USE_CONVERT_TO_EQUATION, Boolean.FALSE);
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
         defaults.put(MAX_BACK_HISTORY_SIZE, 10);

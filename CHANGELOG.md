@@ -27,6 +27,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1592](https://github.com/JabRef/jabref/issues/1592): LibreOffice: wrong numbers in citation labels
 
 ### Removed
+- It is not longer possible to choose to convert HTML sub- and superscripts to equations
 
 
 
