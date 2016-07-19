@@ -102,7 +102,7 @@ public class ArXivTest {
     }
 
     @Test
-    public void searchEntryById() throws Exception {
+    public void searchEntryByOldId() throws Exception {
         BibEntry expected = new BibEntry();
         expected.setType(BibLatexEntryTypes.ARTICLE);
         expected.setField("author", "H1 Collaboration");
@@ -118,6 +118,23 @@ public class ArXivTest {
         expected.setField("journaltitle", "Eur.Phys.J.C31:17-29,2003");
 
         assertEquals(Optional.of(expected), finder.performSearch("hep-ex/0307015"));
+    }
+
+    @Test
+    public void searchEntryByIdWith4DigitsAndVersion() throws Exception {
+        assertEquals(Optional.of(sliceTheoremPaper), finder.performSearch("1405.2249v1"));
+    }
+
+    @Test
+    public void searchEntryByIdWith4Digits() throws Exception {
+        assertEquals(Optional.of(sliceTheoremPaper), finder.performSearch("1405.2249"));
+    }
+
+    @Test
+    public void searchEntryByIdWith5Digits() throws Exception {
+        assertEquals(Optional.of(
+                "An Optimal Convergence Theorem for Mean Curvature Flow of Arbitrary Codimension in Hyperbolic Spaces"),
+                finder.performSearch("1503.06747").flatMap(entry -> entry.getFieldOptional("title")));
     }
 
     @Test
