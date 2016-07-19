@@ -280,6 +280,9 @@ public class JabRefPreferences {
     public static final String KEY_PATTERN_REGEX = "KeyPatternRegex";
     public static final String KEY_PATTERN_REPLACEMENT = "KeyPatternReplacement";
 
+    public static final String CONSOLE_COMMAND = "consoleCommand";
+    public static final String USE_DEFAULT_CONSOLE_APPLICATION = "useDefaultConsoleApplication";
+
     // Currently, it is not possible to specify defaults for specific entry types
     // When this should be made possible, the code to inspect is net.sf.jabref.gui.preftabs.LabelPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getLabelPattern(); etc
     public static final String DEFAULT_LABEL_PATTERN = "defaultLabelPattern";
@@ -865,6 +868,13 @@ public class JabRefPreferences {
         defaults.put(MAX_BACK_HISTORY_SIZE, 10);
         defaults.put(LINE_LENGTH, 65);
         defaults.put(INDENT, 4);
+
+        defaults.put(USE_DEFAULT_CONSOLE_APPLICATION, Boolean.TRUE);
+        if (OS.WINDOWS) {
+            defaults.put(CONSOLE_COMMAND, "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\"");
+        } else {
+            defaults.put(CONSOLE_COMMAND, "");
+        }
 
         //versioncheck defaults
         defaults.put(VersionPreferences.VERSION_IGNORED_UPDATE, "");
