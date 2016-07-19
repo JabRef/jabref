@@ -34,6 +34,7 @@ import net.sf.jabref.importer.OutputPrinter;
  * A Fetcher should not execute any GUI Operations, because it might be run in
  * headless mode, but rather use the OutputPrinter for talking to the user.
  */
+@Deprecated // use SearchBasedFetcher instead
 public interface EntryFetcher extends ImportInspectionDialog.CallBack {
 
     /**
