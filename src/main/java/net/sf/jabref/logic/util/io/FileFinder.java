@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -25,13 +26,12 @@ public class FileFinder {
         Set<File> result = new HashSet<>();
         for (File directory : directories) {
 
-            try {
-                Set<File> files = Files
-                        .find(directory.toPath(), Integer.MAX_VALUE,
-                                (path, attr) -> !Files.isDirectory(path)
-                                        && extensions.contains(FileUtil.getFileExtension(path.toFile()).orElse("")))
-                        .map(x -> x.toFile()).collect(Collectors.toSet());
-                result.addAll(files);
+            try (Stream<File> files = Files
+                    .find(directory.toPath(), Integer.MAX_VALUE,
+                            (path, attr) -> !Files.isDirectory(path)
+                                    && extensions.contains(FileUtil.getFileExtension(path.toFile()).orElse("")))
+                    .map(x -> x.toFile())) {
+                result.addAll(files.collect(Collectors.toSet()));
 
             } catch (IOException e) {
                 LOGGER.error("Problem in finding files", e);

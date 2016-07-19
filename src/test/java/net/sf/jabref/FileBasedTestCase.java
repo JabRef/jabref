@@ -3,6 +3,7 @@ package net.sf.jabref;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.stream.Stream;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -74,13 +75,12 @@ public class FileBasedTestCase {
     @After
     public void tearDown() {
 
-        try {
-            for (Path p : Files.walk(rootDir).sorted((a, b) -> b.compareTo(a)). // reverse; files before dirs
-                    toArray(Path[]::new)) {
+        try (Stream<Path> path = Files.walk(rootDir)) {
+            // reverse; files before dirs
+            for (Path p : path.sorted((a, b) -> b.compareTo(a)).toArray(Path[]::new)) {
                 Files.delete(p);
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
