@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javafx.beans.property.SimpleIntegerProperty;
@@ -68,9 +67,9 @@ public class ManageJournalAbbreviationsViewModel {
      */
     public void addBuiltInLists() {
         List<Abbreviation> builtInList = Globals.journalAbbreviationLoader.getBuiltInAbbreviations();
-        List<AbbreviationViewModel> builtInListViewModel = Collections.EMPTY_LIST;
+        List<AbbreviationViewModel> builtInListViewModel = new ArrayList<>();
         builtInList.forEach(abbreviation -> builtInListViewModel.add(new AbbreviationViewModel(abbreviation)));
-        AbbreviationsFile builtInFile = new AbbreviationsFile(abbreviations, "JabRef built in list");
+        AbbreviationsFile builtInFile = new AbbreviationsFile(builtInListViewModel, "JabRef built in list");
         journalFiles.add(builtInFile);
         List<Abbreviation> ieeeList;
         if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
@@ -78,7 +77,7 @@ public class ManageJournalAbbreviationsViewModel {
         } else {
             ieeeList = Globals.journalAbbreviationLoader.getStandardIEEEAbbreviations();
         }
-        List<AbbreviationViewModel> ieeeListViewModel = Collections.EMPTY_LIST;
+        List<AbbreviationViewModel> ieeeListViewModel = new ArrayList<>();
         ieeeList.forEach(abbreviation -> ieeeListViewModel.add(new AbbreviationViewModel(abbreviation)));
         AbbreviationsFile ieeeFile = new AbbreviationsFile(ieeeListViewModel, "IEEE built in list");
         journalFiles.add(ieeeFile);
@@ -188,7 +187,7 @@ public class ManageJournalAbbreviationsViewModel {
     public void addAbbreviation() throws JabRefException {
         Abbreviation abbreviation = new Abbreviation(abbreviationsName.get(), abbreviationsAbbreviation.get());
         AbbreviationViewModel abbreviationViewModel = new AbbreviationViewModel(abbreviation);
-        if (abbreviations.contains(abbreviation)) {
+        if (abbreviations.contains(abbreviationViewModel)) {
             throw new JabRefException("Duplicated journal abbreviation");
         } else if (abbreviation.getName().trim().isEmpty()) {
             throw new JabRefException("Name field can not be empty");
@@ -209,8 +208,9 @@ public class ManageJournalAbbreviationsViewModel {
     public void editAbbreviation() throws JabRefException {
         if (abbreviationsCount.get() != 0) {
             Abbreviation abbreviation = new Abbreviation(abbreviationsName.get(), abbreviationsAbbreviation.get());
-            if (abbreviations.contains(abbreviation)) {
-                if (abbreviation.equals(currentAbbreviation.get())) {
+            AbbreviationViewModel abbViewModel = new AbbreviationViewModel(abbreviation);
+            if (abbreviations.contains(abbViewModel)) {
+                if (abbViewModel.equals(currentAbbreviation.get())) {
                     currentAbbreviation.get().setName(abbreviationsName.get());
                     currentAbbreviation.get().setAbbreviation(abbreviationsAbbreviation.get());
                 } else {

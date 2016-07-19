@@ -22,10 +22,14 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DialogPane;
+import javafx.scene.control.Label;
+import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -77,6 +81,10 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     private Button addNewJournalFileButton;
     @FXML
     private Button removeJournalAbbreviationsButton;
+    @FXML
+    private ProgressIndicator progressIndicator;
+    @FXML
+    private Label loadingLabel;
 
 
     public ManageJournalAbbreviationsView() {
@@ -89,9 +97,19 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         setUpTable();
         setBindings();
         setButtonStyles();
-        viewModel.createFileObjects();
-        //        viewModel.addBuiltInLists();
-        journalFilesBox.getSelectionModel().selectLast();
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                loadingLabel.setVisible(true);
+                progressIndicator.setVisible(true);
+                viewModel.createFileObjects();
+                journalFilesBox.getSelectionModel().selectLast();
+                viewModel.addBuiltInLists();
+                loadingLabel.setVisible(false);
+                progressIndicator.setVisible(false);
+            }
+        }).start();
     }
 
     private void setButtonStyles() {
@@ -105,6 +123,10 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         Text removeJournalAbbreviationsButtonGraphic = new Text(IconTheme.JabRefIcon.CLOSE.getCode());
         removeJournalAbbreviationsButtonGraphic.getStyleClass().add("icon");
         removeJournalAbbreviationsButton.setGraphic(removeJournalAbbreviationsButtonGraphic);
+        ButtonBar.setButtonData(progressIndicator, ButtonData.LEFT);
+        ButtonBar.setButtonData(loadingLabel, ButtonData.LEFT);
+        ButtonBar.setButtonUniformSize(progressIndicator, false);
+        ButtonBar.setButtonUniformSize(loadingLabel, false);
     }
 
     private void setUpTable() {
@@ -134,8 +156,6 @@ public class ManageJournalAbbreviationsView extends FXMLView {
                                 addAbbreviation();
                             });
                         }
-                    } else {
-                        setDisable(true);
                     }
                 }
                 journalAbbreviationsTable.refresh();
@@ -156,8 +176,6 @@ public class ManageJournalAbbreviationsView extends FXMLView {
                                 removeAbbreviation();
                             });
                         }
-                    } else {
-                        setDisable(true);
                     }
                 }
                 journalAbbreviationsTable.refresh();
@@ -169,7 +187,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     private void setBindings() {
         viewModel.currentFileProperty().addListener((observable, oldvalue, newvalue) -> {
             journalFilesBox.getSelectionModel().select(newvalue);
-            if (newvalue.isPseudoFileProperty().get()) {
+            if (newvalue != null) {
                 isEditableAndRemovable.set(!newvalue.isPseudoFileProperty().get());
             }
             removeJournalAbbreviationsButton.setDisable((newvalue == null) || !isEditableAndRemovable.get());
@@ -186,9 +204,6 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         });
         journalFilesBox.getSelectionModel().selectedItemProperty().addListener((observabe, oldvalue, newvalue) -> {
             viewModel.changeActiveFile(newvalue);
-            if (newvalue.isPseudoFileProperty().get()) {
-                isEditableAndRemovable.set(!newvalue.isPseudoFileProperty().get());
-            }
         });
         viewModel.journalFilesProperty().addListener((observable, oldvalue, newvalue) -> {
             journalFilesBox.itemsProperty().set(newvalue);
@@ -200,7 +215,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
             viewModel.abbreviationsProperty().set(newvalue);
         });
         isEditableAndRemovable.addListener((observable, oldvalue, newvalue) -> {
-            removeJournalAbbreviationsButton.setDisable(!newvalue.booleanValue());
+            removeJournalAbbreviationsButton.setDisable(newvalue.booleanValue());
         });
     }
 
@@ -224,7 +239,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
                 viewModel.addNewFile(file.getAbsolutePath());
                 journalFilesBox.getSelectionModel().selectLast();
             } catch (JabRefException e) {
-                showDuplicatedJournalFileErrorDialog();
+                showErrorDialog(e);
             }
         }
     }
@@ -239,7 +254,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
                 viewModel.openFile(file.getAbsolutePath());
                 journalFilesBox.getSelectionModel().selectLast();
             } catch (JabRefException e) {
-                showDuplicatedJournalFileErrorDialog();
+                showErrorDialog(e);
             }
         }
     }
@@ -256,24 +271,16 @@ public class ManageJournalAbbreviationsView extends FXMLView {
 
     @FXML
     private void addAbbreviation() {
-        GridPane content = createDialogContent("", "");
-
-        DialogPane pane = new DialogPane();
-        pane.setContent(content);
-        pane.setMinWidth(300);
-        Optional<ButtonType> result = FXDialogs.showCustomDialogAndWait(
-                Localization.lang("Create journal abbreviation"), pane, ButtonType.OK, ButtonType.CANCEL);
-        result.ifPresent((response -> {
-            if (response == ButtonType.OK) {
-                viewModel.abbreviationsNameProperty().set(((TextField) content.getChildren().get(0)).getText());
-                viewModel.abbreviationsAbbreviationProperty().set(((TextField) content.getChildren().get(1)).getText());
-                try {
-                    viewModel.addAbbreviation();
-                } catch (JabRefException e) {
-                    showDuplicatedEntryErrorDialog();
-                }
-            }
-        }));
+        viewModel.abbreviationsNameProperty().set("Name");
+        viewModel.abbreviationsAbbreviationProperty().set("Abbreviation");
+        try {
+            viewModel.addAbbreviation();
+            viewModel.currentAbbreviationProperty()
+                    .set(viewModel.abbreviationsProperty().get(viewModel.abbreviationsCountProperty().get() - 1));
+            editAbbreviation();
+        } catch (JabRefException e) {
+            showErrorDialog(e);
+        }
     }
 
     @FXML
@@ -293,7 +300,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
                 try {
                     viewModel.editAbbreviation();
                 } catch (JabRefException e) {
-                    showDuplicatedEntryErrorDialog();
+                    showErrorDialog(e);
                 }
             }
         }));
@@ -325,14 +332,8 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         return content;
     }
 
-    private void showDuplicatedEntryErrorDialog() {
-        FXDialogs.showErrorDialogAndWait(Localization.lang("Duplicated entry"),
-                Localization.lang("Journal abbreviation already exists in this list."));
-    }
-
-    private void showDuplicatedJournalFileErrorDialog() {
-        FXDialogs.showErrorDialogAndWait(Localization.lang("Duplicated journal file"),
-                Localization.lang("Journal abbreviation file already exists in this list."));
+    private void showErrorDialog(JabRefException e) {
+        FXDialogs.showErrorDialogAndWait(Localization.lang("Something went wrong"), Localization.lang(e.getMessage()));
     }
 
     @FXML

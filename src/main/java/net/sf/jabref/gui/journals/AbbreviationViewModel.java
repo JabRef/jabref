@@ -15,6 +15,8 @@
  */
 package net.sf.jabref.gui.journals;
 
+import java.util.Objects;
+
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -22,6 +24,12 @@ import javafx.beans.property.StringProperty;
 
 import net.sf.jabref.logic.journals.Abbreviation;
 
+/**
+ * This class provides a view model for abbreviation objects which can also
+ * define placeholder objects of abbreviations. This is indicated by using the
+ * {@code pseudoAbbreviation} property.
+ *
+ */
 public class AbbreviationViewModel {
 
     private final Abbreviation abbreviationObject;
@@ -71,5 +79,19 @@ public class AbbreviationViewModel {
 
     public BooleanProperty isPseudoAbbreviationProperty() {
         return this.pseudoAbbreviation;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(abbreviationObject);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof AbbreviationViewModel) {
+            return Objects.equals(this.abbreviationObject, ((AbbreviationViewModel) obj).abbreviationObject);
+        } else {
+            return false;
+        }
     }
 }

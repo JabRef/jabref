@@ -4,10 +4,10 @@
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -17,7 +17,7 @@
    <content>
       <BorderPane prefHeight="200.0" prefWidth="200.0">
          <center>
-            <TableView fx:id="journalAbbreviationsTable" styleClass="abbreviations-table" BorderPane.alignment="CENTER">
+            <TableView fx:id="journalAbbreviationsTable" editable="true" styleClass="abbreviations-table" BorderPane.alignment="CENTER">
               <columns>
                 <TableColumn fx:id="journalTableNameColumn" prefWidth="200.0" text="%Full journal name" />
                 <TableColumn fx:id="journalTableAbbreviationColumn" prefWidth="200.0" text="%Abbreviation name" />
@@ -32,6 +32,8 @@
          <bottom>
             <ButtonBar prefHeight="40.0" styleClass="custom-buttons" BorderPane.alignment="CENTER">
               <buttons>
+                  <Label fx:id="loadingLabel" maxHeight="30.0" text="%Loading built in lists" visible="false" />
+                  <ProgressIndicator fx:id="progressIndicator" maxHeight="30.0" opacity="0.4" visible="false" />
                 <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#closeDialog" text="%Cancel" />
                   <Button fx:id="saveButton" defaultButton="true" mnemonicParsing="false" onAction="#saveAbbreviations" text="%Save changes" />
               </buttons>
@@ -42,7 +44,7 @@
    <header>
       <HBox spacing="10.0" styleClass="custom-header">
          <children>
-            <ComboBox fx:id="journalFilesBox" minWidth="100.0" onAction="#fileChanged" styleClass="journal-lists" HBox.hgrow="ALWAYS" />
+            <ComboBox fx:id="journalFilesBox" minWidth="200.0" onAction="#fileChanged" styleClass="journal-lists" HBox.hgrow="ALWAYS" />
             <Pane HBox.hgrow="ALWAYS" />
             <Button fx:id="addNewJournalFileButton" mnemonicParsing="false" onAction="#addNewFile">
                <tooltip>
