@@ -47,7 +47,6 @@ import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.JabRefPreferencesFilter;
-import net.sf.jabref.preferences.JabRefPreferencesFilterDialog;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
@@ -208,7 +207,7 @@ public class PreferencesDialog extends JDialog {
         });
 
         showPreferences.addActionListener(
-                e -> new JabRefPreferencesFilterDialog(new JabRefPreferencesFilter(Globals.prefs), frame)
+                e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(Globals.prefs), frame)
                         .setVisible(true));
         resetPreferences.addActionListener(e -> {
             if (JOptionPane.showConfirmDialog(PreferencesDialog.this,
