@@ -256,7 +256,7 @@ public class ManageJournalAbbreviationsTest {
         viewModel.changeActiveFile(viewModel.journalFilesProperty().get(0));
         ObservableList<Abbreviation> expected = FXCollections
                 .observableArrayList(Globals.journalAbbreviationLoader.getBuiltInAbbreviations());
-        ObservableList<Abbreviation> actual = viewModel.abbreviationsProperty().get();
+        ObservableList<AbbreviationViewModel> actual = viewModel.abbreviationsProperty().get();
         Assert.assertEquals(expected, actual);
     }
 

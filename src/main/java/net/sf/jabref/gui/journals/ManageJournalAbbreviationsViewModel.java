@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javafx.beans.property.SimpleIntegerProperty;
@@ -33,8 +34,6 @@ import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.journals.Abbreviation;
-import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -50,13 +49,13 @@ public class ManageJournalAbbreviationsViewModel {
     private final Log logger = LogFactory.getLog(ManageJournalAbbreviationsViewModel.class);
     private final SimpleListProperty<AbbreviationsFile> journalFiles = new SimpleListProperty<>(
             FXCollections.observableArrayList());
-    private final SimpleListProperty<Abbreviation> abbreviations = new SimpleListProperty<>(
+    private final SimpleListProperty<AbbreviationViewModel> abbreviations = new SimpleListProperty<>(
             FXCollections.observableArrayList());
     private final SimpleIntegerProperty abbreviationsCount = new SimpleIntegerProperty();
     private final SimpleStringProperty abbreviationsName = new SimpleStringProperty();
     private final SimpleStringProperty abbreviationsAbbreviation = new SimpleStringProperty();
     private final SimpleObjectProperty<AbbreviationsFile> currentFile = new SimpleObjectProperty<>();
-    private final SimpleObjectProperty<Abbreviation> currentAbbreviation = new SimpleObjectProperty<>();
+    private final SimpleObjectProperty<AbbreviationViewModel> currentAbbreviation = new SimpleObjectProperty<>();
 
 
     public ManageJournalAbbreviationsViewModel() {
@@ -69,7 +68,9 @@ public class ManageJournalAbbreviationsViewModel {
      */
     public void addBuiltInLists() {
         List<Abbreviation> builtInList = Globals.journalAbbreviationLoader.getBuiltInAbbreviations();
-        AbbreviationsFile builtInFile = new AbbreviationsFile(builtInList, "JabRef built in list");
+        List<AbbreviationViewModel> builtInListViewModel = Collections.EMPTY_LIST;
+        builtInList.forEach(abbreviation -> builtInListViewModel.add(new AbbreviationViewModel(abbreviation)));
+        AbbreviationsFile builtInFile = new AbbreviationsFile(abbreviations, "JabRef built in list");
         journalFiles.add(builtInFile);
         List<Abbreviation> ieeeList;
         if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
@@ -77,7 +78,9 @@ public class ManageJournalAbbreviationsViewModel {
         } else {
             ieeeList = Globals.journalAbbreviationLoader.getStandardIEEEAbbreviations();
         }
-        AbbreviationsFile ieeeFile = new AbbreviationsFile(ieeeList, "IEEE built in list");
+        List<AbbreviationViewModel> ieeeListViewModel = Collections.EMPTY_LIST;
+        ieeeList.forEach(abbreviation -> ieeeListViewModel.add(new AbbreviationViewModel(abbreviation)));
+        AbbreviationsFile ieeeFile = new AbbreviationsFile(ieeeListViewModel, "IEEE built in list");
         journalFiles.add(ieeeFile);
     }
 
@@ -184,11 +187,16 @@ public class ManageJournalAbbreviationsViewModel {
      */
     public void addAbbreviation() throws JabRefException {
         Abbreviation abbreviation = new Abbreviation(abbreviationsName.get(), abbreviationsAbbreviation.get());
+        AbbreviationViewModel abbreviationViewModel = new AbbreviationViewModel(abbreviation);
         if (abbreviations.contains(abbreviation)) {
             throw new JabRefException("Duplicated journal abbreviation");
+        } else if (abbreviation.getName().trim().isEmpty()) {
+            throw new JabRefException("Name field can not be empty");
+        } else if (abbreviation.getAbbreviation().trim().isEmpty()) {
+            throw new JabRefException("Abbreviation field can not be empty");
         } else {
-            abbreviations.add(abbreviation);
-            currentAbbreviation.set(abbreviation);
+            abbreviations.add(abbreviationViewModel);
+            currentAbbreviation.set(abbreviationViewModel);
         }
     }
 
@@ -208,6 +216,10 @@ public class ManageJournalAbbreviationsViewModel {
                 } else {
                     throw new JabRefException("Duplicated journal abbreviation");
                 }
+            } else if (abbreviation.getName().trim().isEmpty()) {
+                throw new JabRefException("Name field can not be empty");
+            } else if (abbreviation.getAbbreviation().trim().isEmpty()) {
+                throw new JabRefException("Abbreviation field can not be empty");
             } else {
                 currentAbbreviation.get().setName(abbreviationsName.get());
                 currentAbbreviation.get().setAbbreviation(abbreviationsAbbreviation.get());
@@ -282,7 +294,7 @@ public class ManageJournalAbbreviationsViewModel {
         return this.journalFiles;
     }
 
-    public SimpleListProperty<Abbreviation> abbreviationsProperty() {
+    public SimpleListProperty<AbbreviationViewModel> abbreviationsProperty() {
         return this.abbreviations;
     }
 
@@ -302,7 +314,7 @@ public class ManageJournalAbbreviationsViewModel {
         return this.currentFile;
     }
 
-    public SimpleObjectProperty<Abbreviation> currentAbbreviationProperty() {
+    public SimpleObjectProperty<AbbreviationViewModel> currentAbbreviationProperty() {
         return this.currentAbbreviation;
     }
 

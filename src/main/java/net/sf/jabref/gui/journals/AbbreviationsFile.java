@@ -27,7 +27,7 @@ import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
  */
 public class AbbreviationsFile {
 
-    private final SimpleListProperty<Abbreviation> abbreviations = new SimpleListProperty<>(
+    private final SimpleListProperty<AbbreviationViewModel> abbreviations = new SimpleListProperty<>(
             FXCollections.observableArrayList());
     private final ReadOnlyBooleanProperty isPseudoFile;
     private final String name;
@@ -38,6 +38,7 @@ public class AbbreviationsFile {
         this.path = Paths.get(filePath);
         this.name = path.toString();
         this.isPseudoFile = new SimpleBooleanProperty(false);
+        this.abbreviations.add(new AbbreviationViewModel(null));
     }
 
     /**
@@ -45,7 +46,7 @@ public class AbbreviationsFile {
      * This means it is a placeholder and it's path will be null meaning it has no place on the filesystem.
      * It's isPseudoFile property will therefore be set to true.
      */
-    public AbbreviationsFile(List<Abbreviation> abbreviations, String name) {
+    public AbbreviationsFile(List<AbbreviationViewModel> abbreviations, String name) {
         this.abbreviations.addAll(abbreviations);
         this.name = name;
         this.path = null;
@@ -53,24 +54,33 @@ public class AbbreviationsFile {
     }
 
     public void readAbbreviations() throws FileNotFoundException {
-        abbreviations.addAll(JournalAbbreviationLoader.readJournalListFromFile(path.toFile()));
+        List<Abbreviation> abbreviationList = JournalAbbreviationLoader.readJournalListFromFile(path.toFile());
+        abbreviationList.forEach(abbreviation -> abbreviations.addAll(new AbbreviationViewModel(abbreviation)));
     }
 
+    /**
+     * This method will write all abbreviations of this abbreviation file to the file on the file system.
+     * If the file exists its content will be overridden, otherwise a new file will be created.
+     *
+     * @throws IOException
+     */
     public void WriteOrCreate() throws IOException {
         if (!isPseudoFile.get()) {
             try (OutputStream outStream = Files.newOutputStream(path);
                     OutputStreamWriter writer = new OutputStreamWriter(outStream, Globals.prefs.getDefaultEncoding())) {
-                for (Abbreviation entry : abbreviations.get()) {
-                    writer.write(entry.getName());
-                    writer.write(" = ");
-                    writer.write(entry.getAbbreviation());
-                    writer.write(Globals.NEWLINE);
+                for (AbbreviationViewModel entry : abbreviations.get()) {
+                    if (!entry.isPseudoAbbreviation()) {
+                        writer.write(entry.getName());
+                        writer.write(" = ");
+                        writer.write(entry.getAbbreviation());
+                        writer.write(Globals.NEWLINE);
+                    }
                 }
             }
         }
     }
 
-    public SimpleListProperty<Abbreviation> abbreviationsProperty() {
+    public SimpleListProperty<AbbreviationViewModel> abbreviationsProperty() {
         return this.abbreviations;
     }
 

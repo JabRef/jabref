@@ -34,7 +34,6 @@
               <buttons>
                 <Button fx:id="cancelButton" cancelButton="true" mnemonicParsing="false" onAction="#closeDialog" text="%Cancel" />
                   <Button fx:id="saveButton" defaultButton="true" mnemonicParsing="false" onAction="#saveAbbreviations" text="%Save changes" />
-                  <Button fx:id="addAbbreviationButton" disable="true" mnemonicParsing="false" onAction="#addAbbreviation" text="%Add" />
               </buttons>
             </ButtonBar>
          </bottom>
