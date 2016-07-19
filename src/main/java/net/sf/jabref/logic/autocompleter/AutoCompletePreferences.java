@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class AutoCompletePreferences {
 

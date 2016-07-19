@@ -82,7 +82,6 @@ import javax.swing.tree.TreePath;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.importer.EntryFromFileCreator;
 import net.sf.jabref.importer.EntryFromFileCreatorManager;
@@ -92,6 +91,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;

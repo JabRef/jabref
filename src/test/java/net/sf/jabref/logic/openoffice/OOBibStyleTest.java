@@ -15,7 +15,6 @@ import java.util.Set;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefMain;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.importer.fileformat.ImportFormat;
@@ -23,6 +22,7 @@ import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.After;
 import org.junit.Before;

@@ -22,6 +22,7 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.Highlight;
 
 import net.sf.jabref.gui.fieldeditors.TextArea;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;

@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.BeforeClass;

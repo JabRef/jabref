@@ -19,8 +19,8 @@ import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class CleanupPreset {
 

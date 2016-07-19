@@ -46,6 +46,7 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.Version;
 import net.sf.jabref.logic.util.VersionPreferences;
 import net.sf.jabref.migrations.PreferencesMigrations;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;

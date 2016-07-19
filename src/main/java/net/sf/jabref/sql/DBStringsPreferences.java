@@ -1,6 +1,6 @@
 package net.sf.jabref.sql;
 
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public final class DBStringsPreferences {
 

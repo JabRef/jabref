@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.remote;
 
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * Place for handling the preferences for the remote communication

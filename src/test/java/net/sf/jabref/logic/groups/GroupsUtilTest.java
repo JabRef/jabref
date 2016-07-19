@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Set;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.After;
 import org.junit.Before;

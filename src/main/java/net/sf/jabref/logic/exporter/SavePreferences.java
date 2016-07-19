@@ -3,8 +3,8 @@ package net.sf.jabref.logic.exporter;
 import java.nio.charset.Charset;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.config.SaveOrderConfig;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class SavePreferences {
 

@@ -62,7 +62,7 @@ import javax.swing.text.Keymap;
 import javax.swing.text.TextAction;
 import javax.swing.text.Utilities;
 
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

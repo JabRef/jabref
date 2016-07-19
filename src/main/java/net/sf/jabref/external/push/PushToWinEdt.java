@@ -17,8 +17,8 @@ package net.sf.jabref.external.push;
 
 import javax.swing.Icon;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class PushToWinEdt extends AbstractPushToApplication implements PushToApplication {
 

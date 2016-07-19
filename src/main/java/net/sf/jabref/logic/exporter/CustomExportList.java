@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;

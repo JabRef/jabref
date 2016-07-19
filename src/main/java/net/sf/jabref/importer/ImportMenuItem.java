@@ -31,7 +31,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryMarker;
@@ -48,6 +47,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /*
  * TODO: could separate the "menu item" functionality from the importing functionality

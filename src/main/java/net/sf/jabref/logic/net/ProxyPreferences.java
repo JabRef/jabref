@@ -2,7 +2,7 @@ package net.sf.jabref.logic.net;
 
 import java.util.Objects;
 
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class ProxyPreferences {
 

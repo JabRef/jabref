@@ -26,7 +26,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
@@ -39,6 +38,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;

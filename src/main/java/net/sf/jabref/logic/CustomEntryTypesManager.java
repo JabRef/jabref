@@ -5,11 +5,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class CustomEntryTypesManager {
 

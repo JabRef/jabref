@@ -24,10 +24,10 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileHistory;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class FileHistoryMenu extends JMenu implements ActionListener {
 

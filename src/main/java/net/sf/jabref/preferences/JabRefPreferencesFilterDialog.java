@@ -1,4 +1,4 @@
-package net.sf.jabref;
+package net.sf.jabref.preferences;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;

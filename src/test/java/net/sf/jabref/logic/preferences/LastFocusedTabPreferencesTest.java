@@ -2,7 +2,7 @@ package net.sf.jabref.logic.preferences;
 
 import java.io.File;
 
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;

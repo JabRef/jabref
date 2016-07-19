@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collection;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
@@ -25,6 +24,7 @@ import net.sf.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import net.sf.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import net.sf.jabref.logic.formatter.minifier.MinifyNameListFormatter;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
