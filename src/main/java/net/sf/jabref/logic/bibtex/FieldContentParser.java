@@ -20,8 +20,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * This class provides the reformatting needed when reading BibTeX fields formatted

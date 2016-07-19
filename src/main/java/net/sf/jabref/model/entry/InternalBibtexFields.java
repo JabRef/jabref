@@ -43,7 +43,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 public class InternalBibtexFields {

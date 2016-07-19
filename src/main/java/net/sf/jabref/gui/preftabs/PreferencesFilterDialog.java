@@ -1,4 +1,4 @@
-package net.sf.jabref;
+package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -16,8 +16,9 @@ import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.gui.WrapLayout;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.preferences.JabRefPreferencesFilter;
 
-public class JabRefPreferencesFilterDialog extends JDialog {
+class PreferencesFilterDialog extends JDialog {
 
     private final JabRefPreferencesFilter preferencesFilter;
 
@@ -25,7 +26,7 @@ public class JabRefPreferencesFilterDialog extends JDialog {
     private final JCheckBox showOnlyDeviatingPreferenceOptions;
     private final JLabel count;
 
-    public JabRefPreferencesFilterDialog(JabRefPreferencesFilter preferencesFilter, JFrame frame) {
+    public PreferencesFilterDialog(JabRefPreferencesFilter preferencesFilter, JFrame frame) {
         super(frame, true); // is modal
 
         this.preferencesFilter = Objects.requireNonNull(preferencesFilter);

@@ -15,7 +15,7 @@
 */
 package net.sf.jabref.logic.util;
 
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 
 public class VersionPreferences {

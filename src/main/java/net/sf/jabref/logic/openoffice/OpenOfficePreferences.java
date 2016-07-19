@@ -18,8 +18,8 @@ package net.sf.jabref.logic.openoffice;
 import java.io.File;
 import java.util.List;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * The OpenOffice connection preferences are:

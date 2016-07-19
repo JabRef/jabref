@@ -26,8 +26,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class FileDialogs {
 

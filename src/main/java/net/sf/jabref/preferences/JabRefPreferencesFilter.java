@@ -1,4 +1,4 @@
-package net.sf.jabref;
+package net.sf.jabref.preferences;
 
 import java.util.HashMap;
 import java.util.List;

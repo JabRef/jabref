@@ -3,10 +3,10 @@ package net.sf.jabref.logic.bibtex;
 import java.util.Optional;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.After;
 import org.junit.Before;

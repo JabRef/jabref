@@ -1,8 +1,8 @@
 package net.sf.jabref.logic.layout.format;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.layout.ParamLayoutFormatter;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -35,10 +35,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.event.FieldChangedEvent;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;

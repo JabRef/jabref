@@ -6,7 +6,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.BeforeClass;
 import org.junit.Test;

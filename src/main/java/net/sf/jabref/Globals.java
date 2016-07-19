@@ -27,6 +27,7 @@ import net.sf.jabref.logic.error.StreamEavesdropper;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import net.sf.jabref.logic.util.BuildInfo;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class Globals {
 

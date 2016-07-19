@@ -9,6 +9,7 @@ import java.util.Optional;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * Represents everything related to a .bib file.

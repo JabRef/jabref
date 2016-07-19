@@ -11,8 +11,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.jabref.BibtexTestData;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;

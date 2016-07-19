@@ -55,9 +55,7 @@ import javax.swing.undo.CannotUndoException;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.HighlightMatchingGroupPreferences;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
@@ -131,6 +129,8 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.event.EntryAddedEvent;
 import net.sf.jabref.model.event.EntryChangedEvent;
+import net.sf.jabref.preferences.HighlightMatchingGroupPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;

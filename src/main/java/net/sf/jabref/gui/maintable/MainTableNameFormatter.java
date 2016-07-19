@@ -1,8 +1,8 @@
 package net.sf.jabref.gui.maintable;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class MainTableNameFormatter {
 

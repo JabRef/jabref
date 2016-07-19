@@ -32,7 +32,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.help.HelpAction;
@@ -44,6 +43,7 @@ import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class LabelPatternPanel extends JPanel {
 
