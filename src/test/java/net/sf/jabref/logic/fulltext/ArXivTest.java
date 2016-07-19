@@ -92,13 +92,13 @@ public class ArXivTest {
     @Test
     public void searchEntryByPartOfTitle() throws Exception {
         assertEquals(Collections.singletonList(sliceTheoremPaper),
-                finder.performShallowSearch("ti:\"slice theorem for Frechet\""));
+                finder.performSearch("ti:\"slice theorem for Frechet\""));
     }
 
     @Test
     public void searchEntryByPartOfTitleWithAcuteAccent() throws Exception {
         assertEquals(Collections.singletonList(sliceTheoremPaper),
-                finder.performShallowSearch("ti:\"slice theorem for Fréchet\""));
+                finder.performSearch("ti:\"slice theorem for Fréchet\""));
     }
 
     @Test
@@ -117,30 +117,30 @@ public class ArXivTest {
         expected.setField("doi", "10.1140/epjc/s2003-01326-x");
         expected.setField("journaltitle", "Eur.Phys.J.C31:17-29,2003");
 
-        assertEquals(Optional.of(expected), finder.performSearch("hep-ex/0307015"));
+        assertEquals(Optional.of(expected), finder.performSearchById("hep-ex/0307015"));
     }
 
     @Test
     public void searchEntryByIdWith4DigitsAndVersion() throws Exception {
-        assertEquals(Optional.of(sliceTheoremPaper), finder.performSearch("1405.2249v1"));
+        assertEquals(Optional.of(sliceTheoremPaper), finder.performSearchById("1405.2249v1"));
     }
 
     @Test
     public void searchEntryByIdWith4Digits() throws Exception {
-        assertEquals(Optional.of(sliceTheoremPaper), finder.performSearch("1405.2249"));
+        assertEquals(Optional.of(sliceTheoremPaper), finder.performSearchById("1405.2249"));
     }
 
     @Test
     public void searchEntryByIdWith5Digits() throws Exception {
         assertEquals(Optional.of(
                 "An Optimal Convergence Theorem for Mean Curvature Flow of Arbitrary Codimension in Hyperbolic Spaces"),
-                finder.performSearch("1503.06747").flatMap(entry -> entry.getFieldOptional("title")));
+                finder.performSearchById("1503.06747").flatMap(entry -> entry.getFieldOptional("title")));
     }
 
     @Test
     public void searchWithMalformedIdThrowsException() throws Exception {
         expectedException.expect(FetcherException.class);
         expectedException.expectMessage("incorrect id format");
-        finder.performSearch("123412345");
+        finder.performSearchById("123412345");
     }
 }

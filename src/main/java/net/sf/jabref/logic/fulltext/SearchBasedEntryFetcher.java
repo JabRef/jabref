@@ -51,7 +51,7 @@ public class SearchBasedEntryFetcher implements EntryFetcher{
 
         status.setStatus(Localization.lang("Processing %0", query));
         try {
-            List<BibEntry> matches = fetcher.performShallowSearch(query);
+            List<BibEntry> matches = fetcher.performSearch(query);
             matches.forEach(inspector::addEntry);
             return !matches.isEmpty();
         } catch (FetcherException e) {

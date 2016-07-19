@@ -206,12 +206,12 @@ public class ArXiv implements FullTextFinder, SearchBasedFetcher, IdBasedFetcher
     }
 
     @Override
-    public List<BibEntry> performShallowSearch(String query) throws FetcherException {
+    public List<BibEntry> performSearch(String query) throws FetcherException {
         return searchForEntries(query).stream().map(ArXivEntry::toBibEntry).collect(Collectors.toList());
     }
 
     @Override
-    public Optional<BibEntry> performSearch(String identifier) throws FetcherException {
+    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         return searchForEntryById(identifier).map(ArXivEntry::toBibEntry);
     }
 
