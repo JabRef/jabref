@@ -28,6 +28,7 @@ import javax.swing.JOptionPane;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypeEntryEditor;
 import net.sf.jabref.external.ExternalFileTypes;
@@ -303,13 +304,57 @@ public class JabRefDesktop {
         }
     }
 
+    /**
+     * Opens a new console starting on the given file location
+     *
+     * If no command is specified in {@link Globals},
+     * the default system console will be executed.
+     *
+     * @param file Location the console should be opened at.
+     */
     public static void openConsole(File file) throws IOException {
         if (file == null) {
             return;
         }
 
         String absolutePath = file.toPath().toAbsolutePath().getParent().toString();
-        NATIVE_DESKTOP.openConsole(absolutePath);
+        boolean usingDefault = Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION);
+
+        if (usingDefault) {
+            NATIVE_DESKTOP.openConsole(absolutePath);
+        } else {
+            String command = Globals.prefs.get(JabRefPreferences.CONSOLE_COMMAND);
+            command = command.trim();
+
+            if (!command.isEmpty()) {
+                command = command.replaceAll("\\s+", " "); // normalize white spaces
+                String[] subcommands = command.split(" ");
+                StringBuilder commandLoggingText = new StringBuilder();
+
+                for (int i = 0; i < subcommands.length; i++) {
+                    subcommands[i] = subcommands[i].replace("%DIR", absolutePath); // replace the placeholder if used
+                    commandLoggingText.append(subcommands[i]);
+                    if (i < (subcommands.length - 1)) {
+                        commandLoggingText.append(" ");
+                    }
+                }
+
+                JabRefGUI.getMainFrame().output(Localization.lang("Executing command \"%0\"...", commandLoggingText.toString()));
+                LOGGER.info("Executing command \"" + commandLoggingText.toString() + "\"...");
+
+                try {
+                    new ProcessBuilder(subcommands).start();
+                } catch (IOException exception) {
+                    LOGGER.error("Open console", exception);
+
+                    JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(),
+                            Localization.lang("Error_occured_while_executing_the_command_\"%0\".", commandLoggingText.toString()),
+                            Localization.lang("Open console") + " - " + Localization.lang("Error"),
+                            JOptionPane.ERROR_MESSAGE);
+                    JabRefGUI.getMainFrame().output(null);
+                }
+            }
+        }
     }
 
     // TODO: Move to OS.java
