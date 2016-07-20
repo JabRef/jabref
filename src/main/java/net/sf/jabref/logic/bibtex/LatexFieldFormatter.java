@@ -21,7 +21,6 @@ import java.util.List;
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * Currently the only implementation of net.sf.jabref.exporter.FieldFormatter
