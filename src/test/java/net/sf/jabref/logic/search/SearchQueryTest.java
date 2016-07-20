@@ -1,8 +1,6 @@
 package net.sf.jabref.logic.search;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Test;
 

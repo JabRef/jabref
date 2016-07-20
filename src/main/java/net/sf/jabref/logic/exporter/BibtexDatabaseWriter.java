@@ -90,7 +90,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
     protected void writeString(BibtexString bibtexString, boolean isFirstString, int maxKeyLength, Boolean reformatFile,
             LatexFieldFormatterPreferences latexFieldFormatterPreferences) throws SaveException {
         try {
-            // If the string has not been modified, write it back as it wass
+            // If the string has not been modified, write it back as it was
             if (!reformatFile && !bibtexString.hasChanged()) {
                 getWriter().write(bibtexString.getParsedSerialization());
                 return;
