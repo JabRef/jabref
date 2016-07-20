@@ -115,6 +115,7 @@ import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.SaveSession;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
@@ -577,7 +578,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // Finally, set the new keys:
                 for (BibEntry entry : entries) {
                     bes = entry;
-                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes, Globals.prefs);
+                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes,
+                            LabelPatternPreferences.fromPreferences(Globals.prefs));
                     ce.addEdit(new UndoableKeyChange(database, bes, (String) oldvals.get(bes),
                             bes.getCiteKey()));
                 }
@@ -1991,7 +1993,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             for (BibEntry bes : database.getEntries()) {
                 String oldKey = bes.getCiteKey();
                 if ((oldKey == null) || oldKey.isEmpty()) {
-                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes, Globals.prefs);
+                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes,
+                            LabelPatternPreferences.fromPreferences(Globals.prefs));
                     ce.addEdit(new UndoableKeyChange(database, bes, null, bes.getCiteKey()));
                     any = true;
                 }

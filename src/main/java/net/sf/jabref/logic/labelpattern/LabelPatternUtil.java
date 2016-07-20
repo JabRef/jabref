@@ -60,14 +60,15 @@ public class LabelPatternUtil {
 
 
     static {
-        updateDefaultPattern();
+        updateDefaultPattern(LabelPatternPreferences.fromPreferences(JabRefPreferences.getInstance()));
     }
 
     private static BibDatabase database;
 
-    public static void updateDefaultPattern() {
+
+    public static void updateDefaultPattern(LabelPatternPreferences labelPatternPreferences) {
         defaultLabelPattern = LabelPatternUtil
-                .split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
+                .split(labelPatternPreferences.getDefaultLabelPattern());
     }
 
     /**
@@ -427,7 +428,8 @@ public class LabelPatternUtil {
      * @param entry a <code>BibEntry</code>
      * @return modified BibEntry
      */
-    public static void makeLabel(MetaData metaData, BibDatabase dBase, BibEntry entry, JabRefPreferences prefs) {
+    public static void makeLabel(MetaData metaData, BibDatabase dBase, BibEntry entry,
+            LabelPatternPreferences labelPatternPreferences) {
         database = dBase;
         String key;
         StringBuilder stringBuilder = new StringBuilder();
@@ -474,9 +476,9 @@ public class LabelPatternUtil {
         key = checkLegalKey(stringBuilder.toString());
 
         // Remove Regular Expressions while generating Keys
-        String regex = prefs.get(JabRefPreferences.KEY_PATTERN_REGEX);
+        String regex = labelPatternPreferences.getKeyPatternRegex();
         if ((regex != null) && !regex.trim().isEmpty()) {
-            String replacement = prefs.get(JabRefPreferences.KEY_PATTERN_REPLACEMENT);
+            String replacement = labelPatternPreferences.getKeyPatternReplacement();
             key = key.replaceAll(regex, replacement);
         }
 
@@ -494,8 +496,8 @@ public class LabelPatternUtil {
             occurrences--; // No change, so we can accept one dupe.
         }
 
-        boolean alwaysAddLetter = prefs.getBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER);
-        boolean firstLetterA = prefs.getBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A);
+        boolean alwaysAddLetter = labelPatternPreferences.isAlwaysAddLetter();
+        boolean firstLetterA = labelPatternPreferences.isFirstLetterA();
 
         if (!alwaysAddLetter && (occurrences == 0)) {
             // No dupes found, so we can just go ahead.

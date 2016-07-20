@@ -41,6 +41,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.PdfContentImporter;
 import net.sf.jabref.importer.fileformat.PdfXmpImporter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -252,7 +253,7 @@ public class PdfImporter {
         panel.getDatabase().insertEntry(entry);
         panel.markBaseChanged();
         LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
-                Globals.prefs);
+                LabelPatternPreferences.fromPreferences(Globals.prefs));
         DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
         dfh.linkPdfToEntry(fileName, entry);
         panel.highlightEntry(entry);
