@@ -212,7 +212,7 @@ public class OAI2Fetcher implements EntryFetcher {
                     int monthNumber = Integer.parseInt(fixedKey.substring(2, 4));
                     MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
                     if (month.isValid()) {
-                        be.setField("month", month.bibtexFormat);
+                        be.setField(FieldName.MONTH, month.bibtexFormat);
                     }
                 }
             }

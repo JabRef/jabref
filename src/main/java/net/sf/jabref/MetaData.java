@@ -127,10 +127,10 @@ public class MetaData implements Iterable<String> {
      * Add default metadata for new database:
      */
     public void initializeNewDatabase() {
-        metaData.put(SELECTOR_META_PREFIX + "keywords", new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + FieldName.KEYWORDS, new Vector<>());
         metaData.put(SELECTOR_META_PREFIX + FieldName.AUTHOR, new Vector<>());
-        metaData.put(SELECTOR_META_PREFIX + "journal", new Vector<>());
-        metaData.put(SELECTOR_META_PREFIX + "publisher", new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + FieldName.JOURNAL, new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + FieldName.PUBLISHER, new Vector<>());
         metaData.put(SELECTOR_META_PREFIX + FieldName.REVIEW, new Vector<>());
     }
 

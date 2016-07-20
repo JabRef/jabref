@@ -376,10 +376,10 @@ class StyleSelectDialog {
         prevEntry.setField(FieldName.AUTHOR, "Smith, Bill and Jones, Bob and Williams, Jeff");
         prevEntry.setField(FieldName.EDITOR, "Taylor, Phil");
         prevEntry.setField(FieldName.TITLE, "Title of the test entry for reference styles");
-        prevEntry.setField("volume", "34");
+        prevEntry.setField(FieldName.VOLUME, "34");
         prevEntry.setField(FieldName.YEAR, "2008");
-        prevEntry.setField("journal", "BibTeX journal");
-        prevEntry.setField("publisher", "JabRef publishing");
+        prevEntry.setField(FieldName.JOURNAL, "BibTeX journal");
+        prevEntry.setField(FieldName.PUBLISHER, "JabRef publishing");
         prevEntry.setField("address", "Trondheim");
         prevEntry.setField("www", "https://github.com/JabRef");
     }

@@ -377,7 +377,7 @@ public class RepecNepImporter extends ImportFormat {
                 cal.setTime(date == null ? new Date() : date);
                 be.setField(FieldName.YEAR, String.valueOf(cal.get(Calendar.YEAR)));
                 if ((date != null) && recognizedDateFormats[i - 1].contains("MM")) {
-                    be.setField("month", String.valueOf(cal.get(Calendar.MONTH) + 1));
+                    be.setField(FieldName.MONTH, String.valueOf(cal.get(Calendar.MONTH) + 1));
                 }
                 if ((date != null) && recognizedDateFormats[i - 1].contains("dd")) {
                     be.setField("day", String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));

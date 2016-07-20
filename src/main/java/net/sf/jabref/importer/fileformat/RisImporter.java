@@ -166,7 +166,7 @@ public class RisImporter extends ImportFormat {
                         if ("inproceedings".equals(type)) {
                             hm.put("booktitle", val);
                         } else {
-                            hm.put("journal", val);
+                            hm.put(FieldName.JOURNAL, val);
                         }
                     } else if ("SP".equals(lab)) {
                         startPage = val;
@@ -174,7 +174,7 @@ public class RisImporter extends ImportFormat {
                         if ("phdthesis".equals(type)) {
                             hm.put("school", val);
                         } else {
-                            hm.put("publisher", val);
+                            hm.put(FieldName.PUBLISHER, val);
                         }
                     } else if ("AD".equals(lab) || "CY".equals(lab)) {
                         hm.put("address", val);
@@ -186,9 +186,9 @@ public class RisImporter extends ImportFormat {
                     } else if ("SN".equals(lab)) {
                         hm.put(FieldName.ISSN, val);
                     } else if ("VL".equals(lab)) {
-                        hm.put("volume", val);
+                        hm.put(FieldName.VOLUME, val);
                     } else if ("IS".equals(lab)) {
-                        hm.put("number", val);
+                        hm.put(FieldName.NUMBER, val);
                     } else if ("N2".equals(lab) || "AB".equals(lab)) {
                         String oldAb = hm.get(FieldName.ABSTRACT);
                         if (oldAb == null) {
@@ -207,18 +207,18 @@ public class RisImporter extends ImportFormat {
                                 int monthNumber = Integer.parseInt(parts[1]);
                                 MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
                                 if (month.isValid()) {
-                                    hm.put("month", month.bibtexFormat);
+                                    hm.put(FieldName.MONTH, month.bibtexFormat);
                                 }
                             } catch (NumberFormatException ex) {
                                 // The month part is unparseable, so we ignore it.
                             }
                         }
                     } else if ("KW".equals(lab)) {
-                        if (hm.containsKey("keywords")) {
-                            String kw = hm.get("keywords");
-                            hm.put("keywords", kw + ", " + val);
+                        if (hm.containsKey(FieldName.KEYWORDS)) {
+                            String kw = hm.get(FieldName.KEYWORDS);
+                            hm.put(FieldName.KEYWORDS, kw + ", " + val);
                         } else {
-                            hm.put("keywords", val);
+                            hm.put(FieldName.KEYWORDS, val);
                         }
                     } else if ("U1".equals(lab) || "U2".equals(lab) || "N1".equals(lab)) {
                         if (!comment.isEmpty()) {

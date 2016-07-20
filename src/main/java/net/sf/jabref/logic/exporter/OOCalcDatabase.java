@@ -160,10 +160,10 @@ class OOCalcDatabase {
                 addTableCell(result, row, getField(e, BibEntry.KEY_FIELD));
                 addTableCell(result, row, getField(e, FieldName.AUTHOR));//new AuthorLastFirst().format(getField(e, FieldName.AUTHOR_FIELD)));
                 addTableCell(result, row, new RemoveWhitespace().format(new RemoveBrackets().format(getField(e, FieldName.TITLE))));
-                addTableCell(result, row, getField(e, "journal"));
-                addTableCell(result, row, getField(e, "volume"));
-                addTableCell(result, row, getField(e, "number"));
-                addTableCell(result, row, getField(e, "month"));
+                addTableCell(result, row, getField(e, FieldName.JOURNAL));
+                addTableCell(result, row, getField(e, FieldName.VOLUME));
+                addTableCell(result, row, getField(e, FieldName.NUMBER));
+                addTableCell(result, row, getField(e, FieldName.MONTH));
                 addTableCell(result, row, getField(e, FieldName.PAGES));
                 addTableCell(result, row, getField(e, FieldName.YEAR));
                 addTableCell(result, row, getField(e, "address"));
@@ -174,7 +174,7 @@ class OOCalcDatabase {
                 addTableCell(result, row, getField(e, "edition"));
                 addTableCell(result, row, getField(e, "series"));
                 addTableCell(result, row, getField(e, FieldName.EDITOR));//new AuthorLastFirst().format(getField(e, FieldName.EDITOR_FIELD)));
-                addTableCell(result, row, getField(e, "publisher"));
+                addTableCell(result, row, getField(e, FieldName.PUBLISHER));
                 addTableCell(result, row, getField(e, "reporttype"));
                 addTableCell(result, row, getField(e, "howpublished"));
                 addTableCell(result, row, getField(e, "institution"));

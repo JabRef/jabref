@@ -20,7 +20,7 @@ public class IEEETranEntryTypes {
     public static final EntryType ELECTRONIC = new BibtexEntryType() {
 
         {
-            addAllOptional(FieldName.AUTHOR, "month", FieldName.YEAR, FieldName.TITLE, "language", "howpublished", "organization", "address",
+            addAllOptional(FieldName.AUTHOR, FieldName.MONTH, FieldName.YEAR, FieldName.TITLE, "language", "howpublished", "organization", "address",
                     "note", FieldName.URL);
 
         }
@@ -59,7 +59,7 @@ public class IEEETranEntryTypes {
 
         {
             addAllRequired(FieldName.TITLE, FieldName.YEAR);
-            addAllOptional(FieldName.EDITOR, "language", "series", "volume", "number", "organization", "month", "note", FieldName.URL);
+            addAllOptional(FieldName.EDITOR, "language", "series", FieldName.VOLUME, FieldName.NUMBER, "organization", FieldName.MONTH, "note", FieldName.URL);
         }
 
         @Override
@@ -77,9 +77,9 @@ public class IEEETranEntryTypes {
     public static final EntryType PATENT = new BibtexEntryType() {
 
         {
-            addAllRequired("nationality", "number", "year/yearfiled");
-            addAllOptional(FieldName.AUTHOR, FieldName.TITLE, "language", "assignee", "address", "type", "number", "day", "dayfiled",
-                    "month", "monthfiled", "note", FieldName.URL);
+            addAllRequired("nationality", FieldName.NUMBER, "year/yearfiled");
+            addAllOptional(FieldName.AUTHOR, FieldName.TITLE, "language", "assignee", "address", "type", FieldName.NUMBER, "day", "dayfiled",
+                    FieldName.MONTH, "monthfiled", "note", FieldName.URL);
         }
 
         @Override
@@ -98,7 +98,7 @@ public class IEEETranEntryTypes {
 
         {
             addAllRequired(FieldName.TITLE, "organization/institution");
-            addAllOptional(FieldName.AUTHOR, "language", "howpublished", "type", "number", "revision", "address", "month",
+            addAllOptional(FieldName.AUTHOR, "language", "howpublished", "type", FieldName.NUMBER, "revision", "address", FieldName.MONTH,
                     FieldName.YEAR, "note", FieldName.URL);
         }
 

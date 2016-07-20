@@ -49,7 +49,6 @@ public class BibEntry implements Cloneable {
     public static final String TYPE_HEADER = "entrytype";
     public static final String KEY_FIELD = "bibtexkey";
     protected static final String ID_FIELD = "id";
-    public static final String KEYWORDS_FIELD = "keywords";
     private static final String DEFAULT_TYPE = "misc";
 
     private String id;
@@ -263,7 +262,7 @@ public class BibEntry implements Cloneable {
         if (FieldName.DATE.equals(name)) {
             Optional<String> year = getFieldOptional(FieldName.YEAR);
             if (year.isPresent()) {
-                MonthUtil.Month month = MonthUtil.getMonth(getFieldOptional("month").orElse(""));
+                MonthUtil.Month month = MonthUtil.getMonth(getFieldOptional(FieldName.MONTH).orElse(""));
                 if (month.isValid()) {
                     return Optional.of(year.get() + '-' + month.twoDigitNumber);
                 } else {
@@ -271,7 +270,7 @@ public class BibEntry implements Cloneable {
                 }
             }
         }
-        if (FieldName.YEAR.equals(name) || "month".equals(name)) {
+        if (FieldName.YEAR.equals(name) || FieldName.MONTH.equals(name)) {
             Optional<String> date = getFieldOptional(FieldName.DATE);
             if (!date.isPresent()) {
                 return Optional.empty();
@@ -306,7 +305,7 @@ public class BibEntry implements Cloneable {
                 if (FieldName.YEAR.equals(name)) {
                     return Optional.of(Integer.toString(calendar.get(Calendar.YEAR)));
                 }
-                if ("month".equals(name)) {
+                if (FieldName.MONTH.equals(name)) {
                     return Optional.of(Integer.toString(calendar.get(Calendar.MONTH) + 1)); // Shift by 1 since in this calendar Jan = 0
                 }
             } catch (ParseException e) {
@@ -509,7 +508,7 @@ public class BibEntry implements Cloneable {
 
         Optional<String> year = getFieldOptional(FieldName.YEAR);
 
-        Optional<String> monthString = getFieldOptional("month");
+        Optional<String> monthString = getFieldOptional(FieldName.MONTH);
         if (monthString.isPresent()) {
             MonthUtil.Month month = MonthUtil.getMonth(monthString.get());
             if (month.isValid()) {
@@ -539,12 +538,12 @@ public class BibEntry implements Cloneable {
 
     public Optional<FieldChange> putKeywords(Collection<String> keywords, String separator) {
         Objects.requireNonNull(keywords);
-        Optional<String> oldValue = this.getFieldOptional(KEYWORDS_FIELD);
+        Optional<String> oldValue = this.getFieldOptional(FieldName.KEYWORDS);
 
         if (keywords.isEmpty()) {
             // Clear keyword field
             if (oldValue.isPresent()) {
-                return this.clearField(KEYWORDS_FIELD);
+                return this.clearField(FieldName.KEYWORDS);
             } else {
                 return Optional.empty();
             }
@@ -552,7 +551,7 @@ public class BibEntry implements Cloneable {
 
         // Set new keyword field
         String newValue = String.join(separator, keywords);
-        return this.setField(KEYWORDS_FIELD, newValue);
+        return this.setField(FieldName.KEYWORDS, newValue);
     }
 
     /**

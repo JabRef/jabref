@@ -385,7 +385,7 @@ public class GVKParser {
             result.setField("subtitle", newSubtitle.toString());
         }
         if (publisher != null) {
-            result.setField("publisher", publisher);
+            result.setField(FieldName.PUBLISHER, publisher);
         }
         if (year != null) {
             result.setField(FieldName.YEAR, year);
@@ -406,7 +406,7 @@ public class GVKParser {
             result.setField(FieldName.ISSN, issn);
         }
         if (number != null) {
-            result.setField("number", number);
+            result.setField(FieldName.NUMBER, number);
         }
         if (pagetotal != null) {
             result.setField("pagetotal", pagetotal);
@@ -415,10 +415,10 @@ public class GVKParser {
             result.setField(FieldName.PAGES, pages);
         }
         if (volume != null) {
-            result.setField("volume", volume);
+            result.setField(FieldName.VOLUME, volume);
         }
         if (journal != null) {
-            result.setField("journal", journal);
+            result.setField(FieldName.JOURNAL, journal);
         }
         if (ppn != null) {
             result.setField("ppn_GVK", ppn);
@@ -431,7 +431,7 @@ public class GVKParser {
         }
 
         if ("article".equals(entryType) && (journal != null)) {
-            result.setField("journal", journal);
+            result.setField(FieldName.JOURNAL, journal);
         } else if ("incollection".equals(entryType) && (booktitle != null)) {
             result.setField("booktitle", booktitle);
         }

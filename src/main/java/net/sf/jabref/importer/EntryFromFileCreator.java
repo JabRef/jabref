@@ -108,7 +108,7 @@ public abstract class EntryFromFileCreator implements FileFilter {
         }
 
         if (addPathTokensAsKeywords) {
-            appendToField(newEntry.get(), "keywords", extractPathesToKeyWordsfield(f.getAbsolutePath()));
+            appendToField(newEntry.get(), FieldName.KEYWORDS, extractPathesToKeyWordsfield(f.getAbsolutePath()));
         }
 
         if (!newEntry.get().hasField(FieldName.TITLE)) {

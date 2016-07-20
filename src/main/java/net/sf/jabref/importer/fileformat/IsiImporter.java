@@ -133,7 +133,7 @@ public class IsiImporter extends ImportFormat {
 
     private static void processCapitalization(Map<String, String> map) {
 
-        String[] subsup = {FieldName.TITLE, "journal", "publisher"};
+        String[] subsup = {FieldName.TITLE, FieldName.JOURNAL, FieldName.PUBLISHER};
 
         for (String aSubsup : subsup) {
 
@@ -240,17 +240,17 @@ public class IsiImporter extends ImportFormat {
                 } else if ("TI".equals(beg)) {
                     hm.put(FieldName.TITLE, value.replace("EOLEOL", " "));
                 } else if ("SO".equals(beg) || "JA".equals(beg)) {
-                    hm.put("journal", value.replace("EOLEOL", " "));
+                    hm.put(FieldName.JOURNAL, value.replace("EOLEOL", " "));
                 } else if ("ID".equals(beg) || "KW".equals(beg)) {
 
                     value = value.replace("EOLEOL", " ");
-                    String existingKeywords = hm.get("keywords");
+                    String existingKeywords = hm.get(FieldName.KEYWORDS);
                     if ((existingKeywords == null) || existingKeywords.contains(value)) {
                         existingKeywords = value;
                     } else {
                         existingKeywords += ", " + value;
                     }
-                    hm.put("keywords", existingKeywords);
+                    hm.put(FieldName.KEYWORDS, existingKeywords);
 
                 } else if ("AB".equals(beg)) {
                     hm.put(FieldName.ABSTRACT, value.replace("EOLEOL", " "));
@@ -270,20 +270,20 @@ public class IsiImporter extends ImportFormat {
                 } else if ("AR".equals(beg)) {
                     pages = value;
                 } else if ("IS".equals(beg)) {
-                    hm.put("number", value);
+                    hm.put(FieldName.NUMBER, value);
                 } else if ("PY".equals(beg)) {
                     hm.put(FieldName.YEAR, value);
                 } else if ("VL".equals(beg)) {
-                    hm.put("volume", value);
+                    hm.put(FieldName.VOLUME, value);
                 } else if ("PU".equals(beg)) {
-                    hm.put("publisher", value);
+                    hm.put(FieldName.PUBLISHER, value);
                 } else if ("DI".equals(beg)) {
                     hm.put(FieldName.DOI, value);
                 } else if ("PD".equals(beg)) {
 
                     String month = IsiImporter.parseMonth(value);
                     if (month != null) {
-                        hm.put("month", month);
+                        hm.put(FieldName.MONTH, month);
                     }
 
                 } else if ("DT".equals(beg)) {

@@ -104,22 +104,22 @@ public class InternalBibtexFields {
         add(new BibtexSingleField("howpublished", true, BibtexSingleField.MEDIUM_W));
         add(new BibtexSingleField("institution", true, BibtexSingleField.MEDIUM_W));
 
-        dummy = new BibtexSingleField("journal", true, BibtexSingleField.SMALL_W);
+        dummy = new BibtexSingleField(FieldName.JOURNAL, true, BibtexSingleField.SMALL_W);
         dummy.setExtras(EnumSet.of(FieldProperties.JOURNAL_NAME));
         add(dummy);
-        dummy = new BibtexSingleField("journaltitle", true, BibtexSingleField.SMALL_W);
+        dummy = new BibtexSingleField(FieldName.JOURNALTITLE, true, BibtexSingleField.SMALL_W);
         dummy.setExtras(EnumSet.of(FieldProperties.JOURNAL_NAME));
         add(dummy);
 
         add(new BibtexSingleField("key", true));
-        dummy = new BibtexSingleField("month", true, BibtexSingleField.SMALL_W);
+        dummy = new BibtexSingleField(FieldName.MONTH, true, BibtexSingleField.SMALL_W);
         dummy.setExtras(EnumSet.of(FieldProperties.MONTH));
         add(dummy);
         add(new BibtexSingleField("note", true, BibtexSingleField.MEDIUM_W));
-        add(new BibtexSingleField("number", true, BibtexSingleField.SMALL_W, 60).setNumeric(true));
+        add(new BibtexSingleField(FieldName.NUMBER, true, BibtexSingleField.SMALL_W, 60).setNumeric(true));
         add(new BibtexSingleField("organization", true, BibtexSingleField.MEDIUM_W));
         add(new BibtexSingleField(FieldName.PAGES, true, BibtexSingleField.SMALL_W));
-        add(new BibtexSingleField("publisher", true, BibtexSingleField.MEDIUM_W));
+        add(new BibtexSingleField(FieldName.PUBLISHER, true, BibtexSingleField.MEDIUM_W));
         add(new BibtexSingleField("school", true, BibtexSingleField.MEDIUM_W));
         add(new BibtexSingleField("series", true, BibtexSingleField.SMALL_W));
         add(new BibtexSingleField(FieldName.TITLE, true, 400));
@@ -127,7 +127,7 @@ public class InternalBibtexFields {
         dummy.getExtras().add(FieldProperties.TYPE);
         add(dummy);
         add(new BibtexSingleField("language", true, BibtexSingleField.SMALL_W));
-        add(new BibtexSingleField("volume", true, BibtexSingleField.SMALL_W, 60).setNumeric(true));
+        add(new BibtexSingleField(FieldName.VOLUME, true, BibtexSingleField.SMALL_W, 60).setNumeric(true));
         add(new BibtexSingleField(FieldName.YEAR, true, BibtexSingleField.SMALL_W, 60).setNumeric(true));
 
         // custom fields not displayed at editor, but as columns in the UI
@@ -199,7 +199,7 @@ public class InternalBibtexFields {
         add(dummy);
 
         add(new BibtexSingleField("comment", false, BibtexSingleField.MEDIUM_W));
-        add(new BibtexSingleField("keywords", false, BibtexSingleField.SMALL_W));
+        add(new BibtexSingleField(FieldName.KEYWORDS, false, BibtexSingleField.SMALL_W));
 
         dummy = new BibtexSingleField(FieldName.FILE, false);
         dummy.setExtras(EnumSet.of(FieldProperties.FILE_EDITOR));

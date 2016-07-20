@@ -130,13 +130,13 @@ public class CopacImporter extends ImportFormat {
                 } else if ("PY- ".equals(code)) {
                     setOrAppend(b, FieldName.YEAR, line.substring(4).trim(), ", ");
                 } else if ("PU- ".equals(code)) {
-                    setOrAppend(b, "publisher", line.substring(4).trim(), ", ");
+                    setOrAppend(b, FieldName.PUBLISHER, line.substring(4).trim(), ", ");
                 } else if ("SE- ".equals(code)) {
                     setOrAppend(b, "series", line.substring(4).trim(), ", ");
                 } else if ("IS- ".equals(code)) {
                     setOrAppend(b, FieldName.ISBN, line.substring(4).trim(), ", ");
                 } else if ("KW- ".equals(code)) {
-                    setOrAppend(b, "keywords", line.substring(4).trim(), ", ");
+                    setOrAppend(b, FieldName.KEYWORDS, line.substring(4).trim(), ", ");
                 } else if ("NT- ".equals(code)) {
                     setOrAppend(b, "note", line.substring(4).trim(), ", ");
                 } else if ("PD- ".equals(code)) {

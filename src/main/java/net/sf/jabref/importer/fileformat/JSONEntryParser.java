@@ -43,10 +43,10 @@ public class JSONEntryParser {
      */
     public BibEntry parseBibJSONtoBibtex(JSONObject bibJsonEntry) {
         // Fields that are directly accessible at the top level BibJson object
-        String[] singleFieldStrings = {FieldName.YEAR, FieldName.TITLE, FieldName.ABSTRACT, "month"};
+        String[] singleFieldStrings = {FieldName.YEAR, FieldName.TITLE, FieldName.ABSTRACT, FieldName.MONTH};
 
         // Fields that are accessible in the journal part of the BibJson object
-        String[] journalSingleFieldStrings = {"publisher", "number", "volume"};
+        String[] journalSingleFieldStrings = {FieldName.PUBLISHER, FieldName.NUMBER, FieldName.VOLUME};
 
 
 
@@ -91,7 +91,7 @@ public class JSONEntryParser {
             JSONObject journal = bibJsonEntry.getJSONObject("journal");
             // Journal title
             if (journal.has("title")) {
-                entry.setField("journal", journal.getString("title"));
+                entry.setField(FieldName.JOURNAL, journal.getString("title"));
             } else {
                 LOGGER.info("No journal title found.");
             }
@@ -156,8 +156,8 @@ public class JSONEntryParser {
      */
     public static BibEntry parseSpringerJSONtoBibtex(JSONObject springerJsonEntry) {
         // Fields that are directly accessible at the top level Json object
-        String[] singleFieldStrings = {FieldName.ISSN, "volume", FieldName.ABSTRACT, FieldName.DOI, FieldName.TITLE, "number",
-                "publisher"};
+        String[] singleFieldStrings = {FieldName.ISSN, FieldName.VOLUME, FieldName.ABSTRACT, FieldName.DOI, FieldName.TITLE, FieldName.NUMBER,
+                FieldName.PUBLISHER};
 
         BibEntry entry = new BibEntry();
         String nametype;
@@ -167,7 +167,7 @@ public class JSONEntryParser {
         if (com.google.common.base.Strings.isNullOrEmpty(isbn)) {
             // Probably article
             entry.setType("article");
-            nametype = "journal";
+            nametype = FieldName.JOURNAL;
         } else {
             // Probably book chapter or from proceeding, go for book chapter
             entry.setType("incollection");
@@ -232,7 +232,7 @@ public class JSONEntryParser {
             entry.setField(FieldName.DATE, date); // For BibLatex
             String[] dateparts = date.split("-");
             entry.setField(FieldName.YEAR, dateparts[0]);
-            entry.setField("month", MonthUtil.getMonthByNumber(Integer.parseInt(dateparts[1])).bibtexFormat);
+            entry.setField(FieldName.MONTH, MonthUtil.getMonthByNumber(Integer.parseInt(dateparts[1])).bibtexFormat);
         }
 
         // Clean up abstract (often starting with Abstract)

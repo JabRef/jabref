@@ -65,7 +65,7 @@ public class DuplicateCheck {
         DuplicateCheck.FIELD_WEIGHTS.put(FieldName.AUTHOR, 2.5);
         DuplicateCheck.FIELD_WEIGHTS.put(FieldName.EDITOR, 2.5);
         DuplicateCheck.FIELD_WEIGHTS.put(FieldName.TITLE, 3.);
-        DuplicateCheck.FIELD_WEIGHTS.put("journal", 2.);
+        DuplicateCheck.FIELD_WEIGHTS.put(FieldName.JOURNAL, 2.);
     }
 
 
@@ -169,7 +169,7 @@ public class DuplicateCheck {
                 return EQUAL;
             }
             return NOT_EQUAL;
-        } else if ("journal".equals(field)) {
+        } else if (FieldName.JOURNAL.equals(field)) {
             // We do not attempt to harmonize abbreviation state of the journal names,
             // but we remove periods from the names in case they are abbreviated with
             // and without dots:

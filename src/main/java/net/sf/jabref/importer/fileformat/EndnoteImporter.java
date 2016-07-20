@@ -182,12 +182,12 @@ public class EndnoteImporter extends ImportFormat {
                 } else if ("J".equals(prefix)) {
                     // "Alternate journal. Let's set it only if no journal
                     // has been set with %B.
-                    hm.putIfAbsent("journal", val);
+                    hm.putIfAbsent(FieldName.JOURNAL, val);
                 } else if ("B".equals(prefix)) {
                     // This prefix stands for "journal" in a journal entry, and
                     // "series" in a book entry.
                     if ("article".equals(type)) {
-                        hm.put("journal", val);
+                        hm.put(FieldName.JOURNAL, val);
                     } else if ("book".equals(type) || "inbook".equals(type)) {
                         hm.put("series", val);
                     } else {
@@ -198,16 +198,16 @@ public class EndnoteImporter extends ImportFormat {
                     if ("phdthesis".equals(type)) {
                         hm.put("school", val);
                     } else {
-                        hm.put("publisher", val);
+                        hm.put(FieldName.PUBLISHER, val);
                     }
                 }
                 // replace single dash page ranges (23-45) with double dashes (23--45):
                 else if ("P".equals(prefix)) {
                     hm.put(FieldName.PAGES, val.replaceAll("([0-9]) *- *([0-9])", "$1--$2"));
                 } else if ("V".equals(prefix)) {
-                    hm.put("volume", val);
+                    hm.put(FieldName.VOLUME, val);
                 } else if ("N".equals(prefix)) {
-                    hm.put("number", val);
+                    hm.put(FieldName.NUMBER, val);
                 } else if ("U".equals(prefix)) {
                     hm.put(FieldName.URL, val);
                 } else if ("R".equals(prefix)) {
@@ -225,7 +225,7 @@ public class EndnoteImporter extends ImportFormat {
                         hm.put("note", val);
                     }
                 } else if ("K".equals(prefix)) {
-                    hm.put("keywords", val);
+                    hm.put(FieldName.KEYWORDS, val);
                 } else if ("X".equals(prefix)) {
                     hm.put(FieldName.ABSTRACT, val);
                 } else if ("9".equals(prefix)) {

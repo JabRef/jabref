@@ -452,7 +452,7 @@ public class PdfContentImporter extends ImportFormat {
                 entry.setField(FieldName.ABSTRACT, abstractT);
             }
             if (!Strings.isNullOrEmpty(keywords)) {
-                entry.setField("keywords", keywords);
+                entry.setField(FieldName.KEYWORDS, keywords);
             }
             if (title != null) {
                 entry.setField(FieldName.TITLE, title);
@@ -467,10 +467,10 @@ public class PdfContentImporter extends ImportFormat {
                 entry.setField("series", series);
             }
             if (volume != null) {
-                entry.setField("volume", volume);
+                entry.setField(FieldName.VOLUME, volume);
             }
             if (number != null) {
-                entry.setField("number", number);
+                entry.setField(FieldName.NUMBER, number);
             }
             if (pages != null) {
                 entry.setField(FieldName.PAGES, pages);
@@ -479,7 +479,7 @@ public class PdfContentImporter extends ImportFormat {
                 entry.setField(FieldName.YEAR, year);
             }
             if (publisher != null) {
-                entry.setField("publisher", publisher);
+                entry.setField(FieldName.PUBLISHER, publisher);
             }
 
             result.add(entry);

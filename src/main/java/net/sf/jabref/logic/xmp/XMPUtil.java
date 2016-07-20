@@ -273,7 +273,7 @@ public class XMPUtil {
 
         s = di.getKeywords();
         if (s != null) {
-            entry.setField("keywords", s);
+            entry.setField(FieldName.KEYWORDS, s);
         }
 
         s = di.getSubject();
@@ -350,7 +350,7 @@ public class XMPUtil {
             if (c != null) {
                 entry.setField(FieldName.YEAR, String.valueOf(c.get(Calendar.YEAR)));
                 if (date.length() > 4) {
-                    entry.setField("month", MonthUtil.getMonthByIndex(c.get(Calendar.MONTH)).bibtexFormat);
+                    entry.setField(FieldName.MONTH, MonthUtil.getMonthByIndex(c.get(Calendar.MONTH)).bibtexFormat);
                 }
             }
         }
@@ -677,7 +677,7 @@ public class XMPUtil {
                 continue;
             }
 
-            if ("month".equals(field)) {
+            if (FieldName.MONTH.equals(field)) {
                 // Dealt with in year
                 continue;
             }
@@ -763,7 +763,7 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: doi
              */
-            if ("publisher".equals(field)) {
+            if (FieldName.PUBLISHER.equals(field)) {
                 String o = entry.getField(field);
                 dcSchema.addPublisher(o);
                 continue;
@@ -801,7 +801,7 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: doi
              */
-            if ("keywords".equals(field)) {
+            if (FieldName.KEYWORDS.equals(field)) {
                 String o = entry.getField(field);
                 String[] keywords = o.split(",");
                 for (String keyword : keywords) {
@@ -1013,7 +1013,7 @@ public class XMPUtil {
                     di.setAuthor(null);
                 } else if (FieldName.TITLE.equals(field)) {
                     di.setTitle(null);
-                } else if ("keywords".equals(field)) {
+                } else if (FieldName.KEYWORDS.equals(field)) {
                     di.setKeywords(null);
                 } else if (FieldName.ABSTRACT.equals(field)) {
                     di.setSubject(null);
@@ -1027,8 +1027,8 @@ public class XMPUtil {
                 di.setAuthor(resolvedEntry.getField(FieldName.AUTHOR));
             } else if (FieldName.TITLE.equals(field)) {
                 di.setTitle(resolvedEntry.getField(FieldName.TITLE));
-            } else if ("keywords".equals(field)) {
-                di.setKeywords(resolvedEntry.getField("keywords"));
+            } else if (FieldName.KEYWORDS.equals(field)) {
+                di.setKeywords(resolvedEntry.getField(FieldName.KEYWORDS));
             } else if (FieldName.ABSTRACT.equals(field)) {
                 di.setSubject(resolvedEntry.getField(FieldName.ABSTRACT));
             } else {

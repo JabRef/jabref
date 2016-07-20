@@ -322,9 +322,9 @@ class ContentSelectorDialog2 extends JDialog {
         if (contents.isEmpty()) {
             // if nothing was added, put the default fields (as described in the help)
             fieldListModel.addElement(FieldName.AUTHOR);
-            fieldListModel.addElement("journal");
-            fieldListModel.addElement("keywords");
-            fieldListModel.addElement("publisher");
+            fieldListModel.addElement(FieldName.JOURNAL);
+            fieldListModel.addElement(FieldName.KEYWORDS);
+            fieldListModel.addElement(FieldName.PUBLISHER);
         } else {
             for (String s : contents) {
                 fieldListModel.addElement(s);

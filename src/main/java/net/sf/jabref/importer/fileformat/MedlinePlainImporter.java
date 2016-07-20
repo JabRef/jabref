@@ -160,7 +160,7 @@ public class MedlinePlainImporter extends ImportFormat {
                 hashMap.put("PL", "address");
                 hashMap.put("PHST", "history");
                 hashMap.put("PST", "publication-status");
-                hashMap.put("VI", "volume");
+                hashMap.put("VI", FieldName.VOLUME);
                 hashMap.put("LA", "language");
                 hashMap.put("LA", "language");
                 hashMap.put("PUBM", "model");
@@ -168,7 +168,7 @@ public class MedlinePlainImporter extends ImportFormat {
                 hashMap.put("NM", "substance-name");
                 hashMap.put("OCI", "copyright-owner");
                 hashMap.put("CN", "corporate");
-                hashMap.put("IP", "issue");
+                hashMap.put("IP", FieldName.ISSUE);
                 hashMap.put("EN", "edition");
                 hashMap.put("GS", "gene-symbol");
                 hashMap.put("GN", "note");
@@ -198,11 +198,11 @@ public class MedlinePlainImporter extends ImportFormat {
                         fields.put("investigator", oldInvestigator + ", " + value);
                     }
                 } else if ("MH".equals(label) || "OT".equals(label)) {
-                    if (!fields.containsKey("keywords")) {
-                        fields.put("keywords", value);
+                    if (!fields.containsKey(FieldName.KEYWORDS)) {
+                        fields.put(FieldName.KEYWORDS, value);
                     } else {
-                        String kw = fields.get("keywords");
-                        fields.put("keywords", kw + ", " + value);
+                        String kw = fields.get(FieldName.KEYWORDS);
+                        fields.put(FieldName.KEYWORDS, kw + ", " + value);
                     }
                 } else if ("CON".equals(label) || "CIN".equals(label) || "EIN".equals(label) || "EFR".equals(label)
                         || "CRI".equals(label) || "CRF".equals(label) || "PRIN".equals(label) || "PROF".equals(label)
@@ -346,7 +346,7 @@ public class MedlinePlainImporter extends ImportFormat {
             if ("inproceedings".equals(type)) {
                 hm.put("booktitle", val);
             } else {
-                hm.put("journal", val);
+                hm.put(FieldName.JOURNAL, val);
             }
         } else if ("CTI".equals(lab)) {
             hm.put("collection-title", val);
@@ -398,7 +398,7 @@ public class MedlinePlainImporter extends ImportFormat {
             String[] parts = val.split(" ");
             hm.put(FieldName.YEAR, parts[0]);
             if ((parts.length > 1) && !parts[1].isEmpty()) {
-                hm.put("month", parts[1]);
+                hm.put(FieldName.MONTH, parts[1]);
             }
         } else if ("EDAT".equals(lab) && isCreateDateFormat(val)) {
             hm.put("publication", val);

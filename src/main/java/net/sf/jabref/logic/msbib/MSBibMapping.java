@@ -19,18 +19,18 @@ public class MSBibMapping {
         bibtexToMSBib.put(BibEntry.KEY_FIELD, "Tag");
         bibtexToMSBib.put(FieldName.TITLE, "Title");
         bibtexToMSBib.put(FieldName.YEAR, "Year");
-        bibtexToMSBib.put("month", "Month");
+        bibtexToMSBib.put(FieldName.MONTH, "Month");
         bibtexToMSBib.put("note", "Comments");
-        bibtexToMSBib.put("volume", "Volume");
+        bibtexToMSBib.put(FieldName.VOLUME, "Volume");
         bibtexToMSBib.put("language", "LCID");
         bibtexToMSBib.put("edition", "Edition");
-        bibtexToMSBib.put("publisher", "Publisher");
+        bibtexToMSBib.put(FieldName.PUBLISHER, "Publisher");
         bibtexToMSBib.put("booktitle", "BookTitle");
         //bibtexToMSBib.put("booktitle", "ConferenceName");
         //bibtexToMSBib.put(FieldName.PAGES, "Pages");
         bibtexToMSBib.put("chapter", "ChapterNumber");
-        bibtexToMSBib.put("journal", "JournalName");
-        bibtexToMSBib.put("number", "Issue");
+        bibtexToMSBib.put(FieldName.JOURNAL, "JournalName");
+        bibtexToMSBib.put(FieldName.NUMBER, "Issue");
         bibtexToMSBib.put("school", "Department");
         bibtexToMSBib.put("institution", "Institution");
         bibtexToMSBib.put(FieldName.DOI, "DOI");
@@ -38,7 +38,7 @@ public class MSBibMapping {
         // BibTeX/Biblatex only fields
         bibtexToMSBib.put("series", BIBTEX_PREFIX + "Series");
         bibtexToMSBib.put(FieldName.ABSTRACT, BIBTEX_PREFIX + "Abstract");
-        bibtexToMSBib.put("keywords", BIBTEX_PREFIX + "KeyWords");
+        bibtexToMSBib.put(FieldName.KEYWORDS, BIBTEX_PREFIX + "KeyWords");
         bibtexToMSBib.put(FieldName.CROSSREF, BIBTEX_PREFIX + "CrossRef");
         bibtexToMSBib.put("howpublished", BIBTEX_PREFIX + "HowPublished");
         bibtexToMSBib.put("affiliation", BIBTEX_PREFIX + "Affiliation");

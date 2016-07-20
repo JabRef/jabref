@@ -237,7 +237,7 @@ class MedlineHandler extends DefaultHandler {
             }
             // if (!title.equals("")) b.setField("title",Util.replaceSpecialCharacters(title));
             if (!"".equals(journal)) {
-                b.setField("journal", journal);
+                b.setField(FieldName.JOURNAL, journal);
             }
             if (!"".equals(year)) {
                 b.setField(FieldName.YEAR, year);
@@ -247,7 +247,7 @@ class MedlineHandler extends DefaultHandler {
                 b.setField(FieldName.PAGES, fixPageRange(page));
             }
             if (!"".equals(volume)) {
-                b.setField("volume", volume);
+                b.setField(FieldName.VOLUME, volume);
             }
             if (!"".equals(language)) {
                 b.setField("language", language);
@@ -259,14 +259,14 @@ class MedlineHandler extends DefaultHandler {
                 b.setField(FieldName.ABSTRACT, abstractText.replace("%", "\\%"));
             }
             if (!"".equals(keywords)) {
-                b.setField("keywords", keywords);
+                b.setField(FieldName.KEYWORDS, keywords);
             }
             if (!"".equals(month)) {
-                b.setField("month", month);
+                b.setField(FieldName.MONTH, month);
             }
             //if (!url.equals("")) b.setField("url",url);
             if (!"".equals(number)) {
-                b.setField("number", number);
+                b.setField(FieldName.NUMBER, number);
             }
 
             if (!"".equals(doi)) {

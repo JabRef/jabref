@@ -95,10 +95,10 @@ public class BiblioscapeImporter extends ImportFormat {
                         hm.put(FieldName.YEAR, entry
                                 .getValue().toString());
                     } else if ("VL".equals(entry.getKey())) {
-                        hm.put("volume", entry
+                        hm.put(FieldName.VOLUME, entry
                                 .getValue().toString());
                     } else if ("NB".equals(entry.getKey())) {
-                        hm.put("number", entry
+                        hm.put(FieldName.NUMBER, entry
                                 .getValue().toString());
                     } else if ("PS".equals(entry.getKey())) {
                         pages[0] = entry.getValue()
@@ -107,7 +107,7 @@ public class BiblioscapeImporter extends ImportFormat {
                         pages[1] = entry.getValue()
                                 .toString();
                     } else if ("KW".equals(entry.getKey())) {
-                        hm.put("keywords", entry
+                        hm.put(FieldName.KEYWORDS, entry
                                 .getValue().toString());
                     } else if ("RT".equals(entry.getKey())) {
                         type[0] = entry.getValue()
@@ -122,7 +122,7 @@ public class BiblioscapeImporter extends ImportFormat {
                         hm.put("note", entry
                                 .getValue().toString());
                     } else if ("PB".equals(entry.getKey())) {
-                        hm.put("publisher", entry
+                        hm.put(FieldName.PUBLISHER, entry
                                 .getValue().toString());
                     } else if ("TA".equals(entry.getKey())) {
                         comments
@@ -232,7 +232,7 @@ public class BiblioscapeImporter extends ImportFormat {
                 // titleTI
                 if ("article".equals(bibtexType)) {
                     if (titleST != null) {
-                        hm.put("journal", titleST);
+                        hm.put(FieldName.JOURNAL, titleST);
                     }
                     if (titleTI != null) {
                         hm.put(FieldName.TITLE, titleTI);

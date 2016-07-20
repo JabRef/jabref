@@ -57,6 +57,7 @@ import net.sf.jabref.logic.groups.SearchGroup;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -89,7 +90,7 @@ class GroupDialog extends JDialog {
             Localization.lang("Include subgroups: When selected, view entries contained in this group or its subgroups"));
     // for KeywordGroup
     private final JTextField keywordGroupSearchField = new JTextField(GroupDialog.TEXTFIELD_LENGTH);
-    private final TextField keywordGroupSearchTerm = new TextField("keywords", "", false);
+    private final TextField keywordGroupSearchTerm = new TextField(FieldName.KEYWORDS, "", false);
     private final JCheckBox keywordGroupCaseSensitive = new JCheckBox(Localization.lang("Case sensitive"));
     private final JCheckBox keywordGroupRegExp = new JCheckBox(Localization.lang("regular expression"));
     // for SearchGroup

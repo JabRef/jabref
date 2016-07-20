@@ -88,7 +88,7 @@ class MODSEntry {
 
     public MODSEntry(BibEntry bibtex) {
         this();
-        handledExtensions.add(MODSEntry.BIBTEX + "publisher");
+        handledExtensions.add(MODSEntry.BIBTEX + FieldName.PUBLISHER);
         handledExtensions.add(MODSEntry.BIBTEX + FieldName.TITLE);
         handledExtensions.add(MODSEntry.BIBTEX + BibEntry.KEY_FIELD);
         handledExtensions.add(MODSEntry.BIBTEX + "author");
@@ -104,11 +104,11 @@ class MODSEntry {
             }
         }
 
-        if (bibtex.hasField("publisher")) {
+        if (bibtex.hasField(FieldName.PUBLISHER)) {
             if (CHARFORMAT) {
-                publisher = chars.format(bibtex.getField("publisher"));
+                publisher = chars.format(bibtex.getField(FieldName.PUBLISHER));
             } else {
-                publisher = bibtex.getField("publisher");
+                publisher = bibtex.getField(FieldName.PUBLISHER);
             }
         }
 
@@ -132,10 +132,10 @@ class MODSEntry {
             host = new MODSEntry();
             host.entryType = "relatedItem";
             host.title = bibtex.getField("booktitle");
-            host.publisher = bibtex.getField("publisher");
-            host.number = bibtex.getField("number");
-            if (bibtex.hasField("volume")) {
-                host.volume = bibtex.getField("volume");
+            host.publisher = bibtex.getField(FieldName.PUBLISHER);
+            host.number = bibtex.getField(FieldName.NUMBER);
+            if (bibtex.hasField(FieldName.VOLUME)) {
+                host.volume = bibtex.getField(FieldName.VOLUME);
             }
             host.issuance = "continuing";
             if (bibtex.hasField(FieldName.PAGES)) {
@@ -181,7 +181,7 @@ class MODSEntry {
     private static String getDate(BibEntry bibtex) {
         StringBuilder result = new StringBuilder();
         bibtex.getFieldOptional(FieldName.YEAR).ifPresent(result::append);
-        bibtex.getFieldOptional("month").ifPresent(result.append('-')::append);
+        bibtex.getFieldOptional(FieldName.MONTH).ifPresent(result.append('-')::append);
         return result.toString();
     }
 
@@ -250,7 +250,7 @@ class MODSEntry {
             Element originInfo = d.createElement("originInfo");
             mods.appendChild(originInfo);
             if (this.publisher != null) {
-                Element publisher = d.createElement("publisher");
+                Element publisher = d.createElement(FieldName.PUBLISHER);
                 publisher.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(this.publisher)));
                 originInfo.appendChild(publisher);
             }

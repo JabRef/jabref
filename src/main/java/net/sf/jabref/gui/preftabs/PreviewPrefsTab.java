@@ -196,13 +196,13 @@ class PreviewPrefsTab extends JPanel implements PrefsTab {
         PreviewPrefsTab.entry.setField(FieldName.TITLE,
                 "Amino acid metabolism and protein turnover in larval turbot (Scophthalmus maximus) fed natural zooplankton or Artemia");
         PreviewPrefsTab.entry.setField(FieldName.YEAR, "1997");
-        PreviewPrefsTab.entry.setField("journal", "Marine Biology");
-        PreviewPrefsTab.entry.setField("month", "January");
-        PreviewPrefsTab.entry.setField("number", "2");
-        PreviewPrefsTab.entry.setField("volume", "123");
+        PreviewPrefsTab.entry.setField(FieldName.JOURNAL, "Marine Biology");
+        PreviewPrefsTab.entry.setField(FieldName.MONTH, "January");
+        PreviewPrefsTab.entry.setField(FieldName.NUMBER, "2");
+        PreviewPrefsTab.entry.setField(FieldName.VOLUME, "123");
         PreviewPrefsTab.entry.setField("pdf", "conceicao1997.pdf");
         PreviewPrefsTab.entry.setField(FieldName.PAGES, "255--265");
-        PreviewPrefsTab.entry.setField("keywords", "energetics, artemia, metabolism, amino acid, turbot");
+        PreviewPrefsTab.entry.setField(FieldName.KEYWORDS, "energetics, artemia, metabolism, amino acid, turbot");
         PreviewPrefsTab.entry.setField(FieldName.URL, "http://ejournals.ebsco.com/direct.asp?ArticleID=TYY4NT82XA9H7R8PFPPV");
         PreviewPrefsTab.entry.setField(FieldName.ABSTRACT,
                 "Abstract The present paper studied the influence of different food regimes "

@@ -322,7 +322,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up month
-        String month = entry.getField("month");
+        String month = entry.getField(FieldName.MONTH);
         if ((month != null) && !month.isEmpty()) {
             month = month.replace(".", "");
             month = month.toLowerCase();
@@ -352,7 +352,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                             .append(mm.group(3)).append(',');
                 }
             }
-            entry.setField("month", date.toString());
+            entry.setField(FieldName.MONTH, date.toString());
         }
 
         // clean up pages
@@ -372,7 +372,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         String type = entry.getType();
         String sourceField = "";
         if ("article".equals(type)) {
-            sourceField = "journal";
+            sourceField = FieldName.JOURNAL;
             entry.clearField("booktitle");
         } else if ("inproceedings".equals(type)) {
             sourceField = "booktitle";
@@ -384,9 +384,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 if (ind > 0) {
                     fullName = fullName.substring(0, ind);
                     entry.setField(FieldName.YEAR, "to be published");
-                    entry.clearField("month");
+                    entry.clearField(FieldName.MONTH);
                     entry.clearField(FieldName.PAGES);
-                    entry.clearField("number");
+                    entry.clearField(FieldName.NUMBER);
                 }
                 String[] parts = fullName.split("[\\[\\]]"); //[see also...], [legacy...]
                 fullName = parts[0];
@@ -396,9 +396,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 String note = entry.getField("note");
                 if ("Early Access".equals(note)) {
                     entry.setField(FieldName.YEAR, "to be published");
-                    entry.clearField("month");
+                    entry.clearField(FieldName.MONTH);
                     entry.clearField(FieldName.PAGES);
-                    entry.clearField("number");
+                    entry.clearField(FieldName.NUMBER);
                 }
             } else {
                 fullName = fullName.replace("Conference Proceedings", "Proceedings")
@@ -510,7 +510,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 .ifPresent(url -> entry.setField(FieldName.URL, "http://ieeexplore.ieee.org" + url.replace("tp=&", "")));
 
         // Replace ; as keyword separator
-        entry.getFieldOptional("keywords").ifPresent(keys -> entry.setField("keywords",
+        entry.getFieldOptional(FieldName.KEYWORDS).ifPresent(keys -> entry.setField(FieldName.KEYWORDS,
                 keys.replace(";", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR))));
         return entry;
     }

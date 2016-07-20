@@ -24,6 +24,7 @@ import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * Converts journal abbreviations back to full name for all selected entries.
@@ -57,10 +58,10 @@ public class UnabbreviateAction extends AbstractWorker {
         NamedCompound ce = new NamedCompound(Localization.lang("Unabbreviate journal names"));
         int count = 0;
         for (BibEntry entry : entries) {
-            if (undoableAbbreviator.unabbreviate(panel.getDatabase(), entry, "journal", ce)) {
+            if (undoableAbbreviator.unabbreviate(panel.getDatabase(), entry, FieldName.JOURNAL, ce)) {
                 count++;
             }
-            if (undoableAbbreviator.unabbreviate(panel.getDatabase(), entry, "journaltitle", ce)) {
+            if (undoableAbbreviator.unabbreviate(panel.getDatabase(), entry, FieldName.JOURNALTITLE, ce)) {
                 count++;
             }
         }

@@ -116,12 +116,12 @@ public class SilverPlatterImporter extends ImportFormat {
                     h.put(FieldName.ABSTRACT, frest);
                 } else if ("DE".equals(f3)) {
                     String kw = frest.replace("-;", ",").toLowerCase();
-                    h.put("keywords", kw.substring(0, kw.length() - 1));
+                    h.put(FieldName.KEYWORDS, kw.substring(0, kw.length() - 1));
                 } else if ("SO".equals(f3)) {
                     int m = frest.indexOf('.');
                     if (m >= 0) {
                         String jr = frest.substring(0, m);
-                        h.put("journal", jr.replace("-", " "));
+                        h.put(FieldName.JOURNAL, jr.replace("-", " "));
                         frest = frest.substring(m);
                         m = frest.indexOf(';');
                         if (m >= 5) {
@@ -134,8 +134,8 @@ public class SilverPlatterImporter extends ImportFormat {
                             if (m >= 0) {
                                 String pg = frest.substring(m + 1).trim();
                                 h.put(FieldName.PAGES, pg);
-                                h.put("volume", frest.substring(1, issueIndex).trim());
-                                h.put("issue", frest.substring(issueIndex + 1, endIssueIndex).trim());
+                                h.put(FieldName.VOLUME, frest.substring(1, issueIndex).trim());
+                                h.put(FieldName.ISSUE, frest.substring(issueIndex + 1, endIssueIndex).trim());
                             }
                         }
                     }
@@ -143,7 +143,7 @@ public class SilverPlatterImporter extends ImportFormat {
                     int m = frest.indexOf(':');
                     if (m >= 0) {
                         String jr = frest.substring(0, m);
-                        h.put("publisher", jr.replace("-", " ").trim());
+                        h.put(FieldName.PUBLISHER, jr.replace("-", " ").trim());
                         frest = frest.substring(m);
                         m = frest.indexOf(", ");
                         if ((m + 2) < frest.length()) {
@@ -168,7 +168,7 @@ public class SilverPlatterImporter extends ImportFormat {
                         type = "book";
                     } else if (frest.startsWith("Dissertation")) {
                         type = "phdthesis";
-                    } else if (frest.toLowerCase().contains("journal")) {
+                    } else if (frest.toLowerCase().contains(FieldName.JOURNAL)) {
                         type = "article";
                     } else if ("Contribution".equals(frest) || "Chapter".equals(frest)) {
                         type = "incollection";

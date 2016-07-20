@@ -46,7 +46,7 @@ public class AutoCompleterFactory {
             return new NameFieldAutoCompleter(fieldName, preferences);
         } else if (FieldName.CROSSREF.equals(fieldName)) {
             return new BibtexKeyAutoCompleter(preferences);
-        } else if ("journal".equals(fieldName) || "publisher".equals(fieldName)) {
+        } else if (FieldName.JOURNAL.equals(fieldName) || FieldName.PUBLISHER.equals(fieldName)) {
             return new JournalAutoCompleter(fieldName, preferences, abbreviationLoader);
         } else {
             return new DefaultAutoCompleter(fieldName, preferences);

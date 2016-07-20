@@ -80,10 +80,10 @@ public class OAI2Handler extends DefaultHandler {
             forenames = content;
         } else if ("journal-ref".equals(qualifiedName)) {
             String journal = content.replaceFirst("[0-9].*", "");
-            entry.setField("journal", journal);
+            entry.setField(FieldName.JOURNAL, journal);
             String volume = content.replaceFirst(journal, "");
             volume = volume.replaceFirst(" .*", "");
-            entry.setField("volume", volume);
+            entry.setField(FieldName.VOLUME, volume);
             String year = content.replaceFirst(".*?\\(", "");
             year = year.replaceFirst("\\).*", "");
             entry.setField(FieldName.YEAR, year);

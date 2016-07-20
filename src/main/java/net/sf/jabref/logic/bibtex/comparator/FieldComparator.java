@@ -101,7 +101,7 @@ public class FieldComparator implements Comparator<BibEntry> {
             return FieldType.NAME;
         } else if (FieldName.YEAR.equals(this.field[0])) {
             return FieldType.YEAR;
-        } else if("month".equals(this.field[0])) {
+        } else if(FieldName.MONTH.equals(this.field[0])) {
             return FieldType.MONTH;
         } else {
             return FieldType.OTHER;

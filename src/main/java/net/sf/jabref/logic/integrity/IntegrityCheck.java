@@ -62,7 +62,7 @@ public class IntegrityCheck {
         result.addAll(new UrlChecker().check(entry));
         result.addAll(new FileChecker(bibDatabaseContext).check(entry));
         result.addAll(new TypeChecker().check(entry));
-        result.addAll(new AbbreviationChecker("journal").check(entry));
+        result.addAll(new AbbreviationChecker(FieldName.JOURNAL).check(entry));
         result.addAll(new AbbreviationChecker("booktitle").check(entry));
         result.addAll(new BibStringChecker().check(entry));
         result.addAll(new HTMLCharacterChecker().check(entry));

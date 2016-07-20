@@ -14,6 +14,7 @@ import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.pdfimport.PdfImporter;
 import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
 
@@ -96,7 +97,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
                         // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
                         String date = new SimpleDateFormat("yyyy-MM-dd")
                                 .format(creationDate.getTime());
-                        appendToField(entry, "timestamp", date);
+                        appendToField(entry, InternalBibtexFields.TIMESTAMP, date);
                     }
 
                     if (pdfDocInfo.getCustomMetadataValue("bibtex/bibtexkey") != null) {

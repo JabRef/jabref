@@ -76,6 +76,7 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.VersionPreferences;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
@@ -361,7 +362,7 @@ public class JabRefPreferences {
         List<FieldFormatterCleanup> activeFormatterCleanups = new ArrayList<>();
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.PAGES, new NormalizePagesFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.DATE, new NormalizeDateFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("month", new NormalizeMonthFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.MONTH, new NormalizeMonthFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new ProtectTermsFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new UnitsToLatexFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new LatexCleanupFormatter()));
@@ -550,7 +551,7 @@ public class JabRefPreferences {
         defaults.put(EXPORT_IN_SPECIFIED_ORDER, Boolean.FALSE);
 
         // export order: if EXPORT_IN_SPECIFIED_ORDER, then use following criteria
-        defaults.put(EXPORT_PRIMARY_SORT_FIELD, "bibtexkey");
+        defaults.put(EXPORT_PRIMARY_SORT_FIELD, BibEntry.KEY_FIELD);
         defaults.put(EXPORT_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
         defaults.put(EXPORT_SECONDARY_SORT_FIELD, FieldName.AUTHOR);
         defaults.put(EXPORT_SECONDARY_SORT_DESCENDING, Boolean.FALSE);
@@ -615,7 +616,7 @@ public class JabRefPreferences {
         defaults.put(GROUP_INTERSECT_SELECTIONS, Boolean.TRUE);
         defaults.put(GROUP_INVERT_SELECTIONS, Boolean.FALSE);
         defaults.put(GROUP_SHOW_OVERLAPPING, Boolean.FALSE);
-        defaults.put(GROUPS_DEFAULT_FIELD, "keywords");
+        defaults.put(GROUPS_DEFAULT_FIELD, FieldName.KEYWORDS);
         defaults.put(GROUP_SHOW_ICONS, Boolean.TRUE);
         defaults.put(GROUP_SHOW_DYNAMIC, Boolean.TRUE);
         defaults.put(GROUP_EXPAND_TREE, Boolean.TRUE);

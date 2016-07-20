@@ -134,22 +134,22 @@ public class OvidImporter extends ImportFormat {
                 } else if (fieldName.startsWith("Source")) {
                     Matcher matcher;
                     if ((matcher = OvidImporter.OVID_SOURCE_PATTERN.matcher(content)).find()) {
-                        h.put("journal", matcher.group(1));
-                        h.put("volume", matcher.group(2));
-                        h.put("issue", matcher.group(3));
+                        h.put(FieldName.JOURNAL, matcher.group(1));
+                        h.put(FieldName.VOLUME, matcher.group(2));
+                        h.put(FieldName.ISSUE, matcher.group(3));
                         h.put(FieldName.PAGES, matcher.group(4));
                         h.put(FieldName.YEAR, matcher.group(5));
                     } else if ((matcher = OvidImporter.OVID_SOURCE_PATTERN_NO_ISSUE.matcher(content)).find()) {// may be missing the issue
-                        h.put("journal", matcher.group(1));
-                        h.put("volume", matcher.group(2));
+                        h.put(FieldName.JOURNAL, matcher.group(1));
+                        h.put(FieldName.VOLUME, matcher.group(2));
                         h.put(FieldName.PAGES, matcher.group(3));
                         h.put(FieldName.YEAR, matcher.group(4));
                     } else if ((matcher = OvidImporter.OVID_SOURCE_PATTERN_2.matcher(content)).find()) {
 
-                        h.put("journal", matcher.group(1));
-                        h.put("volume", matcher.group(2));
-                        h.put("issue", matcher.group(3));
-                        h.put("month", matcher.group(4));
+                        h.put(FieldName.JOURNAL, matcher.group(1));
+                        h.put(FieldName.VOLUME, matcher.group(2));
+                        h.put(FieldName.ISSUE, matcher.group(3));
+                        h.put(FieldName.MONTH, matcher.group(4));
                         h.put(FieldName.YEAR, matcher.group(5));
                         h.put(FieldName.PAGES, matcher.group(6));
 
@@ -159,12 +159,12 @@ public class OvidImporter extends ImportFormat {
                         h.put("booktitle", matcher.group(3));
                         h.put(FieldName.PAGES, matcher.group(4));
                         h.put("address", matcher.group(5));
-                        h.put("publisher", matcher.group(6));
+                        h.put(FieldName.PUBLISHER, matcher.group(6));
                     } else if ((matcher = OvidImporter.BOOK_PATTERN.matcher(content)).find()) {
                         h.put(FieldName.YEAR, matcher.group(1));
                         h.put(FieldName.PAGES, matcher.group(2));
                         h.put("address", matcher.group(3));
-                        h.put("publisher", matcher.group(4));
+                        h.put(FieldName.PUBLISHER, matcher.group(4));
 
                     }
                     // Add double hyphens to page ranges:
@@ -187,7 +187,7 @@ public class OvidImporter extends ImportFormat {
                     h.put("language", content);
                 } else if (fieldName.startsWith("Author Keywords")) {
                     content = content.replace(";", ",").replace("  ", " ");
-                    h.put("keywords", content);
+                    h.put(FieldName.KEYWORDS, content);
                 } else if (fieldName.startsWith("ISSN")) {
                     h.put(FieldName.ISSN, content);
                 } else if (fieldName.startsWith("DOI Number")) {

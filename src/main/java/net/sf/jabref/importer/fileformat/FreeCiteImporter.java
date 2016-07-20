@@ -154,7 +154,7 @@ public class FreeCiteImporter extends ImportFormat {
                                     // end:authors
                                 }
                                 e.setField(FieldName.AUTHOR, sb.toString());
-                            } else if ("journal".equals(ln)) {
+                            } else if (FieldName.JOURNAL.equals(ln)) {
                                 // we guess that the entry is a journal
                                 // the alternative way is to parse
                                 // ctx:context-objects / ctx:context-object / ctx:referent / ctx:metadata-by-val / ctx:metadata / journal / rft:genre
@@ -165,16 +165,16 @@ public class FreeCiteImporter extends ImportFormat {
                             } else if ("tech".equals(ln)) {
                                 type = BibtexEntryTypes.TECHREPORT;
                                 // the content of the "tech" field seems to contain the number of the technical report
-                                e.setField("number", parser.getElementText());
+                                e.setField(FieldName.NUMBER, parser.getElementText());
                             } else if (FieldName.DOI.equals(ln)
                                     || "institution".equals(ln)
                                     || "location".equals(ln)
-                                    || "number".equals(ln)
+                                    || FieldName.NUMBER.equals(ln)
                                     || "note".equals(ln)
                                     || FieldName.TITLE.equals(ln)
                                     || FieldName.PAGES.equals(ln)
-                                    || "publisher".equals(ln)
-                                    || "volume".equals(ln)
+                                    || FieldName.PUBLISHER.equals(ln)
+                                    || FieldName.VOLUME.equals(ln)
                                     || FieldName.YEAR.equals(ln)) {
                                 e.setField(ln, parser.getElementText());
                             } else if ("booktitle".equals(ln)) {

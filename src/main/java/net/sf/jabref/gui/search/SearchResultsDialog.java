@@ -97,7 +97,7 @@ public class SearchResultsDialog {
 
     private JDialog diag;
     private static final String[] FIELDS = new String[] {
-            FieldName.AUTHOR, FieldName.TITLE, FieldName.YEAR, "journal"
+            FieldName.AUTHOR, FieldName.TITLE, FieldName.YEAR, FieldName.JOURNAL
     };
     private static final int FILE_COL = 0;
     private static final int URL_COL = 1;
