@@ -35,7 +35,7 @@ public class SearchQueryTest {
     @Test
     public void testGrammarSearch() {
         BibEntry entry = new BibEntry();
-        entry.addKeyword("one two", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        entry.addKeyword("one two", ", ");
         SearchQuery searchQuery = new SearchQuery("keywords=\"one two\"", false, false);
         assertTrue(searchQuery.isMatch(entry));
     }

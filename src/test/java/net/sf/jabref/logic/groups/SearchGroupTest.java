@@ -27,7 +27,7 @@ public class SearchGroupTest {
         BibEntry entry = new BibEntry();
         assertFalse(group.contains(entry));
 
-        entry.addKeyword("review", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        entry.addKeyword("review", ", ");
         assertTrue(group.contains(entry));
     }
 

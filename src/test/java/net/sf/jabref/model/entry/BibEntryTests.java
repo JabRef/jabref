@@ -212,13 +212,13 @@ public class BibEntryTests {
 
     @Test(expected = NullPointerException.class)
     public void addNullKeywordThrowsNPE() {
-        keywordEntry.addKeyword(null, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        keywordEntry.addKeyword(null, ", ");
         Assert.fail();
     }
 
     @Test(expected = NullPointerException.class)
     public void putNullKeywordListThrowsNPE() {
-        keywordEntry.putKeywords(null, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        keywordEntry.putKeywords(null, ", ");
         Assert.fail();
     }
 
@@ -235,48 +235,48 @@ public class BibEntryTests {
 
     @Test
     public void testAddKeywordIsCorrect() {
-        keywordEntry.addKeyword("FooBar", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        keywordEntry.addKeyword("FooBar", ", ");
         String[] expected = {"Foo", "Bar", "FooBar"};
         Assert.assertArrayEquals(expected, keywordEntry.getKeywords().toArray());
     }
 
     @Test
     public void testAddKeywordHasChanged() {
-        keywordEntry.addKeyword("FooBar", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        keywordEntry.addKeyword("FooBar", ", ");
         Assert.assertTrue(keywordEntry.hasChanged());
     }
 
     @Test
     public void testAddKeywordTwiceYiedsOnlyOne() {
-        keywordEntry.addKeyword("FooBar", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
-        keywordEntry.addKeyword("FooBar", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        keywordEntry.addKeyword("FooBar", ", ");
+        keywordEntry.addKeyword("FooBar", ", ");
         String[] expected = {"Foo", "Bar", "FooBar"};
         Assert.assertArrayEquals(expected, keywordEntry.getKeywords().toArray());
     }
 
     @Test
     public void addKeywordIsCaseSensitive() {
-        keywordEntry.addKeyword("FOO", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        keywordEntry.addKeyword("FOO", ", ");
         String[] expected = {"Foo", "Bar", "FOO"};
         Assert.assertArrayEquals(expected, keywordEntry.getKeywords().toArray());
     }
 
     @Test
     public void testAddKeywordWithDifferentCapitalizationChanges() {
-        keywordEntry.addKeyword("FOO", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        keywordEntry.addKeyword("FOO", ", ");
         Assert.assertTrue(keywordEntry.hasChanged());
     }
 
     @Test
     public void testAddKeywordEmptyKeywordIsNotAdded() {
-        keywordEntry.addKeyword("", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        keywordEntry.addKeyword("", ", ");
         String[] expected = {"Foo", "Bar"};
         Assert.assertArrayEquals(expected, keywordEntry.getKeywords().toArray());
     }
 
     @Test
     public void testAddKeywordEmptyKeywordNotChanged() {
-        keywordEntry.addKeyword("", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        keywordEntry.addKeyword("", ", ");
         Assert.assertFalse(keywordEntry.hasChanged());
     }
 
@@ -287,85 +287,85 @@ public class BibEntryTests {
 
     @Test
     public void texNewBibEntryHasNoKeywordsEvenAfterAddingEmptyKeyword() {
-        emptyEntry.addKeyword("", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        emptyEntry.addKeyword("", ", ");
         Assert.assertTrue(emptyEntry.getKeywords().isEmpty());
     }
 
     @Test
     public void texNewBibEntryAfterAddingEmptyKeywordNotChanged() {
-        emptyEntry.addKeyword("", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        emptyEntry.addKeyword("", ", ");
         Assert.assertFalse(emptyEntry.hasChanged());
     }
 
     @Test
     public void testAddKeywordsWorksAsExpected() {
         String[] expected = {"Foo", "Bar"};
-        emptyEntry.addKeywords(keywordEntry.getKeywords(), Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        emptyEntry.addKeywords(keywordEntry.getKeywords(), ", ");
         Assert.assertArrayEquals(expected, emptyEntry.getKeywords().toArray());
     }
 
     @Test
     public void testPutKeywordsOverwritesOldKeywords() {
-        keywordEntry.putKeywords(Arrays.asList("Yin", "Yang"), Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        keywordEntry.putKeywords(Arrays.asList("Yin", "Yang"), ", ");
         String[] expected = {"Yin", "Yang"};
         Assert.assertArrayEquals(expected, keywordEntry.getKeywords().toArray());
     }
 
     @Test
     public void testPutKeywordsHasChanged() {
-        keywordEntry.putKeywords(Arrays.asList("Yin", "Yang"), Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        keywordEntry.putKeywords(Arrays.asList("Yin", "Yang"), ", ");
         Assert.assertTrue(keywordEntry.hasChanged());
     }
 
     @Test
     public void testPutKeywordsPutEmpyListErasesPreviousKeywords() {
-        keywordEntry.putKeywords(Collections.emptyList(), Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        keywordEntry.putKeywords(Collections.emptyList(), ", ");
         Assert.assertTrue(keywordEntry.getKeywords().isEmpty());
     }
 
     @Test
     public void testPutKeywordsPutEmpyListHasChanged() {
-        keywordEntry.putKeywords(Collections.emptyList(), Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        keywordEntry.putKeywords(Collections.emptyList(), ", ");
         Assert.assertTrue(keywordEntry.hasChanged());
     }
 
     @Test
     public void testPutKeywordsPutEmpyListToEmptyBibentry() {
-        emptyEntry.putKeywords(Collections.emptyList(), Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        emptyEntry.putKeywords(Collections.emptyList(), ", ");
         Assert.assertTrue(emptyEntry.getKeywords().isEmpty());
     }
 
     @Test
     public void testPutKeywordsPutEmpyListToEmptyBibentryNotChanged() {
-        emptyEntry.putKeywords(Collections.emptyList(), Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+        emptyEntry.putKeywords(Collections.emptyList(), ", ");
         Assert.assertFalse(emptyEntry.hasChanged());
     }
 
     @Test
     public void putKeywordsToEmptyReturnsNoChange() {
         Optional<FieldChange> change = emptyEntry.putKeywords(Collections.emptyList(),
-                Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+                ", ");
         Assert.assertEquals(Optional.empty(), change);
     }
 
     @Test
     public void clearKeywordsReturnsChange() {
         Optional<FieldChange> change = keywordEntry.putKeywords(Collections.emptyList(),
-                Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+                ", ");
         Assert.assertEquals(Optional.of(new FieldChange(keywordEntry, "keywords", "Foo, Bar", null)), change);
     }
 
     @Test
     public void changeKeywordsReturnsChange() {
         Optional<FieldChange> change = keywordEntry.putKeywords(Arrays.asList("Test", "FooTest"),
-                Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+                ", ");
         Assert.assertEquals(Optional.of(new FieldChange(keywordEntry, "keywords", "Foo, Bar", "Test, FooTest")), change);
     }
 
     @Test
     public void putKeywordsToSameReturnsNoChange() {
         Optional<FieldChange> change = keywordEntry.putKeywords(Arrays.asList("Foo", "Bar"),
-                Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+                ", ");
         Assert.assertEquals(Optional.empty(), change);
     }
 
