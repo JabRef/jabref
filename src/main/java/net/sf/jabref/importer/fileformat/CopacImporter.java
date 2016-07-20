@@ -124,17 +124,17 @@ public class CopacImporter extends ImportFormat {
                 String code = line.substring(0, 4);
 
                 if ("TI- ".equals(code)) {
-                    setOrAppend(b, "title", line.substring(4).trim(), ", ");
+                    setOrAppend(b, FieldName.TITLE, line.substring(4).trim(), ", ");
                 } else if ("AU- ".equals(code)) {
-                    setOrAppend(b, FieldName.AUTHOR_FIELD, line.substring(4).trim(), " and ");
+                    setOrAppend(b, FieldName.AUTHOR, line.substring(4).trim(), " and ");
                 } else if ("PY- ".equals(code)) {
-                    setOrAppend(b, FieldName.YEAR_FIELD, line.substring(4).trim(), ", ");
+                    setOrAppend(b, FieldName.YEAR, line.substring(4).trim(), ", ");
                 } else if ("PU- ".equals(code)) {
                     setOrAppend(b, "publisher", line.substring(4).trim(), ", ");
                 } else if ("SE- ".equals(code)) {
                     setOrAppend(b, "series", line.substring(4).trim(), ", ");
                 } else if ("IS- ".equals(code)) {
-                    setOrAppend(b, FieldName.ISBN_FIELD, line.substring(4).trim(), ", ");
+                    setOrAppend(b, FieldName.ISBN, line.substring(4).trim(), ", ");
                 } else if ("KW- ".equals(code)) {
                     setOrAppend(b, "keywords", line.substring(4).trim(), ", ");
                 } else if ("NT- ".equals(code)) {

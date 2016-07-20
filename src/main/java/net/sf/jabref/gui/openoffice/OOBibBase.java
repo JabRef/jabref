@@ -135,9 +135,9 @@ class OOBibBase {
     private final boolean atEnd;
     private final Comparator<BibEntry> entryComparator;
     private final Comparator<BibEntry> yearAuthorTitleComparator;
-    private final FieldComparator authComp = new FieldComparator(FieldName.AUTHOR_FIELD);
-    private final FieldComparator yearComp = new FieldComparator(FieldName.YEAR_FIELD);
-    private final FieldComparator titleComp = new FieldComparator("title");
+    private final FieldComparator authComp = new FieldComparator(FieldName.AUTHOR);
+    private final FieldComparator yearComp = new FieldComparator(FieldName.YEAR);
+    private final FieldComparator titleComp = new FieldComparator(FieldName.TITLE);
 
     private final List<Comparator<BibEntry>> authorYearTitleList = new ArrayList<>(3);
     private final List<Comparator<BibEntry>> yearAuthorTitleList = new ArrayList<>(3);
@@ -1215,7 +1215,7 @@ class OOBibBase {
                         }
                     }
                 }
-                Collections.sort(entries, new FieldComparator(FieldName.YEAR_FIELD));
+                Collections.sort(entries, new FieldComparator(FieldName.YEAR));
                 String keyString = String.join(",",
                         entries.stream().map(BibEntry::getCiteKey).collect(Collectors.toList()));
                 // Insert bookmark:

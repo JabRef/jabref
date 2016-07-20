@@ -99,7 +99,7 @@ public class FieldComparator implements Comparator<BibEntry> {
             return FieldType.TYPE;
         } else if (InternalBibtexFields.getFieldExtras(this.field[0]).contains(FieldProperties.PERSON_NAMES)) {
             return FieldType.NAME;
-        } else if (FieldName.YEAR_FIELD.equals(this.field[0])) {
+        } else if (FieldName.YEAR.equals(this.field[0])) {
             return FieldType.YEAR;
         } else if("month".equals(this.field[0])) {
             return FieldType.MONTH;

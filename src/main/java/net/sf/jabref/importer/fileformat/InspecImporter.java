@@ -92,14 +92,14 @@ public class InspecImporter extends ImportFormat {
                 String f3 = s.substring(0, 2);
                 String frest = s.substring(5);
                 if ("TI".equals(f3)) {
-                    h.put("title", frest);
+                    h.put(FieldName.TITLE, frest);
                 } else if ("PY".equals(f3)) {
-                    h.put(FieldName.YEAR_FIELD, frest);
+                    h.put(FieldName.YEAR, frest);
                 } else if ("AU".equals(f3)) {
-                    h.put(FieldName.AUTHOR_FIELD,
+                    h.put(FieldName.AUTHOR,
                             AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
                 } else if ("AB".equals(f3)) {
-                    h.put(FieldName.ABSTRACT_FIELD, frest);
+                    h.put(FieldName.ABSTRACT, frest);
                 } else if ("ID".equals(f3)) {
                     h.put("keywords", frest);
                 } else if ("SO".equals(f3)) {
@@ -111,12 +111,12 @@ public class InspecImporter extends ImportFormat {
                         m = frest.indexOf(';');
                         if (m >= 5) {
                             String yr = frest.substring(m - 5, m).trim();
-                            h.put(FieldName.YEAR_FIELD, yr);
+                            h.put(FieldName.YEAR, yr);
                             frest = frest.substring(m);
                             m = frest.indexOf(':');
                             if (m >= 0) {
                                 String pg = frest.substring(m + 1).trim();
-                                h.put("pages", pg);
+                                h.put(FieldName.PAGES, pg);
                                 String vol = frest.substring(1, m).trim();
                                 h.put("volume", vol);
                             }

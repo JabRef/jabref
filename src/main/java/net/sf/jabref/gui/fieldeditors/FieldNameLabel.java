@@ -49,15 +49,15 @@ public class FieldNameLabel extends JLabel {
 
     private static String getFieldNameLabelText(String fieldName) {
         // selected terms should be uppercase
-        if(FieldName.ISBN_FIELD.equalsIgnoreCase(fieldName)) {
+        if(FieldName.ISBN.equalsIgnoreCase(fieldName)) {
             return " ISBN ";
-        } else if (FieldName.URL_FIELD.equalsIgnoreCase(fieldName)){
+        } else if (FieldName.URL.equalsIgnoreCase(fieldName)){
             return " URL ";
         } else if ("uri".equalsIgnoreCase(fieldName)) {
             return " URI ";
-        } else if (FieldName.ISSN_FIELD.equalsIgnoreCase(fieldName)) {
+        } else if (FieldName.ISSN.equalsIgnoreCase(fieldName)) {
             return " ISSN ";
-        } else if(FieldName.DOI_FIELD.equalsIgnoreCase(fieldName)) {
+        } else if(FieldName.DOI.equalsIgnoreCase(fieldName)) {
             return " DOI ";
         } else if("isrn".equalsIgnoreCase(fieldName)) {
             return " ISRN ";

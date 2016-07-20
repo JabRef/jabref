@@ -89,18 +89,18 @@ class MODSEntry {
     public MODSEntry(BibEntry bibtex) {
         this();
         handledExtensions.add(MODSEntry.BIBTEX + "publisher");
-        handledExtensions.add(MODSEntry.BIBTEX + "title");
+        handledExtensions.add(MODSEntry.BIBTEX + FieldName.TITLE);
         handledExtensions.add(MODSEntry.BIBTEX + BibEntry.KEY_FIELD);
         handledExtensions.add(MODSEntry.BIBTEX + "author");
         populateFromBibtex(bibtex);
     }
 
     private void populateFromBibtex(BibEntry bibtex) {
-        if (bibtex.hasField("title")) {
+        if (bibtex.hasField(FieldName.TITLE)) {
             if (CHARFORMAT) {
-                title = chars.format(bibtex.getField("title"));
+                title = chars.format(bibtex.getField(FieldName.TITLE));
             } else {
-                title = bibtex.getField("title");
+                title = bibtex.getField(FieldName.TITLE);
             }
         }
 
@@ -125,8 +125,8 @@ class MODSEntry {
 
         date = getDate(bibtex);
         genre = getMODSgenre(bibtex);
-        if (bibtex.hasField(FieldName.AUTHOR_FIELD)) {
-            authors = getAuthors(bibtex.getField(FieldName.AUTHOR_FIELD));
+        if (bibtex.hasField(FieldName.AUTHOR)) {
+            authors = getAuthors(bibtex.getField(FieldName.AUTHOR));
         }
         if ("article".equals(bibtex.getType()) || "inproceedings".equals(bibtex.getType())) {
             host = new MODSEntry();
@@ -138,8 +138,8 @@ class MODSEntry {
                 host.volume = bibtex.getField("volume");
             }
             host.issuance = "continuing";
-            if (bibtex.hasField("pages")) {
-                host.pages = new PageNumbers(bibtex.getField("pages"));
+            if (bibtex.hasField(FieldName.PAGES)) {
+                host.pages = new PageNumbers(bibtex.getField(FieldName.PAGES));
             }
         }
 
@@ -180,7 +180,7 @@ class MODSEntry {
     /* construct a MODS date object */
     private static String getDate(BibEntry bibtex) {
         StringBuilder result = new StringBuilder();
-        bibtex.getFieldOptional(FieldName.YEAR_FIELD).ifPresent(result::append);
+        bibtex.getFieldOptional(FieldName.YEAR).ifPresent(result::append);
         bibtex.getFieldOptional("month").ifPresent(result.append('-')::append);
         return result.toString();
     }

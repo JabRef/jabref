@@ -47,7 +47,7 @@ public class CrossrefFetcherEvaluator {
 
                 @Override
                 public void run() {
-                    Optional<DOI> origDOI = entry.getFieldOptional(FieldName.DOI_FIELD).flatMap(DOI::build);
+                    Optional<DOI> origDOI = entry.getFieldOptional(FieldName.DOI).flatMap(DOI::build);
                     if (origDOI.isPresent()) {
                         dois.incrementAndGet();
                         Optional<DOI> crossrefDOI = CrossRef.findDOI(entry);

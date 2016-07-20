@@ -53,7 +53,7 @@ public class ScienceDirect implements FullTextFinder {
         Optional<URL> pdfLink = Optional.empty();
 
         // Try unique DOI first
-        Optional<DOI> doi = entry.getFieldOptional(FieldName.DOI_FIELD).flatMap(DOI::build);
+        Optional<DOI> doi = entry.getFieldOptional(FieldName.DOI).flatMap(DOI::build);
 
         if(doi.isPresent()) {
             // Available in catalog?

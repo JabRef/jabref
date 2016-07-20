@@ -101,19 +101,19 @@ public class SilverPlatterImporter extends ImportFormat {
                 String f3 = field.substring(0, 2);
                 String frest = field.substring(5);
                 if ("TI".equals(f3)) {
-                    h.put("title", frest);
+                    h.put(FieldName.TITLE, frest);
                 } else if ("AU".equals(f3)) {
                     if (frest.trim().endsWith("(ed)")) {
                         String ed = frest.trim();
                         ed = ed.substring(0, ed.length() - 4);
-                        h.put(FieldName.EDITOR_FIELD,
+                        h.put(FieldName.EDITOR,
                                 AuthorList.fixAuthorLastNameFirst(ed.replace(",-", ", ").replace(";", " and ")));
                     } else {
-                        h.put(FieldName.AUTHOR_FIELD,
+                        h.put(FieldName.AUTHOR,
                                 AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
                     }
                 } else if ("AB".equals(f3)) {
-                    h.put(FieldName.ABSTRACT_FIELD, frest);
+                    h.put(FieldName.ABSTRACT, frest);
                 } else if ("DE".equals(f3)) {
                     String kw = frest.replace("-;", ",").toLowerCase();
                     h.put("keywords", kw.substring(0, kw.length() - 1));
@@ -126,14 +126,14 @@ public class SilverPlatterImporter extends ImportFormat {
                         m = frest.indexOf(';');
                         if (m >= 5) {
                             String yr = frest.substring(m - 5, m).trim();
-                            h.put(FieldName.YEAR_FIELD, yr);
+                            h.put(FieldName.YEAR, yr);
                             frest = frest.substring(m);
                             m = frest.indexOf(':');
                             int issueIndex = frest.indexOf('(');
                             int endIssueIndex = frest.indexOf(')');
                             if (m >= 0) {
                                 String pg = frest.substring(m + 1).trim();
-                                h.put("pages", pg);
+                                h.put(FieldName.PAGES, pg);
                                 h.put("volume", frest.substring(1, issueIndex).trim());
                                 h.put("issue", frest.substring(issueIndex + 1, endIssueIndex).trim());
                             }
@@ -150,7 +150,7 @@ public class SilverPlatterImporter extends ImportFormat {
                             String yr = frest.substring(m + 2).trim();
                             try {
                                 Integer.parseInt(yr);
-                                h.put(FieldName.YEAR_FIELD, yr);
+                                h.put(FieldName.YEAR, yr);
                             } catch (NumberFormatException ex) {
                                 // Let's assume that this wasn't a number, since it
                                 // couldn't be parsed as an integer.
@@ -182,12 +182,12 @@ public class SilverPlatterImporter extends ImportFormat {
             }
 
             if (isChapter) {
-                Object titleO = h.get("title");
+                Object titleO = h.get(FieldName.TITLE);
                 if (titleO != null) {
                     String title = ((String) titleO).trim();
                     int inPos = title.indexOf("\" in ");
                     if (inPos > 1) {
-                        h.put("title", title.substring(0, inPos));
+                        h.put(FieldName.TITLE, title.substring(0, inPos));
                     }
                 }
 

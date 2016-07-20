@@ -153,7 +153,7 @@ public class FreeCiteImporter extends ImportFormat {
                                     // current tag is either begin:author or
                                     // end:authors
                                 }
-                                e.setField(FieldName.AUTHOR_FIELD, sb.toString());
+                                e.setField(FieldName.AUTHOR, sb.toString());
                             } else if ("journal".equals(ln)) {
                                 // we guess that the entry is a journal
                                 // the alternative way is to parse
@@ -166,16 +166,16 @@ public class FreeCiteImporter extends ImportFormat {
                                 type = BibtexEntryTypes.TECHREPORT;
                                 // the content of the "tech" field seems to contain the number of the technical report
                                 e.setField("number", parser.getElementText());
-                            } else if (FieldName.DOI_FIELD.equals(ln)
+                            } else if (FieldName.DOI.equals(ln)
                                     || "institution".equals(ln)
                                     || "location".equals(ln)
                                     || "number".equals(ln)
                                     || "note".equals(ln)
-                                    || "title".equals(ln)
-                                    || "pages".equals(ln)
+                                    || FieldName.TITLE.equals(ln)
+                                    || FieldName.PAGES.equals(ln)
                                     || "publisher".equals(ln)
                                     || "volume".equals(ln)
-                                    || FieldName.YEAR_FIELD.equals(ln)) {
+                                    || FieldName.YEAR.equals(ln)) {
                                 e.setField(ln, parser.getElementText());
                             } else if ("booktitle".equals(ln)) {
                                 String booktitle = parser.getElementText();

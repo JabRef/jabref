@@ -365,13 +365,13 @@ public class GVKParser {
 
         // Zuordnung der Felder in Abhängigkeit vom Dokumenttyp
         if (author != null) {
-            result.setField(FieldName.AUTHOR_FIELD, author);
+            result.setField(FieldName.AUTHOR, author);
         }
         if (editor != null) {
-            result.setField(FieldName.EDITOR_FIELD, editor);
+            result.setField(FieldName.EDITOR, editor);
         }
         if (title != null) {
-            result.setField("title", title);
+            result.setField(FieldName.TITLE, title);
         }
         if (!Strings.isNullOrEmpty(subtitle)) {
             // ensure that first letter is an upper case letter
@@ -388,7 +388,7 @@ public class GVKParser {
             result.setField("publisher", publisher);
         }
         if (year != null) {
-            result.setField(FieldName.YEAR_FIELD, year);
+            result.setField(FieldName.YEAR, year);
         }
         if (address != null) {
             result.setField("address", address);
@@ -400,10 +400,10 @@ public class GVKParser {
             result.setField("edition", edition);
         }
         if (isbn != null) {
-            result.setField(FieldName.ISBN_FIELD, isbn);
+            result.setField(FieldName.ISBN, isbn);
         }
         if (issn != null) {
-            result.setField(FieldName.ISSN_FIELD, issn);
+            result.setField(FieldName.ISSN, issn);
         }
         if (number != null) {
             result.setField("number", number);
@@ -412,7 +412,7 @@ public class GVKParser {
             result.setField("pagetotal", pagetotal);
         }
         if (pages != null) {
-            result.setField("pages", pages);
+            result.setField(FieldName.PAGES, pages);
         }
         if (volume != null) {
             result.setField("volume", volume);
@@ -424,7 +424,7 @@ public class GVKParser {
             result.setField("ppn_GVK", ppn);
         }
         if (url != null) {
-            result.setField(FieldName.URL_FIELD, url);
+            result.setField(FieldName.URL, url);
         }
         if (note != null) {
             result.setField("note", note);

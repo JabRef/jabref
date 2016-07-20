@@ -145,7 +145,7 @@ public class SynchronizeFileField extends AbstractWorker {
             boolean removeAllBroken = false;
             mainLoop: for (BibEntry aSel : sel) {
                 panel.frame().setProgressBarValue(progress++);
-                final Optional<String> old = aSel.getFieldOptional(FieldName.FILE_FIELD);
+                final Optional<String> old = aSel.getFieldOptional(FieldName.FILE);
                 // Check if a extension is set:
                 if (old.isPresent() && !(old.get().isEmpty())) {
                     FileListTableModel tableModel = new FileListTableModel();
@@ -255,11 +255,11 @@ public class SynchronizeFileField extends AbstractWorker {
                         // The table has been modified. Store the change:
                         String toSet = tableModel.getStringRepresentation();
                         if (toSet.isEmpty()) {
-                            ce.addEdit(new UndoableFieldChange(aSel, FieldName.FILE_FIELD, old.orElse(null), null));
-                            aSel.clearField(FieldName.FILE_FIELD);
+                            ce.addEdit(new UndoableFieldChange(aSel, FieldName.FILE, old.orElse(null), null));
+                            aSel.clearField(FieldName.FILE);
                         } else {
-                            ce.addEdit(new UndoableFieldChange(aSel, FieldName.FILE_FIELD, old.orElse(null), toSet));
-                            aSel.setField(FieldName.FILE_FIELD, toSet);
+                            ce.addEdit(new UndoableFieldChange(aSel, FieldName.FILE, old.orElse(null), toSet));
+                            aSel.setField(FieldName.FILE, toSet);
                         }
                         changedEntries.add(aSel);
                     }

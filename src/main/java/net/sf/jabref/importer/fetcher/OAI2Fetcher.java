@@ -207,7 +207,7 @@ public class OAI2Fetcher implements EntryFetcher {
                 }
 
                 if (fixedKey.matches("\\d\\d\\d\\d\\..*")) {
-                    be.setField(FieldName.YEAR_FIELD, "20" + fixedKey.substring(0, 2));
+                    be.setField(FieldName.YEAR, "20" + fixedKey.substring(0, 2));
 
                     int monthNumber = Integer.parseInt(fixedKey.substring(2, 4));
                     MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);

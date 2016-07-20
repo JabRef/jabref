@@ -396,7 +396,7 @@ public class DroppedFileHandler {
     private void doLink(BibEntry entry, ExternalFileType fileType, String filename,
                         boolean avoidDuplicate, NamedCompound edits) {
 
-        Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE_FIELD);
+        Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
         FileListTableModel tm = new FileListTableModel();
         oldValue.ifPresent(tm::setContent);
 
@@ -442,8 +442,8 @@ public class DroppedFileHandler {
 
         tm.addEntry(tm.getRowCount(), new FileListEntry("", filename, fileType));
         String newValue = tm.getStringRepresentation();
-        UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE_FIELD, oldValue.orElse(null), newValue);
-        entry.setField(FieldName.FILE_FIELD, newValue);
+        UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE, oldValue.orElse(null), newValue);
+        entry.setField(FieldName.FILE, newValue);
 
         if (edits == null) {
             panel.getUndoManager().addEdit(edit);

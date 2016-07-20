@@ -83,7 +83,7 @@ public class BiblioscapeImporter extends ImportFormat {
                 // add item
                 for (Map.Entry<String, StringBuilder> entry : lines.entrySet()) {
                     if ("AU".equals(entry.getKey())) {
-                        hm.put(FieldName.AUTHOR_FIELD, entry.getValue()
+                        hm.put(FieldName.AUTHOR, entry.getValue()
                                 .toString());
                     } else if ("TI".equals(entry.getKey())) {
                         titleTI = entry.getValue()
@@ -92,7 +92,7 @@ public class BiblioscapeImporter extends ImportFormat {
                         titleST = entry.getValue()
                                 .toString();
                     } else if ("YP".equals(entry.getKey())) {
-                        hm.put(FieldName.YEAR_FIELD, entry
+                        hm.put(FieldName.YEAR, entry
                                 .getValue().toString());
                     } else if ("VL".equals(entry.getKey())) {
                         hm.put("volume", entry
@@ -143,10 +143,10 @@ public class BiblioscapeImporter extends ImportFormat {
                         comments
                         .add("Quaternary Title: " + entry.getValue());
                     } else if ("IS".equals(entry.getKey())) {
-                        hm.put(FieldName.ISBN_FIELD, entry
+                        hm.put(FieldName.ISBN, entry
                                 .getValue().toString());
                     } else if ("AB".equals(entry.getKey())) {
-                        hm.put(FieldName.ABSTRACT_FIELD, entry
+                        hm.put(FieldName.ABSTRACT, entry
                                 .getValue().toString());
                     } else if ("AD".equals(entry.getKey())) {
                         address = entry.getValue()
@@ -159,7 +159,7 @@ public class BiblioscapeImporter extends ImportFormat {
                                 .toString();
                     } else if ("UR".equals(entry.getKey()) || "AT".equals(entry.getKey())) {
                         String s = entry.getValue().toString().trim();
-                        hm.put(s.startsWith("http://") || s.startsWith("ftp://") ? FieldName.URL_FIELD
+                        hm.put(s.startsWith("http://") || s.startsWith("ftp://") ? FieldName.URL
                                 : "pdf", entry.getValue().toString());
                     } else if ("C1".equals(entry.getKey())) {
                         comments.add("Custom1: "
@@ -235,14 +235,14 @@ public class BiblioscapeImporter extends ImportFormat {
                         hm.put("journal", titleST);
                     }
                     if (titleTI != null) {
-                        hm.put("title", titleTI);
+                        hm.put(FieldName.TITLE, titleTI);
                     }
                 } else if ("inbook".equals(bibtexType)) {
                     if (titleST != null) {
                         hm.put("booktitle", titleST);
                     }
                     if (titleTI != null) {
-                        hm.put("title", titleTI);
+                        hm.put(FieldName.TITLE, titleTI);
                     }
                 } else {
                     if (titleST != null) {
@@ -251,13 +251,13 @@ public class BiblioscapeImporter extends ImportFormat {
                     // happen, I
                     // think
                     if (titleTI != null) {
-                        hm.put("title", titleTI);
+                        hm.put(FieldName.TITLE, titleTI);
                     }
                 }
 
                 // concatenate pages
                 if ((pages[0] != null) || (pages[1] != null)) {
-                    hm.put("pages", (pages[0] == null ? "" : pages[0]) + (pages[1] == null ? "" : "--" + pages[1]));
+                    hm.put(FieldName.PAGES, (pages[0] == null ? "" : pages[0]) + (pages[1] == null ? "" : "--" + pages[1]));
                 }
 
                 // concatenate address and country

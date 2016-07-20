@@ -32,7 +32,7 @@ public class DoiCleanup implements CleanupJob {
     /**
      * Fields to check for DOIs.
      */
-    private static final String[] FIELDS = {"note", FieldName.URL_FIELD, "ee"};
+    private static final String[] FIELDS = {"note", FieldName.URL, "ee"};
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
@@ -40,17 +40,17 @@ public class DoiCleanup implements CleanupJob {
         List<FieldChange> changes = new ArrayList<>();
 
         // First check if the Doi Field is empty
-        if (entry.hasField(FieldName.DOI_FIELD)) {
-            String doiFieldValue = entry.getField(FieldName.DOI_FIELD);
+        if (entry.hasField(FieldName.DOI)) {
+            String doiFieldValue = entry.getField(FieldName.DOI);
 
             Optional<DOI> doi = DOI.build(doiFieldValue);
 
             if (doi.isPresent()) {
                 String newValue = doi.get().getDOI();
                 if (!doiFieldValue.equals(newValue)) {
-                    entry.setField(FieldName.DOI_FIELD, newValue);
+                    entry.setField(FieldName.DOI, newValue);
 
-                    FieldChange change = new FieldChange(entry, FieldName.DOI_FIELD, doiFieldValue, newValue);
+                    FieldChange change = new FieldChange(entry, FieldName.DOI, doiFieldValue, newValue);
                     changes.add(change);
                 }
 
@@ -66,12 +66,12 @@ public class DoiCleanup implements CleanupJob {
 
                 if (doi.isPresent()) {
                     // update Doi
-                    String oldValue = entry.getField(FieldName.DOI_FIELD);
+                    String oldValue = entry.getField(FieldName.DOI);
                     String newValue = doi.get().getDOI();
 
-                    entry.setField(FieldName.DOI_FIELD, newValue);
+                    entry.setField(FieldName.DOI, newValue);
 
-                    FieldChange change = new FieldChange(entry, FieldName.DOI_FIELD, oldValue, newValue);
+                    FieldChange change = new FieldChange(entry, FieldName.DOI, oldValue, newValue);
                     changes.add(change);
 
                     removeFieldValue(entry, field, changes);

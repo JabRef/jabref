@@ -49,7 +49,7 @@ public class CreateDocBookEditors extends CreateDocBookAuthors {
         //		<editor><firstname>L.</firstname><surname>Xue</surname></editor>
         StringBuilder sb = new StringBuilder(100);
         AuthorList al = AuthorList.parse(fieldText);
-        addBody(sb, al, FieldName.EDITOR_FIELD);
+        addBody(sb, al, FieldName.EDITOR);
         return sb.toString();
 
     }

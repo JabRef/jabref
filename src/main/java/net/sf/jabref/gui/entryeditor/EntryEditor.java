@@ -261,7 +261,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 addOptionalTab(type);
 
                 Set<String> deprecatedFields = new HashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
-                deprecatedFields.add(FieldName.YEAR_FIELD);
+                deprecatedFields.add(FieldName.YEAR);
                 deprecatedFields.add("month");
                 List<String> secondaryOptionalFields = type.getSecondaryOptionalFields();
                 List<String> optionalFieldsNotPrimaryOrDeprecated = new ArrayList<>(secondaryOptionalFields);

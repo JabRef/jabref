@@ -22,7 +22,7 @@ public class EntryConverter {
         EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put("archiveprefix", "eprinttype");
         EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put("journal", "journaltitle");
         EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put("key", "sortkey");
-        EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put("pdf", FieldName.FILE_FIELD);
+        EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put("pdf", FieldName.FILE);
         EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put("primaryclass", "eprintclass");
         EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put("school", "institution");
 

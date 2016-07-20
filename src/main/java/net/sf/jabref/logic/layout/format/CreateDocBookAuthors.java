@@ -56,7 +56,7 @@ public class CreateDocBookAuthors implements LayoutFormatter {
 
         AuthorList al = AuthorList.parse(fieldText);
 
-        addBody(sb, al, FieldName.AUTHOR_FIELD);
+        addBody(sb, al, FieldName.AUTHOR);
         return sb.toString();
 
     }

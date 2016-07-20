@@ -112,7 +112,7 @@ public class AutoSetLinks {
                 // Iterate over the entries:
                 for (Entry<BibEntry, List<File>> entryFilePair : result.entrySet()) {
                     FileListTableModel tableModel;
-                    Optional<String> oldVal = entryFilePair.getKey().getFieldOptional(FieldName.FILE_FIELD);
+                    Optional<String> oldVal = entryFilePair.getKey().getFieldOptional(FieldName.FILE);
                     if (singleTableModel == null) {
                         tableModel = new FileListTableModel();
                         oldVal.ifPresent(tableModel::setContent);
@@ -153,12 +153,12 @@ public class AutoSetLinks {
                             if (ce != null) {
                                 // store undo information
                                 UndoableFieldChange change = new UndoableFieldChange(entryFilePair.getKey(),
-                                        FieldName.FILE_FIELD, oldVal.orElse(null), newVal);
+                                        FieldName.FILE, oldVal.orElse(null), newVal);
                                 ce.addEdit(change);
                             }
                             // hack: if table model is given, do NOT modify entry
                             if (singleTableModel == null) {
-                                entryFilePair.getKey().setField(FieldName.FILE_FIELD, newVal);
+                                entryFilePair.getKey().setField(FieldName.FILE, newVal);
                             }
                             if (changedEntries != null) {
                                 changedEntries.add(entryFilePair.getKey());

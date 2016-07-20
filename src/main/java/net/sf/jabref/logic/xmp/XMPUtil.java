@@ -263,12 +263,12 @@ public class XMPUtil {
 
         String s = di.getAuthor();
         if (s != null) {
-            entry.setField(FieldName.AUTHOR_FIELD, s);
+            entry.setField(FieldName.AUTHOR, s);
         }
 
         s = di.getTitle();
         if (s != null) {
-            entry.setField("title", s);
+            entry.setField(FieldName.TITLE, s);
         }
 
         s = di.getKeywords();
@@ -278,7 +278,7 @@ public class XMPUtil {
 
         s = di.getSubject();
         if (s != null) {
-            entry.setField(FieldName.ABSTRACT_FIELD, s);
+            entry.setField(FieldName.ABSTRACT, s);
         }
 
         COSDictionary dict = di.getDictionary();
@@ -324,7 +324,7 @@ public class XMPUtil {
          */
         List<String> contributors = dcSchema.getContributors();
         if ((contributors != null) && !contributors.isEmpty()) {
-            entry.setField(FieldName.EDITOR_FIELD, String.join(" and ", contributors));
+            entry.setField(FieldName.EDITOR, String.join(" and ", contributors));
         }
 
         /**
@@ -332,7 +332,7 @@ public class XMPUtil {
          */
         List<String> creators = dcSchema.getCreators();
         if ((creators != null) && !creators.isEmpty()) {
-            entry.setField(FieldName.AUTHOR_FIELD, String.join(" and ", creators));
+            entry.setField(FieldName.AUTHOR, String.join(" and ", creators));
         }
 
         /**
@@ -348,7 +348,7 @@ public class XMPUtil {
                 // Ignored
             }
             if (c != null) {
-                entry.setField(FieldName.YEAR_FIELD, String.valueOf(c.get(Calendar.YEAR)));
+                entry.setField(FieldName.YEAR, String.valueOf(c.get(Calendar.YEAR)));
                 if (date.length() > 4) {
                     entry.setField("month", MonthUtil.getMonthByIndex(c.get(Calendar.MONTH)).bibtexFormat);
                 }
@@ -360,7 +360,7 @@ public class XMPUtil {
          */
         String s = dcSchema.getDescription();
         if (s != null) {
-            entry.setField(FieldName.ABSTRACT_FIELD, s);
+            entry.setField(FieldName.ABSTRACT, s);
         }
 
         /**
@@ -368,7 +368,7 @@ public class XMPUtil {
          */
         s = dcSchema.getIdentifier();
         if (s != null) {
-            entry.setField(FieldName.DOI_FIELD, s);
+            entry.setField(FieldName.DOI, s);
         }
 
         /**
@@ -427,7 +427,7 @@ public class XMPUtil {
          */
         s = dcSchema.getTitle();
         if (s != null) {
-            entry.setField("title", s);
+            entry.setField(FieldName.TITLE, s);
         }
 
         /**
@@ -619,7 +619,7 @@ public class XMPUtil {
                 continue;
             }
 
-            if (FieldName.EDITOR_FIELD.equals(field)) {
+            if (FieldName.EDITOR.equals(field)) {
                 String authors = resolvedEntry.getField(field);
 
                 /**
@@ -682,7 +682,7 @@ public class XMPUtil {
                 continue;
             }
 
-            if (FieldName.YEAR_FIELD.equals(field)) {
+            if (FieldName.YEAR.equals(field)) {
 
                 /**
                  * Year + Month -> Date
@@ -716,7 +716,7 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: abstract
              */
-            if (FieldName.ABSTRACT_FIELD.equals(field)) {
+            if (FieldName.ABSTRACT.equals(field)) {
                 String o = resolvedEntry.getField(field);
                 dcSchema.setDescription(o);
                 continue;
@@ -735,7 +735,7 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: doi
              */
-            if (FieldName.DOI_FIELD.equals(field)) {
+            if (FieldName.DOI.equals(field)) {
                 String o = resolvedEntry.getField(field);
                 dcSchema.setIdentifier(o);
                 continue;
@@ -825,7 +825,7 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: title
              */
-            if ("title".equals(field)) {
+            if (FieldName.TITLE.equals(field)) {
                 String o = entry.getField(field);
                 dcSchema.setTitle(o);
                 continue;
@@ -1011,11 +1011,11 @@ public class XMPUtil {
                 // erase field instead of adding it
                 if ("author".equals(field)) {
                     di.setAuthor(null);
-                } else if ("title".equals(field)) {
+                } else if (FieldName.TITLE.equals(field)) {
                     di.setTitle(null);
                 } else if ("keywords".equals(field)) {
                     di.setKeywords(null);
-                } else if (FieldName.ABSTRACT_FIELD.equals(field)) {
+                } else if (FieldName.ABSTRACT.equals(field)) {
                     di.setSubject(null);
                 } else {
                     di.setCustomMetadataValue("bibtex/" + field, null);
@@ -1024,13 +1024,13 @@ public class XMPUtil {
             }
 
             if ("author".equals(field)) {
-                di.setAuthor(resolvedEntry.getField(FieldName.AUTHOR_FIELD));
-            } else if ("title".equals(field)) {
-                di.setTitle(resolvedEntry.getField("title"));
+                di.setAuthor(resolvedEntry.getField(FieldName.AUTHOR));
+            } else if (FieldName.TITLE.equals(field)) {
+                di.setTitle(resolvedEntry.getField(FieldName.TITLE));
             } else if ("keywords".equals(field)) {
                 di.setKeywords(resolvedEntry.getField("keywords"));
-            } else if (FieldName.ABSTRACT_FIELD.equals(field)) {
-                di.setSubject(resolvedEntry.getField(FieldName.ABSTRACT_FIELD));
+            } else if (FieldName.ABSTRACT.equals(field)) {
+                di.setSubject(resolvedEntry.getField(FieldName.ABSTRACT));
             } else {
                 di.setCustomMetadataValue("bibtex/" + field, resolvedEntry.getField(field));
             }

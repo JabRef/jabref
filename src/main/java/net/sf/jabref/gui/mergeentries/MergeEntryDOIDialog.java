@@ -74,7 +74,7 @@ public class MergeEntryDOIDialog extends JDialog {
 
         this.originalEntry = panel.getSelectedEntries().get(0);
         panel.output(Localization.lang("Fetching info based on DOI"));
-        Optional<String> doi = this.originalEntry.getFieldOptional(FieldName.DOI_FIELD);
+        Optional<String> doi = this.originalEntry.getFieldOptional(FieldName.DOI);
 
         if (doi.isPresent()) {
             this.doiEntry = doiFetcher.getEntryFromDOI(doi.get()).orElse(null);

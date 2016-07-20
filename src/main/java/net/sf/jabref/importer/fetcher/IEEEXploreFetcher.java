@@ -269,8 +269,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up title
-        if (entry.hasField("title")) {
-            String title = entry.getField("title");
+        if (entry.hasField(FieldName.TITLE)) {
+            String title = entry.getField(FieldName.TITLE);
             // USe the alt-text and replace image links
             title = title.replaceAll("[ ]?img src=[^ ]+ alt=\"([^\"]+)\">[ ]?", "\\$$1\\$");
             // Try to sort out most of the /spl / conversions
@@ -298,12 +298,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 title = protectTermsFormatter.format(title);
             }
             // Write back
-            entry.setField("title", title);
+            entry.setField(FieldName.TITLE, title);
         }
 
         // clean up author
-        if (entry.hasField(FieldName.AUTHOR_FIELD)) {
-            String author = entry.getField(FieldName.AUTHOR_FIELD);
+        if (entry.hasField(FieldName.AUTHOR)) {
+            String author = entry.getField(FieldName.AUTHOR);
             author = author.replaceAll("\\s+", " ");
 
             //reorder the "Jr." "Sr." etc to the correct ordering
@@ -318,7 +318,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                     .replace(" ,", ",").replace("  ", " ");
             author = author.replaceAll("[ ,;]+$", "");
             //TODO: remove trailing commas
-            entry.setField(FieldName.AUTHOR_FIELD, author);
+            entry.setField(FieldName.AUTHOR, author);
         }
 
         // clean up month
@@ -356,14 +356,14 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up pages
-        if (entry.hasField("pages")) {
-            String pages = entry.getField("pages");
+        if (entry.hasField(FieldName.PAGES)) {
+            String pages = entry.getField(FieldName.PAGES);
             String[] pageNumbers = pages.split("-");
             if (pageNumbers.length == 2) {
                 if (pageNumbers[0].equals(pageNumbers[1])) {// single page
-                    entry.setField("pages", pageNumbers[0]);
+                    entry.setField(FieldName.PAGES, pageNumbers[0]);
                 } else {
-                    entry.setField("pages", pages.replace("-", "--"));
+                    entry.setField(FieldName.PAGES, pages.replace("-", "--"));
                 }
             }
         }
@@ -383,9 +383,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 int ind = fullName.indexOf(": Accepted for future publication");
                 if (ind > 0) {
                     fullName = fullName.substring(0, ind);
-                    entry.setField(FieldName.YEAR_FIELD, "to be published");
+                    entry.setField(FieldName.YEAR, "to be published");
                     entry.clearField("month");
-                    entry.clearField("pages");
+                    entry.clearField(FieldName.PAGES);
                     entry.clearField("number");
                 }
                 String[] parts = fullName.split("[\\[\\]]"); //[see also...], [legacy...]
@@ -395,9 +395,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 }
                 String note = entry.getField("note");
                 if ("Early Access".equals(note)) {
-                    entry.setField(FieldName.YEAR_FIELD, "to be published");
+                    entry.setField(FieldName.YEAR, "to be published");
                     entry.clearField("month");
-                    entry.clearField("pages");
+                    entry.clearField(FieldName.PAGES);
                     entry.clearField("number");
                 }
             } else {
@@ -472,7 +472,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 fullName = fullName.trim();
 
                 fullName = fullName.replaceAll("^[tT]he ", "").replaceAll("^\\d{4} ", "").replaceAll("[,.]$", "");
-                String year = entry.getField(FieldName.YEAR_FIELD);
+                String year = entry.getField(FieldName.YEAR);
                 if (year != null) {
                     fullName = fullName.replaceAll(", " + year + "\\.?", "");
                 }
@@ -486,8 +486,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up abstract
-        if (entry.hasField(FieldName.ABSTRACT_FIELD)) {
-            String abstr = entry.getField(FieldName.ABSTRACT_FIELD);
+        if (entry.hasField(FieldName.ABSTRACT)) {
+            String abstr = entry.getField(FieldName.ABSTRACT);
             // Try to sort out most of the /spl / conversions
             // Deal with this specific nested type first
             abstr = abstr.replaceAll("/sub /spl infin//", "\\$_\\\\infty\\$");
@@ -502,12 +502,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
             // Replace \infin with \infty
             abstr = abstr.replace("\\infin", "\\infty");
             // Write back
-            entry.setField(FieldName.ABSTRACT_FIELD, abstr);
+            entry.setField(FieldName.ABSTRACT, abstr);
         }
 
         // Clean up url
-        entry.getFieldOptional(FieldName.URL_FIELD)
-                .ifPresent(url -> entry.setField(FieldName.URL_FIELD, "http://ieeexplore.ieee.org" + url.replace("tp=&", "")));
+        entry.getFieldOptional(FieldName.URL)
+                .ifPresent(url -> entry.setField(FieldName.URL, "http://ieeexplore.ieee.org" + url.replace("tp=&", "")));
 
         // Replace ; as keyword separator
         entry.getFieldOptional("keywords").ifPresent(keys -> entry.setField("keywords",

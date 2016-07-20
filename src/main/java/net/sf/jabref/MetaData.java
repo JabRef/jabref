@@ -58,7 +58,7 @@ public class MetaData implements Iterable<String> {
     private static final String DATABASE_TYPE = "databaseType";
 
     private static final String GROUPSTREE = "groupstree";
-    private static final String FILE_DIRECTORY = FieldName.FILE_FIELD + Globals.DIR_SUFFIX;
+    private static final String FILE_DIRECTORY = FieldName.FILE + Globals.DIR_SUFFIX;
     public static final String SELECTOR_META_PREFIX = "selector_";
     private static final String PROTECTED_FLAG_META = "protectedFlag";
 
@@ -128,10 +128,10 @@ public class MetaData implements Iterable<String> {
      */
     public void initializeNewDatabase() {
         metaData.put(SELECTOR_META_PREFIX + "keywords", new Vector<>());
-        metaData.put(SELECTOR_META_PREFIX + FieldName.AUTHOR_FIELD, new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + FieldName.AUTHOR, new Vector<>());
         metaData.put(SELECTOR_META_PREFIX + "journal", new Vector<>());
         metaData.put(SELECTOR_META_PREFIX + "publisher", new Vector<>());
-        metaData.put(SELECTOR_META_PREFIX + FieldName.REVIEW_FIELD, new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + FieldName.REVIEW, new Vector<>());
     }
 
     /**

@@ -500,7 +500,7 @@ public class MainTable extends JTable {
      */
     public boolean isFileColumn(int modelIndex) {
         return (tableFormat.getTableColumn(modelIndex) != null) && tableFormat.getTableColumn(modelIndex)
-                .getBibtexFields().contains(FieldName.FILE_FIELD);
+                .getBibtexFields().contains(FieldName.FILE);
     }
 
     private boolean matches(int row, Matcher<BibEntry> m) {

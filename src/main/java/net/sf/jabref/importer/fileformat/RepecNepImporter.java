@@ -256,7 +256,7 @@ public class RepecNepImporter extends ImportFormat {
     private void parseTitleString(BibEntry be, BufferedReader in) throws IOException {
         // skip article number
         this.lastLine = this.lastLine.substring(this.lastLine.indexOf('.') + 1, this.lastLine.length());
-        be.setField("title", readMultipleLines(in));
+        be.setField(FieldName.TITLE, readMultipleLines(in));
     }
 
     /**
@@ -306,7 +306,7 @@ public class RepecNepImporter extends ImportFormat {
         }
 
         if (!authors.isEmpty()) {
-            be.setField(FieldName.AUTHOR_FIELD, String.join(" and ", authors));
+            be.setField(FieldName.AUTHOR, String.join(" and ", authors));
         }
         if (institutions.length() > 0) {
             be.setField("institution", institutions.toString());
@@ -323,7 +323,7 @@ public class RepecNepImporter extends ImportFormat {
         String theabstract = readMultipleLines(in);
 
         if (!"".equals(theabstract)) {
-            be.setField(FieldName.ABSTRACT_FIELD, theabstract);
+            be.setField(FieldName.ABSTRACT, theabstract);
         }
     }
 
@@ -375,7 +375,7 @@ public class RepecNepImporter extends ImportFormat {
 
                 Calendar cal = new GregorianCalendar();
                 cal.setTime(date == null ? new Date() : date);
-                be.setField(FieldName.YEAR_FIELD, String.valueOf(cal.get(Calendar.YEAR)));
+                be.setField(FieldName.YEAR, String.valueOf(cal.get(Calendar.YEAR)));
                 if ((date != null) && recognizedDateFormats[i - 1].contains("MM")) {
                     be.setField("month", String.valueOf(cal.get(Calendar.MONTH) + 1));
                 }
@@ -392,7 +392,7 @@ public class RepecNepImporter extends ImportFormat {
                     content = this.lastLine;
                     readLine(in);
                 }
-                be.setField(FieldName.URL_FIELD, content);
+                be.setField(FieldName.URL, content);
 
                 // authors field
             } else if (keyword.startsWith("By")) {

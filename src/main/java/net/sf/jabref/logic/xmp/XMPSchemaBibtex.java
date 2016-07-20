@@ -54,9 +54,9 @@ public class XMPSchemaBibtex extends XMPSchema {
 
 
     static {
-        XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add(FieldName.ABSTRACT_FIELD);
+        XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add(FieldName.ABSTRACT);
         XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add("note");
-        XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add(FieldName.REVIEW_FIELD);
+        XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add(FieldName.REVIEW);
     }
 
     /**

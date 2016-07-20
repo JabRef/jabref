@@ -149,7 +149,7 @@ public class EndnoteImporter extends ImportFormat {
                         editor += " and " + val;
                     }
                 } else if ("T".equals(prefix)) {
-                    hm.put("title", val);
+                    hm.put(FieldName.TITLE, val);
                 } else if ("0".equals(prefix)) {
                     if (val.indexOf("Journal") == 0) {
                         type = "article";
@@ -176,9 +176,9 @@ public class EndnoteImporter extends ImportFormat {
                 } else if ("C".equals(prefix)) {
                     hm.put("address", val);
                 } else if ("D".equals(prefix)) {
-                    hm.put(FieldName.YEAR_FIELD, val);
+                    hm.put(FieldName.YEAR, val);
                 } else if ("8".equals(prefix)) {
-                    hm.put(FieldName.DATE_FIELD, val);
+                    hm.put(FieldName.DATE, val);
                 } else if ("J".equals(prefix)) {
                     // "Alternate journal. Let's set it only if no journal
                     // has been set with %B.
@@ -203,19 +203,19 @@ public class EndnoteImporter extends ImportFormat {
                 }
                 // replace single dash page ranges (23-45) with double dashes (23--45):
                 else if ("P".equals(prefix)) {
-                    hm.put("pages", val.replaceAll("([0-9]) *- *([0-9])", "$1--$2"));
+                    hm.put(FieldName.PAGES, val.replaceAll("([0-9]) *- *([0-9])", "$1--$2"));
                 } else if ("V".equals(prefix)) {
                     hm.put("volume", val);
                 } else if ("N".equals(prefix)) {
                     hm.put("number", val);
                 } else if ("U".equals(prefix)) {
-                    hm.put(FieldName.URL_FIELD, val);
+                    hm.put(FieldName.URL, val);
                 } else if ("R".equals(prefix)) {
                     String doi = val;
                     if (doi.startsWith("doi:")) {
                         doi = doi.substring(4);
                     }
-                    hm.put(FieldName.DOI_FIELD, doi);
+                    hm.put(FieldName.DOI, doi);
                 } else if ("O".equals(prefix)) {
                     // Notes may contain Article number
                     if (val.startsWith("Artn")) {
@@ -227,7 +227,7 @@ public class EndnoteImporter extends ImportFormat {
                 } else if ("K".equals(prefix)) {
                     hm.put("keywords", val);
                 } else if ("X".equals(prefix)) {
-                    hm.put(FieldName.ABSTRACT_FIELD, val);
+                    hm.put(FieldName.ABSTRACT, val);
                 } else if ("9".equals(prefix)) {
                     if (val.indexOf("Ph.D.") == 0) {
                         type = "phdthesis";
@@ -249,14 +249,14 @@ public class EndnoteImporter extends ImportFormat {
 
             //fixauthorscomma
             if (!"".equals(author)) {
-                hm.put(FieldName.AUTHOR_FIELD, fixAuthor(author));
+                hm.put(FieldName.AUTHOR, fixAuthor(author));
             }
             if (!"".equals(editor)) {
-                hm.put(FieldName.EDITOR_FIELD, fixAuthor(editor));
+                hm.put(FieldName.EDITOR, fixAuthor(editor));
             }
             //if pages missing and article number given, use the article number
-            if (((hm.get("pages") == null) || "-".equals(hm.get("pages"))) && !"".equals(artnum)) {
-                hm.put("pages", artnum);
+            if (((hm.get(FieldName.PAGES) == null) || "-".equals(hm.get(FieldName.PAGES))) && !"".equals(artnum)) {
+                hm.put(FieldName.PAGES, artnum);
             }
 
             BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't

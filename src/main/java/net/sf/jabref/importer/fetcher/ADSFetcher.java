@@ -160,7 +160,7 @@ public class ADSFetcher implements EntryFetcher {
             while (reader.hasNext()) {
                 reader.next();
                 if (reader.isStartElement() &&
-                        FieldName.ABSTRACT_FIELD.equals(reader.getLocalName())) {
+                        FieldName.ABSTRACT.equals(reader.getLocalName())) {
                     isAbstract = true;
                 }
                 if (isAbstract && reader.isCharacters()) {
@@ -172,7 +172,7 @@ public class ADSFetcher implements EntryFetcher {
             }
             String abstractText = abstractSB.toString();
             abstractText = abstractText.replace("\n", " ");
-            entry.setField(FieldName.ABSTRACT_FIELD, abstractText);
+            entry.setField(FieldName.ABSTRACT, abstractText);
         } catch (XMLStreamException e) {
             status.showMessage(Localization.lang("An Error occurred while parsing abstract"), getTitle(),
                     JOptionPane.ERROR_MESSAGE);

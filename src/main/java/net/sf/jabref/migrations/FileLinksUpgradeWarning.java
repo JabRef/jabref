@@ -78,7 +78,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         // Only offer to upgrade links if the pdf/ps fields are used:
         offerChangeDatabase = linksFound(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
         // If the "file" directory is not set, offer to migrate pdf/ps dir:
-        offerSetFileDir = !Globals.prefs.hasKey(FieldName.FILE_FIELD + Globals.DIR_SUFFIX)
+        offerSetFileDir = !Globals.prefs.hasKey(FieldName.FILE + Globals.DIR_SUFFIX)
                 && (Globals.prefs.hasKey("pdfDirectory") || Globals.prefs.hasKey("psDirectory"));
 
         // First check if this warning is disabled:
@@ -200,7 +200,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         }
 
         if (fileDir != null) {
-            Globals.prefs.put(FieldName.FILE_FIELD + Globals.DIR_SUFFIX, fileDir);
+            Globals.prefs.put(FieldName.FILE + Globals.DIR_SUFFIX, fileDir);
         }
 
         if (upgradePrefs) {
@@ -215,7 +215,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
                 if (!gfs.isEmpty()) {
                     sb.append(';');
                 }
-                sb.append(FieldName.FILE_FIELD);
+                sb.append(FieldName.FILE);
                 Globals.prefs.put(JabRefPreferences.CUSTOM_TAB_FIELDS + "0", sb.toString());
                 Globals.prefs.updateEntryEditorTabList();
                 panel.frame().removeCachedEntryEditors();
@@ -230,7 +230,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         outer: for (int i = 0; i < tabList.getTabCount(); i++) {
             List<String> fields = tabList.getTabFields(i);
             for (String field : fields) {
-                if (field.equals(FieldName.FILE_FIELD)) {
+                if (field.equals(FieldName.FILE)) {
                     found = true;
                     break outer;
                 }

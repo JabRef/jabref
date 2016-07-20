@@ -156,7 +156,7 @@ public class MedlinePlainImporter extends ImportFormat {
 
                 //store the fields in a map
                 Map<String, String> hashMap = new HashMap<>();
-                hashMap.put("PG", "pages");
+                hashMap.put("PG", FieldName.PAGES);
                 hashMap.put("PL", "address");
                 hashMap.put("PHST", "history");
                 hashMap.put("PST", "publication-status");
@@ -214,8 +214,8 @@ public class MedlinePlainImporter extends ImportFormat {
                     comment = comment + value;
                 }
             }
-            fixAuthors(fields, author, FieldName.AUTHOR_FIELD);
-            fixAuthors(fields, editor, FieldName.EDITOR_FIELD);
+            fixAuthors(fields, author, FieldName.AUTHOR);
+            fixAuthors(fields, editor, FieldName.EDITOR);
             if (!comment.isEmpty()) {
                 fields.put("comment", comment);
             }
@@ -275,7 +275,7 @@ public class MedlinePlainImporter extends ImportFormat {
 
     private void addStandardNumber(Map<String, String> hm, String lab, String value) {
         if ("IS".equals(lab)) {
-            String key = FieldName.ISSN_FIELD;
+            String key = FieldName.ISSN;
             //it is possible to have two issn, one for electronic and for print
             //if there are two then it comes at the end in brackets (electronic) or (print)
             //so search for the brackets
@@ -289,7 +289,7 @@ public class MedlinePlainImporter extends ImportFormat {
                 hm.put(key, value);
             }
         } else if ("ISBN".equals(lab)) {
-            hm.put(FieldName.ISBN_FIELD, value);
+            hm.put(FieldName.ISBN, value);
         }
     }
 
@@ -306,7 +306,7 @@ public class MedlinePlainImporter extends ImportFormat {
             String idValue = value;
             if (value.startsWith("doi:")) {
                 idValue = idValue.replaceAll("(?i)doi:", "").trim();
-                key = FieldName.DOI_FIELD;
+                key = FieldName.DOI;
             } else if (value.indexOf('[') > 0) {
                 int startOfIdentifier = value.indexOf('[');
                 int endOfIdentifier = value.indexOf(']');
@@ -330,14 +330,14 @@ public class MedlinePlainImporter extends ImportFormat {
 
     private void addTitles(Map<String, String> hm, String lab, String val, String type) {
         if ("TI".equals(lab)) {
-            String oldVal = hm.get("title");
+            String oldVal = hm.get(FieldName.TITLE);
             if (oldVal == null) {
-                hm.put("title", val);
+                hm.put(FieldName.TITLE, val);
             } else {
                 if (oldVal.endsWith(":") || oldVal.endsWith(".") || oldVal.endsWith("?")) {
-                    hm.put("title", oldVal + " " + val);
+                    hm.put(FieldName.TITLE, oldVal + " " + val);
                 } else {
-                    hm.put("title", oldVal + ": " + val);
+                    hm.put(FieldName.TITLE, oldVal + ": " + val);
                 }
             }
         } else if ("BTI".equals(lab) || "CTI".equals(lab)) {
@@ -372,11 +372,11 @@ public class MedlinePlainImporter extends ImportFormat {
             } else {
                 abstractValue = value;
             }
-            String oldAb = hm.get(FieldName.ABSTRACT_FIELD);
+            String oldAb = hm.get(FieldName.ABSTRACT);
             if (oldAb == null) {
-                hm.put(FieldName.ABSTRACT_FIELD, abstractValue);
+                hm.put(FieldName.ABSTRACT, abstractValue);
             } else {
-                hm.put(FieldName.ABSTRACT_FIELD, oldAb + Globals.NEWLINE + abstractValue);
+                hm.put(FieldName.ABSTRACT, oldAb + Globals.NEWLINE + abstractValue);
             }
         } else if ("OAB".equals(lab) || "OABL".equals(lab)) {
             hm.put("other-abstract", value);
@@ -396,7 +396,7 @@ public class MedlinePlainImporter extends ImportFormat {
             hm.put("revised", val);
         } else if ("DP".equals(lab)) {
             String[] parts = val.split(" ");
-            hm.put(FieldName.YEAR_FIELD, parts[0]);
+            hm.put(FieldName.YEAR, parts[0]);
             if ((parts.length > 1) && !parts[1].isEmpty()) {
                 hm.put("month", parts[1]);
             }

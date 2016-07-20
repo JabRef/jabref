@@ -62,9 +62,9 @@ public class DuplicateCheck {
 
 
     static {
-        DuplicateCheck.FIELD_WEIGHTS.put(FieldName.AUTHOR_FIELD, 2.5);
-        DuplicateCheck.FIELD_WEIGHTS.put(FieldName.EDITOR_FIELD, 2.5);
-        DuplicateCheck.FIELD_WEIGHTS.put("title", 3.);
+        DuplicateCheck.FIELD_WEIGHTS.put(FieldName.AUTHOR, 2.5);
+        DuplicateCheck.FIELD_WEIGHTS.put(FieldName.EDITOR, 2.5);
+        DuplicateCheck.FIELD_WEIGHTS.put(FieldName.TITLE, 3.);
         DuplicateCheck.FIELD_WEIGHTS.put("journal", 2.);
     }
 
@@ -159,7 +159,7 @@ public class DuplicateCheck {
                 return EQUAL;
             }
             return NOT_EQUAL;
-        } else if ("pages".equals(field)) {
+        } else if (FieldName.PAGES.equals(field)) {
             // Pages can be given with a variety of delimiters, "-", "--", " - ", " -- ".
             // We do a replace to harmonize these to a simple "-":
             // After this, a simple test for equality should be enough:

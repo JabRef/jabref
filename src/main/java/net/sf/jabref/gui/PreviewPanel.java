@@ -241,7 +241,7 @@ public class PreviewPanel extends JPanel
                     .isPresent()) {
                 try {
                     String address = hyperlinkEvent.getURL().toString();
-                    JabRefDesktop.openExternalViewer(PreviewPanel.this.databaseContext.get(), address, FieldName.URL_FIELD);
+                    JabRefDesktop.openExternalViewer(PreviewPanel.this.databaseContext.get(), address, FieldName.URL);
                 } catch (IOException e) {
                     LOGGER.warn("Could not open external viewer", e);
                 }

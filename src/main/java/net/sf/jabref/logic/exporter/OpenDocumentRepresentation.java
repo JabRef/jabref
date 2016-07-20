@@ -54,8 +54,8 @@ class OpenDocumentRepresentation {
         this.database = database;
         // Make a list of comparators for sorting the entries:
         List<FieldComparator> comparators = new ArrayList<>();
-        comparators.add(new FieldComparator(FieldName.AUTHOR_FIELD));
-        comparators.add(new FieldComparator(FieldName.YEAR_FIELD));
+        comparators.add(new FieldComparator(FieldName.AUTHOR));
+        comparators.add(new FieldComparator(FieldName.YEAR));
         comparators.add(new FieldComparator(BibEntry.KEY_FIELD));
         // Use glazed lists to get a sorted view of the entries:
         List<BibEntry> entryList = new ArrayList<>();
@@ -165,13 +165,13 @@ class OpenDocumentRepresentation {
                 addTableCell(result, row, getField(e, "address"));
                 addTableCell(result, row, getField(e, "assignee"));
                 addTableCell(result, row, getField(e, "annote"));
-                addTableCell(result, row, getField(e, FieldName.AUTHOR_FIELD));//new AuthorLastFirst().format(getField(e, FieldName.AUTHOR_FIELD)));
+                addTableCell(result, row, getField(e, FieldName.AUTHOR));//new AuthorLastFirst().format(getField(e, FieldName.AUTHOR_FIELD)));
                 addTableCell(result, row, getField(e, "booktitle"));
                 addTableCell(result, row, getField(e, "chapter"));
                 addTableCell(result, row, getField(e, "day"));
                 addTableCell(result, row, getField(e, "dayfiled"));
                 addTableCell(result, row, getField(e, "edition"));
-                addTableCell(result, row, getField(e, FieldName.EDITOR_FIELD));//new AuthorLastFirst().format(getField(e, FieldName.EDITOR_FIELD)));
+                addTableCell(result, row, getField(e, FieldName.EDITOR));//new AuthorLastFirst().format(getField(e, FieldName.EDITOR_FIELD)));
                 addTableCell(result, row, getField(e, "howpublished"));
                 addTableCell(result, row, getField(e, "institution"));
                 addTableCell(result, row, getField(e, "journal"));
@@ -182,23 +182,23 @@ class OpenDocumentRepresentation {
                 addTableCell(result, row, getField(e, "note"));
                 addTableCell(result, row, getField(e, "number"));
                 addTableCell(result, row, getField(e, "organization"));
-                addTableCell(result, row, getField(e, "pages"));
+                addTableCell(result, row, getField(e, FieldName.PAGES));
                 addTableCell(result, row, getField(e, "publisher"));
                 addTableCell(result, row, getField(e, "revision"));
                 addTableCell(result, row, getField(e, "school"));
                 addTableCell(result, row, getField(e, "series"));
-                addTableCell(result, row, new RemoveWhitespace().format(new RemoveBrackets().format(getField(e, "title"))));
+                addTableCell(result, row, new RemoveWhitespace().format(new RemoveBrackets().format(getField(e, FieldName.TITLE))));
                 addTableCell(result, row, getField(e, "reporttype"));
                 addTableCell(result, row, getField(e, "volume"));
-                addTableCell(result, row, getField(e, FieldName.YEAR_FIELD));
+                addTableCell(result, row, getField(e, FieldName.YEAR));
                 addTableCell(result, row, getField(e, "yearfiled"));
-                addTableCell(result, row, getField(e, FieldName.URL_FIELD));
+                addTableCell(result, row, getField(e, FieldName.URL));
                 addTableCell(result, row, "");
                 addTableCell(result, row, "");
                 addTableCell(result, row, "");
                 addTableCell(result, row, "");
                 addTableCell(result, row, "");
-                addTableCell(result, row, getField(e, FieldName.ISBN_FIELD));
+                addTableCell(result, row, getField(e, FieldName.ISBN));
                 table.appendChild(row);
             }
 

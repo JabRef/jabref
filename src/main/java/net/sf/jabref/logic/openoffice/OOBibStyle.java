@@ -190,7 +190,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
         // Set default properties for the citation marker:
         citProperties.put(AUTHOR_FIELD, "author/editor");
-        citProperties.put(YEAR_FIELD, FieldName.YEAR_FIELD);
+        citProperties.put(YEAR_FIELD, FieldName.YEAR);
         citProperties.put(MAX_AUTHORS, 3);
         citProperties.put(MAX_AUTHORS_FIRST, -1);
         citProperties.put(AUTHOR_SEPARATOR, ", ");

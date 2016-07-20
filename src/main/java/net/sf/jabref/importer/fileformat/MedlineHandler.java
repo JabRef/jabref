@@ -175,7 +175,7 @@ class MedlineHandler extends DefaultHandler {
         } else if ("ArticleId".equals(localName)) {
             for (int i = 0; i < atts.getLength(); i++) {
                 String value = atts.getValue(i);
-                if (FieldName.DOI_FIELD.equals(value)) {
+                if (FieldName.DOI.equals(value)) {
                     inDoi = true;
                 } else if ("pii".equals(value)) {
                     inPii = true;
@@ -228,23 +228,23 @@ class MedlineHandler extends DefaultHandler {
 
             BibEntry b = new BibEntry(IdGenerator.next(), "article"); // id assumes an existing database so don't create one here
             if (!"".equals(author)) {
-                b.setField(FieldName.AUTHOR_FIELD,
+                b.setField(FieldName.AUTHOR,
                         MedlineHandler.UNICODE_CONVERTER.format(author));
                 author = "";
             }
             if (!"".equals(title)) {
-                b.setField("title", MedlineHandler.UNICODE_CONVERTER.format(title));
+                b.setField(FieldName.TITLE, MedlineHandler.UNICODE_CONVERTER.format(title));
             }
             // if (!title.equals("")) b.setField("title",Util.replaceSpecialCharacters(title));
             if (!"".equals(journal)) {
                 b.setField("journal", journal);
             }
             if (!"".equals(year)) {
-                b.setField(FieldName.YEAR_FIELD, year);
+                b.setField(FieldName.YEAR, year);
             }
             // PENDING jeffrey.kuhn@yale.edu 2005-05-27 : added call to fixPageRange
             if (!"".equals(page)) {
-                b.setField("pages", fixPageRange(page));
+                b.setField(FieldName.PAGES, fixPageRange(page));
             }
             if (!"".equals(volume)) {
                 b.setField("volume", volume);
@@ -256,7 +256,7 @@ class MedlineHandler extends DefaultHandler {
                 b.setField("medline-pst", pst);
             }
             if (!"".equals(abstractText)) {
-                b.setField(FieldName.ABSTRACT_FIELD, abstractText.replace("%", "\\%"));
+                b.setField(FieldName.ABSTRACT, abstractText.replace("%", "\\%"));
             }
             if (!"".equals(keywords)) {
                 b.setField("keywords", keywords);
@@ -270,8 +270,8 @@ class MedlineHandler extends DefaultHandler {
             }
 
             if (!"".equals(doi)) {
-                b.setField(FieldName.DOI_FIELD, doi);
-                b.setField(FieldName.URL_FIELD, "http://dx.doi.org/" + doi);
+                b.setField(FieldName.DOI, doi);
+                b.setField(FieldName.URL, "http://dx.doi.org/" + doi);
             }
             if (!"".equals(pii)) {
                 b.setField("pii", pii);

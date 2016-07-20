@@ -277,20 +277,20 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
                     entry.clearField(BibEntry.KEY_FIELD);
                     // If the entry's url field is not set, and we have stored an url for this
                     // entry, set it:
-                    if (!entry.hasField(FieldName.URL_FIELD)) {
+                    if (!entry.hasField(FieldName.URL)) {
                         String storedUrl = entryLinks.get(link);
                         if (storedUrl != null) {
-                            entry.setField(FieldName.URL_FIELD, storedUrl);
+                            entry.setField(FieldName.URL, storedUrl);
                         }
                     }
 
                     // Clean up some remaining HTML code from Elsevier(?) papers
                     // Search for: Poincare algebra
                     // to see an example
-                    entry.getFieldOptional("title").ifPresent(title -> {
+                    entry.getFieldOptional(FieldName.TITLE).ifPresent(title -> {
                         String newtitle = title.replaceAll("<.?i>([^<]*)</i>", "$1");
                         if (!newtitle.equals(title)) {
-                            entry.setField("title", newtitle);
+                            entry.setField(FieldName.TITLE, newtitle);
                         }
                     });
                     return entry;

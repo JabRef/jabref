@@ -147,25 +147,25 @@ public class CiteSeerXFetcher implements EntryFetcher {
         Matcher m = CiteSeerXFetcher.TITLE_PATTERN.matcher(cont);
         if (m.find()) {
             BibEntry entry = new BibEntry(IdGenerator.next());
-            entry.setField("title", m.group(1));
+            entry.setField(FieldName.TITLE, m.group(1));
 
             // Find authors:
             m = CiteSeerXFetcher.AUTHOR_PATTERN.matcher(cont);
             if (m.find()) {
                 String authors = m.group(1);
-                entry.setField(FieldName.AUTHOR_FIELD, new NormalizeNamesFormatter().format(authors));
+                entry.setField(FieldName.AUTHOR, new NormalizeNamesFormatter().format(authors));
             }
 
             // Find year:
             m = CiteSeerXFetcher.YEAR_PATTERN.matcher(cont);
             if (m.find()) {
-                entry.setField(FieldName.YEAR_FIELD, m.group(1));
+                entry.setField(FieldName.YEAR, m.group(1));
             }
 
             // Find abstract:
             m = CiteSeerXFetcher.ABSTRACT_PATTERN.matcher(cont);
             if (m.find()) {
-                entry.setField(FieldName.ABSTRACT_FIELD, m.group(1));
+                entry.setField(FieldName.ABSTRACT, m.group(1));
             }
 
             return entry;

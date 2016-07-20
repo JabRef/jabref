@@ -102,7 +102,7 @@ public class IsiImporter extends ImportFormat {
 
     public static void processSubSup(Map<String, String> map) {
 
-        String[] subsup = {"title", FieldName.ABSTRACT_FIELD, FieldName.REVIEW_FIELD, "notes"};
+        String[] subsup = {FieldName.TITLE, FieldName.ABSTRACT, FieldName.REVIEW, "notes"};
 
         for (String aSubsup : subsup) {
             if (map.containsKey(aSubsup)) {
@@ -133,7 +133,7 @@ public class IsiImporter extends ImportFormat {
 
     private static void processCapitalization(Map<String, String> map) {
 
-        String[] subsup = {"title", "journal", "publisher"};
+        String[] subsup = {FieldName.TITLE, "journal", "publisher"};
 
         for (String aSubsup : subsup) {
 
@@ -232,13 +232,13 @@ public class IsiImporter extends ImportFormat {
                     String author = IsiImporter.isiAuthorsConvert(value.replace("EOLEOL", " and "));
 
                     // if there is already someone there then append with "and"
-                    if (hm.get(FieldName.AUTHOR_FIELD) != null) {
-                        author = hm.get(FieldName.AUTHOR_FIELD) + " and " + author;
+                    if (hm.get(FieldName.AUTHOR) != null) {
+                        author = hm.get(FieldName.AUTHOR) + " and " + author;
                     }
 
-                    hm.put(FieldName.AUTHOR_FIELD, author);
+                    hm.put(FieldName.AUTHOR, author);
                 } else if ("TI".equals(beg)) {
-                    hm.put("title", value.replace("EOLEOL", " "));
+                    hm.put(FieldName.TITLE, value.replace("EOLEOL", " "));
                 } else if ("SO".equals(beg) || "JA".equals(beg)) {
                     hm.put("journal", value.replace("EOLEOL", " "));
                 } else if ("ID".equals(beg) || "KW".equals(beg)) {
@@ -253,7 +253,7 @@ public class IsiImporter extends ImportFormat {
                     hm.put("keywords", existingKeywords);
 
                 } else if ("AB".equals(beg)) {
-                    hm.put(FieldName.ABSTRACT_FIELD, value.replace("EOLEOL", " "));
+                    hm.put(FieldName.ABSTRACT, value.replace("EOLEOL", " "));
                 } else if ("BP".equals(beg) || "BR".equals(beg) || "SP".equals(beg)) {
                     pages = value;
                 } else if ("EP".equals(beg)) {
@@ -272,13 +272,13 @@ public class IsiImporter extends ImportFormat {
                 } else if ("IS".equals(beg)) {
                     hm.put("number", value);
                 } else if ("PY".equals(beg)) {
-                    hm.put(FieldName.YEAR_FIELD, value);
+                    hm.put(FieldName.YEAR, value);
                 } else if ("VL".equals(beg)) {
                     hm.put("volume", value);
                 } else if ("PU".equals(beg)) {
                     hm.put("publisher", value);
                 } else if ("DI".equals(beg)) {
-                    hm.put(FieldName.DOI_FIELD, value);
+                    hm.put(FieldName.DOI, value);
                 } else if ("PD".equals(beg)) {
 
                     String month = IsiImporter.parseMonth(value);
@@ -307,7 +307,7 @@ public class IsiImporter extends ImportFormat {
             }
 
             if (!"".equals(pages)) {
-                hm.put("pages", pages);
+                hm.put(FieldName.PAGES, pages);
             }
 
             // Skip empty entries

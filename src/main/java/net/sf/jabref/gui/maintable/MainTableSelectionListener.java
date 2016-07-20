@@ -297,7 +297,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
 
                         // See if this is a simple file link field, or if it is a file-list
                         // field that can specify a list of links:
-                        if (fieldName.equals(FieldName.FILE_FIELD)) {
+                        if (fieldName.equals(FieldName.FILE)) {
 
                             // We use a FileListTableModel to parse the field content:
                             FileListTableModel fileList = new FileListTableModel();
@@ -337,8 +337,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     }
                 }
             });
-        } else if (modelColumn.getBibtexFields().contains("crossref")) { // Clicking on crossref column
-            tableRows.get(row).getFieldOptional("crossref")
+        } else if (modelColumn.getBibtexFields().contains(FieldName.CROSSREF)) { // Clicking on crossref column
+            tableRows.get(row).getFieldOptional(FieldName.CROSSREF)
                     .ifPresent(crossref -> panel.getDatabase().getEntryByKey(crossref).ifPresent(entry -> panel.highlightEntry(entry)));
         }
     }
@@ -401,7 +401,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         // field that can specify a list of links:
         if(!column.getBibtexFields().isEmpty()) {
             for(String field : column.getBibtexFields()) {
-                if (FieldName.FILE_FIELD.equals(field)) {
+                if (FieldName.FILE.equals(field)) {
                     // We use a FileListTableModel to parse the field content:
                     FileListTableModel fileList = new FileListTableModel();
                     entry.getFieldOptional(field).ifPresent(fileList::setContent);

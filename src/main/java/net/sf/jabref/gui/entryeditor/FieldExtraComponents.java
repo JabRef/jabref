@@ -190,7 +190,7 @@ public class FieldExtraComponents {
         doiButton.addActionListener(actionEvent -> {
             Optional<DOI> doi = DOI.fromBibEntry(entryEditor.getEntry());
             if (doi.isPresent()) {
-                entryEditor.getEntry().setField(FieldName.DOI_FIELD, doi.get().getDOI());
+                entryEditor.getEntry().setField(FieldName.DOI, doi.get().getDOI());
             } else {
                 panel.frame().setStatus(Localization.lang("No DOI found"));
             }

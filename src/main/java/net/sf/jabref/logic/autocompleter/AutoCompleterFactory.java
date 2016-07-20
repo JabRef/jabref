@@ -44,7 +44,7 @@ public class AutoCompleterFactory {
 
         if (InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.PERSON_NAMES)) {
             return new NameFieldAutoCompleter(fieldName, preferences);
-        } else if ("crossref".equals(fieldName)) {
+        } else if (FieldName.CROSSREF.equals(fieldName)) {
             return new BibtexKeyAutoCompleter(preferences);
         } else if ("journal".equals(fieldName) || "publisher".equals(fieldName)) {
             return new JournalAutoCompleter(fieldName, preferences, abbreviationLoader);
@@ -54,7 +54,7 @@ public class AutoCompleterFactory {
     }
 
     public AutoCompleter<String> getPersonAutoCompleter() {
-        return new NameFieldAutoCompleter(Arrays.asList(FieldName.AUTHOR_FIELD, FieldName.EDITOR_FIELD), true, preferences);
+        return new NameFieldAutoCompleter(Arrays.asList(FieldName.AUTHOR, FieldName.EDITOR), true, preferences);
     }
 
 }

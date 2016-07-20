@@ -39,13 +39,13 @@ public class AttachFileAction implements BaseAction {
         editor.setVisible(true, true);
         if (editor.okPressed()) {
             FileListTableModel model = new FileListTableModel();
-            entry.getFieldOptional(FieldName.FILE_FIELD).ifPresent(model::setContent);
+            entry.getFieldOptional(FieldName.FILE).ifPresent(model::setContent);
             model.addEntry(model.getRowCount(), flEntry);
             String newVal = model.getStringRepresentation();
 
-            UndoableFieldChange ce = new UndoableFieldChange(entry, FieldName.FILE_FIELD,
-                    entry.getFieldOptional(FieldName.FILE_FIELD).orElse(null), newVal);
-            entry.setField(FieldName.FILE_FIELD, newVal);
+            UndoableFieldChange ce = new UndoableFieldChange(entry, FieldName.FILE,
+                    entry.getFieldOptional(FieldName.FILE).orElse(null), newVal);
+            entry.setField(FieldName.FILE, newVal);
             panel.getUndoManager().addEdit(ce);
             panel.markBaseChanged();
         }

@@ -200,7 +200,7 @@ class FileTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        fileDir.setText(prefs.get(FieldName.FILE_FIELD + Globals.DIR_SUFFIX));
+        fileDir.setText(prefs.get(FieldName.FILE + Globals.DIR_SUFFIX));
         bibLocAsPrimaryDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
         runAutoFileSearch.setSelected(prefs.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH));
         allowFileAutoOpenBrowse.setSelected(prefs.getBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE));
@@ -241,7 +241,7 @@ class FileTab extends JPanel implements PrefsTab {
 
     @Override
     public void storeSettings() {
-        prefs.put(FieldName.FILE_FIELD + Globals.DIR_SUFFIX, fileDir.getText());
+        prefs.put(FieldName.FILE + Globals.DIR_SUFFIX, fileDir.getText());
         prefs.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, bibLocAsPrimaryDir.isSelected());
         prefs.putBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH, runAutoFileSearch.isSelected());
         prefs.putBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE, allowFileAutoOpenBrowse.isSelected());

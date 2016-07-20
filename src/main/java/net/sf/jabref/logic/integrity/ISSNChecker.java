@@ -17,16 +17,16 @@ public class ISSNChecker implements Checker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        if (!entry.hasField(FieldName.ISSN_FIELD)) {
+        if (!entry.hasField(FieldName.ISSN)) {
             return Collections.emptyList();
         }
 
         // Check that the ISSN is on the correct form
-        String issn = entry.getFieldOptional(FieldName.ISSN_FIELD).get().trim();
+        String issn = entry.getFieldOptional(FieldName.ISSN).get().trim();
         Matcher issnMatcher = ISSN_PATTERN.matcher(issn);
         if (!issnMatcher.matches()) {
             return Collections.singletonList(
-                    new IntegrityMessage(Localization.lang("incorrect format"), entry, FieldName.ISSN_FIELD));
+                    new IntegrityMessage(Localization.lang("incorrect format"), entry, FieldName.ISSN));
         }
 
         // Check that the control digit is correct, see e.g. https://en.wikipedia.org/wiki/International_Standard_Serial_Number
@@ -45,7 +45,7 @@ public class ISSNChecker implements Checker {
             return Collections.emptyList();
         } else {
             return Collections
-                    .singletonList(new IntegrityMessage(Localization.lang("incorrect control digit"), entry, FieldName.ISSN_FIELD));
+                    .singletonList(new IntegrityMessage(Localization.lang("incorrect control digit"), entry, FieldName.ISSN));
         }
     }
 

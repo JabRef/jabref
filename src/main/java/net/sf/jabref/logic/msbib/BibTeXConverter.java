@@ -43,9 +43,9 @@ public class BibTeXConverter {
             fieldValues.put("language", MSBibMapping.getLanguage(lcid));
         }
 
-        addAuthor(fieldValues, FieldName.AUTHOR_FIELD, entry.authors);
+        addAuthor(fieldValues, FieldName.AUTHOR, entry.authors);
         addAuthor(fieldValues, MSBIB_PREFIX + "bookauthor", entry.bookAuthors);
-        addAuthor(fieldValues, FieldName.EDITOR_FIELD, entry.editors);
+        addAuthor(fieldValues, FieldName.EDITOR, entry.editors);
         addAuthor(fieldValues, MSBIB_PREFIX + "translator", entry.translators);
         addAuthor(fieldValues, MSBIB_PREFIX + "producername", entry.producerNames);
         addAuthor(fieldValues, MSBIB_PREFIX + "composer", entry.composers);
@@ -60,7 +60,7 @@ public class BibTeXConverter {
         addAuthor(fieldValues, MSBIB_PREFIX + "counsel", entry.counsels);
 
         if (entry.pages != null) {
-            fieldValues.put("pages", entry.pages.toString("--"));
+            fieldValues.put(FieldName.PAGES, entry.pages.toString("--"));
         }
 
         parseStandardNumber(entry.standardNumber, fieldValues);
@@ -104,10 +104,10 @@ public class BibTeXConverter {
         if (standardNum == null) {
             return;
         }
-        parseSingleStandardNumber("ISBN", FieldName.ISBN_FIELD, standardNum, map);
-        parseSingleStandardNumber("ISSN", FieldName.ISSN_FIELD, standardNum, map);
+        parseSingleStandardNumber("ISBN", FieldName.ISBN, standardNum, map);
+        parseSingleStandardNumber("ISSN", FieldName.ISSN, standardNum, map);
         parseSingleStandardNumber("LCCN", "lccn", standardNum, map);
         parseSingleStandardNumber("MRN", "mrnumber", standardNum, map);
-        parseSingleStandardNumber("DOI", FieldName.DOI_FIELD, standardNum, map);
+        parseSingleStandardNumber("DOI", FieldName.DOI, standardNum, map);
     }
 }

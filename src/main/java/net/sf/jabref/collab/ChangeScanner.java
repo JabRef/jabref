@@ -61,7 +61,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class ChangeScanner implements Runnable {
 
-    private static final String[] SORT_BY = new String[] {FieldName.YEAR_FIELD, FieldName.AUTHOR_FIELD, "title"};
+    private static final String[] SORT_BY = new String[] {FieldName.YEAR, FieldName.AUTHOR, FieldName.TITLE};
 
     private final File f;
 

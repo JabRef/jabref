@@ -216,7 +216,7 @@ public class PdfImporter {
 
         tm.addEntry(0, new FileListEntry(toLink.getName(), FileUtil.shortenFileName(toLink, dirsS).getPath(),
                 ExternalFileTypes.getInstance().getExternalFileTypeByName("PDF")));
-        entry.setField(FieldName.FILE_FIELD, tm.getStringRepresentation());
+        entry.setField(FieldName.FILE, tm.getStringRepresentation());
         res.add(entry);
 
     }

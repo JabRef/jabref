@@ -31,6 +31,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.antlr.runtime.ANTLRFileStream;
 import org.antlr.runtime.ANTLRStringStream;
@@ -940,8 +941,8 @@ public class VM implements Warn {
         }
 
         for (BstEntry e : entries) {
-            if (!e.getFields().containsKey("crossref")) {
-                e.getFields().put("crossref", null);
+            if (!e.getFields().containsKey(FieldName.CROSSREF)) {
+                e.getFields().put(FieldName.CROSSREF, null);
             }
         }
     }

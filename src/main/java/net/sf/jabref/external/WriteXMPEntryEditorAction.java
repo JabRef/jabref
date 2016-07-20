@@ -73,9 +73,9 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
 
         // Then check the "file" field:
         List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
-        if (entry.hasField(FieldName.FILE_FIELD)) {
+        if (entry.hasField(FieldName.FILE)) {
             FileListTableModel tm = new FileListTableModel();
-            entry.getFieldOptional(FieldName.FILE_FIELD).ifPresent(tm::setContent);
+            entry.getFieldOptional(FieldName.FILE).ifPresent(tm::setContent);
             for (int j = 0; j < tm.getRowCount(); j++) {
                 FileListEntry flEntry = tm.getEntry(j);
                 if ((flEntry.type.isPresent()) && "pdf".equalsIgnoreCase(flEntry.type.get().getName())) {

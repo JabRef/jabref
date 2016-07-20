@@ -69,8 +69,8 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
         /*addEntryDataFromPDDocumentInformation(pdfFile, entry);
         addEntryDataFromXMP(pdfFile, entry);
 
-        if (entry.getField("title") == null) {
-        	entry.setField("title", pdfFile.getName());
+        if (entry.getField(FieldName.TITLE) == null) {
+        	entry.setField(FieldName.TITLE, pdfFile.getName());
         }
 
         return entry;*/

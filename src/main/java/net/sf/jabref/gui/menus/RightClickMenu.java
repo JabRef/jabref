@@ -157,7 +157,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(new GeneralAction(Actions.OPEN_FOLDER, Localization.lang("Open folder")) {
             {
-                if (!isFieldSetForSelectedEntry(FieldName.FILE_FIELD)) {
+                if (!isFieldSetForSelectedEntry(FieldName.FILE)) {
                     this.setEnabled(false);
                 }
             }
@@ -165,7 +165,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(new GeneralAction(Actions.OPEN_EXTERNAL_FILE, Localization.lang("Open file"), getFileIconForSelectedEntry()) {
             {
-                if (!isFieldSetForSelectedEntry(FieldName.FILE_FIELD)) {
+                if (!isFieldSetForSelectedEntry(FieldName.FILE)) {
                     this.setEnabled(false);
                 }
             }
@@ -173,7 +173,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(new GeneralAction(Actions.OPEN_URL, Localization.lang("Open URL or DOI"), IconTheme.JabRefIcon.WWW.getSmallIcon()) {
             {
-                if(!(isFieldSetForSelectedEntry(FieldName.URL_FIELD) || isFieldSetForSelectedEntry(FieldName.DOI_FIELD))) {
+                if(!(isFieldSetForSelectedEntry(FieldName.URL) || isFieldSetForSelectedEntry(FieldName.DOI))) {
                     this.setEnabled(false);
                 }
             }
@@ -185,7 +185,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(new GeneralAction(Actions.MERGE_DOI, Localization.lang("Get BibTeX data from DOI")) {
             {
-                if (!(isFieldSetForSelectedEntry(FieldName.DOI_FIELD))) {
+                if (!(isFieldSetForSelectedEntry(FieldName.DOI))) {
                     this.setEnabled(false);
                 }
             }
@@ -280,8 +280,8 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     private Icon getFileIconForSelectedEntry() {
         if (panel.getMainTable().getSelectedRowCount() == 1) {
             BibEntry entry = panel.getMainTable().getSelected().get(0);
-            if(entry.hasField(FieldName.FILE_FIELD)) {
-                JLabel label = FileListTableModel.getFirstLabel(entry.getFieldOptional(FieldName.FILE_FIELD).get());
+            if(entry.hasField(FieldName.FILE)) {
+                JLabel label = FileListTableModel.getFirstLabel(entry.getFieldOptional(FieldName.FILE).get());
                 if (label != null) {
                     return label.getIcon();
                 }

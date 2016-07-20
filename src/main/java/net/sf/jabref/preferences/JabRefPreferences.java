@@ -359,13 +359,13 @@ public class JabRefPreferences {
                 CleanupPreset.CleanupStep.CONVERT_TO_BIBLATEX);
 
         List<FieldFormatterCleanup> activeFormatterCleanups = new ArrayList<>();
-        activeFormatterCleanups.add(new FieldFormatterCleanup("pages", new NormalizePagesFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.DATE_FIELD, new NormalizeDateFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.PAGES, new NormalizePagesFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.DATE, new NormalizeDateFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup("month", new NormalizeMonthFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new ProtectTermsFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new UnitsToLatexFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new LatexCleanupFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup("title", new HtmlToLatexFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new ProtectTermsFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new UnitsToLatexFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new LatexCleanupFormatter()));
+        activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new HtmlToLatexFormatter()));
         FieldFormatterCleanups formatterCleanups = new FieldFormatterCleanups(true, activeFormatterCleanups);
         CLEANUP_DEFAULT_PRESET = new CleanupPreset(EnumSet.complementOf(deactivedJobs), formatterCleanups);
     }
@@ -536,11 +536,11 @@ public class JabRefPreferences {
         defaults.put(LANGUAGE, Locale.getDefault().getLanguage());
 
         // Sorting preferences
-        defaults.put(TABLE_PRIMARY_SORT_FIELD, FieldName.AUTHOR_FIELD);
+        defaults.put(TABLE_PRIMARY_SORT_FIELD, FieldName.AUTHOR);
         defaults.put(TABLE_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(TABLE_SECONDARY_SORT_FIELD, FieldName.YEAR_FIELD);
+        defaults.put(TABLE_SECONDARY_SORT_FIELD, FieldName.YEAR);
         defaults.put(TABLE_SECONDARY_SORT_DESCENDING, Boolean.TRUE);
-        defaults.put(TABLE_TERTIARY_SORT_FIELD, "title");
+        defaults.put(TABLE_TERTIARY_SORT_FIELD, FieldName.TITLE);
         defaults.put(TABLE_TERTIARY_SORT_DESCENDING, Boolean.FALSE);
 
         defaults.put(REFORMAT_FILE_ON_SAVE_AND_EXPORT, Boolean.FALSE);
@@ -552,9 +552,9 @@ public class JabRefPreferences {
         // export order: if EXPORT_IN_SPECIFIED_ORDER, then use following criteria
         defaults.put(EXPORT_PRIMARY_SORT_FIELD, "bibtexkey");
         defaults.put(EXPORT_PRIMARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(EXPORT_SECONDARY_SORT_FIELD, FieldName.AUTHOR_FIELD);
+        defaults.put(EXPORT_SECONDARY_SORT_FIELD, FieldName.AUTHOR);
         defaults.put(EXPORT_SECONDARY_SORT_DESCENDING, Boolean.FALSE);
-        defaults.put(EXPORT_TERTIARY_SORT_FIELD, "title");
+        defaults.put(EXPORT_TERTIARY_SORT_FIELD, FieldName.TITLE);
         defaults.put(EXPORT_TERTIARY_SORT_DESCENDING, Boolean.TRUE);
 
         defaults.put(NEWLINE, System.lineSeparator());
@@ -770,7 +770,7 @@ public class JabRefPreferences {
 
         // TODO: Currently not possible to edit this setting:
         defaults.put(PREVIEW_PRINT_BUTTON, Boolean.FALSE);
-        defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, FieldName.URL_FIELD);
+        defaults.put(DO_NOT_RESOLVE_STRINGS_FOR, FieldName.URL);
         defaults.put(RESOLVE_STRINGS_ALL_FIELDS, Boolean.FALSE);
         defaults.put(NON_WRAPPABLE_FIELDS, "pdf;ps;url;doi;file");
         defaults.put(GENERATE_KEYS_AFTER_INSPECTION, Boolean.TRUE);
@@ -913,11 +913,11 @@ public class JabRefPreferences {
                 + "comment;owner;timestamp");
 
         // Entry editor tab 1:
-        defaults.put(CUSTOM_TAB_FIELDS + "_def1", FieldName.ABSTRACT_FIELD);
+        defaults.put(CUSTOM_TAB_FIELDS + "_def1", FieldName.ABSTRACT);
         defaults.put(CUSTOM_TAB_NAME + "_def1", Localization.lang("Abstract"));
 
         // Entry editor tab 2: Review Field - used for research comments, etc.
-        defaults.put(CUSTOM_TAB_FIELDS + "_def2", FieldName.REVIEW_FIELD);
+        defaults.put(CUSTOM_TAB_FIELDS + "_def2", FieldName.REVIEW);
         defaults.put(CUSTOM_TAB_NAME + "_def2", Localization.lang("Review"));
 
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));

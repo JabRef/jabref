@@ -1035,13 +1035,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
 
             final BibEntry entry = bes.get(0);
-            if (!entry.hasField(FieldName.FILE_FIELD)) {
+            if (!entry.hasField(FieldName.FILE)) {
                 // no bibtex field
                 new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
                 return;
             }
             FileListTableModel tableModel = new FileListTableModel();
-            entry.getFieldOptional(FieldName.FILE_FIELD).ifPresent(tableModel::setContent);
+            entry.getFieldOptional(FieldName.FILE).ifPresent(tableModel::setContent);
             if (tableModel.getRowCount() == 0) {
                 // content in bibtex field is not readable
                 new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
@@ -2064,11 +2064,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         public void action() {
             final List<BibEntry> bes = mainTable.getSelectedEntries();
             if (bes.size() == 1) {
-                String field = FieldName.DOI_FIELD;
-                Optional<String> link = bes.get(0).getFieldOptional(FieldName.DOI_FIELD);
-                if (bes.get(0).hasField(FieldName.URL_FIELD)) {
-                    link = bes.get(0).getFieldOptional(FieldName.URL_FIELD);
-                    field = FieldName.URL_FIELD;
+                String field = FieldName.DOI;
+                Optional<String> link = bes.get(0).getFieldOptional(FieldName.DOI);
+                if (bes.get(0).hasField(FieldName.URL)) {
+                    link = bes.get(0).getFieldOptional(FieldName.URL);
+                    field = FieldName.URL;
                 }
                 if (link.isPresent()) {
                     try {
@@ -2082,10 +2082,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     // Look for web links in the "file" field as a fallback:
                     FileListEntry entry = null;
                     FileListTableModel tm = new FileListTableModel();
-                    bes.get(0).getFieldOptional(FieldName.FILE_FIELD).ifPresent(tm::setContent);
+                    bes.get(0).getFieldOptional(FieldName.FILE).ifPresent(tm::setContent);
                     for (int i = 0; i < tm.getRowCount(); i++) {
                         FileListEntry flEntry = tm.getEntry(i);
-                        if (FieldName.URL_FIELD.equalsIgnoreCase(flEntry.type.get().getName())
+                        if (FieldName.URL.equalsIgnoreCase(flEntry.type.get().getName())
                                 || PS_FIELD.equalsIgnoreCase(flEntry.type.get().getName())
                                 || PDF_FIELD.equalsIgnoreCase(flEntry.type.get().getName())) {
                             entry = flEntry;

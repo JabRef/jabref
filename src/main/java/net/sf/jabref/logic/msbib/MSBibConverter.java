@@ -36,8 +36,8 @@ public class MSBibConverter {
             result.conferenceName = entry.getField("booktitle");
         }
 
-        if (entry.hasField("pages")) {
-            result.pages = new PageNumbers(entry.getField("pages"));
+        if (entry.hasField(FieldName.PAGES)) {
+            result.pages = new PageNumbers(entry.getField(FieldName.PAGES));
         }
 
         if (entry.hasField(MSBIB_PREFIX + "accessed")) {
@@ -45,13 +45,13 @@ public class MSBibConverter {
         }
 
         // TODO: currently this can never happen
-        if ("SoundRecording".equals(msbibType) && (entry.hasField("title"))) {
-            result.albumTitle = entry.getField("title");
+        if ("SoundRecording".equals(msbibType) && (entry.hasField(FieldName.TITLE))) {
+            result.albumTitle = entry.getField(FieldName.TITLE);
         }
 
         // TODO: currently this can never happen
-        if ("Interview".equals(msbibType) && (entry.hasField("title"))) {
-            result.broadcastTitle = entry.getField("title");
+        if ("Interview".equals(msbibType) && (entry.hasField(FieldName.TITLE))) {
+            result.broadcastTitle = entry.getField(FieldName.TITLE);
         }
 
         // Value must be converted
@@ -60,11 +60,11 @@ public class MSBibConverter {
         }
 
         result.standardNumber = "";
-        if (entry.hasField(FieldName.ISBN_FIELD)) {
-            result.standardNumber += " ISBN: " + entry.getField(FieldName.ISBN_FIELD);
+        if (entry.hasField(FieldName.ISBN)) {
+            result.standardNumber += " ISBN: " + entry.getField(FieldName.ISBN);
         }
-        if (entry.hasField(FieldName.ISSN_FIELD)) {
-            result.standardNumber += " ISSN: " + entry.getField(FieldName.ISSN_FIELD);
+        if (entry.hasField(FieldName.ISSN)) {
+            result.standardNumber += " ISSN: " + entry.getField(FieldName.ISSN);
         }
         if (entry.hasField("lccn")) {
             result.standardNumber += " LCCN: " + entry.getField("lccn");
@@ -72,8 +72,8 @@ public class MSBibConverter {
         if (entry.hasField("mrnumber")) {
             result.standardNumber += " MRN: " + entry.getField("mrnumber");
         }
-        if (entry.hasField(FieldName.DOI_FIELD)) {
-            result.standardNumber += " DOI: " + entry.getField(FieldName.DOI_FIELD);
+        if (entry.hasField(FieldName.DOI)) {
+            result.standardNumber += " DOI: " + entry.getField(FieldName.DOI);
         }
         if (result.standardNumber.isEmpty()) {
             result.standardNumber = null;
@@ -99,21 +99,21 @@ public class MSBibConverter {
 
         // TODO: currently this can never happen
         if (("InternetSite".equals(msbibType) || "DocumentFromInternetSite".equals(msbibType))
-                && (entry.hasField("title"))) {
-            result.internetSiteTitle = entry.getField("title");
+                && (entry.hasField(FieldName.TITLE))) {
+            result.internetSiteTitle = entry.getField(FieldName.TITLE);
         }
 
         // TODO: currently only Misc can happen
         if (("ElectronicSource".equals(msbibType) || "Art".equals(msbibType) || "Misc".equals(msbibType))
-                && (entry.hasField("title"))) {
-            result.publicationTitle = entry.getField("title");
+                && (entry.hasField(FieldName.TITLE))) {
+            result.publicationTitle = entry.getField(FieldName.TITLE);
         }
 
-        if (entry.hasField(FieldName.AUTHOR_FIELD)) {
-            result.authors = getAuthors(entry.getField(FieldName.AUTHOR_FIELD));
+        if (entry.hasField(FieldName.AUTHOR)) {
+            result.authors = getAuthors(entry.getField(FieldName.AUTHOR));
         }
-        if (entry.hasField(FieldName.EDITOR_FIELD)) {
-            result.editors = getAuthors(entry.getField(FieldName.EDITOR_FIELD));
+        if (entry.hasField(FieldName.EDITOR)) {
+            result.editors = getAuthors(entry.getField(FieldName.EDITOR));
         }
 
         return result;

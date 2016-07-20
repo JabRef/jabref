@@ -178,6 +178,6 @@ public class BibDatabaseContext {
     }
 
     public List<String> getFileDirectory() {
-        return getFileDirectory(FieldName.FILE_FIELD);
+        return getFileDirectory(FieldName.FILE);
     }
 }

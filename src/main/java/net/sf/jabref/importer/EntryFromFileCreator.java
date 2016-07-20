@@ -111,8 +111,8 @@ public abstract class EntryFromFileCreator implements FileFilter {
             appendToField(newEntry.get(), "keywords", extractPathesToKeyWordsfield(f.getAbsolutePath()));
         }
 
-        if (!newEntry.get().hasField("title")) {
-            newEntry.get().setField("title", f.getName());
+        if (!newEntry.get().hasField(FieldName.TITLE)) {
+            newEntry.get().setField(FieldName.TITLE, f.getName());
         }
 
         addFileInfo(newEntry.get(), f);
@@ -162,7 +162,7 @@ public abstract class EntryFromFileCreator implements FileFilter {
         FileListTableModel model = new FileListTableModel();
         model.addEntry(0, fileListEntry);
 
-        entry.setField(FieldName.FILE_FIELD, model.getStringRepresentation());
+        entry.setField(FieldName.FILE, model.getStringRepresentation());
     }
 
     protected void appendToField(BibEntry entry, String field, String value) {

@@ -390,7 +390,7 @@ public class PdfContentImporter extends ImportFormat {
                     if (DOI == null) {
                         pos = curString.indexOf("DOI");
                         if (pos < 0) {
-                            pos = curString.indexOf(FieldName.DOI_FIELD);
+                            pos = curString.indexOf(FieldName.DOI);
                         }
                         if (pos >= 0) {
                             pos += 3;
@@ -443,25 +443,25 @@ public class PdfContentImporter extends ImportFormat {
             // TODO: institution parsing missing
 
             if (author != null) {
-                entry.setField(FieldName.AUTHOR_FIELD, author);
+                entry.setField(FieldName.AUTHOR, author);
             }
             if (editor != null) {
-                entry.setField(FieldName.EDITOR_FIELD, editor);
+                entry.setField(FieldName.EDITOR, editor);
             }
             if (abstractT != null) {
-                entry.setField(FieldName.ABSTRACT_FIELD, abstractT);
+                entry.setField(FieldName.ABSTRACT, abstractT);
             }
             if (!Strings.isNullOrEmpty(keywords)) {
                 entry.setField("keywords", keywords);
             }
             if (title != null) {
-                entry.setField("title", title);
+                entry.setField(FieldName.TITLE, title);
             }
             if (conference != null) {
                 entry.setField("booktitle", conference);
             }
             if (DOI != null) {
-                entry.setField(FieldName.DOI_FIELD, DOI);
+                entry.setField(FieldName.DOI, DOI);
             }
             if (series != null) {
                 entry.setField("series", series);
@@ -473,10 +473,10 @@ public class PdfContentImporter extends ImportFormat {
                 entry.setField("number", number);
             }
             if (pages != null) {
-                entry.setField("pages", pages);
+                entry.setField(FieldName.PAGES, pages);
             }
             if (year != null) {
-                entry.setField(FieldName.YEAR_FIELD, year);
+                entry.setField(FieldName.YEAR, year);
             }
             if (publisher != null) {
                 entry.setField("publisher", publisher);

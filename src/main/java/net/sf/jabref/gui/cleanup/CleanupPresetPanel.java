@@ -61,7 +61,7 @@ public class CleanupPresetPanel {
                 event -> cleanUpRenamePDFonlyRelativePaths.setEnabled(cleanUpRenamePDF.isSelected()));
         cleanUpRenamePDFonlyRelativePaths = new JCheckBox(Localization.lang("Rename only PDFs having a relative path"));
         cleanUpUpgradeExternalLinks = new JCheckBox(
-                Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", FieldName.FILE_FIELD));
+                Localization.lang("Upgrade external PDF/PS links to use the '%0' field.", FieldName.FILE));
         cleanUpBibLatex = new JCheckBox(Localization.lang(
                 "Convert to BibLatex format (for example, move the value of the 'journal' field to 'journaltitle')"));
 
