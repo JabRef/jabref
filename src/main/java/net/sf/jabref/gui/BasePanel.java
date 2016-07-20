@@ -575,7 +575,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // Finally, set the new keys:
                 for (BibEntry entry : entries) {
                     bes = entry;
-                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes);
+                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes, Globals.prefs);
                     ce.addEdit(new UndoableKeyChange(database, bes, (String) oldvals.get(bes),
                             bes.getCiteKey()));
                 }
@@ -990,7 +990,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     "\\bibtexkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
             Layout layout;
             try {
-                layout = new LayoutHelper(sr, Globals.journalAbbreviationLoader).getLayoutFromText();
+                layout = new LayoutHelper(sr, Globals.prefs, Globals.journalAbbreviationLoader).getLayoutFromText();
             } catch (IOException e) {
                 LOGGER.info("Could not get layout", e);
                 return;
@@ -1987,7 +1987,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             for (BibEntry bes : database.getEntries()) {
                 String oldKey = bes.getCiteKey();
                 if ((oldKey == null) || oldKey.isEmpty()) {
-                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes);
+                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes, Globals.prefs);
                     ce.addEdit(new UndoableKeyChange(database, bes, null, bes.getCiteKey()));
                     any = true;
                 }
@@ -2425,7 +2425,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                 result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
             } else {
-                result = FileUtil.findAssociatedFiles(entries, extensions, dirs);
+                result = FileUtil.findAssociatedFiles(entries, extensions, dirs, Globals.prefs);
             }
             if (result.containsKey(entry)) {
                 final List<File> res = result.get(entry);

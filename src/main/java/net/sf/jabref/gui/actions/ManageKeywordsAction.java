@@ -54,6 +54,7 @@ import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -321,7 +322,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             keywords.addAll(keywordsToAdd);
 
             // put keywords back
-            Optional<FieldChange> change = entry.putKeywords(keywords);
+            Optional<FieldChange> change = entry.putKeywords(keywords,
+                    Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
             if (change.isPresent()) {
                 ce.addEdit(new UndoableFieldChange(change.get()));
             }

@@ -29,7 +29,8 @@ public class AbbreviationsTest {
         when(prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)).thenReturn(true);
 
         assertEquals("#IEEE_J_PROC#",
-                abbreviations.getRepository().getNextAbbreviation("Proceedings of the IEEE").get());
+                abbreviations.getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs))
+                        .getNextAbbreviation("Proceedings of the IEEE").get());
     }
 
     @Test
@@ -37,24 +38,29 @@ public class AbbreviationsTest {
         when(prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)).thenReturn(true);
 
         assertEquals("Proceedings of the IEEE",
-                abbreviations.getRepository().getNextAbbreviation("#IEEE_J_PROC#").get());
+                abbreviations.getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs))
+                        .getNextAbbreviation("#IEEE_J_PROC#").get());
     }
 
     @Test
     public void getNextAbbreviationAbbreviatesJournalTitle() {
         assertEquals("Proc. IEEE",
-                abbreviations.getRepository().getNextAbbreviation("Proceedings of the IEEE").get());
+                abbreviations.getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs))
+                        .getNextAbbreviation("Proceedings of the IEEE").get());
     }
 
     @Test
     public void getNextAbbreviationRemovesPoint() {
-        assertEquals("Proc IEEE", abbreviations.getRepository().getNextAbbreviation("Proc. IEEE").get());
+        assertEquals("Proc IEEE",
+                abbreviations.getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs))
+                        .getNextAbbreviation("Proc. IEEE").get());
     }
 
     @Test
     public void getNextAbbreviationExpandsAbbreviation() {
         assertEquals("Proceedings of the IEEE",
-                abbreviations.getRepository().getNextAbbreviation("Proc IEEE").get());
+                abbreviations.getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs))
+                        .getNextAbbreviation("Proc IEEE").get());
     }
 
 }

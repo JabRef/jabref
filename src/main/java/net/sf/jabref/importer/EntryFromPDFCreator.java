@@ -7,6 +7,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
@@ -119,7 +120,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
      */
     private void addEntryDataFromXMP(File aFile, BibEntry entry) {
         try {
-            List<BibEntry> entrys = XMPUtil.readXMP(aFile.getAbsoluteFile());
+            List<BibEntry> entrys = XMPUtil.readXMP(aFile.getAbsoluteFile(), Globals.prefs);
             addEntrysToEntry(entry, entrys);
         } catch (IOException e) {
             // no canceling here, just no data added.

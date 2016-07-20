@@ -33,6 +33,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.bibtex.FieldContentParser;
+import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
@@ -43,6 +44,7 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,7 +72,8 @@ public class BibtexParser {
     private Map<String, EntryType> entryTypes;
     private boolean eof;
     private int line = 1;
-    private final FieldContentParser fieldContentParser = new FieldContentParser();
+    private final FieldContentParser fieldContentParser = new FieldContentParser(
+            FieldContentParserPreferences.fromPreferences(Globals.prefs));
     private ParserResult parserResult;
     private static final Integer LOOKAHEAD = 64;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
@@ -562,7 +565,7 @@ public class BibtexParser {
                     entry.setField(key, entry.getFieldOptional(key).get() + " and " + content);
                 } else if ("keywords".equals(key)) {
                     //multiple keywords fields should be combined to one
-                    entry.addKeyword(content);
+                    entry.addKeyword(content, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                 }
             } else {
                 entry.setField(key, content);

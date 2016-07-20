@@ -2,7 +2,7 @@ package net.sf.jabref.logic.exporter;
 
 import java.nio.charset.Charset;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -15,13 +15,15 @@ public class SavePreferences {
     private final boolean makeBackup;
     private final DatabaseSaveType saveType;
     private final boolean takeMetadataSaveOrderInAccount;
+    private final LatexFieldFormatterPreferences latexFieldFormatterPreferences;
 
     public SavePreferences() {
-        this(true, null, null, false, DatabaseSaveType.ALL, true, false);
+        this(true, null, null, false, DatabaseSaveType.ALL, true, false, new LatexFieldFormatterPreferences());
     }
 
     public SavePreferences(Boolean saveInOriginalOrder, SaveOrderConfig saveOrder, Charset encoding, Boolean makeBackup,
-            DatabaseSaveType saveType, Boolean takeMetadataSaveOrderInAccount, Boolean reformatFile) {
+            DatabaseSaveType saveType, Boolean takeMetadataSaveOrderInAccount, Boolean reformatFile,
+            LatexFieldFormatterPreferences latexFieldFormatterPreferences) {
         this.saveInOriginalOrder = saveInOriginalOrder;
         this.saveOrder = saveOrder;
         this.encoding = encoding;
@@ -29,13 +31,14 @@ public class SavePreferences {
         this.saveType = saveType;
         this.takeMetadataSaveOrderInAccount = takeMetadataSaveOrderInAccount;
         this.reformatFile = reformatFile;
+        this.latexFieldFormatterPreferences = latexFieldFormatterPreferences;
     }
 
     public static SavePreferences loadForExportFromPreferences(JabRefPreferences preferences) {
-        Boolean saveInOriginalOrder = Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
+        Boolean saveInOriginalOrder = preferences.getBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER);
         SaveOrderConfig saveOrder = null;
         if (!saveInOriginalOrder) {
-            if (Globals.prefs.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
+            if (preferences.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
                 saveOrder = SaveOrderConfig.loadExportSaveOrderFromPreferences(preferences);
             } else {
                 saveOrder = SaveOrderConfig.loadTableSaveOrderFromPreferences(preferences);
@@ -46,8 +49,10 @@ public class SavePreferences {
         DatabaseSaveType saveType = DatabaseSaveType.ALL;
         Boolean takeMetadataSaveOrderInAccount = false;
         Boolean reformatFile = preferences.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT);
+        LatexFieldFormatterPreferences latexFieldFormatterPreferences = LatexFieldFormatterPreferences
+                .fromPreferences(preferences);
         return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
-                takeMetadataSaveOrderInAccount, reformatFile);
+                takeMetadataSaveOrderInAccount, reformatFile, latexFieldFormatterPreferences);
     }
 
     public static SavePreferences loadForSaveFromPreferences(JabRefPreferences preferences) {
@@ -58,8 +63,10 @@ public class SavePreferences {
         DatabaseSaveType saveType = DatabaseSaveType.ALL;
         Boolean takeMetadataSaveOrderInAccount = true;
         Boolean reformatFile = preferences.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT);
+        LatexFieldFormatterPreferences latexFieldFormatterPreferences = LatexFieldFormatterPreferences
+                .fromPreferences(preferences);
         return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
-                takeMetadataSaveOrderInAccount, reformatFile);
+                takeMetadataSaveOrderInAccount, reformatFile, latexFieldFormatterPreferences);
     }
 
     public Boolean getTakeMetadataSaveOrderInAccount() {
@@ -76,7 +83,7 @@ public class SavePreferences {
 
     public SavePreferences withSaveInOriginalOrder(Boolean saveInOriginalOrder) {
         return new SavePreferences(saveInOriginalOrder, this.saveOrder, this.encoding, this.makeBackup, this.saveType,
-                this.takeMetadataSaveOrderInAccount, this.reformatFile);
+                this.takeMetadataSaveOrderInAccount, this.reformatFile, this.latexFieldFormatterPreferences);
     }
 
     public boolean getMakeBackup() {
@@ -85,7 +92,7 @@ public class SavePreferences {
 
     public SavePreferences withMakeBackup(Boolean makeBackup) {
         return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, this.encoding, makeBackup, this.saveType,
-                this.takeMetadataSaveOrderInAccount, this.reformatFile);
+                this.takeMetadataSaveOrderInAccount, this.reformatFile, this.latexFieldFormatterPreferences);
     }
 
     public Charset getEncoding() {
@@ -94,7 +101,7 @@ public class SavePreferences {
 
     public SavePreferences withEncoding(Charset encoding) {
         return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, encoding, this.makeBackup, this.saveType,
-                this.takeMetadataSaveOrderInAccount, this.reformatFile);
+                this.takeMetadataSaveOrderInAccount, this.reformatFile, this.latexFieldFormatterPreferences);
     }
 
     public DatabaseSaveType getSaveType() {
@@ -103,7 +110,7 @@ public class SavePreferences {
 
     public SavePreferences withSaveType(DatabaseSaveType saveType) {
         return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, this.encoding, this.makeBackup, saveType,
-                this.takeMetadataSaveOrderInAccount, this.reformatFile);
+                this.takeMetadataSaveOrderInAccount, this.reformatFile, this.latexFieldFormatterPreferences);
     }
 
     public Boolean isReformatFile() {
@@ -112,11 +119,15 @@ public class SavePreferences {
 
     public SavePreferences withReformatFile(boolean reformatFile) {
         return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, this.encoding, this.makeBackup,
-                this.saveType, this.takeMetadataSaveOrderInAccount, reformatFile);
+                this.saveType, this.takeMetadataSaveOrderInAccount, reformatFile, this.latexFieldFormatterPreferences);
     }
 
     public Charset getEncodingOrDefault() {
         return encoding == null ? Charset.defaultCharset() : encoding;
+    }
+
+    public LatexFieldFormatterPreferences getLatexFieldFormatterPreferences() {
+        return latexFieldFormatterPreferences;
     }
 
     public enum DatabaseSaveType {

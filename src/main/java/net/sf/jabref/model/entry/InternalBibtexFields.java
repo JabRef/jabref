@@ -43,7 +43,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 public class InternalBibtexFields {
@@ -78,9 +77,11 @@ public class InternalBibtexFields {
     public static final List<String> BIBLATEX_PAGINATION_FIELDS = Arrays.asList("pagination", "bookpagination");
 
     // singleton instance
-    private static final InternalBibtexFields RUNTIME = new InternalBibtexFields();
+    private static final InternalBibtexFields RUNTIME = new InternalBibtexFields(
+            Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS));
 
-    private InternalBibtexFields() {
+
+    private InternalBibtexFields(boolean serializeSpecialFields) {
         fieldSet = new HashMap<>();
         BibtexSingleField dummy;
 
@@ -131,42 +132,42 @@ public class InternalBibtexFields {
 
         // custom fields not displayed at editor, but as columns in the UI
         dummy = new BibtexSingleField(SpecialFieldsUtils.FIELDNAME_RANKING, false);
-        if (!Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS)) {
+        if (!serializeSpecialFields) {
             dummy.setPrivate();
             dummy.setWriteable(false);
             dummy.setDisplayable(false);
         }
         add(dummy);
         dummy = new BibtexSingleField(SpecialFieldsUtils.FIELDNAME_PRIORITY, false);
-        if (!Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS)) {
+        if (!serializeSpecialFields) {
             dummy.setPrivate();
             dummy.setWriteable(false);
             dummy.setDisplayable(false);
         }
         add(dummy);
         dummy = new BibtexSingleField(SpecialFieldsUtils.FIELDNAME_RELEVANCE, false);
-        if (!Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS)) {
+        if (!serializeSpecialFields) {
             dummy.setPrivate();
             dummy.setWriteable(false);
             dummy.setDisplayable(false);
         }
         add(dummy);
         dummy = new BibtexSingleField(SpecialFieldsUtils.FIELDNAME_QUALITY, false);
-        if (!Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS)) {
+        if (!serializeSpecialFields) {
             dummy.setPrivate();
             dummy.setWriteable(false);
             dummy.setDisplayable(false);
         }
         add(dummy);
         dummy = new BibtexSingleField(SpecialFieldsUtils.FIELDNAME_READ, false);
-        if (!Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS)) {
+        if (!serializeSpecialFields) {
             dummy.setPrivate();
             dummy.setWriteable(false);
             dummy.setDisplayable(false);
         }
         add(dummy);
         dummy = new BibtexSingleField(SpecialFieldsUtils.FIELDNAME_PRINTED, false);
-        if (!Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS)) {
+        if (!serializeSpecialFields) {
             dummy.setPrivate();
             dummy.setWriteable(false);
             dummy.setDisplayable(false);
@@ -321,8 +322,7 @@ public class InternalBibtexFields {
      * sorting for all fields listed in the array. If an unknown field name is included,
      * add a field descriptor for the new field.
      */
-    public static void setNumericFieldsFromPrefs() {
-        List<String> numFields = Globals.prefs.getStringList(JabRefPreferences.NUMERIC_FIELDS);
+    public static void setNumericFields(List<String> numFields) {
         if (numFields.isEmpty()) {
             return;
         }

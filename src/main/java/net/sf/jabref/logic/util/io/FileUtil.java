@@ -317,7 +317,8 @@ public class FileUtil {
         }
     }
 
-    public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries, Collection<String> extensions, Collection<File> directories) {
+    public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries,
+            Collection<String> extensions, Collection<File> directories, JabRefPreferences prefs) {
         Map<BibEntry, List<File>> result = new HashMap<>();
 
         // First scan directories
@@ -328,7 +329,7 @@ public class FileUtil {
             result.put(entry, new ArrayList<>());
         }
 
-        boolean exactOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
+        boolean exactOnly = prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
         // Now look for keys
         nextFile: for (File file : filesWithExtension) {
 
@@ -392,12 +393,12 @@ public class FileUtil {
      * @return a suggested fileName
      */
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry,
-            JournalAbbreviationLoader repositoryLoader) {
+            JournalAbbreviationLoader repositoryLoader, JabRefPreferences prefs) {
         String targetName = entry.getCiteKey() == null ? "default" : entry.getCiteKey();
-        StringReader sr = new StringReader(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
+        StringReader sr = new StringReader(prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
         Layout layout = null;
         try {
-            layout = new LayoutHelper(sr, repositoryLoader).getLayoutFromText();
+            layout = new LayoutHelper(sr, prefs, repositoryLoader).getLayoutFromText();
         } catch (IOException e) {
             LOGGER.info("Wrong format " + e.getMessage(), e);
         }

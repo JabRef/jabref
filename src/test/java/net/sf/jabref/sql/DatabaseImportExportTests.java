@@ -179,7 +179,8 @@ public class DatabaseImportExportTests {
         BibDatabaseContext databaseContext = createContextWithSingleEntry();
 
         GroupTreeNode root = GroupTreeNode.fromGroup(new AllEntriesGroup());
-        KeywordGroup group = new KeywordGroup("test", "asdf", "fdas", false, true, GroupHierarchyType.INCLUDING);
+        KeywordGroup group = new KeywordGroup("test", "asdf", "fdas", false, true, GroupHierarchyType.INCLUDING,
+                Globals.prefs);
         root.addSubgroup(group);
         databaseContext.getMetaData().setGroups(root);
         return databaseContext;

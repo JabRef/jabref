@@ -24,6 +24,7 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
@@ -74,7 +75,7 @@ public class DBLPFetcher implements EntryFetcher {
             String address = makeSearchURL();
             URLDownload dl = new URLDownload(address);
 
-            String page = dl.downloadToString();
+            String page = dl.downloadToString(Globals.prefs.getDefaultEncoding());
 
             String[] lines = page.split("\n");
             List<String> bibtexUrlList = new ArrayList<>();
@@ -100,7 +101,8 @@ public class DBLPFetcher implements EntryFetcher {
                     break;
                 }
 
-                final String bibtexHTMLPage = new URLDownload(urlStr).downloadToString();
+                final String bibtexHTMLPage = new URLDownload(urlStr)
+                        .downloadToString(Globals.prefs.getDefaultEncoding());
 
                 final String[] htmlLines = bibtexHTMLPage.split("\n");
 
@@ -114,7 +116,8 @@ public class DBLPFetcher implements EntryFetcher {
                         // we do not access dblp.uni-trier.de as they will complain
                         bibtexUrl = bibtexUrl.replace("dblp.uni-trier.de", "www.dblp.org");
 
-                        final String bibtexPage = new URLDownload(bibtexUrl).downloadToString();
+                        final String bibtexPage = new URLDownload(bibtexUrl)
+                                .downloadToString(Globals.prefs.getDefaultEncoding());
 
                         Collection<BibEntry> bibtexEntries = BibtexParser.fromString(bibtexPage);
 

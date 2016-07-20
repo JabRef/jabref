@@ -45,6 +45,7 @@ import net.sf.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLUtil;
@@ -93,7 +94,8 @@ public class FieldExtraComponents {
         button.setToolTipText(ABBREVIATION_TOOLTIP_TEXT);
         button.addActionListener(actionEvent -> {
             String text = editor.getText();
-            JournalAbbreviationRepository abbreviationRepository = Globals.journalAbbreviationLoader.getRepository();
+            JournalAbbreviationRepository abbreviationRepository = Globals.journalAbbreviationLoader
+                    .getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs));
             if (abbreviationRepository.isKnownName(text)) {
                 String s = abbreviationRepository.getNextAbbreviation(text).orElse(text);
 

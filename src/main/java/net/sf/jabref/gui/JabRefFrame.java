@@ -776,7 +776,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
 
         fileHistory.storeHistory();
-        prefs.customExports.store();
+        prefs.customExports.store(Globals.prefs);
         prefs.customImports.store();
         CustomEntryTypesManager.saveCustomEntryTypes(prefs);
 

@@ -123,6 +123,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.FreeCiteImporter;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.EntryTypes;
@@ -476,7 +477,7 @@ public class TextInputDialog extends JDialog {
                             entry.setField(fieldName, old.get() + " and " + txt);
                         } else if ("keywords".equals(fieldName)) {
                             // Add keyword
-                                entry.addKeyword(txt);
+                            entry.addKeyword(txt, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                         } else {
                             entry.setField(fieldName, old.get() + txt);
                         }
@@ -537,7 +538,9 @@ public class TextInputDialog extends JDialog {
     private void updateSourceView() {
         StringWriter sw = new StringWriter(200);
         try {
-            new BibEntryWriter(new LatexFieldFormatter(), false).write(entry, sw, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+            new BibEntryWriter(new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)),
+                    false).write(entry, sw,
+                    frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
             sourcePreview.setText(sw.getBuffer().toString());
         } catch (IOException ex) {
             LOGGER.error("Error in entry" + ": " + ex.getMessage(), ex);

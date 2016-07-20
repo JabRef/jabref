@@ -54,7 +54,8 @@ public class RenamePdfCleanupTest {
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationLoader.class));
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationLoader.class),
+                Globals.prefs);
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot.tmp", "");
@@ -70,7 +71,8 @@ public class RenamePdfCleanupTest {
         entry.setField("file", FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""),
                 new ParsedFileField("", tempFile.getAbsolutePath(), ""), new ParsedFileField("","",""))));
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationLoader.class));
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationLoader.class),
+                Globals.prefs);
         cleanup.cleanup(entry);
 
         assertEquals(
@@ -87,7 +89,8 @@ public class RenamePdfCleanupTest {
         entry.setField("file", FileField.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationLoader.class));
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationLoader.class),
+                Globals.prefs);
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot - test title.tmp", "");
@@ -102,7 +105,8 @@ public class RenamePdfCleanupTest {
         entry.setField("file", FileField.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationLoader.class));
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationLoader.class),
+                Globals.prefs);
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot - test title.pdf", "PDF");

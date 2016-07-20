@@ -32,6 +32,7 @@ public class AutoCompleterFactory {
     private final AutoCompletePreferences preferences;
     private final JournalAbbreviationLoader abbreviationLoader;
 
+
     public AutoCompleterFactory(AutoCompletePreferences preferences, JournalAbbreviationLoader abbreviationLoader) {
         this.preferences = Objects.requireNonNull(preferences);
         this.abbreviationLoader = Objects.requireNonNull(abbreviationLoader);

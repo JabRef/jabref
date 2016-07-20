@@ -44,6 +44,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
@@ -73,11 +74,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private static final Pattern SUB_DETECTION_1 = Pattern.compile("/sub ([^/]+)/");
     private static final Pattern SUB_DETECTION_2 = Pattern.compile("\\(sub\\)([^(]+)\\(/sub\\)");
     private static final String SUB_TEXT_RESULT = "\\\\textsubscript\\{$1\\}";
-    private static final String SUB_EQ_RESULT = "\\$_\\{$1\\}\\$";
     private static final Pattern SUPER_DETECTION_1 = Pattern.compile("/sup ([^/]+)/");
     private static final Pattern SUPER_DETECTION_2 = Pattern.compile("\\(sup\\)([^(]+)\\(/sup\\)");
     private static final String SUPER_TEXT_RESULT = "\\\\textsuperscript\\{$1\\}";
-    private static final String SUPER_EQ_RESULT = "\\$\\^\\{$1\\}\\$";
 
     private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
     private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
@@ -156,7 +155,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
 
             //fetch the raw Bibtex results from IEEEXplore
-            String bibtexPage = new URLDownload(createBibtexQueryURL(searchResultsJson)).downloadToString();
+            String bibtexPage = new URLDownload(createBibtexQueryURL(searchResultsJson))
+                    .downloadToString(Globals.prefs.getDefaultEncoding());
 
             //preprocess the result (eg. convert HTML escaped characters to latex and do other formatting not performed by BibtexParser)
             bibtexPage = preprocessBibtexResultsPage(bibtexPage);
@@ -279,17 +279,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
             // Replace general expressions
             title = title.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
             // Deal with subscripts and superscripts
-            if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
-                title = SUPER_DETECTION_1.matcher(title).replaceAll(SUPER_EQ_RESULT);
-                title = SUB_DETECTION_1.matcher(title).replaceAll(SUB_EQ_RESULT);
-                title = SUPER_DETECTION_2.matcher(title).replaceAll(SUPER_EQ_RESULT);
-                title = SUB_DETECTION_2.matcher(title).replaceAll(SUB_EQ_RESULT);
-            } else {
-                title = SUPER_DETECTION_1.matcher(title).replaceAll(SUPER_TEXT_RESULT);
-                title = SUB_DETECTION_1.matcher(title).replaceAll(SUB_TEXT_RESULT);
-                title = SUPER_DETECTION_2.matcher(title).replaceAll(SUPER_TEXT_RESULT);
-                title = SUB_DETECTION_2.matcher(title).replaceAll(SUB_TEXT_RESULT);
-            }
+            title = SUPER_DETECTION_1.matcher(title).replaceAll(SUPER_TEXT_RESULT);
+            title = SUB_DETECTION_1.matcher(title).replaceAll(SUB_TEXT_RESULT);
+            title = SUPER_DETECTION_2.matcher(title).replaceAll(SUPER_TEXT_RESULT);
+            title = SUB_DETECTION_2.matcher(title).replaceAll(SUB_TEXT_RESULT);
 
             // Replace \infin with \infty
             title = title.replaceAll("\\\\infin", "\\\\infty");
@@ -443,7 +436,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
                 fullName = fullName.trim();
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
-                    fullName = abbreviationLoader.getRepository().getMedlineAbbreviation(fullName).orElse(fullName);
+                    fullName = abbreviationLoader
+                            .getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs))
+                            .getMedlineAbbreviation(fullName)
+                            .orElse(fullName);
                 }
             }
             if ("inproceedings".equals(type)) {
@@ -498,17 +494,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
             // Replace general expressions
             abstr = abstr.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
             // Deal with subscripts and superscripts
-            if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
-                abstr = SUPER_DETECTION_1.matcher(abstr).replaceAll(SUPER_EQ_RESULT);
-                abstr = SUB_DETECTION_1.matcher(abstr).replaceAll(SUB_EQ_RESULT);
-                abstr = SUPER_DETECTION_2.matcher(abstr).replaceAll(SUPER_EQ_RESULT);
-                abstr = SUB_DETECTION_2.matcher(abstr).replaceAll(SUB_EQ_RESULT);
-            } else {
-                abstr = SUPER_DETECTION_1.matcher(abstr).replaceAll(SUPER_TEXT_RESULT);
-                abstr = SUB_DETECTION_1.matcher(abstr).replaceAll(SUB_TEXT_RESULT);
-                abstr = SUPER_DETECTION_2.matcher(abstr).replaceAll(SUPER_TEXT_RESULT);
-                abstr = SUB_DETECTION_2.matcher(abstr).replaceAll(SUB_TEXT_RESULT);
-            }
+            abstr = SUPER_DETECTION_1.matcher(abstr).replaceAll(SUPER_TEXT_RESULT);
+            abstr = SUB_DETECTION_1.matcher(abstr).replaceAll(SUB_TEXT_RESULT);
+            abstr = SUPER_DETECTION_2.matcher(abstr).replaceAll(SUPER_TEXT_RESULT);
+            abstr = SUB_DETECTION_2.matcher(abstr).replaceAll(SUB_TEXT_RESULT);
             // Replace \infin with \infty
             abstr = abstr.replace("\\infin", "\\infty");
             // Write back

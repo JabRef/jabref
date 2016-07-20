@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -52,9 +51,9 @@ public class CustomExportList {
         sorted = new SortedList<>(list, comp);
     }
 
-    public Map<String, ExportFormat> getCustomExportFormats() {
+    public Map<String, ExportFormat> getCustomExportFormats(JabRefPreferences prefs) {
         formats.clear();
-        readPrefs();
+        readPrefs(prefs);
         return formats;
     }
 
@@ -66,18 +65,18 @@ public class CustomExportList {
         return sorted;
     }
 
-    private void readPrefs() {
+    private void readPrefs(JabRefPreferences prefs) {
         formats.clear();
         list.clear();
         int i = 0;
         List<String> s;
-        while (!((s = Globals.prefs.getStringList(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i)).isEmpty())) {
+        while (!((s = prefs.getStringList(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i)).isEmpty())) {
             Optional<ExportFormat> format = createFormat(s);
             if (format.isPresent()) {
                 formats.put(format.get().getConsoleName(), format.get());
                 list.add(s);
             } else {
-                String customExportFormat = Globals.prefs.get(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i);
+                String customExportFormat = prefs.get(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i);
                 LOGGER.error("Error initializing custom export format from string " + customExportFormat);
             }
             i++;
@@ -113,22 +112,22 @@ public class CustomExportList {
         });
     }
 
-    public void store() {
+    public void store(JabRefPreferences prefs) {
 
         if (list.isEmpty()) {
-            purge(0);
+            purge(0, prefs);
         } else {
             for (int i = 0; i < list.size(); i++) {
-                Globals.prefs.putStringList(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i, list.get(i));
+                prefs.putStringList(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i, list.get(i));
             }
-            purge(list.size());
+            purge(list.size(), prefs);
         }
     }
 
-    private void purge(int from) {
+    private void purge(int from, JabRefPreferences prefs) {
         int i = from;
-        while (!Globals.prefs.getStringList(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i).isEmpty()) {
-            Globals.prefs.remove(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i);
+        while (!prefs.getStringList(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i).isEmpty()) {
+            prefs.remove(JabRefPreferences.CUSTOM_EXPORT_FORMAT + i);
             i++;
         }
     }

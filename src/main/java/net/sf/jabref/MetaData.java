@@ -178,7 +178,7 @@ public class MetaData implements Iterable<String> {
      */
     private void putGroups(List<String> orderedData) throws ParseException {
         try {
-            groupsRoot = GroupTreeNode.parse(orderedData);
+            groupsRoot = GroupTreeNode.parse(orderedData, Globals.prefs);
         } catch (ParseException e) {
             throw new ParseException(Localization.lang(
                     "Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."), e);
@@ -238,7 +238,7 @@ public class MetaData implements Iterable<String> {
             return labelPattern;
         }
 
-        labelPattern = new DatabaseLabelPattern();
+        labelPattern = new DatabaseLabelPattern(Globals.prefs);
 
         // read the data from the metadata and store it into the labelPattern
         for (String key : this) {

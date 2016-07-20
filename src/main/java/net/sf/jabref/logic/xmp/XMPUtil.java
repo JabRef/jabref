@@ -47,6 +47,7 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.Author;
@@ -93,8 +94,8 @@ public class XMPUtil {
      * @return BibtexEntryies found in the PDF or an empty list
      * @throws IOException
      */
-    public static List<BibEntry> readXMP(String filename) throws IOException {
-        return XMPUtil.readXMP(new File(filename));
+    public static List<BibEntry> readXMP(String filename, JabRefPreferences prefs) throws IOException {
+        return XMPUtil.readXMP(new File(filename), prefs);
     }
 
     /**
@@ -137,10 +138,10 @@ public class XMPUtil {
      *             Throws an IOException if the file cannot be read, so the user
      *             than remove a lock or cancel the operation.
      */
-    public static List<BibEntry> readXMP(File file) throws IOException {
+    public static List<BibEntry> readXMP(File file, JabRefPreferences prefs) throws IOException {
         List<BibEntry> result = Collections.emptyList();
         try (FileInputStream inputStream = new FileInputStream(file)) {
-            result = XMPUtil.readXMP(inputStream);
+            result = XMPUtil.readXMP(inputStream, prefs);
         }
         return result;
     }
@@ -178,7 +179,7 @@ public class XMPUtil {
      *
      * @return list of BibEntries retrieved from the stream. May be empty, but never null
      */
-    public static List<BibEntry> readXMP(InputStream inputStream)
+    public static List<BibEntry> readXMP(InputStream inputStream, JabRefPreferences prefs)
             throws IOException {
 
         List<BibEntry> result = new LinkedList<>();
@@ -206,7 +207,7 @@ public class XMPUtil {
                     for (XMPSchema schema : schemas) {
                         XMPSchemaDublinCore dc = (XMPSchemaDublinCore) schema;
 
-                        Optional<BibEntry> entry = XMPUtil.getBibtexEntryFromDublinCore(dc);
+                        Optional<BibEntry> entry = XMPUtil.getBibtexEntryFromDublinCore(dc, prefs);
 
                         if (entry.isPresent()) {
                             if (entry.get().getType() == null) {
@@ -234,8 +235,8 @@ public class XMPUtil {
         return result;
     }
 
-    public static Collection<BibEntry> readXMP(Path filePath) throws IOException {
-        return readXMP(filePath.toFile());
+    public static Collection<BibEntry> readXMP(Path filePath, JabRefPreferences prefs) throws IOException {
+        return readXMP(filePath.toFile(), prefs);
     }
 
     /**
@@ -312,7 +313,8 @@ public class XMPUtil {
      *
      * @return The bibtex entry found in the document information.
      */
-    public static Optional<BibEntry> getBibtexEntryFromDublinCore(XMPSchemaDublinCore dcSchema) {
+    public static Optional<BibEntry> getBibtexEntryFromDublinCore(XMPSchemaDublinCore dcSchema,
+            JabRefPreferences prefs) {
 
         BibEntry entry = new BibEntry();
 
@@ -416,7 +418,7 @@ public class XMPUtil {
          */
         List<String> subjects = dcSchema.getSubjects();
         if (subjects != null) {
-            entry.addKeywords(subjects);
+            entry.addKeywords(subjects, prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
         }
 
         /**
@@ -1187,9 +1189,10 @@ public class XMPUtil {
 
             if (args[0].endsWith(".pdf")) {
                 // Read from pdf and write as BibTex
-                List<BibEntry> l = XMPUtil.readXMP(new File(args[0]));
+                List<BibEntry> l = XMPUtil.readXMP(new File(args[0]), Globals.prefs);
 
-                BibEntryWriter bibtexEntryWriter = new BibEntryWriter(new LatexFieldFormatter(), false);
+                BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
+                        new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)), false);
 
                 for (BibEntry entry : l) {
                     StringWriter sw = new StringWriter();
@@ -1274,9 +1277,9 @@ public class XMPUtil {
     /**
      * see XMPUtil.hasMetadata(InputStream)
      */
-    public static boolean hasMetadata(Path path) {
+    public static boolean hasMetadata(Path path, JabRefPreferences prefs) {
         try (InputStream inputStream = Files.newInputStream(path, StandardOpenOption.READ)) {
-            return hasMetadata(inputStream);
+            return hasMetadata(inputStream, prefs);
         } catch (IOException e) {
             LOGGER.error("XMP reading failed", e);
             return false;
@@ -1294,9 +1297,9 @@ public class XMPUtil {
      *            The inputStream to read the PDF from.
      * @return whether a BibEntry was found in the given PDF.
      */
-    public static boolean hasMetadata(InputStream inputStream) {
+    public static boolean hasMetadata(InputStream inputStream, JabRefPreferences prefs) {
         try {
-            List<BibEntry> bibEntries = XMPUtil.readXMP(inputStream);
+            List<BibEntry> bibEntries = XMPUtil.readXMP(inputStream, prefs);
             return !bibEntries.isEmpty();
         } catch (EncryptedPdfsNotSupportedException ex) {
             LOGGER.info("Encryption not supported by XMPUtil");

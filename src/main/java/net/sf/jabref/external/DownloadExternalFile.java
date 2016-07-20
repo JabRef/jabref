@@ -270,7 +270,8 @@ public class DownloadExternalFile {
     // FIXME: will break download if no bibtexkey is present!
     private String getSuggestedFileName(String suffix) {
         String plannedName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(),
-                frame.getCurrentBasePanel().getSelectedEntries().get(0), Globals.journalAbbreviationLoader);
+                frame.getCurrentBasePanel().getSelectedEntries().get(0), Globals.journalAbbreviationLoader,
+                Globals.prefs);
 
         if (!suffix.isEmpty()) {
             plannedName += "." + suffix;

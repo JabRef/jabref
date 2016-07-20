@@ -59,7 +59,7 @@ public class CleanupWorkerTest {
         MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
-        worker = new CleanupWorker(context, mock(JournalAbbreviationLoader.class));
+        worker = new CleanupWorker(context, mock(JournalAbbreviationLoader.class), Globals.prefs);
     }
 
 

@@ -143,7 +143,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         try {
             URLDownload dl = new URLDownload(address);
 
-            String page = dl.downloadToString();
+            String page = dl.downloadToString(Globals.prefs.getDefaultEncoding());
 
             int hits = getNumberOfHits(page, RESULTS_FOUND_PATTERN, ACMPortalFetcher.HITS_PATTERN);
 
@@ -351,7 +351,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             // get abstract
             if (downloadAbstract) {
                 URLDownload dl = new URLDownload(ACMPortalFetcher.START_URL + ACMPortalFetcher.ABSTRACT_URL + id);
-                String page = dl.downloadToString();
+                String page = dl.downloadToString(Globals.prefs.getDefaultEncoding());
 
                 Matcher absM = ACMPortalFetcher.ABSTRACT_PATTERN.matcher(page);
                 if (absM.find()) {

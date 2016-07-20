@@ -168,7 +168,7 @@ public class AppendDatabaseAction implements BaseAction {
                     // create a dummy group
                     ExplicitGroup group = null;
                     try {
-                        group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT);
+                        group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT, Globals.prefs);
                     } catch (ParseException e) {
                         LOGGER.error(e);
                     }
