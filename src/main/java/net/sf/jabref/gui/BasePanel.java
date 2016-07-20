@@ -1040,7 +1040,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 return;
             }
             FileListTableModel tableModel = new FileListTableModel();
-            tableModel.setContent(entry.getField(Globals.FILE_FIELD));
+            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(tableModel::setContent);
             if (tableModel.getRowCount() == 0) {
                 // content in bibtex field is not readable
                 new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
@@ -2064,19 +2064,26 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         @Override
         public void action() {
             final List<BibEntry> bes = mainTable.getSelectedEntries();
-            String field = DOI_FIELD;
             if (bes.size() == 1) {
-                Object link = bes.get(0).getField(DOI_FIELD);
+                String field = DOI_FIELD;
+                Optional<String> link = bes.get(0).getFieldOptional(DOI_FIELD);
                 if (bes.get(0).hasField(URL_FIELD)) {
-                    link = bes.get(0).getField(URL_FIELD);
+                    link = bes.get(0).getFieldOptional(URL_FIELD);
                     field = URL_FIELD;
                 }
-                if (link == null) {
+                if (link.isPresent()) {
+                    try {
+                        JabRefDesktop.openExternalViewer(bibDatabaseContext, link.get(), field);
+                        output(Localization.lang("External viewer called") + '.');
+                    } catch (IOException ex) {
+                        output(Localization.lang("Error") + ": " + ex.getMessage());
+                    }
+                } else {
                     // No URL or DOI found in the "url" and "doi" fields.
                     // Look for web links in the "file" field as a fallback:
                     FileListEntry entry = null;
                     FileListTableModel tm = new FileListTableModel();
-                    tm.setContent(bes.get(0).getField(Globals.FILE_FIELD));
+                    bes.get(0).getFieldOptional(Globals.FILE_FIELD).ifPresent(tm::setContent);
                     for (int i = 0; i < tm.getRowCount(); i++) {
                         FileListEntry flEntry = tm.getEntry(i);
                         if (URL_FIELD.equalsIgnoreCase(flEntry.type.get().getName())
@@ -2096,13 +2103,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             output(Localization.lang("Could not open link"));
                             LOGGER.info("Could not open link", e);
                         }
-                    }
-                } else {
-                    try {
-                        JabRefDesktop.openExternalViewer(bibDatabaseContext, link.toString(), field);
-                        output(Localization.lang("External viewer called") + '.');
-                    } catch (IOException ex) {
-                        output(Localization.lang("Error") + ": " + ex.getMessage());
                     }
                 }
             } else {

@@ -60,7 +60,7 @@ public class BibEntry implements Cloneable {
     /*
      * Map to store the words in every field
      */
-    private Map<String, Set<String>> fieldsAsWords = new HashMap<>();
+    private final Map<String, Set<String>> fieldsAsWords = new HashMap<>();
 
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit;
@@ -263,13 +263,13 @@ public class BibEntry implements Cloneable {
 
         // Finally, handle dates
         if ("date".equals(name)) {
-            String year = getField("year");
-            MonthUtil.Month month = MonthUtil.getMonth(getField("month"));
-            if (year != null) {
+            Optional<String> year = getFieldOptional("year");
+            if (year.isPresent()) {
+                MonthUtil.Month month = MonthUtil.getMonth(getFieldOptional("month").orElse(""));
                 if (month.isValid()) {
-                    return Optional.of(year + '-' + month.twoDigitNumber);
+                    return Optional.of(year.get() + '-' + month.twoDigitNumber);
                 } else {
-                    return Optional.of(year);
+                    return year;
                 }
             }
         }

@@ -106,7 +106,7 @@ public class SpecialMainTableColumns {
         public Object getColumnValue(BibEntry entry) {
             // We use a FileListTableModel to parse the field content:
             FileListTableModel fileList = new FileListTableModel();
-            fileList.setContent(entry.getField(Globals.FILE_FIELD));
+            entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(fileList::setContent);
             if (fileList.getRowCount() > 1) {
                 return new JLabel(IconTheme.JabRefIcon.FILE_MULTIPLE.getSmallIcon());
             } else if (fileList.getRowCount() == 1) {
@@ -185,7 +185,7 @@ public class SpecialMainTableColumns {
                 boolean iconFound = false;
                 JLabel iconLabel = null;
                 FileListTableModel fileList = new FileListTableModel();
-                fileList.setContent(entry.getField(Globals.FILE_FIELD));
+                entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(fileList::setContent);
                 for (int i = 0; i < fileList.getRowCount(); i++) {
                     if ((fileList.getEntry(i).type.isPresent())
                             && externalFileTypeName.equalsIgnoreCase(fileList.getEntry(i).type.get().getName())) {

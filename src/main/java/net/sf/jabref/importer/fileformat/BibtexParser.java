@@ -559,7 +559,7 @@ public class BibtexParser {
                 // it inconvenient
                 // for users if JabRef didn't accept it.
                 if (InternalBibtexFields.getFieldExtras(key).contains(FieldProperties.PERSON_NAMES)) {
-                    entry.setField(key, entry.getField(key) + " and " + content);
+                    entry.setField(key, entry.getFieldOptional(key).get() + " and " + content);
                 } else if ("keywords".equals(key)) {
                     //multiple keywords fields should be combined to one
                     entry.addKeyword(content);

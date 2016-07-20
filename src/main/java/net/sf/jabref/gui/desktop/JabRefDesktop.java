@@ -228,8 +228,8 @@ public class JabRefDesktop {
             // User wants to change the type of this link.
             // First get a model of all file links for this entry:
             FileListTableModel tModel = new FileListTableModel();
-            String oldValue = entry.getField(Globals.FILE_FIELD);
-            tModel.setContent(oldValue);
+            Optional<String> oldValue = entry.getFieldOptional(Globals.FILE_FIELD);
+            oldValue.ifPresent(tModel::setContent);
             FileListEntry flEntry = null;
             // Then find which one we are looking at:
             for (int i = 0; i < tModel.getRowCount(); i++) {
@@ -249,7 +249,8 @@ public class JabRefDesktop {
             if (editor.okPressed()) {
                 // Store the changes and add an undo edit:
                 String newValue = tModel.getStringRepresentation();
-                UndoableFieldChange ce = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue);
+                UndoableFieldChange ce = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue.orElse(null),
+                        newValue);
                 entry.setField(Globals.FILE_FIELD, newValue);
                 frame.getCurrentBasePanel().getUndoManager().addEdit(ce);
                 frame.getCurrentBasePanel().markBaseChanged();

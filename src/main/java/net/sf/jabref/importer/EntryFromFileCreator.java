@@ -169,15 +169,14 @@ public abstract class EntryFromFileCreator implements FileFilter {
         if ((value == null) || value.isEmpty()) {
             return;
         }
-        String oVal = entry.getField(field);
-        if (oVal == null) {
-            entry.setField(field, value);
-        } else {
+        Optional<String> oVal = entry.getFieldOptional(field);
+        if (oVal.isPresent()) {
             // TODO: find Jabref constant for delimter
-            if (!oVal.contains(value)) {
-                entry.setField(field, oVal + "," + value);
+            if (!oVal.get().contains(value)) {
+                entry.setField(field, oVal.get() + "," + value);
             }
-
+        } else {
+            entry.setField(field, value);
         }
     }
 
@@ -191,7 +190,7 @@ public abstract class EntryFromFileCreator implements FileFilter {
 
     protected void addEntryDataToEntry(BibEntry entry, BibEntry e) {
         for (String field : e.getFieldNames()) {
-            appendToField(entry, field, e.getField(field));
+            e.getFieldOptional(field).ifPresent(fieldContent -> appendToField(entry, field, fieldContent));
         }
     }
 

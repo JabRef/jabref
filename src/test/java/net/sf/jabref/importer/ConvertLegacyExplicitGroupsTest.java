@@ -1,6 +1,7 @@
 package net.sf.jabref.importer;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
@@ -43,7 +44,7 @@ public class ConvertLegacyExplicitGroupsTest {
 
         action.performAction(basePanel, parserResult);
 
-        assertEquals("TestGroup", entry.getField("groups"));
+        assertEquals(Optional.of("TestGroup"), entry.getFieldOptional("groups"));
     }
 
     @Test
@@ -64,7 +65,7 @@ public class ConvertLegacyExplicitGroupsTest {
 
         action.performAction(basePanel, parserResult);
 
-        assertEquals("TestGroup", entry.getField("groups"));
+        assertEquals(Optional.of("TestGroup"), entry.getFieldOptional("groups"));
     }
 
     @Test
