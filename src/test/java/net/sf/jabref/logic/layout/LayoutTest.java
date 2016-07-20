@@ -53,7 +53,8 @@ public class LayoutTest {
 
         BibEntry be = LayoutTest.bibtexString2BibtexEntry(entry);
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
-        Layout layout = new LayoutHelper(sr, Globals.prefs, mock(JournalAbbreviationLoader.class)).getLayoutFromText();
+        Layout layout = new LayoutHelper(sr, LayoutFormatterPreferences.fromPreferences(Globals.prefs),
+                mock(JournalAbbreviationLoader.class)).getLayoutFromText();
 
         return layout.doLayout(be, null);
     }

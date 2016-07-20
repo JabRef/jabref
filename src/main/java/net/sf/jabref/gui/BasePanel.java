@@ -117,6 +117,7 @@ import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.logic.util.io.FileBasedLock;
@@ -991,7 +992,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     "\\bibtexkey - \\begin{title}\\format[RemoveBrackets]{\\title}\\end{title}\n");
             Layout layout;
             try {
-                layout = new LayoutHelper(sr, Globals.prefs, Globals.journalAbbreviationLoader).getLayoutFromText();
+                layout = new LayoutHelper(sr, LayoutFormatterPreferences.fromPreferences(Globals.prefs),
+                        Globals.journalAbbreviationLoader).getLayoutFromText();
             } catch (IOException e) {
                 LOGGER.info("Could not get layout", e);
                 return;

@@ -17,17 +17,13 @@ package net.sf.jabref.logic.layout.format;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.layout.ParamLayoutFormatter;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,11 +37,11 @@ public class FileLink implements ParamLayoutFormatter {
     private static final Log LOGGER = LogFactory.getLog(FileLink.class);
 
     private String fileType;
-    private final JabRefPreferences prefs;
+    private final FileLinkPreferences prefs;
 
 
-    public FileLink(JabRefPreferences prefs) {
-        this.prefs = prefs;
+    public FileLink(FileLinkPreferences fileLinkPreferences) {
+        this.prefs = fileLinkPreferences;
     }
 
     @Override
@@ -82,10 +78,10 @@ public class FileLink implements ParamLayoutFormatter {
         // but that is not available from a formatter. Therefore, as an
         // ugly hack, the export routine has set a global variable before
         // starting the export, which contains the database's file directory:
-        if (prefs.fileDirForDatabase == null) {
-            dirs = Collections.singletonList(prefs.get(FieldName.FILE + Globals.DIR_SUFFIX));
+        if (prefs.getFileDirForDatabase() == null) {
+            dirs = prefs.getGeneratedDirForDatabase();
         } else {
-            dirs = prefs.fileDirForDatabase;
+            dirs = prefs.getFileDirForDatabase();
         }
 
         Optional<File> f = FileUtil.expandFilename(link, dirs);

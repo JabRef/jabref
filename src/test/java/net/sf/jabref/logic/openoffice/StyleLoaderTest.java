@@ -10,6 +10,7 @@ import java.util.List;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefMain;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.After;
@@ -48,21 +49,23 @@ public class StyleLoaderTest {
 
     @Test(expected = NullPointerException.class)
     public void throwNPEWithNullPreferences() {
-        loader = new StyleLoader(null, Globals.prefs,
+        loader = new StyleLoader(null, LayoutFormatterPreferences.fromPreferences(Globals.prefs),
                 mock(JournalAbbreviationLoader.class), mock(Charset.class));
         fail();
     }
 
     @Test(expected = NullPointerException.class)
     public void throwNPEWithNullRepository() {
-        loader = new StyleLoader(mock(OpenOfficePreferences.class), Globals.prefs,
+        loader = new StyleLoader(mock(OpenOfficePreferences.class),
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs),
                 null, mock(Charset.class));
         fail();
     }
 
     @Test(expected = NullPointerException.class)
     public void throwNPEWithNullCharset() {
-        loader = new StyleLoader(mock(OpenOfficePreferences.class), Globals.prefs,
+        loader = new StyleLoader(mock(OpenOfficePreferences.class),
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs),
                 mock(JournalAbbreviationLoader.class), null);
         fail();
     }
@@ -70,7 +73,7 @@ public class StyleLoaderTest {
     @Test
     public void testGetStylesWithEmptyExternal() {
         preferences.setExternalStyles(Collections.emptyList());
-        loader = new StyleLoader(preferences, Globals.prefs,
+        loader = new StyleLoader(preferences, LayoutFormatterPreferences.fromPreferences(Globals.prefs),
                 mock(JournalAbbreviationLoader.class), Globals.prefs.getDefaultEncoding());
 
         assertEquals(2, loader.getStyles().size());
@@ -79,7 +82,7 @@ public class StyleLoaderTest {
     @Test
     public void testAddStyleLeadsToOneMoreStyle() throws URISyntaxException {
         preferences.setExternalStyles(Collections.emptyList());
-        loader = new StyleLoader(preferences, Globals.prefs,
+        loader = new StyleLoader(preferences, LayoutFormatterPreferences.fromPreferences(Globals.prefs),
                 mock(JournalAbbreviationLoader.class), Globals.prefs.getDefaultEncoding());
 
         String filename = Paths.get(JabRefMain.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
@@ -92,7 +95,7 @@ public class StyleLoaderTest {
     public void testAddInvalidStyleLeadsToNoMoreStyle() {
         preferences.setExternalStyles(Collections.emptyList());
         Globals.prefs.putStringList(JabRefPreferences.OO_EXTERNAL_STYLE_FILES, Collections.emptyList());
-        loader = new StyleLoader(preferences, Globals.prefs,
+        loader = new StyleLoader(preferences, LayoutFormatterPreferences.fromPreferences(Globals.prefs),
                 mock(JournalAbbreviationLoader.class), Globals.prefs.getDefaultEncoding());
         int beforeAdding = loader.getStyles().size();
         loader.addStyleIfValid("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky");
@@ -104,7 +107,7 @@ public class StyleLoaderTest {
         String filename = Paths.get(JabRefMain.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
                 .toFile().getPath();
         preferences.setExternalStyles(Collections.singletonList(filename));
-        loader = new StyleLoader(preferences, Globals.prefs,
+        loader = new StyleLoader(preferences, LayoutFormatterPreferences.fromPreferences(Globals.prefs),
                 mock(JournalAbbreviationLoader.class), Globals.prefs.getDefaultEncoding());
         assertEquals(numberOfInternalStyles + 1, loader.getStyles().size());
     }
@@ -113,7 +116,8 @@ public class StyleLoaderTest {
     public void testInitalizeWithIncorrectExternalFile() {
         preferences.setExternalStyles(Collections.singletonList("DefinitelyNotAValidFileNameOrWeAreExtremelyUnlucky"));
 
-        loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs), Globals.prefs,
+        loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs),
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs),
                 mock(JournalAbbreviationLoader.class), Globals.prefs.getDefaultEncoding());
         assertEquals(numberOfInternalStyles, loader.getStyles().size());
     }
@@ -124,7 +128,8 @@ public class StyleLoaderTest {
                 .toFile().getPath();
         preferences.setExternalStyles(Collections.singletonList(filename));
 
-        loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs), Globals.prefs,
+        loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs),
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs),
                 mock(JournalAbbreviationLoader.class), Globals.prefs.getDefaultEncoding());
         List<OOBibStyle> toremove = new ArrayList<>();
         int beforeRemoving = loader.getStyles().size();
@@ -146,7 +151,7 @@ public class StyleLoaderTest {
                 .toFile().getPath();
         preferences.setExternalStyles(Collections.singletonList(filename));
 
-        loader = new StyleLoader(preferences, Globals.prefs,
+        loader = new StyleLoader(preferences, LayoutFormatterPreferences.fromPreferences(Globals.prefs),
                 mock(JournalAbbreviationLoader.class), Globals.prefs.getDefaultEncoding());
         List<OOBibStyle> toremove = new ArrayList<>();
         for (OOBibStyle style : loader.getStyles()) {
@@ -164,7 +169,8 @@ public class StyleLoaderTest {
     @Test
     public void testAddSameStyleTwiceLeadsToOneMoreStyle() throws URISyntaxException {
         preferences.setExternalStyles(Collections.emptyList());
-        loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs), Globals.prefs,
+        loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs),
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs),
                 mock(JournalAbbreviationLoader.class), Globals.prefs.getDefaultEncoding());
         int beforeAdding = loader.getStyles().size();
         String filename = Paths.get(JabRefMain.class.getResource(StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH).toURI())
@@ -176,7 +182,8 @@ public class StyleLoaderTest {
 
     @Test(expected = NullPointerException.class)
     public void testAddNullStyleThrowsNPE() {
-        loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs), Globals.prefs,
+        loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs),
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs),
                 mock(JournalAbbreviationLoader.class), Globals.prefs.getDefaultEncoding());
         loader.addStyleIfValid(null);
         fail();
@@ -186,7 +193,8 @@ public class StyleLoaderTest {
     @Test
     public void testGetDefaultUsedStyleWhenEmpty() {
         Globals.prefs.remove(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
-        loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs), Globals.prefs,
+        loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs),
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs),
                 mock(JournalAbbreviationLoader.class), Globals.prefs.getDefaultEncoding());
         OOBibStyle style = loader.getUsedStyle();
         assertTrue(style.isValid());
@@ -197,7 +205,8 @@ public class StyleLoaderTest {
     @Test
     public void testGetStoredUsedStyle() {
         preferences.setCurrentStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH);
-        loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs), Globals.prefs,
+        loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs),
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs),
                 mock(JournalAbbreviationLoader.class), Globals.prefs.getDefaultEncoding());
         OOBibStyle style = loader.getUsedStyle();
         assertTrue(style.isValid());
@@ -208,7 +217,8 @@ public class StyleLoaderTest {
     @Test
     public void testGtDefaultUsedStyleWhenIncorrect() {
         preferences.setCurrentStyle("ljlkjlkjnljnvdlsjniuhwelfhuewfhlkuewhfuwhelu");
-        loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs), Globals.prefs,
+        loader = new StyleLoader(new OpenOfficePreferences(Globals.prefs),
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs),
                 mock(JournalAbbreviationLoader.class), Globals.prefs.getDefaultEncoding());
         OOBibStyle style = loader.getUsedStyle();
         assertTrue(style.isValid());
@@ -220,7 +230,8 @@ public class StyleLoaderTest {
     public void testRemoveInternalStyleReturnsFalseAndDoNotRemove() {
         preferences.setExternalStyles(Collections.emptyList());
 
-        loader = new StyleLoader(preferences, Globals.prefs, mock(JournalAbbreviationLoader.class),
+        loader = new StyleLoader(preferences, LayoutFormatterPreferences.fromPreferences(Globals.prefs),
+                mock(JournalAbbreviationLoader.class),
                 Globals.prefs.getDefaultEncoding());
         List<OOBibStyle> toremove = new ArrayList<>();
         for (OOBibStyle style : loader.getStyles()) {

@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * Helper class to get a Layout object.
@@ -52,11 +51,11 @@ public class LayoutHelper {
     private final PushbackReader in;
     private final List<StringInt> parsedEntries = new ArrayList<>();
     private final JournalAbbreviationLoader repositoryLoader;
-    private final JabRefPreferences prefs;
+    private final LayoutFormatterPreferences prefs;
     private boolean endOfFile;
 
 
-    public LayoutHelper(Reader in, JabRefPreferences prefs, JournalAbbreviationLoader repositoryLoader) {
+    public LayoutHelper(Reader in, LayoutFormatterPreferences prefs, JournalAbbreviationLoader repositoryLoader) {
         this.in = new PushbackReader(Objects.requireNonNull(in));
         this.repositoryLoader = Objects.requireNonNull(repositoryLoader);
         this.prefs = Objects.requireNonNull(prefs);

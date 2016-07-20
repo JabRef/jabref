@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatter;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
@@ -46,7 +47,6 @@ import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -148,13 +148,13 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private static final String AUTHOR_SEPARATOR = "AuthorSeparator";
 
     private final JournalAbbreviationLoader repositoryLoader;
-    private final JabRefPreferences prefs;
+    private final LayoutFormatterPreferences prefs;
     private static final Pattern QUOTED = Pattern.compile("\".*\"");
 
     private static final Log LOGGER = LogFactory.getLog(OOBibStyle.class);
 
 
-    public OOBibStyle(File styleFile, JabRefPreferences prefs, JournalAbbreviationLoader repositoryLoader,
+    public OOBibStyle(File styleFile, LayoutFormatterPreferences prefs, JournalAbbreviationLoader repositoryLoader,
             Charset encoding) throws IOException {
         this.repositoryLoader = Objects.requireNonNull(repositoryLoader);
         this.prefs = Objects.requireNonNull(prefs);
@@ -166,7 +166,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         path = styleFile.getPath();
     }
 
-    public OOBibStyle(String resourcePath, JabRefPreferences prefs, JournalAbbreviationLoader repositoryLoader)
+    public OOBibStyle(String resourcePath, LayoutFormatterPreferences prefs, JournalAbbreviationLoader repositoryLoader)
             throws IOException {
         this.repositoryLoader = Objects.requireNonNull(repositoryLoader);
         this.prefs = Objects.requireNonNull(prefs);

@@ -25,7 +25,6 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -42,7 +41,8 @@ public class Layout {
     private static final Log LOGGER = LogFactory.getLog(Layout.class);
 
 
-    public Layout(List<StringInt> parsedEntries, JabRefPreferences prefs, JournalAbbreviationLoader repositoryLoader) {
+    public Layout(List<StringInt> parsedEntries, LayoutFormatterPreferences prefs,
+            JournalAbbreviationLoader repositoryLoader) {
         List<LayoutEntry> tmpEntries = new ArrayList<>(parsedEntries.size());
 
         List<StringInt> blockEntries = null;

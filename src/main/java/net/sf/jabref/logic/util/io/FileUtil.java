@@ -39,6 +39,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibDatabase;
@@ -398,7 +399,8 @@ public class FileUtil {
         StringReader sr = new StringReader(prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
         Layout layout = null;
         try {
-            layout = new LayoutHelper(sr, prefs, repositoryLoader).getLayoutFromText();
+            layout = new LayoutHelper(sr, LayoutFormatterPreferences.fromPreferences(Globals.prefs), repositoryLoader)
+                    .getLayoutFromText();
         } catch (IOException e) {
             LOGGER.info("Wrong format " + e.getMessage(), e);
         }
