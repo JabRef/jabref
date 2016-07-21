@@ -399,7 +399,7 @@ public class FileUtil {
         StringReader sr = new StringReader(prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
         Layout layout = null;
         try {
-            layout = new LayoutHelper(sr, LayoutFormatterPreferences.fromPreferences(Globals.prefs), repositoryLoader)
+            layout = new LayoutHelper(sr, LayoutFormatterPreferences.fromPreferences(prefs, repositoryLoader))
                     .getLayoutFromText();
         } catch (IOException e) {
             LOGGER.info("Wrong format " + e.getMessage(), e);

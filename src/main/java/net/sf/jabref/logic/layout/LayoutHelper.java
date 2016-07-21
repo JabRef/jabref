@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-
 /**
  * Helper class to get a Layout object.
  *
@@ -50,14 +48,12 @@ public class LayoutHelper {
 
     private final PushbackReader in;
     private final List<StringInt> parsedEntries = new ArrayList<>();
-    private final JournalAbbreviationLoader repositoryLoader;
     private final LayoutFormatterPreferences prefs;
     private boolean endOfFile;
 
 
-    public LayoutHelper(Reader in, LayoutFormatterPreferences prefs, JournalAbbreviationLoader repositoryLoader) {
+    public LayoutHelper(Reader in, LayoutFormatterPreferences prefs) {
         this.in = new PushbackReader(Objects.requireNonNull(in));
-        this.repositoryLoader = Objects.requireNonNull(repositoryLoader);
         this.prefs = Objects.requireNonNull(prefs);
     }
 
@@ -72,7 +68,7 @@ public class LayoutHelper {
             }
         }
 
-        return new Layout(parsedEntries, prefs, repositoryLoader);
+        return new Layout(parsedEntries, prefs);
     }
 
     public static String getCurrentGroup() {

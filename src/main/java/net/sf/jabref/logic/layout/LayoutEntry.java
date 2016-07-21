@@ -28,7 +28,6 @@ import java.util.regex.Pattern;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.format.AuthorAbbreviator;
 import net.sf.jabref.logic.layout.format.AuthorAndsCommaReplacer;
 import net.sf.jabref.logic.layout.format.AuthorAndsReplacer;
@@ -115,13 +114,10 @@ class LayoutEntry {
 
     private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
 
-    private final JournalAbbreviationLoader repositoryLoader;
-
     private final LayoutFormatterPreferences prefs;
 
 
-    public LayoutEntry(StringInt si, LayoutFormatterPreferences prefs, JournalAbbreviationLoader repositoryLoader) {
-        this.repositoryLoader = repositoryLoader;
+    public LayoutEntry(StringInt si, LayoutFormatterPreferences prefs) {
         this.prefs = prefs;
         type = si.i;
         switch (type) {
@@ -141,9 +137,7 @@ class LayoutEntry {
         }
     }
 
-    public LayoutEntry(List<StringInt> parsedEntries, int layoutType, LayoutFormatterPreferences prefs,
-            JournalAbbreviationLoader repositoryLoader) {
-        this.repositoryLoader = repositoryLoader;
+    public LayoutEntry(List<StringInt> parsedEntries, int layoutType, LayoutFormatterPreferences prefs) {
         this.prefs = prefs;
         List<LayoutEntry> tmpEntries = new ArrayList<>();
         String blockStart = parsedEntries.get(0).s;
@@ -169,7 +163,7 @@ class LayoutEntry {
                     blockEntries.add(parsedEntry);
                     int groupType = parsedEntry.i == LayoutHelper.IS_GROUP_END ? LayoutHelper.IS_GROUP_START :
                             LayoutHelper.IS_FIELD_START;
-                    LayoutEntry le = new LayoutEntry(blockEntries, groupType, prefs, repositoryLoader);
+                    LayoutEntry le = new LayoutEntry(blockEntries, groupType, prefs);
                     tmpEntries.add(le);
                     blockEntries = null;
                 } else {
@@ -185,7 +179,7 @@ class LayoutEntry {
             }
 
             if (blockEntries == null) {
-                tmpEntries.add(new LayoutEntry(parsedEntry, prefs, repositoryLoader));
+                tmpEntries.add(new LayoutEntry(parsedEntry, prefs));
             } else {
                 blockEntries.add(parsedEntry);
             }
@@ -512,7 +506,8 @@ class LayoutEntry {
         case "Iso690NamesAuthors":
             return new Iso690NamesAuthors();
         case "JournalAbbreviator":
-            return new JournalAbbreviator(repositoryLoader, prefs.getJournalAbbreviationPreferences());
+            return new JournalAbbreviator(prefs.getJournalAbbreviationLoader(),
+                    prefs.getJournalAbbreviationPreferences());
         case "LastPage":
             return new LastPage();
         case "FormatChars": // For backward compatibility

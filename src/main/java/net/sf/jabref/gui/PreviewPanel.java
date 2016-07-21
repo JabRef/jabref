@@ -264,8 +264,8 @@ public class PreviewPanel extends JPanel
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         try {
             layout = Optional
-                    .of(new LayoutHelper(sr, LayoutFormatterPreferences.fromPreferences(Globals.prefs),
-                            Globals.journalAbbreviationLoader).getLayoutFromText());
+                    .of(new LayoutHelper(sr, LayoutFormatterPreferences.fromPreferences(Globals.prefs,
+                            Globals.journalAbbreviationLoader)).getLayoutFromText());
         } catch (IOException e) {
             layout = Optional.empty();
             LOGGER.debug("no layout could be set", e);

@@ -24,7 +24,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 
 import org.apache.commons.logging.Log;
@@ -41,7 +40,6 @@ public class StyleLoader {
     private final List<String> internalStyleFiles = Arrays.asList(DEFAULT_AUTHORYEAR_STYLE_PATH,
             DEFAULT_NUMERICAL_STYLE_PATH);
 
-    private final JournalAbbreviationLoader journalAbbreviationLoader;
     private final OpenOfficePreferences preferences;
     private final Charset encoding;
     private final LayoutFormatterPreferences layoutFormatterPreferences;
@@ -53,8 +51,7 @@ public class StyleLoader {
 
 
     public StyleLoader(OpenOfficePreferences preferences, LayoutFormatterPreferences jabrefPreferences,
-            JournalAbbreviationLoader journalAbbreviationLoader, Charset encoding) {
-        this.journalAbbreviationLoader = Objects.requireNonNull(journalAbbreviationLoader);
+            Charset encoding) {
         this.preferences = Objects.requireNonNull(preferences);
         this.layoutFormatterPreferences = Objects.requireNonNull(jabrefPreferences);
         this.encoding = Objects.requireNonNull(encoding);
@@ -76,8 +73,7 @@ public class StyleLoader {
     public boolean addStyleIfValid(String filename) {
         Objects.requireNonNull(filename);
         try {
-            OOBibStyle newStyle = new OOBibStyle(new File(filename), layoutFormatterPreferences, journalAbbreviationLoader,
-                    encoding);
+            OOBibStyle newStyle = new OOBibStyle(new File(filename), layoutFormatterPreferences, encoding);
             if (externalStyles.contains(newStyle)) {
                 LOGGER.info("External style file " + filename + " already existing.");
             } else if (newStyle.isValid()) {
@@ -103,8 +99,7 @@ public class StyleLoader {
         List<String> lists = preferences.getExternalStyles();
         for (String filename : lists) {
             try {
-                OOBibStyle style = new OOBibStyle(new File(filename), layoutFormatterPreferences, journalAbbreviationLoader,
-                        encoding);
+                OOBibStyle style = new OOBibStyle(new File(filename), layoutFormatterPreferences, encoding);
                 if (style.isValid()) { //Problem!
                     externalStyles.add(style);
                 } else {
@@ -123,7 +118,7 @@ public class StyleLoader {
         internalStyles.clear();
         for (String filename : internalStyleFiles) {
             try {
-                internalStyles.add(new OOBibStyle(filename, layoutFormatterPreferences, journalAbbreviationLoader));
+                internalStyles.add(new OOBibStyle(filename, layoutFormatterPreferences));
             } catch (IOException e) {
                 LOGGER.info("Problem reading internal style file " + filename, e);
             }
