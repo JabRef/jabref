@@ -27,9 +27,9 @@ import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-import static net.sf.jabref.model.entry.BibEntry.KEYWORDS_FIELD;
 
 public class SpecialFieldsUtils {
 
@@ -163,7 +163,7 @@ public class SpecialFieldsUtils {
      * @param ce indicates the undo named compound. May be null
      */
     public static void syncSpecialFieldsFromKeywords(BibEntry be, NamedCompound ce) {
-        if (!be.hasField(KEYWORDS_FIELD)) {
+        if (!be.hasField(FieldName.KEYWORDS)) {
             return;
         }
         Set<String> keywordList = EntryUtil.getSeparatedKeywords(be);

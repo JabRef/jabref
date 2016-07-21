@@ -54,6 +54,7 @@ import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
@@ -66,8 +67,6 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-
-import static net.sf.jabref.model.entry.BibEntry.KEYWORDS_FIELD;
 
 /**
  * An Action for launching keyword managing dialog
@@ -195,7 +194,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         });
 
         AutoCompleter<String> autoComp = JabRefGUI.getMainFrame().getCurrentBasePanel().getAutoCompleters()
-                .get(KEYWORDS_FIELD);
+                .get(FieldName.KEYWORDS);
         AutoCompleteListener acl = new AutoCompleteListener(autoComp);
         keyword.addKeyListener(acl);
         keyword.addFocusListener(acl);

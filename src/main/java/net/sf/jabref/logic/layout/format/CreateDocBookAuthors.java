@@ -39,6 +39,7 @@ package net.sf.jabref.logic.layout.format;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * Create DocBook authors formatter.
@@ -55,7 +56,7 @@ public class CreateDocBookAuthors implements LayoutFormatter {
 
         AuthorList al = AuthorList.parse(fieldText);
 
-        addBody(sb, al, "author");
+        addBody(sb, al, FieldName.AUTHOR);
         return sb.toString();
 
     }

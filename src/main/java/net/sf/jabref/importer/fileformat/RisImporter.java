@@ -28,6 +28,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.MonthUtil;
 
 /**
@@ -134,17 +135,17 @@ public class RisImporter extends ImportFormat {
                             type = "other";
                         }
                     } else if ("T1".equals(lab) || "TI".equals(lab)) {
-                        String oldVal = hm.get("title");
+                        String oldVal = hm.get(FieldName.TITLE);
                         if (oldVal == null) {
-                            hm.put("title", val);
+                            hm.put(FieldName.TITLE, val);
                         } else {
                             if (oldVal.endsWith(":") || oldVal.endsWith(".") || oldVal.endsWith("?")) {
-                                hm.put("title", oldVal + " " + val);
+                                hm.put(FieldName.TITLE, oldVal + " " + val);
                             } else {
-                                hm.put("title", oldVal + ": " + val);
+                                hm.put(FieldName.TITLE, oldVal + ": " + val);
                             }
                         }
-                        hm.put("title", hm.get("title").replaceAll("\\s+", " ")); // Normalize whitespaces
+                        hm.put(FieldName.TITLE, hm.get(FieldName.TITLE).replaceAll("\\s+", " ")); // Normalize whitespaces
                     } else if ("T2".equals(lab) || "BT".equals(lab)) {
                         hm.put("booktitle", val);
                     } else if ("T3".equals(lab)) {
@@ -165,7 +166,7 @@ public class RisImporter extends ImportFormat {
                         if ("inproceedings".equals(type)) {
                             hm.put("booktitle", val);
                         } else {
-                            hm.put("journal", val);
+                            hm.put(FieldName.JOURNAL, val);
                         }
                     } else if ("SP".equals(lab)) {
                         startPage = val;
@@ -173,7 +174,7 @@ public class RisImporter extends ImportFormat {
                         if ("phdthesis".equals(type)) {
                             hm.put("school", val);
                         } else {
-                            hm.put("publisher", val);
+                            hm.put(FieldName.PUBLISHER, val);
                         }
                     } else if ("AD".equals(lab) || "CY".equals(lab)) {
                         hm.put("address", val);
@@ -183,41 +184,41 @@ public class RisImporter extends ImportFormat {
                             endPage = "--" + endPage;
                         }
                     } else if ("SN".equals(lab)) {
-                        hm.put("issn", val);
+                        hm.put(FieldName.ISSN, val);
                     } else if ("VL".equals(lab)) {
-                        hm.put("volume", val);
+                        hm.put(FieldName.VOLUME, val);
                     } else if ("IS".equals(lab)) {
-                        hm.put("number", val);
+                        hm.put(FieldName.NUMBER, val);
                     } else if ("N2".equals(lab) || "AB".equals(lab)) {
-                        String oldAb = hm.get("abstract");
+                        String oldAb = hm.get(FieldName.ABSTRACT);
                         if (oldAb == null) {
-                            hm.put("abstract", val);
+                            hm.put(FieldName.ABSTRACT, val);
                         } else {
-                            hm.put("abstract", oldAb + Globals.NEWLINE + val);
+                            hm.put(FieldName.ABSTRACT, oldAb + Globals.NEWLINE + val);
                         }
                     } else if ("UR".equals(lab)) {
-                        hm.put("url", val);
+                        hm.put(FieldName.URL, val);
                     } else if (("Y1".equals(lab) || "PY".equals(lab)) && (val.length() >= 4)) {
                         String[] parts = val.split("/");
-                        hm.put("year", parts[0]);
+                        hm.put(FieldName.YEAR, parts[0]);
                         if ((parts.length > 1) && !parts[1].isEmpty()) {
                             try {
 
                                 int monthNumber = Integer.parseInt(parts[1]);
                                 MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
                                 if (month.isValid()) {
-                                    hm.put("month", month.bibtexFormat);
+                                    hm.put(FieldName.MONTH, month.bibtexFormat);
                                 }
                             } catch (NumberFormatException ex) {
                                 // The month part is unparseable, so we ignore it.
                             }
                         }
                     } else if ("KW".equals(lab)) {
-                        if (hm.containsKey("keywords")) {
-                            String kw = hm.get("keywords");
-                            hm.put("keywords", kw + ", " + val);
+                        if (hm.containsKey(FieldName.KEYWORDS)) {
+                            String kw = hm.get(FieldName.KEYWORDS);
+                            hm.put(FieldName.KEYWORDS, kw + ", " + val);
                         } else {
-                            hm.put("keywords", val);
+                            hm.put(FieldName.KEYWORDS, val);
                         }
                     } else if ("U1".equals(lab) || "U2".equals(lab) || "N1".equals(lab)) {
                         if (!comment.isEmpty()) {
@@ -232,24 +233,24 @@ public class RisImporter extends ImportFormat {
                         String doi = val;
                         if (doi.startsWith("doi:")) {
                             doi = doi.replaceAll("(?i)doi:", "").trim();
-                            hm.put("doi", doi);
+                            hm.put(FieldName.DOI, doi);
                         }
                     }
                 }
                 // fix authors
                 if (!author.isEmpty()) {
                     author = AuthorList.fixAuthorLastNameFirst(author);
-                    hm.put("author", author);
+                    hm.put(FieldName.AUTHOR, author);
                 }
                 if (!editor.isEmpty()) {
                     editor = AuthorList.fixAuthorLastNameFirst(editor);
-                    hm.put("editor", editor);
+                    hm.put(FieldName.EDITOR, editor);
                 }
                 if (!comment.isEmpty()) {
                     hm.put("comment", comment);
                 }
 
-                hm.put("pages", startPage + endPage);
+                hm.put(FieldName.PAGES, startPage + endPage);
             }
             BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
 

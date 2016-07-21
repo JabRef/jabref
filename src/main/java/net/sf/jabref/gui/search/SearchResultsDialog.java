@@ -66,6 +66,7 @@ import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -96,7 +97,7 @@ public class SearchResultsDialog {
 
     private JDialog diag;
     private static final String[] FIELDS = new String[] {
-            "author", "title", "year", "journal"
+            FieldName.AUTHOR, FieldName.TITLE, FieldName.YEAR, FieldName.JOURNAL
     };
     private static final int FILE_COL = 0;
     private static final int URL_COL = 1;
@@ -130,7 +131,7 @@ public class SearchResultsDialog {
                 .get(JabRefPreferences.PREVIEW_1);
         preview = new PreviewPanel(null, null, layoutFile);
 
-        sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, "author"));
+        sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, FieldName.AUTHOR));
         model = (DefaultEventTableModel<BibEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,
                 new EntryTableFormat());
         entryTable = new JTable(model);
@@ -238,9 +239,9 @@ public class SearchResultsDialog {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
             if (i == FILE_COL) {
-                comparators.add(new IconComparator(Collections.singletonList(Globals.FILE_FIELD)));
+                comparators.add(new IconComparator(Collections.singletonList(FieldName.FILE)));
             } else if (i == URL_COL) {
-                comparators.add(new IconComparator(Collections.singletonList("url")));
+                comparators.add(new IconComparator(Collections.singletonList(FieldName.URL)));
             }
 
         }
@@ -346,9 +347,9 @@ public class SearchResultsDialog {
                 BasePanel p = entryHome.get(entry);
                 switch (col) {
                 case FILE_COL:
-                    if (entry.hasField(Globals.FILE_FIELD)) {
+                    if (entry.hasField(FieldName.FILE)) {
                         FileListTableModel tableModel = new FileListTableModel();
-                        entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(tableModel::setContent);
+                        entry.getFieldOptional(FieldName.FILE).ifPresent(tableModel::setContent);
                         if (tableModel.getRowCount() == 0) {
                             return;
                         }
@@ -358,8 +359,8 @@ public class SearchResultsDialog {
                     }
                     break;
                 case URL_COL:
-                    entry.getFieldOptional("url").ifPresent(link -> { try {
-                        JabRefDesktop.openExternalViewer(p.getBibDatabaseContext(), link, "url");
+                    entry.getFieldOptional(FieldName.URL).ifPresent(link -> { try {
+                        JabRefDesktop.openExternalViewer(p.getBibDatabaseContext(), link, FieldName.URL);
                     } catch (IOException ex) {
                             LOGGER.warn("Could not open viewer", ex);
                         }
@@ -388,7 +389,7 @@ public class SearchResultsDialog {
             if (col == FILE_COL) {
                 // We use a FileListTableModel to parse the field content:
                 FileListTableModel fileList = new FileListTableModel();
-                entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(fileList::setContent);
+                entry.getFieldOptional(FieldName.FILE).ifPresent(fileList::setContent);
                 // If there are one or more links, open the first one:
                 for (int i = 0; i < fileList.getRowCount(); i++) {
                     FileListEntry flEntry = fileList.getEntry(i);
@@ -456,9 +457,9 @@ public class SearchResultsDialog {
             if (column < PAD) {
                 switch (column) {
                 case FILE_COL:
-                    if (entry.hasField(Globals.FILE_FIELD)) {
+                    if (entry.hasField(FieldName.FILE)) {
                         FileListTableModel tmpModel = new FileListTableModel();
-                        entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(tmpModel::setContent);
+                        entry.getFieldOptional(FieldName.FILE).ifPresent(tmpModel::setContent);
                         fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
                         if (tmpModel.getRowCount() > 0) {
                             if (tmpModel.getEntry(0).type.isPresent()) {
@@ -472,8 +473,8 @@ public class SearchResultsDialog {
                         return null;
                     }
                 case URL_COL:
-                    if (entry.hasField("url")) {
-                        urlLabel.setToolTipText(entry.getFieldOptional("url").get());
+                    if (entry.hasField(FieldName.URL)) {
+                        urlLabel.setToolTipText(entry.getFieldOptional(FieldName.URL).get());
                         return urlLabel;
                     } else {
                         return null;

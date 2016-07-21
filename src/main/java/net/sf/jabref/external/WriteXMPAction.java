@@ -49,6 +49,7 @@ import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
@@ -138,9 +139,9 @@ public class WriteXMPAction extends AbstractWorker {
                     .ifPresent(files::add));
             // Then check the "file" field:
             List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
-            if (entry.hasField(Globals.FILE_FIELD)) {
+            if (entry.hasField(FieldName.FILE)) {
                 FileListTableModel tm = new FileListTableModel();
-                entry.getFieldOptional(Globals.FILE_FIELD).ifPresent(tm::setContent);
+                entry.getFieldOptional(FieldName.FILE).ifPresent(tm::setContent);
                 for (int j = 0; j < tm.getRowCount(); j++) {
                     FileListEntry flEntry = tm.getEntry(j);
                     if ((flEntry.type.isPresent()) && "pdf".equalsIgnoreCase(flEntry.type.get().getName())) {

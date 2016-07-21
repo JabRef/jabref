@@ -129,6 +129,7 @@ import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -475,7 +476,7 @@ public class TextInputDialog extends JDialog {
                         // insert a new name with an additional "and"
                         if (InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.PERSON_NAMES)) {
                             entry.setField(fieldName, old.get() + " and " + txt);
-                        } else if ("keywords".equals(fieldName)) {
+                        } else if (FieldName.KEYWORDS.equals(fieldName)) {
                             // Add keyword
                             entry.addKeyword(txt, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                         } else {

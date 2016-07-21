@@ -28,6 +28,7 @@ import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
@@ -98,9 +99,9 @@ public class FieldComparator implements Comparator<BibEntry> {
             return FieldType.TYPE;
         } else if (InternalBibtexFields.getFieldExtras(this.field[0]).contains(FieldProperties.PERSON_NAMES)) {
             return FieldType.NAME;
-        } else if ("year".equals(this.field[0])) {
+        } else if (FieldName.YEAR.equals(this.field[0])) {
             return FieldType.YEAR;
-        } else if("month".equals(this.field[0])) {
+        } else if(FieldName.MONTH.equals(this.field[0])) {
             return FieldType.MONTH;
         } else {
             return FieldType.OTHER;

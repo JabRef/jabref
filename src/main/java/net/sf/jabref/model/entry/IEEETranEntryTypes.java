@@ -20,8 +20,8 @@ public class IEEETranEntryTypes {
     public static final EntryType ELECTRONIC = new BibtexEntryType() {
 
         {
-            addAllOptional("author", "month", "year", "title", "language", "howpublished", "organization", "address",
-                    "note", "url");
+            addAllOptional(FieldName.AUTHOR, FieldName.MONTH, FieldName.YEAR, FieldName.TITLE, "language", "howpublished", "organization", "address",
+                    "note", FieldName.URL);
 
         }
 
@@ -58,8 +58,8 @@ public class IEEETranEntryTypes {
     public static final EntryType PERIODICAL = new BibtexEntryType() {
 
         {
-            addAllRequired("title", "year");
-            addAllOptional("editor", "language", "series", "volume", "number", "organization", "month", "note", "url");
+            addAllRequired(FieldName.TITLE, FieldName.YEAR);
+            addAllOptional(FieldName.EDITOR, "language", "series", FieldName.VOLUME, FieldName.NUMBER, "organization", FieldName.MONTH, "note", FieldName.URL);
         }
 
         @Override
@@ -77,9 +77,9 @@ public class IEEETranEntryTypes {
     public static final EntryType PATENT = new BibtexEntryType() {
 
         {
-            addAllRequired("nationality", "number", "year/yearfiled");
-            addAllOptional("author", "title", "language", "assignee", "address", "type", "number", "day", "dayfiled",
-                    "month", "monthfiled", "note", "url");
+            addAllRequired("nationality", FieldName.NUMBER, "year/yearfiled");
+            addAllOptional(FieldName.AUTHOR, FieldName.TITLE, "language", "assignee", "address", "type", FieldName.NUMBER, "day", "dayfiled",
+                    FieldName.MONTH, "monthfiled", "note", FieldName.URL);
         }
 
         @Override
@@ -97,9 +97,9 @@ public class IEEETranEntryTypes {
     public static final EntryType STANDARD = new BibtexEntryType() {
 
         {
-            addAllRequired("title", "organization/institution");
-            addAllOptional("author", "language", "howpublished", "type", "number", "revision", "address", "month",
-                    "year", "note", "url");
+            addAllRequired(FieldName.TITLE, "organization/institution");
+            addAllOptional(FieldName.AUTHOR, "language", "howpublished", "type", FieldName.NUMBER, "revision", "address", FieldName.MONTH,
+                    FieldName.YEAR, "note", FieldName.URL);
         }
 
         @Override

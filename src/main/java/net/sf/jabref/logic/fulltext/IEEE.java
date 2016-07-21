@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,7 +37,7 @@ public class IEEE implements FullTextFinder {
 
         String stampString = "";
         // Try URL first -- will primarily work for entries from the old IEEE search
-        Optional<String> urlString = entry.getFieldOptional("url");
+        Optional<String> urlString = entry.getFieldOptional(FieldName.URL);
         if (urlString.isPresent()) {
             // Is the URL a direct link to IEEE?
             Matcher matcher = STAMP_PATTERN.matcher(urlString.get());
@@ -48,7 +49,7 @@ public class IEEE implements FullTextFinder {
 
         // If not, try DOI
         if (stampString.isEmpty()) {
-            Optional<DOI> doi = entry.getFieldOptional("doi").flatMap(DOI::build);
+            Optional<DOI> doi = entry.getFieldOptional(FieldName.DOI).flatMap(DOI::build);
             if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI) && doi.get().getURI().isPresent()) {
                 // Download the HTML page from IEEE
                 String resolvedDOIPage = new URLDownload(doi.get().getURI().get().toURL())

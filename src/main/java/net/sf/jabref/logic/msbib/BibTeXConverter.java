@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.mods.PersonName;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 public class BibTeXConverter {
     private static final String MSBIB_PREFIX = "msbib-";
@@ -31,7 +32,7 @@ public class BibTeXConverter {
             String msField = field.getKey();
             String value = field.getValue();
 
-            if (value != null && MSBibMapping.getBibTeXField(msField) != null) {
+            if ((value != null) && (MSBibMapping.getBibTeXField(msField) != null)) {
                 fieldValues.put(MSBibMapping.getBibTeXField(msField), value);
             }
         }
@@ -42,9 +43,9 @@ public class BibTeXConverter {
             fieldValues.put("language", MSBibMapping.getLanguage(lcid));
         }
 
-        addAuthor(fieldValues, "author", entry.authors);
+        addAuthor(fieldValues, FieldName.AUTHOR, entry.authors);
         addAuthor(fieldValues, MSBIB_PREFIX + "bookauthor", entry.bookAuthors);
-        addAuthor(fieldValues, "editor", entry.editors);
+        addAuthor(fieldValues, FieldName.EDITOR, entry.editors);
         addAuthor(fieldValues, MSBIB_PREFIX + "translator", entry.translators);
         addAuthor(fieldValues, MSBIB_PREFIX + "producername", entry.producerNames);
         addAuthor(fieldValues, MSBIB_PREFIX + "composer", entry.composers);
@@ -59,7 +60,7 @@ public class BibTeXConverter {
         addAuthor(fieldValues, MSBIB_PREFIX + "counsel", entry.counsels);
 
         if (entry.pages != null) {
-            fieldValues.put("pages", entry.pages.toString("--"));
+            fieldValues.put(FieldName.PAGES, entry.pages.toString("--"));
         }
 
         parseStandardNumber(entry.standardNumber, fieldValues);
@@ -103,10 +104,10 @@ public class BibTeXConverter {
         if (standardNum == null) {
             return;
         }
-        parseSingleStandardNumber("ISBN", "isbn", standardNum, map);
-        parseSingleStandardNumber("ISSN", "issn", standardNum, map);
+        parseSingleStandardNumber("ISBN", FieldName.ISBN, standardNum, map);
+        parseSingleStandardNumber("ISSN", FieldName.ISSN, standardNum, map);
         parseSingleStandardNumber("LCCN", "lccn", standardNum, map);
         parseSingleStandardNumber("MRN", "mrnumber", standardNum, map);
-        parseSingleStandardNumber("DOI", "doi", standardNum, map);
+        parseSingleStandardNumber("DOI", FieldName.DOI, standardNum, map);
     }
 }

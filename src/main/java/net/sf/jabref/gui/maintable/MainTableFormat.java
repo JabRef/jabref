@@ -26,6 +26,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
@@ -38,8 +39,8 @@ public class MainTableFormat implements TableFormat<BibEntry> {
 
     // Values to gather iconImages for those columns
     // These values are also used to put a heading into the table; see getColumnName(int)
-    private static final List<String> URL_FIRST = Arrays.asList("url", "doi");
-    private static final List<String> DOI_FIRST = Arrays.asList("doi", "url");
+    private static final List<String> URL_FIRST = Arrays.asList(FieldName.URL, FieldName.DOI);
+    private static final List<String> DOI_FIRST = Arrays.asList(FieldName.DOI, FieldName.URL);
     private static final List<String> ARXIV = Collections.singletonList("eprint");
 
     private final BibDatabase database;

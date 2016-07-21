@@ -5,6 +5,7 @@ import java.util.TreeMap;
 
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.model.entry.FieldName;
 
 import com.google.common.collect.HashBiMap;
 
@@ -16,29 +17,29 @@ public class MSBibMapping {
 
     static {
         bibtexToMSBib.put(BibEntry.KEY_FIELD, "Tag");
-        bibtexToMSBib.put("title", "Title");
-        bibtexToMSBib.put("year", "Year");
-        bibtexToMSBib.put("month", "Month");
+        bibtexToMSBib.put(FieldName.TITLE, "Title");
+        bibtexToMSBib.put(FieldName.YEAR, "Year");
+        bibtexToMSBib.put(FieldName.MONTH, "Month");
         bibtexToMSBib.put("note", "Comments");
-        bibtexToMSBib.put("volume", "Volume");
+        bibtexToMSBib.put(FieldName.VOLUME, "Volume");
         bibtexToMSBib.put("language", "LCID");
         bibtexToMSBib.put("edition", "Edition");
-        bibtexToMSBib.put("publisher", "Publisher");
+        bibtexToMSBib.put(FieldName.PUBLISHER, "Publisher");
         bibtexToMSBib.put("booktitle", "BookTitle");
         //bibtexToMSBib.put("booktitle", "ConferenceName");
-        //bibtexToMSBib.put("pages", "Pages");
+        //bibtexToMSBib.put(FieldName.PAGES, "Pages");
         bibtexToMSBib.put("chapter", "ChapterNumber");
-        bibtexToMSBib.put("journal", "JournalName");
-        bibtexToMSBib.put("number", "Issue");
+        bibtexToMSBib.put(FieldName.JOURNAL, "JournalName");
+        bibtexToMSBib.put(FieldName.NUMBER, "Issue");
         bibtexToMSBib.put("school", "Department");
         bibtexToMSBib.put("institution", "Institution");
-        bibtexToMSBib.put("doi", "DOI");
-        bibtexToMSBib.put("url", "URL");
+        bibtexToMSBib.put(FieldName.DOI, "DOI");
+        bibtexToMSBib.put(FieldName.URL, "URL");
         // BibTeX/Biblatex only fields
         bibtexToMSBib.put("series", BIBTEX_PREFIX + "Series");
-        bibtexToMSBib.put("abstract", BIBTEX_PREFIX + "Abstract");
-        bibtexToMSBib.put("keywords", BIBTEX_PREFIX + "KeyWords");
-        bibtexToMSBib.put("crossref", BIBTEX_PREFIX + "CrossRef");
+        bibtexToMSBib.put(FieldName.ABSTRACT, BIBTEX_PREFIX + "Abstract");
+        bibtexToMSBib.put(FieldName.KEYWORDS, BIBTEX_PREFIX + "KeyWords");
+        bibtexToMSBib.put(FieldName.CROSSREF, BIBTEX_PREFIX + "CrossRef");
         bibtexToMSBib.put("howpublished", BIBTEX_PREFIX + "HowPublished");
         bibtexToMSBib.put("affiliation", BIBTEX_PREFIX + "Affiliation");
         bibtexToMSBib.put("contents", BIBTEX_PREFIX + "Contents");

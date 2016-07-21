@@ -8,6 +8,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -37,7 +38,7 @@ public class CrossRef {
         Optional<DOI> doi = Optional.empty();
 
         // title is minimum requirement
-        Optional<String> title = entry.getFieldOptional("title");
+        Optional<String> title = entry.getFieldOptional(FieldName.TITLE);
 
         if (!title.isPresent() || title.get().isEmpty()) {
             return doi;
@@ -67,14 +68,14 @@ public class CrossRef {
     private static String enhanceQuery(String query, BibEntry entry) {
         StringBuilder enhancedQuery = new StringBuilder(query);
         // author
-        entry.getFieldOptional("author").ifPresent(author -> {
+        entry.getFieldOptional(FieldName.AUTHOR).ifPresent(author -> {
             if (!author.isEmpty()) {
                 enhancedQuery.append('+').append(author);
             }
         });
 
         // year
-        entry.getFieldOptional("year").ifPresent(year -> {
+        entry.getFieldOptional(FieldName.YEAR).ifPresent(year -> {
             if (!year.isEmpty()) {
                 enhancedQuery.append('+').append(year);
             }
@@ -85,7 +86,7 @@ public class CrossRef {
 
     private static boolean checkValidity(BibEntry entry, JSONArray result) {
         // TODO: use latex-free version instead in the future
-        final String entryTitle = removeLaTeX(entry.getField("title"));
+        final String entryTitle = removeLaTeX(entry.getField(FieldName.TITLE));
 
         // currently only title-based
         // title: [ "How the Mind Hurts and Heals the Body." ]
@@ -93,7 +94,7 @@ public class CrossRef {
         try {
             // title
             JSONObject data = result.getJSONObject(0);
-            String dataTitle = data.getJSONArray("title").getString(0);
+            String dataTitle = data.getJSONArray(FieldName.TITLE).getString(0);
 
             if (editDistanceIgnoreCase(entryTitle, dataTitle) <= METRIC_THRESHOLD) {
                 return true;

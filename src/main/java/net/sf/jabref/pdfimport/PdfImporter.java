@@ -48,6 +48,7 @@ import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -215,7 +216,7 @@ public class PdfImporter {
 
         tm.addEntry(0, new FileListEntry(toLink.getName(), FileUtil.shortenFileName(toLink, dirsS).getPath(),
                 ExternalFileTypes.getInstance().getExternalFileTypeByName("PDF")));
-        entry.setField(Globals.FILE_FIELD, tm.getStringRepresentation());
+        entry.setField(FieldName.FILE, tm.getStringRepresentation());
         res.add(entry);
 
     }

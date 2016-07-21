@@ -41,6 +41,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
@@ -563,7 +564,7 @@ public class BibtexParser {
                 // for users if JabRef didn't accept it.
                 if (InternalBibtexFields.getFieldExtras(key).contains(FieldProperties.PERSON_NAMES)) {
                     entry.setField(key, entry.getFieldOptional(key).get() + " and " + content);
-                } else if ("keywords".equals(key)) {
+                } else if (FieldName.KEYWORDS.equals(key)) {
                     //multiple keywords fields should be combined to one
                     entry.addKeyword(content, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                 }

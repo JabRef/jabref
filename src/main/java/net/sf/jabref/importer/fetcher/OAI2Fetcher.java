@@ -37,6 +37,7 @@ import net.sf.jabref.importer.OAI2Handler;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.MonthUtil;
 
@@ -206,12 +207,12 @@ public class OAI2Fetcher implements EntryFetcher {
                 }
 
                 if (fixedKey.matches("\\d\\d\\d\\d\\..*")) {
-                    be.setField("year", "20" + fixedKey.substring(0, 2));
+                    be.setField(FieldName.YEAR, "20" + fixedKey.substring(0, 2));
 
                     int monthNumber = Integer.parseInt(fixedKey.substring(2, 4));
                     MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
                     if (month.isValid()) {
-                        be.setField("month", month.bibtexFormat);
+                        be.setField(FieldName.MONTH, month.bibtexFormat);
                     }
                 }
             }

@@ -43,6 +43,7 @@ import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -152,8 +153,8 @@ public class FreeCiteImporter extends ImportFormat {
                                     // current tag is either begin:author or
                                     // end:authors
                                 }
-                                e.setField("author", sb.toString());
-                            } else if ("journal".equals(ln)) {
+                                e.setField(FieldName.AUTHOR, sb.toString());
+                            } else if (FieldName.JOURNAL.equals(ln)) {
                                 // we guess that the entry is a journal
                                 // the alternative way is to parse
                                 // ctx:context-objects / ctx:context-object / ctx:referent / ctx:metadata-by-val / ctx:metadata / journal / rft:genre
@@ -164,17 +165,17 @@ public class FreeCiteImporter extends ImportFormat {
                             } else if ("tech".equals(ln)) {
                                 type = BibtexEntryTypes.TECHREPORT;
                                 // the content of the "tech" field seems to contain the number of the technical report
-                                e.setField("number", parser.getElementText());
-                            } else if ("doi".equals(ln)
+                                e.setField(FieldName.NUMBER, parser.getElementText());
+                            } else if (FieldName.DOI.equals(ln)
                                     || "institution".equals(ln)
                                     || "location".equals(ln)
-                                    || "number".equals(ln)
+                                    || FieldName.NUMBER.equals(ln)
                                     || "note".equals(ln)
-                                    || "title".equals(ln)
-                                    || "pages".equals(ln)
-                                    || "publisher".equals(ln)
-                                    || "volume".equals(ln)
-                                    || "year".equals(ln)) {
+                                    || FieldName.TITLE.equals(ln)
+                                    || FieldName.PAGES.equals(ln)
+                                    || FieldName.PUBLISHER.equals(ln)
+                                    || FieldName.VOLUME.equals(ln)
+                                    || FieldName.YEAR.equals(ln)) {
                                 e.setField(ln, parser.getElementText());
                             } else if ("booktitle".equals(ln)) {
                                 String booktitle = parser.getElementText();

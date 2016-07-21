@@ -14,10 +14,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.InternalBibtexFields;
@@ -57,12 +57,12 @@ public class IntegrityCheck {
             result.addAll(new BiblatexPagesChecker().check(entry));
         }
 
-        result.addAll(new BracketChecker("title").check(entry));
+        result.addAll(new BracketChecker(FieldName.TITLE).check(entry));
         result.addAll(new YearChecker().check(entry));
         result.addAll(new UrlChecker().check(entry));
         result.addAll(new FileChecker(bibDatabaseContext).check(entry));
         result.addAll(new TypeChecker().check(entry));
-        result.addAll(new AbbreviationChecker("journal").check(entry));
+        result.addAll(new AbbreviationChecker(FieldName.JOURNAL).check(entry));
         result.addAll(new AbbreviationChecker("booktitle").check(entry));
         result.addAll(new BibStringChecker().check(entry));
         result.addAll(new HTMLCharacterChecker().check(entry));
@@ -83,13 +83,13 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional("pages");
+            Optional<String> value = entry.getFieldOptional(FieldName.PAGES);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
 
             if ("proceedings".equalsIgnoreCase(entry.getType())) {
-                return Collections.singletonList(new IntegrityMessage(Localization.lang("wrong entry type as proceedings has page numbers"), entry, "pages"));
+                return Collections.singletonList(new IntegrityMessage(Localization.lang("wrong entry type as proceedings has page numbers"), entry, FieldName.PAGES));
             }
 
             return Collections.emptyList();
@@ -147,7 +147,7 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(Globals.FILE_FIELD);
+            Optional<String> value = entry.getFieldOptional(FieldName.FILE);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -161,7 +161,7 @@ public class IntegrityCheck {
                 if ((!file.isPresent()) || !file.get().exists()) {
                     return Collections.singletonList(
                             new IntegrityMessage(Localization.lang("link should refer to a correct file path"), entry,
-                                    Globals.FILE_FIELD));
+                                    FieldName.FILE));
                 }
             }
 
@@ -173,13 +173,13 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional("url");
+            Optional<String> value = entry.getFieldOptional(FieldName.URL);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
 
             if (!value.get().contains("://")) {
-                return Collections.singletonList(new IntegrityMessage(Localization.lang("should contain a protocol") + ": http[s]://, file://, ftp://, ...", entry, "url"));
+                return Collections.singletonList(new IntegrityMessage(Localization.lang("should contain a protocol") + ": http[s]://, file://, ftp://, ...", entry, FieldName.URL));
             }
 
             return Collections.emptyList();
@@ -255,7 +255,7 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional("title");
+            Optional<String> value = entry.getFieldOptional(FieldName.TITLE);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -282,7 +282,7 @@ public class IntegrityCheck {
             boolean hasCapitalLettersThatBibtexWillConvertToSmallerOnes = HAS_CAPITAL_LETTERS.test(valueOnlySpacesWithinCurlyBraces);
 
             if (hasCapitalLettersThatBibtexWillConvertToSmallerOnes) {
-                return Collections.singletonList(new IntegrityMessage(Localization.lang("large capitals are not masked using curly brackets {}"), entry, "title"));
+                return Collections.singletonList(new IntegrityMessage(Localization.lang("large capitals are not masked using curly brackets {}"), entry, FieldName.TITLE));
             }
 
             return Collections.emptyList();
@@ -298,13 +298,13 @@ public class IntegrityCheck {
          */
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional("year");
+            Optional<String> value = entry.getFieldOptional(FieldName.YEAR);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
 
             if (!CONTAINS_FOUR_DIGIT.test(value.get().trim())) {
-                return Collections.singletonList(new IntegrityMessage(Localization.lang("should contain a four digit number"), entry, "year"));
+                return Collections.singletonList(new IntegrityMessage(Localization.lang("should contain a four digit number"), entry, FieldName.YEAR));
             }
 
             return Collections.emptyList();
@@ -339,13 +339,13 @@ public class IntegrityCheck {
          */
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional("pages");
+            Optional<String> value = entry.getFieldOptional(FieldName.PAGES);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
 
             if (!VALID_PAGE_NUMBER.test(value.get().trim())) {
-                return Collections.singletonList(new IntegrityMessage(Localization.lang("should contain a valid page number range"), entry, "pages"));
+                return Collections.singletonList(new IntegrityMessage(Localization.lang("should contain a valid page number range"), entry, FieldName.PAGES));
             }
 
             return Collections.emptyList();
@@ -376,13 +376,13 @@ public class IntegrityCheck {
          */
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional("pages");
+            Optional<String> value = entry.getFieldOptional(FieldName.PAGES);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
 
             if (!VALID_PAGE_NUMBER.test(value.get().trim())) {
-                return Collections.singletonList(new IntegrityMessage(Localization.lang("should contain a valid page number range"), entry, "pages"));
+                return Collections.singletonList(new IntegrityMessage(Localization.lang("should contain a valid page number range"), entry, FieldName.PAGES));
             }
 
             return Collections.emptyList();
@@ -404,7 +404,7 @@ public class IntegrityCheck {
 
             Map<String, String> fields = entry.getFieldMap();
             // the url field should not be checked for hashes, as they are legal in this field
-            fields.remove("url");
+            fields.remove(FieldName.URL);
 
             for (Map.Entry<String, String> field : fields.entrySet()) {
                 Matcher hashMatcher = UNESCAPED_HASH.matcher(field.getValue());

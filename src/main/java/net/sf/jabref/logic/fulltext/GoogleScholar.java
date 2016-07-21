@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,12 +31,12 @@ public class GoogleScholar implements FullTextFinder {
         Optional<URL> pdfLink = Optional.empty();
 
         // Search in title
-        if (!entry.hasField("title")) {
+        if (!entry.hasField(FieldName.TITLE)) {
             return pdfLink;
         }
 
         String url = String.format(SEARCH_URL,
-                URLEncoder.encode(entry.getFieldOptional("title").orElse(null), StandardCharsets.UTF_8.name()));
+                URLEncoder.encode(entry.getFieldOptional(FieldName.TITLE).orElse(null), StandardCharsets.UTF_8.name()));
 
         Document doc = Jsoup.connect(url)
                 .userAgent("Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0") // don't identify as a crawler

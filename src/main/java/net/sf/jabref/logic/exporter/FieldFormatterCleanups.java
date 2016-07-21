@@ -19,6 +19,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 public class FieldFormatterCleanups {
 
@@ -26,7 +27,7 @@ public class FieldFormatterCleanups {
 
     private static List<Formatter> availableFormatters;
 
-    private boolean enabled;
+    private final boolean enabled;
 
     public static final FieldFormatterCleanups DEFAULT_SAVE_ACTIONS;
 
@@ -35,8 +36,8 @@ public class FieldFormatterCleanups {
         availableFormatters.addAll(Formatters.ALL);
 
         List<FieldFormatterCleanup> defaultFormatters = new ArrayList<>();
-        defaultFormatters.add(new FieldFormatterCleanup("pages", new NormalizePagesFormatter()));
-        defaultFormatters.add(new FieldFormatterCleanup("month", new NormalizeMonthFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup(FieldName.PAGES, new NormalizePagesFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup(FieldName.MONTH, new NormalizeMonthFormatter()));
         defaultFormatters.add(new FieldFormatterCleanup("booktitle", new OrdinalsToSuperscriptFormatter()));
         DEFAULT_SAVE_ACTIONS = new FieldFormatterCleanups(false, defaultFormatters);
     }
@@ -214,7 +215,7 @@ public class FieldFormatterCleanups {
 
     public static FieldFormatterCleanups parse(List<String> formatterMetaList) {
 
-        if (formatterMetaList != null && formatterMetaList.size() >= 2) {
+        if ((formatterMetaList != null) && (formatterMetaList.size() >= 2)) {
             boolean enablementStatus = "enabled".equals(formatterMetaList.get(0));
             String formatterString = formatterMetaList.get(1);
             return new FieldFormatterCleanups(enablementStatus, formatterString);

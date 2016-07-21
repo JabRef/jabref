@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
@@ -43,9 +44,9 @@ public class AutoCompleterFactory {
 
         if (InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.PERSON_NAMES)) {
             return new NameFieldAutoCompleter(fieldName, preferences);
-        } else if ("crossref".equals(fieldName)) {
+        } else if (FieldName.CROSSREF.equals(fieldName)) {
             return new BibtexKeyAutoCompleter(preferences);
-        } else if ("journal".equals(fieldName) || "publisher".equals(fieldName)) {
+        } else if (FieldName.JOURNAL.equals(fieldName) || FieldName.PUBLISHER.equals(fieldName)) {
             return new JournalAutoCompleter(fieldName, preferences, abbreviationLoader);
         } else {
             return new DefaultAutoCompleter(fieldName, preferences);
@@ -53,7 +54,7 @@ public class AutoCompleterFactory {
     }
 
     public AutoCompleter<String> getPersonAutoCompleter() {
-        return new NameFieldAutoCompleter(Arrays.asList("author", "editor"), true, preferences);
+        return new NameFieldAutoCompleter(Arrays.asList(FieldName.AUTHOR, FieldName.EDITOR), true, preferences);
     }
 
 }

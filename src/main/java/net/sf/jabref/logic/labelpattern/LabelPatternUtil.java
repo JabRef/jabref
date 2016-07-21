@@ -33,6 +33,7 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -602,7 +603,7 @@ public class LabelPatternUtil {
                  * form "pureauth..." which does not do this fallback
                  * substitution of editor.
                  */
-                String authString = entry.getField("author");
+                String authString = entry.getField(FieldName.AUTHOR);
                 if (authString != null) {
                     authString = normalize(database.resolveForStrings(authString));
                 }
@@ -614,7 +615,7 @@ public class LabelPatternUtil {
                 }
 
                 if ((authString == null) || authString.isEmpty()) {
-                    authString = entry.getField("editor");
+                    authString = entry.getField(FieldName.EDITOR);
                     if (authString == null) {
                         authString = "";
                     } else {
@@ -688,39 +689,39 @@ public class LabelPatternUtil {
                 // Gather all markers starting with "ed" here, so we
                 // don't have to check all the time.
                 if ("edtr".equals(val)) {
-                    return firstAuthor(entry.getField("editor"));
+                    return firstAuthor(entry.getField(FieldName.EDITOR));
                 } else if ("edtrForeIni".equals(val)) {
-                    return firstAuthorForenameInitials(entry.getField("editor"));
+                    return firstAuthorForenameInitials(entry.getField(FieldName.EDITOR));
                 } else if ("editors".equals(val)) {
-                    return allAuthors(entry.getField("editor"));
+                    return allAuthors(entry.getField(FieldName.EDITOR));
                     // Last author's last name
                 } else if ("editorLast".equals(val)) {
-                    return lastAuthor(entry.getField("editor"));
+                    return lastAuthor(entry.getField(FieldName.EDITOR));
                 } else if ("editorLastForeIni".equals(val)) {
-                    return lastAuthorForenameInitials(entry.getField("editor"));
+                    return lastAuthorForenameInitials(entry.getField(FieldName.EDITOR));
                 } else if ("editorIni".equals(val)) {
-                    return oneAuthorPlusIni(entry.getField("editor"));
+                    return oneAuthorPlusIni(entry.getField(FieldName.EDITOR));
                 } else if (val.matches("edtrIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
-                    String s = authIniN(entry.getField("editor"), num);
+                    String s = authIniN(entry.getField(FieldName.EDITOR), num);
                     return s == null ? "" : s;
                 } else if (val.matches("edtr[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
-                    String s = authNofMth(entry.getField("editor"),
+                    String s = authNofMth(entry.getField(FieldName.EDITOR),
                             Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]) - 1);
                     return s == null ? "" : s;
                 } else if ("edtr.edtr.ea".equals(val)) {
-                    String s = authAuthEa(entry.getField("editor"));
+                    String s = authAuthEa(entry.getField(FieldName.EDITOR));
                     return s == null ? "" : s;
                 } else if ("edtrshort".equals(val)) {
-                    String s = authshort(entry.getField("editor"));
+                    String s = authshort(entry.getField(FieldName.EDITOR));
                     return s == null ? "" : s;
                 }
                 // authN. First N chars of the first author's last
                 // name.
                 else if (val.matches("edtr\\d+")) {
-                    String fa = firstAuthor(entry.getField("editor"));
+                    String fa = firstAuthor(entry.getField(FieldName.EDITOR));
                     if (fa == null) {
                         return "";
                     }
@@ -735,17 +736,17 @@ public class LabelPatternUtil {
                     return getField(entry, val);
                 }
             } else if ("firstpage".equals(val)) {
-                return firstPage(entry.getField("pages"));
+                return firstPage(entry.getField(FieldName.PAGES));
             } else if ("lastpage".equals(val)) {
-                return lastPage(entry.getField("pages"));
+                return lastPage(entry.getField(FieldName.PAGES));
             } else if ("shorttitle".equals(val)) {
-                return getTitleWords(3, entry.getField("title"));
+                return getTitleWords(3, entry.getField(FieldName.TITLE));
             } else if ("shorttitleINI".equals(val)) {
-                return keepLettersAndDigitsOnly(applyModifiers(getTitleWordsWithSpaces(3, entry.getField("title")), new String[] {"abbr"}, 0));
+                return keepLettersAndDigitsOnly(applyModifiers(getTitleWordsWithSpaces(3, entry.getField(FieldName.TITLE)), new String[] {"abbr"}, 0));
             } else if ("veryshorttitle".equals(val)) {
-                return getTitleWords(1, entry.getField("title"));
+                return getTitleWords(1, entry.getField(FieldName.TITLE));
             } else if ("shortyear".equals(val)) {
-                String ss = entry.getFieldOrAlias("year").orElse("");
+                String ss = entry.getFieldOrAlias(FieldName.YEAR).orElse("");
                 if (ss.isEmpty()) {
                     return ss;
                 } else if (ss.startsWith("in") || ss.startsWith("sub")) {
