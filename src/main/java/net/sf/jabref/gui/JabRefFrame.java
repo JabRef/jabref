@@ -336,7 +336,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final Action toggleToolbar = enableToggle(new AbstractAction(Localization.menuTitle("Hide/show toolbar")) {
 
         {
-            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.HIDE_SHOW_TOOLBAR));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Hide/show toolbar"));
         }
 

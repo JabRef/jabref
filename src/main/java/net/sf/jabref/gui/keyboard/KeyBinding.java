@@ -40,7 +40,6 @@ public enum KeyBinding {
     FOCUS_ENTRY_TABLE("Focus entry table", Localization.lang("Focus entry table"), "alt 1"),
     FORWARD("Forward", Localization.lang("Forward"), "alt RIGHT"),
     HELP("Help", Localization.lang("Help"), "F1"),
-    HIDE_SHOW_TOOLBAR("Hide/show toolbar", Localization.lang("Hide/show toolbar"), "alt 6"),
     IMPORT_INTO_CURRENT_DATABASE("Import into current database", Localization.lang("Import into current database"), "ctrl I"),
     IMPORT_INTO_NEW_DATABASE("Import into new database", Localization.lang("Import into new database"), "ctrl alt I"),
     INCREASE_TABLE_FONT_SIZE("Increase table font size", Localization.lang("Increase table font size"), "ctrl PLUS"),
@@ -87,9 +86,9 @@ public enum KeyBinding {
     UNABBREVIATE("Unabbreviate", Localization.lang("Unabbreviate"), "ctrl alt shift A"),
     UNDO("Undo", Localization.lang("Undo"), "ctrl Z"),
     UNMARK_ENTRIES("Unmark entries", Localization.lang("Unmark entries"), "ctrl shift M"),
-    WEB_SEARCH("Web search", Localization.lang("Web search"), "alt + 5"),
+    WEB_SEARCH("Web search", Localization.lang("Web search"), "alt + 4"),
     WRITE_XMP("Write XMP", Localization.lang("Write XMP"), "F6"),
-    OPEN_OFFICE_LIBRE_CONNECTION("Open office/libre connection", Localization.lang("Open office/libre connection"), "alt 4"),;
+    OPEN_OFFICE_LIBRE_CONNECTION("Open office/libre connection", Localization.lang("Open office/libre connection"), "alt 0"),;
 
     private final String key;
     private final String localization;
