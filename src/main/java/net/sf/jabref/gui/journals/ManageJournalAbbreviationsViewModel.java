@@ -83,10 +83,6 @@ public class ManageJournalAbbreviationsViewModel {
         journalFiles.add(ieeeFile);
     }
 
-    public void removeBuiltInLists() {
-        journalFiles.removeIf(item -> item.isPseudoFileProperty().get());
-    }
-
     /**
      * Read all saved file paths and read their abbreviations
      */
@@ -234,7 +230,8 @@ public class ManageJournalAbbreviationsViewModel {
      */
     public void deleteAbbreviation() {
         int index = abbreviations.indexOf(currentAbbreviation.get());
-        if (index > 0) {
+        // index > 1 because there is a pseudo abbreviation at the start of every editable abbreviation list
+        if (index > 1) {
             currentAbbreviation.set(abbreviations.get(index - 1));
         } else if ((index + 1) < abbreviationsCount.get()) {
             currentAbbreviation.set(abbreviations.get(index + 1));

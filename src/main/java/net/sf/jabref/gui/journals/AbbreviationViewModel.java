@@ -49,6 +49,10 @@ public class AbbreviationViewModel {
         }
     }
 
+    public Abbreviation getAbbreviationObject() {
+        return this.abbreviationObject;
+    }
+
     public void setName(String name) {
         this.name.set(name);
     }
