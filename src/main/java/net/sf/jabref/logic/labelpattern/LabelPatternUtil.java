@@ -34,7 +34,6 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,11 +56,6 @@ public class LabelPatternUtil {
     private static List<String> defaultLabelPattern;
 
     private static final int CHARS_OF_FIRST = 5;
-
-
-    static {
-        updateDefaultPattern(LabelPatternPreferences.fromPreferences(JabRefPreferences.getInstance()));
-    }
 
     private static BibDatabase database;
 
@@ -473,7 +467,7 @@ public class LabelPatternUtil {
         }
 
         // Remove all illegal characters from the key.
-        key = checkLegalKey(stringBuilder.toString());
+        key = checkLegalKey(stringBuilder.toString(), labelPatternPreferences.isEnforceLegalKey());
 
         // Remove Regular Expressions while generating Keys
         String regex = labelPatternPreferences.getKeyPatternRegex();
@@ -1382,21 +1376,6 @@ public class LabelPatternUtil {
         return parts.toArray(new String[parts.size()]);
     }
 
-    /**
-     * This method returns a String similar to the one passed in, except that it is molded into a form that is
-     * acceptable for bibtex.
-     * <p>
-     * Watch-out that the returned string might be of length 0 afterwards.
-     *
-     * @param key mayBeNull
-     */
-    public static String checkLegalKey(String key) {
-        if (key == null) {
-            return null;
-        }
-        return checkLegalKey(key,
-                JabRefPreferences.getInstance().getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
-    }
 
     /**
      * This method returns a String similar to the one passed in, except that it is molded into a form that is

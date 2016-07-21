@@ -46,8 +46,10 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionListener;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * @author alver
@@ -249,7 +251,8 @@ class FieldSetComponent extends JPanel implements ActionListener {
             return;
         }
 
-        String testString = LabelPatternUtil.checkLegalKey(s);
+        String testString = LabelPatternUtil.checkLegalKey(s,
+                Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
         if (!testString.equals(s) || (s.indexOf('&') >= 0)) {
             // Report error and exit.
             JOptionPane.showMessageDialog(this, Localization.lang("Field names are not allowed to contain white space or the following "

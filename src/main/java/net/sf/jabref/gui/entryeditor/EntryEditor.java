@@ -1103,7 +1103,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
 
                 // Make sure the key is legal:
-                String cleaned = LabelPatternUtil.checkLegalKey(newValue);
+                String cleaned = LabelPatternUtil.checkLegalKey(newValue,
+                        Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
                 if ((cleaned == null) || cleaned.equals(newValue)) {
                     textField.setValidBackgroundColor();
                 } else {
