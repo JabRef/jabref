@@ -19,6 +19,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#1249](https://github.com/JabRef/jabref/issues/1249) Date layout formatter added
 - Added ISBN integrity checker
 - Added filter to not show selected integrity checks
+- Enhance the entry customization dialog to give better visual feedback
 
 ### Fixed
 - Fixed [#1264](https://github.com/JabRef/jabref/issues/1264): S with caron does not render correctly

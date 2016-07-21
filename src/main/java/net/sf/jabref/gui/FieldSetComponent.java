@@ -22,6 +22,8 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -48,7 +50,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 
 /**
- *
  * @author alver
  */
 class FieldSetComponent extends JPanel implements ActionListener {
@@ -176,6 +177,8 @@ class FieldSetComponent extends JPanel implements ActionListener {
         gbl.setConstraints(add, con);
         add(add);
 
+        FieldListFocusListener fieldListFocusListener = new FieldListFocusListener(list);
+        list.addFocusListener(fieldListFocusListener);
     }
 
     public void setListSelectionMode(int mode) {
@@ -191,7 +194,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
         // Make sure it is visible:
         JViewport viewport = sp.getViewport();
         Rectangle rectangle = list.getCellBounds(idx, idx);
-        if(rectangle != null) {
+        if (rectangle != null) {
             viewport.scrollRectToVisible(rectangle);
         }
 
@@ -363,5 +366,30 @@ class FieldSetComponent extends JPanel implements ActionListener {
             move(1);
         }
     }
+
+    /**
+     * FocusListener to select the first entry in the list of fields when they are focused
+     */
+    protected class FieldListFocusListener<T> implements FocusListener {
+
+        private JList<T> list;
+
+        public FieldListFocusListener(JList<T> list) {
+            this.list = list;
+        }
+
+        @Override
+        public void focusGained(FocusEvent e) {
+            if (list.getSelectedValue() == null) {
+                list.setSelectedIndex(0);
+            }
+        }
+
+        @Override
+        public void focusLost(FocusEvent e) {
+            //focus should remain at the same position so nothing to do here
+        }
+    }
+
 
 }
