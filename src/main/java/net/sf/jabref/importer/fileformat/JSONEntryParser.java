@@ -171,7 +171,7 @@ public class JSONEntryParser {
         } else {
             // Probably book chapter or from proceeding, go for book chapter
             entry.setType("incollection");
-            nametype = "booktitle";
+            nametype = FieldName.BOOKTITLE;
             entry.setField(FieldName.ISBN, isbn);
         }
 

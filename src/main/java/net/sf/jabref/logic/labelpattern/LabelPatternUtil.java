@@ -310,7 +310,7 @@ public class LabelPatternUtil {
                 if (k.matches("^[Tt][Ee][Cc][Hh].*")) { // Starts with "tech" case and locale independent
                     isTechnology = true;
                 }
-                if ("school".equalsIgnoreCase(k)) {
+                if (FieldName.SCHOOL.equalsIgnoreCase(k)) {
                     isSchool = true;
                 }
                 if (k.matches("^[Dd][EeIi][Pp].*") || k.matches("^[Ll][Aa][Bb].*")) { // Starts with "dep"/"dip"/"lab", case and locale independent
@@ -347,7 +347,7 @@ public class LabelPatternUtil {
                 StringBuilder schoolSB = new StringBuilder();
                 StringBuilder departmentSB = new StringBuilder();
                 for (String k : part) {
-                    if (!k.matches("^[Dd][EeIi][Pp].*") && !"school".equalsIgnoreCase(k)
+                    if (!k.matches("^[Dd][EeIi][Pp].*") && !FieldName.SCHOOL.equalsIgnoreCase(k)
                             && !"faculty".equalsIgnoreCase(k)
                             && !(k.replaceAll(STARTING_CAPITAL_PATTERN, "").isEmpty())) {
                         if (isSchool) {

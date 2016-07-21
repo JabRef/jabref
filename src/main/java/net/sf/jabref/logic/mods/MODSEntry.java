@@ -131,7 +131,7 @@ class MODSEntry {
         if ("article".equals(bibtex.getType()) || "inproceedings".equals(bibtex.getType())) {
             host = new MODSEntry();
             host.entryType = "relatedItem";
-            host.title = bibtex.getField("booktitle");
+            host.title = bibtex.getField(FieldName.BOOKTITLE);
             host.publisher = bibtex.getField(FieldName.PUBLISHER);
             host.number = bibtex.getField(FieldName.NUMBER);
             if (bibtex.hasField(FieldName.VOLUME)) {

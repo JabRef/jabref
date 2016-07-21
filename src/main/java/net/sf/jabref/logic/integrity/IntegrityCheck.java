@@ -63,7 +63,7 @@ public class IntegrityCheck {
         result.addAll(new FileChecker(bibDatabaseContext).check(entry));
         result.addAll(new TypeChecker().check(entry));
         result.addAll(new AbbreviationChecker(FieldName.JOURNAL).check(entry));
-        result.addAll(new AbbreviationChecker("booktitle").check(entry));
+        result.addAll(new AbbreviationChecker(FieldName.BOOKTITLE).check(entry));
         result.addAll(new BibStringChecker().check(entry));
         result.addAll(new HTMLCharacterChecker().check(entry));
         result.addAll(new BooktitleChecker().check(entry));
@@ -100,7 +100,7 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            String field = "booktitle";
+            String field = FieldName.BOOKTITLE;
             Optional<String> value = entry.getFieldOptional(field);
             if (!value.isPresent()) {
                 return Collections.emptyList();

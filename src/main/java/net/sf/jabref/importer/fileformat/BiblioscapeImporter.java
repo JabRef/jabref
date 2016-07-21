@@ -119,7 +119,7 @@ public class BiblioscapeImporter extends ImportFormat {
                         comments
                         .add("Secondary Authors: " + entry.getValue());
                     } else if ("NT".equals(entry.getKey())) {
-                        hm.put("note", entry
+                        hm.put(FieldName.NOTE, entry
                                 .getValue().toString());
                     } else if ("PB".equals(entry.getKey())) {
                         hm.put(FieldName.PUBLISHER, entry
@@ -131,7 +131,7 @@ public class BiblioscapeImporter extends ImportFormat {
                         comments
                         .add("Tertiary Title: " + entry.getValue());
                     } else if ("ED".equals(entry.getKey())) {
-                        hm.put("edition", entry
+                        hm.put(FieldName.EDITION, entry
                                 .getValue().toString());
                     } else if ("TW".equals(entry.getKey())) {
                         type[1] = entry.getValue()
@@ -152,7 +152,7 @@ public class BiblioscapeImporter extends ImportFormat {
                         address = entry.getValue()
                                 .toString();
                     } else if ("LG".equals(entry.getKey())) {
-                        hm.put("language", entry
+                        hm.put(FieldName.LANGUAGE, entry
                                 .getValue().toString());
                     } else if ("CO".equals(entry.getKey())) {
                         country = entry.getValue()
@@ -239,14 +239,14 @@ public class BiblioscapeImporter extends ImportFormat {
                     }
                 } else if ("inbook".equals(bibtexType)) {
                     if (titleST != null) {
-                        hm.put("booktitle", titleST);
+                        hm.put(FieldName.BOOKTITLE, titleST);
                     }
                     if (titleTI != null) {
                         hm.put(FieldName.TITLE, titleTI);
                     }
                 } else {
                     if (titleST != null) {
-                        hm.put("booktitle", titleST); // should not
+                        hm.put(FieldName.BOOKTITLE, titleST); // should not
                     }
                     // happen, I
                     // think
@@ -262,7 +262,7 @@ public class BiblioscapeImporter extends ImportFormat {
 
                 // concatenate address and country
                 if (address != null) {
-                    hm.put("address", address + (country == null ? "" : ", " + country));
+                    hm.put(FieldName.ADDRESS, address + (country == null ? "" : ", " + country));
                 }
 
                 if (!comments.isEmpty()) { // set comment if present

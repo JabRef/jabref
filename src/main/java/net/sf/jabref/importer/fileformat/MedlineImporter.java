@@ -80,6 +80,7 @@ import net.sf.jabref.importer.fileformat.medline.Sections;
 import net.sf.jabref.importer.fileformat.medline.Text;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
 
 import com.google.common.base.Joiner;
@@ -283,7 +284,7 @@ public class MedlineImporter extends ImportFormat {
         }
 
         putIfValueNotNull(fields, "volume", book.getVolume());
-        putIfValueNotNull(fields, "edition", book.getEdition());
+        putIfValueNotNull(fields, FieldName.EDITION, book.getEdition());
         putIfValueNotNull(fields, "medium", book.getMedium());
         putIfValueNotNull(fields, "reportnumber", book.getReportNumber());
 
@@ -406,7 +407,7 @@ public class MedlineImporter extends ImportFormat {
                 notes.add(note.getContent());
             }
         }
-        fields.put("note", join(notes, ", "));
+        fields.put(FieldName.NOTE, join(notes, ", "));
     }
 
     private void addInvestigators(HashMap<String, String> fields, InvestigatorList investigatorList) {

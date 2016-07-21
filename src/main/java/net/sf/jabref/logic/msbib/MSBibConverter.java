@@ -32,8 +32,8 @@ public class MSBibConverter {
         }
 
         // Duplicate: also added as BookTitle
-        if (entry.hasField("booktitle")) {
-            result.conferenceName = entry.getField("booktitle");
+        if (entry.hasField(FieldName.BOOKTITLE)) {
+            result.conferenceName = entry.getField(FieldName.BOOKTITLE);
         }
 
         if (entry.hasField(FieldName.PAGES)) {
@@ -55,8 +55,8 @@ public class MSBibConverter {
         }
 
         // Value must be converted
-        if (entry.hasField("language")) {
-            result.fields.put("LCID", String.valueOf(MSBibMapping.getLCID(entry.getField("language"))));
+        if (entry.hasField(FieldName.LANGUAGE)) {
+            result.fields.put("LCID", String.valueOf(MSBibMapping.getLCID(entry.getField(FieldName.LANGUAGE))));
         }
 
         result.standardNumber = "";
@@ -79,12 +79,12 @@ public class MSBibConverter {
             result.standardNumber = null;
         }
 
-        if (entry.hasField("address")) {
-            result.address = entry.getField("address");
+        if (entry.hasField(FieldName.ADDRESS)) {
+            result.address = entry.getField(FieldName.ADDRESS);
         }
 
-        if (entry.hasField("type")) {
-            result.thesisType = entry.getField("type");
+        if (entry.hasField(FieldName.TYPE)) {
+            result.thesisType = entry.getField(FieldName.TYPE);
         } else {
             if ("techreport".equalsIgnoreCase(entry.getType())) {
                 result.thesisType = "Tech. rep.";

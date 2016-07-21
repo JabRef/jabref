@@ -157,21 +157,21 @@ public class MedlinePlainImporter extends ImportFormat {
                 //store the fields in a map
                 Map<String, String> hashMap = new HashMap<>();
                 hashMap.put("PG", FieldName.PAGES);
-                hashMap.put("PL", "address");
+                hashMap.put("PL", FieldName.ADDRESS);
                 hashMap.put("PHST", "history");
                 hashMap.put("PST", "publication-status");
                 hashMap.put("VI", FieldName.VOLUME);
-                hashMap.put("LA", "language");
-                hashMap.put("LA", "language");
+                hashMap.put("LA", FieldName.LANGUAGE);
+                hashMap.put("LA", FieldName.LANGUAGE);
                 hashMap.put("PUBM", "model");
                 hashMap.put("RN", "registry-number");
                 hashMap.put("NM", "substance-name");
                 hashMap.put("OCI", "copyright-owner");
                 hashMap.put("CN", "corporate");
                 hashMap.put("IP", FieldName.ISSUE);
-                hashMap.put("EN", "edition");
+                hashMap.put("EN", FieldName.EDITION);
                 hashMap.put("GS", "gene-symbol");
-                hashMap.put("GN", "note");
+                hashMap.put("GN", FieldName.NOTE);
                 hashMap.put("GR", "grantno");
                 hashMap.put("SO", "source");
                 hashMap.put("NR", "number-of-references");
@@ -341,10 +341,10 @@ public class MedlinePlainImporter extends ImportFormat {
                 }
             }
         } else if ("BTI".equals(lab) || "CTI".equals(lab)) {
-            hm.put("booktitle", val);
+            hm.put(FieldName.BOOKTITLE, val);
         } else if ("JT".equals(lab)) {
             if ("inproceedings".equals(type)) {
-                hm.put("booktitle", val);
+                hm.put(FieldName.BOOKTITLE, val);
             } else {
                 hm.put(FieldName.JOURNAL, val);
             }

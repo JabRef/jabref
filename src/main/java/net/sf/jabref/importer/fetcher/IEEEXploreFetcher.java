@@ -373,9 +373,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
         String sourceField = "";
         if ("article".equals(type)) {
             sourceField = FieldName.JOURNAL;
-            entry.clearField("booktitle");
+            entry.clearField(FieldName.BOOKTITLE);
         } else if ("inproceedings".equals(type)) {
-            sourceField = "booktitle";
+            sourceField = FieldName.BOOKTITLE;
         }
         if (entry.hasField(sourceField)) {
             String fullName = entry.getField(sourceField);
@@ -393,7 +393,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 if (parts.length == 3) {
                     fullName += parts[2];
                 }
-                String note = entry.getField("note");
+                String note = entry.getField(FieldName.NOTE);
                 if ("Early Access".equals(note)) {
                     entry.setField(FieldName.YEAR, "to be published");
                     entry.clearField(FieldName.MONTH);

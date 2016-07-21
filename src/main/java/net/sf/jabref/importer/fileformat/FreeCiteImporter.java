@@ -167,24 +167,24 @@ public class FreeCiteImporter extends ImportFormat {
                                 // the content of the "tech" field seems to contain the number of the technical report
                                 e.setField(FieldName.NUMBER, parser.getElementText());
                             } else if (FieldName.DOI.equals(ln)
-                                    || "institution".equals(ln)
+                                    || FieldName.INSTITUTION.equals(ln)
                                     || "location".equals(ln)
                                     || FieldName.NUMBER.equals(ln)
-                                    || "note".equals(ln)
+                                    || FieldName.NOTE.equals(ln)
                                     || FieldName.TITLE.equals(ln)
                                     || FieldName.PAGES.equals(ln)
                                     || FieldName.PUBLISHER.equals(ln)
                                     || FieldName.VOLUME.equals(ln)
                                     || FieldName.YEAR.equals(ln)) {
                                 e.setField(ln, parser.getElementText());
-                            } else if ("booktitle".equals(ln)) {
+                            } else if (FieldName.BOOKTITLE.equals(ln)) {
                                 String booktitle = parser.getElementText();
                                 if (booktitle.startsWith("In ")) {
                                     // special treatment for parsing of
                                     // "In proceedings of..." references
                                     booktitle = booktitle.substring(3);
                                 }
-                                e.setField("booktitle", booktitle);
+                                e.setField(FieldName.BOOKTITLE, booktitle);
                             } else if ("raw_string".equals(ln)) {
                                 // raw input string is ignored
                             } else {
@@ -200,13 +200,13 @@ public class FreeCiteImporter extends ImportFormat {
 
                     if (noteSB.length() > 0) {
                         String note;
-                        if (e.hasField("note")) {
+                        if (e.hasField(FieldName.NOTE)) {
                             // "note" could have been set during the parsing as FreeCite also returns "note"
-                            note = e.getFieldOptional("note").get().concat(Globals.NEWLINE).concat(noteSB.toString());
+                            note = e.getFieldOptional(FieldName.NOTE).get().concat(Globals.NEWLINE).concat(noteSB.toString());
                         } else {
                             note = noteSB.toString();
                         }
-                        e.setField("note", note);
+                        e.setField(FieldName.NOTE, note);
                     }
 
                     // type has been derived from "genre"

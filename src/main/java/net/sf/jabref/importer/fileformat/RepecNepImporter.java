@@ -309,7 +309,7 @@ public class RepecNepImporter extends ImportFormat {
             be.setField(FieldName.AUTHOR, String.join(" and ", authors));
         }
         if (institutions.length() > 0) {
-            be.setField("institution", institutions.toString());
+            be.setField(FieldName.INSTITUTION, institutions.toString());
         }
     }
 
