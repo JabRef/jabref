@@ -162,7 +162,6 @@ public class MedlinePlainImporter extends ImportFormat {
                 hashMap.put("PST", "publication-status");
                 hashMap.put("VI", FieldName.VOLUME);
                 hashMap.put("LA", FieldName.LANGUAGE);
-                hashMap.put("LA", FieldName.LANGUAGE);
                 hashMap.put("PUBM", "model");
                 hashMap.put("RN", "registry-number");
                 hashMap.put("NM", "substance-name");
