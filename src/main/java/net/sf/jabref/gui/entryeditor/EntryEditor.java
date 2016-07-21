@@ -309,7 +309,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         otherFields.remove("bibtexkey");
         otherFields.removeAll(Globals.prefs.getCustomTabFieldNames());
 
-        if(!otherFields.isEmpty()) {
+        if (!otherFields.isEmpty()) {
             addOtherTab(otherFields);
         }
 
@@ -1026,6 +1026,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 Object activeTab = tabs.get(tabbed.getSelectedIndex());
                 if (activeTab instanceof EntryEditorTab) {
                     ((EntryEditorTab) activeTab).updateAll();
+                    activateVisible();
                 }
             });
         }
@@ -1436,7 +1437,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private void warnEmptyBibtexkey() {
-        panel.output(Localization.lang("Empty BibTeX key")+". "+Localization.lang("Grouping may not work for this entry."));
+        panel.output(Localization.lang("Empty BibTeX key") + ". " + Localization.lang("Grouping may not work for this entry."));
     }
 
 
