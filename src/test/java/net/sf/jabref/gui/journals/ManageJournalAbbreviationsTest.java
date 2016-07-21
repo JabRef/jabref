@@ -263,6 +263,20 @@ public class ManageJournalAbbreviationsTest {
     }
 
     @Test
+    public void testBuiltInListsStandardIEEE() {
+        viewModel.addBuiltInLists();
+        selectLastJournalFile();
+        Globals.prefs.put(JabRefPreferences.USE_IEEE_ABRV, "true");
+        Assert.assertEquals(2, viewModel.journalFilesProperty().getSize());
+        ObservableList<Abbreviation> expected = FXCollections
+                .observableArrayList(Globals.journalAbbreviationLoader.getOfficialIEEEAbbreviations());
+        ObservableList<AbbreviationViewModel> actual = viewModel.abbreviationsProperty().get();
+        ObservableList<Abbreviation> actualAbbreviations = FXCollections.observableArrayList();
+        actual.forEach(abbViewModel -> actualAbbreviations.add(abbViewModel.getAbbreviationObject()));
+        Assert.assertEquals(expected, actualAbbreviations);
+    }
+
+    @Test
     public void testOpenEmptyFile() {
         int size = viewModel.journalFilesProperty().size();
 
@@ -326,7 +340,7 @@ public class ManageJournalAbbreviationsTest {
     @Test(expected = JabRefException.class)
     public void testAddDuplicatedAbbreviation() throws JabRefException {
         savelyAddNewFileToViewModel(testFile3Entries);
-        viewModel.changeActiveFile(viewModel.journalFilesProperty().get(0));
+        selectLastJournalFile();
         viewModel.abbreviationsNameProperty().set("YetAnotherEntry");
         viewModel.abbreviationsAbbreviationProperty().set("YAE");
         viewModel.addAbbreviation();
@@ -336,7 +350,7 @@ public class ManageJournalAbbreviationsTest {
     @Test
     public void testEditSameAbbreviationWithNoChange() {
         savelyAddNewFileToViewModel(emptyTestFile);
-        viewModel.changeActiveFile(viewModel.journalFilesProperty().get(0));
+        selectLastJournalFile();
         Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
         savelyAddAbbreviation(testAbbreviation);
         savelyEditAbbreviation(testAbbreviation);

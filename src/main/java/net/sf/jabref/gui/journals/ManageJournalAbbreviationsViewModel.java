@@ -185,10 +185,6 @@ public class ManageJournalAbbreviationsViewModel {
         AbbreviationViewModel abbreviationViewModel = new AbbreviationViewModel(abbreviation);
         if (abbreviations.contains(abbreviationViewModel)) {
             throw new JabRefException("Duplicated journal abbreviation");
-        } else if (abbreviation.getName().trim().isEmpty()) {
-            throw new JabRefException("Name field can not be empty");
-        } else if (abbreviation.getAbbreviation().trim().isEmpty()) {
-            throw new JabRefException("Abbreviation field can not be empty");
         } else {
             abbreviations.add(abbreviationViewModel);
             currentAbbreviation.set(abbreviationViewModel);
@@ -212,10 +208,6 @@ public class ManageJournalAbbreviationsViewModel {
                 } else {
                     throw new JabRefException("Duplicated journal abbreviation");
                 }
-            } else if (abbreviation.getName().trim().isEmpty()) {
-                throw new JabRefException("Name field can not be empty");
-            } else if (abbreviation.getAbbreviation().trim().isEmpty()) {
-                throw new JabRefException("Abbreviation field can not be empty");
             } else {
                 currentAbbreviation.get().setName(abbreviationsName.get());
                 currentAbbreviation.get().setAbbreviation(abbreviationsAbbreviation.get());
