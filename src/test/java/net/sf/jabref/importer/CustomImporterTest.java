@@ -5,10 +5,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.BibTeXMLImporter;
 import net.sf.jabref.importer.fileformat.CopacImporter;
 import net.sf.jabref.importer.fileformat.OvidImporter;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
