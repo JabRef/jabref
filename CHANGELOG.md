@@ -128,7 +128,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Integrity check table can be sorted by clicking on column headings
 - Added \SOFTWARE\Jabref 'Path' registry entry for installation path inside the installer
 - Added an additional icon to distinguish DOI and URL links ([feature request #696](https://github.com/JabRef/jabref/issues/696))
-- Added nbib fields to Medlineplain importer
+- Added nbib fields to Medlineplain importer and to MedlineImporter
 - Implemented [#1342](https://github.com/JabRef/jabref/issues/1342): show description of case converters as tooltip 
 - Updated German translation
 
