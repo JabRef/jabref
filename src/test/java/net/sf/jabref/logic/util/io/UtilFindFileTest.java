@@ -48,7 +48,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
     @Test
     public void testFindAssociatedFilesException() {
         Collection<String> extensions = Arrays.asList("jpg", "pdf");
-        Collection<File> dirs = Arrays.asList(new File("asdfasdf/asdfasdf"));
+        Collection<File> dirs = Arrays.asList(rootDir.resolve("asdfasdf/asdfasdf").toFile());
         Set<File> results = FileFinder.findFiles(extensions, dirs);
 
         assertEquals(0, results.size());
