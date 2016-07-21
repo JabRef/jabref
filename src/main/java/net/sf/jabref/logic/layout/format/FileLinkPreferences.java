@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public class FileLinkPreferences {
@@ -18,7 +19,7 @@ public class FileLinkPreferences {
     }
 
     public static FileLinkPreferences fromPreferences(JabRefPreferences prefs) {
-        return new FileLinkPreferences(Collections.singletonList(prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX)),
+        return new FileLinkPreferences(Collections.singletonList(prefs.get(FieldName.FILE + Globals.DIR_SUFFIX)),
                 prefs.fileDirForDatabase);
     }
 
