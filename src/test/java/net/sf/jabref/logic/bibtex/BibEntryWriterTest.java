@@ -192,6 +192,44 @@ public class BibEntryWriterTest {
     }
 
     @Test
+    public void testEntryTypeChange() throws IOException {
+        // @formatter:off
+        String expected = Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
+                "  author       = {BlaBla}," + Globals.NEWLINE +
+                "  journal      = {International Journal of Something}," + Globals.NEWLINE +
+                "  number       = {1}," + Globals.NEWLINE +
+                "  note         = {some note}," + Globals.NEWLINE +
+                "  howpublished = {asdf}," + Globals.NEWLINE +
+                "}" + Globals.NEWLINE;
+        // @formatter:on
+
+        // read in bibtex string
+        ParserResult result = BibtexParser.parse(new StringReader(expected));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        // modify entry
+        entry.setType("inproceedings");
+
+        //write out bibtex string
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+        String actual = stringWriter.toString();
+
+        // @formatter:off
+        String expectedNewEntry = Globals.NEWLINE + "@InProceedings{test," + Globals.NEWLINE +
+                "  author       = {BlaBla}," + Globals.NEWLINE +
+                "  number       = {1}," + Globals.NEWLINE +
+                "  note         = {some note}," + Globals.NEWLINE +
+                "  howpublished = {asdf}," + Globals.NEWLINE +
+                "  journal      = {International Journal of Something}," + Globals.NEWLINE +
+                "}" + Globals.NEWLINE;
+        // @formatter:on
+        assertEquals(expectedNewEntry, actual);
+    }
+
+
+    @Test
     public void roundTripWithAppendedNewlines() throws IOException {
         // @formatter:off
         String bibtexEntry = "@Article{test," + Globals.NEWLINE +
