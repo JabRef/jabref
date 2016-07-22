@@ -15,11 +15,9 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package net.sf.jabref.logic.importer.fetcher;
+package net.sf.jabref.logic.importer;
 
 import java.net.URISyntaxException;
-
-import net.sf.jabref.logic.importer.MimeTypeDetector;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Rule;
