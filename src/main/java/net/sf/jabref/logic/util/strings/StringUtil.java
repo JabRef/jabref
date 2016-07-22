@@ -23,12 +23,17 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.Globals;
-
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.StringUtils;
 
 public class StringUtil {
+
+    // Non-letters which are used to denote accents in LaTeX-commands, e.g., in {\"{a}}
+    public static final String SPECIAL_COMMAND_CHARS = "\"`^~'=.|";
+
+    // Newlines
+    // will be overridden in initialization due to feature #857 @ JabRef.java
+    public static String NEWLINE = System.lineSeparator();
 
     // contains all possible line breaks, not omitting any break such as "\\n"
     private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
@@ -176,12 +181,12 @@ public class StringUtil {
         for (int i = 1; i < lines.length; i++) {
 
             if (lines[i].trim().isEmpty()) {
-                result.append(Globals.NEWLINE);
+                result.append(StringUtil.NEWLINE);
                 result.append('\t');
             } else {
-                result.append(Globals.NEWLINE);
+                result.append(StringUtil.NEWLINE);
                 result.append('\t');
-                result.append(Globals.NEWLINE);
+                result.append(StringUtil.NEWLINE);
                 result.append('\t');
                 // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
                 String line = CharMatcher.WHITESPACE.trimTrailingFrom(lines[i]);
@@ -204,8 +209,8 @@ public class StringUtil {
             }
 
             result.deleteCharAt(current);
-            result.insert(current, Globals.NEWLINE + "\t");
-            length = current + Globals.NEWLINE.length();
+            result.insert(current, StringUtil.NEWLINE + "\t");
+            length = current + StringUtil.NEWLINE.length();
 
         }
     }
@@ -411,7 +416,7 @@ public class StringUtil {
      * @return a String with only Globals.NEWLINE as line breaks
      */
     public static String unifyLineBreaksToConfiguredLineBreaks(String s) {
-        return LINE_BREAKS.matcher(s).replaceAll(Globals.NEWLINE);
+        return LINE_BREAKS.matcher(s).replaceAll(StringUtil.NEWLINE);
     }
 
     /**
@@ -656,7 +661,7 @@ public class StringUtil {
     }
 
     public static boolean isNullOrEmpty(String toTest) {
-        return (toTest == null || toTest.isEmpty());
+        return ((toTest == null) || toTest.isEmpty());
     }
 
     public static boolean isNotBlank(Optional<String> string) {
@@ -666,4 +671,5 @@ public class StringUtil {
     public static boolean isNotBlank(String string) {
         return StringUtils.isNotBlank(string);
     }
+
 }

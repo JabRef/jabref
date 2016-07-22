@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.logic.layout.format;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.layout.ParamLayoutFormatter;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 
 public class RisAuthors implements ParamLayoutFormatter {
@@ -36,7 +36,7 @@ public class RisAuthors implements ParamLayoutFormatter {
             sb.append("  - ");
             sb.append(authors[i]);
             if (i < authors.length - 1) {
-                sb.append(Globals.NEWLINE);
+                sb.append(StringUtil.NEWLINE);
             }
         }
         return sb.toString();

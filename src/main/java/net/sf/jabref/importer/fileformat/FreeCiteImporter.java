@@ -40,6 +40,7 @@ import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
@@ -192,7 +193,7 @@ public class FreeCiteImporter extends ImportFormat {
                                 noteSB.append(ln);
                                 noteSB.append(':');
                                 noteSB.append(parser.getElementText());
-                                noteSB.append(Globals.NEWLINE);
+                                noteSB.append(StringUtil.NEWLINE);
                             }
                         }
                         parser.next();
@@ -202,7 +203,7 @@ public class FreeCiteImporter extends ImportFormat {
                         String note;
                         if (e.hasField(FieldName.NOTE)) {
                             // "note" could have been set during the parsing as FreeCite also returns "note"
-                            note = e.getFieldOptional(FieldName.NOTE).get().concat(Globals.NEWLINE).concat(noteSB.toString());
+                            note = e.getFieldOptional(FieldName.NOTE).get().concat(StringUtil.NEWLINE).concat(noteSB.toString());
                         } else {
                             note = noteSB.toString();
                         }

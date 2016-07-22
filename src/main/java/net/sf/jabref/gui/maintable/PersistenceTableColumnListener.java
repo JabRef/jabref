@@ -41,10 +41,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
  */
 public class PersistenceTableColumnListener implements TableColumnModelListener {
 
-    public static final String ACTIVATE_PREF_KEY = "ActivatePersistenceTableColumnListener";
-
-    public static final boolean DEFAULT_ENABLED = true;
-
     private static final String SIMPLE_CLASS_NAME = PersistenceTableColumnListener.class.getSimpleName();
 
     // needed to get column names / indices mapped from view to model

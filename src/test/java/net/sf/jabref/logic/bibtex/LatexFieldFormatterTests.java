@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.bibtex;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
@@ -26,13 +27,13 @@ public class LatexFieldFormatterTests {
     @Test
     public void normalizeNewlineInAbstractField() {
         String fieldName = "abstract";
-        String text = "lorem" + Globals.NEWLINE + " ipsum lorem ipsum\nlorem ipsum \rlorem ipsum\r\ntest";
+        String text = "lorem" + StringUtil.NEWLINE + " ipsum lorem ipsum\nlorem ipsum \rlorem ipsum\r\ntest";
 
         // The newlines are normalized according to the globally configured newline setting in the formatter
-        String expected = "{" + "lorem" + Globals.NEWLINE + " ipsum lorem ipsum" + Globals.NEWLINE
+        String expected = "{" + "lorem" + StringUtil.NEWLINE + " ipsum lorem ipsum" + StringUtil.NEWLINE
  + "lorem ipsum "
-                + Globals.NEWLINE + "lorem ipsum"
-                + Globals.NEWLINE + "test" + "}";
+                + StringUtil.NEWLINE + "lorem ipsum"
+                + StringUtil.NEWLINE + "test" + "}";
 
         String result = formatter.format(text, fieldName);
 
@@ -43,7 +44,7 @@ public class LatexFieldFormatterTests {
     public void preserveNewlineInAbstractField() {
         String fieldName = "abstract";
         // The newlines are normalized according to the globally configured newline setting in the formatter
-        String text = "lorem ipsum lorem ipsum" + Globals.NEWLINE + "lorem ipsum lorem ipsum" + Globals.NEWLINE;
+        String text = "lorem ipsum lorem ipsum" + StringUtil.NEWLINE + "lorem ipsum lorem ipsum" + StringUtil.NEWLINE;
 
         String result = formatter.format(text, fieldName);
         String expected = "{" + text + "}";
@@ -55,8 +56,8 @@ public class LatexFieldFormatterTests {
     public void preserveMultipleNewlinesInAbstractField() {
         String fieldName = "abstract";
         // The newlines are normalized according to the globally configured newline setting in the formatter
-        String text = "lorem ipsum lorem ipsum" + Globals.NEWLINE + Globals.NEWLINE + "lorem ipsum lorem ipsum"
-                + Globals.NEWLINE;
+        String text = "lorem ipsum lorem ipsum" + StringUtil.NEWLINE + StringUtil.NEWLINE + "lorem ipsum lorem ipsum"
+                + StringUtil.NEWLINE;
 
         String result = formatter.format(text, fieldName);
         String expected = "{" + text + "}";
@@ -68,7 +69,7 @@ public class LatexFieldFormatterTests {
     public void preserveNewlineInReviewField() {
         String fieldName = "review";
         // The newlines are normalized according to the globally configured newline setting in the formatter
-        String text = "lorem ipsum lorem ipsum" + Globals.NEWLINE + "lorem ipsum lorem ipsum" + Globals.NEWLINE;
+        String text = "lorem ipsum lorem ipsum" + StringUtil.NEWLINE + "lorem ipsum lorem ipsum" + StringUtil.NEWLINE;
 
         String result = formatter.format(text, fieldName);
         String expected = "{"+text+"}";

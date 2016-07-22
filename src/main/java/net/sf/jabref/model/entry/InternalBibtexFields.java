@@ -43,6 +43,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 public class InternalBibtexFields {
@@ -53,7 +54,6 @@ public class InternalBibtexFields {
     public static final String MARKED = "__markedentry";
     public static final String OWNER = "owner";
     public static final String TIMESTAMP = "timestamp";
-    private static final String ENTRYTYPE = "entrytype";
     public static final String NUMBER_COL = "#";
 
 
@@ -224,12 +224,13 @@ public class InternalBibtexFields {
         dummy.setPrivate();
         add(dummy);
 
-        dummy = new BibtexSingleField(InternalBibtexFields.TIMESTAMP, false, BibtexSingleField.SMALL_W);
+        dummy = new BibtexSingleField(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD), false,
+                BibtexSingleField.SMALL_W);
         dummy.setExtras(EnumSet.of(FieldProperties.DATE));
         dummy.setPrivate();
         add(dummy);
 
-        dummy = new BibtexSingleField(InternalBibtexFields.ENTRYTYPE, false, 75);
+        dummy = new BibtexSingleField(BibEntry.TYPE_HEADER, false, 75);
         dummy.setPrivate();
         add(dummy);
 

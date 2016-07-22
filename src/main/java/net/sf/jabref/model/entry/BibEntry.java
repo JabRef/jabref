@@ -410,13 +410,12 @@ public class BibEntry implements Cloneable {
      * @return true if all fields are set or could be resolved, false otherwise.
      */
     public boolean allFieldsPresent(List<String> allFields, BibDatabase database) {
-        final String orSeparator = "/";
 
         for (String field : allFields) {
             String fieldName = toLowerCase(field);
             // OR fields
-            if (fieldName.contains(orSeparator)) {
-                String[] altFields = field.split(orSeparator);
+            if (fieldName.contains(FieldName.FIELD_SEPARATOR)) {
+                String[] altFields = field.split(FieldName.FIELD_SEPARATOR);
 
                 if (!atLeastOnePresent(altFields, database)) {
                     return false;

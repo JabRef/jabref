@@ -7,6 +7,7 @@ import java.util.TreeMap;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
@@ -37,7 +38,7 @@ public class MetaDataTest {
 
         Map<String, String> expectedSerialization = new TreeMap<>();
         expectedSerialization.put("saveActions",
-                "enabled;" + Globals.NEWLINE + "title[lower_case]" + Globals.NEWLINE + ";");
+                "enabled;" + StringUtil.NEWLINE + "title[lower_case]" + StringUtil.NEWLINE + ";");
         assertEquals(expectedSerialization, metaData.getAsStringMap());
     }
 }

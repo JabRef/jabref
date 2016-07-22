@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
@@ -137,7 +138,7 @@ public class BibDatabaseContext {
         }
 
         // 3. preferences directory
-        String dir = Globals.prefs.get(fieldName + Globals.DIR_SUFFIX); // FILE_DIR
+        String dir = Globals.prefs.get(fieldName + FileLinkPreferences.DIR_SUFFIX); // FILE_DIR
         if (dir != null) {
             fileDirs.add(dir);
         }

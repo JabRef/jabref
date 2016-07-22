@@ -33,13 +33,13 @@ public class StringUtilTest {
     public void testUnifyLineBreaks() {
         // Mac < v9
         String result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r");
-        assertEquals(Globals.NEWLINE, result);
+        assertEquals(StringUtil.NEWLINE, result);
         // Windows
         result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r\n");
-        assertEquals(Globals.NEWLINE, result);
+        assertEquals(StringUtil.NEWLINE, result);
         // Unix
         result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\n");
-        assertEquals(Globals.NEWLINE, result);
+        assertEquals(StringUtil.NEWLINE, result);
     }
 
     @Test
@@ -127,19 +127,19 @@ public class StringUtilTest {
 
     @Test
     public void testWrap() {
-        assertEquals("aaaaa" + Globals.NEWLINE + "\tbbbbb" + Globals.NEWLINE + "\tccccc",
+        assertEquals("aaaaa" + StringUtil.NEWLINE + "\tbbbbb" + StringUtil.NEWLINE + "\tccccc",
                 StringUtil.wrap("aaaaa bbbbb ccccc", 5));
-        assertEquals("aaaaa bbbbb" + Globals.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 8));
-        assertEquals("aaaaa bbbbb" + Globals.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 11));
+        assertEquals("aaaaa bbbbb" + StringUtil.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 8));
+        assertEquals("aaaaa bbbbb" + StringUtil.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 11));
         assertEquals("aaaaa bbbbb ccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 12));
-        assertEquals("aaaaa" + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\tbbbbb" + Globals.NEWLINE + "\t"
-                + Globals.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\nbbbbb\nccccc", 12));
+        assertEquals("aaaaa" + StringUtil.NEWLINE + "\t" + StringUtil.NEWLINE + "\tbbbbb" + StringUtil.NEWLINE + "\t"
+                + StringUtil.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\nbbbbb\nccccc", 12));
         assertEquals(
-                "aaaaa" + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\tbbbbb"
-                        + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\tccccc",
+                "aaaaa" + StringUtil.NEWLINE + "\t" + StringUtil.NEWLINE + "\t" + StringUtil.NEWLINE + "\tbbbbb"
+                        + StringUtil.NEWLINE + "\t" + StringUtil.NEWLINE + "\tccccc",
                 StringUtil.wrap("aaaaa\n\nbbbbb\nccccc", 12));
-        assertEquals("aaaaa" + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\tbbbbb" + Globals.NEWLINE + "\t"
-                + Globals.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\r\nbbbbb\r\nccccc", 12));
+        assertEquals("aaaaa" + StringUtil.NEWLINE + "\t" + StringUtil.NEWLINE + "\tbbbbb" + StringUtil.NEWLINE + "\t"
+                + StringUtil.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\r\nbbbbb\r\nccccc", 12));
     }
 
     @Test

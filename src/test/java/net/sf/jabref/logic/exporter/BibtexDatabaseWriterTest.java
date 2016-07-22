@@ -24,6 +24,7 @@ import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -80,7 +81,7 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), preferences);
 
-        assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE, session.getStringValue());
+        assertEquals("% Encoding: US-ASCII" + StringUtil.NEWLINE, session.getStringValue());
     }
 
     @Test
@@ -89,7 +90,7 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
 
-        assertEquals(Globals.NEWLINE + "@Preamble{Test preamble}" + Globals.NEWLINE, session.getStringValue());
+        assertEquals(StringUtil.NEWLINE + "@Preamble{Test preamble}" + StringUtil.NEWLINE, session.getStringValue());
     }
 
     @Test
@@ -99,8 +100,8 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), preferences);
 
-        assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
-                "@Preamble{Test preamble}" + Globals.NEWLINE, session.getStringValue());
+        assertEquals("% Encoding: US-ASCII" + StringUtil.NEWLINE + StringUtil.NEWLINE +
+                "@Preamble{Test preamble}" + StringUtil.NEWLINE, session.getStringValue());
     }
 
     @Test
@@ -111,10 +112,10 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry), new SavePreferences());
 
-        assertEquals(Globals.NEWLINE +
-                "@Article{," + Globals.NEWLINE + "}" + Globals.NEWLINE + Globals.NEWLINE
+        assertEquals(StringUtil.NEWLINE +
+                "@Article{," + StringUtil.NEWLINE + "}" + StringUtil.NEWLINE + StringUtil.NEWLINE
                 + "@Comment{jabref-meta: databaseType:bibtex;}"
-                + Globals.NEWLINE, session.getStringValue());
+                + StringUtil.NEWLINE, session.getStringValue());
     }
 
     @Test
@@ -126,11 +127,11 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry), preferences);
 
-        assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
-                "@Article{," + Globals.NEWLINE + "}"
-                + Globals.NEWLINE + Globals.NEWLINE
+        assertEquals("% Encoding: US-ASCII" + StringUtil.NEWLINE + StringUtil.NEWLINE +
+                "@Article{," + StringUtil.NEWLINE + "}"
+                + StringUtil.NEWLINE + StringUtil.NEWLINE
                 + "@Comment{jabref-meta: databaseType:bibtex;}"
-                + Globals.NEWLINE, session.getStringValue());
+                + StringUtil.NEWLINE, session.getStringValue());
     }
 
     @Test
@@ -139,7 +140,7 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
 
-        assertEquals(Globals.NEWLINE + "Test epilog" + Globals.NEWLINE, session.getStringValue());
+        assertEquals(StringUtil.NEWLINE + "Test epilog" + StringUtil.NEWLINE, session.getStringValue());
     }
 
     @Test
@@ -149,8 +150,8 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), preferences);
 
-        assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
-                "Test epilog" + Globals.NEWLINE, session.getStringValue());
+        assertEquals("% Encoding: US-ASCII" + StringUtil.NEWLINE + StringUtil.NEWLINE +
+                "Test epilog" + StringUtil.NEWLINE, session.getStringValue());
     }
 
     @Test
@@ -161,7 +162,7 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
 
-        assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: keypatterndefault:test;}" + Globals.NEWLINE,
+        assertEquals(StringUtil.NEWLINE + "@Comment{jabref-meta: keypatterndefault:test;}" + StringUtil.NEWLINE,
                 session.getStringValue());
     }
 
@@ -174,9 +175,9 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), preferences);
 
-        assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE
+        assertEquals("% Encoding: US-ASCII" + StringUtil.NEWLINE + StringUtil.NEWLINE
                 +
-                "@Comment{jabref-meta: keypatterndefault:test;}" + Globals.NEWLINE, session.getStringValue());
+                "@Comment{jabref-meta: keypatterndefault:test;}" + StringUtil.NEWLINE, session.getStringValue());
     }
 
     @Test
@@ -188,11 +189,11 @@ public class BibtexDatabaseWriterTest {
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
 
         // @formatter:off
-        assertEquals(Globals.NEWLINE
-                + "@Comment{jabref-meta: groupstree:" + Globals.NEWLINE
-                + "0 AllEntriesGroup:;" + Globals.NEWLINE
-                + "1 ExplicitGroup:test\\;2\\;;" + Globals.NEWLINE
-                + "}" + Globals.NEWLINE, session.getStringValue());
+        assertEquals(StringUtil.NEWLINE
+                + "@Comment{jabref-meta: groupstree:" + StringUtil.NEWLINE
+                + "0 AllEntriesGroup:;" + StringUtil.NEWLINE
+                + "1 ExplicitGroup:test\\;2\\;;" + StringUtil.NEWLINE
+                + "}" + StringUtil.NEWLINE, session.getStringValue());
         // @formatter:on
     }
 
@@ -209,12 +210,12 @@ public class BibtexDatabaseWriterTest {
 
         // @formatter:off
         assertEquals(
-                "% Encoding: US-ASCII" + Globals.NEWLINE +
-                Globals.NEWLINE
-                + "@Comment{jabref-meta: groupstree:" + Globals.NEWLINE
-                + "0 AllEntriesGroup:;" + Globals.NEWLINE
-                + "1 ExplicitGroup:test\\;2\\;;" + Globals.NEWLINE
-                + "}" + Globals.NEWLINE, session.getStringValue());
+                "% Encoding: US-ASCII" + StringUtil.NEWLINE +
+                StringUtil.NEWLINE
+                + "@Comment{jabref-meta: groupstree:" + StringUtil.NEWLINE
+                + "0 AllEntriesGroup:;" + StringUtil.NEWLINE
+                + "1 ExplicitGroup:test\\;2\\;;" + StringUtil.NEWLINE
+                + "}" + StringUtil.NEWLINE, session.getStringValue());
         // @formatter:on
     }
 
@@ -224,7 +225,7 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
 
-        assertEquals(Globals.NEWLINE + "@String{name = {content}}" + Globals.NEWLINE, session.getStringValue());
+        assertEquals(StringUtil.NEWLINE + "@String{name = {content}}" + StringUtil.NEWLINE, session.getStringValue());
     }
 
     @Test
@@ -234,8 +235,8 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), preferences);
 
-        assertEquals("% Encoding: US-ASCII" + Globals.NEWLINE + Globals.NEWLINE +
-                "@String{name = {content}}" + Globals.NEWLINE, session.getStringValue());
+        assertEquals("% Encoding: US-ASCII" + StringUtil.NEWLINE + StringUtil.NEWLINE +
+                "@String{name = {content}}" + StringUtil.NEWLINE, session.getStringValue());
     }
 
     @Test
@@ -249,11 +250,11 @@ public class BibtexDatabaseWriterTest {
             StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry), new SavePreferences());
 
             assertEquals(
-                    Globals.NEWLINE +
-                            "@Customizedtype{," + Globals.NEWLINE + "}" + Globals.NEWLINE + Globals.NEWLINE
+                    StringUtil.NEWLINE +
+                            "@Customizedtype{," + StringUtil.NEWLINE + "}" + StringUtil.NEWLINE + StringUtil.NEWLINE
                             + "@Comment{jabref-meta: databaseType:bibtex;}"
-                            + Globals.NEWLINE + Globals.NEWLINE
-                            + "@Comment{jabref-entrytype: Customizedtype: req[required] opt[optional]}" + Globals.NEWLINE,
+                            + StringUtil.NEWLINE + StringUtil.NEWLINE
+                            + "@Comment{jabref-entrytype: Customizedtype: req[required] opt[optional]}" + StringUtil.NEWLINE,
                     session.getStringValue());
         } finally {
             EntryTypes.removeAllCustomEntryTypes();
@@ -345,8 +346,8 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry), new SavePreferences());
 
-        assertEquals("presaved serialization" + Globals.NEWLINE + "@Comment{jabref-meta: databaseType:bibtex;}"
-                + Globals.NEWLINE, session.getStringValue());
+        assertEquals("presaved serialization" + StringUtil.NEWLINE + "@Comment{jabref-meta: databaseType:bibtex;}"
+                + StringUtil.NEWLINE, session.getStringValue());
     }
 
     @Test
@@ -361,11 +362,11 @@ public class BibtexDatabaseWriterTest {
         SavePreferences preferences = new SavePreferences().withReformatFile(true);
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry), preferences);
 
-        assertEquals(Globals.NEWLINE +
-                        "@Article{," + Globals.NEWLINE + "  author = {Mr. author}," + Globals.NEWLINE + "}"
-                        + Globals.NEWLINE + Globals.NEWLINE
+        assertEquals(StringUtil.NEWLINE +
+                        "@Article{," + StringUtil.NEWLINE + "  author = {Mr. author}," + StringUtil.NEWLINE + "}"
+                        + StringUtil.NEWLINE + StringUtil.NEWLINE
                         + "@Comment{jabref-meta: databaseType:bibtex;}"
-                        + Globals.NEWLINE,
+                        + StringUtil.NEWLINE,
                 session.getStringValue());
     }
 
@@ -389,7 +390,7 @@ public class BibtexDatabaseWriterTest {
         SavePreferences preferences = new SavePreferences().withReformatFile(true);
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), preferences);
 
-        assertEquals(Globals.NEWLINE + "@String{name = {content}}" + Globals.NEWLINE, session.getStringValue());
+        assertEquals(StringUtil.NEWLINE + "@String{name = {content}}" + StringUtil.NEWLINE, session.getStringValue());
 
     }
 
@@ -401,8 +402,8 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
 
-        assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: saveActions:enabled;" + Globals.NEWLINE
-                + "title[lower_case]" + Globals.NEWLINE + ";}" + Globals.NEWLINE, session.getStringValue());
+        assertEquals(StringUtil.NEWLINE + "@Comment{jabref-meta: saveActions:enabled;" + StringUtil.NEWLINE
+                + "title[lower_case]" + StringUtil.NEWLINE + ";}" + StringUtil.NEWLINE, session.getStringValue());
     }
 
     @Test
@@ -414,9 +415,9 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
 
-        assertEquals(Globals.NEWLINE
+        assertEquals(StringUtil.NEWLINE
                 + "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}"
-                + Globals.NEWLINE, session.getStringValue());
+                + StringUtil.NEWLINE, session.getStringValue());
     }
 
     @Test
@@ -428,8 +429,8 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
 
-        assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: keypattern_article:articleTest;}" + Globals.NEWLINE
-                        + Globals.NEWLINE + "@Comment{jabref-meta: keypatterndefault:test;}" + Globals.NEWLINE,
+        assertEquals(StringUtil.NEWLINE + "@Comment{jabref-meta: keypattern_article:articleTest;}" + StringUtil.NEWLINE
+                        + StringUtil.NEWLINE + "@Comment{jabref-meta: keypatterndefault:test;}" + StringUtil.NEWLINE,
                 session.getStringValue());
     }
 
@@ -439,7 +440,7 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
 
-        assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: databaseType:biblatex;}" + Globals.NEWLINE,
+        assertEquals(StringUtil.NEWLINE + "@Comment{jabref-meta: databaseType:biblatex;}" + StringUtil.NEWLINE,
                 session.getStringValue());
     }
 
@@ -449,7 +450,7 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
 
-        assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: protectedFlag:true;}" + Globals.NEWLINE,
+        assertEquals(StringUtil.NEWLINE + "@Comment{jabref-meta: protectedFlag:true;}" + StringUtil.NEWLINE,
                 session.getStringValue());
     }
 
@@ -459,7 +460,7 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
 
-        assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: selector_title:testWord;word2;}" + Globals.NEWLINE,
+        assertEquals(StringUtil.NEWLINE + "@Comment{jabref-meta: selector_title:testWord;word2;}" + StringUtil.NEWLINE,
                 session.getStringValue());
     }
 
@@ -470,9 +471,9 @@ public class BibtexDatabaseWriterTest {
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
 
-        assertEquals(Globals.NEWLINE + "@Comment{jabref-meta: fileDirectory:\\\\Literature\\\\;}" + Globals.NEWLINE +
-                Globals.NEWLINE + "@Comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"
-                + Globals.NEWLINE, session.getStringValue());
+        assertEquals(StringUtil.NEWLINE + "@Comment{jabref-meta: fileDirectory:\\\\Literature\\\\;}" + StringUtil.NEWLINE +
+                StringUtil.NEWLINE + "@Comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"
+                + StringUtil.NEWLINE, session.getStringValue());
     }
 
     @Test
@@ -522,23 +523,23 @@ public class BibtexDatabaseWriterTest {
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, database.getEntries(), new SavePreferences());
 
         assertEquals(
-                Globals.NEWLINE +
-                "@Article{," + Globals.NEWLINE +
-                "  author = {A}," + Globals.NEWLINE +
-                "  year   = {2000}," + Globals.NEWLINE +
-                "}"  + Globals.NEWLINE + Globals.NEWLINE +
-                "@Article{," + Globals.NEWLINE +
-                "  author = {A}," + Globals.NEWLINE +
-                "  year   = {2010}," + Globals.NEWLINE +
-                "}" + Globals.NEWLINE + Globals.NEWLINE +
-                "@Article{," + Globals.NEWLINE +
-                "  author = {B}," + Globals.NEWLINE +
-                "  year   = {2000}," + Globals.NEWLINE +
-                "}" + Globals.NEWLINE + Globals.NEWLINE +
+                StringUtil.NEWLINE +
+                "@Article{," + StringUtil.NEWLINE +
+                "  author = {A}," + StringUtil.NEWLINE +
+                "  year   = {2000}," + StringUtil.NEWLINE +
+                "}"  + StringUtil.NEWLINE + StringUtil.NEWLINE +
+                "@Article{," + StringUtil.NEWLINE +
+                "  author = {A}," + StringUtil.NEWLINE +
+                "  year   = {2010}," + StringUtil.NEWLINE +
+                "}" + StringUtil.NEWLINE + StringUtil.NEWLINE +
+                "@Article{," + StringUtil.NEWLINE +
+                "  author = {B}," + StringUtil.NEWLINE +
+                "  year   = {2000}," + StringUtil.NEWLINE +
+                "}" + StringUtil.NEWLINE + StringUtil.NEWLINE +
                 "@Comment{jabref-meta: databaseType:bibtex;}"
-                 + Globals.NEWLINE + Globals.NEWLINE +
+                 + StringUtil.NEWLINE + StringUtil.NEWLINE +
                 "@Comment{jabref-meta: saveOrderConfig:specified;author;false;year;true;abstract;false;}" +
-                Globals.NEWLINE
+                StringUtil.NEWLINE
                 , session.getStringValue());
     }
 
@@ -567,22 +568,22 @@ public class BibtexDatabaseWriterTest {
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, database.getEntries(), preferences);
 
         assertEquals(
-                Globals.NEWLINE +
-                        "@Article{," + Globals.NEWLINE +
-                        "  author = {A}," + Globals.NEWLINE +
-                        "  year   = {2010}," + Globals.NEWLINE +
-                        "}" + Globals.NEWLINE + Globals.NEWLINE +
-                        "@Article{," + Globals.NEWLINE +
-                        "  author = {B}," + Globals.NEWLINE +
-                        "  year   = {2000}," + Globals.NEWLINE +
-                        "}" + Globals.NEWLINE + Globals.NEWLINE +
-                        "@Article{," + Globals.NEWLINE +
-                        "  author = {A}," + Globals.NEWLINE +
-                        "  year   = {2000}," + Globals.NEWLINE +
+                StringUtil.NEWLINE +
+                        "@Article{," + StringUtil.NEWLINE +
+                        "  author = {A}," + StringUtil.NEWLINE +
+                        "  year   = {2010}," + StringUtil.NEWLINE +
+                        "}" + StringUtil.NEWLINE + StringUtil.NEWLINE +
+                        "@Article{," + StringUtil.NEWLINE +
+                        "  author = {B}," + StringUtil.NEWLINE +
+                        "  year   = {2000}," + StringUtil.NEWLINE +
+                        "}" + StringUtil.NEWLINE + StringUtil.NEWLINE +
+                        "@Article{," + StringUtil.NEWLINE +
+                        "  author = {A}," + StringUtil.NEWLINE +
+                        "  year   = {2000}," + StringUtil.NEWLINE +
                         "}"
-                        + Globals.NEWLINE + Globals.NEWLINE +
+                        + StringUtil.NEWLINE + StringUtil.NEWLINE +
                         "@Comment{jabref-meta: databaseType:bibtex;}"
-                        + Globals.NEWLINE
+                        + StringUtil.NEWLINE
                 , session.getStringValue());
     }
 

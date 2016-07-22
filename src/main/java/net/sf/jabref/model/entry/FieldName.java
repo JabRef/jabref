@@ -3,6 +3,12 @@ package net.sf.jabref.model.entry;
 
 public class FieldName {
 
+    // Character separating field names that are to be used in sequence as
+    // fallbacks for a single column (e.g. "author/editor" to use editor where
+    // author is not set):
+    public static final String FIELD_SEPARATOR = "/";
+
+    // Field name constants
     public static final String ABSTRACT = "abstract";
     public static final String ADDRESS = "address";
     public static final String AUTHOR = "author";

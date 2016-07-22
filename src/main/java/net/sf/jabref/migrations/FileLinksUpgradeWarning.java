@@ -35,6 +35,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.PostOpenAction;
 import net.sf.jabref.logic.cleanup.UpgradePdfPsToFileCleanup;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -78,7 +79,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         // Only offer to upgrade links if the pdf/ps fields are used:
         offerChangeDatabase = linksFound(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
         // If the "file" directory is not set, offer to migrate pdf/ps dir:
-        offerSetFileDir = !Globals.prefs.hasKey(FieldName.FILE + Globals.DIR_SUFFIX)
+        offerSetFileDir = !Globals.prefs.hasKey(FieldName.FILE + FileLinkPreferences.DIR_SUFFIX)
                 && (Globals.prefs.hasKey("pdfDirectory") || Globals.prefs.hasKey("psDirectory"));
 
         // First check if this warning is disabled:
@@ -200,7 +201,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         }
 
         if (fileDir != null) {
-            Globals.prefs.put(FieldName.FILE + Globals.DIR_SUFFIX, fileDir);
+            Globals.prefs.put(FieldName.FILE + FileLinkPreferences.DIR_SUFFIX, fileDir);
         }
 
         if (upgradePrefs) {

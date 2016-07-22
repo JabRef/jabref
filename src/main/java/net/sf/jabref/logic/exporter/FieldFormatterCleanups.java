@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.formatter.Formatters;
@@ -101,7 +100,7 @@ public class FieldFormatterCleanups {
         // first remove all newlines for easier parsing
         String remainingString = formatterString;
 
-        remainingString = StringUtil.unifyLineBreaksToConfiguredLineBreaks(remainingString).replaceAll(Globals.NEWLINE, "");
+        remainingString = StringUtil.unifyLineBreaksToConfiguredLineBreaks(remainingString).replaceAll(StringUtil.NEWLINE, "");
         try {
             while (startIndex < formatterString.length()) {
                 // read the field name
@@ -191,7 +190,7 @@ public class FieldFormatterCleanups {
         for (Map.Entry<String, List<String>> entry : groupedByField.entrySet()) {
             result.append(entry.getKey());
 
-            StringJoiner joiner = new StringJoiner(",", "[", "]" + Globals.NEWLINE);
+            StringJoiner joiner = new StringJoiner(",", "[", "]" + StringUtil.NEWLINE);
             entry.getValue().forEach(joiner::add);
             result.append(joiner.toString());
         }

@@ -47,9 +47,9 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
     protected void writeEpilogue(String epilogue) throws SaveException {
         if (!StringUtil.isNullOrEmpty(epilogue)) {
             try {
-                getWriter().write(Globals.NEWLINE);
+                getWriter().write(StringUtil.NEWLINE);
                 getWriter().write(epilogue);
-                getWriter().write(Globals.NEWLINE);
+                getWriter().write(StringUtil.NEWLINE);
             } catch (IOException e) {
                 throw new SaveException(e);
             }
@@ -59,11 +59,11 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
     @Override
     protected void writeMetaDataItem(Map.Entry<String, String> metaItem) throws SaveException {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(Globals.NEWLINE);
+        stringBuilder.append(StringUtil.NEWLINE);
         stringBuilder.append(COMMENT_PREFIX + "{").append(MetaData.META_FLAG).append(metaItem.getKey()).append(":");
         stringBuilder.append(metaItem.getValue());
         stringBuilder.append("}");
-        stringBuilder.append(Globals.NEWLINE);
+        stringBuilder.append(StringUtil.NEWLINE);
 
         try {
             getWriter().write(stringBuilder.toString());
@@ -76,10 +76,10 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
     protected void writePreamble(String preamble) throws SaveException {
         if (!StringUtil.isNullOrEmpty(preamble)) {
             try {
-                getWriter().write(Globals.NEWLINE);
+                getWriter().write(StringUtil.NEWLINE);
                 getWriter().write(PREAMBLE_PREFIX + "{");
                 getWriter().write(preamble);
-                getWriter().write('}' + Globals.NEWLINE);
+                getWriter().write('}' + StringUtil.NEWLINE);
             } catch (IOException e) {
                 throw new SaveException(e);
             }
@@ -99,11 +99,11 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
             // Write user comments
             String userComments = bibtexString.getUserComments();
             if(!userComments.isEmpty()) {
-                getWriter().write(userComments + Globals.NEWLINE);
+                getWriter().write(userComments + StringUtil.NEWLINE);
             }
 
             if (isFirstString) {
-                getWriter().write(Globals.NEWLINE);
+                getWriter().write(StringUtil.NEWLINE);
             }
 
             getWriter().write(STRING_PREFIX + "{" + bibtexString.getName() + StringUtil
@@ -122,7 +122,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
                 }
             }
 
-            getWriter().write("}" + Globals.NEWLINE);
+            getWriter().write("}" + StringUtil.NEWLINE);
         } catch (IOException e) {
             throw new SaveException(e);
         }
@@ -131,11 +131,11 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
     @Override
     protected void writeEntryTypeDefinition(CustomEntryType customType) throws SaveException {
         try {
-            getWriter().write(Globals.NEWLINE);
+            getWriter().write(StringUtil.NEWLINE);
             getWriter().write(COMMENT_PREFIX + "{");
             getWriter().write(customType.getAsString());
             getWriter().write("}");
-            getWriter().write(Globals.NEWLINE);
+            getWriter().write(StringUtil.NEWLINE);
         } catch (IOException e) {
             throw new SaveException(e);
         }
@@ -151,7 +151,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
         try {
             getWriter().write("% ");
             getWriter().write(Globals.ENCODING_PREFIX + encoding);
-            getWriter().write(Globals.NEWLINE);
+            getWriter().write(StringUtil.NEWLINE);
         } catch (IOException e) {
             throw new SaveException(e);
         }

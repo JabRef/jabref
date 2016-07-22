@@ -37,6 +37,8 @@ import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.format.FileLinkPreferences;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -200,7 +202,7 @@ class FileTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        fileDir.setText(prefs.get(FieldName.FILE + Globals.DIR_SUFFIX));
+        fileDir.setText(prefs.get(FieldName.FILE + FileLinkPreferences.DIR_SUFFIX));
         bibLocAsPrimaryDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
         runAutoFileSearch.setSelected(prefs.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH));
         allowFileAutoOpenBrowse.setSelected(prefs.getBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE));
@@ -241,7 +243,7 @@ class FileTab extends JPanel implements PrefsTab {
 
     @Override
     public void storeSettings() {
-        prefs.put(FieldName.FILE + Globals.DIR_SUFFIX, fileDir.getText());
+        prefs.put(FieldName.FILE + FileLinkPreferences.DIR_SUFFIX, fileDir.getText());
         prefs.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, bibLocAsPrimaryDir.isSelected());
         prefs.putBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH, runAutoFileSearch.isSelected());
         prefs.putBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE, allowFileAutoOpenBrowse.isSelected());
@@ -265,7 +267,7 @@ class FileTab extends JPanel implements PrefsTab {
         }
         prefs.put(JabRefPreferences.NEWLINE, newline);
         // we also have to change Globals variable as globals is not a getter, but a constant
-        Globals.NEWLINE = newline;
+        StringUtil.NEWLINE = newline;
 
         prefs.putBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT, reformatFileOnSaveAndExport.isSelected());
         prefs.putBoolean(JabRefPreferences.BACKUP, backup.isSelected());

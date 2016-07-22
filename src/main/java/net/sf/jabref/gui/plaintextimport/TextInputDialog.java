@@ -126,6 +126,7 @@ import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
@@ -507,11 +508,11 @@ public class TextInputDialog extends JDialog {
 
         // we have to remove line breaks (but keep empty lines)
         // otherwise, the result is broken
-        text = text.replace(Globals.NEWLINE.concat(Globals.NEWLINE), "##NEWLINE##");
+        text = text.replace(StringUtil.NEWLINE.concat(StringUtil.NEWLINE), "##NEWLINE##");
         // possible URL line breaks are removed completely.
-        text = text.replace("/".concat(Globals.NEWLINE), "/");
-        text = text.replace(Globals.NEWLINE, " ");
-        text = text.replace("##NEWLINE##", Globals.NEWLINE);
+        text = text.replace("/".concat(StringUtil.NEWLINE), "/");
+        text = text.replace(StringUtil.NEWLINE, " ");
+        text = text.replace("##NEWLINE##", StringUtil.NEWLINE);
 
         ParserResult importerResult = fimp.importEntries(text);
         if(importerResult.hasWarnings()) {

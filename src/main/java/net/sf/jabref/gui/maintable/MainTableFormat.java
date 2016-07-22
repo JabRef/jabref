@@ -137,7 +137,7 @@ public class MainTableFormat implements TableFormat<BibEntry> {
             // stored column name will be used as columnName
             // There might be more than one field to display, e.g., "author/editor" or "date/year" - so split
             // at MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR
-            String[] fields = columnName.split(Globals.COL_DEFINITION_FIELD_SEPARATOR);
+            String[] fields = columnName.split(FieldName.FIELD_SEPARATOR);
             tableColumns.add(new MainTableColumn(columnName, Arrays.asList(fields), database));
         }
 
