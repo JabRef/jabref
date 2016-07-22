@@ -76,7 +76,6 @@ import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
 import net.sf.jabref.gui.groups.UndoableChangeEntriesOfGroup;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -90,6 +89,7 @@ import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.EntriesGroupChange;
 import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.UpdateField;
@@ -1428,7 +1428,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         FileListTableModel model = new FileListTableModel();
                         entry.getFieldOptional(FieldName.FILE).ifPresent(model::setContent);
                         fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
-                        if (model.getRowCount() > 0) {
+                        if (model.getRowCount() > 0 && model.getEntry(0).type.isPresent()) {
                             fileLabel.setIcon(model.getEntry(0).type.get().getIcon());
                         }
                         return fileLabel;

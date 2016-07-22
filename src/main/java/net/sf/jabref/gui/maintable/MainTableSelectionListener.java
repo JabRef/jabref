@@ -35,6 +35,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.external.ExternalFileMenuItem;
+import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.BasePanelMode;
 import net.sf.jabref.gui.FileListEntry;
@@ -318,7 +319,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             }
                             if (flEntry != null) {
                                 ExternalFileMenuItem item = new ExternalFileMenuItem(panel.frame(), entry, "",
-                                        flEntry.link, flEntry.type.get().getIcon(),
+                                        flEntry.link, flEntry.type.map(ExternalFileType::getIcon).orElse(null),
                                         panel.getBibDatabaseContext(), flEntry.type);
                                 boolean success = item.openLink();
                                 if (!success) {

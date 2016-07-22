@@ -391,13 +391,13 @@ public class GVKParser {
             result.setField(FieldName.YEAR, year);
         }
         if (address != null) {
-            result.setField("address", address);
+            result.setField(FieldName.ADDRESS, address);
         }
         if (series != null) {
-            result.setField("series", series);
+            result.setField(FieldName.SERIES, series);
         }
         if (edition != null) {
-            result.setField("edition", edition);
+            result.setField(FieldName.EDITION, edition);
         }
         if (isbn != null) {
             result.setField(FieldName.ISBN, isbn);
@@ -427,13 +427,13 @@ public class GVKParser {
             result.setField(FieldName.URL, url);
         }
         if (note != null) {
-            result.setField("note", note);
+            result.setField(FieldName.NOTE, note);
         }
 
         if ("article".equals(entryType) && (journal != null)) {
             result.setField(FieldName.JOURNAL, journal);
         } else if ("incollection".equals(entryType) && (booktitle != null)) {
-            result.setField("booktitle", booktitle);
+            result.setField(FieldName.BOOKTITLE, booktitle);
         }
 
         return result;

@@ -380,7 +380,7 @@ class StyleSelectDialog {
         prevEntry.setField(FieldName.YEAR, "2008");
         prevEntry.setField(FieldName.JOURNAL, "BibTeX journal");
         prevEntry.setField(FieldName.PUBLISHER, "JabRef publishing");
-        prevEntry.setField("address", "Trondheim");
+        prevEntry.setField(FieldName.ADDRESS, "Trondheim");
         prevEntry.setField("www", "https://github.com/JabRef");
     }
 

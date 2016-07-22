@@ -458,13 +458,13 @@ public class PdfContentImporter extends ImportFormat {
                 entry.setField(FieldName.TITLE, title);
             }
             if (conference != null) {
-                entry.setField("booktitle", conference);
+                entry.setField(FieldName.BOOKTITLE, conference);
             }
             if (DOI != null) {
                 entry.setField(FieldName.DOI, DOI);
             }
             if (series != null) {
-                entry.setField("series", series);
+                entry.setField(FieldName.SERIES, series);
             }
             if (volume != null) {
                 entry.setField(FieldName.VOLUME, volume);

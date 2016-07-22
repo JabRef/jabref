@@ -156,14 +156,14 @@ public class OvidImporter extends ImportFormat {
                     } else if ((matcher = OvidImporter.INCOLLECTION_PATTERN.matcher(content)).find()) {
                         h.put(FieldName.EDITOR, matcher.group(1).replace(" (Ed)", ""));
                         h.put(FieldName.YEAR, matcher.group(2));
-                        h.put("booktitle", matcher.group(3));
+                        h.put(FieldName.BOOKTITLE, matcher.group(3));
                         h.put(FieldName.PAGES, matcher.group(4));
-                        h.put("address", matcher.group(5));
+                        h.put(FieldName.ADDRESS, matcher.group(5));
                         h.put(FieldName.PUBLISHER, matcher.group(6));
                     } else if ((matcher = OvidImporter.BOOK_PATTERN.matcher(content)).find()) {
                         h.put(FieldName.YEAR, matcher.group(1));
                         h.put(FieldName.PAGES, matcher.group(2));
-                        h.put("address", matcher.group(3));
+                        h.put(FieldName.ADDRESS, matcher.group(3));
                         h.put(FieldName.PUBLISHER, matcher.group(4));
 
                     }
@@ -184,7 +184,7 @@ public class OvidImporter extends ImportFormat {
                         h.put("entrytype", "inproceedings");
                     }
                 } else if (fieldName.startsWith("Language")) {
-                    h.put("language", content);
+                    h.put(FieldName.LANGUAGE, content);
                 } else if (fieldName.startsWith("Author Keywords")) {
                     content = content.replace(";", ",").replace("  ", " ");
                     h.put(FieldName.KEYWORDS, content);

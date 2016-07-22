@@ -28,8 +28,6 @@ import java.util.regex.Pattern;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.layout.format.AuthorAbbreviator;
 import net.sf.jabref.logic.layout.format.AuthorAndsCommaReplacer;
 import net.sf.jabref.logic.layout.format.AuthorAndsReplacer;
@@ -95,7 +93,6 @@ import net.sf.jabref.logic.search.MatchesHighlighter;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -117,13 +114,10 @@ class LayoutEntry {
 
     private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
 
-    private final JournalAbbreviationLoader repositoryLoader;
-
-    private final JabRefPreferences prefs;
+    private final LayoutFormatterPreferences prefs;
 
 
-    public LayoutEntry(StringInt si, JabRefPreferences prefs, JournalAbbreviationLoader repositoryLoader) {
-        this.repositoryLoader = repositoryLoader;
+    public LayoutEntry(StringInt si, LayoutFormatterPreferences prefs) {
         this.prefs = prefs;
         type = si.i;
         switch (type) {
@@ -143,9 +137,7 @@ class LayoutEntry {
         }
     }
 
-    public LayoutEntry(List<StringInt> parsedEntries, int layoutType, JabRefPreferences prefs,
-            JournalAbbreviationLoader repositoryLoader) {
-        this.repositoryLoader = repositoryLoader;
+    public LayoutEntry(List<StringInt> parsedEntries, int layoutType, LayoutFormatterPreferences prefs) {
         this.prefs = prefs;
         List<LayoutEntry> tmpEntries = new ArrayList<>();
         String blockStart = parsedEntries.get(0).s;
@@ -171,7 +163,7 @@ class LayoutEntry {
                     blockEntries.add(parsedEntry);
                     int groupType = parsedEntry.i == LayoutHelper.IS_GROUP_END ? LayoutHelper.IS_GROUP_START :
                             LayoutHelper.IS_FIELD_START;
-                    LayoutEntry le = new LayoutEntry(blockEntries, groupType, prefs, repositoryLoader);
+                    LayoutEntry le = new LayoutEntry(blockEntries, groupType, prefs);
                     tmpEntries.add(le);
                     blockEntries = null;
                 } else {
@@ -187,7 +179,7 @@ class LayoutEntry {
             }
 
             if (blockEntries == null) {
-                tmpEntries.add(new LayoutEntry(parsedEntry, prefs, repositoryLoader));
+                tmpEntries.add(new LayoutEntry(parsedEntry, prefs));
             } else {
                 blockEntries.add(parsedEntry);
             }
@@ -514,7 +506,8 @@ class LayoutEntry {
         case "Iso690NamesAuthors":
             return new Iso690NamesAuthors();
         case "JournalAbbreviator":
-            return new JournalAbbreviator(repositoryLoader, JournalAbbreviationPreferences.fromPreferences(prefs));
+            return new JournalAbbreviator(prefs.getJournalAbbreviationLoader(),
+                    prefs.getJournalAbbreviationPreferences());
         case "LastPage":
             return new LastPage();
         case "FormatChars": // For backward compatibility
@@ -551,7 +544,7 @@ class LayoutEntry {
         case "Default":
             return new Default();
         case "FileLink":
-            return new FileLink(prefs);
+            return new FileLink(prefs.getFileLinkPreferences());
         case "Number":
             return new Number();
         case "RisAuthors":
@@ -565,7 +558,7 @@ class LayoutEntry {
         case "WrapContent":
             return new WrapContent();
         case "WrapFileLinks":
-            return new WrapFileLinks(prefs);
+            return new WrapFileLinks(prefs.getFileLinkPreferences());
         default:
             return new NotFoundFormatter(name);
         }
@@ -582,15 +575,15 @@ class LayoutEntry {
 
         List<LayoutFormatter> results = new ArrayList<>(formatterStrings.size());
 
-        Map<String, String> userNameFormatter = NameFormatter.getNameFormatters(prefs);
+        Map<String, String> userNameFormatter = NameFormatter.getNameFormatters(prefs.getNameFormatterPreferences());
 
         for (List<String> strings : formatterStrings) {
 
             String className = strings.get(0).trim();
 
             // Check if this is a name formatter defined by this export filter:
-            if (prefs.customExportNameFormatters != null) {
-                String contents = prefs.customExportNameFormatters.get(className);
+            if (prefs.getCustomExportNameFormatters() != null) {
+                String contents = prefs.getCustomExportNameFormatters().get(className);
                 if (contents != null) {
                     NameFormatter nf = new NameFormatter();
                     nf.setParameter(contents);
