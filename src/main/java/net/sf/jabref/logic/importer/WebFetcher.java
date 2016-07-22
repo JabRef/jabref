@@ -15,22 +15,27 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package net.sf.jabref.importer.fetcher;
+package net.sf.jabref.logic.importer;
 
-import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.logic.help.HelpFile;
 
 /**
- * Looks for article identifier based on already present bibliographic information.
+ * Searches web resources for bibliographic information.
  */
-public interface IdFetcher {
+public interface WebFetcher {
 
     /**
-     * Looks for an identifier based on the information stored in the given {@link BibEntry} and
-     * then updates the {@link BibEntry} with the found id.
+     * Returns the localized name of this fetcher.
+     * The title can be used to display the fetcher in the menu and in the side pane.
      *
-     * @param entry the {@link BibEntry} for which an identifier should be found
-     * @return an updated {@link BibEntry} containing the identifier (if an ID was found, otherwise the {@link BibEntry}
-     *         is left unchanged)
+     * @return the localized name
      */
-    BibEntry updateIdentfier(BibEntry entry);
+    String getName();
+
+    /**
+     * Returns the help page for this fetcher.
+     *
+     * @return the {@link HelpFile} enum constant for the help page
+     */
+    HelpFile getHelpPage();
 }

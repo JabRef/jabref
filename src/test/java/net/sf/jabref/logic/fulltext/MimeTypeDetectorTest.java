@@ -2,6 +2,8 @@ package net.sf.jabref.logic.fulltext;
 
 import java.net.URISyntaxException;
 
+import net.sf.jabref.logic.importer.MimeTypeDetector;
+
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Rule;
 import org.junit.Test;

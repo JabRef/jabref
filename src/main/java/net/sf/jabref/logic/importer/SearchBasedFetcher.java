@@ -15,27 +15,23 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package net.sf.jabref.importer.fetcher;
+package net.sf.jabref.logic.importer;
 
-import net.sf.jabref.gui.help.HelpFile;
+import java.util.List;
+
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
- * Searches web resources for bibliographic information.
+ * Searches web resources for bibliographic information based on a free-text query.
+ * May return multiple search hits.
  */
-public interface WebFetcher {
+public interface SearchBasedFetcher extends WebFetcher {
 
     /**
-     * Returns the localized name of this fetcher.
-     * The title can be used to display the fetcher in the menu and in the side pane.
+     * Looks for hits which are matched by the given free-text query.
      *
-     * @return the localized name
+     * @param query search string
+     * @return a list of {@link BibEntry}, which are matched by the query (may be empty)
      */
-    String getName();
-
-    /**
-     * Returns the help page for this fetcher.
-     *
-     * @return the {@link HelpFile} enum constant for the help page
-     */
-    HelpFile getHelpPage();
+    List<BibEntry> performSearch(String query) throws FetcherException;
 }
