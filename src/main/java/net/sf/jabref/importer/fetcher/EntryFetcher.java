@@ -18,9 +18,9 @@ package net.sf.jabref.importer.fetcher;
 import javax.swing.JPanel;
 
 import net.sf.jabref.gui.ImportInspectionDialog;
-import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.help.HelpFile;
 
 /**
  * Implement this interface to add another activeFetcher (something that grabs records
@@ -34,6 +34,7 @@ import net.sf.jabref.importer.OutputPrinter;
  * A Fetcher should not execute any GUI Operations, because it might be run in
  * headless mode, but rather use the OutputPrinter for talking to the user.
  */
+@Deprecated // use SearchBasedFetcher instead
 public interface EntryFetcher extends ImportInspectionDialog.CallBack {
 
     /**
