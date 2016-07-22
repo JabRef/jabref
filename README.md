@@ -71,7 +71,7 @@ Try to double click the `jar` file or execute the following command:
 
 ## Documentation
 
-JabRef comes with an [online help](http://help.jabref.org/), accessed by pressing `F1` or clicking on a question mark icon.
+JabRef comes with an [online help](https://help.jabref.org/), accessed by pressing `F1` or clicking on a question mark icon.
 The help is are probably not exhaustive enough to satisfy everyone yet, but it should help sort out the most important issues about using the program. 
 If you choose languages other than English, some or all help pages may appear in your chosen languages.
 
