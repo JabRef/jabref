@@ -31,10 +31,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OAI2Handler;
 import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;

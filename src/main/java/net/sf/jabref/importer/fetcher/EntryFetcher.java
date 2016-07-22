@@ -18,9 +18,9 @@ package net.sf.jabref.importer.fetcher;
 import javax.swing.JPanel;
 
 import net.sf.jabref.gui.ImportInspectionDialog;
-import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.help.HelpFile;
 
 /**
  * Implement this interface to add another activeFetcher (something that grabs records

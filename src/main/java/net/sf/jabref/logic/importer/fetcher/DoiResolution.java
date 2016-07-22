@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.logic.importer.MimeTypeDetector;
 import net.sf.jabref.logic.importer.FulltextFetcher;
+import net.sf.jabref.logic.importer.MimeTypeDetector;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;

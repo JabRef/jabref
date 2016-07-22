@@ -25,12 +25,12 @@ import java.util.Optional;
 
 import net.sf.jabref.importer.fetcher.CrossRef;
 import net.sf.jabref.logic.importer.fetcher.ACS;
+import net.sf.jabref.logic.importer.fetcher.ArXiv;
 import net.sf.jabref.logic.importer.fetcher.DoiResolution;
 import net.sf.jabref.logic.importer.fetcher.GoogleScholar;
 import net.sf.jabref.logic.importer.fetcher.IEEE;
 import net.sf.jabref.logic.importer.fetcher.ScienceDirect;
 import net.sf.jabref.logic.importer.fetcher.SpringerLink;
-import net.sf.jabref.logic.importer.fetcher.ArXiv;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;

@@ -22,9 +22,9 @@ import java.util.Objects;
 
 import javax.swing.JPanel;
 
-import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.l10n.Localization;

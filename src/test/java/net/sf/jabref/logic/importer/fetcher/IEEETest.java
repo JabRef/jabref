@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 
-import net.sf.jabref.logic.importer.fetcher.IEEE;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.support.DevEnvironment;
 

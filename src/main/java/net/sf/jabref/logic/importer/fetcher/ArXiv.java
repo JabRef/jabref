@@ -33,9 +33,9 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.importer.fetcher.OAI2Fetcher;
 import net.sf.jabref.logic.TypedBibEntry;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.FulltextFetcher;
 import net.sf.jabref.logic.importer.IdBasedFetcher;

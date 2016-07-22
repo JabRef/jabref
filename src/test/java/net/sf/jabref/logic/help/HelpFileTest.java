@@ -21,8 +21,6 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import net.sf.jabref.logic.help.HelpFile;
-
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertEquals;

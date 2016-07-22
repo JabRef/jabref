@@ -28,11 +28,11 @@ import java.nio.charset.StandardCharsets;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 
