@@ -23,40 +23,29 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assume.assumeFalse;
-
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class FileBasedTestCase {
 
-    private BibDatabase database;
     private BibEntry entry;
     private Path rootDir;
-
-    private String oldPdfDirectory;
-    private boolean oldUseRegExp;
-    private boolean oldAutoLinkExcatKeyOnly;
 
 
     @Before
     public void setUp() throws IOException {
-        Globals.prefs = JabRefPreferences.getInstance();
-        oldUseRegExp = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY);
-        oldAutoLinkExcatKeyOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
-        oldPdfDirectory = Globals.prefs.get("pdfDirectory");
+        Globals.prefs = mock(JabRefPreferences.class);
 
-        Globals.prefs.putBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY, false);
-        Globals.prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, false);
-
-        database = BibtexTestData.getBibtexDatabase();
+        BibDatabase database = BibtexTestData.getBibtexDatabase();
         entry = database.getEntries().iterator().next();
 
         rootDir = Files.createTempDirectory("UtilFindFileTest");
 
-        Globals.prefs.put("pdfDirectory", rootDir.toAbsolutePath().toString());
+
 
         Path subDir = Files.createDirectory(rootDir.resolve("Organization Science"));
         Path pdfSubDir = Files.createDirectory(rootDir.resolve("pdfs"));
@@ -90,8 +79,9 @@ public class FileBasedTestCase {
 
         List<BibEntry> entries = Collections.singletonList(entry);
         List<String> extensions = Arrays.asList("jpg", "pdf");
-        List<File> dirs = Arrays.asList(rootDir.resolve("graphicsDir").toFile(),
-                rootDir.resolve("pdfs").toFile());
+        List<File> dirs = Arrays.asList(rootDir.resolve("graphicsDir").toFile(), rootDir.resolve("pdfs").toFile());
+
+        when(Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY)).thenReturn(false);
 
         Map<BibEntry, List<File>> results = FileUtil.findAssociatedFiles(entries, extensions, dirs, Globals.prefs);
 
@@ -119,23 +109,16 @@ public class FileBasedTestCase {
         assumeFalse(DevEnvironment.isCIServer());
         FileFinder.findFiles(null, null);
     }
-    @After
-    public void tearDown() {
 
+    @After
+    public void tearDown() throws IOException {
+
+        Globals.prefs = null;
         try (Stream<Path> path = Files.walk(rootDir)) {
             // reverse; files before dirs
             for (Path p : path.sorted((a, b) -> b.compareTo(a)).toArray(Path[]::new)) {
                 Files.delete(p);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-
-        Globals.prefs.putBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY, oldAutoLinkExcatKeyOnly);
-        Globals.prefs.putBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY, oldUseRegExp);
-        Globals.prefs.put("pdfDirectory", oldPdfDirectory);
-        // TODO: This is not a great way to do this, sure ;-)
-
     }
-
 }

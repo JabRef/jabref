@@ -3,10 +3,13 @@ package net.sf.jabref.logic.util.io;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -23,13 +26,14 @@ public class FileFinder {
         Objects.requireNonNull(directories, "Directories must not be null!");
         Objects.requireNonNull(extensions, "Extensions must not be null!");
 
+        BiPredicate<Path, BasicFileAttributes> isDirectoryAndContainsExtension = (path,
+                attr) -> !Files.isDirectory(path)
+                        && extensions.contains(FileUtil.getFileExtension(path.toFile()).orElse(""));
+
         Set<File> result = new HashSet<>();
         for (File directory : directories) {
 
-            try (Stream<File> files = Files
-                    .find(directory.toPath(), Integer.MAX_VALUE,
-                            (path, attr) -> !Files.isDirectory(path)
-                                    && extensions.contains(FileUtil.getFileExtension(path.toFile()).orElse("")))
+            try (Stream<File> files = Files.find(directory.toPath(), Integer.MAX_VALUE, isDirectoryAndContainsExtension)
                     .map(x -> x.toFile())) {
                 result.addAll(files.collect(Collectors.toSet()));
 
@@ -38,5 +42,6 @@ public class FileFinder {
             }
         }
         return result;
+
     }
 }
