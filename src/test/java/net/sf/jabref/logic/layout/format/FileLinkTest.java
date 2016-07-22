@@ -21,40 +21,41 @@ public class FileLinkTest {
 
     @Test
     public void testEmpty() {
-        assertEquals("", new FileLink(Globals.prefs).format(""));
+        assertEquals("", new FileLink(FileLinkPreferences.fromPreferences(Globals.prefs)).format(""));
     }
 
     @Test
     public void testNull() {
-        assertEquals("", new FileLink(Globals.prefs).format(null));
+        assertEquals("", new FileLink(FileLinkPreferences.fromPreferences(Globals.prefs)).format(null));
     }
 
     @Test
     public void testOnlyFilename() {
-        assertEquals("test.pdf", new FileLink(Globals.prefs).format("test.pdf"));
+        assertEquals("test.pdf", new FileLink(FileLinkPreferences.fromPreferences(Globals.prefs)).format("test.pdf"));
     }
 
     @Test
     public void testCompleteRecord() {
-        assertEquals("test.pdf", new FileLink(Globals.prefs).format("paper:test.pdf:PDF"));
+        assertEquals("test.pdf",
+                new FileLink(FileLinkPreferences.fromPreferences(Globals.prefs)).format("paper:test.pdf:PDF"));
     }
 
     @Test
     public void testMultipleFiles() {
-        ParamLayoutFormatter a = new FileLink(Globals.prefs);
+        ParamLayoutFormatter a = new FileLink(FileLinkPreferences.fromPreferences(Globals.prefs));
         assertEquals("test.pdf", a.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
     }
 
     @Test
     public void testMultipleFilesPick() {
-        ParamLayoutFormatter a = new FileLink(Globals.prefs);
+        ParamLayoutFormatter a = new FileLink(FileLinkPreferences.fromPreferences(Globals.prefs));
         a.setArgument("ppt");
         assertEquals("pres.ppt", a.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
     }
 
     @Test
     public void testMultipleFilesPickNonExistant() {
-        ParamLayoutFormatter a = new FileLink(Globals.prefs);
+        ParamLayoutFormatter a = new FileLink(FileLinkPreferences.fromPreferences(Globals.prefs));
         a.setArgument("doc");
         assertEquals("", a.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
     }

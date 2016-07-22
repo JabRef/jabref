@@ -18,19 +18,15 @@ package net.sf.jabref.logic.layout.format;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.layout.AbstractParamLayoutFormatter;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -118,7 +114,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     // Define which escape sequences give what results:
     private static final Map<Character, Integer> ESCAPE_SEQ = new HashMap<>();
 
-    private final JabRefPreferences prefs;
+    private final FileLinkPreferences prefs;
 
     static {
         WrapFileLinks.ESCAPE_SEQ.put('i', WrapFileLinks.ITERATION_COUNT);
@@ -130,8 +126,8 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     }
 
 
-    public WrapFileLinks(JabRefPreferences prefs) {
-        this.prefs = prefs;
+    public WrapFileLinks(FileLinkPreferences fileLinkPreferences) {
+        this.prefs = fileLinkPreferences;
     }
 
     @Override
@@ -178,10 +174,10 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                         // but that is not available from a formatter. Therefore, as an
                         // ugly hack, the export routine has set a global variable before
                         // starting the export, which contains the database's file directory:
-                        if (prefs.fileDirForDatabase == null) {
-                            dirs = Collections.singletonList(prefs.get(FieldName.FILE + Globals.DIR_SUFFIX));
+                        if (prefs.getFileDirForDatabase() == null) {
+                            dirs = prefs.getGeneratedDirForDatabase();
                         } else {
-                            dirs = prefs.fileDirForDatabase;
+                            dirs = prefs.getFileDirForDatabase();
                         }
 
                         Optional<File> f = FileUtil.expandFilename(flEntry.getLink(), dirs);

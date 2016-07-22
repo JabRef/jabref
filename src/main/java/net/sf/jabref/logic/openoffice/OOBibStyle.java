@@ -36,9 +36,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatter;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
@@ -46,7 +46,6 @@ import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -147,16 +146,14 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private static final String AUTHOR_LAST_SEPARATOR = "AuthorLastSeparator";
     private static final String AUTHOR_SEPARATOR = "AuthorSeparator";
 
-    private final JournalAbbreviationLoader repositoryLoader;
-    private final JabRefPreferences prefs;
+    private final LayoutFormatterPreferences prefs;
     private static final Pattern QUOTED = Pattern.compile("\".*\"");
 
     private static final Log LOGGER = LogFactory.getLog(OOBibStyle.class);
 
 
-    public OOBibStyle(File styleFile, JabRefPreferences prefs, JournalAbbreviationLoader repositoryLoader,
+    public OOBibStyle(File styleFile, LayoutFormatterPreferences prefs,
             Charset encoding) throws IOException {
-        this.repositoryLoader = Objects.requireNonNull(repositoryLoader);
         this.prefs = Objects.requireNonNull(prefs);
         this.styleFile = Objects.requireNonNull(styleFile);
         this.encoding = Objects.requireNonNull(encoding);
@@ -166,9 +163,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         path = styleFile.getPath();
     }
 
-    public OOBibStyle(String resourcePath, JabRefPreferences prefs, JournalAbbreviationLoader repositoryLoader)
+    public OOBibStyle(String resourcePath, LayoutFormatterPreferences prefs)
             throws IOException {
-        this.repositoryLoader = Objects.requireNonNull(repositoryLoader);
         this.prefs = Objects.requireNonNull(prefs);
         this.encoding = StandardCharsets.UTF_8;
         setDefaultProperties();
@@ -383,8 +379,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             boolean setDefault = line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK);
             String type = line.substring(0, index);
             try {
-                Layout layout = new LayoutHelper(new StringReader(formatString), this.prefs, this.repositoryLoader)
-                        .getLayoutFromText();
+                Layout layout = new LayoutHelper(new StringReader(formatString), this.prefs).getLayoutFromText();
                 if (setDefault) {
                     defaultBibLayout = layout;
                 } else {

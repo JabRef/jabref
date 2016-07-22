@@ -57,6 +57,7 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.openoffice.OOBibStyle;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
@@ -126,7 +127,8 @@ public class OpenOfficePanel extends AbstractWorker {
         update = new JButton(IconTheme.JabRefIcon.REFRESH.getSmallIcon());
         update.setToolTipText(Localization.lang("Sync OpenOffice/LibreOffice bibliography"));
         preferences = new OpenOfficePreferences(Globals.prefs);
-        loader = new StyleLoader(preferences, Globals.prefs, Globals.journalAbbreviationLoader,
+        loader = new StyleLoader(preferences,
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader),
                 Globals.prefs.getDefaultEncoding());
     }
 
