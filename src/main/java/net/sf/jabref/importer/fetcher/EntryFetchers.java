@@ -19,8 +19,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sf.jabref.logic.fulltext.ArXiv;
-import net.sf.jabref.logic.fulltext.SearchBasedEntryFetcher;
+import net.sf.jabref.logic.importer.fetcher.ArXiv;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 
 public class EntryFetchers {

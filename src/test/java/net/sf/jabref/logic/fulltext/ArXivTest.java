@@ -5,7 +5,8 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Optional;
 
-import net.sf.jabref.logic.fetcher.FetcherException;
+import net.sf.jabref.logic.importer.FetcherException;
+import net.sf.jabref.logic.importer.fetcher.ArXiv;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
 

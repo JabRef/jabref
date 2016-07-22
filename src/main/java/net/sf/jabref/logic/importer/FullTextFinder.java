@@ -15,23 +15,28 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package net.sf.jabref.importer.fetcher;
+package net.sf.jabref.logic.importer;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Optional;
 
-import net.sf.jabref.logic.fetcher.FetcherException;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
- * Searches web resources for bibliographic information based on an identifier.
+ * This interface is used for classes that try to resolve a full-text PDF url for a BibTex entry.
+ * Implementing classes should specialize on specific article sites.
+ * See e.g. @link{http://libguides.mit.edu/apis}.
  */
-public interface IdBasedFetcher extends WebFetcher {
-
+@FunctionalInterface
+public interface FullTextFinder {
     /**
-     * Looks for bibliographic information associated to the given identifier.
+     * Tries to find a fulltext URL for a given BibTex entry.
      *
-     * @param identifier a string which uniquely identifies the item
-     * @return a {@link BibEntry} containing the bibliographic information (or an empty optional if no data was found)
+     * @param entry The Bibtex entry
+     * @return The fulltext PDF URL Optional, if found, or an empty Optional if not found.
+     * @throws NullPointerException if no BibTex entry is given
+     * @throws java.io.IOException
      */
-    Optional<BibEntry> performSearchById(String identifier) throws FetcherException;
+    Optional<URL> findFullText(BibEntry entry) throws IOException;
 }

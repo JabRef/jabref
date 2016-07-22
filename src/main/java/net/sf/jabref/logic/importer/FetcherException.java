@@ -15,7 +15,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package net.sf.jabref.logic.fetcher;
+package net.sf.jabref.logic.importer;
 
 public class FetcherException extends Exception {
 
