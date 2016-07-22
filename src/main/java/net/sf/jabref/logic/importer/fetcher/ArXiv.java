@@ -37,7 +37,7 @@ import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.importer.fetcher.OAI2Fetcher;
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.importer.FetcherException;
-import net.sf.jabref.logic.importer.FullTextFinder;
+import net.sf.jabref.logic.importer.FulltextFetcher;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
 import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.util.DOI;
@@ -68,7 +68,7 @@ import org.xml.sax.SAXException;
  * <a href="https://github.com/nathangrigg/arxiv2bib">arxiv2bib</a> which is <a href="https://arxiv2bibtex.org/">live</a>
  * <a herf="https://gitlab.c3sl.ufpr.br/portalmec/dspace-portalmec/blob/aa209d15082a9870f9daac42c78a35490ce77b52/dspace-api/src/main/java/org/dspace/submit/lookup/ArXivService.java">dspace-portalmec</a>
  */
-public class ArXiv implements FullTextFinder, SearchBasedFetcher, IdBasedFetcher {
+public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(ArXiv.class);
 

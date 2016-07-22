@@ -21,7 +21,7 @@ import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.logic.importer.FullTextFinder;
+import net.sf.jabref.logic.importer.FulltextFetcher;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -35,11 +35,11 @@ import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
 
 /**
- * FullTextFinder implementation that attempts to find a PDF URL at SpringerLink.
+ * FulltextFetcher implementation that attempts to find a PDF URL at SpringerLink.
  *
  * Uses Springer API, see @link{https://dev.springer.com}
  */
-public class SpringerLink implements FullTextFinder {
+public class SpringerLink implements FulltextFetcher {
     private static final Log LOGGER = LogFactory.getLog(SpringerLink.class);
 
     private static final String API_URL = "http://api.springer.com/meta/v1/json";

@@ -29,7 +29,7 @@ import net.sf.jabref.model.entry.BibEntry;
  * See e.g. @link{http://libguides.mit.edu/apis}.
  */
 @FunctionalInterface
-public interface FullTextFinder {
+public interface FulltextFetcher {
     /**
      * Tries to find a fulltext URL for a given BibTex entry.
      *

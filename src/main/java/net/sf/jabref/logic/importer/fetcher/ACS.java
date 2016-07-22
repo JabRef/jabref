@@ -22,7 +22,7 @@ import java.net.URL;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.logic.importer.FullTextFinder;
+import net.sf.jabref.logic.importer.FulltextFetcher;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -34,9 +34,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 /**
- * FullTextFinder implementation that attempts to find a PDF URL at ACS.
+ * FulltextFetcher implementation that attempts to find a PDF URL at ACS.
  */
-public class ACS implements FullTextFinder {
+public class ACS implements FulltextFetcher {
     private static final Log LOGGER = LogFactory.getLog(ACS.class);
 
     private static final String SOURCE = "http://pubs.acs.org/doi/abs/%s";

@@ -41,12 +41,12 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Utility class for trying to resolve URLs to full-text PDF for articles.
  */
-public class FindFullText {
-    private static final Log LOGGER = LogFactory.getLog(FindFullText.class);
+public class FulltextFetchers {
+    private static final Log LOGGER = LogFactory.getLog(FulltextFetchers.class);
 
-    private final List<FullTextFinder> finders = new ArrayList<>();
+    private final List<FulltextFetcher> finders = new ArrayList<>();
 
-    public FindFullText() {
+    public FulltextFetchers() {
         // Ordering is important, authorities first!
         // Publisher
         finders.add(new DoiResolution());
@@ -59,7 +59,7 @@ public class FindFullText {
         finders.add(new GoogleScholar());
     }
 
-    public FindFullText(List<FullTextFinder> fetcher) {
+    public FulltextFetchers(List<FulltextFetcher> fetcher) {
         finders.addAll(fetcher);
     }
 
@@ -72,7 +72,7 @@ public class FindFullText {
             CrossRef.findDOI(clonedEntry).ifPresent(e -> clonedEntry.setField(FieldName.DOI, e.getDOI()));
         }
 
-        for (FullTextFinder finder : finders) {
+        for (FulltextFetcher finder : finders) {
             try {
                 Optional<URL> result = finder.findFullText(clonedEntry);
 

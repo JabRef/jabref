@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.logic.importer.FullTextFinder;
+import net.sf.jabref.logic.importer.FulltextFetcher;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
@@ -39,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
  * Will first look for URLs of the type http://ieeexplore.ieee.org/stamp/stamp.jsp?[tp=&]arnumber=...
  * If not found, will resolve the DOI, if it starts with 10.1109, and try to find a similar link on the HTML page
  */
-public class IEEE implements FullTextFinder {
+public class IEEE implements FulltextFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(IEEE.class);
     private static final Pattern STAMP_PATTERN = Pattern.compile("(/stamp/stamp.jsp\\?t?p?=?&?arnumber=[0-9]+)");

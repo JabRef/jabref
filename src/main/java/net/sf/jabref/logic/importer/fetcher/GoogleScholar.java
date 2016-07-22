@@ -24,7 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.logic.importer.FullTextFinder;
+import net.sf.jabref.logic.importer.FulltextFetcher;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
@@ -35,9 +35,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 /**
- * FullTextFinder implementation that attempts to find a PDF URL at GoogleScholar.
+ * FulltextFetcher implementation that attempts to find a PDF URL at GoogleScholar.
  */
-public class GoogleScholar implements FullTextFinder {
+public class GoogleScholar implements FulltextFetcher {
     private static final Log LOGGER = LogFactory.getLog(GoogleScholar.class);
 
     private static final String SEARCH_URL = "https://scholar.google.com//scholar?as_q=&as_epq=%s&as_occt=title";

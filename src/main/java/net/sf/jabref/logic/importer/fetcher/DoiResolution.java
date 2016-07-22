@@ -24,7 +24,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.logic.importer.MimeTypeDetector;
-import net.sf.jabref.logic.importer.FullTextFinder;
+import net.sf.jabref.logic.importer.FulltextFetcher;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -38,9 +38,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 /**
- * FullTextFinder implementation that follows the DOI resolution redirects and scans for a full-text PDF URL.
+ * FulltextFetcher implementation that follows the DOI resolution redirects and scans for a full-text PDF URL.
  */
-public class DoiResolution implements FullTextFinder {
+public class DoiResolution implements FulltextFetcher {
     private static final Log LOGGER = LogFactory.getLog(DoiResolution.class);
 
     @Override
