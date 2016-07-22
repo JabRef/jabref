@@ -107,7 +107,7 @@ public class EndnoteImporter extends ImportFormat {
         for (String entry : entries) {
             hm.clear();
             author = "";
-            type = "misc";
+            type = BibEntry.DEFAULT_TYPE;
             editor = "";
             artnum = "";
 
@@ -169,7 +169,7 @@ public class EndnoteImporter extends ImportFormat {
                     } else if (val.indexOf("Thesis") == 0) {
                         type = "phdthesis";
                     } else {
-                        type = "misc"; //
+                        type = BibEntry.DEFAULT_TYPE; //
                     }
                 } else if ("7".equals(prefix)) {
                     hm.put(FieldName.EDITION, val);

@@ -49,7 +49,7 @@ public class BibEntry implements Cloneable {
     public static final String TYPE_HEADER = "entrytype";
     public static final String KEY_FIELD = "bibtexkey";
     protected static final String ID_FIELD = "id";
-    private static final String DEFAULT_TYPE = "misc";
+    public static final String DEFAULT_TYPE = "misc";
 
     private String id;
     private String type;

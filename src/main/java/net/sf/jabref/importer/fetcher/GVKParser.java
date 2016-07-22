@@ -337,7 +337,7 @@ public class GVKParser {
         // Dokumenttyp bestimmen und Eintrag anlegen
 
         if (mak.startsWith("As")) {
-            entryType = "misc";
+            entryType = BibEntry.DEFAULT_TYPE;
 
             if (quelle.contains("ISBN")) {
                 entryType = "incollection";
@@ -346,9 +346,9 @@ public class GVKParser {
                 entryType = "article";
             }
         } else if (mak.isEmpty()) {
-            entryType = "misc";
+            entryType = BibEntry.DEFAULT_TYPE;
         } else if (mak.startsWith("O")) {
-            entryType = "misc";
+            entryType = BibEntry.DEFAULT_TYPE;
             // FIXME: online only available in Biblatex
             //entryType = "online";
         }

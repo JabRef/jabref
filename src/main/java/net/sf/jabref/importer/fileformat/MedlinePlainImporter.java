@@ -98,7 +98,7 @@ public class MedlinePlainImporter extends ImportFormat {
                 continue;
             }
 
-            String type = "misc";
+            String type = BibEntry.DEFAULT_TYPE;
             String author = "";
             String editor = "";
             String comment = "";
