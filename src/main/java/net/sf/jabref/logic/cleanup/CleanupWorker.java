@@ -23,6 +23,7 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public class CleanupWorker {
@@ -62,7 +63,7 @@ public class CleanupWorker {
         List<CleanupJob> jobs = new ArrayList<>();
 
         if (preset.isCleanUpUpgradeExternalLinks()) {
-            jobs.add(new UpgradePdfPsToFileCleanup(Arrays.asList("pdf", "ps")));
+            jobs.add(new UpgradePdfPsToFileCleanup(Arrays.asList(FieldName.PDF, FieldName.PS)));
         }
         if (preset.isCleanUpDOI()) {
             jobs.add(new DoiCleanup());

@@ -41,7 +41,7 @@ public class MainTableFormat implements TableFormat<BibEntry> {
     // These values are also used to put a heading into the table; see getColumnName(int)
     private static final List<String> URL_FIRST = Arrays.asList(FieldName.URL, FieldName.DOI);
     private static final List<String> DOI_FIRST = Arrays.asList(FieldName.DOI, FieldName.URL);
-    private static final List<String> ARXIV = Collections.singletonList("eprint");
+    private static final List<String> ARXIV = Collections.singletonList(FieldName.EPRINT);
 
     private final BibDatabase database;
 

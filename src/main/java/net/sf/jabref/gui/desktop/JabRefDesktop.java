@@ -74,7 +74,7 @@ public class JabRefDesktop {
             String initialFieldName) throws IOException {
         String link = initialLink;
         String fieldName = initialFieldName;
-        if ("ps".equals(fieldName) || "pdf".equals(fieldName)) {
+        if (FieldName.PS.equals(fieldName) || FieldName.PDF.equals(fieldName)) {
             // Find the default directory for this field type:
             List<String> dir = databaseContext.getFileDirectory(fieldName);
 
@@ -90,10 +90,10 @@ public class JabRefDesktop {
             String[] split = file.get().getName().split("\\.");
             if (split.length >= 2) {
                 if ("pdf".equalsIgnoreCase(split[split.length - 1])) {
-                    fieldName = "pdf";
+                    fieldName = FieldName.PDF;
                 } else if ("ps".equalsIgnoreCase(split[split.length - 1])
                         || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
-                    fieldName = "ps";
+                    fieldName = FieldName.PS;
                 }
             }
         } else if (FieldName.DOI.equals(fieldName)) {
@@ -103,7 +103,7 @@ public class JabRefDesktop {
             }
             // should be opened in browser
             fieldName = FieldName.URL;
-        } else if ("eprint".equals(fieldName)) {
+        } else if (FieldName.EPRINT.equals(fieldName)) {
             fieldName = FieldName.URL;
 
             // Check to see if link field already contains a well formated URL
@@ -121,15 +121,15 @@ public class JabRefDesktop {
                 // In BasePanel.java, the exception is catched and a text output to the frame
                 // throw e;
             }
-        } else if ("ps".equals(fieldName)) {
+        } else if (FieldName.PS.equals(fieldName)) {
             try {
-                NATIVE_DESKTOP.openFile(link, "ps");
+                NATIVE_DESKTOP.openFile(link, FieldName.PS);
             } catch (IOException e) {
                 LOGGER.error("An error occured on the command: " + link, e);
             }
-        } else if ("pdf".equals(fieldName)) {
+        } else if (FieldName.PDF.equals(fieldName)) {
             try {
-                NATIVE_DESKTOP.openFile(link, "pdf");
+                NATIVE_DESKTOP.openFile(link, FieldName.PDF);
             } catch (IOException e) {
                 LOGGER.error("An error occured on the command: " + link, e);
             }

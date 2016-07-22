@@ -2056,10 +2056,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private class OpenURLAction implements BaseAction {
 
-        private static final String PS_FIELD = "ps";
-        private static final String PDF_FIELD = "pdf";
-
-
         @Override
         public void action() {
             final List<BibEntry> bes = mainTable.getSelectedEntries();
@@ -2086,8 +2082,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     for (int i = 0; i < tm.getRowCount(); i++) {
                         FileListEntry flEntry = tm.getEntry(i);
                         if (FieldName.URL.equalsIgnoreCase(flEntry.type.get().getName())
-                                || PS_FIELD.equalsIgnoreCase(flEntry.type.get().getName())
-                                || PDF_FIELD.equalsIgnoreCase(flEntry.type.get().getName())) {
+                                || FieldName.PS.equalsIgnoreCase(flEntry.type.get().getName())
+                                || FieldName.PDF.equalsIgnoreCase(flEntry.type.get().getName())) {
                             entry = flEntry;
                             break;
                         }

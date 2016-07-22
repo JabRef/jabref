@@ -168,7 +168,7 @@ public class FreeCiteImporter extends ImportFormat {
                                 e.setField(FieldName.NUMBER, parser.getElementText());
                             } else if (FieldName.DOI.equals(ln)
                                     || FieldName.INSTITUTION.equals(ln)
-                                    || "location".equals(ln)
+                                    || FieldName.LOCATION.equals(ln)
                                     || FieldName.NUMBER.equals(ln)
                                     || FieldName.NOTE.equals(ln)
                                     || FieldName.TITLE.equals(ln)

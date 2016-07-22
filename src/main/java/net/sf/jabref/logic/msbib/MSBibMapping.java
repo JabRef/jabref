@@ -28,7 +28,7 @@ public class MSBibMapping {
         bibtexToMSBib.put(FieldName.BOOKTITLE, "BookTitle");
         //bibtexToMSBib.put(FieldName.BOOKTITLE, "ConferenceName");
         //bibtexToMSBib.put(FieldName.PAGES, "Pages");
-        bibtexToMSBib.put("chapter", "ChapterNumber");
+        bibtexToMSBib.put(FieldName.CHAPTER, "ChapterNumber");
         bibtexToMSBib.put(FieldName.JOURNAL, "JournalName");
         bibtexToMSBib.put(FieldName.NUMBER, "Issue");
         bibtexToMSBib.put(FieldName.SCHOOL, "Department");

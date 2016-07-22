@@ -97,7 +97,7 @@ public class GUIGlobals {
         JLabel label;
         label = new JLabel(IconTheme.JabRefIcon.PDF_FILE.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " PDF");
-        GUIGlobals.TABLE_ICONS.put("pdf", label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.PDF, label);
 
         label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " URL");
@@ -109,7 +109,7 @@ public class GUIGlobals {
 
         label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " ArXiv URL");
-        GUIGlobals.TABLE_ICONS.put("eprint", label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.EPRINT, label);
 
         label = new JLabel(IconTheme.JabRefIcon.DOI.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " DOI " + Localization.lang("web link"));
@@ -117,7 +117,7 @@ public class GUIGlobals {
 
         label = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " PS");
-        GUIGlobals.TABLE_ICONS.put("ps", label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.PS, label);
 
         label = new JLabel(IconTheme.JabRefIcon.FOLDER.getSmallIcon());
         label.setToolTipText(Localization.lang("Open folder"));
