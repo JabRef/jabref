@@ -58,7 +58,7 @@ public class FieldFormatterCleanupsTest {
 
         actions.applySaveActions(entry);
 
-        assertEquals("Educational session 1", entry.getField("title"));
+        assertEquals(Optional.of("Educational session 1"), entry.getFieldOptional("title"));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class FieldFormatterCleanupsTest {
 
         actions.applySaveActions(entry);
 
-        assertEquals("Educational session 1", entry.getField("title"));
+        assertEquals(Optional.of("Educational session 1"), entry.getFieldOptional("title"));
     }
 
     @Test
@@ -83,7 +83,7 @@ public class FieldFormatterCleanupsTest {
 
         actions.applySaveActions(entry);
 
-        assertEquals("educational session 1", entry.getField("title"));
+        assertEquals(Optional.of("educational session 1"), entry.getFieldOptional("title"));
     }
 
     @Test
@@ -96,7 +96,7 @@ public class FieldFormatterCleanupsTest {
 
         actions.applySaveActions(entry);
 
-        assertEquals("educational session 1", entry.getField("title"));
+        assertEquals(Optional.of("educational session 1"), entry.getFieldOptional("title"));
     }
 
     @Test
@@ -111,7 +111,7 @@ public class FieldFormatterCleanupsTest {
 
         actions.applySaveActions(entry);
 
-        assertEquals("educational session 1", entry.getField("title"));
+        assertEquals(Optional.of("educational session 1"), entry.getFieldOptional("title"));
     }
 
     @Test
@@ -126,8 +126,8 @@ public class FieldFormatterCleanupsTest {
 
         actions.applySaveActions(entry);
 
-        assertEquals("educational session 1", entry.getField("title"));
-        assertEquals("1--7", entry.getField("pages"));
+        assertEquals(Optional.of("educational session 1"), entry.getFieldOptional("title"));
+        assertEquals(Optional.of("1--7"), entry.getFieldOptional("pages"));
     }
 
     @Test
@@ -144,8 +144,8 @@ public class FieldFormatterCleanupsTest {
 
         actions.applySaveActions(entry);
 
-        assertEquals("educational session 1", entry.getField("title"));
-        assertEquals("1--7", entry.getField("pages"));
+        assertEquals(Optional.of("educational session 1"), entry.getFieldOptional("title"));
+        assertEquals(Optional.of("1--7"), entry.getFieldOptional("pages"));
     }
 
     @Test

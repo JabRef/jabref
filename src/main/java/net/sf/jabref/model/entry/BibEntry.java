@@ -34,11 +34,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.event.FieldChangedEvent;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
@@ -51,7 +49,6 @@ public class BibEntry implements Cloneable {
     public static final String TYPE_HEADER = "entrytype";
     public static final String KEY_FIELD = "bibtexkey";
     protected static final String ID_FIELD = "id";
-    public static final String KEYWORDS_FIELD = "keywords";
     private static final String DEFAULT_TYPE = "misc";
 
     private String id;
@@ -60,7 +57,7 @@ public class BibEntry implements Cloneable {
     /*
      * Map to store the words in every field
      */
-    private Map<String, Set<String>> fieldsAsWords = new HashMap<>();
+    private final Map<String, Set<String>> fieldsAsWords = new HashMap<>();
 
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit;
@@ -262,19 +259,19 @@ public class BibEntry implements Cloneable {
         }
 
         // Finally, handle dates
-        if ("date".equals(name)) {
-            String year = getField("year");
-            MonthUtil.Month month = MonthUtil.getMonth(getField("month"));
-            if (year != null) {
+        if (FieldName.DATE.equals(name)) {
+            Optional<String> year = getFieldOptional(FieldName.YEAR);
+            if (year.isPresent()) {
+                MonthUtil.Month month = MonthUtil.getMonth(getFieldOptional(FieldName.MONTH).orElse(""));
                 if (month.isValid()) {
-                    return Optional.of(year + '-' + month.twoDigitNumber);
+                    return Optional.of(year.get() + '-' + month.twoDigitNumber);
                 } else {
-                    return Optional.of(year);
+                    return year;
                 }
             }
         }
-        if ("year".equals(name) || "month".equals(name)) {
-            Optional<String> date = getFieldOptional("date");
+        if (FieldName.YEAR.equals(name) || FieldName.MONTH.equals(name)) {
+            Optional<String> date = getFieldOptional(FieldName.DATE);
             if (!date.isPresent()) {
                 return Optional.empty();
             }
@@ -305,10 +302,10 @@ public class BibEntry implements Cloneable {
                 Date parsedDate = df.parse(date.get());
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(parsedDate);
-                if ("year".equals(name)) {
+                if (FieldName.YEAR.equals(name)) {
                     return Optional.of(Integer.toString(calendar.get(Calendar.YEAR)));
                 }
-                if ("month".equals(name)) {
+                if (FieldName.MONTH.equals(name)) {
                     return Optional.of(Integer.toString(calendar.get(Calendar.MONTH) + 1)); // Shift by 1 since in this calendar Jan = 0
                 }
             } catch (ParseException e) {
@@ -319,7 +316,7 @@ public class BibEntry implements Cloneable {
                     Date parsedDate = df.parse(date.get());
                     Calendar calendar = Calendar.getInstance();
                     calendar.setTime(parsedDate);
-                    if ("year".equals(name)) {
+                    if (FieldName.YEAR.equals(name)) {
                         return Optional.of(Integer.toString(calendar.get(Calendar.YEAR)));
                     }
                 } catch (ParseException e2) {
@@ -489,8 +486,8 @@ public class BibEntry implements Cloneable {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[] {getFieldOptional("author").orElse("N/A"), getFieldOptional("title").orElse("N/A"),
-                getFieldOptional("year").orElse("N/A")};
+        String[] s = new String[] {getFieldOptional(FieldName.AUTHOR).orElse("N/A"), getFieldOptional(FieldName.TITLE).orElse("N/A"),
+                getFieldOptional(FieldName.YEAR).orElse("N/A")};
 
         String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
         if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
@@ -505,13 +502,13 @@ public class BibEntry implements Cloneable {
      * @return will return the publication date of the entry or null if no year was found.
      */
     public Optional<String> getPublicationDate() {
-        if (!hasField("year")) {
+        if (!hasField(FieldName.YEAR)) {
             return Optional.empty();
         }
 
-        Optional<String> year = getFieldOptional("year");
+        Optional<String> year = getFieldOptional(FieldName.YEAR);
 
-        Optional<String> monthString = getFieldOptional("month");
+        Optional<String> monthString = getFieldOptional(FieldName.MONTH);
         if (monthString.isPresent()) {
             MonthUtil.Month month = MonthUtil.getMonth(monthString.get());
             if (month.isValid()) {
@@ -539,22 +536,22 @@ public class BibEntry implements Cloneable {
         this.changed = changed;
     }
 
-    public Optional<FieldChange> putKeywords(Collection<String> keywords) {
+    public Optional<FieldChange> putKeywords(Collection<String> keywords, String separator) {
         Objects.requireNonNull(keywords);
-        Optional<String> oldValue = this.getFieldOptional(KEYWORDS_FIELD);
+        Optional<String> oldValue = this.getFieldOptional(FieldName.KEYWORDS);
 
         if (keywords.isEmpty()) {
             // Clear keyword field
             if (oldValue.isPresent()) {
-                return this.clearField(KEYWORDS_FIELD);
+                return this.clearField(FieldName.KEYWORDS);
             } else {
                 return Optional.empty();
             }
         }
 
         // Set new keyword field
-        String newValue = String.join(Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR), keywords);
-        return this.setField(KEYWORDS_FIELD, newValue);
+        String newValue = String.join(separator, keywords);
+        return this.setField(FieldName.KEYWORDS, newValue);
     }
 
     /**
@@ -562,7 +559,7 @@ public class BibEntry implements Cloneable {
      *
      * @param keyword Keyword to add
      */
-    public void addKeyword(String keyword) {
+    public void addKeyword(String keyword, String separator) {
         Objects.requireNonNull(keyword, "keyword must not be null");
 
         if (keyword.isEmpty()) {
@@ -571,7 +568,7 @@ public class BibEntry implements Cloneable {
 
         Set<String> keywords = this.getKeywords();
         keywords.add(keyword);
-        this.putKeywords(keywords);
+        this.putKeywords(keywords, separator);
     }
 
     /**
@@ -579,11 +576,11 @@ public class BibEntry implements Cloneable {
      *
      * @param keywords Keywords to add
      */
-    public void addKeywords(Collection<String> keywords) {
+    public void addKeywords(Collection<String> keywords, String separator) {
         Objects.requireNonNull(keywords);
 
         for (String keyword : keywords) {
-            this.addKeyword(keyword);
+            this.addKeyword(keyword, separator);
         }
     }
 

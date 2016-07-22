@@ -60,11 +60,15 @@ public class CustomImporter implements Comparable<CustomImporter> {
     }
 
     public CustomImporter(String name, String cliId, String className, String basePath) {
-        super();
+        this();
         this.name = name;
         this.cliId = cliId;
         this.className = className;
         this.basePath = basePath;
+    }
+
+    public CustomImporter(ImportFormat importer) {
+        this(importer.getFormatName(), importer.getId(), importer.getClass().getName(), "src/main/java/net/sf/jabref/importer/fileformat/" + importer.getFormatName() + "Importer.java");
     }
 
     public String getName() {
@@ -113,7 +117,12 @@ public class CustomImporter implements Comparable<CustomImporter> {
 
     @Override
     public boolean equals(Object o) {
-        return (o instanceof CustomImporter) && this.getName().equals(((CustomImporter) o).getName());
+        boolean equalName = this.getName().equals(((CustomImporter) o).getName());
+        boolean equalCliId = this.getClidId().equals(((CustomImporter) o).getClidId());
+        boolean equalClassName = this.getClassName().equals(((CustomImporter) o).getClassName());
+        boolean equalBasePath = this.getBasePath().equals(((CustomImporter) o).getBasePath());
+
+        return (o instanceof CustomImporter) && equalName && equalCliId && equalClassName && equalBasePath;
     }
 
     @Override

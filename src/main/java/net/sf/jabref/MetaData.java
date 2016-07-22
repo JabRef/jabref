@@ -40,6 +40,7 @@ import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.sql.DBStrings;
 
 import org.apache.commons.logging.Log;
@@ -57,7 +58,7 @@ public class MetaData implements Iterable<String> {
     private static final String DATABASE_TYPE = "databaseType";
 
     private static final String GROUPSTREE = "groupstree";
-    private static final String FILE_DIRECTORY = Globals.FILE_FIELD + Globals.DIR_SUFFIX;
+    private static final String FILE_DIRECTORY = FieldName.FILE + Globals.DIR_SUFFIX;
     public static final String SELECTOR_META_PREFIX = "selector_";
     private static final String PROTECTED_FLAG_META = "protectedFlag";
 
@@ -126,11 +127,11 @@ public class MetaData implements Iterable<String> {
      * Add default metadata for new database:
      */
     public void initializeNewDatabase() {
-        metaData.put(SELECTOR_META_PREFIX + "keywords", new Vector<>());
-        metaData.put(SELECTOR_META_PREFIX + "author", new Vector<>());
-        metaData.put(SELECTOR_META_PREFIX + "journal", new Vector<>());
-        metaData.put(SELECTOR_META_PREFIX + "publisher", new Vector<>());
-        metaData.put(SELECTOR_META_PREFIX + "review", new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + FieldName.KEYWORDS, new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + FieldName.AUTHOR, new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + FieldName.JOURNAL, new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + FieldName.PUBLISHER, new Vector<>());
+        metaData.put(SELECTOR_META_PREFIX + FieldName.REVIEW, new Vector<>());
     }
 
     /**
@@ -178,7 +179,7 @@ public class MetaData implements Iterable<String> {
      */
     private void putGroups(List<String> orderedData) throws ParseException {
         try {
-            groupsRoot = GroupTreeNode.parse(orderedData);
+            groupsRoot = GroupTreeNode.parse(orderedData, Globals.prefs);
         } catch (ParseException e) {
             throw new ParseException(Localization.lang(
                     "Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."), e);
@@ -238,7 +239,7 @@ public class MetaData implements Iterable<String> {
             return labelPattern;
         }
 
-        labelPattern = new DatabaseLabelPattern();
+        labelPattern = new DatabaseLabelPattern(Globals.prefs);
 
         // read the data from the metadata and store it into the labelPattern
         for (String key : this) {

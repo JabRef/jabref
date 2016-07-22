@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * INSPEC format importer.
@@ -91,33 +92,33 @@ public class InspecImporter extends ImportFormat {
                 String f3 = s.substring(0, 2);
                 String frest = s.substring(5);
                 if ("TI".equals(f3)) {
-                    h.put("title", frest);
+                    h.put(FieldName.TITLE, frest);
                 } else if ("PY".equals(f3)) {
-                    h.put("year", frest);
+                    h.put(FieldName.YEAR, frest);
                 } else if ("AU".equals(f3)) {
-                    h.put("author",
+                    h.put(FieldName.AUTHOR,
                             AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
                 } else if ("AB".equals(f3)) {
-                    h.put("abstract", frest);
+                    h.put(FieldName.ABSTRACT, frest);
                 } else if ("ID".equals(f3)) {
-                    h.put("keywords", frest);
+                    h.put(FieldName.KEYWORDS, frest);
                 } else if ("SO".equals(f3)) {
                     int m = frest.indexOf('.');
                     if (m >= 0) {
                         String jr = frest.substring(0, m);
-                        h.put("journal", jr.replace("-", " "));
+                        h.put(FieldName.JOURNAL, jr.replace("-", " "));
                         frest = frest.substring(m);
                         m = frest.indexOf(';');
                         if (m >= 5) {
                             String yr = frest.substring(m - 5, m).trim();
-                            h.put("year", yr);
+                            h.put(FieldName.YEAR, yr);
                             frest = frest.substring(m);
                             m = frest.indexOf(':');
                             if (m >= 0) {
                                 String pg = frest.substring(m + 1).trim();
-                                h.put("pages", pg);
+                                h.put(FieldName.PAGES, pg);
                                 String vol = frest.substring(1, m).trim();
-                                h.put("volume", vol);
+                                h.put(FieldName.VOLUME, vol);
                             }
                         }
                     }

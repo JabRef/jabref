@@ -17,13 +17,20 @@ package net.sf.jabref.logic.labelpattern;
 
 import java.util.List;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class DatabaseLabelPattern extends AbstractLabelPattern {
 
+    private final JabRefPreferences prefs;
+
+
+    public DatabaseLabelPattern(JabRefPreferences prefs) {
+        this.prefs = prefs;
+    }
+
     @Override
     public List<String> getLastLevelLabelPattern(String key) {
-        return Globals.prefs.getKeyPattern().getValue(key);
+        return prefs.getKeyPattern().getValue(key);
     }
 
 }

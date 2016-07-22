@@ -19,7 +19,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -51,7 +50,8 @@ public class MedlineImporterTestFiles {
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(FILEFORMAT_PATH))) {
             stream.forEach(files::add);
         }
-        return files.stream().filter(n -> n.getFileName().toString().startsWith("MedlineImporterTest") && n.getFileName().toString().endsWith(".xml"))
+        return files.stream().filter(n -> n.getFileName().toString().startsWith("MedlineImporterTest")
+                && n.getFileName().toString().endsWith(".xml"))
                 .collect(Collectors.toList());
     }
 
@@ -61,7 +61,6 @@ public class MedlineImporterTestFiles {
     }
 
     @Test
-    @Ignore
     public void testImportEntries() throws IOException {
             List<BibEntry> medlineEntries = medlineImporter.importDatabase(importFile, Charset.defaultCharset()).getDatabase().getEntries();
             String bibFileName = importFile.getFileName().toString().replace(".xml", ".bib");

@@ -27,7 +27,8 @@ public class URLDownloadTest {
         try {
             URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
-            Assert.assertTrue("google.com should contain google", dl.downloadToString().contains("Google"));
+            Assert.assertTrue("google.com should contain google",
+                    dl.downloadToString(Globals.prefs.getDefaultEncoding()).contains("Google"));
         } finally {
             Globals.prefs = null;
         }

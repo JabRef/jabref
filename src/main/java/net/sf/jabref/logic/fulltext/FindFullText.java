@@ -9,6 +9,7 @@ import java.util.Optional;
 import net.sf.jabref.importer.fetcher.CrossRef;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,10 +42,10 @@ public class FindFullText {
     public Optional<URL> findFullTextPDF(BibEntry entry) {
         // for accuracy, fetch DOI first but do not modify entry
         BibEntry clonedEntry = (BibEntry) entry.clone();
-        Optional<String> doi = clonedEntry.getFieldOptional("doi");
+        Optional<String> doi = clonedEntry.getFieldOptional(FieldName.DOI);
 
         if (!doi.isPresent() || !DOI.build(doi.get()).isPresent()) {
-            CrossRef.findDOI(clonedEntry).ifPresent(e -> clonedEntry.setField("doi", e.getDOI()));
+            CrossRef.findDOI(clonedEntry).ifPresent(e -> clonedEntry.setField(FieldName.DOI, e.getDOI()));
         }
 
         for (FullTextFinder finder : finders) {

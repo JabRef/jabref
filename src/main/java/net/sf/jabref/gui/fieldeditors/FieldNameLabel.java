@@ -25,6 +25,7 @@ import javax.swing.SwingConstants;
 
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.FieldName;
 
 public class FieldNameLabel extends JLabel {
 
@@ -48,15 +49,15 @@ public class FieldNameLabel extends JLabel {
 
     private static String getFieldNameLabelText(String fieldName) {
         // selected terms should be uppercase
-        if("isbn".equalsIgnoreCase(fieldName)) {
+        if(FieldName.ISBN.equalsIgnoreCase(fieldName)) {
             return " ISBN ";
-        } else if ("url".equalsIgnoreCase(fieldName)){
+        } else if (FieldName.URL.equalsIgnoreCase(fieldName)){
             return " URL ";
         } else if ("uri".equalsIgnoreCase(fieldName)) {
             return " URI ";
-        } else if ("issn".equalsIgnoreCase(fieldName)) {
+        } else if (FieldName.ISSN.equalsIgnoreCase(fieldName)) {
             return " ISSN ";
-        } else if("doi".equalsIgnoreCase(fieldName)) {
+        } else if(FieldName.DOI.equalsIgnoreCase(fieldName)) {
             return " DOI ";
         } else if("isrn".equalsIgnoreCase(fieldName)) {
             return " ISRN ";

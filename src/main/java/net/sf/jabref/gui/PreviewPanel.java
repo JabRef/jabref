@@ -58,6 +58,7 @@ import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.event.FieldChangedEvent;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -240,7 +241,7 @@ public class PreviewPanel extends JPanel
                     .isPresent()) {
                 try {
                     String address = hyperlinkEvent.getURL().toString();
-                    JabRefDesktop.openExternalViewer(PreviewPanel.this.databaseContext.get(), address, "url");
+                    JabRefDesktop.openExternalViewer(PreviewPanel.this.databaseContext.get(), address, FieldName.URL);
                 } catch (IOException e) {
                     LOGGER.warn("Could not open external viewer", e);
                 }
@@ -261,7 +262,8 @@ public class PreviewPanel extends JPanel
     private void updateLayout() {
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         try {
-            layout = Optional.of(new LayoutHelper(sr, Globals.journalAbbreviationLoader).getLayoutFromText());
+            layout = Optional
+                    .of(new LayoutHelper(sr, Globals.prefs, Globals.journalAbbreviationLoader).getLayoutFromText());
         } catch (IOException e) {
             layout = Optional.empty();
             LOGGER.debug("no layout could be set", e);

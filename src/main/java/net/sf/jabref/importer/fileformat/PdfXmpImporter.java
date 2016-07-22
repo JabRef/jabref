@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.xmp.XMPUtil;
@@ -54,7 +55,7 @@ public class PdfXmpImporter extends ImportFormat {
     public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
         Objects.requireNonNull(filePath);
         try {
-            return new ParserResult(XMPUtil.readXMP(filePath));
+            return new ParserResult(XMPUtil.readXMP(filePath, Globals.prefs));
         } catch (IOException exception) {
             return ParserResult.fromErrorMessage(exception.getLocalizedMessage());
         }
@@ -75,7 +76,7 @@ public class PdfXmpImporter extends ImportFormat {
     @Override
     public boolean isRecognizedFormat(Path filePath, Charset defaultEncoding) throws IOException {
         Objects.requireNonNull(filePath);
-        return XMPUtil.hasMetadata(filePath);
+        return XMPUtil.hasMetadata(filePath, Globals.prefs);
     }
 
     @Override

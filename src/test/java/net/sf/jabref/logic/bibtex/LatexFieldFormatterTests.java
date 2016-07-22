@@ -20,7 +20,7 @@ public class LatexFieldFormatterTests {
 
     @Before
     public void setUp() {
-        this.formatter = new LatexFieldFormatter();
+        this.formatter = new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs));
     }
 
     @Test

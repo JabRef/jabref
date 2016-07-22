@@ -32,7 +32,7 @@ public class UndoableAbbreviator {
         if (!entry.hasField(fieldName)) {
             return false;
         }
-        String text = entry.getField(fieldName);
+        String text = entry.getFieldOptional(fieldName).get();
         String origText = text;
         if (database != null) {
             text = database.resolveForStrings(text);

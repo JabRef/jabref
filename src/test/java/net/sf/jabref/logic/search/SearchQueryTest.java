@@ -33,7 +33,7 @@ public class SearchQueryTest {
     @Test
     public void testGrammarSearch() {
         BibEntry entry = new BibEntry();
-        entry.addKeyword("one two");
+        entry.addKeyword("one two", ", ");
         SearchQuery searchQuery = new SearchQuery("keywords=\"one two\"", false, false);
         assertTrue(searchQuery.isMatch(entry));
     }

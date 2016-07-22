@@ -91,43 +91,43 @@ public class ExportCustomizationDialog extends JDialog {
             if (ecd.okPressed()) {
                 List<String> newFormat = Arrays.asList(ecd.name(), ecd.layoutFile(), ecd.extension());
                 Globals.prefs.customExports.addFormat(newFormat);
-                Globals.prefs.customExports.store();
+                Globals.prefs.customExports.store(Globals.prefs);
             }
         });
 
         JButton modify = new JButton(Localization.lang("Modify"));
         modify.addActionListener(e -> {
-                int row = table.getSelectedRow();
-                if (row == -1) {
-                    return;
-                }
-                List<String> old = Globals.prefs.customExports.getSortedList().get(row);
-                CustomExportDialog ecd = new CustomExportDialog(frame, old.get(0), old.get(1), old.get(2));
-                ecd.setVisible(true); // ecd.show(); -> deprecated since 1.5
-                if (ecd.okPressed()) {
-                    old.set(0, ecd.name());
-                    old.set(1, ecd.layoutFile());
-                    old.set(2, ecd.extension());
-                    table.revalidate();
-                    table.repaint();
-                    Globals.prefs.customExports.store();
-                }
+            int row = table.getSelectedRow();
+            if (row == -1) {
+                return;
+            }
+            List<String> old = Globals.prefs.customExports.getSortedList().get(row);
+            CustomExportDialog ecd = new CustomExportDialog(frame, old.get(0), old.get(1), old.get(2));
+            ecd.setVisible(true); // ecd.show(); -> deprecated since 1.5
+            if (ecd.okPressed()) {
+                old.set(0, ecd.name());
+                old.set(1, ecd.layoutFile());
+                old.set(2, ecd.extension());
+                table.revalidate();
+                table.repaint();
+                Globals.prefs.customExports.store(Globals.prefs);
+            }
         });
 
         JButton remove = new JButton(Localization.lang("Remove"));
         remove.addActionListener(e -> {
-                int[] rows = table.getSelectedRows();
-                if (rows.length == 0) {
-                    return;
-                }
-                List<List<String>> entries = new ArrayList<>();
-                for (int i = 0; i < rows.length; i++) {
-                    entries.add(Globals.prefs.customExports.getSortedList().get(rows[i]));
-                }
-                for (List<String> list : entries) {
-                    Globals.prefs.customExports.remove(list);
-                }
-                Globals.prefs.customExports.store();
+            int[] rows = table.getSelectedRows();
+            if (rows.length == 0) {
+                return;
+            }
+            List<List<String>> entries = new ArrayList<>();
+            for (int i = 0; i < rows.length; i++) {
+                entries.add(Globals.prefs.customExports.getSortedList().get(rows[i]));
+            }
+            for (List<String> list : entries) {
+                Globals.prefs.customExports.remove(list);
+            }
+            Globals.prefs.customExports.store(Globals.prefs);
         });
 
         Action closeAction = new AbstractAction() {

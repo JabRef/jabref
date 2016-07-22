@@ -32,9 +32,12 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -253,7 +256,7 @@ public class RepecNepImporter extends ImportFormat {
     private void parseTitleString(BibEntry be, BufferedReader in) throws IOException {
         // skip article number
         this.lastLine = this.lastLine.substring(this.lastLine.indexOf('.') + 1, this.lastLine.length());
-        be.setField("title", readMultipleLines(in));
+        be.setField(FieldName.TITLE, readMultipleLines(in));
     }
 
     /**
@@ -303,10 +306,10 @@ public class RepecNepImporter extends ImportFormat {
         }
 
         if (!authors.isEmpty()) {
-            be.setField("author", String.join(" and ", authors));
+            be.setField(FieldName.AUTHOR, String.join(" and ", authors));
         }
         if (institutions.length() > 0) {
-            be.setField("institution", institutions.toString());
+            be.setField(FieldName.INSTITUTION, institutions.toString());
         }
     }
 
@@ -320,7 +323,7 @@ public class RepecNepImporter extends ImportFormat {
         String theabstract = readMultipleLines(in);
 
         if (!"".equals(theabstract)) {
-            be.setField("abstract", theabstract);
+            be.setField(FieldName.ABSTRACT, theabstract);
         }
     }
 
@@ -350,7 +353,8 @@ public class RepecNepImporter extends ImportFormat {
             if ("Keywords".equals(keyword)) {
                 String content = readMultipleLines(in);
                 String[] keywords = content.split("[,;]");
-                be.addKeywords(new LinkedHashSet<>(Arrays.asList(keywords)));
+                be.addKeywords(new LinkedHashSet<>(Arrays.asList(keywords)),
+                        Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                 // parse JEL field
             } else if ("JEL".equals(keyword)) {
                 be.setField("jel", readMultipleLines(in));
@@ -371,9 +375,9 @@ public class RepecNepImporter extends ImportFormat {
 
                 Calendar cal = new GregorianCalendar();
                 cal.setTime(date == null ? new Date() : date);
-                be.setField("year", String.valueOf(cal.get(Calendar.YEAR)));
+                be.setField(FieldName.YEAR, String.valueOf(cal.get(Calendar.YEAR)));
                 if ((date != null) && recognizedDateFormats[i - 1].contains("MM")) {
-                    be.setField("month", String.valueOf(cal.get(Calendar.MONTH) + 1));
+                    be.setField(FieldName.MONTH, String.valueOf(cal.get(Calendar.MONTH) + 1));
                 }
                 if ((date != null) && recognizedDateFormats[i - 1].contains("dd")) {
                     be.setField("day", String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
@@ -388,7 +392,7 @@ public class RepecNepImporter extends ImportFormat {
                     content = this.lastLine;
                     readLine(in);
                 }
-                be.setField("url", content);
+                be.setField(FieldName.URL, content);
 
                 // authors field
             } else if (keyword.startsWith("By")) {

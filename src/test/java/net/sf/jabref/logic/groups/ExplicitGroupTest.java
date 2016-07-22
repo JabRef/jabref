@@ -21,13 +21,13 @@ public class ExplicitGroupTest {
 
     @Test
      public void testToStringSimple() throws ParseException {
-        ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT);
+        ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, Globals.prefs);
         assertEquals("ExplicitGroup:myExplicitGroup;0;", group.toString());
     }
 
     @Test
     public void toStringDoesNotWriteAssignedEntries() throws ParseException {
-        ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INCLUDING);
+        ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INCLUDING, Globals.prefs);
         group.add(makeBibtexEntry());
         assertEquals("ExplicitGroup:myExplicitGroup;2;", group.toString());
     }

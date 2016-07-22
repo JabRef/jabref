@@ -25,12 +25,14 @@ import java.util.regex.Pattern;
 
 import javax.swing.JPanel;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
 
 import org.apache.commons.logging.Log;
@@ -127,7 +129,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
     }
 
     private static String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
-        String cont = new URLDownload(urlQuery).downloadToString();
+        String cont = new URLDownload(urlQuery).downloadToString(Globals.prefs.getDefaultEncoding());
         Matcher m = CiteSeerXFetcher.CITE_LINK_PATTERN.matcher(cont);
         while (m.find()) {
             ids.add(CiteSeerXFetcher.URL_START + m.group(1));
@@ -145,25 +147,25 @@ public class CiteSeerXFetcher implements EntryFetcher {
         Matcher m = CiteSeerXFetcher.TITLE_PATTERN.matcher(cont);
         if (m.find()) {
             BibEntry entry = new BibEntry(IdGenerator.next());
-            entry.setField("title", m.group(1));
+            entry.setField(FieldName.TITLE, m.group(1));
 
             // Find authors:
             m = CiteSeerXFetcher.AUTHOR_PATTERN.matcher(cont);
             if (m.find()) {
                 String authors = m.group(1);
-                entry.setField("author", new NormalizeNamesFormatter().format(authors));
+                entry.setField(FieldName.AUTHOR, new NormalizeNamesFormatter().format(authors));
             }
 
             // Find year:
             m = CiteSeerXFetcher.YEAR_PATTERN.matcher(cont);
             if (m.find()) {
-                entry.setField("year", m.group(1));
+                entry.setField(FieldName.YEAR, m.group(1));
             }
 
             // Find abstract:
             m = CiteSeerXFetcher.ABSTRACT_PATTERN.matcher(cont);
             if (m.find()) {
-                entry.setField("abstract", m.group(1));
+                entry.setField(FieldName.ABSTRACT, m.group(1));
             }
 
             return entry;

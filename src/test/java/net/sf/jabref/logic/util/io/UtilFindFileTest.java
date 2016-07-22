@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.jabref.FileBasedTestCase;
+import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
@@ -30,7 +31,7 @@ public class UtilFindFileTest extends FileBasedTestCase {
         Collection<File> dirs = Arrays.asList(new File(root.getAbsoluteFile() + "/pdfs/"),
                 new File(root.getAbsoluteFile() + "/graphicsDir/"));
 
-        Map<BibEntry, List<File>> results = FileUtil.findAssociatedFiles(entries, extensions, dirs);
+        Map<BibEntry, List<File>> results = FileUtil.findAssociatedFiles(entries, extensions, dirs, Globals.prefs);
 
         Assert.assertEquals(2, results.get(entry).size());
         Assert.assertTrue(

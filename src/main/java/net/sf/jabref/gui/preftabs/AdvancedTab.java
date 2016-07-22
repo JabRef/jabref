@@ -29,6 +29,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.help.HelpFile;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
+import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.RemoteUtil;
@@ -44,7 +45,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
     private final JCheckBox useIEEEAbrv;
     private final JTextField remoteServerPort;
 
-    private final JCheckBox useConvertToEquation;
     private final JCheckBox useCaseKeeperOnSearch;
     private final JCheckBox useUnitFormatterOnSearch;
     private final RemotePreferences remotePreferences;
@@ -57,7 +57,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
         useRemoteServer = new JCheckBox(Localization.lang("Listen for remote operation on port") + ':');
         useIEEEAbrv = new JCheckBox(Localization.lang("Use IEEE LaTeX abbreviations"));
         remoteServerPort = new JTextField();
-        useConvertToEquation = new JCheckBox(Localization.lang("Prefer converting subscripts and superscripts to equations rather than text"));
         useCaseKeeperOnSearch = new JCheckBox(Localization.lang("Add {} to specified title words on search to keep the correct case"));
         useUnitFormatterOnSearch = new JCheckBox(Localization.lang("Format units by adding non-breaking separators and keeping the correct case on search"));
 
@@ -95,9 +94,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.appendSeparator(Localization.lang("Import conversions"));
         builder.nextLine();
-        builder.append(new JPanel());
-        builder.append(useConvertToEquation);
-        builder.nextLine();
         builder.append(pan);
         builder.append(useCaseKeeperOnSearch);
         builder.nextLine();
@@ -116,7 +112,6 @@ class AdvancedTab extends JPanel implements PrefsTab {
         useRemoteServer.setSelected(remotePreferences.useRemoteServer());
         remoteServerPort.setText(String.valueOf(remotePreferences.getPort()));
         useIEEEAbrv.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV));
-        useConvertToEquation.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION));
         useCaseKeeperOnSearch.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH));
         useUnitFormatterOnSearch.setSelected(Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH));
     }
@@ -125,11 +120,10 @@ class AdvancedTab extends JPanel implements PrefsTab {
     public void storeSettings() {
         if (preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV) != useIEEEAbrv.isSelected()) {
             preferences.putBoolean(JabRefPreferences.USE_IEEE_ABRV, useIEEEAbrv.isSelected());
-            Globals.journalAbbreviationLoader.update(preferences);
+            Globals.journalAbbreviationLoader.update(JournalAbbreviationPreferences.fromPreferences(preferences));
         }
         storeRemoteSettings();
 
-        preferences.putBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION, useConvertToEquation.isSelected());
         preferences.putBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH, useCaseKeeperOnSearch.isSelected());
         preferences.putBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH, useUnitFormatterOnSearch.isSelected());
     }

@@ -63,8 +63,9 @@ public class EntryFromPDFCreatorTest {
     public void testCreationOfEntryNotInDatabase() {
         Optional<BibEntry> entry = entryCreator.createEntry(ImportDataTest.FILE_NOT_IN_DATABASE, false);
         Assert.assertTrue(entry.isPresent());
-        Assert.assertTrue(entry.get().getField("file").endsWith(":PDF"));
-        Assert.assertEquals(ImportDataTest.FILE_NOT_IN_DATABASE.getName(), entry.get().getField("title"));
+        Assert.assertTrue(entry.get().getFieldOptional("file").get().endsWith(":PDF"));
+        Assert.assertEquals(Optional.of(ImportDataTest.FILE_NOT_IN_DATABASE.getName()),
+                entry.get().getFieldOptional("title"));
 
     }
 }

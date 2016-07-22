@@ -27,6 +27,7 @@ import net.sf.jabref.logic.search.matchers.MatcherSet;
 import net.sf.jabref.logic.search.matchers.MatcherSets;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * A node in the groups tree that holds exactly one AbstractGroup.
@@ -248,8 +249,9 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         return GroupTreeNode.fromGroup(group);
     }
 
-    public static GroupTreeNode parse(List<String> orderedData) throws ParseException {
-        return GroupsParser.importGroups(orderedData);
+    public static GroupTreeNode parse(List<String> orderedData, JabRefPreferences jabRefPreferences)
+            throws ParseException {
+        return GroupsParser.importGroups(orderedData, jabRefPreferences);
     }
 
     /**

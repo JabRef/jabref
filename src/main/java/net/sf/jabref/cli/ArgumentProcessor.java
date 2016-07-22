@@ -390,7 +390,7 @@ public class ArgumentProcessor {
         try {
             Globals.prefs.importPreferences(cli.getPreferencesImport());
             CustomEntryTypesManager.loadCustomEntryTypes(Globals.prefs);
-            ExportFormats.initAllExports();
+            ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }
@@ -435,7 +435,7 @@ public class ArgumentProcessor {
                 LOGGER.info(Localization.lang("Regenerating BibTeX keys according to metadata"));
                 for (BibEntry entry : database.getEntries()) {
                     // try to make a new label
-                    LabelPatternUtil.makeLabel(metaData, database, entry);
+                    LabelPatternUtil.makeLabel(metaData, database, entry, Globals.prefs);
                 }
             } else {
                 LOGGER.info(Localization.lang("No meta data present in bibfile. Cannot regenerate BibTeX keys"));

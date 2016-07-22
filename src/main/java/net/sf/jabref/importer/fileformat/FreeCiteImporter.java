@@ -43,6 +43,7 @@ import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -152,8 +153,8 @@ public class FreeCiteImporter extends ImportFormat {
                                     // current tag is either begin:author or
                                     // end:authors
                                 }
-                                e.setField("author", sb.toString());
-                            } else if ("journal".equals(ln)) {
+                                e.setField(FieldName.AUTHOR, sb.toString());
+                            } else if (FieldName.JOURNAL.equals(ln)) {
                                 // we guess that the entry is a journal
                                 // the alternative way is to parse
                                 // ctx:context-objects / ctx:context-object / ctx:referent / ctx:metadata-by-val / ctx:metadata / journal / rft:genre
@@ -164,26 +165,26 @@ public class FreeCiteImporter extends ImportFormat {
                             } else if ("tech".equals(ln)) {
                                 type = BibtexEntryTypes.TECHREPORT;
                                 // the content of the "tech" field seems to contain the number of the technical report
-                                e.setField("number", parser.getElementText());
-                            } else if ("doi".equals(ln)
-                                    || "institution".equals(ln)
+                                e.setField(FieldName.NUMBER, parser.getElementText());
+                            } else if (FieldName.DOI.equals(ln)
+                                    || FieldName.INSTITUTION.equals(ln)
                                     || "location".equals(ln)
-                                    || "number".equals(ln)
-                                    || "note".equals(ln)
-                                    || "title".equals(ln)
-                                    || "pages".equals(ln)
-                                    || "publisher".equals(ln)
-                                    || "volume".equals(ln)
-                                    || "year".equals(ln)) {
+                                    || FieldName.NUMBER.equals(ln)
+                                    || FieldName.NOTE.equals(ln)
+                                    || FieldName.TITLE.equals(ln)
+                                    || FieldName.PAGES.equals(ln)
+                                    || FieldName.PUBLISHER.equals(ln)
+                                    || FieldName.VOLUME.equals(ln)
+                                    || FieldName.YEAR.equals(ln)) {
                                 e.setField(ln, parser.getElementText());
-                            } else if ("booktitle".equals(ln)) {
+                            } else if (FieldName.BOOKTITLE.equals(ln)) {
                                 String booktitle = parser.getElementText();
                                 if (booktitle.startsWith("In ")) {
                                     // special treatment for parsing of
                                     // "In proceedings of..." references
                                     booktitle = booktitle.substring(3);
                                 }
-                                e.setField("booktitle", booktitle);
+                                e.setField(FieldName.BOOKTITLE, booktitle);
                             } else if ("raw_string".equals(ln)) {
                                 // raw input string is ignored
                             } else {
@@ -198,14 +199,14 @@ public class FreeCiteImporter extends ImportFormat {
                     }
 
                     if (noteSB.length() > 0) {
-                        String note = e.getField("note");
-                        if (note == null) {
-                            note = noteSB.toString();
-                        } else {
+                        String note;
+                        if (e.hasField(FieldName.NOTE)) {
                             // "note" could have been set during the parsing as FreeCite also returns "note"
-                            note = note.concat(Globals.NEWLINE).concat(noteSB.toString());
+                            note = e.getFieldOptional(FieldName.NOTE).get().concat(Globals.NEWLINE).concat(noteSB.toString());
+                        } else {
+                            note = noteSB.toString();
                         }
-                        e.setField("note", note);
+                        e.setField(FieldName.NOTE, note);
                     }
 
                     // type has been derived from "genre"
@@ -213,7 +214,9 @@ public class FreeCiteImporter extends ImportFormat {
                     e.setType(type);
 
                     // autogenerate label (BibTeX key)
-                    LabelPatternUtil.makeLabel(JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getMetaData(), JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabase(), e);
+                    LabelPatternUtil.makeLabel(
+                            JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getMetaData(),
+                            JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabase(), e, Globals.prefs);
 
                     res.add(e);
                 }
