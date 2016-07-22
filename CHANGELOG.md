@@ -30,6 +30,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1527](https://github.com/JabRef/jabref/issues/1527): 'Get BibTeX data from DOI' Removes Marking
 - Fixed [#1592](https://github.com/JabRef/jabref/issues/1592): LibreOffice: wrong numbers in citation labels
 - Fixed [#1321](https://github.com/JabRef/jabref/issues/1321): LaTeX commands in fields not displayed in the list of references
+- Date fields in the BibLatex standard are now always formatted in the correct way, independent of the preferences
 
 ### Removed
 - It is not longer possible to choose to convert HTML sub- and superscripts to equations
