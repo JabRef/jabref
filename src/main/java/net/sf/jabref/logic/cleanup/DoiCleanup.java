@@ -32,7 +32,7 @@ public class DoiCleanup implements CleanupJob {
     /**
      * Fields to check for DOIs.
      */
-    private static final String[] FIELDS = {"note", FieldName.URL, "ee"};
+    private static final String[] FIELDS = {FieldName.NOTE, FieldName.URL, "ee"};
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {

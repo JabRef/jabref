@@ -109,8 +109,8 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
                 entry.setField(FieldName.TITLE, title);
             });
 
-            entry.getFieldOptional("institution").ifPresent(
-                    institution -> entry.setField("institution", new UnicodeToLatexFormatter().format(institution)));
+            entry.getFieldOptional(FieldName.INSTITUTION).ifPresent(
+                    institution -> entry.setField(FieldName.INSTITUTION, new UnicodeToLatexFormatter().format(institution)));
             // Do not use the provided key
             // entry.clearField(InternalBibtexFields.KEY_FIELD);
             inspector.addEntry(entry);

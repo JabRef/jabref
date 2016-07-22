@@ -160,7 +160,7 @@ public class SilverPlatterImporter extends ImportFormat {
 
                     }
                 } else if ("AF".equals(f3)) {
-                    h.put("school", frest.trim());
+                    h.put(FieldName.SCHOOL, frest.trim());
 
                 } else if ("DT".equals(f3)) {
                     frest = frest.trim();

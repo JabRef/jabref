@@ -38,9 +38,9 @@ public class BibTeXConverter {
         }
 
         // Value must be converted
-        if (fieldValues.containsKey("language")) {
-            int lcid = Integer.valueOf(fieldValues.get("language"));
-            fieldValues.put("language", MSBibMapping.getLanguage(lcid));
+        if (fieldValues.containsKey(FieldName.LANGUAGE)) {
+            int lcid = Integer.valueOf(fieldValues.get(FieldName.LANGUAGE));
+            fieldValues.put(FieldName.LANGUAGE, MSBibMapping.getLanguage(lcid));
         }
 
         addAuthor(fieldValues, FieldName.AUTHOR, entry.authors);
@@ -66,11 +66,11 @@ public class BibTeXConverter {
         parseStandardNumber(entry.standardNumber, fieldValues);
 
         if (entry.address != null) {
-            fieldValues.put("address", entry.address);
+            fieldValues.put(FieldName.ADDRESS, entry.address);
         }
         // TODO: ConferenceName is saved as booktitle when converting from MSBIB to BibTeX
         if (entry.conferenceName != null) {
-            fieldValues.put("organization", entry.conferenceName);
+            fieldValues.put(FieldName.ORGANIZATION, entry.conferenceName);
         }
 
         if (entry.dateAccessed != null) {

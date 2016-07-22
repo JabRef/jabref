@@ -147,9 +147,9 @@ public class RisImporter extends ImportFormat {
                         }
                         hm.put(FieldName.TITLE, hm.get(FieldName.TITLE).replaceAll("\\s+", " ")); // Normalize whitespaces
                     } else if ("T2".equals(lab) || "BT".equals(lab)) {
-                        hm.put("booktitle", val);
+                        hm.put(FieldName.BOOKTITLE, val);
                     } else if ("T3".equals(lab)) {
-                        hm.put("series", val);
+                        hm.put(FieldName.SERIES, val);
                     } else if ("AU".equals(lab) || "A1".equals(lab)) {
                         if ("".equals(author)) {
                             author = val;
@@ -164,7 +164,7 @@ public class RisImporter extends ImportFormat {
                         }
                     } else if ("JA".equals(lab) || "JF".equals(lab) || "JO".equals(lab)) {
                         if ("inproceedings".equals(type)) {
-                            hm.put("booktitle", val);
+                            hm.put(FieldName.BOOKTITLE, val);
                         } else {
                             hm.put(FieldName.JOURNAL, val);
                         }
@@ -172,12 +172,12 @@ public class RisImporter extends ImportFormat {
                         startPage = val;
                     } else if ("PB".equals(lab)) {
                         if ("phdthesis".equals(type)) {
-                            hm.put("school", val);
+                            hm.put(FieldName.SCHOOL, val);
                         } else {
                             hm.put(FieldName.PUBLISHER, val);
                         }
                     } else if ("AD".equals(lab) || "CY".equals(lab)) {
-                        hm.put("address", val);
+                        hm.put(FieldName.ADDRESS, val);
                     } else if ("EP".equals(lab)) {
                         endPage = val;
                         if (!endPage.isEmpty()) {

@@ -88,21 +88,21 @@ public class InternalBibtexFields {
         // FIRST: all standard fields
         // These are the fields that BibTex might want to treat, so these
         // must conform to BibTex rules.
-        add(new BibtexSingleField("address", true, BibtexSingleField.SMALL_W));
+        add(new BibtexSingleField(FieldName.ADDRESS, true, BibtexSingleField.SMALL_W));
         // An annotation. It is not used by the standard bibliography styles,
         // but may be used by others that produce an annotated bibliography.
         // http://www.ecst.csuchico.edu/~jacobsd/bib/formats/bibtex.html
         add(new BibtexSingleField("annote", true, BibtexSingleField.LARGE_W));
         add(new BibtexSingleField(FieldName.AUTHOR, true, BibtexSingleField.MEDIUM_W, 280));
-        add(new BibtexSingleField("booktitle", true, 175));
+        add(new BibtexSingleField(FieldName.BOOKTITLE, true, 175));
         add(new BibtexSingleField("chapter", true, BibtexSingleField.SMALL_W));
         dummy = new BibtexSingleField(FieldName.CROSSREF, true, BibtexSingleField.SMALL_W);
         dummy.setExtras(EnumSet.of(FieldProperties.CROSSREF));
         add(dummy);
-        add(new BibtexSingleField("edition", true, BibtexSingleField.SMALL_W));
+        add(new BibtexSingleField(FieldName.EDITION, true, BibtexSingleField.SMALL_W));
         add(new BibtexSingleField(FieldName.EDITOR, true, BibtexSingleField.MEDIUM_W, 280));
-        add(new BibtexSingleField("howpublished", true, BibtexSingleField.MEDIUM_W));
-        add(new BibtexSingleField("institution", true, BibtexSingleField.MEDIUM_W));
+        add(new BibtexSingleField(FieldName.HOWPUBLISHED, true, BibtexSingleField.MEDIUM_W));
+        add(new BibtexSingleField(FieldName.INSTITUTION, true, BibtexSingleField.MEDIUM_W));
 
         dummy = new BibtexSingleField(FieldName.JOURNAL, true, BibtexSingleField.SMALL_W);
         dummy.setExtras(EnumSet.of(FieldProperties.JOURNAL_NAME));
@@ -115,18 +115,18 @@ public class InternalBibtexFields {
         dummy = new BibtexSingleField(FieldName.MONTH, true, BibtexSingleField.SMALL_W);
         dummy.setExtras(EnumSet.of(FieldProperties.MONTH));
         add(dummy);
-        add(new BibtexSingleField("note", true, BibtexSingleField.MEDIUM_W));
+        add(new BibtexSingleField(FieldName.NOTE, true, BibtexSingleField.MEDIUM_W));
         add(new BibtexSingleField(FieldName.NUMBER, true, BibtexSingleField.SMALL_W, 60).setNumeric(true));
-        add(new BibtexSingleField("organization", true, BibtexSingleField.MEDIUM_W));
+        add(new BibtexSingleField(FieldName.ORGANIZATION, true, BibtexSingleField.MEDIUM_W));
         add(new BibtexSingleField(FieldName.PAGES, true, BibtexSingleField.SMALL_W));
         add(new BibtexSingleField(FieldName.PUBLISHER, true, BibtexSingleField.MEDIUM_W));
         add(new BibtexSingleField("school", true, BibtexSingleField.MEDIUM_W));
-        add(new BibtexSingleField("series", true, BibtexSingleField.SMALL_W));
+        add(new BibtexSingleField(FieldName.SERIES, true, BibtexSingleField.SMALL_W));
         add(new BibtexSingleField(FieldName.TITLE, true, 400));
-        dummy = new BibtexSingleField("type", true, BibtexSingleField.SMALL_W);
+        dummy = new BibtexSingleField(FieldName.TYPE, true, BibtexSingleField.SMALL_W);
         dummy.getExtras().add(FieldProperties.TYPE);
         add(dummy);
-        add(new BibtexSingleField("language", true, BibtexSingleField.SMALL_W));
+        add(new BibtexSingleField(FieldName.LANGUAGE, true, BibtexSingleField.SMALL_W));
         add(new BibtexSingleField(FieldName.VOLUME, true, BibtexSingleField.SMALL_W, 60).setNumeric(true));
         add(new BibtexSingleField(FieldName.YEAR, true, BibtexSingleField.SMALL_W, 60).setNumeric(true));
 

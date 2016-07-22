@@ -38,7 +38,7 @@ public class FieldFormatterCleanups {
         List<FieldFormatterCleanup> defaultFormatters = new ArrayList<>();
         defaultFormatters.add(new FieldFormatterCleanup(FieldName.PAGES, new NormalizePagesFormatter()));
         defaultFormatters.add(new FieldFormatterCleanup(FieldName.MONTH, new NormalizeMonthFormatter()));
-        defaultFormatters.add(new FieldFormatterCleanup("booktitle", new OrdinalsToSuperscriptFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup(FieldName.BOOKTITLE, new OrdinalsToSuperscriptFormatter()));
         DEFAULT_SAVE_ACTIONS = new FieldFormatterCleanups(false, defaultFormatters);
     }
 

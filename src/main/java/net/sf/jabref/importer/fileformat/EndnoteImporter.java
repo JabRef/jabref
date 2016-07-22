@@ -172,9 +172,9 @@ public class EndnoteImporter extends ImportFormat {
                         type = "misc"; //
                     }
                 } else if ("7".equals(prefix)) {
-                    hm.put("edition", val);
+                    hm.put(FieldName.EDITION, val);
                 } else if ("C".equals(prefix)) {
-                    hm.put("address", val);
+                    hm.put(FieldName.ADDRESS, val);
                 } else if ("D".equals(prefix)) {
                     hm.put(FieldName.YEAR, val);
                 } else if ("8".equals(prefix)) {
@@ -189,14 +189,14 @@ public class EndnoteImporter extends ImportFormat {
                     if ("article".equals(type)) {
                         hm.put(FieldName.JOURNAL, val);
                     } else if ("book".equals(type) || "inbook".equals(type)) {
-                        hm.put("series", val);
+                        hm.put(FieldName.SERIES, val);
                     } else {
                         /* type = inproceedings */
-                        hm.put("booktitle", val);
+                        hm.put(FieldName.BOOKTITLE, val);
                     }
                 } else if ("I".equals(prefix)) {
                     if ("phdthesis".equals(type)) {
-                        hm.put("school", val);
+                        hm.put(FieldName.SCHOOL, val);
                     } else {
                         hm.put(FieldName.PUBLISHER, val);
                     }
@@ -222,7 +222,7 @@ public class EndnoteImporter extends ImportFormat {
                         String[] tokens = val.split("\\s");
                         artnum = tokens[1];
                     } else {
-                        hm.put("note", val);
+                        hm.put(FieldName.NOTE, val);
                     }
                 } else if ("K".equals(prefix)) {
                     hm.put(FieldName.KEYWORDS, val);

@@ -20,8 +20,8 @@ public class IEEETranEntryTypes {
     public static final EntryType ELECTRONIC = new BibtexEntryType() {
 
         {
-            addAllOptional(FieldName.AUTHOR, FieldName.MONTH, FieldName.YEAR, FieldName.TITLE, "language", "howpublished", "organization", "address",
-                    "note", FieldName.URL);
+            addAllOptional(FieldName.AUTHOR, FieldName.MONTH, FieldName.YEAR, FieldName.TITLE, FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.ORGANIZATION, FieldName.ADDRESS,
+                    FieldName.NOTE, FieldName.URL);
 
         }
 
@@ -59,7 +59,7 @@ public class IEEETranEntryTypes {
 
         {
             addAllRequired(FieldName.TITLE, FieldName.YEAR);
-            addAllOptional(FieldName.EDITOR, "language", "series", FieldName.VOLUME, FieldName.NUMBER, "organization", FieldName.MONTH, "note", FieldName.URL);
+            addAllOptional(FieldName.EDITOR, FieldName.LANGUAGE, FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER, FieldName.ORGANIZATION, FieldName.MONTH, FieldName.NOTE, FieldName.URL);
         }
 
         @Override
@@ -78,8 +78,8 @@ public class IEEETranEntryTypes {
 
         {
             addAllRequired("nationality", FieldName.NUMBER, "year/yearfiled");
-            addAllOptional(FieldName.AUTHOR, FieldName.TITLE, "language", "assignee", "address", "type", FieldName.NUMBER, "day", "dayfiled",
-                    FieldName.MONTH, "monthfiled", "note", FieldName.URL);
+            addAllOptional(FieldName.AUTHOR, FieldName.TITLE, FieldName.LANGUAGE, "assignee", FieldName.ADDRESS, FieldName.TYPE, FieldName.NUMBER, "day", "dayfiled",
+                    FieldName.MONTH, "monthfiled", FieldName.NOTE, FieldName.URL);
         }
 
         @Override
@@ -98,8 +98,8 @@ public class IEEETranEntryTypes {
 
         {
             addAllRequired(FieldName.TITLE, "organization/institution");
-            addAllOptional(FieldName.AUTHOR, "language", "howpublished", "type", FieldName.NUMBER, "revision", "address", FieldName.MONTH,
-                    FieldName.YEAR, "note", FieldName.URL);
+            addAllOptional(FieldName.AUTHOR, FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.TYPE, FieldName.NUMBER, "revision", FieldName.ADDRESS, FieldName.MONTH,
+                    FieldName.YEAR, FieldName.NOTE, FieldName.URL);
         }
 
         @Override

@@ -227,7 +227,7 @@ public class IsiImporter extends ImportFormat {
                         Type = "inproceedings";
                     }
                 } else if ("JO".equals(beg)) {
-                    hm.put("booktitle", value);
+                    hm.put(FieldName.BOOKTITLE, value);
                 } else if ("AU".equals(beg)) {
                     String author = IsiImporter.isiAuthorsConvert(value.replace("EOLEOL", " and "));
 
