@@ -31,7 +31,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import net.sf.jabref.gui.help.HelpFile;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OAI2Handler;
 import net.sf.jabref.importer.OutputPrinter;

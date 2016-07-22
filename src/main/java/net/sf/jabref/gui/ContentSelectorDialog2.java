@@ -44,7 +44,7 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFile;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;

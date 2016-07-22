@@ -39,7 +39,7 @@ import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.WrapLayout;
 import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFile;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.util.component.JTextFieldWithUnfocusedText;
 import net.sf.jabref.gui.worker.AbstractWorker;
