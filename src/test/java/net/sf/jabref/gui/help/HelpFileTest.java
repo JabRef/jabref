@@ -15,6 +15,7 @@ public class HelpFileTest {
         for (HelpFile help : HelpFile.values()) {
             URL url = new URL(jabrefHelp + help.getPageName());
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
+            http.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64)");
             assertEquals(200, http.getResponseCode());
         }
     }
