@@ -30,6 +30,7 @@ package net.sf.jabref.logic.layout.format;
 import java.util.Objects;
 
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 
 /**
@@ -50,14 +51,18 @@ import net.sf.jabref.logic.layout.LayoutFormatter;
 public class JournalAbbreviator implements LayoutFormatter {
 
     private final JournalAbbreviationLoader repostioryLoader;
+    private final JournalAbbreviationPreferences journalAbbreviationPreferences;
 
 
-    public JournalAbbreviator(JournalAbbreviationLoader repostioryLoader) {
+    public JournalAbbreviator(JournalAbbreviationLoader repostioryLoader,
+            JournalAbbreviationPreferences journalAbbreviationPreferences) {
         this.repostioryLoader = Objects.requireNonNull(repostioryLoader);
+        this.journalAbbreviationPreferences = Objects.requireNonNull(journalAbbreviationPreferences);
     }
 
     @Override
     public String format(String fieldText) {
-        return repostioryLoader.getRepository().getIsoAbbreviation(fieldText).orElse(fieldText);
+        return repostioryLoader.getRepository(journalAbbreviationPreferences)
+                .getIsoAbbreviation(fieldText).orElse(fieldText);
     }
 }

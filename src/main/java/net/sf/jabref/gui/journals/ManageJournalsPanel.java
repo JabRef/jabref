@@ -66,6 +66,7 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -185,7 +186,9 @@ class ManageJournalsPanel extends JPanel {
 
         viewBuiltin.addActionListener(e -> {
             JTable table = new JTable(JournalAbbreviationsUtil
-                    .getTableModel(Globals.journalAbbreviationLoader.getRepository().getAbbreviations()));
+                    .getTableModel(Globals.journalAbbreviationLoader
+                            .getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs))
+                            .getAbbreviations()));
             JScrollPane pane = new JScrollPane(table);
             JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"),
                     JOptionPane.INFORMATION_MESSAGE);
@@ -392,7 +395,7 @@ class ManageJournalsPanel extends JPanel {
         Globals.prefs.putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, extFiles);
 
         // Update journal abbreviation loader
-        Globals.journalAbbreviationLoader.update(Globals.prefs);
+        Globals.journalAbbreviationLoader.update(JournalAbbreviationPreferences.fromPreferences(Globals.prefs));
     }
 
 

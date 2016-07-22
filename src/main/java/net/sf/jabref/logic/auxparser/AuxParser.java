@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
 
 import org.apache.commons.logging.Log;
@@ -148,7 +149,7 @@ public class AuxParser {
      * Resolves and adds CrossRef entries
      */
     private void resolveCrossReferences(BibEntry entry, AuxParserResult result) {
-        entry.getFieldOptional("crossref").ifPresent(crossref -> {
+        entry.getFieldOptional(FieldName.CROSSREF).ifPresent(crossref -> {
             if (!result.getUniqueKeys().contains(crossref)) {
                 Optional<BibEntry> refEntry = masterDatabase.getEntryByKey(crossref);
 

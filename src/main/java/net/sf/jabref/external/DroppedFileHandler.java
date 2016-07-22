@@ -44,6 +44,7 @@ import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
 
 import com.jgoodies.forms.builder.FormBuilder;
@@ -233,7 +234,7 @@ public class DroppedFileHandler {
 
         List<BibEntry> xmpEntriesInFile;
         try {
-            xmpEntriesInFile = XMPUtil.readXMP(fileName);
+            xmpEntriesInFile = XMPUtil.readXMP(fileName, Globals.prefs);
         } catch (IOException e) {
             LOGGER.warn("Problem reading XMP", e);
             return false;
@@ -350,7 +351,8 @@ public class DroppedFileHandler {
         renameCheckBox.setText(Localization.lang("Rename file to").concat(": "));
 
         // Determine which name to suggest:
-        String targetName = FileUtil.createFileNameFromPattern(database, entry, Globals.journalAbbreviationLoader);
+        String targetName = FileUtil.createFileNameFromPattern(database, entry, Globals.journalAbbreviationLoader,
+                Globals.prefs);
 
         renameToTextBox.setText(targetName.concat(".").concat(fileType.getExtension()));
 
@@ -394,7 +396,7 @@ public class DroppedFileHandler {
     private void doLink(BibEntry entry, ExternalFileType fileType, String filename,
                         boolean avoidDuplicate, NamedCompound edits) {
 
-        Optional<String> oldValue = entry.getFieldOptional(Globals.FILE_FIELD);
+        Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
         FileListTableModel tm = new FileListTableModel();
         oldValue.ifPresent(tm::setContent);
 
@@ -440,8 +442,8 @@ public class DroppedFileHandler {
 
         tm.addEntry(tm.getRowCount(), new FileListEntry("", filename, fileType));
         String newValue = tm.getStringRepresentation();
-        UndoableFieldChange edit = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue.orElse(null), newValue);
-        entry.setField(Globals.FILE_FIELD, newValue);
+        UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE, oldValue.orElse(null), newValue);
+        entry.setField(FieldName.FILE, newValue);
 
         if (edits == null) {
             panel.getUndoManager().addEdit(edit);

@@ -161,7 +161,7 @@ public class CleanupAction extends AbstractWorker {
     private void doCleanup(CleanupPreset preset, BibEntry entry, NamedCompound ce) {
         // Create and run cleaner
         BibDatabaseContext bibDatabaseContext = panel.getBibDatabaseContext();
-        CleanupWorker cleaner = new CleanupWorker(bibDatabaseContext, Globals.journalAbbreviationLoader);
+        CleanupWorker cleaner = new CleanupWorker(bibDatabaseContext, Globals.journalAbbreviationLoader, Globals.prefs);
         List<FieldChange> changes = cleaner.cleanup(preset, entry);
 
         unsuccessfulRenames = cleaner.getUnsuccessfulRenames();

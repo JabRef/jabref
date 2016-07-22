@@ -49,6 +49,7 @@ import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.GroupsUtil;
 import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.FieldName;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -94,7 +95,8 @@ class AutoGroupDialog extends JDialog implements CaretListener {
 
                 try {
                     GroupTreeNode autoGroupsRoot = GroupTreeNode.fromGroup(
-                            new ExplicitGroup(Localization.lang("Automatically created groups"), GroupHierarchyType.INCLUDING));
+                            new ExplicitGroup(Localization.lang("Automatically created groups"),
+                                    GroupHierarchyType.INCLUDING, Globals.prefs));
                     Set<String> hs;
                     String fieldText = field.getText();
                     if (keywords.isSelected()) {
@@ -108,19 +110,19 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                         }
                     } else if (authors.isSelected()) {
                         List<String> fields = new ArrayList<>(2);
-                        fields.add("author");
+                        fields.add(FieldName.AUTHOR);
                         hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
-                        fieldText = "author";
+                        fieldText = FieldName.AUTHOR;
                     } else { // editors.isSelected() as it is a radio button group.
                         List<String> fields = new ArrayList<>(2);
-                        fields.add("editor");
+                        fields.add(FieldName.EDITOR);
                         hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
-                        fieldText = "editor";
+                        fieldText = FieldName.EDITOR;
                     }
 
                     for (String keyword : hs) {
                         KeywordGroup group = new KeywordGroup(keyword, fieldText, keyword, false, false,
-                                GroupHierarchyType.INDEPENDENT);
+                                GroupHierarchyType.INDEPENDENT, Globals.prefs);
                         autoGroupsRoot.addChild(GroupTreeNode.fromGroup(group));
                     }
 

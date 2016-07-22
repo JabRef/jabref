@@ -45,6 +45,7 @@ import net.sf.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLUtil;
@@ -52,6 +53,7 @@ import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
@@ -93,7 +95,8 @@ public class FieldExtraComponents {
         button.setToolTipText(ABBREVIATION_TOOLTIP_TEXT);
         button.addActionListener(actionEvent -> {
             String text = editor.getText();
-            JournalAbbreviationRepository abbreviationRepository = Globals.journalAbbreviationLoader.getRepository();
+            JournalAbbreviationRepository abbreviationRepository = Globals.journalAbbreviationLoader
+                    .getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs));
             if (abbreviationRepository.isKnownName(text)) {
                 String s = abbreviationRepository.getNextAbbreviation(text).orElse(text);
 
@@ -187,7 +190,7 @@ public class FieldExtraComponents {
         doiButton.addActionListener(actionEvent -> {
             Optional<DOI> doi = DOI.fromBibEntry(entryEditor.getEntry());
             if (doi.isPresent()) {
-                entryEditor.getEntry().setField("doi", doi.get().getDOI());
+                entryEditor.getEntry().setField(FieldName.DOI, doi.get().getDOI());
             } else {
                 panel.frame().setStatus(Localization.lang("No DOI found"));
             }

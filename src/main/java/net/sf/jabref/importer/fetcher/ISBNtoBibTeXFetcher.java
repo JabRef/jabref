@@ -35,6 +35,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -90,8 +91,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
             BibEntry entry = BibtexParser.singleFromString(bibtexString);
             if (entry != null) {
                 // Optionally add curly brackets around key words to keep the case
-                String title = entry.getField("title");
-                if (title != null) {
+                entry.getFieldOptional(FieldName.TITLE).ifPresent(title -> {
                     // Unit formatting
                     if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
                         title = unitsToLatexFormatter.format(title);
@@ -101,9 +101,8 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
                     if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
                         title = protectTermsFormatter.format(title);
                     }
-                    entry.setField("title", title);
-                }
-
+                    entry.setField(FieldName.TITLE, title);
+                });
                 inspector.addEntry(entry);
                 return true;
             }

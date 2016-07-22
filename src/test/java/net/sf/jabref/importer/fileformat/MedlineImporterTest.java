@@ -7,7 +7,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,12 +55,6 @@ public class MedlineImporterTest {
     public void setUp() throws Exception {
         Globals.prefs = JabRefPreferences.getInstance();
         this.importer = new MedlineImporter();
-    }
-
-    @Test
-    public void testGetItemsEmpty() {
-        MedlineHandler handler = new MedlineHandler();
-        assertEquals(Collections.emptyList(), handler.getItems());
     }
 
     @Test

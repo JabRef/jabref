@@ -26,10 +26,10 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.layout.format.AuthorAbbreviator;
 import net.sf.jabref.logic.layout.format.AuthorAndsCommaReplacer;
 import net.sf.jabref.logic.layout.format.AuthorAndsReplacer;
@@ -95,6 +95,7 @@ import net.sf.jabref.logic.search.MatchesHighlighter;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -118,8 +119,12 @@ class LayoutEntry {
 
     private final JournalAbbreviationLoader repositoryLoader;
 
-    public LayoutEntry(StringInt si, JournalAbbreviationLoader repositoryLoader) {
+    private final JabRefPreferences prefs;
+
+
+    public LayoutEntry(StringInt si, JabRefPreferences prefs, JournalAbbreviationLoader repositoryLoader) {
         this.repositoryLoader = repositoryLoader;
+        this.prefs = prefs;
         type = si.i;
         switch (type) {
         case LayoutHelper.IS_LAYOUT_TEXT:
@@ -138,8 +143,10 @@ class LayoutEntry {
         }
     }
 
-    public LayoutEntry(List<StringInt> parsedEntries, int layoutType, JournalAbbreviationLoader repositoryLoader) {
+    public LayoutEntry(List<StringInt> parsedEntries, int layoutType, JabRefPreferences prefs,
+            JournalAbbreviationLoader repositoryLoader) {
         this.repositoryLoader = repositoryLoader;
+        this.prefs = prefs;
         List<LayoutEntry> tmpEntries = new ArrayList<>();
         String blockStart = parsedEntries.get(0).s;
         String blockEnd = parsedEntries.get(parsedEntries.size() - 1).s;
@@ -164,7 +171,7 @@ class LayoutEntry {
                     blockEntries.add(parsedEntry);
                     int groupType = parsedEntry.i == LayoutHelper.IS_GROUP_END ? LayoutHelper.IS_GROUP_START :
                             LayoutHelper.IS_FIELD_START;
-                    LayoutEntry le = new LayoutEntry(blockEntries, groupType, repositoryLoader);
+                    LayoutEntry le = new LayoutEntry(blockEntries, groupType, prefs, repositoryLoader);
                     tmpEntries.add(le);
                     blockEntries = null;
                 } else {
@@ -180,7 +187,7 @@ class LayoutEntry {
             }
 
             if (blockEntries == null) {
-                tmpEntries.add(new LayoutEntry(parsedEntry, repositoryLoader));
+                tmpEntries.add(new LayoutEntry(parsedEntry, prefs, repositoryLoader));
             } else {
                 blockEntries.add(parsedEntry);
             }
@@ -507,7 +514,7 @@ class LayoutEntry {
         case "Iso690NamesAuthors":
             return new Iso690NamesAuthors();
         case "JournalAbbreviator":
-            return new JournalAbbreviator(repositoryLoader);
+            return new JournalAbbreviator(repositoryLoader, JournalAbbreviationPreferences.fromPreferences(prefs));
         case "LastPage":
             return new LastPage();
         case "FormatChars": // For backward compatibility
@@ -544,7 +551,7 @@ class LayoutEntry {
         case "Default":
             return new Default();
         case "FileLink":
-            return new FileLink();
+            return new FileLink(prefs);
         case "Number":
             return new Number();
         case "RisAuthors":
@@ -558,7 +565,7 @@ class LayoutEntry {
         case "WrapContent":
             return new WrapContent();
         case "WrapFileLinks":
-            return new WrapFileLinks();
+            return new WrapFileLinks(prefs);
         default:
             return new NotFoundFormatter(name);
         }
@@ -575,15 +582,15 @@ class LayoutEntry {
 
         List<LayoutFormatter> results = new ArrayList<>(formatterStrings.size());
 
-        Map<String, String> userNameFormatter = NameFormatter.getNameFormatters();
+        Map<String, String> userNameFormatter = NameFormatter.getNameFormatters(prefs);
 
         for (List<String> strings : formatterStrings) {
 
             String className = strings.get(0).trim();
 
             // Check if this is a name formatter defined by this export filter:
-            if (Globals.prefs.customExportNameFormatters != null) {
-                String contents = Globals.prefs.customExportNameFormatters.get(className);
+            if (prefs.customExportNameFormatters != null) {
+                String contents = prefs.customExportNameFormatters.get(className);
                 if (contents != null) {
                     NameFormatter nf = new NameFormatter();
                     nf.setParameter(contents);

@@ -31,6 +31,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * Importer for the MEDLINE Plain format.
@@ -155,22 +156,21 @@ public class MedlinePlainImporter extends ImportFormat {
 
                 //store the fields in a map
                 Map<String, String> hashMap = new HashMap<>();
-                hashMap.put("PG", "pages");
-                hashMap.put("PL", "address");
+                hashMap.put("PG", FieldName.PAGES);
+                hashMap.put("PL", FieldName.ADDRESS);
                 hashMap.put("PHST", "history");
                 hashMap.put("PST", "publication-status");
-                hashMap.put("VI", "volume");
-                hashMap.put("LA", "language");
-                hashMap.put("LA", "language");
+                hashMap.put("VI", FieldName.VOLUME);
+                hashMap.put("LA", FieldName.LANGUAGE);
                 hashMap.put("PUBM", "model");
                 hashMap.put("RN", "registry-number");
                 hashMap.put("NM", "substance-name");
                 hashMap.put("OCI", "copyright-owner");
                 hashMap.put("CN", "corporate");
-                hashMap.put("IP", "issue");
-                hashMap.put("EN", "edition");
+                hashMap.put("IP", FieldName.ISSUE);
+                hashMap.put("EN", FieldName.EDITION);
                 hashMap.put("GS", "gene-symbol");
-                hashMap.put("GN", "note");
+                hashMap.put("GN", FieldName.NOTE);
                 hashMap.put("GR", "grantno");
                 hashMap.put("SO", "source");
                 hashMap.put("NR", "number-of-references");
@@ -197,11 +197,11 @@ public class MedlinePlainImporter extends ImportFormat {
                         fields.put("investigator", oldInvestigator + ", " + value);
                     }
                 } else if ("MH".equals(label) || "OT".equals(label)) {
-                    if (!fields.containsKey("keywords")) {
-                        fields.put("keywords", value);
+                    if (!fields.containsKey(FieldName.KEYWORDS)) {
+                        fields.put(FieldName.KEYWORDS, value);
                     } else {
-                        String kw = fields.get("keywords");
-                        fields.put("keywords", kw + ", " + value);
+                        String kw = fields.get(FieldName.KEYWORDS);
+                        fields.put(FieldName.KEYWORDS, kw + ", " + value);
                     }
                 } else if ("CON".equals(label) || "CIN".equals(label) || "EIN".equals(label) || "EFR".equals(label)
                         || "CRI".equals(label) || "CRF".equals(label) || "PRIN".equals(label) || "PROF".equals(label)
@@ -213,8 +213,8 @@ public class MedlinePlainImporter extends ImportFormat {
                     comment = comment + value;
                 }
             }
-            fixAuthors(fields, author, "author");
-            fixAuthors(fields, editor, "editor");
+            fixAuthors(fields, author, FieldName.AUTHOR);
+            fixAuthors(fields, editor, FieldName.EDITOR);
             if (!comment.isEmpty()) {
                 fields.put("comment", comment);
             }
@@ -274,7 +274,7 @@ public class MedlinePlainImporter extends ImportFormat {
 
     private void addStandardNumber(Map<String, String> hm, String lab, String value) {
         if ("IS".equals(lab)) {
-            String key = "issn";
+            String key = FieldName.ISSN;
             //it is possible to have two issn, one for electronic and for print
             //if there are two then it comes at the end in brackets (electronic) or (print)
             //so search for the brackets
@@ -288,7 +288,7 @@ public class MedlinePlainImporter extends ImportFormat {
                 hm.put(key, value);
             }
         } else if ("ISBN".equals(lab)) {
-            hm.put("isbn", value);
+            hm.put(FieldName.ISBN, value);
         }
     }
 
@@ -305,7 +305,7 @@ public class MedlinePlainImporter extends ImportFormat {
             String idValue = value;
             if (value.startsWith("doi:")) {
                 idValue = idValue.replaceAll("(?i)doi:", "").trim();
-                key = "doi";
+                key = FieldName.DOI;
             } else if (value.indexOf('[') > 0) {
                 int startOfIdentifier = value.indexOf('[');
                 int endOfIdentifier = value.indexOf(']');
@@ -329,23 +329,23 @@ public class MedlinePlainImporter extends ImportFormat {
 
     private void addTitles(Map<String, String> hm, String lab, String val, String type) {
         if ("TI".equals(lab)) {
-            String oldVal = hm.get("title");
+            String oldVal = hm.get(FieldName.TITLE);
             if (oldVal == null) {
-                hm.put("title", val);
+                hm.put(FieldName.TITLE, val);
             } else {
                 if (oldVal.endsWith(":") || oldVal.endsWith(".") || oldVal.endsWith("?")) {
-                    hm.put("title", oldVal + " " + val);
+                    hm.put(FieldName.TITLE, oldVal + " " + val);
                 } else {
-                    hm.put("title", oldVal + ": " + val);
+                    hm.put(FieldName.TITLE, oldVal + ": " + val);
                 }
             }
         } else if ("BTI".equals(lab) || "CTI".equals(lab)) {
-            hm.put("booktitle", val);
+            hm.put(FieldName.BOOKTITLE, val);
         } else if ("JT".equals(lab)) {
             if ("inproceedings".equals(type)) {
-                hm.put("booktitle", val);
+                hm.put(FieldName.BOOKTITLE, val);
             } else {
-                hm.put("journal", val);
+                hm.put(FieldName.JOURNAL, val);
             }
         } else if ("CTI".equals(lab)) {
             hm.put("collection-title", val);
@@ -371,11 +371,11 @@ public class MedlinePlainImporter extends ImportFormat {
             } else {
                 abstractValue = value;
             }
-            String oldAb = hm.get("abstract");
+            String oldAb = hm.get(FieldName.ABSTRACT);
             if (oldAb == null) {
-                hm.put("abstract", abstractValue);
+                hm.put(FieldName.ABSTRACT, abstractValue);
             } else {
-                hm.put("abstract", oldAb + Globals.NEWLINE + abstractValue);
+                hm.put(FieldName.ABSTRACT, oldAb + Globals.NEWLINE + abstractValue);
             }
         } else if ("OAB".equals(lab) || "OABL".equals(lab)) {
             hm.put("other-abstract", value);
@@ -395,9 +395,9 @@ public class MedlinePlainImporter extends ImportFormat {
             hm.put("revised", val);
         } else if ("DP".equals(lab)) {
             String[] parts = val.split(" ");
-            hm.put("year", parts[0]);
+            hm.put(FieldName.YEAR, parts[0]);
             if ((parts.length > 1) && !parts[1].isEmpty()) {
-                hm.put("month", parts[1]);
+                hm.put(FieldName.MONTH, parts[1]);
             }
         } else if ("EDAT".equals(lab) && isCreateDateFormat(val)) {
             hm.put("publication", val);

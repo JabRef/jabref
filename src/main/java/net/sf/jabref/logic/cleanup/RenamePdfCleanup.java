@@ -27,20 +27,23 @@ import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class RenamePdfCleanup implements CleanupJob {
 
     private final BibDatabaseContext databaseContext;
     private final boolean onlyRelativePaths;
     private final JournalAbbreviationLoader repositoryLoader;
+    private final JabRefPreferences prefs;
 
     private int unsuccessfulRenames;
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext,
-                            JournalAbbreviationLoader repositoryLoader) {
+            JournalAbbreviationLoader repositoryLoader, JabRefPreferences prefs) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
         this.repositoryLoader = Objects.requireNonNull(repositoryLoader);
+        this.prefs = Objects.requireNonNull(prefs);
     }
 
     @Override
@@ -59,7 +62,7 @@ public class RenamePdfCleanup implements CleanupJob {
             }
 
             StringBuilder newFilename = new StringBuilder(
-                    FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, repositoryLoader));
+                    FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, repositoryLoader, prefs));
 
             //Add extension to newFilename
             newFilename.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));

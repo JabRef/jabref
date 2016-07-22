@@ -19,10 +19,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bst.BibtexNameFormatter;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * This layout formatter uses the Bibtex name.format$ method and provides ultimate flexibility:
@@ -184,12 +184,12 @@ public class NameFormatter implements LayoutFormatter {
         this.parameter = parameter;
     }
 
-    public static Map<String, String> getNameFormatters() {
+    public static Map<String, String> getNameFormatters(JabRefPreferences prefs) {
 
         Map<String, String> result = new HashMap<>();
 
-        List<String> names = Globals.prefs.getStringList(NameFormatter.NAME_FORMATER_KEY);
-        List<String> formats = Globals.prefs.getStringList(NameFormatter.NAME_FORMATTER_VALUE);
+        List<String> names = prefs.getStringList(NameFormatter.NAME_FORMATER_KEY);
+        List<String> formats = prefs.getStringList(NameFormatter.NAME_FORMATTER_VALUE);
 
         for (int i = 0; i < names.size(); i++) {
             if (i < formats.size()) {

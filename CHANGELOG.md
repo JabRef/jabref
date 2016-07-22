@@ -18,6 +18,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#1026](https://github.com/JabRef/jabref/issues/1026) JabRef does no longer delete user comments outside of BibTeX entries and strings
 - [#1249](https://github.com/JabRef/jabref/issues/1249) Date layout formatter added
 - Added ISBN integrity checker
+- Added filter to not show selected integrity checks
+- Enhance the entry customization dialog to give better visual feedback
 
 ### Fixed
 - Fixed [#1264](https://github.com/JabRef/jabref/issues/1264): S with caron does not render correctly
@@ -26,6 +28,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1592](https://github.com/JabRef/jabref/issues/1592): LibreOffice: wrong numbers in citation labels
 
 ### Removed
+- It is not longer possible to choose to convert HTML sub- and superscripts to equations
 
 
 
@@ -126,7 +129,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Integrity check table can be sorted by clicking on column headings
 - Added \SOFTWARE\Jabref 'Path' registry entry for installation path inside the installer
 - Added an additional icon to distinguish DOI and URL links ([feature request #696](https://github.com/JabRef/jabref/issues/696))
-- Added nbib fields to Medlineplain importer
+- Added nbib fields to Medlineplain importer and to MedlineImporter
 - Implemented [#1342](https://github.com/JabRef/jabref/issues/1342): show description of case converters as tooltip 
 - Updated German translation
 

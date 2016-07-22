@@ -22,6 +22,7 @@ import java.util.Optional;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryConverter;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * Converts the entry to BibLatex format.
@@ -47,19 +48,19 @@ public class BiblatexCleanup implements CleanupJob {
         }
 
         // Dates: create date out of year and month, save it and delete old fields
-        entry.getFieldOptional("date").ifPresent(date -> {
+        entry.getFieldOptional(FieldName.DATE).ifPresent(date -> {
             if (date.isEmpty()) {
-                entry.getFieldOrAlias("date").ifPresent(newDate -> {
-                    Optional<String> oldYear = entry.getFieldOptional("year");
-                    Optional<String> oldMonth = entry.getFieldOptional("month");
+                entry.getFieldOrAlias(FieldName.DATE).ifPresent(newDate -> {
+                    Optional<String> oldYear = entry.getFieldOptional(FieldName.YEAR);
+                    Optional<String> oldMonth = entry.getFieldOptional(FieldName.MONTH);
 
-                    entry.setField("date", newDate);
-                    entry.clearField("year");
-                    entry.clearField("month");
+                    entry.setField(FieldName.DATE, newDate);
+                    entry.clearField(FieldName.YEAR);
+                    entry.clearField(FieldName.MONTH);
 
-                    changes.add(new FieldChange(entry, "date", null, newDate));
-                    changes.add(new FieldChange(entry, "year", oldYear.orElse(null), null));
-                    changes.add(new FieldChange(entry, "month", oldMonth.orElse(null), null));
+                    changes.add(new FieldChange(entry, FieldName.DATE, null, newDate));
+                    changes.add(new FieldChange(entry, FieldName.YEAR, oldYear.orElse(null), null));
+                    changes.add(new FieldChange(entry, FieldName.MONTH, oldMonth.orElse(null), null));
                 });
             }
         });

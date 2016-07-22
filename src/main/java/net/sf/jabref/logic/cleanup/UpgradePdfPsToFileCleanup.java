@@ -19,10 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
 
@@ -42,7 +42,7 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
         List<FieldChange> changes = new ArrayList<>();
 
         // If there are already links in the file field, keep those on top:
-        String oldFileContent = entry.getField(Globals.FILE_FIELD);
+        String oldFileContent = entry.getField(FieldName.FILE);
 
         List<ParsedFileField> fileList = new ArrayList<>(FileField.parse(oldFileContent));
         int oldItemCount = fileList.size();
@@ -63,8 +63,8 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
 
         if (fileList.size() != oldItemCount) {
             String newValue = FileField.getStringRepresentation(fileList);
-            entry.setField(Globals.FILE_FIELD, newValue);
-            changes.add(new FieldChange(entry, Globals.FILE_FIELD, oldFileContent, newValue));
+            entry.setField(FieldName.FILE, newValue);
+            changes.add(new FieldChange(entry, FieldName.FILE, oldFileContent, newValue));
         }
 
         return changes;

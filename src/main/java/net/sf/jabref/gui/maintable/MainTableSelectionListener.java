@@ -49,6 +49,7 @@ import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
@@ -292,11 +293,11 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 for (String fieldName : fieldNames) {
                     // Check if field is present, if not skip this field
                     if (entry.hasField(fieldName)) {
-                        String link = entry.getField(fieldName);
+                        String link = entry.getFieldOptional(fieldName).get();
 
                         // See if this is a simple file link field, or if it is a file-list
                         // field that can specify a list of links:
-                        if (fieldName.equals(Globals.FILE_FIELD)) {
+                        if (fieldName.equals(FieldName.FILE)) {
 
                             // We use a FileListTableModel to parse the field content:
                             FileListTableModel fileList = new FileListTableModel();
@@ -336,8 +337,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     }
                 }
             });
-        } else if (modelColumn.getBibtexFields().contains("crossref")) { // Clicking on crossref column
-            tableRows.get(row).getFieldOptional("crossref")
+        } else if (modelColumn.getBibtexFields().contains(FieldName.CROSSREF)) { // Clicking on crossref column
+            tableRows.get(row).getFieldOptional(FieldName.CROSSREF)
                     .ifPresent(crossref -> panel.getDatabase().getEntryByKey(crossref).ifPresent(entry -> panel.highlightEntry(entry)));
         }
     }
@@ -400,11 +401,10 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         // field that can specify a list of links:
         if(!column.getBibtexFields().isEmpty()) {
             for(String field : column.getBibtexFields()) {
-                if (Globals.FILE_FIELD.equals(field)) {
+                if (FieldName.FILE.equals(field)) {
                     // We use a FileListTableModel to parse the field content:
-                    String fileFieldContent = entry.getField(field);
                     FileListTableModel fileList = new FileListTableModel();
-                    fileList.setContent(fileFieldContent);
+                    entry.getFieldOptional(field).ifPresent(fileList::setContent);
                     for (int i = 0; i < fileList.getRowCount(); i++) {
                         FileListEntry flEntry = fileList.getEntry(i);
                         if (column.isFileFilter()

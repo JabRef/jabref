@@ -135,7 +135,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
     }
 
     @Test
@@ -150,7 +150,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
     }
 
     @Test
@@ -178,7 +178,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
     }
 
     @Test
@@ -193,7 +193,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
     }
 
     @Test
@@ -208,7 +208,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
     }
 
     @Test
@@ -223,7 +223,7 @@ public class BibtexParserTest {
         assertEquals("unknown", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
     }
 
     @Test
@@ -239,7 +239,7 @@ public class BibtexParserTest {
         assertEquals("thisisalongstringtotestmaybeitistolongwhoknowsnotme", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
     }
 
     @Test
@@ -254,7 +254,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
     }
 
     /**
@@ -272,9 +272,9 @@ public class BibtexParserTest {
 
         assertEquals("article", e.getType());
         assertEquals("canh05", e.getCiteKey());
-        assertEquals("1234567890123456789", e.getField("isbn"));
-        assertEquals("1234567890123456789", e.getField("isbn2"));
-        assertEquals("1234", e.getField("small"));
+        assertEquals(Optional.of("1234567890123456789"), e.getFieldOptional("isbn"));
+        assertEquals(Optional.of("1234567890123456789"), e.getFieldOptional("isbn2"));
+        assertEquals(Optional.of("1234"), e.getFieldOptional("small"));
     }
 
     @Test
@@ -289,7 +289,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("te_st:with-special(characters)", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
     }
 
     @Test
@@ -304,7 +304,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
     }
 
     @Test
@@ -389,7 +389,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test and Second Author and Third Author", e.getField("author"));
+        assertEquals(Optional.of("Ed von Test and Second Author and Third Author"), e.getFieldOptional("author"));
     }
 
     @Test
@@ -405,7 +405,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test and Second Author and Third Author", e.getField("editor"));
+        assertEquals(Optional.of("Ed von Test and Second Author and Third Author"), e.getFieldOptional("editor"));
     }
 
     /**
@@ -424,7 +424,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Test, Second Keyword, Third Keyword", e.getField("keywords"));
+        assertEquals(Optional.of("Test, Second Keyword, Third Keyword"), e.getFieldOptional("keywords"));
     }
 
     @Test
@@ -462,13 +462,13 @@ public class BibtexParserTest {
         assertEquals("inproceedings", e.getType());
         assertEquals(8, e.getFieldNames().size());
         assertEquals("CroAnnHow05", e.getCiteKey());
-        assertEquals("Crowston, K. and Annabi, H. and Howison, J. and Masango, C.", e.getField("author"));
-        assertEquals("Effective work practices for floss development: A model and propositions", e.getField("title"));
-        assertEquals("Hawaii International Conference On System Sciences (HICSS)", e.getField("booktitle"));
-        assertEquals("2005", e.getField("year"));
-        assertEquals("oezbek", e.getField("owner"));
-        assertEquals("2006.05.29", e.getField("timestamp"));
-        assertEquals("http://james.howison.name/publications.html", e.getField("url"));
+        assertEquals(Optional.of("Crowston, K. and Annabi, H. and Howison, J. and Masango, C."), e.getFieldOptional("author"));
+        assertEquals(Optional.of("Effective work practices for floss development: A model and propositions"), e.getFieldOptional("title"));
+        assertEquals(Optional.of("Hawaii International Conference On System Sciences (HICSS)"), e.getFieldOptional("booktitle"));
+        assertEquals(Optional.of("2005"), e.getFieldOptional("year"));
+        assertEquals(Optional.of("oezbek"), e.getFieldOptional("owner"));
+        assertEquals(Optional.of("2006.05.29"), e.getFieldOptional("timestamp"));
+        assertEquals(Optional.of("http://james.howison.name/publications.html"), e.getFieldOptional("url"));
     }
 
     @Test
@@ -498,13 +498,13 @@ public class BibtexParserTest {
         assertEquals("inproceedings", e.getType());
         assertEquals(8, e.getFieldNames().size());
         assertEquals("CroAnnHow05", e.getCiteKey());
-        assertEquals("Crowston, K. and Annabi, H. and Howison, J. and Masango, C.", e.getField("author"));
-        assertEquals("Effective work practices for floss development: A model and propositions", e.getField("title"));
-        assertEquals("Hawaii International Conference On System Sciences (HICSS)", e.getField("booktitle"));
-        assertEquals("2005", e.getField("year"));
-        assertEquals("oezbek", e.getField("owner"));
-        assertEquals("2006.05.29", e.getField("timestamp"));
-        assertEquals("http://james.howison.name/publications.html", e.getField("url"));
+        assertEquals(Optional.of("Crowston, K. and Annabi, H. and Howison, J. and Masango, C."), e.getFieldOptional("author"));
+        assertEquals(Optional.of("Effective work practices for floss development: A model and propositions"), e.getFieldOptional("title"));
+        assertEquals(Optional.of("Hawaii International Conference On System Sciences (HICSS)"), e.getFieldOptional("booktitle"));
+        assertEquals(Optional.of("2005"), e.getFieldOptional("year"));
+        assertEquals(Optional.of("oezbek"), e.getFieldOptional("owner"));
+        assertEquals(Optional.of("2006.05.29"), e.getFieldOptional("timestamp"));
+        assertEquals(Optional.of("http://james.howison.name/publications.html"), e.getFieldOptional("url"));
     }
 
     @Test
@@ -519,7 +519,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
     }
 
     @Test
@@ -534,7 +534,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("2005", e.getField("year"));
+        assertEquals(Optional.of("2005"), e.getFieldOptional("year"));
     }
 
     @Test
@@ -549,7 +549,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
     }
 
     /**
@@ -568,7 +568,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("D:\\Documents\\literature\\Tansel-PRL2006.pdf", e.getField("file"));
+        assertEquals(Optional.of("D:\\Documents\\literature\\Tansel-PRL2006.pdf"), e.getFieldOptional("file"));
     }
 
     /**
@@ -586,7 +586,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("1-4~#nov#", e.getField("date"));
+        assertEquals(Optional.of("1-4~#nov#"), e.getFieldOptional("date"));
     }
 
     @Test
@@ -676,7 +676,7 @@ public class BibtexParserTest {
         BibEntry e = c.iterator().next();
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
-        assertEquals("escaped \\{ bracket", e.getField("review"));
+        assertEquals(Optional.of("escaped \\{ bracket"), e.getFieldOptional("review"));
     }
 
     @Test
@@ -692,7 +692,7 @@ public class BibtexParserTest {
         BibEntry e = c.iterator().next();
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
-        assertEquals("escaped \\} bracket", e.getField("review"));
+        assertEquals(Optional.of("escaped \\} bracket"), e.getFieldOptional("review"));
     }
 
     @Test
@@ -749,7 +749,7 @@ public class BibtexParserTest {
         entries.addAll(c);
 
         assertEquals(1, entries.size());
-        assertEquals("author @ good", entries.get(0).getField("author"));
+        assertEquals(Optional.of("author @ good"), entries.get(0).getFieldOptional("author"));
     }
 
     @Test
@@ -764,7 +764,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("author @ good", e.getField("author"));
+        assertEquals(Optional.of("author @ good"), e.getFieldOptional("author"));
     }
 
     @Test
@@ -779,7 +779,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Test {Ed {von} Test}", e.getField("author"));
+        assertEquals(Optional.of("Test {Ed {von} Test}"), e.getFieldOptional("author"));
     }
 
     @Test
@@ -795,7 +795,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Test {\" Test}", e.getField("author"));
+        assertEquals(Optional.of("Test {\" Test}"), e.getFieldOptional("author"));
     }
 
     @Test
@@ -824,7 +824,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
     }
 
     /**
@@ -842,8 +842,8 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(3, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
-        assertEquals("8,", e.getField("month"));
+        assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
+        assertEquals(Optional.of("8,"), e.getFieldOptional("month"));
     }
 
     @Test
@@ -976,12 +976,12 @@ public class BibtexParserTest {
 
         assertEquals("book", e.getType());
         assertEquals("bourdieu-2002-questions-sociologie", e.getCiteKey());
-        assertEquals("Paris", e.getField("address"));
-        assertEquals("#bourdieu#", e.getField("author"));
-        assertEquals("2707318256", e.getField("isbn"));
-        assertEquals("Minuit", e.getField("publisher"));
-        assertEquals("Questions de sociologie", e.getField("title"));
-        assertEquals("2002", e.getField("year"));
+        assertEquals(Optional.of("Paris"), e.getFieldOptional("address"));
+        assertEquals(Optional.of("#bourdieu#"), e.getFieldOptional("author"));
+        assertEquals(Optional.of("2707318256"), e.getFieldOptional("isbn"));
+        assertEquals(Optional.of("Minuit"), e.getFieldOptional("publisher"));
+        assertEquals(Optional.of("Questions de sociologie"), e.getFieldOptional("title"));
+        assertEquals(Optional.of("2002"), e.getFieldOptional("year"));
     }
 
     @Test
@@ -1019,7 +1019,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
     }
 
     @Test
@@ -1034,7 +1034,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
     }
 
     @Test
@@ -1056,7 +1056,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
     }
 
     @Test
@@ -1071,7 +1071,7 @@ public class BibtexParserTest {
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
         assertEquals(2, e.getFieldNames().size());
-        assertEquals("Ed von Test", e.getField("author"));
+        assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
     }
 
     @Test
@@ -1081,7 +1081,7 @@ public class BibtexParserTest {
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         BibEntry e = c.iterator().next();
-        assertEquals("a b", e.getField("a"));
+        assertEquals(Optional.of("a b"), e.getFieldOptional("a"));
     }
 
     @Test
@@ -1092,9 +1092,9 @@ public class BibtexParserTest {
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         BibEntry e = c.iterator().next();
-        assertEquals("a b", e.getField("a"));
-        assertEquals("a b", e.getField("b"));
-        assertEquals("a b", e.getField("c"));
+        assertEquals(Optional.of("a b"), e.getFieldOptional("a"));
+        assertEquals(Optional.of("a b"), e.getFieldOptional("b"));
+        assertEquals(Optional.of("a b"), e.getFieldOptional("c"));
     }
 
     @Test
@@ -1104,7 +1104,7 @@ public class BibtexParserTest {
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         BibEntry e = c.iterator().next();
-        assertEquals("a b", e.getField("a"));
+        assertEquals(Optional.of("a b"), e.getFieldOptional("a"));
     }
 
     @Test
@@ -1115,9 +1115,9 @@ public class BibtexParserTest {
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         BibEntry e = c.iterator().next();
-        assertEquals("a b", e.getField("a"));
-        assertEquals("a b", e.getField("b"));
-        assertEquals("a b", e.getField("c"));
+        assertEquals(Optional.of("a b"), e.getFieldOptional("a"));
+        assertEquals(Optional.of("a b"), e.getFieldOptional("b"));
+        assertEquals(Optional.of("a b"), e.getFieldOptional("c"));
     }
 
     /**
@@ -1132,7 +1132,7 @@ public class BibtexParserTest {
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         BibEntry e = c.iterator().next();
-        assertEquals("ups  sala", e.getField("file"));
+        assertEquals(Optional.of("ups  sala"), e.getFieldOptional("file"));
     }
 
     /**
@@ -1148,7 +1148,7 @@ public class BibtexParserTest {
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         BibEntry e = c.iterator().next();
-        assertEquals("ups  sala", e.getField("file"));
+        assertEquals(Optional.of("ups  sala"), e.getFieldOptional("file"));
     }
 
     /**
@@ -1164,7 +1164,7 @@ public class BibtexParserTest {
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         BibEntry e = c.iterator().next();
-        assertEquals("ups  sala", e.getField("file"));
+        assertEquals(Optional.of("ups  sala"), e.getFieldOptional("file"));
     }
 
     /**
@@ -1182,7 +1182,7 @@ public class BibtexParserTest {
         BibEntry e = c.iterator().next();
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
-        assertEquals("H\'{e}lne Fiaux", e.getField("author"));
+        assertEquals(Optional.of("H\'{e}lne Fiaux"), e.getFieldOptional("author"));
     }
 
     /**
@@ -1203,7 +1203,7 @@ public class BibtexParserTest {
         BibEntry e = c.iterator().next();
         assertEquals("article", e.getType());
         assertEquals("test", e.getCiteKey());
-        assertEquals("H\'{e}lne Fiaux", e.getField("author"));
+        assertEquals(Optional.of("H\'{e}lne Fiaux"), e.getFieldOptional("author"));
     }
 
     /**
@@ -1393,7 +1393,7 @@ public class BibtexParserTest {
 
         AbstractLabelPattern labelPattern = result.getMetaData().getLabelPattern();
 
-        AbstractLabelPattern expectedPattern = new DatabaseLabelPattern();
+        AbstractLabelPattern expectedPattern = new DatabaseLabelPattern(Globals.prefs);
         expectedPattern.setDefaultValue("test");
         expectedPattern.addLabelPattern("article", "articleTest");
 
@@ -1430,10 +1430,12 @@ public class BibtexParserTest {
         assertEquals(new AllEntriesGroup(), root.getGroup());
         assertEquals(3, root.getNumberOfChildren());
         assertEquals(
-                new KeywordGroup("Fréchet", "keywords", "FrechetSpace", false, true, GroupHierarchyType.INDEPENDENT),
+                new KeywordGroup("Fréchet", "keywords", "FrechetSpace", false, true, GroupHierarchyType.INDEPENDENT,
+                        Globals.prefs),
                 root.getChildren().get(0).getGroup());
         assertEquals(
-                new KeywordGroup("Invariant theory", "keywords", "GIT", false, false, GroupHierarchyType.INDEPENDENT),
+                new KeywordGroup("Invariant theory", "keywords", "GIT", false, false, GroupHierarchyType.INDEPENDENT,
+                        Globals.prefs),
                 root.getChildren().get(1).getGroup());
         assertEquals(Arrays.asList("Key1", "Key2"), ((ExplicitGroup) root.getChildren().get(2).getGroup()).getLegacyEntryKeys());
     }
@@ -1511,7 +1513,7 @@ public class BibtexParserTest {
         assertEquals(5, entry.getFieldNames().size());
         Set<String> fields = entry.getFieldNames();
         assertTrue(fields.contains("author"));
-        assertEquals("Foo Bar", entry.getField("author"));
+        assertEquals(Optional.of("Foo Bar"), entry.getFieldOptional("author"));
         assertEquals(bibtexEntry, entry.getParsedSerialization());
     }
 
@@ -1537,7 +1539,7 @@ public class BibtexParserTest {
         assertEquals(5, entry.getFieldNames().size());
         Set<String> fields = entry.getFieldNames();
         assertTrue(fields.contains("author"));
-        assertEquals("Foo Bar", entry.getField("author"));
+        assertEquals(Optional.of("Foo Bar"), entry.getFieldOptional("author"));
         assertEquals(bibtexEntry, entry.getParsedSerialization());
     }
 

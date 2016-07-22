@@ -17,14 +17,14 @@ public class EntryConverter {
 
     static {
         EntryConverter.FIELD_ALIASES_TEX_TO_LTX = new HashMap<>();
-        EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put("address", "location");
+        EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put(FieldName.ADDRESS, "location");
         EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put("annote", "annotation");
         EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put("archiveprefix", "eprinttype");
-        EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put("journal", "journaltitle");
+        EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put(FieldName.JOURNAL, FieldName.JOURNALTITLE);
         EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put("key", "sortkey");
-        EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put("pdf", "file");
+        EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put("pdf", FieldName.FILE);
         EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put("primaryclass", "eprintclass");
-        EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put("school", "institution");
+        EntryConverter.FIELD_ALIASES_TEX_TO_LTX.put(FieldName.SCHOOL, FieldName.INSTITUTION);
 
         // inverse map
         EntryConverter.FIELD_ALIASES_LTX_TO_TEX = EntryConverter.FIELD_ALIASES_TEX_TO_LTX.entrySet()

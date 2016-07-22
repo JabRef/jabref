@@ -24,8 +24,10 @@ import java.util.Optional;
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.layout.ParamLayoutFormatter;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,7 +41,12 @@ public class FileLink implements ParamLayoutFormatter {
     private static final Log LOGGER = LogFactory.getLog(FileLink.class);
 
     private String fileType;
+    private final JabRefPreferences prefs;
 
+
+    public FileLink(JabRefPreferences prefs) {
+        this.prefs = prefs;
+    }
 
     @Override
     public String format(String field) {
@@ -75,10 +82,10 @@ public class FileLink implements ParamLayoutFormatter {
         // but that is not available from a formatter. Therefore, as an
         // ugly hack, the export routine has set a global variable before
         // starting the export, which contains the database's file directory:
-        if (Globals.prefs.fileDirForDatabase == null) {
-            dirs = Collections.singletonList(Globals.prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX));
+        if (prefs.fileDirForDatabase == null) {
+            dirs = Collections.singletonList(prefs.get(FieldName.FILE + Globals.DIR_SUFFIX));
         } else {
-            dirs = Globals.prefs.fileDirForDatabase;
+            dirs = prefs.fileDirForDatabase;
         }
 
         Optional<File> f = FileUtil.expandFilename(link, dirs);

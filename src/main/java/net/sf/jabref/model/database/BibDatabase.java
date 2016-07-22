@@ -46,6 +46,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.model.event.EntryAddedEvent;
@@ -515,7 +516,7 @@ public class BibDatabase {
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry: Do not do this for the bibtex key.
         if (!result.isPresent() && (database != null) && !field.equals(BibEntry.KEY_FIELD)) {
-            Optional<String> crossrefKey = entry.getFieldOptional("crossref");
+            Optional<String> crossrefKey = entry.getFieldOptional(FieldName.CROSSREF);
             if (crossrefKey.isPresent()) {
                 Optional<BibEntry> referred = database.getEntryByKey(crossrefKey.get());
                 if (referred.isPresent()) {

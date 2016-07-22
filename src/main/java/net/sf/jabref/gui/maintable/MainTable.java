@@ -58,6 +58,7 @@ import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexSingleField;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
@@ -499,7 +500,7 @@ public class MainTable extends JTable {
      */
     public boolean isFileColumn(int modelIndex) {
         return (tableFormat.getTableColumn(modelIndex) != null) && tableFormat.getTableColumn(modelIndex)
-                .getBibtexFields().contains(Globals.FILE_FIELD);
+                .getBibtexFields().contains(FieldName.FILE);
     }
 
     private boolean matches(int row, Matcher<BibEntry> m) {

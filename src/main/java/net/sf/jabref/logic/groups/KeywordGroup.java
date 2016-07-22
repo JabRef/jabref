@@ -22,7 +22,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
@@ -47,7 +46,8 @@ public class KeywordGroup extends AbstractGroup {
     private final boolean caseSensitive;
     private final boolean regExp;
     private Pattern pattern;
-    private List<String> searchWords;
+    private final List<String> searchWords;
+    protected final JabRefPreferences jabRefPreferences;
 
     private static final Log LOGGER = LogFactory.getLog(KeywordGroup.class);
 
@@ -57,7 +57,7 @@ public class KeywordGroup extends AbstractGroup {
      */
     public KeywordGroup(String name, String searchField,
                         String searchExpression, boolean caseSensitive, boolean regExp,
-                        GroupHierarchyType context) throws ParseException {
+            GroupHierarchyType context, JabRefPreferences jabRefPreferences) throws ParseException {
         super(name, context);
         this.searchField = searchField;
         this.searchExpression = searchExpression;
@@ -66,6 +66,7 @@ public class KeywordGroup extends AbstractGroup {
         if (this.regExp) {
             compilePattern();
         }
+        this.jabRefPreferences = jabRefPreferences;
         this.searchWords = EntryUtil.getStringAsWords(searchExpression);
     }
 
@@ -84,7 +85,7 @@ public class KeywordGroup extends AbstractGroup {
      * @param s The String representation obtained from
      *          KeywordGroup.toString()
      */
-    public static AbstractGroup fromString(String s) throws ParseException {
+    public static AbstractGroup fromString(String s, JabRefPreferences jabRefPreferences) throws ParseException {
         if (!s.startsWith(KeywordGroup.ID)) {
             throw new IllegalArgumentException("KeywordGroup cannot be created from \"" + s + "\".");
         }
@@ -100,7 +101,7 @@ public class KeywordGroup extends AbstractGroup {
         return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR),
                 StringUtil.unquote(field, AbstractGroup.QUOTE_CHAR),
                 StringUtil.unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
-                GroupHierarchyType.getByNumber(context));
+                GroupHierarchyType.getByNumber(context), jabRefPreferences);
     }
 
     /**
@@ -140,7 +141,7 @@ public class KeywordGroup extends AbstractGroup {
                 if (!contains(entry)) {
                     String oldContent = entry
                             .getField(searchField);
-                    String pre = Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR);
+                    String pre = jabRefPreferences.get(JabRefPreferences.KEYWORD_SEPARATOR);
                     String newContent = (oldContent == null ? "" : oldContent
                             + pre)
                             + searchExpression;
@@ -279,7 +280,7 @@ public class KeywordGroup extends AbstractGroup {
         int i;
         int j;
         int k;
-        final String separator = Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR);
+        final String separator = jabRefPreferences.get(JabRefPreferences.KEYWORD_SEPARATOR);
         while ((i = haystack.indexOf(needle)) >= 0) {
             sbOrig.replace(i, i + needle.length(), "");
             sbLower.replace(i, i + needle.length(), "");
@@ -308,7 +309,7 @@ public class KeywordGroup extends AbstractGroup {
     public AbstractGroup deepCopy() {
         try {
             return new KeywordGroup(getName(), searchField, searchExpression,
-                    caseSensitive, regExp, getContext());
+                    caseSensitive, regExp, getContext(), jabRefPreferences);
         } catch (ParseException exception) {
             // this should never happen, because the constructor obviously succeeded in creating _this_ instance!
             LOGGER.error("Internal error in KeywordGroup.deepCopy(). "
@@ -367,10 +368,10 @@ public class KeywordGroup extends AbstractGroup {
     }
 
     @Override
-    public String getShortDescription() {
+    public String getShortDescription(boolean showDynamic) {
         StringBuilder sb = new StringBuilder();
         sb.append("<b>");
-        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC)) {
+        if (showDynamic) {
             sb.append("<i>").append(StringUtil.quoteForHTML(getName())).append("</i>");
         } else {
             sb.append(StringUtil.quoteForHTML(getName()));

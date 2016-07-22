@@ -39,6 +39,7 @@ import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.Printed;
@@ -156,7 +157,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(new GeneralAction(Actions.OPEN_FOLDER, Localization.lang("Open folder")) {
             {
-                if (!isFieldSetForSelectedEntry(Globals.FILE_FIELD)) {
+                if (!isFieldSetForSelectedEntry(FieldName.FILE)) {
                     this.setEnabled(false);
                 }
             }
@@ -164,7 +165,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(new GeneralAction(Actions.OPEN_EXTERNAL_FILE, Localization.lang("Open file"), getFileIconForSelectedEntry()) {
             {
-                if (!isFieldSetForSelectedEntry(Globals.FILE_FIELD)) {
+                if (!isFieldSetForSelectedEntry(FieldName.FILE)) {
                     this.setEnabled(false);
                 }
             }
@@ -172,7 +173,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(new GeneralAction(Actions.OPEN_URL, Localization.lang("Open URL or DOI"), IconTheme.JabRefIcon.WWW.getSmallIcon()) {
             {
-                if(!(isFieldSetForSelectedEntry("url") || isFieldSetForSelectedEntry("doi"))) {
+                if(!(isFieldSetForSelectedEntry(FieldName.URL) || isFieldSetForSelectedEntry(FieldName.DOI))) {
                     this.setEnabled(false);
                 }
             }
@@ -184,7 +185,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(new GeneralAction(Actions.MERGE_DOI, Localization.lang("Get BibTeX data from DOI")) {
             {
-                if (!(isFieldSetForSelectedEntry("doi"))) {
+                if (!(isFieldSetForSelectedEntry(FieldName.DOI))) {
                     this.setEnabled(false);
                 }
             }
@@ -279,8 +280,8 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     private Icon getFileIconForSelectedEntry() {
         if (panel.getMainTable().getSelectedRowCount() == 1) {
             BibEntry entry = panel.getMainTable().getSelected().get(0);
-            if(entry.hasField(Globals.FILE_FIELD)) {
-                JLabel label = FileListTableModel.getFirstLabel(entry.getField(Globals.FILE_FIELD));
+            if(entry.hasField(FieldName.FILE)) {
+                JLabel label = FileListTableModel.getFirstLabel(entry.getFieldOptional(FieldName.FILE).get());
                 if (label != null) {
                     return label.getIcon();
                 }

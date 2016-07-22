@@ -15,7 +15,10 @@
 */
 package net.sf.jabref.importer;
 
+import java.util.Optional;
+
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -77,34 +80,34 @@ public class OAI2Handler extends DefaultHandler {
             forenames = content;
         } else if ("journal-ref".equals(qualifiedName)) {
             String journal = content.replaceFirst("[0-9].*", "");
-            entry.setField("journal", journal);
+            entry.setField(FieldName.JOURNAL, journal);
             String volume = content.replaceFirst(journal, "");
             volume = volume.replaceFirst(" .*", "");
-            entry.setField("volume", volume);
+            entry.setField(FieldName.VOLUME, volume);
             String year = content.replaceFirst(".*?\\(", "");
             year = year.replaceFirst("\\).*", "");
-            entry.setField("year", year);
+            entry.setField(FieldName.YEAR, year);
             String pages = content.replaceFirst(journal, "");
             pages = pages.replaceFirst(volume, "");
             pages = pages.replaceFirst("\\(" + year + "\\)", "");
             pages = pages.replace(" ", "");
-            entry.setField("pages", pages);
+            entry.setField(FieldName.PAGES, pages);
         } else if ("datestamp".equals(qualifiedName)) {
-            String year = entry.getField("year");
-            if ((year == null) || year.isEmpty()) {
-                entry.setField("year", content.replaceFirst("-.*", ""));
+            Optional<String> year = entry.getFieldOptional(FieldName.YEAR);
+            if (!year.isPresent() || year.get().isEmpty()) {
+                entry.setField(FieldName.YEAR, content.replaceFirst("-.*", ""));
             }
-        } else if ("title".equals(qualifiedName)) {
-            entry.setField("title", content);
+        } else if (FieldName.TITLE.equals(qualifiedName)) {
+            entry.setField(FieldName.TITLE, content);
         } else if ("abstract".equals(qualifiedName)) {
-            entry.setField("abstract", content);
+            entry.setField(FieldName.ABSTRACT, content);
         } else if ("comments".equals(qualifiedName)) {
             entry.setField("comments", content);
         } else if ("report-no".equals(qualifiedName)) {
             entry.setField("reportno", content);
-        } else if("doi".equals(qualifiedName)) {
-          entry.setField("doi", content);
-        } else if ("author".equals(qualifiedName)) {
+        } else if(FieldName.DOI.equals(qualifiedName)) {
+          entry.setField(FieldName.DOI, content);
+        } else if (FieldName.AUTHOR.equals(qualifiedName)) {
             String author = forenames + " " + keyname;
             if (authors.length() > 0) {
                 authors.append(" and ");
@@ -115,7 +118,7 @@ public class OAI2Handler extends DefaultHandler {
 
     @Override
     public void endDocument() throws SAXException {
-        entry.setField("author", authors.toString());
+        entry.setField(FieldName.AUTHOR, authors.toString());
     }
 
 }

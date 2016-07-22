@@ -27,6 +27,7 @@ public class CopacImporterTest {
 
     /**
      * Generates a List of all files in the package "/src/test/resources/net/sf/jabref/importer/fileformat"
+     *
      * @return A list of Names
      * @throws IOException
      */

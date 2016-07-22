@@ -53,6 +53,7 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.EntrySorter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -60,7 +61,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class ChangeScanner implements Runnable {
 
-    private static final String[] SORT_BY = new String[] {"year", "author", "title"};
+    private static final String[] SORT_BY = new String[] {FieldName.YEAR, FieldName.AUTHOR, FieldName.TITLE};
 
     private final File f;
 

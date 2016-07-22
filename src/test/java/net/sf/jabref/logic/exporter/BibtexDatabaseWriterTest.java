@@ -155,7 +155,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeMetadata() throws Exception {
-        DatabaseLabelPattern labelPattern = new DatabaseLabelPattern();
+        DatabaseLabelPattern labelPattern = new DatabaseLabelPattern(Globals.prefs);
         labelPattern.setDefaultValue("test");
         metaData.setLabelPattern(labelPattern);
 
@@ -168,7 +168,7 @@ public class BibtexDatabaseWriterTest {
     @Test
     public void writeMetadataAndEncoding() throws Exception {
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
-        DatabaseLabelPattern labelPattern = new DatabaseLabelPattern();
+        DatabaseLabelPattern labelPattern = new DatabaseLabelPattern(Globals.prefs);
         labelPattern.setDefaultValue("test");
         metaData.setLabelPattern(labelPattern);
 
@@ -182,7 +182,7 @@ public class BibtexDatabaseWriterTest {
     @Test
     public void writeGroups() throws Exception {
         GroupTreeNode groupRoot = GroupTreeNode.fromGroup(new AllEntriesGroup());
-        groupRoot.addSubgroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING));
+        groupRoot.addSubgroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING, Globals.prefs));
         metaData.setGroups(groupRoot);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
@@ -201,7 +201,8 @@ public class BibtexDatabaseWriterTest {
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
 
         GroupTreeNode groupRoot = GroupTreeNode.fromGroup(new AllEntriesGroup());
-        groupRoot.addChild(GroupTreeNode.fromGroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING)));
+        groupRoot.addChild(
+                GroupTreeNode.fromGroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING, Globals.prefs)));
         metaData.setGroups(groupRoot);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), preferences);
@@ -420,7 +421,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeCustomKeyPattern() throws Exception {
-        AbstractLabelPattern pattern = new DatabaseLabelPattern();
+        AbstractLabelPattern pattern = new DatabaseLabelPattern(Globals.prefs);
         pattern.setDefaultValue("test");
         pattern.addLabelPattern("article", "articleTest");
         metaData.setLabelPattern(pattern);

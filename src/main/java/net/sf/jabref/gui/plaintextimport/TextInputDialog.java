@@ -123,11 +123,13 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.FreeCiteImporter;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -467,22 +469,22 @@ public class TextInputDialog extends JDialog {
                     markedTextStore.appendPosition(fieldName, selectionStart, selectionEnd);
 
                     // get old text from BibTeX tag
-                    String old = entry.getField(fieldName);
+                    Optional<String> old = entry.getFieldOptional(fieldName);
 
                     // merge old and selected text
-                    if (old == null) {
-                        // "null"+"txt" Strings forbidden
-                        entry.setField(fieldName, txt);
-                    } else {
+                    if (old.isPresent()) {
                         // insert a new name with an additional "and"
                         if (InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.PERSON_NAMES)) {
-                            entry.setField(fieldName, old + " and " + txt);
-                        } else if ("keywords".equals(fieldName)) {
+                            entry.setField(fieldName, old.get() + " and " + txt);
+                        } else if (FieldName.KEYWORDS.equals(fieldName)) {
                             // Add keyword
-                                entry.addKeyword(txt);
+                            entry.addKeyword(txt, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                         } else {
-                            entry.setField(fieldName, old + txt);
+                            entry.setField(fieldName, old.get() + txt);
                         }
+                    } else {
+                        // "null"+"txt" Strings forbidden
+                        entry.setField(fieldName, txt);
                     }
                 }
                 // make the new data in BibTeX source code visible
@@ -537,7 +539,9 @@ public class TextInputDialog extends JDialog {
     private void updateSourceView() {
         StringWriter sw = new StringWriter(200);
         try {
-            new BibEntryWriter(new LatexFieldFormatter(), false).write(entry, sw, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+            new BibEntryWriter(new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)),
+                    false).write(entry, sw,
+                    frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
             sourcePreview.setText(sw.getBuffer().toString());
         } catch (IOException ex) {
             LOGGER.error("Error in entry" + ": " + ex.getMessage(), ex);

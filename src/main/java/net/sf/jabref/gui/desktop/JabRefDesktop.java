@@ -49,6 +49,7 @@ import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -95,15 +96,15 @@ public class JabRefDesktop {
                     fieldName = "ps";
                 }
             }
-        } else if ("doi".equals(fieldName)) {
+        } else if (FieldName.DOI.equals(fieldName)) {
             Optional<DOI> doiUrl = DOI.build(link);
             if (doiUrl.isPresent()) {
                 link = doiUrl.get().getURIAsASCIIString();
             }
             // should be opened in browser
-            fieldName = "url";
+            fieldName = FieldName.URL;
         } else if ("eprint".equals(fieldName)) {
-            fieldName = "url";
+            fieldName = FieldName.URL;
 
             // Check to see if link field already contains a well formated URL
             if (!link.startsWith("http://")) {
@@ -111,7 +112,7 @@ public class JabRefDesktop {
             }
         }
 
-        if ("url".equals(fieldName)) { // html
+        if (FieldName.URL.equals(fieldName)) { // html
             try {
                 openBrowser(link);
             } catch (IOException e) {
@@ -228,8 +229,8 @@ public class JabRefDesktop {
             // User wants to change the type of this link.
             // First get a model of all file links for this entry:
             FileListTableModel tModel = new FileListTableModel();
-            String oldValue = entry.getField(Globals.FILE_FIELD);
-            tModel.setContent(oldValue);
+            Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
+            oldValue.ifPresent(tModel::setContent);
             FileListEntry flEntry = null;
             // Then find which one we are looking at:
             for (int i = 0; i < tModel.getRowCount(); i++) {
@@ -249,8 +250,9 @@ public class JabRefDesktop {
             if (editor.okPressed()) {
                 // Store the changes and add an undo edit:
                 String newValue = tModel.getStringRepresentation();
-                UndoableFieldChange ce = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue);
-                entry.setField(Globals.FILE_FIELD, newValue);
+                UndoableFieldChange ce = new UndoableFieldChange(entry, FieldName.FILE, oldValue.orElse(null),
+                        newValue);
+                entry.setField(FieldName.FILE, newValue);
                 frame.getCurrentBasePanel().getUndoManager().addEdit(ce);
                 frame.getCurrentBasePanel().markBaseChanged();
                 // Finally, open the link:
