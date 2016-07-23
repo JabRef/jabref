@@ -9,6 +9,7 @@ public class TestEntry {
     public static BibEntry getTestEntry() {
 
         BibEntry entry = new BibEntry(IdGenerator.next(), "article");
+        entry.setCiteKey("Smith2016");
         entry.setField(FieldName.AUTHOR, "Smith, Bill and Jones, Bob and Williams, Jeff");
         entry.setField(FieldName.EDITOR, "Taylor, Phil");
         entry.setField(FieldName.TITLE, "Title of the test entry");
