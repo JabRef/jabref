@@ -2,6 +2,7 @@ package net.sf.jabref.logic.formatter;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
@@ -24,6 +25,7 @@ import net.sf.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import net.sf.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import net.sf.jabref.logic.formatter.minifier.MinifyNameListFormatter;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import net.sf.jabref.logic.protectterms.ProtectTermsLoader;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.BeforeClass;
@@ -117,7 +119,7 @@ public class FormatterTest {
                 new Object[]{new NormalizeNamesFormatter()},
                 new Object[]{new NormalizePagesFormatter()},
                 new Object[]{new OrdinalsToSuperscriptFormatter()},
-                new Object[]{new ProtectTermsFormatter()},
+                new Object[]{new ProtectTermsFormatter(new ProtectTermsLoader(Collections.emptyList(), Collections.emptyList()))},
                 new Object[]{new RemoveBracesFormatter()},
                 new Object[]{new SentenceCaseFormatter()},
                 new Object[]{new TitleCaseFormatter()},

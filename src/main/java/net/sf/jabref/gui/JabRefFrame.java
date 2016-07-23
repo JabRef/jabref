@@ -1954,9 +1954,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            ProtectTermsDialog ecd = new ProtectTermsDialog(JabRefFrame.this,
-                    new ProtectTermsLoader(Collections.emptyList()));
-            ecd.setVisible(true);
+            ProtectTermsDialog protectTermsDialog = new ProtectTermsDialog(JabRefFrame.this,
+                    new ProtectTermsLoader(Globals.prefs.getStringList(JabRefPreferences.ENABLED_PROTECTED_TERMS),
+                            Globals.prefs.getStringList(JabRefPreferences.DISABLED_PROTECTED_TERMS)));
+            protectTermsDialog.setVisible(true);
         }
     }
     private class DatabasePropertiesAction extends MnemonicAwareAction {

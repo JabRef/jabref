@@ -1,5 +1,9 @@
 package net.sf.jabref.logic.formatter.casechanger;
 
+import java.util.Collections;
+
+import net.sf.jabref.logic.protectterms.ProtectTermsLoader;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -15,7 +19,7 @@ public class ProtectTermsFormatterTest {
 
     @Before
     public void setUp() {
-        formatter = new ProtectTermsFormatter();
+        formatter = new ProtectTermsFormatter(new ProtectTermsLoader(Collections.emptyList(), Collections.emptyList()));
     }
 
     @Test

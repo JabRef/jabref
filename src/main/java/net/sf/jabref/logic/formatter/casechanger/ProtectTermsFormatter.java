@@ -20,10 +20,17 @@ import java.util.Objects;
 
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.protectterms.ProtectTermsLists;
+import net.sf.jabref.logic.protectterms.ProtectTermsLoader;
 import net.sf.jabref.logic.util.strings.StringLengthComparator;
 
 public class ProtectTermsFormatter implements Formatter {
+
+    private final ProtectTermsLoader protectTermsLoader;
+
+
+    public ProtectTermsFormatter(ProtectTermsLoader protectTermsLoader) {
+        this.protectTermsLoader = protectTermsLoader;
+    }
 
     private String format(String text, List<String> listOfWords) {
         String result = text;
@@ -43,7 +50,7 @@ public class ProtectTermsFormatter implements Formatter {
         if (text.isEmpty()) {
             return text;
         }
-        return this.format(text, ProtectTermsLists.getAll());
+        return this.format(text, protectTermsLoader.getProtectedTerms());
     }
 
     @Override

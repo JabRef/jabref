@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
-import joptsimple.internal.Strings;
 
 public class ProtectTermsList implements Comparable<ProtectTermsList> {
 
@@ -41,7 +40,7 @@ public class ProtectTermsList implements Comparable<ProtectTermsList> {
     }
 
     public String getTermListing() {
-        return Strings.join(termsList, "\n");
+        return String.join("\n", termsList);
     }
 
     public void ensureUpToDate() throws IOException {

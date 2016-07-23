@@ -991,24 +991,20 @@ public class ProtectTermsLists {
         // Only static methods
     }
 
-    /* Return terms from all internal lists concatenated
-     */
-    public static List<String> getAll() {
-        List<String> result = new ArrayList<>();
-        for (ProtectTermsList termsList : getAllLists()) {
-            result.addAll(termsList.getTermList());
-        }
-        return result;
-    }
-
     public static List<ProtectTermsList> getAllLists() {
         List<ProtectTermsList> allLists = new ArrayList<>();
-        allLists.add(new ProtectTermsList(Localization.lang("Countries and territories in English"),
-                Arrays.asList(wordListCountries), Localization.lang("Internal list"), true));
-        allLists.add(new ProtectTermsList(Localization.lang("Electrical engineering terms"),
-                Arrays.asList(wordListIEEEXplore), Localization.lang("Internal list"), true));
-        allLists.add(new ProtectTermsList(Localization.lang("Months and weekdays in English"),
-                Arrays.asList(wordListDayMonth), Localization.lang("Internal list"), true));
+        ProtectTermsList countriesList = new ProtectTermsList(Localization.lang("Countries and territories in English"),
+                Arrays.asList(wordListCountries), Localization.lang("Internal list"), true);
+        countriesList.setEnabled(true);
+        allLists.add(countriesList);
+        ProtectTermsList ieeeList = new ProtectTermsList(Localization.lang("Electrical engineering terms"),
+                Arrays.asList(wordListIEEEXplore), Localization.lang("Internal list"), true);
+        ieeeList.setEnabled(true);
+        allLists.add(ieeeList);
+        ProtectTermsList monthDayList = new ProtectTermsList(Localization.lang("Months and weekdays in English"),
+                Arrays.asList(wordListDayMonth), Localization.lang("Internal list"), true);
+        monthDayList.setEnabled(true);
+        allLists.add(monthDayList);
         return allLists;
     }
 }

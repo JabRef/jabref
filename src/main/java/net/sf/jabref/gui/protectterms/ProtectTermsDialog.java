@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
+/*  Copyright (C) 2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -22,7 +22,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -32,6 +34,7 @@ import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.InputMap;
 import javax.swing.JButton;
+import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JMenuItem;
@@ -95,6 +98,7 @@ public class ProtectTermsDialog {
     private final JMenuItem show = new JMenuItem(Localization.lang("View"));
     private final JMenuItem remove = new JMenuItem(Localization.lang("Remove"));
     private final JMenuItem reload = new JMenuItem(Localization.lang("Reload"));
+    private final JMenuItem enabled = new JCheckBoxMenuItem(Localization.lang("Enabled"));
     private final JButton addButton = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
     private final JButton removeButton = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
     private ActionListener removeAction;
@@ -120,8 +124,8 @@ public class ProtectTermsDialog {
         addButton.addActionListener(actionEvent -> {
             AddFileDialog addDialog = new AddFileDialog();
             addDialog.setVisible(true);
-            addDialog.getFileName().ifPresent(loader::addFromFile);
-            updateStyles();
+            addDialog.getFileName().ifPresent(fileName -> loader.addFromFile(fileName, true));
+            updateTermLists();
         });
         addButton.setToolTipText(Localization.lang("Add term file"));
 
@@ -130,19 +134,17 @@ public class ProtectTermsDialog {
 
 
         setupTable();
-        updateStyles();
+        updateTermLists();
 
         // Build dialog
         diag = new JDialog(frame, Localization.lang("Manage term files"), true);
 
         FormBuilder builder = FormBuilder.create();
         builder.layout(new FormLayout("fill:pref:grow, 4dlu, left:pref, 4dlu, left:pref",
-                "pref, 4dlu, 100dlu:grow, 4dlu, pref, 4dlu, fill:100dlu"));
-        builder.add(Localization.lang("Select one of the available styles or add a style file from disk.")).xyw(1, 1,
-                5);
-        builder.add(new JScrollPane(table)).xyw(1, 3, 5);
-        builder.add(addButton).xy(3, 5);
-        builder.add(removeButton).xy(5, 5);
+                "100dlu:grow, 4dlu, pref"));
+        builder.add(new JScrollPane(table)).xyw(1, 1, 5);
+        builder.add(addButton).xy(3, 3);
+        builder.add(removeButton).xy(5, 3);
         builder.padding("5dlu, 5dlu, 5dlu, 5dlu");
 
         diag.add(builder.getPanel(), BorderLayout.CENTER);
@@ -151,12 +153,7 @@ public class ProtectTermsDialog {
 
             @Override
             public void actionPerformed(ActionEvent event) {
-                if ((table.getRowCount() == 0) || (table.getSelectedRowCount() == 0)) {
-                    JOptionPane.showMessageDialog(diag, Localization.lang("You must select a valid style file."),
-                            Localization.lang("Style selection"), JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                okPressed = true;
+                storePreferences();
                 diag.dispose();
             }
         };
@@ -188,8 +185,8 @@ public class ProtectTermsDialog {
 
         diag.pack();
 
-        PositionWindow pw = new PositionWindow(diag, JabRefPreferences.STYLES_POS_X, JabRefPreferences.STYLES_POS_Y,
-                JabRefPreferences.STYLES_SIZE_X, JabRefPreferences.STYLES_SIZE_Y);
+        PositionWindow pw = new PositionWindow(diag, JabRefPreferences.TERMS_POS_X, JabRefPreferences.TERMS_POS_Y,
+                JabRefPreferences.TERMS_SIZE_X, JabRefPreferences.TERMS_SIZE_Y);
         pw.setWindowPosition();
     }
 
@@ -223,6 +220,14 @@ public class ProtectTermsDialog {
                     tablePopup(mouseEvent);
                 }
             }
+
+            @Override
+            public void mouseClicked(MouseEvent mouseEvent) {
+                if (mouseEvent.getClickCount() == 2) {
+                    getSelectedTermsList().ifPresent(list -> list.setEnabled(!list.isEnabled()));
+                    updateTermLists();
+                }
+            }
         });
 
         selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
@@ -233,16 +238,18 @@ public class ProtectTermsDialog {
         popup.add(show);
         popup.add(remove);
         popup.add(reload);
+        popup.addSeparator();
+        popup.add(enabled);
 
         // Add action listener to "Edit" menu item, which is supposed to open the style file in an external editor:
         edit.addActionListener(actionEvent -> getSelectedTermsList().ifPresent(term -> {
             Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("txt");
-            String link = term.getLocation();
+            String fileName = term.getLocation();
             try {
                 if (type.isPresent()) {
-                    JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), link, type);
+                    JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), fileName, type);
                 } else {
-                    JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new BibDatabaseContext(), link,
+                    JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new BibDatabaseContext(), fileName,
                             new UnknownExternalFileType("txt"));
                 }
             } catch (IOException e) {
@@ -263,7 +270,7 @@ public class ProtectTermsDialog {
                 if (!loader.removeTermList(list)) {
                     LOGGER.info("Problem removing term list");
                 }
-                updateStyles();
+                updateTermLists();
             }
         });
         // Add it to the remove menu item
@@ -278,6 +285,11 @@ public class ProtectTermsDialog {
             }
         }));
 
+        enabled.addActionListener(actionEvent -> getSelectedTermsList().ifPresent(list -> {
+            list.setEnabled(enabled.isSelected());
+            updateTermLists();
+        }));
+
     }
 
     public void setVisible(boolean visible) {
@@ -289,7 +301,7 @@ public class ProtectTermsDialog {
      * Read all style files or directories of style files indicated by the current
      * settings, and add the styles to the list of styles.
      */
-    private void updateStyles() {
+    private void updateTermLists() {
 
         table.clearSelection();
         termList.getReadWriteLock().writeLock().lock();
@@ -399,6 +411,7 @@ public class ProtectTermsDialog {
                     reload.setEnabled(true);
                     removeButton.setEnabled(true);
                 }
+                enabled.setSelected(list.isEnabled());
             }
         }
     }
@@ -464,5 +477,21 @@ public class ProtectTermsDialog {
             return Optional.empty();
         }
 
+    }
+
+
+    private void storePreferences() {
+        List<String> enabledList = new ArrayList<>();
+        List<String> disabledList = new ArrayList<>();
+
+        for (ProtectTermsList list : loader.getTermsLists()) {
+            if (list.isEnabled()) {
+                enabledList.add(list.getLocation());
+            } else {
+                disabledList.add(list.getLocation());
+            }
+        }
+        Globals.prefs.putStringList(JabRefPreferences.ENABLED_PROTECTED_TERMS, enabledList);
+        Globals.prefs.putStringList(JabRefPreferences.DISABLED_PROTECTED_TERMS, disabledList);
     }
 }

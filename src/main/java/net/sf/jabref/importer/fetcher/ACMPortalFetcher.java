@@ -64,7 +64,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     private static final Log LOGGER = LogFactory.getLog(ACMPortalFetcher.class);
 
     private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
-    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
+    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter(Globals.protectTermsLoader);
     private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
     private String terms;
 

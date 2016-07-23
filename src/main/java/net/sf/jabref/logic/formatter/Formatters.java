@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
@@ -54,7 +55,7 @@ public class Formatters {
     public static final List<Formatter> CASE_CHANGERS = Arrays.asList(
             new CapitalizeFormatter(),
             new LowerCaseFormatter(),
-            new ProtectTermsFormatter(),
+            new ProtectTermsFormatter(Globals.protectTermsLoader),
             new SentenceCaseFormatter(),
             new TitleCaseFormatter(),
             new UpperCaseFormatter()

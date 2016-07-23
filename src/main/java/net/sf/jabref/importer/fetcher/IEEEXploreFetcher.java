@@ -79,7 +79,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private static final Pattern SUPER_DETECTION_2 = Pattern.compile("\\(sup\\)([^(]+)\\(/sup\\)");
     private static final String SUPER_TEXT_RESULT = "\\\\textsuperscript\\{$1\\}";
 
-    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
+    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter(Globals.protectTermsLoader);
     private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
     private final HtmlToLatexFormatter htmlToLatexFormatter = new HtmlToLatexFormatter();
     private final JCheckBox absCheckBox = new JCheckBox(Localization.lang("Include abstracts"), false);

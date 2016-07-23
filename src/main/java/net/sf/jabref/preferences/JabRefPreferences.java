@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefException;
 import net.sf.jabref.JabRefMain;
 import net.sf.jabref.external.DroppedFileHandler;
@@ -174,6 +175,10 @@ public class JabRefPreferences {
     public static final String PREAMBLE_SIZE_X = "preambleSizeX";
     public static final String PREAMBLE_POS_Y = "preamblePosY";
     public static final String PREAMBLE_POS_X = "preamblePosX";
+    public static final String TERMS_SIZE_Y = "termsSizeY";
+    public static final String TERMS_SIZE_X = "termsSizeX";
+    public static final String TERMS_POS_Y = "termsPosY";
+    public static final String TERMS_POS_X = "termsPosX";
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
     public static final String LAST_FOCUSED = "lastFocused";
@@ -338,6 +343,9 @@ public class JabRefPreferences {
     public static final String USE_CASE_KEEPER_ON_SEARCH = "useCaseKeeperOnSearch";
     public static final String USE_IEEE_ABRV = "useIEEEAbrv";
 
+    public static final String ENABLED_PROTECTED_TERMS = "enabledProtectedTerms";
+    public static final String DISABLED_PROTECTED_TERMS = "disabledProtectedTerms";
+
     public static final String AKS_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP_DOI = "CleanUpDOI";
     public static final String CLEANUP_ISSN = "CleanUpISSN";
@@ -360,7 +368,8 @@ public class JabRefPreferences {
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.PAGES, new NormalizePagesFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.DATE, new NormalizeDateFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.MONTH, new NormalizeMonthFormatter()));
-        activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new ProtectTermsFormatter()));
+        activeFormatterCleanups
+                .add(new FieldFormatterCleanup(FieldName.TITLE, new ProtectTermsFormatter(Globals.protectTermsLoader)));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new UnitsToLatexFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new LatexCleanupFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new HtmlToLatexFormatter()));
@@ -591,6 +600,10 @@ public class JabRefPreferences {
         defaults.put(PREAMBLE_POS_Y, 0);
         defaults.put(PREAMBLE_SIZE_X, 600);
         defaults.put(PREAMBLE_SIZE_Y, 400);
+        defaults.put(TERMS_POS_X, 0);
+        defaults.put(TERMS_POS_Y, 0);
+        defaults.put(TERMS_SIZE_X, 500);
+        defaults.put(TERMS_SIZE_Y, 500);
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
         defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
@@ -669,6 +682,9 @@ public class JabRefPreferences {
 
         defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
         defaults.put(LIST_OF_FILE_COLUMNS, "");
+
+        defaults.put(ENABLED_PROTECTED_TERMS, "");
+        defaults.put(DISABLED_PROTECTED_TERMS, "");
 
         // OpenOffice/LibreOffice
         if (OS.WINDOWS) {

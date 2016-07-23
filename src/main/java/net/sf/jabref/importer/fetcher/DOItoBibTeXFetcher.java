@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
 public class DOItoBibTeXFetcher implements EntryFetcher {
     private static final Log LOGGER = LogFactory.getLog(DOItoBibTeXFetcher.class);
 
-    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
+    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter(Globals.protectTermsLoader);
     private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
 
     @Override

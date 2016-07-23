@@ -96,7 +96,9 @@ public class ProtectTermsParser {
         this.terms.add(line);
     }
 
-    public ProtectTermsList getProtectTermsList() {
-        return new ProtectTermsList(description, terms, location);
+    public ProtectTermsList getProtectTermsList(boolean enabled) {
+        ProtectTermsList termList = new ProtectTermsList(description, terms, location);
+        termList.setEnabled(enabled);
+        return termList;
     }
 }

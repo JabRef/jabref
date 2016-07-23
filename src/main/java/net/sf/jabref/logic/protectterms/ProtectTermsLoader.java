@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -32,19 +32,31 @@ public class ProtectTermsLoader {
     private final List<ProtectTermsList> mainList = new ArrayList<>();
 
 
-    public ProtectTermsLoader(List<String> externalTermLists) {
-        update(externalTermLists);
+    public ProtectTermsLoader(List<String> enabledExternalTermLists, List<String> disabledExternalTermLists) {
+        update(enabledExternalTermLists, disabledExternalTermLists);
     }
 
-    public void update(List<String> externalTermLists) {
+    public void update(List<String> enabledExternalTermLists, List<String> disabledExternalTermLists) {
+        mainList.clear();
+
         // Read builtin list
         mainList.addAll(ProtectTermsLists.getAllLists());
 
         // Read external lists
-        if (!(externalTermLists.isEmpty())) {
-            for (String filename : externalTermLists) {
+        if (!(enabledExternalTermLists.isEmpty())) {
+            for (String filename : enabledExternalTermLists) {
                 try {
-                    mainList.add(readTermsFromFile(new File(filename)));
+                    mainList.add(readTermsFromFile(new File(filename), true));
+                } catch (FileNotFoundException e) {
+                    // The file couldn't be found... should we tell anyone?
+                    LOGGER.info("Cannot find term list file " + filename, e);
+                }
+            }
+        }
+        if (!(disabledExternalTermLists.isEmpty())) {
+            for (String filename : disabledExternalTermLists) {
+                try {
+                    mainList.add(readTermsFromFile(new File(filename), false));
                 } catch (FileNotFoundException e) {
                     // The file couldn't be found... should we tell anyone?
                     LOGGER.info("Cannot find term list file " + filename, e);
@@ -67,27 +79,28 @@ public class ProtectTermsLoader {
         return result;
     }
 
-    public void addFromFile(String filename) {
+    public void addFromFile(String fileName, boolean enabled) {
         try {
-            mainList.add(readTermsFromFile(new File(filename)));
+            mainList.add(readTermsFromFile(new File(fileName), enabled));
         } catch (FileNotFoundException e) {
             // The file couldn't be found... should we tell anyone?
-            LOGGER.info("Cannot find term list file " + filename, e);
+            LOGGER.info("Cannot find term list file " + fileName, e);
         }
     }
 
-    public static ProtectTermsList readTermsFromFile(File file) throws FileNotFoundException {
+    public static ProtectTermsList readTermsFromFile(File file, boolean enabled) throws FileNotFoundException {
         LOGGER.debug("Reading term list from file " + file);
         ProtectTermsParser parser = new ProtectTermsParser();
         parser.readTermsFromFile(Objects.requireNonNull(file));
-        return parser.getProtectTermsList();
+        return parser.getProtectTermsList(enabled);
     }
 
-    public static ProtectTermsList readTermsFromFile(File file, Charset encoding) throws FileNotFoundException {
+    public static ProtectTermsList readTermsFromFile(File file, Charset encoding, boolean enabled)
+            throws FileNotFoundException {
         LOGGER.debug("Reading term list from file " + file);
         ProtectTermsParser parser = new ProtectTermsParser();
         parser.readTermsFromFile(Objects.requireNonNull(file), Objects.requireNonNull(encoding));
-        return parser.getProtectTermsList();
+        return parser.getProtectTermsList(enabled);
     }
 
     public boolean removeTermList(ProtectTermsList termList) {
