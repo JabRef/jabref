@@ -76,6 +76,8 @@ public class ProtectTermsLoader {
                 result.addAll(list.getTermList());
             }
         }
+        result.sort(null);
+
         return result;
     }
 

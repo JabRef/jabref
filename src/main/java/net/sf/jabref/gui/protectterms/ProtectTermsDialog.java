@@ -81,7 +81,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * This class produces a dialog box for choosing a style file.
+ * This class produces a dialog box for managing term list files.
  */
 public class ProtectTermsDialog {
 
@@ -127,10 +127,10 @@ public class ProtectTermsDialog {
             addDialog.getFileName().ifPresent(fileName -> loader.addFromFile(fileName, true));
             updateTermLists();
         });
-        addButton.setToolTipText(Localization.lang("Add term file"));
+        addButton.setToolTipText(Localization.lang("Add protected terms file"));
 
         removeButton.addActionListener(removeAction);
-        removeButton.setToolTipText(Localization.lang("Remove term file"));
+        removeButton.setToolTipText(Localization.lang("Remove protected terms file"));
 
 
         setupTable();
@@ -153,6 +153,7 @@ public class ProtectTermsDialog {
 
             @Override
             public void actionPerformed(ActionEvent event) {
+                // Write changes to preferences
                 storePreferences();
                 diag.dispose();
             }
@@ -163,6 +164,9 @@ public class ProtectTermsDialog {
 
             @Override
             public void actionPerformed(ActionEvent event) {
+                // Restore from preferences
+                loader.update(Globals.prefs.getStringList(JabRefPreferences.ENABLED_PROTECTED_TERMS),
+                        Globals.prefs.getStringList(JabRefPreferences.DISABLED_PROTECTED_TERMS));
                 diag.dispose();
             }
         };
@@ -192,17 +196,17 @@ public class ProtectTermsDialog {
 
     private void setupTable() {
         termList = new BasicEventList<>();
-        EventList<ProtectTermsList> sortedStyles = new SortedList<>(termList);
+        EventList<ProtectTermsList> sortedTermLists = new SortedList<>(termList);
 
         tableModel = (DefaultEventTableModel<ProtectTermsList>) GlazedListsSwing
-                .eventTableModelWithThreadProxyList(sortedStyles, new TermTableFormat());
+                .eventTableModelWithThreadProxyList(sortedTermLists, new TermTableFormat());
         table = new JTable(tableModel);
         TableColumnModel cm = table.getColumnModel();
         cm.getColumn(0).setPreferredWidth(50);
         cm.getColumn(1).setPreferredWidth(100);
         cm.getColumn(0).setPreferredWidth(100);
         selectionModel = (DefaultEventSelectionModel<ProtectTermsList>) GlazedListsSwing
-                .eventSelectionModelWithThreadProxyList(sortedStyles);
+                .eventSelectionModelWithThreadProxyList(sortedTermLists);
         table.setSelectionModel(selectionModel);
         table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.addMouseListener(new MouseAdapter() {
@@ -241,7 +245,7 @@ public class ProtectTermsDialog {
         popup.addSeparator();
         popup.add(enabled);
 
-        // Add action listener to "Edit" menu item, which is supposed to open the style file in an external editor:
+        // Add action listener to "Edit" menu item, which is supposed to open the term file in an external editor:
         edit.addActionListener(actionEvent -> getSelectedTermsList().ifPresent(term -> {
             Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("txt");
             String fileName = term.getLocation();
@@ -257,18 +261,18 @@ public class ProtectTermsDialog {
             }
         }));
 
-        // Add action listener to "Show" menu item, which is supposed to open the style file in a dialog:
-        show.addActionListener(actionEvent -> getSelectedTermsList().ifPresent(this::displayStyle));
+        // Add action listener to "Show" menu item, which is supposed to open the term file in a dialog:
+        show.addActionListener(actionEvent -> getSelectedTermsList().ifPresent(this::displayTerms));
 
-        // Create action listener for removing a style, also used for the remove button
+        // Create action listener for removing a term file, also used for the remove button
         removeAction = actionEvent -> getSelectedTermsList().ifPresent(list -> {
 
             if (!list.isInternalList() && (JOptionPane.showConfirmDialog(diag,
-                    Localization.lang("Are you sure you want to remove the term list?"),
-                    Localization.lang("Remove term list"),
+                    Localization.lang("Are you sure you want to remove the protected terms file?"),
+                    Localization.lang("Remove protected terms file"),
                     JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)) {
                 if (!loader.removeTermList(list)) {
-                    LOGGER.info("Problem removing term list");
+                    LOGGER.info("Problem removing protected terms file");
                 }
                 updateTermLists();
             }
@@ -276,7 +280,7 @@ public class ProtectTermsDialog {
         // Add it to the remove menu item
         remove.addActionListener(removeAction);
 
-        // Add action listener to the "Reload" menu item, which is supposed to reload an external style file
+        // Add action listener to the "Reload" menu item, which is supposed to reload an external term file
         reload.addActionListener(actionEvent -> getSelectedTermsList().ifPresent(list -> {
             try {
                 list.ensureUpToDate();
@@ -298,8 +302,7 @@ public class ProtectTermsDialog {
     }
 
     /**
-     * Read all style files or directories of style files indicated by the current
-     * settings, and add the styles to the list of styles.
+     * Read all term files and add the files to the list.
      */
     private void updateTermLists() {
 
@@ -312,8 +315,8 @@ public class ProtectTermsDialog {
 
 
     /**
-     * Get the currently selected style.
-     * @return the selected style, or empty if no style is selected.
+     * Get the currently selected term list.
+     * @return the selected term list, or empty if no term list is selected.
      */
     private Optional<ProtectTermsList> getSelectedTermsList() {
         if (!selectionModel.getSelected().isEmpty()) {
@@ -367,11 +370,11 @@ public class ProtectTermsDialog {
         popup.show(e.getComponent(), e.getX(), e.getY());
     }
 
-    private void displayStyle(ProtectTermsList style) {
+    private void displayTerms(ProtectTermsList list) {
         // Make a dialog box to display the contents:
-        final JDialog dd = new JDialog(diag, style.getDescription(), true);
+        final JDialog dd = new JDialog(diag, list.getDescription(), true);
 
-        JTextArea ta = new JTextArea(style.getTermListing());
+        JTextArea ta = new JTextArea(list.getTermListing());
         ta.setEditable(false);
         JScrollPane sp = new JScrollPane(ta);
         sp.setPreferredSize(new Dimension(700, 500));
@@ -423,7 +426,7 @@ public class ProtectTermsDialog {
 
 
         public AddFileDialog() {
-            super(diag, Localization.lang("Add protected term file"), true);
+            super(diag, Localization.lang("Add protected terms file"), true);
 
             JButton browse = new JButton(Localization.lang("Browse"));
             browse.addActionListener(BrowseAction.buildForFile(newFile, null, Collections.singletonList(".txt")));
