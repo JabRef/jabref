@@ -14,17 +14,19 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-package net.sf.jabref.logic.formatter.casechanger;
+package net.sf.jabref.logic.protectterms;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.sf.jabref.logic.l10n.Localization;
+
 /**
  * Container class for lists with keywords where the case should be kept independent of bibstyle
  *
  */
-public class CaseKeeperList {
+public class ProtectTermsLists {
 
 
     // @formatter:off
@@ -984,37 +986,29 @@ public class CaseKeeperList {
             "North America"
     };
 
-    // List of all keyword lists
-    private static final String[][] allLists = new String[][] {
-            wordListIEEEXplore,
-            wordListDayMonth,
-            wordListCountries
-    };
 
-    private static final String[][] genericLists = new String[][] {
-            wordListDayMonth,
-            wordListCountries
-    };
-    // @formatter:on
-
-
-    private CaseKeeperList() {
+    private ProtectTermsLists() {
         // Only static methods
     }
 
-    /* Return all lists concatenated
-     * Can be done faster once deciding on Java 6.0
-     * see: http://stackoverflow.com/questions/80476/how-to-concatenate-two-arrays-in-java
+    /* Return terms from all internal lists concatenated
      */
     public static List<String> getAll() {
-        int length = 0;
-        for (String[] array : allLists) {
-            length += array.length;
-        }
-        List<String> result = new ArrayList<>(length);
-        for (String[] array : allLists) {
-            result.addAll(Arrays.asList(array));
+        List<String> result = new ArrayList<>();
+        for (ProtectTermsList termsList : getAllLists()) {
+            result.addAll(termsList.getTermList());
         }
         return result;
+    }
+
+    public static List<ProtectTermsList> getAllLists() {
+        List<ProtectTermsList> allLists = new ArrayList<>();
+        allLists.add(new ProtectTermsList(Localization.lang("Countries and territories in English"),
+                Arrays.asList(wordListCountries), Localization.lang("Internal list")));
+        allLists.add(new ProtectTermsList(Localization.lang("Electrical engineering terms"),
+                Arrays.asList(wordListIEEEXplore), Localization.lang("Internal list")));
+        allLists.add(new ProtectTermsList(Localization.lang("Months and weekdays in English"),
+                Arrays.asList(wordListDayMonth), Localization.lang("Internal list")));
+        return allLists;
     }
 }

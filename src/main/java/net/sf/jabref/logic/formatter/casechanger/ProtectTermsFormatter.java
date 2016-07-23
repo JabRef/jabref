@@ -20,6 +20,7 @@ import java.util.Objects;
 
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.protectterms.ProtectTermsLists;
 import net.sf.jabref.logic.util.strings.StringLengthComparator;
 
 public class ProtectTermsFormatter implements Formatter {
@@ -42,7 +43,7 @@ public class ProtectTermsFormatter implements Formatter {
         if (text.isEmpty()) {
             return text;
         }
-        return this.format(text, CaseKeeperList.getAll());
+        return this.format(text, ProtectTermsLists.getAll());
     }
 
     @Override
