@@ -17,6 +17,7 @@ package net.sf.jabref.logic.protectterms;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +50,7 @@ public class ProtectTermsLoader {
                     mainList.add(readTermsFromFile(new File(filename), true));
                 } catch (FileNotFoundException e) {
                     // The file couldn't be found... should we tell anyone?
-                    LOGGER.info("Cannot find term list file " + filename, e);
+                    LOGGER.info("Cannot find protected terms file " + filename, e);
                 }
             }
         }
@@ -59,12 +60,26 @@ public class ProtectTermsLoader {
                     mainList.add(readTermsFromFile(new File(filename), false));
                 } catch (FileNotFoundException e) {
                     // The file couldn't be found... should we tell anyone?
-                    LOGGER.info("Cannot find term list file " + filename, e);
+                    LOGGER.info("Cannot find protected terms file " + filename, e);
                 }
             }
         }
     }
 
+    public void reloadList(ProtectTermsList list) {
+        try {
+            ProtectTermsParser parser = new ProtectTermsParser();
+            parser.readTermsFromFile(new File(list.getLocation()));
+            ProtectTermsList newList = parser.getProtectTermsList(list.isEnabled());
+            int index = mainList.indexOf(list);
+            if (index >= 0) {
+                mainList.set(index, newList);
+            }
+        } catch (IOException e) {
+            LOGGER.warn("Problem with terms file '" + list.getLocation() + "'", e);
+        }
+
+    }
     public List<ProtectTermsList> getTermsLists() {
         return mainList;
     }
@@ -86,7 +101,7 @@ public class ProtectTermsLoader {
             mainList.add(readTermsFromFile(new File(fileName), enabled));
         } catch (FileNotFoundException e) {
             // The file couldn't be found... should we tell anyone?
-            LOGGER.info("Cannot find term list file " + fileName, e);
+            LOGGER.info("Cannot find protected terms file " + fileName, e);
         }
     }
 

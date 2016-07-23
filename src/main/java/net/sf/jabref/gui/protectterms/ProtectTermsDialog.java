@@ -281,13 +281,10 @@ public class ProtectTermsDialog {
         remove.addActionListener(removeAction);
 
         // Add action listener to the "Reload" menu item, which is supposed to reload an external term file
-        reload.addActionListener(actionEvent -> getSelectedTermsList().ifPresent(list -> {
-            try {
-                list.ensureUpToDate();
-            } catch (IOException e) {
-                LOGGER.warn("Problem with terms file '" + list.getLocation() + "'", e);
-            }
-        }));
+        reload.addActionListener(actionEvent -> {
+            getSelectedTermsList().ifPresent(loader::reloadList);
+            updateTermLists();
+        });
 
         enabled.addActionListener(actionEvent -> getSelectedTermsList().ifPresent(list -> {
             list.setEnabled(enabled.isSelected());
@@ -372,7 +369,7 @@ public class ProtectTermsDialog {
 
     private void displayTerms(ProtectTermsList list) {
         // Make a dialog box to display the contents:
-        final JDialog dd = new JDialog(diag, list.getDescription(), true);
+        final JDialog dd = new JDialog(diag, list.getDescription() + " - " + list.getLocation(), true);
 
         JTextArea ta = new JTextArea(list.getTermListing());
         ta.setEditable(false);
