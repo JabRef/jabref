@@ -1004,11 +1004,11 @@ public class ProtectTermsLists {
     public static List<ProtectTermsList> getAllLists() {
         List<ProtectTermsList> allLists = new ArrayList<>();
         allLists.add(new ProtectTermsList(Localization.lang("Countries and territories in English"),
-                Arrays.asList(wordListCountries), Localization.lang("Internal list")));
+                Arrays.asList(wordListCountries), Localization.lang("Internal list"), true));
         allLists.add(new ProtectTermsList(Localization.lang("Electrical engineering terms"),
-                Arrays.asList(wordListIEEEXplore), Localization.lang("Internal list")));
+                Arrays.asList(wordListIEEEXplore), Localization.lang("Internal list"), true));
         allLists.add(new ProtectTermsList(Localization.lang("Months and weekdays in English"),
-                Arrays.asList(wordListDayMonth), Localization.lang("Internal list")));
+                Arrays.asList(wordListDayMonth), Localization.lang("Internal list"), true));
         return allLists;
     }
 }

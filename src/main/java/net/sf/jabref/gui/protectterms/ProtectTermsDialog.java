@@ -85,7 +85,7 @@ public class ProtectTermsDialog {
     private static final Log LOGGER = LogFactory.getLog(ProtectTermsDialog.class);
 
     private final JabRefFrame frame;
-    private EventList<ProtectTermsList> styles;
+    private EventList<ProtectTermsList> termList;
     private JDialog diag;
     private JTable table;
     private DefaultEventTableModel<ProtectTermsList> tableModel;
@@ -194,15 +194,16 @@ public class ProtectTermsDialog {
     }
 
     private void setupTable() {
-        styles = new BasicEventList<>();
-        EventList<ProtectTermsList> sortedStyles = new SortedList<>(styles);
+        termList = new BasicEventList<>();
+        EventList<ProtectTermsList> sortedStyles = new SortedList<>(termList);
 
         tableModel = (DefaultEventTableModel<ProtectTermsList>) GlazedListsSwing
                 .eventTableModelWithThreadProxyList(sortedStyles, new TermTableFormat());
         table = new JTable(tableModel);
         TableColumnModel cm = table.getColumnModel();
+        cm.getColumn(0).setPreferredWidth(50);
+        cm.getColumn(1).setPreferredWidth(100);
         cm.getColumn(0).setPreferredWidth(100);
-        cm.getColumn(1).setPreferredWidth(200);
         selectionModel = (DefaultEventSelectionModel<ProtectTermsList>) GlazedListsSwing
                 .eventSelectionModelWithThreadProxyList(sortedStyles);
         table.setSelectionModel(selectionModel);
@@ -253,12 +254,13 @@ public class ProtectTermsDialog {
         show.addActionListener(actionEvent -> getSelectedTermsList().ifPresent(this::displayStyle));
 
         // Create action listener for removing a style, also used for the remove button
-        removeAction = actionEvent -> getSelectedTermsList().ifPresent(termList -> {
-            if ((JOptionPane.showConfirmDialog(diag,
+        removeAction = actionEvent -> getSelectedTermsList().ifPresent(list -> {
+
+            if (!list.isInternalList() && (JOptionPane.showConfirmDialog(diag,
                     Localization.lang("Are you sure you want to remove the term list?"),
                     Localization.lang("Remove term list"),
                     JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)) {
-                if (!loader.removeStyle(termList)) {
+                if (!loader.removeTermList(list)) {
                     LOGGER.info("Problem removing term list");
                 }
                 updateStyles();
@@ -268,11 +270,11 @@ public class ProtectTermsDialog {
         remove.addActionListener(removeAction);
 
         // Add action listener to the "Reload" menu item, which is supposed to reload an external style file
-        reload.addActionListener(actionEvent -> getSelectedTermsList().ifPresent(termList -> {
+        reload.addActionListener(actionEvent -> getSelectedTermsList().ifPresent(list -> {
             try {
-                termList.ensureUpToDate();
+                list.ensureUpToDate();
             } catch (IOException e) {
-                LOGGER.warn("Problem with terms file '" + termList.getLocation() + "'", e);
+                LOGGER.warn("Problem with terms file '" + list.getLocation() + "'", e);
             }
         }));
 
@@ -290,10 +292,10 @@ public class ProtectTermsDialog {
     private void updateStyles() {
 
         table.clearSelection();
-        styles.getReadWriteLock().writeLock().lock();
-        styles.clear();
-        styles.addAll(loader.getTermsLists());
-        styles.getReadWriteLock().writeLock().unlock();
+        termList.getReadWriteLock().writeLock().lock();
+        termList.clear();
+        termList.addAll(loader.getTermsLists());
+        termList.getReadWriteLock().writeLock().unlock();
     }
 
 
@@ -312,15 +314,17 @@ public class ProtectTermsDialog {
 
         @Override
         public int getColumnCount() {
-            return 2;
+            return 3;
         }
 
         @Override
         public String getColumnName(int i) {
             switch (i) {
             case 0:
-                return Localization.lang("Description");
+                return Localization.lang("Enabled");
             case 1:
+                return Localization.lang("Description");
+            case 2:
                 return Localization.lang("File");
             default:
                 return "";
@@ -331,8 +335,10 @@ public class ProtectTermsDialog {
         public Object getColumnValue(ProtectTermsList termList, int i) {
             switch (i) {
             case 0:
-                return termList.getDescription();
+                return termList.isEnabled() ? Localization.lang("Yes") : Localization.lang("No");
             case 1:
+                return termList.getDescription();
+            case 2:
                 return termList.getLocation();
             default:
                 return "";
@@ -374,14 +380,25 @@ public class ProtectTermsDialog {
 
     /**
      * The listener for the Glazed list monitoring the current selection.
-     * When selection changes, we need to update the preview panel.
      */
     private class EntrySelectionListener implements ListEventListener<ProtectTermsList> {
 
         @Override
         public void listChanged(ListEvent<ProtectTermsList> listEvent) {
             if (listEvent.getSourceList().size() == 1) {
-                ProtectTermsList style = listEvent.getSourceList().get(0);
+                ProtectTermsList list = listEvent.getSourceList().get(0);
+                // Enable/disable popup menu items and buttons
+                if (list.isInternalList()) {
+                    remove.setEnabled(false);
+                    edit.setEnabled(false);
+                    reload.setEnabled(false);
+                    removeButton.setEnabled(false);
+                } else {
+                    remove.setEnabled(true);
+                    edit.setEnabled(true);
+                    reload.setEnabled(true);
+                    removeButton.setEnabled(true);
+                }
             }
         }
     }
@@ -393,10 +410,10 @@ public class ProtectTermsDialog {
 
 
         public AddFileDialog() {
-            super(diag, Localization.lang("Add style file"), true);
+            super(diag, Localization.lang("Add protected term file"), true);
 
             JButton browse = new JButton(Localization.lang("Browse"));
-            browse.addActionListener(BrowseAction.buildForFile(newFile, null, Collections.singletonList(".jstyle")));
+            browse.addActionListener(BrowseAction.buildForFile(newFile, null, Collections.singletonList(".txt")));
 
             // Build content panel
             FormBuilder builder = FormBuilder.create();

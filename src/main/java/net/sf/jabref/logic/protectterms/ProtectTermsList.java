@@ -11,14 +11,20 @@ public class ProtectTermsList implements Comparable<ProtectTermsList> {
     private final String description;
     private final List<String> termsList;
     private final String location;
+    private final boolean internalList;
+    private boolean enabled;
 
 
-    public ProtectTermsList(String description, List<String> termList, String location) {
+    public ProtectTermsList(String description, List<String> termList, String location, boolean internalList) {
         this.description = Objects.requireNonNull(description);
         this.termsList = Objects.requireNonNull(termList);
         this.location = Objects.requireNonNull(location);
+        this.internalList = internalList;
     }
 
+    public ProtectTermsList(String description, List<String> termList, String location) {
+        this(description, termList, location, false);
+    }
 
     public String getDescription() {
         return description;
@@ -46,6 +52,18 @@ public class ProtectTermsList implements Comparable<ProtectTermsList> {
     @Override
     public int compareTo(ProtectTermsList otherList) {
         return this.getDescription().compareTo(otherList.getDescription());
+    }
+
+    public boolean isInternalList() {
+        return internalList;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
     }
 
 }

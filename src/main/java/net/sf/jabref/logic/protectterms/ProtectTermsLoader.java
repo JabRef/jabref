@@ -57,6 +57,16 @@ public class ProtectTermsLoader {
         return mainList;
     }
 
+    public List<String> getProtectedTerms() {
+        List<String> result = new ArrayList<>();
+        for (ProtectTermsList list : mainList) {
+            if (list.isEnabled()) {
+                result.addAll(list.getTermList());
+            }
+        }
+        return result;
+    }
+
     public void addFromFile(String filename) {
         try {
             mainList.add(readTermsFromFile(new File(filename)));
@@ -80,7 +90,7 @@ public class ProtectTermsLoader {
         return parser.getProtectTermsList();
     }
 
-    public boolean removeStyle(ProtectTermsList termList) {
+    public boolean removeTermList(ProtectTermsList termList) {
         return mainList.remove(termList);
     }
 }
