@@ -116,7 +116,7 @@ public class BibtexEntryTypes {
 
         {
             addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, FieldName.PUBLISHER, FieldName.YEAR);
-            addAllOptional(FieldName.EDITOR, FieldName.VOLUME, FieldName.NUMBER, FieldName.SERIES, FieldName.TYPE, "chapter", FieldName.PAGES, FieldName.ADDRESS, FieldName.EDITION,
+            addAllOptional(FieldName.EDITOR, FieldName.VOLUME, FieldName.NUMBER, FieldName.SERIES, FieldName.TYPE, FieldName.CHAPTER, FieldName.PAGES, FieldName.ADDRESS, FieldName.EDITION,
                     FieldName.MONTH, FieldName.NOTE);
         }
 

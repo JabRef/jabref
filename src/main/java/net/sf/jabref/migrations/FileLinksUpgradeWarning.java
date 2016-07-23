@@ -55,7 +55,7 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class FileLinksUpgradeWarning implements PostOpenAction {
 
-    private static final String[] FIELDS_TO_LOOK_FOR = new String[] {"pdf", "ps", "evastar_pdf"};
+    private static final String[] FIELDS_TO_LOOK_FOR = new String[] {FieldName.PDF, FieldName.PS, "evastar_pdf"};
 
     private boolean offerChangeSettings;
 

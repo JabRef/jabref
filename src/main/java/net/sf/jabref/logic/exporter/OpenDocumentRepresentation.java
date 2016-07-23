@@ -164,10 +164,10 @@ class OpenDocumentRepresentation {
                 addTableCell(result, row, new GetOpenOfficeType().format(e.getType()));
                 addTableCell(result, row, getField(e, FieldName.ADDRESS));
                 addTableCell(result, row, getField(e, "assignee"));
-                addTableCell(result, row, getField(e, "annote"));
+                addTableCell(result, row, getField(e, FieldName.ANNOTE));
                 addTableCell(result, row, getField(e, FieldName.AUTHOR));//new AuthorLastFirst().format(getField(e, FieldName.AUTHOR_FIELD)));
                 addTableCell(result, row, getField(e, FieldName.BOOKTITLE));
-                addTableCell(result, row, getField(e, "chapter"));
+                addTableCell(result, row, getField(e, FieldName.CHAPTER));
                 addTableCell(result, row, getField(e, "day"));
                 addTableCell(result, row, getField(e, "dayfiled"));
                 addTableCell(result, row, getField(e, FieldName.EDITION));

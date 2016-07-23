@@ -68,7 +68,7 @@ public class InternalBibtexFields {
             "ctlnames_show_etal", "ctlalt_stretch_factor");
     public static final List<String> IEEETRANBSTCTL_YES_NO_FIELDS = Arrays.asList("ctluse_article_number",
             "ctluse_paper", "ctluse_url", "ctluse_forced_etal", "ctluse_alt_spacing", "ctldash_repeated_names");
-    public static final List<String> BIBLATEX_DATE_FIELDS = Arrays.asList(FieldName.DATE, "eventdate", "origdate", "urldate");
+    public static final List<String> BIBLATEX_DATE_FIELDS = Arrays.asList(FieldName.DATE, "eventdate", "origdate", FieldName.URLDATE);
     public static final List<String> BIBLATEX_PERSON_NAME_FIELDS = Arrays.asList(FieldName.AUTHOR, FieldName.EDITOR, "editora",
             "editorb", "editorc", "translator", "annotator", "commentator", "introduction", "foreword", "afterword",
             "bookauthor", "holder", "shortauthor", "shorteditor", "sortname");
@@ -92,10 +92,10 @@ public class InternalBibtexFields {
         // An annotation. It is not used by the standard bibliography styles,
         // but may be used by others that produce an annotated bibliography.
         // http://www.ecst.csuchico.edu/~jacobsd/bib/formats/bibtex.html
-        add(new BibtexSingleField("annote", true, BibtexSingleField.LARGE_W));
+        add(new BibtexSingleField(FieldName.ANNOTE, true, BibtexSingleField.LARGE_W));
         add(new BibtexSingleField(FieldName.AUTHOR, true, BibtexSingleField.MEDIUM_W, 280));
         add(new BibtexSingleField(FieldName.BOOKTITLE, true, 175));
-        add(new BibtexSingleField("chapter", true, BibtexSingleField.SMALL_W));
+        add(new BibtexSingleField(FieldName.CHAPTER, true, BibtexSingleField.SMALL_W));
         dummy = new BibtexSingleField(FieldName.CROSSREF, true, BibtexSingleField.SMALL_W);
         dummy.setExtras(EnumSet.of(FieldProperties.CROSSREF));
         add(dummy);
@@ -111,7 +111,7 @@ public class InternalBibtexFields {
         dummy.setExtras(EnumSet.of(FieldProperties.JOURNAL_NAME));
         add(dummy);
 
-        add(new BibtexSingleField("key", true));
+        add(new BibtexSingleField(FieldName.KEY, true));
         dummy = new BibtexSingleField(FieldName.MONTH, true, BibtexSingleField.SMALL_W);
         dummy.setExtras(EnumSet.of(FieldProperties.MONTH));
         add(dummy);
@@ -120,7 +120,7 @@ public class InternalBibtexFields {
         add(new BibtexSingleField(FieldName.ORGANIZATION, true, BibtexSingleField.MEDIUM_W));
         add(new BibtexSingleField(FieldName.PAGES, true, BibtexSingleField.SMALL_W));
         add(new BibtexSingleField(FieldName.PUBLISHER, true, BibtexSingleField.MEDIUM_W));
-        add(new BibtexSingleField("school", true, BibtexSingleField.MEDIUM_W));
+        add(new BibtexSingleField(FieldName.SCHOOL, true, BibtexSingleField.MEDIUM_W));
         add(new BibtexSingleField(FieldName.SERIES, true, BibtexSingleField.SMALL_W));
         add(new BibtexSingleField(FieldName.TITLE, true, 400));
         dummy = new BibtexSingleField(FieldName.TYPE, true, BibtexSingleField.SMALL_W);
@@ -191,7 +191,7 @@ public class InternalBibtexFields {
         add(new BibtexSingleField("pmid", false, BibtexSingleField.SMALL_W, 60).setNumeric(true));
 
         // additional fields ------------------------------------------------------
-        add(new BibtexSingleField("location", false));
+        add(new BibtexSingleField(FieldName.LOCATION, false));
         add(new BibtexSingleField(FieldName.ABSTRACT, false, BibtexSingleField.LARGE_W, 400));
 
         dummy = new BibtexSingleField(FieldName.URL, false, BibtexSingleField.SMALL_W);
