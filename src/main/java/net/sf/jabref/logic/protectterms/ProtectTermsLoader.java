@@ -44,39 +44,35 @@ public class ProtectTermsLoader {
         mainList.addAll(ProtectTermsLists.getAllLists());
 
         // Read external lists
-        if (!(enabledExternalTermLists.isEmpty())) {
-            for (String filename : enabledExternalTermLists) {
-                try {
-                    mainList.add(readTermsFromFile(new File(filename), true));
-                } catch (FileNotFoundException e) {
-                    // The file couldn't be found... should we tell anyone?
-                    LOGGER.info("Cannot find protected terms file " + filename, e);
-                }
+        for (String filename : enabledExternalTermLists) {
+            try {
+                mainList.add(readTermsFromFile(new File(filename), true));
+            } catch (FileNotFoundException e) {
+                // The file couldn't be found... should we tell anyone?
+                LOGGER.info("Cannot find protected terms file " + filename, e);
             }
         }
-        if (!(disabledExternalTermLists.isEmpty())) {
-            for (String filename : disabledExternalTermLists) {
-                try {
-                    mainList.add(readTermsFromFile(new File(filename), false));
-                } catch (FileNotFoundException e) {
-                    // The file couldn't be found... should we tell anyone?
-                    LOGGER.info("Cannot find protected terms file " + filename, e);
-                }
+        for (String filename : disabledExternalTermLists) {
+            try {
+                mainList.add(readTermsFromFile(new File(filename), false));
+            } catch (FileNotFoundException e) {
+                // The file couldn't be found... should we tell anyone?
+                LOGGER.info("Cannot find protected terms file " + filename, e);
             }
         }
     }
 
     public void reloadList(ProtectTermsList list) {
         try {
-            ProtectTermsParser parser = new ProtectTermsParser();
-            parser.readTermsFromFile(new File(list.getLocation()));
-            ProtectTermsList newList = parser.getProtectTermsList(list.isEnabled());
+            ProtectTermsList newList = readTermsFromFile(new File(list.getLocation()), list.isEnabled());
             int index = mainList.indexOf(list);
             if (index >= 0) {
                 mainList.set(index, newList);
+            } else {
+                LOGGER.warn("Problem reloading protected terms file");
             }
         } catch (IOException e) {
-            LOGGER.warn("Problem with terms file '" + list.getLocation() + "'", e);
+            LOGGER.warn("Problem with protected terms file '" + list.getLocation() + "'", e);
         }
 
     }
