@@ -1349,7 +1349,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         options.add(customImpAction);
         options.add(customFileTypesAction);
         options.add(manageJournals);
-        options.add(customImpAction);
+        options.add(manageSelectors);
         options.add(protectTerms);
         options.add(selectKeys);
         mb.add(options);
