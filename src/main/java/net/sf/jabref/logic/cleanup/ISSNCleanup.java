@@ -3,6 +3,7 @@ package net.sf.jabref.logic.cleanup;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
 import net.sf.jabref.logic.util.ISSN;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;

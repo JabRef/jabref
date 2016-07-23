@@ -2,6 +2,7 @@ package net.sf.jabref.logic.integrity;
 
 import java.util.Collections;
 import java.util.List;
+
 import net.sf.jabref.logic.integrity.IntegrityCheck.Checker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.ISSN;

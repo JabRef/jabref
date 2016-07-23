@@ -19,7 +19,7 @@ public class ISSN {
     public boolean isValidFormat() {
         Matcher issnMatcher = ISSN_PATTERN.matcher(issnString);
         return (issnMatcher.matches());
-        }
+    }
 
     public boolean isCanBeCleaned() {
         Matcher issnNoDashMatcher = ISSN_PATTERN_NODASH.matcher(issnString);
