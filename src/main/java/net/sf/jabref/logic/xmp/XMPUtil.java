@@ -376,7 +376,7 @@ public class XMPUtil {
          */
         List<String> publishers = dcSchema.getPublishers();
         if ((publishers != null) && !publishers.isEmpty()) {
-            entry.setField("publishers", String.join(" and ", publishers));
+            entry.setField(FieldName.PUBLISHER, String.join(" and ", publishers));
         }
 
         /**
@@ -667,7 +667,7 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: author
              */
-            if ("author".equals(field)) {
+            if (FieldName.AUTHOR.equals(field)) {
                 String authors = resolvedEntry.getField(field);
                 AuthorList list = AuthorList.parse(authors);
 
@@ -1009,7 +1009,7 @@ public class XMPUtil {
 
             if (useXmpPrivacyFilter && filters.contains(field)) {
                 // erase field instead of adding it
-                if ("author".equals(field)) {
+                if (FieldName.AUTHOR.equals(field)) {
                     di.setAuthor(null);
                 } else if (FieldName.TITLE.equals(field)) {
                     di.setTitle(null);
@@ -1023,7 +1023,7 @@ public class XMPUtil {
                 continue;
             }
 
-            if ("author".equals(field)) {
+            if (FieldName.AUTHOR.equals(field)) {
                 di.setAuthor(resolvedEntry.getField(FieldName.AUTHOR));
             } else if (FieldName.TITLE.equals(field)) {
                 di.setTitle(resolvedEntry.getField(FieldName.TITLE));

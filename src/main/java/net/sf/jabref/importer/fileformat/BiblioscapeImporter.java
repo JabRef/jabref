@@ -160,7 +160,7 @@ public class BiblioscapeImporter extends ImportFormat {
                     } else if ("UR".equals(entry.getKey()) || "AT".equals(entry.getKey())) {
                         String s = entry.getValue().toString().trim();
                         hm.put(s.startsWith("http://") || s.startsWith("ftp://") ? FieldName.URL
-                                : "pdf", entry.getValue().toString());
+                                : FieldName.PDF, entry.getValue().toString());
                     } else if ("C1".equals(entry.getKey())) {
                         comments.add("Custom1: "
                                 + entry.getValue());
@@ -180,7 +180,7 @@ public class BiblioscapeImporter extends ImportFormat {
                         comments.add("Custom6: "
                                 + entry.getValue());
                     } else if ("DE".equals(entry.getKey())) {
-                        hm.put("annote", entry
+                        hm.put(FieldName.ANNOTE, entry
                                 .getValue().toString());
                     } else if ("CA".equals(entry.getKey())) {
                         comments.add("Categories: "
@@ -190,7 +190,7 @@ public class BiblioscapeImporter extends ImportFormat {
                                 + entry.getValue());
                     } else if ("SE".equals(entry.getKey()))
                     {
-                        hm.put("chapter", entry
+                        hm.put(FieldName.CHAPTER, entry
                                 .getValue().toString());
                         //else if (entry.getKey().equals("AC"))
                         // hm.put("",entry.getValue().toString());

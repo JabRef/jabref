@@ -73,7 +73,7 @@ public class OAI2Handler extends DefaultHandler {
         if ("error".equals(qualifiedName)) {
             throw new RuntimeException(content);
         } else if ("id".equals(qualifiedName)) {
-            entry.setField("eprint", content);
+            entry.setField(FieldName.EPRINT, content);
         } else if ("keyname".equals(qualifiedName)) {
             keyname = content;
         } else if ("forenames".equals(qualifiedName)) {

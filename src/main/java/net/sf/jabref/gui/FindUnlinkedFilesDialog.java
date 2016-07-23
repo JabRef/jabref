@@ -91,6 +91,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -997,7 +998,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                             try {
                                 JabRefDesktop.openExternalViewer(
                                         JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext(),
-                                        fnw.file.getAbsolutePath(), "pdf");
+                                        fnw.file.getAbsolutePath(), FieldName.PDF);
                             } catch (IOException e1) {
                                 LOGGER.info("Error opening file", e1);
                             }

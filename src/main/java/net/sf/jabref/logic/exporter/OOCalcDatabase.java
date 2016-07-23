@@ -170,7 +170,7 @@ class OOCalcDatabase {
                 addTableCell(result, row, getField(e, FieldName.NOTE));
                 addTableCell(result, row, getField(e, FieldName.URL));
                 addTableCell(result, row, getField(e, FieldName.BOOKTITLE));
-                addTableCell(result, row, getField(e, "chapter"));
+                addTableCell(result, row, getField(e, FieldName.CHAPTER));
                 addTableCell(result, row, getField(e, FieldName.EDITION));
                 addTableCell(result, row, getField(e, FieldName.SERIES));
                 addTableCell(result, row, getField(e, FieldName.EDITOR));//new AuthorLastFirst().format(getField(e, FieldName.EDITOR_FIELD)));
@@ -180,7 +180,7 @@ class OOCalcDatabase {
                 addTableCell(result, row, getField(e, FieldName.INSTITUTION));
                 addTableCell(result, row, getField(e, FieldName.ORGANIZATION));
                 addTableCell(result, row, getField(e, FieldName.SCHOOL));
-                addTableCell(result, row, getField(e, "annote"));
+                addTableCell(result, row, getField(e, FieldName.ANNOTE));
                 addTableCell(result, row, getField(e, "assignee"));
                 addTableCell(result, row, getField(e, "day"));
                 addTableCell(result, row, getField(e, "dayfiled"));
