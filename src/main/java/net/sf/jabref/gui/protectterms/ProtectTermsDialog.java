@@ -137,7 +137,7 @@ public class ProtectTermsDialog {
         updateTermLists();
 
         // Build dialog
-        diag = new JDialog(frame, Localization.lang("Manage term files"), true);
+        diag = new JDialog(frame, Localization.lang("Manage protected terms files"), true);
 
         FormBuilder builder = FormBuilder.create();
         builder.layout(new FormLayout("fill:pref:grow, 4dlu, left:pref, 4dlu, left:pref",
