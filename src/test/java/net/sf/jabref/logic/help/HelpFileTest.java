@@ -26,7 +26,7 @@ import org.junit.Test;
 import static junit.framework.TestCase.assertEquals;
 
 public class HelpFileTest {
-    private final String jabrefHelp = "http://help.jabref.org/en/";
+    private final String jabrefHelp = "https://help.jabref.org/en/";
     @Test
     public void referToValidPage() throws IOException {
         for (HelpFile help : HelpFile.values()) {
