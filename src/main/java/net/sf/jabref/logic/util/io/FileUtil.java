@@ -319,7 +319,7 @@ public class FileUtil {
     }
 
     public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries,
-            Collection<String> extensions, Collection<File> directories, JabRefPreferences prefs) {
+            Collection<String> extensions, Collection<File> directories, boolean autolinkExactKeyOnly) {
         Map<BibEntry, List<File>> result = new HashMap<>();
 
         // First scan directories
@@ -330,7 +330,6 @@ public class FileUtil {
             result.put(entry, new ArrayList<>());
         }
 
-        boolean exactOnly = prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
         // Now look for keys
         nextFile: for (File file : filesWithExtension) {
 
@@ -346,7 +345,7 @@ public class FileUtil {
             }
             // If we get here, we didn't find any exact matches. If non-exact
             // matches are allowed, try to find one:
-            if (!exactOnly) {
+            if (!autolinkExactKeyOnly) {
                 for (BibEntry entry : entries) {
                     String citeKey = entry.getCiteKey();
                     if ((citeKey != null) && !citeKey.isEmpty() && name.startsWith(citeKey)) {
