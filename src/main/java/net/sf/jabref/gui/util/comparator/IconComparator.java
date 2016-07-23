@@ -17,6 +17,7 @@ package net.sf.jabref.gui.util.comparator;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -36,20 +37,20 @@ public class IconComparator implements Comparator<BibEntry> {
     public int compare(BibEntry e1, BibEntry e2) {
 
         for (String field : fields) {
-            String val1 = e1.getField(field);
-            String val2 = e2.getField(field);
-            if (val1 == null) {
-                if (val2 != null) {
+            Optional<String> val1 = e1.getFieldOptional(field);
+            Optional<String> val2 = e2.getFieldOptional(field);
+            if (!val1.isPresent()) {
+                if (val2.isPresent()) {
                     return 1;
                 } else {
                     // continue loop and check for next field
                 }
             } else {
-                if (val2 == null) {
+                if (!val2.isPresent()) {
                     return -1;
                 } else {
                     // val1 is not null AND val2 is not null
-                    int compareToRes = val1.compareTo(val2);
+                    int compareToRes = val1.get().compareTo(val2.get());
                     if (compareToRes != 0) {
                         return compareToRes;
                     } else {
