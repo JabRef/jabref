@@ -195,11 +195,11 @@ public class FieldExtraComponents {
             if (doi.isPresent()) {
                 entryEditor.getEntry().setField(FieldName.DOI, doi.get().getDOI());
             } else {
-                panel.frame().setStatus(Localization.lang("No DOI found"));
+                panel.frame().setStatus(Localization.lang("No %0 found", "DOI"));
             }
         });
         // fetch bibtex data
-        JButton fetchButton = new JButton(Localization.lang("Get BibTeX data from DOI"));
+        JButton fetchButton = new JButton(Localization.lang("Get BibTeX data from %0", "DOI"));
         fetchButton.setEnabled(false);
         fetchButton.addActionListener(actionEvent -> {
             BibEntry entry = entryEditor.getEntry();
@@ -213,7 +213,7 @@ public class FieldExtraComponents {
                             .setStatus(Localization.lang("Cannot get info based on given %0:_%1", "DOI", doi.get()));
                 }
             } else {
-                panel.frame().setStatus(Localization.lang("No DOI found"));
+                panel.frame().setStatus(Localization.lang("No %0 found", "DOI"));
             }
         });
 
@@ -265,7 +265,7 @@ public class FieldExtraComponents {
     public static Optional<JComponent> getIsbnExtraComponent(BasePanel panel, EntryEditor entryEditor,
             FieldEditor fieldEditor) {
         // fetch bibtex data
-        JButton fetchButton = new JButton(Localization.lang("Get BibTeX data from ISBN"));
+        JButton fetchButton = new JButton(Localization.lang("Get BibTeX data from %0", "ISBN"));
         fetchButton.setEnabled(false);
         fetchButton.addActionListener(actionEvent -> {
             BibEntry entry = entryEditor.getEntry();
@@ -279,7 +279,7 @@ public class FieldExtraComponents {
                             .setStatus(Localization.lang("Cannot get info based on given %0:_%1", "ISBN", isbn.get()));
                 }
             } else {
-                panel.frame().setStatus(Localization.lang("No ISBN found"));
+                panel.frame().setStatus(Localization.lang("No %0 found", "ISBN"));
             }
         });
 
