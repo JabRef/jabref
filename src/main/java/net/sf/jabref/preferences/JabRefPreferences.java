@@ -66,11 +66,12 @@ import net.sf.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
-import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import net.sf.jabref.logic.formatter.casechanger.ProtectedTermsFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.VersionPreferences;
@@ -343,8 +344,10 @@ public class JabRefPreferences {
     public static final String USE_CASE_KEEPER_ON_SEARCH = "useCaseKeeperOnSearch";
     public static final String USE_IEEE_ABRV = "useIEEEAbrv";
 
-    public static final String ENABLED_PROTECTED_TERMS = "enabledProtectedTerms";
-    public static final String DISABLED_PROTECTED_TERMS = "disabledProtectedTerms";
+    public static final String PROTECTED_TERMS_ENABLED_EXTERNAL = "protectedTermsEnabledExternal";
+    public static final String PROTECTED_TERMS_DISABLED_EXTERNAL = "protectedTermsDisabledExternal";
+    public static final String PROTECTED_TERMS_ENABLED_INTERNAL = "protectedTermsEnabledInternal";
+    public static final String PROTECTED_TERMS_DISABLED_INTERNAL = "protectedTermsDisabledInternal";
 
     public static final String AKS_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP_DOI = "CleanUpDOI";
@@ -369,7 +372,7 @@ public class JabRefPreferences {
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.DATE, new NormalizeDateFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.MONTH, new NormalizeMonthFormatter()));
         activeFormatterCleanups
-                .add(new FieldFormatterCleanup(FieldName.TITLE, new ProtectTermsFormatter(Globals.protectTermsLoader)));
+                .add(new FieldFormatterCleanup(FieldName.TITLE, new ProtectedTermsFormatter(Globals.protectTermsLoader)));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new UnitsToLatexFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new LatexCleanupFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new HtmlToLatexFormatter()));
@@ -683,8 +686,11 @@ public class JabRefPreferences {
         defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
         defaults.put(LIST_OF_FILE_COLUMNS, "");
 
-        defaults.put(ENABLED_PROTECTED_TERMS, "");
-        defaults.put(DISABLED_PROTECTED_TERMS, "");
+        defaults.put(PROTECTED_TERMS_ENABLED_INTERNAL, convertListToString(ProtectedTermsLoader.getInternalLists()));
+        // defaults.put(PROTECTED_TERMS_ENABLED_INTERNAL, "");
+        defaults.put(PROTECTED_TERMS_DISABLED_INTERNAL, "");
+        defaults.put(PROTECTED_TERMS_ENABLED_EXTERNAL, "");
+        defaults.put(PROTECTED_TERMS_DISABLED_EXTERNAL, "");
 
         // OpenOffice/LibreOffice
         if (OS.WINDOWS) {

@@ -25,7 +25,7 @@ import net.sf.jabref.gui.keyboard.KeyBindingPreferences;
 import net.sf.jabref.importer.ImportFormatReader;
 import net.sf.jabref.logic.error.StreamEavesdropper;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.logic.protectterms.ProtectTermsLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.remote.server.RemoteListenerServerLifecycle;
 import net.sf.jabref.logic.util.BuildInfo;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -54,7 +54,7 @@ public class Globals {
      * This field is initialized upon startup.
      * Only GUI code is allowed to access it, logic code should use dependency injection.
      */
-    public static ProtectTermsLoader protectTermsLoader;
+    public static ProtectedTermsLoader protectTermsLoader;
 
     // Key binding preferences
     private static KeyBindingPreferences keyPrefs;

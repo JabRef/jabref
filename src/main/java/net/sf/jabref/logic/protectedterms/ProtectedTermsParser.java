@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.logic.protectterms;
+package net.sf.jabref.logic.protectedterms;
 
 
 import java.io.BufferedReader;
@@ -24,7 +24,9 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.URL;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -37,14 +39,27 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Reads abbreviation files (property files using NAME = ABBREVIATION as a format) into a list of Abbreviations.
  */
-public class ProtectTermsParser {
+public class ProtectedTermsParser {
 
     private final List<String> terms = new ArrayList<>();
 
     private String description = Localization.lang("The text after the last line starting with # will be used");
     private String location;
 
-    private static final Log LOGGER = LogFactory.getLog(ProtectTermsParser.class);
+    private static final Log LOGGER = LogFactory.getLog(ProtectedTermsParser.class);
+
+
+    public void readTermsFromResource(String resourceFileName, String descriptionString) {
+        URL url = Objects
+                .requireNonNull(ProtectedTermsLoader.class.getResource(Objects.requireNonNull(resourceFileName)));
+        description = descriptionString;
+        location = resourceFileName;
+        try {
+            readTermsList(new InputStreamReader(url.openStream(), StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            LOGGER.info("Could not read protected terms from resource " + resourceFileName, e);
+        }
+    }
 
 
     public void readTermsFromFile(File file) throws FileNotFoundException {
@@ -96,8 +111,8 @@ public class ProtectTermsParser {
         this.terms.add(line);
     }
 
-    public ProtectTermsList getProtectTermsList(boolean enabled) {
-        ProtectTermsList termList = new ProtectTermsList(description, terms, location);
+    public ProtectedTermsList getProtectTermsList(boolean enabled, boolean internal) {
+        ProtectedTermsList termList = new ProtectedTermsList(description, terms, location, internal);
         termList.setEnabled(enabled);
         return termList;
     }

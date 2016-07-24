@@ -19,13 +19,13 @@ import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CapitalizeFormatter;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
-import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import net.sf.jabref.logic.formatter.casechanger.ProtectedTermsFormatter;
 import net.sf.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import net.sf.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import net.sf.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import net.sf.jabref.logic.formatter.minifier.MinifyNameListFormatter;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
-import net.sf.jabref.logic.protectterms.ProtectTermsLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.BeforeClass;
@@ -119,7 +119,8 @@ public class FormatterTest {
                 new Object[]{new NormalizeNamesFormatter()},
                 new Object[]{new NormalizePagesFormatter()},
                 new Object[]{new OrdinalsToSuperscriptFormatter()},
-                new Object[]{new ProtectTermsFormatter(new ProtectTermsLoader(Collections.emptyList(), Collections.emptyList()))},
+                new Object[]{new ProtectedTermsFormatter(new ProtectedTermsLoader(ProtectedTermsLoader.getInternalLists(),
+                        Collections.emptyList(), Collections.emptyList(), Collections.emptyList()))},
                 new Object[]{new RemoveBracesFormatter()},
                 new Object[]{new SentenceCaseFormatter()},
                 new Object[]{new TitleCaseFormatter()},

@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.gui.protectterms;
+package net.sf.jabref.gui.protectedterms;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -46,8 +46,10 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
-
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.external.ExternalFileType;
@@ -60,20 +62,12 @@ import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.protectterms.ProtectTermsList;
-import net.sf.jabref.logic.protectterms.ProtectTermsLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsList;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-import ca.odell.glazedlists.BasicEventList;
-import ca.odell.glazedlists.EventList;
-import ca.odell.glazedlists.SortedList;
-import ca.odell.glazedlists.event.ListEvent;
-import ca.odell.glazedlists.event.ListEventListener;
-import ca.odell.glazedlists.gui.TableFormat;
-import ca.odell.glazedlists.swing.DefaultEventSelectionModel;
-import ca.odell.glazedlists.swing.DefaultEventTableModel;
-import ca.odell.glazedlists.swing.GlazedListsSwing;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -83,16 +77,15 @@ import org.apache.commons.logging.LogFactory;
 /**
  * This class produces a dialog box for managing term list files.
  */
-public class ProtectTermsDialog {
+public class ProtectedTermsDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(ProtectTermsDialog.class);
+    private static final Log LOGGER = LogFactory.getLog(ProtectedTermsDialog.class);
 
     private final JabRefFrame frame;
-    private EventList<ProtectTermsList> termList;
+    private List<ProtectedTermsList> termList;
     private JDialog diag;
     private JTable table;
-    private DefaultEventTableModel<ProtectTermsList> tableModel;
-    private DefaultEventSelectionModel<ProtectTermsList> selectionModel;
+    private DefaultTableModel tableModel;
     private final JPopupMenu popup = new JPopupMenu();
     private final JMenuItem edit = new JMenuItem(Localization.lang("Edit"));
     private final JMenuItem show = new JMenuItem(Localization.lang("View"));
@@ -107,10 +100,10 @@ public class ProtectTermsDialog {
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
 
     private boolean okPressed;
-    private final ProtectTermsLoader loader;
+    private final ProtectedTermsLoader loader;
 
 
-    public ProtectTermsDialog(JabRefFrame frame, ProtectTermsLoader loader) {
+    public ProtectedTermsDialog(JabRefFrame frame, ProtectedTermsLoader loader) {
 
         this.frame = Objects.requireNonNull(frame);
         this.loader = Objects.requireNonNull(loader);
@@ -125,7 +118,7 @@ public class ProtectTermsDialog {
             AddFileDialog addDialog = new AddFileDialog();
             addDialog.setVisible(true);
             addDialog.getFileName().ifPresent(fileName -> loader.addFromFile(fileName, true));
-            updateTermLists();
+            tableModel.fireTableDataChanged();
         });
         addButton.setToolTipText(Localization.lang("Add protected terms file"));
 
@@ -134,7 +127,6 @@ public class ProtectTermsDialog {
 
 
         setupTable();
-        updateTermLists();
 
         // Build dialog
         diag = new JDialog(frame, Localization.lang("Manage protected terms files"), true);
@@ -165,8 +157,10 @@ public class ProtectTermsDialog {
             @Override
             public void actionPerformed(ActionEvent event) {
                 // Restore from preferences
-                loader.update(Globals.prefs.getStringList(JabRefPreferences.ENABLED_PROTECTED_TERMS),
-                        Globals.prefs.getStringList(JabRefPreferences.DISABLED_PROTECTED_TERMS));
+                loader.update(Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_INTERNAL),
+                        Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_EXTERNAL),
+                        Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_INTERNAL),
+                        Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_EXTERNAL));
                 diag.dispose();
             }
         };
@@ -195,20 +189,19 @@ public class ProtectTermsDialog {
     }
 
     private void setupTable() {
-        termList = new BasicEventList<>();
-        EventList<ProtectTermsList> sortedTermLists = new SortedList<>(termList);
 
-        tableModel = (DefaultEventTableModel<ProtectTermsList>) GlazedListsSwing
-                .eventTableModelWithThreadProxyList(sortedTermLists, new TermTableFormat());
+        tableModel = new TermTableModel();
         table = new JTable(tableModel);
         TableColumnModel cm = table.getColumnModel();
-        cm.getColumn(0).setPreferredWidth(50);
+        cm.getColumn(0).setMinWidth((cm.getColumn(0).getPreferredWidth() * 11) / 10);
+        cm.getColumn(0).setMaxWidth((cm.getColumn(0).getPreferredWidth() * 11) / 10);
         cm.getColumn(1).setPreferredWidth(100);
-        cm.getColumn(0).setPreferredWidth(100);
-        selectionModel = (DefaultEventSelectionModel<ProtectTermsList>) GlazedListsSwing
-                .eventSelectionModelWithThreadProxyList(sortedTermLists);
-        table.setSelectionModel(selectionModel);
-        table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        cm.getColumn(2).setPreferredWidth(100);
+        if (OS.WINDOWS) { // On Windows the table font scales with the menu font
+            table.setRowHeight(Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + 2);
+        }
+
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.addMouseListener(new MouseAdapter() {
 
             @Override
@@ -229,12 +222,12 @@ public class ProtectTermsDialog {
             public void mouseClicked(MouseEvent mouseEvent) {
                 if (mouseEvent.getClickCount() == 2) {
                     getSelectedTermsList().ifPresent(list -> list.setEnabled(!list.isEnabled()));
-                    updateTermLists();
+                    tableModel.fireTableDataChanged();
                 }
             }
         });
 
-        selectionModel.getSelected().addListEventListener(new EntrySelectionListener());
+        table.getSelectionModel().addListSelectionListener(new EntrySelectionListener());
     }
 
     private void setupPopupMenu() {
@@ -274,7 +267,7 @@ public class ProtectTermsDialog {
                 if (!loader.removeTermList(list)) {
                     LOGGER.info("Problem removing protected terms file");
                 }
-                updateTermLists();
+                tableModel.fireTableDataChanged();
             }
         });
         // Add it to the remove menu item
@@ -283,12 +276,10 @@ public class ProtectTermsDialog {
         // Add action listener to the "Reload" menu item, which is supposed to reload an external term file
         reload.addActionListener(actionEvent -> {
             getSelectedTermsList().ifPresent(loader::reloadList);
-            updateTermLists();
         });
 
         enabled.addActionListener(actionEvent -> getSelectedTermsList().ifPresent(list -> {
             list.setEnabled(enabled.isSelected());
-            updateTermLists();
         }));
 
     }
@@ -298,35 +289,28 @@ public class ProtectTermsDialog {
         diag.setVisible(visible);
     }
 
-    /**
-     * Read all term files and add the files to the list.
-     */
-    private void updateTermLists() {
-
-        table.clearSelection();
-        termList.getReadWriteLock().writeLock().lock();
-        termList.clear();
-        termList.addAll(loader.getTermsLists());
-        termList.getReadWriteLock().writeLock().unlock();
-    }
-
 
     /**
      * Get the currently selected term list.
      * @return the selected term list, or empty if no term list is selected.
      */
-    private Optional<ProtectTermsList> getSelectedTermsList() {
-        if (!selectionModel.getSelected().isEmpty()) {
-            return Optional.of(selectionModel.getSelected().get(0));
+    private Optional<ProtectedTermsList> getSelectedTermsList() {
+        if (table.getSelectedRow() != -1) {
+            return Optional.of(loader.getTermsLists().get(table.getSelectedRow()));
         }
         return Optional.empty();
     }
 
-    static class TermTableFormat implements TableFormat<ProtectTermsList> {
 
+    class TermTableModel extends DefaultTableModel {
         @Override
         public int getColumnCount() {
             return 3;
+        }
+
+        @Override
+        public int getRowCount() {
+            return loader.getTermsLists().size();
         }
 
         @Override
@@ -344,20 +328,50 @@ public class ProtectTermsDialog {
         }
 
         @Override
-        public Object getColumnValue(ProtectTermsList termList, int i) {
-            switch (i) {
+        public Object getValueAt(int row, int column) {
+            switch (column) {
             case 0:
-                return termList.isEnabled() ? Localization.lang("Yes") : Localization.lang("No");
+                return loader.getTermsLists().get(row).isEnabled();
             case 1:
-                return termList.getDescription();
+                return loader.getTermsLists().get(row).getDescription();
             case 2:
-                return termList.getLocation();
+                ProtectedTermsList list = loader.getTermsLists().get(row);
+                return list.isInternalList() ? Localization.lang("Internal list") + " - " + list.getLocation() : list
+                        .getLocation();
             default:
                 return "";
             }
         }
-    }
 
+        @Override
+        public boolean isCellEditable(int row, int column) {
+            return column == 0;
+        }
+
+        @Override
+        public Class<?> getColumnClass(int column) {
+            switch (column) {
+            case 0:
+                return Boolean.class;
+            case 1:
+                return String.class;
+            case 2:
+                return String.class;
+            default:
+                return String.class;
+            }
+        }
+
+        @Override
+        public void setValueAt(Object cell, int row, int column) {
+            if (column == 0) {
+                ProtectedTermsList list = loader.getTermsLists().get(row);
+                list.setEnabled(!list.isEnabled());
+                this.fireTableCellUpdated(row, column);
+            }
+        }
+
+    }
 
     public boolean isOkPressed() {
         return okPressed;
@@ -367,7 +381,7 @@ public class ProtectTermsDialog {
         popup.show(e.getComponent(), e.getX(), e.getY());
     }
 
-    private void displayTerms(ProtectTermsList list) {
+    private void displayTerms(ProtectedTermsList list) {
         // Make a dialog box to display the contents:
         final JDialog dd = new JDialog(diag, list.getDescription() + " - " + list.getLocation(), true);
 
@@ -393,12 +407,11 @@ public class ProtectTermsDialog {
     /**
      * The listener for the Glazed list monitoring the current selection.
      */
-    private class EntrySelectionListener implements ListEventListener<ProtectTermsList> {
+    private class EntrySelectionListener implements ListSelectionListener {
 
         @Override
-        public void listChanged(ListEvent<ProtectTermsList> listEvent) {
-            if (listEvent.getSourceList().size() == 1) {
-                ProtectTermsList list = listEvent.getSourceList().get(0);
+        public void valueChanged(ListSelectionEvent listEvent) {
+            getSelectedTermsList().ifPresent(list -> {
                 // Enable/disable popup menu items and buttons
                 if (list.isInternalList()) {
                     remove.setEnabled(false);
@@ -412,7 +425,7 @@ public class ProtectTermsDialog {
                     removeButton.setEnabled(true);
                 }
                 enabled.setSelected(list.isEnabled());
-            }
+            });
         }
     }
 
@@ -481,17 +494,30 @@ public class ProtectTermsDialog {
 
 
     private void storePreferences() {
-        List<String> enabledList = new ArrayList<>();
-        List<String> disabledList = new ArrayList<>();
+        List<String> enabledExternalList = new ArrayList<>();
+        List<String> disabledExternalList = new ArrayList<>();
+        List<String> enabledInternalList = new ArrayList<>();
+        List<String> disabledInternalList = new ArrayList<>();
 
-        for (ProtectTermsList list : loader.getTermsLists()) {
-            if (list.isEnabled()) {
-                enabledList.add(list.getLocation());
+        for (ProtectedTermsList list : loader.getTermsLists()) {
+            if (list.isInternalList()) {
+                if (list.isEnabled()) {
+                    enabledInternalList.add(list.getLocation());
+                } else {
+                    disabledInternalList.add(list.getLocation());
+                }
             } else {
-                disabledList.add(list.getLocation());
+                if (list.isEnabled()) {
+                    enabledExternalList.add(list.getLocation());
+                } else {
+                    disabledExternalList.add(list.getLocation());
+                }
             }
         }
-        Globals.prefs.putStringList(JabRefPreferences.ENABLED_PROTECTED_TERMS, enabledList);
-        Globals.prefs.putStringList(JabRefPreferences.DISABLED_PROTECTED_TERMS, disabledList);
+
+        Globals.prefs.putStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_EXTERNAL, enabledExternalList);
+        Globals.prefs.putStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_EXTERNAL, disabledExternalList);
+        Globals.prefs.putStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_INTERNAL, enabledInternalList);
+        Globals.prefs.putStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_INTERNAL, disabledInternalList);
     }
 }

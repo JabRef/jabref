@@ -2,7 +2,7 @@ package net.sf.jabref.logic.formatter.casechanger;
 
 import java.util.Collections;
 
-import net.sf.jabref.logic.protectterms.ProtectTermsLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -15,11 +15,12 @@ import static org.junit.Assert.assertEquals;
  */
 public class ProtectTermsFormatterTest {
 
-    private ProtectTermsFormatter formatter;
+    private ProtectedTermsFormatter formatter;
 
     @Before
     public void setUp() {
-        formatter = new ProtectTermsFormatter(new ProtectTermsLoader(Collections.emptyList(), Collections.emptyList()));
+        formatter = new ProtectedTermsFormatter(new ProtectedTermsLoader(ProtectedTermsLoader.getInternalLists(),
+                Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
     }
 
     @Test

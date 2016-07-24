@@ -1,11 +1,10 @@
-package net.sf.jabref.logic.protectterms;
+package net.sf.jabref.logic.protectedterms;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
 
 
-public class ProtectTermsList implements Comparable<ProtectTermsList> {
+public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
 
     private final String description;
     private final List<String> termsList;
@@ -14,14 +13,14 @@ public class ProtectTermsList implements Comparable<ProtectTermsList> {
     private boolean enabled;
 
 
-    public ProtectTermsList(String description, List<String> termList, String location, boolean internalList) {
+    public ProtectedTermsList(String description, List<String> termList, String location, boolean internalList) {
         this.description = Objects.requireNonNull(description);
         this.termsList = Objects.requireNonNull(termList);
         this.location = Objects.requireNonNull(location);
         this.internalList = internalList;
     }
 
-    public ProtectTermsList(String description, List<String> termList, String location) {
+    public ProtectedTermsList(String description, List<String> termList, String location) {
         this(description, termList, location, false);
     }
 
@@ -43,13 +42,8 @@ public class ProtectTermsList implements Comparable<ProtectTermsList> {
         return String.join("\n", termsList);
     }
 
-    public void ensureUpToDate() throws IOException {
-        // TODO Auto-generated method stub
-
-    }
-
     @Override
-    public int compareTo(ProtectTermsList otherList) {
+    public int compareTo(ProtectedTermsList otherList) {
         return this.getDescription().compareTo(otherList.getDescription());
     }
 

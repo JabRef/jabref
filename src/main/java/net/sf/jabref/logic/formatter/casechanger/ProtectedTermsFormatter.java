@@ -20,15 +20,15 @@ import java.util.Objects;
 
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.protectterms.ProtectTermsLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.util.strings.StringLengthComparator;
 
-public class ProtectTermsFormatter implements Formatter {
+public class ProtectedTermsFormatter implements Formatter {
 
-    private final ProtectTermsLoader protectTermsLoader;
+    private final ProtectedTermsLoader protectTermsLoader;
 
 
-    public ProtectTermsFormatter(ProtectTermsLoader protectTermsLoader) {
+    public ProtectedTermsFormatter(ProtectedTermsLoader protectTermsLoader) {
         this.protectTermsLoader = protectTermsLoader;
     }
 
