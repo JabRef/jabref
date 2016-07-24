@@ -91,16 +91,16 @@ public class ProtectedTermsLoader {
             try {
                 mainList.add(readProtectedTermsListFromFile(new File(filename), true));
             } catch (FileNotFoundException e) {
-                // The file couldn't be found... should we tell anyone?
-                LOGGER.info("Cannot find protected terms file " + filename, e);
+                // The file couldn't be found...
+                LOGGER.warn("Cannot find protected terms file " + filename, e);
             }
         }
         for (String filename : disabledExternalTermLists) {
             try {
                 mainList.add(readProtectedTermsListFromFile(new File(filename), false));
             } catch (FileNotFoundException e) {
-                // The file couldn't be found... should we tell anyone?
-                LOGGER.info("Cannot find protected terms file " + filename, e);
+                // The file couldn't be found...
+                LOGGER.warn("Cannot find protected terms file " + filename, e);
             }
         }
     }
@@ -138,8 +138,8 @@ public class ProtectedTermsLoader {
         try {
             mainList.add(readProtectedTermsListFromFile(new File(fileName), enabled));
         } catch (FileNotFoundException e) {
-            // The file couldn't be found... should we tell anyone?
-            LOGGER.info("Cannot find protected terms file " + fileName, e);
+            // The file couldn't be found...
+            LOGGER.warn("Cannot find protected terms file " + fileName, e);
         }
     }
 
