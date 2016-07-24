@@ -87,7 +87,7 @@ import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.maintable.MainTableFormat;
 import net.sf.jabref.gui.maintable.MainTableSelectionListener;
 import net.sf.jabref.gui.mergeentries.MergeEntriesDialog;
-import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
+import net.sf.jabref.gui.mergeentries.MergeFetchedEntryDialog;
 import net.sf.jabref.gui.plaintextimport.TextInputDialog;
 import net.sf.jabref.gui.search.SearchBar;
 import net.sf.jabref.gui.undo.CountingUndoManager;
@@ -654,7 +654,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.OPEN_URL, new OpenURLAction());
 
-        actions.put(Actions.MERGE_DOI, (BaseAction) () -> new MergeEntryDOIDialog(BasePanel.this));
+        actions.put(Actions.MERGE_DOI,
+                (BaseAction) () -> {
+                    BibEntry originalEntry = mainTable.getSelectedEntries().get(0);
+                    new MergeFetchedEntryDialog(BasePanel.this, originalEntry, originalEntry);
+                    });
 
         actions.put(Actions.REPLACE_ALL, (BaseAction) () -> {
             final ReplaceStringDialog rsd = new ReplaceStringDialog(frame);

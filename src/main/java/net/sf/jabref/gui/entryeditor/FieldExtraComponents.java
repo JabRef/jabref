@@ -43,13 +43,16 @@ import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
-import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
+import net.sf.jabref.gui.mergeentries.MergeFetchedEntryDialog;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
+import net.sf.jabref.importer.fetcher.ISBNtoBibTeXFetcher;
 import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLUtil;
 import net.sf.jabref.logic.util.DOI;
+import net.sf.jabref.logic.util.ISBN;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
@@ -198,7 +201,21 @@ public class FieldExtraComponents {
         // fetch bibtex data
         JButton fetchButton = new JButton(Localization.lang("Get BibTeX data from DOI"));
         fetchButton.setEnabled(false);
-        fetchButton.addActionListener(actionEvent -> new MergeEntryDOIDialog(panel));
+        fetchButton.addActionListener(actionEvent -> {
+            BibEntry entry = entryEditor.getEntry();
+            Optional<String> doi = entry.getFieldOptional(FieldName.DOI);
+            if (doi.isPresent()) {
+                Optional<BibEntry> fetchedEntry = new DOItoBibTeXFetcher().getEntryFromDOI(doi.get());
+                if (fetchedEntry.isPresent()) {
+                    new MergeFetchedEntryDialog(panel, entry, fetchedEntry.get());
+                } else {
+                    panel.frame()
+                            .setStatus(Localization.lang("Cannot get info based on given %0:_%1", "DOI", doi.get()));
+                }
+            } else {
+                panel.frame().setStatus(Localization.lang("No DOI found"));
+            }
+        });
 
         controls.add(button, BorderLayout.NORTH);
         controls.add(doiButton, BorderLayout.CENTER);
@@ -236,6 +253,67 @@ public class FieldExtraComponents {
         });
 
         return Optional.of(controls);
+    }
+
+    /**
+     * Set up a mouse listener for opening an external viewer and fetching by DOI
+     *
+     * @param fieldEditor
+     * @param panel
+     * @return
+     */
+    public static Optional<JComponent> getIsbnExtraComponent(BasePanel panel, EntryEditor entryEditor,
+            FieldEditor fieldEditor) {
+        // fetch bibtex data
+        JButton fetchButton = new JButton(Localization.lang("Get BibTeX data from ISBN"));
+        fetchButton.setEnabled(false);
+        fetchButton.addActionListener(actionEvent -> {
+            BibEntry entry = entryEditor.getEntry();
+            Optional<String> isbn = entry.getFieldOptional(FieldName.ISBN);
+            if (isbn.isPresent()) {
+                Optional<BibEntry> fetchedEntry = new ISBNtoBibTeXFetcher().getEntryFromISBN(isbn.get(), null);
+                if (fetchedEntry.isPresent()) {
+                    new MergeFetchedEntryDialog(panel, entry, fetchedEntry.get());
+                } else {
+                    panel.frame()
+                            .setStatus(Localization.lang("Cannot get info based on given %0:_%1", "ISBN", isbn.get()));
+                }
+            } else {
+                panel.frame().setStatus(Localization.lang("No ISBN found"));
+            }
+        });
+
+        // enable/disable button
+        JTextComponent isbn = (JTextComponent) fieldEditor;
+
+        isbn.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+                checkDoi();
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                checkDoi();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent documentEvent) {
+                checkDoi();
+            }
+
+            private void checkDoi() {
+                ISBN isbnString = new ISBN(isbn.getText());
+                if (isbnString.isValidFormat()) {
+                    fetchButton.setEnabled(true);
+                } else {
+                    fetchButton.setEnabled(false);
+                }
+            }
+        });
+
+        return Optional.of(fetchButton);
     }
 
     /**
