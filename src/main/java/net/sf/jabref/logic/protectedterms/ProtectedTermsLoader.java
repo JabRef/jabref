@@ -36,7 +36,7 @@ public class ProtectedTermsLoader {
 
     private final List<ProtectedTermsList> mainList = new ArrayList<>();
 
-    static private final Map<String, String> internalLists = new HashMap<>();
+    private static final Map<String, String> internalLists = new HashMap<>();
 
     static {
         internalLists.put("/protectedterms/months_weekdays.terms", Localization.lang("Months and weekdays in English"));
@@ -47,7 +47,7 @@ public class ProtectedTermsLoader {
     }
 
 
-    static public List<String> getInternalLists() {
+    public static List<String> getInternalLists() {
         return new ArrayList<>(internalLists.keySet());
     }
 
@@ -64,14 +64,14 @@ public class ProtectedTermsLoader {
         // Read internal lists
         for (String filename : enabledInternalTermLists) {
             if (internalLists.containsKey(filename)) {
-                mainList.add(readTermsFromResource(filename, internalLists.get(filename), true));
+                mainList.add(readProtectedTermsListFromResource(filename, internalLists.get(filename), true));
             } else {
                 LOGGER.warn("Protected terms resource '" + filename + "' is no longer available.");
             }
         }
         for (String filename : disabledInternalTermLists) {
             if (internalLists.containsKey(filename)) {
-                mainList.add(readTermsFromResource(filename, internalLists.get(filename), false));
+                mainList.add(readProtectedTermsListFromResource(filename, internalLists.get(filename), false));
             } else {
                 LOGGER.warn("Protected terms resource '" + filename + "' is no longer available.");
             }
@@ -81,7 +81,7 @@ public class ProtectedTermsLoader {
         for (String filename : internalLists.keySet()) {
             if (!enabledInternalTermLists.contains(filename) && !disabledInternalTermLists.contains(filename)) {
                 // New internal list, add it
-                mainList.add(readTermsFromResource(filename, internalLists.get(filename), true));
+                mainList.add(readProtectedTermsListFromResource(filename, internalLists.get(filename), true));
                 LOGGER.warn("New protected terms resource '" + filename + "' is available and enabled by default.");
             }
         }
@@ -89,7 +89,7 @@ public class ProtectedTermsLoader {
         // Read external lists
         for (String filename : enabledExternalTermLists) {
             try {
-                mainList.add(readTermsFromFile(new File(filename), true));
+                mainList.add(readProtectedTermsListFromFile(new File(filename), true));
             } catch (FileNotFoundException e) {
                 // The file couldn't be found... should we tell anyone?
                 LOGGER.info("Cannot find protected terms file " + filename, e);
@@ -97,7 +97,7 @@ public class ProtectedTermsLoader {
         }
         for (String filename : disabledExternalTermLists) {
             try {
-                mainList.add(readTermsFromFile(new File(filename), false));
+                mainList.add(readProtectedTermsListFromFile(new File(filename), false));
             } catch (FileNotFoundException e) {
                 // The file couldn't be found... should we tell anyone?
                 LOGGER.info("Cannot find protected terms file " + filename, e);
@@ -105,9 +105,9 @@ public class ProtectedTermsLoader {
         }
     }
 
-    public void reloadList(ProtectedTermsList list) {
+    public void reloadProtectedTermsList(ProtectedTermsList list) {
         try {
-            ProtectedTermsList newList = readTermsFromFile(new File(list.getLocation()), list.isEnabled());
+            ProtectedTermsList newList = readProtectedTermsListFromFile(new File(list.getLocation()), list.isEnabled());
             int index = mainList.indexOf(list);
             if (index >= 0) {
                 mainList.set(index, newList);
@@ -119,7 +119,7 @@ public class ProtectedTermsLoader {
         }
 
     }
-    public List<ProtectedTermsList> getTermsLists() {
+    public List<ProtectedTermsList> getProtectedTermsLists() {
         return mainList;
     }
 
@@ -134,29 +134,29 @@ public class ProtectedTermsLoader {
         return result;
     }
 
-    public void addFromFile(String fileName, boolean enabled) {
+    public void addProtectedTermsListFromFile(String fileName, boolean enabled) {
         try {
-            mainList.add(readTermsFromFile(new File(fileName), enabled));
+            mainList.add(readProtectedTermsListFromFile(new File(fileName), enabled));
         } catch (FileNotFoundException e) {
             // The file couldn't be found... should we tell anyone?
             LOGGER.info("Cannot find protected terms file " + fileName, e);
         }
     }
 
-    public static ProtectedTermsList readTermsFromResource(String resource, String description, boolean enabled) {
+    public static ProtectedTermsList readProtectedTermsListFromResource(String resource, String description, boolean enabled) {
         ProtectedTermsParser parser = new ProtectedTermsParser();
         parser.readTermsFromResource(Objects.requireNonNull(resource), Objects.requireNonNull(description));
         return parser.getProtectTermsList(enabled, true);
     }
 
-    public static ProtectedTermsList readTermsFromFile(File file, boolean enabled) throws FileNotFoundException {
+    public static ProtectedTermsList readProtectedTermsListFromFile(File file, boolean enabled) throws FileNotFoundException {
         LOGGER.debug("Reading term list from file " + file);
         ProtectedTermsParser parser = new ProtectedTermsParser();
         parser.readTermsFromFile(Objects.requireNonNull(file));
         return parser.getProtectTermsList(enabled, false);
     }
 
-    public static ProtectedTermsList readTermsFromFile(File file, Charset encoding, boolean enabled)
+    public static ProtectedTermsList readProtectedTermsListFromFile(File file, Charset encoding, boolean enabled)
             throws FileNotFoundException {
         LOGGER.debug("Reading term list from file " + file);
         ProtectedTermsParser parser = new ProtectedTermsParser();
@@ -164,7 +164,7 @@ public class ProtectedTermsLoader {
         return parser.getProtectTermsList(enabled, false);
     }
 
-    public boolean removeTermList(ProtectedTermsList termList) {
+    public boolean removeProtectedTermsList(ProtectedTermsList termList) {
         return mainList.remove(termList);
     }
 }

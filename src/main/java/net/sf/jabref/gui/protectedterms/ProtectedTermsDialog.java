@@ -117,7 +117,7 @@ public class ProtectedTermsDialog {
         addButton.addActionListener(actionEvent -> {
             AddFileDialog addDialog = new AddFileDialog();
             addDialog.setVisible(true);
-            addDialog.getFileName().ifPresent(fileName -> loader.addFromFile(fileName, true));
+            addDialog.getFileName().ifPresent(fileName -> loader.addProtectedTermsListFromFile(fileName, true));
             tableModel.fireTableDataChanged();
         });
         addButton.setToolTipText(Localization.lang("Add protected terms file"));
@@ -271,7 +271,7 @@ public class ProtectedTermsDialog {
                     Localization.lang("Are you sure you want to remove the protected terms file?"),
                     Localization.lang("Remove protected terms file"),
                     JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION)) {
-                if (!loader.removeTermList(list)) {
+                if (!loader.removeProtectedTermsList(list)) {
                     LOGGER.info("Problem removing protected terms file");
                 }
                 tableModel.fireTableDataChanged();
@@ -282,7 +282,7 @@ public class ProtectedTermsDialog {
 
         // Add action listener to the "Reload" menu item, which is supposed to reload an external term file
         reload.addActionListener(actionEvent -> {
-            getSelectedTermsList().ifPresent(loader::reloadList);
+            getSelectedTermsList().ifPresent(loader::reloadProtectedTermsList);
         });
 
         enabled.addActionListener(actionEvent -> getSelectedTermsList().ifPresent(list -> {
@@ -303,7 +303,7 @@ public class ProtectedTermsDialog {
      */
     private Optional<ProtectedTermsList> getSelectedTermsList() {
         if (table.getSelectedRow() != -1) {
-            return Optional.of(loader.getTermsLists().get(table.getSelectedRow()));
+            return Optional.of(loader.getProtectedTermsLists().get(table.getSelectedRow()));
         }
         return Optional.empty();
     }
@@ -317,7 +317,7 @@ public class ProtectedTermsDialog {
 
         @Override
         public int getRowCount() {
-            return loader.getTermsLists().size();
+            return loader.getProtectedTermsLists().size();
         }
 
         @Override
@@ -338,11 +338,11 @@ public class ProtectedTermsDialog {
         public Object getValueAt(int row, int column) {
             switch (column) {
             case 0:
-                return loader.getTermsLists().get(row).isEnabled();
+                return loader.getProtectedTermsLists().get(row).isEnabled();
             case 1:
-                return loader.getTermsLists().get(row).getDescription();
+                return loader.getProtectedTermsLists().get(row).getDescription();
             case 2:
-                ProtectedTermsList list = loader.getTermsLists().get(row);
+                ProtectedTermsList list = loader.getProtectedTermsLists().get(row);
                 return list.isInternalList() ? Localization.lang("Internal list") + " - " + list.getLocation() : list
                         .getLocation();
             default:
@@ -372,7 +372,7 @@ public class ProtectedTermsDialog {
         @Override
         public void setValueAt(Object cell, int row, int column) {
             if (column == 0) {
-                ProtectedTermsList list = loader.getTermsLists().get(row);
+                ProtectedTermsList list = loader.getProtectedTermsLists().get(row);
                 list.setEnabled(!list.isEnabled());
                 this.fireTableCellUpdated(row, column);
             }
@@ -506,7 +506,7 @@ public class ProtectedTermsDialog {
         List<String> enabledInternalList = new ArrayList<>();
         List<String> disabledInternalList = new ArrayList<>();
 
-        for (ProtectedTermsList list : loader.getTermsLists()) {
+        for (ProtectedTermsList list : loader.getProtectedTermsLists()) {
             if (list.isInternalList()) {
                 if (list.isEnabled()) {
                     enabledInternalList.add(list.getLocation());
