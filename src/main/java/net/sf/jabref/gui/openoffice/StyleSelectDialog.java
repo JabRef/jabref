@@ -63,6 +63,7 @@ import net.sf.jabref.logic.openoffice.OOBibStyle;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.logic.util.FileExtensions;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.TestEntry;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -228,6 +229,9 @@ class StyleSelectDialog {
         cm.getColumn(0).setPreferredWidth(100);
         cm.getColumn(1).setPreferredWidth(200);
         cm.getColumn(2).setPreferredWidth(80);
+        if (OS.WINDOWS) { // Arbitrary tables scales with menu font size on Windows
+            table.setRowHeight(Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + 2);
+        }
         selectionModel = (DefaultEventSelectionModel<OOBibStyle>) GlazedListsSwing
                 .eventSelectionModelWithThreadProxyList(sortedStyles);
         table.setSelectionModel(selectionModel);

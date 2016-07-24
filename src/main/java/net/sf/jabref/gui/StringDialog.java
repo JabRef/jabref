@@ -58,6 +58,7 @@ import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibtexString;
@@ -121,6 +122,10 @@ class StringDialog extends JDialog {
         table = new StringTable(stm);
         if (!base.hasNoStrings()) {
             table.setRowSelectionInterval(0, 0);
+        }
+
+        if (OS.WINDOWS) { // Arbitrary tables scales with menu font size on Windows
+            table.setRowHeight(Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + 2);
         }
 
         gbl.setConstraints(table.getPane(), con);

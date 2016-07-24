@@ -64,6 +64,7 @@ import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.logic.bibtex.comparator.EntryComparator;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
@@ -135,6 +136,10 @@ public class SearchResultsDialog {
         model = (DefaultEventTableModel<BibEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,
                 new EntryTableFormat());
         entryTable = new JTable(model);
+        if (OS.WINDOWS) { // Arbitrary tables scales with menu font size on Windows
+            entryTable.setRowHeight(Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + 2);
+        }
+
         GeneralRenderer renderer = new GeneralRenderer(Color.white);
         entryTable.setDefaultRenderer(JLabel.class, renderer);
         entryTable.setDefaultRenderer(String.class, renderer);

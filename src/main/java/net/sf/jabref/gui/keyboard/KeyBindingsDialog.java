@@ -31,6 +31,8 @@ import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * Dialog to customize key bindings
@@ -93,6 +95,9 @@ public class KeyBindingsDialog extends JDialog {
         table.setColumnSelectionAllowed(false);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setAutoCreateRowSorter(true);
+        if (OS.WINDOWS) { // Arbitrary tables scales with menu font size on Windows
+            table.setRowHeight(Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + 2);
+        }
         return table;
     }
 

@@ -192,6 +192,9 @@ class ManageJournalsPanel extends JPanel {
         viewBuiltin.addActionListener(e -> {
             JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbreviationLoader
                     .getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs)).getAbbreviations()));
+            if (OS.WINDOWS) { // Arbitrary tables scales with menu font size on Windows
+                table.setRowHeight(Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + 2);
+            }
             JScrollPane pane = new JScrollPane(table);
             JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"),
                     JOptionPane.INFORMATION_MESSAGE);
@@ -325,6 +328,9 @@ class ManageJournalsPanel extends JPanel {
 
         tableModel.setJournals(userAbbreviations);
         userTable = new JTable(tableModel);
+        if (OS.WINDOWS) { // Arbitrary tables scales with menu font size on Windows
+            userTable.setRowHeight(Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + 2);
+        }
         userTable.addMouseListener(tableModel.getMouseListener());
         userPanel.add(new JScrollPane(userTable), BorderLayout.CENTER);
     }
@@ -580,6 +586,9 @@ class ManageJournalsPanel extends JPanel {
                             .readJournalListFromFile(new File(tf.getText()));
 
                     JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(abbreviations));
+                    if (OS.WINDOWS) { // Arbitrary tables scales with menu font size on Windows
+                        table.setRowHeight(Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + 2);
+                    }
                     JScrollPane pane = new JScrollPane(table);
                     JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"),
                             JOptionPane.INFORMATION_MESSAGE);

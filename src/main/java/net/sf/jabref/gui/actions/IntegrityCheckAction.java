@@ -24,6 +24,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.integrity.IntegrityCheck;
 import net.sf.jabref.logic.integrity.IntegrityMessage;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
@@ -95,7 +96,9 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
                 }
             });
 
-            table.setRowHeight(Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + 2);
+            if (OS.WINDOWS) { // Arbitrary tables scales with menu font size on Windows
+                table.setRowHeight(Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + 2);
+            }
 
             table.getColumnModel().getColumn(0).setPreferredWidth(100);
             table.getColumnModel().getColumn(1).setPreferredWidth(60);
