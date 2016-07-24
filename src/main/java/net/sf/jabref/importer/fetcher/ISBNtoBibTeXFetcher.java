@@ -22,6 +22,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 import java.util.Scanner;
 
 import javax.swing.JPanel;
@@ -61,14 +62,26 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
 
     @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
+        Optional<BibEntry> entry = getEntryFromISBN(query, status);
+        if (entry.isPresent()) {
+            inspector.addEntry(entry.get());
+            return true;
+        }
+        return false;
+
+    }
+
+    public Optional<BibEntry> getEntryFromISBN(String query, OutputPrinter status) {
         String q;
         try {
             q = URLEncoder.encode(query, StandardCharsets.UTF_8.name());
         } catch (UnsupportedEncodingException e) {
             // this should never happen
-            status.setStatus(Localization.lang("Error"));
+            if (status != null) {
+                status.setStatus(Localization.lang("Error"));
+            }
             LOGGER.warn("Shouldn't happen...", e);
-            return false;
+            return Optional.empty();
         }
 
         String urlString = String.format(ISBNtoBibTeXFetcher.URL_PATTERN, q);
@@ -79,7 +92,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
             url = new URL(urlString);
         } catch (MalformedURLException e) {
             LOGGER.warn("Bad URL when fetching ISBN info", e);
-            return false;
+            return Optional.empty();
         }
 
         try(InputStream source = url.openStream()) {
@@ -103,27 +116,31 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
                     }
                     entry.setField(FieldName.TITLE, title);
                 });
-                inspector.addEntry(entry);
-                return true;
+                return Optional.of(entry);
             }
-            return false;
+            return Optional.empty();
         } catch (FileNotFoundException e) {
             // invalid ISBN --> 404--> FileNotFoundException
-            status.showMessage(Localization.lang("No entry found for ISBN %0 at www.ebook.de", query));
+            if (status != null) {
+                status.showMessage(Localization.lang("No entry found for ISBN %0 at www.ebook.de", query));
+            }
             LOGGER.debug("No ISBN info found", e);
-            return false;
+            return Optional.empty();
         } catch (UnknownHostException e) {
             // It is very unlikely that ebook.de is an unknown host
             // It is more likely that we don't have an internet connection
-            status.showMessage(Localization.lang("No_internet_connection."));
+            if (status != null) {
+                status.showMessage(Localization.lang("No_internet_connection."));
+            }
             LOGGER.debug("No internet connection", e);
-            return false;
+            return Optional.empty();
         } catch (Exception e) {
-            status.showMessage(e.toString());
+            if (status != null) {
+                status.showMessage(e.toString());
+            }
             LOGGER.warn("Problem getting info for ISBN", e);
-            return false;
+            return Optional.empty();
         }
-
     }
 
     @Override

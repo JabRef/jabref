@@ -30,6 +30,7 @@ import net.sf.jabref.gui.undo.UndoableChangeType;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
+import net.sf.jabref.importer.fetcher.ISBNtoBibTeXFetcher;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -50,45 +51,74 @@ public class MergeEntryDOIDialog extends JDialog {
     private final BasePanel panel;
     private final CellConstraints cc = new CellConstraints();
     private BibEntry originalEntry;
-    private BibEntry doiEntry;
+    private BibEntry fetchedEntry;
     private NamedCompound ce;
     private MergeEntries mergeEntries;
 
     private final DOItoBibTeXFetcher doiFetcher = new DOItoBibTeXFetcher();
+    private final ISBNtoBibTeXFetcher isbnFetcher = new ISBNtoBibTeXFetcher();
 
     private static final String MARGIN = "5px";
 
+    private static String fetchedString;
 
     public MergeEntryDOIDialog(BasePanel panel) {
-        super(panel.frame(), Localization.lang("Merge entry with DOI information"), true);
+        super(panel.frame(), Localization.lang("Merge entry with DOI/ISBN information"), true);
 
         this.panel = panel;
 
         if (panel.getSelectedEntries().size() != 1) {
             JOptionPane.showMessageDialog(panel.frame(),
                     Localization.lang("This operation requires exactly one item to be selected."),
-                    Localization.lang("Merge entry with DOI information"), JOptionPane.INFORMATION_MESSAGE);
+                    Localization.lang("Merge entry with DOI/ISBN information"), JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             return;
         }
 
         this.originalEntry = panel.getSelectedEntries().get(0);
-        panel.output(Localization.lang("Fetching info based on DOI"));
         Optional<String> doi = this.originalEntry.getFieldOptional(FieldName.DOI);
 
         if (doi.isPresent()) {
-            this.doiEntry = doiFetcher.getEntryFromDOI(doi.get()).orElse(null);
+            panel.output(Localization.lang("Fetching info based on DOI"));
+            this.fetchedEntry = doiFetcher.getEntryFromDOI(doi.get()).orElse(null);
+            this.fetchedString = Localization.lang("Entry from DOI");
+            if (this.fetchedEntry == null) {
+                panel.output("");
+                JOptionPane.showMessageDialog(panel.frame(),
+                        Localization.lang("Cannot get info based on given DOI: %0",
+                                doi.get()),
+                        Localization.lang("Merge entry with DOI/ISBN information"), JOptionPane.INFORMATION_MESSAGE);
+                this.dispose();
+                return;
+            }
         }
 
-        if (this.doiEntry == null) {
+        Optional<String> isbn = this.originalEntry.getFieldOptional(FieldName.ISBN);
+
+        if (isbn.isPresent()) {
+            panel.output(Localization.lang("Fetching info based on ISBN"));
+            this.fetchedEntry = isbnFetcher.getEntryFromISBN(isbn.get(), null).orElse(null);
+            this.fetchedString = Localization.lang("Entry from ISBN");
+            if (this.fetchedEntry == null) {
+                panel.output("");
+                JOptionPane.showMessageDialog(panel.frame(),
+                        Localization.lang("Cannot get info based on given ISBN: %0",
+                                isbn.get()),
+                        Localization.lang("Merge entry with DOI/ISBN information"), JOptionPane.INFORMATION_MESSAGE);
+                this.dispose();
+                return;
+            }
+        }
+
+        if (this.fetchedEntry == null) {
             panel.output("");
             JOptionPane.showMessageDialog(panel.frame(),
-                    Localization.lang("Cannot get info based on given DOI: %0",
-                            doi.orElse(Localization.lang("No DOI found"))),
-                    Localization.lang("Merge entry with DOI information"), JOptionPane.INFORMATION_MESSAGE);
+                    Localization.lang("Cannot get info as neither DOI or ISBN is found."),
+                    Localization.lang("Merge entry with DOI/ISBN information"), JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             return;
         }
+
 
         panel.output(Localization.lang("Opening dialog"));
         // Start setting up the dialog
@@ -99,11 +129,11 @@ public class MergeEntryDOIDialog extends JDialog {
      * Sets up the dialog
      */
     private void init() {
-        mergeEntries = new MergeEntries(this.originalEntry, this.doiEntry, Localization.lang("Original entry"),
-                Localization.lang("Entry from DOI"), panel.getBibDatabaseContext().getMode());
+        mergeEntries = new MergeEntries(this.originalEntry, this.fetchedEntry, Localization.lang("Original entry"),
+                this.fetchedString, panel.getBibDatabaseContext().getMode());
 
         // Create undo-compound
-        ce = new NamedCompound(Localization.lang("Merge entry with DOI information"));
+        ce = new NamedCompound(Localization.lang("Merge entry with DOI/ISBN information"));
 
         FormLayout layout = new FormLayout("fill:700px:grow", "fill:400px:grow, 4px, p, 5px, p");
         // layout.setColumnGroups(new int[][] {{3, 11}});
@@ -194,7 +224,7 @@ public class MergeEntryDOIDialog extends JDialog {
             if (edited) {
                 ce.end();
                 panel.getUndoManager().addEdit(ce);
-                panel.output(Localization.lang("Updated entry with info from DOI"));
+                panel.output(Localization.lang("Updated entry with info from DOI/ISBN"));
                 panel.updateEntryEditorIfShowing();
                 panel.markBaseChanged();
             } else {
