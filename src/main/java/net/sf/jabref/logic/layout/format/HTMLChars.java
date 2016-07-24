@@ -85,18 +85,20 @@ public class HTMLChars implements LayoutFormatter {
                         String command = currentCommand.toString();
                         i++;
                         c = field.charAt(i);
-                        String combody;
+                        String commandBody;
                         if (c == '{') {
                             String part = StringUtil.getPart(field, i, false);
                             i += part.length();
-                            combody = part;
+                            commandBody = part;
                         } else {
-                            combody = field.substring(i, i + 1);
+                            commandBody = field.substring(i, i + 1);
                         }
-                        Object result = HTML_CHARS.get(command + combody);
+                        String result = HTML_CHARS.get(command + commandBody);
 
-                        if (result != null) {
-                            sb.append((String) result);
+                        if (result == null) {
+                            sb.append(commandBody);
+                        } else {
+                            sb.append(result);
                         }
 
                         incommand = false;
@@ -105,7 +107,7 @@ public class HTMLChars implements LayoutFormatter {
                         //	Are we already at the end of the string?
                         if ((i + 1) == field.length()) {
                             String command = currentCommand.toString();
-                            Object result = HTML_CHARS.get(command);
+                            String result = HTML_CHARS.get(command);
                             /* If found, then use translated version. If not,
                              * then keep
                              * the text of the parameter intact.
@@ -113,7 +115,7 @@ public class HTMLChars implements LayoutFormatter {
                             if (result == null) {
                                 sb.append(command);
                             } else {
-                                sb.append((String) result);
+                                sb.append(result);
                             }
 
                         }
@@ -141,14 +143,21 @@ public class HTMLChars implements LayoutFormatter {
                         argument = part;
                         if (argument != null) {
                             // handle common case of general latex command
-                            Object result = HTML_CHARS.get(command + argument);
+                            String result = HTML_CHARS.get(command + argument);
                             // If found, then use translated version. If not, then keep
                             // the
                             // text of the parameter intact.
+
                             if (result == null) {
-                                sb.append(argument);
+                                if (argument.length() == 0) {
+                                    // Maybe a separator, such as in \LaTeX{}, so use command
+                                    sb.append(command);
+                                } else {
+                                    // Otherwise, use argument
+                                    sb.append(argument);
+                                }
                             } else {
-                                sb.append((String) result);
+                                sb.append(result);
                             }
                         }
                     } else if (c == '}') {

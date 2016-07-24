@@ -107,18 +107,21 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
                         } else {
                             commandBody = field.substring(i, i + 1);
                         }
-                        Object result = LatexToUnicodeFormatter.CHARS.get(command + commandBody);
+                        String result = LatexToUnicodeFormatter.CHARS.get(command + commandBody);
 
                         if (result == null) {
                             // Use combining accents if argument is single character or empty
                             if (commandBody.length() <= 1) {
                                 String accent = LatexToUnicodeFormatter.ACCENTS.get(command);
-                                if (accent != null) {
+                                if (accent == null) {
+                                    // Shouldn't happen
+                                    sb.append(commandBody);
+                                } else {
                                     sb.append(commandBody).append(accent);
                                 }
                             }
                         } else {
-                            sb.append((String) result);
+                            sb.append(result);
                         }
 
                         incommand = false;
@@ -127,7 +130,7 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
                         //	Are we already at the end of the string?
                         if ((i + 1) == field.length()) {
                             String command = currentCommand.toString();
-                            Object result = LatexToUnicodeFormatter.CHARS.get(command);
+                            String result = LatexToUnicodeFormatter.CHARS.get(command);
                             /* If found, then use translated version. If not,
                              * then keep
                              * the text of the parameter intact.
@@ -135,7 +138,7 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
                             if (result == null) {
                                 sb.append(command);
                             } else {
-                                sb.append((String) result);
+                                sb.append(result);
                             }
 
                         }
@@ -168,10 +171,15 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
                                 // Use combining accents if argument is single character or empty
                                 if (argument.length() <= 1) {
                                     String accent = LatexToUnicodeFormatter.ACCENTS.get(command);
-                                    if (accent != null) {
-                                        sb.append(argument).append(accent);
+                                    if (accent == null) {
+                                        if (argument.length() == 0) {
+                                            // Empty argument, may be used as separator as in \LaTeX{}, so keep the command
+                                            sb.append(command);
+                                        } else {
+                                            sb.append(argument);
+                                        }
                                     } else {
-                                        sb.append(argument);
+                                        sb.append(argument).append(accent);
                                     }
                                 } else {
                                     sb.append(argument);
