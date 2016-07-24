@@ -39,23 +39,23 @@ public class IconComparator implements Comparator<BibEntry> {
         for (String field : fields) {
             Optional<String> val1 = e1.getFieldOptional(field);
             Optional<String> val2 = e2.getFieldOptional(field);
-            if (!val1.isPresent()) {
+            if (val1.isPresent()) {
+                if (val2.isPresent()) {
+                    // val1 is not null AND val2 is not null
+                    int compareToRes = val1.get().compareTo(val2.get());
+                    if (compareToRes == 0) {
+                        // continue loop as current two values are equal
+                    } else {
+                        return compareToRes;
+                    }
+                } else {
+                    return -1;
+                }
+            } else {
                 if (val2.isPresent()) {
                     return 1;
                 } else {
                     // continue loop and check for next field
-                }
-            } else {
-                if (!val2.isPresent()) {
-                    return -1;
-                } else {
-                    // val1 is not null AND val2 is not null
-                    int compareToRes = val1.get().compareTo(val2.get());
-                    if (compareToRes != 0) {
-                        return compareToRes;
-                    } else {
-                        // continue loop as current two values are equal
-                    }
                 }
             }
         }
