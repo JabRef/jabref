@@ -30,6 +30,7 @@ import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.net.ProxyAuthenticator;
 import net.sf.jabref.logic.net.ProxyPreferences;
 import net.sf.jabref.logic.net.ProxyRegisterer;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.client.RemoteListenerClient;
 import net.sf.jabref.logic.util.OS;
@@ -76,6 +77,13 @@ public class JabRefMain {
 
         // Set key pattern based on preferences
         LabelPatternUtil.updateDefaultPattern(LabelPatternPreferences.fromPreferences(Globals.prefs));
+
+        // Initialize protected terms loader
+        Globals.protectedTermsLoader = new ProtectedTermsLoader(
+                Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_INTERNAL),
+                Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_EXTERNAL),
+                Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_INTERNAL),
+                Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_EXTERNAL));
 
         // Check for running JabRef
         RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);

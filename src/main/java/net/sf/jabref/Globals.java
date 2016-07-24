@@ -54,7 +54,7 @@ public class Globals {
      * This field is initialized upon startup.
      * Only GUI code is allowed to access it, logic code should use dependency injection.
      */
-    public static ProtectedTermsLoader protectTermsLoader;
+    public static ProtectedTermsLoader protectedTermsLoader;
 
     // Key binding preferences
     private static KeyBindingPreferences keyPrefs;

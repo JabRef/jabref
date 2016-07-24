@@ -55,7 +55,7 @@ public class Formatters {
     public static final List<Formatter> CASE_CHANGERS = Arrays.asList(
             new CapitalizeFormatter(),
             new LowerCaseFormatter(),
-            new ProtectedTermsFormatter(Globals.protectTermsLoader),
+            new ProtectedTermsFormatter(Globals.protectedTermsLoader),
             new SentenceCaseFormatter(),
             new TitleCaseFormatter(),
             new UpperCaseFormatter()

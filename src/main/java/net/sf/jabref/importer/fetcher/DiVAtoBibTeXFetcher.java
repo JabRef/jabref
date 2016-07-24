@@ -47,7 +47,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
     private static final Log LOGGER = LogFactory.getLog(DiVAtoBibTeXFetcher.class);
 
     private static final String URL_PATTERN = "http://www.diva-portal.org/smash/getreferences?referenceFormat=BibTex&pids=%s";
-    private final ProtectedTermsFormatter protectTermsFormatter = new ProtectedTermsFormatter(Globals.protectTermsLoader);
+    private final ProtectedTermsFormatter protectTermsFormatter = new ProtectedTermsFormatter(Globals.protectedTermsLoader);
     private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
 
     @Override

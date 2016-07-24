@@ -55,8 +55,8 @@ public class CleanupWorkerTest {
             Globals.journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
         }
 
-        if (Globals.protectTermsLoader == null) {
-            Globals.protectTermsLoader = new ProtectedTermsLoader(ProtectedTermsLoader.getInternalLists(),
+        if (Globals.protectedTermsLoader == null) {
+            Globals.protectedTermsLoader = new ProtectedTermsLoader(ProtectedTermsLoader.getInternalLists(),
                     Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
         }
 
@@ -290,7 +290,7 @@ public class CleanupWorkerTest {
     public void cleanupCasesAddsBracketAroundAluminiumGalliumArsenid() {
         CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true,
                 Collections.singletonList(
-                        new FieldFormatterCleanup("title", new ProtectedTermsFormatter(Globals.protectTermsLoader)))));
+                        new FieldFormatterCleanup("title", new ProtectedTermsFormatter(Globals.protectedTermsLoader)))));
         BibEntry entry = new BibEntry();
         entry.setField("title", "AlGaAs");
 

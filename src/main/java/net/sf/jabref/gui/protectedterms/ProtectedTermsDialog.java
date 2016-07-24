@@ -240,17 +240,24 @@ public class ProtectedTermsDialog {
 
         // Add action listener to "Edit" menu item, which is supposed to open the term file in an external editor:
         edit.addActionListener(actionEvent -> getSelectedTermsList().ifPresent(term -> {
-            Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("txt");
+            Optional<ExternalFileType> type = ExternalFileTypes.getInstance().getExternalFileTypeByExt("terms");
             String fileName = term.getLocation();
             try {
                 if (type.isPresent()) {
                     JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), fileName, type);
                 } else {
-                    JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new BibDatabaseContext(), fileName,
-                            new UnknownExternalFileType("txt"));
+                    // Fall back to ".txt"
+                    Optional<ExternalFileType> txtType = ExternalFileTypes.getInstance()
+                            .getExternalFileTypeByExt("txt");
+                    if (txtType.isPresent()) {
+                        JabRefDesktop.openExternalFileAnyFormat(new BibDatabaseContext(), fileName, txtType);
+                    } else {
+                        JabRefDesktop.openExternalFileUnknown(frame, new BibEntry(), new BibDatabaseContext(), fileName,
+                                new UnknownExternalFileType("terms"));
+                    }
                 }
             } catch (IOException e) {
-                LOGGER.warn("Problem open term file editor", e);
+                LOGGER.warn("Problem open protected terms file editor", e);
             }
         }));
 
@@ -405,7 +412,7 @@ public class ProtectedTermsDialog {
 
 
     /**
-     * The listener for the Glazed list monitoring the current selection.
+     * The listener for the table monitoring the current selection.
      */
     private class EntrySelectionListener implements ListSelectionListener {
 

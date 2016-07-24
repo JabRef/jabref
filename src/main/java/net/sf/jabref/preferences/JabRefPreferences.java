@@ -372,7 +372,7 @@ public class JabRefPreferences {
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.DATE, new NormalizeDateFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.MONTH, new NormalizeMonthFormatter()));
         activeFormatterCleanups
-                .add(new FieldFormatterCleanup(FieldName.TITLE, new ProtectedTermsFormatter(Globals.protectTermsLoader)));
+                .add(new FieldFormatterCleanup(FieldName.TITLE, new ProtectedTermsFormatter(Globals.protectedTermsLoader)));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new UnitsToLatexFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new LatexCleanupFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new HtmlToLatexFormatter()));
