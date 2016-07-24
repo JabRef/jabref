@@ -51,6 +51,9 @@ public class FormatterTest {
     @BeforeClass
     public static void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
+        ProtectedTermsFormatter
+                .setProtectedTermsLoader(new ProtectedTermsLoader(ProtectedTermsLoader.getInternalLists(),
+                        Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
     }
 
     @Test
@@ -119,8 +122,7 @@ public class FormatterTest {
                 new Object[]{new NormalizeNamesFormatter()},
                 new Object[]{new NormalizePagesFormatter()},
                 new Object[]{new OrdinalsToSuperscriptFormatter()},
-                new Object[]{new ProtectedTermsFormatter(new ProtectedTermsLoader(ProtectedTermsLoader.getInternalLists(),
-                        Collections.emptyList(), Collections.emptyList(), Collections.emptyList()))},
+                new Object[]{new ProtectedTermsFormatter()},
                 new Object[]{new RemoveBracesFormatter()},
                 new Object[]{new SentenceCaseFormatter()},
                 new Object[]{new TitleCaseFormatter()},

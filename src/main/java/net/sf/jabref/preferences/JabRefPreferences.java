@@ -46,7 +46,6 @@ import java.util.stream.Collectors;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefException;
 import net.sf.jabref.JabRefMain;
 import net.sf.jabref.external.DroppedFileHandler;
@@ -371,8 +370,7 @@ public class JabRefPreferences {
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.PAGES, new NormalizePagesFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.DATE, new NormalizeDateFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.MONTH, new NormalizeMonthFormatter()));
-        activeFormatterCleanups
-                .add(new FieldFormatterCleanup(FieldName.TITLE, new ProtectedTermsFormatter(Globals.protectedTermsLoader)));
+        activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new ProtectedTermsFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new UnitsToLatexFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new LatexCleanupFormatter()));
         activeFormatterCleanups.add(new FieldFormatterCleanup(FieldName.TITLE, new HtmlToLatexFormatter()));
@@ -687,7 +685,6 @@ public class JabRefPreferences {
         defaults.put(LIST_OF_FILE_COLUMNS, "");
 
         defaults.put(PROTECTED_TERMS_ENABLED_INTERNAL, convertListToString(ProtectedTermsLoader.getInternalLists()));
-        // defaults.put(PROTECTED_TERMS_ENABLED_INTERNAL, "");
         defaults.put(PROTECTED_TERMS_DISABLED_INTERNAL, "");
         defaults.put(PROTECTED_TERMS_ENABLED_EXTERNAL, "");
         defaults.put(PROTECTED_TERMS_DISABLED_EXTERNAL, "");

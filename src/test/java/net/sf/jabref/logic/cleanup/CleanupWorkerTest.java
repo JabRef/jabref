@@ -58,6 +58,7 @@ public class CleanupWorkerTest {
         if (Globals.protectedTermsLoader == null) {
             Globals.protectedTermsLoader = new ProtectedTermsLoader(ProtectedTermsLoader.getInternalLists(),
                     Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+            ProtectedTermsFormatter.setProtectedTermsLoader(Globals.protectedTermsLoader);
         }
 
         pdfFolder = bibFolder.newFolder();
@@ -290,7 +291,7 @@ public class CleanupWorkerTest {
     public void cleanupCasesAddsBracketAroundAluminiumGalliumArsenid() {
         CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true,
                 Collections.singletonList(
-                        new FieldFormatterCleanup("title", new ProtectedTermsFormatter(Globals.protectedTermsLoader)))));
+                        new FieldFormatterCleanup("title", new ProtectedTermsFormatter()))));
         BibEntry entry = new BibEntry();
         entry.setField("title", "AlGaAs");
 

@@ -50,7 +50,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
     private static final Log LOGGER = LogFactory.getLog(ISBNtoBibTeXFetcher.class);
 
     private static final String URL_PATTERN = "http://www.ebook.de/de/tools/isbn2bibtex?isbn=%s";
-    private final ProtectedTermsFormatter protectTermsFormatter = new ProtectedTermsFormatter(Globals.protectedTermsLoader);
+    private final ProtectedTermsFormatter protectTermsFormatter = new ProtectedTermsFormatter();
     private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
 
 

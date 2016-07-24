@@ -25,11 +25,16 @@ import net.sf.jabref.logic.util.strings.StringLengthComparator;
 
 public class ProtectedTermsFormatter implements Formatter {
 
-    private final ProtectedTermsLoader protectTermsLoader;
+    private static ProtectedTermsLoader protectedTermsLoader;
 
 
-    public ProtectedTermsFormatter(ProtectedTermsLoader protectTermsLoader) {
-        this.protectTermsLoader = protectTermsLoader;
+    // This must be called from JabRefMain
+    public static void setProtectedTermsLoader(ProtectedTermsLoader loader) {
+        protectedTermsLoader = loader;
+    }
+
+    public static ProtectedTermsLoader getProtectedTermsLoader() {
+        return protectedTermsLoader;
     }
 
     private String format(String text, List<String> listOfWords) {
@@ -50,7 +55,7 @@ public class ProtectedTermsFormatter implements Formatter {
         if (text.isEmpty()) {
             return text;
         }
-        return this.format(text, protectTermsLoader.getProtectedTerms());
+        return this.format(text, ProtectedTermsFormatter.getProtectedTermsLoader().getProtectedTerms());
     }
 
     @Override

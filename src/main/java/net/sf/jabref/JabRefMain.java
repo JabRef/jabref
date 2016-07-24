@@ -23,6 +23,7 @@ import net.sf.jabref.cli.ArgumentProcessor;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.exporter.ExportFormats;
+import net.sf.jabref.logic.formatter.casechanger.ProtectedTermsFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
@@ -84,6 +85,7 @@ public class JabRefMain {
                 Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_EXTERNAL),
                 Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_INTERNAL),
                 Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_EXTERNAL));
+        ProtectedTermsFormatter.setProtectedTermsLoader(Globals.protectedTermsLoader);
 
         // Check for running JabRef
         RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);
