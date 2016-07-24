@@ -35,7 +35,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CapitalizeFormatter;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
-import net.sf.jabref.logic.formatter.casechanger.ProtectedTermsFormatter;
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import net.sf.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import net.sf.jabref.logic.formatter.casechanger.UpperCaseFormatter;
@@ -54,7 +54,7 @@ public class Formatters {
     public static final List<Formatter> CASE_CHANGERS = Arrays.asList(
             new CapitalizeFormatter(),
             new LowerCaseFormatter(),
-            new ProtectedTermsFormatter(),
+            new ProtectTermsFormatter(),
             new SentenceCaseFormatter(),
             new TitleCaseFormatter(),
             new UpperCaseFormatter()

@@ -19,7 +19,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.CapitalizeFormatter;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
-import net.sf.jabref.logic.formatter.casechanger.ProtectedTermsFormatter;
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import net.sf.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import net.sf.jabref.logic.formatter.casechanger.UpperCaseFormatter;
@@ -51,7 +51,7 @@ public class FormatterTest {
     @BeforeClass
     public static void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
-        ProtectedTermsFormatter
+        ProtectTermsFormatter
                 .setProtectedTermsLoader(new ProtectedTermsLoader(ProtectedTermsLoader.getInternalLists(),
                         Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
     }
@@ -122,7 +122,7 @@ public class FormatterTest {
                 new Object[]{new NormalizeNamesFormatter()},
                 new Object[]{new NormalizePagesFormatter()},
                 new Object[]{new OrdinalsToSuperscriptFormatter()},
-                new Object[]{new ProtectedTermsFormatter()},
+                new Object[]{new ProtectTermsFormatter()},
                 new Object[]{new RemoveBracesFormatter()},
                 new Object[]{new SentenceCaseFormatter()},
                 new Object[]{new TitleCaseFormatter()},

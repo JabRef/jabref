@@ -15,14 +15,14 @@ import static org.junit.Assert.assertEquals;
  */
 public class ProtectTermsFormatterTest {
 
-    private ProtectedTermsFormatter formatter;
+    private ProtectTermsFormatter formatter;
 
     @Before
     public void setUp() {
-        ProtectedTermsFormatter
+        ProtectTermsFormatter
                 .setProtectedTermsLoader(new ProtectedTermsLoader(ProtectedTermsLoader.getInternalLists(),
                 Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
-        formatter = new ProtectedTermsFormatter();
+        formatter = new ProtectTermsFormatter();
     }
 
     @Test
