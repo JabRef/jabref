@@ -50,6 +50,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
+
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.external.ExternalFileType;
@@ -82,7 +83,6 @@ public class ProtectedTermsDialog {
     private static final Log LOGGER = LogFactory.getLog(ProtectedTermsDialog.class);
 
     private final JabRefFrame frame;
-    private List<ProtectedTermsList> termList;
     private JDialog diag;
     private JTable table;
     private DefaultTableModel tableModel;
@@ -439,7 +439,7 @@ public class ProtectedTermsDialog {
             super(diag, Localization.lang("Add protected terms file"), true);
 
             JButton browse = new JButton(Localization.lang("Browse"));
-            browse.addActionListener(BrowseAction.buildForFile(newFile, null, Collections.singletonList(".txt")));
+            browse.addActionListener(BrowseAction.buildForFile(newFile, null, Collections.singletonList(".terms")));
 
             // Build content panel
             FormBuilder builder = FormBuilder.create();
