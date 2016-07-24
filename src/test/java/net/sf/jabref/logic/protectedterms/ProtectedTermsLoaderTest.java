@@ -60,7 +60,7 @@ public class ProtectedTermsLoaderTest {
         File file = Paths.get(
                 ProtectedTermsLoader.class.getResource("/net/sf/jabref/logic/protectedterms/namedterms.terms").toURI())
                 .toFile();
-        ProtectedTermsList list = loader.readProtectedTermsListFromFile(file, true);
+        ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
         assertEquals("Term list", list.getDescription());
     }
 
@@ -69,7 +69,7 @@ public class ProtectedTermsLoaderTest {
         File file = Paths.get(
                 ProtectedTermsLoader.class.getResource("/net/sf/jabref/logic/protectedterms/namedterms.terms").toURI())
                 .toFile();
-        ProtectedTermsList list = loader.readProtectedTermsListFromFile(file, false);
+        ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, false);
         assertFalse(list.isEnabled());
     }
 
@@ -78,7 +78,7 @@ public class ProtectedTermsLoaderTest {
         File file = Paths.get(
                 ProtectedTermsLoader.class.getResource("/net/sf/jabref/logic/protectedterms/namedterms.terms").toURI())
                 .toFile();
-        ProtectedTermsList list = loader.readProtectedTermsListFromFile(file, true);
+        ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
         assertTrue(list.isEnabled());
     }
 
@@ -87,7 +87,7 @@ public class ProtectedTermsLoaderTest {
         File file = Paths.get(
                 ProtectedTermsLoader.class.getResource("/net/sf/jabref/logic/protectedterms/namedterms.terms").toURI())
                 .toFile();
-        ProtectedTermsList list = loader.readProtectedTermsListFromFile(file, true);
+        ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
         assertFalse(list.isInternalList());
     }
 
@@ -98,7 +98,7 @@ public class ProtectedTermsLoaderTest {
                 ProtectedTermsLoader.class.getResource("/net/sf/jabref/logic/protectedterms/unnamedterms.terms")
                         .toURI())
                 .toFile();
-        ProtectedTermsList list = loader.readProtectedTermsListFromFile(file, true);
+        ProtectedTermsList list = ProtectedTermsLoader.readProtectedTermsListFromFile(file, true);
         assertEquals(Localization.lang("The text after the last line starting with # will be used"),
                 list.getDescription());
     }
