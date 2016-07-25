@@ -1,7 +1,6 @@
 package net.sf.jabref.external;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -104,7 +103,7 @@ public final class ExternalFileTypes {
         return list;
     }
 
-    public Collection<ExternalFileType> getExternalFileTypeSelection() {
+    public Set<ExternalFileType> getExternalFileTypeSelection() {
         return externalFileTypes;
     }
 

@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TimerTask;
 
 import javax.swing.AbstractAction;
@@ -2402,9 +2403,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 of stuff below. It is now disabled by default. */
 
             // see if we can fall back to a filename based on the bibtex key
-            final Collection<BibEntry> entries = Collections.singleton(entry);
+            final List<BibEntry> entries = Collections.singletonList(entry);
 
-            final Collection<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
+            final Set<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
             final List<File> dirs = new ArrayList<>();
             if (!basePanel.getBibDatabaseContext().getFileDirectory().isEmpty()) {
                 final List<String> mdDirs = basePanel.getBibDatabaseContext().getFileDirectory();
@@ -2423,7 +2424,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                 result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
             } else {
-                result = FileUtil.findAssociatedFiles(entries, extensions, dirs, Globals.prefs);
+                boolean autoLinkExactKeyOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
+                result = FileUtil.findAssociatedFiles(entries, extensions, dirs, autoLinkExactKeyOnly);
             }
             if (result.containsKey(entry)) {
                 final List<File> res = result.get(entry);
