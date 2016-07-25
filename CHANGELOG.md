@@ -21,12 +21,15 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Added filter to not show selected integrity checks
 - Enhance the entry customization dialog to give better visual feedback
 - The arXiv fetcher now also supports free-text search queries
+- [#1345](https://github.com/JabRef/jabref/issues/1345) Cleanup ISSN
 
 ### Fixed
 - Fixed [#1264](https://github.com/JabRef/jabref/issues/1264): S with caron does not render correctly
 - LaTeX to Unicode converter now handles combining accents
+- Fixed [#636](https://github.com/JabRef/jabref/issues/636): DOI in export filters
 - Fixed [#1527](https://github.com/JabRef/jabref/issues/1527): 'Get BibTeX data from DOI' Removes Marking
 - Fixed [#1592](https://github.com/JabRef/jabref/issues/1592): LibreOffice: wrong numbers in citation labels
+- Fixed [#1321](https://github.com/JabRef/jabref/issues/1321): LaTeX commands in fields not displayed in the list of references
 
 ### Removed
 - It is not longer possible to choose to convert HTML sub- and superscripts to equations

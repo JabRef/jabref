@@ -41,7 +41,7 @@ public interface EntryType extends Comparable<EntryType> {
      */
     default List<String> getRequiredFieldsFlat() {
         List<String> requiredFlat = getRequiredFields().stream()
-                .map(field -> field.split("/"))
+                .map(field -> field.split(FieldName.FIELD_SEPARATOR))
                 .flatMap(Arrays::stream)
                 .collect(Collectors.toList());
 

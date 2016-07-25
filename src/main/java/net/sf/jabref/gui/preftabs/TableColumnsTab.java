@@ -55,7 +55,7 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexSingleField;
-import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
@@ -175,7 +175,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             public Object getValueAt(int row, int column) {
                 int internalRow = row;
                 if (internalRow == 0) {
-                    return column == 0 ? InternalBibtexFields.NUMBER_COL : String.valueOf(ncWidth);
+                    return column == 0 ? FieldName.NUMBER_COL : String.valueOf(ncWidth);
                 }
                 internalRow--;
                 if (internalRow >= tableRows.size()) {

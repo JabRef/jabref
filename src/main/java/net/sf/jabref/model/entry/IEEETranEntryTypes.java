@@ -77,7 +77,7 @@ public class IEEETranEntryTypes {
     public static final EntryType PATENT = new BibtexEntryType() {
 
         {
-            addAllRequired("nationality", FieldName.NUMBER, "year/yearfiled");
+            addAllRequired("nationality", FieldName.NUMBER, FieldName.orFields(FieldName.YEAR, FieldName.YEARFILED));
             addAllOptional(FieldName.AUTHOR, FieldName.TITLE, FieldName.LANGUAGE, "assignee", FieldName.ADDRESS, FieldName.TYPE, FieldName.NUMBER, "day", "dayfiled",
                     FieldName.MONTH, "monthfiled", FieldName.NOTE, FieldName.URL);
         }
@@ -97,7 +97,7 @@ public class IEEETranEntryTypes {
     public static final EntryType STANDARD = new BibtexEntryType() {
 
         {
-            addAllRequired(FieldName.TITLE, "organization/institution");
+            addAllRequired(FieldName.TITLE, FieldName.orFields(FieldName.ORGANIZATION, FieldName.INSTITUTION));
             addAllOptional(FieldName.AUTHOR, FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.TYPE, FieldName.NUMBER, "revision", FieldName.ADDRESS, FieldName.MONTH,
                     FieldName.YEAR, FieldName.NOTE, FieldName.URL);
         }

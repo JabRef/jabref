@@ -197,7 +197,7 @@ public class XMPUtil {
 
                     BibEntry entry = bib.getBibtexEntry();
                     if (entry.getType() == null) {
-                        entry.setType("misc");
+                        entry.setType(BibEntry.DEFAULT_TYPE);
                     }
                     result.add(entry);
                 }
@@ -212,7 +212,7 @@ public class XMPUtil {
 
                         if (entry.isPresent()) {
                             if (entry.get().getType() == null) {
-                                entry.get().setType("misc");
+                                entry.get().setType(BibEntry.DEFAULT_TYPE);
                             }
                             result.add(entry.get());
                         }
@@ -259,7 +259,7 @@ public class XMPUtil {
             PDDocumentInformation di) {
 
         BibEntry entry = new BibEntry();
-        entry.setType("misc");
+        entry.setType(BibEntry.DEFAULT_TYPE);
 
         String s = di.getAuthor();
         if (s != null) {

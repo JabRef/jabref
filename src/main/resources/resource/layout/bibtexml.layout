@@ -21,7 +21,7 @@
 \begin{howpublished}    <bibtex:howpublished>\format[XMLChars]{\howpublished}</bibtex:howpublished>\end{howpublished}
 \begin{abstract}    <bibtex:abstract>\format[XMLChars]{\abstract}</bibtex:abstract>\end{abstract}
 \begin{url}    <bibtex:url>\format[XMLChars]{\url}</bibtex:url>\end{url}
-\begin{doi}    <bibtex:doi>\format[XMLChars]{\doi}</bibtex:doi>\end{doi}
+\begin{doi}    <bibtex:doi>\format[DOIStrip,XMLChars]{\doi}</bibtex:doi>\end{doi}
 \begin{eid}    <bibtex:eid>\format[XMLChars]{\eid}</bibtex:eid>\end{eid}
 \begin{type}    <bibtex:type>\format[XMLChars]{\type}</bibtex:type>\end{type}
 \begin{crossref}    <bibtex:crossref>\format[XMLChars]{\crossref}</bibtex:crossref>\end{crossref}

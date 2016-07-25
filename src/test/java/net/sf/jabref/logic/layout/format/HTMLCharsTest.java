@@ -3,14 +3,22 @@ package net.sf.jabref.logic.layout.format;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 public class HTMLCharsTest {
 
+    private LayoutFormatter layout;
+
+    @Before
+    public void setUp() {
+        layout = new HTMLChars();
+    }
+
     @Test
     public void testBasicFormat() {
-
-        LayoutFormatter layout = new HTMLChars();
 
         Assert.assertEquals("", layout.format(""));
 
@@ -39,9 +47,6 @@ public class HTMLCharsTest {
 
     @Test
     public void testLaTeXHighlighting() {
-
-        LayoutFormatter layout = new HTMLChars();
-
         Assert.assertEquals("<em>hallo</em>", layout.format("\\emph{hallo}"));
         Assert.assertEquals("<em>hallo</em>", layout.format("{\\emph hallo}"));
         Assert.assertEquals("<em>hallo</em>", layout.format("{\\em hallo}"));
@@ -65,8 +70,6 @@ public class HTMLCharsTest {
 
     @Test
     public void testEquations() {
-        LayoutFormatter layout = new HTMLChars();
-
         Assert.assertEquals("&dollar;", layout.format("\\$"));
         Assert.assertEquals("&sigma;", layout.format("$\\sigma$"));
         Assert.assertEquals("A 32&nbsp;mA &Sigma;&Delta;-modulator",
@@ -75,11 +78,25 @@ public class HTMLCharsTest {
 
     @Test
     public void testNewLine() {
-        LayoutFormatter layout = new HTMLChars();
         Assert.assertEquals("a<br>b", layout.format("a\nb"));
         Assert.assertEquals("a<p>b", layout.format("a\n\nb"));
     }
     /*
      * Is missing a lot of test cases for the individual chars...
      */
+
+    @Test
+    public void unknownCommandIsKept() {
+        assertEquals("aaaa", layout.format("\\aaaa"));
+    }
+
+    @Test
+    public void unknownCommandKeepsArgument() {
+        assertEquals("bbbb", layout.format("\\aaaa{bbbb}"));
+    }
+
+    @Test
+    public void unknownCommandWithEmptyArgumentIsKept() {
+        assertEquals("aaaa", layout.format("\\aaaa{}"));
+    }
 }

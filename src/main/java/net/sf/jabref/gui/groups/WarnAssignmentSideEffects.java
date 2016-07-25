@@ -31,7 +31,7 @@ public class WarnAssignmentSideEffects {
             if (group instanceof KeywordGroup) {
                 KeywordGroup keywordGroup = (KeywordGroup) group;
                 String field = keywordGroup.getSearchField().toLowerCase();
-                if (FieldName.KEYWORDS.equals(field) || "groups".equals(field)) {
+                if (FieldName.KEYWORDS.equals(field) || FieldName.GROUPS.equals(field)) {
                     continue; // this is not undesired
                 }
                 int len = InternalBibtexFields.numberOfPublicFields();

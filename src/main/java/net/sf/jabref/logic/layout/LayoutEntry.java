@@ -54,6 +54,7 @@ import net.sf.jabref.logic.layout.format.CreateDocBookAuthors;
 import net.sf.jabref.logic.layout.format.CurrentDate;
 import net.sf.jabref.logic.layout.format.DOICheck;
 import net.sf.jabref.logic.layout.format.DOIStrip;
+import net.sf.jabref.logic.layout.format.DateFormatter;
 import net.sf.jabref.logic.layout.format.Default;
 import net.sf.jabref.logic.layout.format.FileLink;
 import net.sf.jabref.logic.layout.format.FirstPage;
@@ -485,6 +486,8 @@ class LayoutEntry {
             return new CreateDocBookAuthors();
         case "CurrentDate":
             return new CurrentDate();
+        case "DateFormatter":
+            return new DateFormatter();
         case "DOICheck":
             return new DOICheck();
         case "DOIStrip":
@@ -616,10 +619,7 @@ class LayoutEntry {
                 continue;
             }
 
-            // If not found throw exception...
-            //return new LayoutFormatter[] {new NotFoundFormatter(className)};
             results.add(new NotFoundFormatter(className));
-            //throw new Exception(Globals.lang("Formatter not found") + ": "+ className);
         }
 
         return results;
