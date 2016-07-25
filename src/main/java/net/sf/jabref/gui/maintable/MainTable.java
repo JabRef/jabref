@@ -179,6 +179,8 @@ public class MainTable extends JTable {
         setupComparatorChooser();
         model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
         setWidths();
+
+        addKeyListener(new TableKeyListener());
     }
 
     public void addSelectionListener(ListEventListener<BibEntry> listener) {
