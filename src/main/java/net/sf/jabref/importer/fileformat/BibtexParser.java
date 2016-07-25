@@ -34,6 +34,7 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.bibtex.FieldContentParser;
 import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
+import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
@@ -328,9 +329,9 @@ public class BibtexParser {
         // if there is no entry found, simply return the content (necessary to parse text remaining after the last entry)
         if (indexOfAt == -1) {
             return purgeEOFCharacters(result);
-        } else if(result.contains(Globals.ENCODING_PREFIX)) {
+        } else if(result.contains(SavePreferences.ENCODING_PREFIX)) {
             // purge the encoding line if it exists
-            int runningIndex = result.indexOf(Globals.ENCODING_PREFIX);
+            int runningIndex = result.indexOf(SavePreferences.ENCODING_PREFIX);
             while(runningIndex < indexOfAt) {
                 if(result.charAt(runningIndex) == '\n') {
                     break;

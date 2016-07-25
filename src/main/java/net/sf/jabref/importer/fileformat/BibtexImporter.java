@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.logic.exporter.SavePreferences;
 
 /**
  * This importer exists only to enable `--importToOpen someEntry.bib`
@@ -34,6 +34,9 @@ import net.sf.jabref.importer.ParserResult;
  * The metadata is not required to be read here, as this class is NOT called at --import
  */
 public class BibtexImporter extends ImportFormat {
+
+    // Signature written at the top of the .bib file in earlier versions.
+    private static final String SIGNATURE = "This file was created with JabRef";
 
     /**
      * @return true as we have no effective way to decide whether a file is in bibtex format or not. See
@@ -109,17 +112,17 @@ public class BibtexImporter extends ImportFormat {
                 // Only keep the part after %
                 line = line.substring(1).trim();
 
-                if (line.startsWith(Globals.SIGNATURE)) {
+                if (line.startsWith(BibtexImporter.SIGNATURE)) {
                     // Signature line, so keep reading and skip to next line
-                } else if (line.startsWith(Globals.ENCODING_PREFIX)) {
+                } else if (line.startsWith(SavePreferences.ENCODING_PREFIX)) {
                     // Line starts with "Encoding: ", so the rest of the line should contain the name of the encoding
                     // Except if there is already a @ symbol signaling the starting of a BibEntry
                     Integer atSymbolIndex = line.indexOf('@');
                     String encoding;
                     if (atSymbolIndex > 0) {
-                        encoding = line.substring(Globals.ENCODING_PREFIX.length(), atSymbolIndex);
+                        encoding = line.substring(SavePreferences.ENCODING_PREFIX.length(), atSymbolIndex);
                     } else {
-                        encoding = line.substring(Globals.ENCODING_PREFIX.length());
+                        encoding = line.substring(SavePreferences.ENCODING_PREFIX.length());
                     }
 
                     return Optional.of(Charset.forName(encoding));

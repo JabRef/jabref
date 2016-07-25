@@ -21,7 +21,6 @@ import java.nio.charset.Charset;
 import java.util.Map;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
@@ -151,7 +150,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
         // Writes the file encoding information.
         try {
             getWriter().write("% ");
-            getWriter().write(Globals.ENCODING_PREFIX + encoding);
+            getWriter().write(SavePreferences.ENCODING_PREFIX + encoding);
             getWriter().write(OS.NEWLINE);
         } catch (IOException e) {
             throw new SaveException(e);

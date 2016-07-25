@@ -17,6 +17,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
+import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.ExplicitGroup;
@@ -1258,7 +1259,7 @@ public class BibtexParserTest {
     public void parseRemovesEncodingLineInParsedSerialization() throws IOException {
         String testEntry = "@article{test,author={Ed von Test}}";
         ParserResult result = BibtexParser.parse(
-                new StringReader(Globals.ENCODING_PREFIX + OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntry));
+                new StringReader(SavePreferences.ENCODING_PREFIX + OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntry));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(1, c.size());
 
@@ -1546,12 +1547,12 @@ public class BibtexParserTest {
 
     @Test
     public void preserveEncodingPrefixInsideEntry() {
-        List<BibEntry> parsed = BibtexParser.fromString("@article{test,author={" + Globals.ENCODING_PREFIX + "}}");
+        List<BibEntry> parsed = BibtexParser.fromString("@article{test,author={" + SavePreferences.ENCODING_PREFIX + "}}");
 
         BibEntry expected = new BibEntry();
         expected.setType("article");
         expected.setCiteKey("test");
-        expected.setField("author", Globals.ENCODING_PREFIX);
+        expected.setField("author", SavePreferences.ENCODING_PREFIX);
         assertEquals(Collections.singletonList(expected), parsed);
     }
 

@@ -33,9 +33,6 @@ public class Globals {
 
     // JabRef version info
     public static final BuildInfo BUILD_INFO = new BuildInfo();
-    // Signature written at the top of the .bib file.
-    public static final String SIGNATURE = "This file was created with JabRef";
-    public static final String ENCODING_PREFIX = "Encoding: ";
     // Remote listener
     public static final RemoteListenerServerLifecycle REMOTE_LISTENER = new RemoteListenerServerLifecycle();
 
