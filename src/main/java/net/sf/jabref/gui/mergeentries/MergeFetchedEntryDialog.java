@@ -51,20 +51,24 @@ public class MergeFetchedEntryDialog extends JDialog {
     private BibEntry fetchedEntry;
     private NamedCompound ce;
     private MergeEntries mergeEntries;
+    private final String type;
 
     private static final String MARGIN = "5px";
 
-    public MergeFetchedEntryDialog(BasePanel panel, BibEntry originalEntry, BibEntry fetchedEntry) {
-        super(panel.frame(), Localization.lang("Merge entry with fetched information"), true);
+
+    public MergeFetchedEntryDialog(BasePanel panel, BibEntry originalEntry, BibEntry fetchedEntry, String type) {
+        super(panel.frame(), Localization.lang("Merge entry with %0 information", type), true);
 
         this.panel = panel;
         this.originalEntry = originalEntry;
         this.fetchedEntry = fetchedEntry;
+        this.type = type;
 
         if (panel.getSelectedEntries().size() != 1) {
             JOptionPane.showMessageDialog(panel.frame(),
                     Localization.lang("This operation requires exactly one item to be selected."),
-                    Localization.lang("Merge entry with fetched information"), JOptionPane.INFORMATION_MESSAGE);
+                    Localization.lang("Merge entry with %0 information", type),
+                    JOptionPane.INFORMATION_MESSAGE);
             this.dispose();
             return;
         }
@@ -81,10 +85,10 @@ public class MergeFetchedEntryDialog extends JDialog {
      */
     private void init() {
         mergeEntries = new MergeEntries(this.originalEntry, this.fetchedEntry, Localization.lang("Original entry"),
-                Localization.lang("Fetched entry"), panel.getBibDatabaseContext().getMode());
+                Localization.lang("Entry from %0", type), panel.getBibDatabaseContext().getMode());
 
         // Create undo-compound
-        ce = new NamedCompound(Localization.lang("Merge entry with fetched information"));
+        ce = new NamedCompound(Localization.lang("Merge entry with %0 information", type));
 
         FormLayout layout = new FormLayout("fill:700px:grow", "fill:400px:grow, 4px, p, 5px, p");
         // layout.setColumnGroups(new int[][] {{3, 11}});
@@ -117,9 +121,6 @@ public class MergeFetchedEntryDialog extends JDialog {
                 JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
                 JabRefPreferences.MERGEENTRIES_SIZE_Y);
         pw.setWindowPosition();
-
-        // Show what we've got
-        setVisible(true);
 
     }
 
@@ -175,7 +176,7 @@ public class MergeFetchedEntryDialog extends JDialog {
             if (edited) {
                 ce.end();
                 panel.getUndoManager().addEdit(ce);
-                panel.output(Localization.lang("Updated entry with fetched information"));
+                panel.output(Localization.lang("Updated entry with info from %0", type));
                 panel.updateEntryEditorIfShowing();
                 panel.markBaseChanged();
             } else {

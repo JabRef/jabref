@@ -30,6 +30,7 @@ import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -86,8 +87,8 @@ import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.maintable.MainTableFormat;
 import net.sf.jabref.gui.maintable.MainTableSelectionListener;
+import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
 import net.sf.jabref.gui.mergeentries.MergeEntriesDialog;
-import net.sf.jabref.gui.mergeentries.MergeFetchedEntryDialog;
 import net.sf.jabref.gui.plaintextimport.TextInputDialog;
 import net.sf.jabref.gui.search.SearchBar;
 import net.sf.jabref.gui.undo.CountingUndoManager;
@@ -654,11 +655,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.OPEN_URL, new OpenURLAction());
 
-        actions.put(Actions.MERGE_DOI,
-                (BaseAction) () -> {
-                    BibEntry originalEntry = mainTable.getSelectedEntries().get(0);
-                    new MergeFetchedEntryDialog(BasePanel.this, originalEntry, originalEntry);
-                    });
+        actions.put(Actions.MERGE_DOI, (BaseAction) () -> {
+            if (mainTable.getSelectedEntries().size() == 1) {
+                BibEntry originalEntry = mainTable.getSelectedEntries().get(0);
+                new FetchAndMergeEntry(originalEntry, this, Arrays.asList(FieldName.DOI, FieldName.ISBN));
+            }
+        });
 
         actions.put(Actions.REPLACE_ALL, (BaseAction) () -> {
             final ReplaceStringDialog rsd = new ReplaceStringDialog(frame);
