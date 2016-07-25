@@ -63,9 +63,8 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.openoffice.OOBibStyle;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
+import net.sf.jabref.logic.util.TestEntry;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -109,7 +108,7 @@ class StyleSelectDialog {
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
     private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
-    private final BibEntry prevEntry = new BibEntry(IdGenerator.next());
+    private final BibEntry prevEntry;
 
     private boolean okPressed;
     private final StyleLoader loader;
@@ -121,7 +120,7 @@ class StyleSelectDialog {
         this.frame = Objects.requireNonNull(frame);
         this.preferences = Objects.requireNonNull(preferences);
         this.loader = Objects.requireNonNull(loader);
-        setupPrevEntry();
+        prevEntry = TestEntry.getTestEntry();
         init();
 
     }
@@ -371,19 +370,6 @@ class StyleSelectDialog {
         }
         return Optional.empty();
     }
-
-    private void setupPrevEntry() {
-        prevEntry.setField(FieldName.AUTHOR, "Smith, Bill and Jones, Bob and Williams, Jeff");
-        prevEntry.setField(FieldName.EDITOR, "Taylor, Phil");
-        prevEntry.setField(FieldName.TITLE, "Title of the test entry for reference styles");
-        prevEntry.setField(FieldName.VOLUME, "34");
-        prevEntry.setField(FieldName.YEAR, "2008");
-        prevEntry.setField(FieldName.JOURNAL, "BibTeX journal");
-        prevEntry.setField(FieldName.PUBLISHER, "JabRef publishing");
-        prevEntry.setField(FieldName.ADDRESS, "Trondheim");
-        prevEntry.setField("www", "https://github.com/JabRef");
-    }
-
 
     static class StyleTableFormat implements TableFormat<OOBibStyle> {
 
