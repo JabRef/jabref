@@ -239,7 +239,7 @@ public class LabelPatternPanel extends JPanel {
     }
 
     protected GlobalLabelPattern getLabelPatternAsGlobalLabelPattern() {
-        GlobalLabelPattern res = new GlobalLabelPattern();
+        GlobalLabelPattern res = new GlobalLabelPattern(AbstractLabelPattern.split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_LABEL_PATTERN)));
         fillPatternUsingPanelData(res);
         return res;
     }

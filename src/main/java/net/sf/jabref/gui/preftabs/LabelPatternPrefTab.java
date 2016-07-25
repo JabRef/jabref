@@ -28,6 +28,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.labelpattern.LabelPatternPanel;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.model.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -88,8 +89,6 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
             Globals.prefs.putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, false);
             Globals.prefs.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
         }
-
-        GlobalLabelPattern.updateDefaultPattern();
 
         // fetch entries from GUI
         GlobalLabelPattern keypatterns = getLabelPatternAsGlobalLabelPattern();

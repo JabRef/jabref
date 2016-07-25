@@ -17,27 +17,16 @@ package net.sf.jabref.model.labelpattern;
 
 import java.util.List;
 
-import net.sf.jabref.preferences.JabRefPreferences;
-
 public class GlobalLabelPattern extends AbstractLabelPattern {
 
-    private static List<String> defaultLabelPattern;
+    private List<String> defaultLabelPattern;
 
-    static {
-        updateDefaultPattern();
-    }
-
-    public static void updateDefaultPattern() {
-        defaultLabelPattern = AbstractLabelPattern.split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
+    public GlobalLabelPattern(List<String> labelPattern) {
+        defaultLabelPattern = labelPattern;
     }
 
     @Override
     public List<String> getLastLevelLabelPattern(String key) {
-        return GlobalLabelPattern.getDefaultLabelPattern();
-    }
-
-    public static List<String> getDefaultLabelPattern() {
         return defaultLabelPattern;
     }
-
 }

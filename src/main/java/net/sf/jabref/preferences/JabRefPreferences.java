@@ -79,6 +79,7 @@ import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.model.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
@@ -1148,7 +1149,7 @@ public class JabRefPreferences {
      * @return LabelPattern containing all keys. Returned LabelPattern has no parent
      */
     public GlobalLabelPattern getKeyPattern() {
-        keyPattern = new GlobalLabelPattern();
+        keyPattern = new GlobalLabelPattern(AbstractLabelPattern.split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_LABEL_PATTERN)));
         Preferences pre = Preferences.userNodeForPackage(GlobalLabelPattern.class);
         try {
             String[] keys = pre.keys();
