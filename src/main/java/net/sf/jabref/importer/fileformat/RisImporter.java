@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -194,7 +194,7 @@ public class RisImporter extends ImportFormat {
                         if (oldAb == null) {
                             hm.put(FieldName.ABSTRACT, val);
                         } else {
-                            hm.put(FieldName.ABSTRACT, oldAb + FileUtil.NEWLINE + val);
+                            hm.put(FieldName.ABSTRACT, oldAb + OS.NEWLINE + val);
                         }
                     } else if ("UR".equals(lab)) {
                         hm.put(FieldName.URL, val);

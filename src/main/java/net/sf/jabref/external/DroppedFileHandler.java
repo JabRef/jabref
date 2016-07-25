@@ -40,6 +40,7 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.BibDatabase;
@@ -478,7 +479,7 @@ public class DroppedFileHandler {
             LOGGER.warn("Cannot determine destination directory or destination directory does not exist");
             return false;
         }
-        File toFile = new File(dirs.get(found) + FileUtil.FILE_SEPARATOR + destFilename);
+        File toFile = new File(dirs.get(found) + OS.FILE_SEPARATOR + destFilename);
         if (toFile.exists()) {
             int answer = JOptionPane.showConfirmDialog(frame,
                     Localization.lang("'%0' exists. Overwrite file?", toFile.getAbsolutePath()),
@@ -530,7 +531,7 @@ public class DroppedFileHandler {
         }
         String destinationFileName = new File(toFile).getName();
 
-        File destFile = new File(dirs.get(found) + FileUtil.FILE_SEPARATOR + destinationFileName);
+        File destFile = new File(dirs.get(found) + OS.FILE_SEPARATOR + destinationFileName);
         if (destFile.equals(new File(fileName))) {
             // File is already in the correct position. Don't override!
             return true;

@@ -20,7 +20,7 @@ import java.util.Map;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatter;
-import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
@@ -225,7 +225,7 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
             }
         }
 
-        return sb.toString().replace("&amp;", "&").replace("<p>", FileUtil.NEWLINE).replace("&dollar;", "$").replace("~",
+        return sb.toString().replace("&amp;", "&").replace("<p>", OS.NEWLINE).replace("&dollar;", "$").replace("~",
                 "\u00A0");
     }
 

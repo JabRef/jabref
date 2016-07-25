@@ -200,10 +200,10 @@ public class DownloadExternalFile {
             if (directory == null) {
                 dirPrefix = null;
             } else {
-                if (directory.endsWith(FileUtil.FILE_SEPARATOR)) {
+                if (directory.endsWith(OS.FILE_SEPARATOR)) {
                     dirPrefix = directory;
                 } else {
-                    dirPrefix = directory + FileUtil.FILE_SEPARATOR;
+                    dirPrefix = directory + OS.FILE_SEPARATOR;
                 }
             }
 
@@ -249,7 +249,7 @@ public class DownloadExternalFile {
     private File expandFilename(String directory, String link) {
         File toFile = new File(link);
         // If this is a relative link, we should perhaps append the directory:
-        String dirPrefix = directory + FileUtil.FILE_SEPARATOR;
+        String dirPrefix = directory + OS.FILE_SEPARATOR;
         if (!toFile.isAbsolute()) {
             toFile = new File(dirPrefix + link);
         }

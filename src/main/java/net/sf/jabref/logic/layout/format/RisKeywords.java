@@ -18,7 +18,7 @@ package net.sf.jabref.logic.layout.format;
 import java.util.Set;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
-import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.OS;
 
 public class RisKeywords implements LayoutFormatter {
 
@@ -34,7 +34,7 @@ public class RisKeywords implements LayoutFormatter {
             sb.append("KW  - ");
             sb.append(keyword);
             if (i < (keywords.size() - 1)) {
-                sb.append(FileUtil.NEWLINE);
+                sb.append(OS.NEWLINE);
             }
             i++;
         }

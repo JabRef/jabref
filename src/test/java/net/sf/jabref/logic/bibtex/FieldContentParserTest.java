@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.bibtex;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
@@ -27,7 +27,7 @@ public class FieldContentParserTest {
     @Test
     public void unifiesLineBreaks() {
         String original = "I\r\nunify\nline\rbreaks.";
-        String expected = "I\nunify\nline\nbreaks.".replace("\n", FileUtil.NEWLINE);
+        String expected = "I\nunify\nline\nbreaks.".replace("\n", OS.NEWLINE);
         String processed = parser.format(new StringBuilder(original), "abstract").toString();
 
         assertEquals(expected, processed);
@@ -36,7 +36,7 @@ public class FieldContentParserTest {
     @Test
     public void retainsWhitespaceForMultiLineFields() {
         String original = "I\nkeep\nline\nbreaks\nand\n\ttabs.";
-        String formatted = original.replace("\n", FileUtil.NEWLINE);
+        String formatted = original.replace("\n", OS.NEWLINE);
 
         String abstrakt = parser.format(new StringBuilder(original), "abstract").toString();
         String review = parser.format(new StringBuilder(original), "review").toString();

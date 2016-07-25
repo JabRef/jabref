@@ -23,6 +23,7 @@ import java.util.Optional;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
@@ -76,7 +77,7 @@ public class RenamePdfCleanup implements CleanupJob {
                 newFileList.add(flEntry);
                 continue;
             }
-            String newPath = expandedOldFile.get().getParent().concat(FileUtil.FILE_SEPARATOR)
+            String newPath = expandedOldFile.get().getParent().concat(OS.FILE_SEPARATOR)
                     .concat(newFilename.toString());
 
             String expandedOldFilePath = expandedOldFile.get().toString();
@@ -107,7 +108,7 @@ public class RenamePdfCleanup implements CleanupJob {
                 if ((parent == null) || databaseContext.getFileDirectory().contains(parent.getAbsolutePath())) {
                     newFileEntryFileName = newFilename.toString();
                 } else {
-                    newFileEntryFileName = parent.toString().concat(FileUtil.FILE_SEPARATOR)
+                    newFileEntryFileName = parent.toString().concat(OS.FILE_SEPARATOR)
                             .concat(newFilename.toString());
                 }
                 newFileList.add(new ParsedFileField(description, newFileEntryFileName, type));

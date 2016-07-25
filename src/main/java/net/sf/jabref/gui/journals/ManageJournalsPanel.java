@@ -68,7 +68,7 @@ import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -374,7 +374,7 @@ class ManageJournalsPanel extends JPanel {
                     writer.write(entry.getName());
                     writer.write(" = ");
                     writer.write(entry.getAbbreviation());
-                    writer.write(FileUtil.NEWLINE);
+                    writer.write(OS.NEWLINE);
                 }
             } catch (IOException e) {
                 LOGGER.warn("Problem writing abbreviation file", e);

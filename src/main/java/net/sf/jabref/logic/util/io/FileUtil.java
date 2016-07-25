@@ -56,13 +56,6 @@ public class FileUtil {
 
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
-    // Newlines
-    // will be overridden in initialization due to feature #857 @ JabRef.java
-    public static String NEWLINE = System.lineSeparator();
-
-    // File separator obtained from system
-    public static final String FILE_SEPARATOR = System.getProperty("file.separator");
-
     private static final Pattern SLASH = Pattern.compile("/");
     private static final Pattern BACKSLASH = Pattern.compile("\\\\");
 
@@ -249,10 +242,10 @@ public class FileUtil {
             return Optional.of(file);
         }
 
-        if (dir.endsWith(FILE_SEPARATOR)) {
+        if (dir.endsWith(OS.FILE_SEPARATOR)) {
             name = dir + name;
         } else {
-            name = dir + FILE_SEPARATOR + name;
+            name = dir + OS.FILE_SEPARATOR + name;
         }
 
         // fix / and \ problems:
@@ -311,8 +304,8 @@ public class FileUtil {
             longName = fileName.toString();
         }
 
-        if (!dir.endsWith(FILE_SEPARATOR)) {
-            dir = dir.concat(FILE_SEPARATOR);
+        if (!dir.endsWith(OS.FILE_SEPARATOR)) {
+            dir = dir.concat(OS.FILE_SEPARATOR);
         }
 
         if (longName.startsWith(dir)) {

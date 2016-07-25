@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.util.strings;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -34,13 +34,13 @@ public class StringUtilTest {
     public void testUnifyLineBreaks() {
         // Mac < v9
         String result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r");
-        assertEquals(FileUtil.NEWLINE, result);
+        assertEquals(OS.NEWLINE, result);
         // Windows
         result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r\n");
-        assertEquals(FileUtil.NEWLINE, result);
+        assertEquals(OS.NEWLINE, result);
         // Unix
         result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\n");
-        assertEquals(FileUtil.NEWLINE, result);
+        assertEquals(OS.NEWLINE, result);
     }
 
     @Test
@@ -128,19 +128,19 @@ public class StringUtilTest {
 
     @Test
     public void testWrap() {
-        assertEquals("aaaaa" + FileUtil.NEWLINE + "\tbbbbb" + FileUtil.NEWLINE + "\tccccc",
+        assertEquals("aaaaa" + OS.NEWLINE + "\tbbbbb" + OS.NEWLINE + "\tccccc",
                 StringUtil.wrap("aaaaa bbbbb ccccc", 5));
-        assertEquals("aaaaa bbbbb" + FileUtil.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 8));
-        assertEquals("aaaaa bbbbb" + FileUtil.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 11));
+        assertEquals("aaaaa bbbbb" + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 8));
+        assertEquals("aaaaa bbbbb" + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 11));
         assertEquals("aaaaa bbbbb ccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 12));
-        assertEquals("aaaaa" + FileUtil.NEWLINE + "\t" + FileUtil.NEWLINE + "\tbbbbb" + FileUtil.NEWLINE + "\t"
-                + FileUtil.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\nbbbbb\nccccc", 12));
+        assertEquals("aaaaa" + OS.NEWLINE + "\t" + OS.NEWLINE + "\tbbbbb" + OS.NEWLINE + "\t"
+                + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\nbbbbb\nccccc", 12));
         assertEquals(
-                "aaaaa" + FileUtil.NEWLINE + "\t" + FileUtil.NEWLINE + "\t" + FileUtil.NEWLINE + "\tbbbbb"
-                        + FileUtil.NEWLINE + "\t" + FileUtil.NEWLINE + "\tccccc",
+                "aaaaa" + OS.NEWLINE + "\t" + OS.NEWLINE + "\t" + OS.NEWLINE + "\tbbbbb"
+                        + OS.NEWLINE + "\t" + OS.NEWLINE + "\tccccc",
                 StringUtil.wrap("aaaaa\n\nbbbbb\nccccc", 12));
-        assertEquals("aaaaa" + FileUtil.NEWLINE + "\t" + FileUtil.NEWLINE + "\tbbbbb" + FileUtil.NEWLINE + "\t"
-                + FileUtil.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\r\nbbbbb\r\nccccc", 12));
+        assertEquals("aaaaa" + OS.NEWLINE + "\t" + OS.NEWLINE + "\tbbbbb" + OS.NEWLINE + "\t"
+                + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\r\nbbbbb\r\nccccc", 12));
     }
 
     @Test

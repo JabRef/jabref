@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.layout.format;
 
-import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.OS;
 
 import org.junit.Test;
 
@@ -26,12 +26,12 @@ public class RisKeywordsTest {
 
     @Test
     public void testTwoKeywords() {
-        assertEquals("KW  - abcd" + FileUtil.NEWLINE + "KW  - efg", new RisKeywords().format("abcd, efg"));
+        assertEquals("KW  - abcd" + OS.NEWLINE + "KW  - efg", new RisKeywords().format("abcd, efg"));
     }
 
     @Test
     public void testMultipleKeywords() {
-        assertEquals("KW  - abcd" + FileUtil.NEWLINE + "KW  - efg" + FileUtil.NEWLINE + "KW  - hij" + FileUtil.NEWLINE
+        assertEquals("KW  - abcd" + OS.NEWLINE + "KW  - efg" + OS.NEWLINE + "KW  - hij" + OS.NEWLINE
                 + "KW  - klm", new RisKeywords().format("abcd, efg, hij, klm"));
     }
 }
