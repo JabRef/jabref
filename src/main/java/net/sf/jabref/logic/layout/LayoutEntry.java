@@ -619,7 +619,7 @@ class LayoutEntry {
             // If not found throw exception...
             //return new LayoutFormatter[] {new NotFoundFormatter(className)};
             results.add(new NotFoundFormatter(className));
-            //throw new Exception(Globals.lang("Formatter not found") + ": "+ className);
+            //throw new Exception(Localization.lang("Formatter not found") + ": "+ className);
         }
 
         return results;

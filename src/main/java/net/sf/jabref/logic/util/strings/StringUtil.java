@@ -402,16 +402,16 @@ public class StringUtil {
     }
 
     /**
-     * Replaces all platform-dependent line breaks by Globals.NEWLINE line breaks.
+     * Replaces all platform-dependent line breaks by OS.NEWLINE line breaks.
      *
      * We do NOT use UNIX line breaks as the user explicitly configures its linebreaks and this method is used in bibtex field writing
      *
      * <example>
-     * Legacy Macintosh \r -> Globals.NEWLINE
-     * Windows \r\n -> Globals.NEWLINE
+     * Legacy Macintosh \r -> OS.NEWLINE
+     * Windows \r\n -> OS.NEWLINE
      * </example>
      *
-     * @return a String with only Globals.NEWLINE as line breaks
+     * @return a String with only OS.NEWLINE as line breaks
      */
     public static String unifyLineBreaksToConfiguredLineBreaks(String s) {
         return LINE_BREAKS.matcher(s).replaceAll(OS.NEWLINE);
