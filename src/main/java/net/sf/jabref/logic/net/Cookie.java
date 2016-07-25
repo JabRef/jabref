@@ -30,9 +30,9 @@ class Cookie {
     private LocalDateTime expires;
     private String path;
 
-    private final DateTimeFormatter whiteSpaceFormat = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss zzz",
+    private final DateTimeFormatter whiteSpaceFormat = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss 'GMT'",
             Locale.ROOT);
-    private final DateTimeFormatter hyphenFormat = DateTimeFormatter.ofPattern("EEE, dd-MMM-yyyy HH:mm:ss zzz",
+    private final DateTimeFormatter hyphenFormat = DateTimeFormatter.ofPattern("EEE, dd-MMM-yyyy HH:mm:ss 'GMT'",
             Locale.ROOT);
 
 
@@ -45,10 +45,8 @@ class Cookie {
     public Cookie(URI uri, String header) {
         String[] attributes = header.split(";");
         String nameValue = attributes[0].trim();
-        this.name =
-                nameValue.substring(0, nameValue.indexOf('='));
-        this.value =
-                nameValue.substring(nameValue.indexOf('=') + 1);
+        this.name = nameValue.substring(0, nameValue.indexOf('='));
+        this.value = nameValue.substring(nameValue.indexOf('=') + 1);
         this.path = "/";
         this.domain = uri.getHost();
 
