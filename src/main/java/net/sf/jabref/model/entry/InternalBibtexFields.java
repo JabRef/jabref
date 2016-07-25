@@ -95,6 +95,10 @@ public class InternalBibtexFields {
         add(new BibtexSingleField(FieldName.HOWPUBLISHED, true, BibtexSingleField.MEDIUM_W));
         add(new BibtexSingleField(FieldName.INSTITUTION, true, BibtexSingleField.MEDIUM_W));
 
+        dummy = new BibtexSingleField(FieldName.ISBN, true, BibtexSingleField.SMALL_W);
+        dummy.setExtras(EnumSet.of(FieldProperties.ISBN));
+        add(dummy);
+
         dummy = new BibtexSingleField(FieldName.JOURNAL, true, BibtexSingleField.SMALL_W);
         dummy.setExtras(EnumSet.of(FieldProperties.JOURNAL_NAME));
         add(dummy);

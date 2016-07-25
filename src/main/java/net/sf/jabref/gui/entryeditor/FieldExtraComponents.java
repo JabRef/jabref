@@ -243,7 +243,7 @@ public class FieldExtraComponents {
     }
 
     /**
-     * Set up a mouse listener for opening an external viewer and fetching by DOI
+     * Add button for fetching by ISBN
      *
      * @param fieldEditor
      * @param panel
