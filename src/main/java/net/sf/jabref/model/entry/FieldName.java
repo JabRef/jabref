@@ -16,6 +16,7 @@ public class FieldName {
     public static final String AUTHOR = "author";
     public static final String BOOKTITLE = "booktitle";
     public static final String CHAPTER = "chapter";
+    public static final String COMMENTS = "comments";
     public static final String CROSSREF = "crossref";
     public static final String DATE = "date";
     public static final String DOI = "doi";
@@ -42,12 +43,15 @@ public class FieldName {
     public static final String NUMBER = "number";
     public static final String ORGANIZATION = "organization";
     public static final String PAGES = "pages";
+    public static final String PAGETOTAL = "pagetotal";
     public static final String PDF = "pdf";
     public static final String PS = "ps";
     public static final String PUBLISHER = "publisher";
+    public static final String REPORTNO = "reportno";
     public static final String REVIEW = "review";
     public static final String SCHOOL = "school";
     public static final String SERIES = "series";
+    public static final String SUBTITLE = "subtitle";
     public static final String TITLE = "title";
     public static final String TYPE = "type";
     public static final String URL = "url";
