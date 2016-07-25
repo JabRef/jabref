@@ -25,7 +25,7 @@ public enum KeyBinding {
     DECREASE_TABLE_FONT_SIZE("Decrease table font size", Localization.lang("Decrease table font size"), "ctrl MINUS"),
     DELETE_ENTRY("Delete entry", Localization.lang("Delete entry"), "DELETE"),
     EDIT_ENTRY("Edit entry", Localization.lang("Edit entry"), "ctrl E"),
-    EDIT_PREAMBLE("Edit preamble", Localization.lang("Edit preamble"), "alt S"),
+    EDIT_PREAMBLE("Edit preamble", Localization.lang("Edit preamble"), "alt P"),
     EDIT_STRINGS("Edit strings", Localization.lang("Edit strings"), "ctrl T"),
     ENTRY_EDITOR_NEXT_ENTRY("Entry editor, next entry", Localization.lang("Entry editor, next entry"), "ctrl shift DOWN"),
     ENTRY_EDITOR_NEXT_PANEL("Entry editor, next panel", Localization.lang("Entry editor, next panel"), "ctrl TAB"),
@@ -86,7 +86,7 @@ public enum KeyBinding {
     UNABBREVIATE("Unabbreviate", Localization.lang("Unabbreviate"), "ctrl alt shift A"),
     UNDO("Undo", Localization.lang("Undo"), "ctrl Z"),
     UNMARK_ENTRIES("Unmark entries", Localization.lang("Unmark entries"), "ctrl shift M"),
-    WEB_SEARCH("Web search", Localization.lang("Web search"), "alt + 4"),
+    WEB_SEARCH("Web search", Localization.lang("Web search"), "alt 4"),
     WRITE_XMP("Write XMP", Localization.lang("Write XMP"), "F6"),
     OPEN_OFFICE_LIBRE_CONNECTION("Open office/libre connection", Localization.lang("Open office/libre connection"), "alt 0"),;
 
