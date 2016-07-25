@@ -266,20 +266,20 @@ public class FieldExtraComponents {
 
             @Override
             public void changedUpdate(DocumentEvent documentEvent) {
-                checkDoi();
+                checkIsbn();
             }
 
             @Override
             public void insertUpdate(DocumentEvent documentEvent) {
-                checkDoi();
+                checkIsbn();
             }
 
             @Override
             public void removeUpdate(DocumentEvent documentEvent) {
-                checkDoi();
+                checkIsbn();
             }
 
-            private void checkDoi() {
+            private void checkIsbn() {
                 ISBN isbnString = new ISBN(isbn.getText());
                 if (isbnString.isValidFormat()) {
                     fetchButton.setEnabled(true);
