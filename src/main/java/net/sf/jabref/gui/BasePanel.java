@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TimerTask;
 
 import javax.swing.AbstractAction;
@@ -2402,9 +2403,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 of stuff below. It is now disabled by default. */
 
             // see if we can fall back to a filename based on the bibtex key
-            final Collection<BibEntry> entries = Collections.singleton(entry);
+            final List<BibEntry> entries = Collections.singletonList(entry);
 
-            final Collection<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
+            final Set<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
             final List<File> dirs = new ArrayList<>();
             if (!basePanel.getBibDatabaseContext().getFileDirectory().isEmpty()) {
                 final List<String> mdDirs = basePanel.getBibDatabaseContext().getFileDirectory();

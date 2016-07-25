@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -317,8 +316,8 @@ public class FileUtil {
         }
     }
 
-    public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries,
-            Collection<String> extensions, Collection<File> directories, boolean autolinkExactKeyOnly) {
+    public static Map<BibEntry, List<File>> findAssociatedFiles(List<BibEntry> entries,
+            List<String> extensions, List<File> directories, boolean autolinkExactKeyOnly) {
         Map<BibEntry, List<File>> result = new HashMap<>();
 
         // First scan directories

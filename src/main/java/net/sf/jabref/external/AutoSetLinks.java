@@ -40,7 +40,7 @@ public class AutoSetLinks {
      * @param entries  the entries for which links should be set
      * @param databaseContext the database for which links are set
      */
-    public static void autoSetLinks(Collection<BibEntry> entries, BibDatabaseContext databaseContext) {
+    public static void autoSetLinks(List<BibEntry> entries, BibDatabaseContext databaseContext) {
         autoSetLinks(entries, null, null, null, databaseContext, null, null);
     }
 
@@ -69,7 +69,7 @@ public class AutoSetLinks {
      *                         parameter can be null, which means that no progress update will be shown.
      * @return the thread performing the automatically setting
      */
-    public static Runnable autoSetLinks(final Collection<BibEntry> entries, final NamedCompound ce,
+    public static Runnable autoSetLinks(final List<BibEntry> entries, final NamedCompound ce,
             final Set<BibEntry> changedEntries, final FileListTableModel singleTableModel,
             final BibDatabaseContext databaseContext, final ActionListener callback, final JDialog diag) {
         final Collection<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
@@ -96,7 +96,7 @@ public class AutoSetLinks {
                 dirs.addAll(dirsS.stream().map(File::new).collect(Collectors.toList()));
 
                 // determine extensions
-                Collection<String> extensions = new ArrayList<>();
+                List<String> extensions = new ArrayList<>();
                 for (final ExternalFileType type : types) {
                     extensions.add(type.getExtension());
                 }

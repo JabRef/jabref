@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiPredicate;
@@ -21,7 +21,7 @@ public class FileFinder {
     private static final Log LOGGER = LogFactory.getLog(FileFinder.class);
 
 
-    public static Set<File> findFiles(Collection<String> extensions, Collection<File> directories) {
+    public static Set<File> findFiles(List<String> extensions, List<File> directories) {
 
         Objects.requireNonNull(directories, "Directories must not be null!");
         Objects.requireNonNull(extensions, "Extensions must not be null!");
