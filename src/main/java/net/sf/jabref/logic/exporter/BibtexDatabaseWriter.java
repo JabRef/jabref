@@ -26,6 +26,7 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
@@ -47,9 +48,9 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
     protected void writeEpilogue(String epilogue) throws SaveException {
         if (!StringUtil.isNullOrEmpty(epilogue)) {
             try {
-                getWriter().write(StringUtil.NEWLINE);
+                getWriter().write(FileUtil.NEWLINE);
                 getWriter().write(epilogue);
-                getWriter().write(StringUtil.NEWLINE);
+                getWriter().write(FileUtil.NEWLINE);
             } catch (IOException e) {
                 throw new SaveException(e);
             }
@@ -59,11 +60,11 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
     @Override
     protected void writeMetaDataItem(Map.Entry<String, String> metaItem) throws SaveException {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(StringUtil.NEWLINE);
+        stringBuilder.append(FileUtil.NEWLINE);
         stringBuilder.append(COMMENT_PREFIX + "{").append(MetaData.META_FLAG).append(metaItem.getKey()).append(":");
         stringBuilder.append(metaItem.getValue());
         stringBuilder.append("}");
-        stringBuilder.append(StringUtil.NEWLINE);
+        stringBuilder.append(FileUtil.NEWLINE);
 
         try {
             getWriter().write(stringBuilder.toString());
@@ -76,10 +77,10 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
     protected void writePreamble(String preamble) throws SaveException {
         if (!StringUtil.isNullOrEmpty(preamble)) {
             try {
-                getWriter().write(StringUtil.NEWLINE);
+                getWriter().write(FileUtil.NEWLINE);
                 getWriter().write(PREAMBLE_PREFIX + "{");
                 getWriter().write(preamble);
-                getWriter().write('}' + StringUtil.NEWLINE);
+                getWriter().write('}' + FileUtil.NEWLINE);
             } catch (IOException e) {
                 throw new SaveException(e);
             }
@@ -99,11 +100,11 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
             // Write user comments
             String userComments = bibtexString.getUserComments();
             if(!userComments.isEmpty()) {
-                getWriter().write(userComments + StringUtil.NEWLINE);
+                getWriter().write(userComments + FileUtil.NEWLINE);
             }
 
             if (isFirstString) {
-                getWriter().write(StringUtil.NEWLINE);
+                getWriter().write(FileUtil.NEWLINE);
             }
 
             getWriter().write(STRING_PREFIX + "{" + bibtexString.getName() + StringUtil
@@ -122,7 +123,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
                 }
             }
 
-            getWriter().write("}" + StringUtil.NEWLINE);
+            getWriter().write("}" + FileUtil.NEWLINE);
         } catch (IOException e) {
             throw new SaveException(e);
         }
@@ -131,11 +132,11 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
     @Override
     protected void writeEntryTypeDefinition(CustomEntryType customType) throws SaveException {
         try {
-            getWriter().write(StringUtil.NEWLINE);
+            getWriter().write(FileUtil.NEWLINE);
             getWriter().write(COMMENT_PREFIX + "{");
             getWriter().write(customType.getAsString());
             getWriter().write("}");
-            getWriter().write(StringUtil.NEWLINE);
+            getWriter().write(FileUtil.NEWLINE);
         } catch (IOException e) {
             throw new SaveException(e);
         }
@@ -151,7 +152,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
         try {
             getWriter().write("% ");
             getWriter().write(Globals.ENCODING_PREFIX + encoding);
-            getWriter().write(StringUtil.NEWLINE);
+            getWriter().write(FileUtil.NEWLINE);
         } catch (IOException e) {
             throw new SaveException(e);
         }

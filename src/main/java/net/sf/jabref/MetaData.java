@@ -39,6 +39,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.logic.layout.format.FileLinkPreferences;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.FieldName;
@@ -365,7 +366,7 @@ public class MetaData implements Iterable<String> {
 
                 //in case of save actions, add an additional newline after the enabled flag
                 if (metaItem.getKey().equals(SAVE_ACTIONS) && ("enabled".equals(dataItem) || "disabled".equals(dataItem))) {
-                    stringBuilder.append(StringUtil.NEWLINE);
+                    stringBuilder.append(FileUtil.NEWLINE);
                 }
             }
 
@@ -380,12 +381,12 @@ public class MetaData implements Iterable<String> {
         // (which is always the AllEntriesGroup).
         if ((groupsRoot != null) && (groupsRoot.getNumberOfChildren() > 0)) {
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(StringUtil.NEWLINE);
+            stringBuilder.append(FileUtil.NEWLINE);
 
             for (String groupNode : groupsRoot.getTreeAsString()) {
                 stringBuilder.append(StringUtil.quote(groupNode, ";", '\\'));
                 stringBuilder.append(";");
-                stringBuilder.append(StringUtil.NEWLINE);
+                stringBuilder.append(FileUtil.NEWLINE);
             }
             serializedMetaData.put(GROUPSTREE, stringBuilder.toString());
         }

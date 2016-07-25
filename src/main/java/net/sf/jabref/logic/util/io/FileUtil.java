@@ -56,7 +56,13 @@ public class FileUtil {
 
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
-    private static final String FILE_SEPARATOR = System.getProperty("file.separator");
+    // Newlines
+    // will be overridden in initialization due to feature #857 @ JabRef.java
+    public static String NEWLINE = System.lineSeparator();
+
+    // File separator obtained from system
+    public static final String FILE_SEPARATOR = System.getProperty("file.separator");
+
     private static final Pattern SLASH = Pattern.compile("/");
     private static final Pattern BACKSLASH = Pattern.compile("\\\\");
 

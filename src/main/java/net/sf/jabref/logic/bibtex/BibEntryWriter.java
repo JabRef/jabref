@@ -10,6 +10,7 @@ import java.util.TreeSet;
 import java.util.function.Predicate;
 
 import net.sf.jabref.logic.TypedBibEntry;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -49,16 +50,16 @@ public class BibEntryWriter {
         }
 
         writeUserComments(entry, out);
-        out.write(StringUtil.NEWLINE);
+        out.write(FileUtil.NEWLINE);
         writeRequiredFieldsFirstRemainingFieldsSecond(entry, out, bibDatabaseMode);
-        out.write(StringUtil.NEWLINE);
+        out.write(FileUtil.NEWLINE);
     }
 
     private void writeUserComments(BibEntry entry, Writer out) throws IOException {
         String userComments = entry.getUserComments();
 
         if(!userComments.isEmpty()) {
-            out.write(userComments + StringUtil.NEWLINE);
+            out.write(userComments + FileUtil.NEWLINE);
         }
     }
 
@@ -130,7 +131,7 @@ public class BibEntryWriter {
 
     private void writeKeyField(BibEntry entry, Writer out) throws IOException {
         String keyField = StringUtil.shaveString(entry.getCiteKey());
-        out.write(keyField + ',' + StringUtil.NEWLINE);
+        out.write(keyField + ',' + FileUtil.NEWLINE);
     }
 
     /**
@@ -150,7 +151,7 @@ public class BibEntryWriter {
 
             try {
                 out.write(fieldFormatter.format(field.get(), name));
-                out.write(',' + StringUtil.NEWLINE);
+                out.write(',' + FileUtil.NEWLINE);
             } catch (IOException ex) {
                 throw new IOException("Error in field '" + name + "': " + ex.getMessage());
             }

@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -375,7 +375,7 @@ public class MedlinePlainImporter extends ImportFormat {
             if (oldAb == null) {
                 hm.put(FieldName.ABSTRACT, abstractValue);
             } else {
-                hm.put(FieldName.ABSTRACT, oldAb + StringUtil.NEWLINE + abstractValue);
+                hm.put(FieldName.ABSTRACT, oldAb + FileUtil.NEWLINE + abstractValue);
             }
         } else if ("OAB".equals(lab) || "OABL".equals(lab)) {
             hm.put("other-abstract", value);

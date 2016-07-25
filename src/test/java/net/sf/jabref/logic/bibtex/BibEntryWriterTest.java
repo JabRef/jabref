@@ -9,7 +9,7 @@ import java.util.Set;
 import net.sf.jabref.Globals;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -61,12 +61,12 @@ public class BibEntryWriterTest {
         String actual = stringWriter.toString();
 
         // @formatter:off
-        String expected = StringUtil.NEWLINE + "@Article{," + StringUtil.NEWLINE +
-                "  author  = {Foo Bar}," + StringUtil.NEWLINE +
-                "  journal = {International Journal of Something}," + StringUtil.NEWLINE +
-                "  number  = {1}," + StringUtil.NEWLINE +
-                "  note    = {some note}," + StringUtil.NEWLINE +
-                "}" + StringUtil.NEWLINE;
+        String expected = FileUtil.NEWLINE + "@Article{," + FileUtil.NEWLINE +
+                "  author  = {Foo Bar}," + FileUtil.NEWLINE +
+                "  journal = {International Journal of Something}," + FileUtil.NEWLINE +
+                "  number  = {1}," + FileUtil.NEWLINE +
+                "  note    = {some note}," + FileUtil.NEWLINE +
+                "}" + FileUtil.NEWLINE;
         // @formatter:on
 
         assertEquals(expected, actual);
@@ -75,11 +75,11 @@ public class BibEntryWriterTest {
     @Test
     public void roundTripTest() throws IOException {
         // @formatter:off
-        String bibtexEntry = "@Article{test," + StringUtil.NEWLINE +
-                "  Author                   = {Foo Bar}," + StringUtil.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + StringUtil.NEWLINE +
-                "  Note                     = {some note}," + StringUtil.NEWLINE +
-                "  Number                   = {1}" + StringUtil.NEWLINE +
+        String bibtexEntry = "@Article{test," + FileUtil.NEWLINE +
+                "  Author                   = {Foo Bar}," + FileUtil.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + FileUtil.NEWLINE +
+                "  Note                     = {some note}," + FileUtil.NEWLINE +
+                "  Number                   = {1}" + FileUtil.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -99,11 +99,11 @@ public class BibEntryWriterTest {
     @Test
     public void roundTripWithPrependingNewlines() throws IOException {
         // @formatter:off
-        String bibtexEntry = "\r\n@Article{test," + StringUtil.NEWLINE +
-                "  Author                   = {Foo Bar}," + StringUtil.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + StringUtil.NEWLINE +
-                "  Note                     = {some note}," + StringUtil.NEWLINE +
-                "  Number                   = {1}" + StringUtil.NEWLINE +
+        String bibtexEntry = "\r\n@Article{test," + FileUtil.NEWLINE +
+                "  Author                   = {Foo Bar}," + FileUtil.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + FileUtil.NEWLINE +
+                "  Note                     = {some note}," + FileUtil.NEWLINE +
+                "  Number                   = {1}" + FileUtil.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -123,11 +123,11 @@ public class BibEntryWriterTest {
     @Test
     public void roundTripWithModification() throws IOException {
         // @formatter:off
-        String bibtexEntry = StringUtil.NEWLINE + "@Article{test," + StringUtil.NEWLINE +
-                "  Author                   = {Foo Bar}," + StringUtil.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + StringUtil.NEWLINE +
-                "  Note                     = {some note}," + StringUtil.NEWLINE +
-                "  Number                   = {1}," + StringUtil.NEWLINE +
+        String bibtexEntry = FileUtil.NEWLINE + "@Article{test," + FileUtil.NEWLINE +
+                "  Author                   = {Foo Bar}," + FileUtil.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + FileUtil.NEWLINE +
+                "  Note                     = {some note}," + FileUtil.NEWLINE +
+                "  Number                   = {1}," + FileUtil.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -145,12 +145,12 @@ public class BibEntryWriterTest {
         String actual = stringWriter.toString();
 
         // @formatter:off
-        String expected = StringUtil.NEWLINE + "@Article{test," + StringUtil.NEWLINE +
-                "  author  = {BlaBla}," + StringUtil.NEWLINE +
-                "  journal = {International Journal of Something}," + StringUtil.NEWLINE +
-                "  number  = {1}," + StringUtil.NEWLINE +
-                "  note    = {some note}," + StringUtil.NEWLINE +
-                "}" + StringUtil.NEWLINE;
+        String expected = FileUtil.NEWLINE + "@Article{test," + FileUtil.NEWLINE +
+                "  author  = {BlaBla}," + FileUtil.NEWLINE +
+                "  journal = {International Journal of Something}," + FileUtil.NEWLINE +
+                "  number  = {1}," + FileUtil.NEWLINE +
+                "  note    = {some note}," + FileUtil.NEWLINE +
+                "}" + FileUtil.NEWLINE;
         // @formatter:on
         assertEquals(expected, actual);
     }
@@ -158,12 +158,12 @@ public class BibEntryWriterTest {
     @Test
     public void roundTripWithCamelCasingInTheOriginalEntryAndResultInLowerCase() throws IOException {
         // @formatter:off
-        String bibtexEntry = StringUtil.NEWLINE + "@Article{test," + StringUtil.NEWLINE +
-                "  Author                   = {Foo Bar}," + StringUtil.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + StringUtil.NEWLINE +
-                "  Note                     = {some note}," + StringUtil.NEWLINE +
-                "  Number                   = {1}," + StringUtil.NEWLINE +
-                "  HowPublished             = {asdf}," + StringUtil.NEWLINE +
+        String bibtexEntry = FileUtil.NEWLINE + "@Article{test," + FileUtil.NEWLINE +
+                "  Author                   = {Foo Bar}," + FileUtil.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + FileUtil.NEWLINE +
+                "  Note                     = {some note}," + FileUtil.NEWLINE +
+                "  Number                   = {1}," + FileUtil.NEWLINE +
+                "  HowPublished             = {asdf}," + FileUtil.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -181,13 +181,13 @@ public class BibEntryWriterTest {
         String actual = stringWriter.toString();
 
         // @formatter:off
-        String expected = StringUtil.NEWLINE + "@Article{test," + StringUtil.NEWLINE +
-                "  author       = {BlaBla}," + StringUtil.NEWLINE +
-                "  journal      = {International Journal of Something}," + StringUtil.NEWLINE +
-                "  number       = {1}," + StringUtil.NEWLINE +
-                "  note         = {some note}," + StringUtil.NEWLINE +
-                "  howpublished = {asdf}," + StringUtil.NEWLINE +
-                "}" + StringUtil.NEWLINE;
+        String expected = FileUtil.NEWLINE + "@Article{test," + FileUtil.NEWLINE +
+                "  author       = {BlaBla}," + FileUtil.NEWLINE +
+                "  journal      = {International Journal of Something}," + FileUtil.NEWLINE +
+                "  number       = {1}," + FileUtil.NEWLINE +
+                "  note         = {some note}," + FileUtil.NEWLINE +
+                "  howpublished = {asdf}," + FileUtil.NEWLINE +
+                "}" + FileUtil.NEWLINE;
         // @formatter:on
         assertEquals(expected, actual);
     }
@@ -195,13 +195,13 @@ public class BibEntryWriterTest {
     @Test
     public void testEntryTypeChange() throws IOException {
         // @formatter:off
-        String expected = StringUtil.NEWLINE + "@Article{test," + StringUtil.NEWLINE +
-                "  author       = {BlaBla}," + StringUtil.NEWLINE +
-                "  journal      = {International Journal of Something}," + StringUtil.NEWLINE +
-                "  number       = {1}," + StringUtil.NEWLINE +
-                "  note         = {some note}," + StringUtil.NEWLINE +
-                "  howpublished = {asdf}," + StringUtil.NEWLINE +
-                "}" + StringUtil.NEWLINE;
+        String expected = FileUtil.NEWLINE + "@Article{test," + FileUtil.NEWLINE +
+                "  author       = {BlaBla}," + FileUtil.NEWLINE +
+                "  journal      = {International Journal of Something}," + FileUtil.NEWLINE +
+                "  number       = {1}," + FileUtil.NEWLINE +
+                "  note         = {some note}," + FileUtil.NEWLINE +
+                "  howpublished = {asdf}," + FileUtil.NEWLINE +
+                "}" + FileUtil.NEWLINE;
         // @formatter:on
 
         // read in bibtex string
@@ -218,13 +218,13 @@ public class BibEntryWriterTest {
         String actual = stringWriter.toString();
 
         // @formatter:off
-        String expectedNewEntry = StringUtil.NEWLINE + "@InProceedings{test," + StringUtil.NEWLINE +
-                "  author       = {BlaBla}," + StringUtil.NEWLINE +
-                "  number       = {1}," + StringUtil.NEWLINE +
-                "  note         = {some note}," + StringUtil.NEWLINE +
-                "  howpublished = {asdf}," + StringUtil.NEWLINE +
-                "  journal      = {International Journal of Something}," + StringUtil.NEWLINE +
-                "}" + StringUtil.NEWLINE;
+        String expectedNewEntry = FileUtil.NEWLINE + "@InProceedings{test," + FileUtil.NEWLINE +
+                "  author       = {BlaBla}," + FileUtil.NEWLINE +
+                "  number       = {1}," + FileUtil.NEWLINE +
+                "  note         = {some note}," + FileUtil.NEWLINE +
+                "  howpublished = {asdf}," + FileUtil.NEWLINE +
+                "  journal      = {International Journal of Something}," + FileUtil.NEWLINE +
+                "}" + FileUtil.NEWLINE;
         // @formatter:on
         assertEquals(expectedNewEntry, actual);
     }
@@ -233,11 +233,11 @@ public class BibEntryWriterTest {
     @Test
     public void roundTripWithAppendedNewlines() throws IOException {
         // @formatter:off
-        String bibtexEntry = "@Article{test," + StringUtil.NEWLINE +
-                "  Author                   = {Foo Bar}," + StringUtil.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + StringUtil.NEWLINE +
-                "  Note                     = {some note}," + StringUtil.NEWLINE +
-                "  Number                   = {1}" + StringUtil.NEWLINE +
+        String bibtexEntry = "@Article{test," + FileUtil.NEWLINE +
+                "  Author                   = {Foo Bar}," + FileUtil.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + FileUtil.NEWLINE +
+                "  Note                     = {some note}," + FileUtil.NEWLINE +
+                "  Number                   = {1}" + FileUtil.NEWLINE +
                 "}\n\n";
         // @formatter:on
 
@@ -258,11 +258,11 @@ public class BibEntryWriterTest {
     @Test
     public void multipleWritesWithoutModification() throws IOException {
         // @formatter:off
-        String bibtexEntry = "@Article{test," + StringUtil.NEWLINE +
-                "  Author                   = {Foo Bar}," + StringUtil.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + StringUtil.NEWLINE +
-                "  Note                     = {some note}," + StringUtil.NEWLINE +
-                "  Number                   = {1}" + StringUtil.NEWLINE +
+        String bibtexEntry = "@Article{test," + FileUtil.NEWLINE +
+                "  Author                   = {Foo Bar}," + FileUtil.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + FileUtil.NEWLINE +
+                "  Note                     = {some note}," + FileUtil.NEWLINE +
+                "  Number                   = {1}" + FileUtil.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -291,10 +291,10 @@ public class BibEntryWriterTest {
     @Test
     public void monthFieldSpecialSyntax() throws IOException {
         // @formatter:off
-        String bibtexEntry = "@Article{test," + StringUtil.NEWLINE +
-                "  Author                   = {Foo Bar}," + StringUtil.NEWLINE +
-                "  Month                    = mar," + StringUtil.NEWLINE +
-                "  Number                   = {1}" + StringUtil.NEWLINE +
+        String bibtexEntry = "@Article{test," + FileUtil.NEWLINE +
+                "  Author                   = {Foo Bar}," + FileUtil.NEWLINE +
+                "  Month                    = mar," + FileUtil.NEWLINE +
+                "  Number                   = {1}" + FileUtil.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -319,11 +319,11 @@ public class BibEntryWriterTest {
     @Test
     public void addFieldWithLongerLength() throws IOException {
         // @formatter:off
-        String bibtexEntry = StringUtil.NEWLINE + StringUtil.NEWLINE + "@Article{test," + StringUtil.NEWLINE +
-                "  author =  {BlaBla}," + StringUtil.NEWLINE +
-                "  journal = {International Journal of Something}," + StringUtil.NEWLINE +
-                "  number =  {1}," + StringUtil.NEWLINE +
-                "  note =    {some note}," + StringUtil.NEWLINE +
+        String bibtexEntry = FileUtil.NEWLINE + FileUtil.NEWLINE + "@Article{test," + FileUtil.NEWLINE +
+                "  author =  {BlaBla}," + FileUtil.NEWLINE +
+                "  journal = {International Journal of Something}," + FileUtil.NEWLINE +
+                "  number =  {1}," + FileUtil.NEWLINE +
+                "  note =    {some note}," + FileUtil.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -341,13 +341,13 @@ public class BibEntryWriterTest {
         String actual = stringWriter.toString();
 
         // @formatter:off
-        String expected = StringUtil.NEWLINE + "@Article{test," + StringUtil.NEWLINE +
-                "  author       = {BlaBla}," + StringUtil.NEWLINE +
-                "  journal      = {International Journal of Something}," + StringUtil.NEWLINE +
-                "  number       = {1}," + StringUtil.NEWLINE +
-                "  note         = {some note}," + StringUtil.NEWLINE +
-                "  howpublished = {asdf}," + StringUtil.NEWLINE +
-                "}" + StringUtil.NEWLINE;
+        String expected = FileUtil.NEWLINE + "@Article{test," + FileUtil.NEWLINE +
+                "  author       = {BlaBla}," + FileUtil.NEWLINE +
+                "  journal      = {International Journal of Something}," + FileUtil.NEWLINE +
+                "  number       = {1}," + FileUtil.NEWLINE +
+                "  note         = {some note}," + FileUtil.NEWLINE +
+                "  howpublished = {asdf}," + FileUtil.NEWLINE +
+                "}" + FileUtil.NEWLINE;
         // @formatter:on
         assertEquals(expected, actual);
     }
@@ -364,9 +364,9 @@ public class BibEntryWriterTest {
 
         String actual = stringWriter.toString();
 
-        String expected = StringUtil.NEWLINE + "@Article{," + StringUtil.NEWLINE +
-                "  note   = {some note}," + StringUtil.NEWLINE +
-                "}" + StringUtil.NEWLINE;
+        String expected = FileUtil.NEWLINE + "@Article{," + FileUtil.NEWLINE +
+                "  note   = {some note}," + FileUtil.NEWLINE +
+                "}" + FileUtil.NEWLINE;
 
         assertEquals(expected, actual);
     }
@@ -382,9 +382,9 @@ public class BibEntryWriterTest {
 
         String actual = stringWriter.toString();
 
-        String expected = StringUtil.NEWLINE + "@Article{," + StringUtil.NEWLINE +
-                "  note = {some note}," + StringUtil.NEWLINE +
-                "}" + StringUtil.NEWLINE;
+        String expected = FileUtil.NEWLINE + "@Article{," + FileUtil.NEWLINE +
+                "  note = {some note}," + FileUtil.NEWLINE +
+                "}" + FileUtil.NEWLINE;
 
         assertEquals(expected, actual);
     }
@@ -392,12 +392,12 @@ public class BibEntryWriterTest {
     @Test
     public void roundTripWithPrecedingCommentTest() throws IOException {
         // @formatter:off
-        String bibtexEntry = "% Some random comment that should stay here" + StringUtil.NEWLINE +
-                "@Article{test," + StringUtil.NEWLINE +
-                "  Author                   = {Foo Bar}," + StringUtil.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + StringUtil.NEWLINE +
-                "  Note                     = {some note}," + StringUtil.NEWLINE +
-                "  Number                   = {1}" + StringUtil.NEWLINE +
+        String bibtexEntry = "% Some random comment that should stay here" + FileUtil.NEWLINE +
+                "@Article{test," + FileUtil.NEWLINE +
+                "  Author                   = {Foo Bar}," + FileUtil.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + FileUtil.NEWLINE +
+                "  Note                     = {some note}," + FileUtil.NEWLINE +
+                "  Number                   = {1}" + FileUtil.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -417,12 +417,12 @@ public class BibEntryWriterTest {
     @Test
     public void roundTripWithPrecedingCommentAndModificationTest() throws IOException {
         // @formatter:off
-        String bibtexEntry = "% Some random comment that should stay here" + StringUtil.NEWLINE +
-                "@Article{test," + StringUtil.NEWLINE +
-                "  Author                   = {Foo Bar}," + StringUtil.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + StringUtil.NEWLINE +
-                "  Note                     = {some note}," + StringUtil.NEWLINE +
-                "  Number                   = {1}" + StringUtil.NEWLINE +
+        String bibtexEntry = "% Some random comment that should stay here" + FileUtil.NEWLINE +
+                "@Article{test," + FileUtil.NEWLINE +
+                "  Author                   = {Foo Bar}," + FileUtil.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + FileUtil.NEWLINE +
+                "  Note                     = {some note}," + FileUtil.NEWLINE +
+                "  Number                   = {1}" + FileUtil.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -439,13 +439,13 @@ public class BibEntryWriterTest {
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
         // @formatter:off
-        String expected = "% Some random comment that should stay here" + StringUtil.NEWLINE + StringUtil.NEWLINE +
-                "@Article{test," + StringUtil.NEWLINE +
-                "  author  = {John Doe}," + StringUtil.NEWLINE +
-                "  journal = {International Journal of Something}," + StringUtil.NEWLINE +
-                "  number  = {1}," + StringUtil.NEWLINE +
-                "  note    = {some note}," + StringUtil.NEWLINE +
-                "}" + StringUtil.NEWLINE;
+        String expected = "% Some random comment that should stay here" + FileUtil.NEWLINE + FileUtil.NEWLINE +
+                "@Article{test," + FileUtil.NEWLINE +
+                "  author  = {John Doe}," + FileUtil.NEWLINE +
+                "  journal = {International Journal of Something}," + FileUtil.NEWLINE +
+                "  number  = {1}," + FileUtil.NEWLINE +
+                "  note    = {some note}," + FileUtil.NEWLINE +
+                "}" + FileUtil.NEWLINE;
         // @formatter:on
 
         assertEquals(expected, actual);

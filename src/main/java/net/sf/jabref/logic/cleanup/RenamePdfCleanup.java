@@ -76,7 +76,7 @@ public class RenamePdfCleanup implements CleanupJob {
                 newFileList.add(flEntry);
                 continue;
             }
-            String newPath = expandedOldFile.get().getParent().concat(System.getProperty("file.separator"))
+            String newPath = expandedOldFile.get().getParent().concat(FileUtil.FILE_SEPARATOR)
                     .concat(newFilename.toString());
 
             String expandedOldFilePath = expandedOldFile.get().toString();
@@ -107,8 +107,8 @@ public class RenamePdfCleanup implements CleanupJob {
                 if ((parent == null) || databaseContext.getFileDirectory().contains(parent.getAbsolutePath())) {
                     newFileEntryFileName = newFilename.toString();
                 } else {
-                    newFileEntryFileName = parent.toString().concat(System.getProperty("file.separator")).concat(
-                            newFilename.toString());
+                    newFileEntryFileName = parent.toString().concat(FileUtil.FILE_SEPARATOR)
+                            .concat(newFilename.toString());
                 }
                 newFileList.add(new ParsedFileField(description, newFileEntryFileName, type));
             } else {
