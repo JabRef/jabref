@@ -79,7 +79,6 @@ class Cookie {
                 this.path = value;
             } else if ("expires".equalsIgnoreCase(name)) {
                 try {
-                    System.err.println("*" + value + "*");
                     this.expires = ZonedDateTime.parse(value, whiteSpaceFormat);
                 } catch (DateTimeParseException e) {
                     try {
