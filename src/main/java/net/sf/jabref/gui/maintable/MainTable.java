@@ -20,11 +20,15 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -639,6 +643,28 @@ public class MainTable extends JTable {
     private TableComparatorChooser<BibEntry> createTableComparatorChooser(JTable table, SortedList<BibEntry> list,
                                                                              Object sortingStrategy) {
         return TableComparatorChooser.install(table, list, sortingStrategy);
+    }
+
+    /**
+     * KeyEvent handling of Tab
+     */
+    private class TableKeyListener extends KeyAdapter {
+
+        private final Set<Integer> pressed = new HashSet<>();
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            pressed.add(e.getExtendedKeyCode());
+            if (pressed.contains(KeyEvent.VK_TAB)) {
+                int change = pressed.contains(KeyEvent.VK_SHIFT) ? -1 : 1;
+                setSelected((getSelectedRow() + change + getRowCount()) % getRowCount());
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            pressed.remove(e.getExtendedKeyCode());
+        }
     }
 
     /**
