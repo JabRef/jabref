@@ -18,7 +18,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -57,7 +56,7 @@ public class FileBasedTestCase {
 
         Files.createDirectory(rootDir.resolve("2002"));
         Path dir2003 = Files.createDirectory(rootDir.resolve("2003"));
-        assertTrue(Files.exists(Files.createFile(dir2003.resolve("Paper by HipKro03.pdf"))));
+        Files.createFile(dir2003.resolve("Paper by HipKro03.pdf"));
 
         Path dirTest = Files.createDirectory(rootDir.resolve("test"));
         Files.createFile(dirTest.resolve(".TEST"));
@@ -99,7 +98,6 @@ public class FileBasedTestCase {
         assertEquals(Collections.emptySet(), results);
     }
 
-    @Ignore("Fails on CI Server")
     @Test(expected = NullPointerException.class)
     public void testFindFilesNullPointerException() {
 
