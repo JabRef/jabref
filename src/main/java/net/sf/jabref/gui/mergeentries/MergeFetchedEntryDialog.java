@@ -21,7 +21,6 @@ import java.util.TreeSet;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 
 import net.sf.jabref.gui.BasePanel;
@@ -47,8 +46,8 @@ public class MergeFetchedEntryDialog extends JDialog {
 
     private final BasePanel panel;
     private final CellConstraints cc = new CellConstraints();
-    private BibEntry originalEntry;
-    private BibEntry fetchedEntry;
+    private final BibEntry originalEntry;
+    private final BibEntry fetchedEntry;
     private NamedCompound ce;
     private MergeEntries mergeEntries;
     private final String type;
@@ -63,18 +62,6 @@ public class MergeFetchedEntryDialog extends JDialog {
         this.originalEntry = originalEntry;
         this.fetchedEntry = fetchedEntry;
         this.type = type;
-
-        if (panel.getSelectedEntries().size() != 1) {
-            JOptionPane.showMessageDialog(panel.frame(),
-                    Localization.lang("This operation requires exactly one item to be selected."),
-                    Localization.lang("Merge entry with %0 information", type),
-                    JOptionPane.INFORMATION_MESSAGE);
-            this.dispose();
-            return;
-        }
-
-        panel.output(Localization.lang("Opening dialog"));
-
 
         // Start setting up the dialog
         init();
@@ -91,7 +78,6 @@ public class MergeFetchedEntryDialog extends JDialog {
         ce = new NamedCompound(Localization.lang("Merge entry with %0 information", type));
 
         FormLayout layout = new FormLayout("fill:700px:grow", "fill:400px:grow, 4px, p, 5px, p");
-        // layout.setColumnGroups(new int[][] {{3, 11}});
         this.setLayout(layout);
 
         this.add(mergeEntries.getMergeEntryPanel(), cc.xy(1, 1));
