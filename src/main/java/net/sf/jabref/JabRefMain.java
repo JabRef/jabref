@@ -30,6 +30,7 @@ import net.sf.jabref.logic.net.ProxyPreferences;
 import net.sf.jabref.logic.net.ProxyRegisterer;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.client.RemoteListenerClient;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -92,7 +93,7 @@ public class JabRefMain {
 
         // override used newline character with the one stored in the preferences
         // The preferences return the system newline character sequence as default
-        Globals.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
+        OS.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
 
         // Process arguments
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START);

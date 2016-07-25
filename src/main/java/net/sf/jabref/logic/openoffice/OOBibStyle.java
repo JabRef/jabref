@@ -729,7 +729,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      */
     private String getCitationMarkerField(BibEntry entry, BibDatabase database, String field) {
         String authorField = getStringCitProperty(AUTHOR_FIELD);
-        String[] fields = field.split("/");
+        String[] fields = field.split(FieldName.FIELD_SEPARATOR);
         for (String s : fields) {
             String content = BibDatabase.getResolvedField(s, entry, database);
 

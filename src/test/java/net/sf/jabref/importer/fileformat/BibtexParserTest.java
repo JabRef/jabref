@@ -17,6 +17,7 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
+import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.ExplicitGroup;
@@ -25,6 +26,7 @@ import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
@@ -340,9 +342,9 @@ public class BibtexParserTest {
     public void parseSetsParsedSerialization() throws IOException {
         String firstEntry = "@article{canh05,"
                 + "  author = {Crowston, K. and Annabi, H.},"
-                + Globals.NEWLINE
+                + OS.NEWLINE
                 + "  title = {Title A}}"
-                + Globals.NEWLINE;
+                + OS.NEWLINE;
         String secondEntry = "@inProceedings{foo," + "  author={Norton Bar}}";
 
         ParserResult result = BibtexParser.parse(new StringReader(firstEntry + secondEntry));
@@ -895,8 +897,8 @@ public class BibtexParserTest {
     @Test
     public void parseSavesOneNewlineAfterStringInParsedSerialization() throws IOException {
 
-        String string = "@string{bourdieu = {Bourdieu, Pierre}}" + Globals.NEWLINE;
-        ParserResult result = BibtexParser.parse(new StringReader(string + Globals.NEWLINE + Globals.NEWLINE));
+        String string = "@string{bourdieu = {Bourdieu, Pierre}}" + OS.NEWLINE;
+        ParserResult result = BibtexParser.parse(new StringReader(string + OS.NEWLINE + OS.NEWLINE));
         assertEquals(1, result.getDatabase().getStringCount());
 
         BibtexString s = result.getDatabase().getStringValues().iterator().next();
@@ -1233,36 +1235,36 @@ public class BibtexParserTest {
     @Test
     public void parseSavesOneNewlineAfterEntryInParsedSerialization() throws IOException {
         String testEntry = "@article{test,author={Ed von Test}}";
-        ParserResult result = BibtexParser.parse(new StringReader(testEntry + Globals.NEWLINE + Globals.NEWLINE));
+        ParserResult result = BibtexParser.parse(new StringReader(testEntry + OS.NEWLINE + OS.NEWLINE));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(1, c.size());
 
         BibEntry e = c.iterator().next();
-        assertEquals(testEntry + Globals.NEWLINE, e.getParsedSerialization());
+        assertEquals(testEntry + OS.NEWLINE, e.getParsedSerialization());
     }
 
     @Test
     public void parseSavesNewlinesBeforeEntryInParsedSerialization() throws IOException {
         String testEntry = "@article{test,author={Ed von Test}}";
         ParserResult result = BibtexParser
-                .parse(new StringReader(Globals.NEWLINE + Globals.NEWLINE + Globals.NEWLINE + testEntry));
+                .parse(new StringReader(OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntry));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(1, c.size());
 
         BibEntry e = c.iterator().next();
-        assertEquals(Globals.NEWLINE + Globals.NEWLINE + Globals.NEWLINE + testEntry, e.getParsedSerialization());
+        assertEquals(OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntry, e.getParsedSerialization());
     }
 
     @Test
     public void parseRemovesEncodingLineInParsedSerialization() throws IOException {
         String testEntry = "@article{test,author={Ed von Test}}";
         ParserResult result = BibtexParser.parse(
-                new StringReader(Globals.ENCODING_PREFIX + Globals.NEWLINE + Globals.NEWLINE + Globals.NEWLINE + testEntry));
+                new StringReader(SavePreferences.ENCODING_PREFIX + OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntry));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(1, c.size());
 
         BibEntry e = c.iterator().next();
-        assertEquals(Globals.NEWLINE + Globals.NEWLINE + testEntry, e.getParsedSerialization());
+        assertEquals(OS.NEWLINE + OS.NEWLINE + testEntry, e.getParsedSerialization());
     }
 
     @Test
@@ -1270,7 +1272,7 @@ public class BibtexParserTest {
         String testEntryOne = "@article{test1,author={Ed von Test}}";
         String testEntryTwo = "@article{test2,author={Ed von Test}}";
         ParserResult result = BibtexParser.parse(
-                new StringReader(testEntryOne + Globals.NEWLINE + Globals.NEWLINE + Globals.NEWLINE + testEntryTwo));
+                new StringReader(testEntryOne + OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + testEntryTwo));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(2, c.size());
 
@@ -1285,13 +1287,13 @@ public class BibtexParserTest {
             b = tmp;
         }
 
-        assertEquals(testEntryOne + Globals.NEWLINE, a.getParsedSerialization());
-        assertEquals(Globals.NEWLINE + Globals.NEWLINE + testEntryTwo, b.getParsedSerialization());
+        assertEquals(testEntryOne + OS.NEWLINE, a.getParsedSerialization());
+        assertEquals(OS.NEWLINE + OS.NEWLINE + testEntryTwo, b.getParsedSerialization());
     }
 
     @Test
     public void parseIgnoresWhitespaceInEpilogue() throws IOException {
-        ParserResult result = BibtexParser.parse(new StringReader("   " + Globals.NEWLINE));
+        ParserResult result = BibtexParser.parse(new StringReader("   " + OS.NEWLINE));
 
         assertEquals("", result.getDatabase().getEpilog());
     }
@@ -1300,12 +1302,12 @@ public class BibtexParserTest {
     public void parseIgnoresWhitespaceInEpilogueAfterEntry() throws IOException {
         String testEntry = "@article{test,author={Ed von Test}}";
         ParserResult result = BibtexParser.parse(new StringReader(
-                testEntry + Globals.NEWLINE + Globals.NEWLINE + Globals.NEWLINE + "  " + Globals.NEWLINE));
+                testEntry + OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + "  " + OS.NEWLINE));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(1, c.size());
 
         BibEntry e = c.iterator().next();
-        assertEquals(testEntry + Globals.NEWLINE, e.getParsedSerialization());
+        assertEquals(testEntry + OS.NEWLINE, e.getParsedSerialization());
         assertEquals("", result.getDatabase().getEpilog());
     }
 
@@ -1313,12 +1315,12 @@ public class BibtexParserTest {
     public void parseTrimsWhitespaceInEpilogueAfterEntry() throws IOException {
         String testEntry = "@article{test,author={Ed von Test}}";
         ParserResult result = BibtexParser.parse(new StringReader(
-                testEntry + Globals.NEWLINE + Globals.NEWLINE + Globals.NEWLINE + " epilogue " + Globals.NEWLINE));
+                testEntry + OS.NEWLINE + OS.NEWLINE + OS.NEWLINE + " epilogue " + OS.NEWLINE));
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(1, c.size());
 
         BibEntry e = c.iterator().next();
-        assertEquals(testEntry + Globals.NEWLINE, e.getParsedSerialization());
+        assertEquals(testEntry + OS.NEWLINE, e.getParsedSerialization());
         assertEquals("epilogue", result.getDatabase().getEpilog());
     }
 
@@ -1388,7 +1390,7 @@ public class BibtexParserTest {
         ParserResult result = BibtexParser
                 .parse(new StringReader(
                         "@comment{jabref-meta: keypattern_article:articleTest;}"
-                                + Globals.NEWLINE
+                                + OS.NEWLINE
                                 + "@comment{jabref-meta: keypatterndefault:test;}"));
 
         AbstractLabelPattern labelPattern = result.getMetaData().getLabelPattern();
@@ -1413,15 +1415,15 @@ public class BibtexParserTest {
     public void integrationTestGroupTree() throws IOException, ParseException {
         ParserResult result = BibtexParser.parse(new StringReader(
                 "@comment{jabref-meta: groupsversion:3;}"
-                        + Globals.NEWLINE +
+                        + OS.NEWLINE +
                         "@comment{jabref-meta: groupstree:"
-                        + Globals.NEWLINE
+                        + OS.NEWLINE
                         + "0 AllEntriesGroup:;"
-                        + Globals.NEWLINE
+                        + OS.NEWLINE
                         + "1 KeywordGroup:Fréchet\\;0\\;keywords\\;FrechetSpace\\;0\\;1\\;;"
-                        + Globals.NEWLINE
+                        + OS.NEWLINE
                         + "1 KeywordGroup:Invariant theory\\;0\\;keywords\\;GIT\\;0\\;0\\;;"
-                        + Globals.NEWLINE
+                        + OS.NEWLINE
                         + "1 ExplicitGroup:TestGroup\\;0\\;Key1\\;Key2\\;;"
                         + "}"));
 
@@ -1469,7 +1471,7 @@ public class BibtexParserTest {
     @Test
     public void parseReturnsEntriesInSameOrder() throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader(
-                "@article{a}" + Globals.NEWLINE + "@article{b}" + Globals.NEWLINE + "@inProceedings{c}"));
+                "@article{a}" + OS.NEWLINE + "@article{b}" + OS.NEWLINE + "@inProceedings{c}"));
 
         List<BibEntry> expected = new ArrayList<>();
         BibEntry a = new BibEntry();
@@ -1493,12 +1495,12 @@ public class BibtexParserTest {
     @Test
     public void parsePrecedingComment() throws IOException {
         // @formatter:off
-        String bibtexEntry = "% Some random comment that should stay here" + Globals.NEWLINE +
-                "@Article{test," + Globals.NEWLINE +
-                "  Author                   = {Foo Bar}," + Globals.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
-                "  Note                     = {some note}," + Globals.NEWLINE +
-                "  Number                   = {1}" + Globals.NEWLINE +
+        String bibtexEntry = "% Some random comment that should stay here" + OS.NEWLINE +
+                "@Article{test," + OS.NEWLINE +
+                "  Author                   = {Foo Bar}," + OS.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
+                "  Number                   = {1}" + OS.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -1520,11 +1522,11 @@ public class BibtexParserTest {
     @Test
     public void parseCommentAndEntryInOneLine() throws IOException {
         // @formatter:off
-        String bibtexEntry = "Some random comment that should stay here @Article{test," + Globals.NEWLINE +
-                "  Author                   = {Foo Bar}," + Globals.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
-                "  Note                     = {some note}," + Globals.NEWLINE +
-                "  Number                   = {1}" + Globals.NEWLINE +
+        String bibtexEntry = "Some random comment that should stay here @Article{test," + OS.NEWLINE +
+                "  Author                   = {Foo Bar}," + OS.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
+                "  Number                   = {1}" + OS.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -1545,12 +1547,12 @@ public class BibtexParserTest {
 
     @Test
     public void preserveEncodingPrefixInsideEntry() {
-        List<BibEntry> parsed = BibtexParser.fromString("@article{test,author={" + Globals.ENCODING_PREFIX + "}}");
+        List<BibEntry> parsed = BibtexParser.fromString("@article{test,author={" + SavePreferences.ENCODING_PREFIX + "}}");
 
         BibEntry expected = new BibEntry();
         expected.setType("article");
         expected.setCiteKey("test");
-        expected.setField("author", Globals.ENCODING_PREFIX);
+        expected.setField("author", SavePreferences.ENCODING_PREFIX);
         assertEquals(Collections.singletonList(expected), parsed);
     }
 

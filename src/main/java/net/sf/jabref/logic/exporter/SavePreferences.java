@@ -8,6 +8,9 @@ import net.sf.jabref.preferences.JabRefPreferences;
 
 public class SavePreferences {
 
+    // Encoding written at the top of the .bib file.
+    public static final String ENCODING_PREFIX = "Encoding: ";
+
     private final boolean reformatFile;
     private final boolean saveInOriginalOrder;
     private final SaveOrderConfig saveOrder;

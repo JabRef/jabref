@@ -184,7 +184,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     private static final int FILE_COL = 2;
     private static final int URL_COL = 3;
     private static final int PAD = 4;
-    private static final String URL_FIELD = FieldName.URL;
 
 
     /**
@@ -917,7 +916,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                                 fl.type)).actionPerformed(null);
                     }
                 } else { // Must be URL_COL
-                    openExternalLink(URL_FIELD, e);
+                    openExternalLink(FieldName.URL, e);
                 }
             }
         }
@@ -1130,14 +1129,14 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             }
             BibEntry entry = selectionModel.getSelected().get(0);
             String result = JOptionPane.showInputDialog(ImportInspectionDialog.this, Localization.lang("Enter URL"),
-                    entry.getFieldOptional(URL_FIELD).orElse(""));
+                    entry.getFieldOptional(FieldName.URL).orElse(""));
             entries.getReadWriteLock().writeLock().lock();
             try {
                 if (result != null) {
                     if (result.isEmpty()) {
-                        entry.clearField(URL_FIELD);
+                        entry.clearField(FieldName.URL);
                     } else {
-                        entry.setField(URL_FIELD, result);
+                        entry.setField(FieldName.URL, result);
                     }
                 }
             } finally {
@@ -1308,7 +1307,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             if (i == FILE_COL) {
                 comparators.add(new IconComparator(Collections.singletonList(FieldName.FILE)));
             } else if (i == URL_COL) {
-                comparators.add(new IconComparator(Collections.singletonList(URL_FIELD)));
+                comparators.add(new IconComparator(Collections.singletonList(FieldName.URL)));
             }
 
         }
@@ -1428,7 +1427,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         FileListTableModel model = new FileListTableModel();
                         entry.getFieldOptional(FieldName.FILE).ifPresent(model::setContent);
                         fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
-                        if (model.getRowCount() > 0 && model.getEntry(0).type.isPresent()) {
+                        if ((model.getRowCount() > 0) && model.getEntry(0).type.isPresent()) {
                             fileLabel.setIcon(model.getEntry(0).type.get().getIcon());
                         }
                         return fileLabel;
@@ -1436,8 +1435,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         return null;
                     }
                 case URL_COL:
-                    if (entry.hasField(URL_FIELD)) {
-                        urlLabel.setToolTipText(entry.getFieldOptional(URL_FIELD).orElse(""));
+                    if (entry.hasField(FieldName.URL)) {
+                        urlLabel.setToolTipText(entry.getFieldOptional(FieldName.URL).orElse(""));
                         return urlLabel;
                     } else {
                         return null;

@@ -17,10 +17,10 @@ package net.sf.jabref.logic.layout.format;
 
 import java.util.Map;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatter;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
@@ -83,7 +83,7 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             } else if (Character.isLetter(c) || (c == '%')
-                    || Globals.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
+                    || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
 
                 if (!incommand) {
@@ -91,7 +91,7 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
                 } else {
                     currentCommand.append(c);
                     if ((currentCommand.length() == 1)
-                            && Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())
+                            && StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())
                             && !(i >= (field.length() - 1))) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
@@ -233,7 +233,7 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
             }
         }
 
-        return sb.toString().replace("&amp;", "&").replace("<p>", Globals.NEWLINE).replace("&dollar;", "$").replace("~",
+        return sb.toString().replace("&amp;", "&").replace("<p>", OS.NEWLINE).replace("&dollar;", "$").replace("~",
                 "\u00A0");
     }
 

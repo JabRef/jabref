@@ -38,6 +38,8 @@ import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
+import net.sf.jabref.logic.layout.format.FileLinkPreferences;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.FieldName;
@@ -58,7 +60,7 @@ public class MetaData implements Iterable<String> {
     private static final String DATABASE_TYPE = "databaseType";
 
     private static final String GROUPSTREE = "groupstree";
-    private static final String FILE_DIRECTORY = FieldName.FILE + Globals.DIR_SUFFIX;
+    private static final String FILE_DIRECTORY = FieldName.FILE + FileLinkPreferences.DIR_SUFFIX;
     public static final String SELECTOR_META_PREFIX = "selector_";
     private static final String PROTECTED_FLAG_META = "protectedFlag";
 
@@ -364,7 +366,7 @@ public class MetaData implements Iterable<String> {
 
                 //in case of save actions, add an additional newline after the enabled flag
                 if (metaItem.getKey().equals(SAVE_ACTIONS) && ("enabled".equals(dataItem) || "disabled".equals(dataItem))) {
-                    stringBuilder.append(Globals.NEWLINE);
+                    stringBuilder.append(OS.NEWLINE);
                 }
             }
 
@@ -379,12 +381,12 @@ public class MetaData implements Iterable<String> {
         // (which is always the AllEntriesGroup).
         if ((groupsRoot != null) && (groupsRoot.getNumberOfChildren() > 0)) {
             StringBuilder stringBuilder = new StringBuilder();
-            stringBuilder.append(Globals.NEWLINE);
+            stringBuilder.append(OS.NEWLINE);
 
             for (String groupNode : groupsRoot.getTreeAsString()) {
                 stringBuilder.append(StringUtil.quote(groupNode, ";", '\\'));
                 stringBuilder.append(";");
-                stringBuilder.append(Globals.NEWLINE);
+                stringBuilder.append(OS.NEWLINE);
             }
             serializedMetaData.put(GROUPSTREE, stringBuilder.toString());
         }
