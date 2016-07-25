@@ -42,7 +42,7 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
         List<FieldChange> changes = new ArrayList<>();
 
         // If there are already links in the file field, keep those on top:
-        String oldFileContent = entry.getField(FieldName.FILE);
+        String oldFileContent = entry.getFieldOptional(FieldName.FILE).orElse(null);
 
         List<ParsedFileField> fileList = new ArrayList<>(FileField.parse(oldFileContent));
         int oldItemCount = fileList.size();

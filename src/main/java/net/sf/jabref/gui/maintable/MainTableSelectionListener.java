@@ -24,6 +24,7 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -426,8 +427,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                         // full pop should be shown as left click already shows short popup
                         showDefaultPopup = true;
                     } else {
-                        if (entry.hasField(field)) {
-                            String content = entry.getField(field);
+                        Optional<String> content = entry.getFieldOptional(field);
+                        if (content.isPresent()) {
                             Icon icon;
                             JLabel iconLabel = GUIGlobals.getTableIcon(field);
                             if (iconLabel == null) {
@@ -435,7 +436,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             } else {
                                 icon = iconLabel.getIcon();
                             }
-                            menu.add(new ExternalFileMenuItem(panel.frame(), entry, content, content, icon,
+                            menu.add(new ExternalFileMenuItem(panel.frame(), entry, content.get(), content.get(), icon,
                                     panel.getBibDatabaseContext(), field));
                             showDefaultPopup = false;
                         }

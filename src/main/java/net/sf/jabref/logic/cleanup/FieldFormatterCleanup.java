@@ -58,7 +58,7 @@ public class FieldFormatterCleanup implements CleanupJob {
             // Not set -> nothing to do
             return new ArrayList<>();
         }
-        String oldValue = entry.getField(fieldKey);
+        String oldValue = entry.getFieldOptional(fieldKey).orElse(null);
 
         // Run formatter
         String newValue = formatter.format(oldValue);
