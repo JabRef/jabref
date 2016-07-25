@@ -7,7 +7,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public class UpdateField {
@@ -93,7 +93,7 @@ public class UpdateField {
         String timestamp = DATE_FORMATTER.getCurrentDate();
         String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
         boolean setOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)
-                && (overwriteOwner || (!entry.hasField(InternalBibtexFields.OWNER)));
+                && (overwriteOwner || (!entry.hasField(FieldName.OWNER)));
         boolean setTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP)
                 && (overwriteTimestamp || (!entry.hasField(timeStampField)));
 
@@ -106,7 +106,7 @@ public class UpdateField {
         // Set owner field if this option is enabled:
         if (setOwner) {
             // Set owner field to default value
-            entry.setField(InternalBibtexFields.OWNER, owner);
+            entry.setField(FieldName.OWNER, owner);
         }
 
         if (setTimeStamp) {
@@ -137,7 +137,7 @@ public class UpdateField {
 
         // Iterate through all entries
         for (BibEntry curEntry : bibs) {
-            boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(InternalBibtexFields.OWNER)));
+            boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(FieldName.OWNER)));
             boolean setTimeStamp = globalSetTimeStamp && (overwriteTimestamp || (!curEntry.hasField(timeStampField)));
             setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
         }

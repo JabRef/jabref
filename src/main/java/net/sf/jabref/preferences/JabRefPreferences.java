@@ -79,7 +79,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import org.apache.commons.logging.Log;
@@ -782,7 +781,7 @@ public class JabRefPreferences {
         // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
         defaults.put(TIME_STAMP_FORMAT, "yyyy-MM-dd");
 
-        defaults.put(TIME_STAMP_FIELD, InternalBibtexFields.TIMESTAMP);
+        defaults.put(TIME_STAMP_FIELD, FieldName.TIMESTAMP);
         defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
 
         defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);

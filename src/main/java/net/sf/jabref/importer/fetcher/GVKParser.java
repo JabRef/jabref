@@ -382,7 +382,7 @@ public class GVKParser {
             if (subtitle.length() > 1) {
                 newSubtitle.append(subtitle.substring(1));
             }
-            result.setField("subtitle", newSubtitle.toString());
+            result.setField(FieldName.SUBTITLE, newSubtitle.toString());
         }
         if (publisher != null) {
             result.setField(FieldName.PUBLISHER, publisher);
@@ -409,7 +409,7 @@ public class GVKParser {
             result.setField(FieldName.NUMBER, number);
         }
         if (pagetotal != null) {
-            result.setField("pagetotal", pagetotal);
+            result.setField(FieldName.PAGETOTAL, pagetotal);
         }
         if (pages != null) {
             result.setField(FieldName.PAGES, pages);

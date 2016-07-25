@@ -185,7 +185,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         properties.put(REFERENCE_HEADER_PARAGRAPH_FORMAT, "Heading 1");
 
         // Set default properties for the citation marker:
-        citProperties.put(AUTHOR_FIELD, "author/editor");
+        citProperties.put(AUTHOR_FIELD, FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR));
         citProperties.put(YEAR_FIELD, FieldName.YEAR);
         citProperties.put(MAX_AUTHORS, 3);
         citProperties.put(MAX_AUTHORS_FIRST, -1);
@@ -724,7 +724,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * @param entry    The entry.
      * @param database The database the entry belongs to.
      * @param field    The field, or succession of fields, to look up. If backup fields are needed, separate
-     *                 field names by /. E.g. to use "author" with "editor" as backup, specify "author/editor".
+     *                 field names by /. E.g. to use "author" with "editor" as backup, specify FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR).
      * @return The resolved field content, or an empty string if the field(s) were empty.
      */
     private String getCitationMarkerField(BibEntry entry, BibDatabase database, String field) {

@@ -79,7 +79,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         Objects.requireNonNull(entry);
 
         // 1. Eprint
-        Optional<String> identifier = entry.getFieldOptional("eprint");
+        Optional<String> identifier = entry.getFieldOptional(FieldName.EPRINT);
         if (StringUtil.isNotBlank(identifier)) {
             try {
                 // Get pdf of entry with the specified id
@@ -345,16 +345,16 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         public BibEntry toBibEntry() {
             BibEntry bibEntry = new BibEntry();
             bibEntry.setType(BibtexEntryTypes.ARTICLE);
-            bibEntry.setField("eprinttype", "arXiv");
-            bibEntry.setField("author", StringUtils.join(authorNames, " and "));
-            bibEntry.setField("keywords", StringUtils.join(categories, ", "));
-            getId().ifPresent(id -> bibEntry.setField("eprint", id));
-            title.ifPresent(title -> bibEntry.setField("title", title));
-            doi.ifPresent(doi -> bibEntry.setField("doi", doi));
-            abstractText.ifPresent(abstractText -> bibEntry.setField("abstract", abstractText));
-            getDate().ifPresent(date -> bibEntry.setField("date", date));
-            primaryCategory.ifPresent(category -> bibEntry.setField("eprintclass", category));
-            journalReferenceText.ifPresent(journal -> bibEntry.setField("journaltitle", journal));
+            bibEntry.setField(FieldName.EPRINTTYPE, "arXiv");
+            bibEntry.setField(FieldName.AUTHOR, StringUtils.join(authorNames, " and "));
+            bibEntry.addKeywords(categories, ", "); // TODO: Should use separator value from preferences
+            getId().ifPresent(id -> bibEntry.setField(FieldName.EPRINT, id));
+            title.ifPresent(title -> bibEntry.setField(FieldName.TITLE, title));
+            doi.ifPresent(doi -> bibEntry.setField(FieldName.DOI, doi));
+            abstractText.ifPresent(abstractText -> bibEntry.setField(FieldName.ABSTRACT, abstractText));
+            getDate().ifPresent(date -> bibEntry.setField(FieldName.DATE, date));
+            primaryCategory.ifPresent(category -> bibEntry.setField(FieldName.EPRINTCLASS, category));
+            journalReferenceText.ifPresent(journal -> bibEntry.setField(FieldName.JOURNALTITLE, journal));
             getPdfUrl().ifPresent(url -> (new TypedBibEntry(bibEntry, BibDatabaseMode.BIBLATEX))
                     .setFiles(Collections.singletonList(new ParsedFileField("online", url, "PDF"))));
 

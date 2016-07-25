@@ -97,17 +97,17 @@ public class OAI2Handler extends DefaultHandler {
             if (!year.isPresent() || year.get().isEmpty()) {
                 entry.setField(FieldName.YEAR, content.replaceFirst("-.*", ""));
             }
-        } else if (FieldName.TITLE.equals(qualifiedName)) {
+        } else if ("title".equals(qualifiedName)) {
             entry.setField(FieldName.TITLE, content);
         } else if ("abstract".equals(qualifiedName)) {
             entry.setField(FieldName.ABSTRACT, content);
         } else if ("comments".equals(qualifiedName)) {
-            entry.setField("comments", content);
+            entry.setField(FieldName.COMMENTS, content);
         } else if ("report-no".equals(qualifiedName)) {
-            entry.setField("reportno", content);
-        } else if(FieldName.DOI.equals(qualifiedName)) {
+            entry.setField(FieldName.REPORTNO, content);
+        } else if ("doi".equals(qualifiedName)) {
           entry.setField(FieldName.DOI, content);
-        } else if (FieldName.AUTHOR.equals(qualifiedName)) {
+        } else if ("author".equals(qualifiedName)) {
             String author = forenames + " " + keyname;
             if (authors.length() > 0) {
                 authors.append(" and ");

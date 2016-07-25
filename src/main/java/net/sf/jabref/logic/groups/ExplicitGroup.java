@@ -25,6 +25,7 @@ import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -45,7 +46,7 @@ public class ExplicitGroup extends KeywordGroup {
 
     public ExplicitGroup(String name, GroupHierarchyType context, JabRefPreferences jabRefPreferences)
             throws ParseException {
-        super(name, "groups", name, true, false, context, jabRefPreferences);
+        super(name, FieldName.GROUPS, name, true, false, context, jabRefPreferences);
     }
 
     public static ExplicitGroup fromString(String s, JabRefPreferences jabRefPreferences) throws ParseException {
