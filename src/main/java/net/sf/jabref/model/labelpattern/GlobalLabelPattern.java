@@ -13,15 +13,31 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.logic.labelpattern;
+package net.sf.jabref.model.labelpattern;
 
 import java.util.List;
 
+import net.sf.jabref.preferences.JabRefPreferences;
+
 public class GlobalLabelPattern extends AbstractLabelPattern {
+
+    private static List<String> defaultLabelPattern;
+
+    static {
+        updateDefaultPattern();
+    }
+
+    public static void updateDefaultPattern() {
+        defaultLabelPattern = AbstractLabelPattern.split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
+    }
 
     @Override
     public List<String> getLastLevelLabelPattern(String key) {
-        return LabelPatternUtil.getDefaultLabelPattern();
+        return GlobalLabelPattern.getDefaultLabelPattern();
+    }
+
+    public static List<String> getDefaultLabelPattern() {
+        return defaultLabelPattern;
     }
 
 }
