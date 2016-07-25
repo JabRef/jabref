@@ -178,7 +178,7 @@ public class MedlinePlainImporter extends ImportFormat {
                 hashMap.put("STAT", "status");
                 hashMap.put("SB", "subset");
                 hashMap.put("OTO", "termowner");
-                hashMap.put("OWN", "owner");
+                hashMap.put("OWN", FieldName.OWNER);
 
                 //add the fields to hm
                 for (Map.Entry<String, String> mapEntry : hashMap.entrySet()) {

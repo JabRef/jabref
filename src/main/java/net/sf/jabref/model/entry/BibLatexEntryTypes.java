@@ -29,15 +29,15 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType ARTICLE = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(
-                Arrays.asList(FieldName.SUBTITLE, FieldName.EDITOR, FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER, "eid", FieldName.ISSUE, FieldName.PAGES,
+                Arrays.asList(FieldName.SUBTITLE, FieldName.EDITOR, FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER, FieldName.EID, FieldName.ISSUE, FieldName.PAGES,
                         FieldName.NOTE, FieldName.ISSN, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
                         FieldName.URL, FieldName.URLDATE));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.JOURNALTITLE, "year/date");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.JOURNALTITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional("translator", "annotator", "commentator", FieldName.SUBTITLE, "titleaddon", FieldName.EDITOR, "editora",
                     "editorb", "editorc", "journalsubtitle", "issuetitle", "issuesubtitle", FieldName.LANGUAGE, "origlanguage",
-                    FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER, "eid", FieldName.ISSUE, FieldName.MONTH, FieldName.PAGES, "version", FieldName.NOTE, FieldName.ISSN,
+                    FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER, FieldName.EID, FieldName.ISSUE, FieldName.MONTH, FieldName.PAGES, FieldName.VERSION, FieldName.NOTE, FieldName.ISSN,
                     "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
         }
@@ -63,7 +63,7 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, "year/date");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.EDITOR, "editora", "editorb", "editorc", "translator", "annotator", "commentator",
                     "introduction", "foreword", "afterword", FieldName.SUBTITLE, "titleaddon", "maintitle", "mainsubtitle",
                     "maintitleaddon", FieldName.LANGUAGE, "origlanguage", FieldName.VOLUME, "part", FieldName.EDITION, "volumes", FieldName.SERIES,
@@ -90,7 +90,7 @@ public class BibLatexEntryTypes {
                         FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE));
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, "year/date");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.EDITOR, "editora", "editorb", "editorc", "translator", "annotator", "commentator",
                     "introduction", "foreword", "afterword", FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, "origlanguage",
                     FieldName.EDITION, "volumes", FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.PAGETOTAL,
@@ -119,7 +119,7 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, "year/date");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional("bookauthor", FieldName.EDITOR, "editora", "editorb", "editorc", "translator", "annotator",
                     "commentator", "introduction", "foreword", "afterword", FieldName.SUBTITLE, "titleaddon", "maintitle",
                     "mainsubtitle", "maintitleaddon", "booksubtitle", "booktitleaddon", FieldName.LANGUAGE, "origlanguage",
@@ -196,7 +196,7 @@ public class BibLatexEntryTypes {
                         FieldName.URLDATE));
 
         {
-            addAllRequired("author/editor", FieldName.TITLE, "year/date");
+            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.TYPE, FieldName.NOTE, FieldName.LOCATION, FieldName.CHAPTER,
                     FieldName.PAGES, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
@@ -223,7 +223,7 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired(FieldName.EDITOR, FieldName.TITLE, "year/date");
+            addAllRequired(FieldName.EDITOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional("editora", "editorb", "editorc", "translator", "annotator", "commentator", "introduction",
                     "foreword", "afterword", FieldName.SUBTITLE, "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon",
                     FieldName.LANGUAGE, "origlanguage", FieldName.VOLUME, "part", FieldName.EDITION, "volumes", FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE,
@@ -250,7 +250,7 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired(FieldName.EDITOR, FieldName.TITLE, "year/date");
+            addAllRequired(FieldName.EDITOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional("editora", "editorb", "editorc", "translator", "annotator", "commentator", "introduction",
                     "foreword", "afterword", FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, "origlanguage", FieldName.EDITION, "volumes", FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE,
                     FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI,
@@ -278,7 +278,7 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, "year/date");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.EDITOR, "editora", "editorb", "editorc", "translator", "annotator", "commentator", "introduction",
                     "foreword", "afterword", FieldName.SUBTITLE, "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon",
                     "booksubtitle", "booktitleaddon", FieldName.LANGUAGE, "origlanguage", FieldName.VOLUME, "part", FieldName.EDITION,
@@ -331,8 +331,8 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired("author/editor", FieldName.TITLE, "year/date");
-            addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.EDITION, FieldName.TYPE, FieldName.SERIES, FieldName.NUMBER, "version",
+            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.EDITION, FieldName.TYPE, FieldName.SERIES, FieldName.NUMBER, FieldName.VERSION,
                     FieldName.NOTE, FieldName.ORGANIZATION, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL,
                     "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
@@ -357,8 +357,8 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired("author/editor", FieldName.TITLE, "year/date");
-            addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.TYPE, "version", FieldName.NOTE,
+            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.TYPE, FieldName.VERSION, FieldName.NOTE,
                     FieldName.ORGANIZATION, FieldName.LOCATION, FieldName.MONTH, "addendum", "pubstate", FieldName.DOI,
                     FieldName.EPRINT, FieldName.EPRINTCLASS,
                     FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
@@ -382,8 +382,8 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired("author/editor", FieldName.TITLE, "year/date", FieldName.URL);
-            addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, "version", FieldName.NOTE, FieldName.ORGANIZATION, FieldName.MONTH, "addendum", "pubstate", FieldName.URLDATE);
+            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE), FieldName.URL);
+            addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.VERSION, FieldName.NOTE, FieldName.ORGANIZATION, FieldName.MONTH, "addendum", "pubstate", FieldName.URLDATE);
         }
 
         @Override
@@ -405,8 +405,8 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.NUMBER, "year/date");
-            addAllOptional("holder", FieldName.SUBTITLE, "titleaddon", FieldName.TYPE, "version", FieldName.LOCATION, FieldName.NOTE, FieldName.MONTH,
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.NUMBER, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional("holder", FieldName.SUBTITLE, "titleaddon", FieldName.TYPE, FieldName.VERSION, FieldName.LOCATION, FieldName.NOTE, FieldName.MONTH,
                     "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
         }
@@ -430,7 +430,7 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired(FieldName.EDITOR, FieldName.TITLE, "year/date");
+            addAllRequired(FieldName.EDITOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional("editora", "editorb", "editorc", FieldName.SUBTITLE, "issuetitle", "issuesubtitle", FieldName.LANGUAGE,
                     FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER, FieldName.ISSUE, FieldName.MONTH, FieldName.NOTE, FieldName.ISSN, "addendum", "pubstate",
                     FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
@@ -480,7 +480,7 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired(FieldName.TITLE, "year/date");
+            addAllRequired(FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.EDITOR, FieldName.SUBTITLE, "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon", "eventtitle",
                     "eventtitleaddon", "eventdate", "venue", FieldName.LANGUAGE, FieldName.VOLUME, "part", "volumes", FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE,
                     FieldName.ORGANIZATION, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.MONTH, FieldName.YEAR, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL,
@@ -508,7 +508,7 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired(FieldName.TITLE, "year/date");
+            addAllRequired(FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.EDITOR, FieldName.SUBTITLE, "titleaddon", "eventtitle",
                     "eventtitleaddon", "eventdate", "venue", FieldName.LANGUAGE, "volumes", FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE,
                     FieldName.ORGANIZATION, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN, FieldName.PAGETOTAL,
@@ -537,7 +537,7 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, "year/date");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.EDITOR, FieldName.SUBTITLE, "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon", "booksubtitle",
                     "booktitleaddon", "eventtitle", "eventtitleaddon", "eventdate", "venue", FieldName.LANGUAGE, FieldName.VOLUME, "part", "volumes",
                     FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE, FieldName.ORGANIZATION, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN,
@@ -638,8 +638,8 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.TYPE, FieldName.INSTITUTION, "year/date");
-            addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.NUMBER, "version", FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH,
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.TYPE, FieldName.INSTITUTION, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.NUMBER, FieldName.VERSION, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH,
                     "isrn", FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI,
                     FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
@@ -675,7 +675,7 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.TYPE, FieldName.INSTITUTION, "year/date");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.TYPE, FieldName.INSTITUTION, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN, FieldName.CHAPTER,
                     FieldName.PAGES, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
@@ -700,7 +700,7 @@ public class BibLatexEntryTypes {
 
 
         {
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, "year/date");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH,
                     "addendum", "pubstate", FieldName.URL, FieldName.URLDATE);
         }
@@ -776,7 +776,7 @@ public class BibLatexEntryTypes {
 
         {
             // Treated as alias of "THESIS", except FieldName.TYPE field is optional
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, "year/date");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.TYPE, FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN, FieldName.CHAPTER,
                     FieldName.PAGES, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
@@ -804,7 +804,7 @@ public class BibLatexEntryTypes {
 
         {
             // Treated as alias of "THESIS", except FieldName.TYPE field is optional
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, "year/date");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.TYPE, FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN, FieldName.CHAPTER,
                     FieldName.PAGES, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
@@ -832,8 +832,8 @@ public class BibLatexEntryTypes {
 
         {
             // Treated as alias of "REPORT", except FieldName.TYPE field is optional
-            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, "year/date");
-            addAllOptional(FieldName.TYPE, FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.NUMBER, "version", FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH,
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.TYPE, FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.NUMBER, FieldName.VERSION, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH,
                     "isrn", FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI,
                     FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
