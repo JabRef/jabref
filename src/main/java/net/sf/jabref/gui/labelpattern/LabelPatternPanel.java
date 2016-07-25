@@ -37,12 +37,12 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.labelpattern.AbstractLabelPattern;
-import net.sf.jabref.model.labelpattern.DatabaseLabelPattern;
-import net.sf.jabref.model.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.labelpattern.AbstractLabelPattern;
+import net.sf.jabref.model.labelpattern.DatabaseLabelPattern;
+import net.sf.jabref.model.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public class LabelPatternPanel extends JPanel {
