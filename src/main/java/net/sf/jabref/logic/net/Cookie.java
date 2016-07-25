@@ -19,6 +19,7 @@ import java.net.URI;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Locale;
 import java.util.Optional;
 
 class Cookie {
@@ -29,8 +30,10 @@ class Cookie {
     private ZonedDateTime expires;
     private String path;
 
-    private final DateTimeFormatter whiteSpaceFormat = DateTimeFormatter.ofPattern("E, dd MMM yyyy k:m:s z");
-    private final DateTimeFormatter hyphenFormat = DateTimeFormatter.ofPattern("E, dd-MMM-yyyy k:m:s z");
+    private final DateTimeFormatter whiteSpaceFormat = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss zzz",
+            Locale.ROOT);
+    private final DateTimeFormatter hyphenFormat = DateTimeFormatter.ofPattern("EEE, dd-MMM-yyyy HH:mm:ss zzz",
+            Locale.ROOT);
 
 
     /**
@@ -76,6 +79,7 @@ class Cookie {
                 this.path = value;
             } else if ("expires".equalsIgnoreCase(name)) {
                 try {
+                    System.err.println("*" + value + "*");
                     this.expires = ZonedDateTime.parse(value, whiteSpaceFormat);
                 } catch (DateTimeParseException e) {
                     try {
