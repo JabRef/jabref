@@ -19,6 +19,7 @@ import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.undo.AddUndoEvent;
 import net.sf.jabref.logic.undo.UndoRedoEvent;
 
@@ -34,14 +35,13 @@ public class CountingUndoManager extends UndoManager {
 
     public CountingUndoManager() {
         super();
-        eventBus.post(new UndoRedoEvent());
     }
 
     @Override
     public synchronized boolean addEdit(UndoableEdit edit) {
         current++;
         boolean returnvalue = super.addEdit(edit);
-        eventBus.post(new AddUndoEvent());
+        postAddUndoEvent();
         return returnvalue;
     }
 
@@ -49,14 +49,14 @@ public class CountingUndoManager extends UndoManager {
     public synchronized void undo() throws CannotUndoException {
         super.undo();
         current--;
-        eventBus.post(new UndoRedoEvent());
+        postUndoRedoEvent();
     }
 
     @Override
     public synchronized void redo() throws CannotUndoException {
         super.redo();
         current++;
-        eventBus.post(new UndoRedoEvent());
+        postUndoRedoEvent();
     }
 
     public synchronized void markUnchanged() {
@@ -70,13 +70,24 @@ public class CountingUndoManager extends UndoManager {
 
     public void registerListener(Object object) {
         this.eventBus.register(object);
+        postUndoRedoEvent(); // Send event to trigger changess
     }
 
     public void unregisterListener(Object object) {
         this.eventBus.unregister(object);
     }
 
-    public void triggerEvent() {
-        eventBus.post(new UndoRedoEvent());
+    public void postUndoRedoEvent() {
+        boolean canRedo = this.canRedo();
+        boolean canUndo = this.canUndo();
+        eventBus.post(new UndoRedoEvent(canUndo, canUndo ? getUndoPresentationName() : Localization.lang("Undo"),
+                canRedo, canRedo ? getRedoPresentationName() : Localization.lang("Redo")));
+    }
+
+    private void postAddUndoEvent() {
+        boolean canRedo = this.canRedo();
+        boolean canUndo = this.canUndo();
+        eventBus.post(new AddUndoEvent(canUndo, canUndo ? getUndoPresentationName() : Localization.lang("Undo"),
+                canRedo, canRedo ? getRedoPresentationName() : Localization.lang("Redo")));
     }
 }

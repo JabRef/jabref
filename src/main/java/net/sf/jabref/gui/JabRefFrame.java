@@ -110,7 +110,6 @@ import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.gui.protectedterms.ProtectedTermsDialog;
 import net.sf.jabref.gui.push.PushToApplicationButton;
 import net.sf.jabref.gui.push.PushToApplications;
-import net.sf.jabref.gui.undo.CountingUndoManager;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
@@ -646,7 +645,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             bp.updateSearchManager();
             // Set correct enabled state for Back and Forward actions:
             bp.setBackAndForwardEnabledState();
-            bp.getUndoManager().triggerEvent();
+            bp.getUndoManager().postUndoRedoEvent();
             new FocusRequester(bp.getMainTable());
         });
 
@@ -1658,8 +1657,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
 
         // Register undo/redo listener
-        bp.getUndoManager().registerListener(new UndoRedoEventManager(bp.getUndoManager()));
-        bp.getUndoManager().triggerEvent();
+        bp.getUndoManager().registerListener(new UndoRedoEventManager());
     }
 
     public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
@@ -2291,58 +2289,24 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private class UndoRedoEventManager {
 
-        private final CountingUndoManager undoManager;
-
-
-        public UndoRedoEventManager(CountingUndoManager undoManager) {
-            this.undoManager = undoManager;
-        }
-
         @Subscribe
         public void listen(UndoRedoEvent event) {
-            updateTexts();
+            updateTexts(event);
             JabRefFrame.this.getCurrentBasePanel().updateEntryEditorIfShowing();
         }
 
         @Subscribe
         public void listen(AddUndoEvent event) {
-            updateTexts();
+            updateTexts(event);
         }
 
-        private void updateTexts() {
+        private void updateTexts(AddUndoEvent event) {
             if (JabRefFrame.this != null) {
-                if (undoManager.canUndo()) {
-                    setUndoText(undoManager.getUndoPresentationName());
-                    enableUndo(true);
-                } else {
-                    setUndoText(Localization.lang("Undo"));
-                    enableUndo(false);
-                }
-
-                if (undoManager.canRedo()) {
-                    setRedoText(undoManager.getRedoPresentationName());
-                    enableRedo(true);
-                } else {
-                    setRedoText(Localization.lang("Redo"));
-                    enableRedo(false);
-                }
+                undo.putValue(Action.SHORT_DESCRIPTION, event.undoText);
+                undo.setEnabled(event.canUndo);
+                redo.putValue(Action.SHORT_DESCRIPTION, event.redoText);
+                redo.setEnabled(event.canRedo);
             }
-        }
-
-        private void setUndoText(String undoPresentationName) {
-            undo.putValue(Action.SHORT_DESCRIPTION, undoPresentationName);
-        }
-
-        private void setRedoText(String undoPresentationName) {
-            redo.putValue(Action.SHORT_DESCRIPTION, undoPresentationName);
-        }
-
-        private void enableUndo(boolean value) {
-            undo.setEnabled(value);
-        }
-
-        private void enableRedo(boolean value) {
-            redo.setEnabled(value);
         }
     }
 }
