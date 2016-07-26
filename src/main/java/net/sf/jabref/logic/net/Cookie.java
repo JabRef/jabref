@@ -30,9 +30,11 @@ class Cookie {
     private ZonedDateTime expires;
     private String path;
 
-    private final DateTimeFormatter whiteSpaceFormat = DateTimeFormatter.ofPattern("EEE, dd MMM yy HH:mm:ss z",
+    private final DateTimeFormatter whiteSpaceFormat = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss z",
             Locale.ROOT);
-    private final DateTimeFormatter hyphenFormat = DateTimeFormatter.ofPattern("EEE, dd-MMM-yy HH:mm:ss z",
+    private final DateTimeFormatter hyphenFormat = DateTimeFormatter.ofPattern("EEE, dd-MMM-yyyy HH:mm:ss z",
+            Locale.ROOT);
+    private final DateTimeFormatter hyphenTwoDigitYearFormat = DateTimeFormatter.ofPattern("EEE, dd-MMM-yy HH:mm:ss z",
             Locale.ROOT);
 
 
@@ -82,8 +84,11 @@ class Cookie {
                     try {
                         this.expires = ZonedDateTime.parse(value, hyphenFormat);
                     } catch (DateTimeParseException e2) {
-                        throw new IllegalArgumentException(
-                                "Bad date format in header: " + value);
+                        try {
+                            this.expires = ZonedDateTime.parse(value, hyphenTwoDigitYearFormat);
+                        } catch (DateTimeParseException e3) {
+                            throw new IllegalArgumentException("Bad date format in header: " + value);
+                        }
                     }
                 }
             }
