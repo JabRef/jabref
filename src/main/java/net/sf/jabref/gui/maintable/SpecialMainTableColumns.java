@@ -15,6 +15,7 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
+import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
@@ -42,7 +43,7 @@ public class SpecialMainTableColumns {
         public Object getColumnValue(BibEntry entry) {
 
             return entry.getFieldOptional(SpecialFieldsUtils.FIELDNAME_RANKING)
-                    .flatMap(Priority.getInstance()::parse).map(rank -> rank.createLabel()).orElse(null);
+                    .flatMap(Rank.getInstance()::parse).map(rank -> rank.createLabel()).orElse(null);
         }
     };
 

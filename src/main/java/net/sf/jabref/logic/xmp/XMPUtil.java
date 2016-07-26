@@ -1004,8 +1004,6 @@ public class XMPUtil {
         Set<String> filters = new TreeSet<>(prefs.getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS));
 
         // Set all the values including key and entryType
-        Set<String> fields = resolvedEntry.getFieldNames();
-
         for (Entry<String, String> field : resolvedEntry.getFieldMap().entrySet()) {
 
             String fieldName = field.getKey();
