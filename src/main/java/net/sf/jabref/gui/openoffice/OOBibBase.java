@@ -57,6 +57,7 @@ import net.sf.jabref.logic.openoffice.UndefinedParagraphFormatException;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.IdGenerator;
 
 import com.sun.star.awt.Point;
 import com.sun.star.beans.IllegalTypeException;
@@ -1294,6 +1295,33 @@ class OOBibBase {
             return Objects.hash(position, name);
         }
 
+    }
+
+
+    public BibDatabase generateDatabase(List<BibDatabase> databases, OOBibStyle style)
+            throws NoSuchElementException, WrappedTargetException {
+        BibDatabase resultDatabase = new BibDatabase();
+        List<String> cited = findCitedKeys();
+        for (String key : cited) {
+            for (BibDatabase loopDatabase : databases) {
+                Optional<BibEntry> entry = loopDatabase.getEntryByKey(key);
+                if (entry.isPresent()) {
+                    BibEntry clonedEntry = (BibEntry) entry.get().clone();
+                    clonedEntry.setId(IdGenerator.next());
+                    resultDatabase.insertEntry(clonedEntry);
+                    entry.get().getFieldOptional(FieldName.CROSSREF).ifPresent(crossref -> {
+                        if (!resultDatabase.getEntryByKey(crossref).isPresent()) {
+                            Optional<BibEntry> refEntry = loopDatabase.getEntryByKey(crossref);
+                            if (refEntry.isPresent()) {
+                                resultDatabase.insertEntry(refEntry.get());
+                            }
+                        }
+                    });
+                }
+            }
+        }
+
+        return resultDatabase;
     }
 
 }
