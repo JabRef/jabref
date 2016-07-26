@@ -21,8 +21,8 @@ public class LocalizationParserTest {
         assertLocalizationParsing("Localization.lang(\"Reset preferences (key1,key2,... or 'all')\")", "Reset_preferences_(key1,key2,..._or_'all')");
         assertLocalizationParsing("Localization.lang(\"Multiple entries selected. Do you want to change the type of all these to '%0'?\")",
                 "Multiple_entries_selected._Do_you_want_to_change_the_type_of_all_these_to_'%0'?");
-        assertLocalizationParsing("Localization.lang(\"Run Fetcher, e.g. \\\"--fetch=Medline:cancer\\\"\");",
-                "Run_Fetcher,_e.g._\"--fetch\\=Medline\\:cancer\"");
+        assertLocalizationParsing("Localization.lang(\"Run fetcher, e.g. \\\"--fetch=Medline:cancer\\\"\");",
+                "Run_fetcher,_e.g._\"--fetch\\=Medline\\:cancer\"");
     }
 
     private void assertLocalizationParsing(String code, String expectedLanguageKeys) {

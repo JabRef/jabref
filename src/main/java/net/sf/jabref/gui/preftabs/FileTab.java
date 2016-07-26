@@ -104,7 +104,7 @@ class FileTab extends JPanel implements PrefsTab {
         autoSaveInterval = new JSpinner(new SpinnerNumberModel(1, 1, 60, 1));
         valueDelimiter = new JComboBox<>(new String[] {
                 Localization.lang("Quotes") + ": \", \"",
-                Localization.lang("Curly Brackets") + ": {, }"});
+                Localization.lang("Curly brackets") + ": {, }"});
         resolveStringsAll = new JRadioButton(Localization.lang("Resolve strings for all fields except") + ":");
         resolveStringsStandard = new JRadioButton(Localization.lang("Resolve strings for standard BibTeX fields only"));
         ButtonGroup bg = new ButtonGroup();
@@ -169,7 +169,7 @@ class FileTab extends JPanel implements PrefsTab {
         builder.append(useRegExpComboBox);
         builder.append(regExpTextField);
 
-        builder.append(new HelpAction(Localization.lang("Help on Regular Expression Search"),
+        builder.append(new HelpAction(Localization.lang("Help on regular expression search"),
                 HelpFile.REGEX_SEARCH)
                 .getHelpButton());
         builder.nextLine();

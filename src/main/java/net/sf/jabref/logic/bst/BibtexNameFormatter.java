@@ -89,7 +89,7 @@ public class BibtexNameFormatter {
                         if ("fvlj".indexOf(c[i]) == -1) {
                             if (warn != null) {
                                 warn.warn(
-                                        "Format String in format.name$ may only contain fvlj on brace level 1 in group "
+                                        "Format string in format.name$ may only contain fvlj on brace level 1 in group "
                                                 + group + ": " + format);
                             }
                         } else {
@@ -106,7 +106,7 @@ public class BibtexNameFormatter {
                 }
 
                 if ((control.length() > 2) && (warn != null)) {
-                    warn.warn("Format String in format.name$ may only be one or two character long on brace level 1 in group " + group + ": " + format);
+                    warn.warn("Format string in format.name$ may only be one or two character long on brace level 1 in group " + group + ": " + format);
                 }
 
                 char type = control.charAt(0);
@@ -142,7 +142,7 @@ public class BibtexNameFormatter {
                         abbreviateThatIsSingleLetter = false;
                     } else {
                         if (warn != null) {
-                            warn.warn("Format String in format.name$ may only contain one type of vlfj on brace level 1 in group " + group + ": " + format);
+                            warn.warn("Format string in format.name$ may only contain one type of vlfj on brace level 1 in group " + group + ": " + format);
                         }
                     }
                 }

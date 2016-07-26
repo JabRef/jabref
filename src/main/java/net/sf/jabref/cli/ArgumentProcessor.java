@@ -483,7 +483,7 @@ public class ArgumentProcessor {
         }
 
         String query = split[1];
-        System.out.println(Localization.lang("Running Query '%0' with fetcher '%1'.", query, engine) + " "
+        System.out.println(Localization.lang("Running query '%0' with fetcher '%1'.", query, engine) + " "
                 + Localization.lang("Please wait..."));
         Collection<BibEntry> result = new ImportInspectionCommandLine().query(query, fetcher);
 

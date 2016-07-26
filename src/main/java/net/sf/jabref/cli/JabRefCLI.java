@@ -214,7 +214,7 @@ public class JabRefCLI {
 
         options.addOption(Option.builder("f").
                 longOpt("fetch").
-                desc(Localization.lang("Run Fetcher, e.g. \"--fetch=Medline:cancer\"")).
+                desc(Localization.lang("Run fetcher, e.g. \"--fetch=Medline:cancer\"")).
                 hasArg().
                 argName("FILE").
                 build());

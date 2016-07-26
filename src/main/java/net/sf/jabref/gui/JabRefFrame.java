@@ -552,8 +552,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         // Close actions
         JMenuItem close = new JMenuItem(Localization.lang("Close"));
-        JMenuItem closeOthers = new JMenuItem(Localization.lang("Close Others"));
-        JMenuItem closeAll = new JMenuItem(Localization.lang("Close All"));
+        JMenuItem closeOthers = new JMenuItem(Localization.lang("Close others"));
+        JMenuItem closeAll = new JMenuItem(Localization.lang("Close all"));
         close.addActionListener(closeDatabaseAction);
         closeOthers.addActionListener(closeOtherDatabasesAction);
         closeAll.addActionListener(closeAllDatabasesAction);
