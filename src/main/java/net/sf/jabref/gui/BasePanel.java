@@ -191,7 +191,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // The undo manager.
     private final UndoAction undoAction = new UndoAction();
     private final RedoAction redoAction = new RedoAction();
-    private final CountingUndoManager undoManager = new CountingUndoManager(this);
+    private final CountingUndoManager undoManager = new CountingUndoManager();
 
     private final List<BibEntry> previousEntries = new ArrayList<>();
 

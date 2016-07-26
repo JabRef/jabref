@@ -15,13 +15,10 @@
 */
 package net.sf.jabref.gui.undo;
 
-import java.util.Objects;
-
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
-import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.undo.AddUndoEvent;
 import net.sf.jabref.logic.undo.UndoRedoEvent;
 
@@ -31,14 +28,12 @@ public class CountingUndoManager extends UndoManager {
 
     private int unchangedPoint;
     private int current;
-    private final BasePanel panel;
 
     private final EventBus eventBus = new EventBus();
 
 
-    public CountingUndoManager(BasePanel basePanel) {
+    public CountingUndoManager() {
         super();
-        panel = Objects.requireNonNull(basePanel);
         eventBus.post(new UndoRedoEvent());
     }
 
@@ -62,7 +57,6 @@ public class CountingUndoManager extends UndoManager {
         super.redo();
         current++;
         eventBus.post(new UndoRedoEvent());
-        panel.updateEntryEditorIfShowing();
     }
 
     public synchronized void markUnchanged() {
