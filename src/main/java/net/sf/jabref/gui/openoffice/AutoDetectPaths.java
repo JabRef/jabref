@@ -45,7 +45,7 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 /**
- * Tools for automatically detecting jar and executable paths to OpenOffice and/or LibreOffice.
+ * Tools for automatically detecting JAR and executable paths to OpenOffice and/or LibreOffice.
  */
 public class AutoDetectPaths extends AbstractWorker {
 

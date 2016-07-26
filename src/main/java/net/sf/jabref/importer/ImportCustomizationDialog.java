@@ -127,7 +127,7 @@ public class ImportCustomizationDialog extends JDialog {
         });
         addFromFolderButton.setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a class path.") + "\n" + Localization.lang("The path need not be on the classpath of JabRef."));
 
-        JButton addFromJarButton = new JButton(Localization.lang("Add from jar"));
+        JButton addFromJarButton = new JButton(Localization.lang("Add from JAR"));
         addFromJarButton.addActionListener(e -> {
             String basePath = FileDialogs.getNewFile(frame,
                     new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), Arrays.asList(".zip", ".jar"),
