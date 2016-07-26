@@ -23,7 +23,7 @@ import org.apache.commons.logging.LogFactory;
 /**
  * LaTeX Aux to BibTeX Parser
  * <p>
- * Extracts a subset of BibTeX entries from a BibDatabase that are included in an aux file.
+ * Extracts a subset of BibTeX entries from a BibDatabase that are included in an AUX file.
  */
 public class AuxParser {
     private static final Log LOGGER = LogFactory.getLog(AuxParser.class);
@@ -35,9 +35,9 @@ public class AuxParser {
     private final BibDatabase masterDatabase;
 
     /**
-     * Generates a database based on the given aux file and BibTeX database
+     * Generates a database based on the given AUX file and BibTeX database
      *
-     * @param auxFile  Path to the LaTeX aux file
+     * @param auxFile  Path to the LaTeX AUX file
      * @param database BibTeX database
      */
     public AuxParser(String auxFile, BibDatabase database) {
@@ -55,21 +55,21 @@ public class AuxParser {
     }
 
     /*
-     * Parses the aux file and extracts all bib keys.
-     * Also supports nested aux files (latex \\include).
+     * Parses the AUX file and extracts all bib keys.
+     * Also supports nested AUX files (latex \\include).
      *
-     * There exists no specification of the aux file.
-     * Every package, class or document can write to the aux file.
-     * The aux file consists of LaTeX macros and is read at the \begin{document} and again at the \end{document}.
+     * There exists no specification of the AUX file.
+     * Every package, class or document can write to the AUX file.
+     * The AUX file consists of LaTeX macros and is read at the \begin{document} and again at the \end{document}.
      *
      * BibTeX citation: \citation{x,y,z}
      * Biblatex citation: \abx@aux@cite{x,y,z}
-     * Nested aux files: \@input{x}
+     * Nested AUX files: \@input{x}
      */
     private AuxParserResult parseAuxFile() {
         AuxParserResult result = new AuxParserResult(masterDatabase);
 
-        // nested aux files
+        // nested AUX files
         List<String> fileList = new ArrayList<>(1);
         fileList.add(auxFile);
 
@@ -124,7 +124,7 @@ public class AuxParser {
     }
 
     /*
-     * Try to find an equivalent BibTeX entry inside the reference database for all keys inside the aux file.
+     * Try to find an equivalent BibTeX entry inside the reference database for all keys inside the AUX file.
      */
     private void resolveTags(AuxParserResult result) {
         for (String key : result.getUniqueKeys()) {
