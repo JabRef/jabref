@@ -982,7 +982,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      *
      */
     public List<BasePanel> getBasePanelList() {
-        List<BasePanel> returnList = new ArrayList<>(getBasePanelCount());
+        List<BasePanel> returnList = new ArrayList<>();
         for (int i=0; i< getBasePanelCount(); i++) {
             returnList.add((BasePanel) tabbedPane.getComponentAt(i));
         }

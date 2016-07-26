@@ -1309,14 +1309,14 @@ class OOBibBase {
                     BibEntry clonedEntry = (BibEntry) entry.get().clone();
                     clonedEntry.setId(IdGenerator.next());
                     resultDatabase.insertEntry(clonedEntry);
-                    entry.get().getFieldOptional(FieldName.CROSSREF).ifPresent(crossref -> {
+                    clonedEntry.getFieldOptional(FieldName.CROSSREF).ifPresent(crossref -> {
                         if (!resultDatabase.getEntryByKey(crossref).isPresent()) {
-                            Optional<BibEntry> refEntry = loopDatabase.getEntryByKey(crossref);
-                            if (refEntry.isPresent()) {
-                                resultDatabase.insertEntry(refEntry.get());
-                            }
+                            loopDatabase.getEntryByKey(crossref).ifPresent(resultDatabase::insertEntry);
                         }
                     });
+
+                    // Be happy with the first found BibEntry
+                    break;
                 }
             }
         }
