@@ -701,7 +701,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     /**
-     * The MacAdapter calls this method when a ".bib" file has been double-clicked from the Finder.
+     * The MacAdapter calls this method when a "BIB" file has been double-clicked from the Finder.
      */
     public void openAction(String filePath) {
         File file = new File(filePath);

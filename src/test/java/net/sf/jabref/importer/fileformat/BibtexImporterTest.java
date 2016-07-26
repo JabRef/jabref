@@ -115,7 +115,7 @@ public class BibtexImporterTest {
     @Test
     public void testGetDescription() {
         assertEquals("This importer exists only to enable `--importToOpen someEntry.bib`\n" +
-                            "It is NOT intended to import a bib file. This is done via the option action, which treats the metadata fields.\n" +
+                            "It is NOT intended to import a BIB file. This is done via the option action, which treats the metadata fields.\n" +
                             "The metadata is not required to be read here, as this class is NOT called at --import.", importer.getDescription());
     }
 }

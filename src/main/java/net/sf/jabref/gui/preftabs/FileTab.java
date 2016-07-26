@@ -83,9 +83,9 @@ class FileTab extends JPanel implements PrefsTab {
         this.frame = frame;
 
         fileDir = new JTextField(25);
-        bibLocAsPrimaryDir = new JCheckBox(Localization.lang("Use the bib file location as primary file directory"));
+        bibLocAsPrimaryDir = new JCheckBox(Localization.lang("Use the BIB file location as primary file directory"));
         bibLocAsPrimaryDir.setToolTipText(Localization.lang("When downloading files, or moving linked files to the "
-                + "file directory, prefer the bib file location rather than the file directory set above"));
+                + "file directory, prefer the BIB file location rather than the file directory set above"));
         runAutoFileSearch = new JCheckBox(Localization.lang("When opening file link, search for matching file if no link is defined"));
         allowFileAutoOpenBrowse = new JCheckBox(Localization.lang("Automatically open browse dialog when creating new file link"));
         regExpTextField = new JTextField(25);
@@ -114,7 +114,7 @@ class FileTab extends JPanel implements PrefsTab {
         // This is sort of a quick hack
         newlineSeparator = new JComboBox<>(new String[] {"CR", "CR/LF", "LF"});
 
-        reformatFileOnSaveAndExport = new JCheckBox(Localization.lang("Always reformat .bib file on save and export"));
+        reformatFileOnSaveAndExport = new JCheckBox(Localization.lang("Always reformat BIB file on save and export"));
 
         nonWrappableFields = new JTextField(25);
         doNotResolveStringsFor = new JTextField(30);

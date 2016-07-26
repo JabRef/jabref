@@ -176,7 +176,7 @@ public class FileUtil {
      * Uses <ul>
      * <li>the default directory associated with the extension of the file</li>
      * <li>the standard file directory</li>
-     * <li>the directory of the bib file</li>
+     * <li>the directory of the BIB file</li>
      * </ul>
      *
      * @param databaseContext The database this file belongs to.
@@ -188,7 +188,7 @@ public class FileUtil {
         List<String> directories = databaseContext.getFileDirectory(extension.orElse(null));
         // Include the standard "file" directory:
         List<String> fileDir = databaseContext.getFileDirectory();
-        // Include the directory of the bib file:
+        // Include the directory of the BIB file:
         List<String> al = new ArrayList<>();
         for (String dir : directories) {
             if (!al.contains(dir)) {

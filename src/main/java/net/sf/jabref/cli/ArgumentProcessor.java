@@ -232,7 +232,7 @@ public class ArgumentProcessor {
         if (!cli.isBlank() && (cli.getLeftOver().length > 0)) {
             for (String aLeftOver : cli.getLeftOver()) {
                 // Leftover arguments that have a "bib" extension are interpreted as
-                // bib files to open. Other files, and files that could not be opened
+                // BIB files to open. Other files, and files that could not be opened
                 // as bib, we try to import instead.
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
                 ParserResult pr = null;
@@ -438,7 +438,7 @@ public class ArgumentProcessor {
                     LabelPatternUtil.makeLabel(metaData, database, entry, Globals.prefs);
                 }
             } else {
-                LOGGER.info(Localization.lang("No meta data present in bibfile. Cannot regenerate BibTeX keys"));
+                LOGGER.info(Localization.lang("No meta data present in BIB_file. Cannot regenerate BibTeX keys"));
             }
         }
     }

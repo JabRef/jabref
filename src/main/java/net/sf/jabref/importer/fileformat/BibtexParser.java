@@ -291,7 +291,7 @@ public class BibtexParser {
             if (typ.isPresent()) {
                 entryTypes.put(typ.get().getName(), typ.get());
             } else {
-                parserResult.addWarning(Localization.lang("Ill-formed entrytype comment in bib file") + ": " +
+                parserResult.addWarning(Localization.lang("Ill-formed entrytype comment in BIB file") + ": " +
                         comment);
             }
 

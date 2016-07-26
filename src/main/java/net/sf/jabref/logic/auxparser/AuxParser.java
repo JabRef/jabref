@@ -55,7 +55,7 @@ public class AuxParser {
     }
 
     /*
-     * Parses the AUX file and extracts all bib keys.
+     * Parses the AUX file and extracts all BIB keys.
      * Also supports nested AUX files (latex \\include).
      *
      * There exists no specification of the AUX file.
