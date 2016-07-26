@@ -294,7 +294,7 @@ public class ArgumentProcessor {
                     SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults),
                             prefs);
 
-                    // Show just a warning message if encoding didn't work for all characters:
+                    // Show just a warning message if encoding did not work for all characters:
                     if (!session.getWriter().couldEncodeAll()) {
                         System.err.println(Localization.lang("Warning") + ": "
                                 + Localization.lang(
@@ -336,7 +336,7 @@ public class ArgumentProcessor {
                         SaveSession session = databaseWriter.saveDatabase(
                                 new BibDatabaseContext(pr.getDatabase(), pr.getMetaData(), defaults), prefs);
 
-                        // Show just a warning message if encoding didn't work for all characters:
+                        // Show just a warning message if encoding did not work for all characters:
                         if (!session.getWriter().couldEncodeAll()) {
                             System.err.println(Localization.lang("Warning") + ": "
                                     + Localization.lang(

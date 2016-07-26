@@ -59,7 +59,7 @@ public class BibtexImporter extends ImportFormat {
         try (BufferedReader utf8Reader = getUTF8Reader(filePath)) {
             suppliedEncoding = getSuppliedEncoding(utf8Reader);
         }
-        // Now if that didn't get us anywhere, we check with the 16 bit encoding:
+        // Now if that did not get us anywhere, we check with the 16 bit encoding:
         if (!suppliedEncoding.isPresent()) {
             try (BufferedReader utf16Reader = getUTF16Reader(filePath)) {
                 suppliedEncoding = getSuppliedEncoding(utf16Reader);

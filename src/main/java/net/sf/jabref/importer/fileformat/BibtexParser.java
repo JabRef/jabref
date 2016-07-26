@@ -562,7 +562,7 @@ public class BibtexParser {
                 // format, but
                 // at least one online database exports bibtex like that, making
                 // it inconvenient
-                // for users if JabRef didn't accept it.
+                // for users if JabRef did not accept it.
                 if (InternalBibtexFields.getFieldExtras(key).contains(FieldProperties.PERSON_NAMES)) {
                     entry.setField(key, entry.getFieldOptional(key).get() + " and " + content);
                 } else if (FieldName.KEYWORDS.equals(key)) {

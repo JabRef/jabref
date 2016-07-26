@@ -228,7 +228,7 @@ public class ImportFormatReader {
                     bestFormatName = imFo.getFormatName();
                 }
             } catch (IOException ex) {
-                // The import didn't succeed. Go on.
+                // The import did not succeed. Go on.
             }
         }
 

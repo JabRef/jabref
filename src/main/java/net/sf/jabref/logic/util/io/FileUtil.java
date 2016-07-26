@@ -341,7 +341,7 @@ public class FileUtil {
                     continue nextFile;
                 }
             }
-            // If we get here, we didn't find any exact matches. If non-exact
+            // If we get here, we did not find any exact matches. If non-exact
             // matches are allowed, try to find one:
             if (!autolinkExactKeyOnly) {
                 for (BibEntry entry : entries) {

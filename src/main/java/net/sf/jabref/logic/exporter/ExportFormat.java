@@ -158,7 +158,7 @@ public class ExportFormat implements IExportFormat {
         // Try loading as a resource first. This works for files inside the JAR:
         URL reso = Globals.class.getResource(name);
 
-        // If that didn't work, try loading as a normal file URL:
+        // If that did not work, try loading as a normal file URL:
         try {
             if (reso == null) {
                 File f = new File(name);
