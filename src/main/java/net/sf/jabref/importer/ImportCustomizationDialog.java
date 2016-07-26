@@ -131,7 +131,7 @@ public class ImportCustomizationDialog extends JDialog {
         addFromJarButton.addActionListener(e -> {
             String basePath = FileDialogs.getNewFile(frame,
                     new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), Arrays.asList(".zip", ".jar"),
-                    Localization.lang("Select a Zip-archive"), JFileChooser.CUSTOM_DIALOG, false);
+                    Localization.lang("Select a ZIP-archive"), JFileChooser.CUSTOM_DIALOG, false);
 
             if (basePath != null) {
                 try (ZipFile zipFile = new ZipFile(new File(basePath), ZipFile.OPEN_READ)) {
@@ -140,18 +140,18 @@ public class ImportCustomizationDialog extends JDialog {
                     customImporterTable.revalidate();
                     customImporterTable.repaint(10);
                 } catch (IOException exc) {
-                    LOGGER.info("Could not open Zip-archive.", exc);
+                    LOGGER.info("Could not open ZIP-archive.", exc);
                     JOptionPane.showMessageDialog(frame, Localization.lang("Could not open %0", basePath) + "\n"
                             + Localization.lang("Have you chosen the correct package path?"));
                 } catch (NoClassDefFoundError exc) {
-                    LOGGER.info("Could not instantiate Zip-archive reader.", exc);
+                    LOGGER.info("Could not instantiate ZIP-archive reader.", exc);
                     JOptionPane.showMessageDialog(frame, Localization.lang("Could not instantiate %0", basePath) + "\n"
                             + Localization.lang("Have you chosen the correct package path?"));
                 }
             }
         });
-        addFromJarButton.setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a Zip-archive.") + "\n" +
-                Localization.lang("The Zip-archive need not be on the classpath of JabRef."));
+        addFromJarButton.setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a ZIP-archive.") + "\n" +
+                Localization.lang("The ZIP-archive need not be on the classpath of JabRef."));
 
         JButton showDescButton = new JButton(Localization.lang("Show description"));
         showDescButton.addActionListener(e -> {

@@ -71,10 +71,10 @@ class ZipFileChooser extends JDialog {
 
 
     /**
-     * New Zip file chooser.
+     * New ZIP file chooser.
      *
      * @param owner  Owner of the file chooser
-     * @param zipFile  Zip-Fle to choose from, must be readable
+     * @param zipFile  ZIP-Fle to choose from, must be readable
      */
     public ZipFileChooser(ImportCustomizationDialog importCustomizationDialog, ZipFile zipFile) {
         super(importCustomizationDialog, Localization.lang("Select file from ZIP-archive"), false);
@@ -151,7 +151,7 @@ class ZipFileChooser extends JDialog {
     /**
      * Entries that can be selected with this dialog.
      *
-     * @param zipFile  Zip-File
+     * @param zipFile  ZIP-File
      * @return  entries that can be selected
      */
     private static List<ZipEntry> getSelectableZipEntries(ZipFile zipFile) {
@@ -232,17 +232,17 @@ class ZipFileChooser extends JDialog {
         }
 
         /**
-         * Zip-File entry at the given row index.
+         * ZIP-File entry at the given row index.
          *
          * @param rowIndex  row index
-         * @return  Zip file entry
+         * @return  ZIP file entry
          */
         public ZipEntry getZipEntry(int rowIndex) {
             return this.rows.get(rowIndex);
         }
 
         /**
-         * Zip file which contains all entries of this model.
+         * ZIP file which contains all entries of this model.
          *
          * @return zip file
          */
