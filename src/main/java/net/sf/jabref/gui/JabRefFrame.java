@@ -110,6 +110,7 @@ import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.gui.protectedterms.ProtectedTermsDialog;
 import net.sf.jabref.gui.push.PushToApplicationButton;
 import net.sf.jabref.gui.push.PushToApplications;
+import net.sf.jabref.gui.undo.CountingUndoManager;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
@@ -124,6 +125,8 @@ import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.GuiAppender;
 import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
+import net.sf.jabref.logic.undo.AddUndoEvent;
+import net.sf.jabref.logic.undo.UndoRedoEvent;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -141,6 +144,7 @@ import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.sql.importer.DbImportAction;
 
+import com.google.common.eventbus.Subscribe;
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 import org.apache.commons.logging.Log;
@@ -642,6 +646,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             bp.updateSearchManager();
             // Set correct enabled state for Back and Forward actions:
             bp.setBackAndForwardEnabledState();
+            bp.getUndoManager().triggerEvent();
             new FocusRequester(bp.getMainTable());
         });
 
@@ -655,6 +660,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 LOGGER.fatal("Could not interface with Mac OS X methods.", e);
             }
         }
+
     }
 
     private void positionWindowOnScreen() {
@@ -1650,6 +1656,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (raisePanel) {
             tabbedPane.setSelectedComponent(bp);
         }
+
+        // Register undo/redo listener
+        bp.getUndoManager().registerListener(new UndoRedoEventManager(bp.getUndoManager()));
+        bp.getUndoManager().triggerEvent();
     }
 
     public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
@@ -2278,19 +2288,61 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         return pushApplications;
     }
 
-    public void setUndoText(String undoPresentationName) {
-        undo.putValue(Action.SHORT_DESCRIPTION, undoPresentationName);
-    }
 
-    public void setRedoText(String undoPresentationName) {
-        redo.putValue(Action.SHORT_DESCRIPTION, undoPresentationName);
-    }
+    private class UndoRedoEventManager {
 
-    public void enableUndo(boolean value) {
-        undo.setEnabled(value);
-    }
+        private final CountingUndoManager undoManager;
 
-    public void enableRedo(boolean value) {
-        redo.setEnabled(value);
+
+        public UndoRedoEventManager(CountingUndoManager undoManager) {
+            this.undoManager = undoManager;
+        }
+
+        @Subscribe
+        public void listen(UndoRedoEvent event) {
+            updateTexts();
+            JabRefFrame.this.getCurrentBasePanel().updateEntryEditorIfShowing();
+        }
+
+        @Subscribe
+        public void listen(AddUndoEvent event) {
+            updateTexts();
+        }
+
+        private void updateTexts() {
+            if (JabRefFrame.this != null) {
+                if (undoManager.canUndo()) {
+                    setUndoText(undoManager.getUndoPresentationName());
+                    enableUndo(true);
+                } else {
+                    setUndoText(Localization.lang("Undo"));
+                    enableUndo(false);
+                }
+
+                if (undoManager.canRedo()) {
+                    setRedoText(undoManager.getRedoPresentationName());
+                    enableRedo(true);
+                } else {
+                    setRedoText(Localization.lang("Redo"));
+                    enableRedo(false);
+                }
+            }
+        }
+
+        private void setUndoText(String undoPresentationName) {
+            undo.putValue(Action.SHORT_DESCRIPTION, undoPresentationName);
+        }
+
+        private void setRedoText(String undoPresentationName) {
+            redo.putValue(Action.SHORT_DESCRIPTION, undoPresentationName);
+        }
+
+        private void enableUndo(boolean value) {
+            undo.setEnabled(value);
+        }
+
+        private void enableRedo(boolean value) {
+            redo.setEnabled(value);
+        }
     }
 }

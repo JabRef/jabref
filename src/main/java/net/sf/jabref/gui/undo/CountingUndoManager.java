@@ -22,7 +22,10 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.undo.AddUndoEvent;
+import net.sf.jabref.logic.undo.UndoRedoEvent;
+
+import com.google.common.eventbus.EventBus;
 
 public class CountingUndoManager extends UndoManager {
 
@@ -30,18 +33,20 @@ public class CountingUndoManager extends UndoManager {
     private int current;
     private final BasePanel panel;
 
+    private final EventBus eventBus = new EventBus();
+
 
     public CountingUndoManager(BasePanel basePanel) {
         super();
         panel = Objects.requireNonNull(basePanel);
-        updateTexts();
+        eventBus.post(new UndoRedoEvent());
     }
 
     @Override
     public synchronized boolean addEdit(UndoableEdit edit) {
         current++;
         boolean returnvalue = super.addEdit(edit);
-        updateTexts();
+        eventBus.post(new AddUndoEvent());
         return returnvalue;
     }
 
@@ -49,15 +54,14 @@ public class CountingUndoManager extends UndoManager {
     public synchronized void undo() throws CannotUndoException {
         super.undo();
         current--;
-        updateTexts();
-        panel.updateEntryEditorIfShowing();
+        eventBus.post(new UndoRedoEvent());
     }
 
     @Override
     public synchronized void redo() throws CannotUndoException {
         super.redo();
         current++;
-        updateTexts();
+        eventBus.post(new UndoRedoEvent());
         panel.updateEntryEditorIfShowing();
     }
 
@@ -69,23 +73,16 @@ public class CountingUndoManager extends UndoManager {
         return (current != unchangedPoint);
     }
 
-    private void updateTexts() {
-        if (panel.frame() != null) {
-            if (super.canUndo()) {
-                panel.frame().setUndoText(super.editToBeUndone().getUndoPresentationName());
-                panel.frame().enableUndo(true);
-            } else {
-                panel.frame().setUndoText(Localization.lang("Undo"));
-                panel.frame().enableUndo(false);
-            }
 
-            if (super.canRedo()) {
-                panel.frame().setRedoText(super.editToBeRedone().getRedoPresentationName());
-                panel.frame().enableRedo(true);
-            } else {
-                panel.frame().setRedoText(Localization.lang("Redo"));
-                panel.frame().enableRedo(false);
-            }
-        }
+    public void registerListener(Object object) {
+        this.eventBus.register(object);
+    }
+
+    public void unregisterListener(Object object) {
+        this.eventBus.unregister(object);
+    }
+
+    public void triggerEvent() {
+        eventBus.post(new UndoRedoEvent());
     }
 }
