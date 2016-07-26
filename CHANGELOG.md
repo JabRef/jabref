@@ -17,6 +17,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - For developers: Moved the bst package into logic. This requires the regeneration of antlr sources, execute: gradlew generateSource
 - [#1026](https://github.com/JabRef/jabref/issues/1026) JabRef does no longer delete user comments outside of BibTeX entries and strings
 - [#1249](https://github.com/JabRef/jabref/issues/1249) Date layout formatter added
+- Undo/redo are enabled/disabled and show the action in the tool tip
 - Added ISBN integrity checker
 - Added filter to not show selected integrity checks
 - Enhance the entry customization dialog to give better visual feedback
