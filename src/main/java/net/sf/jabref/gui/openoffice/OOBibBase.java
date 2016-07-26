@@ -1305,7 +1305,7 @@ class OOBibBase {
 
         // For each cited key
         for (String key : cited) {
-            // Loop through the avialables databases
+            // Loop through the available databases
             for (BibDatabase loopDatabase : databases) {
                 Optional<BibEntry> entry = loopDatabase.getEntryByKey(key);
                 // If entry found
