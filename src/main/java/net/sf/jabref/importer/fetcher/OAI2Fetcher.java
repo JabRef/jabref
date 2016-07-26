@@ -224,7 +224,7 @@ public class OAI2Fetcher implements EntryFetcher {
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (SAXException e) {
             status.showMessage(
-                    Localization.lang("An SAX exception occurred while parsing '%0':", url) + "\n\n" + e.getMessage(),
+                    Localization.lang("A SAX exception occurred while parsing '%0':", url) + "\n\n" + e.getMessage(),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             status.showMessage(
