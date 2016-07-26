@@ -344,7 +344,7 @@ public class OpenOfficePanel extends AbstractWorker {
 
             List<BibDatabase> databases = getBaseList();
             List<String> unresolvedKeys = ooBase.refreshCiteMarkers(databases, style);
-            BibDatabase newDatabase = ooBase.generateDatabase(databases, style);
+            BibDatabase newDatabase = ooBase.generateDatabase(databases);
             if (!unresolvedKeys.isEmpty()) {
                 JOptionPane.showMessageDialog(frame,
                         Localization.lang(

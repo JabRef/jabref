@@ -1298,24 +1298,32 @@ class OOBibBase {
     }
 
 
-    public BibDatabase generateDatabase(List<BibDatabase> databases, OOBibStyle style)
+    public BibDatabase generateDatabase(List<BibDatabase> databases)
             throws NoSuchElementException, WrappedTargetException {
         BibDatabase resultDatabase = new BibDatabase();
         List<String> cited = findCitedKeys();
+
+        // For each cited key
         for (String key : cited) {
+            // Loop through the avialables databases
             for (BibDatabase loopDatabase : databases) {
                 Optional<BibEntry> entry = loopDatabase.getEntryByKey(key);
+                // If entry found
                 if (entry.isPresent()) {
                     BibEntry clonedEntry = (BibEntry) entry.get().clone();
                     clonedEntry.setId(IdGenerator.next());
+                    // Insert a copy of the entry
                     resultDatabase.insertEntry(clonedEntry);
+                    // Check if the cloned entry has a crossref field
                     clonedEntry.getFieldOptional(FieldName.CROSSREF).ifPresent(crossref -> {
+                        // If the crossref entry is not already in the database
                         if (!resultDatabase.getEntryByKey(crossref).isPresent()) {
+                            // Add it if it is in the current database
                             loopDatabase.getEntryByKey(crossref).ifPresent(resultDatabase::insertEntry);
                         }
                     });
 
-                    // Be happy with the first found BibEntry
+                    // Be happy with the first found BibEntry and move on to next key
                     break;
                 }
             }
