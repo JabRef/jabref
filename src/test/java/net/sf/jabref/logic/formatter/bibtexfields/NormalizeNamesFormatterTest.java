@@ -150,4 +150,19 @@ public class NormalizeNamesFormatterTest {
         expectCorrect("Cristina    Bosoi,    Mariana Oliveira, Rafael Ochoa Sanchez   ,   Mélanie Tremblay  , Gabrie TenHave, Nicoolas Deutz, Christopher F. Rose, Chantal Bemeur",
                 "Bosoi, Cristina and Oliveira, Mariana and Sanchez, Rafael Ochoa and Tremblay, Mélanie and TenHave, Gabrie and Deutz, Nicoolas and Rose, Christopher F. and Bemeur, Chantal");
     }
+
+    @Test
+    public void testAvoidPreposition() {
+        expectCorrect("Hans von Zimmer, Michael van Oberbergern, Kevin zu Berger", "von Zimmer, Hans and van Oberbergern, Michael and zu Berger, Kevin");
+    }
+
+    @Test
+    public void testPreposition() {
+        expectCorrect("Hans von Zimmer, Michael van Oberbergern, Kevin zu Berger", "von Zimmer, Hans and van Oberbergern, Michael and zu Berger, Kevin");
+    }
+
+    @Test
+    public void testAvoidNameAffixes() {
+        expectCorrect("Canon der Barbar, Alexander der Große","der Barbar, Canon and der Große, Alexander");
+    }
 }
