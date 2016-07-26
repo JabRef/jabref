@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
@@ -1005,34 +1006,37 @@ public class XMPUtil {
         // Set all the values including key and entryType
         Set<String> fields = resolvedEntry.getFieldNames();
 
-        for (String field : fields) {
+        for (Entry<String, String> field : resolvedEntry.getFieldMap().entrySet()) {
 
-            if (useXmpPrivacyFilter && filters.contains(field)) {
+            String fieldName = field.getKey();
+            String fieldContent = field.getValue();
+
+            if (useXmpPrivacyFilter && filters.contains(fieldName)) {
                 // erase field instead of adding it
-                if (FieldName.AUTHOR.equals(field)) {
+                if (FieldName.AUTHOR.equals(fieldName)) {
                     di.setAuthor(null);
-                } else if (FieldName.TITLE.equals(field)) {
+                } else if (FieldName.TITLE.equals(fieldName)) {
                     di.setTitle(null);
-                } else if (FieldName.KEYWORDS.equals(field)) {
+                } else if (FieldName.KEYWORDS.equals(fieldName)) {
                     di.setKeywords(null);
-                } else if (FieldName.ABSTRACT.equals(field)) {
+                } else if (FieldName.ABSTRACT.equals(fieldName)) {
                     di.setSubject(null);
                 } else {
-                    di.setCustomMetadataValue("bibtex/" + field, null);
+                    di.setCustomMetadataValue("bibtex/" + fieldName, null);
                 }
                 continue;
             }
 
-            if (FieldName.AUTHOR.equals(field)) {
-                di.setAuthor(resolvedEntry.getField(FieldName.AUTHOR));
-            } else if (FieldName.TITLE.equals(field)) {
-                di.setTitle(resolvedEntry.getField(FieldName.TITLE));
-            } else if (FieldName.KEYWORDS.equals(field)) {
-                di.setKeywords(resolvedEntry.getField(FieldName.KEYWORDS));
-            } else if (FieldName.ABSTRACT.equals(field)) {
-                di.setSubject(resolvedEntry.getField(FieldName.ABSTRACT));
+            if (FieldName.AUTHOR.equals(fieldName)) {
+                di.setAuthor(fieldContent);
+            } else if (FieldName.TITLE.equals(fieldName)) {
+                di.setTitle(fieldContent);
+            } else if (FieldName.KEYWORDS.equals(fieldName)) {
+                di.setKeywords(fieldContent);
+            } else if (FieldName.ABSTRACT.equals(fieldName)) {
+                di.setSubject(fieldContent);
             } else {
-                di.setCustomMetadataValue("bibtex/" + field, resolvedEntry.getField(field));
+                di.setCustomMetadataValue("bibtex/" + fieldName, fieldContent);
             }
         }
         di.setCustomMetadataValue("bibtex/entrytype", EntryUtil.capitalizeFirst(resolvedEntry.getType()));

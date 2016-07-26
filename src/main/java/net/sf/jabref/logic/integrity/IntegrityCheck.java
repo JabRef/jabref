@@ -412,7 +412,7 @@ public class IntegrityCheck {
                 while (hashMatcher.find()) {
                     hashCount++;
                 }
-                if ((hashCount % 2) == 1) {
+                if ((hashCount & 1) == 1) { // Check if odd
                     results.add(
                             new IntegrityMessage(Localization.lang("odd number of unescaped '#'"), entry,
                                     field.getKey()));

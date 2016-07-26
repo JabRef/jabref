@@ -70,6 +70,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -603,7 +604,8 @@ public class TextInputDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                String chosen = FileDialogs.getNewFile(frame, null, null, ".txt", JFileChooser.OPEN_DIALOG, false);
+                String chosen = FileDialogs.getNewFile(frame, null, Collections.emptyList(), ".txt",
+                        JFileChooser.OPEN_DIALOG, false);
                 if (chosen != null) {
                     File newFile = new File(chosen);
                     document.remove(0, document.getLength());

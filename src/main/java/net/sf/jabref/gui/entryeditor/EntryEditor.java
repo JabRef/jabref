@@ -35,6 +35,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -802,25 +803,30 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
 
             // First, remove fields that the user has removed.
-            for (String field : entry.getFieldNames()) {
-                if (InternalBibtexFields.isDisplayableField(field) && !newEntry.hasField(field)) {
-                    compound.addEdit(new UndoableFieldChange(entry, field, entry.getField(field), null));
-                    entry.clearField(field);
+            for (Entry<String, String> field : entry.getFieldMap().entrySet()) {
+                String fieldName = field.getKey();
+                String fieldValue = field.getValue();
+
+                if (InternalBibtexFields.isDisplayableField(fieldName) && !newEntry.hasField(fieldName)) {
+                    compound.addEdit(
+                            new UndoableFieldChange(entry, fieldName, fieldValue, null));
+                    entry.clearField(fieldName);
                     entryChanged = true;
                 }
             }
 
             // Then set all fields that have been set by the user.
-            for (String field : newEntry.getFieldNames()) {
-                String oldValue = entry.getField(field);
-                String newValue = newEntry.getField(field);
+            for (Entry<String, String> field : newEntry.getFieldMap().entrySet()) {
+                String fieldName = field.getKey();
+                String oldValue = entry.getFieldOptional(fieldName).orElse(null);
+                String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
                     new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs))
-                            .format(newValue, field);
+                            .format(newValue, fieldName);
 
-                    compound.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
-                    entry.setField(field, newValue);
+                    compound.addEdit(new UndoableFieldChange(entry, fieldName, oldValue, newValue));
+                    entry.setField(fieldName, newValue);
                     entryChanged = true;
                 }
             }

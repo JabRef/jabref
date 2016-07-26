@@ -53,13 +53,13 @@ public class AllEntriesGroup extends AbstractGroup {
     @Override
     public Optional<EntriesGroupChange> add(List<BibEntry> entriesToAdd) {
         // not supported -> ignore
-        return null;
+        return Optional.empty();
     }
 
     @Override
     public Optional<EntriesGroupChange> remove(List<BibEntry> entriesToRemove) {
         // not supported -> ignore
-        return null;
+        return Optional.empty();
     }
 
     @Override
