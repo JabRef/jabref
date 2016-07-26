@@ -151,14 +151,14 @@ public class ExportFormat implements IExportFormat {
         }
 
         // Attempt to get a Reader for the file path given, either by
-        // loading it as a resource (from within jar), or as a normal file. If
+        // loading it as a resource (from within JAR), or as a normal file. If
         // unsuccessful (e.g. file not found), an IOException is thrown.
         String name = dir + filename;
         Reader reader;
-        // Try loading as a resource first. This works for files inside the jar:
+        // Try loading as a resource first. This works for files inside the JAR:
         URL reso = Globals.class.getResource(name);
 
-        // If that didn't work, try loading as a normal file URL:
+        // If that did not work, try loading as a normal file URL:
         try {
             if (reso == null) {
                 File f = new File(name);

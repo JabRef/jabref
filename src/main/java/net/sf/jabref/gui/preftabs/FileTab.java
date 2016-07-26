@@ -83,9 +83,9 @@ class FileTab extends JPanel implements PrefsTab {
         this.frame = frame;
 
         fileDir = new JTextField(25);
-        bibLocAsPrimaryDir = new JCheckBox(Localization.lang("Use the bib file location as primary file directory"));
+        bibLocAsPrimaryDir = new JCheckBox(Localization.lang("Use the BIB file location as primary file directory"));
         bibLocAsPrimaryDir.setToolTipText(Localization.lang("When downloading files, or moving linked files to the "
-                + "file directory, prefer the bib file location rather than the file directory set above"));
+                + "file directory, prefer the BIB file location rather than the file directory set above"));
         runAutoFileSearch = new JCheckBox(Localization.lang("When opening file link, search for matching file if no link is defined"));
         allowFileAutoOpenBrowse = new JCheckBox(Localization.lang("Automatically open browse dialog when creating new file link"));
         regExpTextField = new JTextField(25);
@@ -104,7 +104,7 @@ class FileTab extends JPanel implements PrefsTab {
         autoSaveInterval = new JSpinner(new SpinnerNumberModel(1, 1, 60, 1));
         valueDelimiter = new JComboBox<>(new String[] {
                 Localization.lang("Quotes") + ": \", \"",
-                Localization.lang("Curly Brackets") + ": {, }"});
+                Localization.lang("Curly brackets") + ": {, }"});
         resolveStringsAll = new JRadioButton(Localization.lang("Resolve strings for all fields except") + ":");
         resolveStringsStandard = new JRadioButton(Localization.lang("Resolve strings for standard BibTeX fields only"));
         ButtonGroup bg = new ButtonGroup();
@@ -114,7 +114,7 @@ class FileTab extends JPanel implements PrefsTab {
         // This is sort of a quick hack
         newlineSeparator = new JComboBox<>(new String[] {"CR", "CR/LF", "LF"});
 
-        reformatFileOnSaveAndExport = new JCheckBox(Localization.lang("Always reformat .bib file on save and export"));
+        reformatFileOnSaveAndExport = new JCheckBox(Localization.lang("Always reformat BIB file on save and export"));
 
         nonWrappableFields = new JTextField(25);
         doNotResolveStringsFor = new JTextField(30);
@@ -169,7 +169,7 @@ class FileTab extends JPanel implements PrefsTab {
         builder.append(useRegExpComboBox);
         builder.append(regExpTextField);
 
-        builder.append(new HelpAction(Localization.lang("Help on Regular Expression Search"),
+        builder.append(new HelpAction(Localization.lang("Help on regular expression search"),
                 HelpFile.REGEX_SEARCH)
                 .getHelpButton());
         builder.nextLine();

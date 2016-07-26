@@ -143,7 +143,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
     private static BibEntry getSingleCitation(String urlString) throws IOException {
         String cont = new URLDownload(urlString).downloadToString(StandardCharsets.UTF_8);
 
-        // Find title, and create entry if we do. Otherwise assume we didn't get an entry:
+        // Find title, and create entry if we do. Otherwise assume we did not get an entry:
         Matcher m = CiteSeerXFetcher.TITLE_PATTERN.matcher(cont);
         if (m.find()) {
             BibEntry entry = new BibEntry(IdGenerator.next());

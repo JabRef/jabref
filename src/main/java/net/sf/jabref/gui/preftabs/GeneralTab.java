@@ -242,7 +242,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         if (prefs.getBoolean(JabRefPreferences.MEMORY_STICK_MODE) && !memoryStick.isSelected()) {
             JOptionPane.showMessageDialog(null, Localization.lang("To disable the memory stick mode"
                             + " rename or remove the jabref.xml file in the same folder as JabRef."),
-                    Localization.lang("Memory Stick Mode"),
+                    Localization.lang("Memory stick mode"),
                     JOptionPane.INFORMATION_MESSAGE);
         }
         prefs.putBoolean(JabRefPreferences.MEMORY_STICK_MODE, memoryStick.isSelected());

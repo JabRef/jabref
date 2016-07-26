@@ -385,7 +385,7 @@ class OOBibBase {
         } catch (DisposedException ex) {
             // We need to catch this one here because the OpenOfficePanel class is
             // loaded before connection, and therefore cannot directly reference
-            // or catch a DisposedException (which is in a OO jar file).
+            // or catch a DisposedException (which is in a OO JAR file).
             throw new ConnectionLostException(ex.getMessage());
         }
     }
@@ -403,7 +403,7 @@ class OOBibBase {
         } catch (DisposedException ex) {
             // We need to catch this one here because the OpenOfficePanel class is
             // loaded before connection, and therefore cannot directly reference
-            // or catch a DisposedException (which is in a OO jar file).
+            // or catch a DisposedException (which is in a OO JAR file).
             throw new ConnectionLostException(ex.getMessage());
         }
     }

@@ -54,7 +54,7 @@ import org.apache.commons.logging.LogFactory;
  * This class embodies a bibliography formatting for OpenOffice, which is composed
  * of the following elements:
  * <p>
- * 1) Each OO bib entry type must have a formatting. A formatting is an array of elements, each
+ * 1) Each OO BIB entry type must have a formatting. A formatting is an array of elements, each
  * of which is either a piece of constant text, an entry field value, or a tab. Each element has
  * a character format associated with it.
  * <p>
@@ -509,7 +509,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     /**
-     * Format the marker for the in-text citation according to this bib style. Uniquefier letters are added as
+     * Format the marker for the in-text citation according to this BIB style. Uniquefier letters are added as
      * provided by the uniquefiers argument. If successive entries within the citation are uniquefied from each other,
      * this method will perform a grouping of these entries.
      *

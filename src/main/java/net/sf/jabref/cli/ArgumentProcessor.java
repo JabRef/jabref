@@ -232,7 +232,7 @@ public class ArgumentProcessor {
         if (!cli.isBlank() && (cli.getLeftOver().length > 0)) {
             for (String aLeftOver : cli.getLeftOver()) {
                 // Leftover arguments that have a "bib" extension are interpreted as
-                // bib files to open. Other files, and files that could not be opened
+                // BIB files to open. Other files, and files that could not be opened
                 // as bib, we try to import instead.
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
                 ParserResult pr = null;
@@ -294,7 +294,7 @@ public class ArgumentProcessor {
                     SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults),
                             prefs);
 
-                    // Show just a warning message if encoding didn't work for all characters:
+                    // Show just a warning message if encoding did not work for all characters:
                     if (!session.getWriter().couldEncodeAll()) {
                         System.err.println(Localization.lang("Warning") + ": "
                                 + Localization.lang(
@@ -336,7 +336,7 @@ public class ArgumentProcessor {
                         SaveSession session = databaseWriter.saveDatabase(
                                 new BibDatabaseContext(pr.getDatabase(), pr.getMetaData(), defaults), prefs);
 
-                        // Show just a warning message if encoding didn't work for all characters:
+                        // Show just a warning message if encoding did not work for all characters:
                         if (!session.getWriter().couldEncodeAll()) {
                             System.err.println(Localization.lang("Warning") + ": "
                                     + Localization.lang(
@@ -438,7 +438,7 @@ public class ArgumentProcessor {
                     LabelPatternUtil.makeLabel(metaData, database, entry, Globals.prefs);
                 }
             } else {
-                LOGGER.info(Localization.lang("No meta data present in bibfile. Cannot regenerate BibTeX keys"));
+                LOGGER.info(Localization.lang("No meta data present in BIB_file. Cannot regenerate BibTeX keys"));
             }
         }
     }
@@ -483,7 +483,7 @@ public class ArgumentProcessor {
         }
 
         String query = split[1];
-        System.out.println(Localization.lang("Running Query '%0' with fetcher '%1'.", query, engine) + " "
+        System.out.println(Localization.lang("Running query '%0' with fetcher '%1'.", query, engine) + " "
                 + Localization.lang("Please wait..."));
         Collection<BibEntry> result = new ImportInspectionCommandLine().query(query, fetcher);
 

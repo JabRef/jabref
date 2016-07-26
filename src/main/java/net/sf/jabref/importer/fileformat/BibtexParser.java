@@ -291,7 +291,7 @@ public class BibtexParser {
             if (typ.isPresent()) {
                 entryTypes.put(typ.get().getName(), typ.get());
             } else {
-                parserResult.addWarning(Localization.lang("Ill-formed entrytype comment in bib file") + ": " +
+                parserResult.addWarning(Localization.lang("Ill-formed entrytype comment in BIB file") + ": " +
                         comment);
             }
 
@@ -562,7 +562,7 @@ public class BibtexParser {
                 // format, but
                 // at least one online database exports bibtex like that, making
                 // it inconvenient
-                // for users if JabRef didn't accept it.
+                // for users if JabRef did not accept it.
                 if (InternalBibtexFields.getFieldExtras(key).contains(FieldProperties.PERSON_NAMES)) {
                     entry.setField(key, entry.getFieldOptional(key).get() + " and " + content);
                 } else if (FieldName.KEYWORDS.equals(key)) {

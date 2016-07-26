@@ -151,7 +151,7 @@ public class DownloadExternalFile {
         if (suggestedType.isPresent()) {
             suffix = suggestedType.get().getExtension();
         } else {
-            // If we didn't find a file type from the MIME type, try based on extension:
+            // If we did not find a file type from the MIME type, try based on extension:
             suffix = getSuffix(res);
             if (suffix == null) {
                 suffix = "";

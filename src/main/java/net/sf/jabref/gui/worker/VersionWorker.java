@@ -51,7 +51,7 @@ public class VersionWorker extends SwingWorker<Version, Void> {
         try {
             return Version.getLatestVersion();
         } catch (IOException ioException) {
-            LOGGER.warn("Couldn't connect to the updateserver.", ioException);
+            LOGGER.warn("Could not connect to the updateserver.", ioException);
             return null;
         }
     }
@@ -66,7 +66,7 @@ public class VersionWorker extends SwingWorker<Version, Void> {
             Version latestVersion = this.get();
 
             if (latestVersion == null){
-                String couldNotConnect = Localization.lang("Couldn't connect to the update server.");
+                String couldNotConnect = Localization.lang("Could not connect to the update server.");
                 String tryLater = Localization.lang("Please try again later and/or check your network connection.");
                 if (manualExecution) {
                     JOptionPane.showMessageDialog(this.mainFrame, couldNotConnect + "\n" + tryLater,
