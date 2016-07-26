@@ -701,7 +701,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             tidialog.setVisible(true);
 
             if (tidialog.okPressed()) {
-                UpdateField.setAutomaticFields(Collections.singletonList(bibEntry), false, false);
+                UpdateField.setAutomaticFields(Collections.singletonList(bibEntry), false, false, Globals.prefs);
                 insertEntry(bibEntry);
             }
         });
@@ -899,7 +899,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     firstBE = be;
                 }
                 UpdateField.setAutomaticFields(be, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
-                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
+                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs);
 
                 // We have to clone the
                 // entries, since the pasted
@@ -1224,7 +1224,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // Set owner/timestamp if options are enabled:
                 List<BibEntry> list = new ArrayList<>();
                 list.add(be);
-                UpdateField.setAutomaticFields(list, true, true);
+                UpdateField.setAutomaticFields(list, true, true, Globals.prefs);
 
                 // Create an UndoableInsertEntry object.
                 getUndoManager().addEdit(new UndoableInsertEntry(database, be, BasePanel.this));
@@ -1373,7 +1373,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 database.insertEntry(bibEntry);
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)) {
                     // Set owner field to default value
-                    UpdateField.setAutomaticFields(bibEntry, true, true);
+                    UpdateField.setAutomaticFields(bibEntry, true, true, Globals.prefs);
                 }
                 // Create an UndoableInsertEntry object.
                 getUndoManager().addEdit(new UndoableInsertEntry(database, bibEntry, BasePanel.this));

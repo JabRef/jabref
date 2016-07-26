@@ -176,7 +176,8 @@ public class InternalBibtexFields {
         add(new BibtexSingleField(FieldName.EID, true, BibtexSingleField.SMALL_W));
 
         dummy = new BibtexSingleField(FieldName.DATE, true);
-        dummy.setPrivate();
+        dummy.setExtras(EnumSet.of(FieldProperties.DATE));
+        dummy.setPrivate(); // TODO: Why private?
         add(dummy);
 
         add(new BibtexSingleField("pmid", false, BibtexSingleField.SMALL_W, 60).setNumeric(true));
@@ -293,6 +294,7 @@ public class InternalBibtexFields {
                 field = new BibtexSingleField(fieldText, true, BibtexSingleField.SMALL_W);
             }
             field.getExtras().add(FieldProperties.DATE);
+            field.getExtras().add(FieldProperties.ISO_DATE);
             add(field);
         }
 
