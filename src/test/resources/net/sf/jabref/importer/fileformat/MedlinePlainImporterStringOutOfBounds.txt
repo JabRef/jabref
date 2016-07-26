@@ -1,0 +1,263 @@
+
+PMID- 27433151
+OWN - NLM
+STAT- PubMed-not-MEDLINE
+DA  - 20160719
+DCOM- 20160719
+IS  - 1598-9100 (Print)
+IS  - 1598-9100 (Linking)
+VI  - 14
+IP  - 3
+DP  - 2016 Jul
+TI  - Chronic intractable diarrhea caused by gastrointestinal mastocytosis.
+PG  - 280-4
+LID - 10.5217/ir.2016.14.3.280 [doi]
+AB  - just a dummy
+FAU - Seo, Hyungil
+AU  - Seo H
+AD  - Department of Internal Medicine, Asan Medical Center, University of Ulsan College
+      of Medicine, Seoul, Korea.
+FAU - Park, Sang Hyoung
+AU  - Park SH
+AD  - Department of Gastroenterology, Asan Medical Center, University of Ulsan College 
+      of Medicine, Seoul, Korea.
+FAU - Byeon, Jeong-Sik
+AU  - Byeon JS
+AD  - Department of Gastroenterology, Asan Medical Center, University of Ulsan College 
+      of Medicine, Seoul, Korea.
+FAU - Woo, Chang Gok
+AU  - Woo CG
+AD  - Department of Pathology, Asan Medical Center, University of Ulsan College of
+      Medicine, Seoul, Korea.
+FAU - Hong, Seung-Mo
+AU  - Hong SM
+AD  - Department of Pathology, Asan Medical Center, University of Ulsan College of
+      Medicine, Seoul, Korea.
+FAU - Chang, Kiju
+AU  - Chang K
+AD  - Department of Internal Medicine, Asan Medical Center, University of Ulsan College
+      of Medicine, Seoul, Korea.
+FAU - So, Hoonsub
+AU  - So H
+AD  - Department of Gastroenterology, Asan Medical Center, University of Ulsan College 
+      of Medicine, Seoul, Korea.
+FAU - Kwak, Minseob
+AU  - Kwak M
+AD  - Department of Gastroenterology, Asan Medical Center, University of Ulsan College 
+      of Medicine, Seoul, Korea.
+FAU - Kim, Wan Soo
+AU  - Kim WS
+AD  - Department of Gastroenterology, Asan Medical Center, University of Ulsan College 
+      of Medicine, Seoul, Korea.
+FAU - Lee, Jeong-Mi
+AU  - Lee JM
+AD  - Department of Gastroenterology, Asan Medical Center, University of Ulsan College 
+      of Medicine, Seoul, Korea.
+FAU - Yang, Dong-Hoon
+AU  - Yang DH
+AD  - Department of Gastroenterology, Asan Medical Center, University of Ulsan College 
+      of Medicine, Seoul, Korea.
+FAU - Kim, Kyung-Jo
+AU  - Kim KJ
+AD  - Department of Gastroenterology, Asan Medical Center, University of Ulsan College 
+      of Medicine, Seoul, Korea.
+FAU - Ye, Byong Duk
+AU  - Ye BD
+AD  - Department of Gastroenterology, Asan Medical Center, University of Ulsan College 
+      of Medicine, Seoul, Korea.
+FAU - Myung, Seung-Jae
+AU  - Myung SJ
+AD  - Department of Gastroenterology, Asan Medical Center, University of Ulsan College 
+      of Medicine, Seoul, Korea.
+FAU - Yang, Suk-Kyun
+AU  - Yang SK
+AD  - Department of Gastroenterology, Asan Medical Center, University of Ulsan College 
+      of Medicine, Seoul, Korea.
+LA  - eng
+PT  - Journal Article
+DEP - 20160627
+PL  - Korea (South)
+TA  - Intest Res
+JT  - Intestinal research
+JID - 101572802
+OTO - NOTNLM
+OT  - Diarrhea
+OT  - Mast cells
+OT  - Mastocytic enterocolitis
+EDAT- 2016/07/20 06:00
+MHDA- 2016/07/20 06:01
+CRDT- 2016/07/20 06:00
+PHST- 2015/03/24 [received]
+PHST- 2015/06/05 [revised]
+PHST- 2015/06/22 [accepted]
+PHST- 2016/06/27 [epublish]
+AID - 10.5217/ir.2016.14.3.280 [doi]
+PST - ppublish
+SO  - Intest Res. 2016 Jul;14(3):280-4. doi: 10.5217/ir.2016.14.3.280. Epub 2016 Jun
+      27.
+
+PMID- 27423992
+OWN - NLM
+STAT- In-Data-Review
+DA  - 20160718
+IS  - 1557-9808 (Electronic)
+IS  - 1557-9808 (Linking)
+VI  - 19
+IP  - 2
+DP  - 2016 Jun
+TI  - Determining End Points for Critical Limb Ischemia Interventions.
+PG  - 104-12
+LID - 10.1053/j.tvir.2016.04.003 [doi]
+LID - S1089-2516(16)30003-8 [pii]
+AB  - second dummy
+CI  - Copyright (c) 2016 Elsevier Inc. All rights reserved.
+FAU - Cooper, Kyle J
+AU  - Cooper KJ
+AD  - Miami Cardiac & Vascular Institute, Miami, FL.
+FAU - Pena, Constantino
+AU  - Pena C
+AD  - Miami Cardiac & Vascular Institute, Miami, FL. Electronic address:
+      constantinop@baptisthealth.net.
+FAU - Benenati, James
+AU  - Benenati J
+AD  - Miami Cardiac & Vascular Institute, Miami, FL.
+LA  - eng
+PT  - Journal Article
+PT  - Review
+DEP - 20160422
+PL  - United States
+TA  - Tech Vasc Interv Radiol
+JT  - Techniques in vascular and interventional radiology
+JID - 9806675
+SB  - IM
+OTO - NOTNLM
+OT  - Peripheral vascular disease
+OT  - critical limb ischemia
+OT  - postprocedural testing
+OT  - therapeutic end points
+EDAT- 2016/07/18 06:00
+MHDA- 2016/07/18 06:00
+CRDT- 2016/07/18 06:00
+PHST- 2016/04/22 [aheadofprint]
+AID - S1089-2516(16)30003-8 [pii]
+AID - 10.1053/j.tvir.2016.04.003 [doi]
+PST - ppublish
+SO  - Tech Vasc Interv Radiol. 2016 Jun;19(2):104-12. doi: 10.1053/j.tvir.2016.04.003. 
+      Epub 2016 Apr 22.
+
+PMID- 27403930
+OWN - NLM
+STAT- Publisher
+DA  - 20160712
+LR  - 20160712
+IS  - 1945-7197 (Electronic)
+IS  - 0021-972X (Linking)
+DP  - 2016 Jul 12
+TI  - Type 1 Hyperlipoproteinemia due to Compound Heterozygous Rare Variants in GCKR.
+PG  - jc20162179
+AB  - and another dummy
+FAU - Shetty, Shilpa
+AU  - Shetty S
+AD  - Division of Endocrinology, Department of Internal Medicine.
+FAU - Xing, Chao
+AU  - Xing C
+AD  - McDermott Center for Human Growth and Development and Department of Clinical
+      Sciences.
+FAU - Garg, Abhimanyu
+AU  - Garg A
+AD  - Division of Nutrition and Metabolic Diseases, Department of Internal Medicine,
+      Center for Human Nutrition; UT Southwestern Medical Center, Dallas, TX, USA.
+LA  - ENG
+PT  - JOURNAL ARTICLE
+DEP - 20160712
+TA  - J Clin Endocrinol Metab
+JT  - The Journal of clinical endocrinology and metabolism
+JID - 0375362
+EDAT- 2016/07/13 06:00
+MHDA- 2016/07/13 06:00
+CRDT- 2016/07/13 06:00
+AID - 10.1210/jc.2016-2179 [doi]
+PST - aheadofprint
+SO  - J Clin Endocrinol Metab. 2016 Jul 12:jc20162179.
+
+PMID- 27394443
+OWN - NLM
+STAT- Publisher
+DA  - 20160710
+LR  - 20160710
+IS  - 1559-1166 (Electronic)
+IS  - 0895-8696 (Linking)
+DP  - 2016 Jul 9
+TI  - Neuroprotective Effect of Osthole on Neuron Synapses in an Alzheimer's Disease
+      Cell Model via Upregulation of MicroRNA-9.
+AB  - here should stand an abstract
+FAU - Li, Shaoheng
+AU  - Li S
+AD  - School of Pharmacy, Liaoning University of Traditional Chinese Medicine, Dalian, 
+      Liaoning, 116600, China.
+FAU - Yan, Yuhui
+AU  - Yan Y
+AD  - School of Pharmacy, Liaoning University of Traditional Chinese Medicine, Dalian, 
+      Liaoning, 116600, China.
+FAU - Jiao, Yanan
+AU  - Jiao Y
+AD  - School of Pharmacy, Liaoning University of Traditional Chinese Medicine, Dalian, 
+      Liaoning, 116600, China.
+FAU - Gao, Zhong
+AU  - Gao Z
+AD  - Department of Interventional Therapy, Dalian Municipal Central Hospital, Dalian, 
+      Liaoning, 116033, China.
+FAU - Xia, Yang
+AU  - Xia Y
+AD  - Department of Engineering, University of Oxford, Oxford, OX1 3LZ, UK.
+FAU - Kong, Liang
+AU  - Kong L
+AD  - School of Pharmacy, Liaoning University of Traditional Chinese Medicine, Dalian, 
+      Liaoning, 116600, China.
+FAU - Yao, Yingjia
+AU  - Yao Y
+AD  - School of Pharmacy, Liaoning University of Traditional Chinese Medicine, Dalian, 
+      Liaoning, 116600, China.
+FAU - Tao, Zhenyu
+AU  - Tao Z
+AD  - School of Pharmacy, Liaoning University of Traditional Chinese Medicine, Dalian, 
+      Liaoning, 116600, China.
+FAU - Song, Jie
+AU  - Song J
+AD  - School of Pharmacy, Liaoning University of Traditional Chinese Medicine, Dalian, 
+      Liaoning, 116600, China.
+FAU - Yan, Yaping
+AU  - Yan Y
+AD  - Department of Neurology, Thomas Jefferson University, Philadelphia, PA, 19107,
+      USA.
+FAU - Zhang, Guangxian
+AU  - Zhang G
+AD  - Department of Neurology, Thomas Jefferson University, Philadelphia, PA, 19107,
+      USA.
+FAU - Yang, Jingxian
+AU  - Yang J
+AD  - School of Pharmacy, Liaoning University of Traditional Chinese Medicine, Dalian, 
+      Liaoning, 116600, China. jingxian__yang@163.com.
+LA  - ENG
+PT  - JOURNAL ARTICLE
+DEP - 20160709
+TA  - J Mol Neurosci
+JT  - Journal of molecular neuroscience : MN
+JID - 9002991
+OTO - NOTNLM
+OT  - Alzheimer's disease
+OT  - Amyloid precursor protein
+OT  - CAMKK2-AMPK pathway
+OT  - Neuron synapses
+OT  - Osthole
+OT  - miR-9
+EDAT- 2016/07/11 06:00
+MHDA- 2016/07/11 06:00
+CRDT- 2016/07/11 06:00
+PHST- 2016/04/04 [received]
+PHST- 2016/06/30 [accepted]
+PHST- 2016/07/09 [aheadofprint]
+AID - 10.1007/s12031-016-0793-9 [doi]
+AID - 10.1007/s12031-016-0793-9 [pii]
+PST - aheadofprint
+SO  - J Mol Neurosci. 2016 Jul 9.

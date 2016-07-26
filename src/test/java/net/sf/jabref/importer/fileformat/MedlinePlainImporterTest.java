@@ -198,6 +198,14 @@ public class MedlinePlainImporterTest {
     }
 
     @Test
+    public void testWithMultipleEntries() throws IOException, URISyntaxException {
+        Path file = Paths
+                .get(MedlinePlainImporter.class.getResource("MedlinePlainImporterStringOutOfBounds.txt").toURI());
+        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        BibEntryAssert.assertEquals(MedlinePlainImporter.class, "MedlinePlainImporterStringOutOfBounds.bib", entries);
+    }
+
+    @Test
     public void testAllArticleTypes() throws IOException {
         try (BufferedReader reader = readerForString("PMID-22664795" + "\n" +
                 "MH  - Female\n" +
