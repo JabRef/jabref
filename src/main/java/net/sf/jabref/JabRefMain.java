@@ -32,6 +32,7 @@ import net.sf.jabref.logic.net.ProxyAuthenticator;
 import net.sf.jabref.logic.net.ProxyPreferences;
 import net.sf.jabref.logic.net.ProxyRegisterer;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.client.RemoteListenerClient;
 import net.sf.jabref.logic.util.OS;
@@ -81,10 +82,7 @@ public class JabRefMain {
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(
-                Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_INTERNAL),
-                Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_EXTERNAL),
-                Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_INTERNAL),
-                Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_EXTERNAL));
+                ProtectedTermsPreferences.fromPreferences(Globals.prefs));
         ProtectTermsFormatter.setProtectedTermsLoader(Globals.protectedTermsLoader);
 
         // Check for running JabRef

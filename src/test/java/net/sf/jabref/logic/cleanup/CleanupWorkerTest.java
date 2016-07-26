@@ -21,6 +21,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -56,8 +57,9 @@ public class CleanupWorkerTest {
         }
 
         if (Globals.protectedTermsLoader == null) {
-            Globals.protectedTermsLoader = new ProtectedTermsLoader(ProtectedTermsLoader.getInternalLists(),
-                    Collections.emptyList(), Collections.emptyList(), Collections.emptyList());
+            Globals.protectedTermsLoader = new ProtectedTermsLoader(
+                    new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
+                            Collections.emptyList(), Collections.emptyList()));
             ProtectTermsFormatter.setProtectedTermsLoader(Globals.protectedTermsLoader);
         }
 

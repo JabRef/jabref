@@ -26,6 +26,7 @@ import net.sf.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import net.sf.jabref.logic.formatter.minifier.MinifyNameListFormatter;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.BeforeClass;
@@ -52,8 +53,9 @@ public class FormatterTest {
     public static void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
         ProtectTermsFormatter
-                .setProtectedTermsLoader(new ProtectedTermsLoader(ProtectedTermsLoader.getInternalLists(),
-                        Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
+                .setProtectedTermsLoader(
+                        new ProtectedTermsLoader(new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(),
+                                Collections.emptyList(), Collections.emptyList(), Collections.emptyList())));
     }
 
     @Test

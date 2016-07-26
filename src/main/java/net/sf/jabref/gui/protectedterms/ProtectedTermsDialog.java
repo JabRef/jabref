@@ -65,6 +65,7 @@ import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsList;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -157,10 +158,7 @@ public class ProtectedTermsDialog {
             @Override
             public void actionPerformed(ActionEvent event) {
                 // Restore from preferences
-                loader.update(Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_INTERNAL),
-                        Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_EXTERNAL),
-                        Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_INTERNAL),
-                        Globals.prefs.getStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_EXTERNAL));
+                loader.update(ProtectedTermsPreferences.fromPreferences(Globals.prefs));
                 diag.dispose();
             }
         };
@@ -522,9 +520,7 @@ public class ProtectedTermsDialog {
             }
         }
 
-        Globals.prefs.putStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_EXTERNAL, enabledExternalList);
-        Globals.prefs.putStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_EXTERNAL, disabledExternalList);
-        Globals.prefs.putStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_INTERNAL, enabledInternalList);
-        Globals.prefs.putStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_INTERNAL, disabledInternalList);
+        ProtectedTermsPreferences.toPreferences(Globals.prefs, enabledInternalList, enabledExternalList,
+                disabledInternalList, disabledExternalList);
     }
 }

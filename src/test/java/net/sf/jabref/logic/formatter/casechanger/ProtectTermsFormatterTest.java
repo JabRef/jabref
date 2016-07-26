@@ -3,6 +3,7 @@ package net.sf.jabref.logic.formatter.casechanger;
 import java.util.Collections;
 
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,8 +21,9 @@ public class ProtectTermsFormatterTest {
     @Before
     public void setUp() {
         ProtectTermsFormatter
-                .setProtectedTermsLoader(new ProtectedTermsLoader(ProtectedTermsLoader.getInternalLists(),
-                Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
+                .setProtectedTermsLoader(
+                        new ProtectedTermsLoader(new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(),
+                                Collections.emptyList(), Collections.emptyList(), Collections.emptyList())));
         formatter = new ProtectTermsFormatter();
     }
 

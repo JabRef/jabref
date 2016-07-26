@@ -26,8 +26,8 @@ public class ProtectedTermsLoaderTest {
 
     @Before
     public void setUp() {
-        loader = new ProtectedTermsLoader(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
-                Collections.emptyList(), Collections.emptyList());
+        loader = new ProtectedTermsLoader(new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(),
+                Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
 
     }
 
