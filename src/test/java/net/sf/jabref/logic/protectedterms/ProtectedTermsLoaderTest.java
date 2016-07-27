@@ -104,4 +104,54 @@ public class ProtectedTermsLoaderTest {
         assertEquals(Localization.lang("The text after the last line starting with # will be used"),
                 list.getDescription());
     }
+
+    @Test
+    public void testNewListsAreIncluded() {
+
+        ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
+                new ProtectedTermsPreferences(Collections.emptyList(),
+                Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
+        assertEquals(ProtectedTermsLoader.getInternalLists().size(), localLoader.getProtectedTermsLists().size());
+    }
+
+    @Test
+    public void testNewListsAreEnabled() {
+
+        ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
+                new ProtectedTermsPreferences(Collections.emptyList(),
+                Collections.emptyList(), Collections.emptyList(), Collections.emptyList()));
+        for (ProtectedTermsList list : localLoader.getProtectedTermsLists()) {
+            assertTrue(list.isEnabled());
+        }
+    }
+
+    @Test
+    public void testInitalizedAllInternalDisabled() {
+
+        ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
+                new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
+                        ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
+        for (ProtectedTermsList list : localLoader.getProtectedTermsLists()) {
+            assertFalse(list.isEnabled());
+        }
+    }
+
+    @Test
+    public void testUnknownExternalFileWillNotLoad() {
+
+        ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
+                new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(),
+                        Collections.singletonList("someUnlikelyNameThatNeverWillExist"), Collections.emptyList(),
+                        Collections.emptyList()));
+        assertEquals(ProtectedTermsLoader.getInternalLists().size(), localLoader.getProtectedTermsLists().size());
+    }
+
+    @Test
+    public void testAllDisabledNoWords() {
+
+        ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
+                new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
+                        ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
+        assertEquals(Collections.emptyList(), localLoader.getProtectedTerms());
+    }
 }
