@@ -89,10 +89,10 @@ public class CookieTest {
     }
 
     @Test
-    public void testNotMatchesWrongDomain() throws URISyntaxException {
+    public void testNotMatchesWrongPath() throws URISyntaxException {
         Cookie cookie = new Cookie(new URI("http://jabref.org/"),
-                "LSID=LSDLSD; Domain=jabref.org; Path=/; Secure; expires=Sat, 02-May-09 23:38:25 GMT");
-        assertFalse(cookie.matches(new URI("http://google.com/")));
+                "LSID=LSDLSD; Domain=jabref.org; Path=/blog/; Secure; expires=Sat, 02-May-99 23:38:25 GMT");
+        assertFalse(cookie.matches(new URI("http://jabref.org/")));
     }
 
     @Test
