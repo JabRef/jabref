@@ -40,6 +40,7 @@ import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.util.component.DiffHighlightingTextPane;
@@ -84,9 +85,6 @@ public class MergeEntries {
             Localization.lang("Show diff") + " - " + Localization.lang("character"),
             Localization.lang("Show symmetric diff") + " - " + Localization.lang("word"),
             Localization.lang("Show symmetric diff") + " - " + Localization.lang("character")};
-
-    private static final String HTML_START = "<html><body>";
-    private static final String HTML_END = "</body></html>";
 
     private final Set<String> identicalFields = new HashSet<>();
     private final Set<String> differentFields = new HashSet<>();
@@ -289,7 +287,7 @@ public class MergeEntries {
         mergePanel.add(boldFontLabel(Localization.lang("Entry type")), CELL_CONSTRAINTS.xy(1, 1));
 
         JTextPane leftTypeDisplay = new DiffHighlightingTextPane();
-        leftTypeDisplay.setText(HTML_START + leftEntry.getType() + HTML_END);
+        leftTypeDisplay.setText(DiffHighlighting.HTML_START + leftEntry.getType() + DiffHighlighting.HTML_END);
         mergePanel.add(leftTypeDisplay, CELL_CONSTRAINTS.xy(3, 1));
         if (leftEntry.getType().equals(rightEntry.getType())) {
             identicalTypes = true;
@@ -307,7 +305,7 @@ public class MergeEntries {
             typeRadioButtons.get(0).setSelected(true);
         }
         JTextPane rightTypeDisplay = new DiffHighlightingTextPane();
-        rightTypeDisplay.setText(HTML_START + rightEntry.getType() + HTML_END);
+        rightTypeDisplay.setText(DiffHighlighting.HTML_START + rightEntry.getType() + DiffHighlighting.HTML_END);
         mergePanel.add(rightTypeDisplay, CELL_CONSTRAINTS.xy(11, 1));
     }
 
@@ -402,10 +400,10 @@ public class MergeEntries {
                 break;
             }
             if ((leftString != null) && leftTextPanes.containsKey(field)) {
-                leftTextPanes.get(field).setText(HTML_START + leftString + HTML_END);
+                leftTextPanes.get(field).setText(DiffHighlighting.HTML_START + leftString + DiffHighlighting.HTML_END);
             }
             if ((rightString != null) && rightTextPanes.containsKey(field)) {
-                rightTextPanes.get(field).setText(HTML_START + rightString + HTML_END);
+                rightTextPanes.get(field).setText(DiffHighlighting.HTML_START + rightString + DiffHighlighting.HTML_END);
             }
         }
         SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar()
