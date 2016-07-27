@@ -68,7 +68,6 @@ public class LayoutTest {
     }
 
     @Test
-    @Ignore
     public void testHTMLChar() throws IOException {
         String layoutText = layout("\\begin{author}\\format[HTMLChars]{\\author}\\end{author} ",
                 "@other{bla, author={This\nis\na\ntext}}");
