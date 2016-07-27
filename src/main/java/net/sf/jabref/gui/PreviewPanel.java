@@ -381,7 +381,11 @@ public class PreviewPanel extends JPanel
             previewPane.copy();
             previewPane.select(0, -1);
         }
-
     }
+
+    public PrintAction getPrintAction() {
+        return printAction;
+    }
+
 
 }

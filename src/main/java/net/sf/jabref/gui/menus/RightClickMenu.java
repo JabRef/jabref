@@ -96,9 +96,8 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         add(new GeneralAction(Actions.PASTE, Localization.lang("Paste"), IconTheme.JabRefIcon.PASTE.getSmallIcon()));
         add(new GeneralAction(Actions.CUT, Localization.lang("Cut"), IconTheme.JabRefIcon.CUT.getSmallIcon()));
         add(new GeneralAction(Actions.DELETE, Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getSmallIcon()));
+        add(new GeneralAction(Actions.PRINT_PREVIEW, Localization.lang("Print entry preview"), IconTheme.JabRefIcon.PRINTED.getSmallIcon()));
         addSeparator();
-        add(new GeneralAction(Actions.PRINT, Localization.lang("Print entry preview"), IconTheme.JabRefIcon.PRINTED.getSmallIcon()));
-
 
         add(new GeneralAction(Actions.SEND_AS_EMAIL, Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getSmallIcon()));
         addSeparator();

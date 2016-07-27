@@ -16,6 +16,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Externally fetched information can be merged for entries with an ISBN
 - Externally fetched information can be merged for entries with an ArXiv eprint
 - [#1225](https://github.com/JabRef/jabref/issues/1225): Hotkey-system is now consistent
+- Added print entry preview to the right click menu
 - [#462](https://github.com/JabRef/jabref/issues/462) Extend the OpenConsoleFeature by offering a selection between default terminal emulator and configurable command execution.
 - [#1516](https://github.com/JabRef/jabref/issues/1516) Selected field names are written in uppercase in the entry editor
 - For developers: Moved the bst package into logic. This requires the regeneration of antlr sources, execute: gradlew generateSource
