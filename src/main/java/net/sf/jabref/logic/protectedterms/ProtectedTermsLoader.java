@@ -21,9 +21,11 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -122,14 +124,14 @@ public class ProtectedTermsLoader {
     }
 
     public List<String> getProtectedTerms() {
-        List<String> result = new ArrayList<>();
+        Set<String> result = new HashSet<>();
         for (ProtectedTermsList list : mainList) {
             if (list.isEnabled()) {
                 result.addAll(list.getTermList());
             }
         }
 
-        return result;
+        return new ArrayList<>(result);
     }
 
     public void addProtectedTermsListFromFile(String fileName, boolean enabled) {
