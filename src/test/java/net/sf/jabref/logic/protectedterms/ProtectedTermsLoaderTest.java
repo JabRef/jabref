@@ -154,4 +154,13 @@ public class ProtectedTermsLoaderTest {
                         ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
         assertEquals(Collections.emptyList(), localLoader.getProtectedTerms());
     }
+
+    @Test
+    public void testDoNotLoadTheSameInternalListTwice() {
+
+        ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
+                new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
+                        ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
+        assertEquals(ProtectedTermsLoader.getInternalLists().size(), localLoader.getProtectedTermsLists().size());
+    }
 }

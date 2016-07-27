@@ -70,7 +70,9 @@ public class ProtectedTermsLoader {
         }
         for (String filename : preferences.getDisabledInternalTermLists()) {
             if (internalLists.containsKey(filename)) {
-                mainList.add(readProtectedTermsListFromResource(filename, internalLists.get(filename), false));
+                if (!preferences.getEnabledInternalTermLists().contains(filename)) {
+                    mainList.add(readProtectedTermsListFromResource(filename, internalLists.get(filename), false));
+                }
             } else {
                 LOGGER.warn("Protected terms resource '" + filename + "' is no longer available.");
             }
@@ -95,12 +97,15 @@ public class ProtectedTermsLoader {
                 LOGGER.warn("Cannot find protected terms file " + filename, e);
             }
         }
+
         for (String filename : preferences.getDisabledExternalTermLists()) {
-            try {
-                mainList.add(readProtectedTermsListFromFile(new File(filename), false));
-            } catch (FileNotFoundException e) {
-                // The file couldn't be found...
-                LOGGER.warn("Cannot find protected terms file " + filename, e);
+            if (!preferences.getEnabledExternalTermLists().contains(filename)) {
+                try {
+                    mainList.add(readProtectedTermsListFromFile(new File(filename), false));
+                } catch (FileNotFoundException e) {
+                    // The file couldn't be found...
+                    LOGGER.warn("Cannot find protected terms file " + filename, e);
+                }
             }
         }
     }
