@@ -178,7 +178,7 @@ public class OpenOfficePanel extends AbstractWorker {
         JMenuItem item = new JMenuItem(Localization.lang("OpenOffice/LibreOffice connection"),
                 IconTheme.getImage("openoffice"));
         item.addActionListener(event -> manager.show(getName()));
-        item.setAccelerator(Globals.getKeyPrefs().getKey(KeyBinding.OPEN_OFFICE_LIBRE_CONNECTION));
+        item.setAccelerator(Globals.getKeyPrefs().getKey(KeyBinding.OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION));
         return item;
     }
 
