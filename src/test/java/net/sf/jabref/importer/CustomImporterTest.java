@@ -97,7 +97,7 @@ public class CustomImporterTest {
 
     @Test
     public void testCompareToEven() {
-        assertEquals(0, importer.compareTo(importer));
+        assertEquals(0, importer.compareTo(new CustomImporter(new CopacImporter())));
     }
 
     @Test

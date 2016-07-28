@@ -21,12 +21,6 @@ plugins {
     id 'me.champeau.gradle.jmh' version '0.3.0'
 }
 
-configurations.errorprone {
-    // 2.0.10 does not work on Windows while 2.0.9 does
-    // See https://github.com/google/error-prone/issues/432
-    resolutionStrategy.force 'com.google.errorprone:error_prone_core:2.0.9'
-}
-
 apply plugin: "java"
 apply plugin: "application"
 apply plugin: "project-report"
