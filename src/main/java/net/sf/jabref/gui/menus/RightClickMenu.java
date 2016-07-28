@@ -182,9 +182,11 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         add(typeMenu);
 
-        add(new GeneralAction(Actions.MERGE_WITH_FETCHED_ENTRY, Localization.lang("Get BibTeX data from %0", "DOI/ISBN")) {
+        add(new GeneralAction(Actions.MERGE_WITH_FETCHED_ENTRY,
+                Localization.lang("Get BibTeX data from %0", "DOI/ISBN/ArXiv")) {
             {
-                if (!(isFieldSetForSelectedEntry(FieldName.DOI) || isFieldSetForSelectedEntry(FieldName.ISBN))) {
+                if (!(isFieldSetForSelectedEntry(FieldName.DOI) || isFieldSetForSelectedEntry(FieldName.ISBN)
+                        || isFieldSetForSelectedEntry(FieldName.EPRINT))) {
                     this.setEnabled(false);
                 }
             }

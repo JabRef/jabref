@@ -658,7 +658,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.MERGE_WITH_FETCHED_ENTRY, (BaseAction) () -> {
             if (mainTable.getSelectedEntries().size() == 1) {
                 BibEntry originalEntry = mainTable.getSelectedEntries().get(0);
-                new FetchAndMergeEntry(originalEntry, this, Arrays.asList(FieldName.DOI, FieldName.ISBN));
+                new FetchAndMergeEntry(originalEntry, this,
+                        Arrays.asList(FieldName.DOI, FieldName.ISBN, FieldName.EPRINT));
             } else {
                 JOptionPane.showMessageDialog(frame(),
                         Localization.lang("This operation requires exactly one item to be selected."),

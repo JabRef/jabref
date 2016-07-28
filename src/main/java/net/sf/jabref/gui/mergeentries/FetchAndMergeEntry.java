@@ -7,6 +7,8 @@ import java.util.Optional;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
 import net.sf.jabref.importer.fetcher.ISBNtoBibTeXFetcher;
+import net.sf.jabref.logic.importer.FetcherException;
+import net.sf.jabref.logic.importer.fetcher.ArXiv;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -32,6 +34,9 @@ public class FetchAndMergeEntry {
             case FieldName.ISBN:
                 type = "ISBN";
                 break;
+            case FieldName.EPRINT:
+                type = "EPrint";
+                break;
             default:
                 type = field;
                 break;
@@ -44,6 +49,12 @@ public class FetchAndMergeEntry {
                     fetchedEntry = new DOItoBibTeXFetcher().getEntryFromDOI(fieldContent.get());
                 } else if (FieldName.ISBN.equals(field)) {
                     fetchedEntry = new ISBNtoBibTeXFetcher().getEntryFromISBN(fieldContent.get(), null);
+                } else if (FieldName.EPRINT.equals(field)) {
+                    try {
+                        fetchedEntry = new ArXiv().performSearchById(fieldContent.get());
+                    } catch (FetcherException e) {
+                        // Ignore for now
+                    }
                 }
 
                 if (fetchedEntry.isPresent()) {
