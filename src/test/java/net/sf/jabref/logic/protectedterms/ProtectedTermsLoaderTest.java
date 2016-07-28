@@ -2,6 +2,7 @@ package net.sf.jabref.logic.protectedterms;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -12,7 +13,9 @@ import java.util.List;
 import net.sf.jabref.logic.l10n.Localization;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -22,6 +25,9 @@ import static org.junit.Assert.assertTrue;
 public class ProtectedTermsLoaderTest {
 
     private ProtectedTermsLoader loader;
+
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 
     @Before
@@ -162,5 +168,59 @@ public class ProtectedTermsLoaderTest {
                 new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
                         ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
         assertEquals(ProtectedTermsLoader.getInternalLists().size(), localLoader.getProtectedTermsLists().size());
+    }
+
+    @Test
+    public void testAddNewTermListAddsList() throws IOException {
+
+        ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
+                new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
+                        ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
+        localLoader.addNewProtectedTermsList("My new list", temporaryFolder.newFile().getAbsolutePath());
+        assertEquals(ProtectedTermsLoader.getInternalLists().size() + 1, localLoader.getProtectedTermsLists().size());
+    }
+
+    @Test
+    public void testAddNewTermListNewListInList() throws IOException {
+
+        ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
+                new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
+                        ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
+        ProtectedTermsList newList = localLoader.addNewProtectedTermsList("My new list",
+                temporaryFolder.newFile().getAbsolutePath());
+        assertTrue(localLoader.getProtectedTermsLists().contains(newList));
+    }
+
+    @Test
+    public void testRemoveTermList() throws IOException {
+
+        ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
+                new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
+                        ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
+        ProtectedTermsList newList = localLoader.addNewProtectedTermsList("My new list", temporaryFolder.newFile().getAbsolutePath());
+        assertTrue(localLoader.removeProtectedTermsList(newList));
+    }
+
+    @Test
+    public void testRemoveTermListReduceTheCount() throws IOException {
+
+        ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
+                new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
+                        ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
+        ProtectedTermsList newList = localLoader.addNewProtectedTermsList("My new list",
+                temporaryFolder.newFile().getAbsolutePath());
+        localLoader.removeProtectedTermsList(newList);
+        assertEquals(ProtectedTermsLoader.getInternalLists().size(), localLoader.getProtectedTermsLists().size());
+    }
+
+    @Test
+    public void testAddNewTermListSetsCorrectDescription() throws IOException {
+
+        ProtectedTermsLoader localLoader = new ProtectedTermsLoader(
+                new ProtectedTermsPreferences(Collections.emptyList(), Collections.emptyList(),
+                        ProtectedTermsLoader.getInternalLists(), Collections.emptyList()));
+        ProtectedTermsList newList = localLoader.addNewProtectedTermsList("My new list",
+                temporaryFolder.newFile().getAbsolutePath());
+        assertEquals("My new list", newList.getDescription());
     }
 }

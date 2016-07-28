@@ -93,8 +93,9 @@ public class ProtectedTermsDialog {
     private final JMenuItem remove = new JMenuItem(Localization.lang("Remove"));
     private final JMenuItem reload = new JMenuItem(Localization.lang("Reload"));
     private final JMenuItem enabled = new JCheckBoxMenuItem(Localization.lang("Enabled"));
-    private final JButton addButton = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getIcon());
-    private final JButton removeButton = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getIcon());
+    private final JButton loadButton = new JButton(IconTheme.JabRefIcon.OPEN.getIcon());
+    private final JButton removeButton = new JButton(IconTheme.JabRefIcon.DELETE_ENTRY.getIcon());
+    private final JButton newButton = new JButton(IconTheme.JabRefIcon.NEW.getIcon());
     private ActionListener removeAction;
 
     private final JButton ok = new JButton(Localization.lang("OK"));
@@ -115,16 +116,23 @@ public class ProtectedTermsDialog {
     private void init() {
         setupPopupMenu();
 
-        addButton.addActionListener(actionEvent -> {
+        loadButton.addActionListener(actionEvent -> {
             AddFileDialog addDialog = new AddFileDialog();
             addDialog.setVisible(true);
             addDialog.getFileName().ifPresent(fileName -> loader.addProtectedTermsListFromFile(fileName, true));
             tableModel.fireTableDataChanged();
         });
-        addButton.setToolTipText(Localization.lang("Add protected terms file"));
+        loadButton.setToolTipText(Localization.lang("Add protected terms file"));
 
         removeButton.addActionListener(removeAction);
         removeButton.setToolTipText(Localization.lang("Remove protected terms file"));
+
+        newButton.addActionListener(actionEvent -> {
+            NewProtectedTermsFileDialog newDialog = new NewProtectedTermsFileDialog(diag, loader);
+            newDialog.setVisible(true);
+            tableModel.fireTableDataChanged();
+        });
+        newButton.setToolTipText(Localization.lang("New protected terms file"));
 
 
         setupTable();
@@ -133,11 +141,12 @@ public class ProtectedTermsDialog {
         diag = new JDialog(frame, Localization.lang("Manage protected terms files"), true);
 
         FormBuilder builder = FormBuilder.create();
-        builder.layout(new FormLayout("fill:pref:grow, 4dlu, left:pref, 4dlu, left:pref",
+        builder.layout(new FormLayout("fill:pref:grow, 4dlu, left:pref, 4dlu, left:pref, 4dlu, left:pref",
                 "100dlu:grow, 4dlu, pref"));
-        builder.add(new JScrollPane(table)).xyw(1, 1, 5);
-        builder.add(addButton).xy(3, 3);
-        builder.add(removeButton).xy(5, 3);
+        builder.add(new JScrollPane(table)).xyw(1, 1, 7);
+        builder.add(newButton).xy(3, 3);
+        builder.add(loadButton).xy(5, 3);
+        builder.add(removeButton).xy(7, 3);
         builder.padding("5dlu, 5dlu, 5dlu, 5dlu");
 
         diag.add(builder.getPanel(), BorderLayout.CENTER);

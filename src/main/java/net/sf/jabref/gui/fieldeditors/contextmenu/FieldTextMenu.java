@@ -23,6 +23,8 @@ public class FieldTextMenu implements MouseListener {
     private final CopyAction copyAction;
     private final PasteAction pasteAction;
 
+    private ProtectedTermsMenu protectedTermsMenu;
+
     private static final int MAX_PASTE_PREVIEW_LENGTH = 20;
 
 
@@ -82,6 +84,9 @@ public class FieldTextMenu implements MouseListener {
                 pasteAction.putValue(Action.SHORT_DESCRIPTION, Localization.lang("Paste from clipboard"));
             }
             pasteAction.setEnabled(pasteStatus);
+            if (protectedTermsMenu != null) {
+                protectedTermsMenu.updateFiles();
+            }
             inputMenu.show(e.getComponent(), e.getX(), e.getY());
         }
     }
@@ -95,6 +100,9 @@ public class FieldTextMenu implements MouseListener {
         if (field.getTextComponent() instanceof JTextComponent) {
             inputMenu.add(new CaseChangeMenu((JTextComponent) field.getTextComponent()));
             inputMenu.add(new ConversionMenu((JTextComponent) field.getTextComponent()));
+            inputMenu.addSeparator();
+            protectedTermsMenu = new ProtectedTermsMenu((JTextComponent) field.getTextComponent());
+            inputMenu.add(protectedTermsMenu);
         }
     }
 

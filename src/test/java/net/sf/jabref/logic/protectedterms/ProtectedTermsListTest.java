@@ -1,9 +1,12 @@
 package net.sf.jabref.logic.protectedterms;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
-
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,11 +18,15 @@ public class ProtectedTermsListTest {
     private ProtectedTermsList internalList;
     private ProtectedTermsList externalList;
 
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     @Before
-    public void setUp() {
-        internalList = new ProtectedTermsList("Name", Arrays.asList("AAA", "BBB"), "location", true);
-        externalList = new ProtectedTermsList("Namely", Arrays.asList("AAA", "BBB"), "location");
+    public void setUp() throws IOException {
+        String tempFileName = temporaryFolder.newFile().getAbsolutePath();
+
+        internalList = new ProtectedTermsList("Name", new ArrayList<>(Arrays.asList("AAA", "BBB")), "location", true);
+        externalList = new ProtectedTermsList("Namely", new ArrayList<>(Arrays.asList("AAA", "BBB")), tempFileName);
     }
 
     @Test
@@ -67,6 +74,28 @@ public class ProtectedTermsListTest {
     @Test
     public void testNotEnabledByDefault() {
         assertFalse(internalList.isEnabled());
+    }
+
+    @Test
+    public void testCanNotAddTermToInternalList() {
+        assertFalse(internalList.addProtectedTerm("CCC"));
+    }
+
+    @Test
+    public void testTermNotAddedToInternalList() {
+        internalList.addProtectedTerm("CCC");
+        assertFalse(internalList.getTermList().contains("CCC"));
+    }
+
+    @Test
+    public void testCanAddTermToExternalList() {
+        assertTrue(externalList.addProtectedTerm("CCC"));
+    }
+
+    @Test
+    public void testTermAddedToExternalList() {
+        externalList.addProtectedTerm("CCC");
+        assertTrue(externalList.getTermList().contains("CCC"));
     }
 
 }

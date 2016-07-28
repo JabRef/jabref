@@ -1,12 +1,25 @@
 package net.sf.jabref.logic.protectedterms;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.List;
 import java.util.Objects;
 
+import net.sf.jabref.logic.util.OS;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
 
-    private final String description;
+    private static final Log LOGGER = LogFactory.getLog(ProtectedTermsList.class);
+
+    private String description;
     private final List<String> termsList;
     private final String location;
     private final boolean internalList;
@@ -59,4 +72,46 @@ public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
         return enabled;
     }
 
+    public boolean createAndWriteHeading(String newDescription) {
+        description = newDescription;
+        return addProtectedTerm("# " + newDescription, true);
+    }
+
+    public boolean addProtectedTerm(String term) {
+        return addProtectedTerm(term, false);
+    }
+
+    public boolean addProtectedTerm(String term, boolean create) {
+        Objects.requireNonNull(term);
+        // Can not add to internal lists
+        if (internalList) {
+            return false;
+        }
+
+        Path p = Paths.get(location);
+        String s = OS.NEWLINE + term;
+        try (BufferedWriter writer = Files.newBufferedWriter(p, StandardCharsets.UTF_8,
+                create ? StandardOpenOption.CREATE : StandardOpenOption.APPEND)) {
+            writer.write(s);
+            termsList.add(term);
+        } catch (IOException ioe) {
+            LOGGER.warn("Problem adding protected term to list", ioe);
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof ProtectedTermsList)) {
+            return false;
+        }
+        ProtectedTermsList otherList = (ProtectedTermsList) o;
+        return (this.location == otherList.location) && (this.description == otherList.description);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(location, description);
+    }
 }

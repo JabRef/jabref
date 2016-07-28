@@ -170,6 +170,21 @@ public class ProtectedTermsLoader {
     }
 
     public boolean removeProtectedTermsList(ProtectedTermsList termList) {
+        termList.setEnabled(false);
         return mainList.remove(termList);
+    }
+
+    public ProtectedTermsList addNewProtectedTermsList(String newDescription, String newLocation, boolean enabled) {
+        Objects.requireNonNull(newDescription);
+        Objects.requireNonNull(newLocation);
+        ProtectedTermsList resultingList = new ProtectedTermsList(newDescription, new ArrayList<>(), newLocation);
+        resultingList.setEnabled(enabled);
+        resultingList.createAndWriteHeading(newDescription);
+        mainList.add(resultingList);
+        return resultingList;
+    }
+
+    public ProtectedTermsList addNewProtectedTermsList(String newDescription, String newLocation) {
+        return addNewProtectedTermsList(newDescription, newLocation, true);
     }
 }
