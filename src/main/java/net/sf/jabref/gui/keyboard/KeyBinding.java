@@ -88,7 +88,7 @@ public enum KeyBinding {
     UNMARK_ENTRIES("Unmark entries", Localization.lang("Unmark entries"), "ctrl shift M"),
     WEB_SEARCH("Web search", Localization.lang("Web search"), "alt 4"),
     WRITE_XMP("Write XMP", Localization.lang("Write XMP"), "F6"),
-    OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION("Open OpenOffice/LibreOffice connection", Localization.lang("Open office/libre connection"), "alt 0"),;
+    OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION("Open OpenOffice/LibreOffice connection", Localization.lang("Open OpenOffice/LibreOffice connection"), "alt 0"),;
 
     private final String key;
     private final String localization;
