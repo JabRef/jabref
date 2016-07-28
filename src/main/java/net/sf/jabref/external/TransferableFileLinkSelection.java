@@ -87,7 +87,7 @@ public class TransferableFileLinkSelection implements Transferable {
             String dir = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
             // Include the standard "file" directory:
             String fileDir = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
-            // Include the directory of the bib file:
+            // Include the directory of the BIB file:
             String[] dirs;
             if (panel.metaData().getDatabaseFile() != null) {
                 String databaseDir = panel.metaData().getDatabaseFile().getParent();

@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TimerTask;
 
 import javax.swing.AbstractAction;
@@ -115,6 +116,7 @@ import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.SaveSession;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
@@ -577,7 +579,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // Finally, set the new keys:
                 for (BibEntry entry : entries) {
                     bes = entry;
-                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes, Globals.prefs);
+                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes,
+                            LabelPatternPreferences.fromPreferences(Globals.prefs));
                     ce.addEdit(new UndoableKeyChange(database, bes, (String) oldvals.get(bes),
                             bes.getCiteKey()));
                 }
@@ -700,7 +703,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             tidialog.setVisible(true);
 
             if (tidialog.okPressed()) {
-                UpdateField.setAutomaticFields(Collections.singletonList(bibEntry), false, false);
+                UpdateField.setAutomaticFields(Collections.singletonList(bibEntry), false, false, Globals.prefs);
                 insertEntry(bibEntry);
             }
         });
@@ -898,7 +901,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     firstBE = be;
                 }
                 UpdateField.setAutomaticFields(be, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
-                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
+                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs);
 
                 // We have to clone the
                 // entries, since the pasted
@@ -1223,7 +1226,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // Set owner/timestamp if options are enabled:
                 List<BibEntry> list = new ArrayList<>();
                 list.add(be);
-                UpdateField.setAutomaticFields(list, true, true);
+                UpdateField.setAutomaticFields(list, true, true, Globals.prefs);
 
                 // Create an UndoableInsertEntry object.
                 getUndoManager().addEdit(new UndoableInsertEntry(database, be, BasePanel.this));
@@ -1372,7 +1375,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 database.insertEntry(bibEntry);
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)) {
                     // Set owner field to default value
-                    UpdateField.setAutomaticFields(bibEntry, true, true);
+                    UpdateField.setAutomaticFields(bibEntry, true, true, Globals.prefs);
                 }
                 // Create an UndoableInsertEntry object.
                 getUndoManager().addEdit(new UndoableInsertEntry(database, bibEntry, BasePanel.this));
@@ -1991,7 +1994,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             for (BibEntry bes : database.getEntries()) {
                 String oldKey = bes.getCiteKey();
                 if ((oldKey == null) || oldKey.isEmpty()) {
-                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes, Globals.prefs);
+                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes,
+                            LabelPatternPreferences.fromPreferences(Globals.prefs));
                     ce.addEdit(new UndoableKeyChange(database, bes, null, bes.getCiteKey()));
                     any = true;
                 }
@@ -2402,9 +2406,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 of stuff below. It is now disabled by default. */
 
             // see if we can fall back to a filename based on the bibtex key
-            final Collection<BibEntry> entries = Collections.singleton(entry);
+            final List<BibEntry> entries = Collections.singletonList(entry);
 
-            final Collection<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
+            final Set<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
             final List<File> dirs = new ArrayList<>();
             if (!basePanel.getBibDatabaseContext().getFileDirectory().isEmpty()) {
                 final List<String> mdDirs = basePanel.getBibDatabaseContext().getFileDirectory();
@@ -2423,7 +2427,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
                 result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
             } else {
-                result = FileUtil.findAssociatedFiles(entries, extensions, dirs, Globals.prefs);
+                boolean autoLinkExactKeyOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
+                result = FileUtil.findAssociatedFiles(entries, extensions, dirs, autoLinkExactKeyOnly);
             }
             if (result.containsKey(entry)) {
                 final List<File> res = result.get(entry);

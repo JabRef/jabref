@@ -19,7 +19,7 @@ import net.sf.jabref.gui.BasePanel;
 
 /**
  * This interface defines potential actions that may need to be taken after
- * opening a bib file into JabRef. This can for instance be file upgrade actions
+ * opening a BIB file into JabRef. This can for instance be file upgrade actions
  * that should be offered due to new features in JabRef, and may depend on e.g.
  * which JabRef version the file was last written by.
  *
@@ -31,7 +31,7 @@ public interface PostOpenAction {
     /**
      * This method is queried in order to find out whether the action needs to be
      * performed or not.
-     * @param pr The result of the bib parse operation.
+     * @param pr The result of the BIB parse operation.
      * @return true if the action should be called, false otherwise.
      */
     boolean isActionNecessary(ParserResult pr);
@@ -46,7 +46,7 @@ public interface PostOpenAction {
      *       into a worker thread, use Spin to do this synchronously.
      *
      * @param panel The BasePanel where the database is shown.
-     * @param pr The result of the bib parse operation.
+     * @param pr The result of the BIB parse operation.
      */
     void performAction(BasePanel panel, ParserResult pr);
 }

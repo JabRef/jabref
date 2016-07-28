@@ -44,7 +44,7 @@ public class NewVersionDialog extends JDialog {
         JLabel lblCurrentVersion = new JLabel(Localization.lang("Installed version") + ": " + currentVersion.getFullVersion());
         JLabel lblLatestVersion = new JLabel(Localization.lang("Latest version") + ": " + latestVersion.getFullVersion());
 
-        String localization = Localization.lang("To see what's new view the changelog.");
+        String localization = Localization.lang("To see what is new view the changelog.");
         JLabel lblMoreInformation = new JLabel("<HTML><a href=" + latestVersion.getChangelogUrl() + "'>" + localization + "</a></HTML>");
         lblMoreInformation.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         lblMoreInformation.addMouseListener(new MouseInputAdapter() {

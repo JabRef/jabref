@@ -115,7 +115,7 @@ public class CustomEntryType implements EntryType {
     /**
      * Get a String describing the required field set for this entry type.
      *
-     * @return Description of required field set for storage in preferences or bib file.
+     * @return Description of required field set for storage in preferences or BIB file.
      */
     public String getRequiredFieldsString() {
         return String.join(";", required);

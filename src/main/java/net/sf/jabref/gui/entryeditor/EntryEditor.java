@@ -98,6 +98,7 @@ import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.logic.util.date.TimeStamp;
@@ -503,7 +504,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 || fieldExtras.contains(FieldProperties.DATE)) {
             // double click AND datefield => insert the current date (today)
             return FieldExtraComponents.getDateTimeExtraComponent(editor,
-                    fieldExtras.contains(FieldProperties.DATE));
+                    fieldExtras.contains(FieldProperties.DATE), fieldExtras.contains(FieldProperties.ISO_DATE));
         } else if (fieldExtras.contains(FieldProperties.EXTERNAL)) {
             return FieldExtraComponents.getExternalExtraComponent(panel, editor);
         } else if (fieldExtras.contains(FieldProperties.JOURNAL_NAME)) {
@@ -1102,7 +1103,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
 
                 // Make sure the key is legal:
-                String cleaned = LabelPatternUtil.checkLegalKey(newValue);
+                String cleaned = LabelPatternUtil.checkLegalKey(newValue,
+                        Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
                 if ((cleaned == null) || cleaned.equals(newValue)) {
                     textField.setValidBackgroundColor();
                 } else {
@@ -1126,10 +1128,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                 // Add an UndoableKeyChange to the baseframe's undoManager.
                 UndoableKeyChange undoableKeyChange = new UndoableKeyChange(panel.getDatabase(), entry, oldValue, newValue);
-                if (TimeStamp.updateTimeStampIsSet()) {
+                if (TimeStamp.updateTimeStampIsSet(Globals.prefs)) {
                     NamedCompound ce = new NamedCompound(undoableKeyChange.getPresentationName());
                     ce.addEdit(undoableKeyChange);
-                    TimeStamp.doUpdateTimeStamp(entry)
+                    TimeStamp.doUpdateTimeStamp(entry, Globals.prefs)
                             .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
                     ce.end();
                     panel.getUndoManager().addEdit(ce);
@@ -1194,11 +1196,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                         // Add an UndoableFieldChange to the baseframe's undoManager.
                         UndoableFieldChange undoableFieldChange = new UndoableFieldChange(entry, fieldEditor.getFieldName(), oldValue, toSet);
-                        if (TimeStamp.updateTimeStampIsSet()) {
+                        if (TimeStamp.updateTimeStampIsSet(Globals.prefs)) {
                             NamedCompound ce = new NamedCompound(undoableFieldChange.getPresentationName());
                             ce.addEdit(undoableFieldChange);
 
-                            TimeStamp.doUpdateTimeStamp(entry)
+                            TimeStamp.doUpdateTimeStamp(entry, Globals.prefs)
                                     .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
                             ce.end();
 
@@ -1369,7 +1371,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
 
             LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
-                    Globals.prefs);
+                    LabelPatternPreferences.fromPreferences(Globals.prefs));
 
             // Store undo information:
             panel.getUndoManager().addEdit(new UndoableKeyChange(panel.getDatabase(), entry, (String) oldValue, entry.getCiteKey()));

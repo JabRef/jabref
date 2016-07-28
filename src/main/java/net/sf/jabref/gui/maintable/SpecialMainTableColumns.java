@@ -12,7 +12,6 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -24,7 +23,7 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 public class SpecialMainTableColumns {
 
-    public static final MainTableColumn NUMBER_COL = new MainTableColumn(InternalBibtexFields.NUMBER_COL) {
+    public static final MainTableColumn NUMBER_COL = new MainTableColumn(FieldName.NUMBER_COL) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {

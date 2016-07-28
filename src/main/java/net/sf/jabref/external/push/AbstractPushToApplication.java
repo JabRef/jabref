@@ -85,7 +85,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
             Runtime.getRuntime().exec(getCommandLine(keyString));
         }
 
-        // In case it didn't work
+        // In case it did not work
         catch (IOException excep) {
             couldNotCall = true;
 

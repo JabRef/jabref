@@ -147,7 +147,7 @@ public final class BibtexCaseChanger {
      * or `\j', or an accent like one in Table~3.1 of the \LaTeX\ manual, or a
      * foreign character like one in Table~3.2) if the first character after the
      * |left_brace| is a |backslash|; the special character ends with the
-     * matching |right_brace|. How we handle what's in between depends on the
+     * matching |right_brace|. How we handle what is in between depends on the
      * special character. In general, this code will do reasonably well if there
      * is other stuff, too, between braces, but it doesn't try to do anything
      * special with |colon|s.

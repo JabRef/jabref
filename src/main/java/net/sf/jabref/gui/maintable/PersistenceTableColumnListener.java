@@ -24,7 +24,7 @@ import javax.swing.event.TableColumnModelEvent;
 import javax.swing.event.TableColumnModelListener;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
@@ -68,7 +68,7 @@ public class PersistenceTableColumnListener implements TableColumnModelListener 
         for (int i = 0; i < columnCount; i++) {
             final String name = mainTable.getColumnName(i);
             if ((name != null) && !name.isEmpty()) {
-                if (InternalBibtexFields.NUMBER_COL.equals(name)) {
+                if (FieldName.NUMBER_COL.equals(name)) {
                     ncWidth = mainTable.getColumnModel().getColumn(i).getWidth();
                 } else {
                     storedColumns.add(name.toLowerCase());

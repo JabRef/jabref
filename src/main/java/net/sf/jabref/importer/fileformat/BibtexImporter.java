@@ -30,7 +30,7 @@ import net.sf.jabref.logic.exporter.SavePreferences;
 /**
  * This importer exists only to enable `--importToOpen someEntry.bib`
  *
- * It is NOT intended to import a bib file. This is done via the option action, which treats the metadata fields
+ * It is NOT intended to import a BIB file. This is done via the option action, which treats the metadata fields
  * The metadata is not required to be read here, as this class is NOT called at --import
  */
 public class BibtexImporter extends ImportFormat {
@@ -59,7 +59,7 @@ public class BibtexImporter extends ImportFormat {
         try (BufferedReader utf8Reader = getUTF8Reader(filePath)) {
             suppliedEncoding = getSuppliedEncoding(utf8Reader);
         }
-        // Now if that didn't get us anywhere, we check with the 16 bit encoding:
+        // Now if that did not get us anywhere, we check with the 16 bit encoding:
         if (!suppliedEncoding.isPresent()) {
             try (BufferedReader utf16Reader = getUTF16Reader(filePath)) {
                 suppliedEncoding = getSuppliedEncoding(utf16Reader);
@@ -91,7 +91,7 @@ public class BibtexImporter extends ImportFormat {
     @Override
     public String getDescription() {
         return "This importer exists only to enable `--importToOpen someEntry.bib`\n" +
-                "It is NOT intended to import a bib file. This is done via the option action, which treats the metadata fields.\n" +
+                "It is NOT intended to import a BIB file. This is done via the option action, which treats the metadata fields.\n" +
                 "The metadata is not required to be read here, as this class is NOT called at --import.";
     }
 

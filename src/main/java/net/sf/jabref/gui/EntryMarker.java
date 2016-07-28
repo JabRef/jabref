@@ -25,7 +25,7 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public class EntryMarker {
@@ -43,8 +43,8 @@ public class EntryMarker {
     public static void markEntry(BibEntry be, int markIncrement, boolean increment, NamedCompound ce) {
         int prevMarkLevel;
         String newValue = null;
-        if (be.hasField(InternalBibtexFields.MARKED)) {
-            String markerString = be.getFieldOptional(InternalBibtexFields.MARKED).get();
+        if (be.hasField(FieldName.MARKED)) {
+            String markerString = be.getFieldOptional(FieldName.MARKED).get();
             int index = markerString.indexOf(Globals.prefs.WRAPPED_USERNAME);
             if (index >= 0) {
                 // Already marked 1 for this user.
@@ -66,17 +66,17 @@ public class EntryMarker {
             newValue = Globals.prefs.WRAPPED_USERNAME.substring(0, Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":" + markIncrement + "]";
         }
 
-        ce.addEdit(new UndoableFieldChange(be, InternalBibtexFields.MARKED,
-                be.getFieldOptional(InternalBibtexFields.MARKED).orElse(null), newValue));
-        be.setField(InternalBibtexFields.MARKED, newValue);
+        ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED,
+                be.getFieldOptional(FieldName.MARKED).orElse(null), newValue));
+        be.setField(FieldName.MARKED, newValue);
     }
 
     /**
      * SIDE EFFECT: Unselects given entry
      */
     public static void unmarkEntry(BibEntry be, boolean onlyMaxLevel, BibDatabase database, NamedCompound ce) {
-        if (be.hasField(InternalBibtexFields.MARKED)) {
-            String markerString = be.getFieldOptional(InternalBibtexFields.MARKED).get();
+        if (be.hasField(FieldName.MARKED)) {
+            String markerString = be.getFieldOptional(FieldName.MARKED).get();
             if ("0".equals(markerString)) {
                 if (!onlyMaxLevel) {
                     unmarkOldStyle(be, database, ce);
@@ -128,12 +128,12 @@ public class EntryMarker {
             	sb.append(s.substring(piv));
             }
             String newVal = sb.length() > 0 ? sb.toString() : null;*/
-            ce.addEdit(new UndoableFieldChange(be, InternalBibtexFields.MARKED,
-                    be.getFieldOptional(InternalBibtexFields.MARKED).get(), newValue));
+            ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED,
+                    be.getFieldOptional(FieldName.MARKED).get(), newValue));
             if (newValue == null) {
-                be.clearField(InternalBibtexFields.MARKED);
+                be.clearField(FieldName.MARKED);
             } else {
-                be.setField(InternalBibtexFields.MARKED, newValue);
+                be.setField(FieldName.MARKED, newValue);
             }
         }
     }
@@ -152,7 +152,7 @@ public class EntryMarker {
     private static void unmarkOldStyle(BibEntry be, BibDatabase database, NamedCompound ce) {
         Set<Object> owners = new TreeSet<>();
         for (BibEntry entry : database.getEntries()) {
-            entry.getFieldOptional(InternalBibtexFields.OWNER).ifPresent(owners::add);
+            entry.getFieldOptional(FieldName.OWNER).ifPresent(owners::add);
         }
         owners.remove(Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER));
         StringBuilder sb = new StringBuilder();
@@ -163,21 +163,21 @@ public class EntryMarker {
         }
         String newVal = sb.toString();
         if (newVal.isEmpty()) {
-            ce.addEdit(new UndoableFieldChange(be, InternalBibtexFields.MARKED,
-                    be.getFieldOptional(InternalBibtexFields.MARKED).orElse(null), null));
-            be.clearField(InternalBibtexFields.MARKED);
+            ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED,
+                    be.getFieldOptional(FieldName.MARKED).orElse(null), null));
+            be.clearField(FieldName.MARKED);
         } else {
-            ce.addEdit(new UndoableFieldChange(be, InternalBibtexFields.MARKED,
-                    be.getFieldOptional(InternalBibtexFields.MARKED).orElse(null), newVal));
-            be.setField(InternalBibtexFields.MARKED, newVal);
+            ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED,
+                    be.getFieldOptional(FieldName.MARKED).orElse(null), newVal));
+            be.setField(FieldName.MARKED, newVal);
         }
     }
 
     public static int isMarked(BibEntry be) {
-        if (!be.hasField(InternalBibtexFields.MARKED)) {
+        if (!be.hasField(FieldName.MARKED)) {
             return 0;
         }
-        String s = be.getFieldOptional(InternalBibtexFields.MARKED).get();
+        String s = be.getFieldOptional(FieldName.MARKED).get();
         if ("0".equals(s)) {
             return 1;
         }

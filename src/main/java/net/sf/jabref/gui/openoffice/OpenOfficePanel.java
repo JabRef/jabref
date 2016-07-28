@@ -379,7 +379,7 @@ public class OpenOfficePanel extends AbstractWorker {
             }
         }
 
-        // Add OO jars to the classpath:
+        // Add OO JARs to the classpath:
         try {
             List<File> jarFiles = Arrays.asList(new File(ooJarsDirectory, "unoil.jar"),
                     new File(ooJarsDirectory, "jurt.jar"), new File(ooJarsDirectory, "juh.jar"),

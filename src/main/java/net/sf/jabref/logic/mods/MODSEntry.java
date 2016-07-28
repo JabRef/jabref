@@ -115,7 +115,7 @@ class MODSEntry {
         if (bibtex.hasField(BibEntry.KEY_FIELD)) {
             id = bibtex.getCiteKey();
         }
-        if (bibtex.hasField("place")) {
+        if (bibtex.hasField("place")) { // TODO: "place" is the MODS version, in BibTeX: "address", BibLaTeX: "location"?
             if (CHARFORMAT) {
                 place = chars.format(bibtex.getField("place"));
             } else {

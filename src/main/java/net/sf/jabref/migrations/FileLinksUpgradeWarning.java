@@ -168,7 +168,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
     /**
      * Check the database to find out whether any of a set of fields are used
      * for any of the entries.
-     * @param database The bib database.
+     * @param database The BIB database.
      * @param fields The set of fields to look for.
      * @return true if at least one of the given fields is set in at least one entry,
      *  false otherwise.

@@ -350,7 +350,7 @@ public class MedlineImporter extends ImportFormat {
             }
 
             fields.put("pmid", medlineCitation.getPMID().getContent());
-            fields.put("owner", medlineCitation.getOwner());
+            fields.put(FieldName.OWNER, medlineCitation.getOwner());
 
             addArticleInformation(fields, medlineCitation.getArticle().getContent());
 

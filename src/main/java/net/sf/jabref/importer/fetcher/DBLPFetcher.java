@@ -91,9 +91,9 @@ public class DBLPFetcher implements EntryFetcher {
 
             // 2014-11-08
             // DBLP now shows the BibTeX entry using ugly HTML entities
-            // but they also offer the download of a bib file
+            // but they also offer the download of a BIB file
             // we find this in the page which we get from "url"
-            // and this bib file is then in "biburl"
+            // and this BIB file is then in "biburl"
 
             int count = 1;
             for (String urlStr : bibtexUrlList) {

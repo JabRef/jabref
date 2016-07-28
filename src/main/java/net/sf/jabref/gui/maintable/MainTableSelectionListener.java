@@ -64,7 +64,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * List event, mouse, key and focus listener for the main table that makes up the
- * most part of the BasePanel for a single bib database.
+ * most part of the BasePanel for a single BIB database.
  */
 public class MainTableSelectionListener implements ListEventListener<BibEntry>, MouseListener,
         KeyListener, FocusListener {

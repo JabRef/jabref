@@ -470,7 +470,7 @@ public class BibDatabase {
                     }
                     piv = stringEnd + 1;
                 } else {
-                    // We didn't find the boundaries of the string ref. This
+                    // We did not find the boundaries of the string ref. This
                     // makes it impossible to interpret it as a string label.
                     // So we should just append the rest of the text and finish.
                     newRes.append(res.substring(next));

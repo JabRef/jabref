@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -177,7 +176,7 @@ public class FileUtil {
      * Uses <ul>
      * <li>the default directory associated with the extension of the file</li>
      * <li>the standard file directory</li>
-     * <li>the directory of the bib file</li>
+     * <li>the directory of the BIB file</li>
      * </ul>
      *
      * @param databaseContext The database this file belongs to.
@@ -189,7 +188,7 @@ public class FileUtil {
         List<String> directories = databaseContext.getFileDirectory(extension.orElse(null));
         // Include the standard "file" directory:
         List<String> fileDir = databaseContext.getFileDirectory();
-        // Include the directory of the bib file:
+        // Include the directory of the BIB file:
         List<String> al = new ArrayList<>();
         for (String dir : directories) {
             if (!al.contains(dir)) {
@@ -317,8 +316,8 @@ public class FileUtil {
         }
     }
 
-    public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries,
-            Collection<String> extensions, Collection<File> directories, JabRefPreferences prefs) {
+    public static Map<BibEntry, List<File>> findAssociatedFiles(List<BibEntry> entries,
+            List<String> extensions, List<File> directories, boolean autolinkExactKeyOnly) {
         Map<BibEntry, List<File>> result = new HashMap<>();
 
         // First scan directories
@@ -329,7 +328,6 @@ public class FileUtil {
             result.put(entry, new ArrayList<>());
         }
 
-        boolean exactOnly = prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
         // Now look for keys
         nextFile: for (File file : filesWithExtension) {
 
@@ -343,9 +341,9 @@ public class FileUtil {
                     continue nextFile;
                 }
             }
-            // If we get here, we didn't find any exact matches. If non-exact
+            // If we get here, we did not find any exact matches. If non-exact
             // matches are allowed, try to find one:
-            if (!exactOnly) {
+            if (!autolinkExactKeyOnly) {
                 for (BibEntry entry : entries) {
                     String citeKey = entry.getCiteKey();
                     if ((citeKey != null) && !citeKey.isEmpty() && name.startsWith(citeKey)) {

@@ -27,7 +27,7 @@
 
  */
 
-// A wizard dialog for generating a new sub database from existing TeX aux file
+// A wizard dialog for generating a new sub database from existing TeX AUX file
 //
 // created by : r.nagel 23.08.2004
 //

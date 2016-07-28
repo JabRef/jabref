@@ -18,7 +18,7 @@ package net.sf.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -242,7 +242,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         if (prefs.getBoolean(JabRefPreferences.MEMORY_STICK_MODE) && !memoryStick.isSelected()) {
             JOptionPane.showMessageDialog(null, Localization.lang("To disable the memory stick mode"
                             + " rename or remove the jabref.xml file in the same folder as JabRef."),
-                    Localization.lang("Memory Stick Mode"),
+                    Localization.lang("Memory stick mode"),
                     JOptionPane.INFORMATION_MESSAGE);
         }
         prefs.putBoolean(JabRefPreferences.MEMORY_STICK_MODE, memoryStick.isSelected());
@@ -278,7 +278,7 @@ class GeneralTab extends JPanel implements PrefsTab {
     public boolean validateSettings() {
         try {
             // Test if date format is legal:
-            new SimpleDateFormat(timeStampFormat.getText());
+            DateTimeFormatter.ofPattern(timeStampFormat.getText());
 
         } catch (IllegalArgumentException ex2) {
             JOptionPane.showMessageDialog

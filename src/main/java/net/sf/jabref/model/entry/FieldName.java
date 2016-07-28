@@ -1,6 +1,5 @@
 package net.sf.jabref.model.entry;
 
-
 public class FieldName {
 
     // Character separating field names that are to be used in sequence as
@@ -16,11 +15,13 @@ public class FieldName {
     public static final String AUTHOR = "author";
     public static final String BOOKTITLE = "booktitle";
     public static final String CHAPTER = "chapter";
+    public static final String COMMENTS = "comments";
     public static final String CROSSREF = "crossref";
     public static final String DATE = "date";
     public static final String DOI = "doi";
     public static final String EDITION = "edition";
     public static final String EDITOR = "editor";
+    public static final String EID = "eid";
     public static final String EPRINT = "eprint";
     public static final String EPRINTCLASS = "eprintclass";
     public static final String EPRINTTYPE = "eprinttype";
@@ -42,16 +43,35 @@ public class FieldName {
     public static final String NUMBER = "number";
     public static final String ORGANIZATION = "organization";
     public static final String PAGES = "pages";
+    public static final String PAGETOTAL = "pagetotal";
     public static final String PDF = "pdf";
     public static final String PS = "ps";
     public static final String PUBLISHER = "publisher";
+    public static final String REPORTNO = "reportno";
     public static final String REVIEW = "review";
     public static final String SCHOOL = "school";
     public static final String SERIES = "series";
+    public static final String SUBTITLE = "subtitle";
     public static final String TITLE = "title";
     public static final String TYPE = "type";
     public static final String URL = "url";
     public static final String URLDATE = "urldate";
+    public static final String VERSION = "version";
     public static final String VOLUME = "volume";
     public static final String YEAR = "year";
+    public static final String YEARFILED = "yearfiled";
+
+    // JabRef internal field names
+    public static final String OWNER = "owner";
+    public static final String TIMESTAMP = "timestamp"; // Not the actual field name, but the default value
+    public static final String NUMBER_COL = "#";
+    public static final String GROUPS = "groups";
+    public static final String SEARCH = "__search";
+    public static final String GROUPSEARCH = "__groupsearch";
+    public static final String MARKED = "__markedentry";
+
+    public static String orFields(String... fields) {
+        return String.join(FieldName.FIELD_SEPARATOR, fields);
+    }
+
 }

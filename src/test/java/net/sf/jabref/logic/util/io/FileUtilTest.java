@@ -20,6 +20,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class FileUtilTest {
+
     @Before
     public void setUp() {
         Globals.prefs = mock(JabRefPreferences.class);
@@ -34,7 +35,8 @@ public class FileUtilTest {
     @Test
     public void testGetLinkedFileNameDefault() {
         // bibkey - title
-        when(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN)).thenReturn("\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}");
+        when(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN))
+                .thenReturn("\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}");
 
         BibEntry entry = new BibEntry();
         entry.setCiteKey("1234");
@@ -109,26 +111,17 @@ public class FileUtilTest {
 
     @Test
     public void uniquePathSubstrings() {
-        String[] pathArr = {
-                Paths.get("C:/uniquefile.bib").toString(),
-                Paths.get("C:/downloads/filename.bib").toString(),
+        String[] pathArr = {Paths.get("C:/uniquefile.bib").toString(),
+                Paths.get("C:/downloads/filename.bib").toString(), Paths.get("C:/mypaper/bib/filename.bib").toString(),
+                Paths.get("C:/external/mypaper/bib/filename.bib").toString(), ""};
+        String[] uniqArr = {Paths.get("uniquefile.bib").toString(), Paths.get("downloads/filename.bib").toString(),
                 Paths.get("C:/mypaper/bib/filename.bib").toString(),
-                Paths.get("C:/external/mypaper/bib/filename.bib").toString(),
-                ""
-        };
-        String[] uniqArr = {
-                Paths.get("uniquefile.bib").toString(),
-                Paths.get("downloads/filename.bib").toString(),
-                Paths.get("C:/mypaper/bib/filename.bib").toString(),
-                Paths.get("external/mypaper/bib/filename.bib").toString(),
-                ""
-        };
+                Paths.get("external/mypaper/bib/filename.bib").toString(), ""};
         List<String> paths = Arrays.asList(pathArr);
         List<String> uniqPath = Arrays.asList(uniqArr);
 
         List<String> result = FileUtil.uniquePathSubstrings(paths);
         assertEquals(uniqPath, result);
     }
-
 
 }

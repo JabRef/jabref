@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -63,8 +62,8 @@ public class RegExpFileSearch {
      * @param regExp The expression deciding which names are acceptable.
      * @return A map linking each given entry to a list of files matching the given criteria.
      */
-    public static Map<BibEntry, List<File>> findFilesForSet(Collection<BibEntry> entries,
-            Collection<String> extensions, List<File> directories, String regExp) {
+    public static Map<BibEntry, List<File>> findFilesForSet(List<BibEntry> entries, List<String> extensions,
+            List<File> directories, String regExp) {
 
         Map<BibEntry, List<File>> res = new HashMap<>();
         for (BibEntry entry : entries) {
@@ -82,8 +81,8 @@ public class RegExpFileSearch {
      * @param regularExpression The expression deciding which names are acceptable.
      * @return A list of files paths matching the given criteria.
      */
-    private static List<File> findFiles(BibEntry entry, Collection<String> extensions,
-            Collection<File> directories, String regularExpression) {
+    private static List<File> findFiles(BibEntry entry, List<String> extensions, List<File> directories,
+            String regularExpression) {
 
         String extensionRegExp = '(' + String.join("|", extensions) + ')';
 
@@ -128,8 +127,7 @@ public class RegExpFileSearch {
      * @return Will return the first file found to match the given criteria or
      *         null if none was found.
      */
-    private static List<File> findFile(BibEntry entry, Collection<File> dirs, String file,
-            String extensionRegExp) {
+    private static List<File> findFile(BibEntry entry, List<File> dirs, String file, String extensionRegExp) {
         List<File> res = new ArrayList<>();
         for (File directory : dirs) {
             res.addAll(findFile(entry, directory.getPath(), file, extensionRegExp));

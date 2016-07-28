@@ -48,15 +48,6 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 public class InternalBibtexFields {
 
-    // some internal fields
-    public static final String SEARCH = "__search";
-    public static final String GROUPSEARCH = "__groupsearch";
-    public static final String MARKED = "__markedentry";
-    public static final String OWNER = "owner";
-    public static final String TIMESTAMP = "timestamp";
-    public static final String NUMBER_COL = "#";
-
-
     // contains all bibtex-field objects (BibtexSingleField)
     private final Map<String, BibtexSingleField> fieldSet;
 
@@ -182,10 +173,11 @@ public class InternalBibtexFields {
         dummy = new BibtexSingleField(FieldName.DOI, true, BibtexSingleField.SMALL_W);
         dummy.setExtras(EnumSet.of(FieldProperties.DOI));
         add(dummy);
-        add(new BibtexSingleField("eid", true, BibtexSingleField.SMALL_W));
+        add(new BibtexSingleField(FieldName.EID, true, BibtexSingleField.SMALL_W));
 
         dummy = new BibtexSingleField(FieldName.DATE, true);
-        dummy.setPrivate();
+        dummy.setExtras(EnumSet.of(FieldProperties.DATE));
+        dummy.setPrivate(); // TODO: Why private?
         add(dummy);
 
         add(new BibtexSingleField("pmid", false, BibtexSingleField.SMALL_W, 60).setNumeric(true));
@@ -213,13 +205,13 @@ public class InternalBibtexFields {
         add(dummy);
 
         // some internal fields ----------------------------------------------
-        dummy = new BibtexSingleField(InternalBibtexFields.NUMBER_COL, false, 32);
+        dummy = new BibtexSingleField(FieldName.NUMBER_COL, false, 32);
         dummy.setPrivate();
         dummy.setWriteable(false);
         dummy.setDisplayable(false);
         add(dummy);
 
-        dummy = new BibtexSingleField(InternalBibtexFields.OWNER, false, BibtexSingleField.SMALL_W);
+        dummy = new BibtexSingleField(FieldName.OWNER, false, BibtexSingleField.SMALL_W);
         dummy.setExtras(EnumSet.of(FieldProperties.OWNER));
         dummy.setPrivate();
         add(dummy);
@@ -234,19 +226,19 @@ public class InternalBibtexFields {
         dummy.setPrivate();
         add(dummy);
 
-        dummy = new BibtexSingleField(InternalBibtexFields.SEARCH, false);
+        dummy = new BibtexSingleField(FieldName.SEARCH, false);
         dummy.setPrivate();
         dummy.setWriteable(false);
         dummy.setDisplayable(false);
         add(dummy);
 
-        dummy = new BibtexSingleField(InternalBibtexFields.GROUPSEARCH, false);
+        dummy = new BibtexSingleField(FieldName.GROUPSEARCH, false);
         dummy.setPrivate();
         dummy.setWriteable(false);
         dummy.setDisplayable(false);
         add(dummy);
 
-        dummy = new BibtexSingleField(InternalBibtexFields.MARKED, false);
+        dummy = new BibtexSingleField(FieldName.MARKED, false);
         dummy.setPrivate();
         dummy.setWriteable(true); // This field must be written to file!
         dummy.setDisplayable(false);
@@ -302,6 +294,7 @@ public class InternalBibtexFields {
                 field = new BibtexSingleField(fieldText, true, BibtexSingleField.SMALL_W);
             }
             field.getExtras().add(FieldProperties.DATE);
+            field.getExtras().add(FieldProperties.ISO_DATE);
             add(field);
         }
 

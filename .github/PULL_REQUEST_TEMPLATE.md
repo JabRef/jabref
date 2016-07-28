@@ -3,3 +3,4 @@
 - [ ] Change in CHANGELOG.md described
 - [ ] Tests created for changes
 - [ ] Screenshots added (for bigger UI changes)
+- [ ] Manually tested changed features in running JabRef

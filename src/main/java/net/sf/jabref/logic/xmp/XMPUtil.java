@@ -1202,7 +1202,7 @@ public class XMPUtil {
                 }
 
             } else if (args[0].endsWith(".bib")) {
-                // Read from bib and write as XMP
+                // Read from BIB and write as XMP
                 try (FileReader fr = new FileReader(args[0])) {
                     ParserResult result = BibtexParser.parse(fr);
                     Collection<BibEntry> entries = result.getDatabase().getEntries();
