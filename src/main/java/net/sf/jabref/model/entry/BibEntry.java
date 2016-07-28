@@ -697,6 +697,15 @@ public class BibEntry implements Cloneable {
         return REMOVE_TRAILING_WHITESPACE.matcher(commentsBeforeEntry).replaceFirst("");
     }
 
+    public List<ParsedEntryLink> getEntryLinkList(String fieldName, BibDatabase database) {
+        return getFieldOptional(fieldName).map(fieldValue -> EntryLinkList.parse(fieldValue, database))
+                .orElse(Collections.emptyList());
+    }
+
+    public Optional<FieldChange> setEntryLinkList(String fieldName, List<ParsedEntryLink> list) {
+        return setField(fieldName, EntryLinkList.serialize(list));
+    }
+
     public Set<String> getFieldAsWords(String field) {
         String fieldName = toLowerCase(field);
         Set<String> storedList = fieldsAsWords.get(fieldName);

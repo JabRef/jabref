@@ -42,6 +42,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
+import net.sf.jabref.gui.fieldeditors.EntryLinkListEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
@@ -152,6 +153,13 @@ class EntryEditorTab {
             if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.FILE_EDITOR)) {
                 fieldEditor = new FileListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent);
                 fileListEditor = (FileListEditor) fieldEditor;
+                defaultHeight = 0;
+            } else if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.SINGLE_ENTRY_LINK)) {
+                fieldEditor = new EntryLinkListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent, true);
+                defaultHeight = 0;
+            } else if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.MULTIPLE_ENTRY_LINK)) {
+                fieldEditor = new EntryLinkListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent,
+                        false);
                 defaultHeight = 0;
             } else {
                 fieldEditor = new TextArea(field, null);
