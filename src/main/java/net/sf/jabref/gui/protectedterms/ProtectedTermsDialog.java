@@ -22,9 +22,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -508,28 +506,6 @@ public class ProtectedTermsDialog {
 
 
     private void storePreferences() {
-        List<String> enabledExternalList = new ArrayList<>();
-        List<String> disabledExternalList = new ArrayList<>();
-        List<String> enabledInternalList = new ArrayList<>();
-        List<String> disabledInternalList = new ArrayList<>();
-
-        for (ProtectedTermsList list : loader.getProtectedTermsLists()) {
-            if (list.isInternalList()) {
-                if (list.isEnabled()) {
-                    enabledInternalList.add(list.getLocation());
-                } else {
-                    disabledInternalList.add(list.getLocation());
-                }
-            } else {
-                if (list.isEnabled()) {
-                    enabledExternalList.add(list.getLocation());
-                } else {
-                    disabledExternalList.add(list.getLocation());
-                }
-            }
-        }
-
-        ProtectedTermsPreferences.toPreferences(Globals.prefs, enabledInternalList, enabledExternalList,
-                disabledInternalList, disabledExternalList);
+        ProtectedTermsPreferences.toPreferences(Globals.prefs, loader);
     }
 }

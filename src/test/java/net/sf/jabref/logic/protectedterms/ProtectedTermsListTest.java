@@ -3,6 +3,7 @@ package net.sf.jabref.logic.protectedterms;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

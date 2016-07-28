@@ -1,5 +1,6 @@
 package net.sf.jabref.logic.protectedterms;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -28,15 +29,6 @@ public class ProtectedTermsPreferences {
                 jabRefPreferences.getStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_EXTERNAL));
     }
 
-    public static void toPreferences(JabRefPreferences jabRefPreferences, List<String> enabledInternalTermLists,
-            List<String> enabledExternalTermLists, List<String> disabledInternalTermLists,
-            List<String> disabledExternalTermLists) {
-        jabRefPreferences.putStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_EXTERNAL, enabledExternalTermLists);
-        jabRefPreferences.putStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_EXTERNAL, disabledExternalTermLists);
-        jabRefPreferences.putStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_INTERNAL, enabledInternalTermLists);
-        jabRefPreferences.putStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_INTERNAL, disabledInternalTermLists);
-
-    }
 
     public List<String> getEnabledInternalTermLists() {
         return enabledInternalTermLists;
@@ -52,5 +44,34 @@ public class ProtectedTermsPreferences {
 
     public List<String> getDisabledExternalTermLists() {
         return disabledExternalTermLists;
+    }
+
+    public static void toPreferences(JabRefPreferences jabRefPreferences, ProtectedTermsLoader loader) {
+        List<String> enabledExternalList = new ArrayList<>();
+        List<String> disabledExternalList = new ArrayList<>();
+        List<String> enabledInternalList = new ArrayList<>();
+        List<String> disabledInternalList = new ArrayList<>();
+
+        for (ProtectedTermsList list : loader.getProtectedTermsLists()) {
+            if (list.isInternalList()) {
+                if (list.isEnabled()) {
+                    enabledInternalList.add(list.getLocation());
+                } else {
+                    disabledInternalList.add(list.getLocation());
+                }
+            } else {
+                if (list.isEnabled()) {
+                    enabledExternalList.add(list.getLocation());
+                } else {
+                    disabledExternalList.add(list.getLocation());
+                }
+            }
+        }
+
+        jabRefPreferences.putStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_EXTERNAL, enabledExternalList);
+        jabRefPreferences.putStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_EXTERNAL, disabledExternalList);
+        jabRefPreferences.putStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_INTERNAL, enabledInternalList);
+        jabRefPreferences.putStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_INTERNAL, disabledInternalList);
+
     }
 }

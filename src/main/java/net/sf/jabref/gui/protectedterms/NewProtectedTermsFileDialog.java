@@ -3,8 +3,6 @@ package net.sf.jabref.gui.protectedterms;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
-import java.util.Optional;
-
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
@@ -15,6 +13,7 @@ import javax.swing.JDialog;
 import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
@@ -37,6 +36,13 @@ public class NewProtectedTermsFileDialog extends JDialog {
         this.loader = loader;
         setupDialog();
         setLocationRelativeTo(parent);
+    }
+
+    public NewProtectedTermsFileDialog(JabRefFrame mainFrame, ProtectedTermsLoader loader) {
+        super(mainFrame, Localization.lang("New protected terms file"), true);
+        this.loader = loader;
+        setupDialog();
+        setLocationRelativeTo(mainFrame);
     }
 
     private void setupDialog() {
@@ -90,11 +96,8 @@ public class NewProtectedTermsFileDialog extends JDialog {
         pack();
     }
 
-    public Optional<String> getFileName() {
-        if (addOKPressed && (newFile.getText() != null) && !newFile.getText().isEmpty()) {
-            return Optional.of(newFile.getText());
-        }
-        return Optional.empty();
+    public boolean isOKPressed() {
+        return addOKPressed;
     }
 
 }

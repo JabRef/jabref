@@ -5,9 +5,12 @@ import javax.swing.JMenuItem;
 import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.gui.protectedterms.NewProtectedTermsFileDialog;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsList;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 
 public class ProtectedTermsMenu extends JMenu {
 
@@ -32,14 +35,7 @@ public class ProtectedTermsMenu extends JMenu {
         externalFiles = new JMenu(Localization.lang("Add selected text to list"));
         updateFiles();
 
-        /* It would be nice to add a new file from the menu, but I do not realize how to get hold of JabRefFrame from here as a parent JFrame
-        externalFiles.addSeparator();
-        JMenuItem addToNewFileItem = new JMenuItem("New file" + "...");
-        addToNewFileItem.addActionListener(event -> {
-            NewProtectedTermsFileDialog dialog = new NewProtectedTermsFileDialog();
-        });
 
-        */
 
         this.add(protectItem);
         this.add(externalFiles);
@@ -60,6 +56,18 @@ public class ProtectedTermsMenu extends JMenu {
                 });
             }
         }
+        externalFiles.addSeparator();
+        JMenuItem addToNewFileItem = new JMenuItem(Localization.lang("New") + "...");
+        addToNewFileItem.addActionListener(event -> {
+            NewProtectedTermsFileDialog dialog = new NewProtectedTermsFileDialog(JabRefGUI.getMainFrame(),
+                    Globals.protectedTermsLoader);
+            dialog.setVisible(true);
+            if (dialog.isOKPressed()) {
+                // Update preferences with new list
+                ProtectedTermsPreferences.toPreferences(Globals.prefs, Globals.protectedTermsLoader);
+            }
+        });
+        externalFiles.add(addToNewFileItem);
 
     }
 
