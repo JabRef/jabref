@@ -3,6 +3,7 @@ package net.sf.jabref.gui.protectedterms;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.util.Collections;
+
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
