@@ -34,7 +34,6 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,16 +57,12 @@ public class LabelPatternUtil {
 
     private static final int CHARS_OF_FIRST = 5;
 
-
-    static {
-        updateDefaultPattern();
-    }
-
     private static BibDatabase database;
 
-    public static void updateDefaultPattern() {
+
+    public static void updateDefaultPattern(LabelPatternPreferences labelPatternPreferences) {
         defaultLabelPattern = LabelPatternUtil
-                .split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
+                .split(labelPatternPreferences.getDefaultLabelPattern());
     }
 
     /**
@@ -427,7 +422,8 @@ public class LabelPatternUtil {
      * @param entry a <code>BibEntry</code>
      * @return modified BibEntry
      */
-    public static void makeLabel(MetaData metaData, BibDatabase dBase, BibEntry entry, JabRefPreferences prefs) {
+    public static void makeLabel(MetaData metaData, BibDatabase dBase, BibEntry entry,
+            LabelPatternPreferences labelPatternPreferences) {
         database = dBase;
         String key;
         StringBuilder stringBuilder = new StringBuilder();
@@ -471,12 +467,12 @@ public class LabelPatternUtil {
         }
 
         // Remove all illegal characters from the key.
-        key = checkLegalKey(stringBuilder.toString());
+        key = checkLegalKey(stringBuilder.toString(), labelPatternPreferences.isEnforceLegalKey());
 
         // Remove Regular Expressions while generating Keys
-        String regex = prefs.get(JabRefPreferences.KEY_PATTERN_REGEX);
+        String regex = labelPatternPreferences.getKeyPatternRegex();
         if ((regex != null) && !regex.trim().isEmpty()) {
-            String replacement = prefs.get(JabRefPreferences.KEY_PATTERN_REPLACEMENT);
+            String replacement = labelPatternPreferences.getKeyPatternReplacement();
             key = key.replaceAll(regex, replacement);
         }
 
@@ -494,8 +490,8 @@ public class LabelPatternUtil {
             occurrences--; // No change, so we can accept one dupe.
         }
 
-        boolean alwaysAddLetter = prefs.getBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER);
-        boolean firstLetterA = prefs.getBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A);
+        boolean alwaysAddLetter = labelPatternPreferences.isAlwaysAddLetter();
+        boolean firstLetterA = labelPatternPreferences.isFirstLetterA();
 
         if (!alwaysAddLetter && (occurrences == 0)) {
             // No dupes found, so we can just go ahead.
@@ -1380,21 +1376,6 @@ public class LabelPatternUtil {
         return parts.toArray(new String[parts.size()]);
     }
 
-    /**
-     * This method returns a String similar to the one passed in, except that it is molded into a form that is
-     * acceptable for bibtex.
-     * <p>
-     * Watch-out that the returned string might be of length 0 afterwards.
-     *
-     * @param key mayBeNull
-     */
-    public static String checkLegalKey(String key) {
-        if (key == null) {
-            return null;
-        }
-        return checkLegalKey(key,
-                JabRefPreferences.getInstance().getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
-    }
 
     /**
      * This method returns a String similar to the one passed in, except that it is molded into a form that is

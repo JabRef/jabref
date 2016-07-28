@@ -39,6 +39,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
@@ -217,7 +218,8 @@ public class FreeCiteImporter extends ImportFormat {
                     // autogenerate label (BibTeX key)
                     LabelPatternUtil.makeLabel(
                             JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getMetaData(),
-                            JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabase(), e, Globals.prefs);
+                            JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabase(), e,
+                            LabelPatternPreferences.fromPreferences(Globals.prefs));
 
                     res.add(e);
                 }

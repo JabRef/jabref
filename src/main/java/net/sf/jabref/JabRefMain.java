@@ -25,6 +25,8 @@ import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.net.ProxyAuthenticator;
 import net.sf.jabref.logic.net.ProxyPreferences;
 import net.sf.jabref.logic.net.ProxyRegisterer;
@@ -71,6 +73,9 @@ public class JabRefMain {
 
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
+
+        // Set key pattern based on preferences
+        LabelPatternUtil.updateDefaultPattern(LabelPatternPreferences.fromPreferences(Globals.prefs));
 
         // Check for running JabRef
         RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);

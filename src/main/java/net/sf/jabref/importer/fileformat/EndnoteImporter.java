@@ -24,11 +24,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -236,7 +238,8 @@ public class EndnoteImporter extends ImportFormat {
                         type = "mastersthesis";
                     }
                 } else if ("F".equals(prefix)) {
-                    hm.put(BibEntry.KEY_FIELD, LabelPatternUtil.checkLegalKey(val));
+                    hm.put(BibEntry.KEY_FIELD, LabelPatternUtil.checkLegalKey(val,
+                            Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY)));
                 }
             }
 

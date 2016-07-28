@@ -35,6 +35,7 @@ import net.sf.jabref.logic.exporter.SaveException;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.SaveSession;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.logging.JabRefLogger;
 import net.sf.jabref.logic.search.DatabaseSearcher;
@@ -435,7 +436,8 @@ public class ArgumentProcessor {
                 LOGGER.info(Localization.lang("Regenerating BibTeX keys according to metadata"));
                 for (BibEntry entry : database.getEntries()) {
                     // try to make a new label
-                    LabelPatternUtil.makeLabel(metaData, database, entry, Globals.prefs);
+                    LabelPatternUtil.makeLabel(metaData, database, entry,
+                            LabelPatternPreferences.fromPreferences(Globals.prefs));
                 }
             } else {
                 LOGGER.info(Localization.lang("No meta data present in BIB_file. Cannot regenerate BibTeX keys"));
