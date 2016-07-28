@@ -11,6 +11,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class StringUtilTest {
@@ -241,6 +242,38 @@ public class StringUtilTest {
     @Test(expected = NumberFormatException.class)
     public void testIntValueOfExceptionfIfStringEmpty() {
             StringUtil.intValueOf("");
+    }
+
+    @Test
+    public void testIntValueOfWithNullSingleDigit() {
+        assertEquals(Integer.valueOf(1), StringUtil.intValueOfWithNull("1"));
+        assertEquals(Integer.valueOf(2), StringUtil.intValueOfWithNull("2"));
+        assertEquals(Integer.valueOf(8), StringUtil.intValueOfWithNull("8"));
+    }
+
+    @Test
+    public void testIntValueOfWithNullLongString() {
+        assertEquals(Integer.valueOf(1234567890), StringUtil.intValueOfWithNull("1234567890"));
+    }
+
+    @Test
+    public void testIntValueOfWithNullStartWithZeros() {
+        assertEquals(Integer.valueOf(1234), StringUtil.intValueOfWithNull("001234"));
+    }
+
+    @Test
+    public void testIntValueOfWithNullExceptionIfStringContainsLetter() {
+        assertNull(StringUtil.intValueOfWithNull("12A2"));
+    }
+
+    @Test
+    public void testIntValueOfWithNullExceptionIfStringNull() {
+        assertNull(StringUtil.intValueOfWithNull(null));
+    }
+
+    @Test
+    public void testIntValueOfWithNullExceptionfIfStringEmpty() {
+        assertNull(StringUtil.intValueOfWithNull(""));
     }
 
     @Test
