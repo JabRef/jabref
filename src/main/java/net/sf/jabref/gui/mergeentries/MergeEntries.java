@@ -19,6 +19,7 @@ import java.awt.Font;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,11 +40,10 @@ import javax.swing.JSeparator;
 import javax.swing.JTextArea;
 import javax.swing.JTextPane;
 import javax.swing.SwingUtilities;
-import javax.swing.text.html.HTMLEditorKit;
-import javax.swing.text.html.StyleSheet;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.PreviewPanel;
+import net.sf.jabref.gui.util.component.DiffHighlightingTextPane;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
@@ -72,28 +72,19 @@ public class MergeEntries {
 
     private static final Log LOGGER = LogFactory.getLog(MergeEntries.class);
 
-    private static final String CONTENT_TYPE = "text/html";
-
 
     // Headings
-    private static final String[] COLUMN_HEADINGS = {Localization.lang("Field"),
+    private final List<String> columnHeadings = Arrays.asList(Localization.lang("Field"),
             Localization.lang("Left entry"),
             Localization.lang("Left"),
             Localization.lang("None"),
             Localization.lang("Right"),
-            Localization.lang("Right entry")};
+            Localization.lang("Right entry"));
     private static final String[] DIFF_MODES = {Localization.lang("Plain text"),
             Localization.lang("Show diff") + " - " + Localization.lang("word"),
             Localization.lang("Show diff") + " - " + Localization.lang("character"),
             Localization.lang("Show symmetric diff") + " - " + Localization.lang("word"),
             Localization.lang("Show symmetric diff") + " - " + Localization.lang("character")};
-
-    private static final String HTML_START = "<html><body>";
-    private static final String HTML_END = "</body></html>";
-    private static final String BODY_STYLE = "body{font:sans-serif}";
-    private static final String ADDITION_STYLE = ".add{color:blue;text-decoration:underline}";
-    private static final String REMOVAL_STYLE = ".del{color:red;text-decoration:line-through;}";
-    private static final String CHANGE_STYLE = ".change{color:#006400;text-decoration:underline}";
 
     private final Set<String> identicalFields = new HashSet<>();
     private final Set<String> differentFields = new HashSet<>();
@@ -116,6 +107,11 @@ public class MergeEntries {
     private final JPanel mainPanel = new JPanel();
 
     private static final String MARGIN = "10px";
+
+    private static final List<JLabel> HEADING_LABELS = new ArrayList<>(6);
+
+    private static final CellConstraints CELL_CONSTRAINTS = new CellConstraints();
+
 
 
     /**
@@ -142,8 +138,8 @@ public class MergeEntries {
      * @param type Bib database mode
      */
     public MergeEntries(BibEntry entryLeft, BibEntry entryRight, String headingLeft, String headingRight, BibDatabaseMode type) {
-        COLUMN_HEADINGS[1] = headingLeft;
-        COLUMN_HEADINGS[5] = headingRight;
+        columnHeadings.set(1, headingLeft);
+        columnHeadings.set(5, headingRight);
         this.leftEntry = entryLeft;
         this.rightEntry = entryRight;
 
@@ -159,16 +155,7 @@ public class MergeEntries {
         doneBuilding = false;
         setupFields();
 
-        // Fill diff mode combo box
-        for (String diffText : DIFF_MODES) {
-            diffMode.addItem(diffText);
-        }
-        diffMode.setSelectedIndex(
-                Math.min(Globals.prefs.getInt(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE), diffMode.getItemCount() - 1));
-        diffMode.addActionListener(e -> {
-            updateTextPanes(differentFields);
-            storePreference();
-        });
+        fillDiffModes();
 
         // Create main layout
         String colSpecMain = "left:pref, 5px, center:3cm:grow, 5px, center:pref, 3px, center:pref, 3px, center:pref, 5px, center:3cm:grow";
@@ -186,52 +173,62 @@ public class MergeEntries {
         mainPanel.setLayout(mainLayout);
         mergePanel.setLayout(mergeLayout);
 
-        CellConstraints cc = new CellConstraints();
+        setupHeadingRows();
 
-        mainPanel.add(boldFontLabel(Localization.lang("Use")), cc.xyw(4, 1, 7, "center, bottom"));
-        mainPanel.add(diffMode, cc.xy(11, 1, "right, bottom"));
+        mainPanel.add(new JSeparator(), CELL_CONSTRAINTS.xyw(1, 3, 11));
 
-        // Set headings
-        JLabel[] headingLabels = new JLabel[6];
-        for (int i = 0; i < 6; i++) {
-            headingLabels[i] = boldFontLabel(COLUMN_HEADINGS[i]);
-            mainPanel.add(headingLabels[i], cc.xy(1 + (i * 2), 2));
+        setupEntryTypeRow(mergePanel);
 
-        }
+        int maxLabelWidth = setupFieldRows(mergePanel);
 
-        mainPanel.add(new JSeparator(), cc.xyw(1, 3, 11));
 
-        // Start with entry type
-        mergePanel.add(boldFontLabel(Localization.lang("Entry type")), cc.xy(1, 1));
+        // Create and add scrollpane
+        scrollPane = new JScrollPane(mergePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        updateTextPanes(allFields);
+        mainPanel.add(scrollPane, CELL_CONSTRAINTS.xyw(1, 4, 11));
+        mainPanel.add(new JSeparator(), CELL_CONSTRAINTS.xyw(1, 5, 11));
 
-        JTextPane leftTypeDisplay = getStyledTextPane();
-        leftTypeDisplay.setText(HTML_START + leftEntry.getType() + HTML_END);
-        mergePanel.add(leftTypeDisplay, cc.xy(3, 1));
-        if (leftEntry.getType().equals(rightEntry.getType())) {
-            identicalTypes = true;
-        } else {
-            identicalTypes = false;
-            ButtonGroup group = new ButtonGroup();
-            typeRadioButtons = new ArrayList<>(2);
-            for (int k = 0; k < 3; k += 2) {
-                JRadioButton button = new JRadioButton();
-                typeRadioButtons.add(button);
-                group.add(button);
-                mergePanel.add(button, cc.xy(5 + (k * 2), 1));
-                button.addChangeListener(e -> updateAll());
-            }
-            typeRadioButtons.get(0).setSelected(true);
-        }
-        JTextPane rightTypeDisplay = getStyledTextPane();
-        rightTypeDisplay.setText(HTML_START + rightEntry.getType() + HTML_END);
-        mergePanel.add(rightTypeDisplay, cc.xy(11, 1));
+        synchronizeColumnWidths(mainLayout, mergeLayout, maxLabelWidth);
 
+        // Setup a PreviewPanel and a Bibtex source box for the merged entry
+        mainPanel.add(boldFontLabel(Localization.lang("Merged entry")), CELL_CONSTRAINTS.xyw(1, 6, 6));
+
+        entryPreview = new PreviewPanel(null, mergedEntry, null, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+        mainPanel.add(entryPreview, CELL_CONSTRAINTS.xyw(1, 8, 6));
+
+        mainPanel.add(boldFontLabel(Localization.lang("Merged BibTeX source code")), CELL_CONSTRAINTS.xyw(8, 6, 4));
+
+        sourceView = new JTextArea();
+        sourceView.setLineWrap(true);
+        sourceView.setFont(new Font("Monospaced", Font.PLAIN, Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
+        mainPanel.add(new JScrollPane(sourceView), CELL_CONSTRAINTS.xyw(8, 8, 4));
+        sourceView.setEditable(false);
+
+        // Add some margin around the layout
+        mainLayout.appendRow(RowSpec.decode(MARGIN));
+        mainLayout.appendColumn(ColumnSpec.decode(MARGIN));
+        mainLayout.insertRow(1, RowSpec.decode(MARGIN));
+        mainLayout.insertColumn(1, ColumnSpec.decode(MARGIN));
+
+        // Everything done, allow any action to actually update the merged entry
+        doneBuilding = true;
+
+        updateAll();
+
+        // Show what we've got
+        mainPanel.setVisible(true);
+        SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(0));
+    }
+
+    private int setupFieldRows(JPanel mergePanel) {
         // For all fields in joint add a row and possibly radio buttons
         int row = 2;
         int maxLabelWidth = -1;
         for (String field : allFields) {
             JLabel label = boldFontLabel(new SentenceCaseFormatter().format(field));
-            mergePanel.add(label, cc.xy(1, (2 * row) - 1, "left, top"));
+            mergePanel.add(label, CELL_CONSTRAINTS.xy(1, (2 * row) - 1, "left, top"));
             Optional<String> leftString = leftEntry.getFieldOptional(field);
             Optional<String> rightString = rightEntry.getFieldOptional(field);
             if (leftString.equals(rightString)) {
@@ -244,8 +241,8 @@ public class MergeEntries {
 
             // Left text pane
             if (leftString.isPresent()) {
-                JTextPane tf = getStyledTextPane();
-                mergePanel.add(tf, cc.xy(3, (2 * row) - 1, "f, f"));
+                JTextPane tf = new DiffHighlightingTextPane();
+                mergePanel.add(tf, CELL_CONSTRAINTS.xy(3, (2 * row) - 1, "f, f"));
                 leftTextPanes.put(field, tf);
             }
 
@@ -258,7 +255,7 @@ public class MergeEntries {
                 for (int k = 0; k < 3; k++) {
                     JRadioButton button = new JRadioButton();
                     group.add(button);
-                    mergePanel.add(button, cc.xy(5 + (k * 2), (2 * row) - 1));
+                    mergePanel.add(button, CELL_CONSTRAINTS.xy(5 + (k * 2), (2 * row) - 1));
                     button.addChangeListener(e -> updateAll());
                     list.add(button);
                 }
@@ -276,60 +273,78 @@ public class MergeEntries {
 
             // Right text pane
             if (rightString.isPresent()) {
-                JTextPane tf = getStyledTextPane();
-                mergePanel.add(tf, cc.xy(11, (2 * row) - 1, "f, f"));
+                JTextPane tf = new DiffHighlightingTextPane();
+                mergePanel.add(tf, CELL_CONSTRAINTS.xy(11, (2 * row) - 1, "f, f"));
                 rightTextPanes.put(field, tf);
             }
             row++;
         }
+        return maxLabelWidth;
+    }
 
+    private void setupEntryTypeRow(JPanel mergePanel) {
+        // Start with entry type
+        mergePanel.add(boldFontLabel(Localization.lang("Entry type")), CELL_CONSTRAINTS.xy(1, 1));
 
-        scrollPane = new JScrollPane(mergePanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setBorder(BorderFactory.createEmptyBorder());
-        updateTextPanes(allFields);
-        mainPanel.add(scrollPane, cc.xyw(1, 4, 11));
-        mainPanel.add(new JSeparator(), cc.xyw(1, 5, 11));
+        JTextPane leftTypeDisplay = new DiffHighlightingTextPane();
+        leftTypeDisplay.setText(DiffHighlighting.HTML_START + leftEntry.getType() + DiffHighlighting.HTML_END);
+        mergePanel.add(leftTypeDisplay, CELL_CONSTRAINTS.xy(3, 1));
+        if (leftEntry.getType().equals(rightEntry.getType())) {
+            identicalTypes = true;
+        } else {
+            identicalTypes = false;
+            ButtonGroup group = new ButtonGroup();
+            typeRadioButtons = new ArrayList<>(2);
+            for (int k = 0; k < 3; k += 2) {
+                JRadioButton button = new JRadioButton();
+                typeRadioButtons.add(button);
+                group.add(button);
+                mergePanel.add(button, CELL_CONSTRAINTS.xy(5 + (k * 2), 1));
+                button.addChangeListener(e -> updateAll());
+            }
+            typeRadioButtons.get(0).setSelected(true);
+        }
+        JTextPane rightTypeDisplay = new DiffHighlightingTextPane();
+        rightTypeDisplay.setText(DiffHighlighting.HTML_START + rightEntry.getType() + DiffHighlighting.HTML_END);
+        mergePanel.add(rightTypeDisplay, CELL_CONSTRAINTS.xy(11, 1));
+    }
 
+    private void setupHeadingRows() {
+        mainPanel.add(boldFontLabel(Localization.lang("Use")), CELL_CONSTRAINTS.xyw(4, 1, 7, "center, bottom"));
+        mainPanel.add(diffMode, CELL_CONSTRAINTS.xy(11, 1, "right, bottom"));
+
+        // Set headings
+        for (int i = 0; i < 6; i++) {
+            HEADING_LABELS.add(boldFontLabel(columnHeadings.get(i)));
+            mainPanel.add(HEADING_LABELS.get(i), CELL_CONSTRAINTS.xy(1 + (i * 2), 2));
+        }
+    }
+
+    private void fillDiffModes() {
+        // Fill diff mode combo box
+        for (String diffText : DIFF_MODES) {
+            diffMode.addItem(diffText);
+        }
+        diffMode.setSelectedIndex(
+                Math.min(Globals.prefs.getInt(JabRefPreferences.MERGE_ENTRIES_DIFF_MODE), diffMode.getItemCount() - 1));
+        diffMode.addActionListener(e -> {
+            updateTextPanes(differentFields);
+            storePreference();
+        });
+    }
+
+    private void synchronizeColumnWidths(FormLayout mainLayout, FormLayout mergeLayout,
+            int maxLabelWidth) {
         // Synchronize column widths
         String[] rbAlign = {"right", "center", "left"};
         mainLayout.setColumnSpec(1, ColumnSpec.decode(Integer.toString(maxLabelWidth) + "px"));
         Integer maxRBWidth = -1;
         for (int k = 2; k < 5; k++) {
-            maxRBWidth = Math.max(maxRBWidth, headingLabels[k].getPreferredSize().width);
+            maxRBWidth = Math.max(maxRBWidth, HEADING_LABELS.get(k).getPreferredSize().width);
         }
         for (int k = 0; k < 3; k++) {
             mergeLayout.setColumnSpec(5 + (k * 2), ColumnSpec.decode(rbAlign[k] + ":" + maxRBWidth + "px"));
         }
-
-        // Setup a PreviewPanel and a Bibtex source box for the merged entry
-        mainPanel.add(boldFontLabel(Localization.lang("Merged entry")), cc.xyw(1, 6, 6));
-
-        entryPreview = new PreviewPanel(null, mergedEntry, null, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
-        mainPanel.add(entryPreview, cc.xyw(1, 8, 6));
-
-        mainPanel.add(boldFontLabel(Localization.lang("Merged BibTeX source code")), cc.xyw(8, 6, 4));
-
-        sourceView = new JTextArea();
-        sourceView.setLineWrap(true);
-        sourceView.setFont(new Font("Monospaced", Font.PLAIN, Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
-        mainPanel.add(new JScrollPane(sourceView), cc.xyw(8, 8, 4));
-        sourceView.setEditable(false);
-
-        // Add some margin around the layout
-        mainLayout.appendRow(RowSpec.decode(MARGIN));
-        mainLayout.appendColumn(ColumnSpec.decode(MARGIN));
-        mainLayout.insertRow(1, RowSpec.decode(MARGIN));
-        mainLayout.insertColumn(1, ColumnSpec.decode(MARGIN));
-
-        // Everything done, allow any action to actually update the merged entry
-        doneBuilding = true;
-
-        updateAll();
-
-        // Show what we've got
-        mainPanel.setVisible(true);
-        javax.swing.SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar().setValue(0));
     }
 
     private JLabel boldFontLabel(String text) {
@@ -385,27 +400,16 @@ public class MergeEntries {
                 break;
             }
             if ((leftString != null) && leftTextPanes.containsKey(field)) {
-                leftTextPanes.get(field).setText(HTML_START + leftString + HTML_END);
+                leftTextPanes.get(field).setText(DiffHighlighting.HTML_START + leftString + DiffHighlighting.HTML_END);
             }
             if ((rightString != null) && rightTextPanes.containsKey(field)) {
-                rightTextPanes.get(field).setText(HTML_START + rightString + HTML_END);
+                rightTextPanes.get(field).setText(DiffHighlighting.HTML_START + rightString + DiffHighlighting.HTML_END);
             }
         }
         SwingUtilities.invokeLater(() -> scrollPane.getVerticalScrollBar()
                 .setValue(Math.min(scrollPane.getVerticalScrollBar().getMaximum(), oldScrollPaneValue)));
     }
 
-    private JTextPane getStyledTextPane() {
-        JTextPane pane = new JTextPane();
-        pane.setContentType(CONTENT_TYPE);
-        StyleSheet sheet = ((HTMLEditorKit) pane.getEditorKit()).getStyleSheet();
-        sheet.addRule(BODY_STYLE);
-        sheet.addRule(ADDITION_STYLE);
-        sheet.addRule(REMOVAL_STYLE);
-        sheet.addRule(CHANGE_STYLE);
-        pane.setEditable(false);
-        return pane;
-    }
 
     /**
      * @return Merged BibEntry
