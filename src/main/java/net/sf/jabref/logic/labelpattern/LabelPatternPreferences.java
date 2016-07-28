@@ -49,4 +49,6 @@ public class LabelPatternPreferences {
     public boolean isEnforceLegalKey() {
         return enforceLegalKey;
     }
+
+    public String getDefaultLabelPattern() { return defaultLabelPattern;}
 }
