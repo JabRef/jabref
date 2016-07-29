@@ -2,24 +2,37 @@
 
 Describes relevant information about the code structure of JabRef in a very precise and succinct way. 
 
-We are currently transitioning from a spaghetti to an onion architecture with the `model` in the center, and the `logic` as an intermediate layer towards the `gui` which is the outer shell. The dependencies are only directed towards the center. We have JUnit tests to detect violations, and the build will fail automatically in these cases.
+We are currently transitioning from a spaghetti to a more structured architecture with the `model` in the center, and the `logic` as an intermediate layer towards the `gui` which is the outer shell. There are additional utility packages for `preferences` and the `cli`. The dependencies are only directed towards the center. We have JUnit tests to detect violations of the most crucial dependencies (between `logic`, `model`, and `gui`), and the build will fail automatically in these cases.
 
-The `model` can only represent the most important data structures and has only a little bit of logic attached. The `logic` is responsible for reading/writing/importing/exporting and manipulating the `model`, and it is structured often as an API the `gui` can call and use. Only the `gui` knows the user and his preferences, and can interact with him to help him solve tasks. For each onion layer, we form packages according to their responsibility, i.e., vertical structuring.
+The `model` represents the most important data structures (`BibDatases`, `BibEntries`, `Events`, and related aspects) and has only a little bit of logic attached. The `logic` is responsible for reading/writing/importing/exporting and manipulating the `model`, and it is structured often as an API the `gui` can call and use. Only the `gui` knows the user and his preferences, and can interact with him to help him solve tasks. For each layer, we form packages according to their responsibility, i.e., vertical structuring. The `model` should have no dependencies to other classes of JabRef and the `logic` should only depend on `model` classes. The `cli` package bundles classes that are responsible for JabRef's command line interface. The `preferences` represents all information is customizable by a user for her personal needs.
 
-We use an event bus to publish events from the `model` to the other onion layers.
-This allows us to keep the onion architecture but still react upon changes within the core in the outer layers.
-
-
+We use an event bus to publish events from the `model` to the other layers.
+This allows us to keep the architecture, but still react upon changes within the core in the outer layers.
 
 
 ## Package Structure
-
+Permitted dependencies in our architecture are:
 ```
 gui --> logic --> model
 gui ------------> model
-# all packages and classes which are not part of logic or model 
-# are considered gui classes from a dependency stand of view
+gui ------------> preferences
+gui ------------> cli
+gui ------------> global classes
+
+logic ------------> model
+
+global classes ------------> everywhere
+
+cli ------------> model
+cli ------------> logic
+cli ------------> global classes
+cli ------------> preferences
 ```
+All packages and classes which are currently not part of these packages (we are still in the process of structuring) are considered as gui classes from a dependency stand of view.
+
+![Package Diagram](http://yuml.me/b1215eef)
+
+Visualization as a package diagram: http://yuml.me/edit/b1215eef
 
 ## Most Important Classes and their Relation
 
