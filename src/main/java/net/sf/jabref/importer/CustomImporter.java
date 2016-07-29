@@ -35,6 +35,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import net.sf.jabref.importer.fileformat.ImportFormat;
 
@@ -117,9 +118,6 @@ public class CustomImporter implements Comparable<CustomImporter> {
 
     @Override
     public boolean equals(Object other) {
-        if (other == null) {
-            return false;
-        }
 
         if (this == other) {
             return true;
@@ -130,17 +128,14 @@ public class CustomImporter implements Comparable<CustomImporter> {
         }
 
         CustomImporter otherImporter = (CustomImporter) other;
-        boolean equalName = this.getName().equals(otherImporter.getName());
-        boolean equalCliId = this.getClidId().equals(otherImporter.getClidId());
-        boolean equalClassName = this.getClassName().equals(otherImporter.getClassName());
-        boolean equalBasePath = this.getBasePath().equals(otherImporter.getBasePath());
-
-        return equalName && equalCliId && equalClassName && equalBasePath;
+        return Objects.equals(name, otherImporter.name) && Objects.equals(cliId, otherImporter.cliId)
+                && Objects.equals(className, otherImporter.className)
+                && Objects.equals(basePath, otherImporter.basePath);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return Objects.hash(name, cliId, className, basePath);
     }
 
     @Override
