@@ -115,6 +115,10 @@ public class MainTableColumn {
                 TypedBibEntry typedEntry = new TypedBibEntry(entry, BibDatabaseMode.BIBLATEX);
                 content = typedEntry.getTypeForDisplay();
             } else {
+                if (database.isPresent()) {
+                    content = BibDatabase.getResolvedField(field, entry, database.get());
+                }
+                /*
                 Optional<String> newContent = entry.getFieldOrAlias(field);
                 if (newContent.isPresent()) {
                     if (database.isPresent() && "Author".equalsIgnoreCase(columnName)) {
@@ -122,7 +126,7 @@ public class MainTableColumn {
                     } else {
                         content = newContent.get();
                     }
-                }
+                }*/
             }
             if (content != null) {
                 break;
