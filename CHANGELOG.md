@@ -24,6 +24,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#1345](https://github.com/JabRef/jabref/issues/1345) Cleanup ISSN
 
 ### Fixed
+- Fixed [#1632](https://github.com/JabRef/jabref/issues/1632) User comments (@Comment) with or without brackets are now kept
 - Fixed [#1264](https://github.com/JabRef/jabref/issues/1264): S with caron does not render correctly
 - LaTeX to Unicode converter now handles combining accents
 - Fixed [#636](https://github.com/JabRef/jabref/issues/636): DOI in export filters

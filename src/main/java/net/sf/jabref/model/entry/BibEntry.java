@@ -634,7 +634,7 @@ public class BibEntry implements Cloneable {
 
             try {
                 // get the text before the entry
-                String prolog = parsedSerialization.substring(0, parsedSerialization.indexOf('@'));
+                String prolog = parsedSerialization.substring(0, parsedSerialization.lastIndexOf('@'));
 
                 // delete trailing whitespaces (between entry and text)
                 prolog = prolog.replaceFirst("\\s+$", "");
