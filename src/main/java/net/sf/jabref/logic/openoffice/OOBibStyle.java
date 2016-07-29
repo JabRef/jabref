@@ -888,15 +888,21 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
         if (o instanceof OOBibStyle) {
-            return path.equals(((OOBibStyle) o).path);
+            OOBibStyle otherStyle = (OOBibStyle) o;
+            return Objects.equals(path, otherStyle.path) && Objects.equals(name, otherStyle.name)
+                    && Objects.equals(citProperties, otherStyle.citProperties)
+                    && Objects.equals(properties, otherStyle.properties);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(path);
+        return Objects.hash(path, name, citProperties, properties);
     }
 
     private String createAuthorList(String author, int maxAuthors, String andString,
