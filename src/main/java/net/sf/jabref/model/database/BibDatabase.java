@@ -90,6 +90,11 @@ public class BibDatabase {
 
     private final EventBus eventBus = new EventBus();
 
+
+    public BibDatabase() {
+        this.registerListener(new KeyChangeListener(this));
+    }
+
     /**
      * Returns the number of entries.
      */

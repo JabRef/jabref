@@ -184,6 +184,10 @@ public class InternalBibtexFields {
         dummy.setExtras(EnumSet.of(FieldProperties.FILE_EDITOR));
         add(dummy);
 
+        dummy = new BibtexSingleField(FieldName.RELATED, false);
+        dummy.setExtras(EnumSet.of(FieldProperties.MULTIPLE_ENTRY_LINK));
+        add(dummy);
+
         add(new BibtexSingleField("search", false, 75));
 
         // some BibLatex fields
@@ -209,6 +213,7 @@ public class InternalBibtexFields {
 
         dummy = new BibtexSingleField(timeStampFieldName, false, BibtexSingleField.SMALL_W);
         timeStampField = timeStampFieldName;
+
         dummy.setExtras(EnumSet.of(FieldProperties.DATE));
         dummy.setPrivate();
         add(dummy);

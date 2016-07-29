@@ -25,6 +25,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Undo/redo are enabled/disabled and show the action in the tool tip
 - Added ISBN integrity checker
 - Added filter to not show selected integrity checks
+- The contents of `crossref` and `related` will be automatically updated if a linked entry changes key
 - Enhance the entry customization dialog to give better visual feedback
 - It is now possible to generate a new BIB database from the citations in an OpenOffice/LibreOffice document
 - The arXiv fetcher now also supports free-text search queries

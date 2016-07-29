@@ -125,7 +125,9 @@ public class BibEntry implements Cloneable {
     public void setId(String id) {
         Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
-        eventBus.post(new FieldChangedEvent(this, BibEntry.ID_FIELD, id));
+        String oldId = this.id;
+
+        eventBus.post(new FieldChangedEvent(this, BibEntry.ID_FIELD, id, oldId));
         this.id = id;
         changed = true;
     }
@@ -183,13 +185,14 @@ public class BibEntry implements Cloneable {
         } else {
             newType = type;
         }
+        String oldType = getFieldOptional(TYPE_HEADER).orElse(null);
 
         // We set the type before throwing the changeEvent, to enable
         // the change listener to access the new value if the change
         // sets off a change in database sorting etc.
         this.type = newType.toLowerCase(Locale.ENGLISH);
         changed = true;
-        eventBus.post(new FieldChangedEvent(this, TYPE_HEADER, newType, eventSource));
+        eventBus.post(new FieldChangedEvent(this, TYPE_HEADER, newType, oldType, eventSource));
     }
 
     /**
