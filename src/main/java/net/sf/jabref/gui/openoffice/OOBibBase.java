@@ -17,6 +17,7 @@ package net.sf.jabref.gui.openoffice;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -68,6 +69,7 @@ import com.sun.star.beans.UnknownPropertyException;
 import com.sun.star.beans.XPropertyContainer;
 import com.sun.star.beans.XPropertySet;
 import com.sun.star.comp.helper.Bootstrap;
+import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.container.XEnumeration;
 import com.sun.star.container.XEnumerationAccess;
@@ -150,7 +152,9 @@ class OOBibBase {
     private static final Log LOGGER = LogFactory.getLog(OOBibBase.class);
 
 
-    public OOBibBase(String pathToOO, boolean atEnd) throws Exception {
+    public OOBibBase(String pathToOO, boolean atEnd) throws IOException, IllegalAccessException,
+            InvocationTargetException, BootstrapException, CreationException, UnknownPropertyException,
+            WrappedTargetException, IndexOutOfBoundsException, NoSuchElementException, NoDocumentException {
         authorYearTitleList.add(authComp);
         authorYearTitleList.add(yearComp);
         authorYearTitleList.add(titleComp);
@@ -224,7 +228,9 @@ class OOBibBase {
 
     }
 
-    private XDesktop simpleBootstrap(String pathToExecutable) throws Exception {
+    private XDesktop simpleBootstrap(String pathToExecutable)
+            throws IOException, IllegalAccessException, InvocationTargetException, BootstrapException,
+            CreationException {
 
         ClassLoader loader = ClassLoader.getSystemClassLoader();
         if (loader instanceof URLClassLoader) {
@@ -250,13 +256,17 @@ class OOBibBase {
         XMultiComponentFactory xServiceManager = xContext.getServiceManager();
         //Create the desktop, which is the root frame of the
         //hierarchy of frames that contain viewable components:
-        Object desktop = xServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", xContext);
+        Object desktop;
+        try {
+            desktop = xServiceManager.createInstanceWithContext("com.sun.star.frame.Desktop", xContext);
+        } catch (Exception e) {
+            throw new CreationException(e.getMessage());
+        }
         XDesktop xD = UnoRuntime.queryInterface(XDesktop.class, desktop);
 
         UnoRuntime.queryInterface(XComponentLoader.class, desktop);
 
         return xD;
-
     }
 
     private List<XTextDocument> getTextDocuments() throws NoSuchElementException, WrappedTargetException {
@@ -312,11 +322,25 @@ class OOBibBase {
      * @param withText Indicates whether this should be a normal citation (true) or an empty
      *   (invisible) citation (false).
      * @param sync Indicates whether the reference list should be refreshed.
-     * @throws Exception
+     * @throws IllegalTypeException
+     * @throws PropertyExistException
+     * @throws NotRemoveableException
+     * @throws UnknownPropertyException
+     * @throws UndefinedCharacterFormatException
+     * @throws NoSuchElementException
+     * @throws WrappedTargetException
+     * @throws IOException
+     * @throws PropertyVetoException
+     * @throws CreationException
+     * @throws BibEntryNotFoundException
+     * @throws UndefinedParagraphFormatException
      */
     public void insertEntry(List<BibEntry> entries, BibDatabase database,
             List<BibDatabase> allBases, OOBibStyle style,
-            boolean inParenthesis, boolean withText, String pageInfo, boolean sync) throws Exception {
+            boolean inParenthesis, boolean withText, String pageInfo, boolean sync) throws IllegalArgumentException,
+            UnknownPropertyException, NotRemoveableException, PropertyExistException, IllegalTypeException,
+            UndefinedCharacterFormatException, WrappedTargetException, NoSuchElementException, PropertyVetoException,
+            IOException, CreationException, BibEntryNotFoundException, UndefinedParagraphFormatException {
 
         try {
 
@@ -396,9 +420,20 @@ class OOBibBase {
      * @param databases The databases to get entries from.
      * @param style The bibliography style to use.
      * @return A list of those referenced BibTeX keys that could not be resolved.
-     * @throws Exception
+     * @throws UndefinedCharacterFormatException
+     * @throws NoSuchElementException
+     * @throws IllegalArgumentException
+     * @throws WrappedTargetException
+     * @throws BibEntryNotFoundException
+     * @throws CreationException
+     * @throws IOException
+     * @throws PropertyVetoException
+     * @throws UnknownPropertyException
      */
-    public List<String> refreshCiteMarkers(List<BibDatabase> databases, OOBibStyle style) throws Exception {
+    public List<String> refreshCiteMarkers(List<BibDatabase> databases, OOBibStyle style)
+            throws WrappedTargetException, IllegalArgumentException, NoSuchElementException,
+            UndefinedCharacterFormatException, UnknownPropertyException, PropertyVetoException, IOException,
+            CreationException, BibEntryNotFoundException {
         try {
             return refreshCiteMarkersInternal(databases, style);
         } catch (DisposedException ex) {
@@ -428,7 +463,10 @@ class OOBibBase {
         return res;
     }
 
-    private List<String> refreshCiteMarkersInternal(List<BibDatabase> databases, OOBibStyle style) throws Exception {
+    private List<String> refreshCiteMarkersInternal(List<BibDatabase> databases, OOBibStyle style)
+            throws WrappedTargetException, IllegalArgumentException, NoSuchElementException,
+            UndefinedCharacterFormatException, UnknownPropertyException, PropertyVetoException, IOException,
+            CreationException, BibEntryNotFoundException {
 
         List<String> cited = findCitedKeys();
         Map<String, BibDatabase> linkSourceBase = new HashMap<>();
@@ -765,7 +803,9 @@ class OOBibBase {
         return result;
     }
 
-    public void rebuildBibTextSection(List<BibDatabase> databases, OOBibStyle style) throws Exception {
+    public void rebuildBibTextSection(List<BibDatabase> databases, OOBibStyle style)
+            throws IOException, NoSuchElementException, WrappedTargetException, IllegalArgumentException,
+            CreationException, PropertyVetoException, UnknownPropertyException, UndefinedParagraphFormatException {
         List<String> cited = findCitedKeys();
         Map<String, BibDatabase> linkSourceBase = new HashMap<>();
         Map<BibEntry, BibDatabase> entries = findCitedEntries(databases, cited, linkSourceBase); // Although entries are redefined without use, this also updates linkSourceBase
@@ -996,7 +1036,8 @@ class OOBibBase {
 
     }
 
-    private void createBibTextSection2(boolean end) throws Exception {
+    private void createBibTextSection2(boolean end)
+            throws IOException, IllegalArgumentException, CreationException {
 
         XTextCursor mxDocCursor = text.createTextCursor();
         if (end) {
@@ -1004,8 +1045,13 @@ class OOBibBase {
         }
         OOUtil.insertParagraphBreak(text, mxDocCursor);
         // Create a new TextSection from the document factory and access it's XNamed interface
-        XNamed xChildNamed = UnoRuntime.queryInterface(XNamed.class,
+        XNamed xChildNamed;
+        try {
+            xChildNamed= UnoRuntime.queryInterface(XNamed.class,
                 mxDocFactory.createInstance("com.sun.star.text.TextSection"));
+        } catch (Exception e) {
+            throw new CreationException(e.getMessage());
+        }
         // Set the new sections name to 'Child_Section'
         xChildNamed.setName(OOBibBase.BIB_SECTION_NAME);
         // Access the Child_Section's XTextContent interface and insert it into the document
@@ -1014,7 +1060,8 @@ class OOBibBase {
 
     }
 
-    private void clearBibTextSectionContent2() throws Exception {
+    private void clearBibTextSectionContent2() throws IOException, NoSuchElementException, WrappedTargetException,
+            IllegalArgumentException, CreationException {
 
         // Check if the section exists:
         XTextSectionsSupplier supp = UnoRuntime.queryInterface(XTextSectionsSupplier.class, mxDoc);
@@ -1030,7 +1077,9 @@ class OOBibBase {
         }
     }
 
-    private void populateBibTextSection(Map<BibEntry, BibDatabase> entries, OOBibStyle style) throws Exception {
+    private void populateBibTextSection(Map<BibEntry, BibDatabase> entries, OOBibStyle style)
+            throws IOException, NoSuchElementException, WrappedTargetException, PropertyVetoException,
+            UnknownPropertyException, UndefinedParagraphFormatException, IllegalArgumentException, CreationException {
         XTextSectionsSupplier supp = UnoRuntime.queryInterface(XTextSectionsSupplier.class, mxDoc);
         XTextSection section = (XTextSection) ((Any) supp.getTextSections().getByName(OOBibBase.BIB_SECTION_NAME))
                 .getObject();
@@ -1042,8 +1091,14 @@ class OOBibBase {
         insertBookMark(OOBibBase.BIB_SECTION_END_NAME, cursor);
     }
 
-    private XTextContent insertBookMark(String name, XTextCursor position) throws Exception {
-        Object bookmark = mxDocFactory.createInstance("com.sun.star.text.Bookmark");
+    private XTextContent insertBookMark(String name, XTextCursor position)
+            throws IllegalArgumentException, CreationException {
+        Object bookmark;
+        try {
+            bookmark = mxDocFactory.createInstance("com.sun.star.text.Bookmark");
+        } catch (Exception e) {
+            throw new CreationException(e.getMessage());
+        }
         // name the bookmark
         XNamed xNamed = UnoRuntime.queryInterface(XNamed.class, bookmark);
         xNamed.setName(name);
@@ -1057,7 +1112,8 @@ class OOBibBase {
     }
 
     private void insertReferenceMark(String name, String citationText, XTextCursor position, boolean withText,
-            OOBibStyle style) throws Exception {
+            OOBibStyle style) throws IOException, UnknownPropertyException, WrappedTargetException,
+            PropertyVetoException, IllegalArgumentException, UndefinedCharacterFormatException, CreationException {
 
         // Check if there is "page info" stored for this citation. If so, insert it into
         // the citation text before inserting the citation:
@@ -1069,7 +1125,12 @@ class OOBibBase {
             citText = citationText;
         }
 
-        Object bookmark = mxDocFactory.createInstance("com.sun.star.text.ReferenceMark");
+        Object bookmark;
+        try {
+            bookmark = mxDocFactory.createInstance("com.sun.star.text.ReferenceMark");
+        } catch (Exception e) {
+            throw new CreationException(e.getMessage());
+        }
         // Name the reference
         XNamed xNamed = UnoRuntime.queryInterface(XNamed.class, bookmark);
         xNamed.setName(name);
@@ -1112,7 +1173,8 @@ class OOBibBase {
 
     }
 
-    private void italicizeOrBold(XTextCursor position, boolean italicize, int start, int end) throws Exception {
+    private void italicizeOrBold(XTextCursor position, boolean italicize, int start, int end)
+            throws UnknownPropertyException, PropertyVetoException, IllegalArgumentException, WrappedTargetException {
         XTextRange rng = position.getStart();
         XTextCursor cursor = position.getText().createTextCursorByRange(rng);
         cursor.goRight((short) start, false);
@@ -1140,7 +1202,6 @@ class OOBibBase {
      * @return The XTextRange for the bookmark.
      * @throws WrappedTargetException
      * @throws NoSuchElementException
-     * @throws Exception
      */
     private XTextRange getBookmarkRange(String name) throws NoSuchElementException, WrappedTargetException {
         // query XBookmarksSupplier from document model and get bookmarks collection
@@ -1156,7 +1217,10 @@ class OOBibBase {
         return xFoundBookmark.getAnchor();
     }
 
-    public void combineCiteMarkers(List<BibDatabase> databases, OOBibStyle style) throws Exception {
+    public void combineCiteMarkers(List<BibDatabase> databases, OOBibStyle style)
+            throws IOException, WrappedTargetException, NoSuchElementException, IllegalArgumentException,
+            UndefinedCharacterFormatException, UnknownPropertyException, PropertyVetoException, CreationException,
+            BibEntryNotFoundException {
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, xCurrentComponent);
         XNameAccess nameAccess = supplier.getReferenceMarks();
         // TODO: doesn't work for citations in footnotes/tables

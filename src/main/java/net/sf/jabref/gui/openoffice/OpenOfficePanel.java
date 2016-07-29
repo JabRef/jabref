@@ -73,7 +73,12 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import com.sun.star.beans.IllegalTypeException;
+import com.sun.star.beans.NotRemoveableException;
+import com.sun.star.beans.PropertyExistException;
+import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.beans.UnknownPropertyException;
+import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import org.apache.commons.logging.Log;
@@ -258,7 +263,8 @@ public class OpenOfficePanel extends AbstractWorker {
                                     ex.getBibtexKey()),
                             Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
                     LOGGER.debug("BibEntry not found", ex);
-                } catch (Exception ex) {
+                } catch (com.sun.star.lang.IllegalArgumentException | PropertyVetoException | UnknownPropertyException | WrappedTargetException | NoSuchElementException |
+                        CreationException ex) {
                     LOGGER.warn("Could not update bibliography", ex);
                 }
             }
@@ -271,7 +277,9 @@ public class OpenOfficePanel extends AbstractWorker {
                 ooBase.combineCiteMarkers(getBaseList(), style);
             } catch (UndefinedCharacterFormatException ex) {
                 reportUndefinedCharacterFormat(ex);
-            } catch (Exception ex) {
+            } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
+                    CreationException | NoSuchElementException | WrappedTargetException | IOException |
+                    BibEntryNotFoundException ex) {
                 LOGGER.warn("Problem combining cite markers", ex);
             }
 
@@ -359,7 +367,16 @@ public class OpenOfficePanel extends AbstractWorker {
             BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase, defaults);
             this.frame.addTab(databaseContext, true);
 
-        } catch (Exception e) {
+        } catch (BibEntryNotFoundException ex) {
+            JOptionPane.showMessageDialog(frame,
+                    Localization.lang(
+                            "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current database.",
+                            ex.getBibtexKey()),
+                    Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
+            LOGGER.debug("BibEntry not found", ex);
+        } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
+                UndefinedCharacterFormatException | NoSuchElementException | WrappedTargetException | IOException |
+                CreationException e) {
             LOGGER.warn("Problem generating new database.", e);
         }
 
@@ -483,7 +500,9 @@ public class OpenOfficePanel extends AbstractWorker {
         try {
             // Connect:
             ooBase = new OOBibBase(sOffice, true);
-        } catch (Exception e) {
+        } catch (UnknownPropertyException |
+                CreationException | NoSuchElementException | WrappedTargetException | IOException |
+                NoDocumentException | BootstrapException | InvocationTargetException | IllegalAccessException e) {
             ooBase = null;
             connectException = new IOException(e.getMessage());
         }
@@ -631,7 +650,10 @@ public class OpenOfficePanel extends AbstractWorker {
                     reportUndefinedCharacterFormat(ex);
                 } catch (UndefinedParagraphFormatException ex) {
                     reportUndefinedParagraphFormat(ex);
-                } catch (Exception ex) {
+                } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
+                        CreationException | NoSuchElementException | WrappedTargetException | IOException |
+                        BibEntryNotFoundException | IllegalTypeException | PropertyExistException |
+                        NotRemoveableException ex) {
                     LOGGER.warn("Could not insert entry", ex);
                 }
             }
