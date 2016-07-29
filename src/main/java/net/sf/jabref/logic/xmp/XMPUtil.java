@@ -868,7 +868,7 @@ public class XMPUtil {
          *
          * Bibtex-Fields used: title
          */
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty(), BibDatabaseMode.BIBTEX);
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, BibDatabaseMode.BIBTEX);
         String o = typedEntry.getTypeForDisplay();
         if (!o.isEmpty()) {
             dcSchema.addType(o);
