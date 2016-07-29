@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2005-2015 Andreas Rudert, Oscar Gustafsson extracted from CustomImportList
+ Copyright (C) 2005-2016 Andreas Rudert, Oscar Gustafsson extracted from CustomImportList
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as
@@ -116,17 +116,26 @@ public class CustomImporter implements Comparable<CustomImporter> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (o == null) {
+    public boolean equals(Object other) {
+        if (other == null) {
             return false;
         }
 
-        boolean equalName = this.getName().equals(((CustomImporter) o).getName());
-        boolean equalCliId = this.getClidId().equals(((CustomImporter) o).getClidId());
-        boolean equalClassName = this.getClassName().equals(((CustomImporter) o).getClassName());
-        boolean equalBasePath = this.getBasePath().equals(((CustomImporter) o).getBasePath());
+        if (this == other) {
+            return true;
+        }
 
-        return (o instanceof CustomImporter) && equalName && equalCliId && equalClassName && equalBasePath;
+        if (!(other instanceof CustomImporter)) {
+            return false;
+        }
+
+        CustomImporter otherImporter = (CustomImporter) other;
+        boolean equalName = this.getName().equals(otherImporter.getName());
+        boolean equalCliId = this.getClidId().equals(otherImporter.getClidId());
+        boolean equalClassName = this.getClassName().equals(otherImporter.getClassName());
+        boolean equalBasePath = this.getBasePath().equals(otherImporter.getBasePath());
+
+        return equalName && equalCliId && equalClassName && equalBasePath;
     }
 
     @Override
