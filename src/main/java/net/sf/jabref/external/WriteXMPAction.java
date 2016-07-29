@@ -159,7 +159,7 @@ public class WriteXMPAction extends AbstractWorker {
                 for (File file : files) {
                     if (file.exists()) {
                         try {
-                            XMPUtil.writeXMP(file, entry, database);
+                            XMPUtil.writeXMP(file, entry, database, Globals.prefs);
                             optDiag.getProgressArea().append("  " + Localization.lang("OK") + ".\n");
                             entriesChanged++;
                         } catch (Exception e) {

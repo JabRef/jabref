@@ -25,6 +25,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.xml.transform.TransformerException;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
@@ -126,7 +127,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
 
                     } else {
                         try {
-                            XMPUtil.writeXMP(file, entry, panel.getDatabase());
+                            XMPUtil.writeXMP(file, entry, panel.getDatabase(), Globals.prefs);
                             if (files.size() == 1) {
                                 message = Localization.lang("Wrote XMP-metadata");
                             }
