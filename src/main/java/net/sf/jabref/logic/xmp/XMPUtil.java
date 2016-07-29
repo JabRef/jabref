@@ -48,7 +48,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -87,8 +86,8 @@ public class XMPUtil {
      * @return BibtexEntryies found in the PDF or an empty list
      * @throws IOException
      */
-    public static List<BibEntry> readXMP(String filename, JabRefPreferences prefs) throws IOException {
-        return XMPUtil.readXMP(new File(filename), prefs);
+    public static List<BibEntry> readXMP(String filename, XMPPreferences xmpPreferences) throws IOException {
+        return XMPUtil.readXMP(new File(filename), xmpPreferences);
     }
 
     /**
@@ -117,8 +116,8 @@ public class XMPUtil {
      *             If the file could not be written to or could not be found.
      */
     public static void writeXMP(String filename, BibEntry entry,
-            BibDatabase database, JabRefPreferences prefs) throws IOException, TransformerException {
-        XMPUtil.writeXMP(new File(filename), entry, database, prefs);
+            BibDatabase database, XMPPreferences xmpPreferences) throws IOException, TransformerException {
+        XMPUtil.writeXMP(new File(filename), entry, database, xmpPreferences);
     }
 
     /**
@@ -131,10 +130,10 @@ public class XMPUtil {
      *             Throws an IOException if the file cannot be read, so the user
      *             than remove a lock or cancel the operation.
      */
-    public static List<BibEntry> readXMP(File file, JabRefPreferences prefs) throws IOException {
+    public static List<BibEntry> readXMP(File file, XMPPreferences xmpPreferences) throws IOException {
         List<BibEntry> result = Collections.emptyList();
         try (FileInputStream inputStream = new FileInputStream(file)) {
-            result = XMPUtil.readXMP(inputStream, prefs);
+            result = XMPUtil.readXMP(inputStream, xmpPreferences);
         }
         return result;
     }
@@ -172,7 +171,7 @@ public class XMPUtil {
      *
      * @return list of BibEntries retrieved from the stream. May be empty, but never null
      */
-    public static List<BibEntry> readXMP(InputStream inputStream, JabRefPreferences prefs)
+    public static List<BibEntry> readXMP(InputStream inputStream, XMPPreferences xmpPreferences)
             throws IOException {
 
         List<BibEntry> result = new LinkedList<>();
@@ -200,7 +199,8 @@ public class XMPUtil {
                     for (XMPSchema schema : schemas) {
                         XMPSchemaDublinCore dc = (XMPSchemaDublinCore) schema;
 
-                        Optional<BibEntry> entry = XMPUtil.getBibtexEntryFromDublinCore(dc, prefs);
+                        Optional<BibEntry> entry = XMPUtil.getBibtexEntryFromDublinCore(dc,
+                                xmpPreferences);
 
                         if (entry.isPresent()) {
                             if (entry.get().getType() == null) {
@@ -228,8 +228,8 @@ public class XMPUtil {
         return result;
     }
 
-    public static Collection<BibEntry> readXMP(Path filePath, JabRefPreferences prefs) throws IOException {
-        return readXMP(filePath.toFile(), prefs);
+    public static Collection<BibEntry> readXMP(Path filePath, XMPPreferences xmpPreferences) throws IOException {
+        return readXMP(filePath.toFile(), xmpPreferences);
     }
 
     /**
@@ -307,7 +307,7 @@ public class XMPUtil {
      * @return The bibtex entry found in the document information.
      */
     public static Optional<BibEntry> getBibtexEntryFromDublinCore(XMPSchemaDublinCore dcSchema,
-            JabRefPreferences prefs) {
+            XMPPreferences xmpPreferences) {
 
         BibEntry entry = new BibEntry();
 
@@ -411,7 +411,7 @@ public class XMPUtil {
          */
         List<String> subjects = dcSchema.getSubjects();
         if (subjects != null) {
-            entry.addKeywords(subjects, prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+            entry.addKeywords(subjects, xmpPreferences.getKeywordSeparator());
         }
 
         /**
@@ -462,10 +462,10 @@ public class XMPUtil {
      *             If the file could not be written to or could not be found.
      */
     public static void writeXMP(File file, BibEntry entry,
-            BibDatabase database, JabRefPreferences prefs) throws IOException, TransformerException {
+            BibDatabase database, XMPPreferences xmpPreferences) throws IOException, TransformerException {
         List<BibEntry> l = new LinkedList<>();
         l.add(entry);
-        XMPUtil.writeXMP(file, l, database, true, prefs);
+        XMPUtil.writeXMP(file, l, database, true, xmpPreferences);
     }
 
     /**
@@ -488,7 +488,7 @@ public class XMPUtil {
      *      resolved.
      */
     private static void toXMP(Collection<BibEntry> bibtexEntries,
-            BibDatabase database, OutputStream outputStream)
+            BibDatabase database, OutputStream outputStream, XMPPreferences xmpPreferences)
                     throws IOException, TransformerException {
 
         Collection<BibEntry> resolvedEntries;
@@ -503,7 +503,7 @@ public class XMPUtil {
         for (BibEntry e : resolvedEntries) {
             XMPSchemaBibtex schema = new XMPSchemaBibtex(x);
             x.addSchema(schema);
-            schema.setBibtexEntry(e);
+            schema.setBibtexEntry(e, xmpPreferences);
         }
 
         x.save(outputStream);
@@ -527,10 +527,10 @@ public class XMPUtil {
      *             Thrown if the bibtexEntries could not transformed to XMP.
      */
     public static String toXMP(Collection<BibEntry> bibtexEntries,
-            BibDatabase database) throws TransformerException {
+            BibDatabase database, XMPPreferences xmpPreferences) throws TransformerException {
         try {
             ByteArrayOutputStream bs = new ByteArrayOutputStream();
-            XMPUtil.toXMP(bibtexEntries, database, bs);
+            XMPUtil.toXMP(bibtexEntries, database, bs, xmpPreferences);
             return bs.toString();
         } catch (IOException e) {
             throw new TransformerException(e);
@@ -587,7 +587,7 @@ public class XMPUtil {
     }
 
     private static void writeToDCSchema(XMPSchemaDublinCore dcSchema,
-            BibEntry entry, BibDatabase database, JabRefPreferences prefs) {
+            BibEntry entry, BibDatabase database, XMPPreferences xmpPreferences) {
 
         BibEntry resolvedEntry;
         if (database == null) {
@@ -597,10 +597,9 @@ public class XMPUtil {
         }
 
         // Query privacy filter settings
-        boolean useXmpPrivacyFilter =
-                prefs.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER);
+        boolean useXmpPrivacyFilter = xmpPreferences.isUseXMPPrivacyFilter();
         // Fields for which not to write XMP data later on:
-        Set<String> filters = new TreeSet<>(prefs.getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS));
+        Set<String> filters = new TreeSet<>(xmpPreferences.getXmpPrivacyFilter());
 
         // Set all the values including key and entryType
 
@@ -892,12 +891,12 @@ public class XMPUtil {
      * @throws TransformerException
      */
     public static void writeDublinCore(PDDocument document, BibEntry entry,
-            BibDatabase database, JabRefPreferences prefs) throws IOException, TransformerException {
+            BibDatabase database, XMPPreferences xmpPreferences) throws IOException, TransformerException {
 
         List<BibEntry> entries = new ArrayList<>();
         entries.add(entry);
 
-        XMPUtil.writeDublinCore(document, entries, database, prefs);
+        XMPUtil.writeDublinCore(document, entries, database, xmpPreferences);
     }
 
     /**
@@ -917,7 +916,7 @@ public class XMPUtil {
      * @throws TransformerException
      */
     private static void writeDublinCore(PDDocument document,
-            Collection<BibEntry> entries, BibDatabase database, JabRefPreferences prefs)
+            Collection<BibEntry> entries, BibDatabase database, XMPPreferences xmpPreferences)
                     throws IOException, TransformerException {
 
         Collection<BibEntry> resolvedEntries;
@@ -946,7 +945,7 @@ public class XMPUtil {
 
         for (BibEntry entry : resolvedEntries) {
             XMPSchemaDublinCore dcSchema = new XMPSchemaDublinCore(meta);
-            XMPUtil.writeToDCSchema(dcSchema, entry, null, prefs);
+            XMPUtil.writeToDCSchema(dcSchema, entry, null, xmpPreferences);
             meta.addSchema(dcSchema);
         }
 
@@ -975,7 +974,7 @@ public class XMPUtil {
      *            database is null the strings will not be resolved.
      */
     private static void writeDocumentInformation(PDDocument document,
-            BibEntry entry, BibDatabase database, JabRefPreferences prefs) {
+            BibEntry entry, BibDatabase database, XMPPreferences xmpPreferences) {
 
         PDDocumentInformation di = document.getDocumentInformation();
 
@@ -987,10 +986,9 @@ public class XMPUtil {
         }
 
         // Query privacy filter settings
-        boolean useXmpPrivacyFilter =
-                prefs.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER);
+        boolean useXmpPrivacyFilter = xmpPreferences.isUseXMPPrivacyFilter();
         // Fields for which not to write XMP data later on:
-        Set<String> filters = new TreeSet<>(prefs.getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS));
+        Set<String> filters = new TreeSet<>(xmpPreferences.getXmpPrivacyFilter());
 
         // Set all the values including key and entryType
         for (Entry<String, String> field : resolvedEntry.getFieldMap().entrySet()) {
@@ -1056,7 +1054,7 @@ public class XMPUtil {
      */
     public static void writeXMP(File file,
             Collection<BibEntry> bibtexEntries, BibDatabase database,
-            boolean writePDFInfo, JabRefPreferences prefs) throws IOException, TransformerException {
+            boolean writePDFInfo, XMPPreferences xmpPreferences) throws IOException, TransformerException {
 
         Collection<BibEntry> resolvedEntries;
         if (database == null) {
@@ -1072,8 +1070,8 @@ public class XMPUtil {
 
             if (writePDFInfo && (resolvedEntries.size() == 1)) {
                 XMPUtil.writeDocumentInformation(document, resolvedEntries
-                        .iterator().next(), null, prefs);
-                XMPUtil.writeDublinCore(document, resolvedEntries, null, prefs);
+                        .iterator().next(), null, xmpPreferences);
+                XMPUtil.writeDublinCore(document, resolvedEntries, null, xmpPreferences);
             }
 
             PDDocumentCatalog catalog = document.getDocumentCatalog();
@@ -1099,7 +1097,7 @@ public class XMPUtil {
             for (BibEntry e : resolvedEntries) {
                 XMPSchemaBibtex bibtex = new XMPSchemaBibtex(meta);
                 meta.addSchema(bibtex);
-                bibtex.setBibtexEntry(e, null);
+                bibtex.setBibtexEntry(e, xmpPreferences);
             }
 
             // Save to stream and then input that stream to the PDF
@@ -1122,9 +1120,9 @@ public class XMPUtil {
     /**
      * see XMPUtil.hasMetadata(InputStream)
      */
-    public static boolean hasMetadata(Path path, JabRefPreferences prefs) {
+    public static boolean hasMetadata(Path path, XMPPreferences xmpPreferences) {
         try (InputStream inputStream = Files.newInputStream(path, StandardOpenOption.READ)) {
-            return hasMetadata(inputStream, prefs);
+            return hasMetadata(inputStream, xmpPreferences);
         } catch (IOException e) {
             LOGGER.error("XMP reading failed", e);
             return false;
@@ -1142,9 +1140,9 @@ public class XMPUtil {
      *            The inputStream to read the PDF from.
      * @return whether a BibEntry was found in the given PDF.
      */
-    public static boolean hasMetadata(InputStream inputStream, JabRefPreferences prefs) {
+    public static boolean hasMetadata(InputStream inputStream, XMPPreferences xmpPreferences) {
         try {
-            List<BibEntry> bibEntries = XMPUtil.readXMP(inputStream, prefs);
+            List<BibEntry> bibEntries = XMPUtil.readXMP(inputStream, xmpPreferences);
             return !bibEntries.isEmpty();
         } catch (EncryptedPdfsNotSupportedException ex) {
             LOGGER.info("Encryption not supported by XMPUtil");

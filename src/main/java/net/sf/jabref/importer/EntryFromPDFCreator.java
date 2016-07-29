@@ -13,6 +13,7 @@ import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.pdfimport.PdfImporter;
@@ -122,7 +123,8 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
      */
     private void addEntryDataFromXMP(File aFile, BibEntry entry) {
         try {
-            List<BibEntry> entrys = XMPUtil.readXMP(aFile.getAbsoluteFile(), Globals.prefs);
+            List<BibEntry> entrys = XMPUtil.readXMP(aFile.getAbsoluteFile(),
+                    XMPPreferences.fromPreferences(Globals.prefs));
             addEntrysToEntry(entry, entrys);
         } catch (IOException e) {
             // no canceling here, just no data added.

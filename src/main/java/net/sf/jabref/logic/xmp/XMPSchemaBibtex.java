@@ -32,7 +32,6 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.jempbox.xmp.XMPMetadata;
 import org.apache.jempbox.xmp.XMPSchema;
@@ -276,8 +275,8 @@ public class XMPSchemaBibtex extends XMPSchema {
 
 
 
-    public void setBibtexEntry(BibEntry entry) {
-        setBibtexEntry(entry, null);
+    public void setBibtexEntry(BibEntry entry, XMPPreferences xmpPreferences) {
+        setBibtexEntry(entry, null, xmpPreferences);
     }
 
     /**
@@ -285,13 +284,12 @@ public class XMPSchemaBibtex extends XMPSchema {
      * @param entry
      * @param database maybenull
      */
-    public void setBibtexEntry(BibEntry entry, BibDatabase database) {
+    public void setBibtexEntry(BibEntry entry, BibDatabase database, XMPPreferences xmpPreferences) {
         // Set all the values including key and entryType
         Set<String> fields = entry.getFieldNames();
 
-        JabRefPreferences prefs = JabRefPreferences.getInstance();
-        if (prefs.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER)) {
-            Set<String> filters = new TreeSet<>(prefs.getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS));
+        if (xmpPreferences.isUseXMPPrivacyFilter()) {
+            Set<String> filters = new TreeSet<>(xmpPreferences.getXmpPrivacyFilter());
             fields.removeAll(filters);
         }
 

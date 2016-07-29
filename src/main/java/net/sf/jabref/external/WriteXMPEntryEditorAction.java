@@ -34,6 +34,7 @@ import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -127,7 +128,8 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
 
                     } else {
                         try {
-                            XMPUtil.writeXMP(file, entry, panel.getDatabase(), Globals.prefs);
+                            XMPUtil.writeXMP(file, entry, panel.getDatabase(),
+                                    XMPPreferences.fromPreferences(Globals.prefs));
                             if (files.size() == 1) {
                                 message = Localization.lang("Wrote XMP-metadata");
                             }

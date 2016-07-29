@@ -16,6 +16,7 @@ import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
@@ -57,6 +58,8 @@ public class XMPUtilMain {
             Globals.prefs = JabRefPreferences.getInstance();
         }
 
+        XMPPreferences xmpPreferences = XMPPreferences.fromPreferences(Globals.prefs);
+
         switch (args.length) {
         case 0:
             usage();
@@ -65,7 +68,7 @@ public class XMPUtilMain {
 
             if (args[0].endsWith(".pdf")) {
                 // Read from pdf and write as BibTex
-                List<BibEntry> l = XMPUtil.readXMP(new File(args[0]), Globals.prefs);
+                List<BibEntry> l = XMPUtil.readXMP(new File(args[0]), xmpPreferences);
 
                 BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
                         new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)), false);
@@ -85,7 +88,7 @@ public class XMPUtilMain {
                     if (entries.isEmpty()) {
                         System.err.println("Could not find BibEntry in " + args[0]);
                     } else {
-                        System.out.println(XMPUtil.toXMP(entries, result.getDatabase()));
+                        System.out.println(XMPUtil.toXMP(entries, result.getDatabase(), xmpPreferences));
                     }
                 }
             } else {
@@ -113,7 +116,7 @@ public class XMPUtilMain {
                 if (entries.isEmpty()) {
                     System.err.println("Could not find BibEntry in " + args[0]);
                 } else {
-                    XMPUtil.writeXMP(new File(args[1]), entries, result.getDatabase(), false, Globals.prefs);
+                    XMPUtil.writeXMP(new File(args[1]), entries, result.getDatabase(), false, xmpPreferences);
                     System.out.println("XMP written.");
                 }
                 break;
@@ -132,7 +135,7 @@ public class XMPUtilMain {
             Optional<BibEntry> bibEntry = result.getDatabase().getEntryByKey(args[0]);
 
             if (bibEntry.isPresent()) {
-                XMPUtil.writeXMP(new File(args[2]), bibEntry.get(), result.getDatabase(), Globals.prefs);
+                XMPUtil.writeXMP(new File(args[2]), bibEntry.get(), result.getDatabase(), xmpPreferences);
 
                 System.out.println("XMP written.");
             } else {
