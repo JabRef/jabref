@@ -3,6 +3,7 @@ package net.sf.jabref.model.entry;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.SortedSet;
 import java.util.StringJoiner;
 import java.util.TreeSet;
@@ -29,12 +30,14 @@ public class CanonicalBibtexEntry {
 
         // determine sorted fields -- all fields lower case
         SortedSet<String> sortedFields = new TreeSet<>();
-        for (String fieldName : e.getFieldNames()) {
+        for (Entry<String, String> field : e.getFieldMap().entrySet()) {
+            String fieldName = field.getKey();
+            String fieldValue = field.getValue();
             // JabRef stores the key in the field KEY_FIELD, which must not be serialized
             if (!fieldName.equals(BibEntry.KEY_FIELD)) {
                 String lowerCaseFieldName = fieldName.toLowerCase(Locale.US);
                 sortedFields.add(lowerCaseFieldName);
-                mapFieldToValue.put(lowerCaseFieldName, e.getField(fieldName));
+                mapFieldToValue.put(lowerCaseFieldName, fieldValue);
             }
         }
 

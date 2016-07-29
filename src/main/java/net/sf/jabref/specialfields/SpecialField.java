@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.swing.Icon;
 
@@ -57,8 +58,8 @@ public abstract class SpecialField {
         return this.keywords;
     }
 
-    public SpecialFieldValue parse(String s) {
-        return map.get(s);
+    public Optional<SpecialFieldValue> parse(String s) {
+        return Optional.ofNullable(map.get(s));
     }
 
     public abstract String getFieldName();

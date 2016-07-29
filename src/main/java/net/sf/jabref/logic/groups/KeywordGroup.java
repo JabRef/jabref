@@ -139,8 +139,7 @@ public class KeywordGroup extends AbstractGroup {
             boolean modified = false;
             for (BibEntry entry : entriesToAdd) {
                 if (!contains(entry)) {
-                    String oldContent = entry
-                            .getField(searchField);
+                    String oldContent = entry.getFieldOptional(searchField).orElse(null);
                     String pre = jabRefPreferences.get(JabRefPreferences.KEYWORD_SEPARATOR);
                     String newContent = (oldContent == null ? "" : oldContent
                             + pre)
@@ -170,12 +169,12 @@ public class KeywordGroup extends AbstractGroup {
             boolean modified = false;
             for (BibEntry entry : entriesToRemove) {
                 if (contains(entry)) {
-                    String oldContent = entry
-                            .getField(searchField);
+                    String oldContent = entry.getFieldOptional(searchField).orElse(null);
                     removeMatches(entry);
 
                     // Store change information.
-                    changes.add(new FieldChange(entry, searchField, oldContent, entry.getField(searchField)));
+                    changes.add(new FieldChange(entry, searchField, oldContent,
+                            entry.getFieldOptional(searchField).orElse(null)));
                     modified = true;
                 }
             }
@@ -268,41 +267,38 @@ public class KeywordGroup extends AbstractGroup {
      * possible if the search expression is not a regExp.
      */
     private void removeMatches(BibEntry entry) {
-        if (!entry.hasField(searchField)) {
-            return; // nothing to modify
-        }
-        String content = entry.getField(searchField);
-        StringBuffer sbOrig = new StringBuffer(content);
-        StringBuffer sbLower = new StringBuffer(content.toLowerCase());
-        StringBuffer haystack = caseSensitive ? sbOrig : sbLower;
-        String needle = caseSensitive ? searchExpression
-                : searchExpression.toLowerCase();
-        int i;
-        int j;
-        int k;
-        final String separator = jabRefPreferences.get(JabRefPreferences.KEYWORD_SEPARATOR);
-        while ((i = haystack.indexOf(needle)) >= 0) {
-            sbOrig.replace(i, i + needle.length(), "");
-            sbLower.replace(i, i + needle.length(), "");
-            // reduce spaces at i to 1
-            j = i;
-            k = i;
-            while (((j - 1) >= 0) && (separator.indexOf(haystack.charAt(j - 1)) >= 0)) {
-                --j;
+        entry.getFieldOptional(searchField).ifPresent(content -> {
+            StringBuffer sbOrig = new StringBuffer(content);
+            StringBuffer sbLower = new StringBuffer(content.toLowerCase());
+            StringBuffer haystack = caseSensitive ? sbOrig : sbLower;
+            String needle = caseSensitive ? searchExpression : searchExpression.toLowerCase();
+            int i;
+            int j;
+            int k;
+            final String separator = jabRefPreferences.get(JabRefPreferences.KEYWORD_SEPARATOR);
+            while ((i = haystack.indexOf(needle)) >= 0) {
+                sbOrig.replace(i, i + needle.length(), "");
+                sbLower.replace(i, i + needle.length(), "");
+                // reduce spaces at i to 1
+                j = i;
+                k = i;
+                while (((j - 1) >= 0) && (separator.indexOf(haystack.charAt(j - 1)) >= 0)) {
+                    --j;
+                }
+                while ((k < haystack.length()) && (separator.indexOf(haystack.charAt(k)) >= 0)) {
+                    ++k;
+                }
+                sbOrig.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? separator : "");
+                sbLower.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? separator : "");
             }
-            while ((k < haystack.length()) && (separator.indexOf(haystack.charAt(k)) >= 0)) {
-                ++k;
-            }
-            sbOrig.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? separator : "");
-            sbLower.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? separator : "");
-        }
 
-        String result = sbOrig.toString().trim();
-        if (result.isEmpty()) {
-            entry.clearField(searchField);
-        } else {
-            entry.setField(searchField, result);
-        }
+            String result = sbOrig.toString().trim();
+            if (result.isEmpty()) {
+                entry.clearField(searchField);
+            } else {
+                entry.setField(searchField, result);
+            }
+        });
     }
 
     @Override

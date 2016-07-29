@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -98,17 +99,17 @@ class MODSEntry {
     private void populateFromBibtex(BibEntry bibtex) {
         if (bibtex.hasField(FieldName.TITLE)) {
             if (CHARFORMAT) {
-                title = chars.format(bibtex.getField(FieldName.TITLE));
+                title = chars.format(bibtex.getFieldOptional(FieldName.TITLE).get());
             } else {
-                title = bibtex.getField(FieldName.TITLE);
+                title = bibtex.getFieldOptional(FieldName.TITLE).get();
             }
         }
 
         if (bibtex.hasField(FieldName.PUBLISHER)) {
             if (CHARFORMAT) {
-                publisher = chars.format(bibtex.getField(FieldName.PUBLISHER));
+                publisher = chars.format(bibtex.getFieldOptional(FieldName.PUBLISHER).get());
             } else {
-                publisher = bibtex.getField(FieldName.PUBLISHER);
+                publisher = bibtex.getFieldOptional(FieldName.PUBLISHER).get();
             }
         }
 
@@ -126,7 +127,7 @@ class MODSEntry {
         date = getDate(bibtex);
         genre = getMODSgenre(bibtex);
         if (bibtex.hasField(FieldName.AUTHOR)) {
-            authors = getAuthors(bibtex.getField(FieldName.AUTHOR));
+            authors = getAuthors(bibtex.getFieldOptional(FieldName.AUTHOR).get());
         }
         if ("article".equals(bibtex.getType()) || "inproceedings".equals(bibtex.getType())) {
             host = new MODSEntry();
@@ -135,11 +136,11 @@ class MODSEntry {
             host.publisher = bibtex.getField(FieldName.PUBLISHER);
             host.number = bibtex.getField(FieldName.NUMBER);
             if (bibtex.hasField(FieldName.VOLUME)) {
-                host.volume = bibtex.getField(FieldName.VOLUME);
+                host.volume = bibtex.getFieldOptional(FieldName.VOLUME).get();
             }
             host.issuance = "continuing";
             if (bibtex.hasField(FieldName.PAGES)) {
-                host.pages = new PageNumbers(bibtex.getField(FieldName.PAGES));
+                host.pages = new PageNumbers(bibtex.getFieldOptional(FieldName.PAGES).get());
             }
         }
 
@@ -149,9 +150,8 @@ class MODSEntry {
 
     private void populateExtensionFields(BibEntry e) {
 
-        for (String field : e.getFieldNames()) {
-            String value = e.getField(field);
-            extensionFields.put(MODSEntry.BIBTEX + field, value);
+        for (Entry<String, String> field : e.getFieldMap().entrySet()) {
+            extensionFields.put(MODSEntry.BIBTEX + field.getKey(), field.getValue());
         }
     }
 

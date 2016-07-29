@@ -353,7 +353,7 @@ public class BibEntry implements Cloneable {
             return clearField(fieldName);
         }
 
-        String oldValue = getField(fieldName);
+        String oldValue = getFieldOptional(fieldName).orElse(null);
         if (value.equals(oldValue)) {
             return Optional.empty();
         }
