@@ -1556,4 +1556,79 @@ public class BibtexParserTest {
         assertEquals(Collections.singletonList(expected), parsed);
     }
 
+    @Test
+    public void parseBracketedComment() throws IOException {
+        String commentText = "@Comment{someComment}";
+        ParserResult result = BibtexParser.parse(new StringReader(commentText));
+
+        assertEquals(commentText, result.getDatabase().getEpilog());
+    }
+
+    @Test
+    public void parseRegularCommentBeforeEntry() throws IOException {
+        // @formatter:off
+        String bibtexEntry = "@Comment{someComment} " + OS.NEWLINE +
+                "@Article{test," + OS.NEWLINE +
+                "  Author                   = {Foo Bar}," + OS.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
+                "  Number                   = {1}" + OS.NEWLINE +
+                "}";
+        // @formatter:on
+
+        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        assertEquals(bibtexEntry, entry.getParsedSerialization());
+    }
+
+    @Test
+    public void parseCommentWithoutBrackets () throws IOException {
+        String commentText = "@Comment someComment";
+        ParserResult result = BibtexParser.parse(new StringReader(commentText));
+
+        assertEquals(commentText, result.getDatabase().getEpilog());
+    }
+
+    @Test
+    public void parseCommentWithoutBracketsBeforeEntry() throws IOException {
+        // @formatter:off
+        String bibtexEntry = "@Comment someComment  " + OS.NEWLINE +
+                "@Article{test," + OS.NEWLINE +
+                "  Author                   = {Foo Bar}," + OS.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
+                "  Number                   = {1}" + OS.NEWLINE +
+                "}";
+        // @formatter:on
+
+        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        assertEquals(bibtexEntry, entry.getParsedSerialization());
+    }
+
+    @Test
+    public void parseCommentContainingEntries() throws IOException {
+        // @formatter:off
+        String bibtexEntry = "@Comment{@article{myarticle,}" + OS.NEWLINE +
+                "@inproceedings{blabla, title={the proceedings of blabla}; }" + OS.NEWLINE +
+                "} " + OS.NEWLINE +
+                "@Article{test," + OS.NEWLINE +
+                "  Author                   = {Foo Bar}," + OS.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
+                "  Number                   = {1}" + OS.NEWLINE +
+                "}";
+        // @formatter:on
+
+        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        assertEquals(bibtexEntry, entry.getParsedSerialization());
+    }
+
 }
