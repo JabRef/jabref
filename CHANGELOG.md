@@ -20,6 +20,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Added ISBN integrity checker
 - Added filter to not show selected integrity checks
 - Enhance the entry customization dialog to give better visual feedback
+- It is now possible to generate a new BIB database from the citations in an OpenOffice/LibreOffice document
 - The arXiv fetcher now also supports free-text search queries
 - [#1345](https://github.com/JabRef/jabref/issues/1345) Cleanup ISSN
 

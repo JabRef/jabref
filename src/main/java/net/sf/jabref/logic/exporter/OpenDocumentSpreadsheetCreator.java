@@ -65,7 +65,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
 
     @Override
     public void performExport(final BibDatabaseContext databaseContext, final String file,
-            final Charset encoding, List<BibEntry> entries) throws Exception {
+            final Charset encoding, List<BibEntry> entries) throws IOException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (!entries.isEmpty()) { // Only export if entries exists
@@ -73,7 +73,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
         }
     }
 
-    private static void storeOpenDocumentSpreadsheetFile(File file, InputStream source) throws Exception {
+    private static void storeOpenDocumentSpreadsheetFile(File file, InputStream source) throws IOException {
 
         try (ZipOutputStream out = new ZipOutputStream(new BufferedOutputStream(new FileOutputStream(file)))) {
 
@@ -109,7 +109,7 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
     }
 
     private static void exportOpenDocumentSpreadsheet(File file, BibDatabase database, List<BibEntry> entries)
-            throws Exception {
+            throws IOException {
 
         // First store the xml formatted content to a temporary file.
         File tmpFile = File.createTempFile("opendocument", null);

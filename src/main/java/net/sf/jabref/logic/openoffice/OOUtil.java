@@ -80,7 +80,6 @@ public class OOUtil {
      * @param entry The entry to insert.
      * @param database The database the entry belongs to.
      * @param uniquefier Uniqiefier letter, if any, to append to the entry's year.
-     * @throws Exception
      */
     public static void insertFullReferenceAtCurrentLocation(XText text, XTextCursor cursor,
             Layout layout, String parStyle, BibEntry entry, BibDatabase database, String uniquefier)
