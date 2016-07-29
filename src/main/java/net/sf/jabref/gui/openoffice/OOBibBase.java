@@ -1342,6 +1342,10 @@ class OOBibBase {
 
         @Override
         public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
             if (o instanceof ComparableMark) {
                 ComparableMark other = (ComparableMark) o;
                 return (this.position.X == other.position.X) && (this.position.Y == other.position.Y)
