@@ -28,6 +28,7 @@ This page provides some development support in the form of howtos. See also [[Hi
   * [Working with BibTeX data](#working-with-bibtex-data)
     * [Working with authors](#working-with-authors)
   * [Benchmarks](#benchmarks)
+  * [equals](#equals)
 
 ## Generic code how tos
 
@@ -372,3 +373,16 @@ You can normalize the authors using `net.sf.jabref.model.entry.AuthorList.fixAut
   - Read test input from `@State` objects
   - Return result of calculations (either explicitly or via a `BlackHole` object)
 - [List of examples](https://github.com/melix/jmh-gradle-example/tree/master/src/jmh/java/org/openjdk/jmh/samples)
+
+## equals
+When creating an `equals`method follow:
+ 1.   Use the `== `operator to check if the argument is a reference to this object. If so, return `true`.
+ 2.   Use the `instanceof` operator to check if the argument has the correct type. If not, return `false`.
+ 3.   Cast the argument to the correct type.
+ 4.   For each “significant” field in the class, check if that field of the argument matches the corresponding field of this object. If all these tests succeed, return `true` otherwise, return `false`.
+ 5.   When you are finished writing your equals method, ask yourself three questions: Is it symmetric? Is it transitive? Is it consistent?
+
+Also, note:
+ *   Always override `hashCode` when you override equals (`hashCode` also has very strict rules)
+ *   Don’t try to be too clever
+ *   Don’t substitute another type for `Object` in the equals declaration
