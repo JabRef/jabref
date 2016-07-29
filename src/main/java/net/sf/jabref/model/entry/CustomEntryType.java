@@ -19,11 +19,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.google.common.base.Objects;
 
 /**
  * This class is used to represent customized entry types.
@@ -84,7 +83,7 @@ public class CustomEntryType implements EntryType {
             return true;
         }
         if (o instanceof CustomEntryType) {
-            return Objects.equal(name, ((CustomEntryType) o).name);
+            return Objects.equals(name, ((CustomEntryType) o).name);
         } else {
             return false;
         }
