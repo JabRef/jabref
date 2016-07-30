@@ -2,9 +2,7 @@ package net.sf.jabref.logic.importer;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.fileformat.BibtexImporter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.AutoSaveUtil;
@@ -28,7 +26,8 @@ public class OpenDatabase {
      * @return ParserResult which never is null
      */
 
-    public static ParserResult loadDatabaseOrAutoSave(String name, boolean ignoreAutosave, Charset defaultEncoding) {
+    public static ParserResult loadDatabaseOrAutoSave(String name, boolean ignoreAutosave,
+            ImportFormatPreferences importFormatPreferences) {
         // String in OpenDatabaseAction.java
         LOGGER.info("Opening: " + name);
         File file = new File(name);
@@ -60,7 +59,7 @@ public class OpenDatabase {
                 return ParserResult.getNullResult();
             }
 
-            ParserResult pr = OpenDatabase.loadDatabase(file, defaultEncoding);
+            ParserResult pr = OpenDatabase.loadDatabase(file, importFormatPreferences);
             pr.setFile(file);
             if (pr.hasWarnings()) {
                 for (String aWarn : pr.warnings()) {
@@ -82,14 +81,15 @@ public class OpenDatabase {
     /**
      * Opens a new database.
      */
-    public static ParserResult loadDatabase(File fileToOpen, Charset defaultEncoding) throws IOException {
+    public static ParserResult loadDatabase(File fileToOpen, ImportFormatPreferences importFormatPreferences)
+            throws IOException {
         // Open and parse file
-        ParserResult result = new BibtexImporter(ImportFormatPreferences.fromPreferences(Globals.prefs))
-                .importDatabase(fileToOpen.toPath(), defaultEncoding);
+        ParserResult result = new BibtexImporter(importFormatPreferences).importDatabase(fileToOpen.toPath(),
+                importFormatPreferences.getEncoding());
 
         if (SpecialFieldsUtils.keywordSyncEnabled()) {
             for (BibEntry entry : result.getDatabase().getEntries()) {
-                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
+                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry);
             }
             LOGGER.debug("Synchronized special fields based on keywords");
         }

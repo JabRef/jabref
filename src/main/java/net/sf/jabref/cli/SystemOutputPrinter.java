@@ -10,7 +10,7 @@ public class SystemOutputPrinter implements OutputPrinter {
     }
 
     @Override
-    public void showMessage(Object message, String title, int msgType) {
+    public void showMessage(String message, String title, int msgType) {
         System.out.println(title + ": " + message);
     }
 

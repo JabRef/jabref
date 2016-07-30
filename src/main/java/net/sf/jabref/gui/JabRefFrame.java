@@ -2093,7 +2093,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     @Override
-    public void showMessage(Object message, String title, int msgType) {
+    public void showMessage(String message, String title, int msgType) {
         JOptionPane.showMessageDialog(this, message, title, msgType);
     }
 

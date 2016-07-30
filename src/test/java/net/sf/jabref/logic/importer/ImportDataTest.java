@@ -13,14 +13,15 @@ import org.junit.Test;
 public class ImportDataTest {
 
     public static final File FILE_IN_DATABASE = Paths
-            .get("src/test/resources/net/sf/jabref/importer/unlinkedFilesTestFolder/pdfInDatabase.pdf").toFile();
+            .get("src/test/resources/net/sf/jabref/logic/importer/unlinkedFilesTestFolder/pdfInDatabase.pdf").toFile();
     public static final File FILE_NOT_IN_DATABASE = Paths
-            .get("src/test/resources/net/sf/jabref/importer/unlinkedFilesTestFolder/pdfNotInDatabase.pdf").toFile();
+            .get("src/test/resources/net/sf/jabref/logic/importer/unlinkedFilesTestFolder/pdfNotInDatabase.pdf")
+            .toFile();
     public static final File EXISTING_FOLDER = Paths
-            .get("src/test/resources/net/sf/jabref/importer/unlinkedFilesTestFolder").toFile();
+            .get("src/test/resources/net/sf/jabref/logic/importer/unlinkedFilesTestFolder").toFile();
     public static final File NOT_EXISTING_FOLDER = Paths.get("notexistingfolder").toFile();
     public static final File NOT_EXISTING_PDF = Paths
-            .get("src/test/resources/net/sf/jabref/importer/unlinkedFilesTestFolder/null.pdf").toFile();
+            .get("src/test/resources/net/sf/jabref/logic/importer/unlinkedFilesTestFolder/null.pdf").toFile();
     public static final File UNLINKED_FILES_TEST_BIB = Paths
             .get("src/test/resources/net/sf/jabref/util/unlinkedFilesTestBib.bib").toFile();
 

@@ -88,7 +88,7 @@ public class ImportFormatTest {
                 new Object[]{new MedlinePlainImporter()},
                 new Object[]{new MsBibImporter()},
                 new Object[]{new OvidImporter()},
-                new Object[]{new PdfContentImporter()},
+                new Object[]{new PdfContentImporter(importFormatPreferences)},
                 new Object[]{new PdfXmpImporter()},
                 new Object[]{new RepecNepImporter(importFormatPreferences)},
                 new Object[]{new RisImporter()},

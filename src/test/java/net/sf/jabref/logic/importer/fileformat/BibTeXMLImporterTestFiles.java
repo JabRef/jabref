@@ -30,7 +30,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class BibTeXMLImporterTestFiles {
 
     private static final Pattern PATTERN = Pattern.compile("\\D*[0123456789]");
-    private final static String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/importer/fileformat";
+    private final static String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/logic/importer/fileformat";
 
     private BibTeXMLImporter bibtexmlImporter;
 

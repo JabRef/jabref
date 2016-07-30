@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.importer.fetcher;
+package net.sf.jabref.cli;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fetcher.CrossRef;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.database.BibDatabase;

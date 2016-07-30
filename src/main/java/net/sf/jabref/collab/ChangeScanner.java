@@ -44,6 +44,7 @@ import net.sf.jabref.logic.exporter.SaveException;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.SaveSession;
 import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
@@ -100,11 +101,12 @@ public class ChangeScanner implements Runnable {
 
             // Parse the temporary file.
             Path tempFile = Globals.getFileUpdateMonitor().getTempFile(panel.fileMonitorHandle());
-            ParserResult pr = OpenDatabase.loadDatabase(tempFile.toFile(), Globals.prefs.getDefaultEncoding());
+            ImportFormatPreferences importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
+            ParserResult pr = OpenDatabase.loadDatabase(tempFile.toFile(), importFormatPreferences);
             inTemp = pr.getDatabase();
             mdInTemp = pr.getMetaData();
             // Parse the modified file.
-            pr = OpenDatabase.loadDatabase(f, Globals.prefs.getDefaultEncoding());
+            pr = OpenDatabase.loadDatabase(f, importFormatPreferences);
             BibDatabase onDisk = pr.getDatabase();
             MetaData mdOnDisk = pr.getMetaData();
 

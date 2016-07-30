@@ -31,6 +31,7 @@ import net.sf.jabref.logic.exporter.IExportFormat;
 import net.sf.jabref.logic.exporter.SaveException;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.SaveSession;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportFormatReader;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.OutputPrinter;
@@ -235,7 +236,8 @@ public class ArgumentProcessor {
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
                 ParserResult pr = null;
                 if (bibExtension) {
-                    pr = OpenDatabase.loadDatabaseOrAutoSave(aLeftOver, false, Globals.prefs.getDefaultEncoding());
+                    pr = OpenDatabase.loadDatabaseOrAutoSave(aLeftOver, false,
+                            ImportFormatPreferences.fromPreferences(Globals.prefs));
                 }
 
                 if (!bibExtension || (pr.isNullResult())) {

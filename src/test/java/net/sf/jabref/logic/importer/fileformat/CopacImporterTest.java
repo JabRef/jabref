@@ -22,11 +22,12 @@ import org.junit.Test;
 
 public class CopacImporterTest {
 
-    private final String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/importer/fileformat";
+    private final String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/logic/importer/fileformat";
     private CopacImporter importer;
 
+    
     /**
-     * Generates a List of all files in the package "/src/test/resources/net/sf/jabref/importer/fileformat"
+     * Generates a List of all files in the package "/src/test/resources/net/sf/jabref/logic/importer/fileformat"
      *
      * @return A list of Names
      * @throws IOException

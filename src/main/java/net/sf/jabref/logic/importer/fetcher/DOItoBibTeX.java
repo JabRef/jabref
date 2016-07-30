@@ -7,7 +7,6 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
@@ -18,7 +17,6 @@ import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,11 +29,12 @@ public class DOItoBibTeX {
     private static final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
 
 
-    public static Optional<BibEntry> getEntryFromDOI(String doiStr) {
-        return getEntryFromDOI(doiStr, null);
+    public static Optional<BibEntry> getEntryFromDOI(String doiStr, ImportFormatPreferences importFormatPreferences) {
+        return getEntryFromDOI(doiStr, null, importFormatPreferences);
     }
 
-    public static Optional<BibEntry> getEntryFromDOI(String doiStr, ParserResult parserResult) {
+    public static Optional<BibEntry> getEntryFromDOI(String doiStr, ParserResult parserResult,
+            ImportFormatPreferences importFormatPreferences) {
         Optional<DOI> doi = DOI.build(doiStr);
 
         if (!doi.isPresent()) {
@@ -55,14 +54,13 @@ public class DOItoBibTeX {
             bibtexString = cleanupEncoding(bibtexString);
 
             // BibTeX entry
-            BibEntry entry = BibtexParser.singleFromString(bibtexString,
-                    ImportFormatPreferences.fromPreferences(Globals.prefs));
+            BibEntry entry = BibtexParser.singleFromString(bibtexString, importFormatPreferences);
 
             if (entry == null) {
                 return Optional.empty();
             }
             // Optionally re-format BibTeX entry
-            formatTitleField(entry);
+            formatTitleField(entry, importFormatPreferences);
 
             return Optional.of(entry);
         } catch (MalformedURLException e) {
@@ -80,16 +78,16 @@ public class DOItoBibTeX {
         }
     }
 
-    private static void formatTitleField(BibEntry entry) {
+    private static void formatTitleField(BibEntry entry, ImportFormatPreferences importFormatPreferences) {
         // Optionally add curly brackets around key words to keep the case
         entry.getFieldOptional(FieldName.TITLE).ifPresent(title -> {
             // Unit formatting
-            if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
+            if (importFormatPreferences.isConvertUnitsOnSearch()) {
                 title = unitsToLatexFormatter.format(title);
             }
 
             // Case keeping
-            if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
+            if (importFormatPreferences.isUseCaseKeeperOnSearch()) {
                 title = protectTermsFormatter.format(title);
             }
             entry.setField(FieldName.TITLE, title);

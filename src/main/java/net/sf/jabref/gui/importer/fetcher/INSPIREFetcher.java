@@ -35,6 +35,7 @@ import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.importer.util.INSPIREBibtexFilterReader;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 

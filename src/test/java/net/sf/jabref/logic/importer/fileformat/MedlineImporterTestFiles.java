@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class MedlineImporterTestFiles {
 
-    private final static String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/importer/fileformat";
+    private final static String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/logic/importer/fileformat";
 
     private MedlineImporter medlineImporter;
 

@@ -29,7 +29,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class CopacImporterTestFiles {
 
     private CopacImporter copacImporter;
-    private final static String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/importer/fileformat";
+    private final static String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/logic/importer/fileformat";
 
     @Parameter
     public String fileName;

@@ -8,15 +8,24 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class PdfContentImporterTest {
 
-    private final PdfContentImporter importer = new PdfContentImporter();
+    private PdfContentImporter importer;
+
+
+    @Before
+    public void setUp() {
+        importer = new PdfContentImporter(ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
+    }
 
     @Test
     public void testsGetExtensions() {

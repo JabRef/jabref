@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui.importer.fetcher;
+package net.sf.jabref.logic.importer.util;
 
 import java.io.BufferedReader;
 import java.io.FilterReader;
@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
  * TODO: Fix grammar in bibtex entries -- it ma return invalid bibkeys (with space)
  *
  */
-class INSPIREBibtexFilterReader extends FilterReader {
+public class INSPIREBibtexFilterReader extends FilterReader {
 
     private final BufferedReader inReader;
 
@@ -45,7 +45,8 @@ class INSPIREBibtexFilterReader extends FilterReader {
 
     private static final Pattern PATTERN = Pattern.compile("@Article\\{.*,");
 
-    INSPIREBibtexFilterReader(final Reader initialReader) {
+
+    public INSPIREBibtexFilterReader(final Reader initialReader) {
         super(initialReader);
         inReader = new BufferedReader(initialReader);
         pos = -1;

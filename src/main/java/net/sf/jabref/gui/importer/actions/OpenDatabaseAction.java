@@ -18,7 +18,6 @@ package net.sf.jabref.gui.importer.actions;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,6 +42,7 @@ import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.ParserResultWarningDialog;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
@@ -251,11 +251,11 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
                 }
 
-                Charset encoding = Globals.prefs.getDefaultEncoding();
                 ParserResult result;
                 String errorMessage = null;
                 try {
-                    result = OpenDatabase.loadDatabase(fileToLoad, encoding);
+                    result = OpenDatabase.loadDatabase(fileToLoad,
+                            ImportFormatPreferences.fromPreferences(Globals.prefs));
                 } catch (IOException ex) {
                     LOGGER.error("Error loading database " + fileToLoad, ex);
                     result = ParserResult.getNullResult();

@@ -67,7 +67,8 @@ public class CustomImporter implements Comparable<CustomImporter> {
     }
 
     public CustomImporter(ImportFormat importer) {
-        this(importer.getFormatName(), importer.getId(), importer.getClass().getName(), "src/main/java/net/sf/jabref/importer/fileformat/" + importer.getFormatName() + "Importer.java");
+        this(importer.getFormatName(), importer.getId(), importer.getClass().getName(),
+                "src/main/java/net/sf/jabref/logic/importer/fileformat/" + importer.getFormatName() + "Importer.java");
     }
 
     public String getName() {

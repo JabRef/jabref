@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fetcher.DOItoBibTeX;
 import net.sf.jabref.logic.l10n.Localization;
@@ -64,6 +65,12 @@ public class PdfContentImporter extends ImportFormat {
 
     private String year;
 
+    private final ImportFormatPreferences importFormatPreferences;
+
+
+    public PdfContentImporter(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+    }
     /**
      * Removes all non-letter characters at the end
      * <p>
@@ -214,7 +221,8 @@ public class PdfContentImporter extends ImportFormat {
             Optional<DOI> doi = DOI.findInText(firstPageContents);
             if (doi.isPresent()) {
                 ParserResult parserResult = new ParserResult(result);
-                Optional<BibEntry> entry = DOItoBibTeX.getEntryFromDOI(doi.get().getDOI(), parserResult);
+                Optional<BibEntry> entry = DOItoBibTeX.getEntryFromDOI(doi.get().getDOI(), parserResult,
+                        importFormatPreferences);
                 entry.ifPresent(parserResult.getDatabase()::insertEntry);
                 return parserResult;
             }

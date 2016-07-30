@@ -46,7 +46,6 @@ import net.sf.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabases;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -83,7 +82,7 @@ public class ImportFormatReader {
         formats.add(new MedlinePlainImporter());
         formats.add(new MsBibImporter());
         formats.add(new OvidImporter());
-        formats.add(new PdfContentImporter());
+        formats.add(new PdfContentImporter(importFormatPreferences));
         formats.add(new PdfXmpImporter());
         formats.add(new RepecNepImporter(importFormatPreferences));
         formats.add(new RisImporter());
@@ -129,7 +128,7 @@ public class ImportFormatReader {
             throw new IllegalArgumentException("Unknown import format: " + format);
         }
 
-        return importer.get().importDatabase(file, importFormatPreferences.getDefaultEncoding());
+        return importer.get().importDatabase(file, importFormatPreferences.getEncoding());
     }
 
     /**
@@ -199,17 +198,9 @@ public class ImportFormatReader {
 
         // First, see if it is a BibTeX file:
         try {
-            ParserResult parserResult = new BibtexImporter(importFormatPreferences).importDatabase(filePath,
-                    importFormatPreferences.getDefaultEncoding());
+            ParserResult parserResult = OpenDatabase.loadDatabase(filePath.toFile(), importFormatPreferences);
             if (parserResult.getDatabase().hasEntries() || !parserResult.getDatabase().hasNoStrings()) {
                 parserResult.setFile(filePath.toFile());
-                if (SpecialFieldsUtils.keywordSyncEnabled()) {
-                    for (BibEntry entry : parserResult.getDatabase().getEntries()) {
-                        SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
-                    }
-                    LOGGER.debug("Synchronized special fields based on keywords");
-                }
-
                 return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, parserResult);
             }
         } catch (IOException ignore) {
@@ -224,11 +215,11 @@ public class ImportFormatReader {
         // Cycle through all importers:
         for (ImportFormat imFo : getImportFormats()) {
             try {
-                if (!imFo.isRecognizedFormat(filePath, importFormatPreferences.getDefaultEncoding())) {
+                if (!imFo.isRecognizedFormat(filePath, importFormatPreferences.getEncoding())) {
                     continue;
                 }
 
-                ParserResult parserResult = imFo.importDatabase(filePath, importFormatPreferences.getDefaultEncoding());
+                ParserResult parserResult = imFo.importDatabase(filePath, importFormatPreferences.getEncoding());
                 List<BibEntry> entries = parserResult.getDatabase().getEntries();
 
                 BibDatabases.purgeEmptyEntries(entries);

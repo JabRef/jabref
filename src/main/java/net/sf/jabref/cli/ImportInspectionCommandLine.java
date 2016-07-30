@@ -30,6 +30,8 @@ public class ImportInspectionCommandLine implements ImportInspector {
 
     private final List<BibEntry> entries = new LinkedList<>();
 
+    private final OutputPrinter status = new SystemOutputPrinter();
+
 
     @Override
     public void addEntry(BibEntry entry) {
@@ -42,8 +44,6 @@ public class ImportInspectionCommandLine implements ImportInspector {
                 .valueOf(max)));
     }
 
-
-    private final OutputPrinter status = new SystemOutputPrinter();
 
     public Collection<BibEntry> query(String query, EntryFetcher fetcher) {
         entries.clear();
