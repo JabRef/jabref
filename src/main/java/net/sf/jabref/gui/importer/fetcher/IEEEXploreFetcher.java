@@ -40,6 +40,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.help.HelpFile;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
@@ -163,7 +164,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
             bibtexPage = preprocessBibtexResultsPage(bibtexPage);
 
             //parse the page into Bibtex entries
-            Collection<BibEntry> parsedBibtexCollection = BibtexParser.fromString(bibtexPage);
+            Collection<BibEntry> parsedBibtexCollection = BibtexParser.fromString(bibtexPage,
+                    ImportFormatPreferences.fromPreferences(Globals.prefs));
             if (parsedBibtexCollection == null) {
                 status.showMessage(Localization.lang("Error while fetching from %0", getTitle()),
                         DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);

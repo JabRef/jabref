@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibEntry;
@@ -34,19 +35,21 @@ public class BibDatabaseTest {
     public ExpectedException thrown = ExpectedException.none();
 
     private BibDatabase database;
+    private ImportFormatPreferences importFormatPreferences;
 
     @Before
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance(); // set preferences for this test
 
         database = new BibDatabase();
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
     }
 
     @Test
     public void resolveStrings() throws IOException {
         try (FileInputStream stream = new FileInputStream("src/test/resources/net/sf/jabref/util/twente.bib");
                 InputStreamReader fr = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            ParserResult result = BibtexParser.parse(fr);
+            ParserResult result = BibtexParser.parse(fr, importFormatPreferences);
 
             BibDatabase db = result.getDatabase();
 

@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.importer.fileformat.CopacImporter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 

@@ -52,6 +52,7 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.help.HelpFile;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
 import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
@@ -186,7 +187,7 @@ public class ImportCustomizationDialog extends JDialog {
                 customImporterTable.removeRowSelectionInterval(row, row);
                 Globals.prefs.customImports
                         .remove(((ImportTableModel) customImporterTable.getModel()).getImporter(row));
-                Globals.IMPORT_FORMAT_READER.resetImportFormats();
+                Globals.IMPORT_FORMAT_READER.resetImportFormats(ImportFormatPreferences.fromPreferences(Globals.prefs));
                 customImporterTable.revalidate();
                 customImporterTable.repaint();
             }
@@ -276,7 +277,7 @@ public class ImportCustomizationDialog extends JDialog {
      */
     public void addOrReplaceImporter(CustomImporter importer) {
         Globals.prefs.customImports.replaceImporter(importer);
-        Globals.IMPORT_FORMAT_READER.resetImportFormats();
+        Globals.IMPORT_FORMAT_READER.resetImportFormats(ImportFormatPreferences.fromPreferences(Globals.prefs));
         ((ImportTableModel) customImporterTable.getModel()).fireTableDataChanged();
     }
 

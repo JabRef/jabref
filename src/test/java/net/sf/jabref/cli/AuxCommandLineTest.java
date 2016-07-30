@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
@@ -31,7 +32,8 @@ public class AuxCommandLineTest {
 
         File auxFile = Paths.get(AuxCommandLineTest.class.getResource("paper.aux").toURI()).toFile();
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
-            ParserResult result = BibtexParser.parse(originalReader);
+            ParserResult result = BibtexParser.parse(originalReader,
+                    ImportFormatPreferences.fromPreferences(Globals.prefs));
 
             AuxCommandLine auxCommandLine = new AuxCommandLine(auxFile.getAbsolutePath(), result.getDatabase());
             BibDatabase newDB = auxCommandLine.perform();

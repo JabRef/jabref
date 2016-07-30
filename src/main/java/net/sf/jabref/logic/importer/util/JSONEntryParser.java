@@ -20,12 +20,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.preferences.JabRefPreferences;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONArray;
@@ -41,7 +38,7 @@ public class JSONEntryParser {
      * @param bibJsonEntry The JSONObject to convert
      * @return the converted BibEntry
      */
-    public BibEntry parseBibJSONtoBibtex(JSONObject bibJsonEntry) {
+    public BibEntry parseBibJSONtoBibtex(JSONObject bibJsonEntry, String keywordSeparator) {
         // Fields that are directly accessible at the top level BibJson object
         String[] singleFieldStrings = {FieldName.YEAR, FieldName.TITLE, FieldName.ABSTRACT, FieldName.MONTH};
 
@@ -114,7 +111,7 @@ public class JSONEntryParser {
                     keywordList.add(keywords.getString(i));
                 }
             }
-            entry.putKeywords(keywordList, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+            entry.putKeywords(keywordList, keywordSeparator);
         }
 
         // Identifiers

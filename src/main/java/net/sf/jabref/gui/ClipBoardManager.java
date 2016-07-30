@@ -34,7 +34,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.importer.fetcher.DOItoBibTeXFetcher;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.database.BibDatabase;
@@ -75,7 +77,7 @@ public class ClipBoardManager implements ClipboardOwner {
         String result = "";
         //odd: the Object param of getContents is not currently used
         Transferable contents = CLIPBOARD.getContents(null);
-        if (contents != null && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
+        if ((contents != null) && contents.isDataFlavorSupported(DataFlavor.stringFlavor)) {
             try {
                 result = (String) contents.getTransferData(DataFlavor.stringFlavor);
             } catch (UnsupportedFlavorException | IOException e) {
@@ -110,7 +112,8 @@ public class ClipBoardManager implements ClipboardOwner {
                     entry.ifPresent(result::add);
                 } else {
                     // parse bibtex string
-                    BibtexParser bp = new BibtexParser(new StringReader(data));
+                    BibtexParser bp = new BibtexParser(new StringReader(data),
+                            ImportFormatPreferences.fromPreferences(Globals.prefs));
                     BibDatabase db = bp.parse().getDatabase();
                     LOGGER.info("Parsed " + db.getEntryCount() + " entries from clipboard text");
                     if (db.hasEntries()) {

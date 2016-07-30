@@ -44,6 +44,9 @@ import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.Author;
@@ -1122,6 +1125,158 @@ public class XMPUtil {
     }
 
     /**
+<<<<<<< f7ebc79570654b4b717b4d43043cd617fe42a4e0
+=======
+     * Print usage information for the command line tool xmpUtil.
+     *
+     * @see XMPUtil#main(String[])
+     */
+    private static void usage() {
+        System.out.println("Read or write XMP-metadata from or to pdf file.");
+        System.out.println("");
+        System.out.println("Usage:");
+        System.out.println("Read from PDF and print as bibtex:");
+        System.out.println("  xmpUtil <pdf>");
+        System.out.println("Read from PDF and print raw XMP:");
+        System.out.println("  xmpUtil -x <pdf>");
+        System.out
+        .println("Write the entry in <bib> given by <key> to the PDF:");
+        System.out.println("  xmpUtil <key> <bib> <pdf>");
+        System.out.println("Write all entries in <bib> to the PDF:");
+        System.out.println("  xmpUtil <bib> <pdf>");
+        System.out.println("");
+        System.out
+        .println("To report bugs visit http://jabref.sourceforge.net");
+    }
+
+    /**
+     * Command-line tool for working with XMP-data.
+     *
+     * Read or write XMP-metadata from or to pdf file.
+     *
+     * Usage:
+     * <dl>
+     * <dd>Read from PDF and print as bibtex:</dd>
+     * <dt>xmpUtil PDF</dt>
+     * <dd>Read from PDF and print raw XMP:</dd>
+     * <dt>xmpUtil -x PDF</dt>
+     * <dd>Write the entry in BIB given by KEY to the PDF:</dd>
+     * <dt>xmpUtil KEY BIB PDF</dt>
+     * <dd>Write all entries in BIB to the PDF:</dd>
+     * <dt>xmpUtil BIB PDF</dt>
+     * </dl>
+     *
+     * @param args
+     *            Command line strings passed to utility.
+     * @throws IOException
+     *             If any of the given files could not be read or written.
+     * @throws TransformerException
+     *             If the given BibEntry is malformed.
+     */
+    public static void main(String[] args) throws IOException, TransformerException {
+
+        // Don't forget to initialize the preferences
+        if (Globals.prefs == null) {
+            Globals.prefs = JabRefPreferences.getInstance();
+        }
+
+        ImportFormatPreferences importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
+
+        switch (args.length) {
+        case 0:
+            XMPUtil.usage();
+            break;
+        case 1:
+
+            if (args[0].endsWith(".pdf")) {
+                // Read from pdf and write as BibTex
+                List<BibEntry> l = XMPUtil.readXMP(new File(args[0]), Globals.prefs);
+
+                BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
+                        new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)), false);
+
+                for (BibEntry entry : l) {
+                    StringWriter sw = new StringWriter();
+                    bibtexEntryWriter.write(entry, sw, BibDatabaseMode.BIBTEX);
+                    System.out.println(sw.getBuffer());
+                }
+
+            } else if (args[0].endsWith(".bib")) {
+                // Read from BIB and write as XMP
+                try (FileReader fr = new FileReader(args[0])) {
+                    ParserResult result = BibtexParser.parse(fr, importFormatPreferences);
+                    Collection<BibEntry> entries = result.getDatabase().getEntries();
+
+                    if (entries.isEmpty()) {
+                        System.err.println("Could not find BibEntry in " + args[0]);
+                    } else {
+                        System.out.println(XMPUtil.toXMP(entries, result.getDatabase()));
+                    }
+                }
+            } else {
+                XMPUtil.usage();
+            }
+            break;
+        case 2:
+            if ("-x".equals(args[0]) && args[1].endsWith(".pdf")) {
+                // Read from pdf and write as BibTex
+                Optional<XMPMetadata> meta = XMPUtil.readRawXMP(new File(args[1]));
+
+                if (meta.isPresent()) {
+                    XMLUtil.save(meta.get().getXMPDocument(), System.out, StandardCharsets.UTF_8.name());
+                } else {
+                    System.err
+                    .println("The given pdf does not contain any XMP-metadata.");
+                }
+                break;
+            }
+
+            if (args[0].endsWith(".bib") && args[1].endsWith(".pdf")) {
+                ParserResult result = BibtexParser
+                        .parse(new FileReader(args[0]), importFormatPreferences);
+
+                Collection<BibEntry> entries = result.getDatabase()
+                        .getEntries();
+
+                if (entries.isEmpty()) {
+                    System.err.println("Could not find BibEntry in "
+                            + args[0]);
+                } else {
+                    XMPUtil.writeXMP(new File(args[1]), entries, result
+                            .getDatabase(), false);
+                    System.out.println("XMP written.");
+                }
+                break;
+            }
+
+            XMPUtil.usage();
+            break;
+        case 3:
+            if (!args[1].endsWith(".bib") && !args[2].endsWith(".pdf")) {
+                XMPUtil.usage();
+                break;
+            }
+
+            ParserResult result = BibtexParser.parse(new FileReader(args[1]), importFormatPreferences);
+
+            Optional<BibEntry> bibEntry = result.getDatabase().getEntryByKey(args[0]);
+
+            if (bibEntry.isPresent()) {
+                XMPUtil.writeXMP(new File(args[2]), bibEntry.get(), result.getDatabase());
+
+                System.out.println("XMP written.");
+            } else {
+                System.err.println("Could not find BibEntry " + args[0] + " in " + args[0]);
+            }
+            break;
+
+        default:
+            XMPUtil.usage();
+        }
+    }
+
+    /**
+>>>>>>> Added ImportFormatPreferences
      * see XMPUtil.hasMetadata(InputStream)
      */
     public static boolean hasMetadata(Path path, XMPPreferences xmpPreferences) {

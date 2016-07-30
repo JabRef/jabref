@@ -28,8 +28,10 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.help.HelpFile;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
+import net.sf.jabref.logic.importer.fetcher.BibsonomyScraper;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 
@@ -100,7 +102,8 @@ public class ScienceDirectFetcher implements EntryFetcher {
                 if (stopFetching) {
                     break;
                 }
-                BibsonomyScraper.getEntry(cit).ifPresent(dialog::addEntry);
+                BibsonomyScraper.getEntry(cit, ImportFormatPreferences.fromPreferences(Globals.prefs))
+                        .ifPresent(dialog::addEntry);
                 dialog.setProgress(++i, citations.size());
             }
 

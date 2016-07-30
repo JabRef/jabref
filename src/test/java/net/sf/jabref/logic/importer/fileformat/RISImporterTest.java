@@ -7,7 +7,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.importer.fileformat.RisImporter;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;

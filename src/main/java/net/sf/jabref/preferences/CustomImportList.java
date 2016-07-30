@@ -25,13 +25,14 @@
   Copyright (C) 2005-2014 JabRef contributors.
 
 */
-package net.sf.jabref.logic.importer.fileformat;
+package net.sf.jabref.preferences;
 
 import java.util.List;
 import java.util.TreeSet;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.logic.importer.fileformat.CustomImporter;
+import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

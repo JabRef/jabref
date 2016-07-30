@@ -19,6 +19,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.importer.fileformat.BibtexImporter;
 =======
 import net.sf.jabref.MetaData;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fileformat.BibtexImporter;
 import net.sf.jabref.model.database.BibDatabase;
 >>>>>>> Refactored importer and split into logic and gui
@@ -70,7 +71,7 @@ public class MSBibExportFormatTestFiles {
         charset = Charsets.UTF_8;
         msBibExportFormat = new MSBibExportFormat();
         tempFile = testFolder.newFile();
-        testImporter = new BibtexImporter();
+        testImporter = new BibtexImporter(ImportFormatPreferences.fromPreferences(Globals.prefs));
     }
 
     @Test

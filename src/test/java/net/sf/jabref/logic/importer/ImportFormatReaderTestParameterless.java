@@ -23,7 +23,7 @@ public class ImportFormatReaderTestParameterless {
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
         reader = new ImportFormatReader();
-        reader.resetImportFormats();
+        reader.resetImportFormats(ImportFormatPreferences.fromPreferences(Globals.prefs));
     }
 
     @Test

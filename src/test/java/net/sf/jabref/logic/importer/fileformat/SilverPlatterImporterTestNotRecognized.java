@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;

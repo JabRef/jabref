@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.importer.fileformat.BibTeXMLImporter;
 import net.sf.jabref.logic.importer.util.BibTeXMLHandler;
 import net.sf.jabref.preferences.JabRefPreferences;
 

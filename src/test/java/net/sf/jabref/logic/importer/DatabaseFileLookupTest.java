@@ -37,7 +37,7 @@ public class DatabaseFileLookupTest {
 
         try (FileInputStream stream = new FileInputStream(ImportDataTest.UNLINKED_FILES_TEST_BIB);
                 InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            ParserResult result = BibtexParser.parse(reader);
+            ParserResult result = BibtexParser.parse(reader, ImportFormatPreferences.fromPreferences(Globals.prefs));
             database = result.getDatabase();
             entries = database.getEntries();
 

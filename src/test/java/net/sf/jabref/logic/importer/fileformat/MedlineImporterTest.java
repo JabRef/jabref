@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.importer.fileformat.MedlineImporter;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;

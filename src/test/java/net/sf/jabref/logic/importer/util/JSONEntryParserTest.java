@@ -18,7 +18,6 @@ package net.sf.jabref.logic.importer.util;
 
 import java.util.Optional;
 
-import net.sf.jabref.logic.importer.util.JSONEntryParser;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.json.JSONObject;
@@ -40,7 +39,7 @@ public class JSONEntryParserTest {
                         + "\"id\": \"1563-5171\"},{\"type\": \"doi\",\"id\": \"10.1155/2014/217495\""
                 + "}],\"created_date\":\"2014-05-09T19:38:31Z\"}\"";
         JSONObject jo = new JSONObject(jsonString);
-        BibEntry be = jc.parseBibJSONtoBibtex(jo);
+        BibEntry be = jc.parseBibJSONtoBibtex(jo, ", ");
 
         Assert.assertEquals("article", be.getType());
         Assert.assertEquals(Optional.of("VLSI Design"), be.getFieldOptional("journal"));

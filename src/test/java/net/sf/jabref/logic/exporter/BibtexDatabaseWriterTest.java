@@ -19,14 +19,10 @@ import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.ExplicitGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.logic.groups.GroupTreeNode;
-<<<<<<< ad6b5cc1ff518ac2366c3f82810b7a7f24cc7ed6
-=======
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.importer.fileformat.ImportFormat;
-import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
-import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
->>>>>>> Refactored importer and split into logic and gui
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
@@ -52,6 +48,7 @@ public class BibtexDatabaseWriterTest {
     private BibDatabase database;
     private MetaData metaData;
     private BibDatabaseContext bibtexContext;
+    private ImportFormatPreferences importFormatPreferences;
 
     @Before
     public void setUp() {
@@ -63,6 +60,7 @@ public class BibtexDatabaseWriterTest {
         database = new BibDatabase();
         metaData = new MetaData();
         bibtexContext = new BibDatabaseContext(database, metaData, new Defaults(BibDatabaseMode.BIBTEX));
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
     }
 
     @Test(expected = NullPointerException.class)
@@ -270,7 +268,8 @@ public class BibtexDatabaseWriterTest {
     public void roundtrip() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding));
+        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding),
+                importFormatPreferences);
 
         SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
@@ -286,7 +285,8 @@ public class BibtexDatabaseWriterTest {
     public void roundtripWithUserComment() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding));
+        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding),
+                importFormatPreferences);
 
         SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
         BibDatabaseContext context = new BibDatabaseContext(result.getDatabase(), result.getMetaData(),
@@ -302,7 +302,8 @@ public class BibtexDatabaseWriterTest {
     public void roundtripWithUserCommentAndEntryChange() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding));
+        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding),
+                importFormatPreferences);
 
         BibEntry entry = result.getDatabase().getEntryByKey("1137631").get();
         entry.setField("author", "Mr. Author");
@@ -322,7 +323,8 @@ public class BibtexDatabaseWriterTest {
     public void roundtripWithUserCommentBeforeStringAndChange() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding));
+        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding),
+                importFormatPreferences);
 
         for (BibtexString string : result.getDatabase().getStringValues()) {
             // Mark them as changed

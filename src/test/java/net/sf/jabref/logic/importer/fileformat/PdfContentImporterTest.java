@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.logic.importer.fileformat.PdfContentImporter;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Test;

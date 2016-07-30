@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.logic.exporter.SavePreferences;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 
 /**
@@ -38,6 +39,12 @@ public class BibtexImporter extends ImportFormat {
     // Signature written at the top of the .bib file in earlier versions.
     private static final String SIGNATURE = "This file was created with JabRef";
 
+    private final ImportFormatPreferences importFormatPreferences;
+
+
+    public BibtexImporter(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+    }
     /**
      * @return true as we have no effective way to decide whether a file is in bibtex format or not. See
      *         https://github.com/JabRef/jabref/pull/379#issuecomment-158685726 for more details.
@@ -75,7 +82,7 @@ public class BibtexImporter extends ImportFormat {
 
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
-        return BibtexParser.parse(reader);
+        return BibtexParser.parse(reader, importFormatPreferences);
     }
 
     @Override

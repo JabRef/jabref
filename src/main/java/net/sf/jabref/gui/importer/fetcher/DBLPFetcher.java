@@ -26,9 +26,11 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.help.HelpFile;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.importer.util.DBLPHelper;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.entry.BibEntry;
@@ -46,7 +48,7 @@ public class DBLPFetcher implements EntryFetcher {
 
     private volatile boolean shouldContinue;
     private String query;
-    private final DBLPHelper helper = new DBLPHelper();
+    private final DBLPHelper helper = new DBLPHelper(ImportFormatPreferences.fromPreferences(Globals.prefs));
 
 
     @Override
@@ -119,7 +121,8 @@ public class DBLPFetcher implements EntryFetcher {
                         final String bibtexPage = new URLDownload(bibtexUrl)
                                 .downloadToString(Globals.prefs.getDefaultEncoding());
 
-                        Collection<BibEntry> bibtexEntries = BibtexParser.fromString(bibtexPage);
+                        Collection<BibEntry> bibtexEntries = BibtexParser.fromString(bibtexPage,
+                                ImportFormatPreferences.fromPreferences(Globals.prefs));
 
                         for (BibEntry be : bibtexEntries) {
 

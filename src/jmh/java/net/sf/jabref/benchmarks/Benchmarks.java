@@ -17,6 +17,7 @@ import net.sf.jabref.logic.exporter.StringSaveSession;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.logic.groups.KeywordGroup;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.importer.util.ParseException;
@@ -74,7 +75,8 @@ public class Benchmarks {
     @Benchmark
     public ParserResult parse() throws IOException {
         StringReader bibtexStringReader = new StringReader(bibtexString);
-        BibtexParser parser = new BibtexParser(bibtexStringReader);
+        BibtexParser parser = new BibtexParser(bibtexStringReader,
+                ImportFormatPreferences.fromPreferences(Globals.prefs));
         return parser.parse();
     }
 

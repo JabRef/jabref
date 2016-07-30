@@ -24,8 +24,7 @@ import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
+import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.importer.fileformat.BibTeXMLImporter;
 import net.sf.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import net.sf.jabref.logic.importer.fileformat.BibtexImporter;
@@ -48,6 +47,7 @@ import net.sf.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabases;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -64,16 +64,20 @@ public class ImportFormatReader {
 
     private static final Log LOGGER = LogFactory.getLog(ImportFormatReader.class);
 
+    private ImportFormatPreferences importFormatPreferences;
 
-    public void resetImportFormats() {
+
+    public void resetImportFormats(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+
         formats.clear();
 
         formats.add(new BiblioscapeImporter());
-        formats.add(new BibtexImporter());
+        formats.add(new BibtexImporter(importFormatPreferences));
         formats.add(new BibTeXMLImporter());
         formats.add(new CopacImporter());
         formats.add(new EndnoteImporter());
-        formats.add(new FreeCiteImporter());
+        formats.add(new FreeCiteImporter(importFormatPreferences));
         formats.add(new InspecImporter());
         formats.add(new IsiImporter());
         formats.add(new MedlineImporter());
@@ -82,14 +86,14 @@ public class ImportFormatReader {
         formats.add(new OvidImporter());
         formats.add(new PdfContentImporter());
         formats.add(new PdfXmpImporter());
-        formats.add(new RepecNepImporter());
+        formats.add(new RepecNepImporter(importFormatPreferences));
         formats.add(new RisImporter());
         formats.add(new SilverPlatterImporter());
 
         /**
          * Get custom import formats
          */
-        for (CustomImporter importer : Globals.prefs.customImports) {
+        for (CustomImporter importer : importFormatPreferences.getCustomImportList()) {
             try {
                 ImportFormat imFo = importer.getInstance();
                 formats.add(imFo);
@@ -126,7 +130,7 @@ public class ImportFormatReader {
             throw new IllegalArgumentException("Unknown import format: " + format);
         }
 
-        return importer.get().importDatabase(file, Globals.prefs.getDefaultEncoding());
+        return importer.get().importDatabase(file, importFormatPreferences.getDefaultEncoding());
     }
 
     /**
@@ -191,16 +195,24 @@ public class ImportFormatReader {
      *
      * @throws IOException
      */
-    public UnknownFormatImport importUnknownFormat(Path file) {
-        Objects.requireNonNull(file);
+    public UnknownFormatImport importUnknownFormat(Path filePath) {
+        Objects.requireNonNull(filePath);
 
         // First, see if it is a BibTeX file:
         try {
-            ParserResult pr = OpenDatabaseAction.loadDatabase(file.toFile(),
-                    Globals.prefs.getDefaultEncoding());
-            if (pr.getDatabase().hasEntries() || !pr.getDatabase().hasNoStrings()) {
-                pr.setFile(file.toFile());
-                return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, pr);
+            ParserResult parserResult = new BibtexImporter(importFormatPreferences).importDatabase(filePath,
+                    importFormatPreferences.getDefaultEncoding());
+            if (parserResult.getDatabase().hasEntries() || !parserResult.getDatabase().hasNoStrings()) {
+                parserResult.setFile(filePath.toFile());
+                if (SpecialFieldsUtils.keywordSyncEnabled()) {
+                    NamedCompound compound = new NamedCompound("SpecialFieldSync");
+                    for (BibEntry entry : parserResult.getDatabase().getEntries()) {
+                        SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
+                    }
+                    LOGGER.debug("Synchronized special fields based on keywords");
+                }
+
+                return new UnknownFormatImport(ImportFormatReader.BIBTEX_FORMAT, parserResult);
             }
         } catch (IOException ignore) {
             // Ignored
@@ -214,11 +226,11 @@ public class ImportFormatReader {
         // Cycle through all importers:
         for (ImportFormat imFo : getImportFormats()) {
             try {
-                if(!imFo.isRecognizedFormat(file, Globals.prefs.getDefaultEncoding())) {
+                if (!imFo.isRecognizedFormat(filePath, importFormatPreferences.getDefaultEncoding())) {
                     continue;
                 }
 
-                ParserResult parserResult = imFo.importDatabase(file, Globals.prefs.getDefaultEncoding());
+                ParserResult parserResult = imFo.importDatabase(filePath, importFormatPreferences.getDefaultEncoding());
                 List<BibEntry> entries = parserResult.getDatabase().getEntries();
 
                 BibDatabases.purgeEmptyEntries(entries);

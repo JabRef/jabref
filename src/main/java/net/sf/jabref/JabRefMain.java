@@ -24,6 +24,7 @@ import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.ProxyAuthenticator;
@@ -73,7 +74,7 @@ public class JabRefMain {
         InternalBibtexFields.setNumericFields(Globals.prefs.getStringList(JabRefPreferences.NUMERIC_FIELDS));
 
         /* Build list of Import and Export formats */
-        Globals.IMPORT_FORMAT_READER.resetImportFormats();
+        Globals.IMPORT_FORMAT_READER.resetImportFormats(ImportFormatPreferences.fromPreferences(Globals.prefs));
         CustomEntryTypesManager.loadCustomEntryTypes(preferences);
         ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
 

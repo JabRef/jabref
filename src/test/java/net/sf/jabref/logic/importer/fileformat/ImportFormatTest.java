@@ -5,24 +5,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.logic.importer.fileformat.BibTeXMLImporter;
-import net.sf.jabref.logic.importer.fileformat.BiblioscapeImporter;
-import net.sf.jabref.logic.importer.fileformat.BibtexImporter;
-import net.sf.jabref.logic.importer.fileformat.CopacImporter;
-import net.sf.jabref.logic.importer.fileformat.EndnoteImporter;
-import net.sf.jabref.logic.importer.fileformat.FreeCiteImporter;
-import net.sf.jabref.logic.importer.fileformat.ImportFormat;
-import net.sf.jabref.logic.importer.fileformat.InspecImporter;
-import net.sf.jabref.logic.importer.fileformat.IsiImporter;
-import net.sf.jabref.logic.importer.fileformat.MedlineImporter;
-import net.sf.jabref.logic.importer.fileformat.MedlinePlainImporter;
-import net.sf.jabref.logic.importer.fileformat.MsBibImporter;
-import net.sf.jabref.logic.importer.fileformat.OvidImporter;
-import net.sf.jabref.logic.importer.fileformat.PdfContentImporter;
-import net.sf.jabref.logic.importer.fileformat.PdfXmpImporter;
-import net.sf.jabref.logic.importer.fileformat.RepecNepImporter;
-import net.sf.jabref.logic.importer.fileformat.RisImporter;
-import net.sf.jabref.logic.importer.fileformat.SilverPlatterImporter;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -88,14 +72,16 @@ public class ImportFormatTest {
         // all classes implementing {@link ImportFormat}
         // sorted alphabetically
 
+        ImportFormatPreferences importFormatPreferences = ImportFormatPreferences
+                .fromPreferences(JabRefPreferences.getInstance());
         // @formatter:off
         return Arrays.asList(
                 new Object[]{new BiblioscapeImporter()},
-                new Object[]{new BibtexImporter()},
+                new Object[]{new BibtexImporter(importFormatPreferences)},
                 new Object[]{new BibTeXMLImporter()},
                 new Object[]{new CopacImporter()},
                 new Object[]{new EndnoteImporter()},
-                new Object[]{new FreeCiteImporter()},
+                new Object[]{new FreeCiteImporter(importFormatPreferences)},
                 new Object[]{new InspecImporter()},
                 new Object[]{new IsiImporter()},
                 new Object[]{new MedlineImporter()},
@@ -104,7 +90,7 @@ public class ImportFormatTest {
                 new Object[]{new OvidImporter()},
                 new Object[]{new PdfContentImporter()},
                 new Object[]{new PdfXmpImporter()},
-                new Object[]{new RepecNepImporter()},
+                new Object[]{new RepecNepImporter(importFormatPreferences)},
                 new Object[]{new RisImporter()},
                 new Object[]{new SilverPlatterImporter()}
         );

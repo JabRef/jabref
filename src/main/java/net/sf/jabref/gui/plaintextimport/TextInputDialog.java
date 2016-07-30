@@ -123,6 +123,7 @@ import net.sf.jabref.gui.util.component.OverlayPanel;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.FreeCiteImporter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -496,7 +497,7 @@ public class TextInputDialog extends JDialog {
      * @return true if successful, false otherwise
      */
     private boolean parseWithFreeCiteAndAddEntries() {
-        FreeCiteImporter fimp = new FreeCiteImporter();
+        FreeCiteImporter fimp = new FreeCiteImporter(ImportFormatPreferences.fromPreferences(Globals.prefs));
         String text = textPane.getText();
 
         // we have to remove line breaks (but keep empty lines)

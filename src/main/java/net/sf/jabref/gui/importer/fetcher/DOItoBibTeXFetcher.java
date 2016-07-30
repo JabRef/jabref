@@ -13,6 +13,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.help.HelpFile;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.ParserResult;
@@ -90,7 +91,8 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             bibtexString = cleanupEncoding(bibtexString);
 
             // BibTeX entry
-            BibEntry entry = BibtexParser.singleFromString(bibtexString);
+            BibEntry entry = BibtexParser.singleFromString(bibtexString,
+                    ImportFormatPreferences.fromPreferences(Globals.prefs));
 
             if (entry == null) {
                 return Optional.empty();

@@ -32,13 +32,11 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.preferences.JabRefPreferences;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -172,6 +170,13 @@ public class RepecNepImporter extends ImportFormat {
     private String lastLine = "";
     private String preLine = "";
     private boolean inOverviewSection;
+
+    private final ImportFormatPreferences importFormatPreferences;
+
+
+    public RepecNepImporter(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+    }
 
     @Override
     public String getFormatName() {
@@ -354,7 +359,7 @@ public class RepecNepImporter extends ImportFormat {
                 String content = readMultipleLines(in);
                 String[] keywords = content.split("[,;]");
                 be.addKeywords(new LinkedHashSet<>(Arrays.asList(keywords)),
-                        Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+                        importFormatPreferences.getKeywordSeparator());
                 // parse JEL field
             } else if ("JEL".equals(keyword)) {
                 be.setField("jel", readMultipleLines(in));

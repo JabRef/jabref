@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.bibtexkeypattern;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -37,10 +38,13 @@ public class BibtexKeyPatternUtilTest {
     private static final String TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD = "Towards Choreography-based Process Distribution in the Cloud";
     private static final String TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS = "On the Measurement of Design-Time Adaptability for Process-Based Systems ";
 
+    private static ImportFormatPreferences importFormatPreferences;
+
 
     @BeforeClass
     public static void setUpGlobalsPrefs() {
         Globals.prefs = JabRefPreferences.getInstance();
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
     }
 
     @Before
@@ -50,23 +54,25 @@ public class BibtexKeyPatternUtilTest {
 
     @Test
     public void testAndInAuthorName() {
-        BibEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}}");
+        BibEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}}",
+                importFormatPreferences);
         assertEquals("Holland", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0, "auth"), true));
     }
 
     @Test
     public void testAndAuthorNames() {
         String bibtexString = "@ARTICLE{whatevery, author={Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland}}";
-        BibEntry entry = BibtexParser.singleFromString(bibtexString);
+        BibEntry entry = BibtexParser.singleFromString(bibtexString, importFormatPreferences);
         assertEquals("HerlandHaugeHelgeland",
                 BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry, "authors3"), true));
     }
 
     @Test
     public void testSpecialLatexCharacterInAuthorName() {
-        BibEntry entry = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Popovi\\v{c}ov\\'{a}}}");
-        assertEquals("Popovicova", BibtexKeyPatternUtil
-                .checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry, "auth"), true));
+        BibEntry entry = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Popovi\\v{c}ov\\'{a}}}",
+                importFormatPreferences);
+        assertEquals("Popovicova",
+                BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry, "auth"), true));
     }
 
     /**
@@ -75,40 +81,53 @@ public class BibtexKeyPatternUtilTest {
      */
     @Test
     public void testMakeLabelAndCheckLegalKeys() {
-        BibEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Köning}, year={2000}}");
+
+        BibEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Köning}, year={2000}}",
+                importFormatPreferences);
         assertEquals("Koen", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0, "auth3"), true));
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Áöning}, year={2000}}");
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Áöning}, year={2000}}",
+                importFormatPreferences);
         assertEquals("Aoen", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0, "auth3"), true));
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Éöning}, year={2000}}");
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Éöning}, year={2000}}",
+                importFormatPreferences);
         assertEquals("Eoen", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0, "auth3"), true));
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Íöning}, year={2000}}");
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Íöning}, year={2000}}",
+                importFormatPreferences);
         assertEquals("Ioen", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0, "auth3"), true));
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ĺöning}, year={2000}}");
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ĺöning}, year={2000}}",
+                importFormatPreferences);
         assertEquals("Loen", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0, "auth3"), true));
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ńöning}, year={2000}}");
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ńöning}, year={2000}}",
+                importFormatPreferences);
         assertEquals("Noen", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0, "auth3"), true));
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Óöning}, year={2000}}");
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Óöning}, year={2000}}",
+                importFormatPreferences);
         assertEquals("Ooen", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0, "auth3"), true));
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ŕöning}, year={2000}}");
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ŕöning}, year={2000}}",
+                importFormatPreferences);
         assertEquals("Roen", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0, "auth3"), true));
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Śöning}, year={2000}}");
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Śöning}, year={2000}}",
+                importFormatPreferences);
         assertEquals("Soen", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0, "auth3"), true));
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Úöning}, year={2000}}");
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Úöning}, year={2000}}",
+                importFormatPreferences);
         assertEquals("Uoen", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0, "auth3"), true));
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ýöning}, year={2000}}");
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ýöning}, year={2000}}",
+                importFormatPreferences);
         assertEquals("Yoen", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0, "auth3"), true));
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Źöning}, year={2000}}");
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Źöning}, year={2000}}",
+                importFormatPreferences);
         assertEquals("Zoen", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0, "auth3"), true));
     }
 
@@ -117,19 +136,24 @@ public class BibtexKeyPatternUtilTest {
      */
     @Test
     public void testMakeLabelAndCheckLegalKeysAccentGrave() {
-        BibEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}");
+        BibEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}",
+                importFormatPreferences);
         assertEquals("Aoen", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0, "auth3"), true));
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Èöning}, year={2000}}");
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Èöning}, year={2000}}",
+                importFormatPreferences);
         assertEquals("Eoen", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0, "auth3"), true));
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ìöning}, year={2000}}");
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ìöning}, year={2000}}",
+                importFormatPreferences);
         assertEquals("Ioen", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0, "auth3"), true));
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Òöning}, year={2000}}");
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Òöning}, year={2000}}",
+                importFormatPreferences);
         assertEquals("Ooen", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0, "auth3"), true));
 
-        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ùöning}, year={2000}}");
+        entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ùöning}, year={2000}}",
+                importFormatPreferences);
         assertEquals("Uoen", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry0, "auth3"), true));
     }
 
@@ -223,16 +247,17 @@ public class BibtexKeyPatternUtilTest {
 
     @Test
     public void testUniversity() {
-        BibEntry entry = BibtexParser.singleFromString("@ARTICLE{kohn, author={{Link{\\\"{o}}ping University}}}");
-        assertEquals("UniLinkoeping", BibtexKeyPatternUtil
-                .checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry, "auth"), true));
+        BibEntry entry = BibtexParser.singleFromString("@ARTICLE{kohn, author={{Link{\\\"{o}}ping University}}}",
+                importFormatPreferences);
+        assertEquals("UniLinkoeping", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry, "auth"), true));
     }
 
     @Test
     public void testDepartment() {
         BibEntry entry = BibtexParser
                 .singleFromString(
-                        "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, Department of Electrical Engineering}}}");
+                        "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, Department of Electrical Engineering}}}",
+                        importFormatPreferences);
         assertEquals("UniLinkoepingEE",
                 BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry, "auth"), true));
     }
@@ -240,7 +265,8 @@ public class BibtexKeyPatternUtilTest {
     @Test
     public void testSchool() {
         BibEntry entry = BibtexParser.singleFromString(
-                "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, School of Computer Engineering}}}");
+                "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, School of Computer Engineering}}}",
+                importFormatPreferences);
         assertEquals("UniLinkoepingCE",
                 BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry, "auth"), true));
     }
@@ -248,7 +274,8 @@ public class BibtexKeyPatternUtilTest {
     @Test
     public void testInstituteOfTechnology() {
         BibEntry entry = BibtexParser
-                .singleFromString("@ARTICLE{kohn, author={{Massachusetts Institute of Technology}}}");
+                .singleFromString("@ARTICLE{kohn, author={{Massachusetts Institute of Technology}}}",
+                        importFormatPreferences);
         assertEquals("MIT", BibtexKeyPatternUtil.checkLegalKey(BibtexKeyPatternUtil.makeLabel(entry, "auth"), true));
     }
 

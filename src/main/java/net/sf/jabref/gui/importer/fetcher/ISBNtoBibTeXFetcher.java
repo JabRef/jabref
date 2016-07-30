@@ -31,6 +31,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.help.HelpFile;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
@@ -101,7 +102,8 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
                 bibtexString = scan.useDelimiter("\\A").next();
             }
 
-            BibEntry entry = BibtexParser.singleFromString(bibtexString);
+            BibEntry entry = BibtexParser.singleFromString(bibtexString,
+                    ImportFormatPreferences.fromPreferences(Globals.prefs));
             if (entry != null) {
                 // Optionally add curly brackets around key words to keep the case
                 entry.getFieldOptional(FieldName.TITLE).ifPresent(title -> {

@@ -12,7 +12,7 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
-import net.sf.jabref.logic.importer.fileformat.RepecNepImporter;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -28,7 +28,7 @@ public class RepecNepImporterTest {
     @Before
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
-        testImporter = new RepecNepImporter();
+        testImporter = new RepecNepImporter(ImportFormatPreferences.fromPreferences(Globals.prefs));
     }
 
     @Test

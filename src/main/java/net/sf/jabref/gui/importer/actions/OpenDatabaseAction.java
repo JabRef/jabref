@@ -45,6 +45,7 @@ import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.exporter.AutoSaveManager;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexImporter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -351,7 +352,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
      */
     public static ParserResult loadDatabase(File fileToOpen, Charset defaultEncoding) throws IOException {
         // Open and parse file
-        ParserResult result = new BibtexImporter().importDatabase(fileToOpen.toPath(), defaultEncoding);
+        ParserResult result = new BibtexImporter(ImportFormatPreferences.fromPreferences(Globals.prefs))
+                .importDatabase(fileToOpen.toPath(), defaultEncoding);
 
         if (SpecialFieldsUtils.keywordSyncEnabled()) {
             NamedCompound compound = new NamedCompound("SpecialFieldSync");

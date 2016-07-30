@@ -98,6 +98,7 @@ import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.help.HelpFile;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
@@ -778,7 +779,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private boolean storeSource() {
-        BibtexParser bibtexParser = new BibtexParser(new StringReader(source.getText()));
+        BibtexParser bibtexParser = new BibtexParser(new StringReader(source.getText()),
+                ImportFormatPreferences.fromPreferences(Globals.prefs));
 
         try {
             ParserResult parserResult = bibtexParser.parse();

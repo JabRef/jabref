@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui.importer.fetcher;
+package net.sf.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -21,6 +21,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.net.URLDownload;
@@ -33,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
  * Convenience class for getting BibTeX entries from the BibSonomy scraper,
  * from an URL pointing to an entry.
  */
-class BibsonomyScraper {
+public class BibsonomyScraper {
 
     private static final String BIBSONOMY_SCRAPER = "http://scraper.bibsonomy.org/service?url=";
     private static final String BIBSONOMY_SCRAPER_POST = "&format=bibtex";
@@ -45,7 +46,7 @@ class BibsonomyScraper {
      * @param entryUrl
      * @return
      */
-    public static Optional<BibEntry> getEntry(String entryUrl) {
+    public static Optional<BibEntry> getEntry(String entryUrl, ImportFormatPreferences importFormatPreferences) {
         try {
             // Replace special characters by corresponding sequences:
             String cleanURL = entryUrl.replace("%", "%25").replace(":", "%3A").replace("/", "%2F").replace("?", "%3F")
@@ -53,7 +54,7 @@ class BibsonomyScraper {
 
             URL url = new URL(BibsonomyScraper.BIBSONOMY_SCRAPER + cleanURL + BibsonomyScraper.BIBSONOMY_SCRAPER_POST);
             String bibtex = new URLDownload(url).downloadToString(StandardCharsets.UTF_8);
-            BibtexParser bp = new BibtexParser(new StringReader(bibtex));
+            BibtexParser bp = new BibtexParser(new StringReader(bibtex), importFormatPreferences);
             ParserResult pr = bp.parse();
             if ((pr != null) && pr.getDatabase().hasEntries()) {
                 return Optional.of(pr.getDatabase().getEntries().iterator().next());

@@ -29,11 +29,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.bibtex.FieldContentParser;
-import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
 import net.sf.jabref.logic.exporter.SavePreferences;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
@@ -47,8 +46,6 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.preferences.JabRefPreferences;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -75,16 +72,16 @@ public class BibtexParser {
     private Map<String, EntryType> entryTypes;
     private boolean eof;
     private int line = 1;
-    private final FieldContentParser fieldContentParser = new FieldContentParser(
-            FieldContentParserPreferences.fromPreferences(Globals.prefs));
+    private final FieldContentParser fieldContentParser;
     private ParserResult parserResult;
     private static final Integer LOOKAHEAD = 64;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
+    private final ImportFormatPreferences importFormatPreferences;
 
-
-    public BibtexParser(Reader in) {
+    public BibtexParser(Reader in, ImportFormatPreferences importFormatPreferences) {
         Objects.requireNonNull(in);
-
+        this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
+        fieldContentParser = new FieldContentParser(importFormatPreferences.getFieldContentParserPreferences());
         pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
     }
 
@@ -94,8 +91,9 @@ public class BibtexParser {
      * @param in the Reader to read from
      * @throws IOException
      */
-    public static ParserResult parse(Reader in) throws IOException {
-        BibtexParser parser = new BibtexParser(in);
+    public static ParserResult parse(Reader in, ImportFormatPreferences importFormatPreferences)
+            throws IOException {
+        BibtexParser parser = new BibtexParser(in, importFormatPreferences);
         return parser.parse();
     }
 
@@ -106,9 +104,10 @@ public class BibtexParser {
      * @param bibtexString
      * @return Returns returns an empty collection if no entries where found or if an error occurred.
      */
-    public static List<BibEntry> fromString(String bibtexString) {
+    public static List<BibEntry> fromString(String bibtexString,
+            ImportFormatPreferences importFormatPreferences) {
         StringReader reader = new StringReader(bibtexString);
-        BibtexParser parser = new BibtexParser(reader);
+        BibtexParser parser = new BibtexParser(reader, importFormatPreferences);
 
         try {
             return parser.parse().getDatabase().getEntries();
@@ -126,8 +125,9 @@ public class BibtexParser {
      * @param bibtexString
      * @return The BibEntry or null if non was found or an error occurred.
      */
-    public static BibEntry singleFromString(String bibtexString) {
-        Collection<BibEntry> entries = BibtexParser.fromString(bibtexString);
+    public static BibEntry singleFromString(String bibtexString,
+            ImportFormatPreferences importFormatPreferences) {
+        Collection<BibEntry> entries = BibtexParser.fromString(bibtexString, importFormatPreferences);
         if ((entries == null) || entries.isEmpty()) {
             return null;
         }
@@ -568,7 +568,7 @@ public class BibtexParser {
                     entry.setField(key, entry.getFieldOptional(key).get() + " and " + content);
                 } else if (FieldName.KEYWORDS.equals(key)) {
                     //multiple keywords fields should be combined to one
-                    entry.addKeyword(content, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+                    entry.addKeyword(content, importFormatPreferences.getKeywordSeparator());
                 }
             } else {
                 entry.setField(key, content);

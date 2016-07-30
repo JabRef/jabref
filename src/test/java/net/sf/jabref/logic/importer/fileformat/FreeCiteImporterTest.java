@@ -3,7 +3,7 @@ package net.sf.jabref.logic.importer.fileformat;
 import java.util.Arrays;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.importer.fileformat.FreeCiteImporter;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
@@ -18,7 +18,7 @@ public class FreeCiteImporterTest {
     @Before
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
-        importer = new FreeCiteImporter();
+        importer = new FreeCiteImporter(ImportFormatPreferences.fromPreferences(Globals.prefs));
     }
 
     @Test

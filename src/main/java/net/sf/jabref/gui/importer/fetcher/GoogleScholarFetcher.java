@@ -35,6 +35,7 @@ import javax.swing.JPanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.FetcherPreviewDialog;
 import net.sf.jabref.logic.help.HelpFile;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.ParserResult;
@@ -267,7 +268,8 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     private BibEntry downloadEntry(String link) throws IOException {
         try {
             String s = new URLDownload(link).downloadToString(Globals.prefs.getDefaultEncoding());
-            BibtexParser bp = new BibtexParser(new StringReader(s));
+            BibtexParser bp = new BibtexParser(new StringReader(s),
+                    ImportFormatPreferences.fromPreferences(Globals.prefs));
             ParserResult pr = bp.parse();
             if ((pr != null) && (pr.getDatabase() != null)) {
                 Collection<BibEntry> entries = pr.getDatabase().getEntries();

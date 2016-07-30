@@ -21,7 +21,6 @@ import java.util.Optional;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.importer.EntryFromPDFCreator;
 import net.sf.jabref.logic.importer.ImportDataTest;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;

@@ -14,20 +14,22 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.gui.importer.fetcher;
+package net.sf.jabref.logic.importer.util;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibEntry;
 
-class DBLPHelper {
+public class DBLPHelper {
 
     private final DBLPQueryCleaner cleaner = new DBLPQueryCleaner();
     private static final String START_PATTERN = "<pre class=\"verbatim select-on-click\">";
     private static final String END_PATTERN = "</pre>";
 
+    private final ImportFormatPreferences importFormatPreferences;
 
     /*
      * This is a small helper class that cleans the user submitted query. Right
@@ -47,6 +49,10 @@ class DBLPHelper {
         }
     }
 
+
+    public DBLPHelper(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+    }
 
     /**
      *
@@ -78,7 +84,7 @@ class DBLPHelper {
         String entry1 = tmpStr.substring(startIdx + START_PATTERN.length(),
                 endIdx);
         entry1 = cleanEntry(entry1);
-        bibtexList.add(BibtexParser.singleFromString(entry1));
+        bibtexList.add(BibtexParser.singleFromString(entry1, importFormatPreferences));
 
         // let's see whether there is another entry (crossref)
         tmpStr = tmpStr
@@ -90,7 +96,7 @@ class DBLPHelper {
             String entry2 = tmpStr.substring(startIdx + START_PATTERN.length(),
                     endIdx);
             entry2 = cleanEntry(entry2);
-            bibtexList.add(BibtexParser.singleFromString(entry2));
+            bibtexList.add(BibtexParser.singleFromString(entry2, importFormatPreferences));
         }
 
         return bibtexList;

@@ -39,6 +39,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
@@ -57,6 +58,13 @@ import org.apache.commons.logging.LogFactory;
 public class FreeCiteImporter extends ImportFormat {
 
     private static final Log LOGGER = LogFactory.getLog(FreeCiteImporter.class);
+
+    private final ImportFormatPreferences importFormatPreferences;
+
+
+    public FreeCiteImporter(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+    }
 
     @Override
     public boolean isRecognizedFormat(BufferedReader reader) throws IOException {

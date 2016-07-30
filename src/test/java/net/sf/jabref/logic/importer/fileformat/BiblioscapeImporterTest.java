@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
