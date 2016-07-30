@@ -235,7 +235,7 @@ class LayoutEntry {
     private String handleOptionField(BibEntry bibtex, BibDatabase database) {
         String fieldEntry;
 
-        if ("bibtextype".equals(text)) {
+        if (BibEntry.TYPE_HEADER.equals(text) || "bibtextype".equals(text)) {
             fieldEntry = bibtex.getType();
         } else {
             // changed section begin - arudert

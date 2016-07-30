@@ -523,7 +523,7 @@ public class BibDatabase {
      */
     public static Optional<String> getResolvedField(String field, BibEntry entry, BibDatabase database) {
         Objects.requireNonNull(entry, "entry cannot be null");
-        if ("bibtextype".equals(field)) {
+        if (BibEntry.TYPE_HEADER.equals(field) || "bibtextype".equals(field)) {
             return Optional.of(EntryUtil.capitalizeFirst(entry.getType()));
         }
 

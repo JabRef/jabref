@@ -3,7 +3,7 @@
 	<td>\format[HTMLChars]{\title} <p class="infolinks">\begin{abstract}[<a href="javascript:toggleInfo('\format{\bibtexkey}','abstract')">Abstract</a>] \end{abstract}\begin{review}[<a href="javascript:toggleInfo('\format{\bibtexkey}','review')">Review</a>] \end{review}[<a href="javascript:toggleInfo('\format{\bibtexkey}','bibtex')">BibTeX</a>]</p></td>
 	<td>\year</td>
 	<td>\format[HTMLChars]{\journal}\begin{volume}<br/>Vol. \volume\end{volume}\begin{number}(\format[FormatPagesForHTML]{\number})\end{number}\format[HTMLChars]{\booktitle}\begin{pages}, pp. \format[FormatPagesForHTML]{\pages}\end{pages}\begin{school}<i>School</i>: \format[HTMLChars]{\school}\end{school}\begin{howpublished}\format[HTMLChars]{\howpublished}\end{howpublished}&nbsp;</td>
-	<td>\format[ToLowerCase]{\bibtextype}</td>
+	<td>\format[ToLowerCase]{\entrytype}</td>
 	<td>\begin{doi}<a href="\format[DOICheck]{\doi}">DOI</a> \end{doi}\begin{url}<a href="\format{\url}">URL</a>\end{url}&nbsp;</td>
 </tr>\begin{abstract}
 <tr id="abs_\format{\bibtexkey}" class="abstract noshow">
@@ -15,7 +15,7 @@
 <tr id="bib_\format{\bibtexkey}" class="bibtex noshow">
 <td colspan="6"><b>BibTeX</b>:
 <pre>
-@\format[ToLowerCase]{\bibtextype}{\bibtexkey,\begin{author}
+@\format[ToLowerCase]{\entrytype}{\bibtexkey,\begin{author}
   author = {\format[HTMLChars]{\author}}\end{author}\begin{title},
   title = {\format[HTMLChars]{\title}}\end{title}\begin{booktitle},
   booktitle = {\format[HTMLChars]{\booktitle}}\end{booktitle}\begin{journal},
