@@ -1,7 +1,7 @@
 /**
  * License: GPLv2, but Jan Frederik Maas agreed to change license upon request
  */
-package net.sf.jabref.gui.importer.fetcher;
+package net.sf.jabref.logic.importer.util;
 
 import java.io.IOException;
 import java.io.InputStream;

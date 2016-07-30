@@ -1,4 +1,4 @@
-package net.sf.jabref.gui.importer.fetcher;
+package net.sf.jabref.logic.importer.fetcher;
 
 import java.util.Locale;
 import java.util.Objects;

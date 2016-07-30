@@ -1,4 +1,4 @@
-package net.sf.jabref.gui.importer.fetcher;
+package net.sf.jabref.logic.importer.util;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -10,7 +10,6 @@ import java.util.Optional;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.importer.fetcher.GVKParser;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;

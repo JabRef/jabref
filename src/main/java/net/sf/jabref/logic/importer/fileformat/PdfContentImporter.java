@@ -28,8 +28,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.gui.importer.fetcher.DOItoBibTeXFetcher;
 import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fetcher.DOItoBibTeX;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
@@ -53,8 +53,6 @@ import org.apache.pdfbox.util.PDFTextStripper;
 public class PdfContentImporter extends ImportFormat {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
-    // we can store the DOItoBibTeXFetcher as single reference as the fetcher doesn't hold internal state
-    private static final DOItoBibTeXFetcher DOI_TO_BIBTEX_FETCHER = new DOItoBibTeXFetcher();
 
     // input lines into several lines
     private String[] lines;
@@ -216,7 +214,7 @@ public class PdfContentImporter extends ImportFormat {
             Optional<DOI> doi = DOI.findInText(firstPageContents);
             if (doi.isPresent()) {
                 ParserResult parserResult = new ParserResult(result);
-                Optional<BibEntry> entry = DOI_TO_BIBTEX_FETCHER.getEntryFromDOI(doi.get().getDOI(), parserResult);
+                Optional<BibEntry> entry = DOItoBibTeX.getEntryFromDOI(doi.get().getDOI(), parserResult);
                 entry.ifPresent(parserResult.getDatabase()::insertEntry);
                 return parserResult;
             }

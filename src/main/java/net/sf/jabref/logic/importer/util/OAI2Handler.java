@@ -121,4 +121,10 @@ public class OAI2Handler extends DefaultHandler {
         entry.setField(FieldName.AUTHOR, authors.toString());
     }
 
+    public static String correctLineBreaks(String s) {
+        String result = s.replaceAll("\\n(?!\\s*\\n)", " ");
+        result = result.replaceAll("\\s*\\n\\s*", "\n");
+        return result.replaceAll(" {2,}", " ").replaceAll("(^\\s*|\\s+$)", "");
+    }
+
 }

@@ -7,7 +7,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import net.sf.jabref.gui.importer.fetcher.OAI2Fetcher;
 import net.sf.jabref.logic.importer.util.OAI2Handler;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -46,11 +45,11 @@ public class OAI2HandlerFetcherTest {
 
     @Test
     public void testCorrectLineBreaks() {
-        Assert.assertEquals("Test this", OAI2Fetcher.correctLineBreaks("Test\nthis"));
-        Assert.assertEquals("Test this", OAI2Fetcher.correctLineBreaks("Test \n this"));
-        Assert.assertEquals("Test\nthis", OAI2Fetcher.correctLineBreaks("Test\n\nthis"));
-        Assert.assertEquals("Test\nthis", OAI2Fetcher.correctLineBreaks("Test\n    \nthis"));
-        Assert.assertEquals("Test\nthis", OAI2Fetcher.correctLineBreaks("  Test   \n   \n   this  "));
+        Assert.assertEquals("Test this", OAI2Handler.correctLineBreaks("Test\nthis"));
+        Assert.assertEquals("Test this", OAI2Handler.correctLineBreaks("Test \n this"));
+        Assert.assertEquals("Test\nthis", OAI2Handler.correctLineBreaks("Test\n\nthis"));
+        Assert.assertEquals("Test\nthis", OAI2Handler.correctLineBreaks("Test\n    \nthis"));
+        Assert.assertEquals("Test\nthis", OAI2Handler.correctLineBreaks("  Test   \n   \n   this  "));
     }
 
     @Test

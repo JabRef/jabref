@@ -8,7 +8,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.importer.ImportFormatReader;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;

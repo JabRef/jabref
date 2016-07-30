@@ -43,24 +43,7 @@ public class ImportInspectionCommandLine implements ImportInspector {
     }
 
 
-    private final OutputPrinter status = new OutputPrinter() {
-
-        @Override
-        public void setStatus(String s) {
-            System.out.println(s);
-        }
-
-        @Override
-        public void showMessage(Object message, String title, int msgType) {
-            System.out.println(title + ": " + message);
-        }
-
-        @Override
-        public void showMessage(String message) {
-            System.out.println(message);
-        }
-    };
-
+    private final OutputPrinter status = new SystemOutputPrinter();
 
     public Collection<BibEntry> query(String query, EntryFetcher fetcher) {
         entries.clear();

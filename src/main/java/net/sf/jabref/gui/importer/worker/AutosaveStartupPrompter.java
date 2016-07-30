@@ -28,10 +28,10 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.ParserResultWarningDialog;
-import net.sf.jabref.gui.exporter.AutoSaveManager;
-import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
+import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.io.AutoSaveUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
@@ -70,12 +70,13 @@ public class AutosaveStartupPrompter implements Runnable {
             }
 
             if (tryingAutosave) {
-                fileToLoad = AutoSaveManager.getAutoSaveFile(file);
+                fileToLoad = AutoSaveUtil.getAutoSaveFile(file);
             }
             boolean done = false;
             ParserResult pr;
             do {
-                pr = OpenDatabaseAction.loadDatabaseOrAutoSave(fileToLoad.getPath(), true);
+                pr = OpenDatabase.loadDatabaseOrAutoSave(fileToLoad.getPath(), true,
+                        Globals.prefs.getDefaultEncoding());
                 if (pr.isInvalid()) {
                     loaded.add(pr);
                     BibDatabaseContext databaseContext = pr.getDatabaseContext();

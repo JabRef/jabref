@@ -46,6 +46,7 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

@@ -42,22 +42,17 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.ParserResultWarningDialog;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.gui.exporter.AutoSaveManager;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
-import net.sf.jabref.logic.importer.fileformat.BibtexImporter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.io.AutoSaveUtil;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.migrations.FileLinksUpgradeWarning;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -65,7 +60,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class OpenDatabaseAction extends MnemonicAwareAction {
 
-    private static final Log LOGGER = LogFactory.getLog(OpenDatabaseAction.class);
+    public static final Log LOGGER = LogFactory.getLog(OpenDatabaseAction.class);
 
     private final boolean showDialog;
     private final JabRefFrame frame;
@@ -199,11 +194,11 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             File fileToLoad = file;
             frame.output(Localization.lang("Opening") + ": '" + file.getPath() + "'");
             boolean tryingAutosave = false;
-            boolean autoSaveFound = AutoSaveManager.newerAutoSaveExists(file);
+            boolean autoSaveFound = AutoSaveUtil.newerAutoSaveExists(file);
             if (autoSaveFound && !Globals.prefs.getBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE)) {
                 // We have found a newer autosave, and the preferences say we should load
                 // it without prompting, so we replace the fileToLoad:
-                fileToLoad = AutoSaveManager.getAutoSaveFile(file);
+                fileToLoad = AutoSaveUtil.getAutoSaveFile(file);
                 tryingAutosave = true;
             } else if (autoSaveFound) {
                 // We have found a newer autosave, but we are not allowed to use it without
@@ -220,7 +215,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                                         + "</html>",
                                 Localization.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
-                    fileToLoad = AutoSaveManager.getAutoSaveFile(file);
+                    fileToLoad = AutoSaveUtil.getAutoSaveFile(file);
                     tryingAutosave = true;
                 }
             }
@@ -260,7 +255,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 ParserResult result;
                 String errorMessage = null;
                 try {
-                    result = OpenDatabaseAction.loadDatabase(fileToLoad, encoding);
+                    result = OpenDatabase.loadDatabase(fileToLoad, encoding);
                 } catch (IOException ex) {
                     LOGGER.error("Error loading database " + fileToLoad, ex);
                     result = ParserResult.getNullResult();
@@ -347,82 +342,4 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         return basePanel;
     }
 
-    /**
-     * Opens a new database.
-     */
-    public static ParserResult loadDatabase(File fileToOpen, Charset defaultEncoding) throws IOException {
-        // Open and parse file
-        ParserResult result = new BibtexImporter(ImportFormatPreferences.fromPreferences(Globals.prefs))
-                .importDatabase(fileToOpen.toPath(), defaultEncoding);
-
-        if (SpecialFieldsUtils.keywordSyncEnabled()) {
-            NamedCompound compound = new NamedCompound("SpecialFieldSync");
-            for (BibEntry entry : result.getDatabase().getEntries()) {
-                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
-            }
-            LOGGER.debug("Synchronized special fields based on keywords");
-        }
-
-        return result;
-    }
-
-    /**
-     * Load database (bib-file) or, if there exists, a newer autosave version, unless the flag is set to ignore the autosave
-     *
-     * @param name Name of the BIB-file to open
-     * @param ignoreAutosave true if autosave version of the file should be ignored
-     * @return ParserResult which never is null
-     */
-
-    public static ParserResult loadDatabaseOrAutoSave(String name, boolean ignoreAutosave) {
-        // String in OpenDatabaseAction.java
-        LOGGER.info("Opening: " + name);
-        File file = new File(name);
-        if (!file.exists()) {
-            ParserResult pr = new ParserResult(null, null, null);
-            pr.setFile(file);
-            pr.setInvalid(true);
-            LOGGER.error(Localization.lang("Error") + ": " + Localization.lang("File not found"));
-            return pr;
-
-        }
-        try {
-
-            if (!ignoreAutosave) {
-                boolean autoSaveFound = AutoSaveManager.newerAutoSaveExists(file);
-                if (autoSaveFound) {
-                    // We have found a newer autosave. Make a note of this, so it can be
-                    // handled after startup:
-                    ParserResult postp = new ParserResult(null, null, null);
-                    postp.setPostponedAutosaveFound(true);
-                    postp.setFile(file);
-                    return postp;
-                }
-            }
-
-            if (!FileBasedLock.waitForFileLock(file.toPath(), 10)) {
-                LOGGER.error(Localization.lang("Error opening file") + " '" + name + "'. "
-                        + "File is locked by another JabRef instance.");
-                return ParserResult.getNullResult();
-            }
-
-            Charset encoding = Globals.prefs.getDefaultEncoding();
-            ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);
-            pr.setFile(file);
-            if (pr.hasWarnings()) {
-                for (String aWarn : pr.warnings()) {
-                    LOGGER.warn(aWarn);
-                }
-            }
-            return pr;
-        } catch (Throwable ex) {
-            ParserResult pr = new ParserResult(null, null, null);
-            pr.setFile(file);
-            pr.setInvalid(true);
-            pr.setErrorMessage(ex.getMessage());
-            LOGGER.info("Problem opening .bib-file", ex);
-            return pr;
-        }
-
-    }
 }

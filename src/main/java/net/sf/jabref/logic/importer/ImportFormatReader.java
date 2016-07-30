@@ -24,7 +24,6 @@ import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.importer.fileformat.BibTeXMLImporter;
 import net.sf.jabref.logic.importer.fileformat.BiblioscapeImporter;
 import net.sf.jabref.logic.importer.fileformat.BibtexImporter;
@@ -67,8 +66,8 @@ public class ImportFormatReader {
     private ImportFormatPreferences importFormatPreferences;
 
 
-    public void resetImportFormats(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+    public void resetImportFormats(ImportFormatPreferences newImportFormatPreferences) {
+        this.importFormatPreferences = newImportFormatPreferences;
 
         formats.clear();
 
@@ -205,9 +204,8 @@ public class ImportFormatReader {
             if (parserResult.getDatabase().hasEntries() || !parserResult.getDatabase().hasNoStrings()) {
                 parserResult.setFile(filePath.toFile());
                 if (SpecialFieldsUtils.keywordSyncEnabled()) {
-                    NamedCompound compound = new NamedCompound("SpecialFieldSync");
                     for (BibEntry entry : parserResult.getDatabase().getEntries()) {
-                        SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
+                        SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, null);
                     }
                     LOGGER.debug("Synchronized special fields based on keywords");
                 }

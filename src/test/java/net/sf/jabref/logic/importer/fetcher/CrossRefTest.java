@@ -1,9 +1,8 @@
-package net.sf.jabref.gui.importer.fetcher;
+package net.sf.jabref.logic.importer.fetcher;
 
 import java.util.Locale;
 import java.util.Optional;
 
-import net.sf.jabref.gui.importer.fetcher.CrossRef;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Test;

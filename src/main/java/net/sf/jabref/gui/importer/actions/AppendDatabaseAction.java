@@ -38,6 +38,7 @@ import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.ExplicitGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
@@ -108,9 +109,9 @@ public class AppendDatabaseAction implements BaseAction {
                 Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
                 Charset encoding = Globals.prefs.getDefaultEncoding();
-                ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);
-                AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings, importGroups,
-                        importSelectorWords);
+                ParserResult pr = OpenDatabase.loadDatabase(file, encoding);
+                AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings,
+                        importGroups, importSelectorWords);
                 panel.output(Localization.lang("Imported from database") + " '" + file.getPath() + "'");
             } catch (IOException | KeyCollisionException ex) {
                 LOGGER.warn("Could not open database", ex);

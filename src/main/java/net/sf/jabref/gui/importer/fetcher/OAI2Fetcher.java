@@ -165,12 +165,6 @@ public class OAI2Fetcher implements EntryFetcher {
         return resultingKey;
     }
 
-    public static String correctLineBreaks(String s) {
-        String result = s.replaceAll("\\n(?!\\s*\\n)", " ");
-        result = result.replaceAll("\\s*\\n\\s*", "\n");
-        return result.replaceAll(" {2,}", " ").replaceAll("(^\\s*|\\s+$)", "");
-    }
-
     /**
      * Import an entry from an OAI2 archive. The BibEntry provided has to
      * have the field OAI2_IDENTIFIER_FIELD set to the search string.
@@ -205,7 +199,7 @@ public class OAI2Fetcher implements EntryFetcher {
                 /* Correct line breaks and spacing */
                 for (String name : be.getFieldNames()) {
                     be.getFieldOptional(name)
-                            .ifPresent(content -> be.setField(name, OAI2Fetcher.correctLineBreaks(content)));
+                            .ifPresent(content -> be.setField(name, OAI2Handler.correctLineBreaks(content)));
                 }
 
                 if (fixedKey.matches("\\d\\d\\d\\d\\..*")) {

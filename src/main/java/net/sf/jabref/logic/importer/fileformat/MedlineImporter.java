@@ -33,6 +33,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.medline.Abstract;
 import net.sf.jabref.logic.importer.fileformat.medline.AbstractText;
 import net.sf.jabref.logic.importer.fileformat.medline.AffiliationInfo;
@@ -77,7 +78,6 @@ import net.sf.jabref.logic.importer.fileformat.medline.QualifierName;
 import net.sf.jabref.logic.importer.fileformat.medline.Section;
 import net.sf.jabref.logic.importer.fileformat.medline.Sections;
 import net.sf.jabref.logic.importer.fileformat.medline.Text;
-import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
