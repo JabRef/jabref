@@ -3,8 +3,8 @@ package net.sf.jabref;
 import java.io.IOException;
 import java.io.StringReader;
 
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 

@@ -40,7 +40,7 @@ import javax.swing.table.TableModel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
 
 import ca.odell.glazedlists.BasicEventList;

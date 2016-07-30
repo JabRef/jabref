@@ -8,8 +8,8 @@ import java.util.Collections;
 import java.util.Optional;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.IdGenerator;

@@ -39,7 +39,11 @@ import java.util.TreeSet;
 
 import javax.xml.transform.TransformerException;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.TypedBibEntry;
+import net.sf.jabref.logic.bibtex.BibEntryWriter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.Author;

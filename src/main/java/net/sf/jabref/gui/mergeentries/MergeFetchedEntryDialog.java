@@ -24,6 +24,7 @@ import javax.swing.JDialog;
 import javax.swing.JSeparator;
 
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.importer.fetcher.DOItoBibTeXFetcher;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableChangeType;
 import net.sf.jabref.gui.undo.UndoableFieldChange;

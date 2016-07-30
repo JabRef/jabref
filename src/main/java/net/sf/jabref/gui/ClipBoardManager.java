@@ -34,8 +34,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
-import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.gui.importer.fetcher.DOItoBibTeXFetcher;
+import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;

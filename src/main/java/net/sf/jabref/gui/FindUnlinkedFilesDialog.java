@@ -79,17 +79,17 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.importer.EntryFromFileCreator;
-import net.sf.jabref.importer.EntryFromFileCreatorManager;
-import net.sf.jabref.importer.UnlinkedFilesCrawler;
-import net.sf.jabref.importer.UnlinkedPDFFileFilter;
+import net.sf.jabref.gui.importer.EntryFromFileCreator;
+import net.sf.jabref.gui.importer.EntryFromFileCreatorManager;
+import net.sf.jabref.gui.importer.UnlinkedFilesCrawler;
+import net.sf.jabref.gui.importer.UnlinkedPDFFileFilter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -121,7 +121,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
     private static final String GLOBAL_PREFS_DIALOG_SIZE_KEY = "findUnlinkedFilesDialogSize";
     private JabRefFrame frame;
-    private BibDatabase database;
+    private BibDatabaseContext databaseContext;
     private EntryFromFileCreatorManager creatorManager;
 
     private UnlinkedFilesCrawler crawler;
@@ -195,9 +195,9 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
         restoreSizeOfDialog();
 
-        database = panel.getDatabase();
+        databaseContext = panel.getDatabaseContext();
         creatorManager = new EntryFromFileCreatorManager();
-        crawler = new UnlinkedFilesCrawler(database);
+        crawler = new UnlinkedFilesCrawler(databaseContext);
 
         lastSelectedDirectory = loadLastSelectedDirectory();
 
@@ -521,7 +521,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
         threadState.set(true);
         JabRefExecutorService.INSTANCE.execute(() -> {
-            UnlinkedPDFFileFilter unlinkedPDFFileFilter = new UnlinkedPDFFileFilter(selectedFileFilter, database);
+            UnlinkedPDFFileFilter unlinkedPDFFileFilter = new UnlinkedPDFFileFilter(selectedFileFilter,
+                    databaseContext);
             CheckableTreeNode rootNode = crawler.searchDirectory(dir.toFile(), unlinkedPDFFileFilter, threadState,
                     new ChangeListener() {
 
@@ -583,8 +584,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
         threadState.set(true);
         JabRefExecutorService.INSTANCE.execute(() -> {
             List<String> errors = new LinkedList<>();
-            creatorManager.addEntriesFromFiles(fileList, database, frame.getCurrentBasePanel(), entryType,
-                    checkBoxWhyIsThereNoGetSelectedStupidSwing, new ChangeListener() {
+            creatorManager.addEntriesFromFiles(fileList, databaseContext.getDatabase(), frame.getCurrentBasePanel(),
+                    entryType, checkBoxWhyIsThereNoGetSelectedStupidSwing, new ChangeListener() {
 
                         int counter;
 

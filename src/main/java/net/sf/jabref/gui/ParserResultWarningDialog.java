@@ -23,7 +23,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
-import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**

@@ -12,9 +12,6 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
@@ -22,6 +19,14 @@ import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.ExplicitGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.logic.groups.GroupTreeNode;
+<<<<<<< ad6b5cc1ff518ac2366c3f82810b7a7f24cc7ed6
+=======
+import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.importer.fileformat.ImportFormat;
+import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
+import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
+>>>>>>> Refactored importer and split into logic and gui
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;

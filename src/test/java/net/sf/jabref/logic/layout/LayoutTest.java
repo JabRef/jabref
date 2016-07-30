@@ -5,8 +5,8 @@ import java.io.StringReader;
 import java.util.Collection;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;

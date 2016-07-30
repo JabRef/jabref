@@ -33,10 +33,10 @@ import java.util.Vector;
 
 import net.sf.jabref.event.GroupUpdatedEvent;
 import net.sf.jabref.event.MetaDataChangedEvent;
-import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.logic.util.OS;

@@ -15,7 +15,13 @@ import java.util.stream.Stream;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
+<<<<<<< ad6b5cc1ff518ac2366c3f82810b7a7f24cc7ed6
 import net.sf.jabref.importer.fileformat.BibtexImporter;
+=======
+import net.sf.jabref.MetaData;
+import net.sf.jabref.logic.importer.fileformat.BibtexImporter;
+import net.sf.jabref.model.database.BibDatabase;
+>>>>>>> Refactored importer and split into logic and gui
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 

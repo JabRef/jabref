@@ -13,9 +13,9 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.importer.fileformat.ImportFormat;
+import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
