@@ -54,6 +54,7 @@ import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.openoffice.OOBibStyle;
 import net.sf.jabref.logic.openoffice.OOPreFormatter;
 import net.sf.jabref.logic.openoffice.OOUtil;
+import net.sf.jabref.logic.openoffice.UndefinedBibtexEntry;
 import net.sf.jabref.logic.openoffice.UndefinedParagraphFormatException;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -229,8 +230,8 @@ class OOBibBase {
     }
 
     private XDesktop simpleBootstrap(String pathToExecutable)
-            throws IOException, IllegalAccessException, InvocationTargetException, BootstrapException,
-            CreationException {
+            throws IllegalAccessException, InvocationTargetException, BootstrapException,
+            CreationException, IOException {
 
         ClassLoader loader = ClassLoader.getSystemClassLoader();
         if (loader instanceof URLClassLoader) {
@@ -306,9 +307,7 @@ class OOBibBase {
     }
 
     public void updateSortedReferenceMarks() throws WrappedTargetException, NoSuchElementException {
-        XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, xCurrentComponent);
-        XNameAccess nameAccess = supplier.getReferenceMarks();
-        sortedReferenceMarks = getSortedReferenceMarks(nameAccess);
+        sortedReferenceMarks = getSortedReferenceMarks(getReferenceMarks());
     }
 
     /**
@@ -444,10 +443,6 @@ class OOBibBase {
         }
     }
 
-    public XNameAccess getReferenceMarks() {
-        XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, xCurrentComponent);
-        return supplier.getReferenceMarks();
-    }
 
     public List<String> getJabRefReferenceMarks(XNameAccess nameAccess) {
         String[] names = nameAccess.getElementNames();
@@ -465,7 +460,7 @@ class OOBibBase {
 
     private List<String> refreshCiteMarkersInternal(List<BibDatabase> databases, OOBibStyle style)
             throws WrappedTargetException, IllegalArgumentException, NoSuchElementException,
-            UndefinedCharacterFormatException, UnknownPropertyException, PropertyVetoException, IOException,
+            UndefinedCharacterFormatException, UnknownPropertyException, PropertyVetoException,
             CreationException, BibEntryNotFoundException {
 
         List<String> cited = findCitedKeys();
@@ -827,9 +822,13 @@ class OOBibBase {
         populateBibTextSection(entries, style);
     }
 
-    private String getUniqueReferenceMarkName(String bibtexKey, int type) {
+    public XNameAccess getReferenceMarks() {
         XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, xCurrentComponent);
-        XNameAccess xNamedRefMarks = supplier.getReferenceMarks();
+        return supplier.getReferenceMarks();
+    }
+
+    private String getUniqueReferenceMarkName(String bibtexKey, int type) {
+        XNameAccess xNamedRefMarks = getReferenceMarks();
         int i = 0;
         String name = OOBibBase.BIB_CITATION + '_' + type + '_' + bibtexKey;
         while (xNamedRefMarks.hasByName(name)) {
@@ -862,9 +861,7 @@ class OOBibBase {
     }
 
     private List<String> findCitedKeys() throws NoSuchElementException, WrappedTargetException {
-
-        XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, xCurrentComponent);
-        XNameAccess xNamedMarks = supplier.getReferenceMarks();
+        XNameAccess xNamedMarks = getReferenceMarks();
         String[] names = xNamedMarks.getElementNames();
         List<String> keys = new ArrayList<>();
         for (String name1 : names) {
@@ -1037,7 +1034,7 @@ class OOBibBase {
     }
 
     private void createBibTextSection2(boolean end)
-            throws IOException, IllegalArgumentException, CreationException {
+            throws IllegalArgumentException, CreationException {
 
         XTextCursor mxDocCursor = text.createTextCursor();
         if (end) {
@@ -1060,8 +1057,8 @@ class OOBibBase {
 
     }
 
-    private void clearBibTextSectionContent2() throws IOException, NoSuchElementException, WrappedTargetException,
-            IllegalArgumentException, CreationException {
+    private void clearBibTextSectionContent2()
+            throws NoSuchElementException, WrappedTargetException, IllegalArgumentException, CreationException {
 
         // Check if the section exists:
         XTextSectionsSupplier supp = UnoRuntime.queryInterface(XTextSectionsSupplier.class, mxDoc);
@@ -1078,7 +1075,7 @@ class OOBibBase {
     }
 
     private void populateBibTextSection(Map<BibEntry, BibDatabase> entries, OOBibStyle style)
-            throws IOException, NoSuchElementException, WrappedTargetException, PropertyVetoException,
+            throws NoSuchElementException, WrappedTargetException, PropertyVetoException,
             UnknownPropertyException, UndefinedParagraphFormatException, IllegalArgumentException, CreationException {
         XTextSectionsSupplier supp = UnoRuntime.queryInterface(XTextSectionsSupplier.class, mxDoc);
         XTextSection section = (XTextSection) ((Any) supp.getTextSections().getByName(OOBibBase.BIB_SECTION_NAME))
@@ -1112,7 +1109,7 @@ class OOBibBase {
     }
 
     private void insertReferenceMark(String name, String citationText, XTextCursor position, boolean withText,
-            OOBibStyle style) throws IOException, UnknownPropertyException, WrappedTargetException,
+            OOBibStyle style) throws UnknownPropertyException, WrappedTargetException,
             PropertyVetoException, IllegalArgumentException, UndefinedCharacterFormatException, CreationException {
 
         // Check if there is "page info" stored for this citation. If so, insert it into
@@ -1188,9 +1185,9 @@ class OOBibBase {
     }
 
     private void removeReferenceMark(String name) throws NoSuchElementException, WrappedTargetException {
-        XReferenceMarksSupplier xSupplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, xCurrentComponent);
-        if (xSupplier.getReferenceMarks().hasByName(name)) {
-            Object o = xSupplier.getReferenceMarks().getByName(name);
+        XNameAccess nameAccess = getReferenceMarks();
+        if (nameAccess.hasByName(name)) {
+            Object o = nameAccess.getByName(name);
             XTextContent bm = UnoRuntime.queryInterface(XTextContent.class, o);
             text.removeTextContent(bm);
         }
@@ -1204,9 +1201,7 @@ class OOBibBase {
      * @throws NoSuchElementException
      */
     private XTextRange getBookmarkRange(String name) throws NoSuchElementException, WrappedTargetException {
-        // query XBookmarksSupplier from document model and get bookmarks collection
-        XBookmarksSupplier xBookmarksSupplier = UnoRuntime.queryInterface(XBookmarksSupplier.class, xCurrentComponent);
-        XNameAccess xNamedBookmarks = xBookmarksSupplier.getBookmarks();
+        XNameAccess xNamedBookmarks = getBookmarks();
 
         // retrieve bookmark by name
         if (!xNamedBookmarks.hasByName(name)) {
@@ -1217,12 +1212,18 @@ class OOBibBase {
         return xFoundBookmark.getAnchor();
     }
 
+    private XNameAccess getBookmarks() {
+        // query XBookmarksSupplier from document model and get bookmarks collection
+        XBookmarksSupplier xBookmarksSupplier = UnoRuntime.queryInterface(XBookmarksSupplier.class, xCurrentComponent);
+        XNameAccess xNamedBookmarks = xBookmarksSupplier.getBookmarks();
+        return xNamedBookmarks;
+    }
+
     public void combineCiteMarkers(List<BibDatabase> databases, OOBibStyle style)
             throws IOException, WrappedTargetException, NoSuchElementException, IllegalArgumentException,
             UndefinedCharacterFormatException, UnknownPropertyException, PropertyVetoException, CreationException,
             BibEntryNotFoundException {
-        XReferenceMarksSupplier supplier = UnoRuntime.queryInterface(XReferenceMarksSupplier.class, xCurrentComponent);
-        XNameAccess nameAccess = supplier.getReferenceMarks();
+        XNameAccess nameAccess = getReferenceMarks();
         // TODO: doesn't work for citations in footnotes/tables
         List<String> names = getSortedReferenceMarks(nameAccess);
 

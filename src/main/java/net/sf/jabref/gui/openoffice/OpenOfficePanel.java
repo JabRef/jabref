@@ -16,6 +16,7 @@
 package net.sf.jabref.gui.openoffice;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -106,7 +107,7 @@ public class OpenOfficePanel extends AbstractWorker {
     private final JButton update;
     private final JButton merge = new JButton(Localization.lang("Merge citations"));
     private final JButton manageCitations = new JButton(Localization.lang("Manage citations"));
-    private final JButton exportCitations = new JButton(Localization.lang("Generate new BIB database"));
+    private final JButton exportCitations = new JButton(Localization.lang("Export cited"));
     private final JButton settingsB = new JButton(Localization.lang("Settings"));
     private final JButton help = new HelpAction(Localization.lang("OpenOffice/LibreOffice integration"),
             HelpFile.OPENOFFICE_LIBREOFFICE).getHelpButton();
@@ -132,10 +133,15 @@ public class OpenOfficePanel extends AbstractWorker {
         manualConnect = new JButton(connectImage);
         connect.setToolTipText(Localization.lang("Connect"));
         manualConnect.setToolTipText(Localization.lang("Manual connect"));
+        connect.setPreferredSize(new Dimension(24, 24));
+        manualConnect.setPreferredSize(new Dimension(24, 24));
+
         selectDocument = new JButton(IconTheme.JabRefIcon.OPEN.getSmallIcon());
         selectDocument.setToolTipText(Localization.lang("Select Writer document"));
+        selectDocument.setPreferredSize(new Dimension(24, 24));
         update = new JButton(IconTheme.JabRefIcon.REFRESH.getSmallIcon());
         update.setToolTipText(Localization.lang("Sync OpenOffice/LibreOffice bibliography"));
+        update.setPreferredSize(new Dimension(24, 24));
         preferences = new OpenOfficePreferences(Globals.prefs);
         loader = new StyleLoader(preferences,
                 LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader),
@@ -311,8 +317,9 @@ public class OpenOfficePanel extends AbstractWorker {
                 .layout(new FormLayout("fill:pref:grow", "p,p,p,p,p,p,p,p,p,p,p"));
 
         FormBuilder topRowBuilder = FormBuilder.create()
-                .layout(new FormLayout("fill:pref:grow, 1dlu, fill:pref:grow, 1dlu, fill:pref:grow, "
-                        + "1dlu, fill:pref:grow, 1dlu, fill:pref:grow", "pref"));
+                .layout(new FormLayout(
+                        "fill:pref:grow, 1dlu, fill:pref:grow, 1dlu, fill:pref:grow, 1dlu, fill:pref:grow, 1dlu, fill:pref",
+                        "pref"));
         topRowBuilder.add(connect).xy(1, 1);
         topRowBuilder.add(manualConnect).xy(3, 1);
         topRowBuilder.add(selectDocument).xy(5, 1);
@@ -403,11 +410,11 @@ public class OpenOfficePanel extends AbstractWorker {
                 autoDetected = true;
                 dialogOkPressed = true;
                 diag.dispose();
-            } else if (!adp.canceled()) {
+            } else if (adp.canceled()) {
+                frame.setStatus(Localization.lang("Operation canceled."));
+            } else {
                 JOptionPane.showMessageDialog(diag, Localization.lang("Autodetection failed"),
                         Localization.lang("Autodetection failed"), JOptionPane.ERROR_MESSAGE);
-            } else {
-                frame.setStatus(Localization.lang("Operation canceled."));
             }
             if (!autoDetected) {
                 return;
