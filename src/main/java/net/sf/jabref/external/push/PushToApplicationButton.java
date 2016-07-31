@@ -63,7 +63,7 @@ public class PushToApplicationButton implements ActionListener {
     private final List<PushToApplication> pushActions;
     private JPanel comp;
     private JButton pushButton;
-    private int selected;
+    private PushToApplication toApp;
     private JPopupMenu popup;
     private final Map<PushToApplication, PushToApplicationAction> actions = new HashMap<>();
     private final Dimension buttonDim = new Dimension(23, 23);
@@ -104,14 +104,19 @@ public class PushToApplicationButton implements ActionListener {
 
         // Set the last used external application
         String appSelected = Globals.prefs.get(JabRefPreferences.PUSH_TO_APPLICATION);
-        for (int i = 0; i < pushActions.size(); i++) {
-            if (pushActions.get(i).getApplicationName().equals(appSelected)) {
-                selected = i;
+        for (PushToApplication application : pushActions) {
+            if (application.getApplicationName().equals(appSelected)) {
+                toApp = application;
                 break;
             }
         }
 
-        setSelected(selected);
+        if (toApp == null) {
+            // Nothing found, pick first
+            toApp = pushActions.get(0);
+        }
+
+        setSelected();
         pushButton.addActionListener(this);
         pushButton.addMouseListener(new PushButtonMouseListener());
         pushButton.setOpaque(false);
@@ -123,7 +128,6 @@ public class PushToApplicationButton implements ActionListener {
 
         optPopup.add(settings);
         settings.addActionListener(event -> {
-            PushToApplication toApp = pushActions.get(selected);
             JPanel options = toApp.getSettingsPanel();
             if (options != null) {
                 PushToApplicationButton.showSettingsDialog(frame, toApp, options);
@@ -138,13 +142,11 @@ public class PushToApplicationButton implements ActionListener {
      */
     private void buildPopupMenu() {
         popup = new JPopupMenu();
-        int j = 0;
         for (PushToApplication application : pushActions) {
             JMenuItem item = new JMenuItem(application.getApplicationName(), application.getIcon());
             item.setToolTipText(application.getTooltip());
-            item.addActionListener(new PopupItemActionListener(j));
+            item.addActionListener(new PopupItemActionListener(application));
             popup.add(item);
-            j++;
         }
     }
 
@@ -153,9 +155,12 @@ public class PushToApplicationButton implements ActionListener {
      *
      * @param i The List index of the application to default to.
      */
-    private void setSelected(int i) {
-        selected = i;
-        PushToApplication toApp = pushActions.get(i);
+    private void setSelected(PushToApplication newApplication) {
+        toApp = newApplication;
+        setSelected();
+    }
+
+    private void setSelected() {
         pushButton.setIcon(toApp.getIcon());
         pushButton.setToolTipText(toApp.getTooltip());
         pushButton.setPreferredSize(buttonDim);
@@ -182,8 +187,6 @@ public class PushToApplicationButton implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        PushToApplication toApp = pushActions.get(selected);
-
         // Lazy initialization of the push action:
         PushToApplicationAction action = actions.get(toApp);
         if (action == null) {
@@ -252,17 +255,17 @@ public class PushToApplicationButton implements ActionListener {
 
     class PopupItemActionListener implements ActionListener {
 
-        private final int index;
+        private final PushToApplication application;
 
 
-        public PopupItemActionListener(int index) {
-            this.index = index;
+        public PopupItemActionListener(PushToApplication application) {
+            this.application = application;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             // Change the selection:
-            setSelected(index);
+            setSelected(application);
             // Invoke the selected operation (is that expected behaviour?):
             //PushToApplicationButton.this.actionPerformed(null);
             // It makes sense to transfer focus to the push button after the
@@ -317,7 +320,6 @@ public class PushToApplicationButton implements ActionListener {
         private void processPopupTrigger(MouseEvent e) {
             // We only want to show the popup if a settings panel exists for the selected
             // item:
-            PushToApplication toApp = pushActions.get(selected);
             if (toApp.getSettingsPanel() != null) {
                 optPopup.show(pushButton, e.getX(), e.getY());
             }
