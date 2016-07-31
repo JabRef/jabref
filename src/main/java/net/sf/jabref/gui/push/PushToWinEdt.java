@@ -13,41 +13,33 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.external.push;
+package net.sf.jabref.gui.push;
 
 import javax.swing.Icon;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-/**
- * Class for pushing entries into LatexEditor.
- */
-public class PushToLatexEditor extends AbstractPushToApplication implements PushToApplication {
+public class PushToWinEdt extends AbstractPushToApplication implements PushToApplication {
 
     @Override
     public String getApplicationName() {
-        return "LatexEditor";
+        return "WinEdt";
     }
 
     @Override
     public Icon getIcon() {
-        return IconTheme.JabRefIcon.EDIT.getSmallIcon();
+        return IconTheme.getImage("winedt");
     }
 
     @Override
     protected String[] getCommandLine(String keyString) {
-        return new String[] {commandPath, "-i", getCiteCommand() + "{" + keyString + "}"};
-    }
-
-    @Override
-    protected String getCommandName() {
-        return "LEd.exe";
+        return new String[] {commandPath,
+                "\"[InsText('" + getCiteCommand() + "{" + keyString.replace("'", "''") + "}');]\""};
     }
 
     @Override
     protected void initParameters() {
-        commandPathPreferenceKey = JabRefPreferences.LATEX_EDITOR_PATH;
+        commandPathPreferenceKey = JabRefPreferences.WIN_EDT_PATH;
     }
-
 }

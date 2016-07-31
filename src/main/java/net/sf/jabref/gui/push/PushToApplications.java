@@ -14,30 +14,33 @@
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
 
-package net.sf.jabref.external.push;
+package net.sf.jabref.gui.push;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class PushToApplications {
-    private static final List<PushToApplication> APPLICATIONS;
 
+    private final List<PushToApplication> applications;
+
+
+    public PushToApplications() {
     /**
      * Set up the current available choices:
      */
-    static {
-        APPLICATIONS = new ArrayList<>();
 
-        PushToApplications.APPLICATIONS.add(new PushToEmacs());
-        PushToApplications.APPLICATIONS.add(new PushToLatexEditor());
-        PushToApplications.APPLICATIONS.add(new PushToLyx());
-        PushToApplications.APPLICATIONS.add(new PushToTexmaker());
-        PushToApplications.APPLICATIONS.add(new PushToTeXstudio());
-        PushToApplications.APPLICATIONS.add(new PushToVim());
-        PushToApplications.APPLICATIONS.add(new PushToWinEdt());
+        applications = new ArrayList<>();
+
+        applications.add(new PushToEmacs());
+        applications.add(new PushToLatexEditor());
+        applications.add(new PushToLyx());
+        applications.add(new PushToTexmaker());
+        applications.add(new PushToTeXstudio());
+        applications.add(new PushToVim());
+        applications.add(new PushToWinEdt());
     }
 
-    public static List<PushToApplication> getApplications() {
-        return APPLICATIONS;
+    public List<PushToApplication> getApplications() {
+        return applications;
     }
 }

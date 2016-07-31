@@ -1,5 +1,4 @@
-/*  Copyright (C) 2015 JabRef contributors.
-    Copyright (C) 2015 Oscar Gustafsson.
+/*  Copyright (C) 2003-2015 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -14,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.external.push;
+package net.sf.jabref.gui.push;
 
 import javax.swing.Icon;
 
@@ -22,28 +21,33 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
- * Class for pushing entries into TexMaker.
+ * Class for pushing entries into LatexEditor.
  */
-public class PushToTexmaker extends AbstractPushToApplication implements PushToApplication {
+public class PushToLatexEditor extends AbstractPushToApplication implements PushToApplication {
 
     @Override
     public String getApplicationName() {
-        return "Texmaker";
+        return "LatexEditor";
     }
 
     @Override
     public Icon getIcon() {
-        return IconTheme.getImage("texmaker");
+        return IconTheme.JabRefIcon.EDIT.getSmallIcon();
     }
 
     @Override
     protected String[] getCommandLine(String keyString) {
-        return new String[] {commandPath, "-insert", getCiteCommand() + "{" + keyString + "}"};
+        return new String[] {commandPath, "-i", getCiteCommand() + "{" + keyString + "}"};
+    }
+
+    @Override
+    protected String getCommandName() {
+        return "LEd.exe";
     }
 
     @Override
     protected void initParameters() {
-        commandPathPreferenceKey = JabRefPreferences.TEXMAKER_PATH;
+        commandPathPreferenceKey = JabRefPreferences.LATEX_EDITOR_PATH;
     }
 
 }
