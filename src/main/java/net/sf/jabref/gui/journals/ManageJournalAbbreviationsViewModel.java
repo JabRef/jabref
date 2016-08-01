@@ -203,15 +203,33 @@ public class ManageJournalAbbreviationsViewModel {
             AbbreviationViewModel abbViewModel = new AbbreviationViewModel(abbreviation);
             if (abbreviations.contains(abbViewModel)) {
                 if (abbViewModel.equals(currentAbbreviation.get())) {
-                    currentAbbreviation.get().setName(abbreviationsName.get());
-                    currentAbbreviation.get().setAbbreviation(abbreviationsAbbreviation.get());
+                    setCurrentAbbreviationNameAndAbbreviationIfValid();
                 } else {
                     throw new JabRefException("Duplicated journal abbreviation");
                 }
             } else {
-                currentAbbreviation.get().setName(abbreviationsName.get());
-                currentAbbreviation.get().setAbbreviation(abbreviationsAbbreviation.get());
+                setCurrentAbbreviationNameAndAbbreviationIfValid();
             }
+        }
+    }
+
+    /**
+     * Sets the name and the abbreviation of the {@code currentAbbreviation} property
+     * to the values of the {@code abbreviationsName} and {@code abbreviationsAbbreviation}
+     * properties. If the values are not valid for the abbreviation it will throw a {@link JabRefException}.
+     *
+     * @throws JabRefException
+     */
+    private void setCurrentAbbreviationNameAndAbbreviationIfValid() throws JabRefException {
+        String name = abbreviationsName.get();
+        String abbreviation = abbreviationsAbbreviation.get();
+        if (name.trim().isEmpty()) {
+            throw new JabRefException("Name can not be empty");
+        } else if (abbreviation.trim().isEmpty()) {
+            throw new JabRefException("Abbrevaition can not be empty");
+        } else {
+            currentAbbreviation.get().setName(name);
+            currentAbbreviation.get().setAbbreviation(abbreviation);
         }
     }
 
@@ -266,6 +284,20 @@ public class ManageJournalAbbreviationsViewModel {
     }
 
     /**
+     * This will bind the given list property to the journal files list property of this class.
+     * If the size of the given list property is bigger than 0 it will call
+     * {@link #changeActiveFile(AbbreviationsFile)} on the first  item of the list.
+     *
+     * @param itemsProperty as list property of {@link AbbreviationsFile} objects
+     */
+    public void bindFileItems(SimpleListProperty<AbbreviationsFile> itemsProperty) {
+        journalFiles.bindBidirectional(itemsProperty);
+        if (!itemsProperty.isEmpty()) {
+            changeActiveFile(journalFilesProperty().get(0));
+        }
+    }
+
+    /**
      * <p><b>This method is untested!</b></p>
      * Should be called after the editing of the journal abbreviations has been
      * finished and the files have been saved with {@link #saveExternalFilesList()}
@@ -305,13 +337,6 @@ public class ManageJournalAbbreviationsViewModel {
 
     public SimpleObjectProperty<AbbreviationViewModel> currentAbbreviationProperty() {
         return this.currentAbbreviation;
-    }
-
-    public void bindFileItems(SimpleListProperty<AbbreviationsFile> itemsProperty) {
-        journalFiles.bindBidirectional(itemsProperty);
-        if (!itemsProperty.isEmpty()) {
-            changeActiveFile(journalFilesProperty().get(0));
-        }
     }
 
 }

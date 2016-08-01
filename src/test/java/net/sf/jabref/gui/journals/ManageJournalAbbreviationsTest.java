@@ -390,6 +390,28 @@ public class ManageJournalAbbreviationsTest {
         viewModel.editAbbreviation();
     }
 
+    @Test(expected = JabRefException.class)
+    public void testEditAbbreviationToEmptyName() throws JabRefException {
+        savelyAddNewFileToViewModel(testFile3Entries);
+        selectLastJournalFile();
+        selectLastAbbreviation();
+        Assert.assertEquals(4, viewModel.abbreviationsProperty().size());
+        viewModel.abbreviationsNameProperty().set("");
+        viewModel.abbreviationsAbbreviationProperty().set("YAE");
+        viewModel.editAbbreviation();
+    }
+
+    @Test(expected = JabRefException.class)
+    public void testEditAbbreviationToEmptyAbbreviation() throws JabRefException {
+        savelyAddNewFileToViewModel(testFile3Entries);
+        selectLastJournalFile();
+        selectLastAbbreviation();
+        Assert.assertEquals(4, viewModel.abbreviationsProperty().size());
+        viewModel.abbreviationsNameProperty().set("YetAnotherEntry");
+        viewModel.abbreviationsAbbreviationProperty().set("");
+        viewModel.editAbbreviation();
+    }
+
     @Test
     public void testDeleteAbbreviationSelectPrevious() {
         savelyAddNewFileToViewModel(testFile4Entries);
@@ -442,7 +464,7 @@ public class ManageJournalAbbreviationsTest {
         selectLastJournalFile();
         selectLastAbbreviation();
         int size = 5;
-        Abbreviation testAbbreviation = new Abbreviation("YetAnotherEntry", "YAE");
+        Abbreviation testAbbreviation = new Abbreviation("JabRefTestEntry", "JTE");
         savelyEditAbbreviation(testAbbreviation);
         Assert.assertEquals(size, viewModel.abbreviationsProperty().size());
         Assert.assertTrue(viewModel.abbreviationsProperty().contains(new AbbreviationViewModel(testAbbreviation)));
@@ -461,7 +483,7 @@ public class ManageJournalAbbreviationsTest {
         viewModel.saveJournalAbbreviationFiles();
 
         String expected = "Abbreviations = Abb" + Globals.NEWLINE + "Test Entry = TE" + Globals.NEWLINE
-                + "MoreEntries = ME" + Globals.NEWLINE + "YetAnotherEntry = YAE" + Globals.NEWLINE + "";
+                + "MoreEntries = ME" + Globals.NEWLINE + "JabRefTestEntry = JTE" + Globals.NEWLINE + "";
         String actual = Files.contentOf(new File(testFile4Entries), StandardCharsets.UTF_8);
         Assert.assertEquals(expected, actual);
 

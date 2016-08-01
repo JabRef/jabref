@@ -16,16 +16,19 @@
 package net.sf.jabref.gui.journals;
 
 import java.io.File;
-import java.util.Optional;
 
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
@@ -34,13 +37,10 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Priority;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
-
 import net.sf.jabref.JabRefException;
 import net.sf.jabref.gui.FXAlert;
 import net.sf.jabref.gui.FXDialogs;
@@ -130,8 +130,18 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     }
 
     private void setUpTable() {
+        journalAbbreviationsTable.setOnKeyPressed(event -> {
+            if ((event.getCode() == KeyCode.DELETE) && isEditableAndRemovable.get()) {
+                if ((viewModel.currentAbbreviationProperty().get() != null)
+                        && !viewModel.currentAbbreviationProperty().get().isPseudoAbbreviation()) {
+                    viewModel.deleteAbbreviation();
+                }
+            }
+        });
         journalTableNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
+        journalTableNameColumn.setCellFactory(cell -> new JournalAbbreviationsNameTableEditingCell());
         journalTableAbbreviationColumn.setCellValueFactory(cellData -> cellData.getValue().abbreviationProperty());
+        journalTableAbbreviationColumn.setCellFactory(cell -> new JournalAbbreviationsAbbreviationTableEditingCell());
         journalTableEditColumn.setCellValueFactory(cellData -> cellData.getValue().isPseudoAbbreviationProperty());
         journalTableDeleteColumn.setCellValueFactory(cellData -> cellData.getValue().isPseudoAbbreviationProperty());
         journalTableEditColumn.setCellFactory(column -> new TableCell<AbbreviationViewModel, Boolean>() {
@@ -139,26 +149,29 @@ public class ManageJournalAbbreviationsView extends FXMLView {
             @Override
             protected void updateItem(Boolean isPseudoAbbreviation, boolean isEmpty) {
                 super.updateItem(isPseudoAbbreviation, isEmpty);
-                if (!isEmpty) {
-                    if (isEditableAndRemovable.get()) {
-                        if (!isPseudoAbbreviation) {
-                            Text graphic = new Text(IconTheme.JabRefIcon.EDIT.getCode());
-                            graphic.getStyleClass().add("icon");
-                            setGraphic(graphic);
-                            setOnMouseClicked(evt -> {
-                                editAbbreviation();
-                            });
-                        } else {
-                            Text graphic = new Text(IconTheme.JabRefIcon.ADD.getCode());
-                            graphic.getStyleClass().add("icon");
-                            setGraphic(graphic);
-                            setOnMouseClicked(evt -> {
-                                addAbbreviation();
-                            });
+                if (isPseudoAbbreviation != null) {
+                    if (!isEmpty) {
+                        if (isEditableAndRemovable.get()) {
+                            if (!isPseudoAbbreviation) {
+                                Text graphic = new Text(IconTheme.JabRefIcon.EDIT.getCode());
+                                graphic.getStyleClass().add("icon");
+                                setGraphic(graphic);
+                                setOnMouseClicked(evt -> {
+                                    editAbbreviation();
+                                });
+                            } else {
+                                Text graphic = new Text(IconTheme.JabRefIcon.ADD.getCode());
+                                graphic.getStyleClass().add("icon");
+                                setGraphic(graphic);
+                                setOnMouseClicked(evt -> {
+                                    addAbbreviation();
+                                });
+                            }
                         }
                     }
+                } else {
+                    setGraphic(null);
                 }
-                journalAbbreviationsTable.refresh();
             }
         });
         journalTableDeleteColumn.setCellFactory(column -> new TableCell<AbbreviationViewModel, Boolean>() {
@@ -166,19 +179,25 @@ public class ManageJournalAbbreviationsView extends FXMLView {
             @Override
             protected void updateItem(Boolean isPseudoAbbreviation, boolean isEmpty) {
                 super.updateItem(isPseudoAbbreviation, isEmpty);
-                if (!isEmpty) {
-                    if (isEditableAndRemovable.get()) {
-                        if (!isPseudoAbbreviation) {
-                            Text graphic = new Text(IconTheme.JabRefIcon.DELETE_ENTRY.getCode());
-                            graphic.getStyleClass().add("icon");
-                            setGraphic(graphic);
-                            setOnMouseClicked(evt -> {
-                                removeAbbreviation();
-                            });
+                if (isPseudoAbbreviation != null) {
+
+                    if (!isEmpty) {
+                        if (isEditableAndRemovable.get()) {
+                            if (!isPseudoAbbreviation) {
+                                Text graphic = new Text(IconTheme.JabRefIcon.DELETE_ENTRY.getCode());
+                                graphic.getStyleClass().add("icon");
+                                setGraphic(graphic);
+                                setOnMouseClicked(evt -> {
+                                    removeAbbreviation();
+                                });
+                            } else {
+                                setGraphic(null);
+                            }
                         }
                     }
+                } else {
+                    setGraphic(null);
                 }
-                journalAbbreviationsTable.refresh();
             }
 
         });
@@ -275,65 +294,27 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         viewModel.abbreviationsAbbreviationProperty().set("Abbreviation");
         try {
             viewModel.addAbbreviation();
-            viewModel.currentAbbreviationProperty()
-                    .set(viewModel.abbreviationsProperty().get(viewModel.abbreviationsCountProperty().get() - 1));
-            editAbbreviation();
         } catch (JabRefException e) {
             showErrorDialog(e);
         }
+        selectNewAbbreviation();
     }
 
     @FXML
     private void editAbbreviation() {
-        AbbreviationViewModel currentAbbreviation = viewModel.currentAbbreviationProperty().get();
-        GridPane content = createDialogContent(currentAbbreviation.getName(), currentAbbreviation.getAbbreviation());
-
-        DialogPane pane = new DialogPane();
-        pane.setContent(content);
-        pane.setMinWidth(300);
-        Optional<ButtonType> result = FXDialogs.showCustomDialogAndWait(Localization.lang("Edit journal abbreviation"),
-                pane, ButtonType.OK, ButtonType.CANCEL);
-        result.ifPresent((response -> {
-            if (response == ButtonType.OK) {
-                viewModel.abbreviationsNameProperty().set(((TextField) content.getChildren().get(0)).getText());
-                viewModel.abbreviationsAbbreviationProperty().set(((TextField) content.getChildren().get(1)).getText());
-                try {
-                    viewModel.editAbbreviation();
-                } catch (JabRefException e) {
-                    showErrorDialog(e);
-                }
-            }
-        }));
+        journalAbbreviationsTable.edit(journalAbbreviationsTable.getSelectionModel().getSelectedIndex(),
+                journalTableNameColumn);
     }
 
-    private GridPane createDialogContent(String name, String abbreviation) {
-        TextField abbreviationField = new TextField(abbreviation);
-        abbreviationField.setPromptText(Localization.lang("Abbreviation"));
-
-        TextField nameField = new TextField(name);
-        nameField.setPromptText(Localization.lang("Name"));
-        nameField.requestFocus();
-
-        nameField.setMaxWidth(Double.MAX_VALUE);
-        nameField.setMaxHeight(Double.MAX_VALUE);
-        GridPane.setVgrow(nameField, Priority.ALWAYS);
-        GridPane.setHgrow(nameField, Priority.ALWAYS);
-
-        abbreviationField.setMaxWidth(Double.MAX_VALUE);
-        abbreviationField.setMaxHeight(Double.MAX_VALUE);
-        GridPane.setVgrow(abbreviationField, Priority.ALWAYS);
-        GridPane.setHgrow(abbreviationField, Priority.ALWAYS);
-
-        GridPane content = new GridPane();
-        content.setVgap(5);
-        content.setMaxWidth(Double.MAX_VALUE);
-        content.add(nameField, 0, 0);
-        content.add(abbreviationField, 0, 1);
-        return content;
+    private void selectNewAbbreviation() {
+        int lastRow = viewModel.abbreviationsCountProperty().get() - 1;
+        journalAbbreviationsTable.scrollTo(lastRow);
+        journalAbbreviationsTable.getSelectionModel().select(lastRow);
+        journalAbbreviationsTable.getFocusModel().focus(lastRow);
     }
 
     private void showErrorDialog(JabRefException e) {
-        FXDialogs.showErrorDialogAndWait(Localization.lang("Something went wrong"), Localization.lang(e.getMessage()));
+        FXDialogs.showErrorDialogAndWait(Localization.lang("An error occurred"), Localization.lang(e.getMessage()));
     }
 
     @FXML
@@ -353,6 +334,213 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         viewModel.saveJournalAbbreviationFiles();
         viewModel.updateAbbreviationsAutoComplete();
         closeDialog();
+    }
+
+
+    /**
+     * This class provides a editable text field that is used as table cell.
+     * It handles the editing of the name column.
+     *
+     */
+    public class JournalAbbreviationsNameTableEditingCell extends TableCell<AbbreviationViewModel, String> {
+
+        private TextField textField;
+        private String oldName;
+        private int editingIndex;
+
+
+        @Override
+        public void startEdit() {
+            if (!isEmpty() && isEditableAndRemovable.get()
+                    && !viewModel.currentAbbreviationProperty().get().isPseudoAbbreviation()) {
+                oldName = viewModel.currentAbbreviationProperty().get().getName();
+                super.startEdit();
+                createTextField();
+                setText(null);
+                setGraphic(textField);
+                editingIndex = journalAbbreviationsTable.getSelectionModel().getSelectedIndex();
+                textField.requestFocus();
+                textField.selectAll();
+            }
+        }
+
+        @Override
+        public void cancelEdit() {
+            super.cancelEdit();
+            setText(getItem());
+            setGraphic(null);
+            journalAbbreviationsTable.itemsProperty().get().get(editingIndex).setName(oldName);
+        }
+
+        @Override
+        public void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty) {
+                setText(null);
+                setGraphic(null);
+            } else {
+                if (isEditing()) {
+                    if (textField != null) {
+                        textField.setText(getString());
+                    }
+                    setText(null);
+                    setGraphic(textField);
+                } else {
+                    setText(getString());
+                    setGraphic(null);
+                }
+            }
+        }
+
+        @Override
+        public void commitEdit(String name) {
+            journalAbbreviationsTable.getSelectionModel().select(editingIndex);
+            AbbreviationViewModel current = viewModel.currentAbbreviationProperty().get();
+            super.commitEdit(name);
+            current.setName(oldName);
+            viewModel.abbreviationsNameProperty().set(name);
+            viewModel.abbreviationsAbbreviationProperty().set(current.getAbbreviation());
+            try {
+                viewModel.editAbbreviation();
+            } catch (JabRefException e) {
+                showErrorDialog(e);
+            }
+        }
+
+        private void createTextField() {
+            textField = new TextField(getString());
+            textField.setMinWidth(this.getWidth() - (this.getGraphicTextGap() * 2));
+            textField.focusedProperty().addListener(new ChangeListener<Boolean>() {
+
+                @Override
+                public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
+                    if (!arg2) {
+                        commitEdit(textField.getText());
+                    }
+                }
+            });
+            textField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+
+                @Override
+                public void handle(KeyEvent t) {
+                    if (t.getCode() == KeyCode.ENTER) {
+                        journalAbbreviationsTable.requestFocus();
+                    } else if (t.getCode() == KeyCode.ESCAPE) {
+                        cancelEdit();
+                    }
+                }
+            });
+        }
+
+        private String getString() {
+            return getItem() == null ? "" : getItem().toString();
+        }
+
+    }
+
+    /**
+     * This class provides a editable text field that is used as table cell.
+     * It handles the editing of the abbreviation column.
+     *
+     */
+    public class JournalAbbreviationsAbbreviationTableEditingCell extends TableCell<AbbreviationViewModel, String> {
+
+        private TextField textField;
+        private String oldAbbreviation;
+        private int editingIndex;
+
+
+        @Override
+        public void startEdit() {
+            if (!isEmpty() && isEditableAndRemovable.get()
+                    && !viewModel.currentAbbreviationProperty().get().isPseudoAbbreviation()) {
+                oldAbbreviation = viewModel.currentAbbreviationProperty().get().getAbbreviation();
+                super.startEdit();
+                createTextField();
+                setText(null);
+                setGraphic(textField);
+                editingIndex = journalAbbreviationsTable.getSelectionModel().getSelectedIndex();
+                textField.requestFocus();
+                textField.selectAll();
+            }
+        }
+
+        @Override
+        public void cancelEdit() {
+            super.cancelEdit();
+            setText(getItem());
+            setGraphic(null);
+            journalAbbreviationsTable.itemsProperty().get().get(editingIndex).setAbbreviation(oldAbbreviation);
+        }
+
+        @Override
+        public void updateItem(String item, boolean empty) {
+            super.updateItem(item, empty);
+            if (empty) {
+                setText(null);
+                setGraphic(null);
+            } else {
+                if (isEditing()) {
+                    if (textField != null) {
+                        textField.setText(getString());
+                    }
+                    setText(null);
+                    setGraphic(textField);
+                } else {
+                    setText(getString());
+                    setGraphic(null);
+                }
+            }
+        }
+
+        @Override
+        public void commitEdit(String abbreviation) {
+            journalAbbreviationsTable.getSelectionModel().select(editingIndex);
+            AbbreviationViewModel current = viewModel.currentAbbreviationProperty().get();
+            super.commitEdit(abbreviation);
+            current.setAbbreviation(oldAbbreviation);
+            viewModel.abbreviationsNameProperty().set(current.getName());
+            viewModel.abbreviationsAbbreviationProperty().set(abbreviation);
+            try {
+                viewModel.editAbbreviation();
+            } catch (JabRefException e) {
+                showErrorDialog(e);
+            }
+        }
+
+        private void createTextField() {
+            textField = new TextField(getString());
+            textField.setMinWidth(this.getWidth() - (this.getGraphicTextGap() * 2));
+            textField.focusedProperty().addListener(new ChangeListener<Boolean>() {
+
+                @Override
+                public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
+                    if (!arg2) {
+                        commitEdit(textField.getText());
+                    }
+                }
+            });
+            textField.setOnKeyPressed(new EventHandler<KeyEvent>() {
+
+                @Override
+                public void handle(KeyEvent t) {
+                    if (t.getCode() == KeyCode.ENTER) {
+                        if (isEditing()) {
+                            journalAbbreviationsTable.requestFocus();
+                        } else {
+                            startEdit();
+                        }
+                    } else if (t.getCode() == KeyCode.ESCAPE) {
+                        cancelEdit();
+                    }
+                }
+            });
+        }
+
+        private String getString() {
+            return getItem() == null ? "" : getItem().toString();
+        }
+
     }
 
 }
