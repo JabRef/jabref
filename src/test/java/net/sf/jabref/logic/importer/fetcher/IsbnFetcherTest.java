@@ -12,6 +12,7 @@ import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -37,6 +38,7 @@ public class IsbnFetcherTest {
         assertEquals("ISBNtoBibTeXHelp", fetcher.getHelpPage().getPageName());
     }
 
+    @Ignore("Create reproducible offline test")
     @Test
     public void testFetcher10() throws FetcherException, IOException {
         Optional<BibEntry> isbn = fetcher.performSearchById("0321356683");
@@ -46,6 +48,7 @@ public class IsbnFetcherTest {
         }
     }
 
+    @Ignore("Create reproducible offline test")
     @Test
     public void testFetcher13() throws FetcherException, IOException {
         Optional<BibEntry> isbn = fetcher.performSearchById("978-0321356680");
@@ -55,11 +58,12 @@ public class IsbnFetcherTest {
         }
     }
 
+    @Ignore("Create reproducible offline test")
     @Test(expected = FetcherException.class)
     public void testFetcher10FetcherException() throws FetcherException, IOException {
         fetcher = Mockito.mock(IsbnFetcher.class);
-        Mockito.when(fetcher.performSearchById("032135668")).thenThrow(new FetcherException("Exception"));
-        Optional<BibEntry> isbn = fetcher.performSearchById("032135668");
+        Mockito.when(fetcher.performSearchById("123456789")).thenThrow(new FetcherException("Exception"));
+        Optional<BibEntry> isbn = fetcher.performSearchById("123456789");
         Assert.assertNull(isbn);
     }
 }
