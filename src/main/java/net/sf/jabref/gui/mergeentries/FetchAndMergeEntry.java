@@ -7,11 +7,11 @@ import java.util.stream.Collectors;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.importer.fetcher.ISBNtoBibTeXFetcher;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
 import net.sf.jabref.logic.importer.fetcher.DOItoBibTeX;
+import net.sf.jabref.logic.importer.fetcher.IsbnFetcher;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -58,7 +58,13 @@ public class FetchAndMergeEntry {
                     fetchedEntry = new DOItoBibTeX().getEntryFromDOI(fieldContent.get(),
                             ImportFormatPreferences.fromPreferences(Globals.prefs));
                 } else if (FieldName.ISBN.equals(field)) {
-                    fetchedEntry = new ISBNtoBibTeXFetcher().getEntryFromISBN(fieldContent.get(), null);
+
+                    try {
+                        fetchedEntry = new IsbnFetcher().performSearchById(fieldContent.get());
+                    } catch (FetcherException fe) {
+                        fe.printStackTrace();
+                    }
+
                 } else if (FieldName.EPRINT.equals(field)) {
                     try {
                         fetchedEntry = new ArXiv().performSearchById(fieldContent.get());
