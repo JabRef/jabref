@@ -440,7 +440,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         leftPan.add(closeBut, BorderLayout.NORTH);
 
         // Create type-label
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty(), panel.getBibDatabaseContext().getMode());
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, panel.getBibDatabaseContext().getMode());
         leftPan.add(new TypeLabel(typedEntry.getTypeForDisplay()), BorderLayout.CENTER);
         TypeButton typeButton = new TypeButton();
 

@@ -510,7 +510,7 @@ public class MainTable extends JTable {
     private boolean isComplete(int row) {
         try {
             BibEntry entry = getBibEntry(row);
-            TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.of(panel.getDatabase()), panel.getBibDatabaseContext().getMode());
+            TypedBibEntry typedEntry = new TypedBibEntry(entry, panel.getBibDatabaseContext());
             return typedEntry.hasAllRequiredFields();
         } catch (NullPointerException ex) {
             return true;
