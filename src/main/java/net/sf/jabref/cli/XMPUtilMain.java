@@ -1,4 +1,4 @@
-package net.sf.jabref;
+package net.sf.jabref.cli;
 
 import java.io.File;
 import java.io.FileReader;
@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import javax.xml.transform.TransformerException;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
