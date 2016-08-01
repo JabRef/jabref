@@ -56,9 +56,13 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {
+
+    private static final Log LOGGER = LogFactory.getLog(GeneralFetcher.class);
 
     private final JTextField tf = new JTextField();
 
@@ -88,7 +92,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
         String[] choices = new String[fetcherArray.length + searchBasedFetcherArray.length];
         for (int i = 0; i < fetcherArray.length + searchBasedFetcherArray.length; i++) {
-            if(i < fetcherArray.length){
+            if (i < fetcherArray.length) {
                 choices[i] = fetcherArray[i].getTitle();
             } else {
                 choices[i] = searchBasedFetcherArray[i - fetcherArray.length].getName();
@@ -118,11 +122,11 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
         HelpAction help;
 
-        if(fetcherArray.length < defaultFetcher){
+        if (fetcherArray.length < defaultFetcher) {
             help = new HelpAction(activeFetcher.getHelpPage());
-        }else if (defaultFetcher >= fetcherArray.length && defaultFetcher < fetcherArray.length + searchBasedFetcherArray.length){
+        } else if (defaultFetcher >= fetcherArray.length && defaultFetcher < fetcherArray.length + searchBasedFetcherArray.length) {
             help = new HelpAction(webFetcher.getHelpPage());
-        }else{
+        } else {
             help = new HelpAction(null);
         }
 
@@ -132,7 +136,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
         if (fetcherArray.length < defaultFetcher) {
             helpBut.setEnabled(activeFetcher.getHelpPage() != null);
-        }else if(defaultFetcher >= fetcherArray.length && defaultFetcher < fetcherArray.length + searchBasedFetcherArray.length){
+        } else if (defaultFetcher >= fetcherArray.length && defaultFetcher < fetcherArray.length + searchBasedFetcherArray.length) {
             helpBut.setEnabled(webFetcher.getHelpPage() != null);
         }
 
@@ -153,7 +157,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                     optPanel.add(activeFetcher.getOptionsPanel(), BorderLayout.CENTER);
                 }
             } else {
-                webFetcher = searchBasedFetcherArray[fetcherChoice.getSelectedIndex()-fetcherArray.length];
+                webFetcher = searchBasedFetcherArray[fetcherChoice.getSelectedIndex() - fetcherArray.length];
                 Globals.prefs.putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, fetcherChoice.getSelectedIndex());
                 if (webFetcher.getHelpPage() == null) {
                     helpBut.setEnabled(false);
@@ -161,7 +165,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                     help.setHelpFile(webFetcher.getHelpPage());
                     helpBut.setEnabled(true);
                 }
-                optionsCards.show(optionsPanel, String.valueOf(fetcherChoice.getSelectedIndex()-fetcherArray.length));
+                optionsCards.show(optionsPanel, String.valueOf(fetcherChoice.getSelectedIndex() - fetcherArray.length));
                 optPanel.removeAll();
             }
 
@@ -169,7 +173,6 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         });
 
         action = new FetcherAction();
-
 
 
         helpBut.setMargin(new Insets(0, 0, 0, 0));
@@ -285,8 +288,8 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         // The other category downloads the entries first, then asks the user which ones to keep:
         else {
 
-            if(webFetcher != null && activeFetcher == null){
-                if(webFetcher instanceof SearchBasedFetcher){
+            if (webFetcher != null && activeFetcher == null) {
+                if (webFetcher instanceof SearchBasedFetcher) {
                     SearchBasedFetcher searchBasedFetcher = (SearchBasedFetcher) webFetcher;
                     final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.getCurrentBasePanel(),
                             searchBasedFetcher.getName(), false);
@@ -304,10 +307,10 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                                 dialog.dispose();
                             }
                         } catch (FetcherException fe) {
-                            fe.printStackTrace();
+                            LOGGER.error("Fail while fetching Entries");
                         }
                     });
-                }else if(webFetcher instanceof IdBasedFetcher){
+                } else if (webFetcher instanceof IdBasedFetcher) {
                     IdBasedFetcher idBasedFetcher = (IdBasedFetcher) webFetcher;
                     final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.getCurrentBasePanel(),
                             idBasedFetcher.getName(), false);
@@ -326,7 +329,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                                 dialog.dispose();
                             }
                         } catch (FetcherException fe) {
-                            fe.printStackTrace();
+                            LOGGER.error("Fail while fetching Entries");
                         }
                     });
                 }
