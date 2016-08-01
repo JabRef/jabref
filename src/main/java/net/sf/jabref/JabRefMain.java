@@ -35,6 +35,7 @@ import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.client.RemoteListenerClient;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -74,7 +75,8 @@ public class JabRefMain {
         InternalBibtexFields.setNumericFields(Globals.prefs.getStringList(JabRefPreferences.NUMERIC_FIELDS));
 
         /* Build list of Import and Export formats */
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(ImportFormatPreferences.fromPreferences(Globals.prefs));
+        Globals.IMPORT_FORMAT_READER.resetImportFormats(ImportFormatPreferences.fromPreferences(Globals.prefs),
+                XMPPreferences.fromPreferences(Globals.prefs));
         CustomEntryTypesManager.loadCustomEntryTypes(preferences);
         ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
 

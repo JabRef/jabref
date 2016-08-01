@@ -44,6 +44,7 @@ import net.sf.jabref.logic.importer.fileformat.RepecNepImporter;
 import net.sf.jabref.logic.importer.fileformat.RisImporter;
 import net.sf.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.model.database.BibDatabases;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -65,7 +66,7 @@ public class ImportFormatReader {
     private ImportFormatPreferences importFormatPreferences;
 
 
-    public void resetImportFormats(ImportFormatPreferences newImportFormatPreferences) {
+    public void resetImportFormats(ImportFormatPreferences newImportFormatPreferences, XMPPreferences xmpPreferences) {
         this.importFormatPreferences = newImportFormatPreferences;
 
         formats.clear();
@@ -83,7 +84,7 @@ public class ImportFormatReader {
         formats.add(new MsBibImporter());
         formats.add(new OvidImporter());
         formats.add(new PdfContentImporter(importFormatPreferences));
-        formats.add(new PdfXmpImporter());
+        formats.add(new PdfXmpImporter(xmpPreferences));
         formats.add(new RepecNepImporter(importFormatPreferences));
         formats.add(new RisImporter());
         formats.add(new SilverPlatterImporter());

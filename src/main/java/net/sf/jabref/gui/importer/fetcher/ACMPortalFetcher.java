@@ -42,7 +42,7 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.FetcherPreviewDialog;
+import net.sf.jabref.gui.importer.FetcherPreviewDialog;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;

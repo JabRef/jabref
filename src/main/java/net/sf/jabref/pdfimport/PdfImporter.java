@@ -188,7 +188,7 @@ public class PdfImporter {
 
     private void doXMPImport(String fileName, List<BibEntry> res) {
         List<BibEntry> localRes = new ArrayList<>();
-        PdfXmpImporter importer = new PdfXmpImporter();
+        PdfXmpImporter importer = new PdfXmpImporter(XMPPreferences.fromPreferences(Globals.prefs));
         Path filePath = Paths.get(fileName);
         ParserResult result = importer.importDatabase(filePath, Globals.prefs.getDefaultEncoding());
         if (result.hasWarnings()) {

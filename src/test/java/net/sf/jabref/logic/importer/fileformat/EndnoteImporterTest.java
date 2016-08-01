@@ -46,7 +46,6 @@ public class EndnoteImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        EndnoteImporter importer = new EndnoteImporter();
         List<String> extensions = new ArrayList<>();
         extensions.add(".enw");
 
@@ -55,7 +54,6 @@ public class EndnoteImporterTest {
 
     @Test
     public void testGetDescription() {
-        EndnoteImporter importer = new EndnoteImporter();
         assertEquals("Importer for the Refer/Endnote format." +
                 " Modified to use article number for pages if pages are missing.", importer.getDescription());
     }

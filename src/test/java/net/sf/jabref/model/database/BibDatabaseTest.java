@@ -3,12 +3,10 @@ package net.sf.jabref.model.database;
 import java.util.Collections;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.event.TestEventListener;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -31,8 +29,6 @@ public class BibDatabaseTest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance(); // set preferences for this test
-
         database = new BibDatabase();
     }
 

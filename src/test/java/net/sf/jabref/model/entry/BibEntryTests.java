@@ -7,9 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.model.FieldChange;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -24,8 +22,6 @@ public class BibEntryTests {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-
         // Default entry for most keyword and some type tests
         keywordEntry = new BibEntry();
         keywordEntry.setType(BibtexEntryTypes.ARTICLE);

@@ -66,14 +66,14 @@ public class OpenDatabaseTest {
     @Test
     public void useSpecifiedEncoding() throws IOException {
         ParserResult result = OpenDatabase.loadDatabase(bibHeader,
-                importFormatPreferences.setEncoding(StandardCharsets.US_ASCII));
+                importFormatPreferences.withEncoding(StandardCharsets.US_ASCII));
         Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding());
     }
 
     @Test
     public void useSpecifiedEncodingWithSignature() throws IOException {
         ParserResult result = OpenDatabase.loadDatabase(bibHeaderAndSignature,
-                importFormatPreferences.setEncoding(StandardCharsets.US_ASCII));
+                importFormatPreferences.withEncoding(StandardCharsets.US_ASCII));
         Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding());
     }
 

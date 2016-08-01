@@ -23,7 +23,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.xmp.XMPPreferences;
@@ -33,6 +32,13 @@ import net.sf.jabref.logic.xmp.XMPUtil;
  * Wraps the XMPUtility function to be used as an ImportFormat.
  */
 public class PdfXmpImporter extends ImportFormat {
+
+    private final XMPPreferences xmpPreferences;
+
+
+    public PdfXmpImporter(XMPPreferences xmpPreferences) {
+        this.xmpPreferences = xmpPreferences;
+    }
 
     @Override
     public String getFormatName() {
@@ -56,7 +62,7 @@ public class PdfXmpImporter extends ImportFormat {
     public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
         Objects.requireNonNull(filePath);
         try {
-            return new ParserResult(XMPUtil.readXMP(filePath, XMPPreferences.fromPreferences(Globals.prefs)));
+            return new ParserResult(XMPUtil.readXMP(filePath, xmpPreferences));
         } catch (IOException exception) {
             return ParserResult.fromErrorMessage(exception.getLocalizedMessage());
         }
@@ -77,7 +83,7 @@ public class PdfXmpImporter extends ImportFormat {
     @Override
     public boolean isRecognizedFormat(Path filePath, Charset defaultEncoding) throws IOException {
         Objects.requireNonNull(filePath);
-        return XMPUtil.hasMetadata(filePath, XMPPreferences.fromPreferences(Globals.prefs));
+        return XMPUtil.hasMetadata(filePath, xmpPreferences);
     }
 
     @Override

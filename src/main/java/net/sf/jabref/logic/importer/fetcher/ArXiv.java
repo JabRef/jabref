@@ -262,8 +262,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
             // Abstract of the article
             abstractText = XMLUtil.getNodeContent(item, "summary").map(OAI2Handler::correctLineBreaks)
-                    .map(
-                    String::trim);
+                    .map(String::trim);
 
             // Authors of the article
             authorNames = new ArrayList<>();

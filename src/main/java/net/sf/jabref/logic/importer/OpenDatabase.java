@@ -67,7 +67,7 @@ public class OpenDatabase {
                 }
             }
             return pr;
-        } catch (Throwable ex) {
+        } catch (IOException ex) {
             ParserResult pr = new ParserResult(null, null, null);
             pr.setFile(file);
             pr.setInvalid(true);

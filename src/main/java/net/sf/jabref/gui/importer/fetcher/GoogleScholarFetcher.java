@@ -33,7 +33,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.FetcherPreviewDialog;
+import net.sf.jabref.gui.importer.FetcherPreviewDialog;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;

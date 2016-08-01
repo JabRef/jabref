@@ -112,7 +112,6 @@ public class CustomImporterTest {
         CustomImporter customImporter = new CustomImporter("Copac", "cpc",
                 "net.sf.jabref.logic.importer.fileformat.CopacImporter",
                 "src/main/java/net/sf/jabref/logic/importer/fileformat/CopacImporter.java");
-
         assertEquals(importer, customImporter);
     }
 

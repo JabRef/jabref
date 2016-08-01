@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
@@ -74,6 +75,7 @@ public class ImportFormatTest {
 
         ImportFormatPreferences importFormatPreferences = ImportFormatPreferences
                 .fromPreferences(JabRefPreferences.getInstance());
+        XMPPreferences xmpPreferences = XMPPreferences.fromPreferences(JabRefPreferences.getInstance());
         // @formatter:off
         return Arrays.asList(
                 new Object[]{new BiblioscapeImporter()},
@@ -89,7 +91,7 @@ public class ImportFormatTest {
                 new Object[]{new MsBibImporter()},
                 new Object[]{new OvidImporter()},
                 new Object[]{new PdfContentImporter(importFormatPreferences)},
-                new Object[]{new PdfXmpImporter()},
+                new Object[]{new PdfXmpImporter(xmpPreferences)},
                 new Object[]{new RepecNepImporter(importFormatPreferences)},
                 new Object[]{new RisImporter()},
                 new Object[]{new SilverPlatterImporter()}

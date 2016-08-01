@@ -12,7 +12,7 @@ public class ImportFormatPreferences {
 
     private final Set<CustomImporter> customImportList;
 
-    private Charset encoding;
+    private final Charset encoding;
 
     private final String keywordSeparator;
 
@@ -65,9 +65,9 @@ public class ImportFormatPreferences {
         return useCaseKeeperOnSearch;
     }
 
-    public ImportFormatPreferences setEncoding(Charset newEncoding) {
-        this.encoding = newEncoding;
-        return this;
+    public ImportFormatPreferences withEncoding(Charset newEncoding) {
+        return new ImportFormatPreferences(customImportList, newEncoding, keywordSeparator, labelPatternPreferences,
+                fieldContentParserPreferences, convertUnitsOnSearch, useCaseKeeperOnSearch);
     }
 
     static public ImportFormatPreferences fromPreferences(JabRefPreferences jabRefPreferences) {

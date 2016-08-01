@@ -44,7 +44,7 @@ public class BibtexKeyPatternUtilTest {
     @BeforeClass
     public static void setUpGlobalsPrefs() {
         Globals.prefs = JabRefPreferences.getInstance();
-        importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
     }
 
     @Before

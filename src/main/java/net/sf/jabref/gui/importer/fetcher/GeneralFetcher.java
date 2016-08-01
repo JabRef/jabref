@@ -38,13 +38,13 @@ import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.gui.FetcherPreviewDialog;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.SidePaneComponent;
 import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.importer.FetcherPreviewDialog;
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;

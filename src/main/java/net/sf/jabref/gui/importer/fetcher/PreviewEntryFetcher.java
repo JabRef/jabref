@@ -2,7 +2,7 @@ package net.sf.jabref.gui.importer.fetcher;
 
 import java.util.Map;
 
-import net.sf.jabref.gui.FetcherPreviewDialog;
+import net.sf.jabref.gui.importer.FetcherPreviewDialog;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 

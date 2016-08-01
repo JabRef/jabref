@@ -2,18 +2,20 @@ package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -26,6 +28,11 @@ public class PdfContentImporterTestFiles {
     @Parameter
     public String fileName;
 
+
+    @Before
+    public void setUp() {
+        Globals.prefs = JabRefPreferences.getInstance();
+    }
 
     @Parameters(name = "{index}: {0}")
     public static Collection<Object[]> fileNames() {
@@ -47,7 +54,7 @@ public class PdfContentImporterTestFiles {
         PdfContentImporter importer = new PdfContentImporter(
                 ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
         Path pdfFile = Paths.get(PdfContentImporter.class.getResource(pdfFileName).toURI());
-        List<BibEntry> result = importer.importDatabase(pdfFile, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> result = importer.importDatabase(pdfFile, StandardCharsets.UTF_8).getDatabase().getEntries();
         BibEntryAssert.assertEquals(PdfContentImporterTest.class, bibFileName, result);
     }
 

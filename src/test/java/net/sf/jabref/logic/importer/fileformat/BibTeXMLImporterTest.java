@@ -24,10 +24,10 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class BibTeXMLImporterTest {
 
-    private final String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/logic/importer/fileformat";
+    private static final String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/logic/importer/fileformat";
     private BibTeXMLImporter importer;
 
-    
+
     /**
      * Generates a List of all files in the package "/src/test/resources/net/sf/jabref/logic/importer/fileformat"
      *

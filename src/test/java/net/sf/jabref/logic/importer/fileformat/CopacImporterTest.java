@@ -22,10 +22,10 @@ import org.junit.Test;
 
 public class CopacImporterTest {
 
-    private final String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/logic/importer/fileformat";
+    private static final String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/logic/importer/fileformat";
     private CopacImporter importer;
 
-    
+
     /**
      * Generates a List of all files in the package "/src/test/resources/net/sf/jabref/logic/importer/fileformat"
      *

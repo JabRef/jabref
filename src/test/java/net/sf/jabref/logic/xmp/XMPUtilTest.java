@@ -148,9 +148,9 @@ public class XMPUtilTest {
         return c.iterator().next();
     }
 
-    public static String bibtexEntry2BibtexString(BibEntry e) throws IOException {
+    public static String bibtexEntry2BibtexString(BibEntry e, JabRefPreferences preferences) throws IOException {
         StringWriter sw = new StringWriter();
-        new BibEntryWriter(new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)),
+        new BibEntryWriter(new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(preferences)),
                 false).write(e, sw, BibDatabaseMode.BIBTEX);
         return sw.getBuffer().toString();
     }
@@ -176,7 +176,7 @@ public class XMPUtilTest {
     }
 
     public String t2BibtexString() throws IOException {
-        return XMPUtilTest.bibtexEntry2BibtexString(t2BibtexEntry());
+        return XMPUtilTest.bibtexEntry2BibtexString(t2BibtexEntry(), prefs);
     }
 
     public BibEntry t2BibtexEntry() {
@@ -209,7 +209,7 @@ public class XMPUtilTest {
     }
 
     public String t3BibtexString() throws IOException {
-        return XMPUtilTest.bibtexEntry2BibtexString(t3BibtexEntry());
+        return XMPUtilTest.bibtexEntry2BibtexString(t3BibtexEntry(), prefs);
     }
 
     public String t3XMP() {
@@ -247,7 +247,6 @@ public class XMPUtilTest {
             Globals.prefs = JabRefPreferences.getInstance();
         }
 
-        xmpPreferences = XMPPreferences.fromPreferences(Globals.prefs);
 
         // Store Privacy Settings
         prefs = JabRefPreferences.getInstance();
@@ -259,6 +258,7 @@ public class XMPUtilTest {
         prefs.putBoolean("useXmpPrivacyFilter", false);
 
         importFormatPreferences = ImportFormatPreferences.fromPreferences(prefs);
+        xmpPreferences = XMPPreferences.fromPreferences(prefs);
     }
 
     @After

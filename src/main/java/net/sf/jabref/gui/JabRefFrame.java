@@ -101,6 +101,7 @@ import net.sf.jabref.gui.help.AboutDialog;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.importer.ImportCustomizationDialog;
 import net.sf.jabref.gui.importer.ImportFormats;
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
 import net.sf.jabref.gui.importer.fetcher.GeneralFetcher;
 import net.sf.jabref.gui.journals.ManageJournalsAction;
