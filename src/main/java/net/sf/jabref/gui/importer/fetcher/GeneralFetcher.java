@@ -13,7 +13,11 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
+<<<<<<< 9e9fa4faa175a9f839afb8176ad5baca2ee595f9:src/main/java/net/sf/jabref/gui/importer/fetcher/GeneralFetcher.java
 package net.sf.jabref.gui.importer.fetcher;
+=======
+package net.sf.jabref.importer.fetcher;
+>>>>>>> fix codacy and refactor test ressources:src/main/java/net/sf/jabref/importer/fetcher/GeneralFetcher.java
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
@@ -57,8 +61,13 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {
+
+    private static final Log LOGGER = LogFactory.getLog(GeneralFetcher.class);
 
     private final JTextField tf = new JTextField();
 
@@ -306,7 +315,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                                 dialog.dispose();
                             }
                         } catch (FetcherException fe) {
-                            fe.printStackTrace();
+                            LOGGER.error("Error while fetching");
                         }
                     });
                 }else if(webFetcher instanceof IdBasedFetcher){
@@ -328,7 +337,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                                 dialog.dispose();
                             }
                         } catch (FetcherException fe) {
-                            fe.printStackTrace();
+                            LOGGER.error("Error while fetching");
                         }
                     });
                 }

@@ -58,9 +58,7 @@ public class GvkFetcher implements SearchBasedFetcher {
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
 
-        query = query.trim();
-
-        String[] qterms = query.split("\\s");
+        String[] qterms = query.trim().split("\\s");
 
         // Null abfangen!
         if (qterms.length == 0) {
