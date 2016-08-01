@@ -121,7 +121,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             return;
         }
         EventList<BibEntry> selected = e.getSourceList();
-        Object newSelected = null;
+        BibEntry newSelected = null;
         while (e.next()) {
             if (e.getType() == ListEvent.INSERT) {
                 if (newSelected == null) {
@@ -137,7 +137,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         if (newSelected != null) {
 
             // Ok, we have a single new entry that has been selected. Now decide what to do with it:
-            final BibEntry toShow = (BibEntry) newSelected;
+            final BibEntry toShow = newSelected;
             final BasePanelMode mode = panel.getMode(); // What is the panel already showing?
             if ((mode == BasePanelMode.WILL_SHOW_EDITOR) || (mode == BasePanelMode.SHOWING_EDITOR)) {
                 // An entry is currently being edited.

@@ -182,9 +182,9 @@ public class SilverPlatterImporter extends ImportFormat {
             }
 
             if (isChapter) {
-                Object titleO = h.get(FieldName.TITLE);
+                String titleO = h.get(FieldName.TITLE);
                 if (titleO != null) {
-                    String title = ((String) titleO).trim();
+                    String title = titleO.trim();
                     int inPos = title.indexOf("\" in ");
                     if (inPos > 1) {
                         h.put(FieldName.TITLE, title.substring(0, inPos));

@@ -117,8 +117,8 @@ public class JabRefGUI {
         // Add all loaded databases to the frame:
         boolean first = true;
         if (!loaded.isEmpty()) {
-            for (Iterator<ParserResult> i = loaded.iterator(); i.hasNext();) {
-                ParserResult pr = i.next();
+            for (Iterator<ParserResult> parserResultIterator = loaded.iterator(); parserResultIterator.hasNext();) {
+                ParserResult pr = parserResultIterator.next();
 
                 if (new LastFocusedTabPreferences(Globals.prefs).hadLastFocus(pr.getFile())) {
                     first = true;
@@ -126,7 +126,7 @@ public class JabRefGUI {
 
                 if (pr.isInvalid()) {
                     failed.add(pr);
-                    i.remove();
+                    parserResultIterator.remove();
                 } else if (!pr.isPostponedAutosaveFound()) {
                     if (pr.toOpenTab()) {
                         // things to be appended to an opened tab should be done after opening all tabs
@@ -137,7 +137,7 @@ public class JabRefGUI {
                         first = false;
                     }
                 } else {
-                    i.remove();
+                    parserResultIterator.remove();
                     postponed.add(pr.getFile());
                 }
             }

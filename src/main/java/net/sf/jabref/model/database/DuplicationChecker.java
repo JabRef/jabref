@@ -55,11 +55,11 @@ class DuplicationChecker {
      * Returns the number of occurrences of the given key in this database.
      */
     public int getNumberOfKeyOccurrences(String key) {
-        Object o = allKeys.get(key);
-        if (o == null) {
+        Integer numberOfOccurrences = allKeys.get(key);
+        if (numberOfOccurrences == null) {
             return 0;
         } else {
-            return (Integer) o;
+            return numberOfOccurrences;
         }
 
     }

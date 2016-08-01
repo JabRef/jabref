@@ -72,12 +72,12 @@ public class GUIGlobals {
     }
 
     public static JLabel getTableIcon(String fieldType) {
-        Object o = GUIGlobals.TABLE_ICONS.get(fieldType);
-        if (o == null) {
+        JLabel label = GUIGlobals.TABLE_ICONS.get(fieldType);
+        if (label == null) {
             LOGGER.info("Error: no table icon defined for type '" + fieldType + "'.");
             return null;
         } else {
-            return (JLabel) o;
+            return label;
         }
     }
 

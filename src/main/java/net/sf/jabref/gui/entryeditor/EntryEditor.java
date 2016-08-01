@@ -1355,7 +1355,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             // this updates the table automatically, on close, but not
             // within the tab
-            Object oldValue = entry.getCiteKey();
+            String oldValue = entry.getCiteKey();
 
             if (oldValue != null) {
                 if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
@@ -1380,7 +1380,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     LabelPatternPreferences.fromPreferences(Globals.prefs));
 
             // Store undo information:
-            panel.getUndoManager().addEdit(new UndoableKeyChange(panel.getDatabase(), entry, (String) oldValue, entry.getCiteKey()));
+            panel.getUndoManager().addEdit(new UndoableKeyChange(panel.getDatabase(), entry, oldValue, entry.getCiteKey()));
 
             // here we update the field
             String bibtexKeyData = entry.getCiteKey();

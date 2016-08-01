@@ -69,11 +69,11 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
                 if (incommand) {
                     /* Close Command */
                     String command = currentCommand.toString();
-                    Object result = LatexToUnicodeFormatter.CHARS.get(command);
+                    String result = LatexToUnicodeFormatter.CHARS.get(command);
                     if (result == null) {
                         sb.append(command);
                     } else {
-                        sb.append((String) result);
+                        sb.append(result);
                     }
 
                 }
@@ -162,7 +162,7 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
                         argument = part;
                         if (argument != null) {
                             // handle common case of general latex command
-                            Object result = LatexToUnicodeFormatter.CHARS.get(command + argument);
+                            String result = LatexToUnicodeFormatter.CHARS.get(command + argument);
 
                             // If found, then use translated version. If not, then keep
                             // the
@@ -185,7 +185,7 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
                                     sb.append(argument);
                                 }
                             } else {
-                                sb.append((String) result);
+                                sb.append(result);
                             }
 
                         }
@@ -193,22 +193,22 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
                         // This end brace terminates a command. This can be the case in
                         // constructs like {\aa}. The correct behaviour should be to
                         // substitute the evaluated command and swallow the brace:
-                        Object result = LatexToUnicodeFormatter.CHARS.get(command);
+                        String result = LatexToUnicodeFormatter.CHARS.get(command);
 
                         if (result == null) {
                             // If the command is unknown, just print it:
                             sb.append(command);
                         } else {
-                            sb.append((String) result);
+                            sb.append(result);
                         }
 
                     } else {
-                        Object result = LatexToUnicodeFormatter.CHARS.get(command);
+                        String result = LatexToUnicodeFormatter.CHARS.get(command);
 
                         if (result == null) {
                             sb.append(command);
                         } else {
-                            sb.append((String) result);
+                            sb.append(result);
                         }
                         sb.append(' ');
                     }
