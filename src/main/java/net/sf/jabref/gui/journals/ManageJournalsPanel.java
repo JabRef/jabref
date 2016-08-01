@@ -425,7 +425,8 @@ class ManageJournalsPanel extends JPanel {
             }
             File toFile;
             try {
-                String toName = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")), null,
+                String toName = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")),
+                        Collections.emptyList(),
                         JFileChooser.SAVE_DIALOG, false);
                 if (toName == null) {
                     return;
