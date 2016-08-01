@@ -1,5 +1,6 @@
 package net.sf.jabref.logic.importer.fetcher;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -9,6 +10,7 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.Scanner;
+
 import net.sf.jabref.Globals;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
@@ -16,10 +18,10 @@ import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.ISBN;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -33,7 +35,7 @@ public class IsbnFetcher implements IdBasedFetcher {
 
     @Override
     public String getName() {
-        return Localization.lang("ISBN");
+        return "ISBN";
     }
 
     @Override

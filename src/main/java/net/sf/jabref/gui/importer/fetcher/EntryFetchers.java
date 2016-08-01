@@ -19,12 +19,15 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sf.jabref.logic.importer.WebFetcher;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
+import net.sf.jabref.logic.importer.fetcher.IsbnFetcher;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 
 public class EntryFetchers {
 
     private final List<EntryFetcher> entryFetchers = new LinkedList<>();
+    private final List<WebFetcher> webFetchers = new LinkedList<>();
 
 
     public EntryFetchers(JournalAbbreviationLoader abbreviationLoader) {
@@ -36,7 +39,6 @@ public class EntryFetchers {
         entryFetchers.add(new GVKFetcher());
         entryFetchers.add(new IEEEXploreFetcher(abbreviationLoader));
         entryFetchers.add(new INSPIREFetcher());
-        entryFetchers.add(new ISBNtoBibTeXFetcher());
         entryFetchers.add(new MedlineFetcher());
         // entryFetchers.add(new OAI2Fetcher()); - new arXiv fetcher in place, see below
         // entryFetchers.add(new ScienceDirectFetcher()); currently not working - removed see #409
@@ -45,9 +47,14 @@ public class EntryFetchers {
         entryFetchers.add(new DOAJFetcher());
         entryFetchers.add(new SpringerFetcher());
         entryFetchers.add(new SearchBasedEntryFetcher(new ArXiv()));
+
+        webFetchers.add(new IsbnFetcher());
     }
 
     public List<EntryFetcher> getEntryFetchers() {
         return Collections.unmodifiableList(this.entryFetchers);
+    }
+    public List<WebFetcher> getWebFetchers() {
+        return Collections.unmodifiableList(this.webFetchers);
     }
 }
