@@ -2067,11 +2067,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private class PrintPreviewAction implements BaseAction {
 
-         @Override
-         public void action() throws Throwable {
+        @Override
+        public void action() throws Throwable {
+            if (currentPreview == null) {
+                selectionListener.setPreviewActive(true);
+                showPreview(selectionListener.getPreview());
+            }
             currentPreview.getPrintAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
-         }
-     }
+        }
+    }
 
     // Method pertaining to the ClipboardOwner interface.
     @Override
