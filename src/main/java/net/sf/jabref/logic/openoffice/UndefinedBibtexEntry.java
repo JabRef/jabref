@@ -13,9 +13,8 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui.openoffice;
+package net.sf.jabref.logic.openoffice;
 
-import net.sf.jabref.logic.openoffice.OOBibStyle;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -24,7 +23,7 @@ import net.sf.jabref.model.entry.IdGenerator;
  * Subclass of BibEntry for representing entries referenced in a document that can't
  * be found in JabRef's current database.
  */
-class UndefinedBibtexEntry extends BibEntry {
+public class UndefinedBibtexEntry extends BibEntry {
 
     private final String key;
 
