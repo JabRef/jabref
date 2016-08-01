@@ -15,10 +15,10 @@ import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.jabref.importer.fetcher.GVKParser;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.SearchBasedFetcher;
+import net.sf.jabref.logic.importer.util.GVKParser;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
