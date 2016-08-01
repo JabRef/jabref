@@ -12,12 +12,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.parsers.ParserConfigurationException;
+
 import net.sf.jabref.importer.fetcher.GVKParser;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.xml.sax.SAXException;
@@ -90,7 +93,7 @@ public class GvkFetcher implements SearchBasedFetcher {
 
 
         if (bibs.isEmpty()) {
-            System.err.println("No references found");
+            LOGGER.error("No references found");
         }
 
         return bibs;
