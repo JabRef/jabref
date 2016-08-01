@@ -262,7 +262,7 @@ public final class ExternalFileTypes {
             array[i] = new String[] {type.getName(), FILE_TYPE_REMOVED_FLAG};
             i++;
         }
-        Globals.prefs.put("externalFileTypes", FileField.encodeStringArray(array));
+        Globals.prefs.put(JabRefPreferences.EXTERNAL_FILE_TYPES, FileField.encodeStringArray(array));
     }
 
     /**
