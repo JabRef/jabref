@@ -1,6 +1,5 @@
 package net.sf.jabref.importer.fileformat;
 
-import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
@@ -30,8 +29,7 @@ public class PdfContentImporterTest {
     }
 
     @Test
-    public void doesNotHandleEncryptedPdfs() throws IOException, URISyntaxException {
-        PdfContentImporter importer = new PdfContentImporter();
+    public void doesNotHandleEncryptedPdfs() throws URISyntaxException {
         Path file = Paths.get(PdfContentImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
         List<BibEntry> result = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), result);

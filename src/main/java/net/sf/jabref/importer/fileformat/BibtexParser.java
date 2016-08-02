@@ -242,7 +242,7 @@ public class BibtexParser {
         }
     }
 
-    private void parseJabRefComment(Map<String, String> meta) throws IOException {
+    private void parseJabRefComment(Map<String, String> meta) {
         StringBuilder buffer = null;
         try {
             buffer = parseBracketedTextExactly();

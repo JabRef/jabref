@@ -799,7 +799,7 @@ class OOBibBase {
     }
 
     public void rebuildBibTextSection(List<BibDatabase> databases, OOBibStyle style)
-            throws IOException, NoSuchElementException, WrappedTargetException, IllegalArgumentException,
+            throws NoSuchElementException, WrappedTargetException, IllegalArgumentException,
             CreationException, PropertyVetoException, UnknownPropertyException, UndefinedParagraphFormatException {
         List<String> cited = findCitedKeys();
         Map<String, BibDatabase> linkSourceBase = new HashMap<>();

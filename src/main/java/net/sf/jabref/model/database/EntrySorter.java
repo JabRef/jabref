@@ -22,12 +22,7 @@ import java.util.List;
 
 import net.sf.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class EntrySorter {
-
-    private static final Log LOGGER = LogFactory.getLog(EntrySorter.class);
 
     // guarded by itself
     private final List<BibEntry> entries;

@@ -49,14 +49,14 @@ public class PdfXmpImporterTest {
     }
 
     @Test
-    public void importEncryptedFileReturnsError() throws IOException, URISyntaxException {
+    public void importEncryptedFileReturnsError() throws URISyntaxException {
         Path file = Paths.get(PdfXmpImporterTest.class.getResource("/pdfs/encrypted.pdf").toURI());
         ParserResult result = importer.importDatabase(file, Charset.defaultCharset());
         Assert.assertTrue(result.hasWarnings());
     }
 
     @Test
-    public void testImportEntries() throws IOException, URISyntaxException {
+    public void testImportEntries() throws URISyntaxException {
         Path file = Paths.get(PdfXmpImporterTest.class.getResource("annotated.pdf").toURI());
         List<BibEntry> bibEntries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
 
