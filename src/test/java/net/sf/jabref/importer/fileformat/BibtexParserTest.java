@@ -630,9 +630,9 @@ public class BibtexParserTest {
                 .parse(new StringReader("@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
                         + "  title = {Title A}}\n" + "@inProceedings{canh05," + "  author={Norton Bar}}"));
 
-        String[] duplicateKeys = result.getDuplicateKeys();
-        assertEquals(1, duplicateKeys.length);
-        assertEquals("canh05", duplicateKeys[0]);
+        List<String> duplicateKeys = result.getDuplicateKeys();
+        assertEquals(1, duplicateKeys.size());
+        assertEquals("canh05", duplicateKeys.get(0));
     }
 
     @Test

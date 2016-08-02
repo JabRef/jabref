@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -61,8 +62,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
         }
 
         PdfImporter pi = new PdfImporter(JabRefGUI.getMainFrame(), JabRefGUI.getMainFrame().getCurrentBasePanel(), JabRefGUI.getMainFrame().getCurrentBasePanel().getMainTable(), -1);
-        String[] fileNames = {pdfFile.toString()};
-        ImportPdfFilesResult res = pi.importPdfFiles(fileNames);
+        ImportPdfFilesResult res = pi.importPdfFiles(Collections.singletonList(pdfFile.toString()));
         if (res.getEntries().size() == 1) {
             return Optional.of(res.getEntries().get(0));
         } else {

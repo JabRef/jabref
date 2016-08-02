@@ -146,10 +146,10 @@ public class ParserResult {
     /**
      * Get all duplicated keys found in the database.
      *
-     * @return An array containing the duplicated keys.
+     * @return A list containing the duplicated keys.
      */
-    public String[] getDuplicateKeys() {
-        return duplicateKeys.toArray(new String[duplicateKeys.size()]);
+    public List<String> getDuplicateKeys() {
+        return duplicateKeys;
     }
 
     public boolean isPostponedAutosaveFound() {
