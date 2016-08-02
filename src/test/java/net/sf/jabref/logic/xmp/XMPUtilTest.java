@@ -1,10 +1,10 @@
 package net.sf.jabref.logic.xmp;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -13,6 +13,8 @@ import java.io.PrintStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -1108,7 +1110,7 @@ public class XMPUtilTest {
 
         // First check conversion from .bib to .xmp
         File tempBib = File.createTempFile("JabRef", ".bib");
-        try (FileWriter fileWriter = new FileWriter(tempBib)) {
+        try (BufferedWriter fileWriter = Files.newBufferedWriter(tempBib.toPath(), StandardCharsets.UTF_8)) {
             fileWriter.write(t1BibtexString());
             fileWriter.close();
 
@@ -1208,7 +1210,7 @@ public class XMPUtilTest {
     public void testCommandLineByKey() throws IOException, TransformerException {
 
         File tempBib = File.createTempFile("JabRef", ".bib");
-        try (FileWriter fileWriter = new FileWriter(tempBib)) {
+        try (BufferedWriter fileWriter = Files.newBufferedWriter(tempBib.toPath(), StandardCharsets.UTF_8)) {
             fileWriter.write(t1BibtexString());
             fileWriter.write(t2BibtexString());
 
@@ -1259,7 +1261,7 @@ public class XMPUtilTest {
 
         File tempBib = File.createTempFile("JabRef", ".bib");
 
-        try (FileWriter fileWriter = new FileWriter(tempBib)) {
+        try (BufferedWriter fileWriter = Files.newBufferedWriter(tempBib.toPath(), StandardCharsets.UTF_8)) {
 
             fileWriter.write(t1BibtexString());
             fileWriter.write(t3BibtexString());
@@ -1357,7 +1359,8 @@ public class XMPUtilTest {
     @Test
     public void testResolveStrings2() throws IOException, TransformerException {
 
-        try (FileReader fr = new FileReader("src/test/resources/net/sf/jabref/util/twente.bib")) {
+        try (BufferedReader fr = Files.newBufferedReader(Paths.get("src/test/resources/net/sf/jabref/util/twente.bib"),
+                StandardCharsets.UTF_8)) {
             ParserResult result = BibtexParser.parse(fr);
 
             Assert.assertEquals("Arvind", result.getDatabase().resolveForStrings("#Arvind#"));
