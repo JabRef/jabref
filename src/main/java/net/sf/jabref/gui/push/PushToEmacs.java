@@ -13,13 +13,14 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.external.push;
+package net.sf.jabref.gui.push;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
 import javax.swing.Icon;
+import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -30,6 +31,7 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -38,44 +40,48 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Created by IntelliJ IDEA. User: alver Date: Mar 7, 2007 Time: 6:55:56 PM To change this template use File | Settings
- * | File Templates.
+ * Created by IntelliJ IDEA. User: alver Date: Jan 14, 2006 Time: 4:55:23 PM
  */
-public class PushToVim extends AbstractPushToApplication implements PushToApplication {
+public class PushToEmacs extends AbstractPushToApplication implements PushToApplication {
 
-    private static final Log LOGGER = LogFactory.getLog(PushToVim.class);
+    private static final Log LOGGER = LogFactory.getLog(PushToEmacs.class);
 
-    private final JTextField vimServer = new JTextField(30);
+    private final JTextField additionalParams = new JTextField(30);
+    private final JCheckBox useEmacs23 = new JCheckBox();
 
 
     @Override
     public String getApplicationName() {
-        return "Vim";
+        return "Emacs";
     }
 
     @Override
     public Icon getIcon() {
-        return IconTheme.getImage("vim");
+        return IconTheme.getImage("emacs");
     }
 
     @Override
     public JPanel getSettingsPanel() {
-        vimServer.setText(Globals.prefs.get(JabRefPreferences.VIM_SERVER));
+        additionalParams.setText(Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS));
+        useEmacs23.setSelected(Globals.prefs.getBoolean(JabRefPreferences.EMACS_23));
         return super.getSettingsPanel();
     }
 
     @Override
     public void storeSettings() {
         super.storeSettings();
-        Globals.prefs.put(JabRefPreferences.VIM_SERVER, vimServer.getText());
+        Globals.prefs.put(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS, additionalParams.getText());
+        Globals.prefs.putBoolean(JabRefPreferences.EMACS_23, useEmacs23.isSelected());
     }
 
     @Override
     protected void initSettingsPanel() {
         super.initSettingsPanel();
-        builder.appendRows("2dlu, p");
-        builder.add(Localization.lang("Vim server name") + ":").xy(1, 3);
-        builder.add(vimServer).xy(3, 3);
+        builder.appendRows("2dlu, p, 2dlu, p");
+        builder.add(Localization.lang("Additional parameters") + ":").xy(1, 3);
+        builder.add(additionalParams).xy(3, 3);
+        builder.add(Localization.lang("Use EMACS 23 insertion string") + ":").xy(1, 5);
+        builder.add(useEmacs23).xy(3, 5);
         settings = builder.build();
     }
 
@@ -94,11 +100,33 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
             return;
         }
 
+        commandPath = Globals.prefs.get(commandPathPreferenceKey);
+        String[] addParams = Globals.prefs.get(JabRefPreferences.EMACS_ADDITIONAL_PARAMETERS).split(" ");
         try {
-            String[] com = new String[] {commandPath, "--servername",
-                    Globals.prefs.get(JabRefPreferences.VIM_SERVER), "--remote-send",
-                    "<C-\\><C-N>a" + getCiteCommand() +
-                    "{" + keys + "}"};
+            String[] com = new String[addParams.length + 2];
+            com[0] = commandPath;
+            System.arraycopy(addParams, 0, com, 1, addParams.length);
+            String prefix;
+            String suffix;
+            if (Globals.prefs.getBoolean(JabRefPreferences.EMACS_23)) {
+                prefix = "(with-current-buffer (window-buffer) (insert ";
+                suffix = "))";
+            } else {
+                prefix = "(insert ";
+                suffix = ")";
+            }
+
+            com[com.length - 1] = OS.WINDOWS ?
+            // Windows gnuclient escaping:
+            // java string: "(insert \\\"\\\\cite{Blah2001}\\\")";
+            // so cmd receives: (insert \"\\cite{Blah2001}\")
+            // so emacs receives: (insert "\cite{Blah2001}")
+            prefix.concat("\\\"\\" + getCiteCommand().replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\\\"").concat(suffix) :
+            // Linux gnuclient escaping:
+            // java string: "(insert \"\\\\cite{Blah2001}\")"
+            // so sh receives: (insert "\\cite{Blah2001}")
+            // so emacs receives: (insert "\cite{Blah2001}")
+            prefix.concat("\"" + getCiteCommand().replaceAll("\\\\", "\\\\\\\\") + "{" + keys + "}\"").concat(suffix);
 
             final Process p = Runtime.getRuntime().exec(com);
 
@@ -115,7 +143,7 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
                     }
                     // Error stream has been closed. See if there were any errors:
                     if (!sb.toString().trim().isEmpty()) {
-                        LOGGER.warn("Push to Vim error: " + sb);
+                        LOGGER.warn("Push to Emacs error: " + sb);
                         couldNotConnect = true;
                     }
                 } catch (IOException e) {
@@ -124,25 +152,22 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
             });
         } catch (IOException excep) {
             couldNotCall = true;
-            LOGGER.warn("Problem pushing to Vim.", excep);
+            LOGGER.warn("Problem pushing to Emacs.", excep);
         }
-
     }
 
     @Override
     public void operationCompleted(BasePanel panel) {
         if (couldNotConnect) {
-            JOptionPane.showMessageDialog(
-                    panel.frame(),
-                    "<HTML>" +
-                            Localization.lang("Could not connect to Vim server. Make sure that "
-                                    + "Vim is running<BR>with correct server name.")
-                    + "</HTML>",
+            JOptionPane.showMessageDialog(panel.frame(), "<HTML>" +
+                    Localization.lang("Could not connect to a running gnuserv process. Make sure that "
+                            + "Emacs or XEmacs is running,<BR>and that the server has been started "
+                            + "(by running the command 'server-start'/'gnuserv-start').") + "</HTML>",
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         } else if (couldNotCall) {
-            JOptionPane.showMessageDialog(
-                    panel.frame(),
-                    Localization.lang("Could not run the 'vim' program."),
+            JOptionPane.showMessageDialog(panel.frame(),
+                    Localization.lang("Could not run the gnuclient/emacsclient program. Make sure you have "
+                            + "the emacsclient/gnuclient program installed and available in the PATH."),
                     Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
         } else {
             super.operationCompleted(panel);
@@ -151,7 +176,12 @@ public class PushToVim extends AbstractPushToApplication implements PushToApplic
 
     @Override
     protected void initParameters() {
-        commandPathPreferenceKey = JabRefPreferences.VIM;
+        commandPathPreferenceKey = JabRefPreferences.EMACS_PATH;
+    }
+
+    @Override
+    protected String getCommandName() {
+        return "gnuclient " + Localization.lang("or") + " emacsclient";
     }
 
 }

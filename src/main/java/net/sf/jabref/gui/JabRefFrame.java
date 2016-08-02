@@ -73,8 +73,6 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.external.ExternalFileTypeEditor;
-import net.sf.jabref.external.push.PushToApplicationButton;
-import net.sf.jabref.external.push.PushToApplications;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.AutoLinkFilesAction;
 import net.sf.jabref.gui.actions.ErrorConsoleAction;
@@ -108,6 +106,8 @@ import net.sf.jabref.gui.menus.FileHistoryMenu;
 import net.sf.jabref.gui.menus.RightClickMenu;
 import net.sf.jabref.gui.openoffice.OpenOfficePanel;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
+import net.sf.jabref.gui.push.PushToApplicationButton;
+import net.sf.jabref.gui.push.PushToApplications;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
@@ -463,6 +463,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AutoLinkFilesAction autoLinkFile = new AutoLinkFilesAction();
 
     private PushToApplicationButton pushExternalButton;
+    private PushToApplications pushApplications;
 
     private GeneralFetcher generalFetcher;
 
@@ -879,7 +880,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         setProgressBarVisible(false);
 
-        pushExternalButton = new PushToApplicationButton(this, PushToApplications.getApplications());
+        pushApplications = new PushToApplications();
+        pushExternalButton = new PushToApplicationButton(this, pushApplications.getApplications());
         fillMenu();
         createToolBar();
         getContentPane().setLayout(gbl);
@@ -2246,5 +2248,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public void setPreviewToggle(boolean enabled) {
         previewToggle.setSelected(enabled);
+    }
+
+    public PushToApplications getPushApplications() {
+        return pushApplications;
     }
 }
