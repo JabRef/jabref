@@ -288,7 +288,7 @@ public class XMPSchemaBibtex extends XMPSchema {
         // Set all the values including key and entryType
         Set<String> fields = entry.getFieldNames();
 
-        if (xmpPreferences.isUseXMPPrivacyFilter()) {
+        if (xmpPreferences != null && xmpPreferences.isUseXMPPrivacyFilter()) {
             Set<String> filters = new TreeSet<>(xmpPreferences.getXmpPrivacyFilter());
             fields.removeAll(filters);
         }
