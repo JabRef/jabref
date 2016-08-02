@@ -841,13 +841,13 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
          */
         private void removeSelectedEntries() {
             int row = glTable.getSelectedRow();
-            List<Object> toRemove = new ArrayList<>();
+            List<BibEntry> toRemove = new ArrayList<>();
             toRemove.addAll(selectionModel.getSelected());
 
             entries.getReadWriteLock().writeLock().lock();
             try {
-                for (Object o : toRemove) {
-                    entries.remove(o);
+                for (BibEntry entry : toRemove) {
+                    entries.remove(entry);
                 }
             } finally {
                 entries.getReadWriteLock().writeLock().unlock();

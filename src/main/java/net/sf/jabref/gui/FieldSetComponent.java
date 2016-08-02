@@ -203,11 +203,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
     }
 
     public String getFirstSelected() {
-        Object o = list.getSelectedValue();
-        if (o == null) {
-            return null;
-        }
-        return (String) o;
+        return list.getSelectedValue();
     }
 
     @Override
@@ -375,7 +371,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
      */
     protected class FieldListFocusListener<T> implements FocusListener {
 
-        private JList<T> list;
+        private final JList<T> list;
 
         public FieldListFocusListener(JList<T> list) {
             this.list = list;
