@@ -230,19 +230,19 @@ public class InternalBibtexFields {
         dummy.setPrivate();
         add(dummy);
 
-        dummy = new BibtexSingleField(FieldName.SEARCH, false);
+        dummy = new BibtexSingleField(FieldName.SEARCH_INTERNAL, false);
         dummy.setPrivate();
         dummy.setWriteable(false);
         dummy.setDisplayable(false);
         add(dummy);
 
-        dummy = new BibtexSingleField(FieldName.GROUPSEARCH, false);
+        dummy = new BibtexSingleField(FieldName.GROUPSEARCH_INTERNAL, false);
         dummy.setPrivate();
         dummy.setWriteable(false);
         dummy.setDisplayable(false);
         add(dummy);
 
-        dummy = new BibtexSingleField(FieldName.MARKED, false);
+        dummy = new BibtexSingleField(FieldName.MARKED_INTERNAL, false);
         dummy.setPrivate();
         dummy.setWriteable(true); // This field must be written to file!
         dummy.setDisplayable(false);

@@ -30,7 +30,6 @@ import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -658,12 +657,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.MERGE_WITH_FETCHED_ENTRY, (BaseAction) () -> {
             if (mainTable.getSelectedEntries().size() == 1) {
                 BibEntry originalEntry = mainTable.getSelectedEntries().get(0);
-                new FetchAndMergeEntry(originalEntry, this,
-                        Arrays.asList(FieldName.DOI, FieldName.ISBN, FieldName.EPRINT));
+                new FetchAndMergeEntry(originalEntry, this, FetchAndMergeEntry.SUPPORTED_FIELDS);
             } else {
                 JOptionPane.showMessageDialog(frame(),
                         Localization.lang("This operation requires exactly one item to be selected."),
-                        Localization.lang("Merge entry with %0 information", "DOI/ISBN"),
+                        Localization.lang("Merge entry with %0 information",
+                                FieldName.orFields(FieldName.getDisplayName(FieldName.DOI),
+                                        FieldName.getDisplayName(FieldName.ISBN),
+                                        FieldName.getDisplayName(FieldName.EPRINT))),
                         JOptionPane.INFORMATION_MESSAGE);
             }
         });

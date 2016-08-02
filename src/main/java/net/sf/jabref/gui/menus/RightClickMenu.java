@@ -16,6 +16,7 @@
 package net.sf.jabref.gui.menus;
 
 import java.awt.event.ActionEvent;
+import java.util.List;
 import java.util.Optional;
 
 import javax.swing.AbstractAction;
@@ -35,6 +36,7 @@ import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.Actions;
+import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
@@ -107,7 +109,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             add(markSpecific);
             add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entries"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon()));
         } else if (be != null) {
-            Optional<String> marked = be.getFieldOptional(FieldName.MARKED);
+            Optional<String> marked = be.getFieldOptional(FieldName.MARKED_INTERNAL);
             // We have to check for "" too as the marked field may be empty
             if ((!marked.isPresent()) || marked.get().isEmpty()) {
                 add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entry"), IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon()));
@@ -183,10 +185,9 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         add(typeMenu);
 
         add(new GeneralAction(Actions.MERGE_WITH_FETCHED_ENTRY,
-                Localization.lang("Get BibTeX data from %0", "DOI/ISBN/ArXiv")) {
+                Localization.lang("Get BibTeX data from %0", FetchAndMergeEntry.getDisplayNameOfSupportedFields())) {
             {
-                if (!(isFieldSetForSelectedEntry(FieldName.DOI) || isFieldSetForSelectedEntry(FieldName.ISBN)
-                        || isFieldSetForSelectedEntry(FieldName.EPRINT))) {
+                if (!(isAnyFieldSetForSelectedEntry(FetchAndMergeEntry.SUPPORTED_FIELDS))) {
                     this.setEnabled(false);
                 }
             }
@@ -273,6 +274,29 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         if (panel.getMainTable().getSelectedRowCount() == 1) {
             BibEntry entry = panel.getMainTable().getSelected().get(0);
             return entry.getFieldNames().contains(fieldname);
+        } else {
+            return false;
+        }
+    }
+
+    private boolean areAllFieldsSetForSelectedEntry(List<String> fieldnames) {
+        if (panel.getMainTable().getSelectedRowCount() == 1) {
+            BibEntry entry = panel.getMainTable().getSelected().get(0);
+            return entry.getFieldNames().containsAll(fieldnames);
+        } else {
+            return false;
+        }
+    }
+
+    private boolean isAnyFieldSetForSelectedEntry(List<String> fieldnames) {
+        if (panel.getMainTable().getSelectedRowCount() == 1) {
+            BibEntry entry = panel.getMainTable().getSelected().get(0);
+            for (String fieldname : fieldnames) {
+                if (entry.getFieldNames().contains(fieldname)) {
+                    return true;
+                }
+            }
+            return false;
         } else {
             return false;
         }

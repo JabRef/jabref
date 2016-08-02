@@ -1,5 +1,14 @@
 package net.sf.jabref.model.entry;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+
+/**
+ * String constants for BibTeX entry field names
+ *
+ */
 public class FieldName {
 
     // Character separating field names that are to be used in sequence as
@@ -30,6 +39,7 @@ public class FieldName {
     public static final String HOWPUBLISHED = "howpublished";
     public static final String INSTITUTION = "institution";
     public static final String ISBN = "isbn";
+    public static final String ISRN = "isrn";
     public static final String ISSN = "issn";
     public static final String ISSUE = "issue";
     public static final String JOURNAL = "journal";
@@ -54,6 +64,7 @@ public class FieldName {
     public static final String SUBTITLE = "subtitle";
     public static final String TITLE = "title";
     public static final String TYPE = "type";
+    public static final String URI = "uri";
     public static final String URL = "url";
     public static final String URLDATE = "urldate";
     public static final String VERSION = "version";
@@ -66,12 +77,44 @@ public class FieldName {
     public static final String TIMESTAMP = "timestamp"; // Not the actual field name, but the default value
     public static final String NUMBER_COL = "#";
     public static final String GROUPS = "groups";
-    public static final String SEARCH = "__search";
-    public static final String GROUPSEARCH = "__groupsearch";
-    public static final String MARKED = "__markedentry";
+    public static final String SEARCH_INTERNAL = "__search";
+    public static final String GROUPSEARCH_INTERNAL = "__groupsearch";
+    public static final String MARKED_INTERNAL = "__markedentry";
+
+    // Map to hold alternative display names
+    private static final Map<String, String> displayNames = new HashMap<>();
+
 
     public static String orFields(String... fields) {
         return String.join(FieldName.FIELD_SEPARATOR, fields);
     }
 
+    public static String orFields(List<String> fields) {
+        return String.join(FieldName.FIELD_SEPARATOR, fields);
+    }
+
+    static {
+        displayNames.put(FieldName.DOI, "DOI");
+        displayNames.put(FieldName.ISBN, "ISBN");
+        displayNames.put(FieldName.ISRN, "ISRN");
+        displayNames.put(FieldName.ISSN, "ISSN");
+        displayNames.put(FieldName.PS, "PS");
+        displayNames.put(FieldName.PDF, "PDF");
+        displayNames.put(FieldName.URI, "URI");
+        displayNames.put(FieldName.URL, "URL");
+    }
+
+
+    /**
+     * @param field - field to get the display version for
+     * @return A version of the field name more suitable for display
+     */
+    public static String getDisplayName(String field) {
+        String lowercaseField = field.toLowerCase(Locale.ROOT);
+
+        if (displayNames.containsKey(lowercaseField)) {
+            return displayNames.get(lowercaseField);
+        }
+        return EntryUtil.capitalizeFirst(field);
+    }
 }

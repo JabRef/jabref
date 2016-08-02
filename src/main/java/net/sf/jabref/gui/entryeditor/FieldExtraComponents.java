@@ -193,11 +193,12 @@ public class FieldExtraComponents {
             if (doi.isPresent()) {
                 entryEditor.getEntry().setField(FieldName.DOI, doi.get().getDOI());
             } else {
-                panel.frame().setStatus(Localization.lang("No %0 found", "DOI"));
+                panel.frame().setStatus(Localization.lang("No %0 found", FieldName.getDisplayName(FieldName.DOI)));
             }
         });
         // fetch bibtex data
-        JButton fetchButton = new JButton(Localization.lang("Get BibTeX data from %0", "DOI"));
+        JButton fetchButton = new JButton(
+                Localization.lang("Get BibTeX data from %0", FieldName.getDisplayName(FieldName.DOI)));
         fetchButton.setEnabled(false);
         fetchButton.addActionListener(actionEvent -> {
             BibEntry entry = entryEditor.getEntry();
@@ -252,7 +253,8 @@ public class FieldExtraComponents {
     public static Optional<JComponent> getIsbnExtraComponent(BasePanel panel, EntryEditor entryEditor,
             FieldEditor fieldEditor) {
         // fetch bibtex data
-        JButton fetchButton = new JButton(Localization.lang("Get BibTeX data from %0", "ISBN"));
+        JButton fetchButton = new JButton(
+                Localization.lang("Get BibTeX data from %0", FieldName.getDisplayName(FieldName.ISBN)));
         fetchButton.setEnabled(false);
         fetchButton.addActionListener(actionEvent -> {
             BibEntry entry = entryEditor.getEntry();
