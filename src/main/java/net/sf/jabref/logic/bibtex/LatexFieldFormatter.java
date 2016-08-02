@@ -43,6 +43,9 @@ public class LatexFieldFormatter {
 
     private final FieldContentParser parser;
 
+    private static final char FIELD_START = '{';
+    private static final char FIELD_END = '}';
+
 
     public LatexFieldFormatter(LatexFieldFormatterPreferences prefs) {
         this(true, prefs);
@@ -71,7 +74,7 @@ public class LatexFieldFormatter {
             throws IllegalArgumentException {
 
         if (content == null) {
-            return prefs.getValueDelimiterStartOfValue() + String.valueOf(prefs.getValueDelimiterEndOfValue());
+            return FIELD_START + String.valueOf(FIELD_END);
         }
 
         String result = content;
@@ -182,18 +185,18 @@ public class LatexFieldFormatter {
         checkBraces(content);
 
         stringBuilder = new StringBuilder(
-                String.valueOf(prefs.getValueDelimiterStartOfValue()));
+                String.valueOf(FIELD_START));
 
         stringBuilder.append(parser.format(content, fieldName));
 
-        stringBuilder.append(prefs.getValueDelimiterEndOfValue());
+        stringBuilder.append(FIELD_END);
 
         return stringBuilder.toString();
     }
 
     private void writeText(String text, int startPos, int endPos) {
 
-        stringBuilder.append(prefs.getValueDelimiterStartOfValue());
+        stringBuilder.append(FIELD_START);
         boolean escape = false;
         boolean inCommandName = false;
         boolean inCommand = false;
@@ -252,7 +255,7 @@ public class LatexFieldFormatter {
             }
             escape = c == '\\';
         }
-        stringBuilder.append(prefs.getValueDelimiterEndOfValue());
+        stringBuilder.append(FIELD_END);
     }
 
     private void writeStringLabel(String text, int startPos, int endPos,

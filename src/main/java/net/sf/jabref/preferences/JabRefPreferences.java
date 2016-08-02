@@ -319,7 +319,6 @@ public class JabRefPreferences {
     public static final String OPEN_FOLDERS_OF_ATTACHED_FILES = "openFoldersOfAttachedFiles";
     public static final String KEY_GEN_ALWAYS_ADD_LETTER = "keyGenAlwaysAddLetter";
     public static final String KEY_GEN_FIRST_LETTER_A = "keyGenFirstLetterA";
-    public static final String VALUE_DELIMITERS2 = "valueDelimiters";
     public static final String ENFORCE_LEGAL_BIBTEX_KEY = "enforceLegalBibtexKey";
     public static final String PROMPT_BEFORE_USING_AUTOSAVE = "promptBeforeUsingAutosave";
     public static final String AUTO_SAVE_INTERVAL = "autoSaveInterval";
@@ -416,8 +415,6 @@ public class JabRefPreferences {
     private static final String CUSTOM_TYPE_REQ = "customTypeReq_";
     private static final String CUSTOM_TYPE_OPT = "customTypeOpt_";
     private static final String CUSTOM_TYPE_PRIOPT = "customTypePriOpt_";
-
-    private static final char[][] VALUE_DELIMITERS = new char[][] { {'"', '"'}, {'{', '}'}};
 
 
     public String WRAPPED_USERNAME;
@@ -828,7 +825,6 @@ public class JabRefPreferences {
         defaults.put(ENFORCE_LEGAL_BIBTEX_KEY, Boolean.TRUE);
         // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
         // Currently, JabRef does not escape them
-        defaults.put(VALUE_DELIMITERS2, 1);
         defaults.put(KEY_GEN_FIRST_LETTER_A, Boolean.TRUE);
         defaults.put(KEY_GEN_ALWAYS_ADD_LETTER, Boolean.FALSE);
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
@@ -947,14 +943,6 @@ public class JabRefPreferences {
             }
         }
 
-    }
-
-    public char getValueDelimiters(int index) {
-        return getValueDelimiters()[index];
-    }
-
-    private char[] getValueDelimiters() {
-        return JabRefPreferences.VALUE_DELIMITERS[getInt(VALUE_DELIMITERS2)];
     }
 
     /**
