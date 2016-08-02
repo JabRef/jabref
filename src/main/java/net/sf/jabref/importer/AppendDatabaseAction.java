@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -82,7 +83,7 @@ public class AppendDatabaseAction implements BaseAction {
         if (md.isOkPressed()) {
             List<String> chosen = FileDialogs.getMultipleFiles(frame,
                     new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
-                    null, false);
+                    Collections.emptyList(), false);
             //String chosenFile = Globals.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")),
             //                                       null, JFileChooser.OPEN_DIALOG, false);
             if (chosen.isEmpty()) {
@@ -142,7 +143,7 @@ public class AppendDatabaseAction implements BaseAction {
             for (BibEntry originalEntry : fromDatabase.getEntries()) {
                 BibEntry be = (BibEntry) originalEntry.clone();
                 be.setId(IdGenerator.next());
-                UpdateField.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp);
+                UpdateField.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp, Globals.prefs);
                 database.insertEntry(be);
                 appendedEntries.add(be);
                 originalEntries.add(originalEntry);

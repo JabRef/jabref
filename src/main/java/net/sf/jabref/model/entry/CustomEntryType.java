@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -78,8 +79,11 @@ public class CustomEntryType implements EntryType {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
         if (o instanceof CustomEntryType) {
-            return this.compareTo((CustomEntryType) o) == 0;
+            return Objects.equals(name, ((CustomEntryType) o).name);
         } else {
             return false;
         }
@@ -115,7 +119,7 @@ public class CustomEntryType implements EntryType {
     /**
      * Get a String describing the required field set for this entry type.
      *
-     * @return Description of required field set for storage in preferences or bib file.
+     * @return Description of required field set for storage in preferences or BIB file.
      */
     public String getRequiredFieldsString() {
         return String.join(";", required);

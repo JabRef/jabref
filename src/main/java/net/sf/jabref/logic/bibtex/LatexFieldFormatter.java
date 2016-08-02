@@ -18,7 +18,7 @@ package net.sf.jabref.logic.bibtex;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
@@ -77,11 +77,11 @@ public class LatexFieldFormatter {
         String result = content;
 
         // normalize newlines
-        boolean shouldNormalizeNewlines = !result.contains(Globals.NEWLINE) && result.contains("\n");
+        boolean shouldNormalizeNewlines = !result.contains(OS.NEWLINE) && result.contains("\n");
         if (shouldNormalizeNewlines) {
             // if we don't have real new lines, but pseudo newlines, we replace them
             // On Win 8.1, this is always true for multiline fields
-            result = result.replace("\n", Globals.NEWLINE);
+            result = result.replace("\n", OS.NEWLINE);
         }
 
         // If the field is non-standard, we will just append braces,

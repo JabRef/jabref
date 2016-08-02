@@ -489,10 +489,10 @@ public class SearchResultsDialog {
                     // For name fields, tap into a MainTableFormat instance and use
                     // the same name formatting as is used in the entry table:
                     if (frame.getCurrentBasePanel() != null) {
-                        return MainTableNameFormatter.formatName(entry.getField(field));
+                        return MainTableNameFormatter.formatName(entry.getFieldOptional(field).orElse(null));
                     }
                 }
-                return entry.getField(field);
+                return entry.getFieldOptional(field).orElse(null);
             }
         }
 

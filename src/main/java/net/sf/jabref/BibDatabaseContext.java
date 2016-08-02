@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
@@ -13,7 +14,7 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
- * Represents everything related to a .bib file.
+ * Represents everything related to a BIB file.
  * <p>
  * The entries are stored in BibDatabase, the other data in MetaData and the options relevant for this file in Defaults.
  */
@@ -116,7 +117,7 @@ public class BibDatabaseContext {
      * 1. metadata user-specific directory
      * 2. metadata general directory
      * 3. preferences directory
-     * 4. bib file directory
+     * 4. BIB file directory
      *
      * @param fieldName The field type
      * @return The default directory for this field type.
@@ -137,12 +138,12 @@ public class BibDatabaseContext {
         }
 
         // 3. preferences directory
-        String dir = Globals.prefs.get(fieldName + Globals.DIR_SUFFIX); // FILE_DIR
+        String dir = Globals.prefs.get(fieldName + FileLinkPreferences.DIR_SUFFIX); // FILE_DIR
         if (dir != null) {
             fileDirs.add(dir);
         }
 
-        // 4. bib file directory
+        // 4. BIB file directory
         if (getDatabaseFile() != null) {
             String parentDir = getDatabaseFile().getParent();
             // Check if we should add it as primary file dir (first in the list) or not:
@@ -159,7 +160,7 @@ public class BibDatabaseContext {
     private String getFileDirectoryPath(String directoryName) {
         String dir = directoryName;
         // If this directory is relative, we try to interpret it as relative to
-        // the file path of this bib file:
+        // the file path of this BIB file:
         if (!new File(dir).isAbsolute() && (getDatabaseFile() != null)) {
             String relDir;
             if (".".equals(dir)) {

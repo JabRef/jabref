@@ -198,7 +198,7 @@ public class JabRefCLI {
 
         options.addOption(Option.builder("a").
                 longOpt("aux").
-                desc(String.format("%s: %s[.aux],%s[.bib]", Localization.lang("Subdatabase from aux"),
+                desc(String.format("%s: %s[.aux],%s[.bib]", Localization.lang("Subdatabase from AUX"),
                         Localization.lang("file"),
                         Localization.lang("new"))).
                 hasArg().
@@ -214,7 +214,7 @@ public class JabRefCLI {
 
         options.addOption(Option.builder("f").
                 longOpt("fetch").
-                desc(Localization.lang("Run Fetcher, e.g. \"--fetch=Medline:cancer\"")).
+                desc(Localization.lang("Run fetcher, e.g. \"--fetch=Medline:cancer\"")).
                 hasArg().
                 argName("FILE").
                 build());

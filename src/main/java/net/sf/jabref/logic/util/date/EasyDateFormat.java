@@ -1,9 +1,10 @@
 package net.sf.jabref.logic.util.date;
 
-import java.text.SimpleDateFormat;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public class EasyDateFormat {
@@ -11,8 +12,16 @@ public class EasyDateFormat {
     /**
      * The formatter objects
      */
-    private SimpleDateFormat dateFormatter;
+    private final DateTimeFormatter dateFormatter;
 
+
+    public EasyDateFormat(String dateFormat) {
+        this(DateTimeFormatter.ofPattern(dateFormat));
+    }
+
+    public EasyDateFormat(DateTimeFormatter dateFormatter) {
+        this.dateFormatter = dateFormatter;
+    }
 
     /**
      * Creates a String containing the current date (and possibly time),
@@ -22,7 +31,7 @@ public class EasyDateFormat {
      * @return The date string.
      */
     public String getCurrentDate() {
-        return getDateAt(new Date());
+        return getDateAt(ZonedDateTime.now());
     }
 
     /**
@@ -32,11 +41,26 @@ public class EasyDateFormat {
      * @return The formatted date string.
      */
     public String getDateAt(Date date) {
+        return getDateAt(date.toInstant().atZone(ZoneId.systemDefault()));
+    }
+
+    /**
+     * Creates a readable Date string from the parameter date. The format is set
+     * in preferences under the key "timeStampFormat".
+     *
+     * @return The formatted date string.
+     */
+    public String getDateAt(ZonedDateTime dateTime) {
         // first use, create an instance
-        if (dateFormatter == null) {
-            String format = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT);
-            dateFormatter = new SimpleDateFormat(format);
-        }
-        return dateFormatter.format(date);
+        return dateTime.format(dateFormatter);
+    }
+
+
+    public static EasyDateFormat fromPreferences(JabRefPreferences preferences) {
+     return new EasyDateFormat(preferences.get(JabRefPreferences.TIME_STAMP_FORMAT));
+    }
+
+    public static EasyDateFormat isoDateFormat() {
+        return new EasyDateFormat(DateTimeFormatter.ISO_LOCAL_DATE);
     }
 }

@@ -172,7 +172,7 @@ public class JabRefDesktop {
             openExternalFilePlatformIndependent(type, filePath);
             return true;
         } else {
-            // No file matched the name, or we didn't know the file type.
+            // No file matched the name, or we did not know the file type.
             return false;
         }
     }

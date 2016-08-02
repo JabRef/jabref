@@ -444,7 +444,7 @@ public class VM implements Warn {
         });
 
         /**
-         * Writes onto the bbl file what's accumulated in the output buffer.
+         * Writes onto the bbl file what is accumulated in the output buffer.
          * It writes a blank line if and only if the output buffer is empty.
          * Since write$ does reasonable line breaking, you should use this
          * function only when you want a blank line or an explicit line

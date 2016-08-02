@@ -20,13 +20,24 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Added ISBN integrity checker
 - Added filter to not show selected integrity checks
 - Enhance the entry customization dialog to give better visual feedback
+- It is now possible to generate a new BIB database from the citations in an OpenOffice/LibreOffice document
 - The arXiv fetcher now also supports free-text search queries
+- [#1345](https://github.com/JabRef/jabref/issues/1345) Cleanup ISSN
 
 ### Fixed
+- Fixed [#1632](https://github.com/JabRef/jabref/issues/1632) User comments (@Comment) with or without brackets are now kept
 - Fixed [#1264](https://github.com/JabRef/jabref/issues/1264): S with caron does not render correctly
 - LaTeX to Unicode converter now handles combining accents
+- Fixed NullPointerException when clicking Browse in Journal abbreviations with empty text field
+- Fixed NullPointerException when opening file in Plain text import
+- Fixed NullPointerException when appending database
+- Fixed [#636](https://github.com/JabRef/jabref/issues/636): DOI in export filters
 - Fixed [#1527](https://github.com/JabRef/jabref/issues/1527): 'Get BibTeX data from DOI' Removes Marking
 - Fixed [#1592](https://github.com/JabRef/jabref/issues/1592): LibreOffice: wrong numbers in citation labels
+- The merge entry dialog showed wrong heading after merging from DOI
+- Fixed [#1321](https://github.com/JabRef/jabref/issues/1321): LaTeX commands in fields not displayed in the list of references
+- Fixed [#1639](https://github.com/JabRef/jabref/issues/1639): Google Scholar fetching works again.
+- Date fields in the BibLatex standard are now always formatted in the correct way, independent of the preferences
 
 ### Removed
 - It is not longer possible to choose to convert HTML sub- and superscripts to equations

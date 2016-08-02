@@ -97,4 +97,19 @@ public class LatexToUnicodeFormatterTest {
     public void testCombiningAccentsCase2() {
         assertEquals("a͍", formatter.format("\\spreadlips{a}"));
     }
+
+    @Test
+    public void unknownCommandIsKept() {
+        assertEquals("aaaa", formatter.format("\\aaaa"));
+    }
+
+    @Test
+    public void unknownCommandKeepsArgument() {
+        assertEquals("bbbb", formatter.format("\\aaaa{bbbb}"));
+    }
+
+    @Test
+    public void unknownCommandWithEmptyArgumentIsKept() {
+        assertEquals("aaaa", formatter.format("\\aaaa{}"));
+    }
 }

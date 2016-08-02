@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2005-2015 Andreas Rudert, Oscar Gustafsson extracted from CustomImportList
+ Copyright (C) 2005-2016 Andreas Rudert, Oscar Gustafsson extracted from CustomImportList
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as
@@ -35,6 +35,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import net.sf.jabref.importer.fileformat.ImportFormat;
 
@@ -116,18 +117,25 @@ public class CustomImporter implements Comparable<CustomImporter> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        boolean equalName = this.getName().equals(((CustomImporter) o).getName());
-        boolean equalCliId = this.getClidId().equals(((CustomImporter) o).getClidId());
-        boolean equalClassName = this.getClassName().equals(((CustomImporter) o).getClassName());
-        boolean equalBasePath = this.getBasePath().equals(((CustomImporter) o).getBasePath());
+    public boolean equals(Object other) {
 
-        return (o instanceof CustomImporter) && equalName && equalCliId && equalClassName && equalBasePath;
+        if (this == other) {
+            return true;
+        }
+
+        if (!(other instanceof CustomImporter)) {
+            return false;
+        }
+
+        CustomImporter otherImporter = (CustomImporter) other;
+        return Objects.equals(name, otherImporter.name) && Objects.equals(cliId, otherImporter.cliId)
+                && Objects.equals(className, otherImporter.className)
+                && Objects.equals(basePath, otherImporter.basePath);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return Objects.hash(name, cliId, className, basePath);
     }
 
     @Override

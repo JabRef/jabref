@@ -25,4 +25,11 @@ public class OS {
     public static final boolean LINUX = OS_NAME.startsWith("linux");
     public static final boolean WINDOWS = OS_NAME.startsWith("win");
     public static final boolean OS_X = OS_NAME.startsWith("mac");
+
+    // File separator obtained from system
+    public static final String FILE_SEPARATOR = System.getProperty("file.separator");
+
+    // Newlines
+    // will be overridden in initialization due to feature #857 @ JabRef.java
+    public static String NEWLINE = System.lineSeparator();
 }

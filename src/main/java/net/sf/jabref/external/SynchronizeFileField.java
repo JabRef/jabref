@@ -132,7 +132,7 @@ public class SynchronizeFileField extends AbstractWorker {
 
         // First we try to autoset fields
         if (autoSet) {
-            Collection<BibEntry> entries = new ArrayList<>(sel);
+            List<BibEntry> entries = new ArrayList<>(sel);
 
             // Start the automatically setting process:
             Runnable r = AutoSetLinks.autoSetLinks(entries, ce, changedEntries, null, panel.getBibDatabaseContext(), null, null);

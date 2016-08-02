@@ -29,7 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -434,8 +433,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     public void autoSetLinks() {
         auto.setEnabled(false);
 
-        Collection<BibEntry> entries = new ArrayList<>();
-        entries.addAll(frame.getCurrentBasePanel().getSelectedEntries());
+        List<BibEntry> entries = new ArrayList<>(frame.getCurrentBasePanel().getSelectedEntries());
 
         // filesystem lookup
         JDialog dialog = new JDialog(frame, true);

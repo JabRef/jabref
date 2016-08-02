@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.formatter.Formatters;
@@ -16,6 +15,7 @@ import net.sf.jabref.logic.formatter.IdentityFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
@@ -101,7 +101,7 @@ public class FieldFormatterCleanups {
         // first remove all newlines for easier parsing
         String remainingString = formatterString;
 
-        remainingString = StringUtil.unifyLineBreaksToConfiguredLineBreaks(remainingString).replaceAll(Globals.NEWLINE, "");
+        remainingString = StringUtil.unifyLineBreaksToConfiguredLineBreaks(remainingString).replaceAll(OS.NEWLINE, "");
         try {
             while (startIndex < formatterString.length()) {
                 // read the field name
@@ -191,7 +191,7 @@ public class FieldFormatterCleanups {
         for (Map.Entry<String, List<String>> entry : groupedByField.entrySet()) {
             result.append(entry.getKey());
 
-            StringJoiner joiner = new StringJoiner(",", "[", "]" + Globals.NEWLINE);
+            StringJoiner joiner = new StringJoiner(",", "[", "]" + OS.NEWLINE);
             entry.getValue().forEach(joiner::add);
             result.append(joiner.toString());
         }

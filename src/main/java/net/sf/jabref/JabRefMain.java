@@ -25,11 +25,14 @@ import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.net.ProxyAuthenticator;
 import net.sf.jabref.logic.net.ProxyPreferences;
 import net.sf.jabref.logic.net.ProxyRegisterer;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.client.RemoteListenerClient;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -71,6 +74,9 @@ public class JabRefMain {
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
 
+        // Set key pattern based on preferences
+        LabelPatternUtil.updateDefaultPattern(LabelPatternPreferences.fromPreferences(Globals.prefs));
+
         // Check for running JabRef
         RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);
         if (remotePreferences.useRemoteServer()) {
@@ -92,7 +98,7 @@ public class JabRefMain {
 
         // override used newline character with the one stored in the preferences
         // The preferences return the system newline character sequence as default
-        Globals.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
+        OS.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
 
         // Process arguments
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START);

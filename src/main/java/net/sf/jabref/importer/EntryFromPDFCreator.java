@@ -2,7 +2,8 @@ package net.sf.jabref.importer;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
@@ -14,9 +15,9 @@ import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.pdfimport.PdfImporter;
 import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
@@ -95,9 +96,9 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
                     Calendar creationDate = pdfDocInfo.getCreationDate();
                     if (creationDate != null) {
                         // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
-                        String date = new SimpleDateFormat("yyyy-MM-dd")
-                                .format(creationDate.getTime());
-                        appendToField(entry, InternalBibtexFields.TIMESTAMP, date);
+                        String date = LocalDate.of(creationDate.YEAR, creationDate.MONTH + 1, creationDate.DAY_OF_MONTH)
+                                .format(DateTimeFormatter.ISO_LOCAL_DATE);
+                        appendToField(entry, Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD), date);
                     }
 
                     if (pdfDocInfo.getCustomMetadataValue("bibtex/bibtexkey") != null) {

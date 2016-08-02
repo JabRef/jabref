@@ -310,13 +310,13 @@ public class LayoutHelper {
                         return;
                     }
                 } else if ("filename".equalsIgnoreCase(name)) {
-                    // Print the name of the database bib file.
+                    // Print the name of the database BIB file.
                     // This is only supported in begin/end layouts, not in
                     // entry layouts.
                     parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILENAME));
                     return;
                 } else if ("filepath".equalsIgnoreCase(name)) {
-                    // Print the full path of the database bib file.
+                    // Print the full path of the database BIB file.
                     // This is only supported in begin/end layouts, not in
                     // entry layouts.
                     parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILEPATH));

@@ -151,7 +151,7 @@ public class DownloadExternalFile {
         if (suggestedType.isPresent()) {
             suffix = suggestedType.get().getExtension();
         } else {
-            // If we didn't find a file type from the MIME type, try based on extension:
+            // If we did not find a file type from the MIME type, try based on extension:
             suffix = getSuffix(res);
             if (suffix == null) {
                 suffix = "";
@@ -200,10 +200,10 @@ public class DownloadExternalFile {
             if (directory == null) {
                 dirPrefix = null;
             } else {
-                if (directory.endsWith(System.getProperty("file.separator"))) {
+                if (directory.endsWith(OS.FILE_SEPARATOR)) {
                     dirPrefix = directory;
                 } else {
-                    dirPrefix = directory + System.getProperty("file.separator");
+                    dirPrefix = directory + OS.FILE_SEPARATOR;
                 }
             }
 
@@ -249,7 +249,7 @@ public class DownloadExternalFile {
     private File expandFilename(String directory, String link) {
         File toFile = new File(link);
         // If this is a relative link, we should perhaps append the directory:
-        String dirPrefix = directory + System.getProperty("file.separator");
+        String dirPrefix = directory + OS.FILE_SEPARATOR;
         if (!toFile.isAbsolute()) {
             toFile = new File(dirPrefix + link);
         }

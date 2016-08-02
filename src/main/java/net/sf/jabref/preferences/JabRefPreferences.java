@@ -51,7 +51,6 @@ import net.sf.jabref.JabRefMain;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
-import net.sf.jabref.gui.maintable.PersistenceTableColumnListener;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.importer.CustomImportList;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
@@ -80,7 +79,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import org.apache.commons.logging.Log;
@@ -344,6 +342,7 @@ public class JabRefPreferences {
 
     public static final String AKS_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP_DOI = "CleanUpDOI";
+    public static final String CLEANUP_ISSN = "CleanUpISSN";
     public static final String CLEANUP_MOVE_PDF = "CleanUpMovePDF";
     public static final String CLEANUP_MAKE_PATHS_RELATIVE = "CleanUpMakePathsRelative";
     public static final String CLEANUP_RENAME_PDF = "CleanUpRenamePDF";
@@ -565,8 +564,6 @@ public class JabRefPreferences {
 
         defaults.put(COLUMN_NAMES, "entrytype;author/editor;title;year;journal/booktitle;bibtexkey");
         defaults.put(COLUMN_WIDTHS, "75;300;470;60;130;100");
-        defaults.put(PersistenceTableColumnListener.ACTIVATE_PREF_KEY,
-                PersistenceTableColumnListener.DEFAULT_ENABLED);
         defaults.put(XMP_PRIVACY_FILTERS, "pdf;timestamp;keywords;owner;note;review");
         defaults.put(USE_XMP_PRIVACY_FILTER, Boolean.FALSE);
         defaults.put(NUMBER_COL_WIDTH, 32);
@@ -784,7 +781,7 @@ public class JabRefPreferences {
         // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
         defaults.put(TIME_STAMP_FORMAT, "yyyy-MM-dd");
 
-        defaults.put(TIME_STAMP_FIELD, InternalBibtexFields.TIMESTAMP);
+        defaults.put(TIME_STAMP_FIELD, FieldName.TIMESTAMP);
         defaults.put(UPDATE_TIMESTAMP, Boolean.FALSE);
 
         defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
@@ -1386,6 +1383,7 @@ public class JabRefPreferences {
 
     private static void insertCleanupPreset(Map<String, Object> storage, CleanupPreset preset) {
         storage.put(CLEANUP_DOI, preset.isCleanUpDOI());
+        storage.put(CLEANUP_ISSN, preset.isCleanUpISSN());
         storage.put(CLEANUP_MOVE_PDF, preset.isMovePDF());
         storage.put(CLEANUP_MAKE_PATHS_RELATIVE, preset.isMakePathsRelative());
         storage.put(CLEANUP_RENAME_PDF, preset.isRenamePDF());

@@ -128,12 +128,12 @@ public class ADSFetcher implements EntryFetcher {
                     getTitle(), JOptionPane.ERROR_MESSAGE);
             LOGGER.debug("File not found", e);
         } catch (IOException e) {
-            status.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url) + "\n\n" + e,
+            status.showMessage(Localization.lang("An exception occurred while accessing '%0'", url) + "\n\n" + e,
                     getTitle(), JOptionPane.ERROR_MESSAGE);
             LOGGER.debug("Problem accessing URL", e);
         } catch (RuntimeException e) {
             status.showMessage(
-                    Localization.lang("An Error occurred while fetching from ADS (%0):", url) + "\n\n" + e.getMessage(),
+                    Localization.lang("An error occurred while fetching from ADS (%0):", url) + "\n\n" + e.getMessage(),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
             LOGGER.warn("Problem fetching from ADS", e);
         }
@@ -174,14 +174,14 @@ public class ADSFetcher implements EntryFetcher {
             abstractText = abstractText.replace("\n", " ");
             entry.setField(FieldName.ABSTRACT, abstractText);
         } catch (XMLStreamException e) {
-            status.showMessage(Localization.lang("An Error occurred while parsing abstract"), getTitle(),
+            status.showMessage(Localization.lang("An error occurred while parsing abstract"), getTitle(),
                     JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            status.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url) + "\n\n" + e,
+            status.showMessage(Localization.lang("An exception occurred while accessing '%0'", url) + "\n\n" + e,
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             status.showMessage(
-                    Localization.lang("An Error occurred while fetching from ADS (%0):", url) + "\n\n" + e.getMessage(),
+                    Localization.lang("An error occurred while fetching from ADS (%0):", url) + "\n\n" + e.getMessage(),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         }
     }

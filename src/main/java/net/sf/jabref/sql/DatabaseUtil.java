@@ -44,7 +44,7 @@ public class DatabaseUtil {
     }
 
     /**
-     * Returns a Jabref Database ID from the database in case the DB is already exported. In case the bib was already
+     * Returns a Jabref Database ID from the database in case the DB is already exported. In case the BIB was already
      * exported before, the method returns the id, otherwise it calls the method that inserts a new row and returns the
      * ID for this new database
      *

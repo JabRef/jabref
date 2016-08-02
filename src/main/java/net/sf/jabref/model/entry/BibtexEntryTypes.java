@@ -39,7 +39,7 @@ public class BibtexEntryTypes {
     public static final EntryType BOOK = new BibtexEntryType() {
 
         {
-            addAllRequired(FieldName.TITLE, FieldName.PUBLISHER, FieldName.YEAR, "author/editor");
+            addAllRequired(FieldName.TITLE, FieldName.PUBLISHER, FieldName.YEAR, FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR));
             addAllOptional(FieldName.VOLUME, FieldName.NUMBER, FieldName.SERIES, FieldName.ADDRESS, FieldName.EDITION, FieldName.MONTH, FieldName.NOTE);
         }
 
@@ -97,7 +97,7 @@ public class BibtexEntryTypes {
     public static final EntryType INBOOK = new BibtexEntryType() {
 
         {
-            addAllRequired("chapter/pages", FieldName.TITLE, FieldName.PUBLISHER, FieldName.YEAR, "author/editor");
+            addAllRequired(FieldName.orFields(FieldName.CHAPTER, FieldName.PAGES), FieldName.TITLE, FieldName.PUBLISHER, FieldName.YEAR, FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR));
             addAllOptional(FieldName.VOLUME, FieldName.NUMBER, FieldName.SERIES, FieldName.TYPE, FieldName.ADDRESS, FieldName.EDITION, FieldName.MONTH, FieldName.NOTE);
         }
 

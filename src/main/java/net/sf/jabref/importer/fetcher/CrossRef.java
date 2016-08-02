@@ -94,7 +94,7 @@ public class CrossRef {
         try {
             // title
             JSONObject data = result.getJSONObject(0);
-            String dataTitle = data.getJSONArray(FieldName.TITLE).getString(0);
+            String dataTitle = data.getJSONArray("title").getString(0);
 
             if (editDistanceIgnoreCase(entryTitle, dataTitle) <= METRIC_THRESHOLD) {
                 return true;

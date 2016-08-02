@@ -72,7 +72,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     private static final List<PostOpenAction> POST_OPEN_ACTIONS = new ArrayList<>();
 
     static {
-        // Add the action for checking for new custom entry types loaded from the bib file:
+        // Add the action for checking for new custom entry types loaded from the BIB file:
         POST_OPEN_ACTIONS.add(new CheckForNewEntryTypesAction());
         // Add the action for converting legacy entries in ExplicitGroup
         POST_OPEN_ACTIONS.add(new ConvertLegacyExplicitGroups());
@@ -203,7 +203,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 int answer = JOptionPane.showConfirmDialog(null,
                         "<html>" + Localization
                                 .lang("An autosave file was found for this database. This could indicate "
-                                        + "that JabRef didn't shut down cleanly last time the file was used.")
+                                        + "that JabRef did not shut down cleanly last time the file was used.")
                                 + "<br>" + Localization.lang("Do you want to recover the database from the autosave file?")
                                 + "</html>", Localization.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
@@ -298,7 +298,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
      * Go through the list of post open actions, and perform those that need to be performed.
      *
      * @param panel  The BasePanel where the database is shown.
-     * @param result The result of the bib file parse operation.
+     * @param result The result of the BIB file parse operation.
      */
     public static void performPostOpenActions(BasePanel panel, ParserResult result, boolean mustRaisePanel) {
         for (PostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
@@ -354,7 +354,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     /**
      * Load database (bib-file) or, if there exists, a newer autosave version, unless the flag is set to ignore the autosave
      *
-     * @param name Name of the bib-file to open
+     * @param name Name of the BIB-file to open
      * @param ignoreAutosave true if autosave version of the file should be ignored
      * @return ParserResult which never is null
      */

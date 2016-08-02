@@ -119,6 +119,9 @@ public class SearchGroup extends AbstractGroup {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
         if (!(o instanceof SearchGroup)) {
             return false;
         }

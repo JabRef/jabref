@@ -16,7 +16,7 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
- * The action concerned with generate a new (sub-)database from latex aux file.
+ * The action concerned with generate a new (sub-)database from latex AUX file.
  */
 public class NewSubDatabaseAction extends MnemonicAwareAction {
 

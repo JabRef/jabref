@@ -26,12 +26,14 @@ import javax.swing.JOptionPane;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * This class extends FieldSetComponent to provide some required functionality for the
@@ -70,7 +72,8 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
             return;
         }
 
-        String testString = LabelPatternUtil.checkLegalKey(s);
+        String testString = LabelPatternUtil.checkLegalKey(s,
+                Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
         if (!testString.equals(s) || (s.indexOf('&') >= 0)) {
             // Report error and exit.
             JOptionPane.showMessageDialog(this, Localization.lang("Entry type names are not allowed to contain white space or the following "

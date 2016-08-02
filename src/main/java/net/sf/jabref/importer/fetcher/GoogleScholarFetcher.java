@@ -266,8 +266,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private BibEntry downloadEntry(String link) throws IOException {
         try {
-            String s = new URLDownload(GoogleScholarFetcher.URL_START + link)
-                    .downloadToString(Globals.prefs.getDefaultEncoding());
+            String s = new URLDownload(link).downloadToString(Globals.prefs.getDefaultEncoding());
             BibtexParser bp = new BibtexParser(new StringReader(s));
             ParserResult pr = bp.parse();
             if ((pr != null) && (pr.getDatabase() != null)) {

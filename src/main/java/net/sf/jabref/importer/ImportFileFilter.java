@@ -73,6 +73,9 @@ class ImportFileFilter extends FileFilter implements Comparable<ImportFileFilter
 
     @Override
     public boolean equals(Object o) {
+        if(this == o) {
+            return true;
+        }
         if (o instanceof ImportFileFilter) {
             return name.equals(((ImportFileFilter) o).name);
         }

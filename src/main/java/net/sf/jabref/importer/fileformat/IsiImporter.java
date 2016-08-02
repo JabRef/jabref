@@ -293,7 +293,7 @@ public class IsiImporter extends ImportFormat {
                     } else if (Type.startsWith("Article") || Type.startsWith("Journal") || "article".equals(PT)) {
                         Type = "article";
                     } else {
-                        Type = "misc";
+                        Type = BibEntry.DEFAULT_TYPE;
                     }
                 } else if ("CR".equals(beg)) {
                     hm.put("CitedReferences", value.replace("EOLEOL", " ; ").trim());

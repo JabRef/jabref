@@ -12,19 +12,17 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
 import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
-import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 public class SpecialMainTableColumns {
 
-    public static final MainTableColumn NUMBER_COL = new MainTableColumn(InternalBibtexFields.NUMBER_COL) {
+    public static final MainTableColumn NUMBER_COL = new MainTableColumn(FieldName.NUMBER_COL) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
@@ -43,12 +41,9 @@ public class SpecialMainTableColumns {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
-            SpecialFieldValue rank = Rank.getInstance().parse(entry.getField(SpecialFieldsUtils.FIELDNAME_RANKING));
-            if (rank == null) {
-                return null;
-            } else {
-                return rank.createLabel();
-            }
+
+            return entry.getFieldOptional(SpecialFieldsUtils.FIELDNAME_RANKING)
+                    .flatMap(Rank.getInstance()::parse).map(rank -> rank.createLabel()).orElse(null);
         }
     };
 
@@ -59,13 +54,8 @@ public class SpecialMainTableColumns {
         @Override
         public Object getColumnValue(BibEntry entry) {
 
-            SpecialFieldValue prio = Priority.getInstance()
-                    .parse(entry.getField(SpecialFieldsUtils.FIELDNAME_PRIORITY));
-            if (prio == null) {
-                return null;
-            } else {
-                return prio.createLabel();
-            }
+            return entry.getFieldOptional(SpecialFieldsUtils.FIELDNAME_PRIORITY)
+                    .flatMap(Priority.getInstance()::parse).map(prio -> prio.createLabel()).orElse(null);
         }
     };
 
@@ -76,13 +66,8 @@ public class SpecialMainTableColumns {
         @Override
         public Object getColumnValue(BibEntry entry) {
 
-            SpecialFieldValue status = ReadStatus.getInstance()
-                    .parse(entry.getField(SpecialFieldsUtils.FIELDNAME_READ));
-            if (status == null) {
-                return null;
-            } else {
-                return status.createLabel();
-            }
+            return entry.getFieldOptional(SpecialFieldsUtils.FIELDNAME_READ)
+                    .flatMap(ReadStatus.getInstance()::parse).map(status -> status.createLabel()).orElse(null);
         }
     };
 

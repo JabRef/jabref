@@ -91,6 +91,7 @@ import net.sf.jabref.logic.groups.EntriesGroupChange;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.DuplicateCheck;
@@ -184,7 +185,6 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     private static final int FILE_COL = 2;
     private static final int URL_COL = 3;
     private static final int PAD = 4;
-    private static final String URL_FIELD = FieldName.URL;
 
 
     /**
@@ -462,7 +462,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             database.insertEntry(entry);
 
             // Generate a unique key:
-            LabelPatternUtil.makeLabel(localMetaData, database, entry, Globals.prefs);
+            LabelPatternUtil.makeLabel(localMetaData, database, entry,
+                    LabelPatternPreferences.fromPreferences(Globals.prefs));
             // Remove the entry from the database again, since we only added it in
             // order to
             // make sure the key was unique:
@@ -503,7 +504,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 entry.setId(IdGenerator.next());
                 database.insertEntry(entry);
 
-                LabelPatternUtil.makeLabel(localMetaData, database, entry, Globals.prefs);
+                LabelPatternUtil.makeLabel(localMetaData, database, entry,
+                        LabelPatternPreferences.fromPreferences(Globals.prefs));
                 // Add the generated key to our list:
                 keys.add(entry.getCiteKey());
             }
@@ -708,7 +710,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             // Set owner/timestamp if options are enabled:
             UpdateField.setAutomaticFields(selected, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
-                    Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
+                    Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs);
 
             // Mark entries if we should
             if (EntryMarker.shouldMarkEntries()) {
@@ -917,7 +919,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                                 fl.type)).actionPerformed(null);
                     }
                 } else { // Must be URL_COL
-                    openExternalLink(URL_FIELD, e);
+                    openExternalLink(FieldName.URL, e);
                 }
             }
         }
@@ -1130,14 +1132,14 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             }
             BibEntry entry = selectionModel.getSelected().get(0);
             String result = JOptionPane.showInputDialog(ImportInspectionDialog.this, Localization.lang("Enter URL"),
-                    entry.getFieldOptional(URL_FIELD).orElse(""));
+                    entry.getFieldOptional(FieldName.URL).orElse(""));
             entries.getReadWriteLock().writeLock().lock();
             try {
                 if (result != null) {
                     if (result.isEmpty()) {
-                        entry.clearField(URL_FIELD);
+                        entry.clearField(FieldName.URL);
                     } else {
-                        entry.setField(URL_FIELD, result);
+                        entry.setField(FieldName.URL, result);
                     }
                 }
             } finally {
@@ -1308,7 +1310,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             if (i == FILE_COL) {
                 comparators.add(new IconComparator(Collections.singletonList(FieldName.FILE)));
             } else if (i == URL_COL) {
-                comparators.add(new IconComparator(Collections.singletonList(URL_FIELD)));
+                comparators.add(new IconComparator(Collections.singletonList(FieldName.URL)));
             }
 
         }
@@ -1428,7 +1430,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         FileListTableModel model = new FileListTableModel();
                         entry.getFieldOptional(FieldName.FILE).ifPresent(model::setContent);
                         fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
-                        if (model.getRowCount() > 0 && model.getEntry(0).type.isPresent()) {
+                        if ((model.getRowCount() > 0) && model.getEntry(0).type.isPresent()) {
                             fileLabel.setIcon(model.getEntry(0).type.get().getIcon());
                         }
                         return fileLabel;
@@ -1436,8 +1438,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         return null;
                     }
                 case URL_COL:
-                    if (entry.hasField(URL_FIELD)) {
-                        urlLabel.setToolTipText(entry.getFieldOptional(URL_FIELD).orElse(""));
+                    if (entry.hasField(FieldName.URL)) {
+                        urlLabel.setToolTipText(entry.getFieldOptional(FieldName.URL).orElse(""));
                         return urlLabel;
                     } else {
                         return null;

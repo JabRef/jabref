@@ -16,6 +16,10 @@ public class DiffHighlighting {
     private static final String CHANGE_START = "<span class=change>";
     private static final String TAG_END = "</span>";
 
+    public static final String HTML_START = "<html><body>";
+    public static final String HTML_END = "</body></html>";
+
+
     public static String generateDiffHighlighting(String baseString, String modifiedString, String separator) {
         Objects.requireNonNull(separator);
         if ((baseString != null) && (modifiedString != null)) {
@@ -93,6 +97,5 @@ public class DiffHighlighting {
         }
         return modifiedString;
     }
-
 
 }

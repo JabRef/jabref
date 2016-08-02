@@ -136,7 +136,8 @@ public class GenFieldsCustomizer extends JDialog {
                         Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            String testString = LabelPatternUtil.checkLegalKey(parts[1]);
+            String testString = LabelPatternUtil.checkLegalKey(parts[1],
+                    Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
             if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
                 // Report error and exit.
                 JOptionPane.showMessageDialog(this, Localization.lang("Field names are not allowed to contain white space or the following "

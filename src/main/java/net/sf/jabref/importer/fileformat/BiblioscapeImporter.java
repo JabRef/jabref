@@ -199,9 +199,9 @@ public class BiblioscapeImporter extends ImportFormat {
                     }
                 }
 
-                String bibtexType = "misc";
+                String bibtexType = BibEntry.DEFAULT_TYPE;
                 // to find type, first check TW, then RT
-                for (int i = 1; (i >= 0) && "misc".equals(bibtexType); --i) {
+                for (int i = 1; (i >= 0) && BibEntry.DEFAULT_TYPE.equals(bibtexType); --i) {
                     if (type[i] == null) {
                         continue;
                     }

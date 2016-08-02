@@ -70,6 +70,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -125,6 +126,7 @@ import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
@@ -507,11 +509,11 @@ public class TextInputDialog extends JDialog {
 
         // we have to remove line breaks (but keep empty lines)
         // otherwise, the result is broken
-        text = text.replace(Globals.NEWLINE.concat(Globals.NEWLINE), "##NEWLINE##");
+        text = text.replace(OS.NEWLINE.concat(OS.NEWLINE), "##NEWLINE##");
         // possible URL line breaks are removed completely.
-        text = text.replace("/".concat(Globals.NEWLINE), "/");
-        text = text.replace(Globals.NEWLINE, " ");
-        text = text.replace("##NEWLINE##", Globals.NEWLINE);
+        text = text.replace("/".concat(OS.NEWLINE), "/");
+        text = text.replace(OS.NEWLINE, " ");
+        text = text.replace("##NEWLINE##", OS.NEWLINE);
 
         ParserResult importerResult = fimp.importEntries(text);
         if(importerResult.hasWarnings()) {
@@ -521,7 +523,7 @@ public class TextInputDialog extends JDialog {
         if (importedEntries.isEmpty()) {
             return false;
         } else {
-            UpdateField.setAutomaticFields(importedEntries, false, false);
+            UpdateField.setAutomaticFields(importedEntries, false, false, Globals.prefs);
             boolean markEntries = EntryMarker.shouldMarkEntries();
 
             for (BibEntry e : importedEntries) {
@@ -602,7 +604,8 @@ public class TextInputDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                String chosen = FileDialogs.getNewFile(frame, null, null, ".txt", JFileChooser.OPEN_DIALOG, false);
+                String chosen = FileDialogs.getNewFile(frame, null, Collections.emptyList(), ".txt",
+                        JFileChooser.OPEN_DIALOG, false);
                 if (chosen != null) {
                     File newFile = new File(chosen);
                     document.remove(0, document.getLength());

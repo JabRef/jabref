@@ -337,7 +337,7 @@ public class GVKParser {
         // Dokumenttyp bestimmen und Eintrag anlegen
 
         if (mak.startsWith("As")) {
-            entryType = "misc";
+            entryType = BibEntry.DEFAULT_TYPE;
 
             if (quelle.contains("ISBN")) {
                 entryType = "incollection";
@@ -346,9 +346,9 @@ public class GVKParser {
                 entryType = "article";
             }
         } else if (mak.isEmpty()) {
-            entryType = "misc";
+            entryType = BibEntry.DEFAULT_TYPE;
         } else if (mak.startsWith("O")) {
-            entryType = "misc";
+            entryType = BibEntry.DEFAULT_TYPE;
             // FIXME: online only available in Biblatex
             //entryType = "online";
         }
@@ -382,7 +382,7 @@ public class GVKParser {
             if (subtitle.length() > 1) {
                 newSubtitle.append(subtitle.substring(1));
             }
-            result.setField("subtitle", newSubtitle.toString());
+            result.setField(FieldName.SUBTITLE, newSubtitle.toString());
         }
         if (publisher != null) {
             result.setField(FieldName.PUBLISHER, publisher);
@@ -409,7 +409,7 @@ public class GVKParser {
             result.setField(FieldName.NUMBER, number);
         }
         if (pagetotal != null) {
-            result.setField("pagetotal", pagetotal);
+            result.setField(FieldName.PAGETOTAL, pagetotal);
         }
         if (pages != null) {
             result.setField(FieldName.PAGES, pages);

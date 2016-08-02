@@ -52,6 +52,9 @@ public class CleanupPreset {
         if (preferences.getBoolean(JabRefPreferences.CLEANUP_DOI)) {
             activeJobs.add(CleanupStep.CLEAN_UP_DOI);
         }
+        if (preferences.getBoolean(JabRefPreferences.CLEANUP_ISSN)) {
+            activeJobs.add(CleanupStep.CLEAN_UP_ISSN);
+        }
         if (preferences.getBoolean(JabRefPreferences.CLEANUP_MOVE_PDF)) {
             activeJobs.add(CleanupStep.MOVE_PDF);
         }
@@ -88,6 +91,10 @@ public class CleanupPreset {
         return isActive(CleanupStep.CLEAN_UP_DOI);
     }
 
+    public boolean isCleanUpISSN() {
+        return isActive(CleanupStep.CLEAN_UP_ISSN);
+    }
+
     public boolean isFixFileLinks() {
         return isActive(CleanupStep.FIX_FILE_LINKS);
     }
@@ -114,6 +121,7 @@ public class CleanupPreset {
 
     public void storeInPreferences(JabRefPreferences preferences) {
         preferences.putBoolean(JabRefPreferences.CLEANUP_DOI, isActive(CleanupStep.CLEAN_UP_DOI));
+        preferences.putBoolean(JabRefPreferences.CLEANUP_ISSN, isActive(CleanupStep.CLEAN_UP_ISSN));
         preferences.putBoolean(JabRefPreferences.CLEANUP_MOVE_PDF, isActive(CleanupStep.MOVE_PDF));
         preferences.putBoolean(JabRefPreferences.CLEANUP_MAKE_PATHS_RELATIVE, isActive(CleanupStep.MAKE_PATHS_RELATIVE));
         preferences.putBoolean(JabRefPreferences.CLEANUP_RENAME_PDF, isActive(CleanupStep.RENAME_PDF));
@@ -152,6 +160,8 @@ public class CleanupPreset {
          */
         CONVERT_TO_BIBLATEX,
         MOVE_PDF,
-        FIX_FILE_LINKS
+        FIX_FILE_LINKS,
+        CLEAN_UP_ISSN
     }
+
 }

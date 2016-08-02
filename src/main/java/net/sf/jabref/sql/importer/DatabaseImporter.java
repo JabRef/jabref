@@ -107,7 +107,7 @@ public class DatabaseImporter {
      * @param dbs  The necessary database connection information
      * @param mode
      * @return An ArrayList containing pairs of Objects. Each position of the ArrayList stores three Objects: a
-     * BibDatabase, a MetaData and a String with the bib database name stored in the DBMS
+     * BibDatabase, a MetaData and a String with the BIB database name stored in the DBMS
      * @throws SQLException
      * @throws ClassNotFoundException
      * @throws InstantiationException

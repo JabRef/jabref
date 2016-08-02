@@ -45,6 +45,8 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTextField;
 
+import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
@@ -64,12 +66,19 @@ import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.logic.openoffice.UndefinedParagraphFormatException;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
+import com.sun.star.beans.IllegalTypeException;
+import com.sun.star.beans.NotRemoveableException;
+import com.sun.star.beans.PropertyExistException;
+import com.sun.star.beans.PropertyVetoException;
 import com.sun.star.beans.UnknownPropertyException;
+import com.sun.star.comp.helper.BootstrapException;
 import com.sun.star.container.NoSuchElementException;
 import com.sun.star.lang.WrappedTargetException;
 import org.apache.commons.logging.Log;
@@ -97,6 +106,7 @@ public class OpenOfficePanel extends AbstractWorker {
     private final JButton update;
     private final JButton merge = new JButton(Localization.lang("Merge citations"));
     private final JButton manageCitations = new JButton(Localization.lang("Manage citations"));
+    private final JButton exportCitations = new JButton(Localization.lang("Generate new BIB database"));
     private final JButton settingsB = new JButton(Localization.lang("Settings"));
     private final JButton help = new HelpAction(Localization.lang("OpenOffice/LibreOffice integration"),
             HelpFile.OPENOFFICE_LIBREOFFICE).getHelpButton();
@@ -253,7 +263,8 @@ public class OpenOfficePanel extends AbstractWorker {
                                     ex.getBibtexKey()),
                             Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
                     LOGGER.debug("BibEntry not found", ex);
-                } catch (Exception ex) {
+                } catch (com.sun.star.lang.IllegalArgumentException | PropertyVetoException | UnknownPropertyException | WrappedTargetException | NoSuchElementException |
+                        CreationException ex) {
                     LOGGER.warn("Could not update bibliography", ex);
                 }
             }
@@ -266,7 +277,9 @@ public class OpenOfficePanel extends AbstractWorker {
                 ooBase.combineCiteMarkers(getBaseList(), style);
             } catch (UndefinedCharacterFormatException ex) {
                 reportUndefinedCharacterFormat(ex);
-            } catch (Exception ex) {
+            } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
+                    CreationException | NoSuchElementException | WrappedTargetException | IOException |
+                    BibEntryNotFoundException ex) {
                 LOGGER.warn("Problem combining cite markers", ex);
             }
 
@@ -281,6 +294,8 @@ public class OpenOfficePanel extends AbstractWorker {
             }
         });
 
+        exportCitations.addActionListener(event -> exportEntries());
+
         selectDocument.setEnabled(false);
         pushEntries.setEnabled(false);
         pushEntriesInt.setEnabled(false);
@@ -289,9 +304,11 @@ public class OpenOfficePanel extends AbstractWorker {
         update.setEnabled(false);
         merge.setEnabled(false);
         manageCitations.setEnabled(false);
+        exportCitations.setEnabled(false);
         diag = new JDialog((JFrame) null, "OpenOffice/LibreOffice panel", false);
 
-        FormBuilder mainBuilder = FormBuilder.create().layout(new FormLayout("fill:pref:grow", "p,p,p,p,p,p,p,p,p,p"));
+        FormBuilder mainBuilder = FormBuilder.create()
+                .layout(new FormLayout("fill:pref:grow", "p,p,p,p,p,p,p,p,p,p,p"));
 
         FormBuilder topRowBuilder = FormBuilder.create()
                 .layout(new FormLayout("fill:pref:grow, 1dlu, fill:pref:grow, 1dlu, fill:pref:grow, "
@@ -309,7 +326,8 @@ public class OpenOfficePanel extends AbstractWorker {
         mainBuilder.add(pushEntriesEmpty).xy(1, 6);
         mainBuilder.add(merge).xy(1, 7);
         mainBuilder.add(manageCitations).xy(1, 8);
-        mainBuilder.add(settingsB).xy(1, 9);
+        mainBuilder.add(exportCitations).xy(1, 9);
+        mainBuilder.add(settingsB).xy(1, 10);
 
         JPanel content = new JPanel();
         comp.setContentContainer(content);
@@ -319,6 +337,48 @@ public class OpenOfficePanel extends AbstractWorker {
         frame.getTabbedPane().getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW)
                 .put(Globals.getKeyPrefs().getKey(KeyBinding.REFRESH_OO), "Refresh OO");
         frame.getTabbedPane().getActionMap().put("Refresh OO", updateAction);
+
+    }
+
+    private void exportEntries() {
+        try {
+            if (style == null) {
+                style = loader.getUsedStyle();
+            } else {
+                style.ensureUpToDate();
+            }
+
+            ooBase.updateSortedReferenceMarks();
+
+            List<BibDatabase> databases = getBaseList();
+            List<String> unresolvedKeys = ooBase.refreshCiteMarkers(databases, style);
+            BibDatabase newDatabase = ooBase.generateDatabase(databases);
+            if (!unresolvedKeys.isEmpty()) {
+                JOptionPane.showMessageDialog(frame,
+                        Localization.lang(
+                                "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current database.",
+                                unresolvedKeys.get(0)),
+                        Localization.lang("Unable to generate new database"), JOptionPane.ERROR_MESSAGE);
+            }
+
+            Defaults defaults = new Defaults(
+                    BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+
+            BibDatabaseContext databaseContext = new BibDatabaseContext(newDatabase, defaults);
+            this.frame.addTab(databaseContext, true);
+
+        } catch (BibEntryNotFoundException ex) {
+            JOptionPane.showMessageDialog(frame,
+                    Localization.lang(
+                            "Your OpenOffice/LibreOffice document references the BibTeX key '%0', which could not be found in your current database.",
+                            ex.getBibtexKey()),
+                    Localization.lang("Unable to synchronize bibliography"), JOptionPane.ERROR_MESSAGE);
+            LOGGER.debug("BibEntry not found", ex);
+        } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
+                UndefinedCharacterFormatException | NoSuchElementException | WrappedTargetException | IOException |
+                CreationException e) {
+            LOGGER.warn("Problem generating new database.", e);
+        }
 
     }
 
@@ -379,7 +439,7 @@ public class OpenOfficePanel extends AbstractWorker {
             }
         }
 
-        // Add OO jars to the classpath:
+        // Add OO JARs to the classpath:
         try {
             List<File> jarFiles = Arrays.asList(new File(ooJarsDirectory, "unoil.jar"),
                     new File(ooJarsDirectory, "jurt.jar"), new File(ooJarsDirectory, "juh.jar"),
@@ -418,6 +478,7 @@ public class OpenOfficePanel extends AbstractWorker {
             update.setEnabled(true);
             merge.setEnabled(true);
             manageCitations.setEnabled(true);
+            exportCitations.setEnabled(true);
 
         } catch (UnsatisfiedLinkError e) {
             LOGGER.warn("Could not connect to running OpenOffice/LibreOffice", e);
@@ -439,7 +500,9 @@ public class OpenOfficePanel extends AbstractWorker {
         try {
             // Connect:
             ooBase = new OOBibBase(sOffice, true);
-        } catch (Exception e) {
+        } catch (UnknownPropertyException |
+                CreationException | NoSuchElementException | WrappedTargetException | IOException |
+                NoDocumentException | BootstrapException | InvocationTargetException | IllegalAccessException e) {
             ooBase = null;
             connectException = new IOException(e.getMessage());
         }
@@ -587,7 +650,10 @@ public class OpenOfficePanel extends AbstractWorker {
                     reportUndefinedCharacterFormat(ex);
                 } catch (UndefinedParagraphFormatException ex) {
                     reportUndefinedParagraphFormat(ex);
-                } catch (Exception ex) {
+                } catch (com.sun.star.lang.IllegalArgumentException | UnknownPropertyException | PropertyVetoException |
+                        CreationException | NoSuchElementException | WrappedTargetException | IOException |
+                        BibEntryNotFoundException | IllegalTypeException | PropertyExistException |
+                        NotRemoveableException ex) {
                     LOGGER.warn("Could not insert entry", ex);
                 }
             }

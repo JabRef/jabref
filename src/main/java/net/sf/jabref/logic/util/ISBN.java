@@ -44,7 +44,7 @@ public class ISBN {
 
     // Check that the control digit is correct, see e.g. https://en.wikipedia.org/wiki/International_Standard_Book_Number#Check_digits
     private boolean isbn10check() {
-        if ((isbnString == null) || (isbnString.length() != 10)) {
+        if (isbnString.length() != 10) {
             return false;
         }
 
@@ -62,7 +62,7 @@ public class ISBN {
 
     // Check that the control digit is correct, see e.g. https://en.wikipedia.org/wiki/International_Standard_Book_Number#Check_digits
     private boolean isbn13check() {
-        if ((isbnString == null) || (isbnString.length() != 13)) {
+        if (isbnString.length() != 13) {
             return false;
         }
 

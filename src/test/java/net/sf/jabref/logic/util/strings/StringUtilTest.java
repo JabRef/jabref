@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.util.strings;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -10,6 +11,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class StringUtilTest {
@@ -33,13 +35,13 @@ public class StringUtilTest {
     public void testUnifyLineBreaks() {
         // Mac < v9
         String result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r");
-        assertEquals(Globals.NEWLINE, result);
+        assertEquals(OS.NEWLINE, result);
         // Windows
         result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r\n");
-        assertEquals(Globals.NEWLINE, result);
+        assertEquals(OS.NEWLINE, result);
         // Unix
         result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\n");
-        assertEquals(Globals.NEWLINE, result);
+        assertEquals(OS.NEWLINE, result);
     }
 
     @Test
@@ -127,19 +129,19 @@ public class StringUtilTest {
 
     @Test
     public void testWrap() {
-        assertEquals("aaaaa" + Globals.NEWLINE + "\tbbbbb" + Globals.NEWLINE + "\tccccc",
+        assertEquals("aaaaa" + OS.NEWLINE + "\tbbbbb" + OS.NEWLINE + "\tccccc",
                 StringUtil.wrap("aaaaa bbbbb ccccc", 5));
-        assertEquals("aaaaa bbbbb" + Globals.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 8));
-        assertEquals("aaaaa bbbbb" + Globals.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 11));
+        assertEquals("aaaaa bbbbb" + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 8));
+        assertEquals("aaaaa bbbbb" + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 11));
         assertEquals("aaaaa bbbbb ccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 12));
-        assertEquals("aaaaa" + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\tbbbbb" + Globals.NEWLINE + "\t"
-                + Globals.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\nbbbbb\nccccc", 12));
+        assertEquals("aaaaa" + OS.NEWLINE + "\t" + OS.NEWLINE + "\tbbbbb" + OS.NEWLINE + "\t"
+                + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\nbbbbb\nccccc", 12));
         assertEquals(
-                "aaaaa" + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\tbbbbb"
-                        + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\tccccc",
+                "aaaaa" + OS.NEWLINE + "\t" + OS.NEWLINE + "\t" + OS.NEWLINE + "\tbbbbb"
+                        + OS.NEWLINE + "\t" + OS.NEWLINE + "\tccccc",
                 StringUtil.wrap("aaaaa\n\nbbbbb\nccccc", 12));
-        assertEquals("aaaaa" + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\tbbbbb" + Globals.NEWLINE + "\t"
-                + Globals.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\r\nbbbbb\r\nccccc", 12));
+        assertEquals("aaaaa" + OS.NEWLINE + "\t" + OS.NEWLINE + "\tbbbbb" + OS.NEWLINE + "\t"
+                + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\r\nbbbbb\r\nccccc", 12));
     }
 
     @Test
@@ -240,6 +242,38 @@ public class StringUtilTest {
     @Test(expected = NumberFormatException.class)
     public void testIntValueOfExceptionfIfStringEmpty() {
             StringUtil.intValueOf("");
+    }
+
+    @Test
+    public void testIntValueOfWithNullSingleDigit() {
+        assertEquals(Integer.valueOf(1), StringUtil.intValueOfWithNull("1"));
+        assertEquals(Integer.valueOf(2), StringUtil.intValueOfWithNull("2"));
+        assertEquals(Integer.valueOf(8), StringUtil.intValueOfWithNull("8"));
+    }
+
+    @Test
+    public void testIntValueOfWithNullLongString() {
+        assertEquals(Integer.valueOf(1234567890), StringUtil.intValueOfWithNull("1234567890"));
+    }
+
+    @Test
+    public void testIntValueOfWithNullStartWithZeros() {
+        assertEquals(Integer.valueOf(1234), StringUtil.intValueOfWithNull("001234"));
+    }
+
+    @Test
+    public void testIntValueOfWithNullExceptionIfStringContainsLetter() {
+        assertNull(StringUtil.intValueOfWithNull("12A2"));
+    }
+
+    @Test
+    public void testIntValueOfWithNullExceptionIfStringNull() {
+        assertNull(StringUtil.intValueOfWithNull(null));
+    }
+
+    @Test
+    public void testIntValueOfWithNullExceptionfIfStringEmpty() {
+        assertNull(StringUtil.intValueOfWithNull(""));
     }
 
     @Test
