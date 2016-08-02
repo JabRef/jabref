@@ -2,6 +2,7 @@ package net.sf.jabref.logic.xmp;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -266,7 +267,7 @@ public class XMPSchemaBibtexTest {
                 .bibtexDescription(bibtexString));
 
         Document d = XMLUtil.parse(new ByteArrayInputStream(bibtexString
-                .getBytes()));
+                .getBytes(StandardCharsets.UTF_8)));
 
         Assert.assertEquals("Beach sand convolution by surf-wave optimzation",
                 XMPSchemaBibtex.getTextContent(
