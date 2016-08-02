@@ -9,33 +9,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 
 public class PreferencesMigrations {
 
-    /**
-     * This method is called at startup, and makes necessary adaptations to
-     * preferences for users from an earlier version of Jabref.
-     */
-    public static void replaceAbstractField() {
-        // Make sure "abstract" is not in General fields, because
-        // Jabref 1.55 moves the abstract to its own tab.
-        String genFields = Globals.prefs.get(JabRefPreferences.GENERAL_FIELDS);
-
-        if (genFields.contains(FieldName.ABSTRACT)) {
-
-            String newGen;
-            if (FieldName.ABSTRACT.equals(genFields)) {
-                newGen = "";
-            } else if (genFields.contains(";abstract;")) {
-                newGen = genFields.replace(";abstract;", ";");
-            } else if (genFields.indexOf("abstract;") == 0) {
-                newGen = genFields.replace("abstract;", "");
-            } else if (genFields.indexOf(";abstract") == (genFields.length() - 9)) {
-                newGen = genFields.replace(";abstract", "");
-            } else {
-                newGen = genFields;
-            }
-
-            Globals.prefs.put(JabRefPreferences.GENERAL_FIELDS, newGen);
-        }
-    }
 
     /**
      * Added from Jabref 2.11 beta 4 onwards to fix wrong encoding names

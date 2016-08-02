@@ -53,6 +53,10 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Removed
 - It is not longer possible to choose to convert HTML sub- and superscripts to equations
 - [#1610](https://github.com/JabRef/jabref/issues/1610) Removed the possibility to auto show or hide the groups interface
+- Removed option to open right-click menu with ctrl + left-click as it was not working
+- Removed option to disable entry editor when multiple entries are selected as it was not working
+- Removed option to show warning for empty key as it was not working
+- Removed option to show warning for duplicate key as it was not working
 
 
 
