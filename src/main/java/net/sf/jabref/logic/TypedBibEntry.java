@@ -42,18 +42,14 @@ public class TypedBibEntry {
         this(entry, Optional.empty(), mode);
     }
 
-    public TypedBibEntry(BibEntry entry, Optional<BibDatabase> database, BibDatabaseMode mode) {
+    private TypedBibEntry(BibEntry entry, Optional<BibDatabase> database, BibDatabaseMode mode) {
         this.entry = Objects.requireNonNull(entry);
         this.database = Objects.requireNonNull(database);
         this.mode = mode;
     }
 
     public TypedBibEntry(BibEntry entry, BibDatabaseContext databaseContext) {
-        this(entry, databaseContext.getDatabase(), databaseContext.getMode());
-    }
-
-    public TypedBibEntry(BibEntry entry, BibDatabase database, BibDatabaseMode mode) {
-        this(entry, Optional.of(database), mode);
+        this(entry, Optional.of(databaseContext.getDatabase()), databaseContext.getMode());
     }
 
     /**
