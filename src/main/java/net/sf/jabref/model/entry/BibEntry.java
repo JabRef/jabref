@@ -421,7 +421,7 @@ public class BibEntry implements Cloneable {
                     return false;
                 }
             } else {
-                if (BibDatabase.getResolvedField(fieldName, this, database) == null) {
+                if (!BibDatabase.getResolvedField(fieldName, this, database).isPresent()) {
                     return false;
                 }
             }
@@ -433,8 +433,8 @@ public class BibEntry implements Cloneable {
         for (String field : fieldsToCheck) {
             String fieldName = toLowerCase(field);
 
-            String value = BibDatabase.getResolvedField(fieldName, this, database);
-            if ((value != null) && !value.isEmpty()) {
+            Optional<String> value = BibDatabase.getResolvedField(fieldName, this, database);
+            if ((value.isPresent()) && !value.get().isEmpty()) {
                 return true;
             }
         }

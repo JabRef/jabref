@@ -329,12 +329,9 @@ public class RegExpFileSearch {
             return "";
         }
 
-        String fieldValue = BibDatabase.getResolvedField(beforeColon, entry, database);
-
         // If no field value was found, try to interpret it as a key generator field marker:
-        if (fieldValue == null) {
-            fieldValue = LabelPatternUtil.makeLabel(entry, beforeColon);
-        }
+        String fieldValue = BibDatabase.getResolvedField(beforeColon, entry, database)
+                .orElse(LabelPatternUtil.makeLabel(entry, beforeColon));
 
         if (fieldValue == null) {
             return "";

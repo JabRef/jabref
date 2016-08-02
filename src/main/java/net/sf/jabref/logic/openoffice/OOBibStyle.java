@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -731,13 +732,13 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         String authorField = getStringCitProperty(AUTHOR_FIELD);
         String[] fields = field.split(FieldName.FIELD_SEPARATOR);
         for (String s : fields) {
-            String content = BibDatabase.getResolvedField(s, entry, database);
+            Optional<String> content = BibDatabase.getResolvedField(s, entry, database);
 
-            if ((content != null) && !content.trim().isEmpty()) {
-                if (field.equals(authorField) && StringUtil.isInCurlyBrackets(content)) {
-                    return "{" + fieldFormatter.format(content) + "}";
+            if ((content.isPresent()) && !content.get().trim().isEmpty()) {
+                if (field.equals(authorField) && StringUtil.isInCurlyBrackets(content.get())) {
+                    return "{" + fieldFormatter.format(content.get()) + "}";
                 }
-                return fieldFormatter.format(content);
+                return fieldFormatter.format(content.get());
             }
         }
         // No luck? Return an empty string:
