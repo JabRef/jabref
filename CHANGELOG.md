@@ -38,6 +38,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1321](https://github.com/JabRef/jabref/issues/1321): LaTeX commands in fields not displayed in the list of references
 - Fixed [#1639](https://github.com/JabRef/jabref/issues/1639): Google Scholar fetching works again.
 - Date fields in the BibLatex standard are now always formatted in the correct way, independent of the preferences
+- Fixed [#1554]: Import dialog is no longer hidden behind main window
 
 ### Removed
 - It is not longer possible to choose to convert HTML sub- and superscripts to equations
