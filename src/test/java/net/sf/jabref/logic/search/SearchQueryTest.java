@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.search;
 
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.junit.Test;
 
@@ -35,6 +36,22 @@ public class SearchQueryTest {
         BibEntry entry = new BibEntry();
         entry.addKeyword("one two", ", ");
         SearchQuery searchQuery = new SearchQuery("keywords=\"one two\"", false, false);
+        assertTrue(searchQuery.isMatch(entry));
+    }
+
+    @Test
+    public void testGrammarSearchFullEntryLastCharMissing() {
+        BibEntry entry = new BibEntry();
+        entry.setField(FieldName.TITLE, "systematic revie");
+        SearchQuery searchQuery = new SearchQuery("title=\"systematic review\"", false, false);
+        assertFalse(searchQuery.isMatch(entry));
+    }
+
+    @Test
+    public void testGrammarSearchFullEntry() {
+        BibEntry entry = new BibEntry();
+        entry.setField(FieldName.TITLE, "systematic review");
+        SearchQuery searchQuery = new SearchQuery("title=\"systematic review\"", false, false);
         assertTrue(searchQuery.isMatch(entry));
     }
 
