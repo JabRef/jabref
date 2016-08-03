@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -213,13 +212,13 @@ public class MedlinePlainImporterTest {
         Path file = Paths
                 .get(MedlinePlainImporter.class.getResource("MedlinePlainImporterTestInvalidFormat.xml").toURI());
         List<BibEntry> entries = importer.importDatabase(file, Charsets.UTF_8).getDatabase().getEntries();
-        assertEquals(Collections.EMPTY_LIST, entries);
+        assertEquals(Collections.emptyList(), entries);
     }
 
     @Test(expected = NullPointerException.class)
     public void testNullReader() throws IOException {
         try (BufferedReader reader = null) {
-            ParserResult entries = importer.importDatabase(reader);
+            importer.importDatabase(reader);
         }
         fail();
     }
