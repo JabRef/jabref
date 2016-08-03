@@ -1,10 +1,10 @@
 package net.sf.jabref.logic.undo;
 
 /**
- * Event sent when something is undone or redone
+ * Event sent when a new undoable action is added to the undo manager
  *
  */
-public class UndoRedoEvent {
+public class AddUndoableActionEvent {
 
     private final boolean canUndo;
     private final String undoDescription;
@@ -12,7 +12,7 @@ public class UndoRedoEvent {
     private final String redoDescription;
 
 
-    public UndoRedoEvent(boolean canUndo, String undoDescription, boolean canRedo, String redoDescription) {
+    public AddUndoableActionEvent(boolean canUndo, String undoDescription, boolean canRedo, String redoDescription) {
         this.canUndo = canUndo;
         this.undoDescription = undoDescription;
         this.canRedo = canRedo;
@@ -27,13 +27,15 @@ public class UndoRedoEvent {
         return canUndo;
     }
 
+
     /**
-     *
-     * @return A description of the action to be undone
-     */
+    *
+    * @return A description of the action to be undone
+    */
     public String getUndoDescription() {
         return undoDescription;
     }
+
 
     /**
      *

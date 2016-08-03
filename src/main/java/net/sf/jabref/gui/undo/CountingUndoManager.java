@@ -20,7 +20,7 @@ import javax.swing.undo.UndoManager;
 import javax.swing.undo.UndoableEdit;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.undo.AddUndoEvent;
+import net.sf.jabref.logic.undo.AddUndoableActionEvent;
 import net.sf.jabref.logic.undo.UndoRedoEvent;
 
 import com.google.common.eventbus.EventBus;
@@ -87,7 +87,7 @@ public class CountingUndoManager extends UndoManager {
     private void postAddUndoEvent() {
         boolean canRedo = this.canRedo();
         boolean canUndo = this.canUndo();
-        eventBus.post(new AddUndoEvent(canUndo, canUndo ? getUndoPresentationName() : Localization.lang("Undo"),
+        eventBus.post(new AddUndoableActionEvent(canUndo, canUndo ? getUndoPresentationName() : Localization.lang("Undo"),
                 canRedo, canRedo ? getRedoPresentationName() : Localization.lang("Redo")));
     }
 }
