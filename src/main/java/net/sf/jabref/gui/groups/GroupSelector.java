@@ -1224,15 +1224,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             setGroups(metaData.getGroups());
         }
 
-        // auto show/hide groups interface
-        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_AUTO_SHOW) && !groupsRoot.isLeaf()) { // groups were defined
-            frame.getSidePaneManager().show("groups");
-            frame.groupToggle.setSelected(true);
-        } else if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_AUTO_HIDE) && groupsRoot.isLeaf()) { // groups were not defined
-            frame.getSidePaneManager().hide("groups");
-            frame.groupToggle.setSelected(false);
-        }
-
         synchronized (getTreeLock()) {
             validateTree();
         }
