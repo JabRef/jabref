@@ -19,11 +19,13 @@ import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.apache.commons.codec.Charsets;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class MedlinePlainImporterTest {
 
@@ -195,6 +197,30 @@ public class MedlinePlainImporterTest {
         Path file = Paths.get(MedlinePlainImporter.class.getResource("NbibImporterTest.nbib").toURI());
         List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
         BibEntryAssert.assertEquals(MedlinePlainImporter.class, "NbibImporterTest.bib", entries);
+    }
+
+    @Test
+    public void testWithMultipleEntries() throws IOException, URISyntaxException {
+        Path file = Paths
+                .get(MedlinePlainImporter.class.getResource("MedlinePlainImporterStringOutOfBounds.txt").toURI());
+        List<BibEntry> entries = importer.importDatabase(file, Charsets.UTF_8).getDatabase().getEntries();
+        BibEntryAssert.assertEquals(MedlinePlainImporter.class, "MedlinePlainImporterStringOutOfBounds.bib", entries);
+    }
+
+    @Test
+    public void testInvalidFormat() throws URISyntaxException, IOException {
+        Path file = Paths
+                .get(MedlinePlainImporter.class.getResource("MedlinePlainImporterTestInvalidFormat.xml").toURI());
+        List<BibEntry> entries = importer.importDatabase(file, Charsets.UTF_8).getDatabase().getEntries();
+        assertEquals(Collections.emptyList(), entries);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullReader() throws IOException {
+        try (BufferedReader reader = null) {
+            importer.importDatabase(reader);
+        }
+        fail();
     }
 
     @Test
