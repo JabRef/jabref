@@ -2291,30 +2291,21 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Subscribe
         public void listen(UndoRedoEvent event) {
-            updateTexts(event);
+            updateTexts(event.isCanUndo(), event.getUndoDescription(), event.isCanRedo(), event.getRedoDescription());
             JabRefFrame.this.getCurrentBasePanel().updateEntryEditorIfShowing();
         }
 
         @Subscribe
         public void listen(AddUndoableActionEvent event) {
-            updateTexts(event);
+            updateTexts(event.isCanUndo(), event.getUndoDescription(), event.isCanRedo(), event.getRedoDescription());
         }
 
-        private void updateTexts(AddUndoableActionEvent event) {
+        private void updateTexts(boolean canUndo, String undoDescription, boolean canRedo, String redoDescription) {
             if (JabRefFrame.this != null) {
-                undo.putValue(Action.SHORT_DESCRIPTION, event.getUndoDescription());
-                undo.setEnabled(event.isCanUndo());
-                redo.putValue(Action.SHORT_DESCRIPTION, event.getRedoDescription());
-                redo.setEnabled(event.isCanRedo());
-            }
-        }
-
-        private void updateTexts(UndoRedoEvent event) {
-            if (JabRefFrame.this != null) {
-                undo.putValue(Action.SHORT_DESCRIPTION, event.getUndoDescription());
-                undo.setEnabled(event.isCanUndo());
-                redo.putValue(Action.SHORT_DESCRIPTION, event.getRedoDescription());
-                redo.setEnabled(event.isCanRedo());
+                undo.putValue(Action.SHORT_DESCRIPTION, undoDescription);
+                undo.setEnabled(canUndo);
+                redo.putValue(Action.SHORT_DESCRIPTION, redoDescription);
+                redo.setEnabled(canRedo);
             }
         }
     }

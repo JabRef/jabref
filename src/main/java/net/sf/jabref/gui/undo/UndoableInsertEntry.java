@@ -18,6 +18,7 @@ package net.sf.jabref.gui.undo;
 import javax.swing.undo.AbstractUndoableEdit;
 
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -47,12 +48,18 @@ public class UndoableInsertEntry extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        return "Undo: insert entry";
+        return Localization.lang("Undo") + ": " + getPresentationName();
     }
 
     @Override
     public String getRedoPresentationName() {
-        return "Redo: insert entry";
+        return Localization.lang("Redo") + ": " + getPresentationName();
+    }
+
+    @Override
+    public String getPresentationName() {
+        return Localization.lang("insert entry %0",
+                (entry.getCiteKey() == null ? "" : entry.getCiteKey()));
     }
 
     @Override

@@ -43,14 +43,17 @@ public class UndoableRemoveString extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": " +
-                Localization.lang("remove string");
+        return Localization.lang("Undo") + ": " + getPresentationName();
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": " +
-                Localization.lang("remove string");
+        return Localization.lang("Redo") + ": " + getPresentationName();
+    }
+
+    @Override
+    public String getPresentationName() {
+        return Localization.lang("remove string %0", string.toString());
     }
 
     @Override

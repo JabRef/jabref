@@ -17,6 +17,7 @@ package net.sf.jabref.gui.undo;
 
 import javax.swing.undo.AbstractUndoableEdit;
 
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -35,12 +36,19 @@ public class UndoableChangeType extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        return "Undo: change type";
+        return Localization.lang("Undo") + ": " + getPresentationName();
     }
 
     @Override
     public String getRedoPresentationName() {
-        return "Redo: change type";
+        return Localization.lang("Redo") + ": " + getPresentationName();
+    }
+
+    @Override
+    public String getPresentationName() {
+        return Localization.lang("change type of entry %0 from %1 to %2",
+                (entry.getCiteKey() == null ? "" : entry.getCiteKey()),
+                (oldType == null ? Localization.lang("undefined") : oldType), newType);
     }
 
     @Override

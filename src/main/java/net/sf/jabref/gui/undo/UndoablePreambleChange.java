@@ -44,14 +44,18 @@ public class UndoablePreambleChange extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": " +
-                Localization.lang("change preamble");
+        return Localization.lang("Undo") + ": " + getPresentationName();
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": " +
-                Localization.lang("change preamble");
+        return Localization.lang("Redo") + ": " + getPresentationName();
+    }
+
+    @Override
+    public String getPresentationName() {
+        return Localization.lang("change preamble");
+
     }
 
     @Override

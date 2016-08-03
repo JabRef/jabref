@@ -42,16 +42,18 @@ public class UndoableStringChange extends AbstractUndoableEdit {
 
     @Override
     public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": " + (nameChange ?
-           Localization.lang("change string name") :
-           Localization.lang("change string content"));
+        return Localization.lang("Undo") + ": " + getPresentationName();
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": " + (nameChange ?
-           Localization.lang("change string name") :
-           Localization.lang("change string content"));
+        return Localization.lang("Redo") + ": " + getPresentationName();
+    }
+
+    @Override
+    public String getPresentationName() {
+        return (nameChange ? Localization.lang("change string name %0 to %1", oldValue, newValue) : Localization
+                .lang("change string content %0 to %1", oldValue, newValue));
     }
 
     @Override

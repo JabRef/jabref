@@ -52,19 +52,20 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
 
     @Override
     public String getPresentationName() {
-        return Localization.lang("change field");
+        return Localization.lang("change field %0 of entry %1 from %2 to %3", field,
+                (entry.getCiteKey() == null ? "" : entry.getCiteKey()),
+                (oldValue == null ? Localization.lang("undefined") : oldValue),
+                (newValue == null ? Localization.lang("undefined") : newValue));
     }
 
     @Override
     public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": " +
-                Localization.lang("change field");
+        return Localization.lang("Undo") + ": " + getPresentationName();
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": " +
-                Localization.lang("change field");
+        return Localization.lang("Redo") + ": " + getPresentationName();
     }
 
     @Override
