@@ -461,8 +461,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
      * Run a file download operation.
      */
     private void downloadFile() {
-        String bibtexKey = entryEditor.getEntry().getCiteKey();
-        if (bibtexKey == null) {
+        Optional<String> bibtexKey = entryEditor.getEntry().getCiteKeyOptional();
+        if (!bibtexKey.isPresent()) {
             int answer = JOptionPane.showConfirmDialog(frame,
                     Localization.lang("This entry has no BibTeX key. Generate key now?"),
                     Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
@@ -470,11 +470,11 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             if (answer == JOptionPane.OK_OPTION) {
                 ActionListener l = entryEditor.getGenerateKeyAction();
                 l.actionPerformed(null);
-                bibtexKey = entryEditor.getEntry().getCiteKey();
+                bibtexKey = entryEditor.getEntry().getCiteKeyOptional();
             }
         }
         DownloadExternalFile def = new DownloadExternalFile(frame,
-                frame.getCurrentBasePanel().getBibDatabaseContext(), bibtexKey);
+                frame.getCurrentBasePanel().getBibDatabaseContext(), bibtexKey.orElse(null));
         try {
             def.download(this);
         } catch (IOException ex) {

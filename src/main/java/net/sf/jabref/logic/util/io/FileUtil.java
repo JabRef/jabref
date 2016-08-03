@@ -335,8 +335,9 @@ public class FileUtil {
             int dot = name.lastIndexOf('.');
             // First, look for exact matches:
             for (BibEntry entry : entries) {
-                String citeKey = entry.getCiteKey();
-                if ((citeKey != null) && !citeKey.isEmpty() && (dot > 0) && name.substring(0, dot).equals(citeKey)) {
+                Optional<String> citeKey = entry.getCiteKeyOptional();
+                if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && (dot > 0)
+                        && name.substring(0, dot).equals(citeKey.get())) {
                     result.get(entry).add(file);
                     continue nextFile;
                 }
@@ -345,8 +346,8 @@ public class FileUtil {
             // matches are allowed, try to find one:
             if (!autolinkExactKeyOnly) {
                 for (BibEntry entry : entries) {
-                    String citeKey = entry.getCiteKey();
-                    if ((citeKey != null) && !citeKey.isEmpty() && name.startsWith(citeKey)) {
+                    Optional<String> citeKey = entry.getCiteKeyOptional();
+                    if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && name.startsWith(citeKey.get())) {
                         result.get(entry).add(file);
                         continue nextFile;
                     }
@@ -392,7 +393,7 @@ public class FileUtil {
      */
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry,
             JournalAbbreviationLoader repositoryLoader, JabRefPreferences prefs) {
-        String targetName = entry.getCiteKey() == null ? "default" : entry.getCiteKey();
+        String targetName = entry.getCiteKeyOptional().orElse("default");
         StringReader sr = new StringReader(prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
         Layout layout = null;
         try {

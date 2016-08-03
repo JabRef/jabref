@@ -536,7 +536,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // This is a partial clone of net.sf.jabref.gui.entryeditor.EntryEditor.GenerateKeyAction.actionPerformed(ActionEvent)
                 for (final Iterator<BibEntry> i = entries.iterator(); i.hasNext(); ) {
                     bes = i.next();
-                    if (bes.getCiteKey() != null) {
+                    if (bes.hasCiteKey()) {
                         if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
                             // Remove the entry, because its key is already set:
                             i.remove();
@@ -569,7 +569,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     for (BibEntry entry : entries) {
                         bes = entry;
                         // Store the old value:
-                        oldvals.put(bes, bes.getCiteKey());
+                        oldvals.put(bes, bes.getCiteKeyOptional().orElse(null));
                         database.setCiteKeyForEntry(bes, null);
                     }
                 }
@@ -582,7 +582,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes,
                             LabelPatternPreferences.fromPreferences(Globals.prefs));
                     ce.addEdit(new UndoableKeyChange(database, bes, (String) oldvals.get(bes),
-                            bes.getCiteKey()));
+                            bes.getCiteKeyOptional().orElse(null)));
                 }
                 ce.end();
                 getUndoManager().addEdit(ce);
@@ -933,9 +933,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             List<String> keys = new ArrayList<>(bes.size());
             // Collect all non-null keys.
             for (BibEntry be : bes) {
-                if (be.getCiteKey() != null) {
-                    keys.add(be.getCiteKey());
-                }
+                be.getCiteKeyOptional().ifPresent(keys::add);
             }
             if (keys.isEmpty()) {
                 output(Localization.lang("None of the selected entries have BibTeX keys."));
@@ -963,9 +961,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             List<String> keys = new ArrayList<>(bes.size());
             // Collect all non-null keys.
             for (BibEntry be : bes) {
-                if (be.getCiteKey() != null) {
-                    keys.add(be.getCiteKey());
-                }
+                be.getCiteKeyOptional().ifPresent(keys::add);
             }
             if (keys.isEmpty()) {
                 output(Localization.lang("None of the selected entries have BibTeX keys."));
@@ -1008,7 +1004,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             int copied = 0;
             // Collect all non-null keys.
             for (BibEntry be : bes) {
-                if (be.getCiteKey() != null) {
+                if (be.hasCiteKey()) {
                     copied++;
                     sb.append(layout.doLayout(be, database));
                 }
@@ -1992,11 +1988,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             boolean any = false;
 
             for (BibEntry bes : database.getEntries()) {
-                String oldKey = bes.getCiteKey();
-                if ((oldKey == null) || oldKey.isEmpty()) {
+                Optional<String> oldKey = bes.getCiteKeyOptional();
+                if (!(oldKey.isPresent()) || oldKey.get().isEmpty()) {
                     LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes,
                             LabelPatternPreferences.fromPreferences(Globals.prefs));
-                    ce.addEdit(new UndoableKeyChange(database, bes, null, bes.getCiteKey()));
+                    ce.addEdit(new UndoableKeyChange(database, bes, null, bes.getCiteKeyOptional().get())); // Cite key is set here
                     any = true;
                 }
             }

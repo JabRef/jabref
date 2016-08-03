@@ -343,7 +343,7 @@ public class PreviewPanel extends JPanel
             JabRefExecutorService.INSTANCE.execute(() -> {
                 try {
                     PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
-                    pras.add(new JobName(entry.map(BibEntry::getCiteKey).orElse("NO ENTRY"), null));
+                    pras.add(new JobName(entry.flatMap(BibEntry::getCiteKeyOptional).orElse("NO ENTRY"), null));
                     previewPane.print(null, null, true, null, pras, false);
 
                 } catch (PrinterException e) {
