@@ -38,10 +38,6 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
             "<html>" + Localization.lang("Show dynamic groups in <i>italics</i>") + "</html>");
     private final JCheckBox expandTree = new JCheckBox(
             Localization.lang("Initially show groups tree expanded"));
-    private final JCheckBox autoShow = new JCheckBox(
-            Localization.lang("Automatically show groups interface when switching to a database that contains groups"));
-    private final JCheckBox autoHide = new JCheckBox(
-            Localization.lang("Automatically hide groups interface when switching to a database that contains no groups"));
     private final JCheckBox autoAssignGroup = new JCheckBox(
             Localization.lang("Automatically assign new entry to selected groups"));
     private final JTextField groupingField = new JTextField(20);
@@ -86,14 +82,6 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.nextLine();
         builder.nextColumn();
-        builder.append(autoShow);
-        builder.nextLine();
-        builder.nextLine();
-        builder.nextColumn();
-        builder.append(autoHide);
-        builder.nextLine();
-        builder.nextLine();
-        builder.nextColumn();
         builder.append(autoAssignGroup);
         builder.nextLine();
         builder.nextLine();
@@ -125,8 +113,6 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         showDynamic.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC));
         expandTree.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_EXPAND_TREE));
         groupingField.setText(prefs.get(JabRefPreferences.GROUPS_DEFAULT_FIELD));
-        autoShow.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_AUTO_SHOW));
-        autoHide.setSelected(prefs.getBoolean(JabRefPreferences.GROUP_AUTO_HIDE));
         keywordSeparator.setText(prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
         autoAssignGroup.setSelected(prefs.getBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP));
     }
@@ -137,8 +123,6 @@ class GroupsPrefsTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC, showDynamic.isSelected());
         prefs.putBoolean(JabRefPreferences.GROUP_EXPAND_TREE, expandTree.isSelected());
         prefs.put(JabRefPreferences.GROUPS_DEFAULT_FIELD, groupingField.getText().trim());
-        prefs.putBoolean(JabRefPreferences.GROUP_AUTO_SHOW, autoShow.isSelected());
-        prefs.putBoolean(JabRefPreferences.GROUP_AUTO_HIDE, autoHide.isSelected());
         prefs.putBoolean(JabRefPreferences.AUTO_ASSIGN_GROUP, autoAssignGroup.isSelected());
         prefs.put(JabRefPreferences.KEYWORD_SEPARATOR, keywordSeparator.getText());
     }

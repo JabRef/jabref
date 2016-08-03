@@ -43,6 +43,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Removed
 - It is not longer possible to choose to convert HTML sub- and superscripts to equations
+- [#1610](https://github.com/JabRef/jabref/issues/1610) Removed the possibility to auto show or hide the groups interface
 
 
 
