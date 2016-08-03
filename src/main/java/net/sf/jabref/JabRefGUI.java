@@ -58,15 +58,15 @@ public class JabRefGUI {
 
     private static JabRefFrame mainFrame;
 
-    private final List<ParserResult> loaded;
+    private final List<ParserResult> loadedDatabases;
     private final boolean isBlank;
 
     private final List<File> postponed = new ArrayList<>();
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
 
-    public JabRefGUI(List<ParserResult> loaded, boolean isBlank) {
-        this.loaded = loaded;
+    public JabRefGUI(List<ParserResult> loadedDatabases, boolean isBlank) {
+        this.loadedDatabases = loadedDatabases;
         this.isBlank = isBlank;
         openWindow();
         JabRefGUI.checkForNewVersion(false);
@@ -102,9 +102,8 @@ public class JabRefGUI {
         setLookAndFeel();
 
         // If the option is enabled, open the last edited databases, if any.
-        if (!isBlank && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)
-                && (Globals.prefs.get(JabRefPreferences.LAST_EDITED) != null)) {
-            openLastEditedDatabase();
+        if (!isBlank && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED) && (Globals.prefs.get(JabRefPreferences.LAST_EDITED) != null)) {
+            openLastEditedDatabases();
         }
 
         GUIGlobals.init();
@@ -114,10 +113,10 @@ public class JabRefGUI {
         LOGGER.debug("Initializing frame");
         JabRefGUI.mainFrame = new JabRefFrame();
 
-        // Add all loaded databases to the frame:
+        // Add all loadedDatabases databases to the frame:
         boolean first = true;
-        if (!loaded.isEmpty()) {
-            for (Iterator<ParserResult> parserResultIterator = loaded.iterator(); parserResultIterator.hasNext();) {
+        if (!loadedDatabases.isEmpty()) {
+            for (Iterator<ParserResult> parserResultIterator = loadedDatabases.iterator(); parserResultIterator.hasNext();) {
                 ParserResult pr = parserResultIterator.next();
 
                 if (new LastFocusedTabPreferences(Globals.prefs).hadLastFocus(pr.getFile())) {
@@ -177,7 +176,7 @@ public class JabRefGUI {
 
         if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
             int i = 0;
-            for (ParserResult pr : loaded) {
+            for (ParserResult pr : loadedDatabases) {
                 ParserResultWarningDialog.showParserResultWarningDialog(pr, JabRefGUI.getMainFrame(), i++);
             }
         }
@@ -189,10 +188,10 @@ public class JabRefGUI {
         // in this version of JabRef.
         // Note that we have to check whether i does not go over getBasePanelCount().
         // This is because importToOpen might have been used, which adds to
-        // loaded, but not to getBasePanelCount()
+        // loadedDatabases, but not to getBasePanelCount()
 
-        for (int i = 0; (i < loaded.size()) && (i < JabRefGUI.getMainFrame().getBasePanelCount()); i++) {
-            ParserResult pr = loaded.get(i);
+        for (int i = 0; (i < loadedDatabases.size()) && (i < JabRefGUI.getMainFrame().getBasePanelCount()); i++) {
+            ParserResult pr = loadedDatabases.get(i);
             BasePanel panel = JabRefGUI.getMainFrame().getBasePanelAt(i);
             OpenDatabaseAction.performPostOpenActions(panel, pr, true);
         }
@@ -206,33 +205,39 @@ public class JabRefGUI {
             SwingUtilities.invokeLater(asp);
         }
 
-        if (!loaded.isEmpty()) {
+        if (!loadedDatabases.isEmpty()) {
             new FocusRequester(JabRefGUI.getMainFrame().getCurrentBasePanel().getMainTable());
         }
     }
 
-    private void openLastEditedDatabase() {
-        // How to handle errors in the databases to open?
-        List<String> names = Globals.prefs.getStringList(JabRefPreferences.LAST_EDITED);
-        lastEdLoop: for (String name : names) {
-            File fileToOpen = new File(name);
+    private void openLastEditedDatabases() {
+        List<String> lastFiles = Globals.prefs.getStringList(JabRefPreferences.LAST_EDITED);
 
-            for (ParserResult pr : loaded) {
-                if ((pr.getFile() != null) && pr.getFile().equals(fileToOpen)) {
-                    continue lastEdLoop;
-                }
+        for (String fileName : lastFiles) {
+            File dbFile = new File(fileName);
+
+            // Already parsed via command line parameter, e.g., "jabref.jar somefile.bib"
+            if (isLoaded(dbFile) || !dbFile.exists()) {
+                continue;
             }
 
-            if (fileToOpen.exists()) {
-                ParserResult pr = OpenDatabaseAction.loadDatabaseOrAutoSave(name, false);
+            ParserResult parsedDatabase = OpenDatabaseAction.loadDatabaseOrAutoSave(fileName, false);
 
-                if (pr.isNullResult()) {
-                    LOGGER.error(Localization.lang("Error opening file") + " '" + fileToOpen.getPath() + "'");
-                } else {
-                    loaded.add(pr);
-                }
+            if (parsedDatabase.isNullResult()) {
+                LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
+            } else {
+                loadedDatabases.add(parsedDatabase);
             }
         }
+    }
+
+    private boolean isLoaded(File fileToOpen) {
+        for (ParserResult pr : loadedDatabases) {
+            if (pr.getFile() != null && pr.getFile().equals(fileToOpen)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void setLookAndFeel() {

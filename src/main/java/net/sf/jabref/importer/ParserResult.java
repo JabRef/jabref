@@ -181,7 +181,6 @@ public class ParserResult {
     }
 
     public boolean isNullResult() {
-        // TODO Auto-generated method stub
         return this == NULL_RESULT;
     }
 

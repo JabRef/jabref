@@ -51,14 +51,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class ArgumentProcessor {
+    private static final Log LOGGER = LogFactory.getLog(ArgumentProcessor.class);
 
     public enum Mode {
         INITIAL_START,
         REMOTE_START
     }
-
-
-    private static final Log LOGGER = LogFactory.getLog(ArgumentProcessor.class);
 
     private final JabRefCLI cli;
 
