@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -149,11 +150,10 @@ import osx.macadapter.MacAdapter;
  * The main window of the application.
  */
 public class JabRefFrame extends JFrame implements OutputPrinter {
+    private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
 
     // Frame titles.
     private static final String FRAME_TITLE = "JabRef";
-
-    private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
     private static final String ELLIPSES = "...";
 
     private final JSplitPane splitPane = new JSplitPane();
@@ -1379,19 +1379,26 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         return res;
     }
 
-    public void addParserResult(ParserResult pr, boolean raisePanel) {
+    public void addParserResult(ParserResult pr, boolean focusPanel) {
         if (pr.toOpenTab()) {
             // Add the entries to the open tab.
             BasePanel panel = getCurrentBasePanel();
             if (panel == null) {
                 // There is no open tab to add to, so we create a new tab:
-                addTab(pr.getDatabaseContext(), raisePanel);
+                addTab(pr.getDatabaseContext(), focusPanel);
             } else {
                 List<BibEntry> entries = new ArrayList<>(pr.getDatabase().getEntries());
                 addImportedEntries(panel, entries, false);
             }
         } else {
-            addTab(pr.getDatabaseContext(), raisePanel);
+            // only add tab if DB is not already open
+            Optional<BasePanel> panel = getBasePanelList().stream().filter(p -> p.getBibDatabaseContext().getDatabaseFile().equals(pr.getFile())).findFirst();
+
+            if (panel.isPresent()) {
+                tabbedPane.setSelectedComponent(panel.get());
+            } else {
+                addTab(pr.getDatabaseContext(), focusPanel);
+            }
         }
     }
 
@@ -1644,6 +1651,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
+
         BasePanel bp = new BasePanel(JabRefFrame.this, databaseContext);
         addTab(bp, raisePanel);
         return bp;
