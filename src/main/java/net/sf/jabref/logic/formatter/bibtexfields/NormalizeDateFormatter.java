@@ -3,6 +3,8 @@ package net.sf.jabref.logic.formatter.bibtexfields;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.logic.formatter.Formatter;
@@ -61,11 +63,8 @@ public class NormalizeDateFormatter implements Formatter {
      * The code is essentially taken from http://stackoverflow.com/questions/4024544/how-to-parse-dates-in-multiple-formats-using-simpledateformat.
      */
     private Optional<TemporalAccessor> tryParseDate(String dateString) {
-        String[] formatStrings = {
-                "uuuu-M-d", "uuuu-M",
-                "M/uu", "M/uuuu",
-                "MMMM d, uuuu", "MMMM, uuuu",
-                "d.M.uuuu", "uuuu.M.d"};
+        List<String> formatStrings = Arrays.asList("uuuu-M-d", "uuuu-M", "M/uu", "M/uuuu", "MMMM d, uuuu", "MMMM, uuuu",
+                "d.M.uuuu", "uuuu.M.d");
         for (String formatString : formatStrings) {
             try {
                 return Optional.of(DateTimeFormatter.ofPattern(formatString).parse(dateString));

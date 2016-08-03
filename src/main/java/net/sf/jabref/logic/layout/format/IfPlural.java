@@ -15,6 +15,8 @@
 */
 package net.sf.jabref.logic.layout.format;
 
+import java.util.List;
+
 import net.sf.jabref.logic.layout.AbstractParamLayoutFormatter;
 
 /**
@@ -39,13 +41,13 @@ public class IfPlural extends AbstractParamLayoutFormatter {
 
     @Override
     public void setArgument(String arg) {
-        String[] parts = AbstractParamLayoutFormatter.parseArgument(arg);
+        List<String> parts = AbstractParamLayoutFormatter.parseArgument(arg);
 
-        if (parts.length < 2) {
+        if (parts.size() < 2) {
             return; // TODO: too few arguments. Print an error message here?
         }
-        pluralText = parts[0];
-        singularText = parts[1];
+        pluralText = parts.get(0);
+        singularText = parts.get(1);
 
     }
 
