@@ -25,7 +25,6 @@ public enum KeyBinding {
     DECREASE_TABLE_FONT_SIZE("Decrease table font size", Localization.lang("Decrease table font size"), "ctrl MINUS"),
     DELETE_ENTRY("Delete entry", Localization.lang("Delete entry"), "DELETE"),
     EDIT_ENTRY("Edit entry", Localization.lang("Edit entry"), "ctrl E"),
-    EDIT_PREAMBLE("Edit preamble", Localization.lang("Edit preamble"), "alt P"),
     EDIT_STRINGS("Edit strings", Localization.lang("Edit strings"), "ctrl T"),
     ENTRY_EDITOR_NEXT_ENTRY("Entry editor, next entry", Localization.lang("Entry editor, next entry"), "ctrl shift DOWN"),
     ENTRY_EDITOR_NEXT_PANEL("Entry editor, next panel", Localization.lang("Entry editor, next panel"), "ctrl TAB"),
