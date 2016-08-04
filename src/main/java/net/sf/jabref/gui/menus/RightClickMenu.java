@@ -16,6 +16,8 @@
 package net.sf.jabref.gui.menus;
 
 import java.awt.event.ActionEvent;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -271,35 +273,15 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     }
 
     private boolean isFieldSetForSelectedEntry(String fieldname) {
-        if (panel.getMainTable().getSelectedRowCount() == 1) {
-            BibEntry entry = panel.getMainTable().getSelected().get(0);
-            return entry.getFieldNames().contains(fieldname);
-        } else {
-            return false;
-        }
-    }
-
-    private boolean areAllFieldsSetForSelectedEntry(List<String> fieldnames) {
-        if (panel.getMainTable().getSelectedRowCount() == 1) {
-            BibEntry entry = panel.getMainTable().getSelected().get(0);
-            return entry.getFieldNames().containsAll(fieldnames);
-        } else {
-            return false;
-        }
+        return isAnyFieldSetForSelectedEntry(Arrays.asList(fieldname));
     }
 
     private boolean isAnyFieldSetForSelectedEntry(List<String> fieldnames) {
         if (panel.getMainTable().getSelectedRowCount() == 1) {
             BibEntry entry = panel.getMainTable().getSelected().get(0);
-            for (String fieldname : fieldnames) {
-                if (entry.getFieldNames().contains(fieldname)) {
-                    return true;
-                }
-            }
-            return false;
-        } else {
-            return false;
+            return !Collections.disjoint(fieldnames, entry.getFieldNames());
         }
+        return false;
     }
 
     private Icon getFileIconForSelectedEntry() {
