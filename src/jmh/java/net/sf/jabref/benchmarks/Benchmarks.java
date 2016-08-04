@@ -127,7 +127,7 @@ public class Benchmarks {
     }
 
     @Benchmark
-    public boolean keywordGroupContainsWord() throws ParseException {
+    public boolean keywordGroupContainsWord() {
         return KeywordGroup.containsWord("testWord", "Some longer test string containing testWord the test word");
     }
 

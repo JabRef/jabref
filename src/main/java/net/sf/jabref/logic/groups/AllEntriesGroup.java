@@ -18,7 +18,6 @@ package net.sf.jabref.logic.groups;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -33,7 +32,7 @@ public class AllEntriesGroup extends AbstractGroup {
         super(Localization.lang("All entries"), GroupHierarchyType.INDEPENDENT);
     }
 
-    public static AbstractGroup fromString(String s) throws ParseException {
+    public static AbstractGroup fromString(String s) {
         if (!s.startsWith(AllEntriesGroup.ID)) {
             throw new IllegalArgumentException("AllEntriesGroup cannot be created from \"" + s + "\".");
         }
