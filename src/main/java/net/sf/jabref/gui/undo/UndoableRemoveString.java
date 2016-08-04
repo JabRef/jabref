@@ -15,10 +15,9 @@
 */
 package net.sf.jabref.gui.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
-
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibtexString;
@@ -26,7 +25,7 @@ import net.sf.jabref.model.entry.BibtexString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class UndoableRemoveString extends AbstractUndoableEdit {
+public class UndoableRemoveString extends AbstractUndoableJabRefEdit {
 
     private final BibDatabase base;
     private final BibtexString string;
@@ -42,18 +41,8 @@ public class UndoableRemoveString extends AbstractUndoableEdit {
     }
 
     @Override
-    public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": " + getPresentationName();
-    }
-
-    @Override
-    public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": " + getPresentationName();
-    }
-
-    @Override
     public String getPresentationName() {
-        return Localization.lang("remove string %0", string.toString());
+        return Localization.lang("remove string %0", StringUtil.boldHTML(string.toString()));
     }
 
     @Override

@@ -15,8 +15,6 @@
 */
 package net.sf.jabref.gui.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
-
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
@@ -26,7 +24,7 @@ import net.sf.jabref.model.database.BibDatabase;
  * information is the BibEntry, the field name, the old and the
  * new value. Old/new values can be null.
  */
-public class UndoablePreambleChange extends AbstractUndoableEdit {
+public class UndoablePreambleChange extends AbstractUndoableJabRefEdit {
 
     private final BibDatabase base;
     private final String oldValue;
@@ -40,16 +38,6 @@ public class UndoablePreambleChange extends AbstractUndoableEdit {
         this.oldValue = oldValue;
         this.newValue = newValue;
         this.panel = panel;
-    }
-
-    @Override
-    public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": " + getPresentationName();
-    }
-
-    @Override
-    public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": " + getPresentationName();
     }
 
     @Override

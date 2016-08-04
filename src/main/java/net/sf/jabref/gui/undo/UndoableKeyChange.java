@@ -15,9 +15,8 @@
 */
 package net.sf.jabref.gui.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
-
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -26,7 +25,7 @@ import net.sf.jabref.model.entry.BibEntry;
  * information is the BibEntry, the field name, the old and the
  * new value. Old/new values can be null.
  */
-public class UndoableKeyChange extends AbstractUndoableEdit {
+public class UndoableKeyChange extends AbstractUndoableJabRefEdit {
 
     private final BibEntry entry;
     private final BibDatabase base;
@@ -45,19 +44,9 @@ public class UndoableKeyChange extends AbstractUndoableEdit {
     @Override
     public String getPresentationName() {
         return Localization.lang("change key from %0 to %1",
-                (oldValue == null ? Localization.lang("undefined") : oldValue),
-                (newValue == null ? Localization.lang("undefined") : newValue));
+                StringUtil.boldHTML(oldValue, Localization.lang("undefined")),
+                StringUtil.boldHTML(newValue, Localization.lang("undefined")));
 
-    }
-
-    @Override
-    public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": " + getPresentationName();
-    }
-
-    @Override
-    public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": " + getPresentationName();
     }
 
     @Override

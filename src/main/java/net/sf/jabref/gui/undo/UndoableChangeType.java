@@ -15,15 +15,14 @@
 */
 package net.sf.jabref.gui.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
-
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * This class represents the change of type for an entry.
  */
-public class UndoableChangeType extends AbstractUndoableEdit {
+public class UndoableChangeType extends AbstractUndoableJabRefEdit {
     private final String oldType;
     private final String newType;
     private final BibEntry entry;
@@ -35,20 +34,11 @@ public class UndoableChangeType extends AbstractUndoableEdit {
     }
 
     @Override
-    public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": " + getPresentationName();
-    }
-
-    @Override
-    public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": " + getPresentationName();
-    }
-
-    @Override
     public String getPresentationName() {
         return Localization.lang("change type of entry %0 from %1 to %2",
-                (entry.getCiteKey() == null ? "" : entry.getCiteKey()),
-                (oldType == null ? Localization.lang("undefined") : oldType), newType);
+                StringUtil.boldHTML(entry.getCiteKey(), ""),
+                StringUtil.boldHTML(oldType, Localization.lang("undefined")),
+                StringUtil.boldHTML(newType));
     }
 
     @Override

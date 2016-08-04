@@ -15,13 +15,12 @@
 */
 package net.sf.jabref.gui.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
-
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexString;
 
-public class UndoableStringChange extends AbstractUndoableEdit {
+public class UndoableStringChange extends AbstractUndoableJabRefEdit {
 
     private final BibtexString string;
     private final String oldValue;
@@ -41,19 +40,10 @@ public class UndoableStringChange extends AbstractUndoableEdit {
     }
 
     @Override
-    public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": " + getPresentationName();
-    }
-
-    @Override
-    public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": " + getPresentationName();
-    }
-
-    @Override
     public String getPresentationName() {
-        return (nameChange ? Localization.lang("change string name %0 to %1", oldValue, newValue) : Localization
-                .lang("change string content %0 to %1", oldValue, newValue));
+        return (nameChange ? Localization.lang("change string name %0 to %1", StringUtil.boldHTML(oldValue),
+                StringUtil.boldHTML(newValue)) : Localization.lang("change string content %0 to %1",
+                        StringUtil.boldHTML(oldValue), StringUtil.boldHTML(newValue)));
     }
 
     @Override

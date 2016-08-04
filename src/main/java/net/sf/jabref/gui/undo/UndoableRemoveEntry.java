@@ -15,10 +15,9 @@
 */
 package net.sf.jabref.gui.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
-
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -31,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
  * The latter to be able to close the entry's editor if it is opened after
  * an undo, and the removal is then undone.
  */
-public class UndoableRemoveEntry extends AbstractUndoableEdit {
+public class UndoableRemoveEntry extends AbstractUndoableJabRefEdit {
 
     private final BibDatabase base;
     private final BibEntry entry;
@@ -47,18 +46,9 @@ public class UndoableRemoveEntry extends AbstractUndoableEdit {
     }
 
     @Override
-    public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": " + getPresentationName();
-    }
-
-    @Override
-    public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": " + getPresentationName();
-    }
-
-    @Override
     public String getPresentationName() {
-        return Localization.lang("remove entry %0", (entry.getCiteKey() == null ? "" : entry.getCiteKey()));
+        return Localization.lang("remove entry %0",
+                StringUtil.boldHTML(entry.getCiteKey(), ""));
     }
 
     @Override
