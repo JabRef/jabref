@@ -8,6 +8,7 @@ import java.util.List;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.pdfSearch.ResultSet;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -65,7 +66,7 @@ public class PdfSearchHandler {
         }
     }
 
-    public Document[] searchWithIndex(String pathToDirectory, String searchQuery, String[] fields) throws ParseException, IOException {
+    public ResultSet searchWithIndex(String pathToDirectory, String searchQuery, String[] fields) throws ParseException, IOException {
 
         Query q = new MultiFieldQueryParser(fields,
                 analyzer).parse(searchQuery);
@@ -83,6 +84,6 @@ public class PdfSearchHandler {
             searchResults[i] = searcher.doc(docId);
         }
         //TODO return result set instead of list
-        return searchResults;
+        return new ResultSet(searchResults);
     }
 }
