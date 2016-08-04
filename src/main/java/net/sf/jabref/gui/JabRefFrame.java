@@ -125,6 +125,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.GuiAppender;
 import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
 import net.sf.jabref.logic.undo.AddUndoableActionEvent;
+import net.sf.jabref.logic.undo.UndoChangeEvent;
 import net.sf.jabref.logic.undo.UndoRedoEvent;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -2291,21 +2292,21 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         @Subscribe
         public void listen(UndoRedoEvent event) {
-            updateTexts(event.isCanUndo(), event.getUndoDescription(), event.isCanRedo(), event.getRedoDescription());
+            updateTexts(event);
             JabRefFrame.this.getCurrentBasePanel().updateEntryEditorIfShowing();
         }
 
         @Subscribe
         public void listen(AddUndoableActionEvent event) {
-            updateTexts(event.isCanUndo(), event.getUndoDescription(), event.isCanRedo(), event.getRedoDescription());
+            updateTexts(event);
         }
 
-        private void updateTexts(boolean canUndo, String undoDescription, boolean canRedo, String redoDescription) {
+        private void updateTexts(UndoChangeEvent event) {
             if (JabRefFrame.this != null) {
-                undo.putValue(Action.SHORT_DESCRIPTION, undoDescription);
-                undo.setEnabled(canUndo);
-                redo.putValue(Action.SHORT_DESCRIPTION, redoDescription);
-                redo.setEnabled(canRedo);
+                undo.putValue(Action.SHORT_DESCRIPTION, event.getUndoDescription());
+                undo.setEnabled(event.isCanUndo());
+                redo.putValue(Action.SHORT_DESCRIPTION, event.getRedoDescription());
+                redo.setEnabled(event.isCanRedo());
             }
         }
     }
