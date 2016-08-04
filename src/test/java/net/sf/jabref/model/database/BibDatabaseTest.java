@@ -4,7 +4,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.importer.ParserResult;
@@ -316,5 +319,53 @@ public class BibDatabaseTest {
         BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "aaa");
         database.addString(string);
         assertEquals(database.resolveForStrings("AAA#AAA#AAA#"), "AAAaaaAAA#");
+    }
+
+    @Test
+    public void getUsedStringsSingleStringWithString() {
+        BibEntry entry = new BibEntry(IdGenerator.next());
+        entry.setField("author", "#AAA#");
+        BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "Some other #BBB#");
+        BibtexString string2 = new BibtexString(IdGenerator.next(), "BBB", "Some more text");
+        BibtexString string3 = new BibtexString(IdGenerator.next(), "CCC", "Even more text");
+        database.addString(string);
+        database.addString(string2);
+        database.addString(string3);
+        database.insertEntry(entry);
+        List<BibtexString> usedStrings = (List<BibtexString>) database.getUsedStrings(Arrays.asList(entry));
+        assertEquals(2, usedStrings.size());
+        assertTrue((string.getName() == usedStrings.get(0).getName())
+                || (string.getName() == usedStrings.get(1).getName()));
+        assertTrue((string2.getName() == usedStrings.get(0).getName())
+                || (string2.getName() == usedStrings.get(1).getName()));
+        assertTrue((string.getContent() == usedStrings.get(0).getContent())
+                || (string.getContent() == usedStrings.get(1).getContent()));
+        assertTrue((string2.getContent() == usedStrings.get(0).getContent())
+                || (string2.getContent() == usedStrings.get(1).getContent()));
+    }
+
+    @Test
+    public void getUsedStringsSingleString() {
+        BibEntry entry = new BibEntry(IdGenerator.next());
+        entry.setField("author", "#AAA#");
+        BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "Some other text");
+        BibtexString string2 = new BibtexString(IdGenerator.next(), "BBB", "Some more text");
+        database.addString(string);
+        database.addString(string2);
+        database.insertEntry(entry);
+        List<BibtexString> usedStrings = (List<BibtexString>) database.getUsedStrings(Arrays.asList(entry));
+        assertEquals(string.getName(), usedStrings.get(0).getName());
+        assertEquals(string.getContent(), usedStrings.get(0).getContent());
+    }
+
+    @Test
+    public void getUsedStringsNoString() {
+        BibEntry entry = new BibEntry(IdGenerator.next());
+        entry.setField("author", "Oscar Gustafsson");
+        BibtexString string = new BibtexString(IdGenerator.next(), "AAA", "Some other text");
+        database.addString(string);
+        database.insertEntry(entry);
+        Collection<BibtexString> usedStrings = database.getUsedStrings(Arrays.asList(entry));
+        assertEquals(Collections.emptyList(), usedStrings);
     }
 }

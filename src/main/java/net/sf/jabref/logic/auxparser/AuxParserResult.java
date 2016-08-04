@@ -1,12 +1,14 @@
 package net.sf.jabref.logic.auxparser;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibtexString;
 
 public class AuxParserResult {
 
@@ -17,6 +19,7 @@ public class AuxParserResult {
     private final BibDatabase auxDatabase = new BibDatabase();
     private int nestedAuxCount;
     private int crossRefEntriesCount;
+    private int insertedStrings;
 
     public AuxParserResult(BibDatabase masterDatabase) {
         this.masterDatabase = masterDatabase;
@@ -42,6 +45,10 @@ public class AuxParserResult {
         return unresolvedKeys.size();
     }
 
+    public int getInsertedStringsCount() {
+        return insertedStrings;
+    }
+
     /**
      * Query the number of extra entries pulled in due to crossrefs from other entries.
      *
@@ -59,6 +66,13 @@ public class AuxParserResult {
         nestedAuxCount++;
     }
 
+    public void insertStrings(Collection<BibtexString> usedStrings) {
+        for (BibtexString string : usedStrings) {
+            auxDatabase.addString(string);
+            insertedStrings++;
+        }
+    }
+
     /**
      * Prints parsing statistics
      *
@@ -73,7 +87,8 @@ public class AuxParserResult {
                 .append(Localization.lang("resolved")).append(' ').append(getResolvedKeysCount()).append('\n')
                 .append(Localization.lang("not_found")).append(' ').append(getUnresolvedKeysCount()).append('\n')
                 .append(Localization.lang("crossreferenced entries included")).append(' ')
-                .append(crossRefEntriesCount).append('\n');
+                .append(crossRefEntriesCount).append(Localization.lang("strings included")).append(' ')
+                .append(insertedStrings).append('\n');
 
         if (includeMissingEntries && (getUnresolvedKeysCount() > 0)) {
             for (String entry : unresolvedKeys) {

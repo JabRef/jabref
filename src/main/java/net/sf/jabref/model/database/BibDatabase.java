@@ -342,7 +342,33 @@ public class BibDatabase {
      */
     public String resolveForStrings(String content) {
         Objects.requireNonNull(content, "Content for resolveForStrings must not be null.");
-        return resolveContent(content, new HashSet<>());
+        return resolveContent(content, new HashSet<>(), null);
+    }
+
+    /**
+     * Get all strings used in the entries.
+     */
+    public Collection<BibtexString> getUsedStrings(Collection<BibEntry> entries) {
+        List<BibtexString> result = new ArrayList<>();
+        Set<String> allUsedIds = new HashSet<>();
+
+        // All entries
+        for (BibEntry entry : entries) {
+            for (String fieldContent : entry.getFieldValues()) {
+                resolveContent(fieldContent, new HashSet<>(), allUsedIds);
+            }
+        }
+
+        // Preamble
+        if (preamble != null) {
+            resolveContent(preamble, new HashSet<>(), allUsedIds);
+        }
+
+        for (String stringId : allUsedIds) {
+            result.add((BibtexString) bibtexStrings.get(stringId).clone());
+        }
+
+        return result;
     }
 
     /**
@@ -400,7 +426,7 @@ public class BibDatabase {
      * care not to follow a circular reference pattern.
      * If the string is undefined, returns null.
      */
-    private String resolveString(String label, Set<String> usedIds) {
+    private String resolveString(String label, Set<String> usedIds, Set<String> allUsedIds) {
         for (BibtexString string : bibtexStrings.values()) {
             if (string.getName().equalsIgnoreCase(label)) {
                 // First check if this string label has been resolved
@@ -413,11 +439,14 @@ public class BibDatabase {
                 }
                 // If not, log this string's ID now.
                 usedIds.add(string.getId());
+                if (allUsedIds != null) {
+                    allUsedIds.add(string.getId());
+                }
 
                 // Ok, we found the string. Now we must make sure we
                 // resolve any references to other strings in this one.
                 String result = string.getContent();
-                result = resolveContent(result, usedIds);
+                result = resolveContent(result, usedIds, allUsedIds);
 
                 // Finished with recursing this branch, so we remove our
                 // ID again:
@@ -439,7 +468,8 @@ public class BibDatabase {
 
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
 
-    private String resolveContent(String result, Set<String> usedIds) {
+
+    private String resolveContent(String result, Set<String> usedIds, Set<String> allUsedIds) {
         String res = result;
         if (RESOLVE_CONTENT_PATTERN.matcher(res).matches()) {
             StringBuilder newRes = new StringBuilder();
@@ -457,7 +487,7 @@ public class BibDatabase {
                     // We found the boundaries of the string ref,
                     // now resolve that one.
                     String refLabel = res.substring(next + 1, stringEnd);
-                    String resolved = resolveString(refLabel, usedIds);
+                    String resolved = resolveString(refLabel, usedIds, allUsedIds);
 
                     if (resolved == null) {
                         // Could not resolve string. Display the #
