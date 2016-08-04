@@ -1,13 +1,12 @@
 package net.sf.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.Optional;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibLatexEntryTypes;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
@@ -21,11 +20,25 @@ import static org.junit.Assert.assertEquals;
 public class IsbnFetcherTest {
 
     private IsbnFetcher fetcher;
+    private BibEntry bibEntry;
 
     @Before
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
         fetcher = new IsbnFetcher();
+
+        bibEntry = new BibEntry();
+        bibEntry.setType(BibLatexEntryTypes.BOOK);
+        bibEntry.setField("bibtexkey","9780321356680");
+        bibEntry.setField("title", "Effective Java");
+        bibEntry.setField("publisher", "Addison Wesley");
+        bibEntry.setField("year", "2008");
+        bibEntry.setField("author", "Joshua Bloch");
+        bibEntry.setField("date", "2008-05-08");
+        bibEntry.setField("ean", "9780321356680");
+        bibEntry.setField("isbn", "0321356683");
+        bibEntry.setField("pagetotal", "384 Seiten");
+        bibEntry.setField("url", "http://www.ebook.de/de/product/6441328/joshua_bloch_effective_java.html");
     }
 
     @Test
@@ -43,9 +56,8 @@ public class IsbnFetcherTest {
     public void testFetcher10() throws FetcherException, IOException {
         Optional<BibEntry> isbn = fetcher.performSearchById("0321356683");
         Assert.assertNotNull(isbn);
-        try (InputStream bibStream = IsbnFetcherTest.class.getResourceAsStream("IsbnFetcherTest.bib")) {
-            BibEntryAssert.assertEquals(bibStream, isbn.get());
-        }
+        assertEquals(bibEntry, isbn.get());
+
     }
 
     @Ignore("Create reproducible offline test")
@@ -53,9 +65,8 @@ public class IsbnFetcherTest {
     public void testFetcher13() throws FetcherException, IOException {
         Optional<BibEntry> isbn = fetcher.performSearchById("978-0321356680");
         Assert.assertNotNull(isbn);
-        try (InputStream bibStream = IsbnFetcherTest.class.getResourceAsStream("IsbnFetcherTest.bib")) {
-            BibEntryAssert.assertEquals(bibStream, isbn.get());
-        }
+        assertEquals(bibEntry, isbn.get());
+
     }
 
     @Ignore("Create reproducible offline test")

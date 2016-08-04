@@ -26,7 +26,6 @@ import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -48,22 +47,12 @@ import net.sf.jabref.gui.importer.FetcherPreviewDialog;
 import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.logic.importer.FetcherException;
-import net.sf.jabref.logic.importer.IdBasedFetcher;
-import net.sf.jabref.logic.importer.SearchBasedFetcher;
-import net.sf.jabref.logic.importer.WebFetcher;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {
-
-    private static final Log LOGGER = LogFactory.getLog(GeneralFetcher.class);
 
     private final JTextField tf = new JTextField();
 
@@ -75,105 +64,53 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     private final Action action;
     private final JabRefFrame frame;
     private EntryFetcher activeFetcher;
-    private WebFetcher webFetcher;
 
 
     public GeneralFetcher(SidePaneManager p0, JabRefFrame frame) {
         super(p0, IconTheme.JabRefIcon.WWW.getSmallIcon(), Localization.lang("Web search"));
         this.sidePaneManager = p0;
         this.frame = frame;
-
         List<EntryFetcher> fetchers = new EntryFetchers(Globals.journalAbbreviationLoader).getEntryFetchers();
-        List<WebFetcher> webFetchers = new EntryFetchers(Globals.journalAbbreviationLoader).getWebFetchers();
-
         EntryFetcher[] fetcherArray = fetchers.toArray(new EntryFetcher[fetchers.size()]);
-        WebFetcher[] searchBasedFetcherArray = webFetchers.toArray(new WebFetcher[webFetchers.size()]);
-
         Arrays.sort(fetcherArray, new EntryFetcherComparator());
-
-        String[] choices = new String[fetcherArray.length + searchBasedFetcherArray.length];
-        for (int i = 0; i < fetcherArray.length + searchBasedFetcherArray.length; i++) {
-            if (i < fetcherArray.length) {
-                choices[i] = fetcherArray[i].getTitle();
-            } else {
-                choices[i] = searchBasedFetcherArray[i - fetcherArray.length].getName();
-            }
+        //JLabel[] choices = new JLabel[fetchers.size()];
+        String[] choices = new String[fetcherArray.length];
+        for (int i = 0; i < fetcherArray.length; i++) {
+            choices[i] = fetcherArray[i].getTitle();
         }
-
         JComboBox<String> fetcherChoice = new JComboBox<>(choices);
         int defaultFetcher = Globals.prefs.getInt(JabRefPreferences.SELECTED_FETCHER_INDEX);
-        if (defaultFetcher >= fetcherArray.length + searchBasedFetcherArray.length) {
+        if (defaultFetcher >= fetcherArray.length) {
             defaultFetcher = 0;
         }
-
-
-        if (fetcherArray.length > defaultFetcher) {
-            this.activeFetcher = fetcherArray[defaultFetcher];
-
-            if (this.activeFetcher.getOptionsPanel() != null) {
-                optPanel.add(this.activeFetcher.getOptionsPanel(), BorderLayout.CENTER);
-            }
-        } else if (defaultFetcher >= fetcherArray.length && defaultFetcher < fetcherArray.length + searchBasedFetcherArray.length) {
-            this.webFetcher = searchBasedFetcherArray[defaultFetcher - fetcherArray.length];
-        }
-
-
+        this.activeFetcher = fetcherArray[defaultFetcher];
         fetcherChoice.setSelectedIndex(defaultFetcher);
-
-
-        HelpAction help;
-
-        if (fetcherArray.length < defaultFetcher) {
-            help = new HelpAction(activeFetcher.getHelpPage());
-        } else if (defaultFetcher >= fetcherArray.length && defaultFetcher < fetcherArray.length + searchBasedFetcherArray.length) {
-            help = new HelpAction(webFetcher.getHelpPage());
-        } else {
-            help = new HelpAction(null);
+        if (this.activeFetcher.getOptionsPanel() != null) {
+            optPanel.add(this.activeFetcher.getOptionsPanel(), BorderLayout.CENTER);
         }
-
-
+        HelpAction help = new HelpAction(activeFetcher.getHelpPage());
         JButton helpBut = help.getHelpButton();
-
-
-        if (fetcherArray.length < defaultFetcher) {
-            helpBut.setEnabled(activeFetcher.getHelpPage() != null);
-        } else if (defaultFetcher >= fetcherArray.length && defaultFetcher < fetcherArray.length + searchBasedFetcherArray.length) {
-            helpBut.setEnabled(webFetcher.getHelpPage() != null);
-        }
+        helpBut.setEnabled(activeFetcher.getHelpPage() != null);
 
         fetcherChoice.addActionListener(actionEvent -> {
-
-            if (fetcherChoice.getSelectedIndex() < fetcherArray.length) {
-                activeFetcher = fetcherArray[fetcherChoice.getSelectedIndex()];
-                Globals.prefs.putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, fetcherChoice.getSelectedIndex());
-                if (activeFetcher.getHelpPage() == null) {
-                    helpBut.setEnabled(false);
-                } else {
-                    help.setHelpFile(activeFetcher.getHelpPage());
-                    helpBut.setEnabled(true);
-                }
-                optionsCards.show(optionsPanel, String.valueOf(fetcherChoice.getSelectedIndex()));
-                optPanel.removeAll();
-                if (activeFetcher.getOptionsPanel() != null) {
-                    optPanel.add(activeFetcher.getOptionsPanel(), BorderLayout.CENTER);
-                }
+            activeFetcher = fetcherArray[fetcherChoice.getSelectedIndex()];
+            Globals.prefs.putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, fetcherChoice.getSelectedIndex());
+            if (activeFetcher.getHelpPage() == null) {
+                helpBut.setEnabled(false);
             } else {
-                webFetcher = searchBasedFetcherArray[fetcherChoice.getSelectedIndex() - fetcherArray.length];
-                Globals.prefs.putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, fetcherChoice.getSelectedIndex());
-                if (webFetcher.getHelpPage() == null) {
-                    helpBut.setEnabled(false);
-                } else {
-                    help.setHelpFile(webFetcher.getHelpPage());
-                    helpBut.setEnabled(true);
-                }
-                optionsCards.show(optionsPanel, String.valueOf(fetcherChoice.getSelectedIndex() - fetcherArray.length));
-                optPanel.removeAll();
+                help.setHelpFile(activeFetcher.getHelpPage());
+                helpBut.setEnabled(true);
             }
-
+            optionsCards.show(optionsPanel, String.valueOf(fetcherChoice.getSelectedIndex()));
+            optPanel.removeAll();
+            if (activeFetcher.getOptionsPanel() != null) {
+                optPanel.add(activeFetcher.getOptionsPanel(), BorderLayout.CENTER);
+            }
             revalidate();
         });
 
         action = new FetcherAction();
+
 
 
         helpBut.setMargin(new Insets(0, 0, 0, 0));
@@ -224,8 +161,11 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         gbl.setConstraints(helpBut, con);
         main.add(helpBut);
 
-        gbl.setConstraints(optPanel, con);
-        main.add(optPanel);
+        JPanel pan = new JPanel();
+        if (pan != null) {
+            gbl.setConstraints(optPanel, con);
+            main.add(optPanel);
+        }
 
         main.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
         add(main, BorderLayout.CENTER);
@@ -288,68 +228,19 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
 
         // The other category downloads the entries first, then asks the user which ones to keep:
         else {
+            final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.getCurrentBasePanel(),
+                    activeFetcher.getTitle(), false);
+            dialog.addCallBack(activeFetcher);
+            dialog.setLocationRelativeTo(frame);
+            dialog.setVisible(true);
 
-            if (webFetcher != null && activeFetcher == null) {
-                if (webFetcher instanceof SearchBasedFetcher) {
-                    SearchBasedFetcher searchBasedFetcher = (SearchBasedFetcher) webFetcher;
-                    final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.getCurrentBasePanel(),
-                            searchBasedFetcher.getName(), false);
-                    dialog.setLocationRelativeTo(frame);
-                    dialog.setVisible(true);
-
-                    JabRefExecutorService.INSTANCE.execute(() -> {
-                        try {
-                            List<BibEntry> bibEntryList = searchBasedFetcher.performSearch(tf.getText().trim());
-
-                            if (!bibEntryList.isEmpty()) {
-                                dialog.addEntries(bibEntryList);
-                                dialog.entryListComplete();
-                            } else {
-                                dialog.dispose();
-                            }
-                        } catch (FetcherException fe) {
-                            LOGGER.error("Fail while fetching Entries");
-                        }
-                    });
-                } else if (webFetcher instanceof IdBasedFetcher) {
-                    IdBasedFetcher idBasedFetcher = (IdBasedFetcher) webFetcher;
-                    final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.getCurrentBasePanel(),
-                            idBasedFetcher.getName(), false);
-
-                    dialog.setLocationRelativeTo(frame);
-                    dialog.setVisible(true);
-
-                    JabRefExecutorService.INSTANCE.execute(() -> {
-                        try {
-                            Optional<BibEntry> bibEntry = idBasedFetcher.performSearchById(tf.getText().trim());
-
-                            if (bibEntry.isPresent()) {
-                                dialog.addEntry(bibEntry.get());
-                                dialog.entryListComplete();
-                            } else {
-                                dialog.dispose();
-                            }
-                        } catch (FetcherException fe) {
-                            LOGGER.error("Fail while fetching Entries");
-                        }
-                    });
+            JabRefExecutorService.INSTANCE.execute(() -> {
+                if (activeFetcher.processQuery(tf.getText().trim(), dialog, dialog)) {
+                    dialog.entryListComplete();
+                } else {
+                    dialog.dispose();
                 }
-
-            } else {
-                final ImportInspectionDialog dialog = new ImportInspectionDialog(frame, frame.getCurrentBasePanel(),
-                        activeFetcher.getTitle(), false);
-                dialog.addCallBack(activeFetcher);
-                dialog.setLocationRelativeTo(frame);
-                dialog.setVisible(true);
-
-                JabRefExecutorService.INSTANCE.execute(() -> {
-                    if (activeFetcher.processQuery(tf.getText().trim(), dialog, dialog)) {
-                        dialog.entryListComplete();
-                    } else {
-                        dialog.dispose();
-                    }
-                });
-            }
+            });
         }
     }
 
