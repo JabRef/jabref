@@ -70,7 +70,7 @@ public class CountingUndoManager extends UndoManager {
 
     public void registerListener(Object object) {
         this.eventBus.register(object);
-        postUndoRedoEvent(); // Send event to trigger changess
+        postUndoRedoEvent(); // Send event to trigger changes
     }
 
     public void unregisterListener(Object object) {
