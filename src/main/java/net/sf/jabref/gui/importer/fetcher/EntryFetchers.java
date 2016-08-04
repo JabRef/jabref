@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sf.jabref.logic.importer.WebFetcher;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
 import net.sf.jabref.logic.importer.fetcher.GvkFetcher;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
@@ -27,7 +26,6 @@ import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 public class EntryFetchers {
 
     private final List<EntryFetcher> entryFetchers = new LinkedList<>();
-    private final List<WebFetcher> webFetchers = new LinkedList<>();
 
 
     public EntryFetchers(JournalAbbreviationLoader abbreviationLoader) {
@@ -46,15 +44,12 @@ public class EntryFetchers {
         entryFetchers.add(new GoogleScholarFetcher());
         entryFetchers.add(new DOAJFetcher());
         entryFetchers.add(new SpringerFetcher());
-        entryFetchers.add(new SearchBasedEntryFetcher(new ArXiv()));
 
-        webFetchers.add(new GvkFetcher());
+        entryFetchers.add(new SearchBasedEntryFetcher(new ArXiv()));
+        entryFetchers.add(new SearchBasedEntryFetcher(new GvkFetcher()));
     }
 
     public List<EntryFetcher> getEntryFetchers() {
         return Collections.unmodifiableList(this.entryFetchers);
-    }
-    public List<WebFetcher> getWebFetchers() {
-        return Collections.unmodifiableList(this.webFetchers);
     }
 }
