@@ -66,6 +66,16 @@ public class PdfSearchHandler {
         }
     }
 
+    /**
+     * search for results matching a query in a specified directory
+     *
+     * @param pathToDirectory path in which the index must be stored
+     * @param searchQuery     a pattern to search for matching entries in the index
+     * @param fields          the fields of lucene documents so match the query with
+     * @return a result set of all documents that have matches in any fields
+     * @throws ParseException
+     * @throws IOException
+     */
     public ResultSet searchWithIndex(String pathToDirectory, String searchQuery, String[] fields) throws ParseException, IOException {
 
         Query q = new MultiFieldQueryParser(fields,
@@ -83,7 +93,6 @@ public class PdfSearchHandler {
             int docId = hits[i].doc;
             searchResults[i] = searcher.doc(docId);
         }
-        //TODO return result set instead of list
-        return new ResultSet(searchResults);
+        return new ResultSet(searchResults, collector);
     }
 }

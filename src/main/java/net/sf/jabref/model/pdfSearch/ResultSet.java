@@ -5,6 +5,7 @@ import java.util.List;
 import net.sf.jabref.logic.search.PDFSearch.SearchFieldConstants;
 
 import org.apache.lucene.document.Document;
+import org.apache.lucene.search.TopDocCollector;
 
 /**
  * Created by christoph on 04.08.16.
@@ -12,9 +13,11 @@ import org.apache.lucene.document.Document;
 public class ResultSet {
 
     private List<SearchResult> searchResults;
+    private TopDocCollector collector;
 
-    public ResultSet(Document[] documents) {
+    public ResultSet(Document[] documents, TopDocCollector collector) {
         this.searchResults = mapToSearchResults(documents);
+        this.collector = collector;
     }
 
     private void sortByHits() {
@@ -33,11 +36,12 @@ public class ResultSet {
      */
     private List<SearchResult> mapToSearchResults(Document[] documents) {
 
-        for (Document doc : documents) {
+        for (int i = 0; i < documents.length; i++) {
             SearchResult result = new SearchResult();
             for (String field : SearchFieldConstants.PDF_FIELDS) {
-                result.mapField(field, doc.getField(field).stringValue());
+                result.mapField(field, documents[i].getField(field).stringValue());
             }
+            result.setLuceneScore(collector.topDocs().scoreDocs[i].score);
             searchResults.add(result);
         }
         return searchResults;

@@ -14,17 +14,20 @@ public class SearchResult {
     private String subject;
     private String keyword;
 
+    private float luceneScore;
+
     public SearchResult() {
 
     }
 
-    public SearchResult(String key, String content, String author, String creator, String subject, String keyword) {
+    public SearchResult(String key, String content, String author, String creator, String subject, String keyword, float luceneScore) {
         this.key = key;
         this.content = content;
         this.author = author;
         this.creator = creator;
         this.subject = subject;
         this.keyword = keyword;
+        this.luceneScore = luceneScore;
     }
 
     public void mapField(String fieldName, String value) {
@@ -100,5 +103,13 @@ public class SearchResult {
 
     public void setKeyword(String keyword) {
         this.keyword = keyword;
+    }
+
+    public float getLuceneScore() {
+        return luceneScore;
+    }
+
+    public void setLuceneScore(float luceneScore) {
+        this.luceneScore = luceneScore;
     }
 }
