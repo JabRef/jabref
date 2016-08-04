@@ -41,7 +41,6 @@ import net.sf.jabref.importer.AutosaveStartupPrompter;
 import net.sf.jabref.importer.OpenDatabaseAction;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.Version;
 import net.sf.jabref.logic.util.VersionPreferences;
@@ -58,16 +57,25 @@ public class JabRefGUI {
 
     private static JabRefFrame mainFrame;
 
-    private final List<ParserResult> loadedDatabases;
+    private final List<ParserResult> bibDatabases;
     private final boolean isBlank;
-
     private final List<File> postponed = new ArrayList<>();
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
 
-    public JabRefGUI(List<ParserResult> loadedDatabases, boolean isBlank) {
-        this.loadedDatabases = loadedDatabases;
+    private String focusedFile;
+
+    public JabRefGUI(List<ParserResult> argsDatabases, boolean isBlank) {
+        this.bibDatabases = argsDatabases;
         this.isBlank = isBlank;
+
+        // passed file (we take the first one) should be focused
+        if (!argsDatabases.isEmpty()) {
+            focusedFile = argsDatabases.get(0).getFile().getAbsolutePath();
+        } else {
+            focusedFile = Globals.prefs.get(JabRefPreferences.LAST_FOCUSED);
+        }
+
         openWindow();
         JabRefGUI.checkForNewVersion(false);
     }
@@ -102,7 +110,7 @@ public class JabRefGUI {
         setLookAndFeel();
 
         // If the option is enabled, open the last edited databases, if any.
-        if (!isBlank && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED) && (Globals.prefs.get(JabRefPreferences.LAST_EDITED) != null)) {
+        if (!isBlank && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
             openLastEditedDatabases();
         }
 
@@ -113,13 +121,14 @@ public class JabRefGUI {
         LOGGER.debug("Initializing frame");
         JabRefGUI.mainFrame = new JabRefFrame();
 
-        // Add all loadedDatabases databases to the frame:
-        boolean first = true;
-        if (!loadedDatabases.isEmpty()) {
-            for (Iterator<ParserResult> parserResultIterator = loadedDatabases.iterator(); parserResultIterator.hasNext();) {
+        // Add all bibDatabases databases to the frame:
+        boolean first = false;
+        if (!bibDatabases.isEmpty()) {
+            for (Iterator<ParserResult> parserResultIterator = bibDatabases.iterator(); parserResultIterator.hasNext();) {
                 ParserResult pr = parserResultIterator.next();
 
-                if (new LastFocusedTabPreferences(Globals.prefs).hadLastFocus(pr.getFile())) {
+                // Define focused tab
+                if (focusedFile != null && pr.getFile().getAbsolutePath().equals(focusedFile)) {
                     first = true;
                 }
 
@@ -176,7 +185,7 @@ public class JabRefGUI {
 
         if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
             int i = 0;
-            for (ParserResult pr : loadedDatabases) {
+            for (ParserResult pr : bibDatabases) {
                 ParserResultWarningDialog.showParserResultWarningDialog(pr, JabRefGUI.getMainFrame(), i++);
             }
         }
@@ -190,8 +199,8 @@ public class JabRefGUI {
         // This is because importToOpen might have been used, which adds to
         // loadedDatabases, but not to getBasePanelCount()
 
-        for (int i = 0; (i < loadedDatabases.size()) && (i < JabRefGUI.getMainFrame().getBasePanelCount()); i++) {
-            ParserResult pr = loadedDatabases.get(i);
+        for (int i = 0; (i < bibDatabases.size()) && (i < JabRefGUI.getMainFrame().getBasePanelCount()); i++) {
+            ParserResult pr = bibDatabases.get(i);
             BasePanel panel = JabRefGUI.getMainFrame().getBasePanelAt(i);
             OpenDatabaseAction.performPostOpenActions(panel, pr, true);
         }
@@ -205,12 +214,16 @@ public class JabRefGUI {
             SwingUtilities.invokeLater(asp);
         }
 
-        if (!loadedDatabases.isEmpty()) {
+        if (!bibDatabases.isEmpty()) {
             new FocusRequester(JabRefGUI.getMainFrame().getCurrentBasePanel().getMainTable());
         }
     }
 
     private void openLastEditedDatabases() {
+        if (Globals.prefs.get(JabRefPreferences.LAST_EDITED) == null) {
+            return;
+        }
+
         List<String> lastFiles = Globals.prefs.getStringList(JabRefPreferences.LAST_EDITED);
 
         for (String fileName : lastFiles) {
@@ -226,13 +239,13 @@ public class JabRefGUI {
             if (parsedDatabase.isNullResult()) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
             } else {
-                loadedDatabases.add(parsedDatabase);
+                bibDatabases.add(parsedDatabase);
             }
         }
     }
 
     private boolean isLoaded(File fileToOpen) {
-        for (ParserResult pr : loadedDatabases) {
+        for (ParserResult pr : bibDatabases) {
             if (pr.getFile() != null && pr.getFile().equals(fileToOpen)) {
                 return true;
             }
