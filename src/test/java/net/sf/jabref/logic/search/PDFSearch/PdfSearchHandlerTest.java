@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.queryParser.ParseException;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -12,7 +13,7 @@ import org.junit.Test;
  */
 public class PdfSearchHandlerTest {
 
-
+    @Ignore
     @Test
     public void addDocumentsAndSearchInContent() {
         PdfSearchHandler handler = new PdfSearchHandler();
@@ -24,7 +25,7 @@ public class PdfSearchHandlerTest {
         try {
             handler.initializeIndex(path);
             //TODO add test resource, this path is an absolute path on a specific development machine
-            handler.addDocumentToServer("/home/christoph/ownCloud/uni/Semester/6. Semester/CAD/CAD");
+//            handler.addDocumentsToServer("/home/christoph/ownCloud/uni/Semester/6. Semester/CAD/CAD");
             try {
                 results = handler.searchWithIndex(path, "o*", new String[]{"content", "title"});
             } catch (ParseException e) {

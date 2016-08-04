@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
+
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexWriter;
@@ -34,35 +38,31 @@ public class PdfSearchHandler {
      */
     public void initializeIndex(String pathToIndex) throws IOException {
 
-        l.add("you all");
-        l.add("visit");
-        l.add("some blog");
-        l.add("sometimes");
-
         directoryToIndex = FSDirectory.getDirectory(pathToIndex);
         analyzer = new StandardAnalyzer();
 
     }
 
-    public void addDocumentToServer(String pathToDocumentFolder) throws IOException {
+    /**
+     * Adds all pdf files linked to an entry in the database to the lucene search index
+     *
+     * @param database a bibtex database to link the pdf files to
+     * @throws IOException
+     */
+    public void addDocumentsToServer(BibDatabase database) throws IOException {
 
         IndexWriter indexWriter = new IndexWriter(directoryToIndex, analyzer, true,
                 IndexWriter.MaxFieldLength.UNLIMITED);
 
-        File[] files;
-        if (new File(pathToDocumentFolder).isDirectory()) {
-            files = new File(pathToDocumentFolder).listFiles();
-        } else {
-            files = new File[]{new File(pathToDocumentFolder)};
-        }
+        PdfContentReader reader = new PdfContentReader();
 
-        for (int i = 0; i < files.length; i++) {
-
-            if (files[i].getName().endsWith("pdf")) {
-                indexWriter.addDocument(PdfContentReader.readContentFromPDFToString(files[i]));
+        for (BibEntry entry : database.getEntries()) {
+            if (entry.hasField(FieldName.FILE)) {
+                String key = entry.getCiteKey();
+                File file = new File(entry.getFieldOptional(FieldName.FILE).get().toString());
+                indexWriter.addDocument(reader.readContentFromPDFToString(file, key));
             }
         }
-        indexWriter.close();
     }
 
     public Document[] searchWithIndex(String pathToDirectory, String searchQuery, String[] fields) throws ParseException, IOException {
@@ -82,6 +82,7 @@ public class PdfSearchHandler {
             int docId = hits[i].doc;
             searchResults[i] = searcher.doc(docId);
         }
+        //TODO return result set instead of list
         return searchResults;
     }
 }
