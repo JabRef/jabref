@@ -697,11 +697,13 @@ public class OpenOfficePanel extends AbstractWorker {
         }
 
         // Ask if keys should be generated
-        int answer = JOptionPane.showConfirmDialog(this.frame,
+        String[] options = {Localization.lang("Generate keys"), Localization.lang("Cancel")};
+        int answer = JOptionPane.showOptionDialog(this.frame,
                 Localization.lang("Cannot cite entries without BibTeX keys. Generate keys now?"),
-                Localization.lang("Cite"), JOptionPane.YES_NO_OPTION);
+                Localization.lang("Cite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options,
+                null);
         BasePanel panel = frame.getCurrentBasePanel();
-        if ((answer == JOptionPane.YES_OPTION) && (panel != null)) {
+        if ((answer == JOptionPane.OK_OPTION) && (panel != null)) {
             // Generate keys
             LabelPatternPreferences prefs = LabelPatternPreferences.fromPreferences(Globals.prefs);
             NamedCompound undoCompound = new NamedCompound(Localization.lang("Cite"));
