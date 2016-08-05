@@ -57,9 +57,13 @@ import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.openoffice.OOBibStyle;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
@@ -638,7 +642,8 @@ public class OpenOfficePanel extends AbstractWorker {
         if (panel != null) {
             final BibDatabase database = panel.getDatabase();
             List<BibEntry> entries = panel.getSelectedEntries();
-            if (!entries.isEmpty()) {
+            if (!entries.isEmpty() && checkThatEntriesHaveKeys(entries)) {
+
                 try {
                     if (style == null) {
                         style = loader.getUsedStyle();
@@ -667,6 +672,57 @@ public class OpenOfficePanel extends AbstractWorker {
 
         }
 
+    }
+
+    /**
+     * Check that all entries in the list have BibTeX keys, if not ask if they should be generated
+     *
+     * @param entries A list of entries to be checked
+     * @return true if all entries have BibTeX keys, if it so may be after generating them
+     */
+    private boolean checkThatEntriesHaveKeys(List<BibEntry> entries) {
+        // Check if there are empty keys
+        boolean emptyKeys = false;
+        for (BibEntry entry : entries) {
+            if (entry.getCiteKey() == null) {
+                // Found one, no need to look further for now
+                emptyKeys = true;
+                break;
+            }
+        }
+
+        // If no empty keys, return true
+        if (!emptyKeys) {
+            return true;
+        }
+
+        // Ask if keys should be generated
+        int answer = JOptionPane.showConfirmDialog(this.frame,
+                Localization.lang("Cannot cite entries without BibTeX keys. Generate keys now?"),
+                Localization.lang("Cite"), JOptionPane.YES_NO_OPTION);
+        BasePanel panel = frame.getCurrentBasePanel();
+        if ((answer == JOptionPane.YES_OPTION) && (panel != null)) {
+            // Generate keys
+            LabelPatternPreferences prefs = LabelPatternPreferences.fromPreferences(Globals.prefs);
+            NamedCompound undoCompound = new NamedCompound(Localization.lang("Cite"));
+            for (BibEntry entry : entries) {
+                if (entry.getCiteKey() == null) {
+                    // Generate key
+                    LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
+                            prefs);
+                    // Add undo change
+                    undoCompound.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, null, entry.getCiteKey()));
+                }
+            }
+            undoCompound.end();
+            // Add all undos
+            panel.getUndoManager().addEdit(undoCompound);
+            // Now every entry has a key
+            return true;
+        } else {
+            // No, we canceled (or there is no panel to get the database from, highly unlikely)
+            return false;
+        }
     }
 
     private void showConnectionLostErrorMessage() {
