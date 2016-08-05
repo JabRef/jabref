@@ -20,9 +20,9 @@ This page provides some development support in the form of howtos. See also [[Hi
     * [Files and folders](#files-and-folders-in-tests)
     * [Loading Files from Resources](#loading-files-from-resources)
     * [Preferences in tests](#preferences-in-tests)
-
   * [UI](#ui)
   * [UI for Preferences](#ui-for-preferences)
+  * [Designing GUI Confirmation dialogs](#designing-gui-confirmation-dialogs)
   * ["Special Fields"](#special-fields)
     * [keywords sync](#keywords-sync)
   * [Working with BibTeX data](#working-with-bibtex-data)
@@ -354,6 +354,16 @@ Global variables are OK here. Global variables are NOT OK everywhere else, espec
 
   * `JabRefFrame.preferences()` shows the preferences 
   * class: PrefsDialog3 
+
+## Designing GUI Confirmation dialogs
+
+1. Avoid asking questions 
+2. Be as concise as possible
+3. Identify the item at risk
+4. Name your buttons for the actions
+
+More information:
+http://ux.stackexchange.com/a/768
 
 ## "Special Fields"
 
