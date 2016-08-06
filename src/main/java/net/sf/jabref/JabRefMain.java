@@ -23,6 +23,7 @@ import net.sf.jabref.cli.ArgumentProcessor;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.exporter.ExportFormats;
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
@@ -30,6 +31,8 @@ import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.net.ProxyAuthenticator;
 import net.sf.jabref.logic.net.ProxyPreferences;
 import net.sf.jabref.logic.net.ProxyRegisterer;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.client.RemoteListenerClient;
 import net.sf.jabref.logic.util.OS;
@@ -76,6 +79,11 @@ public class JabRefMain {
 
         // Set key pattern based on preferences
         LabelPatternUtil.updateDefaultPattern(LabelPatternPreferences.fromPreferences(Globals.prefs));
+
+        // Initialize protected terms loader
+        Globals.protectedTermsLoader = new ProtectedTermsLoader(
+                ProtectedTermsPreferences.fromPreferences(Globals.prefs));
+        ProtectTermsFormatter.setProtectedTermsLoader(Globals.protectedTermsLoader);
 
         // Check for running JabRef
         RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);

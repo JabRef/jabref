@@ -23,6 +23,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - It is now possible to generate a new BIB database from the citations in an OpenOffice/LibreOffice document
 - The arXiv fetcher now also supports free-text search queries
 - [#1345](https://github.com/JabRef/jabref/issues/1345) Cleanup ISSN
+- It is now possible to add your own lists of protected terms, see Options -> Manage protected terms
 
 ### Fixed
 - Fixed [#1632](https://github.com/JabRef/jabref/issues/1632) User comments (@Comment) with or without brackets are now kept

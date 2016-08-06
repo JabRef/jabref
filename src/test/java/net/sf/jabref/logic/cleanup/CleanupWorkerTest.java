@@ -20,6 +20,8 @@ import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -52,6 +54,13 @@ public class CleanupWorkerTest {
         }
         if (Globals.journalAbbreviationLoader == null) {
             Globals.journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
+        }
+
+        if (Globals.protectedTermsLoader == null) {
+            Globals.protectedTermsLoader = new ProtectedTermsLoader(
+                    new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
+                            Collections.emptyList(), Collections.emptyList()));
+            ProtectTermsFormatter.setProtectedTermsLoader(Globals.protectedTermsLoader);
         }
 
         pdfFolder = bibFolder.newFolder();
@@ -283,7 +292,8 @@ public class CleanupWorkerTest {
     @Test
     public void cleanupCasesAddsBracketAroundAluminiumGalliumArsenid() {
         CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true,
-                Collections.singletonList(new FieldFormatterCleanup("title", new ProtectTermsFormatter()))));
+                Collections.singletonList(
+                        new FieldFormatterCleanup("title", new ProtectTermsFormatter()))));
         BibEntry entry = new BibEntry();
         entry.setField("title", "AlGaAs");
 

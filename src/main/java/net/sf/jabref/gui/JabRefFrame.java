@@ -107,6 +107,7 @@ import net.sf.jabref.gui.menus.FileHistoryMenu;
 import net.sf.jabref.gui.menus.RightClickMenu;
 import net.sf.jabref.gui.openoffice.OpenOfficePanel;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
+import net.sf.jabref.gui.protectedterms.ProtectedTermsDialog;
 import net.sf.jabref.gui.push.PushToApplicationButton;
 import net.sf.jabref.gui.push.PushToApplications;
 import net.sf.jabref.gui.util.FocusRequester;
@@ -1341,12 +1342,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         options.add(showPrefs);
 
         AbstractAction genFieldsCustomization = new GenFieldsCustomizationAction();
+        AbstractAction protectTerms = new ProtectedTermsAction();
         options.add(genFieldsCustomization);
         options.add(customExpAction);
         options.add(customImpAction);
         options.add(customFileTypesAction);
         options.add(manageJournals);
         options.add(manageSelectors);
+        options.add(protectTerms);
         options.add(selectKeys);
         mb.add(options);
 
@@ -1942,6 +1945,19 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
+    private class ProtectedTermsAction extends MnemonicAwareAction {
+
+        public ProtectedTermsAction() {
+            putValue(Action.NAME, Localization.menuTitle("Manage protected terms"));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ProtectedTermsDialog protectTermsDialog = new ProtectedTermsDialog(JabRefFrame.this,
+                    Globals.protectedTermsLoader);
+            protectTermsDialog.setVisible(true);
+        }
+    }
     private class DatabasePropertiesAction extends MnemonicAwareAction {
 
         private DatabasePropertiesDialog propertiesDialog;

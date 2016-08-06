@@ -70,6 +70,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.VersionPreferences;
@@ -174,6 +175,10 @@ public class JabRefPreferences {
     public static final String PREAMBLE_SIZE_X = "preambleSizeX";
     public static final String PREAMBLE_POS_Y = "preamblePosY";
     public static final String PREAMBLE_POS_X = "preamblePosX";
+    public static final String TERMS_SIZE_Y = "termsSizeY";
+    public static final String TERMS_SIZE_X = "termsSizeX";
+    public static final String TERMS_POS_Y = "termsPosY";
+    public static final String TERMS_POS_X = "termsPosX";
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
     public static final String LAST_FOCUSED = "lastFocused";
@@ -337,6 +342,11 @@ public class JabRefPreferences {
     public static final String USE_UNIT_FORMATTER_ON_SEARCH = "useUnitFormatterOnSearch";
     public static final String USE_CASE_KEEPER_ON_SEARCH = "useCaseKeeperOnSearch";
     public static final String USE_IEEE_ABRV = "useIEEEAbrv";
+
+    public static final String PROTECTED_TERMS_ENABLED_EXTERNAL = "protectedTermsEnabledExternal";
+    public static final String PROTECTED_TERMS_DISABLED_EXTERNAL = "protectedTermsDisabledExternal";
+    public static final String PROTECTED_TERMS_ENABLED_INTERNAL = "protectedTermsEnabledInternal";
+    public static final String PROTECTED_TERMS_DISABLED_INTERNAL = "protectedTermsDisabledInternal";
 
     public static final String AKS_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP_DOI = "CleanUpDOI";
@@ -591,6 +601,10 @@ public class JabRefPreferences {
         defaults.put(PREAMBLE_POS_Y, 0);
         defaults.put(PREAMBLE_SIZE_X, 600);
         defaults.put(PREAMBLE_SIZE_Y, 400);
+        defaults.put(TERMS_POS_X, 0);
+        defaults.put(TERMS_POS_Y, 0);
+        defaults.put(TERMS_SIZE_X, 500);
+        defaults.put(TERMS_SIZE_Y, 500);
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
         defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
@@ -669,6 +683,11 @@ public class JabRefPreferences {
 
         defaults.put(EXTRA_FILE_COLUMNS, Boolean.FALSE);
         defaults.put(LIST_OF_FILE_COLUMNS, "");
+
+        defaults.put(PROTECTED_TERMS_ENABLED_INTERNAL, convertListToString(ProtectedTermsLoader.getInternalLists()));
+        defaults.put(PROTECTED_TERMS_DISABLED_INTERNAL, "");
+        defaults.put(PROTECTED_TERMS_ENABLED_EXTERNAL, "");
+        defaults.put(PROTECTED_TERMS_DISABLED_EXTERNAL, "");
 
         // OpenOffice/LibreOffice
         if (OS.WINDOWS) {
