@@ -28,13 +28,18 @@ public class ProtectTermsFormatterTest {
     }
 
     @Test
-    public void test() {
+    public void testSingleWord() {
         assertEquals("{VLSI}", formatter.format("VLSI"));
+    }
+
+    @Test
+    public void testDoNotProtectAlreadyProtected() {
         assertEquals("{VLSI}", formatter.format("{VLSI}"));
+    }
+
+    @Test
+    public void testCaseSensitivity() {
         assertEquals("VLsI", formatter.format("VLsI"));
-        assertEquals("{VLSI} {VLSI}", formatter.format("VLSI {VLSI}"));
-        assertEquals("{BPEL}", formatter.format("{BPEL}"));
-        assertEquals("{Testing BPEL Engine Performance: A Survey}", formatter.format("{Testing BPEL Engine Performance: A Survey}"));
     }
 
     @Test
@@ -42,4 +47,16 @@ public class ProtectTermsFormatterTest {
         assertEquals("In {CDMA}", formatter.format(formatter.getExampleInput()));
     }
 
+    @Test
+    public void testCorrectOrderingOfTerms() {
+        assertEquals("{3GPP} {3G}", formatter.format("3GPP 3G"));
+    }
+
+    @Test
+    public void test() {
+        assertEquals("{VLSI} {VLSI}", formatter.format("VLSI {VLSI}"));
+        assertEquals("{BPEL}", formatter.format("{BPEL}"));
+        assertEquals("{Testing BPEL Engine Performance: A Survey}",
+                formatter.format("{Testing BPEL Engine Performance: A Survey}"));
+    }
 }

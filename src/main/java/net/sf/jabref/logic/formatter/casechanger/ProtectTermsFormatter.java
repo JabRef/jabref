@@ -33,10 +33,6 @@ public class ProtectTermsFormatter implements Formatter {
         protectedTermsLoader = loader;
     }
 
-    private static ProtectedTermsLoader getProtectedTermsLoader() {
-        return protectedTermsLoader;
-    }
-
     private String format(String text, List<String> listOfWords) {
         String result = text;
         listOfWords.sort(new StringLengthComparator());
@@ -55,7 +51,7 @@ public class ProtectTermsFormatter implements Formatter {
         if (text.isEmpty()) {
             return text;
         }
-        return this.format(text, ProtectTermsFormatter.getProtectedTermsLoader().getProtectedTerms());
+        return this.format(text, ProtectTermsFormatter.protectedTermsLoader.getProtectedTerms());
     }
 
     @Override
