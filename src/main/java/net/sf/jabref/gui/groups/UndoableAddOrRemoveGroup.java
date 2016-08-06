@@ -17,12 +17,11 @@ package net.sf.jabref.gui.groups;
 
 import java.util.List;
 
-import javax.swing.undo.AbstractUndoableEdit;
-
+import net.sf.jabref.gui.undo.AbstractUndoableJabRefEdit;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
 
-class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
+class UndoableAddOrRemoveGroup extends AbstractUndoableJabRefEdit {
 
     /** The root of the global groups tree */
     private final GroupTreeNodeViewModel m_groupsRootHandle;
@@ -78,12 +77,9 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
         m_pathToNode = editedNode.getNode().getIndexedPathFromRoot();
     }
 
-    @Override
-    public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": " + getName();
-    }
 
-    private String getName() {
+    @Override
+    public String getPresentationName() {
         switch (m_editType) {
         case ADD_NODE:
             return Localization.lang("add group");
@@ -97,10 +93,6 @@ class UndoableAddOrRemoveGroup extends AbstractUndoableEdit {
         return "? (" + Localization.lang("unknown edit") + ")";
     }
 
-    @Override
-    public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": " + getName();
-    }
 
     @Override
     public void undo() {

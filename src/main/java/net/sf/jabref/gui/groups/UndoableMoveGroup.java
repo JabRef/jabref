@@ -18,8 +18,7 @@ package net.sf.jabref.gui.groups;
 import java.util.List;
 import java.util.Objects;
 
-import javax.swing.undo.AbstractUndoableEdit;
-
+import net.sf.jabref.gui.undo.AbstractUndoableJabRefEdit;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.MoveGroupChange;
 import net.sf.jabref.logic.l10n.Localization;
@@ -28,7 +27,7 @@ import net.sf.jabref.logic.l10n.Localization;
  * @author jzieren
  *
  */
-class UndoableMoveGroup extends AbstractUndoableEdit {
+class UndoableMoveGroup extends AbstractUndoableJabRefEdit {
 
     private final GroupTreeNodeViewModel root;
     private final List<Integer> pathToNewParent;
@@ -47,13 +46,8 @@ class UndoableMoveGroup extends AbstractUndoableEdit {
     }
 
     @Override
-    public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": " + Localization.lang("move group");
-    }
-
-    @Override
-    public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": " + Localization.lang("move group");
+    public String getPresentationName() {
+        return Localization.lang("move group");
     }
 
     @Override
