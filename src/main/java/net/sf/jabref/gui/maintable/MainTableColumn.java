@@ -116,17 +116,10 @@ public class MainTableColumn {
                 content = typedEntry.getTypeForDisplay();
             } else {
                 if (database.isPresent()) {
-                    content = BibDatabase.getResolvedField(field, entry, database.get());
+                    content = BibDatabase.getResolvedField(field, entry, database.get()).orElse(null);
+                } else {
+                    content = entry.getFieldOrAlias(field).orElse(null);
                 }
-                /*
-                Optional<String> newContent = entry.getFieldOrAlias(field);
-                if (newContent.isPresent()) {
-                    if (database.isPresent() && "Author".equalsIgnoreCase(columnName)) {
-                        content = database.get().resolveForStrings(newContent.get());
-                    } else {
-                        content = newContent.get();
-                    }
-                }*/
             }
             if (content != null) {
                 break;
