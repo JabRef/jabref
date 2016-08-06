@@ -6,4 +6,3 @@ gradlew eol=lf
 *.properties text
 *.java text
 
-src/main/resources/l10n/*.properties merge=union
