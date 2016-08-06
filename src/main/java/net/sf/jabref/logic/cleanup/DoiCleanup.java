@@ -15,6 +15,7 @@
 package net.sf.jabref.logic.cleanup;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,7 +33,7 @@ public class DoiCleanup implements CleanupJob {
     /**
      * Fields to check for DOIs.
      */
-    private static final String[] FIELDS = {FieldName.NOTE, FieldName.URL, "ee"};
+    private static final List<String> FIELDS = Arrays.asList(FieldName.NOTE, FieldName.URL, "ee");
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {

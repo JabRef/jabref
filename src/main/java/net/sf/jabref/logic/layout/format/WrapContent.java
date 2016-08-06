@@ -15,6 +15,8 @@
 */
 package net.sf.jabref.logic.layout.format;
 
+import java.util.List;
+
 import net.sf.jabref.logic.layout.AbstractParamLayoutFormatter;
 
 /**
@@ -34,12 +36,12 @@ public class WrapContent extends AbstractParamLayoutFormatter {
 
     @Override
     public void setArgument(String arg) {
-        String[] parts = AbstractParamLayoutFormatter.parseArgument(arg);
-        if (parts.length < 2) {
+        List<String> parts = AbstractParamLayoutFormatter.parseArgument(arg);
+        if (parts.size() < 2) {
             return;
         }
-        before = parts[0];
-        after = parts[1];
+        before = parts.get(0);
+        after = parts.get(1);
     }
 
     @Override

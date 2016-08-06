@@ -115,7 +115,7 @@ public class Authors extends AbstractParamLayoutFormatter {
 
     @Override
     public void setArgument(String arg) {
-        String[] parts = AbstractParamLayoutFormatter.parseArgument(arg);
+        List<String> parts = AbstractParamLayoutFormatter.parseArgument(arg);
         for (String part : parts) {
             int index = part.indexOf('=');
             if (index > 0) {
