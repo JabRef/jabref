@@ -281,7 +281,7 @@ public class XMPUtilTest {
         BibEntry e = l.get(0);
 
         Assert.assertNotNull(e);
-        Assert.assertEquals("OezbekC06", e.getCiteKey());
+        Assert.assertEquals(Optional.of("OezbekC06"), e.getCiteKeyOptional());
         Assert.assertEquals(Optional.of("2003"), e.getFieldOptional("year"));
         Assert.assertEquals(Optional.of("Beach sand convolution by surf-wave optimzation"),
                 e.getFieldOptional("title"));
@@ -306,7 +306,7 @@ public class XMPUtilTest {
         BibEntry e = l.get(0);
 
         Assert.assertNotNull(e);
-        Assert.assertEquals("OezbekC06", e.getCiteKey());
+        Assert.assertEquals(Optional.of("OezbekC06"), e.getCiteKeyOptional());
         Assert.assertEquals(Optional.of("2003"), e.getFieldOptional("year"));
         Assert.assertEquals(Optional.of("�pt�mz�t��n"), e.getFieldOptional("title"));
         Assert.assertEquals("misc", e.getType());
@@ -380,7 +380,7 @@ public class XMPUtilTest {
         BibEntry e = l.get(0);
 
         Assert.assertNotNull(e);
-        Assert.assertEquals("Clarkson06", e.getCiteKey());
+        Assert.assertEquals(Optional.of("Clarkson06"), e.getCiteKeyOptional());
         Assert.assertEquals("Kelly Clarkson and Ozzy Osbourne", e.getFieldOptional("author").get());
         Assert.assertEquals("Huey Duck and Dewey Duck and Louie Duck", e.getFieldOptional("editor").get());
         Assert.assertEquals("misc", e.getType());
@@ -761,7 +761,7 @@ public class XMPUtilTest {
     public void assertEqualsBibtexEntry(BibEntry expected, BibEntry actual) {
         Assert.assertNotNull(expected);
         Assert.assertNotNull(actual);
-        Assert.assertEquals(expected.getCiteKey(), actual.getCiteKey());
+        Assert.assertEquals(expected.getCiteKeyOptional(), actual.getCiteKeyOptional());
         Assert.assertEquals(expected.getType(), actual.getType());
 
         for (String field : expected.getFieldNames()) {
@@ -824,12 +824,12 @@ public class XMPUtilTest {
             b = tmp;
         }
 
-        Assert.assertEquals("canh05", a.getCiteKey());
+        Assert.assertEquals(Optional.of("canh05"), a.getCiteKeyOptional());
         Assert.assertEquals("K. Crowston and H. Annabi", a.getFieldOptional("author").get());
         Assert.assertEquals("Title A", a.getFieldOptional("title").get());
         Assert.assertEquals("article", a.getType());
 
-        Assert.assertEquals("foo", b.getCiteKey());
+        Assert.assertEquals(Optional.of("foo"), b.getCiteKeyOptional());
         Assert.assertEquals("Norton Bar", b.getFieldOptional("author").get());
         Assert.assertEquals("inproceedings", b.getType());
     }

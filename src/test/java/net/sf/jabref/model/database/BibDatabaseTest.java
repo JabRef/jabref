@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.Optional;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.importer.ParserResult;
@@ -233,7 +234,7 @@ public class BibDatabaseTest {
         database.insertEntry(entry);
         assertFalse(database.setCiteKeyForEntry(entry, null));
         assertEquals(database.getNumberOfKeyOccurrences("AAA"), 0);
-        assertNull(entry.getCiteKey());
+        assertEquals(Optional.empty(), entry.getCiteKeyOptional());
     }
 
     @Test
@@ -256,7 +257,7 @@ public class BibDatabaseTest {
         entry.setCiteKey("BBB");
         database.insertEntry(entry);
         assertTrue(database.setCiteKeyForEntry(entry, "AAA"));
-        assertEquals(entry.getCiteKey(), "AAA");
+        assertEquals(entry.getCiteKeyOptional(), Optional.of("AAA"));
         assertEquals(database.getNumberOfKeyOccurrences("AAA"), 2);
         assertEquals(database.getNumberOfKeyOccurrences("BBB"), 0);
     }

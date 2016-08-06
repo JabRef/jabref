@@ -197,7 +197,7 @@ public class BibDatabase {
         entry.registerListener(this);
 
         eventBus.post(new EntryAddedEvent(entry, isUndo));
-        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
+        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKeyOptional().orElse(null));
     }
 
     /**
@@ -210,7 +210,7 @@ public class BibDatabase {
         boolean anyRemoved =  entries.removeIf(entry -> entry.getId().equals(toBeDeleted.getId()));
         if (anyRemoved) {
             internalIDs.remove(toBeDeleted.getId());
-            duplicationChecker.removeKeyFromSet(toBeDeleted.getCiteKey());
+            toBeDeleted.getCiteKeyOptional().ifPresent(duplicationChecker::removeKeyFromSet);
             eventBus.post(new EntryRemovedEvent(toBeDeleted));
         }
     }
@@ -220,13 +220,13 @@ public class BibDatabase {
     }
 
     public synchronized boolean setCiteKeyForEntry(BibEntry entry, String key) {
-        String oldKey = entry.getCiteKey();
+        String oldKey = entry.getCiteKeyOptional().orElse(null);
         if (key == null) {
             entry.clearField(BibEntry.KEY_FIELD);
         } else {
             entry.setCiteKey(key);
         }
-        return duplicationChecker.checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey());
+        return duplicationChecker.checkForDuplicateKeyAndAdd(oldKey, key);
     }
 
     /**

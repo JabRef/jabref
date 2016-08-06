@@ -66,7 +66,7 @@ public class OAI2HandlerFetcherTest {
 
             // Citekey is only generated if the user says so in the import
             // inspection dialog.
-            Assert.assertEquals(null, be.getCiteKey());
+            Assert.assertEquals(Optional.empty(), be.getCiteKeyOptional());
 
             Assert.assertEquals(Optional.of("Heavy Particles from Inflation"), be.getFieldOptional("title"));
             Assert.assertTrue(be.getFieldOptional("abstract").isPresent());

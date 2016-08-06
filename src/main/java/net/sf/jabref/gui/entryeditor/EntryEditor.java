@@ -794,7 +794,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
             BibEntry newEntry = database.getEntries().get(0);
-            String newKey = newEntry.getCiteKey();
+            String newKey = newEntry.getCiteKeyOptional().orElse(null);
             boolean entryChanged = false;
             boolean duplicateWarning = false;
             boolean emptyWarning = (newKey == null) || newKey.isEmpty();
@@ -1097,7 +1097,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             if (event.getSource() instanceof TextField) {
                 // Storage from bibtex key field.
                 TextField textField = (TextField) event.getSource();
-                String oldValue = entry.getCiteKey();
+                String oldValue = entry.getCiteKeyOptional().orElse(null);
                 String newValue = textField.getText();
 
                 if (newValue.isEmpty()) {
@@ -1355,9 +1355,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             // this updates the table automatically, on close, but not
             // within the tab
-            String oldValue = entry.getCiteKey();
+            Optional<String> oldValue = entry.getCiteKeyOptional();
 
-            if (oldValue != null) {
+            if (oldValue.isPresent()) {
                 if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
                     panel.output(Localization.lang("Not overwriting existing key. To change this setting, open Options -> Prefererences -> BibTeX key generator"));
                     return;
@@ -1380,10 +1380,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     LabelPatternPreferences.fromPreferences(Globals.prefs));
 
             // Store undo information:
-            panel.getUndoManager().addEdit(new UndoableKeyChange(panel.getDatabase(), entry, oldValue, entry.getCiteKey()));
+            panel.getUndoManager().addEdit(
+                    new UndoableKeyChange(panel.getDatabase(), entry, oldValue.orElse(null),
+                            entry.getCiteKeyOptional().get())); // Cite key always set here
 
             // here we update the field
-            String bibtexKeyData = entry.getCiteKey();
+            String bibtexKeyData = entry.getCiteKeyOptional().get();
             setField(BibEntry.KEY_FIELD, bibtexKeyData);
             updateSource();
             panel.markBaseChanged();

@@ -102,8 +102,7 @@ public class FieldChange {
 
     @Override
     public String toString() {
-        return "FieldChange [entry=" + entry.getCiteKey() + ", field=" + field + ", oldValue=" + oldValue
-                + ", newValue=" + newValue
-                + "]";
+        return "FieldChange [entry=" + entry.getCiteKeyOptional().orElse("") + ", field=" + field + ", oldValue="
+                + oldValue + ", newValue=" + newValue + "]";
     }
 }

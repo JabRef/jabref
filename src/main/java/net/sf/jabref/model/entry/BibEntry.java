@@ -143,8 +143,13 @@ public class BibEntry implements Cloneable {
      *
      * Note: this is <emph>not</emph> the internal Id of this entry. The internal Id is always present, whereas the BibTeX key might not be present.
      */
+    @Deprecated
     public String getCiteKey() {
         return fields.get(KEY_FIELD);
+    }
+
+    public Optional<String> getCiteKeyOptional() {
+        return Optional.ofNullable(fields.get(KEY_FIELD));
     }
 
     public boolean hasCiteKey() {

@@ -43,10 +43,7 @@ class BibtexKeyAutoCompleter extends AbstractAutoCompleter {
             return;
         }
 
-        String key = entry.getCiteKey();
-        if (key != null) {
-            addItemToIndex(key.trim());
-        }
+        entry.getCiteKeyOptional().ifPresent(key -> addItemToIndex(key.trim()));
     }
 
     @Override

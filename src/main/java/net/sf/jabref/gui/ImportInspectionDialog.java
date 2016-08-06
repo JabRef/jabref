@@ -496,7 +496,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 localMetaData = panel.getBibDatabaseContext().getMetaData();
             }
 
-            List<String> keys = new ArrayList<>(entries.size());
+            List<Optional<String>> keys = new ArrayList<>(entries.size());
             // Iterate over the entries, add them to the database we are working
             // with,
             // and generate unique keys:
@@ -507,8 +507,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
                 LabelPatternUtil.makeLabel(localMetaData, database, entry,
                         LabelPatternPreferences.fromPreferences(Globals.prefs));
-                // Add the generated key to our list:
-                keys.add(entry.getCiteKey());
+                // Add the generated key to our list:   -- TODO: Why??
+                keys.add(entry.getCiteKeyOptional());
             }
 
             preview.update();
@@ -749,7 +749,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
         private boolean addToGroups(NamedCompound ce, BibEntry entry, Set<GroupTreeNode> groups) {
             boolean groupingCanceled = false;
-            if (entry.getCiteKey() == null) {
+            if (!entry.hasCiteKey()) {
                 // The entry has no key, so it can't be added to the
                 // group.
                 // The best course of action is probably to ask the
@@ -766,7 +766,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             }
 
             // If the key existed, or exists now, go ahead:
-            if (entry.getCiteKey() != null) {
+            if (entry.hasCiteKey()) {
                 for (GroupTreeNode node : groups) {
                     if (node.supportsAddingEntries()) {
                         // Add the entry:
@@ -1166,17 +1166,17 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 return;
             }
             entry = selectionModel.getSelected().get(0);
-            String bibtexKey = entry.getCiteKey();
-            if (bibtexKey == null) {
+            Optional<String> bibtexKey = entry.getCiteKeyOptional();
+            if (!bibtexKey.isPresent()) {
                 int answer = JOptionPane.showConfirmDialog(frame,
                         Localization.lang("This entry has no BibTeX key. Generate key now?"),
                         Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (answer == JOptionPane.OK_OPTION) {
                     generateKeySelectedEntry();
-                    bibtexKey = entry.getCiteKey();
+                    bibtexKey = entry.getCiteKeyOptional();
                 }
             }
-            DownloadExternalFile def = new DownloadExternalFile(frame, bibDatabaseContext, bibtexKey);
+            DownloadExternalFile def = new DownloadExternalFile(frame, bibDatabaseContext, bibtexKey.get());
             try {
                 def.download(this);
             } catch (IOException ex) {
@@ -1213,7 +1213,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 return;
             }
             final BibEntry entry = selectionModel.getSelected().get(0);
-            if (entry.getCiteKey() == null) {
+            if (!entry.hasCiteKey()) {
                 int answer = JOptionPane.showConfirmDialog(frame,
                         Localization.lang("This entry has no BibTeX key. Generate key now?"),
                         Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);

@@ -113,6 +113,6 @@ public class OpenDatabaseActionTest {
         Assert.assertEquals(1, entries.size());
 
         BibEntry entry = entries.iterator().next();
-        Assert.assertEquals("testArticle", entry.getCiteKey());
+        Assert.assertEquals(Optional.of("testArticle"), entry.getCiteKeyOptional());
     }
 }
