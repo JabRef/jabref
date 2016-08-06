@@ -107,7 +107,7 @@ public class ProtectedTermsList implements Comparable<ProtectedTermsList> {
             return false;
         }
         ProtectedTermsList otherList = (ProtectedTermsList) o;
-        return (this.location == otherList.location) && (this.description == otherList.description);
+        return (this.location.equals(otherList.location)) && (this.description.equals(otherList.description));
     }
 
     @Override
