@@ -295,6 +295,56 @@ public class FieldExtraComponents {
     }
 
     /**
+     * Add button for fetching by ISBN
+     *
+     * @param fieldEditor
+     * @param panel
+     * @return
+     */
+    public static Optional<JComponent> getEprintExtraComponent(BasePanel panel, EntryEditor entryEditor,
+            FieldEditor fieldEditor) {
+        // fetch bibtex data
+        JButton fetchButton = new JButton(
+                Localization.lang("Get BibTeX data from %0", FieldName.getDisplayName(FieldName.EPRINT)));
+        fetchButton.setEnabled(false);
+        fetchButton.addActionListener(actionEvent -> {
+            BibEntry entry = entryEditor.getEntry();
+            new FetchAndMergeEntry(entry, panel, FieldName.EPRINT);
+        });
+
+        // enable/disable button
+        JTextComponent eprint = (JTextComponent) fieldEditor;
+
+        eprint.getDocument().addDocumentListener(new DocumentListener() {
+
+            @Override
+            public void changedUpdate(DocumentEvent documentEvent) {
+                checkEprint();
+            }
+
+            @Override
+            public void insertUpdate(DocumentEvent documentEvent) {
+                checkEprint();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent documentEvent) {
+                checkEprint();
+            }
+
+            private void checkEprint() {
+                if ((eprint.getText() == null) || eprint.getText().trim().isEmpty()) {
+                    fetchButton.setEnabled(false);
+                } else {
+                    fetchButton.setEnabled(true);
+                }
+            }
+        });
+
+        return Optional.of(fetchButton);
+    }
+
+    /**
      * Return a dropdown list containing Yes and No for fields with EXTRA_YES_NO
      *
      * @param fieldEditor

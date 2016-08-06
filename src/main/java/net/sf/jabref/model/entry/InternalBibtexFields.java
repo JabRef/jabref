@@ -92,6 +92,9 @@ public class InternalBibtexFields {
         add(dummy);
         add(new BibtexSingleField(FieldName.EDITION, true, BibtexSingleField.SMALL_W));
         add(new BibtexSingleField(FieldName.EDITOR, true, BibtexSingleField.MEDIUM_W, 280));
+        dummy = new BibtexSingleField(FieldName.EPRINT, true, BibtexSingleField.SMALL_W);
+        dummy.setExtras(EnumSet.of(FieldProperties.EPRINT));
+        add(dummy);
         add(new BibtexSingleField(FieldName.HOWPUBLISHED, true, BibtexSingleField.MEDIUM_W));
         add(new BibtexSingleField(FieldName.INSTITUTION, true, BibtexSingleField.MEDIUM_W));
 

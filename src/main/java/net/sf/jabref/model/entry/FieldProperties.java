@@ -25,7 +25,8 @@ public enum FieldProperties {
     TYPE,
     CROSSREF,
     ISO_DATE,
-    ISBN;
+    ISBN,
+    EPRINT;
 
     public static final Set<FieldProperties> ALL_OPTS = EnumSet.allOf(FieldProperties.class);
 
