@@ -40,7 +40,7 @@ public class DiVATest {
         BibEntry entry = new BibEntry();
         entry.setType("article");
         entry.setField("author", "Gustafsson, Oscar");
-        entry.setField("institution", "Link{\\\"{o}}ping University, The Institute of Technology");
+        entry.setField("institution", "Linköping University, The Institute of Technology");
         entry.setCiteKey("Gustafsson260746");
         entry.setField("journal",
                 "IEEE transactions on circuits and systems. 2, Analog and digital signal processing (Print)");

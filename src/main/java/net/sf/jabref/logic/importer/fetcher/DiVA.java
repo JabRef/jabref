@@ -1,30 +1,26 @@
 package net.sf.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
+import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.utils.URIBuilder;
 
+/*
+ * http://www.diva-portal.org/smash/aboutdiva.jsf?dswid=-3222
+ * DiVA portal contains research publications and student theses from 40 Swedish universities and research institutions.
+ */
 public class DiVA implements IdBasedFetcher {
 
-    private static final Log LOGGER = LogFactory.getLog(DiVA.class);
-
-    private static final String URL_PATTERN = "http://www.diva-portal.org/smash/getreferences?referenceFormat=BibTex&pids=%s";
+    private static final String URL = "http://www.diva-portal.org/smash/getreferences"; // ?referenceFormat=BibTex&pids=%s";
 
 
     @Override
@@ -39,39 +35,22 @@ public class DiVA implements IdBasedFetcher {
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        String q;
+        Optional<BibEntry> result = Optional.empty();
         try {
-            q = URLEncoder.encode(identifier, StandardCharsets.UTF_8.name());
-        } catch (UnsupportedEncodingException e) {
-            // this should never happen
-            LOGGER.warn("Encoding issues", e);
-            return Optional.empty();
-        }
+            URIBuilder uriBuilder = new URIBuilder(URL);
 
-        String urlString = String.format(DiVA.URL_PATTERN, q);
+            uriBuilder.addParameter("referenceFormat", "BibTex");
+            uriBuilder.addParameter("pids", identifier);
 
-        // Send the request
-        URL url;
-        try {
-            url = new URL(urlString);
-        } catch (MalformedURLException e) {
-            LOGGER.warn("Bad URL", e);
-            return Optional.empty();
-        }
-
-        String bibtexString;
-        try {
-            URLDownload dl = new URLDownload(url);
+            String bibtexString;
+            URLDownload dl = new URLDownload(uriBuilder.build().toURL());
 
             bibtexString = dl.downloadToString(StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            throw new FetcherException("Communication problems", e);
+            result = Optional.ofNullable(BibtexParser.singleFromString(bibtexString));
+
+        } catch (URISyntaxException | IOException e) {
+            throw new FetcherException("Problem getting information from DiVA", e);
         }
-
-        Optional<BibEntry> result = Optional.ofNullable(BibtexParser.singleFromString(bibtexString));
-
-        result.ifPresent(entry -> entry.getFieldOptional(FieldName.INSTITUTION).ifPresent(institution -> entry
-                .setField(FieldName.INSTITUTION, new UnicodeToLatexFormatter().format(institution))));
 
         return result;
 
