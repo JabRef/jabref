@@ -822,7 +822,7 @@ public class XMPUtil {
             }
 
             /**
-             * bibtextype -> relation
+             * entrytype -> relation
              *
              * Field: dc:relation
              *
@@ -832,7 +832,7 @@ public class XMPUtil {
              *
              * Description: Relationships to other documents.
              *
-             * Bibtex-Fields used: bibtextype
+             * Bibtex-Fields used: entrytype
              */
             /**
              * All others (including the bibtex key) get packaged in the
