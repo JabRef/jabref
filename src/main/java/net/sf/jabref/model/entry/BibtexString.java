@@ -176,4 +176,9 @@ public class BibtexString implements Cloneable {
 
         return "";
     }
+
+    @Override
+    public String toString() {
+        return name + "=" + content;
+    }
 }

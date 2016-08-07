@@ -124,6 +124,9 @@ import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.GuiAppender;
 import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
+import net.sf.jabref.logic.undo.AddUndoableActionEvent;
+import net.sf.jabref.logic.undo.UndoChangeEvent;
+import net.sf.jabref.logic.undo.UndoRedoEvent;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -141,6 +144,7 @@ import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.sql.importer.DbImportAction;
 
+import com.google.common.eventbus.Subscribe;
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 import org.apache.commons.logging.Log;
@@ -642,6 +646,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             bp.updateSearchManager();
             // Set correct enabled state for Back and Forward actions:
             bp.setBackAndForwardEnabledState();
+            bp.getUndoManager().postUndoRedoEvent();
             new FocusRequester(bp.getMainTable());
         });
 
@@ -655,6 +660,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 LOGGER.fatal("Could not interface with Mac OS X methods.", e);
             }
         }
+
     }
 
     private void positionWindowOnScreen() {
@@ -1650,6 +1656,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (raisePanel) {
             tabbedPane.setSelectedComponent(bp);
         }
+
+        // Register undo/redo listener
+        bp.getUndoManager().registerListener(new UndoRedoEventManager());
     }
 
     public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
@@ -2276,5 +2285,29 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public PushToApplications getPushApplications() {
         return pushApplications;
+    }
+
+
+    private class UndoRedoEventManager {
+
+        @Subscribe
+        public void listen(UndoRedoEvent event) {
+            updateTexts(event);
+            JabRefFrame.this.getCurrentBasePanel().updateEntryEditorIfShowing();
+        }
+
+        @Subscribe
+        public void listen(AddUndoableActionEvent event) {
+            updateTexts(event);
+        }
+
+        private void updateTexts(UndoChangeEvent event) {
+            if (JabRefFrame.this != null) {
+                undo.putValue(Action.SHORT_DESCRIPTION, event.getUndoDescription());
+                undo.setEnabled(event.isCanUndo());
+                redo.putValue(Action.SHORT_DESCRIPTION, event.getRedoDescription());
+                redo.setEnabled(event.isCanRedo());
+            }
+        }
     }
 }

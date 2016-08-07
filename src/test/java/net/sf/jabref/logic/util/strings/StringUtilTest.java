@@ -336,4 +336,19 @@ public class StringUtilTest {
         assertEquals("a", StringUtil.repeat(1, 'a'));
         assertEquals("aaaaaaa", StringUtil.repeat(7, 'a'));
     }
+
+    @Test
+    public void testBoldHTML() {
+        assertEquals("<b>AA</b>", StringUtil.boldHTML("AA"));
+    }
+
+    @Test
+    public void testBoldHTMLReturnsOriginalTextIfNonNull() {
+        assertEquals("<b>AA</b>", StringUtil.boldHTML("AA", "BB"));
+    }
+
+    @Test
+    public void testBoldHTMLReturnsAlternativeTextIfNull() {
+        assertEquals("<b>BB</b>", StringUtil.boldHTML(null, "BB"));
+    }
 }
