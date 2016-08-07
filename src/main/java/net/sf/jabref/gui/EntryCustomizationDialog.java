@@ -324,7 +324,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
     private void typeDeletion(String name) {
         Optional<EntryType> type = EntryTypes.getType(name, bibDatabaseContext.getMode());
 
-        if (type.isPresent() && type.get() instanceof CustomEntryType) {
+        if (type.isPresent() && (type.get() instanceof CustomEntryType)) {
             if (! EntryTypes.getStandardType(name, bibDatabaseContext.getMode()).isPresent()) {
                 int reply = JOptionPane.showConfirmDialog
                         (frame, Localization.lang("All entries of this "
@@ -378,7 +378,6 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
         } else if (e.getSource() == apply) {
             applyChanges();
         } else if (e.getSource() == typeComp) {
-            //System.out.println("add: "+e.getActionCommand());
             typeComp.selectField(e.getActionCommand());
         }
     }

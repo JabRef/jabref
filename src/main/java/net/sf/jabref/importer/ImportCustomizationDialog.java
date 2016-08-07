@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.zip.ZipFile;
 
 import javax.swing.AbstractAction;
@@ -100,15 +101,14 @@ public class ImportCustomizationDialog extends JDialog {
         addFromFolderButton.addActionListener(e -> {
             CustomImporter importer = new CustomImporter();
 
-            Path selectedFile = new NewFileDialogs(frame).withExtension(FileExtensions.CLASS).getSelectedFile();
+            Optional<Path> selectedFile = new NewFileDialogs(frame).withExtension(FileExtensions.CLASS)
+                    .openDlgAndGetSelectedFile();
 
-            if (selectedFile.getParent() != null) {
-                importer.setBasePath(selectedFile.getParent().toString());
+            if (selectedFile.isPresent() && (selectedFile.get().getParent() != null)) {
+                importer.setBasePath(selectedFile.get().getParent().toString());
 
-            }
-            String chosenFileStr = selectedFile.toString();
+                String chosenFileStr = selectedFile.toString();
 
-            if (!chosenFileStr.isEmpty()) {
                 try {
                     importer.setClassName(pathToClass(importer.getFileFromBasePath(), new File(chosenFileStr)));
                     importer.setName(importer.getInstance().getFormatName());
@@ -131,25 +131,28 @@ public class ImportCustomizationDialog extends JDialog {
 
         JButton addFromJarButton = new JButton(Localization.lang("Add from JAR"));
         addFromJarButton.addActionListener(e -> {
-            String jarZipFile = new NewFileDialogs(frame)
-                    .withExtension(EnumSet.of(FileExtensions.ZIP, FileExtensions.JAR)).getSelectedFile().toString();
+            Optional<Path> jarZipFile = new NewFileDialogs(frame)
+                    .withExtensions(EnumSet.of(FileExtensions.ZIP, FileExtensions.JAR)).openDlgAndGetSelectedFile();
 
-            if (!jarZipFile.isEmpty()) {
-                try (ZipFile zipFile = new ZipFile(new File(jarZipFile), ZipFile.OPEN_READ)) {
+            if (jarZipFile.isPresent()) {
+                try (ZipFile zipFile = new ZipFile(jarZipFile.get().toFile(), ZipFile.OPEN_READ)) {
                     ZipFileChooser zipFileChooser = new ZipFileChooser(this, zipFile);
                     zipFileChooser.setVisible(true);
                     customImporterTable.revalidate();
                     customImporterTable.repaint(10);
                 } catch (IOException exc) {
                     LOGGER.info("Could not open ZIP-archive.", exc);
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Could not open %0", jarZipFile) + "\n"
-                            + Localization.lang("Have you chosen the correct package path?"));
+                    JOptionPane.showMessageDialog(frame,
+                            Localization.lang("Could not open %0", jarZipFile.get().toString()) + "\n"
+                                    + Localization.lang("Have you chosen the correct package path?"));
                 } catch (NoClassDefFoundError exc) {
                     LOGGER.info("Could not instantiate ZIP-archive reader.", exc);
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Could not instantiate %0", jarZipFile)
-                            + "\n" + Localization.lang("Have you chosen the correct package path?"));
+                    JOptionPane.showMessageDialog(frame,
+                            Localization.lang("Could not instantiate %0", jarZipFile.get().toString()) + "\n"
+                                    + Localization.lang("Have you chosen the correct package path?"));
                 }
             }
+
         });
         addFromJarButton
                 .setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a ZIP-archive.")

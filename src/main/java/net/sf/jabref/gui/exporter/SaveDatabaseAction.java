@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
@@ -307,35 +308,22 @@ public class SaveDatabaseAction extends AbstractWorker {
      * still runs synchronously using Spin (the method returns only after completing the operation).
      */
     public void saveAs() throws Throwable {
-        String chosenFile;
-        File f = null;
-        while (f == null) {
+        File file = null;
+        while (file == null) {
 
-            Path p = new NewFileDialogs(frame).withExtension(FileExtensions.BIBTEX_DB).saveNewFile();
+            Optional<Path> path = new NewFileDialogs(frame).withExtension(FileExtensions.BIBTEX_DB).saveNewFile();
+            if (path.isPresent()) {
+                file = path.get().toFile();
 
-            chosenFile = p.toString();
-            // chosenFile = FileDialogs.getNewFile(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
-            //       Collections.singletonList(".bib"), JFileChooser.SAVE_DIALOG, false, null);
-
-            //System.out.println("OILD SAVE AS " + chosenFile);
-            System.out.println("SAVE AS " + p.toString());
-
-            if (chosenFile == null) {
+            } else {
                 canceled = true;
                 return; // canceled
             }
-            f = new File(chosenFile);
-            // Check if the file already exists:
-            /*   if (f.exists() && (JOptionPane.showConfirmDialog(frame,
-                    Localization.lang("'%0' exists. Overwrite file?", f.getName()), Localization.lang("Save database"),
-                    JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION)) {
-                f = null;
-            }*/
         }
 
         File oldFile = panel.getBibDatabaseContext().getDatabaseFile();
-        panel.getBibDatabaseContext().setDatabaseFile(f);
-        Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, f.getParent());
+        panel.getBibDatabaseContext().setDatabaseFile(file);
+        Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
         runCommand();
         // If the operation failed, revert the file field and return:
         if (!success) {

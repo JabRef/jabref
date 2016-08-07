@@ -17,6 +17,8 @@ package net.sf.jabref.gui.actions;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
@@ -84,14 +86,16 @@ public final class BrowseAction extends AbstractAction {
 
     private String askUser() {
         if (dirsOnly) {
-            String file = new NewFileDialogs(frame, comp.getText()).dirsOnly().withExtension(extensions)
-                    .getSelectedFile().toString();
-            System.out.println("Browse Action DIR " + file);
+            Path path  = new NewFileDialogs(frame, comp.getText()).dirsOnly().withExtensions(extensions)
+                    .openDlgAndGetSelectedFile().orElse(Paths.get(""));
+            String file = path.toString();
+
             return file;
         } else {
-            String file = new NewFileDialogs(frame, comp.getText()).withExtension(extensions).getSelectedFile()
-                    .toString();
-            System.out.println("Browse Action file " + file);
+            Path path = new NewFileDialogs(frame, comp.getText()).withExtensions(extensions)
+                    .openDlgAndGetSelectedFile().orElse(Paths.get(""));
+            String file = path.toString();
+
             return file;
         }
     }

@@ -20,8 +20,10 @@ import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.AbstractAction;
@@ -165,28 +167,28 @@ public class PreferencesDialog extends JDialog {
         exportPreferences.setToolTipText(Localization.lang("Export preferences to file"));
         exportPreferences.addActionListener(e -> {
 
-            String filename = new NewFileDialogs(frame, System.getProperty("user.home"))
-                    .withExtension(FileExtensions.XML).saveNewFile().toString();
-
-            try {
-                prefs.exportPreferences(filename);
-            } catch (JabRefException ex) {
-                LOGGER.warn(ex.getMessage(), ex);
-                JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
-                        Localization.lang("Export preferences"), JOptionPane.ERROR_MESSAGE);
-            }
-
+            Optional<Path> path = new NewFileDialogs(frame, System.getProperty("user.home"))
+                    .withExtension(FileExtensions.XML).saveNewFile();
+            path.ifPresent(exportFile -> {
+                try {
+                    prefs.exportPreferences(exportFile.toString());
+                } catch (JabRefException ex) {
+                    LOGGER.warn(ex.getMessage(), ex);
+                    JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
+                            Localization.lang("Export preferences"), JOptionPane.ERROR_MESSAGE);
+                }
+            });
         });
 
         importPreferences.setToolTipText(Localization.lang("Import preferences from file"));
         importPreferences.addActionListener(e -> {
 
-            String fileName = new NewFileDialogs(frame, System.getProperty("user.home"))
-                    .withExtension(FileExtensions.XML).getSelectedFile().toString();
+            Optional<Path> fileName = new NewFileDialogs(frame, System.getProperty("user.home"))
+                    .withExtension(FileExtensions.XML).openDlgAndGetSelectedFile();
 
-            if (!fileName.isEmpty()) {
+            if (fileName.isPresent()) {
                 try {
-                    prefs.importPreferences(fileName);
+                    prefs.importPreferences(fileName.get().toString());
                     updateAfterPreferenceChanges();
                     JOptionPane.showMessageDialog(PreferencesDialog.this,
                             Localization.lang("You must restart JabRef for this to come into effect."),

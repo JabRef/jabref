@@ -19,8 +19,10 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.JOptionPane;
@@ -144,13 +146,12 @@ public class MoveFileAction extends AbstractAction {
                     }
                     chosenFile = sb.toString();
                 } else {
-                    System.out.println("Entry extension " + extension);
-                    chosenFile = new NewFileDialogs(frame, file.getPath()).saveNewFile().toString();
-
-
-                }
-                if (chosenFile.isEmpty()) {
-                    return; // canceled
+                    Optional<Path> path = new NewFileDialogs(frame, file.getPath()).saveNewFile();
+                    if (path.isPresent()) {
+                        chosenFile = path.get().toString();
+                    } else {
+                        return;
+                    }
                 }
                 newFile = new File(chosenFile);
 

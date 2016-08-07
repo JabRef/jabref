@@ -36,6 +36,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -197,23 +198,23 @@ class ManageJournalsPanel extends JPanel {
         });
 
         browseNew.addActionListener(e -> {
-            String name = new NewFileDialogs(frame, newNameTf.getText()).saveNewFile().toString();
-
-            if (!name.isEmpty()) {
-                newNameTf.setText(name);
+            Optional<Path> path = new NewFileDialogs(frame, newNameTf.getText()).saveNewFile();
+            path.ifPresent(fileName -> {
+                newNameTf.setText(fileName.toString());
                 newFile.setSelected(true);
-            }
+            });
+
         });
 
         browseOld.addActionListener(e -> {
-            String name = new NewFileDialogs(frame, personalFile.getText()).getSelectedFile().toString();
+            Optional<Path> path = new NewFileDialogs(frame, personalFile.getText()).openDlgAndGetSelectedFile();
 
-            if (!name.isEmpty()) {
-                personalFile.setText(name);
+            path.ifPresent(fileName -> {
+                personalFile.setText(fileName.toString());
                 oldFile.setSelected(true);
                 oldFile.setEnabled(true);
                 setupUserTable();
-            }
+            });
         });
 
         ok.addActionListener(e -> {
@@ -415,13 +416,13 @@ class ManageJournalsPanel extends JPanel {
             File toFile;
             try {
 
-                String toName = new NewFileDialogs(frame, System.getProperty("user.home")).saveNewFile().toString();
-
-                if (toName.isEmpty()) {
-                    return;
+                Optional<Path> path = new NewFileDialogs(frame, System.getProperty("user.home")).saveNewFile();
+                if (path.isPresent()) {
+                    toFile = new File(path.get().toString());
                 } else {
-                    toFile = new File(toName);
+                    return;
                 }
+
                 URL url = new URL(chosen);
                 MonitoredURLDownload.buildMonitoredDownload(comp, url).downloadToFile(toFile);
                 comp.setText(toFile.getPath());

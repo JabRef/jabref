@@ -19,6 +19,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
 import java.nio.file.Path;
+import java.util.Optional;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -31,7 +32,6 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
@@ -252,13 +252,13 @@ public class ExternalFileTypeEntryEditor {
             appDir = Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY);
         }
 
-        Path applicationDir = new NewFileDialogs(fParent, appDir).getSelectedFile();
-
-        if (applicationDir.getParent() != null) {
-            Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, applicationDir.getParent().toString());
-        }
-        application.setText(applicationDir.toString());
-
+        Optional<Path> path = new NewFileDialogs(fParent, appDir).openDlgAndGetSelectedFile();
+        path.ifPresent(applicationDir -> {
+            if (applicationDir.getParent() != null) {
+                Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, applicationDir.getParent().toString());
+            }
+            application.setText(applicationDir.toString());
+        });
     };
 
 }

@@ -1,40 +1,47 @@
 package net.sf.jabref.gui;
 
+import net.sf.jabref.logic.l10n.Localization;
+
+/**
+ *
+ *
+ *This enum contains all kind of file extensions for open and save dialogs
+ *Important: Enter the extension without a dot!
+ *The dot is added implicit
+ */
 public enum FileExtensions {
 
-    //importannt: No dot before the extension!
+    //important: No dot before the extension!
     BIBTEX_DB(
-            "BibTeX Database", "bib"),
+            Localization.lang("BibTeX database"), "bib"),
     BIBTEXML(
-            "BibTexMl, bibx"),
+            Localization.lang("%0 file", "BibTeXML"), "bibx"),
     AUX(
-            "Aux file", "aux"),
+            Localization.lang("%0 file", "AUX"), "aux"),
     SILVER_PLATTERN(
-            "SilverPlatter", "dat"),
+            Localization.lang("%0 file", "SilverPlatter"), "dat"),
     PUBMED(
-            "Pubmed file", "fcgi"),
+            Localization.lang("%0 file", "PubMed"), "fcgi"),
     RIS(
-            "Ris file ", "ris"),
+            Localization.lang("%0 file", "RIS"), "ris"),
     ENDNOTE(
-            "Endnote/Refer file", "ref"),
-
+            Localization.lang("Endnote/Refer file"), "ref"),
     JSTYLE(
-            "Style file", "jstyle"),
+            Localization.lang("Style file"), "jstyle"),
     LAYOUT(
-            "Custom Layout File", "layout"),
+            Localization.lang("Custom layout file"), "layout"),
     XML(
-            "XML file", "xml"),
+            Localization.lang("%0 file", "XML"), "xml"),
     TERMS(
-            "Protected TERMS file", "terms"),
+            Localization.lang("Protected terms file"), "terms"),
     TXT(
-            "Plain text file", "txt"),
+            Localization.lang("%0 file", Localization.lang("plain text")), "txt"),
     CLASS(
-            "Class file", "class"),
+            Localization.lang("%0 file", "CLASS"), "class"),
     JAR(
-            "Jar file", "jar"),
+            Localization.lang("%0 file", "JAR"), "jar"),
     ZIP(
-            "Zip file", "zip");
-
+            Localization.lang("%0 file", "ZIP"), "zip");
 
     private final String[] extension;
     private final String description;

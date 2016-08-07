@@ -100,7 +100,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         if (showDialog) {
 
             List<String> chosenStrings = new NewFileDialogs(frame).withExtension(FileExtensions.BIBTEX_DB)
-                    .getMultipleFileNames();
+                    .showDlgAndGetMultipleFiles();
 
             for (String chosen : chosenStrings) {
 

@@ -69,6 +69,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -593,10 +594,10 @@ public class TextInputDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                String chosen = new NewFileDialogs(frame).withExtension(FileExtensions.TXT).getSelectedFile()
-                        .toString();
-                if (!chosen.isEmpty()) {
-                    File newFile = new File(chosen);
+                Optional<Path> path = new NewFileDialogs(frame).withExtension(FileExtensions.TXT)
+                        .openDlgAndGetSelectedFile();
+                if (path.isPresent()) {
+                    File newFile = path.get().toFile();
                     document.remove(0, document.getLength());
                     EditorKit eKit = textPane.getEditorKit();
                     if (eKit != null) {

@@ -22,6 +22,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -202,8 +203,6 @@ public class FileListEntryEditor {
 
         });
 
-        System.out.println("LInk field " + link.getText());
-
         diag = new JDialog(frame, Localization.lang("Save file"), true);
         diag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
@@ -215,7 +214,6 @@ public class FileListEntryEditor {
             public void windowActivated(WindowEvent event) {
                 if (openBrowseWhenShown && !dontOpenBrowseUntilDisposed) {
                     dontOpenBrowseUntilDisposed = true;
-                    System.out.println("Window activated ");
                     // SwingUtilities.invokeLater(() -> browse.actionPerformed(new ActionEvent(browseBut, 0, "")));
                 }
             }
@@ -360,10 +358,12 @@ public class FileListEntryEditor {
         } else {
             workingDir = Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY);
         }
-        String selection = new NewFileDialogs(this.frame, workingDir).getSelectedFile().toString();
 
-        if (selection != null) {
-            File newFile = new File(selection);
+        Optional<Path> path = new NewFileDialogs(this.frame, workingDir).openDlgAndGetSelectedFile();
+
+        path.ifPresent(selection -> {
+
+            File newFile = selection.toFile();
             // Store the directory for next time:
             Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getPath());
 
@@ -373,6 +373,6 @@ public class FileListEntryEditor {
 
             link.setText(newFile.getPath());
             link.requestFocus();
-        }
+        });
     };
 }
