@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToUnicodeFormatter;
@@ -27,7 +26,6 @@ import net.sf.jabref.logic.formatter.minifier.MinifyNameListFormatter;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -51,7 +49,6 @@ public class FormatterTest {
 
     @BeforeClass
     public static void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
         ProtectTermsFormatter
                 .setProtectedTermsLoader(
                         new ProtectedTermsLoader(new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(),
