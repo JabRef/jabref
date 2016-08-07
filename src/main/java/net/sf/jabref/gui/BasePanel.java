@@ -86,8 +86,8 @@ import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.maintable.MainTableFormat;
 import net.sf.jabref.gui.maintable.MainTableSelectionListener;
+import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
 import net.sf.jabref.gui.mergeentries.MergeEntriesDialog;
-import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
 import net.sf.jabref.gui.plaintextimport.TextInputDialog;
 import net.sf.jabref.gui.search.SearchBar;
 import net.sf.jabref.gui.undo.CountingUndoManager;
@@ -654,7 +654,20 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.OPEN_URL, new OpenURLAction());
 
-        actions.put(Actions.MERGE_DOI, (BaseAction) () -> new MergeEntryDOIDialog(BasePanel.this));
+        actions.put(Actions.MERGE_WITH_FETCHED_ENTRY, (BaseAction) () -> {
+            if (mainTable.getSelectedEntries().size() == 1) {
+                BibEntry originalEntry = mainTable.getSelectedEntries().get(0);
+                new FetchAndMergeEntry(originalEntry, this, FetchAndMergeEntry.SUPPORTED_FIELDS);
+            } else {
+                JOptionPane.showMessageDialog(frame(),
+                        Localization.lang("This operation requires exactly one item to be selected."),
+                        Localization.lang("Merge entry with %0 information",
+                                FieldName.orFields(FieldName.getDisplayName(FieldName.DOI),
+                                        FieldName.getDisplayName(FieldName.ISBN),
+                                        FieldName.getDisplayName(FieldName.EPRINT))),
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
 
         actions.put(Actions.REPLACE_ALL, (BaseAction) () -> {
             final ReplaceStringDialog rsd = new ReplaceStringDialog(frame);

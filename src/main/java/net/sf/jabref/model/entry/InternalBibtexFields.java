@@ -92,8 +92,15 @@ public class InternalBibtexFields {
         add(dummy);
         add(new BibtexSingleField(FieldName.EDITION, true, BibtexSingleField.SMALL_W));
         add(new BibtexSingleField(FieldName.EDITOR, true, BibtexSingleField.MEDIUM_W, 280));
+        dummy = new BibtexSingleField(FieldName.EPRINT, true, BibtexSingleField.SMALL_W);
+        dummy.setExtras(EnumSet.of(FieldProperties.EPRINT));
+        add(dummy);
         add(new BibtexSingleField(FieldName.HOWPUBLISHED, true, BibtexSingleField.MEDIUM_W));
         add(new BibtexSingleField(FieldName.INSTITUTION, true, BibtexSingleField.MEDIUM_W));
+
+        dummy = new BibtexSingleField(FieldName.ISBN, true, BibtexSingleField.SMALL_W);
+        dummy.setExtras(EnumSet.of(FieldProperties.ISBN));
+        add(dummy);
 
         dummy = new BibtexSingleField(FieldName.JOURNAL, true, BibtexSingleField.SMALL_W);
         dummy.setExtras(EnumSet.of(FieldProperties.JOURNAL_NAME));
@@ -226,19 +233,19 @@ public class InternalBibtexFields {
         dummy.setPrivate();
         add(dummy);
 
-        dummy = new BibtexSingleField(FieldName.SEARCH, false);
+        dummy = new BibtexSingleField(FieldName.SEARCH_INTERNAL, false);
         dummy.setPrivate();
         dummy.setWriteable(false);
         dummy.setDisplayable(false);
         add(dummy);
 
-        dummy = new BibtexSingleField(FieldName.GROUPSEARCH, false);
+        dummy = new BibtexSingleField(FieldName.GROUPSEARCH_INTERNAL, false);
         dummy.setPrivate();
         dummy.setWriteable(false);
         dummy.setDisplayable(false);
         add(dummy);
 
-        dummy = new BibtexSingleField(FieldName.MARKED, false);
+        dummy = new BibtexSingleField(FieldName.MARKED_INTERNAL, false);
         dummy.setPrivate();
         dummy.setWriteable(true); // This field must be written to file!
         dummy.setDisplayable(false);

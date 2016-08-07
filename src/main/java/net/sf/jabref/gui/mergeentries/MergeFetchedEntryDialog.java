@@ -21,7 +21,6 @@ import java.util.TreeSet;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 
 import net.sf.jabref.gui.BasePanel;
@@ -29,10 +28,8 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableChangeType;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.util.PositionWindow;
-import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -45,52 +42,27 @@ import com.jgoodies.forms.layout.RowSpec;
 /**
  * Dialog for merging Bibtex entry with data fetched from DOI
  */
-public class MergeEntryDOIDialog extends JDialog {
+public class MergeFetchedEntryDialog extends JDialog {
 
     private final BasePanel panel;
     private final CellConstraints cc = new CellConstraints();
-    private BibEntry originalEntry;
-    private BibEntry doiEntry;
+    private final BibEntry originalEntry;
+    private final BibEntry fetchedEntry;
     private NamedCompound ce;
     private MergeEntries mergeEntries;
-
-    private final DOItoBibTeXFetcher doiFetcher = new DOItoBibTeXFetcher();
+    private final String type;
 
     private static final String MARGIN = "5px";
 
 
-    public MergeEntryDOIDialog(BasePanel panel) {
-        super(panel.frame(), Localization.lang("Merge entry with DOI information"), true);
+    public MergeFetchedEntryDialog(BasePanel panel, BibEntry originalEntry, BibEntry fetchedEntry, String type) {
+        super(panel.frame(), Localization.lang("Merge entry with %0 information", type), true);
 
         this.panel = panel;
+        this.originalEntry = originalEntry;
+        this.fetchedEntry = fetchedEntry;
+        this.type = type;
 
-        if (panel.getSelectedEntries().size() != 1) {
-            JOptionPane.showMessageDialog(panel.frame(),
-                    Localization.lang("This operation requires exactly one item to be selected."),
-                    Localization.lang("Merge entry with DOI information"), JOptionPane.INFORMATION_MESSAGE);
-            this.dispose();
-            return;
-        }
-
-        this.originalEntry = panel.getSelectedEntries().get(0);
-        panel.output(Localization.lang("Fetching info based on DOI"));
-        Optional<String> doi = this.originalEntry.getFieldOptional(FieldName.DOI);
-
-        if (doi.isPresent()) {
-            this.doiEntry = doiFetcher.getEntryFromDOI(doi.get()).orElse(null);
-        }
-
-        if (this.doiEntry == null) {
-            panel.output("");
-            JOptionPane.showMessageDialog(panel.frame(),
-                    Localization.lang("Cannot get info based on given DOI: %0",
-                            doi.orElse(Localization.lang("No DOI found"))),
-                    Localization.lang("Merge entry with DOI information"), JOptionPane.INFORMATION_MESSAGE);
-            this.dispose();
-            return;
-        }
-
-        panel.output(Localization.lang("Opening dialog"));
         // Start setting up the dialog
         init();
     }
@@ -99,14 +71,13 @@ public class MergeEntryDOIDialog extends JDialog {
      * Sets up the dialog
      */
     private void init() {
-        mergeEntries = new MergeEntries(this.originalEntry, this.doiEntry, Localization.lang("Original entry"),
-                Localization.lang("Entry from DOI"), panel.getBibDatabaseContext().getMode());
+        mergeEntries = new MergeEntries(this.originalEntry, this.fetchedEntry, Localization.lang("Original entry"),
+                Localization.lang("Entry from %0", type), panel.getBibDatabaseContext().getMode());
 
         // Create undo-compound
-        ce = new NamedCompound(Localization.lang("Merge entry with DOI information"));
+        ce = new NamedCompound(Localization.lang("Merge entry with %0 information", type));
 
         FormLayout layout = new FormLayout("fill:700px:grow", "fill:400px:grow, 4px, p, 5px, p");
-        // layout.setColumnGroups(new int[][] {{3, 11}});
         this.setLayout(layout);
 
         this.add(mergeEntries.getMergeEntryPanel(), cc.xy(1, 1));
@@ -136,9 +107,6 @@ public class MergeEntryDOIDialog extends JDialog {
                 JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
                 JabRefPreferences.MERGEENTRIES_SIZE_Y);
         pw.setWindowPosition();
-
-        // Show what we've got
-        setVisible(true);
 
     }
 
@@ -194,7 +162,7 @@ public class MergeEntryDOIDialog extends JDialog {
             if (edited) {
                 ce.end();
                 panel.getUndoManager().addEdit(ce);
-                panel.output(Localization.lang("Updated entry with info from DOI"));
+                panel.output(Localization.lang("Updated entry with info from %0", type));
                 panel.updateEntryEditorIfShowing();
                 panel.markBaseChanged();
             } else {
