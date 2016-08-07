@@ -20,14 +20,17 @@ import static org.mockito.Mockito.mock;
 
 public class LayoutTest {
 
+    private LayoutFormatterPreferences prefs;
+
+
     /**
      * Initialize Preferences.
      */
     @Before
     public void setUp() {
-        if (Globals.prefs == null) {
-            Globals.prefs = JabRefPreferences.getInstance();
-        }
+        Globals.prefs = JabRefPreferences.getInstance();
+        prefs = LayoutFormatterPreferences.fromPreferences(JabRefPreferences.getInstance(),
+                mock(JournalAbbreviationLoader.class));
     }
 
     /**
@@ -53,8 +56,7 @@ public class LayoutTest {
 
         BibEntry be = LayoutTest.bibtexString2BibtexEntry(entry);
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
-        Layout layout = new LayoutHelper(sr,
-                LayoutFormatterPreferences.fromPreferences(Globals.prefs, mock(JournalAbbreviationLoader.class)))
+        Layout layout = new LayoutHelper(sr, prefs)
                         .getLayoutFromText();
 
         return layout.doLayout(be, null);

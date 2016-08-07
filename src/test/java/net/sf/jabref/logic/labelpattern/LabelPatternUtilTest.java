@@ -37,6 +37,7 @@ public class LabelPatternUtilTest {
     private static final String TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD = "Towards Choreography-based Process Distribution in the Cloud";
     private static final String TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS = "On the Measurement of Design-Time Adaptability for Process-Based Systems ";
 
+
     @BeforeClass
     public static void setUpGlobalsPrefs() {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -705,26 +706,23 @@ public class LabelPatternUtilTest {
     }
 
     @Test
-    public void testCheckLegalKey2() {
-        // Enforce legal keys
+    public void testCheckLegalKeyEnforceLegal() {
         assertEquals("AAAA", LabelPatternUtil.checkLegalKey("AA AA", true));
         assertEquals("SPECIALCHARS", LabelPatternUtil.checkLegalKey("SPECIAL CHARS#{\\\"}~,^", true));
         assertEquals("", LabelPatternUtil.checkLegalKey("\n\t\r", true));
+    }
 
-        // Do not enforce legal keys
+    @Test
+    public void testCheckLegalKeyDoNotEnforceLegal() {
         assertEquals("AAAA", LabelPatternUtil.checkLegalKey("AA AA", false));
         assertEquals("SPECIALCHARS#~^", LabelPatternUtil.checkLegalKey("SPECIAL CHARS#{\\\"}~,^", false));
         assertEquals("", LabelPatternUtil.checkLegalKey("\n\t\r", false));
+    }
 
-        // Check null input
+    @Test
+    public void testCheckLegalNullInNullOut() {
         assertNull(LabelPatternUtil.checkLegalKey(null, true));
         assertNull(LabelPatternUtil.checkLegalKey(null, false));
-
-        // Use preferences setting
-        assertEquals("AAAA", LabelPatternUtil.checkLegalKey("AA AA",
-                Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY)));
-        assertEquals("", LabelPatternUtil.checkLegalKey("\n\t\r",
-                Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY)));
     }
 
     @Test
