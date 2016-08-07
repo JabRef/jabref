@@ -16,6 +16,7 @@
 package net.sf.jabref.logic.layout.format;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
@@ -27,14 +28,14 @@ import net.sf.jabref.logic.layout.LayoutFormatter;
  */
 public class CompositeFormat implements LayoutFormatter {
 
-    private List<LayoutFormatter> formatters;
+    private final List<LayoutFormatter> formatters;
 
 
     /**
      * If called with this constructor, this formatter does nothing.
      */
     public CompositeFormat() {
-        // Nothing
+        formatters = Collections.emptyList();
     }
 
     public CompositeFormat(LayoutFormatter first, LayoutFormatter second) {
@@ -48,10 +49,8 @@ public class CompositeFormat implements LayoutFormatter {
     @Override
     public String format(String fieldText) {
         String result = fieldText;
-        if (formatters != null) {
-            for (LayoutFormatter formatter : formatters) {
-                result = formatter.format(result);
-            }
+        for (LayoutFormatter formatter : formatters) {
+            result = formatter.format(result);
         }
         return result;
     }
