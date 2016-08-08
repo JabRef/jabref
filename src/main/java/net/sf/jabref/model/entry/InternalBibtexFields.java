@@ -42,8 +42,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 public class InternalBibtexFields {
@@ -51,8 +49,8 @@ public class InternalBibtexFields {
     // contains all bibtex-field objects (BibtexSingleField)
     private final Map<String, BibtexSingleField> fieldSet;
 
-    // contains all known (and public) bibtex fieldnames
-    private final List<String> PUBLIC_FIELDS = new ArrayList<>();
+    // the name with the current time stamp field, needed in case we want to change it
+    private String timeStampField;
 
     // Lists of fields with special properties
     public static final List<String> IEEETRANBSTCTL_NUMERIC_FIELDS = Arrays.asList("ctlmax_names_forced_etal",
@@ -67,12 +65,17 @@ public class InternalBibtexFields {
             "editorbtype", "editorctype");
     public static final List<String> BIBLATEX_PAGINATION_FIELDS = Arrays.asList("pagination", "bookpagination");
 
+    public static final List<String> SPECIAL_FIELDS = Arrays.asList(SpecialFieldsUtils.FIELDNAME_PRINTED,
+            SpecialFieldsUtils.FIELDNAME_PRIORITY, SpecialFieldsUtils.FIELDNAME_QUALITY,
+            SpecialFieldsUtils.FIELDNAME_RANKING, SpecialFieldsUtils.FIELDNAME_READ,
+            SpecialFieldsUtils.FIELDNAME_RELEVANCE);
+
     // singleton instance
-    private static final InternalBibtexFields RUNTIME = new InternalBibtexFields(
-            Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS));
+    private static InternalBibtexFields RUNTIME = new InternalBibtexFields(
+            SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS_DEFAULT, FieldName.TIMESTAMP);
 
 
-    private InternalBibtexFields(boolean serializeSpecialFields) {
+    private InternalBibtexFields(boolean serializeSpecialFields, String timeStampFieldName) {
         fieldSet = new HashMap<>();
         BibtexSingleField dummy;
 
@@ -129,48 +132,15 @@ public class InternalBibtexFields {
         add(new BibtexSingleField(FieldName.YEAR, true, BibtexSingleField.SMALL_W, 60).setNumeric(true));
 
         // custom fields not displayed at editor, but as columns in the UI
-        dummy = new BibtexSingleField(SpecialFieldsUtils.FIELDNAME_RANKING, false);
-        if (!serializeSpecialFields) {
-            dummy.setPrivate();
-            dummy.setWriteable(false);
-            dummy.setDisplayable(false);
+        for (String fieldName : SPECIAL_FIELDS) {
+            dummy = new BibtexSingleField(fieldName, false);
+            if (!serializeSpecialFields) {
+                dummy.setPrivate();
+                dummy.setWriteable(false);
+                dummy.setDisplayable(false);
+            }
+            add(dummy);
         }
-        add(dummy);
-        dummy = new BibtexSingleField(SpecialFieldsUtils.FIELDNAME_PRIORITY, false);
-        if (!serializeSpecialFields) {
-            dummy.setPrivate();
-            dummy.setWriteable(false);
-            dummy.setDisplayable(false);
-        }
-        add(dummy);
-        dummy = new BibtexSingleField(SpecialFieldsUtils.FIELDNAME_RELEVANCE, false);
-        if (!serializeSpecialFields) {
-            dummy.setPrivate();
-            dummy.setWriteable(false);
-            dummy.setDisplayable(false);
-        }
-        add(dummy);
-        dummy = new BibtexSingleField(SpecialFieldsUtils.FIELDNAME_QUALITY, false);
-        if (!serializeSpecialFields) {
-            dummy.setPrivate();
-            dummy.setWriteable(false);
-            dummy.setDisplayable(false);
-        }
-        add(dummy);
-        dummy = new BibtexSingleField(SpecialFieldsUtils.FIELDNAME_READ, false);
-        if (!serializeSpecialFields) {
-            dummy.setPrivate();
-            dummy.setWriteable(false);
-            dummy.setDisplayable(false);
-        }
-        add(dummy);
-        dummy = new BibtexSingleField(SpecialFieldsUtils.FIELDNAME_PRINTED, false);
-        if (!serializeSpecialFields) {
-            dummy.setPrivate();
-            dummy.setWriteable(false);
-            dummy.setDisplayable(false);
-        }
-        add(dummy);
 
         // some semi-standard fields
         dummy = new BibtexSingleField(BibEntry.KEY_FIELD, true);
@@ -223,8 +193,8 @@ public class InternalBibtexFields {
         dummy.setPrivate();
         add(dummy);
 
-        dummy = new BibtexSingleField(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD), false,
-                BibtexSingleField.SMALL_W);
+        dummy = new BibtexSingleField(timeStampFieldName, false, BibtexSingleField.SMALL_W);
+        timeStampField = timeStampFieldName;
         dummy.setExtras(EnumSet.of(FieldProperties.DATE));
         dummy.setPrivate();
         add(dummy);
@@ -305,17 +275,29 @@ public class InternalBibtexFields {
             add(field);
         }
 
-        // collect all public fields for the PUBLIC_FIELDS array
-        for (BibtexSingleField sField : fieldSet.values()) {
-            if (!sField.isPrivate()) {
-                PUBLIC_FIELDS.add(sField.getFieldName());
-                // or export the complete BibtexSingleField ?
-                // BibtexSingleField.toString() { return fieldname ; }
-            }
-        }
+    }
 
-        // sort the entries
-        Collections.sort(PUBLIC_FIELDS);
+
+    public static void updateTimeStampField(String timeStampFieldName) {
+        getField(RUNTIME.timeStampField).ifPresent(field -> {
+            field.setName(timeStampFieldName);
+            RUNTIME.timeStampField = timeStampFieldName;
+        });
+
+    }
+
+    public static void updateSpecialFields(boolean serializeSpecialFields) {
+        for (String fieldName : SPECIAL_FIELDS) {
+            getField(fieldName).ifPresent(field -> {
+                if (serializeSpecialFields) {
+                    field.setPublic();
+                } else {
+                    field.setPrivate();
+                }
+                field.setWriteable(serializeSpecialFields);
+                field.setDisplayable(serializeSpecialFields);
+            });
+        }
     }
 
     /**
@@ -431,8 +413,21 @@ public class InternalBibtexFields {
     /**
      * returns a List with all fieldnames
      */
-    public static List<String> getAllFieldNames() {
-        return new ArrayList<>(InternalBibtexFields.RUNTIME.PUBLIC_FIELDS);
+    public static List<String> getAllPublicFieldNames() {
+        // collect all public fields
+        List<String> publicFields = new ArrayList<>();
+        for (BibtexSingleField sField : InternalBibtexFields.RUNTIME.fieldSet.values()) {
+            if (!sField.isPrivate()) {
+                publicFields.add(sField.getFieldName());
+                // or export the complete BibtexSingleField ?
+                // BibtexSingleField.toString() { return fieldname ; }
+            }
+        }
+
+        // sort the entries
+        Collections.sort(publicFields);
+
+        return publicFields;
     }
 
     /**
@@ -449,19 +444,6 @@ public class InternalBibtexFields {
 
     }
 
-    /**
-     * returns the fieldname of the entry at index t
-     */
-    public static String getFieldName(int t) {
-        return InternalBibtexFields.RUNTIME.PUBLIC_FIELDS.get(t);
-    }
-
-    /**
-     * returns the number of available fields
-     */
-    public static int numberOfPublicFields() {
-        return InternalBibtexFields.RUNTIME.PUBLIC_FIELDS.size();
-    }
 
 
     /*

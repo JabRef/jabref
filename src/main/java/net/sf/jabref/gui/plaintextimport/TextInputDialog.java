@@ -551,8 +551,7 @@ public class TextInputDialog extends JDialog {
             requiredFields.addAll(type.get().getRequiredFieldsFlat());
             optionalFields.addAll(type.get().getPrimaryOptionalFields());
         }
-        List<String> internalFields = InternalBibtexFields.getAllFieldNames();
-        for (String field : internalFields) {
+        for (String field : InternalBibtexFields.getAllPublicFieldNames()) {
             if (!allFields.contains(field)) {
                 allFields.add(field);
             }

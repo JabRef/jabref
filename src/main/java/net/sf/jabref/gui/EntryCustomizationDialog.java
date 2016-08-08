@@ -75,7 +75,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
     protected JButton delete;
     protected JButton importTypes;
     protected JButton exportTypes;
-    private final List<String> preset = InternalBibtexFields.getAllFieldNames();
+    private final List<String> preset = InternalBibtexFields.getAllPublicFieldNames();
     private String lastSelected;
     private final Map<String, List<String>> reqLists = new HashMap<>();
     private final Map<String, List<String>> optLists = new HashMap<>();

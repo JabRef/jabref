@@ -17,7 +17,6 @@
 package net.sf.jabref.gui;
 
 import java.awt.Component;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -50,7 +49,7 @@ public class SaveOrderConfigDisplay {
     }
 
     private void init() {
-        List<String> fieldNames = new ArrayList<>(InternalBibtexFields.getAllFieldNames());
+        List<String> fieldNames = InternalBibtexFields.getAllPublicFieldNames();
         fieldNames.add(BibEntry.KEY_FIELD);
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);

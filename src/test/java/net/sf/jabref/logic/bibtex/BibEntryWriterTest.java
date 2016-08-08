@@ -27,6 +27,7 @@ public class BibEntryWriterTest {
     private BibEntryWriter writer;
     private static JabRefPreferences backup;
 
+
     @BeforeClass
     public static void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
