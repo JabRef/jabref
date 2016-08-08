@@ -6,7 +6,6 @@ import java.util.List;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
@@ -15,6 +14,7 @@ import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.sql.exporter.DatabaseExporter;
 import net.sf.jabref.sql.importer.DBImporterResult;
 import net.sf.jabref.sql.importer.DatabaseImporter;
@@ -178,8 +178,9 @@ public class DatabaseImportExportTests {
     private BibDatabaseContext createContextWithSingleEntrySingleGroup() throws ParseException {
         BibDatabaseContext databaseContext = createContextWithSingleEntry();
 
-        GroupTreeNode root = new GroupTreeNode(new AllEntriesGroup());
-        KeywordGroup group = new KeywordGroup("test", "asdf", "fdas", false, true, GroupHierarchyType.INCLUDING);
+        GroupTreeNode root = GroupTreeNode.fromGroup(new AllEntriesGroup());
+        KeywordGroup group = new KeywordGroup("test", "asdf", "fdas", false, true, GroupHierarchyType.INCLUDING,
+                Globals.prefs);
         root.addSubgroup(group);
         databaseContext.getMetaData().setGroups(root);
         return databaseContext;

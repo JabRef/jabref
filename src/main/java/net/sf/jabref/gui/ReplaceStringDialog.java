@@ -44,22 +44,21 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
- * Dialog for creating or modifying groups. Operates directly on the
- * Vector containing group information.
+ * Dialog for replacing strings.
  */
 class ReplaceStringDialog extends JDialog {
 
-    private final JTextField fields = new JTextField("", 30);
-    private final JTextField from = new JTextField("", 30);
-    private final JTextField to = new JTextField("", 30);
+    private final JTextField fieldsField = new JTextField("", 30);
+    private final JTextField fromField = new JTextField("", 30);
+    private final JTextField toField = new JTextField("", 30);
 
     private final JCheckBox selOnly = new JCheckBox(Localization.lang("Limit to selected entries"), false);
     private final JRadioButton allFi = new JRadioButton(Localization.lang("All fields"), true);
     private final JRadioButton field = new JRadioButton(Localization.lang("Limit to fields") + ":", false);
     private boolean okPressed;
-    private String[] flds;
-    private String s1;
-    private String s2;
+    private String[] fieldStrings;
+    private String fromString;
+    private String toString;
 
 
     public ReplaceStringDialog(JabRefFrame parent) {
@@ -68,24 +67,20 @@ class ReplaceStringDialog extends JDialog {
         ButtonGroup bg = new ButtonGroup();
         bg.add(allFi);
         bg.add(field);
-        ActionListener okListener = new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                s1 = from.getText();
-                s2 = to.getText();
-                if ("".equals(s1)) {
-                    return;
-                }
-                okPressed = true;
-                flds = fields.getText().toLowerCase().split(";");
-                dispose();
+        ActionListener okListener = e -> {
+            fromString = fromField.getText();
+            toString = toField.getText();
+            if ("".equals(fromString)) {
+                return;
             }
+            okPressed = true;
+            fieldStrings = fieldsField.getText().toLowerCase().split(";");
+            dispose();
         };
         JButton ok = new JButton(Localization.lang("OK"));
         ok.addActionListener(okListener);
-        to.addActionListener(okListener);
-        fields.addActionListener(okListener);
+        toField.addActionListener(okListener);
+        fieldsField.addActionListener(okListener);
         AbstractAction cancelAction = new AbstractAction() {
 
             @Override
@@ -119,19 +114,8 @@ class ReplaceStringDialog extends JDialog {
                         Localization.lang("Strings")));
 
         // Settings panel:
-        /*
-        con.weightx = 0;
-        con.insets = new Insets(3, 5, 3, 5);
-        con.anchor = GridBagConstraints.EAST;
-        con.fill = GridBagConstraints.NONE;
-        con.gridx = 0;
-        con.gridy = 2;
-        gbl.setConstraints(nf, con);
-        settings.add(nf);*/
-        //con.weightx = 1;
         GridBagConstraints con = new GridBagConstraints();
         con.fill = GridBagConstraints.HORIZONTAL;
-        //JSeparator sep = new JSeparator()
         con.gridwidth = 2;
         con.weightx = 0;
         con.anchor = GridBagConstraints.WEST;
@@ -152,9 +136,8 @@ class ReplaceStringDialog extends JDialog {
         settings.add(field);
         con.gridx = 1;
         con.weightx = 1;
-        //con.insets = new Insets(3, 5, 3, 5);
-        gbl.setConstraints(fields, con);
-        settings.add(fields);
+        gbl.setConstraints(fieldsField, con);
+        settings.add(fieldsField);
 
         con.weightx = 0;
         con.gridx = 0;
@@ -169,11 +152,11 @@ class ReplaceStringDialog extends JDialog {
         con.weightx = 1;
         con.gridx = 1;
         con.gridy = 0;
-        gbl.setConstraints(from, con);
-        main.add(from);
+        gbl.setConstraints(fromField, con);
+        main.add(fromField);
         con.gridy = 1;
-        gbl.setConstraints(to, con);
-        main.add(to);
+        gbl.setConstraints(toField, con);
+        main.add(toField);
 
         // Option buttons:
         con.gridx = GridBagConstraints.RELATIVE;
@@ -194,7 +177,6 @@ class ReplaceStringDialog extends JDialog {
         getContentPane().add(opt, BorderLayout.SOUTH);
 
         pack();
-        //setSize(400, 170);
 
         this.setLocationRelativeTo(parent);
     }
@@ -226,7 +208,7 @@ class ReplaceStringDialog extends JDialog {
                 }
             }
         } else {
-            for (String fld : flds) {
+            for (String fld : fieldStrings) {
                 if (!fld.equals(BibEntry.KEY_FIELD)) {
                     counter += replaceField(be, fld, ce);
                 }
@@ -240,16 +222,16 @@ class ReplaceStringDialog extends JDialog {
         if (!be.hasField(fieldname)) {
             return 0;
         }
-        String txt = be.getField(fieldname);
+        String txt = be.getFieldOptional(fieldname).get();
         StringBuilder sb = new StringBuilder();
         int ind;
         int piv = 0;
         int counter = 0;
-        int len1 = s1.length();
-        while ((ind = txt.indexOf(s1, piv)) >= 0) {
+        int len1 = fromString.length();
+        while ((ind = txt.indexOf(fromString, piv)) >= 0) {
             counter++;
             sb.append(txt.substring(piv, ind)); // Text leading up to s1
-            sb.append(s2); // Insert s2
+            sb.append(toString); // Insert s2
             piv = ind + len1;
         }
         sb.append(txt.substring(piv));

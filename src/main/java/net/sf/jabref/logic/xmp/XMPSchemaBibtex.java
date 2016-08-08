@@ -24,14 +24,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 import org.apache.jempbox.xmp.XMPMetadata;
 import org.apache.jempbox.xmp.XMPSchema;
@@ -53,9 +53,9 @@ public class XMPSchemaBibtex extends XMPSchema {
 
 
     static {
-        XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add("abstract");
-        XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add("note");
-        XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add("review");
+        XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add(FieldName.ABSTRACT);
+        XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add(FieldName.NOTE);
+        XMPSchemaBibtex.PRESERVE_WHITE_SPACE.add(FieldName.REVIEW);
     }
 
     /**
@@ -275,8 +275,8 @@ public class XMPSchemaBibtex extends XMPSchema {
 
 
 
-    public void setBibtexEntry(BibEntry entry) {
-        setBibtexEntry(entry, null);
+    public void setBibtexEntry(BibEntry entry, XMPPreferences xmpPreferences) {
+        setBibtexEntry(entry, null, xmpPreferences);
     }
 
     /**
@@ -284,21 +284,17 @@ public class XMPSchemaBibtex extends XMPSchema {
      * @param entry
      * @param database maybenull
      */
-    public void setBibtexEntry(BibEntry entry, BibDatabase database) {
+    public void setBibtexEntry(BibEntry entry, BibDatabase database, XMPPreferences xmpPreferences) {
         // Set all the values including key and entryType
         Set<String> fields = entry.getFieldNames();
 
-        JabRefPreferences prefs = JabRefPreferences.getInstance();
-        if (prefs.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER)) {
-            Set<String> filters = new TreeSet<>(prefs.getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS));
+        if (xmpPreferences != null && xmpPreferences.isUseXMPPrivacyFilter()) {
+            Set<String> filters = new TreeSet<>(xmpPreferences.getXmpPrivacyFilter());
             fields.removeAll(filters);
         }
 
         for (String field : fields) {
-            String value = BibDatabase.getResolvedField(field, entry, database);
-            if (value == null) {
-                value = "";
-            }
+            String value = BibDatabase.getResolvedField(field, entry, database).orElse("");
             if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
                 setPersonList(field, value);
             } else {

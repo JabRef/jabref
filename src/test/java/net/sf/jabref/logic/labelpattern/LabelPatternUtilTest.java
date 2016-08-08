@@ -1,10 +1,10 @@
 package net.sf.jabref.logic.labelpattern;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -37,6 +37,7 @@ public class LabelPatternUtilTest {
     private static final String TITLE_STRING_CASED_TWO_SMALL_WORDS_ONE_CONNECTED_WORD = "Towards Choreography-based Process Distribution in the Cloud";
     private static final String TITLE_STRING_CASED_FOUR_SMALL_WORDS_TWO_CONNECTED_WORDS = "On the Measurement of Design-Time Adaptability for Process-Based Systems ";
 
+
     @BeforeClass
     public static void setUpGlobalsPrefs() {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -50,20 +51,21 @@ public class LabelPatternUtilTest {
     @Test
     public void testAndInAuthorName() {
         BibEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}}");
-        assertEquals("Holland", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth")));
+        assertEquals("Holland", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth"), true));
     }
 
     @Test
     public void testAndAuthorNames() {
         String bibtexString = "@ARTICLE{whatevery, author={Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland}}";
         BibEntry entry = BibtexParser.singleFromString(bibtexString);
-        assertEquals("HerlandHaugeHelgeland", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry, "authors3")));
+        assertEquals("HerlandHaugeHelgeland",
+                LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry, "authors3"), true));
     }
 
     @Test
     public void testSpecialLatexCharacterInAuthorName() {
         BibEntry entry = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Popovi\\v{c}ov\\'{a}}}");
-        assertEquals("Popovicova", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry, "auth")));
+        assertEquals("Popovicova", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry, "auth"), true));
     }
 
     /**
@@ -73,40 +75,40 @@ public class LabelPatternUtilTest {
     @Test
     public void testMakeLabelAndCheckLegalKeys() {
         BibEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Köning}, year={2000}}");
-        assertEquals("Koen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
+        assertEquals("Koen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3"), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Áöning}, year={2000}}");
-        assertEquals("Aoen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
+        assertEquals("Aoen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3"), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Éöning}, year={2000}}");
-        assertEquals("Eoen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
+        assertEquals("Eoen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3"), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Íöning}, year={2000}}");
-        assertEquals("Ioen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
+        assertEquals("Ioen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3"), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ĺöning}, year={2000}}");
-        assertEquals("Loen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
+        assertEquals("Loen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3"), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ńöning}, year={2000}}");
-        assertEquals("Noen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
+        assertEquals("Noen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3"), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Óöning}, year={2000}}");
-        assertEquals("Ooen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
+        assertEquals("Ooen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3"), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ŕöning}, year={2000}}");
-        assertEquals("Roen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
+        assertEquals("Roen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3"), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Śöning}, year={2000}}");
-        assertEquals("Soen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
+        assertEquals("Soen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3"), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Úöning}, year={2000}}");
-        assertEquals("Uoen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
+        assertEquals("Uoen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3"), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ýöning}, year={2000}}");
-        assertEquals("Yoen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
+        assertEquals("Yoen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3"), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Źöning}, year={2000}}");
-        assertEquals("Zoen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
+        assertEquals("Zoen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3"), true));
     }
 
     /**
@@ -115,19 +117,19 @@ public class LabelPatternUtilTest {
     @Test
     public void testMakeLabelAndCheckLegalKeysAccentGrave() {
         BibEntry entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}");
-        assertEquals("Aoen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
+        assertEquals("Aoen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3"), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Èöning}, year={2000}}");
-        assertEquals("Eoen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
+        assertEquals("Eoen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3"), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ìöning}, year={2000}}");
-        assertEquals("Ioen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
+        assertEquals("Ioen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3"), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Òöning}, year={2000}}");
-        assertEquals("Ooen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
+        assertEquals("Ooen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3"), true));
 
         entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Andreas Ùöning}, year={2000}}");
-        assertEquals("Uoen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3")));
+        assertEquals("Uoen", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry0, "auth3"), true));
     }
 
     /**
@@ -145,43 +147,43 @@ public class LabelPatternUtilTest {
         //"Ł ł   Ő ő Ű ű   Ŀ ŀ   Ħ ħ   Ð ð Þ þ   Œ œ   Æ æ Ø ø Å å   Ə ə
         String accents = "ÀàÈèÌìÒòÙù Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ";
         String expectedResult = "AaEeIiOoUuAaCcEeGgHhIiJjOoSsUuWwYy";
-        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents));
+        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents, true));
 
         accents = "ÄäËëÏïÖöÜüŸÿ";
         expectedResult = "AeaeEeIiOeoeUeueYy";
-        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents));
+        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents, true));
 
         accents = "Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ";
         expectedResult = "CcGgKkLlNnRrSsTt";
-        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents));
+        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents, true));
 
         accents = "Ă ă Ĕ ĕ Ğ ğ Ĭ ĭ Ŏ ŏ Ŭ ŭ";
         expectedResult = "AaEeGgIiOoUu";
-        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents));
+        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents, true));
 
         accents = "Ċ ċ Ė ė Ġ ġ İ ı Ż ż";
         expectedResult = "CcEeGgIiZz";
-        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents));
+        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents, true));
 
         accents = "Ą ą Ę ę Į į Ǫ ǫ Ų ų";
         expectedResult = "AaEeIiOoUu"; // O or Q? o or q?
-        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents));
+        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents, true));
 
         accents = "Ā ā Ē ē Ī ī Ō ō Ū ū Ȳ ȳ";
         expectedResult = "AaEeIiOoUuYy";
-        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents));
+        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents, true));
 
         accents = "Ǎ ǎ Č č Ď ď Ě ě Ǐ ǐ Ľ ľ Ň ň Ǒ ǒ Ř ř Š š Ť ť Ǔ ǔ Ž ž";
         expectedResult = "AaCcDdEeIiLlNnOoRrSsTtUuZz";
-        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents));
+        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents, true));
 
         expectedResult = "AaEeIiNnOoUuYy";
         accents = "ÃãẼẽĨĩÑñÕõŨũỸỹ";
-        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents));
+        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents, true));
 
         accents = "Ḍ ḍ Ḥ ḥ Ḷ ḷ Ḹ ḹ Ṃ ṃ Ṇ ṇ Ṛ ṛ Ṝ ṝ Ṣ ṣ Ṭ ṭ";
         expectedResult = "DdHhLlLlMmNnRrRrSsTt";
-        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents));
+        assertEquals(expectedResult, LabelPatternUtil.checkLegalKey(accents, true));
 
         String totest = "À à È è Ì ì Ò ò Ù ù   Â â Ĉ ĉ Ê ê Ĝ ĝ Ĥ ĥ Î î Ĵ ĵ Ô ô Ŝ ŝ Û û Ŵ ŵ Ŷ ŷ  Ä ä Ë ë Ï ï Ö ö Ü ü Ÿ ÿ    "
                 + "Ã ã Ẽ ẽ Ĩ ĩ Ñ ñ Õ õ Ũ ũ Ỹ ỹ   Ç ç Ģ ģ Ķ ķ Ļ ļ Ņ ņ Ŗ ŗ Ş ş Ţ ţ"
@@ -195,7 +197,7 @@ public class LabelPatternUtilTest {
                 "AaEeGgIiOoUu" +
                 "CcEeGgIiZzAaEeIiOoUu" +
                 "DdHhLlLlMmNnRrRrSsTt";
-        assertEquals(expectedResults, LabelPatternUtil.checkLegalKey(totest));
+        assertEquals(expectedResults, LabelPatternUtil.checkLegalKey(totest, true));
     }
 
     @Test
@@ -221,7 +223,7 @@ public class LabelPatternUtilTest {
     @Test
     public void testUniversity() {
         BibEntry entry = BibtexParser.singleFromString("@ARTICLE{kohn, author={{Link{\\\"{o}}ping University}}}");
-        assertEquals("UniLinkoeping", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry, "auth")));
+        assertEquals("UniLinkoeping", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry, "auth"), true));
     }
 
     @Test
@@ -229,21 +231,23 @@ public class LabelPatternUtilTest {
         BibEntry entry = BibtexParser
                 .singleFromString(
                         "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, Department of Electrical Engineering}}}");
-        assertEquals("UniLinkoepingEE", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry, "auth")));
+        assertEquals("UniLinkoepingEE",
+                LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry, "auth"), true));
     }
 
     @Test
     public void testSchool() {
         BibEntry entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, School of Computer Engineering}}}");
-        assertEquals("UniLinkoepingCE", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry, "auth")));
+        assertEquals("UniLinkoepingCE",
+                LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry, "auth"), true));
     }
 
     @Test
     public void testInstituteOfTechnology() {
         BibEntry entry = BibtexParser
                 .singleFromString("@ARTICLE{kohn, author={{Massachusetts Institute of Technology}}}");
-        assertEquals("MIT", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry, "auth")));
+        assertEquals("MIT", LabelPatternUtil.checkLegalKey(LabelPatternUtil.makeLabel(entry, "auth"), true));
     }
 
     @Test
@@ -702,25 +706,31 @@ public class LabelPatternUtilTest {
     }
 
     @Test
-    public void testCheckLegalKey2() {
-        // Enforce legal keys
+    public void testCheckLegalKeyEnforceLegal() {
         assertEquals("AAAA", LabelPatternUtil.checkLegalKey("AA AA", true));
         assertEquals("SPECIALCHARS", LabelPatternUtil.checkLegalKey("SPECIAL CHARS#{\\\"}~,^", true));
         assertEquals("", LabelPatternUtil.checkLegalKey("\n\t\r", true));
+    }
 
-        // Do not enforce legal keys
+    @Test
+    public void testCheckLegalKeyDoNotEnforceLegal() {
         assertEquals("AAAA", LabelPatternUtil.checkLegalKey("AA AA", false));
         assertEquals("SPECIALCHARS#~^", LabelPatternUtil.checkLegalKey("SPECIAL CHARS#{\\\"}~,^", false));
         assertEquals("", LabelPatternUtil.checkLegalKey("\n\t\r", false));
+    }
 
-        // Check null input
-        assertNull(LabelPatternUtil.checkLegalKey(null));
+    @Test
+    public void testCheckLegalNullInNullOut() {
         assertNull(LabelPatternUtil.checkLegalKey(null, true));
         assertNull(LabelPatternUtil.checkLegalKey(null, false));
+    }
 
-        // Use preferences setting
-        assertEquals("AAAA", LabelPatternUtil.checkLegalKey("AA AA"));
-        assertEquals("", LabelPatternUtil.checkLegalKey("\n\t\r"));
+    @Test
+    public void testApplyModifiers() {
+        BibEntry entry = new BibEntry();
+        entry.setField("title", "Green Scheduling of Whatever");
+        assertEquals("GSW", LabelPatternUtil.makeLabel(entry, "shorttitleINI"));
+        assertEquals("GreenSchedulingWhatever", LabelPatternUtil.makeLabel(entry, "shorttitle"));
     }
 
 }

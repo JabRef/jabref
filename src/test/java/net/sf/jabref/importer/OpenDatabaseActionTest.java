@@ -7,11 +7,12 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Optional;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -46,25 +47,25 @@ public class OpenDatabaseActionTest {
     @Test
     public void useFallbackEncodingIfNoHeader() throws IOException {
         ParserResult result = OpenDatabaseAction.loadDatabase(bibNoHeader, defaultEncoding);
-        Assert.assertEquals(defaultEncoding, result.getEncoding());
+        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding());
     }
 
     @Test
     public void useFallbackEncodingIfUnknownHeader() throws IOException {
         ParserResult result = OpenDatabaseAction.loadDatabase(bibWrongHeader, defaultEncoding);
-        Assert.assertEquals(defaultEncoding, result.getEncoding());
+        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding());
     }
 
     @Test
     public void useSpecifiedEncoding() throws IOException {
         ParserResult result = OpenDatabaseAction.loadDatabase(bibHeader, StandardCharsets.US_ASCII);
-        Assert.assertEquals(StandardCharsets.UTF_8, result.getEncoding());
+        Assert.assertEquals(StandardCharsets.UTF_8, result.getMetaData().getEncoding());
     }
 
     @Test
     public void useSpecifiedEncodingWithSignature() throws IOException {
         ParserResult result = OpenDatabaseAction.loadDatabase(bibHeaderAndSignature, StandardCharsets.US_ASCII);
-        Assert.assertEquals(StandardCharsets.UTF_8, result.getEncoding());
+        Assert.assertEquals(StandardCharsets.UTF_8, result.getMetaData().getEncoding());
     }
 
     @Test
@@ -74,7 +75,7 @@ public class OpenDatabaseActionTest {
 
         // Entry
         Assert.assertEquals(1, db.getEntryCount());
-        Assert.assertEquals("2014", db.getEntryByKey("1").getField("year"));
+        Assert.assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getFieldOptional("year"));
     }
 
     @Test
@@ -84,7 +85,7 @@ public class OpenDatabaseActionTest {
 
         // Entry
         Assert.assertEquals(1, db.getEntryCount());
-        Assert.assertEquals("2014", db.getEntryByKey("1").getField("year"));
+        Assert.assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getFieldOptional("year"));
     }
 
     @Test
@@ -94,7 +95,7 @@ public class OpenDatabaseActionTest {
 
         // Entry
         Assert.assertEquals(1, db.getEntryCount());
-        Assert.assertEquals("2014", db.getEntryByKey("1").getField("year"));
+        Assert.assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getFieldOptional("year"));
     }
 
     /**
@@ -103,7 +104,7 @@ public class OpenDatabaseActionTest {
     @Test
     public void correctlyParseEncodingWithoutNewline() throws IOException {
         ParserResult result = OpenDatabaseAction.loadDatabase(bibEncodingWithoutNewline, defaultEncoding);
-        Assert.assertEquals(StandardCharsets.US_ASCII, result.getEncoding());
+        Assert.assertEquals(StandardCharsets.US_ASCII, result.getMetaData().getEncoding());
 
         BibDatabase db = result.getDatabase();
         Assert.assertEquals("testPreamble", db.getPreamble());
@@ -112,6 +113,6 @@ public class OpenDatabaseActionTest {
         Assert.assertEquals(1, entries.size());
 
         BibEntry entry = entries.iterator().next();
-        Assert.assertEquals("testArticle", entry.getCiteKey());
+        Assert.assertEquals(Optional.of("testArticle"), entry.getCiteKeyOptional());
     }
 }

@@ -1,15 +1,17 @@
 package net.sf.jabref.importer.fileformat;
 
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibEntryAssert;
-import net.sf.jabref.importer.OutputPrinterToNull;
+import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -27,7 +29,7 @@ public class SilverPlatterImporterTest {
     @Parameter
     public String filename;
 
-    public String txtName;
+    public Path txtFile;
     public String bibName;
 
 
@@ -35,8 +37,18 @@ public class SilverPlatterImporterTest {
     public void setUp() throws Exception {
         Globals.prefs = JabRefPreferences.getInstance();
         testImporter = new SilverPlatterImporter();
-        txtName = filename + ".txt";
+        txtFile = Paths.get(SilverPlatterImporterTest.class.getResource(filename + ".txt").toURI());
         bibName = filename + ".bib";
+    }
+
+    @Test
+    public void testsGetExtensions() {
+        Assert.assertEquals(".txt", testImporter.getExtensions().get(0));
+    }
+
+    @Test
+    public void testGetDescription() {
+        Assert.assertEquals("Imports a SilverPlatter exported file.", testImporter.getDescription());
     }
 
     @Parameters(name = "{index}: {0}")
@@ -47,16 +59,13 @@ public class SilverPlatterImporterTest {
 
     @Test
     public final void testIsRecognizedFormat() throws Exception {
-        try (InputStream stream = SilverPlatterImporterTest.class.getResourceAsStream(txtName)) {
-            Assert.assertTrue(testImporter.isRecognizedFormat(stream));
-        }
+        Assert.assertTrue(testImporter.isRecognizedFormat(txtFile, Charset.defaultCharset()));
     }
 
     @Test
     public final void testImportEntries() throws Exception {
-        try (InputStream in = SilverPlatterImporter.class.getResourceAsStream(txtName);
-                InputStream bibIn = SilverPlatterImporterTest.class.getResourceAsStream(bibName)) {
-            List<BibEntry> entries = testImporter.importEntries(in, new OutputPrinterToNull());
+        try (InputStream bibIn = SilverPlatterImporterTest.class.getResourceAsStream(bibName)) {
+            List<BibEntry> entries = testImporter.importDatabase(txtFile, Charset.defaultCharset()).getDatabase().getEntries();
             BibEntryAssert.assertEquals(bibIn, entries);
         }
     }

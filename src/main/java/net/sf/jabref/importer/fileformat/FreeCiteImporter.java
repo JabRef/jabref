@@ -1,4 +1,4 @@
-/*  Copyright (C) 2012, 2015 JabRef contributors.
+/*  Copyright (C) 2012, 2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,8 +15,8 @@
  */
 package net.sf.jabref.importer.fileformat;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -25,8 +25,9 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Scanner;
 
 import javax.xml.stream.XMLInputFactory;
@@ -36,12 +37,15 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -55,22 +59,22 @@ public class FreeCiteImporter extends ImportFormat {
     private static final Log LOGGER = LogFactory.getLog(FreeCiteImporter.class);
 
     @Override
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
-        // TODO: We don't know how to recognize text files, therefore we return
-        // "false"
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
+        // TODO: We don't know how to recognize text files, therefore we return "false"
         return false;
     }
 
     @Override
-    public List<BibEntry> importEntries(InputStream in, OutputPrinter status)
+    public ParserResult importDatabase(BufferedReader reader)
             throws IOException {
-        try (Scanner scan = new Scanner(in)) {
+        try (Scanner scan = new Scanner(reader)) {
             String text = scan.useDelimiter("\\A").next();
-            return importEntries(text, status);
+            return importEntries(text);
         }
     }
 
-    public List<BibEntry> importEntries(String text, OutputPrinter status) {
+    public ParserResult importEntries(String text) {
         // URLencode the string for transmission
         String urlencodedCitation = null;
         try {
@@ -87,10 +91,10 @@ public class FreeCiteImporter extends ImportFormat {
             conn = url.openConnection();
         } catch (MalformedURLException e) {
             LOGGER.warn("Bad URL", e);
-            return Collections.emptyList();
+            return new ParserResult();
         } catch (IOException e) {
             LOGGER.warn("Could not download", e);
-            return Collections.emptyList();
+            return new ParserResult();
         }
         try {
             conn.setRequestProperty("accept", "text/xml");
@@ -104,13 +108,11 @@ public class FreeCiteImporter extends ImportFormat {
         } catch (IllegalStateException e) {
             LOGGER.warn("Already connected.", e);
         } catch (IOException e) {
-            status.showMessage(Localization.lang("Unable to connect to FreeCite online service."));
             LOGGER.warn("Unable to connect to FreeCite online service.", e);
-            return Collections.emptyList();
+            return ParserResult.fromErrorMessage(Localization.lang("Unable to connect to FreeCite online service."));
         }
         // output is in conn.getInputStream();
         // new InputStreamReader(conn.getInputStream())
-
         List<BibEntry> res = new ArrayList<>();
 
         XMLInputFactory factory = XMLInputFactory.newInstance();
@@ -153,8 +155,8 @@ public class FreeCiteImporter extends ImportFormat {
                                     // current tag is either begin:author or
                                     // end:authors
                                 }
-                                e.setField("author", sb.toString());
-                            } else if ("journal".equals(ln)) {
+                                e.setField(FieldName.AUTHOR, sb.toString());
+                            } else if (FieldName.JOURNAL.equals(ln)) {
                                 // we guess that the entry is a journal
                                 // the alternative way is to parse
                                 // ctx:context-objects / ctx:context-object / ctx:referent / ctx:metadata-by-val / ctx:metadata / journal / rft:genre
@@ -165,26 +167,26 @@ public class FreeCiteImporter extends ImportFormat {
                             } else if ("tech".equals(ln)) {
                                 type = BibtexEntryTypes.TECHREPORT;
                                 // the content of the "tech" field seems to contain the number of the technical report
-                                e.setField("number", parser.getElementText());
-                            } else if ("doi".equals(ln)
-                                    || "institution".equals(ln)
-                                    || "location".equals(ln)
-                                    || "number".equals(ln)
-                                    || "note".equals(ln)
-                                    || "title".equals(ln)
-                                    || "pages".equals(ln)
-                                    || "publisher".equals(ln)
-                                    || "volume".equals(ln)
-                                    || "year".equals(ln)) {
+                                e.setField(FieldName.NUMBER, parser.getElementText());
+                            } else if (FieldName.DOI.equals(ln)
+                                    || FieldName.INSTITUTION.equals(ln)
+                                    || FieldName.LOCATION.equals(ln)
+                                    || FieldName.NUMBER.equals(ln)
+                                    || FieldName.NOTE.equals(ln)
+                                    || FieldName.TITLE.equals(ln)
+                                    || FieldName.PAGES.equals(ln)
+                                    || FieldName.PUBLISHER.equals(ln)
+                                    || FieldName.VOLUME.equals(ln)
+                                    || FieldName.YEAR.equals(ln)) {
                                 e.setField(ln, parser.getElementText());
-                            } else if ("booktitle".equals(ln)) {
+                            } else if (FieldName.BOOKTITLE.equals(ln)) {
                                 String booktitle = parser.getElementText();
                                 if (booktitle.startsWith("In ")) {
                                     // special treatment for parsing of
                                     // "In proceedings of..." references
                                     booktitle = booktitle.substring(3);
                                 }
-                                e.setField("booktitle", booktitle);
+                                e.setField(FieldName.BOOKTITLE, booktitle);
                             } else if ("raw_string".equals(ln)) {
                                 // raw input string is ignored
                             } else {
@@ -192,21 +194,21 @@ public class FreeCiteImporter extends ImportFormat {
                                 noteSB.append(ln);
                                 noteSB.append(':');
                                 noteSB.append(parser.getElementText());
-                                noteSB.append(Globals.NEWLINE);
+                                noteSB.append(OS.NEWLINE);
                             }
                         }
                         parser.next();
                     }
 
                     if (noteSB.length() > 0) {
-                        String note = e.getField("note");
-                        if (note == null) {
-                            note = noteSB.toString();
-                        } else {
+                        String note;
+                        if (e.hasField(FieldName.NOTE)) {
                             // "note" could have been set during the parsing as FreeCite also returns "note"
-                            note = note.concat(Globals.NEWLINE).concat(noteSB.toString());
+                            note = e.getFieldOptional(FieldName.NOTE).get().concat(OS.NEWLINE).concat(noteSB.toString());
+                        } else {
+                            note = noteSB.toString();
                         }
-                        e.setField("note", note);
+                        e.setField(FieldName.NOTE, note);
                     }
 
                     // type has been derived from "genre"
@@ -214,7 +216,10 @@ public class FreeCiteImporter extends ImportFormat {
                     e.setType(type);
 
                     // autogenerate label (BibTeX key)
-                    LabelPatternUtil.makeLabel(JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getMetaData(), JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabase(), e);
+                    LabelPatternUtil.makeLabel(
+                            JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getMetaData(),
+                            JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabase(), e,
+                            LabelPatternPreferences.fromPreferences(Globals.prefs));
 
                     res.add(e);
                 }
@@ -223,15 +228,25 @@ public class FreeCiteImporter extends ImportFormat {
             parser.close();
         } catch (IOException | XMLStreamException ex) {
             LOGGER.warn("Could not parse", ex);
-            return Collections.emptyList();
+            return new ParserResult();
         }
 
-        return res;
+        return new ParserResult(res);
     }
 
     @Override
     public String getFormatName() {
         return "text citations";
+    }
+
+    @Override
+    public List<String> getExtensions() {
+        return Arrays.asList(".txt",".xml");
+    }
+
+    @Override
+    public String getDescription() {
+        return "This importer parses text format citations using the online API of FreeCite.";
     }
 
 }

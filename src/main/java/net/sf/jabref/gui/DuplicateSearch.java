@@ -22,6 +22,7 @@
 package net.sf.jabref.gui;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.SwingUtilities;
@@ -44,7 +45,7 @@ public class DuplicateSearch implements Runnable {
 
     private final BasePanel panel;
     private List<BibEntry> bes;
-    private final List<BibEntry[]> duplicates = new ArrayList<>();
+    private final List<List<BibEntry>> duplicates = new ArrayList<>();
 
 
     public DuplicateSearch(BasePanel bp) {
@@ -85,41 +86,40 @@ public class DuplicateSearch implements Runnable {
                     }
 
                 } else { // duplicates found
-                    BibEntry[] be = duplicates.get(current);
+                    List<BibEntry> be = duplicates.get(current);
                     current++;
-                    if (!toRemove.contains(be[0]) && !toRemove.contains(be[1])) {
+                    if (!toRemove.contains(be.get(0)) && !toRemove.contains(be.get(1))) {
                         // Check if they are exact duplicates:
                         boolean askAboutExact = false;
-                        if (DuplicateCheck.compareEntriesStrictly(be[0], be[1]) > 1) {
+                        if (DuplicateCheck.compareEntriesStrictly(be.get(0), be.get(1)) > 1) {
                             if (autoRemoveExactDuplicates) {
-                                toRemove.add(be[1]);
+                                toRemove.add(be.get(1));
                                 duplicateCounter++;
                                 continue;
                             }
                             askAboutExact = true;
                         }
 
-                        DuplicateCallBack cb = new DuplicateCallBack(JabRefGUI.getMainFrame(), be[0], be[1],
+                        DuplicateCallBack cb = new DuplicateCallBack(JabRefGUI.getMainFrame(), be.get(0), be.get(1),
                                 askAboutExact ? DuplicateResolverType.DUPLICATE_SEARCH_WITH_EXACT : DuplicateResolverType.DUPLICATE_SEARCH);
                         ((CallBack) Spin.over(cb)).update();
 
                         duplicateCounter++;
                         DuplicateResolverResult answer = cb.getSelected();
-                        if ((answer == DuplicateResolverResult.KEEP_UPPER)
+                        if ((answer == DuplicateResolverResult.KEEP_LEFT)
                                 || (answer == DuplicateResolverResult.AUTOREMOVE_EXACT)) {
-                            toRemove.add(be[1]);
+                            toRemove.add(be.get(1));
                             if (answer == DuplicateResolverResult.AUTOREMOVE_EXACT) {
                                 autoRemoveExactDuplicates = true; // Remember choice
                             }
-                        } else if (answer == DuplicateResolverResult.KEEP_LOWER) {
-                            toRemove.add(be[0]);
+                        } else if (answer == DuplicateResolverResult.KEEP_RIGHT) {
+                            toRemove.add(be.get(0));
                         } else if (answer == DuplicateResolverResult.BREAK) {
                             st.setFinished(); // thread killing
                             current = Integer.MAX_VALUE;
                             duplicateCounter--; // correct counter
                         } else if (answer == DuplicateResolverResult.KEEP_MERGE) {
-                            toRemove.add(be[0]);
-                            toRemove.add(be[1]);
+                            toRemove.addAll(be);
                             toAdd.add(cb.getMergedEntry());
                         }
                     }
@@ -156,7 +156,7 @@ public class DuplicateSearch implements Runnable {
                             + Localization.lang("pairs processed") + ": " + dupliC);
                 }
                 ce.end();
-                panel.undoManager.addEdit(ce);
+                panel.getUndoManager().addEdit(ce);
 
             }
 
@@ -180,7 +180,7 @@ public class DuplicateSearch implements Runnable {
                     // If (suspected) duplicates, add them to the duplicates vector.
                     if (eq) {
                         synchronized (duplicates) {
-                            duplicates.add(new BibEntry[]{first, second});
+                            duplicates.add(Arrays.asList(first, second));
                             duplicates.notifyAll(); // send wake up all
                         }
                     }

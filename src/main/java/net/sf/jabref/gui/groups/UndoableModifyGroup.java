@@ -17,13 +17,12 @@ package net.sf.jabref.gui.groups;
 
 import java.util.List;
 
-import javax.swing.undo.AbstractUndoableEdit;
-
+import net.sf.jabref.gui.undo.AbstractUndoableJabRefEdit;
 import net.sf.jabref.logic.groups.AbstractGroup;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
 
-class UndoableModifyGroup extends AbstractUndoableEdit {
+class UndoableModifyGroup extends AbstractUndoableJabRefEdit {
 
     private final GroupSelector groupSelector;
     private final AbstractGroup m_oldGroupBackup;
@@ -49,15 +48,8 @@ class UndoableModifyGroup extends AbstractUndoableEdit {
     }
 
     @Override
-    public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": "
-                + Localization.lang("modify group");
-    }
-
-    @Override
-    public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": "
-                + Localization.lang("modify group");
+    public String getPresentationName() {
+        return Localization.lang("modify group");
     }
 
     @Override

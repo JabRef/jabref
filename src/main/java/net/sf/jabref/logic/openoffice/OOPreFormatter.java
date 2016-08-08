@@ -17,7 +17,6 @@ package net.sf.jabref.logic.openoffice;
 
 import java.util.Map;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -71,7 +70,7 @@ public class OOPreFormatter implements LayoutFormatter {
                 //Swallow braces, necessary for replacing encoded characters
 
             } else if (Character.isLetter(c) || (c == '%')
-                    || Globals.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
+                    || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
 
                 if (!incommand) {
@@ -79,7 +78,7 @@ public class OOPreFormatter implements LayoutFormatter {
                 } else {
                     currentCommand.append(c);
                     testCharCom: if ((currentCommand.length() == 1)
-                            && Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
+                            && StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
                         if (i >= (finalResult.length() - 1)) {
@@ -109,7 +108,7 @@ public class OOPreFormatter implements LayoutFormatter {
                         //	Are we already at the end of the string?
                         if ((i + 1) == finalResult.length()) {
                             String command = currentCommand.toString();
-                            Object result = OOPreFormatter.CHARS.get(command);
+                            String result = OOPreFormatter.CHARS.get(command);
                             /* If found, then use translated version. If not,
                              * then keep
                              * the text of the parameter intact.
@@ -117,7 +116,7 @@ public class OOPreFormatter implements LayoutFormatter {
                             if (result == null) {
                                 sb.append(command);
                             } else {
-                                sb.append((String) result);
+                                sb.append(result);
                             }
 
                         }

@@ -25,12 +25,12 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.exporter.AutoSaveManager;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.ParserResultWarningDialog;
+import net.sf.jabref.gui.exporter.AutoSaveManager;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * Runnable task that prompts the user for what to do about files loaded at startup,
@@ -59,7 +59,7 @@ public class AutosaveStartupPrompter implements Runnable {
             if (Globals.prefs.getBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE)) {
                 int answer = JOptionPane.showConfirmDialog(null, "<html>" +
                         Localization.lang("An autosave file was found for this database. This could indicate "
-                                + "that JabRef didn't shut down cleanly last time the file was used.") + "<br>"
+                                + "that JabRef did not shut down cleanly last time the file was used.") + "<br>"
                         + Localization.lang("Do you want to recover the database from the autosave file?") + "</html>",
                         Localization.lang("Autosave of file '%0'", file.getName()), JOptionPane.YES_NO_OPTION);
                 tryingAutosave = answer == JOptionPane.YES_OPTION;
@@ -78,7 +78,7 @@ public class AutosaveStartupPrompter implements Runnable {
                     loaded.add(pr);
                     BibDatabaseContext databaseContext = pr.getDatabaseContext();
                     databaseContext.setDatabaseFile(file);
-                    BasePanel panel = frame.addTab(databaseContext, pr.getEncoding(), first);
+                    BasePanel panel = frame.addTab(databaseContext, first);
                     location.put(pr, frame.getBasePanelCount() - 1);
                     if (tryingAutosave) {
                         panel.markNonUndoableBaseChanged();

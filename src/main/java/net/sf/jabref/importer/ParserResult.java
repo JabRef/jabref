@@ -16,9 +16,9 @@
 package net.sf.jabref.importer;
 
 import java.io.File;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,22 +42,33 @@ public class ParserResult {
     private final List<String> duplicateKeys = new ArrayList<>();
 
     private String errorMessage;
-    // Which encoding was used?
-    private Charset encoding;
 
     private boolean postponedAutosaveFound;
     private boolean invalid;
     private boolean toOpenTab;
 
+    public ParserResult() {
+        this(Collections.emptyList());
+    }
 
     public ParserResult(Collection<BibEntry> entries) {
-        this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)), new MetaData(), new HashMap<>());
+        this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)));
+    }
+
+    public ParserResult(BibDatabase database) {
+        this(database, new MetaData(), new HashMap<>());
     }
 
     public ParserResult(BibDatabase base, MetaData metaData, Map<String, EntryType> entryTypes) {
         this.base = base;
         this.metaData = metaData;
         this.entryTypes = entryTypes;
+    }
+
+    public static ParserResult fromErrorMessage(String message) {
+        ParserResult parserResult = new ParserResult();
+        parserResult.addWarning(message);
+        return parserResult;
     }
 
     /**
@@ -95,23 +106,6 @@ public class ParserResult {
 
     public void setFile(File f) {
         file = f;
-    }
-
-    /**
-     * Sets the variable indicating which encoding was used during parsing.
-     *
-     * @param enc the encoding.
-     */
-    public void setEncoding(Charset enc) {
-        encoding = enc;
-    }
-
-    /**
-     * Returns the encoding used during parsing, or null if not specified (indicates that
-     * prefs.get(JabRefPreferences.DEFAULT_ENCODING) was used).
-     */
-    public Charset getEncoding() {
-        return encoding;
     }
 
     /**
@@ -156,10 +150,10 @@ public class ParserResult {
     /**
      * Get all duplicated keys found in the database.
      *
-     * @return An array containing the duplicated keys.
+     * @return A list containing the duplicated keys.
      */
-    public String[] getDuplicateKeys() {
-        return duplicateKeys.toArray(new String[duplicateKeys.size()]);
+    public List<String> getDuplicateKeys() {
+        return duplicateKeys;
     }
 
     public boolean isPostponedAutosaveFound() {
@@ -191,7 +185,6 @@ public class ParserResult {
     }
 
     public boolean isNullResult() {
-        // TODO Auto-generated method stub
         return this == NULL_RESULT;
     }
 

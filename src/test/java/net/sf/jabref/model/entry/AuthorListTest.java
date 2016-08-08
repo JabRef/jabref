@@ -31,8 +31,8 @@ public class AuthorListTest {
     public void testGetAuthorList() {
         // Test caching in authorCache.
         AuthorList al = AuthorList.parse("John Smith");
-        Assert.assertTrue(al == AuthorList.parse("John Smith"));
-        Assert.assertFalse(al == AuthorList.parse("Smith"));
+        Assert.assertEquals(al, AuthorList.parse("John Smith"));
+        Assert.assertFalse(al.equals(AuthorList.parse("Smith")));
     }
 
     @SuppressWarnings("unused")
@@ -604,5 +604,11 @@ public class AuthorListTest {
     public void parseNameWithHyphenInLastName() throws Exception {
         Author expected = new Author("Firstname", "F.", null, "Bailey-Jones", null);
         Assert.assertEquals(new AuthorList(expected), AuthorList.parse("Firstname Bailey-Jones"));
+    }
+
+    @Test
+    public void parseNameWithBraces() throws Exception {
+        Author expected = new Author("H{e}lene", "H.", null, "Fiaux", null);
+        Assert.assertEquals(new AuthorList(expected), AuthorList.parse("H{e}lene Fiaux"));
     }
 }

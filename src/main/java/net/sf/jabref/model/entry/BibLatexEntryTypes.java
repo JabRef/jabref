@@ -29,15 +29,17 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType ARTICLE = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(
-                Arrays.asList("subtitle", "editor", "series", "volume", "number", "eid", "issue", "pages",
-                        "note", "issn", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                Arrays.asList(FieldName.SUBTITLE, FieldName.EDITOR, FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER, FieldName.EID, FieldName.ISSUE, FieldName.PAGES,
+                        FieldName.NOTE, FieldName.ISSN, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
+                        FieldName.URL, FieldName.URLDATE));
 
         {
-            addAllRequired("author", "title", "journaltitle", "year/date");
-            addAllOptional("translator", "annotator", "commentator", "subtitle", "titleaddon", "editor", "editora",
-                    "editorb", "editorc", "journalsubtitle", "issuetitle", "issuesubtitle", "language", "origlanguage",
-                    "series", "volume", "number", "eid", "issue", "month", "pages", "version", "note", "issn",
-                    "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.JOURNALTITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional("translator", "annotator", "commentator", FieldName.SUBTITLE, "titleaddon", FieldName.EDITOR, "editora",
+                    "editorb", "editorc", "journalsubtitle", "issuetitle", "issuesubtitle", FieldName.LANGUAGE, "origlanguage",
+                    FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER, FieldName.EID, FieldName.ISSUE, FieldName.MONTH, FieldName.PAGES, FieldName.VERSION, FieldName.NOTE, FieldName.ISSN,
+                    "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.URLDATE);
         }
 
         @Override
@@ -54,18 +56,20 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType BOOK = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList("editor", "subtitle", "titleaddon", "maintitle",
-                        "mainsubtitle", "maintitleaddon", "volume", "edition", "publisher", "isbn", "chapter", "pages",
-                        "pagetotal", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                .unmodifiableList(Arrays.asList(FieldName.EDITOR, FieldName.SUBTITLE, "titleaddon", "maintitle",
+                        "mainsubtitle", "maintitleaddon", FieldName.VOLUME, FieldName.EDITION, FieldName.PUBLISHER, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES,
+                        FieldName.PAGETOTAL, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                        FieldName.URLDATE));
 
 
         {
-            addAllRequired("author", "title", "year/date");
-            addAllOptional("editor", "editora", "editorb", "editorc", "translator", "annotator", "commentator",
-                    "introduction", "foreword", "afterword", "subtitle", "titleaddon", "maintitle", "mainsubtitle",
-                    "maintitleaddon", "language", "origlanguage", "volume", "part", "edition", "volumes", "series",
-                    "number", "note", "publisher", "location", "isbn", "chapter", "pages", "pagetotal",
-                    "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.EDITOR, "editora", "editorb", "editorc", "translator", "annotator", "commentator",
+                    "introduction", "foreword", "afterword", FieldName.SUBTITLE, "titleaddon", "maintitle", "mainsubtitle",
+                    "maintitleaddon", FieldName.LANGUAGE, "origlanguage", FieldName.VOLUME, "part", FieldName.EDITION, "volumes", FieldName.SERIES,
+                    FieldName.NUMBER, FieldName.NOTE, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL,
+                    "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.URLDATE);
         }
 
         @Override
@@ -82,15 +86,16 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType MVBOOK = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList("editor", "subtitle", "titleaddon", "edition", "publisher", "isbn", "pagetotal",
-                        "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                .unmodifiableList(Arrays.asList(FieldName.EDITOR, FieldName.SUBTITLE, "titleaddon", FieldName.EDITION, FieldName.PUBLISHER, FieldName.ISBN, FieldName.PAGETOTAL,
+                        FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE));
 
         {
-            addAllRequired("author", "title", "year/date");
-            addAllOptional("editor", "editora", "editorb", "editorc", "translator", "annotator", "commentator",
-                    "introduction", "foreword", "afterword", "subtitle", "titleaddon", "language", "origlanguage",
-                    "edition", "volumes", "series", "number", "note", "publisher", "location", "isbn", "pagetotal",
-                    "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.EDITOR, "editora", "editorb", "editorc", "translator", "annotator", "commentator",
+                    "introduction", "foreword", "afterword", FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, "origlanguage",
+                    FieldName.EDITION, "volumes", FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.PAGETOTAL,
+                    "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.URLDATE);
         }
 
         @Override
@@ -107,19 +112,21 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType INBOOK = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays
-                .asList("bookauthor", "editor", "subtitle", "titleaddon", "maintitle", "mainsubtitle",
-                        "maintitleaddon", "booksubtitle", "booktitleaddon", "volume", "edition", "publisher", "isbn",
-                        "chapter", "pages", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                .asList("bookauthor", FieldName.EDITOR, FieldName.SUBTITLE, "titleaddon", "maintitle", "mainsubtitle",
+                        "maintitleaddon", "booksubtitle", "booktitleaddon", FieldName.VOLUME, FieldName.EDITION, FieldName.PUBLISHER, FieldName.ISBN,
+                        FieldName.CHAPTER, FieldName.PAGES, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
+                        FieldName.URL, FieldName.URLDATE));
 
 
         {
-            addAllRequired("author", "title", "booktitle", "year/date");
-            addAllOptional("bookauthor", "editor", "editora", "editorb", "editorc", "translator", "annotator",
-                    "commentator", "introduction", "foreword", "afterword", "subtitle", "titleaddon", "maintitle",
-                    "mainsubtitle", "maintitleaddon", "booksubtitle", "booktitleaddon", "language", "origlanguage",
-                    "volume", "part", "edition", "volumes", "series", "number", "note", "publisher", "location", "isbn",
-                    "chapter", "pages", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
-                    "urldate");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional("bookauthor", FieldName.EDITOR, "editora", "editorb", "editorc", "translator", "annotator",
+                    "commentator", "introduction", "foreword", "afterword", FieldName.SUBTITLE, "titleaddon", "maintitle",
+                    "mainsubtitle", "maintitleaddon", "booksubtitle", "booktitleaddon", FieldName.LANGUAGE, "origlanguage",
+                    FieldName.VOLUME, "part", FieldName.EDITION, "volumes", FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN,
+                    FieldName.CHAPTER, FieldName.PAGES, "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS,
+                    FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.URLDATE);
         }
 
         @Override
@@ -184,14 +191,16 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType BOOKLET = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList("subtitle", "titleaddon", "howpublished", "chapter",
-                        "pages", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, "titleaddon", FieldName.HOWPUBLISHED, FieldName.CHAPTER,
+                        FieldName.PAGES, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                        FieldName.URLDATE));
 
         {
-            addAllRequired("author/editor", "title", "year/date");
-            addAllOptional("subtitle", "titleaddon", "language", "howpublished", "type", "note", "location", "chapter",
-                    "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype",
-                    "url", "urldate");
+            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.TYPE, FieldName.NOTE, FieldName.LOCATION, FieldName.CHAPTER,
+                    FieldName.PAGES, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT,
+                    FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
+                    FieldName.URL, FieldName.URLDATE);
         }
 
         @Override
@@ -208,18 +217,18 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType COLLECTION = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList("translator", "subtitle", "titleaddon", "maintitle",
-                        "mainsubtitle", "maintitleaddon", "volume", "edition", "publisher", "isbn", "chapter", "pages",
-                        "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                .unmodifiableList(Arrays.asList("translator", FieldName.SUBTITLE, "titleaddon", "maintitle",
+                        "mainsubtitle", "maintitleaddon", FieldName.VOLUME, FieldName.EDITION, FieldName.PUBLISHER, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES,
+                        FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE));
 
 
         {
-            addAllRequired("editor", "title", "year/date");
+            addAllRequired(FieldName.EDITOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional("editora", "editorb", "editorc", "translator", "annotator", "commentator", "introduction",
-                    "foreword", "afterword", "subtitle", "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon",
-                    "language", "origlanguage", "volume", "part", "edition", "volumes", "series", "number", "note",
-                    "publisher", "location", "isbn", "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi",
-                    "eprint", "eprintclass", "eprinttype", "url", "urldate");
+                    "foreword", "afterword", FieldName.SUBTITLE, "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon",
+                    FieldName.LANGUAGE, "origlanguage", FieldName.VOLUME, "part", FieldName.EDITION, "volumes", FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE,
+                    FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI,
+                    FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
 
         @Override
@@ -236,16 +245,16 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType MVCOLLECTION = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList("translator", "subtitle", "titleaddon", "edition", "publisher", "isbn",
-                        "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                .unmodifiableList(Arrays.asList("translator", FieldName.SUBTITLE, "titleaddon", FieldName.EDITION, FieldName.PUBLISHER, FieldName.ISBN,
+                        FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE));
 
 
         {
-            addAllRequired("editor", "title", "year/date");
+            addAllRequired(FieldName.EDITOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional("editora", "editorb", "editorc", "translator", "annotator", "commentator", "introduction",
-                    "foreword", "afterword", "subtitle", "titleaddon", "language", "origlanguage", "edition", "volumes", "series", "number", "note",
-                    "publisher", "location", "isbn", "pagetotal", "addendum", "pubstate", "doi",
-                    "eprint", "eprintclass", "eprinttype", "url", "urldate");
+                    "foreword", "afterword", FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, "origlanguage", FieldName.EDITION, "volumes", FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE,
+                    FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI,
+                    FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
 
         @Override
@@ -262,18 +271,20 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType INCOLLECTION = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(
-                Arrays.asList("translator", "subtitle", "titleaddon", "maintitle", "mainsubtitle",
-                        "maintitleaddon", "booksubtitle", "booktitleaddon", "volume", "edition", "publisher", "isbn",
-                        "chapter", "pages", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                Arrays.asList("translator", FieldName.SUBTITLE, "titleaddon", "maintitle", "mainsubtitle",
+                        "maintitleaddon", "booksubtitle", "booktitleaddon", FieldName.VOLUME, FieldName.EDITION, FieldName.PUBLISHER, FieldName.ISBN,
+                        FieldName.CHAPTER, FieldName.PAGES, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
+                        FieldName.URL, FieldName.URLDATE));
 
 
         {
-            addAllRequired("author", "title", "booktitle", "year/date");
-            addAllOptional("editor", "editora", "editorb", "editorc", "translator", "annotator", "commentator", "introduction",
-                    "foreword", "afterword", "subtitle", "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon",
-                    "booksubtitle", "booktitleaddon", "language", "origlanguage", "volume", "part", "edition",
-                    "volumes", "series", "number", "note", "publisher", "location", "isbn", "chapter", "pages",
-                    "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.EDITOR, "editora", "editorb", "editorc", "translator", "annotator", "commentator", "introduction",
+                    "foreword", "afterword", FieldName.SUBTITLE, "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon",
+                    "booksubtitle", "booktitleaddon", FieldName.LANGUAGE, "origlanguage", FieldName.VOLUME, "part", FieldName.EDITION,
+                    "volumes", FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES,
+                    "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.URLDATE);
         }
 
         @Override
@@ -314,15 +325,17 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType MANUAL = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList("subtitle", "titleaddon", "edition", "publisher", "isbn",
-                        "chapter", "pages", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, "titleaddon", FieldName.EDITION, FieldName.PUBLISHER, FieldName.ISBN,
+                                FieldName.CHAPTER, FieldName.PAGES, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS,
+                                FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE));
 
 
         {
-            addAllRequired("author/editor", "title", "year/date");
-            addAllOptional("subtitle", "titleaddon", "language", "edition", "type", "series", "number", "version",
-                    "note", "organization", "publisher", "location", "isbn", "chapter", "pages", "pagetotal",
-                    "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
+            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.EDITION, FieldName.TYPE, FieldName.SERIES, FieldName.NUMBER, FieldName.VERSION,
+                    FieldName.NOTE, FieldName.ORGANIZATION, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL,
+                    "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.URLDATE);
         }
 
         @Override
@@ -339,15 +352,16 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType MISC = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList("subtitle", "titleaddon", "howpublished", "location",
-                        "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, "titleaddon", FieldName.HOWPUBLISHED, FieldName.LOCATION,
+                        FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE));
 
 
         {
-            addAllRequired("author/editor", "title", "year/date");
-            addAllOptional("subtitle", "titleaddon", "language", "howpublished", "type", "version", "note",
-                    "organization", "location", "month", "addendum", "pubstate", "doi", "eprint", "eprintclass",
-                    "eprinttype", "url", "urldate");
+            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.TYPE, FieldName.VERSION, FieldName.NOTE,
+                    FieldName.ORGANIZATION, FieldName.LOCATION, FieldName.MONTH, "addendum", "pubstate", FieldName.DOI,
+                    FieldName.EPRINT, FieldName.EPRINTCLASS,
+                    FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
 
         @Override
@@ -364,12 +378,12 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType ONLINE = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(
-                Arrays.asList("subtitle", "titleaddon", "note", "organization", "urldate"));
+                Arrays.asList(FieldName.SUBTITLE, "titleaddon", FieldName.NOTE, FieldName.ORGANIZATION, FieldName.URLDATE));
 
 
         {
-            addAllRequired("author/editor", "title", "year/date", "url");
-            addAllOptional("subtitle", "titleaddon", "language", "version", "note", "organization", "month", "addendum", "pubstate", "urldate");
+            addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE), FieldName.URL);
+            addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.VERSION, FieldName.NOTE, FieldName.ORGANIZATION, FieldName.MONTH, "addendum", "pubstate", FieldName.URLDATE);
         }
 
         @Override
@@ -386,13 +400,15 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType PATENT = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList("holder",
-                "subtitle", "titleaddon", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                FieldName.SUBTITLE, "titleaddon", FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                FieldName.URLDATE));
 
 
         {
-            addAllRequired("author", "title", "number", "year/date");
-            addAllOptional("holder", "subtitle", "titleaddon", "type", "version", "location", "note", "month",
-                    "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.NUMBER, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional("holder", FieldName.SUBTITLE, "titleaddon", FieldName.TYPE, FieldName.VERSION, FieldName.LOCATION, FieldName.NOTE, FieldName.MONTH,
+                    "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.URLDATE);
         }
 
         @Override
@@ -409,15 +425,15 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType PERIODICAL = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList("subtitle", "issuetitle", "issuesubtitle", "issn", "doi",
-                        "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, "issuetitle", "issuesubtitle", FieldName.ISSN, FieldName.DOI,
+                                FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE));
 
 
         {
-            addAllRequired("editor", "title", "year/date");
-            addAllOptional("editora", "editorb", "editorc", "subtitle", "issuetitle", "issuesubtitle", "language",
-                    "series", "volume", "number", "issue", "month", "note", "issn", "addendum", "pubstate",
-                    "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
+            addAllRequired(FieldName.EDITOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional("editora", "editorb", "editorc", FieldName.SUBTITLE, "issuetitle", "issuesubtitle", FieldName.LANGUAGE,
+                    FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER, FieldName.ISSUE, FieldName.MONTH, FieldName.NOTE, FieldName.ISSN, "addendum", "pubstate",
+                    FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
 
         @Override
@@ -458,17 +474,18 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType PROCEEDINGS = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList("subtitle", "titleaddon", "maintitle", "mainsubtitle",
-                        "maintitleaddon", "eventtitle", "volume", "publisher", "isbn", "chapter", "pages", "pagetotal",
-                        "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, "titleaddon", "maintitle", "mainsubtitle",
+                        "maintitleaddon", "eventtitle", FieldName.VOLUME, FieldName.PUBLISHER, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL,
+                        FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE));
 
 
         {
-            addAllRequired("title", "year/date");
-            addAllOptional("editor", "subtitle", "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon", "eventtitle",
-                    "eventtitleaddon", "eventdate", "venue", "language", "volume", "part", "volumes", "series", "number", "note",
-                    "organization", "publisher", "location", "month", "year", "isbn", "chapter", "pages", "pagetotal",
-                    "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
+            addAllRequired(FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.EDITOR, FieldName.SUBTITLE, "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon", "eventtitle",
+                    "eventtitleaddon", "eventdate", "venue", FieldName.LANGUAGE, FieldName.VOLUME, "part", "volumes", FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE,
+                    FieldName.ORGANIZATION, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.MONTH, FieldName.YEAR, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL,
+                    "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.URLDATE);
         }
 
         @Override
@@ -485,17 +502,18 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType MVPROCEEDINGS = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList("subtitle", "titleaddon", "maintitle", "mainsubtitle",
-                        "maintitleaddon", "eventtitle", "volume", "publisher", "isbn", "chapter", "pages", "pagetotal",
-                        "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, "titleaddon", "maintitle", "mainsubtitle",
+                        "maintitleaddon", "eventtitle", FieldName.VOLUME, FieldName.PUBLISHER, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL,
+                        FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE));
 
 
         {
-            addAllRequired("title", "year/date");
-            addAllOptional("editor", "subtitle", "titleaddon", "eventtitle",
-                    "eventtitleaddon", "eventdate", "venue", "language", "volumes", "series", "number", "note",
-                    "organization", "publisher", "location", "month", "isbn", "pagetotal",
-                    "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate");
+            addAllRequired(FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.EDITOR, FieldName.SUBTITLE, "titleaddon", "eventtitle",
+                    "eventtitleaddon", "eventdate", "venue", FieldName.LANGUAGE, "volumes", FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE,
+                    FieldName.ORGANIZATION, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN, FieldName.PAGETOTAL,
+                    "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.URLDATE);
         }
 
         @Override
@@ -512,18 +530,20 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType INPROCEEDINGS = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList("subtitle", "titleaddon", "maintitle", "mainsubtitle",
-                        "maintitleaddon", "booksubtitle", "booktitleaddon", "eventtitle", "volume", "publisher", "isbn",
-                        "chapter", "pages", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, "titleaddon", "maintitle", "mainsubtitle",
+                        "maintitleaddon", "booksubtitle", "booktitleaddon", "eventtitle", FieldName.VOLUME, FieldName.PUBLISHER, FieldName.ISBN,
+                        FieldName.CHAPTER, FieldName.PAGES, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
+                        FieldName.URL, FieldName.URLDATE));
 
 
         {
-            addAllRequired("author", "title", "booktitle", "year/date");
-            addAllOptional("editor", "subtitle", "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon", "booksubtitle",
-                    "booktitleaddon", "eventtitle", "eventtitleaddon", "eventdate", "venue", "language", "volume", "part", "volumes",
-                    "series", "number", "note", "organization", "publisher", "location", "month", "isbn",
-                    "chapter", "pages", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
-                    "urldate");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.EDITOR, FieldName.SUBTITLE, "titleaddon", "maintitle", "mainsubtitle", "maintitleaddon", "booksubtitle",
+                    "booktitleaddon", "eventtitle", "eventtitleaddon", "eventdate", "venue", FieldName.LANGUAGE, FieldName.VOLUME, "part", "volumes",
+                    FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE, FieldName.ORGANIZATION, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN,
+                    FieldName.CHAPTER, FieldName.PAGES, "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS,
+                    FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.URLDATE);
         }
 
         @Override
@@ -612,15 +632,17 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType REPORT = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList("subtitle", "titleaddon", "number", "isrn", "chapter",
-                        "pages", "pagetotal", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, "titleaddon", FieldName.NUMBER, FieldName.ISRN, FieldName.CHAPTER,
+                        FieldName.PAGES, FieldName.PAGETOTAL, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
+                        FieldName.URL, FieldName.URLDATE));
 
 
         {
-            addAllRequired("author", "title", "type", "institution", "year/date");
-            addAllOptional("subtitle", "titleaddon", "language", "number", "version", "note", "location", "month",
-                    "isrn", "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint",
-                    "eprintclass", "eprinttype", "url", "urldate");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.TYPE, FieldName.INSTITUTION, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.NUMBER, FieldName.VERSION, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH,
+                    FieldName.ISRN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI,
+                    FieldName.EPRINT,
+                    FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
 
         @Override
@@ -636,7 +658,7 @@ public class BibLatexEntryTypes {
 
     public static final BibLatexEntryType SET = new BibLatexEntryType() {
         {
-            addAllRequired("entryset", "crossref");
+            addAllRequired("entryset", FieldName.CROSSREF);
         }
 
         @Override
@@ -648,15 +670,16 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType THESIS = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList("subtitle", "titleaddon", "chapter", "pages", "pagetotal",
-                        "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, "titleaddon", FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL,
+                        FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE));
 
 
         {
-            addAllRequired("author", "title", "type", "institution", "year/date");
-            addAllOptional("subtitle", "titleaddon", "language", "note", "location", "month", "isbn", "chapter",
-                    "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
-                    "urldate");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.TYPE, FieldName.INSTITUTION, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN, FieldName.CHAPTER,
+                    FieldName.PAGES, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT,
+                    FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.URLDATE);
         }
 
         @Override
@@ -673,13 +696,13 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType UNPUBLISHED = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(
-                Arrays.asList("subtitle", "titleaddon", "howpublished", "pubstate", "url", "urldate"));
+                Arrays.asList(FieldName.SUBTITLE, "titleaddon", FieldName.HOWPUBLISHED, "pubstate", FieldName.URL, FieldName.URLDATE));
 
 
         {
-            addAllRequired("author", "title", "year/date");
-            addAllOptional("subtitle", "titleaddon", "language", "howpublished", "note", "location", "month",
-                    "addendum", "pubstate", "url", "urldate");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH,
+                    "addendum", "pubstate", FieldName.URL, FieldName.URLDATE);
         }
 
         @Override
@@ -746,16 +769,18 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType MASTERSTHESIS = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList("subtitle", "titleaddon", "type", "chapter", "pages",
-                        "pagetotal", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, "titleaddon", FieldName.TYPE, FieldName.CHAPTER, FieldName.PAGES,
+                        FieldName.PAGETOTAL, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                        FieldName.URLDATE));
 
 
         {
-            // Treated as alias of "THESIS", except "type" field is optional
-            addAllRequired("author", "title", "institution", "year/date");
-            addAllOptional("type", "subtitle", "titleaddon", "language", "note", "location", "month", "isbn", "chapter",
-                    "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
-                    "urldate");
+            // Treated as alias of "THESIS", except FieldName.TYPE field is optional
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.TYPE, FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN, FieldName.CHAPTER,
+                    FieldName.PAGES, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT,
+                    FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.URLDATE);
         }
 
         @Override
@@ -772,16 +797,18 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType PHDTHESIS = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList("subtitle", "titleaddon", "type", "chapter", "pages",
-                        "pagetotal", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, "titleaddon", FieldName.TYPE, FieldName.CHAPTER, FieldName.PAGES,
+                        FieldName.PAGETOTAL, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                        FieldName.URLDATE));
 
 
         {
-            // Treated as alias of "THESIS", except "type" field is optional
-            addAllRequired("author", "title", "institution", "year/date");
-            addAllOptional("type", "subtitle", "titleaddon", "language", "note", "location", "month", "isbn", "chapter",
-                    "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint", "eprintclass", "eprinttype", "url",
-                    "urldate");
+            // Treated as alias of "THESIS", except FieldName.TYPE field is optional
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.TYPE, FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN, FieldName.CHAPTER,
+                    FieldName.PAGES, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI, FieldName.EPRINT,
+                    FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.URLDATE);
         }
 
         @Override
@@ -798,16 +825,17 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType TECHREPORT = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(
-                Arrays.asList("subtitle", "titleaddon", "type", "number", "isrn", "chapter", "pages",
-                        "pagetotal", "doi", "eprint", "eprintclass", "eprinttype", "url", "urldate"));
+                Arrays.asList(FieldName.SUBTITLE, "titleaddon", FieldName.TYPE, FieldName.NUMBER, FieldName.ISRN, FieldName.CHAPTER, FieldName.PAGES,
+                        FieldName.PAGETOTAL, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                        FieldName.URLDATE));
 
 
         {
-            // Treated as alias of "REPORT", except "type" field is optional
-            addAllRequired("author", "title", "institution", "year/date");
-            addAllOptional("type", "subtitle", "titleaddon", "language", "number", "version", "note", "location", "month",
-                    "isrn", "chapter", "pages", "pagetotal", "addendum", "pubstate", "doi", "eprint",
-                    "eprintclass", "eprinttype", "url", "urldate");
+            // Treated as alias of "REPORT", except FieldName.TYPE field is optional
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
+            addAllOptional(FieldName.TYPE, FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.NUMBER, FieldName.VERSION, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH,
+                    FieldName.ISRN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI,
+                    FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
 
         @Override

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -17,80 +17,66 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.MonthUtil;
 
 /**
  * Imports a Biblioscape Tag File. The format is described on
- * http://www.biblioscape.com/manual_bsp/Biblioscape_Tag_File.htm Several
- * Biblioscape field types are ignored. Others are only included in the BibTeX
+ * http://www.biblioscape.com/manual_bsp/Biblioscape_Tag_File.htm
+ * Several Biblioscape field types are ignored. Others are only included in the BibTeX
  * field "comment".
  */
 public class RisImporter extends ImportFormat {
 
     private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY  - .*");
 
-    /**
-     * Return the name of this import format.
-     */
     @Override
     public String getFormatName() {
         return "RIS";
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
-     */
     @Override
-    public String getCLIId() {
-        return "ris";
+    public List<String> getExtensions() {
+        return Collections.singletonList(".ris");
     }
 
-    /**
-     * Check whether the source is in the correct format for this importer.
-     */
     @Override
-    public boolean isRecognizedFormat(InputStream stream) throws IOException {
+    public String getDescription() {
+        return "Imports a Biblioscape Tag File.";
+    }
 
+    @Override
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         // Our strategy is to look for the "AU  - *" line.
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-
-            String str;
-            while ((str = in.readLine()) != null) {
-                if (RECOGNIZED_FORMAT_PATTERN.matcher(str).find()) {
-                    return true;
-                }
+        String str;
+        while ((str = reader.readLine()) != null) {
+            if (RECOGNIZED_FORMAT_PATTERN.matcher(str).find()) {
+                return true;
             }
         }
         return false;
     }
 
-    /**
-     * Parse the entries in the source, and return a List of BibEntry
-     * objects.
-     */
     @Override
-    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            String str;
-            while ((str = in.readLine()) != null) {
-                sb.append(str);
-                sb.append('\n');
-            }
+
+        String line;
+        while ((line = reader.readLine()) != null) {
+            sb.append(line);
+            sb.append('\n');
         }
 
         String[] entries = sb.toString().replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
@@ -149,21 +135,21 @@ public class RisImporter extends ImportFormat {
                             type = "other";
                         }
                     } else if ("T1".equals(lab) || "TI".equals(lab)) {
-                        String oldVal = hm.get("title");
+                        String oldVal = hm.get(FieldName.TITLE);
                         if (oldVal == null) {
-                            hm.put("title", val);
+                            hm.put(FieldName.TITLE, val);
                         } else {
                             if (oldVal.endsWith(":") || oldVal.endsWith(".") || oldVal.endsWith("?")) {
-                                hm.put("title", oldVal + " " + val);
+                                hm.put(FieldName.TITLE, oldVal + " " + val);
                             } else {
-                                hm.put("title", oldVal + ": " + val);
+                                hm.put(FieldName.TITLE, oldVal + ": " + val);
                             }
                         }
-                        hm.put("title", hm.get("title").replaceAll("\\s+", " ")); // Normalize whitespaces
+                        hm.put(FieldName.TITLE, hm.get(FieldName.TITLE).replaceAll("\\s+", " ")); // Normalize whitespaces
                     } else if ("T2".equals(lab) || "BT".equals(lab)) {
-                        hm.put("booktitle", val);
+                        hm.put(FieldName.BOOKTITLE, val);
                     } else if ("T3".equals(lab)) {
-                        hm.put("series", val);
+                        hm.put(FieldName.SERIES, val);
                     } else if ("AU".equals(lab) || "A1".equals(lab)) {
                         if ("".equals(author)) {
                             author = val;
@@ -178,61 +164,61 @@ public class RisImporter extends ImportFormat {
                         }
                     } else if ("JA".equals(lab) || "JF".equals(lab) || "JO".equals(lab)) {
                         if ("inproceedings".equals(type)) {
-                            hm.put("booktitle", val);
+                            hm.put(FieldName.BOOKTITLE, val);
                         } else {
-                            hm.put("journal", val);
+                            hm.put(FieldName.JOURNAL, val);
                         }
                     } else if ("SP".equals(lab)) {
                         startPage = val;
                     } else if ("PB".equals(lab)) {
                         if ("phdthesis".equals(type)) {
-                            hm.put("school", val);
+                            hm.put(FieldName.SCHOOL, val);
                         } else {
-                            hm.put("publisher", val);
+                            hm.put(FieldName.PUBLISHER, val);
                         }
                     } else if ("AD".equals(lab) || "CY".equals(lab)) {
-                        hm.put("address", val);
+                        hm.put(FieldName.ADDRESS, val);
                     } else if ("EP".equals(lab)) {
                         endPage = val;
                         if (!endPage.isEmpty()) {
                             endPage = "--" + endPage;
                         }
                     } else if ("SN".equals(lab)) {
-                        hm.put("issn", val);
+                        hm.put(FieldName.ISSN, val);
                     } else if ("VL".equals(lab)) {
-                        hm.put("volume", val);
+                        hm.put(FieldName.VOLUME, val);
                     } else if ("IS".equals(lab)) {
-                        hm.put("number", val);
+                        hm.put(FieldName.NUMBER, val);
                     } else if ("N2".equals(lab) || "AB".equals(lab)) {
-                        String oldAb = hm.get("abstract");
+                        String oldAb = hm.get(FieldName.ABSTRACT);
                         if (oldAb == null) {
-                            hm.put("abstract", val);
+                            hm.put(FieldName.ABSTRACT, val);
                         } else {
-                            hm.put("abstract", oldAb + Globals.NEWLINE + val);
+                            hm.put(FieldName.ABSTRACT, oldAb + OS.NEWLINE + val);
                         }
                     } else if ("UR".equals(lab)) {
-                        hm.put("url", val);
+                        hm.put(FieldName.URL, val);
                     } else if (("Y1".equals(lab) || "PY".equals(lab)) && (val.length() >= 4)) {
                         String[] parts = val.split("/");
-                        hm.put("year", parts[0]);
+                        hm.put(FieldName.YEAR, parts[0]);
                         if ((parts.length > 1) && !parts[1].isEmpty()) {
                             try {
 
                                 int monthNumber = Integer.parseInt(parts[1]);
                                 MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
                                 if (month.isValid()) {
-                                    hm.put("month", month.bibtexFormat);
+                                    hm.put(FieldName.MONTH, month.bibtexFormat);
                                 }
                             } catch (NumberFormatException ex) {
                                 // The month part is unparseable, so we ignore it.
                             }
                         }
                     } else if ("KW".equals(lab)) {
-                        if (hm.containsKey("keywords")) {
-                            String kw = hm.get("keywords");
-                            hm.put("keywords", kw + ", " + val);
+                        if (hm.containsKey(FieldName.KEYWORDS)) {
+                            String kw = hm.get(FieldName.KEYWORDS);
+                            hm.put(FieldName.KEYWORDS, kw + ", " + val);
                         } else {
-                            hm.put("keywords", val);
+                            hm.put(FieldName.KEYWORDS, val);
                         }
                     } else if ("U1".equals(lab) || "U2".equals(lab) || "N1".equals(lab)) {
                         if (!comment.isEmpty()) {
@@ -247,36 +233,36 @@ public class RisImporter extends ImportFormat {
                         String doi = val;
                         if (doi.startsWith("doi:")) {
                             doi = doi.replaceAll("(?i)doi:", "").trim();
-                            hm.put("doi", doi);
+                            hm.put(FieldName.DOI, doi);
                         }
                     }
                 }
                 // fix authors
                 if (!author.isEmpty()) {
                     author = AuthorList.fixAuthorLastNameFirst(author);
-                    hm.put("author", author);
+                    hm.put(FieldName.AUTHOR, author);
                 }
                 if (!editor.isEmpty()) {
                     editor = AuthorList.fixAuthorLastNameFirst(editor);
-                    hm.put("editor", editor);
+                    hm.put(FieldName.EDITOR, editor);
                 }
                 if (!comment.isEmpty()) {
                     hm.put("comment", comment);
                 }
 
-                hm.put("pages", startPage + endPage);
+                hm.put(FieldName.PAGES, startPage + endPage);
             }
             BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
 
             // Remove empty fields:
-            List<Object> toRemove = new ArrayList<>();
+            List<String> toRemove = new ArrayList<>();
             for (Map.Entry<String, String> key : hm.entrySet()) {
                 String content = key.getValue();
                 if ((content == null) || content.trim().isEmpty()) {
                     toRemove.add(key.getKey());
                 }
             }
-            for (Object aToRemove : toRemove) {
+            for (String aToRemove : toRemove) {
                 hm.remove(aToRemove);
 
             }
@@ -287,7 +273,7 @@ public class RisImporter extends ImportFormat {
 
         }
 
-        return bibitems;
+        return new ParserResult(bibitems);
 
     }
 }

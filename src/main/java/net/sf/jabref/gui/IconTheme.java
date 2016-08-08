@@ -91,7 +91,7 @@ public class IconTheme {
         REMOVE_NOBOX("\uf374") /*css: minus */,
         FILE("\uf214"), /* css: file*/
         PDF_FILE("\uf225"), /* css: file-pdf*/
-        DOI("\uf59f") /*css: web*/,
+        DOI("\uF072") /*css: barcode-scan*/,
         DUPLICATE("\uf191") /*css: content-duplicate */,
         EDIT("\uf3eb") /*css: pencil */,
         NEW("\uf224") /* css: file-outline */,
@@ -174,6 +174,7 @@ public class IconTheme {
         CASE_SENSITIVE("\uf02c"), /* css: mdi-alphabetical */
         REG_EX("\uf451"), /*css: mdi-regex */
         CONSOLE("\uf18d"), /*css: console */
+        FORUM("\uF28C"), /* css: forum */
         // STILL MISSING:
         GROUP_REGULAR("\uF4E6", Color.RED);
 

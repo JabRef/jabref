@@ -19,17 +19,17 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryMarker;
 import net.sf.jabref.gui.FileDialogs;
@@ -45,6 +45,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /*
  * TODO: could separate the "menu item" functionality from the importing functionality
@@ -105,7 +106,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             importError = null;
             filenames = FileDialogs.getMultipleFiles(frame,
                     new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
-                    importer == null ? null : importer.getExtensions(), true);
+                    importer == null ? Collections.emptyList() : importer.getExtensions(), true);
 
             if (!filenames.isEmpty()) {
                 frame.block();
@@ -125,6 +126,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             // We import all files and collect their results:
             List<ImportFormatReader.UnknownFormatImport> imports = new ArrayList<>();
             for (String filename : filenames) {
+                Path file = Paths.get(filename);
                 try {
                     if (importer == null) {
                         // Unknown format:
@@ -134,9 +136,10 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     } else {
                         frame.output(Localization.lang("Importing in %0 format", importer.getFormatName()) + "...");
                         // Specific importer:
-                        ParserResult pr = new ParserResult(
-                                Globals.IMPORT_FORMAT_READER.importFromFile(importer,
-                                        filename, frame));
+                        ParserResult pr = importer.importDatabase(file, Globals.prefs.getDefaultEncoding());
+                        if (pr.hasWarnings()) {
+                            frame.showMessage(pr.getErrorMessage());
+                        }
 
                         imports.add(new ImportFormatReader.UnknownFormatImport(importer
                                 .getFormatName(), pr));
@@ -189,7 +192,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 }
             } else {
                 if (openInNew) {
-                    frame.addTab(bibtexResult.getDatabaseContext(), Globals.prefs.getDefaultEncoding(), true);
+                    frame.addTab(bibtexResult.getDatabaseContext(), true);
                     frame.output(
                             Localization.lang("Imported entries") + ": " + bibtexResult.getDatabase().getEntryCount());
                 } else {
@@ -253,7 +256,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
                 // set timestamp and owner
                 UpdateField.setAutomaticFields(entries, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
-                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP)); // set timestamp and owner
+                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs); // set timestamp and owner
 
                 boolean markEntries = !openInNew && EntryMarker.shouldMarkEntries();
                 for (BibEntry entry : entries) {
@@ -273,7 +276,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             return directParserResult;
         } else {
 
-            return new ParserResult(database, new MetaData(), new HashMap<>());
+            return new ParserResult(database);
 
         }
     }

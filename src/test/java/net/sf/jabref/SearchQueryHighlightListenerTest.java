@@ -15,6 +15,7 @@
  */
 package net.sf.jabref;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -22,16 +23,30 @@ import javax.swing.text.Highlighter;
 import javax.swing.text.Highlighter.Highlight;
 
 import net.sf.jabref.gui.fieldeditors.TextArea;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+import static org.mockito.Mockito.when;
+
+@RunWith(MockitoJUnitRunner.class)
 public class SearchQueryHighlightListenerTest {
+
+    @Mock
+    ProtectedTermsLoader loader;
+
 
     @Before
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
+        Globals.protectedTermsLoader = loader;
+        when(loader.getProtectedTermsLists()).thenReturn(Collections.emptyList());
     }
 
     @Test

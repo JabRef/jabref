@@ -23,6 +23,7 @@ import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * A group of BibtexEntries.
@@ -62,9 +63,9 @@ public abstract class AbstractGroup implements SearchMatcher {
      * @throws ParseException If an error occurred and a group could not be created,
      *                        e.g. due to a malformed regular expression.
      */
-    public static AbstractGroup fromString(String s) throws ParseException {
+    public static AbstractGroup fromString(String s, JabRefPreferences jabRefPreferences) throws ParseException {
         if (s.startsWith(KeywordGroup.ID)) {
-            return KeywordGroup.fromString(s);
+            return KeywordGroup.fromString(s, jabRefPreferences);
         }
         if (s.startsWith(AllEntriesGroup.ID)) {
             return AllEntriesGroup.fromString(s);
@@ -73,7 +74,7 @@ public abstract class AbstractGroup implements SearchMatcher {
             return SearchGroup.fromString(s);
         }
         if (s.startsWith(ExplicitGroup.ID)) {
-            return ExplicitGroup.fromString(s);
+            return ExplicitGroup.fromString(s, jabRefPreferences);
         }
         return null; // unknown group
     }
@@ -208,7 +209,7 @@ public abstract class AbstractGroup implements SearchMatcher {
     /**
      * Returns a short description of the group in HTML (for a tooltip).
      */
-    public abstract String getShortDescription();
+    public abstract String getShortDescription(boolean showDynamic);
 
     // by general AbstractGroup contract, toString() must return
     // something from which this object can be reconstructed

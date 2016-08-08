@@ -2,6 +2,7 @@ package net.sf.jabref.logic.xmp;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -11,8 +12,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.jabref.BibtexTestData;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
@@ -33,13 +34,13 @@ public class XMPSchemaBibtexTest {
     public void assertEqualsBibtexEntry(BibEntry e, BibEntry x) {
         Assert.assertNotNull(e);
         Assert.assertNotNull(x);
-        Assert.assertEquals(e.getCiteKey(), x.getCiteKey());
+        Assert.assertEquals(e.getCiteKeyOptional(), x.getCiteKeyOptional());
         Assert.assertEquals(e.getType(), x.getType());
 
         Assert.assertEquals(e.getFieldNames().size(), x.getFieldNames().size());
 
         for (String name : e.getFieldNames()) {
-            Assert.assertEquals(e.getField(name), x.getField(name));
+            Assert.assertEquals(e.getFieldOptional(name), x.getFieldOptional(name));
         }
     }
 
@@ -266,7 +267,7 @@ public class XMPSchemaBibtexTest {
                 .bibtexDescription(bibtexString));
 
         Document d = XMLUtil.parse(new ByteArrayInputStream(bibtexString
-                .getBytes()));
+                .getBytes(StandardCharsets.UTF_8)));
 
         Assert.assertEquals("Beach sand convolution by surf-wave optimzation",
                 XMPSchemaBibtex.getTextContent(

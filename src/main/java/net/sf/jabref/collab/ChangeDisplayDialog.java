@@ -113,7 +113,7 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
                 }
             }
             ce.end();
-            panel.undoManager.addEdit(ce);
+            panel.getUndoManager().addEdit(ce);
             if (anyDisabled) {
                 panel.markBaseChanged();
             }

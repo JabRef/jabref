@@ -20,9 +20,18 @@ import java.util.Objects;
 
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.util.strings.StringLengthComparator;
 
 public class ProtectTermsFormatter implements Formatter {
+
+    private static ProtectedTermsLoader protectedTermsLoader;
+
+
+    // This must be called from JabRefMain
+    public static void setProtectedTermsLoader(ProtectedTermsLoader loader) {
+        protectedTermsLoader = loader;
+    }
 
     private String format(String text, List<String> listOfWords) {
         String result = text;
@@ -30,7 +39,7 @@ public class ProtectTermsFormatter implements Formatter {
         // For each word in the list
         for (String listOfWord : listOfWords) {
             // Add {} if the character before is a space, -, /, (, [, ", or } or if it is at the start of the string but not if it is followed by a }
-            result = result.replaceAll("(^|[- /\\[(}\"])" + listOfWord + "($|[^}])", "$1\\{" + listOfWord + "\\}$2");
+            result = result.replaceAll("(^|[- /\\[(}\"])" + listOfWord + "($|[^a-zA-Z}])", "$1\\{" + listOfWord + "\\}$2");
         }
         return result;
     }
@@ -42,7 +51,7 @@ public class ProtectTermsFormatter implements Formatter {
         if (text.isEmpty()) {
             return text;
         }
-        return this.format(text, CaseKeeperList.getAll());
+        return this.format(text, ProtectTermsFormatter.protectedTermsLoader.getProtectedTerms());
     }
 
     @Override

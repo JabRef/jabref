@@ -16,10 +16,9 @@
 package net.sf.jabref.logic.net;
 
 import java.net.URI;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -28,15 +27,15 @@ class Cookie {
     private final String name;
     private final String value;
     private String domain;
-    private Date expires;
+    private ZonedDateTime expires;
     private String path;
 
-    /**
-     * DateFormats should not be reused among instances (or rather among threads), because they are not thread-safe.
-     * If they are shared, their usage should be synchronized.
-     */
-    private final DateFormat whiteSpaceFormat = new SimpleDateFormat("E, dd MMM yyyy k:m:s 'GMT'", Locale.US);
-    private final DateFormat hyphenFormat = new SimpleDateFormat("E, dd-MMM-yyyy k:m:s 'GMT'", Locale.US);
+    private final DateTimeFormatter whiteSpaceFormat = DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss z",
+            Locale.ROOT);
+    private final DateTimeFormatter hyphenFormat = DateTimeFormatter.ofPattern("EEE, dd-MMM-yyyy HH:mm:ss z",
+            Locale.ROOT);
+    private final DateTimeFormatter hyphenTwoDigitYearFormat = DateTimeFormatter.ofPattern("EEE, dd-MMM-yy HH:mm:ss z",
+            Locale.ROOT);
 
 
     /**
@@ -48,10 +47,8 @@ class Cookie {
     public Cookie(URI uri, String header) {
         String[] attributes = header.split(";");
         String nameValue = attributes[0].trim();
-        this.name =
-                nameValue.substring(0, nameValue.indexOf('='));
-        this.value =
-                nameValue.substring(nameValue.indexOf('=') + 1);
+        this.name = nameValue.substring(0, nameValue.indexOf('='));
+        this.value = nameValue.substring(nameValue.indexOf('=') + 1);
         this.path = "/";
         this.domain = uri.getHost();
 
@@ -82,13 +79,16 @@ class Cookie {
                 this.path = value;
             } else if ("expires".equalsIgnoreCase(name)) {
                 try {
-                    this.expires = whiteSpaceFormat.parse(value);
-                } catch (ParseException e) {
+                    this.expires = ZonedDateTime.parse(value, whiteSpaceFormat);
+                } catch (DateTimeParseException e) {
                     try {
-                        this.expires = hyphenFormat.parse(value);
-                    } catch (ParseException e2) {
-                        throw new IllegalArgumentException(
-                                "Bad date format in header: " + value);
+                        this.expires = ZonedDateTime.parse(value, hyphenFormat);
+                    } catch (DateTimeParseException e2) {
+                        try {
+                            this.expires = ZonedDateTime.parse(value, hyphenTwoDigitYearFormat);
+                        } catch (DateTimeParseException e3) {
+                            throw new IllegalArgumentException("Bad date format in header: " + value);
+                        }
                     }
                 }
             }
@@ -99,8 +99,7 @@ class Cookie {
         if (expires == null) {
             return false;
         }
-        Date now = new Date();
-        return now.after(expires);
+        return ZonedDateTime.now().isAfter(expires);
     }
 
     /**

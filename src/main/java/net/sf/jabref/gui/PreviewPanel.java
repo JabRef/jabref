@@ -49,17 +49,19 @@ import javax.swing.event.HyperlinkEvent;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.event.FieldChangedEvent;
-import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.event.FieldChangedEvent;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
@@ -240,7 +242,7 @@ public class PreviewPanel extends JPanel
                     .isPresent()) {
                 try {
                     String address = hyperlinkEvent.getURL().toString();
-                    JabRefDesktop.openExternalViewer(PreviewPanel.this.databaseContext.get(), address, "url");
+                    JabRefDesktop.openExternalViewer(PreviewPanel.this.databaseContext.get(), address, FieldName.URL);
                 } catch (IOException e) {
                     LOGGER.warn("Could not open external viewer", e);
                 }
@@ -262,7 +264,8 @@ public class PreviewPanel extends JPanel
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         try {
             layout = Optional
-                    .of(new LayoutHelper(sr, Globals.journalAbbreviationLoader.getRepository()).getLayoutFromText());
+                    .of(new LayoutHelper(sr, LayoutFormatterPreferences.fromPreferences(Globals.prefs,
+                            Globals.journalAbbreviationLoader)).getLayoutFromText());
         } catch (IOException e) {
             layout = Optional.empty();
             LOGGER.debug("no layout could be set", e);
@@ -275,13 +278,9 @@ public class PreviewPanel extends JPanel
 
     public void setEntry(BibEntry newEntry) {
 
-        if (entry.isPresent() && (entry.get() != newEntry)) {
-            entry.ifPresent(e -> e.unregisterListener(this));
-        }
-
-        entry.ifPresent(e -> e.registerListener(this));
-
+        entry.filter(e -> e != newEntry).ifPresent(e -> e.unregisterListener(this));
         entry = Optional.ofNullable(newEntry);
+        entry.ifPresent(e -> e.registerListener(this));
 
         updateLayout();
         update();
@@ -344,7 +343,7 @@ public class PreviewPanel extends JPanel
             JabRefExecutorService.INSTANCE.execute(() -> {
                 try {
                     PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
-                    pras.add(new JobName(entry.map(BibEntry::getCiteKey).orElse("NO ENTRY"), null));
+                    pras.add(new JobName(entry.flatMap(BibEntry::getCiteKeyOptional).orElse("NO ENTRY"), null));
                     previewPane.print(null, null, true, null, pras, false);
 
                 } catch (PrinterException e) {

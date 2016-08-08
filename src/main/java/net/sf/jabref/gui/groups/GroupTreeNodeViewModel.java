@@ -34,24 +34,19 @@ import javax.swing.undo.UndoManager;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.undo.CountingUndoManager;
 import net.sf.jabref.logic.groups.AbstractGroup;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.EntriesGroupChange;
-import net.sf.jabref.logic.groups.ExplicitGroup;
 import net.sf.jabref.logic.groups.GroupTreeNode;
-import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.groups.MoveGroupChange;
-import net.sf.jabref.logic.groups.SearchGroup;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
-    private static final int MAX_DISPLAYED_LETTERS = 35;
     private static final Icon GROUP_REFINING_ICON = IconTheme.JabRefIcon.GROUP_REFINING.getSmallIcon();
     private static final Icon GROUP_INCLUDING_ICON = IconTheme.JabRefIcon.GROUP_INCLUDING.getSmallIcon();
     private static final Icon GROUP_REGULAR_ICON = null;
@@ -192,24 +187,14 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
 
     public String getText() {
         AbstractGroup group = node.getGroup();
-        String name = StringUtil.limitStringLength(group.getName(), MAX_DISPLAYED_LETTERS);
         StringBuilder sb = new StringBuilder(60);
-        sb.append(name);
+        sb.append(group.getName());
 
-        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS)) {
-            if (group instanceof ExplicitGroup) {
-                sb.append(" [").append(((ExplicitGroup) group).getNumEntries()).append(']');
-            } else if ((group instanceof KeywordGroup) || (group instanceof SearchGroup)) {
-                int hits = 0;
-                BasePanel currentBasePanel = JabRefGUI.getMainFrame().getCurrentBasePanel();
-                if(currentBasePanel != null) {
-                    for (BibEntry entry : currentBasePanel.getDatabase().getEntries()) {
-                        if (group.contains(entry)) {
-                            hits++;
-                        }
-                    }
-                }
-                sb.append(" [").append(hits).append(']');
+        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_NUMBER_OF_ELEMENTS)
+                && (JabRefGUI.getMainFrame() != null)) {
+            BasePanel currentBasePanel = JabRefGUI.getMainFrame().getCurrentBasePanel();
+            if (currentBasePanel != null) {
+                sb.append(" [").append(node.numberOfHits(currentBasePanel.getDatabase().getEntries())).append(']');
             }
         }
 
@@ -217,7 +202,9 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     }
 
     public String getDescription() {
-        return "<html>" + node.getGroup().getShortDescription() + "</html>";
+        return "<html>"
+                + node.getGroup().getShortDescription(Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC))
+                + "</html>";
     }
 
     public Icon getIcon() {
@@ -338,7 +325,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
                 undoRemove.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd.get()));
             }
             undoManager.addEdit(undoRemove);
-        } else if (changesAdd != null) {
+        } else if (changesAdd.isPresent()) {
             undoManager.addEdit(UndoableChangeEntriesOfGroup.getUndoableEdit(this, changesAdd.get()));
         }
     }
@@ -348,7 +335,7 @@ public class GroupTreeNodeViewModel implements Transferable, TreeNode {
     }
 
     public void addNewGroup(AbstractGroup newGroup, CountingUndoManager undoManager) {
-        GroupTreeNode newNode = new GroupTreeNode(newGroup);
+        GroupTreeNode newNode = GroupTreeNode.fromGroup(newGroup);
         this.getNode().addChild(newNode);
 
         UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(this,

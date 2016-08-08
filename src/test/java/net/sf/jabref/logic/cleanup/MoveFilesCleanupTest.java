@@ -3,15 +3,16 @@ package net.sf.jabref.logic.cleanup;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -60,14 +61,15 @@ public class MoveFilesCleanupTest {
         File fileAfter = new File(pdfFolder, "test.pdf");
         assertTrue(fileAfter.exists());
 
-        assertEquals(FileField.getStringRepresentation(new ParsedFileField("", fileAfter.getName(), "")), entry.getField("file"));
+        assertEquals(Optional.of(FileField.getStringRepresentation(new ParsedFileField("", fileAfter.getName(), ""))),
+                entry.getFieldOptional("file"));
     }
 
     @Test
     public void movesFileFromSubfolderMultiple() throws IOException {
         File subfolder = bibFolder.newFolder();
         File fileBefore = new File(subfolder, "test.pdf");
-        assertTrue(fileBefore.createNewFile());;
+        assertTrue(fileBefore.createNewFile());
         assertTrue(fileBefore.exists());
 
         BibEntry entry = new BibEntry();
@@ -80,7 +82,9 @@ public class MoveFilesCleanupTest {
         File fileAfter = new File(pdfFolder, "test.pdf");
         assertTrue(fileAfter.exists());
 
-        assertEquals(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""),
-                new ParsedFileField("", fileAfter.getName(), ""), new ParsedFileField("","",""))), entry.getField("file"));
+        assertEquals(
+                Optional.of(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("", "", ""),
+                        new ParsedFileField("", fileAfter.getName(), ""), new ParsedFileField("", "", "")))),
+                entry.getFieldOptional("file"));
     }
 }

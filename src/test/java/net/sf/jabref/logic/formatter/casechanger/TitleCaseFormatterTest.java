@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.formatter.casechanger;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -8,7 +9,12 @@ import org.junit.Test;
  */
 public class TitleCaseFormatterTest {
 
-    private final TitleCaseFormatter formatter = new TitleCaseFormatter();
+    private TitleCaseFormatter formatter;
+
+    @Before
+    public void setUp() {
+        formatter = new TitleCaseFormatter();
+    }
 
     @Test
     public void test() {

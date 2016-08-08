@@ -40,10 +40,13 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
 
 import com.jgoodies.forms.builder.FormBuilder;
@@ -137,7 +140,7 @@ public class DroppedFileHandler {
 
         if (tryXmpImport(fileName, fileType, edits)) {
             edits.end();
-            panel.undoManager.addEdit(edits);
+            panel.getUndoManager().addEdit(edits);
             return;
         }
 
@@ -171,7 +174,7 @@ public class DroppedFileHandler {
             panel.updateEntryEditorIfShowing();
         }
         edits.end();
-        panel.undoManager.addEdit(edits);
+        panel.getUndoManager().addEdit(edits);
 
     }
 
@@ -220,7 +223,7 @@ public class DroppedFileHandler {
             panel.markBaseChanged();
         }
         edits.end();
-        panel.undoManager.addEdit(edits);
+        panel.getUndoManager().addEdit(edits);
     }
 
     // Done by MrDlib
@@ -233,7 +236,7 @@ public class DroppedFileHandler {
 
         List<BibEntry> xmpEntriesInFile;
         try {
-            xmpEntriesInFile = XMPUtil.readXMP(fileName);
+            xmpEntriesInFile = XMPUtil.readXMP(fileName, XMPPreferences.fromPreferences(Globals.prefs));
         } catch (IOException e) {
             LOGGER.warn("Problem reading XMP", e);
             return false;
@@ -350,7 +353,8 @@ public class DroppedFileHandler {
         renameCheckBox.setText(Localization.lang("Rename file to").concat(": "));
 
         // Determine which name to suggest:
-        String targetName = FileUtil.getLinkedFileName(database, entry, Globals.journalAbbreviationLoader.getRepository());
+        String targetName = FileUtil.createFileNameFromPattern(database, entry, Globals.journalAbbreviationLoader,
+                Globals.prefs);
 
         renameToTextBox.setText(targetName.concat(".").concat(fileType.getExtension()));
 
@@ -394,7 +398,7 @@ public class DroppedFileHandler {
     private void doLink(BibEntry entry, ExternalFileType fileType, String filename,
                         boolean avoidDuplicate, NamedCompound edits) {
 
-        Optional<String> oldValue = entry.getFieldOptional(Globals.FILE_FIELD);
+        Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
         FileListTableModel tm = new FileListTableModel();
         oldValue.ifPresent(tm::setContent);
 
@@ -440,11 +444,11 @@ public class DroppedFileHandler {
 
         tm.addEntry(tm.getRowCount(), new FileListEntry("", filename, fileType));
         String newValue = tm.getStringRepresentation();
-        UndoableFieldChange edit = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue.orElse(null), newValue);
-        entry.setField(Globals.FILE_FIELD, newValue);
+        UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE, oldValue.orElse(null), newValue);
+        entry.setField(FieldName.FILE, newValue);
 
         if (edits == null) {
-            panel.undoManager.addEdit(edit);
+            panel.getUndoManager().addEdit(edit);
         } else {
             edits.addEdit(edit);
         }
@@ -476,7 +480,7 @@ public class DroppedFileHandler {
             LOGGER.warn("Cannot determine destination directory or destination directory does not exist");
             return false;
         }
-        File toFile = new File(dirs.get(found) + System.getProperty("file.separator") + destFilename);
+        File toFile = new File(dirs.get(found) + OS.FILE_SEPARATOR + destFilename);
         if (toFile.exists()) {
             int answer = JOptionPane.showConfirmDialog(frame,
                     Localization.lang("'%0' exists. Overwrite file?", toFile.getAbsolutePath()),
@@ -528,7 +532,7 @@ public class DroppedFileHandler {
         }
         String destinationFileName = new File(toFile).getName();
 
-        File destFile = new File(dirs.get(found) + System.getProperty("file.separator") + destinationFileName);
+        File destFile = new File(dirs.get(found) + OS.FILE_SEPARATOR + destinationFileName);
         if (destFile.equals(new File(fileName))) {
             // File is already in the correct position. Don't override!
             return true;

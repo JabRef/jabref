@@ -27,12 +27,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.logic.CustomEntryTypesManager;
+import net.sf.jabref.logic.bibtex.FieldContentParser;
+import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
+import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
@@ -40,7 +42,11 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -68,7 +74,8 @@ public class BibtexParser {
     private Map<String, EntryType> entryTypes;
     private boolean eof;
     private int line = 1;
-    private final FieldContentParser fieldContentParser = new FieldContentParser();
+    private final FieldContentParser fieldContentParser = new FieldContentParser(
+            FieldContentParserPreferences.fromPreferences(Globals.prefs));
     private ParserResult parserResult;
     private static final Integer LOOKAHEAD = 64;
     private final Deque<Character> pureTextFromFile = new LinkedList<>();
@@ -195,7 +202,7 @@ public class BibtexParser {
 
         // Instantiate meta data:
         try {
-            parserResult.setMetaData(new MetaData(meta));
+            parserResult.setMetaData(MetaData.parse(meta));
         } catch (ParseException exception) {
             parserResult.addWarning(exception.getLocalizedMessage());
         }
@@ -235,23 +242,19 @@ public class BibtexParser {
         }
     }
 
-    private void parseJabRefComment(Map<String, String> meta) throws IOException {
-        StringBuilder buffer = parseBracketedTextExactly();
-        /**
-         *
-         * Metadata are used to store Bibkeeper-specific
-         * information in .bib files.
-         *
-         * Metadata are stored in bibtex files in the format
-         *
-         * @comment{jabref-meta: type:data0;data1;data2;...}
-         *
-         * Each comment that starts with the META_FLAG is stored
-         * in the meta HashMap, with type as key. Unluckily, the
-         * old META_FLAG bibkeeper-meta: was used in JabRef 1.0
-         * and 1.1, so we need to support it as well. At least
-         * for a while. We'll always save with the new one.
-         */
+    private void parseJabRefComment(Map<String, String> meta) {
+        StringBuilder buffer = null;
+        try {
+            buffer = parseBracketedTextExactly();
+        } catch (IOException e) {
+            /* if we get an IO Exception here, than we have an unbracketed comment,
+            * which means that we should just return and the comment will be picked up as arbitrary text
+            *  by the parser
+             */
+            LOGGER.info("Found unbracketed comment");
+            return;
+        }
+
         String comment = buffer.toString().replaceAll("[\\x0d\\x0a]", "");
         if (comment.substring(0,
                 Math.min(comment.length(), MetaData.META_FLAG.length())).equals(
@@ -280,21 +283,18 @@ public class BibtexParser {
                 .equals(CustomEntryType.ENTRYTYPE_FLAG)) {
             // A custom entry type can also be stored in a
             // "@comment"
-            CustomEntryType typ = CustomEntryTypesManager.parseEntryType(comment);
-            if(typ == null) {
-                parserResult.addWarning(Localization.lang("Ill-formed entrytype comment in bib file") + ": " +
-                        comment);
+            Optional<CustomEntryType> typ = CustomEntryType.parse(comment);
+            if (typ.isPresent()) {
+                entryTypes.put(typ.get().getName(), typ.get());
             } else {
-                entryTypes.put(typ.getName(), typ);
+                parserResult.addWarning(Localization.lang("Ill-formed entrytype comment in BIB file") + ": " +
+                        comment);
             }
 
             // custom entry types are always re-written by JabRef and not stored in the file
             dumpTextReadSoFarToString();
-        } else {
-            // FIXME: user comments are simply dropped
-            // at least, we log that we ignored the comment
-            LOGGER.info("Dropped comment from database: " + comment);
         }
+
     }
 
 
@@ -322,29 +322,23 @@ public class BibtexParser {
         // if there is no entry found, simply return the content (necessary to parse text remaining after the last entry)
         if (indexOfAt == -1) {
             return purgeEOFCharacters(result);
-        } else {
-
-            //skip all text except newlines and whitespaces before first @. This is necessary to remove the file header
-            int runningIndex = indexOfAt - 1;
-            while (runningIndex >= 0) {
-                if (!Character.isWhitespace(result.charAt(runningIndex))) {
+        } else if (result.contains(SavePreferences.ENCODING_PREFIX)) {
+            // purge the encoding line if it exists
+            int runningIndex = result.indexOf(SavePreferences.ENCODING_PREFIX);
+            while (runningIndex < indexOfAt) {
+                if (result.charAt(runningIndex) == '\n') {
+                    break;
+                } else if (result.charAt(runningIndex) == '\r') {
+                    if (result.charAt(runningIndex + 1) == '\n') {
+                        runningIndex++;
+                    }
                     break;
                 }
-                runningIndex--;
+                runningIndex++;
             }
-
-            if(runningIndex > -1) {
-                // We have to ignore some text at the beginning
-                // so we view the first line break as the end of the previous text and don't store it
-                if(result.charAt(runningIndex + 1) == '\r') {
-                    runningIndex++;
-                }
-                if(result.charAt(runningIndex + 1) == '\n') {
-                    runningIndex++;
-                }
-            }
-
             return result.substring(runningIndex + 1);
+        } else {
+            return result;
         }
     }
 
@@ -412,10 +406,10 @@ public class BibtexParser {
 
     private void skipOneNewline() throws IOException {
         skipSpace();
-        if(peek() == '\r') {
+        if (peek() == '\r') {
             read();
         }
-        if(peek() == '\n') {
+        if (peek() == '\n') {
             read();
         }
     }
@@ -459,7 +453,7 @@ public class BibtexParser {
     private int read() throws IOException {
         int character = pushbackReader.read();
 
-        if(! isEOFCharacter(character)) {
+        if (!isEOFCharacter(character)) {
             pureTextFromFile.offerLast((char) character);
         }
         if (character == '\n') {
@@ -473,7 +467,7 @@ public class BibtexParser {
             line--;
         }
         pushbackReader.unread(character);
-        if(pureTextFromFile.getLast() == character) {
+        if (pureTextFromFile.getLast() == character) {
             pureTextFromFile.pollLast();
         }
     }
@@ -561,12 +555,12 @@ public class BibtexParser {
                 // format, but
                 // at least one online database exports bibtex like that, making
                 // it inconvenient
-                // for users if JabRef didn't accept it.
+                // for users if JabRef did not accept it.
                 if (InternalBibtexFields.getFieldExtras(key).contains(FieldProperties.PERSON_NAMES)) {
-                    entry.setField(key, entry.getField(key) + " and " + content);
-                } else if ("keywords".equals(key)) {
+                    entry.setField(key, entry.getFieldOptional(key).get() + " and " + content);
+                } else if (FieldName.KEYWORDS.equals(key)) {
                     //multiple keywords fields should be combined to one
-                    entry.addKeyword(content);
+                    entry.addKeyword(content, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                 }
             } else {
                 entry.setField(key, content);
@@ -798,7 +792,7 @@ public class BibtexParser {
     private StringBuffer parseBracketedText() throws IOException {
         StringBuffer value = new StringBuffer();
 
-        consume('{','(');
+        consume('{', '(');
 
         int brackets = 0;
 
@@ -833,18 +827,18 @@ public class BibtexParser {
             }
         }
 
-        consume('}',')');
+        consume('}', ')');
 
         return value;
     }
 
-    private boolean isClosingBracketNext () {
+    private boolean isClosingBracketNext() {
         try {
             int peek = peek();
             boolean isCurlyBracket = peek == '}';
             boolean isRoundBracket = peek == ')';
             return isCurlyBracket || isRoundBracket;
-        } catch(IOException e) {
+        } catch (IOException e) {
             return false;
         }
     }

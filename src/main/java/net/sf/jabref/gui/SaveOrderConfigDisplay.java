@@ -26,10 +26,10 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -116,6 +116,7 @@ public class SaveOrderConfigDisplay {
         saveOrderConfig.sortCriteria[1].descending = saveSecDesc.isSelected();
         saveOrderConfig.sortCriteria[2].field = getSelectedItemAsLowerCaseTrim(saveTerSort);
         saveOrderConfig.sortCriteria[2].descending = saveTerDesc.isSelected();
+
         return saveOrderConfig;
     }
 

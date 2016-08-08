@@ -1,16 +1,20 @@
 package net.sf.jabref.importer.fileformat;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.importer.OutputPrinterToNull;
-import net.sf.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,49 +38,56 @@ public class PdfXmpImporterTest {
         assertEquals("XMP-annotated PDF", importer.getFormatName());
     }
 
-    @Test(expected = EncryptedPdfsNotSupportedException.class)
-    public void importEncryptedFileThrowsException() throws IOException {
-        try (InputStream is = PdfXmpImporterTest.class.getResourceAsStream("/pdfs/encrypted.pdf")) {
-            importer.importEntries(is, new OutputPrinterToNull());
-        }
+    @Test
+    public void testsGetExtensions() {
+        assertEquals(".pdf", importer.getExtensions().get(0));
     }
 
     @Test
-    public void testImportEntries() throws IOException {
-        try (InputStream is = PdfXmpImporterTest.class.getResourceAsStream("annotated.pdf")) {
-            List<BibEntry> bibEntries = importer.importEntries(is, new OutputPrinterToNull());
-
-            assertEquals(1, bibEntries.size());
-
-            BibEntry be0 = bibEntries.get(0);
-            assertEquals("how to annotate a pdf", be0.getField("abstract"));
-            assertEquals("Chris", be0.getField("author"));
-            assertEquals("pdf, annotation", be0.getField("keywords"));
-            assertEquals("The best Pdf ever", be0.getField("title"));
-        }
+    public void testGetDescription() {
+        assertEquals("Wraps the XMPUtility function to be used as an ImportFormat.", importer.getDescription());
     }
 
     @Test
-    public void testIsRecognizedFormat() throws IOException {
-        try (InputStream is = PdfXmpImporterTest.class.getResourceAsStream("annotated.pdf")) {
-            assertTrue(importer.isRecognizedFormat(is));
-        }
+    public void importEncryptedFileReturnsError() throws URISyntaxException {
+        Path file = Paths.get(PdfXmpImporterTest.class.getResource("/pdfs/encrypted.pdf").toURI());
+        ParserResult result = importer.importDatabase(file, Charset.defaultCharset());
+        Assert.assertTrue(result.hasWarnings());
     }
 
     @Test
-    public void testIsRecognizedFormatReject() throws IOException {
+    public void testImportEntries() throws URISyntaxException {
+        Path file = Paths.get(PdfXmpImporterTest.class.getResource("annotated.pdf").toURI());
+        List<BibEntry> bibEntries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+
+        assertEquals(1, bibEntries.size());
+
+        BibEntry be0 = bibEntries.get(0);
+        assertEquals(Optional.of("how to annotate a pdf"), be0.getFieldOptional("abstract"));
+        assertEquals(Optional.of("Chris"), be0.getFieldOptional("author"));
+        assertEquals(Optional.of("pdf, annotation"), be0.getFieldOptional("keywords"));
+        assertEquals(Optional.of("The best Pdf ever"), be0.getFieldOptional("title"));
+    }
+
+    @Test
+    public void testIsRecognizedFormat() throws IOException, URISyntaxException {
+        Path file = Paths.get(PdfXmpImporterTest.class.getResource("annotated.pdf").toURI());
+        assertTrue(importer.isRecognizedFormat(file, Charset.defaultCharset()));
+    }
+
+    @Test
+    public void testIsRecognizedFormatReject() throws IOException, URISyntaxException {
         List<String> list = Arrays.asList("IEEEImport1.txt", "IsiImporterTest1.isi", "IsiImporterTestInspec.isi",
                 "IsiImporterTestWOS.isi", "IsiImporterTestMedline.isi", "RisImporterTest1.ris", "empty.pdf");
 
         for (String str : list) {
-            try (InputStream is = PdfXmpImporterTest.class.getResourceAsStream(str)) {
-                assertFalse(importer.isRecognizedFormat(is));
-            }
+            Path file = Paths.get(PdfXmpImporterTest.class.getResource(str).toURI());
+            assertFalse(importer.isRecognizedFormat(file, Charset.defaultCharset()));
         }
     }
 
     @Test
     public void testGetCommandLineId() {
-        assertEquals("xmp", importer.getCommandLineId());
+        assertEquals("xmp", importer.getId());
     }
 }

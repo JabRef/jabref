@@ -42,18 +42,19 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FetcherPreviewDialog;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -141,11 +142,9 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
         LinkedHashMap<String, JLabel> previews = new LinkedHashMap<>();
 
         try {
-            URL url = new URL(address);
+            URLDownload dl = new URLDownload(address);
 
-            URLDownload dl = new URLDownload(url);
-
-            String page = dl.downloadToString();
+            String page = dl.downloadToString(Globals.prefs.getDefaultEncoding());
 
             int hits = getNumberOfHits(page, RESULTS_FOUND_PATTERN, ACMPortalFetcher.HITS_PATTERN);
 
@@ -198,7 +197,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             if (selentry.getValue()) {
                 downloadEntryBibTeX(selentry.getKey(), fetchAbstract).ifPresent(entry ->  {
                     // Convert from HTML and optionally add curly brackets around key words to keep the case
-                    entry.getFieldOptional("title").ifPresent(title -> {
+                    entry.getFieldOptional(FieldName.TITLE).ifPresent(title -> {
                         title = title.replace("\\&", "&").replace("\\#", "#");
                         title = convertHTMLChars(title);
 
@@ -211,11 +210,11 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                         if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
                             title = protectTermsFormatter.format(title);
                         }
-                        entry.setField("title", title);
+                        entry.setField(FieldName.TITLE, title);
                     });
 
-                    entry.getFieldOptional("abstract")
-                            .ifPresent(abstr -> entry.setField("abstract", convertHTMLChars(abstr)));
+                    entry.getFieldOptional(FieldName.ABSTRACT)
+                            .ifPresent(abstr -> entry.setField(FieldName.ABSTRACT, convertHTMLChars(abstr)));
                     inspector.addEntry(entry);
                 });
             }
@@ -352,14 +351,12 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
             // get abstract
             if (downloadAbstract) {
-                url = new URL(ACMPortalFetcher.START_URL + ACMPortalFetcher.ABSTRACT_URL + id);
-                URLDownload dl = new URLDownload(url);
-
-                String page = dl.downloadToString();
+                URLDownload dl = new URLDownload(ACMPortalFetcher.START_URL + ACMPortalFetcher.ABSTRACT_URL + id);
+                String page = dl.downloadToString(Globals.prefs.getDefaultEncoding());
 
                 Matcher absM = ACMPortalFetcher.ABSTRACT_PATTERN.matcher(page);
                 if (absM.find()) {
-                    entry.setField("abstract", absM.group(1).trim());
+                    entry.setField(FieldName.ABSTRACT, absM.group(1).trim());
                 }
                 Thread.sleep(ACMPortalFetcher.WAIT_TIME);//wait between requests or you will be blocked by ACM
             }
@@ -418,8 +415,8 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
     }
 
     @Override
-    public HelpFiles getHelpPage() {
-        return HelpFiles.FETCHER_ACM;
+    public HelpFile getHelpPage() {
+        return HelpFile.FETCHER_ACM;
     }
 
 

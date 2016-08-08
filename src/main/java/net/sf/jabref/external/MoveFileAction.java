@@ -18,6 +18,7 @@ package net.sf.jabref.external;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -26,7 +27,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.JabRefFrame;
@@ -35,6 +35,7 @@ import net.sf.jabref.gui.fieldeditors.FileListEditor;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -110,8 +111,8 @@ public class MoveFileAction extends AbstractAction {
                 if (toFileDir) {
                     // Determine which name to suggest:
                     String suggName = FileUtil
-                            .getLinkedFileName(eEditor.getDatabase(), eEditor.getEntry(),
-                                    Globals.journalAbbreviationLoader.getRepository())
+                            .createFileNameFromPattern(eEditor.getDatabase(), eEditor.getEntry(),
+                                    Globals.journalAbbreviationLoader, Globals.prefs)
                             .concat(entry.type.isPresent() ? "." + entry.type.get().getExtension() : "");
                     CheckBoxMessage cbm = new CheckBoxMessage(Localization.lang("Move file to file directory?"),
                             Localization.lang("Rename to '%0'", suggName),
@@ -142,7 +143,8 @@ public class MoveFileAction extends AbstractAction {
                     }
                     chosenFile = sb.toString();
                 } else {
-                    chosenFile = FileDialogs.getNewFile(frame, file, extension, JFileChooser.SAVE_DIALOG, false);
+                    chosenFile = FileDialogs.getNewFile(frame, file, Collections.singletonList(extension),
+                            JFileChooser.SAVE_DIALOG, false);
                 }
                 if (chosenFile == null) {
                     return; // canceled

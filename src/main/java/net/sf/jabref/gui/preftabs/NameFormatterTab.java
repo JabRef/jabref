@@ -35,13 +35,13 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.format.NameFormatter;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -135,8 +135,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
 
             @Override
             public String getColumnName(int col) {
-                return col == 0 ? Localization.lang("Formatter Name") :
-                    Localization.lang("Format String");
+                return col == 0 ? Localization.lang("Formatter name") :
+                    Localization.lang("Format string");
             }
 
             @Override
@@ -194,11 +194,11 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         toolBar.add(new AddRowAction());
         toolBar.add(new DeleteRowAction());
         toolBar.add(new HelpAction(Localization.lang("Help on Name Formatting"),
-                HelpFiles.CUSTOM_EXPORTS_NAME_FORMATTER).getHelpButton());
+                HelpFile.CUSTOM_EXPORTS_NAME_FORMATTER).getHelpButton());
 
         tabPanel.add(toolBar, BorderLayout.EAST);
 
-        builder.appendSeparator(Localization.lang("Special Name Formatters"));
+        builder.appendSeparator(Localization.lang("Special name formatters"));
         builder.nextLine();
         builder.append(pan);
         builder.append(tabPanel);

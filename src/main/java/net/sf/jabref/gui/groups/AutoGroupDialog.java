@@ -49,6 +49,8 @@ import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.GroupsUtil;
 import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import net.sf.jabref.model.entry.FieldName;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -93,8 +95,9 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 dispose();
 
                 try {
-                    GroupTreeNode autoGroupsRoot = new GroupTreeNode(
-                            new ExplicitGroup(Localization.lang("Automatically created groups"), GroupHierarchyType.INCLUDING));
+                    GroupTreeNode autoGroupsRoot = GroupTreeNode.fromGroup(
+                            new ExplicitGroup(Localization.lang("Automatically created groups"),
+                                    GroupHierarchyType.INCLUDING, Globals.prefs));
                     Set<String> hs;
                     String fieldText = field.getText();
                     if (keywords.isSelected()) {
@@ -108,20 +111,22 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                         }
                     } else if (authors.isSelected()) {
                         List<String> fields = new ArrayList<>(2);
-                        fields.add("author");
+                        fields.add(FieldName.AUTHOR);
                         hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
-                        fieldText = "author";
+                        fieldText = FieldName.AUTHOR;
                     } else { // editors.isSelected() as it is a radio button group.
                         List<String> fields = new ArrayList<>(2);
-                        fields.add("editor");
+                        fields.add(FieldName.EDITOR);
                         hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
-                        fieldText = "editor";
+                        fieldText = FieldName.EDITOR;
                     }
 
+                    LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
+
                     for (String keyword : hs) {
-                        KeywordGroup group = new KeywordGroup(keyword, fieldText, keyword, false, false,
-                                GroupHierarchyType.INDEPENDENT);
-                        autoGroupsRoot.addChild(new GroupTreeNode(group));
+                        KeywordGroup group = new KeywordGroup(formatter.format(keyword), fieldText, keyword, false, false,
+                                GroupHierarchyType.INDEPENDENT, Globals.prefs);
+                        autoGroupsRoot.addChild(GroupTreeNode.fromGroup(group));
                     }
 
                     autoGroupsRoot.moveTo(m_groupsRoot.getNode());
@@ -132,11 +137,10 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                     panel.markBaseChanged(); // a change always occurs
                     frame.output(Localization.lang("Created groups."));
                     ce.end();
-                    panel.undoManager.addEdit(ce);
+                    panel.getUndoManager().addEdit(ce);
                 } catch (ParseException exception) {
                     frame.showMessage(exception.getLocalizedMessage());
                 }
-
             }
         };
         remove.addActionListener(okListener);

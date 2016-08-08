@@ -43,6 +43,7 @@ import com.jgoodies.looks.Options;
  */
 public class FieldContentSelector extends JComponent {
 
+    private static final int MAX_CONTENT_SELECTOR_WIDTH = 240; // The max width of the combobox for content selectors.
     private final JComboBox<String> comboBox;
 
     private final FieldEditor editor;
@@ -67,10 +68,6 @@ public class FieldContentSelector extends JComponent {
      * @param editor
      *            The entry editor which will be appended by the text selected
      *            by the user from the combobox.
-     * @param metaData
-     *            The metadata that contains the list of items to display in the
-     *            combobox under the key Globals.SELECTOR_META_PREFIX +
-     *            editor.getFieldName().
      * @param action
      *            The action that will be performed to after an item from the
      *            combobox has been appended to the text in the entryeditor.
@@ -79,12 +76,12 @@ public class FieldContentSelector extends JComponent {
      *            button.
      */
     public FieldContentSelector(JabRefFrame frame, final BasePanel panel,
-            Window owner, final FieldEditor editor, final MetaData metaData,
+            Window owner, final FieldEditor editor,
             final AbstractAction action, boolean horizontalLayout, String delimiter) {
 
 
         this.editor = editor;
-        this.metaData = metaData;
+        this.metaData = panel.getBibDatabaseContext().getMetaData();
         this.action = action;
         this.delimiter = delimiter;
 
@@ -93,8 +90,8 @@ public class FieldContentSelector extends JComponent {
             @Override
             public Dimension getPreferredSize() {
                 Dimension parents = super.getPreferredSize();
-                if (parents.width > GUIGlobals.MAX_CONTENT_SELECTOR_WIDTH) {
-                    parents.width = GUIGlobals.MAX_CONTENT_SELECTOR_WIDTH;
+                if (parents.width > MAX_CONTENT_SELECTOR_WIDTH) {
+                    parents.width = MAX_CONTENT_SELECTOR_WIDTH;
                 }
                 return parents;
             }
@@ -154,7 +151,7 @@ public class FieldContentSelector extends JComponent {
         add(manage);
 
         manage.addActionListener(e -> {
-            ContentSelectorDialog2 csd = new ContentSelectorDialog2(owner, frame, panel, true, metaData,
+            ContentSelectorDialog2 csd = new ContentSelectorDialog2(owner, frame, panel, true,
                     editor.getFieldName());
             csd.setLocationRelativeTo(frame);
 

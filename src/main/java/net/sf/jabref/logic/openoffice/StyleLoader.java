@@ -24,7 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,9 +40,9 @@ public class StyleLoader {
     private final List<String> internalStyleFiles = Arrays.asList(DEFAULT_AUTHORYEAR_STYLE_PATH,
             DEFAULT_NUMERICAL_STYLE_PATH);
 
-    private final JournalAbbreviationRepository repository;
     private final OpenOfficePreferences preferences;
     private final Charset encoding;
+    private final LayoutFormatterPreferences layoutFormatterPreferences;
 
     // Lists of the internal
     // and external styles
@@ -50,9 +50,10 @@ public class StyleLoader {
     private final List<OOBibStyle> externalStyles = new ArrayList<>();
 
 
-    public StyleLoader(OpenOfficePreferences preferences, JournalAbbreviationRepository repository, Charset encoding) {
-        this.repository = Objects.requireNonNull(repository);
+    public StyleLoader(OpenOfficePreferences preferences, LayoutFormatterPreferences jabrefPreferences,
+            Charset encoding) {
         this.preferences = Objects.requireNonNull(preferences);
+        this.layoutFormatterPreferences = Objects.requireNonNull(jabrefPreferences);
         this.encoding = Objects.requireNonNull(encoding);
         loadInternalStyles();
         loadExternalStyles();
@@ -64,15 +65,21 @@ public class StyleLoader {
         return result;
     }
 
-    public void addStyle(String filename) {
+    /**
+     * Adds the given style to the list of styles
+     * @param filename The filename of the style
+     * @return True if the added style is valid, false otherwise
+     */
+    public boolean addStyleIfValid(String filename) {
         Objects.requireNonNull(filename);
         try {
-            OOBibStyle newStyle = new OOBibStyle(new File(filename), repository, encoding);
+            OOBibStyle newStyle = new OOBibStyle(new File(filename), layoutFormatterPreferences, encoding);
             if (externalStyles.contains(newStyle)) {
                 LOGGER.info("External style file " + filename + " already existing.");
             } else if (newStyle.isValid()) {
                 externalStyles.add(newStyle);
                 storeExternalStyles();
+                return true;
             } else {
                 LOGGER.error(String.format("Style with filename %s is invalid", filename));
             }
@@ -82,6 +89,7 @@ public class StyleLoader {
         } catch (IOException e) {
             LOGGER.info("Problem reading external style file " + filename, e);
         }
+        return false;
 
     }
 
@@ -91,8 +99,8 @@ public class StyleLoader {
         List<String> lists = preferences.getExternalStyles();
         for (String filename : lists) {
             try {
-                OOBibStyle style = new OOBibStyle(new File(filename), repository, encoding);
-                if (style.isValid()) {
+                OOBibStyle style = new OOBibStyle(new File(filename), layoutFormatterPreferences, encoding);
+                if (style.isValid()) { //Problem!
                     externalStyles.add(style);
                 } else {
                     LOGGER.error(String.format("Style with filename %s is invalid", filename));
@@ -110,7 +118,7 @@ public class StyleLoader {
         internalStyles.clear();
         for (String filename : internalStyleFiles) {
             try {
-                internalStyles.add(new OOBibStyle(filename, repository));
+                internalStyles.add(new OOBibStyle(filename, layoutFormatterPreferences));
             } catch (IOException e) {
                 LOGGER.info("Problem reading internal style file " + filename, e);
             }

@@ -32,10 +32,10 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -56,7 +56,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     private boolean oldOverrideFontSize;
     private final JTextField fontSize;
     private final JTextField rowPadding;
-    // Look & Feel
+    // look and feel
     private final JComboBox<String> classNamesLAF;
     private String currentLAF = "";
     private boolean useDefaultLAF;

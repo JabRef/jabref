@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,14 +15,19 @@
 */
 package net.sf.jabref.importer.fileformat;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
-import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.Globals;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
-import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * Wraps the XMPUtility function to be used as an ImportFormat.
@@ -34,12 +39,35 @@ public class PdfXmpImporter extends ImportFormat {
         return Localization.lang("XMP-annotated PDF");
     }
 
-    /**
-     * Returns a list of all BibtexEntries found in the inputstream.
-     */
     @Override
-    public List<BibEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
-        return XMPUtil.readXMP(in);
+    public List<String> getExtensions() {
+        return Collections.singletonList(".pdf");
+    }
+
+    @Override
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
+        throw new UnsupportedOperationException(
+                "PdfXmpImporter does not support importDatabase(BufferedReader reader)."
+                        + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+    }
+
+    @Override
+    public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
+        Objects.requireNonNull(filePath);
+        try {
+            return new ParserResult(XMPUtil.readXMP(filePath, XMPPreferences.fromPreferences(Globals.prefs)));
+        } catch (IOException exception) {
+            return ParserResult.fromErrorMessage(exception.getLocalizedMessage());
+        }
+    }
+
+    @Override
+    protected boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
+        throw new UnsupportedOperationException(
+                "PdfXmpImporter does not support isRecognizedFormat(BufferedReader reader)."
+                        + "Instead use isRecognizedFormat(Path filePath, Charset defaultEncoding).");
     }
 
     /**
@@ -47,17 +75,19 @@ public class PdfXmpImporter extends ImportFormat {
      * contains at least one BibEntry.
      */
     @Override
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
-        return XMPUtil.hasMetadata(in);
+    public boolean isRecognizedFormat(Path filePath, Charset defaultEncoding) throws IOException {
+        Objects.requireNonNull(filePath);
+        return XMPUtil.hasMetadata(filePath, XMPPreferences.fromPreferences(Globals.prefs));
     }
 
-    /**
-     * String used to identify this import filter on the command line.
-     * 
-     * @return "xmp"
-     */
-    public String getCommandLineId() {
+    @Override
+    public String getId() {
         return "xmp";
+    }
+
+    @Override
+    public String getDescription() {
+        return "Wraps the XMPUtility function to be used as an ImportFormat.";
     }
 
 }

@@ -1,3 +1,18 @@
+/*  Copyright (C) 2003-2016 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
 package net.sf.jabref.gui.desktop;
 
 import java.io.File;
@@ -12,10 +27,12 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypeEntryEditor;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.FileListTableModel;
@@ -32,6 +49,8 @@ import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -55,7 +74,7 @@ public class JabRefDesktop {
             String initialFieldName) throws IOException {
         String link = initialLink;
         String fieldName = initialFieldName;
-        if ("ps".equals(fieldName) || "pdf".equals(fieldName)) {
+        if (FieldName.PS.equals(fieldName) || FieldName.PDF.equals(fieldName)) {
             // Find the default directory for this field type:
             List<String> dir = databaseContext.getFileDirectory(fieldName);
 
@@ -71,21 +90,21 @@ public class JabRefDesktop {
             String[] split = file.get().getName().split("\\.");
             if (split.length >= 2) {
                 if ("pdf".equalsIgnoreCase(split[split.length - 1])) {
-                    fieldName = "pdf";
+                    fieldName = FieldName.PDF;
                 } else if ("ps".equalsIgnoreCase(split[split.length - 1])
                         || ((split.length >= 3) && "ps".equalsIgnoreCase(split[split.length - 2]))) {
-                    fieldName = "ps";
+                    fieldName = FieldName.PS;
                 }
             }
-        } else if ("doi".equals(fieldName)) {
+        } else if (FieldName.DOI.equals(fieldName)) {
             Optional<DOI> doiUrl = DOI.build(link);
             if (doiUrl.isPresent()) {
-                link = doiUrl.get().getURLAsASCIIString();
+                link = doiUrl.get().getURIAsASCIIString();
             }
             // should be opened in browser
-            fieldName = "url";
-        } else if ("eprint".equals(fieldName)) {
-            fieldName = "url";
+            fieldName = FieldName.URL;
+        } else if (FieldName.EPRINT.equals(fieldName)) {
+            fieldName = FieldName.URL;
 
             // Check to see if link field already contains a well formated URL
             if (!link.startsWith("http://")) {
@@ -93,7 +112,7 @@ public class JabRefDesktop {
             }
         }
 
-        if ("url".equals(fieldName)) { // html
+        if (FieldName.URL.equals(fieldName)) { // html
             try {
                 openBrowser(link);
             } catch (IOException e) {
@@ -102,15 +121,15 @@ public class JabRefDesktop {
                 // In BasePanel.java, the exception is catched and a text output to the frame
                 // throw e;
             }
-        } else if ("ps".equals(fieldName)) {
+        } else if (FieldName.PS.equals(fieldName)) {
             try {
-                NATIVE_DESKTOP.openFile(link, "ps");
+                NATIVE_DESKTOP.openFile(link, FieldName.PS);
             } catch (IOException e) {
                 LOGGER.error("An error occured on the command: " + link, e);
             }
-        } else if ("pdf".equals(fieldName)) {
+        } else if (FieldName.PDF.equals(fieldName)) {
             try {
-                NATIVE_DESKTOP.openFile(link, "pdf");
+                NATIVE_DESKTOP.openFile(link, FieldName.PDF);
             } catch (IOException e) {
                 LOGGER.error("An error occured on the command: " + link, e);
             }
@@ -153,7 +172,7 @@ public class JabRefDesktop {
             openExternalFilePlatformIndependent(type, filePath);
             return true;
         } else {
-            // No file matched the name, or we didn't know the file type.
+            // No file matched the name, or we did not know the file type.
             return false;
         }
     }
@@ -210,8 +229,8 @@ public class JabRefDesktop {
             // User wants to change the type of this link.
             // First get a model of all file links for this entry:
             FileListTableModel tModel = new FileListTableModel();
-            String oldValue = entry.getField(Globals.FILE_FIELD);
-            tModel.setContent(oldValue);
+            Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
+            oldValue.ifPresent(tModel::setContent);
             FileListEntry flEntry = null;
             // Then find which one we are looking at:
             for (int i = 0; i < tModel.getRowCount(); i++) {
@@ -231,9 +250,10 @@ public class JabRefDesktop {
             if (editor.okPressed()) {
                 // Store the changes and add an undo edit:
                 String newValue = tModel.getStringRepresentation();
-                UndoableFieldChange ce = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue);
-                entry.setField(Globals.FILE_FIELD, newValue);
-                frame.getCurrentBasePanel().undoManager.addEdit(ce);
+                UndoableFieldChange ce = new UndoableFieldChange(entry, FieldName.FILE, oldValue.orElse(null),
+                        newValue);
+                entry.setField(FieldName.FILE, newValue);
+                frame.getCurrentBasePanel().getUndoManager().addEdit(ce);
                 frame.getCurrentBasePanel().markBaseChanged();
                 // Finally, open the link:
                 return openExternalFileAnyFormat(databaseContext, flEntry.link, flEntry.type);
@@ -265,13 +285,78 @@ public class JabRefDesktop {
         openExternalFilePlatformIndependent(fileType, url);
     }
 
+    /**
+     * Opens the url with the users standard Browser.
+     * If that fails a popup will be shown to instruct the user to open the link manually
+     * and the link gets copied to the clipboard
+     * @param url
+     */
+    public static void openBrowserShowPopup(String url) {
+        try {
+            openBrowser(url);
+        } catch (IOException exception) {
+            new ClipBoardManager().setClipboardContents(url);
+            LOGGER.error("Could not open browser", exception);
+            String couldNotOpenBrowser = Localization.lang("Could not open browser.");
+            String openManually = Localization.lang("Please open %0 manually.", url);
+            String copiedToClipboard = Localization.lang("The_link_has_been_copied_to_the_clipboard.");
+            JabRefGUI.getMainFrame().output(couldNotOpenBrowser);
+            JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(), couldNotOpenBrowser + "\n" + openManually +"\n"+
+                    copiedToClipboard, couldNotOpenBrowser, JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    /**
+     * Opens a new console starting on the given file location
+     *
+     * If no command is specified in {@link Globals},
+     * the default system console will be executed.
+     *
+     * @param file Location the console should be opened at.
+     */
     public static void openConsole(File file) throws IOException {
         if (file == null) {
             return;
         }
 
         String absolutePath = file.toPath().toAbsolutePath().getParent().toString();
-        NATIVE_DESKTOP.openConsole(absolutePath);
+        boolean usingDefault = Globals.prefs.getBoolean(JabRefPreferences.USE_DEFAULT_CONSOLE_APPLICATION);
+
+        if (usingDefault) {
+            NATIVE_DESKTOP.openConsole(absolutePath);
+        } else {
+            String command = Globals.prefs.get(JabRefPreferences.CONSOLE_COMMAND);
+            command = command.trim();
+
+            if (!command.isEmpty()) {
+                command = command.replaceAll("\\s+", " "); // normalize white spaces
+                String[] subcommands = command.split(" ");
+                StringBuilder commandLoggingText = new StringBuilder();
+
+                for (int i = 0; i < subcommands.length; i++) {
+                    subcommands[i] = subcommands[i].replace("%DIR", absolutePath); // replace the placeholder if used
+                    commandLoggingText.append(subcommands[i]);
+                    if (i < (subcommands.length - 1)) {
+                        commandLoggingText.append(" ");
+                    }
+                }
+
+                JabRefGUI.getMainFrame().output(Localization.lang("Executing command \"%0\"...", commandLoggingText.toString()));
+                LOGGER.info("Executing command \"" + commandLoggingText.toString() + "\"...");
+
+                try {
+                    new ProcessBuilder(subcommands).start();
+                } catch (IOException exception) {
+                    LOGGER.error("Open console", exception);
+
+                    JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(),
+                            Localization.lang("Error_occured_while_executing_the_command_\"%0\".", commandLoggingText.toString()),
+                            Localization.lang("Open console") + " - " + Localization.lang("Error"),
+                            JOptionPane.ERROR_MESSAGE);
+                    JabRefGUI.getMainFrame().output(null);
+                }
+            }
+        }
     }
 
     // TODO: Move to OS.java

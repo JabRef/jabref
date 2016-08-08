@@ -2,7 +2,7 @@ package net.sf.jabref.logic.util;
 
 import java.util.Optional;
 
-import net.sf.jabref.logic.FieldChange;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Before;
@@ -29,14 +29,14 @@ public class UpdateFieldTest {
     public void testUpdateFieldWorksEmptyField() {
         assertFalse(entry.hasField("year"));
         UpdateField.updateField(entry, "year", "2016");
-        assertEquals("2016", entry.getField("year"));
+        assertEquals(Optional.of("2016"), entry.getFieldOptional("year"));
     }
 
     @Test
     public void testUpdateFieldWorksNonEmptyField() {
         entry.setField("year", "2015");
         UpdateField.updateField(entry, "year", "2016");
-        assertEquals("2016", entry.getField("year"));
+        assertEquals(Optional.of("2016"), entry.getFieldOptional("year"));
     }
 
     @Test
@@ -159,7 +159,7 @@ public class UpdateFieldTest {
         assertFalse(entry.hasField("year"));
         UpdateField.updateNonDisplayableField(entry, "year", "2016");
         assertTrue(entry.hasField("year"));
-        assertEquals("2016", entry.getField("year"));
+        assertEquals(Optional.of("2016"), entry.getFieldOptional("year"));
     }
 
     @Test

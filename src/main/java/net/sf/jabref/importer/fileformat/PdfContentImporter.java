@@ -1,28 +1,45 @@
+/*  Copyright (C) 2003-2016 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
 package net.sf.jabref.importer.fileformat;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.importer.ImportInspector;
-import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.xmp.EncryptedPdfsNotSupportedException;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 
 import com.google.common.base.Strings;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
 
@@ -34,7 +51,6 @@ import org.apache.pdfbox.util.PDFTextStripper;
  * Integrating XMP support is future work
  */
 public class PdfContentImporter extends ImportFormat {
-    private static final Log LOGGER = LogFactory.getLog(PdfContentImporter.class);
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
     // we can store the DOItoBibTeXFetcher as single reference as the fetcher doesn't hold internal state
@@ -178,36 +194,31 @@ public class PdfContentImporter extends ImportFormat {
     }
 
     @Override
-    public boolean isRecognizedFormat(InputStream in) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
         return false;
     }
 
     @Override
-    public List<BibEntry> importEntries(InputStream in, OutputPrinter status) throws IOException {
-        final ArrayList<BibEntry> result = new ArrayList<>(1);
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
+        throw new UnsupportedOperationException(
+                "PdfContentImporter does not support importDatabase(BufferedReader reader)."
+                        + "Instead use importDatabase(Path filePath, Charset defaultEncoding).");
+    }
 
-        try (PDDocument document = XMPUtil.loadWithAutomaticDecryption(in)) {
+    @Override
+    public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
+        final ArrayList<BibEntry> result = new ArrayList<>(1);
+        try (PDDocument document = XMPUtil.loadWithAutomaticDecryption(filePath)) {
             String firstPageContents = getFirstPageContents(document);
 
             Optional<DOI> doi = DOI.findInText(firstPageContents);
             if (doi.isPresent()) {
-                ImportInspector inspector = new ImportInspector() {
-                    @Override
-                    public void setProgress(int current, int max) {
-                        // Do nothing
-                    }
-
-                    @Override
-                    public void addEntry(BibEntry entry) {
-                        // add the entry to the result object
-                        result.add(entry);
-                    }
-                };
-
-                DOI_TO_BIBTEX_FETCHER.processQuery(doi.get().getDOI(), inspector, status);
-                if (!result.isEmpty()) {
-                    return result;
-                }
+                ParserResult parserResult = new ParserResult(result);
+                Optional<BibEntry> entry = DOI_TO_BIBTEX_FETCHER.getEntryFromDOI(doi.get().getDOI(), parserResult);
+                entry.ifPresent(parserResult.getDatabase()::insertEntry);
+                return parserResult;
             }
 
             // idea: split[] contains the different lines
@@ -224,7 +235,7 @@ public class PdfContentImporter extends ImportFormat {
             if (i >= lines.length) {
                 // PDF could not be parsed or is empty
                 // return empty list
-                return result;
+                return new ParserResult();
             }
 
             // we start at the current line
@@ -379,7 +390,7 @@ public class PdfContentImporter extends ImportFormat {
                     if (DOI == null) {
                         pos = curString.indexOf("DOI");
                         if (pos < 0) {
-                            pos = curString.indexOf("doi");
+                            pos = curString.indexOf(FieldName.DOI);
                         }
                         if (pos >= 0) {
                             pos += 3;
@@ -432,51 +443,53 @@ public class PdfContentImporter extends ImportFormat {
             // TODO: institution parsing missing
 
             if (author != null) {
-                entry.setField("author", author);
+                entry.setField(FieldName.AUTHOR, author);
             }
             if (editor != null) {
-                entry.setField("editor", editor);
+                entry.setField(FieldName.EDITOR, editor);
             }
             if (abstractT != null) {
-                entry.setField("abstract", abstractT);
+                entry.setField(FieldName.ABSTRACT, abstractT);
             }
             if (!Strings.isNullOrEmpty(keywords)) {
-                entry.setField("keywords", keywords);
+                entry.setField(FieldName.KEYWORDS, keywords);
             }
             if (title != null) {
-                entry.setField("title", title);
+                entry.setField(FieldName.TITLE, title);
             }
             if (conference != null) {
-                entry.setField("booktitle", conference);
+                entry.setField(FieldName.BOOKTITLE, conference);
             }
             if (DOI != null) {
-                entry.setField("doi", DOI);
+                entry.setField(FieldName.DOI, DOI);
             }
             if (series != null) {
-                entry.setField("series", series);
+                entry.setField(FieldName.SERIES, series);
             }
             if (volume != null) {
-                entry.setField("volume", volume);
+                entry.setField(FieldName.VOLUME, volume);
             }
             if (number != null) {
-                entry.setField("number", number);
+                entry.setField(FieldName.NUMBER, number);
             }
             if (pages != null) {
-                entry.setField("pages", pages);
+                entry.setField(FieldName.PAGES, pages);
             }
             if (year != null) {
-                entry.setField("year", year);
+                entry.setField(FieldName.YEAR, year);
             }
             if (publisher != null) {
-                entry.setField("publisher", publisher);
+                entry.setField(FieldName.PUBLISHER, publisher);
             }
 
             result.add(entry);
         } catch (EncryptedPdfsNotSupportedException e) {
-            LOGGER.info("Decryption not supported");
-            return Collections.emptyList();
+            return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
+        } catch(IOException exception) {
+            return ParserResult.fromErrorMessage(exception.getLocalizedMessage());
         }
-        return result;
+
+        return new ParserResult(result);
     }
 
     private String getFirstPageContents(PDDocument document) throws IOException {
@@ -580,6 +593,16 @@ public class PdfContentImporter extends ImportFormat {
     @Override
     public String getFormatName() {
         return "PDFcontent";
+    }
+
+    @Override
+    public List<String> getExtensions() {
+        return Collections.singletonList(".pdf");
+    }
+
+    @Override
+    public String getDescription() {
+        return "PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry. Currently, Springer and IEEE formats are supported.";
     }
 
 }

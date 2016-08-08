@@ -23,10 +23,12 @@ import java.util.Map;
 import javax.swing.JLabel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
+import net.sf.jabref.gui.keyboard.EmacsKeyBindings;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -37,68 +39,32 @@ import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
 
 /**
  * Static variables for graphics files and keyboard shortcuts.
  */
 public class GUIGlobals {
-    private static final Log LOGGER = LogFactory.getLog(GUIGlobals.class);
 
-    // Frame titles.
-    public static final String FRAME_TITLE = "JabRef";
+    private static final Log LOGGER = LogFactory.getLog(GUIGlobals.class);
 
     public static final String UNTITLED_TITLE = Localization.lang("untitled");
     public static Font currentFont;
 
-    // Divider size for BaseFrame split pane. 0 means non-resizable.
-    public static final int SPLIT_PANE_DIVIDER_SIZE = 4;
-    public static final int SPLIT_PANE_DIVIDER_LOCATION = 160 + 15; // + 15 for possible scrollbar.
-    public static final int TABLE_ROW_PADDING = 9;
-    public static final int KEYBIND_COL_0 = 200;
-    public static final int KEYBIND_COL_1 = 80; // Added to the font size when determining table
-    public static final int MAX_CONTENT_SELECTOR_WIDTH = 240; // The max width of the combobox for content selectors.
-
-    // Filenames.
-    public static final String BACKUP_EXTENSION = ".bak";
-
     private static final Map<String, JLabel> TABLE_ICONS = new HashMap<>(); // Contains table icon mappings. Set up
-    // further below.
-    public static final Color ACTIVE_EDITOR_COLOR = new Color(230, 230, 255);
 
     //	Colors.
     public static final Color ENTRY_EDITOR_LABEL_COLOR = new Color(100, 100, 150); // Empty field, blue.
-    public static final Color NULL_FIELD_COLOR = new Color(75, 130, 95); // Valid field, green.
-    public static final Color ACTIVE_TABBED_COLOR = GUIGlobals.ENTRY_EDITOR_LABEL_COLOR.darker(); // active Database (JTabbedPane)
-    public static final Color INACTIVE_TABBED_COLOR = Color.black; // inactive Database
+    static final Color ACTIVE_TABBED_COLOR = ENTRY_EDITOR_LABEL_COLOR.darker(); // active Database (JTabbedPane)
+    static final Color INACTIVE_TABBED_COLOR = Color.black; // inactive Database
     public static Color editorTextColor;
     public static Color validFieldBackgroundColor;
     public static Color activeBackground;
     public static Color invalidFieldBackgroundColor;
-
-
-    public static final int MAX_BACK_HISTORY_SIZE = 10; // The maximum number of "Back" operations stored.
-
-    //	Constants controlling formatted bibtex output.
-    public static final int INDENT = 4;
-    public static final int LINE_LENGTH = 65; // Maximum
-
-    public static final int NUMBER_COL_LENGTH = 32;
-
-    public static final int WIDTH_ICON_COL_RANKING = 80; // Width of Ranking Icon Column
+    public static final Color NULL_FIELD_COLOR = new Color(75, 130, 95); // Valid field, green.
+    public static final Color ACTIVE_EDITOR_COLOR = new Color(230, 230, 255);
 
     public static final int WIDTH_ICON_COL = 26;
-
-    // Column widths for export customization dialog table:
-    public static final int EXPORT_DIALOG_COL_0_WIDTH = 50;
-    public static final int EXPORT_DIALOG_COL_1_WIDTH = 200;
-    public static final int EXPORT_DIALOG_COL_2_WIDTH = 30;
-
-    // Column widths for import customization dialog table:
-    public static final int IMPORT_DIALOG_COL_0_WIDTH = 200;
-    public static final int IMPORT_DIALOG_COL_1_WIDTH = 80;
-    public static final int IMPORT_DIALOG_COL_2_WIDTH = 200;
-    public static final int IMPORT_DIALOG_COL_3_WIDTH = 200;
+    public static final int WIDTH_ICON_COL_RANKING = 80; // Width of Ranking Icon Column
 
     static {
         // Set up entry editor colors, first time:
@@ -106,12 +72,12 @@ public class GUIGlobals {
     }
 
     public static JLabel getTableIcon(String fieldType) {
-        Object o = GUIGlobals.TABLE_ICONS.get(fieldType);
-        if (o == null) {
+        JLabel label = GUIGlobals.TABLE_ICONS.get(fieldType);
+        if (label == null) {
             LOGGER.info("Error: no table icon defined for type '" + fieldType + "'.");
             return null;
         } else {
-            return (JLabel) o;
+            return label;
         }
     }
 
@@ -131,11 +97,11 @@ public class GUIGlobals {
         JLabel label;
         label = new JLabel(IconTheme.JabRefIcon.PDF_FILE.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " PDF");
-        GUIGlobals.TABLE_ICONS.put("pdf", label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.PDF, label);
 
         label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " URL");
-        GUIGlobals.TABLE_ICONS.put("url", label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.URL, label);
 
         label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " CiteSeer URL");
@@ -143,23 +109,23 @@ public class GUIGlobals {
 
         label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " ArXiv URL");
-        GUIGlobals.TABLE_ICONS.put("eprint", label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.EPRINT, label);
 
-        label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
+        label = new JLabel(IconTheme.JabRefIcon.DOI.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " DOI " + Localization.lang("web link"));
-        GUIGlobals.TABLE_ICONS.put("doi", label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.DOI, label);
 
         label = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " PS");
-        GUIGlobals.TABLE_ICONS.put("ps", label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.PS, label);
 
         label = new JLabel(IconTheme.JabRefIcon.FOLDER.getSmallIcon());
         label.setToolTipText(Localization.lang("Open folder"));
-        GUIGlobals.TABLE_ICONS.put(Globals.FOLDER_FIELD, label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.FOLDER, label);
 
         label = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
         label.setToolTipText(Localization.lang("Open file"));
-        GUIGlobals.TABLE_ICONS.put(Globals.FILE_FIELD, label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.FILE, label);
 
         for (ExternalFileType fileType : ExternalFileTypes.getInstance().getExternalFileTypeSelection()) {
             label = new JLabel(fileType.getIcon());

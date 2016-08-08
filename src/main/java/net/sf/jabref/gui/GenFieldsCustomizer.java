@@ -36,13 +36,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.Sizes;
@@ -67,7 +67,7 @@ public class GenFieldsCustomizer extends JDialog {
     public GenFieldsCustomizer(JabRefFrame frame) {
         super(frame, Localization.lang("Set general fields"), false);
         parentFrame = frame;
-        helpBut = new HelpAction(HelpFiles.GENERAL_FIELDS).getHelpButton();
+        helpBut = new HelpAction(HelpFile.GENERAL_FIELDS).getHelpButton();
         jbInit();
         setSize(new Dimension(650, 300));
     }
@@ -136,7 +136,8 @@ public class GenFieldsCustomizer extends JDialog {
                         Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            String testString = LabelPatternUtil.checkLegalKey(parts[1]);
+            String testString = LabelPatternUtil.checkLegalKey(parts[1],
+                    Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
             if (!testString.equals(parts[1]) || (parts[1].indexOf('&') >= 0)) {
                 // Report error and exit.
                 JOptionPane.showMessageDialog(this, Localization.lang("Field names are not allowed to contain white space or the following "

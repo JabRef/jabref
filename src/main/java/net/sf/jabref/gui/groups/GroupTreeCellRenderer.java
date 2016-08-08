@@ -17,14 +17,18 @@ package net.sf.jabref.gui.groups;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JTree;
+import javax.swing.border.Border;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.util.strings.StringUtil;
 
 /**
@@ -36,8 +40,8 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
 
     /** The cell over which the user is currently dragging */
     private Object highlight1Cell;
-    private Object[] highlight2Cells;
-    private Object[] highlight3Cells;
+    private List<GroupTreeNode> overlappingGroups = new ArrayList<>();
+    private List<GroupTreeNode> matchingGroups = new ArrayList<>();
     private Object highlightBorderCell;
 
 
@@ -59,14 +63,18 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         GroupTreeNodeViewModel viewModel = (GroupTreeNodeViewModel) value;
         JLabel label = (JLabel) c;
 
+        Border border;
         if (Objects.equals(highlightBorderCell, value)) {
-            label.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+            border = BorderFactory.createLineBorder(Color.BLACK);
         } else {
-            label.setBorder(BorderFactory.createEmptyBorder());
+            border = BorderFactory.createEmptyBorder();
+        }
+        if (label.getBorder() != border) {
+            label.setBorder(border);
         }
 
-        Boolean red = printInRed(value);
-        Boolean underlined = printUnderlined(value);
+        Boolean red = printInRed(viewModel) && !selected; // do not print currently selected node in red
+        Boolean underlined = printUnderlined(viewModel);
         StringBuilder sb = new StringBuilder(60);
         sb.append("<html>");
         if (red) {
@@ -103,26 +111,21 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
         return c;
     }
 
-    private boolean printInRed(Object value) {
-        if (highlight2Cells != null) {
-            for (Object highlight2Cell : highlight2Cells) {
-                if (highlight2Cell.equals(value)) {
-                    return true;
-                }
-            }
+    private boolean printInRed(GroupTreeNodeViewModel viewModel) {
+        if(viewModel.isAllEntriesGroup()) {
+            // Do not print all entries group in red
+            return false;
         }
-        return false;
+
+        return overlappingGroups.contains(viewModel.getNode());
     }
 
-    private boolean printUnderlined(Object value) {
-        if (highlight3Cells != null) {
-            for (Object highlight3Cell : highlight3Cells) {
-                if (highlight3Cell.equals(value)) {
-                    return true;
-                }
-            }
+    private boolean printUnderlined(GroupTreeNodeViewModel viewModel) {
+        if(viewModel.isAllEntriesGroup()) {
+            // Do not underline all entries group
+            return false;
         }
-        return false;
+        return matchingGroups.contains(viewModel.getNode());
     }
 
     /**
@@ -135,17 +138,19 @@ public class GroupTreeCellRenderer extends DefaultTreeCellRenderer {
     }
 
     /**
-     * Highlights the specified cells (in red), or disables highlight if cells == null.
+     * Highlights the specified groups in red.
      */
-    public void setHighlight2Cells(Object[] cells) {
-        this.highlight2Cells = cells;
+    public void setOverlappingGroups(List<GroupTreeNode> nodes) {
+        Objects.requireNonNull(nodes);
+        this.overlappingGroups = nodes;
     }
 
     /**
-     * Highlights the specified cells (by underlining), or disables highlight if cells == null.
+     * Highlights the specified groups by underlining.
      */
-    public void setHighlight3Cells(Object[] cells) {
-        this.highlight3Cells = cells;
+    public void setMatchingGroups(List<GroupTreeNode> nodes) {
+        Objects.requireNonNull(nodes);
+        this.matchingGroups = nodes;
     }
 
     /**

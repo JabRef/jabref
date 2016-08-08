@@ -23,6 +23,7 @@ import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -48,7 +49,6 @@ import javax.swing.event.DocumentListener;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
@@ -57,6 +57,7 @@ import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -345,10 +346,8 @@ public class FileListEntryEditor {
 
 
     class BrowseListener implements ActionListener {
-
         private final JFrame parent;
         private final JTextField comp;
-
 
         public BrowseListener(JFrame parent, JTextField comp) {
             this.parent = parent;
@@ -357,21 +356,25 @@ public class FileListEntryEditor {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            File initial = new File(comp.getText().trim());
-            if (comp.getText().trim().isEmpty()) {
-                // Nothing in the field. Go to the last file dir used:
-                initial = new File(Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY));
+            String filePath = comp.getText().trim();
+            Optional<File> file = FileUtil.expandFilename(databaseContext, filePath);
+            File workingDir;
+            // no file set yet or found
+            if (file.isPresent()) {
+                workingDir = new File(file.get().getParent());
+            } else {
+                workingDir = new File(Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY));
             }
-            String chosen = FileDialogs.getNewFile(parent, initial, "",
+            String selection = FileDialogs.getNewFile(parent, workingDir, Collections.emptyList(),
                     JFileChooser.OPEN_DIALOG, false);
-            if (chosen != null) {
-                File newFile = new File(chosen);
+            if (selection != null) {
+                File newFile = new File(selection);
                 // Store the directory for next time:
                 Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getParent());
 
                 // If the file is below the file directory, make the path relative:
-                List<String> dirsS = databaseContext.getFileDirectory();
-                newFile = FileUtil.shortenFileName(newFile, dirsS);
+                List<String> fileDirs = databaseContext.getFileDirectory();
+                newFile = FileUtil.shortenFileName(newFile, fileDirs);
 
                 comp.setText(newFile.getPath());
                 comp.requestFocus();

@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -17,14 +17,15 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * Importer for COPAC format.
@@ -37,84 +38,67 @@ public class CopacImporter extends ImportFormat {
 
     private static final Pattern COPAC_PATTERN = Pattern.compile("^\\s*TI- ");
 
-
-    /**
-     * Return the name of this import format.
-     */
     @Override
     public String getFormatName() {
         return "Copac";
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
-     */
     @Override
-    public String getCLIId() {
+    public List<String> getExtensions() {
+        return Collections.singletonList(".txt");
+    }
+
+    @Override
+    public String getId() {
         return "cpc";
     }
 
-
-
-    /**
-     * Check whether the source is in the correct format for this importer.
-     */
     @Override
-    public boolean isRecognizedFormat(InputStream stream) throws IOException {
+    public String getDescription() {
+        return "Importer for COPAC format.";
+    }
 
-        BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream));
-
+    @Override
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         String str;
-
-        while ((str = in.readLine()) != null) {
+        while ((str = reader.readLine()) != null) {
             if (CopacImporter.COPAC_PATTERN.matcher(str).find()) {
                 return true;
             }
         }
-
         return false;
     }
 
-    /**
-     * Parse the entries in the source, and return a List of BibEntry
-     * objects.
-     */
     @Override
-    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        if (stream == null) {
-            throw new IOException("No stream given.");
-        }
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
 
         List<String> entries = new LinkedList<>();
         StringBuilder sb = new StringBuilder();
 
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            // Preprocess entries
-            String str;
+        // Preprocess entries
+        String str;
 
-            while ((str = in.readLine()) != null) {
+        while ((str = reader.readLine()) != null) {
 
-                if (str.length() < 4) {
-                    continue;
-                }
+            if (str.length() < 4) {
+                continue;
+            }
 
-                String code = str.substring(0, 4);
+            String code = str.substring(0, 4);
 
-                if ("    ".equals(code)) {
-                    sb.append(' ').append(str.trim());
-                } else {
+            if ("    ".equals(code)) {
+                sb.append(' ').append(str.trim());
+            } else {
 
-                    // begining of a new item
-                    if ("TI- ".equals(str.substring(0, 4))) {
-                        if (sb.length() > 0) {
-                            entries.add(sb.toString());
-                        }
-                        sb = new StringBuilder();
+                // begining of a new item
+                if ("TI- ".equals(str.substring(0, 4))) {
+                    if (sb.length() > 0) {
+                        entries.add(sb.toString());
                     }
-                    sb.append('\n').append(str);
+                    sb = new StringBuilder();
                 }
+                sb.append('\n').append(str);
             }
         }
 
@@ -140,21 +124,21 @@ public class CopacImporter extends ImportFormat {
                 String code = line.substring(0, 4);
 
                 if ("TI- ".equals(code)) {
-                    setOrAppend(b, "title", line.substring(4).trim(), ", ");
+                    setOrAppend(b, FieldName.TITLE, line.substring(4).trim(), ", ");
                 } else if ("AU- ".equals(code)) {
-                    setOrAppend(b, "author", line.substring(4).trim(), " and ");
+                    setOrAppend(b, FieldName.AUTHOR, line.substring(4).trim(), " and ");
                 } else if ("PY- ".equals(code)) {
-                    setOrAppend(b, "year", line.substring(4).trim(), ", ");
+                    setOrAppend(b, FieldName.YEAR, line.substring(4).trim(), ", ");
                 } else if ("PU- ".equals(code)) {
-                    setOrAppend(b, "publisher", line.substring(4).trim(), ", ");
+                    setOrAppend(b, FieldName.PUBLISHER, line.substring(4).trim(), ", ");
                 } else if ("SE- ".equals(code)) {
-                    setOrAppend(b, "series", line.substring(4).trim(), ", ");
+                    setOrAppend(b, FieldName.SERIES, line.substring(4).trim(), ", ");
                 } else if ("IS- ".equals(code)) {
-                    setOrAppend(b, "isbn", line.substring(4).trim(), ", ");
+                    setOrAppend(b, FieldName.ISBN, line.substring(4).trim(), ", ");
                 } else if ("KW- ".equals(code)) {
-                    setOrAppend(b, "keywords", line.substring(4).trim(), ", ");
+                    setOrAppend(b, FieldName.KEYWORDS, line.substring(4).trim(), ", ");
                 } else if ("NT- ".equals(code)) {
-                    setOrAppend(b, "note", line.substring(4).trim(), ", ");
+                    setOrAppend(b, FieldName.NOTE, line.substring(4).trim(), ", ");
                 } else if ("PD- ".equals(code)) {
                     setOrAppend(b, "physicaldimensions", line.substring(4).trim(), ", ");
                 } else if ("DT- ".equals(code)) {
@@ -166,12 +150,12 @@ public class CopacImporter extends ImportFormat {
             results.add(b);
         }
 
-        return results;
+        return new ParserResult(results);
     }
 
     private static void setOrAppend(BibEntry b, String field, String value, String separator) {
         if (b.hasField(field)) {
-            b.setField(field, b.getField(field) + separator + value);
+            b.setField(field, b.getFieldOptional(field).get() + separator + value);
         } else {
             b.setField(field, value);
         }

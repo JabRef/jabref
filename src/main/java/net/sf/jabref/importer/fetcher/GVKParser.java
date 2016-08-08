@@ -12,8 +12,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
 
 import com.google.common.base.Strings;
@@ -337,7 +337,7 @@ public class GVKParser {
         // Dokumenttyp bestimmen und Eintrag anlegen
 
         if (mak.startsWith("As")) {
-            entryType = "misc";
+            entryType = BibEntry.DEFAULT_TYPE;
 
             if (quelle.contains("ISBN")) {
                 entryType = "incollection";
@@ -346,9 +346,9 @@ public class GVKParser {
                 entryType = "article";
             }
         } else if (mak.isEmpty()) {
-            entryType = "misc";
+            entryType = BibEntry.DEFAULT_TYPE;
         } else if (mak.startsWith("O")) {
-            entryType = "misc";
+            entryType = BibEntry.DEFAULT_TYPE;
             // FIXME: online only available in Biblatex
             //entryType = "online";
         }
@@ -365,13 +365,13 @@ public class GVKParser {
 
         // Zuordnung der Felder in Abhängigkeit vom Dokumenttyp
         if (author != null) {
-            result.setField("author", StringUtil.expandAuthorInitials(author));
+            result.setField(FieldName.AUTHOR, author);
         }
         if (editor != null) {
-            result.setField("editor", StringUtil.expandAuthorInitials(editor));
+            result.setField(FieldName.EDITOR, editor);
         }
         if (title != null) {
-            result.setField("title", title);
+            result.setField(FieldName.TITLE, title);
         }
         if (!Strings.isNullOrEmpty(subtitle)) {
             // ensure that first letter is an upper case letter
@@ -382,58 +382,58 @@ public class GVKParser {
             if (subtitle.length() > 1) {
                 newSubtitle.append(subtitle.substring(1));
             }
-            result.setField("subtitle", newSubtitle.toString());
+            result.setField(FieldName.SUBTITLE, newSubtitle.toString());
         }
         if (publisher != null) {
-            result.setField("publisher", publisher);
+            result.setField(FieldName.PUBLISHER, publisher);
         }
         if (year != null) {
-            result.setField("year", year);
+            result.setField(FieldName.YEAR, year);
         }
         if (address != null) {
-            result.setField("address", address);
+            result.setField(FieldName.ADDRESS, address);
         }
         if (series != null) {
-            result.setField("series", series);
+            result.setField(FieldName.SERIES, series);
         }
         if (edition != null) {
-            result.setField("edition", edition);
+            result.setField(FieldName.EDITION, edition);
         }
         if (isbn != null) {
-            result.setField("isbn", isbn);
+            result.setField(FieldName.ISBN, isbn);
         }
         if (issn != null) {
-            result.setField("issn", issn);
+            result.setField(FieldName.ISSN, issn);
         }
         if (number != null) {
-            result.setField("number", number);
+            result.setField(FieldName.NUMBER, number);
         }
         if (pagetotal != null) {
-            result.setField("pagetotal", pagetotal);
+            result.setField(FieldName.PAGETOTAL, pagetotal);
         }
         if (pages != null) {
-            result.setField("pages", pages);
+            result.setField(FieldName.PAGES, pages);
         }
         if (volume != null) {
-            result.setField("volume", volume);
+            result.setField(FieldName.VOLUME, volume);
         }
         if (journal != null) {
-            result.setField("journal", journal);
+            result.setField(FieldName.JOURNAL, journal);
         }
         if (ppn != null) {
             result.setField("ppn_GVK", ppn);
         }
         if (url != null) {
-            result.setField("url", url);
+            result.setField(FieldName.URL, url);
         }
         if (note != null) {
-            result.setField("note", note);
+            result.setField(FieldName.NOTE, note);
         }
 
         if ("article".equals(entryType) && (journal != null)) {
-            result.setField("journal", journal);
+            result.setField(FieldName.JOURNAL, journal);
         } else if ("incollection".equals(entryType) && (booktitle != null)) {
-            result.setField("booktitle", booktitle);
+            result.setField(FieldName.BOOKTITLE, booktitle);
         }
 
         return result;

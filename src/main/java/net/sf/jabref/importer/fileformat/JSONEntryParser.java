@@ -17,10 +17,14 @@
 package net.sf.jabref.importer.fileformat;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.MonthUtil;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,10 +43,10 @@ public class JSONEntryParser {
      */
     public BibEntry parseBibJSONtoBibtex(JSONObject bibJsonEntry) {
         // Fields that are directly accessible at the top level BibJson object
-        String[] singleFieldStrings = {"year", "title", "abstract", "month"};
+        String[] singleFieldStrings = {FieldName.YEAR, FieldName.TITLE, FieldName.ABSTRACT, FieldName.MONTH};
 
         // Fields that are accessible in the journal part of the BibJson object
-        String[] journalSingleFieldStrings = {"publisher", "number", "volume"};
+        String[] journalSingleFieldStrings = {FieldName.PUBLISHER, FieldName.NUMBER, FieldName.VOLUME};
 
 
 
@@ -60,7 +64,7 @@ public class JSONEntryParser {
                     LOGGER.info("Empty author name.");
                 }
             }
-            entry.setField("author", String.join(" and ", authorList));
+            entry.setField(FieldName.AUTHOR, String.join(" and ", authorList));
         } else {
             LOGGER.info("No author found.");
         }
@@ -75,10 +79,10 @@ public class JSONEntryParser {
         // Page numbers
         if (bibJsonEntry.has("start_page")) {
             if (bibJsonEntry.has("end_page")) {
-                entry.setField("pages",
+                entry.setField(FieldName.PAGES,
                         bibJsonEntry.getString("start_page") + "--" + bibJsonEntry.getString("end_page"));
             } else {
-                entry.setField("pages", bibJsonEntry.getString("start_page"));
+                entry.setField(FieldName.PAGES, bibJsonEntry.getString("start_page"));
             }
         }
 
@@ -87,7 +91,7 @@ public class JSONEntryParser {
             JSONObject journal = bibJsonEntry.getJSONObject("journal");
             // Journal title
             if (journal.has("title")) {
-                entry.setField("journal", journal.getString("title"));
+                entry.setField(FieldName.JOURNAL, journal.getString("title"));
             } else {
                 LOGGER.info("No journal title found.");
             }
@@ -104,13 +108,13 @@ public class JSONEntryParser {
         // Keywords
         if (bibJsonEntry.has("keywords")) {
             JSONArray keywords = bibJsonEntry.getJSONArray("keywords");
-            List<String> keywordList = new ArrayList<>();
+            LinkedHashSet<String> keywordList = new LinkedHashSet<>();
             for (int i = 0; i < keywords.length(); i++) {
                 if (!keywords.isNull(i)) {
                     keywordList.add(keywords.getString(i));
                 }
             }
-            entry.putKeywords(keywordList);
+            entry.putKeywords(keywordList, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
         }
 
         // Identifiers
@@ -119,11 +123,11 @@ public class JSONEntryParser {
             for (int i = 0; i < identifiers.length(); i++) {
                 String type = identifiers.getJSONObject(i).getString("type");
                 if ("doi".equals(type)) {
-                    entry.setField("doi", identifiers.getJSONObject(i).getString("id"));
+                    entry.setField(FieldName.DOI, identifiers.getJSONObject(i).getString("id"));
                 } else if ("pissn".equals(type)) {
-                    entry.setField("issn", identifiers.getJSONObject(i).getString("id"));
+                    entry.setField(FieldName.ISSN, identifiers.getJSONObject(i).getString("id"));
                 } else if ("eissn".equals(type)) {
-                    entry.setField("issn", identifiers.getJSONObject(i).getString("id"));
+                    entry.setField(FieldName.ISSN, identifiers.getJSONObject(i).getString("id"));
                 }
             }
         }
@@ -135,7 +139,7 @@ public class JSONEntryParser {
                 if (links.getJSONObject(i).has("type")) {
                     String type = links.getJSONObject(i).getString("type");
                     if ("fulltext".equals(type) && links.getJSONObject(i).has("url")) {
-                        entry.setField("url", links.getJSONObject(i).getString("url"));
+                        entry.setField(FieldName.URL, links.getJSONObject(i).getString("url"));
                     }
                 }
             }
@@ -152,8 +156,8 @@ public class JSONEntryParser {
      */
     public static BibEntry parseSpringerJSONtoBibtex(JSONObject springerJsonEntry) {
         // Fields that are directly accessible at the top level Json object
-        String[] singleFieldStrings = {"issn", "volume", "abstract", "doi", "title", "number",
-                "publisher"};
+        String[] singleFieldStrings = {FieldName.ISSN, FieldName.VOLUME, FieldName.ABSTRACT, FieldName.DOI, FieldName.TITLE, FieldName.NUMBER,
+                FieldName.PUBLISHER};
 
         BibEntry entry = new BibEntry();
         String nametype;
@@ -163,12 +167,12 @@ public class JSONEntryParser {
         if (com.google.common.base.Strings.isNullOrEmpty(isbn)) {
             // Probably article
             entry.setType("article");
-            nametype = "journal";
+            nametype = FieldName.JOURNAL;
         } else {
             // Probably book chapter or from proceeding, go for book chapter
             entry.setType("incollection");
-            nametype = "booktitle";
-            entry.setField("isbn", isbn);
+            nametype = FieldName.BOOKTITLE;
+            entry.setField(FieldName.ISBN, isbn);
         }
 
         // Authors
@@ -182,7 +186,7 @@ public class JSONEntryParser {
                     LOGGER.info("Empty author name.");
                 }
             }
-            entry.setField("author", String.join(" and ", authorList));
+            entry.setField(FieldName.AUTHOR, String.join(" and ", authorList));
         } else {
             LOGGER.info("No author found.");
         }
@@ -200,10 +204,10 @@ public class JSONEntryParser {
         // Page numbers
         if (springerJsonEntry.has("startingPage") && !(springerJsonEntry.getString("startingPage").isEmpty())) {
             if (springerJsonEntry.has("endPage") && !(springerJsonEntry.getString("endPage").isEmpty())) {
-                entry.setField("pages",
+                entry.setField(FieldName.PAGES,
                         springerJsonEntry.getString("startingPage") + "--" + springerJsonEntry.getString("endPage"));
             } else {
-                entry.setField("pages", springerJsonEntry.getString("startingPage"));
+                entry.setField(FieldName.PAGES, springerJsonEntry.getString("startingPage"));
             }
         }
 
@@ -216,26 +220,27 @@ public class JSONEntryParser {
         if (springerJsonEntry.has("url")) {
             JSONArray urlarray = springerJsonEntry.optJSONArray("url");
             if (urlarray == null) {
-                entry.setField("url", springerJsonEntry.optString("url"));
+                entry.setField(FieldName.URL, springerJsonEntry.optString("url"));
             } else {
-                entry.setField("url", urlarray.getJSONObject(0).optString("value"));
+                entry.setField(FieldName.URL, urlarray.getJSONObject(0).optString("value"));
             }
         }
 
         // Date
         if (springerJsonEntry.has("publicationDate")) {
             String date = springerJsonEntry.getString("publicationDate");
-            entry.setField("date", date); // For BibLatex
+            entry.setField(FieldName.DATE, date); // For BibLatex
             String[] dateparts = date.split("-");
-            entry.setField("year", dateparts[0]);
-            entry.setField("month", MonthUtil.getMonthByNumber(Integer.parseInt(dateparts[1])).bibtexFormat);
+            entry.setField(FieldName.YEAR, dateparts[0]);
+            entry.setField(FieldName.MONTH, MonthUtil.getMonthByNumber(Integer.parseInt(dateparts[1])).bibtexFormat);
         }
 
         // Clean up abstract (often starting with Abstract)
-        String abstr = entry.getField("abstract");
-        if ((abstr != null) && abstr.startsWith("Abstract")) {
-            entry.setField("abstract", abstr.substring(8));
-        }
+        entry.getFieldOptional(FieldName.ABSTRACT).ifPresent(abstractContents -> {
+            if (abstractContents.startsWith("Abstract")) {
+                entry.setField(FieldName.ABSTRACT, abstractContents.substring(8));
+            }
+        });
 
         return entry;
     }

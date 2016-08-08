@@ -31,12 +31,13 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OAI2Handler;
 import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.MonthUtil;
 
@@ -49,6 +50,8 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * This class can be used to access any archive offering an OAI2 interface. By
  * default it will access ArXiv.org
+ *
+ * @see <a href="http://arxiv.org/help/oa/index"></a>
  *
  * @author Ulrich St&auml;rk
  * @author Christian Kopf
@@ -201,26 +204,27 @@ public class OAI2Fetcher implements EntryFetcher {
 
                 /* Correct line breaks and spacing */
                 for (String name : be.getFieldNames()) {
-                    be.setField(name, OAI2Fetcher.correctLineBreaks(be.getField(name)));
+                    be.getFieldOptional(name)
+                            .ifPresent(content -> be.setField(name, OAI2Fetcher.correctLineBreaks(content)));
                 }
 
                 if (fixedKey.matches("\\d\\d\\d\\d\\..*")) {
-                    be.setField("year", "20" + fixedKey.substring(0, 2));
+                    be.setField(FieldName.YEAR, "20" + fixedKey.substring(0, 2));
 
                     int monthNumber = Integer.parseInt(fixedKey.substring(2, 4));
                     MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
                     if (month.isValid()) {
-                        be.setField("month", month.bibtexFormat);
+                        be.setField(FieldName.MONTH, month.bibtexFormat);
                     }
                 }
             }
             return be;
         } catch (IOException e) {
-            status.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url) + "\n\n" + e,
+            status.showMessage(Localization.lang("An exception occurred while accessing '%0'", url) + "\n\n" + e,
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (SAXException e) {
             status.showMessage(
-                    Localization.lang("An SAXException occurred while parsing '%0':", url) + "\n\n" + e.getMessage(),
+                    Localization.lang("A SAX exception occurred while parsing '%0':", url) + "\n\n" + e.getMessage(),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             status.showMessage(
@@ -233,8 +237,8 @@ public class OAI2Fetcher implements EntryFetcher {
     }
 
     @Override
-    public HelpFiles getHelpPage() {
-        return HelpFiles.FETCHER_OAI2_ARXIV;
+    public HelpFile getHelpPage() {
+        return HelpFile.FETCHER_OAI2_ARXIV;
     }
 
     @Override

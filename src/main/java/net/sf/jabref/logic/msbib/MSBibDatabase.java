@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.logic.msbib;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -36,6 +36,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 /**
@@ -46,13 +47,16 @@ import org.xml.sax.SAXException;
 public class MSBibDatabase {
     private static final Log LOGGER = LogFactory.getLog(MSBibDatabase.class);
 
+    public static final String NAMESPACE = "http://schemas.openxmlformats.org/officeDocument/2006/bibliography";
+    public static final String PREFIX = "b:";
+
     private Set<MSBibEntry> entries;
 
     public MSBibDatabase() {
-        // maybe make this sorted later...
         entries = new HashSet<>();
     }
 
+    // TODO: why an additonal entry list? entries are included inside database!
     public MSBibDatabase(BibDatabase database, List<BibEntry> entries) {
         if (entries == null) {
             addEntries(database.getEntries());
@@ -61,34 +65,32 @@ public class MSBibDatabase {
         }
     }
 
-    public List<BibEntry> importEntries(InputStream stream) {
+    public List<BibEntry> importEntries(BufferedReader reader) {
         entries = new HashSet<>();
         Document inputDocument;
         try {
-            DocumentBuilder documentBuilder = DocumentBuilderFactory.
-                    newInstance().
-                    newDocumentBuilder();
-            inputDocument = documentBuilder.parse(stream);
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+            inputDocument = documentBuilder.parse(new InputSource(reader));
         } catch (ParserConfigurationException | SAXException | IOException e) {
             LOGGER.warn("Could not parse document", e);
             return Collections.emptyList();
         }
-        String bcol = "b:";
-        NodeList rootList = inputDocument.getElementsByTagName("b:Sources");
+        NodeList rootList = inputDocument.getElementsByTagNameNS("*", "Sources");
         if (rootList.getLength() == 0) {
-            rootList = inputDocument.getElementsByTagName("Sources");
-            bcol = "";
+            rootList = inputDocument.getElementsByTagNameNS("*", "Sources");
         }
         List<BibEntry> bibitems = new ArrayList<>();
         if (rootList.getLength() == 0) {
             return bibitems;
         }
 
-        NodeList sourceList = ((Element) rootList.item(0)).getElementsByTagName(bcol + "Source");
+        NodeList sourceList = ((Element) rootList.item(0)).getElementsByTagNameNS("*", "Source");
         for (int i = 0; i < sourceList.getLength(); i++) {
-            MSBibEntry entry = new MSBibEntry((Element) sourceList.item(i), bcol);
+            MSBibEntry entry = new MSBibEntry((Element) sourceList.item(i));
             entries.add(entry);
-            bibitems.add(entry.getBibtexRepresentation());
+            bibitems.add(BibTeXConverter.convert(entry));
         }
 
         return bibitems;
@@ -97,32 +99,34 @@ public class MSBibDatabase {
     private void addEntries(List<BibEntry> entriesToAdd) {
         entries = new HashSet<>();
         for (BibEntry entry : entriesToAdd) {
-            MSBibEntry newMods = new MSBibEntry(entry);
+            MSBibEntry newMods = MSBibConverter.convert(entry);
             entries.add(newMods);
         }
     }
 
-    public Document getDOMrepresentation() {
-        Document result = null;
+    public Document getDOM() {
+        Document document = null;
         try {
-            DocumentBuilder documentBuilder = DocumentBuilderFactory.
-                    newInstance().
-                    newDocumentBuilder();
-            result = documentBuilder.newDocument();
-            Element msbibCollection = result.createElement("b:Sources");
-            msbibCollection.setAttribute("SelectedStyle", "");
-            msbibCollection.setAttribute("xmlns", "http://schemas.openxmlformats.org/officeDocument/2006/bibliography");
-            msbibCollection.setAttribute("xmlns:b", "http://schemas.openxmlformats.org/officeDocument/2006/bibliography");
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            DocumentBuilder documentBuilder = factory.newDocumentBuilder();
+            document = documentBuilder.newDocument();
+
+            Element rootNode = document.createElementNS(NAMESPACE, PREFIX + "Sources");
+            rootNode.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", NAMESPACE);
+            rootNode.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:" + PREFIX.substring(0, PREFIX.length() - 1), NAMESPACE);
+            rootNode.setAttribute("SelectedStyle", "");
 
             for (MSBibEntry entry : entries) {
-                Node node = entry.getDOMrepresentation(result);
-                msbibCollection.appendChild(node);
+                Node node = entry.getDOM(document);
+                rootNode.appendChild(node);
             }
 
-            result.appendChild(msbibCollection);
+            document.appendChild(rootNode);
         } catch (ParserConfigurationException e) {
-            LOGGER.warn("Could not build document", e);
+            LOGGER.warn("Could not build XML document", e);
         }
-        return result;
+
+        return document;
     }
 }

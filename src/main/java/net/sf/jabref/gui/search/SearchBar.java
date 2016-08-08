@@ -33,23 +33,23 @@ import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.WrapLayout;
 import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.util.component.JTextFieldWithUnfocusedText;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.search.SearchQueryHighlightObservable;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -172,7 +172,7 @@ public class SearchBar extends JPanel {
         globalSearch.setEnabled(false);
         toolBar.add(globalSearch);
         toolBar.addSeparator();
-        toolBar.add(new HelpAction(HelpFiles.SEARCH));
+        toolBar.add(new HelpAction(HelpFile.SEARCH));
 
         this.add(toolBar);
         this.add(currentResults);
@@ -233,7 +233,7 @@ public class SearchBar extends JPanel {
         autoCompleteSupport.install();
 
         // Add the global focus listener, so a menu item can see if this field was focused when an action was called.
-        searchField.addFocusListener(Globals.focusListener);
+        searchField.addFocusListener(Globals.getFocusListener());
 
         // Search if user press enter
         searchField.addActionListener(e -> performSearch());
@@ -245,9 +245,9 @@ public class SearchBar extends JPanel {
 
     private void endSearch() {
         // first focus request is necessary so that the UI stays nice
-        basePanel.mainTable.requestFocus();
+        basePanel.getMainTable().requestFocus();
         clearSearch();
-        basePanel.mainTable.requestFocus();
+        basePanel.getMainTable().requestFocus();
     }
 
     /**
@@ -281,7 +281,7 @@ public class SearchBar extends JPanel {
 
         this.currentResults.setText("");
 
-        basePanel.mainTable.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
+        basePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
 
         globalSearch.setEnabled(false);
         openCurrentResultsInDialog.setEnabled(false);
@@ -324,7 +324,7 @@ public class SearchBar extends JPanel {
         globalSearch.setEnabled(false);
         openCurrentResultsInDialog.setEnabled(false);
 
-        basePanel.mainTable.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
+        basePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
 
         searchIcon.setIcon(IconTheme.JabRefIcon.SEARCH.getSmallIcon().createWithNewColor(NO_RESULTS_COLOR));
         searchIcon.setToolTipText(Localization.lang("Search failed: illegal search expression"));

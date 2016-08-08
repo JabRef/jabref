@@ -180,7 +180,7 @@ public final class EntryFromFileCreatorManager {
 
         if ((count > 0) && (panel != null)) {
             ce.end();
-            panel.undoManager.addEdit(ce);
+            panel.getUndoManager().addEdit(ce);
         }
         return count;
 

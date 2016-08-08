@@ -13,7 +13,6 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-
 package net.sf.jabref;
 
 import java.net.Authenticator;
@@ -24,18 +23,25 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
 
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.cli.ArgumentProcessor;
-import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.logic.CustomEntryTypesManager;
+import net.sf.jabref.logic.exporter.ExportFormats;
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
+import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.net.ProxyAuthenticator;
 import net.sf.jabref.logic.net.ProxyPreferences;
 import net.sf.jabref.logic.net.ProxyRegisterer;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.client.RemoteListenerClient;
+import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -74,15 +80,23 @@ public class JabRefMain extends Application {
         Globals.prefs.setLanguageDependentDefaultValues();
 
         // Update which fields should be treated as numeric, based on preferences:
-        InternalBibtexFields.setNumericFieldsFromPrefs();
+        InternalBibtexFields.setNumericFields(Globals.prefs.getStringList(JabRefPreferences.NUMERIC_FIELDS));
 
         /* Build list of Import and Export formats */
         Globals.IMPORT_FORMAT_READER.resetImportFormats();
         CustomEntryTypesManager.loadCustomEntryTypes(preferences);
-        ExportFormats.initAllExports();
+        ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
 
         // Read list(s) of journal names and abbreviations
-        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader(Globals.prefs);
+        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
+
+        // Set key pattern based on preferences
+        LabelPatternUtil.updateDefaultPattern(LabelPatternPreferences.fromPreferences(Globals.prefs));
+
+        // Initialize protected terms loader
+        Globals.protectedTermsLoader = new ProtectedTermsLoader(
+                ProtectedTermsPreferences.fromPreferences(Globals.prefs));
+        ProtectTermsFormatter.setProtectedTermsLoader(Globals.protectedTermsLoader);
 
         // Check for running JabRef
         RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);
@@ -105,7 +119,7 @@ public class JabRefMain extends Application {
 
         // override used newline character with the one stored in the preferences
         // The preferences return the system newline character sequence as default
-        Globals.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
+        OS.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
 
         // Process arguments
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START);
@@ -121,5 +135,4 @@ public class JabRefMain extends Application {
                 .invokeLater(() -> new JabRefGUI(argumentProcessor.getParserResults(),
                         argumentProcessor.isBlank()));
     }
-
 }

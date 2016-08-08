@@ -111,7 +111,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         } else {
             panel.add(createEntryGroupPanel("BibTeX", BibtexEntryTypes.ALL));
             panel.add(createEntryGroupPanel("IEEETran", IEEETranEntryTypes.ALL));
-            panel.add(createEntryGroupPanel("Custom", CustomEntryTypesManager.ALL));
+            panel.add(createEntryGroupPanel(Localization.lang("Custom"), CustomEntryTypesManager.ALL));
         }
 
         return panel;

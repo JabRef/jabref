@@ -46,7 +46,6 @@ public class Priority extends SpecialField {
         values.add(new SpecialFieldValue(this, "prio3", "setPriority3", Localization.lang("Set priority to low"),
                 tmpicon, Localization.lang("Priority low")));
         this.setValues(values);
-        TEXT_DONE_PATTERN = "Set priority to '%0' for %1 entries";
     }
 
     public static Priority getInstance() {
@@ -61,18 +60,12 @@ public class Priority extends SpecialField {
         return SpecialFieldsUtils.FIELDNAME_PRIORITY;
     }
 
+    @Override public String getLocalizedFieldName() {
+        return Localization.lang("Priority");
+    }
+
     @Override
     public Icon getRepresentingIcon() {
         return this.icon;
-    }
-
-    @Override
-    public String getToolTip() {
-        return Localization.lang("Priority");
-    }
-
-    @Override
-    public String getMenuString() {
-        return Localization.lang("Priority");
     }
 }

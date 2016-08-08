@@ -22,11 +22,13 @@ import java.util.Map;
 
 import javax.swing.JCheckBox;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -47,7 +49,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
 
     @Override
     public void run() {
-        // Find all multiple occurences of BibTeX keys.
+        // Find all multiple occurrences of BibTeX keys.
         dupes = new HashMap<>();
 
         Map<String, BibEntry> foundKeys = new HashMap<>();
@@ -99,6 +101,8 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
                         toGenerateFor.add(dupeEntry.getValue().get(i));
                     }
                 }
+            } else if (rdld.isCancelPressed()) {
+                break;
             }
         }
 
@@ -107,11 +111,12 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
             NamedCompound ce = new NamedCompound(Localization.lang("Resolve duplicate BibTeX keys"));
             for (BibEntry entry : toGenerateFor) {
                 String oldKey = entry.getCiteKey();
-                LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry);
+                LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
+                        LabelPatternPreferences.fromPreferences(Globals.prefs));
                 ce.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, oldKey, entry.getCiteKey()));
             }
             ce.end();
-            panel.undoManager.addEdit(ce);
+            panel.getUndoManager().addEdit(ce);
             panel.markBaseChanged();
         }
         panel.output(Localization.lang("Finished resolving duplicate BibTeX keys. %0 entries modified.",

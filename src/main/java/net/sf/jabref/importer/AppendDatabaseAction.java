@@ -19,13 +19,13 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialogs;
@@ -47,6 +47,7 @@ import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -82,7 +83,7 @@ public class AppendDatabaseAction implements BaseAction {
         if (md.isOkPressed()) {
             List<String> chosen = FileDialogs.getMultipleFiles(frame,
                     new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
-                    null, false);
+                    Collections.emptyList(), false);
             //String chosenFile = Globals.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")),
             //                                       null, JFileChooser.OPEN_DIALOG, false);
             if (chosen.isEmpty()) {
@@ -142,7 +143,7 @@ public class AppendDatabaseAction implements BaseAction {
             for (BibEntry originalEntry : fromDatabase.getEntries()) {
                 BibEntry be = (BibEntry) originalEntry.clone();
                 be.setId(IdGenerator.next());
-                UpdateField.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp);
+                UpdateField.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp, Globals.prefs);
                 database.insertEntry(be);
                 appendedEntries.add(be);
                 originalEntries.add(originalEntry);
@@ -168,7 +169,7 @@ public class AppendDatabaseAction implements BaseAction {
                     // create a dummy group
                     ExplicitGroup group = null;
                     try {
-                        group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT);
+                        group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT, Globals.prefs);
                     } catch (ParseException e) {
                         LOGGER.error(e);
                     }
@@ -192,7 +193,7 @@ public class AppendDatabaseAction implements BaseAction {
         }
 
         ce.end();
-        panel.undoManager.addEdit(ce);
+        panel.getUndoManager().addEdit(ce);
         panel.markBaseChanged();
     }
 }

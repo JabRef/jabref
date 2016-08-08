@@ -19,7 +19,6 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -28,6 +27,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,7 +53,8 @@ class EntryDeleteChange extends Change {
         // Check if it has been modified locally, since last tempfile was saved.
         boolean isModifiedLocally = (matchWithTmp <= 1);
 
-        LOGGER.debug("Modified entry: " + memEntry.getCiteKey() + "\n Modified locally: " + isModifiedLocally);
+        LOGGER.debug("Modified entry: " + memEntry.getCiteKeyOptional().orElse("<no BibTeX key set>")
+                + "\n Modified locally: " + isModifiedLocally);
 
         PreviewPanel pp = new PreviewPanel(null, memEntry, null, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
         sp = new JScrollPane(pp);

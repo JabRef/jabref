@@ -15,8 +15,8 @@
 */
 package net.sf.jabref.logic.layout.format;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.layout.LayoutFormatter;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 public class RemoveLatexCommands implements LayoutFormatter {
 
@@ -42,12 +42,12 @@ public class RemoveLatexCommands implements LayoutFormatter {
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             } else if (Character.isLetter(c) ||
-                    Globals.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
+                    StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
                 if (incommand) {
                     currentCommand.append(c);
                     if ((currentCommand.length() == 1)
-                            && Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
+                            && StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type \^o or \~{n}
                         incommand = false;
                         escaped = false;

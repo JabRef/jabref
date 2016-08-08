@@ -31,6 +31,7 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.groups.AbstractGroup;
@@ -106,7 +107,7 @@ public class DatabaseImporter {
      * @param dbs  The necessary database connection information
      * @param mode
      * @return An ArrayList containing pairs of Objects. Each position of the ArrayList stores three Objects: a
-     * BibDatabase, a MetaData and a String with the bib database name stored in the DBMS
+     * BibDatabase, a MetaData and a String with the BIB database name stored in the DBMS
      * @throws SQLException
      * @throws ClassNotFoundException
      * @throws InstantiationException
@@ -212,7 +213,7 @@ public class DatabaseImporter {
             final String database_id) throws SQLException {
         Map<String, GroupTreeNode> groups = new HashMap<>();
         LinkedHashMap<GroupTreeNode, String> parentIds = new LinkedHashMap<>();
-        GroupTreeNode rootNode = new GroupTreeNode(new AllEntriesGroup());
+        GroupTreeNode rootNode = GroupTreeNode.fromGroup(new AllEntriesGroup());
 
         String query = SQLUtil.queryAllFromTable("groups WHERE database_id='" + database_id + "' ORDER BY groups_id");
         try (Statement statement = conn.createStatement();
@@ -228,7 +229,7 @@ public class DatabaseImporter {
                         break;
                     case ExplicitGroup.ID:
                         group = new ExplicitGroup(rsGroups.getString("label"),
-                                GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
+                                GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")), Globals.prefs);
                         break;
                     case KeywordGroup.ID:
                         LOGGER.debug("Keyw: " + rsGroups.getBoolean("case_sensitive"));
@@ -236,7 +237,7 @@ public class DatabaseImporter {
                                 StringUtil.unquote(rsGroups.getString("search_field"), '\\'),
                                 StringUtil.unquote(rsGroups.getString("search_expression"), '\\'),
                                 rsGroups.getBoolean("case_sensitive"), rsGroups.getBoolean("reg_exp"),
-                                GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
+                                GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")), Globals.prefs);
                         break;
                     case SearchGroup.ID:
                         LOGGER.debug("Search: " + rsGroups.getBoolean("case_sensitive"));
@@ -245,13 +246,15 @@ public class DatabaseImporter {
                                 rsGroups.getBoolean("case_sensitive"), rsGroups.getBoolean("reg_exp"),
                                 GroupHierarchyType.getByNumber(rsGroups.getInt("hierarchical_context")));
                         break;
+                    default:
+                        break;
                     }
                 } catch (ParseException e) {
                     LOGGER.error(e);
                 }
 
                 if (group != null) {
-                    GroupTreeNode node = new GroupTreeNode(group);
+                    GroupTreeNode node = GroupTreeNode.fromGroup(group);
                     parentIds.put(node, rsGroups.getString("parent_id"));
                     groups.put(rsGroups.getString("groups_id"), node);
                 }

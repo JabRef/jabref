@@ -38,13 +38,13 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.SaveOrderConfigDisplay;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.cleanup.FieldFormatterCleanupsPanel;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.config.SaveOrderConfig;
+import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -52,13 +52,6 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Oct 31, 2005
- * Time: 10:46:03 PM
- * To change this template use File | Settings | File Templates.
- */
 public class DatabasePropertiesDialog extends JDialog {
 
     private MetaData metaData;
@@ -71,10 +64,10 @@ public class DatabasePropertiesDialog extends JDialog {
     private String oldFileVal = "";
     private String oldFileIndvVal = "";
     private SaveOrderConfig oldSaveOrderConfig;
-    private SaveOrderConfig defaultSaveOrderConfig;
 
     /* The code for "Save sort order" is copied from FileSortTab and slightly updated to fit storing at metadata */
     private JRadioButton saveInOriginalOrder;
+
     private JRadioButton saveInSpecifiedOrder;
 
     private final JCheckBox protect = new JCheckBox(
@@ -150,7 +143,6 @@ public class DatabasePropertiesDialog extends JDialog {
         pack();
 
         AbstractAction closeAction = new AbstractAction() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -194,16 +186,13 @@ public class DatabasePropertiesDialog extends JDialog {
     }
 
     private void setValues() {
-        encoding.setSelectedItem(panel.getEncoding());
-
-        defaultSaveOrderConfig = new SaveOrderConfig();
-        defaultSaveOrderConfig.setSaveInOriginalOrder();
+        encoding.setSelectedItem(panel.getBibDatabaseContext().getMetaData().getEncoding());
 
         Optional<SaveOrderConfig> storedSaveOrderConfig = metaData.getSaveOrderConfig();
         boolean selected;
         if (!storedSaveOrderConfig.isPresent()) {
             saveInOriginalOrder.setSelected(true);
-            oldSaveOrderConfig = null;
+            oldSaveOrderConfig = SaveOrderConfig.getDefaultSaveOrder();
             selected = false;
         } else {
             SaveOrderConfig saveOrderConfig = storedSaveOrderConfig.get();
@@ -242,9 +231,9 @@ public class DatabasePropertiesDialog extends JDialog {
 
     private void storeSettings() {
 
-        Charset oldEncoding = panel.getEncoding();
+        Charset oldEncoding = panel.getBibDatabaseContext().getMetaData().getEncoding();
         Charset newEncoding = (Charset) encoding.getSelectedItem();
-        panel.setEncoding(newEncoding);
+        panel.getBibDatabaseContext().getMetaData().setEncoding(newEncoding);
 
         String text = fileDir.getText().trim();
         if (text.isEmpty()) {
@@ -266,10 +255,11 @@ public class DatabasePropertiesDialog extends JDialog {
             metaData.markAsNotProtected();
         }
 
-        SaveOrderConfig newSaveOrderConfig = saveOrderPanel.getSaveOrderConfig();
+        SaveOrderConfig newSaveOrderConfig;
         if (saveInOriginalOrder.isSelected()) {
-            newSaveOrderConfig.setSaveInOriginalOrder();
+            newSaveOrderConfig = SaveOrderConfig.getDefaultSaveOrder();
         } else {
+            newSaveOrderConfig = saveOrderPanel.getSaveOrderConfig();
             newSaveOrderConfig.setSaveInSpecifiedOrder();
         }
 
@@ -282,7 +272,7 @@ public class DatabasePropertiesDialog extends JDialog {
         }
 
         if (saveOrderConfigChanged) {
-            if (newSaveOrderConfig.equals(defaultSaveOrderConfig)) {
+            if (newSaveOrderConfig.equals(SaveOrderConfig.getDefaultSaveOrder())) {
                 metaData.clearSaveOrderConfig();
             } else {
                 metaData.setSaveOrderConfig(newSaveOrderConfig);

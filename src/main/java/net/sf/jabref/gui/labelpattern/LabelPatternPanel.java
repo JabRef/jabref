@@ -32,11 +32,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
 import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
@@ -44,6 +43,7 @@ import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class LabelPatternPanel extends JPanel {
 
@@ -63,7 +63,7 @@ public class LabelPatternPanel extends JPanel {
 
     public LabelPatternPanel(BasePanel panel) {
         this.panel = panel;
-        help = new HelpAction(Localization.lang("Help on key patterns"), HelpFiles.LABEL_PATTERN);
+        help = new HelpAction(Localization.lang("Help on key patterns"), HelpFile.LABEL_PATTERN);
         buildGUI();
     }
 
@@ -120,13 +120,11 @@ public class LabelPatternPanel extends JPanel {
         // check mode of currently used DB
         if (panel != null) {
             mode = panel.getBibDatabaseContext().getMode();
-        } else { // use preferences value if no DB is open
-            if (Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)) {
-                mode = BibDatabaseMode.BIBLATEX;
-            } else {
-                mode = BibDatabaseMode.BIBTEX;
-            }
+        } else {
+            // use preferences value if no DB is open
+            mode = Globals.prefs.getDefaultBibDatabaseMode();
         }
+
         for (EntryType type : EntryTypes.getAllValues(mode)) {
             textFields.put(type.getName().toLowerCase(), addEntryType(pan, type, y));
             y++;
@@ -247,7 +245,7 @@ public class LabelPatternPanel extends JPanel {
     }
 
     public DatabaseLabelPattern getLabelPatternAsDatabaseLabelPattern() {
-        DatabaseLabelPattern res = new DatabaseLabelPattern();
+        DatabaseLabelPattern res = new DatabaseLabelPattern(Globals.prefs);
         fillPatternUsingPanelData(res);
         return res;
     }

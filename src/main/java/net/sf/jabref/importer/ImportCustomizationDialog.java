@@ -22,6 +22,8 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.zip.ZipFile;
 
 import javax.swing.AbstractAction;
@@ -42,16 +44,15 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
-import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.importer.fileformat.ImportFormat;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
@@ -62,14 +63,19 @@ import org.apache.commons.logging.LogFactory;
  */
 public class ImportCustomizationDialog extends JDialog {
 
+    // Column widths for import customization dialog table:
+    private static final int COL_0_WIDTH = 200;
+    private static final int COL_1_WIDTH = 80;
+    private static final int COL_2_WIDTH = 200;
+    private static final int COL_3_WIDTH = 200;
+
     private final JTable customImporterTable;
 
     private static final Log LOGGER = LogFactory.getLog(ImportCustomizationDialog.class);
 
     /**
      *
-     * @param frame_
-     * @throws HeadlessException
+     * @param frame
      */
     public ImportCustomizationDialog(final JabRefFrame frame) {
         super(frame, Localization.lang("Manage custom imports"), false);
@@ -77,10 +83,10 @@ public class ImportCustomizationDialog extends JDialog {
         ImportTableModel tableModel = new ImportTableModel();
         customImporterTable = new JTable(tableModel);
         TableColumnModel cm = customImporterTable.getColumnModel();
-        cm.getColumn(0).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_0_WIDTH);
-        cm.getColumn(1).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_1_WIDTH);
-        cm.getColumn(2).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_2_WIDTH);
-        cm.getColumn(3).setPreferredWidth(GUIGlobals.IMPORT_DIALOG_COL_3_WIDTH);
+        cm.getColumn(0).setPreferredWidth(COL_0_WIDTH);
+        cm.getColumn(1).setPreferredWidth(COL_1_WIDTH);
+        cm.getColumn(2).setPreferredWidth(COL_2_WIDTH);
+        cm.getColumn(3).setPreferredWidth(COL_3_WIDTH);
         JScrollPane sp = new JScrollPane(customImporterTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
                 JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         customImporterTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -91,20 +97,22 @@ public class ImportCustomizationDialog extends JDialog {
 
         JButton addFromFolderButton = new JButton(Localization.lang("Add from folder"));
         addFromFolderButton.addActionListener(e -> {
-            String chosenFileStr = null;
             CustomImporter importer = new CustomImporter();
-            importer.setBasePath(
-                    FileDialogs.getNewDir(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
-                    "", Localization.lang("Select Classpath of New Importer"), JFileChooser.CUSTOM_DIALOG, false));
+            importer.setBasePath(FileDialogs
+                    .getNewDir(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
+                            Collections.emptyList(), Localization.lang("Select Classpath of New Importer"),
+                            JFileChooser.CUSTOM_DIALOG, false));
+            String chosenFileStr = null;
             if (importer.getBasePath() != null) {
-                chosenFileStr = FileDialogs.getNewFile(frame, importer.getFileFromBasePath(), ".class",
-                        Localization.lang("Select new ImportFormat Subclass"), JFileChooser.CUSTOM_DIALOG, false);
+                chosenFileStr = FileDialogs.getNewFile(frame, importer.getFileFromBasePath(),
+                        Collections.singletonList(".class"), Localization.lang("Select new ImportFormat subclass"),
+                        JFileChooser.CUSTOM_DIALOG, false);
             }
             if (chosenFileStr != null) {
                 try {
                     importer.setClassName(pathToClass(importer.getFileFromBasePath(), new File(chosenFileStr)));
                     importer.setName(importer.getInstance().getFormatName());
-                    importer.setCliId(importer.getInstance().getCLIId());
+                    importer.setCliId(importer.getInstance().getId());
                     addOrReplaceImporter(importer);
                     customImporterTable.revalidate();
                     customImporterTable.repaint();
@@ -119,11 +127,11 @@ public class ImportCustomizationDialog extends JDialog {
         });
         addFromFolderButton.setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a class path.") + "\n" + Localization.lang("The path need not be on the classpath of JabRef."));
 
-        JButton addFromJarButton = new JButton(Localization.lang("Add from jar"));
+        JButton addFromJarButton = new JButton(Localization.lang("Add from JAR"));
         addFromJarButton.addActionListener(e -> {
             String basePath = FileDialogs.getNewFile(frame,
-                    new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
-                    ".zip,.jar", Localization.lang("Select a Zip-archive"), JFileChooser.CUSTOM_DIALOG, false);
+                    new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), Arrays.asList(".zip", ".jar"),
+                    Localization.lang("Select a ZIP-archive"), JFileChooser.CUSTOM_DIALOG, false);
 
             if (basePath != null) {
                 try (ZipFile zipFile = new ZipFile(new File(basePath), ZipFile.OPEN_READ)) {
@@ -132,18 +140,18 @@ public class ImportCustomizationDialog extends JDialog {
                     customImporterTable.revalidate();
                     customImporterTable.repaint(10);
                 } catch (IOException exc) {
-                    LOGGER.info("Could not open Zip-archive.", exc);
+                    LOGGER.info("Could not open ZIP-archive.", exc);
                     JOptionPane.showMessageDialog(frame, Localization.lang("Could not open %0", basePath) + "\n"
                             + Localization.lang("Have you chosen the correct package path?"));
                 } catch (NoClassDefFoundError exc) {
-                    LOGGER.info("Could not instantiate Zip-archive reader.", exc);
+                    LOGGER.info("Could not instantiate ZIP-archive reader.", exc);
                     JOptionPane.showMessageDialog(frame, Localization.lang("Could not instantiate %0", basePath) + "\n"
                             + Localization.lang("Have you chosen the correct package path?"));
                 }
             }
         });
-        addFromJarButton.setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a Zip-archive.") + "\n" +
-                Localization.lang("The Zip-archive need not be on the classpath of JabRef."));
+        addFromJarButton.setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a ZIP-archive.") + "\n" +
+                Localization.lang("The ZIP-archive need not be on the classpath of JabRef."));
 
         JButton showDescButton = new JButton(Localization.lang("Show description"));
         showDescButton.addActionListener(e -> {
@@ -189,7 +197,7 @@ public class ImportCustomizationDialog extends JDialog {
         JButton closeButton = new JButton(Localization.lang("Close"));
         closeButton.addActionListener(closeAction);
 
-        JButton helpButton = new HelpAction(HelpFiles.CUSTOM_IMPORTS).getHelpButton();
+        JButton helpButton = new HelpAction(HelpFile.CUSTOM_IMPORTS).getHelpButton();
 
 
         // Key bindings:
@@ -227,8 +235,8 @@ public class ImportCustomizationDialog extends JDialog {
     */
     @Override
     public Dimension getSize() {
-        int width = GUIGlobals.IMPORT_DIALOG_COL_0_WIDTH + GUIGlobals.IMPORT_DIALOG_COL_1_WIDTH
-                + GUIGlobals.IMPORT_DIALOG_COL_2_WIDTH + GUIGlobals.IMPORT_DIALOG_COL_3_WIDTH;
+        int width = COL_0_WIDTH + COL_1_WIDTH
+                + COL_2_WIDTH + COL_3_WIDTH;
         return new Dimension(width, width / 2);
     }
 

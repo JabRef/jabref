@@ -41,7 +41,7 @@ More information on this can be found via `man git-shortlog`.
 
 
 ### Modify the header
-The headers of each `.java` file states "JabREf contributors".
+The headers of each `.java` file states "JabRef contributors".
 Author credits are given using the `AUTHORS` file and by using the `git blame` functionality.
 
 For instance,
@@ -99,7 +99,7 @@ because <additional rationale>.
 Add new Localization.lang("KEY") to Java file.
 Tests fail. In the test output a snippet is generated which must be added to the English translation file. There is also a snippet generated for the non-English files, but this is irrelevant.
 Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
-With `gradlew -b localization.gradle generateMissingTranslationKeys` the "KEY" is added to the other translation files as well.
+With `gradlew generateMissingTranslationKeys` the "KEY" is added to the other translation files as well.
 Tests are green again.
 
 You can also directly run the specific test in your IDE. The test "LocalizationConsistencyTest" is placed under `src/test/java/net.sf.jabref.logic.l10n/LocalizationConsistencyTest.java`

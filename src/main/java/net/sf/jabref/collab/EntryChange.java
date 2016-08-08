@@ -17,6 +17,7 @@ package net.sf.jabref.collab;
 
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -41,11 +42,11 @@ class EntryChange extends Change {
 
     public EntryChange(BibEntry memEntry, BibEntry tmpEntry, BibEntry diskEntry) {
         super();
-        String key = tmpEntry.getCiteKey();
-        if (key == null) {
-            name = Localization.lang("Modified entry");
+        Optional<String> key = tmpEntry.getCiteKeyOptional();
+        if (key.isPresent()) {
+            name = Localization.lang("Modified entry") + ": '" + key.get() + '\'';
         } else {
-            name = Localization.lang("Modified entry") + ": '" + key + '\'';
+            name = Localization.lang("Modified entry");
         }
 
         // We know that tmpEntry is not equal to diskEntry. Check if it has been modified
@@ -56,8 +57,8 @@ class EntryChange extends Change {
         // in the same way. Check for this, too.
         boolean modificationsAgree = (DuplicateCheck.compareEntriesStrictly(memEntry, diskEntry) > 1);
 
-        LOGGER.debug("Modified entry: " + memEntry.getCiteKey() + "\n Modified locally: " + isModifiedLocally
-                + " Modifications agree: " + modificationsAgree);
+        LOGGER.debug("Modified entry: " + memEntry.getCiteKeyOptional().orElse("<no BibTeX key set>")
+                + "\n Modified locally: " + isModifiedLocally + " Modifications agree: " + modificationsAgree);
 
         Set<String> allFields = new TreeSet<>();
         allFields.addAll(memEntry.getFieldNames());

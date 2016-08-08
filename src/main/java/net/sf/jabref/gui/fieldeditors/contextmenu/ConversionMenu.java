@@ -37,6 +37,7 @@ public class ConversionMenu extends JMenu {
         // create menu items, one for each case changer
         for (Formatter converter : Formatters.CONVERTERS) {
             JMenuItem menuItem = new JMenuItem(converter.getName());
+            menuItem.setToolTipText(converter.getDescription());
             menuItem.addActionListener(e -> opener.setText(converter.format(opener.getText())));
             this.add(menuItem);
         }

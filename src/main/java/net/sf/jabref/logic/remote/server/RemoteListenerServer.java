@@ -27,11 +27,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class RemoteListenerServer implements Runnable {
+    private static final Log LOGGER = LogFactory.getLog(RemoteListenerServer.class);
 
     private static final int BACKLOG = 1;
-    private static final int ONE_SECOND_TIMEOUT = 1000;
 
-    private static final Log LOGGER = LogFactory.getLog(RemoteListenerServer.class);
+    private static final int ONE_SECOND_TIMEOUT = 1000;
 
     private final MessageHandler messageHandler;
     private final ServerSocket serverSocket;

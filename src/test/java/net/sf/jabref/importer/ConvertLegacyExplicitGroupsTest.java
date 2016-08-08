@@ -1,15 +1,16 @@
 package net.sf.jabref.importer;
 
 import java.util.Collections;
+import java.util.Optional;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.ExplicitGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,22 +34,22 @@ public class ConvertLegacyExplicitGroupsTest {
 
         entry = new BibEntry();
         entry.setCiteKey("Entry1");
-        group = new ExplicitGroup("TestGroup", GroupHierarchyType.INCLUDING);
+        group = new ExplicitGroup("TestGroup", GroupHierarchyType.INCLUDING, Globals.prefs);
         group.addLegacyEntryKey("Entry1");
     }
 
     @Test
     public void performActionWritesGroupMembershipInEntry() throws Exception {
-        ParserResult parserResult = generateParserResult(entry, new GroupTreeNode(group));
+        ParserResult parserResult = generateParserResult(entry, GroupTreeNode.fromGroup(group));
 
         action.performAction(basePanel, parserResult);
 
-        assertEquals("TestGroup", entry.getField("groups"));
+        assertEquals(Optional.of("TestGroup"), entry.getFieldOptional("groups"));
     }
 
     @Test
     public void performActionClearsLegacyKeys() throws Exception {
-        ParserResult parserResult = generateParserResult(entry, new GroupTreeNode(group));
+        ParserResult parserResult = generateParserResult(entry, GroupTreeNode.fromGroup(group));
 
         action.performAction(basePanel, parserResult);
 
@@ -57,19 +58,19 @@ public class ConvertLegacyExplicitGroupsTest {
 
     @Test
     public void performActionWritesGroupMembershipInEntryForComplexGroupTree() throws Exception {
-        GroupTreeNode root = new GroupTreeNode(new AllEntriesGroup());
-        root.addSubgroup(new ExplicitGroup("TestGroup2", GroupHierarchyType.INCLUDING));
+        GroupTreeNode root = GroupTreeNode.fromGroup(new AllEntriesGroup());
+        root.addSubgroup(new ExplicitGroup("TestGroup2", GroupHierarchyType.INCLUDING, Globals.prefs));
         root.addSubgroup(group);
         ParserResult parserResult = generateParserResult(entry, root);
 
         action.performAction(basePanel, parserResult);
 
-        assertEquals("TestGroup", entry.getField("groups"));
+        assertEquals(Optional.of("TestGroup"), entry.getFieldOptional("groups"));
     }
 
     @Test
     public void isActionNecessaryReturnsTrueIfGroupContainsLegacyKeys() throws Exception {
-        ParserResult parserResult = generateParserResult(entry, new GroupTreeNode(group));
+        ParserResult parserResult = generateParserResult(entry, GroupTreeNode.fromGroup(group));
 
         assertTrue(action.isActionNecessary(parserResult));
     }

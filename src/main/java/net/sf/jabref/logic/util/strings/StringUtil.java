@@ -18,23 +18,27 @@ package net.sf.jabref.logic.util.strings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.model.entry.Author;
+import net.sf.jabref.logic.util.OS;
 
 import com.google.common.base.CharMatcher;
+import org.apache.commons.lang3.StringUtils;
 
 public class StringUtil {
+
+    // Non-letters which are used to denote accents in LaTeX-commands, e.g., in {\"{a}}
+    public static final String SPECIAL_COMMAND_CHARS = "\"`^~'=.|";
 
     // contains all possible line breaks, not omitting any break such as "\\n"
     private static final Pattern LINE_BREAKS = Pattern.compile("\\r\\n|\\r|\\n");
 
     private static final Pattern BRACED_TITLE_CAPITAL_PATTERN = Pattern.compile("\\{[A-Z]+\\}");
 
-    public static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
+    private static final UnicodeToReadableCharMap UNICODE_CHAR_MAP = new UnicodeToReadableCharMap();
 
     /**
      * Returns the string, after shaving off whitespace at the beginning and end,
@@ -175,12 +179,12 @@ public class StringUtil {
         for (int i = 1; i < lines.length; i++) {
 
             if (lines[i].trim().isEmpty()) {
-                result.append(Globals.NEWLINE);
+                result.append(OS.NEWLINE);
                 result.append('\t');
             } else {
-                result.append(Globals.NEWLINE);
+                result.append(OS.NEWLINE);
                 result.append('\t');
-                result.append(Globals.NEWLINE);
+                result.append(OS.NEWLINE);
                 result.append('\t');
                 // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
                 String line = CharMatcher.WHITESPACE.trimTrailingFrom(lines[i]);
@@ -203,8 +207,8 @@ public class StringUtil {
             }
 
             result.deleteCharAt(current);
-            result.insert(current, Globals.NEWLINE + "\t");
-            length = current + Globals.NEWLINE.length();
+            result.insert(current, OS.NEWLINE + "\t");
+            length = current + OS.NEWLINE.length();
 
         }
     }
@@ -398,19 +402,19 @@ public class StringUtil {
     }
 
     /**
-     * Replaces all platform-dependent line breaks by Globals.NEWLINE line breaks.
+     * Replaces all platform-dependent line breaks by OS.NEWLINE line breaks.
      *
      * We do NOT use UNIX line breaks as the user explicitly configures its linebreaks and this method is used in bibtex field writing
      *
      * <example>
-     * Legacy Macintosh \r -> Globals.NEWLINE
-     * Windows \r\n -> Globals.NEWLINE
+     * Legacy Macintosh \r -> OS.NEWLINE
+     * Windows \r\n -> OS.NEWLINE
      * </example>
      *
-     * @return a String with only Globals.NEWLINE as line breaks
+     * @return a String with only OS.NEWLINE as line breaks
      */
     public static String unifyLineBreaksToConfiguredLineBreaks(String s) {
-        return LINE_BREAKS.matcher(s).replaceAll(Globals.NEWLINE);
+        return LINE_BREAKS.matcher(s).replaceAll(OS.NEWLINE);
     }
 
     /**
@@ -627,53 +631,6 @@ public class StringUtil {
     }
 
     /**
-     * Expand initials, e.g. EH Wissler -> E. H. Wissler or Wissler, EH -> Wissler, E. H.
-     *
-     * @param name
-     * @return The name after expanding initials.
-     */
-    public static String expandAuthorInitials(String name) {
-        String[] authors = name.split(" and ");
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < authors.length; i++) {
-            if (authors[i].contains(", ")) {
-                String[] names = authors[i].split(", ");
-                if (names.length > 0) {
-                    sb.append(names[0]);
-                    if (names.length > 1) {
-                        sb.append(", ");
-                    }
-                }
-                for (int j = 1; j < names.length; j++) {
-                    if (j == 1) {
-                        sb.append(Author.addDotIfAbbreviation(names[j]));
-                    } else {
-                        sb.append(names[j]);
-                    }
-                    if (j < (names.length - 1)) {
-                        sb.append(", ");
-                    }
-                }
-
-            } else {
-                String[] names = authors[i].split(" ");
-                if (names.length > 0) {
-                    sb.append(Author.addDotIfAbbreviation(names[0]));
-                }
-                for (int j = 1; j < names.length; j++) {
-                    sb.append(' ');
-                    sb.append(names[j]);
-                }
-            }
-            if (i < (authors.length - 1)) {
-                sb.append(" and ");
-            }
-        }
-
-        return sb.toString().trim();
-    }
-
-    /**
      * Return a String with n spaces
      *
      * @param n Number of spaces
@@ -699,6 +656,36 @@ public class StringUtil {
 
         return resultSB.toString();
 
+    }
+
+    public static boolean isNullOrEmpty(String toTest) {
+        return ((toTest == null) || toTest.isEmpty());
+    }
+
+    public static boolean isNotBlank(Optional<String> string) {
+        return string.isPresent() && isNotBlank(string.get());
+    }
+
+    public static boolean isNotBlank(String string) {
+        return StringUtils.isNotBlank(string);
+    }
+
+    /**
+     * Return string enclosed in HTML bold tags
+     */
+    public static String boldHTML(String input) {
+        return "<b>" + input + "</b>";
+    }
+
+    /**
+     * Return string enclosed in HTML bold tags  if not null, otherwise return alternative text in HTML bold tags
+     */
+    public static String boldHTML(String input, String alternative) {
+
+        if (input == null) {
+            return "<b>" + alternative + "</b>";
+        }
+        return "<b>" + input + "</b>";
     }
 
 }

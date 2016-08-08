@@ -1,6 +1,8 @@
 package net.sf.jabref.model.entry;
 
-import java.util.List;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,10 +20,16 @@ public class EntryUtilTest {
     @Test
     public void getSeparatedKeywords() {
         String keywords = "w1, w2a w2b, w3";
-        List<String> separatedKeywords = EntryUtil.getSeparatedKeywords(keywords);
-        String[] expected = new String[] {"w1", "w2a w2b", "w3"};
-        Assert.assertArrayEquals(expected, separatedKeywords.toArray());
+        Set<String> separatedKeywords = EntryUtil.getSeparatedKeywords(keywords);
+        Assert.assertEquals(new LinkedHashSet<>(Arrays.asList("w1", "w2a w2b", "w3")), separatedKeywords);
     }
 
-
+    @Test
+    public void getSeparatedKeywordsEntry() {
+        String keywords = "w1, w2a w2b, w3";
+        BibEntry entry = new BibEntry();
+        entry.setField(FieldName.KEYWORDS, keywords);
+        Set<String> separatedKeywords = EntryUtil.getSeparatedKeywords(entry);
+        Assert.assertEquals(new LinkedHashSet<>(Arrays.asList("w1", "w2a w2b", "w3")), separatedKeywords);
+    }
 }

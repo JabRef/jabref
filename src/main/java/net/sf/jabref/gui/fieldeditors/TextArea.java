@@ -27,7 +27,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
-import net.sf.jabref.model.entry.EntryUtil;
 
 /**
  * An implementation of the FieldEditor backed by a JTextArea.
@@ -52,7 +51,7 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
         // Add the global focus listener, so a menu item can see if this field
         // was focused when an action was called.
-        addFocusListener(Globals.focusListener);
+        addFocusListener(Globals.getFocusListener());
         addFocusListener(new FieldEditorFocusListener());
         scrollPane = new JScrollPane(this, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -62,7 +61,7 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
         setWrapStyleWord(true);
         this.fieldName = fieldName;
 
-        label = new FieldNameLabel(' ' + EntryUtil.capitalizeFirst(this.fieldName) + ' ');
+        label = new FieldNameLabel(fieldName);
         setBackground(GUIGlobals.validFieldBackgroundColor);
         setForeground(GUIGlobals.editorTextColor);
 

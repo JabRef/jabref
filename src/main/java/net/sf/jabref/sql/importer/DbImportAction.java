@@ -32,6 +32,8 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.gui.worker.CallBack;
+import net.sf.jabref.gui.worker.Worker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.sql.DBConnectDialog;
 import net.sf.jabref.sql.DBExporterAndImporterFactory;
@@ -39,7 +41,6 @@ import net.sf.jabref.sql.DBImportExportDialog;
 import net.sf.jabref.sql.DBStrings;
 import net.sf.jabref.sql.DatabaseUtil;
 import net.sf.jabref.sql.SQLUtil;
-import net.sf.jabref.util.Util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,17 +71,14 @@ public class DbImportAction extends AbstractWorker {
     }
 
     class DbImpAction extends MnemonicAwareAction {
-
         public DbImpAction() {
-            super();
             putValue(Action.NAME, Localization.menuTitle("Import from external SQL database"));
-
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                Util.runAbstractWorker(DbImportAction.this);
+                runInSeparateThread();
             } catch (Throwable throwable) {
                 LOGGER.warn("Problem importing from database", throwable);
             }
@@ -152,14 +150,14 @@ public class DbImportAction extends AbstractWorker {
                             Localization.lang("There are no available databases to be imported"),
                             Localization.lang("Import from SQL database"), JOptionPane.INFORMATION_MESSAGE);
                 } else {
-                    DBImportExportDialog dialogo = new DBImportExportDialog(frame, matrix,
-                            DBImportExportDialog.DialogType.IMPORTER);
+                    DBImportExportDialog dialogo = new DBImportExportDialog(frame, matrix, DBImportExportDialog.DialogType.IMPORTER);
                     if (dialogo.removeAction) {
                         String dbName = dialogo.selectedDB;
                         DatabaseUtil.removeDB(dialogo, dbName, conn, databaseContext);
                         performImport();
                     } else if (dialogo.moreThanOne) {
-                        databases = importer.performImport(dbs, dialogo.listOfDBs, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+                        // use default DB mode for import
+                        databases = importer.performImport(dbs, dialogo.listOfDBs, Globals.prefs.getDefaultBibDatabaseMode());
                         for (DBImporterResult res : databases) {
                             databaseContext = res.getDatabaseContext();
                             dbs.isConfigValid(true);
@@ -190,13 +188,33 @@ public class DbImportAction extends AbstractWorker {
         for (DBImporterResult res : databases) {
             databaseContext = res.getDatabaseContext();
             if (databaseContext != null) {
-                BasePanel pan = frame.addTab(databaseContext, Globals.prefs.getDefaultEncoding(), true);
+                BasePanel pan = frame.addTab(databaseContext, true);
                 pan.getBibDatabaseContext().getMetaData().setDBStrings(dbs);
                 frame.setTabTitle(pan, res.getName() + "(Imported)", "Imported DB");
                 pan.markBaseChanged();
             }
         }
         frame.output(Localization.lang("Imported %0 databases successfully", Integer.toString(databases.size())));
+    }
+
+    private void runInSeparateThread() throws Throwable {
+        // This part uses Spin's features:
+        Worker wrk = this.getWorker();
+        // The Worker returned by getWorker() has been wrapped
+        // by Spin.off(), which makes its methods be run in
+        // a different thread from the EDT.
+        CallBack clb = this.getCallBack();
+
+        this.init(); // This method runs in this same thread, the EDT.
+        // Useful for initial GUI actions, like printing a message.
+
+        // The CallBack returned by getCallBack() has been wrapped
+        // by Spin.over(), which makes its methods be run on
+        // the EDT.
+        wrk.run(); // Runs the potentially time-consuming action
+        // without freezing the GUI. The magic is that THIS line
+        // of execution will not continue until run() is finished.
+        clb.update(); // Runs the update() method on the EDT.
     }
 
 }

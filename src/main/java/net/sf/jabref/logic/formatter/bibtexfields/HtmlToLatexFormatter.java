@@ -20,8 +20,6 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatter;
@@ -41,7 +39,6 @@ public class HtmlToLatexFormatter implements LayoutFormatter, Formatter {
     private static final Pattern ESCAPED_PATTERN3 = Pattern.compile("&#([x]*)([0]*)(\\p{XDigit}+);");
     private static final Pattern ESCAPED_PATTERN4 = Pattern.compile("&(\\w+);");
 
-
     @Override
     public String format(String text) {
         String result = Objects.requireNonNull(text);
@@ -52,15 +49,8 @@ public class HtmlToLatexFormatter implements LayoutFormatter, Formatter {
 
         StringBuilder sb = new StringBuilder();
         // Deal with the form <sup>k</sup>and <sub>k</sub>
-        // If the result is in text or equation form can be controlled
-        // From the "Advanced settings" tab
-        if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
-            result = result.replaceAll("<[ ]?sup>([^<]+)</sup>", "\\$\\^\\{$1\\}\\$");
-            result = result.replaceAll("<[ ]?sub>([^<]+)</sub>", "\\$_\\{$1\\}\\$");
-        } else {
-            result = result.replaceAll("<[ ]?sup>([^<]+)</sup>", "\\\\textsuperscript\\{$1\\}");
-            result = result.replaceAll("<[ ]?sub>([^<]+)</sub>", "\\\\textsubscript\\{$1\\}");
-        }
+        result = result.replaceAll("<[ ]?sup>([^<]+)</sup>", "\\\\textsuperscript\\{$1\\}");
+        result = result.replaceAll("<[ ]?sub>([^<]+)</sub>", "\\\\textsubscript\\{$1\\}");
 
         // TODO: maybe rewrite this based on regular expressions instead
         // Note that (at least) the IEEE Xplore fetcher must be fixed as it relies on the current way to
@@ -81,7 +71,7 @@ public class HtmlToLatexFormatter implements LayoutFormatter, Formatter {
         // Handle text based HTML entities
         Set<String> patterns = HTMLUnicodeConversionMaps.HTML_LATEX_CONVERSION_MAP.keySet();
         for (String pattern : patterns) {
-            result = result.replaceAll(pattern, HTMLUnicodeConversionMaps.HTML_LATEX_CONVERSION_MAP.get(pattern));
+            result = result.replace(pattern, HTMLUnicodeConversionMaps.HTML_LATEX_CONVERSION_MAP.get(pattern));
         }
 
         // Handle numerical HTML entities
@@ -89,7 +79,7 @@ public class HtmlToLatexFormatter implements LayoutFormatter, Formatter {
         while (m.find()) {
             int num = Integer.decode(m.group(1).replace("x", "#") + m.group(3));
             if (HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP.containsKey(num)) {
-                result = result.replaceAll("&#" + m.group(1) + m.group(2) + m.group(3) + ";",
+                result = result.replace("&#" + m.group(1) + m.group(2) + m.group(3) + ";",
                         HTMLUnicodeConversionMaps.NUMERICAL_LATEX_CONVERSION_MAP.get(num));
             }
         }
@@ -100,14 +90,14 @@ public class HtmlToLatexFormatter implements LayoutFormatter, Formatter {
             int num = Integer.decode(m.group(2).replace("x", "#") + m.group(4));
             if (HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.containsKey(num)) {
                 if ("i".equals(m.group(1))) {
-                    result = result.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";",
-                            "\\{\\\\" + HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(num) + "\\{\\\\i\\}\\}");
+                    result = result.replace(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";",
+                            "{\\" + HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(num) + "{\\i}}");
                 } else if ("j".equals(m.group(1))) {
-                    result = result.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";",
-                            "\\{\\\\" + HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(num) + "\\{\\\\j\\}\\}");
+                    result = result.replace(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";",
+                            "{\\" + HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(num) + "{\\j}}");
                 } else {
-                    result = result.replaceAll(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";", "\\{\\\\"
-                            + HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(num) + "\\{" + m.group(1) + "\\}\\}");
+                    result = result.replace(m.group(1) + "&#" + m.group(2) + m.group(3) + m.group(4) + ";",
+                            "{\\" + HTMLUnicodeConversionMaps.ESCAPED_ACCENTS.get(num) + "{" + m.group(1) + "}}");
                 }
             }
         }

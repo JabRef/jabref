@@ -26,7 +26,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
@@ -34,11 +33,14 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.PostOpenAction;
-import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.cleanup.UpgradePdfPsToFileCleanup;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.format.FileLinkPreferences;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -54,7 +56,7 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class FileLinksUpgradeWarning implements PostOpenAction {
 
-    private static final String[] FIELDS_TO_LOOK_FOR = new String[] {"pdf", "ps", "evastar_pdf"};
+    private static final String[] FIELDS_TO_LOOK_FOR = new String[] {FieldName.PDF, FieldName.PS, "evastar_pdf"};
 
     private boolean offerChangeSettings;
 
@@ -77,7 +79,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         // Only offer to upgrade links if the pdf/ps fields are used:
         offerChangeDatabase = linksFound(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
         // If the "file" directory is not set, offer to migrate pdf/ps dir:
-        offerSetFileDir = !Globals.prefs.hasKey(Globals.FILE_FIELD + Globals.DIR_SUFFIX)
+        offerSetFileDir = !Globals.prefs.hasKey(FieldName.FILE + FileLinkPreferences.DIR_SUFFIX)
                 && (Globals.prefs.hasKey("pdfDirectory") || Globals.prefs.hasKey("psDirectory"));
 
         // First check if this warning is disabled:
@@ -166,7 +168,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
     /**
      * Check the database to find out whether any of a set of fields are used
      * for any of the entries.
-     * @param database The bib database.
+     * @param database The BIB database.
      * @param fields The set of fields to look for.
      * @return true if at least one of the given fields is set in at least one entry,
      *  false otherwise.
@@ -194,12 +196,12 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         if (upgradeDatabase) {
             // Update file links links in the database:
             NamedCompound ce = upgradePdfPsToFile(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
-            panel.undoManager.addEdit(ce);
+            panel.getUndoManager().addEdit(ce);
             panel.markBaseChanged();
         }
 
         if (fileDir != null) {
-            Globals.prefs.put(Globals.FILE_FIELD + Globals.DIR_SUFFIX, fileDir);
+            Globals.prefs.put(FieldName.FILE + FileLinkPreferences.DIR_SUFFIX, fileDir);
         }
 
         if (upgradePrefs) {
@@ -214,7 +216,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
                 if (!gfs.isEmpty()) {
                     sb.append(';');
                 }
-                sb.append(Globals.FILE_FIELD);
+                sb.append(FieldName.FILE);
                 Globals.prefs.put(JabRefPreferences.CUSTOM_TAB_FIELDS + "0", sb.toString());
                 Globals.prefs.updateEntryEditorTabList();
                 panel.frame().removeCachedEntryEditors();
@@ -229,7 +231,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         outer: for (int i = 0; i < tabList.getTabCount(); i++) {
             List<String> fields = tabList.getTabFields(i);
             for (String field : fields) {
-                if (field.equals(Globals.FILE_FIELD)) {
+                if (field.equals(FieldName.FILE)) {
                     found = true;
                     break outer;
                 }

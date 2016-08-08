@@ -33,6 +33,6 @@ public class DOICheck implements LayoutFormatter {
         if (result.startsWith("/")) {
             result = result.substring(1);
         }
-        return DOI.build(result).map(DOI::getURLAsASCIIString).orElse(result);
+        return DOI.build(result).map(DOI::getURIAsASCIIString).orElse(result);
     }
 }

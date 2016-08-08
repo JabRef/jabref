@@ -20,6 +20,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.util.Collections;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -35,11 +36,11 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -263,7 +264,7 @@ public class ExternalFileTypeEntryEditor {
                 // Nothing in the field. Go to the last file dir used:
                 initial = new File(Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY));
             }
-            String chosen = FileDialogs.getNewFile(null, initial, "",
+            String chosen = FileDialogs.getNewFile(null, initial, Collections.emptyList(),
                     JFileChooser.OPEN_DIALOG, false);
             if (chosen != null) {
                 File newFile = new File(chosen);

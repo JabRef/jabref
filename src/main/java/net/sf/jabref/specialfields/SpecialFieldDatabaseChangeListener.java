@@ -15,17 +15,16 @@
 */
 package net.sf.jabref.specialfields;
 
-import net.sf.jabref.event.EntryAddedEvent;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.event.EntryAddedEvent;
 
 import com.google.common.eventbus.Subscribe;
 
 public class SpecialFieldDatabaseChangeListener {
 
     private static SpecialFieldDatabaseChangeListener INSTANCE;
-
 
     public static SpecialFieldDatabaseChangeListener getInstance() {
         if (SpecialFieldDatabaseChangeListener.INSTANCE == null) {

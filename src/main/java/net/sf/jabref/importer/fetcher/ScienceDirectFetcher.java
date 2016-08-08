@@ -16,7 +16,6 @@
 package net.sf.jabref.importer.fetcher;
 
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -27,9 +26,10 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.Globals;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 
@@ -60,8 +60,8 @@ public class ScienceDirectFetcher implements EntryFetcher {
 
 
     @Override
-    public HelpFiles getHelpPage() {
-        return HelpFiles.FETCHER_SCIENCEDIRECT;
+    public HelpFile getHelpPage() {
+        return HelpFile.FETCHER_SCIENCEDIRECT;
     }
 
     @Override
@@ -136,8 +136,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
     }
 
     private static String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
-        URL url = new URL(urlQuery);
-        String cont = new URLDownload(url).downloadToString();
+        String cont = new URLDownload(urlQuery).downloadToString(Globals.prefs.getDefaultEncoding());
         Matcher m = ScienceDirectFetcher.LINK_PATTERN.matcher(cont);
         if (m.find()) {
             while (m.find()) {

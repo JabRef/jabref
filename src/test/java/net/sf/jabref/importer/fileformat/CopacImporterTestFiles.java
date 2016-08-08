@@ -2,6 +2,8 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -12,8 +14,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibEntryAssert;
+import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -50,21 +52,17 @@ public class CopacImporterTestFiles {
     }
 
     @Test
-    public void testIsRecognizedFormat() throws IOException {
-        try (InputStream stream = CopacImporterTest.class.getResourceAsStream(fileName)) {
-            Assert.assertTrue(copacImporter.isRecognizedFormat(stream));
-        }
+    public void testIsRecognizedFormat() throws IOException, URISyntaxException {
+        Path file = Paths.get(CopacImporterTest.class.getResource(fileName).toURI());
+        Assert.assertTrue(copacImporter.isRecognizedFormat(file, Charset.defaultCharset()));
     }
 
     @Test
-    public void testImportEntries() throws IOException {
+    public void testImportEntries() throws IOException, URISyntaxException {
         String bibFileName = fileName.replace(".txt", ".bib");
 
-        try (InputStream copacStream = CopacImporterTest.class.getResourceAsStream(fileName);
-                InputStream bibStream = BibtexImporterTest.class.getResourceAsStream(bibFileName)) {
-            BibEntryAssert.assertEquals(bibStream, copacStream, copacImporter);
+        try (InputStream bibStream = BibtexImporterTest.class.getResourceAsStream(bibFileName)) {
+            BibEntryAssert.assertEquals(bibStream, CopacImporterTest.class.getResource(fileName), copacImporter);
         }
-
     }
-
 }

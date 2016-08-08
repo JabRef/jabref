@@ -17,7 +17,9 @@ package net.sf.jabref.gui;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public class OpenFileFilter extends javax.swing.filechooser.FileFilter implements FilenameFilter {
@@ -26,42 +28,38 @@ public class OpenFileFilter extends javax.swing.filechooser.FileFilter implement
     private final String desc;
 
 
-    public OpenFileFilter(String[] extensions) {
+    public OpenFileFilter(List<String> extensions) {
         StringBuilder buf = new StringBuilder();
-        int numExt = extensions.length;
+        int numExt = extensions.size();
 
         if (numExt > 0) {
             buf.append('*');
-            buf.append(extensions[0]);
+            buf.append(extensions.get(0));
 
-            extSet.add(extensions[0]);
+            extSet.add(extensions.get(0));
         }
 
         for (int curExt = 1; curExt < numExt; curExt++) {
             buf.append(", *");
-            buf.append(extensions[curExt]);
+            buf.append(extensions.get(curExt));
 
-            extSet.add(extensions[curExt]);
+            extSet.add(extensions.get(curExt));
         }
 
         desc = buf.toString();
     }
 
     public OpenFileFilter() {
-        this(new String[] {
+        this(Arrays.asList(
                 ".bib",
                 ".dat", // silverplatter ending
-                ".txt", // windows puts ".txt" extentions and for scifinder
+                ".txt", // windows puts ".txt" extensions and for scifinder
                 ".ris",
                 ".ref", // refer/endnote format
                 ".fcgi", // default for pubmed
                 ".bibx", // default for BibTeXML
                 ".xml"
-        });
-    }
-
-    public OpenFileFilter(String s) {
-        this(s.split("[, ]+", 0));
+        ));
     }
 
     @Override

@@ -35,7 +35,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -72,12 +72,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.event.FieldChangedEvent;
-import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.external.WriteXMPEntryEditorAction;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryContainer;
@@ -93,7 +87,6 @@ import net.sf.jabref.gui.fieldeditors.FileListEditor;
 import net.sf.jabref.gui.fieldeditors.JTextAreaWithHighlighting;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -108,7 +101,12 @@ import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
+import net.sf.jabref.logic.bibtex.BibEntryWriter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.logic.util.date.TimeStamp;
@@ -119,6 +117,11 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryConverter;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.event.FieldChangedEvent;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 
 import com.google.common.eventbus.Subscribe;
@@ -136,6 +139,7 @@ import org.apache.commons.logging.LogFactory;
  * update themselves if the change is made from somewhere else.
  */
 public class EntryEditor extends JPanel implements EntryContainer {
+
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     // A reference to the entry this object works on.
@@ -185,6 +189,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private boolean updateSource = true; // This can be set to false to stop the source
     private boolean movingToDifferentEntry; // Indicates that we are about to go to the next or previous entry
+    private boolean validEntry = true;
 
     private final List<Object> tabs = new ArrayList<>();
 
@@ -221,7 +226,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         displayedBibEntryType = entry.getType();
 
-        helpAction = new HelpAction(HelpFiles.ENTRY_EDITOR, IconTheme.JabRefIcon.HELP.getIcon());
+        helpAction = new HelpAction(HelpFile.ENTRY_EDITOR, IconTheme.JabRefIcon.HELP.getIcon());
         closeAction = new CloseAction();
         generateKeyAction = new GenerateKeyAction();
         storeFieldAction = new StoreFieldAction();
@@ -266,8 +271,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 addOptionalTab(type);
 
                 Set<String> deprecatedFields = new HashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
-                deprecatedFields.add("year");
-                deprecatedFields.add("month");
+                deprecatedFields.add(FieldName.YEAR);
+                deprecatedFields.add(FieldName.MONTH);
                 List<String> secondaryOptionalFields = type.getSecondaryOptionalFields();
                 List<String> optionalFieldsNotPrimaryOrDeprecated = new ArrayList<>(secondaryOptionalFields);
                 optionalFieldsNotPrimaryOrDeprecated.removeAll(deprecatedFields);
@@ -312,10 +317,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
         // other fields
         List<String> displayedFields = Stream.concat(requiredFields.stream(), displayedOptionalFields.stream()).map(String::toLowerCase).collect(Collectors.toList());
         List<String> otherFields = entry.getFieldNames().stream().map(String::toLowerCase).filter(f -> !displayedFields.contains(f)).collect(Collectors.toList());
-        otherFields.remove("bibtexkey");
+        otherFields.remove(BibEntry.KEY_FIELD);
         otherFields.removeAll(Globals.prefs.getCustomTabFieldNames());
 
-        if(!otherFields.isEmpty()) {
+        if (!otherFields.isEmpty()) {
             addOtherTab(otherFields);
         }
 
@@ -483,7 +488,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         leftPan.add(closeBut, BorderLayout.NORTH);
 
         // Create type-label
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty(), panel.getBibDatabaseContext().getMode());
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, panel.getBibDatabaseContext().getMode());
         leftPan.add(new TypeLabel(typedEntry.getTypeForDisplay()), BorderLayout.CENTER);
         TypeButton typeButton = new TypeButton();
 
@@ -548,7 +553,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 || fieldExtras.contains(FieldProperties.DATE)) {
             // double click AND datefield => insert the current date (today)
             return FieldExtraComponents.getDateTimeExtraComponent(editor,
-                    fieldExtras.contains(FieldProperties.DATE));
+                    fieldExtras.contains(FieldProperties.DATE), fieldExtras.contains(FieldProperties.ISO_DATE));
         } else if (fieldExtras.contains(FieldProperties.EXTERNAL)) {
             return FieldExtraComponents.getExternalExtraComponent(panel, editor);
         } else if (fieldExtras.contains(FieldProperties.JOURNAL_NAME)) {
@@ -562,6 +567,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
             return FieldExtraComponents.getURLExtraComponent(editor, getStoreFieldAction());
         } else if (fieldExtras.contains(FieldProperties.DOI)) {
             return FieldExtraComponents.getDoiExtraComponent(panel, this, editor);
+        } else if (fieldExtras.contains(FieldProperties.EPRINT)) {
+            return FieldExtraComponents.getEprintExtraComponent(panel, this, editor);
+        } else if (fieldExtras.contains(FieldProperties.ISBN)) {
+            return FieldExtraComponents.getIsbnExtraComponent(panel, this, editor);
         } else if (fieldExtras.contains(FieldProperties.OWNER)) {
             return FieldExtraComponents.getSetOwnerExtraComponent(editor, getStoreFieldAction());
         } else if (fieldExtras.contains(FieldProperties.YES_NO)) {
@@ -575,8 +584,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
         } else if (fieldExtras.contains(FieldProperties.PAGINATION)) {
             return FieldExtraComponents.getPaginationExtraComponent(editor, this);
         } else if (fieldExtras.contains(FieldProperties.TYPE)) {
-            return FieldExtraComponents.getTypeExtraComponent(editor, this,
-                    "patent".equals(entry.getType().toLowerCase(Locale.ENGLISH)));
+            return FieldExtraComponents.getTypeExtraComponent(editor, this, "patent".equalsIgnoreCase(entry.getType()));
+        } else if (fieldExtras.contains(FieldProperties.CROSSREF)) {
+            return FieldExtraComponents.getCrossrefExtraComponent(editor, frame.getCurrentBasePanel());
         }
         return Optional.empty();
     }
@@ -587,10 +597,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         source.setEditable(true);
         source.setLineWrap(true);
-        source.setTabSize(GUIGlobals.INDENT);
+        source.setTabSize(Globals.prefs.getInt(JabRefPreferences.INDENT));
         source.addFocusListener(new FieldEditorFocusListener());
         // Add the global focus listener, so a menu item can see if this field was focused when an action was called.
-        source.addFocusListener(Globals.focusListener);
+        source.addFocusListener(Globals.getFocusListener());
         source.setFont(new Font("Monospaced", Font.PLAIN, Globals.prefs.getInt(JabRefPreferences.FONT_SIZE)));
         setupJTextComponent(source);
         updateSource();
@@ -617,12 +627,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 // - ILC (16/02/2010) -
                 //////////////////////////////////////////////////////////
                 SwingUtilities.invokeLater(() -> {
-                    final int row = panel.mainTable.findEntry(entry);
+                    final int row = panel.getMainTable().findEntry(entry);
                     if (row >= 0) {
-                        if (panel.mainTable.getSelectedRowCount() == 0) {
-                            panel.mainTable.setRowSelectionInterval(row, row);
+                        if (panel.getMainTable().getSelectedRowCount() == 0) {
+                            panel.getMainTable().setRowSelectionInterval(row, row);
                         }
-                        panel.mainTable.ensureVisible(row);
+                        panel.getMainTable().ensureVisible(row);
                     }
                 });
             } catch (IOException ex) {
@@ -638,7 +648,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     public static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
-        LatexFieldFormatter formatter = LatexFieldFormatter.buildIgnoreHashes();
+        LatexFieldFormatter formatter = LatexFieldFormatter
+                .buildIgnoreHashes(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs));
         new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter, type);
 
         return stringWriter.getBuffer().toString();
@@ -733,15 +744,15 @@ public class EntryEditor extends JPanel implements EntryContainer {
      */
     private void scrollTo(int row) {
         movingToDifferentEntry = true;
-        panel.mainTable.setRowSelectionInterval(row, row);
-        panel.mainTable.ensureVisible(row);
+        panel.getMainTable().setRowSelectionInterval(row, row);
+        panel.getMainTable().ensureVisible(row);
     }
 
     /**
      * Makes sure the current edit is stored.
      */
     public void storeCurrentEdit() {
-        Component comp = Globals.focusListener.getFocused();
+        Component comp = Globals.getFocusListener().getFocused();
         if (Objects.equals(comp, source) || ((comp instanceof FieldEditor) && this.isAncestorOf(comp))) {
             if (comp instanceof FieldEditor) {
                 ((FieldEditor) comp).clearAutoCompleteSuggestion();
@@ -835,7 +846,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
             BibEntry newEntry = database.getEntries().get(0);
-            String newKey = newEntry.getCiteKey();
+            String newKey = newEntry.getCiteKeyOptional().orElse(null);
             boolean entryChanged = false;
             boolean duplicateWarning = false;
             boolean emptyWarning = (newKey == null) || newKey.isEmpty();
@@ -845,24 +856,30 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
 
             // First, remove fields that the user has removed.
-            for (String field : entry.getFieldNames()) {
-                if (InternalBibtexFields.isDisplayableField(field) && !newEntry.hasField(field)) {
-                    compound.addEdit(new UndoableFieldChange(entry, field, entry.getField(field), null));
-                    entry.clearField(field);
+            for (Entry<String, String> field : entry.getFieldMap().entrySet()) {
+                String fieldName = field.getKey();
+                String fieldValue = field.getValue();
+
+                if (InternalBibtexFields.isDisplayableField(fieldName) && !newEntry.hasField(fieldName)) {
+                    compound.addEdit(
+                            new UndoableFieldChange(entry, fieldName, fieldValue, null));
+                    entry.clearField(fieldName);
                     entryChanged = true;
                 }
             }
 
             // Then set all fields that have been set by the user.
-            for (String field : newEntry.getFieldNames()) {
-                String oldValue = entry.getField(field);
-                String newValue = newEntry.getField(field);
+            for (Entry<String, String> field : newEntry.getFieldMap().entrySet()) {
+                String fieldName = field.getKey();
+                String oldValue = entry.getFieldOptional(fieldName).orElse(null);
+                String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
-                    new LatexFieldFormatter().format(newValue, field);
+                    new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs))
+                            .format(newValue, fieldName);
 
-                    compound.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
-                    entry.setField(field, newValue);
+                    compound.addEdit(new UndoableFieldChange(entry, fieldName, oldValue, newValue));
+                    entry.setField(fieldName, newValue);
                     entryChanged = true;
                 }
             }
@@ -879,7 +896,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 return true;
             }
 
-            panel.undoManager.addEdit(compound);
+            panel.getUndoManager().addEdit(compound);
 
             if (duplicateWarning) {
                 warnDuplicateBibtexkey();
@@ -899,9 +916,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
             panel.markBaseChanged();
 
             SwingUtilities.invokeLater(() -> {
-                final int row = panel.mainTable.findEntry(entry);
+                final int row = panel.getMainTable().findEntry(entry);
                 if (row >= 0) {
-                    panel.mainTable.ensureVisible(row);
+                    panel.getMainTable().ensureVisible(row);
                 }
             });
 
@@ -1069,6 +1086,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 Object activeTab = tabs.get(tabbed.getSelectedIndex());
                 if (activeTab instanceof EntryEditorTab) {
                     ((EntryEditorTab) activeTab).updateAll();
+                    activateVisible();
                 }
             });
         }
@@ -1092,7 +1110,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             panel.entryEditorClosing(EntryEditor.this);
             panel.getDatabase().removeEntry(entry);
             panel.markBaseChanged();
-            panel.undoManager.addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
+            panel.getUndoManager().addEdit(new UndoableRemoveEntry(panel.getDatabase(), entry, panel));
             panel.output(Localization.lang("Deleted entry"));
         }
     }
@@ -1117,6 +1135,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     public class StoreFieldAction extends AbstractAction {
+
         public StoreFieldAction() {
             super("Store field value");
             putValue(Action.SHORT_DESCRIPTION, "Store field value");
@@ -1130,7 +1149,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             if (event.getSource() instanceof TextField) {
                 // Storage from bibtex key field.
                 TextField textField = (TextField) event.getSource();
-                String oldValue = entry.getCiteKey();
+                String oldValue = entry.getCiteKeyOptional().orElse(null);
                 String newValue = textField.getText();
 
                 if (newValue.isEmpty()) {
@@ -1142,7 +1161,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
 
                 // Make sure the key is legal:
-                String cleaned = LabelPatternUtil.checkLegalKey(newValue);
+                String cleaned = LabelPatternUtil.checkLegalKey(newValue,
+                        Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
                 if ((cleaned == null) || cleaned.equals(newValue)) {
                     textField.setValidBackgroundColor();
                 } else {
@@ -1166,14 +1186,15 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                 // Add an UndoableKeyChange to the baseframe's undoManager.
                 UndoableKeyChange undoableKeyChange = new UndoableKeyChange(panel.getDatabase(), entry, oldValue, newValue);
-                if (TimeStamp.updateTimeStampIsSet()) {
+                if (TimeStamp.updateTimeStampIsSet(Globals.prefs)) {
                     NamedCompound ce = new NamedCompound(undoableKeyChange.getPresentationName());
                     ce.addEdit(undoableKeyChange);
-                    TimeStamp.doUpdateTimeStamp(entry)
+                    TimeStamp.doUpdateTimeStamp(entry, Globals.prefs)
                             .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
-                    panel.undoManager.addEdit(ce);
+                    ce.end();
+                    panel.getUndoManager().addEdit(ce);
                 } else {
-                    panel.undoManager.addEdit(undoableKeyChange);
+                    panel.getUndoManager().addEdit(undoableKeyChange);
                 }
 
                 textField.setValidBackgroundColor();
@@ -1211,7 +1232,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         // properly formatted. If that happens, the field
                         // is not stored and the textarea turns red.
                         if (toSet != null) {
-                            new LatexFieldFormatter().format(toSet, fieldEditor.getFieldName());
+                            new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs))
+                                    .format(toSet, fieldEditor.getFieldName());
                         }
 
                         String oldValue = entry.getField(fieldEditor.getFieldName());
@@ -1232,16 +1254,18 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                         // Add an UndoableFieldChange to the baseframe's undoManager.
                         UndoableFieldChange undoableFieldChange = new UndoableFieldChange(entry, fieldEditor.getFieldName(), oldValue, toSet);
-                        if (TimeStamp.updateTimeStampIsSet()) {
+                        if (TimeStamp.updateTimeStampIsSet(Globals.prefs)) {
                             NamedCompound ce = new NamedCompound(undoableFieldChange.getPresentationName());
                             ce.addEdit(undoableFieldChange);
 
-                            TimeStamp.doUpdateTimeStamp(entry)
+                            TimeStamp.doUpdateTimeStamp(entry, Globals.prefs)
                                     .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
+                            ce.end();
 
-                            panel.undoManager.addEdit(ce);
+                            panel.getUndoManager().addEdit(ce);
+
                         } else {
-                            panel.undoManager.addEdit(undoableFieldChange);
+                            panel.getUndoManager().addEdit(undoableFieldChange);
                         }
                         updateSource();
                         panel.markBaseChanged();
@@ -1261,16 +1285,16 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
             } else if (source.isEditable()
                     && !source.getText().equals(lastSourceStringAccepted)) {
-                storeSource();
+                validEntry = storeSource();
             }
 
             // Make sure we scroll to the entry if it moved in the table.
             // Should only be done if this editor is currently showing:
             if (!movingAway && isShowing()) {
                 SwingUtilities.invokeLater(() -> {
-                    final int row = panel.mainTable.findEntry(entry);
+                    final int row = panel.getMainTable().findEntry(entry);
                     if (row >= 0) {
-                        panel.mainTable.ensureVisible(row);
+                        panel.getMainTable().ensureVisible(row);
                     }
                 });
             }
@@ -1315,7 +1339,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            int thisRow = panel.mainTable.findEntry(entry);
+            int thisRow = panel.getMainTable().findEntry(entry);
             int newRow;
 
             if ((thisRow + 1) < panel.getDatabase().getEntryCount()) {
@@ -1328,7 +1352,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
 
             scrollTo(newRow);
-            panel.mainTable.setRowSelectionInterval(newRow, newRow);
+            panel.getMainTable().setRowSelectionInterval(newRow, newRow);
 
         }
     }
@@ -1342,7 +1366,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int thisRow = panel.mainTable.findEntry(entry);
+            int thisRow = panel.getMainTable().findEntry(entry);
             int newRow;
 
             if ((thisRow - 1) >= 0) {
@@ -1356,7 +1380,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
 
             scrollTo(newRow);
-            panel.mainTable.setRowSelectionInterval(newRow, newRow);
+            panel.getMainTable().setRowSelectionInterval(newRow, newRow);
 
         }
     }
@@ -1383,9 +1407,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             // this updates the table automatically, on close, but not
             // within the tab
-            Object oldValue = entry.getCiteKey();
+            Optional<String> oldValue = entry.getCiteKeyOptional();
 
-            if (oldValue != null) {
+            if (oldValue.isPresent()) {
                 if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
                     panel.output(Localization.lang("Not overwriting existing key. To change this setting, open Options -> Prefererences -> BibTeX key generator"));
                     return;
@@ -1404,13 +1428,16 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
             }
 
-            LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry);
+            LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
+                    LabelPatternPreferences.fromPreferences(Globals.prefs));
 
             // Store undo information:
-            panel.undoManager.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, (String) oldValue, entry.getCiteKey()));
+            panel.getUndoManager().addEdit(
+                    new UndoableKeyChange(panel.getDatabase(), entry, oldValue.orElse(null),
+                            entry.getCiteKeyOptional().get())); // Cite key always set here
 
             // here we update the field
-            String bibtexKeyData = entry.getCiteKey();
+            String bibtexKeyData = entry.getCiteKeyOptional().get();
             setField(BibEntry.KEY_FIELD, bibtexKeyData);
             updateSource();
             panel.markBaseChanged();
@@ -1452,18 +1479,18 @@ public class EntryEditor extends JPanel implements EntryContainer {
             Object activeTab = tabs.get(tabbed.getSelectedIndex());
             if (activeTab instanceof EntryEditorTab) {
                 // Normal panel.
-                EntryEditorTab fp = (EntryEditorTab) activeTab;
-                FieldEditor fe = fp.getActive();
-                fe.clearAutoCompleteSuggestion();
-                updateField(fe);
+                EntryEditorTab tab = (EntryEditorTab) activeTab;
+                FieldEditor fieldEditor = tab.getActive();
+                fieldEditor.clearAutoCompleteSuggestion();
+                updateField(fieldEditor);
             } else {
                 // Source panel.
                 updateField(activeTab);
             }
 
-
-            panel.runCommand(Actions.SAVE);
-
+            if (validEntry) {
+                panel.runCommand(Actions.SAVE);
+            }
         }
     }
 
@@ -1473,7 +1500,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private void warnEmptyBibtexkey() {
-        panel.output(Localization.lang("Empty BibTeX key")+". "+Localization.lang("Grouping may not work for this entry."));
+        panel.output(Localization.lang("Empty BibTeX key") + ". " + Localization.lang("Grouping may not work for this entry."));
     }
 
 

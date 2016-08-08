@@ -21,12 +21,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
@@ -34,6 +33,7 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,16 +57,12 @@ public class LabelPatternUtil {
 
     private static final int CHARS_OF_FIRST = 5;
 
-
-    static {
-        updateDefaultPattern();
-    }
-
     private static BibDatabase database;
 
-    public static void updateDefaultPattern() {
+
+    public static void updateDefaultPattern(LabelPatternPreferences labelPatternPreferences) {
         defaultLabelPattern = LabelPatternUtil
-                .split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_LABEL_PATTERN));
+                .split(labelPatternPreferences.getDefaultLabelPattern());
     }
 
     /**
@@ -309,7 +305,7 @@ public class LabelPatternUtil {
                 if (k.matches("^[Tt][Ee][Cc][Hh].*")) { // Starts with "tech" case and locale independent
                     isTechnology = true;
                 }
-                if ("school".equalsIgnoreCase(k)) {
+                if (FieldName.SCHOOL.equalsIgnoreCase(k)) {
                     isSchool = true;
                 }
                 if (k.matches("^[Dd][EeIi][Pp].*") || k.matches("^[Ll][Aa][Bb].*")) { // Starts with "dep"/"dip"/"lab", case and locale independent
@@ -346,7 +342,7 @@ public class LabelPatternUtil {
                 StringBuilder schoolSB = new StringBuilder();
                 StringBuilder departmentSB = new StringBuilder();
                 for (String k : part) {
-                    if (!k.matches("^[Dd][EeIi][Pp].*") && !"school".equalsIgnoreCase(k)
+                    if (!k.matches("^[Dd][EeIi][Pp].*") && !FieldName.SCHOOL.equalsIgnoreCase(k)
                             && !"faculty".equalsIgnoreCase(k)
                             && !(k.replaceAll(STARTING_CAPITAL_PATTERN, "").isEmpty())) {
                         if (isSchool) {
@@ -426,7 +422,8 @@ public class LabelPatternUtil {
      * @param entry a <code>BibEntry</code>
      * @return modified BibEntry
      */
-    public static void makeLabel(MetaData metaData, BibDatabase dBase, BibEntry entry) {
+    public static void makeLabel(MetaData metaData, BibDatabase dBase, BibEntry entry,
+            LabelPatternPreferences labelPatternPreferences) {
         database = dBase;
         String key;
         StringBuilder stringBuilder = new StringBuilder();
@@ -470,12 +467,12 @@ public class LabelPatternUtil {
         }
 
         // Remove all illegal characters from the key.
-        key = checkLegalKey(stringBuilder.toString());
+        key = checkLegalKey(stringBuilder.toString(), labelPatternPreferences.isEnforceLegalKey());
 
         // Remove Regular Expressions while generating Keys
-        String regex = Globals.prefs.get(JabRefPreferences.KEY_PATTERN_REGEX);
+        String regex = labelPatternPreferences.getKeyPatternRegex();
         if ((regex != null) && !regex.trim().isEmpty()) {
-            String replacement = Globals.prefs.get(JabRefPreferences.KEY_PATTERN_REPLACEMENT);
+            String replacement = labelPatternPreferences.getKeyPatternReplacement();
             key = key.replaceAll(regex, replacement);
         }
 
@@ -493,8 +490,8 @@ public class LabelPatternUtil {
             occurrences--; // No change, so we can accept one dupe.
         }
 
-        boolean alwaysAddLetter = Globals.prefs.getBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER);
-        boolean firstLetterA = Globals.prefs.getBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A);
+        boolean alwaysAddLetter = labelPatternPreferences.isAlwaysAddLetter();
+        boolean firstLetterA = labelPatternPreferences.isFirstLetterA();
 
         if (!alwaysAddLetter && (occurrences == 0)) {
             // No dupes found, so we can just go ahead.
@@ -564,9 +561,9 @@ public class LabelPatternUtil {
                     StringBuilder abbreviateSB = new StringBuilder();
                     String[] words = resultingLabel.replaceAll("[\\{\\}']", "")
                             .split("[\\(\\) \r\n\"]");
-                    for (String word1 : words) {
-                        if (!word1.isEmpty()) {
-                            abbreviateSB.append(word1.charAt(0));
+                    for (String word : words) {
+                        if (!word.isEmpty()) {
+                            abbreviateSB.append(word.charAt(0));
                         }
                     }
                     resultingLabel = abbreviateSB.toString();
@@ -602,7 +599,7 @@ public class LabelPatternUtil {
                  * form "pureauth..." which does not do this fallback
                  * substitution of editor.
                  */
-                String authString = entry.getField("author");
+                String authString = entry.getField(FieldName.AUTHOR);
                 if (authString != null) {
                     authString = normalize(database.resolveForStrings(authString));
                 }
@@ -614,7 +611,7 @@ public class LabelPatternUtil {
                 }
 
                 if ((authString == null) || authString.isEmpty()) {
-                    authString = entry.getField("editor");
+                    authString = entry.getField(FieldName.EDITOR);
                     if (authString == null) {
                         authString = "";
                     } else {
@@ -688,39 +685,39 @@ public class LabelPatternUtil {
                 // Gather all markers starting with "ed" here, so we
                 // don't have to check all the time.
                 if ("edtr".equals(val)) {
-                    return firstAuthor(entry.getField("editor"));
+                    return firstAuthor(entry.getField(FieldName.EDITOR));
                 } else if ("edtrForeIni".equals(val)) {
-                    return firstAuthorForenameInitials(entry.getField("editor"));
+                    return firstAuthorForenameInitials(entry.getField(FieldName.EDITOR));
                 } else if ("editors".equals(val)) {
-                    return allAuthors(entry.getField("editor"));
+                    return allAuthors(entry.getField(FieldName.EDITOR));
                     // Last author's last name
                 } else if ("editorLast".equals(val)) {
-                    return lastAuthor(entry.getField("editor"));
+                    return lastAuthor(entry.getField(FieldName.EDITOR));
                 } else if ("editorLastForeIni".equals(val)) {
-                    return lastAuthorForenameInitials(entry.getField("editor"));
+                    return lastAuthorForenameInitials(entry.getField(FieldName.EDITOR));
                 } else if ("editorIni".equals(val)) {
-                    return oneAuthorPlusIni(entry.getField("editor"));
+                    return oneAuthorPlusIni(entry.getField(FieldName.EDITOR));
                 } else if (val.matches("edtrIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
-                    String s = authIniN(entry.getField("editor"), num);
+                    String s = authIniN(entry.getField(FieldName.EDITOR), num);
                     return s == null ? "" : s;
                 } else if (val.matches("edtr[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
-                    String s = authNofMth(entry.getField("editor"),
+                    String s = authNofMth(entry.getField(FieldName.EDITOR),
                             Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]) - 1);
                     return s == null ? "" : s;
                 } else if ("edtr.edtr.ea".equals(val)) {
-                    String s = authAuthEa(entry.getField("editor"));
+                    String s = authAuthEa(entry.getField(FieldName.EDITOR));
                     return s == null ? "" : s;
                 } else if ("edtrshort".equals(val)) {
-                    String s = authshort(entry.getField("editor"));
+                    String s = authshort(entry.getField(FieldName.EDITOR));
                     return s == null ? "" : s;
                 }
                 // authN. First N chars of the first author's last
                 // name.
                 else if (val.matches("edtr\\d+")) {
-                    String fa = firstAuthor(entry.getField("editor"));
+                    String fa = firstAuthor(entry.getField(FieldName.EDITOR));
                     if (fa == null) {
                         return "";
                     }
@@ -735,17 +732,19 @@ public class LabelPatternUtil {
                     return getField(entry, val);
                 }
             } else if ("firstpage".equals(val)) {
-                return firstPage(entry.getField("pages"));
+                return firstPage(entry.getField(FieldName.PAGES));
             } else if ("lastpage".equals(val)) {
-                return lastPage(entry.getField("pages"));
+                return lastPage(entry.getField(FieldName.PAGES));
             } else if ("shorttitle".equals(val)) {
-                return getTitleWords(3, entry.getField("title"));
+                return getTitleWords(3, entry.getField(FieldName.TITLE));
+            } else if ("shorttitleINI".equals(val)) {
+                return keepLettersAndDigitsOnly(applyModifiers(getTitleWordsWithSpaces(3, entry.getField(FieldName.TITLE)), new String[] {"abbr"}, 0));
             } else if ("veryshorttitle".equals(val)) {
-                return getTitleWords(1, entry.getField("title"));
+                return getTitleWords(1, entry.getField(FieldName.TITLE));
             } else if ("shortyear".equals(val)) {
-                String ss = entry.getFieldOrAlias("year");
-                if (ss == null) {
-                    return "";
+                String ss = entry.getFieldOrAlias(FieldName.YEAR).orElse("");
+                if (ss.isEmpty()) {
+                    return ss;
                 } else if (ss.startsWith("in") || ss.startsWith("sub")) {
                     return "IP";
                 } else if (ss.length() > 2) {
@@ -756,13 +755,13 @@ public class LabelPatternUtil {
             } else if (val.matches("keyword\\d+")) {
                 // according to LabelPattern.php, it returns keyword number n
                 int num = Integer.parseInt(val.substring(7));
-                List<String> separatedKeywords = entry.getSeparatedKeywords();
+                Set<String> separatedKeywords = entry.getKeywords();
                 if (separatedKeywords.size() < num) {
                     // not enough keywords
                     return "";
                 } else {
                     // num counts from 1 to n, but index in arrayList count from 0 to n-1
-                    return separatedKeywords.get(num-1);
+                    return new ArrayList<>(separatedKeywords).get(num-1);
                 }
             } else if (val.matches("keywords\\d*")) {
                 // return all keywords, not separated
@@ -772,13 +771,18 @@ public class LabelPatternUtil {
                 } else {
                     num = Integer.MAX_VALUE;
                 }
-                List<String> separatedKeywords = entry.getSeparatedKeywords();
+                Set<String> separatedKeywords = entry.getKeywords();
                 StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < Math.min(separatedKeywords.size(), num); i++) {
-                    String keyword = separatedKeywords.get(i);
+                int i = 0;
+                for (String keyword : separatedKeywords) {
                     // remove all spaces
                     keyword = keyword.replaceAll("\\s+", "");
                     sb.append(keyword);
+
+                    i++;
+                    if (i >= num) {
+                        break;
+                    }
                 }
                 return sb.toString();
             } else {
@@ -800,8 +804,7 @@ public class LabelPatternUtil {
      * @return The field value.
      */
     private static String getField(BibEntry entry, String field) {
-        String s = entry.getFieldOrAlias(field);
-        return s == null ? "" : s;
+        return entry.getFieldOrAlias(field).orElse("");
     }
 
     /**
@@ -825,6 +828,10 @@ public class LabelPatternUtil {
      * Determines "number" words out of the "title" field in the given BibTeX entry
      */
     public static String getTitleWords(int number, String title) {
+        return keepLettersAndDigitsOnly(getTitleWordsWithSpaces(number, title));
+    }
+
+    private static String getTitleWordsWithSpaces(int number, String title) {
         String ss = new RemoveLatexCommands().format(title);
         StringBuilder stringBuilder = new StringBuilder();
         StringBuilder current;
@@ -861,7 +868,7 @@ public class LabelPatternUtil {
             words++;
         }
 
-        return keepLettersAndDigitsOnly(stringBuilder.toString());
+        return stringBuilder.toString();
     }
 
     private static String keepLettersAndDigitsOnly(String in) {
@@ -1369,21 +1376,6 @@ public class LabelPatternUtil {
         return parts.toArray(new String[parts.size()]);
     }
 
-    /**
-     * This method returns a String similar to the one passed in, except that it is molded into a form that is
-     * acceptable for bibtex.
-     * <p>
-     * Watch-out that the returned string might be of length 0 afterwards.
-     *
-     * @param key mayBeNull
-     */
-    public static String checkLegalKey(String key) {
-        if (key == null) {
-            return null;
-        }
-        return checkLegalKey(key,
-                JabRefPreferences.getInstance().getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
-    }
 
     /**
      * This method returns a String similar to the one passed in, except that it is molded into a form that is

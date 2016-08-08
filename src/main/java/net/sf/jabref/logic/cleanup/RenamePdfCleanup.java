@@ -21,26 +21,30 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.TypedBibEntry;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class RenamePdfCleanup implements CleanupJob {
 
     private final BibDatabaseContext databaseContext;
     private final boolean onlyRelativePaths;
-    private final JournalAbbreviationRepository repository;
+    private final JournalAbbreviationLoader repositoryLoader;
+    private final JabRefPreferences prefs;
 
     private int unsuccessfulRenames;
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext,
-                            JournalAbbreviationRepository repository) {
+            JournalAbbreviationLoader repositoryLoader, JabRefPreferences prefs) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
-        this.repository = Objects.requireNonNull(repository);
+        this.repositoryLoader = Objects.requireNonNull(repositoryLoader);
+        this.prefs = Objects.requireNonNull(prefs);
     }
 
     @Override
@@ -59,7 +63,7 @@ public class RenamePdfCleanup implements CleanupJob {
             }
 
             StringBuilder newFilename = new StringBuilder(
-                    FileUtil.getLinkedFileName(databaseContext.getDatabase(), entry, repository));
+                    FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, repositoryLoader, prefs));
 
             //Add extension to newFilename
             newFilename.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
@@ -73,7 +77,7 @@ public class RenamePdfCleanup implements CleanupJob {
                 newFileList.add(flEntry);
                 continue;
             }
-            String newPath = expandedOldFile.get().getParent().concat(System.getProperty("file.separator"))
+            String newPath = expandedOldFile.get().getParent().concat(OS.FILE_SEPARATOR)
                     .concat(newFilename.toString());
 
             String expandedOldFilePath = expandedOldFile.get().toString();
@@ -104,8 +108,8 @@ public class RenamePdfCleanup implements CleanupJob {
                 if ((parent == null) || databaseContext.getFileDirectory().contains(parent.getAbsolutePath())) {
                     newFileEntryFileName = newFilename.toString();
                 } else {
-                    newFileEntryFileName = parent.toString().concat(System.getProperty("file.separator")).concat(
-                            newFilename.toString());
+                    newFileEntryFileName = parent.toString().concat(OS.FILE_SEPARATOR)
+                            .concat(newFilename.toString());
                 }
                 newFileList.add(new ParsedFileField(description, newFileEntryFileName, type));
             } else {

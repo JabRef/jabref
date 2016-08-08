@@ -69,7 +69,7 @@ public class AuxParserResult {
         StringBuilder result = new StringBuilder();
 
         result.append(Localization.lang("keys_in_database")).append(' ').append(masterDatabase.getEntryCount()).append('\n')
-                .append(Localization.lang("found_in_aux_file")).append(' ').append(getFoundKeysInAux()).append('\n')
+                .append(Localization.lang("found_in_AUX_file")).append(' ').append(getFoundKeysInAux()).append('\n')
                 .append(Localization.lang("resolved")).append(' ').append(getResolvedKeysCount()).append('\n')
                 .append(Localization.lang("not_found")).append(' ').append(getUnresolvedKeysCount()).append('\n')
                 .append(Localization.lang("crossreferenced entries included")).append(' ')
@@ -81,7 +81,7 @@ public class AuxParserResult {
             }
         }
         if (nestedAuxCount > 0) {
-            result.append(Localization.lang("nested_aux_files")).append(' ').append(nestedAuxCount);
+            result.append(Localization.lang("nested_AUX_files")).append(' ').append(nestedAuxCount);
         }
         return result.toString();
     }

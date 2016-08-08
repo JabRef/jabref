@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -17,17 +17,17 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * INSPEC format importer.
@@ -36,60 +36,46 @@ public class InspecImporter extends ImportFormat {
 
     private static final Pattern INSPEC_PATTERN = Pattern.compile("Record.*INSPEC.*");
 
-
-    /**
-     * Return the name of this import format.
-     */
     @Override
     public String getFormatName() {
         return "INSPEC";
     }
 
-    /*
-     *  (non-Javadoc)
-     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
-     */
     @Override
-    public String getCLIId() {
-        return "inspec";
+    public List<String> getExtensions() {
+        return Collections.singletonList(".txt");
     }
 
-    /**
-     * Check whether the source is in the correct format for this importer.
-     */
     @Override
-    public boolean isRecognizedFormat(InputStream stream) throws IOException {
-        // Our strategy is to look for the "PY <year>" line.
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            String str;
+    public String getDescription() {
+        return "INSPEC format importer.";
+    }
 
-            while ((str = in.readLine()) != null) {
-                if (INSPEC_PATTERN.matcher(str).find()) {
-                    return true;
-                }
+    @Override
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+        // Our strategy is to look for the "PY <year>" line.
+        String str;
+        while ((str = reader.readLine()) != null) {
+            if (INSPEC_PATTERN.matcher(str).find()) {
+                return true;
             }
         }
         return false;
     }
 
-    /**
-     * Parse the entries in the source, and return a List of BibEntry objects.
-     */
     @Override
-    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         String str;
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            while ((str = in.readLine()) != null) {
-                if (str.length() < 2) {
-                    continue;
-                }
-                if (str.indexOf("Record") == 0) {
-                    sb.append("__::__").append(str);
-                } else {
-                    sb.append("__NEWFIELD__").append(str);
-                }
+        while ((str = reader.readLine()) != null) {
+            if (str.length() < 2) {
+                continue;
+            }
+            if (str.indexOf("Record") == 0) {
+                sb.append("__::__").append(str);
+            } else {
+                sb.append("__NEWFIELD__").append(str);
             }
         }
         String[] entries = sb.toString().split("__::__");
@@ -106,33 +92,33 @@ public class InspecImporter extends ImportFormat {
                 String f3 = s.substring(0, 2);
                 String frest = s.substring(5);
                 if ("TI".equals(f3)) {
-                    h.put("title", frest);
+                    h.put(FieldName.TITLE, frest);
                 } else if ("PY".equals(f3)) {
-                    h.put("year", frest);
+                    h.put(FieldName.YEAR, frest);
                 } else if ("AU".equals(f3)) {
-                    h.put("author",
+                    h.put(FieldName.AUTHOR,
                             AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
                 } else if ("AB".equals(f3)) {
-                    h.put("abstract", frest);
+                    h.put(FieldName.ABSTRACT, frest);
                 } else if ("ID".equals(f3)) {
-                    h.put("keywords", frest);
+                    h.put(FieldName.KEYWORDS, frest);
                 } else if ("SO".equals(f3)) {
                     int m = frest.indexOf('.');
                     if (m >= 0) {
                         String jr = frest.substring(0, m);
-                        h.put("journal", jr.replace("-", " "));
+                        h.put(FieldName.JOURNAL, jr.replace("-", " "));
                         frest = frest.substring(m);
                         m = frest.indexOf(';');
                         if (m >= 5) {
                             String yr = frest.substring(m - 5, m).trim();
-                            h.put("year", yr);
+                            h.put(FieldName.YEAR, yr);
                             frest = frest.substring(m);
                             m = frest.indexOf(':');
                             if (m >= 0) {
                                 String pg = frest.substring(m + 1).trim();
-                                h.put("pages", pg);
+                                h.put(FieldName.PAGES, pg);
                                 String vol = frest.substring(1, m).trim();
-                                h.put("volume", vol);
+                                h.put(FieldName.VOLUME, vol);
                             }
                         }
                     }
@@ -156,6 +142,6 @@ public class InspecImporter extends ImportFormat {
 
         }
 
-        return bibitems;
+        return new ParserResult(bibitems);
     }
 }

@@ -23,6 +23,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -48,7 +49,6 @@ import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
@@ -63,8 +63,9 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.openoffice.OOBibStyle;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
+import net.sf.jabref.logic.util.TestEntry;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -107,7 +108,7 @@ class StyleSelectDialog {
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
     private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
-    private final BibEntry prevEntry = new BibEntry(IdGenerator.next());
+    private final BibEntry prevEntry;
 
     private boolean okPressed;
     private final StyleLoader loader;
@@ -119,7 +120,7 @@ class StyleSelectDialog {
         this.frame = Objects.requireNonNull(frame);
         this.preferences = Objects.requireNonNull(preferences);
         this.loader = Objects.requireNonNull(loader);
-        setupPrevEntry();
+        prevEntry = TestEntry.getTestEntry();
         init();
 
     }
@@ -132,8 +133,9 @@ class StyleSelectDialog {
             addDialog.setDirectoryPath(preferences.getCurrentStyle());
             addDialog.setVisible(true);
             addDialog.getFileName().ifPresent(fileName -> {
-                loader.addStyle(fileName);
-                preferences.setCurrentStyle(fileName);
+                if (loader.addStyleIfValid(fileName)) {
+                    preferences.setCurrentStyle(fileName);
+                }
             });
             updateStyles();
 
@@ -310,6 +312,7 @@ class StyleSelectDialog {
      * settings, and add the styles to the list of styles.
      */
     private void updateStyles() {
+
         table.clearSelection();
         styles.getReadWriteLock().writeLock().lock();
         styles.clear();
@@ -367,19 +370,6 @@ class StyleSelectDialog {
         }
         return Optional.empty();
     }
-
-    private void setupPrevEntry() {
-        prevEntry.setField("author", "Smith, Bill and Jones, Bob and Williams, Jeff");
-        prevEntry.setField("editor", "Taylor, Phil");
-        prevEntry.setField("title", "Title of the test entry for reference styles");
-        prevEntry.setField("volume", "34");
-        prevEntry.setField("year", "2008");
-        prevEntry.setField("journal", "BibTeX journal");
-        prevEntry.setField("publisher", "JabRef publishing");
-        prevEntry.setField("address", "Trondheim");
-        prevEntry.setField("www", "https://github.com/JabRef");
-    }
-
 
     static class StyleTableFormat implements TableFormat<OOBibStyle> {
 
@@ -495,7 +485,7 @@ class StyleSelectDialog {
             super(diag, Localization.lang("Add style file"), true);
 
             JButton browse = new JButton(Localization.lang("Browse"));
-            browse.addActionListener(BrowseAction.buildForFile(newFile, null, ".jstyle"));
+            browse.addActionListener(BrowseAction.buildForFile(newFile, null, Collections.singletonList(".jstyle")));
 
             // Build content panel
             FormBuilder builder = FormBuilder.create();

@@ -18,8 +18,8 @@ package net.sf.jabref.logic.openoffice;
 import java.io.File;
 import java.util.List;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * The OpenOffice connection preferences are:
@@ -133,6 +133,9 @@ public class OpenOfficePreferences {
         return preferences.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
     }
 
+    public void clearCurrentStyle() {
+        preferences.remove(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
+    }
     public void setCurrentStyle(String path) {
         preferences.put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE, path);
     }

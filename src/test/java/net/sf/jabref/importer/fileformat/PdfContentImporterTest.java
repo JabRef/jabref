@@ -1,7 +1,10 @@
 package net.sf.jabref.importer.fileformat;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.net.URISyntaxException;
+import java.nio.charset.Charset;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -13,13 +16,23 @@ import static org.junit.Assert.assertEquals;
 
 public class PdfContentImporterTest {
 
+    private final PdfContentImporter importer = new PdfContentImporter();
+
     @Test
-    public void doesNotHandleEncryptedPdfs() throws IOException {
-        PdfContentImporter importer = new PdfContentImporter();
-        try (InputStream is = PdfContentImporter.class.getResourceAsStream("/pdfs/encrypted.pdf")) {
-            List<BibEntry> result = importer.importEntries(is, null);
-            assertEquals(Collections.emptyList(), result);
-        }
+    public void testsGetExtensions() {
+        assertEquals(Arrays.asList(".pdf"), importer.getExtensions());
+    }
+
+    @Test
+    public void testGetDescription() {
+        assertEquals("PdfContentImporter parses data of the first page of the PDF and creates a BibTeX entry. Currently, Springer and IEEE formats are supported.", importer.getDescription());
+    }
+
+    @Test
+    public void doesNotHandleEncryptedPdfs() throws URISyntaxException {
+        Path file = Paths.get(PdfContentImporter.class.getResource("/pdfs/encrypted.pdf").toURI());
+        List<BibEntry> result = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        assertEquals(Collections.emptyList(), result);
     }
 
 }

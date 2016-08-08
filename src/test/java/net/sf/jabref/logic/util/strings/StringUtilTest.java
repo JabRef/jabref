@@ -1,15 +1,14 @@
 package net.sf.jabref.logic.util.strings;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.FileField;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class StringUtilTest {
@@ -24,22 +23,17 @@ public class StringUtilTest {
     private static final String ENCODED_STRING_ARRAY_3 = "a:\\:b;c\\;:d";
 
 
-    @BeforeClass
-    public static void loadPreferences() {
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
-
     @Test
     public void testUnifyLineBreaks() {
         // Mac < v9
         String result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r");
-        assertEquals(Globals.NEWLINE, result);
+        assertEquals(OS.NEWLINE, result);
         // Windows
         result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r\n");
-        assertEquals(Globals.NEWLINE, result);
+        assertEquals(OS.NEWLINE, result);
         // Unix
         result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\n");
-        assertEquals(Globals.NEWLINE, result);
+        assertEquals(OS.NEWLINE, result);
     }
 
     @Test
@@ -127,19 +121,19 @@ public class StringUtilTest {
 
     @Test
     public void testWrap() {
-        assertEquals("aaaaa" + Globals.NEWLINE + "\tbbbbb" + Globals.NEWLINE + "\tccccc",
+        assertEquals("aaaaa" + OS.NEWLINE + "\tbbbbb" + OS.NEWLINE + "\tccccc",
                 StringUtil.wrap("aaaaa bbbbb ccccc", 5));
-        assertEquals("aaaaa bbbbb" + Globals.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 8));
-        assertEquals("aaaaa bbbbb" + Globals.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 11));
+        assertEquals("aaaaa bbbbb" + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 8));
+        assertEquals("aaaaa bbbbb" + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 11));
         assertEquals("aaaaa bbbbb ccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 12));
-        assertEquals("aaaaa" + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\tbbbbb" + Globals.NEWLINE + "\t"
-                + Globals.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\nbbbbb\nccccc", 12));
+        assertEquals("aaaaa" + OS.NEWLINE + "\t" + OS.NEWLINE + "\tbbbbb" + OS.NEWLINE + "\t"
+                + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\nbbbbb\nccccc", 12));
         assertEquals(
-                "aaaaa" + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\tbbbbb"
-                        + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\tccccc",
+                "aaaaa" + OS.NEWLINE + "\t" + OS.NEWLINE + "\t" + OS.NEWLINE + "\tbbbbb"
+                        + OS.NEWLINE + "\t" + OS.NEWLINE + "\tccccc",
                 StringUtil.wrap("aaaaa\n\nbbbbb\nccccc", 12));
-        assertEquals("aaaaa" + Globals.NEWLINE + "\t" + Globals.NEWLINE + "\tbbbbb" + Globals.NEWLINE + "\t"
-                + Globals.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\r\nbbbbb\r\nccccc", 12));
+        assertEquals("aaaaa" + OS.NEWLINE + "\t" + OS.NEWLINE + "\tbbbbb" + OS.NEWLINE + "\t"
+                + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\r\nbbbbb\r\nccccc", 12));
     }
 
     @Test
@@ -243,6 +237,38 @@ public class StringUtilTest {
     }
 
     @Test
+    public void testIntValueOfWithNullSingleDigit() {
+        assertEquals(Integer.valueOf(1), StringUtil.intValueOfWithNull("1"));
+        assertEquals(Integer.valueOf(2), StringUtil.intValueOfWithNull("2"));
+        assertEquals(Integer.valueOf(8), StringUtil.intValueOfWithNull("8"));
+    }
+
+    @Test
+    public void testIntValueOfWithNullLongString() {
+        assertEquals(Integer.valueOf(1234567890), StringUtil.intValueOfWithNull("1234567890"));
+    }
+
+    @Test
+    public void testIntValueOfWithNullStartWithZeros() {
+        assertEquals(Integer.valueOf(1234), StringUtil.intValueOfWithNull("001234"));
+    }
+
+    @Test
+    public void testIntValueOfWithNullExceptionIfStringContainsLetter() {
+        assertNull(StringUtil.intValueOfWithNull("12A2"));
+    }
+
+    @Test
+    public void testIntValueOfWithNullExceptionIfStringNull() {
+        assertNull(StringUtil.intValueOfWithNull(null));
+    }
+
+    @Test
+    public void testIntValueOfWithNullExceptionfIfStringEmpty() {
+        assertNull(StringUtil.intValueOfWithNull(""));
+    }
+
+    @Test
     public void testQuoteSimple() {
         assertEquals("a::", StringUtil.quote("a:", "", ':'));
     }
@@ -290,47 +316,6 @@ public class StringUtilTest {
     }
 
     @Test
-    public void testExpandAuthorInitialsAddDot() {
-        assertEquals("O.", StringUtil.expandAuthorInitials("O"));
-        assertEquals("A. O.", StringUtil.expandAuthorInitials("AO"));
-        assertEquals("A. O.", StringUtil.expandAuthorInitials("AO."));
-        assertEquals("A. O.", StringUtil.expandAuthorInitials("A.O."));
-        assertEquals("A.-O.", StringUtil.expandAuthorInitials("A-O"));
-        assertEquals("O. Moore", StringUtil.expandAuthorInitials("O Moore"));
-        assertEquals("A. O. Moore", StringUtil.expandAuthorInitials("AO Moore"));
-        assertEquals("O. von Moore", StringUtil.expandAuthorInitials("O von Moore"));
-        assertEquals("A.-O. Moore", StringUtil.expandAuthorInitials("A-O Moore"));
-        assertEquals("Moore, O.", StringUtil.expandAuthorInitials("Moore, O"));
-        assertEquals("Moore, O., Jr.", StringUtil.expandAuthorInitials("Moore, O, Jr."));
-        assertEquals("Moore, A. O.", StringUtil.expandAuthorInitials("Moore, AO"));
-        assertEquals("Moore, A.-O.", StringUtil.expandAuthorInitials("Moore, A-O"));
-        assertEquals("Moore, O. and O. Moore", StringUtil.expandAuthorInitials("Moore, O and O Moore"));
-        assertEquals("Moore, O. and O. Moore and Moore, O. O.",
-                StringUtil.expandAuthorInitials("Moore, O and O Moore and Moore, OO"));
-    }
-
-    @Test
-    public void testExpandAuthorInitialsDoNotAddDot() {
-        assertEquals("O.", StringUtil.expandAuthorInitials("O."));
-        assertEquals("A. O.", StringUtil.expandAuthorInitials("A. O."));
-        assertEquals("A.-O.", StringUtil.expandAuthorInitials("A.-O."));
-        assertEquals("O. Moore", StringUtil.expandAuthorInitials("O. Moore"));
-        assertEquals("A. O. Moore", StringUtil.expandAuthorInitials("A. O. Moore"));
-        assertEquals("O. von Moore", StringUtil.expandAuthorInitials("O. von Moore"));
-        assertEquals("A.-O. Moore", StringUtil.expandAuthorInitials("A.-O. Moore"));
-        assertEquals("Moore, O.", StringUtil.expandAuthorInitials("Moore, O."));
-        assertEquals("Moore, O., Jr.", StringUtil.expandAuthorInitials("Moore, O., Jr."));
-        assertEquals("Moore, A. O.", StringUtil.expandAuthorInitials("Moore, A. O."));
-        assertEquals("Moore, A.-O.", StringUtil.expandAuthorInitials("Moore, A.-O."));
-        assertEquals("MEmre", StringUtil.expandAuthorInitials("MEmre"));
-        assertEquals("{\\'{E}}douard", StringUtil.expandAuthorInitials("{\\'{E}}douard"));
-        assertEquals("J{\\\"o}rg", StringUtil.expandAuthorInitials("J{\\\"o}rg"));
-        assertEquals("Moore, O. and O. Moore", StringUtil.expandAuthorInitials("Moore, O. and O. Moore"));
-        assertEquals("Moore, O. and O. Moore and Moore, O. O.",
-                StringUtil.expandAuthorInitials("Moore, O. and O. Moore and Moore, O. O."));
-    }
-
-    @Test
     public void testRepeatSpaces() {
         assertEquals("", StringUtil.repeatSpaces(0));
         assertEquals(" ", StringUtil.repeatSpaces(1));
@@ -342,5 +327,20 @@ public class StringUtilTest {
         assertEquals("", StringUtil.repeat(0, 'a'));
         assertEquals("a", StringUtil.repeat(1, 'a'));
         assertEquals("aaaaaaa", StringUtil.repeat(7, 'a'));
+    }
+
+    @Test
+    public void testBoldHTML() {
+        assertEquals("<b>AA</b>", StringUtil.boldHTML("AA"));
+    }
+
+    @Test
+    public void testBoldHTMLReturnsOriginalTextIfNonNull() {
+        assertEquals("<b>AA</b>", StringUtil.boldHTML("AA", "BB"));
+    }
+
+    @Test
+    public void testBoldHTMLReturnsAlternativeTextIfNull() {
+        assertEquals("<b>BB</b>", StringUtil.boldHTML(null, "BB"));
     }
 }

@@ -26,7 +26,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -40,8 +39,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
@@ -53,6 +50,8 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -197,7 +196,8 @@ class EntryEditorTab {
 
         // Add the edit field for Bibtex-key.
         if (addKeyField) {
-            final TextField textField = new TextField(BibEntry.KEY_FIELD, parent.getEntry().getCiteKey(), true);
+            final TextField textField = new TextField(BibEntry.KEY_FIELD,
+                    parent.getEntry().getCiteKeyOptional().orElse(""), true);
             setupJTextComponent(textField, null);
 
             editors.put(BibEntry.KEY_FIELD, textField);
@@ -225,8 +225,7 @@ class EntryEditorTab {
         if (text.isEmpty()) {
             return getEntry().hasField(fieldEditor.getFieldName());
         } else {
-            String entryValue = getEntry().getField(fieldEditor.getFieldName());
-            return !Objects.equals(entryValue, text);
+            return !Optional.of(text).equals(getEntry().getFieldOptional(fieldEditor.getFieldName()));
         }
     }
 

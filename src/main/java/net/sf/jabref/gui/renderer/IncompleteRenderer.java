@@ -1,8 +1,8 @@
 package net.sf.jabref.gui.renderer;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class IncompleteRenderer extends GeneralRenderer {
 

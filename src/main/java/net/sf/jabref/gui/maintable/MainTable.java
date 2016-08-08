@@ -39,9 +39,6 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexSingleField;
-import net.sf.jabref.bibtex.comparator.FieldComparator;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryMarker;
 import net.sf.jabref.gui.GUIGlobals;
@@ -56,9 +53,13 @@ import net.sf.jabref.gui.util.comparator.FirstColumnComparator;
 import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.gui.util.comparator.RankingFieldComparator;
 import net.sf.jabref.logic.TypedBibEntry;
+import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexSingleField;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import ca.odell.glazedlists.EventList;
@@ -81,8 +82,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MainTable extends JTable {
 
-
-
     private static final Log LOGGER = LogFactory.getLog(MainTable.class);
 
     private final MainTableFormat tableFormat;
@@ -96,10 +95,6 @@ public class MainTable extends JTable {
     // needed to activate/deactivate the listener
     private final PersistenceTableColumnListener tableColumnListener;
     private final MainTableDataModel model;
-
-    public MainTableDataModel getTableModel() {
-        return model;
-    }
 
     // Enum used to define how a cell should be rendered.
     private enum CellRendererMode {
@@ -133,7 +128,7 @@ public class MainTable extends JTable {
         super();
         this.model = model;
 
-        addFocusListener(Globals.focusListener);
+        addFocusListener(Globals.getFocusListener());
         setAutoResizeMode(Globals.prefs.getInt(JabRefPreferences.AUTO_RESIZE_MODE));
 
         this.tableFormat = tableFormat;
@@ -190,6 +185,10 @@ public class MainTable extends JTable {
         return pane;
     }
 
+    public MainTableDataModel getTableModel() {
+        return model;
+    }
+
     @Override
     public String getToolTipText(MouseEvent e) {
 
@@ -218,10 +217,12 @@ public class MainTable extends JTable {
 
         CellRendererMode status = getCellStatus(row, column);
 
-        if (!(model.getSearchState() == MainTableDataModel.DisplayOption.FLOAT) || matches(row, model.getSearchState() != MainTableDataModel.DisplayOption.DISABLED ? SearchMatcher.INSTANCE : null)) {
+        if ((model.getSearchState() != MainTableDataModel.DisplayOption.FLOAT) || matches(row,
+                model.getSearchState() != MainTableDataModel.DisplayOption.DISABLED ? SearchMatcher.INSTANCE : null)) {
             score++;
         }
-        if (!(model.getGroupingState() == MainTableDataModel.DisplayOption.FLOAT) || matches(row, model.getGroupingState() != MainTableDataModel.DisplayOption.DISABLED ? GroupMatcher.INSTANCE : null)) {
+        if ((model.getGroupingState() != MainTableDataModel.DisplayOption.FLOAT) || matches(row,
+                model.getGroupingState() != MainTableDataModel.DisplayOption.DISABLED ? GroupMatcher.INSTANCE : null)) {
             score += 2;
         }
 
@@ -499,7 +500,7 @@ public class MainTable extends JTable {
      */
     public boolean isFileColumn(int modelIndex) {
         return (tableFormat.getTableColumn(modelIndex) != null) && tableFormat.getTableColumn(modelIndex)
-                .getBibtexFields().contains(Globals.FILE_FIELD);
+                .getBibtexFields().contains(FieldName.FILE);
     }
 
     private boolean matches(int row, Matcher<BibEntry> m) {
@@ -509,7 +510,7 @@ public class MainTable extends JTable {
     private boolean isComplete(int row) {
         try {
             BibEntry entry = getBibEntry(row);
-            TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.of(panel.getDatabase()), panel.getBibDatabaseContext().getMode());
+            TypedBibEntry typedEntry = new TypedBibEntry(entry, panel.getBibDatabaseContext());
             return typedEntry.hasAllRequiredFields();
         } catch (NullPointerException ex) {
             return true;
@@ -551,7 +552,8 @@ public class MainTable extends JTable {
     public void ensureVisible(int row) {
         JScrollBar vert = pane.getVerticalScrollBar();
         int y = row * getRowHeight();
-        if ((y < vert.getValue()) || ((y > (vert.getValue() + vert.getVisibleAmount())) && !(model.getSearchState() == MainTableDataModel.DisplayOption.FLOAT))) {
+        if ((y < vert.getValue()) || ((y > (vert.getValue() + vert.getVisibleAmount()))
+                && (model.getSearchState() != MainTableDataModel.DisplayOption.FLOAT))) {
             scrollToCenter(row, 1);
         }
 

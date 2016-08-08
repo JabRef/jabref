@@ -22,11 +22,11 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.mergeentries.MergeEntries;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 // created by : ?
 //
@@ -45,8 +45,8 @@ public class DuplicateResolverDialog extends JDialog {
     enum DuplicateResolverResult {
         NOT_CHOSEN,
         KEEP_BOTH,
-        KEEP_UPPER,
-        KEEP_LOWER,
+        KEEP_LEFT,
+        KEEP_RIGHT,
         AUTOREMOVE_EXACT,
         KEEP_MERGE,
         BREAK
@@ -68,7 +68,7 @@ public class DuplicateResolverDialog extends JDialog {
     public DuplicateResolverDialog(ImportInspectionDialog dialog, BibEntry one, BibEntry two,
             DuplicateResolverType type) {
         super(dialog, Localization.lang("Possible duplicate entries"), true);
-        this.frame = dialog.frame;
+        this.frame = dialog.getFrame();
         init(one, two, type);
     }
 
@@ -117,8 +117,8 @@ public class DuplicateResolverDialog extends JDialog {
         options.add(Box.createHorizontalStrut(5));
         options.add(cancel);
 
-        first.addActionListener(e -> buttonPressed(DuplicateResolverResult.KEEP_UPPER));
-        second.addActionListener(e -> buttonPressed(DuplicateResolverResult.KEEP_LOWER));
+        first.addActionListener(e -> buttonPressed(DuplicateResolverResult.KEEP_LEFT));
+        second.addActionListener(e -> buttonPressed(DuplicateResolverResult.KEEP_RIGHT));
         both.addActionListener(e -> buttonPressed(DuplicateResolverResult.KEEP_BOTH));
         merge.addActionListener(e -> buttonPressed(DuplicateResolverResult.KEEP_MERGE));
         if (removeExact != null) {

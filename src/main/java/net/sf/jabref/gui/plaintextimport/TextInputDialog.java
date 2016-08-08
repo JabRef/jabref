@@ -70,6 +70,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -110,11 +111,6 @@ import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibEntryWriter;
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.EntryMarker;
 import net.sf.jabref.gui.FileDialogs;
@@ -124,12 +120,21 @@ import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.util.component.OverlayPanel;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.FreeCiteImporter;
+import net.sf.jabref.logic.bibtex.BibEntryWriter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
@@ -466,22 +471,22 @@ public class TextInputDialog extends JDialog {
                     markedTextStore.appendPosition(fieldName, selectionStart, selectionEnd);
 
                     // get old text from BibTeX tag
-                    String old = entry.getField(fieldName);
+                    Optional<String> old = entry.getFieldOptional(fieldName);
 
                     // merge old and selected text
-                    if (old == null) {
-                        // "null"+"txt" Strings forbidden
-                        entry.setField(fieldName, txt);
-                    } else {
+                    if (old.isPresent()) {
                         // insert a new name with an additional "and"
                         if (InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.PERSON_NAMES)) {
-                            entry.setField(fieldName, old + " and " + txt);
-                        } else if ("keywords".equals(fieldName)) {
+                            entry.setField(fieldName, old.get() + " and " + txt);
+                        } else if (FieldName.KEYWORDS.equals(fieldName)) {
                             // Add keyword
-                                entry.addKeyword(txt);
+                            entry.addKeyword(txt, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                         } else {
-                            entry.setField(fieldName, old + txt);
+                            entry.setField(fieldName, old.get() + txt);
                         }
+                    } else {
+                        // "null"+"txt" Strings forbidden
+                        entry.setField(fieldName, txt);
                     }
                 }
                 // make the new data in BibTeX source code visible
@@ -504,17 +509,21 @@ public class TextInputDialog extends JDialog {
 
         // we have to remove line breaks (but keep empty lines)
         // otherwise, the result is broken
-        text = text.replace(Globals.NEWLINE.concat(Globals.NEWLINE), "##NEWLINE##");
+        text = text.replace(OS.NEWLINE.concat(OS.NEWLINE), "##NEWLINE##");
         // possible URL line breaks are removed completely.
-        text = text.replace("/".concat(Globals.NEWLINE), "/");
-        text = text.replace(Globals.NEWLINE, " ");
-        text = text.replace("##NEWLINE##", Globals.NEWLINE);
+        text = text.replace("/".concat(OS.NEWLINE), "/");
+        text = text.replace(OS.NEWLINE, " ");
+        text = text.replace("##NEWLINE##", OS.NEWLINE);
 
-        List<BibEntry> importedEntries = fimp.importEntries(text, frame);
-        if (importedEntries == null) {
+        ParserResult importerResult = fimp.importEntries(text);
+        if(importerResult.hasWarnings()) {
+            frame.showMessage(importerResult.getErrorMessage());
+        }
+        List<BibEntry> importedEntries = importerResult.getDatabase().getEntries();
+        if (importedEntries.isEmpty()) {
             return false;
         } else {
-            UpdateField.setAutomaticFields(importedEntries, false, false);
+            UpdateField.setAutomaticFields(importedEntries, false, false, Globals.prefs);
             boolean markEntries = EntryMarker.shouldMarkEntries();
 
             for (BibEntry e : importedEntries) {
@@ -532,7 +541,9 @@ public class TextInputDialog extends JDialog {
     private void updateSourceView() {
         StringWriter sw = new StringWriter(200);
         try {
-            new BibEntryWriter(new LatexFieldFormatter(), false).write(entry, sw, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+            new BibEntryWriter(new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)),
+                    false).write(entry, sw,
+                    frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
             sourcePreview.setText(sw.getBuffer().toString());
         } catch (IOException ex) {
             LOGGER.error("Error in entry" + ": " + ex.getMessage(), ex);
@@ -593,7 +604,8 @@ public class TextInputDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                String chosen = FileDialogs.getNewFile(frame, null, null, ".txt", JFileChooser.OPEN_DIALOG, false);
+                String chosen = FileDialogs.getNewFile(frame, null, Collections.emptyList(), ".txt",
+                        JFileChooser.OPEN_DIALOG, false);
                 if (chosen != null) {
                     File newFile = new File(chosen);
                     document.remove(0, document.getLength());

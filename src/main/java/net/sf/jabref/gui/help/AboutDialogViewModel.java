@@ -139,7 +139,7 @@ public class AboutDialogViewModel {
 
     @FXML
     private void copyVersionToClipboard() {
-        new ClipBoardManager().setClipboardContents(Globals.BUILD_INFO.getVersion());
+        new ClipBoardManager().setClipboardContents(Globals.BUILD_INFO.getVersion().getFullVersion());
         String message = String.format("%s - %s", Localization.lang("Copied version information to clipboard"), Globals.BUILD_INFO.getVersion());
         JabRefGUI.getMainFrame().output(message);
     }

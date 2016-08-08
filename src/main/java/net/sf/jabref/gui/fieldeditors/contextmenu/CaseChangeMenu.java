@@ -34,6 +34,7 @@ public class CaseChangeMenu extends JMenu {
         // create menu items, one for each case changer
         for (final Formatter caseChanger : Formatters.CASE_CHANGERS) {
             JMenuItem menuItem = new JMenuItem(caseChanger.getName());
+            menuItem.setToolTipText(caseChanger.getDescription());
             menuItem.addActionListener(e -> parent.setText(caseChanger.format(parent.getText())));
             this.add(menuItem);
         }

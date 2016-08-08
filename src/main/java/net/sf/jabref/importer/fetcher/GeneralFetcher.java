@@ -38,7 +38,6 @@ import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.FetcherPreviewDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.ImportInspectionDialog;
@@ -50,6 +49,7 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {

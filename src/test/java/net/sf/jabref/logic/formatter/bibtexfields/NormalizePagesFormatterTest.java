@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -8,7 +9,12 @@ import org.junit.Test;
  */
 public class NormalizePagesFormatterTest {
 
-    private final NormalizePagesFormatter formatter = new NormalizePagesFormatter();
+    private NormalizePagesFormatter formatter;
+
+    @Before
+    public void setUp() {
+        formatter = new NormalizePagesFormatter();
+    }
 
     @Test
     public void formatSinglePageResultsInNoChange() {
@@ -36,6 +42,12 @@ public class NormalizePagesFormatterTest {
     }
 
     @Test
+    public void removeWhitespace() {
+        expectCorrect("   1  ", "1");
+        expectCorrect("   1 -- 2  ", "1--2");
+    }
+
+    @Test
     public void ignoreWhitespaceInPageNumbersWithDoubleDash() {
         expectCorrect("43 -- 103", "43--103");
     }
@@ -56,13 +68,23 @@ public class NormalizePagesFormatterTest {
     }
 
     @Test
-    public void doesNotRemoveLetters() {
+    public void doNotRemoveLetters() {
         expectCorrect("R1-R50", "R1-R50");
     }
 
     @Test
-    public void replacesLongDashWithDoubleDash() {
+    public void replaceLongDashWithDoubleDash() {
         expectCorrect("1 \u2014 50", "1--50");
+    }
+
+    @Test
+    public void removePagePrefix() {
+        expectCorrect("p.50", "50");
+    }
+
+    @Test
+    public void removePagesPrefix() {
+        expectCorrect("pp.50", "50");
     }
 
     @Test

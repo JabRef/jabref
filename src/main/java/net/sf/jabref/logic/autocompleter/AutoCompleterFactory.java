@@ -18,8 +18,10 @@ package net.sf.jabref.logic.autocompleter;
 import java.util.Arrays;
 import java.util.Objects;
 
-import net.sf.jabref.bibtex.FieldProperties;
-import net.sf.jabref.bibtex.InternalBibtexFields;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 /**
  * Returns an autocompleter to a given fieldname.
@@ -29,10 +31,12 @@ import net.sf.jabref.bibtex.InternalBibtexFields;
 public class AutoCompleterFactory {
 
     private final AutoCompletePreferences preferences;
+    private final JournalAbbreviationLoader abbreviationLoader;
 
 
-    public AutoCompleterFactory(AutoCompletePreferences preferences) {
+    public AutoCompleterFactory(AutoCompletePreferences preferences, JournalAbbreviationLoader abbreviationLoader) {
         this.preferences = Objects.requireNonNull(preferences);
+        this.abbreviationLoader = Objects.requireNonNull(abbreviationLoader);
     }
 
     public AutoCompleter<String> getFor(String fieldName) {
@@ -40,17 +44,17 @@ public class AutoCompleterFactory {
 
         if (InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.PERSON_NAMES)) {
             return new NameFieldAutoCompleter(fieldName, preferences);
-        } else if ("crossref".equals(fieldName)) {
+        } else if (FieldName.CROSSREF.equals(fieldName)) {
             return new BibtexKeyAutoCompleter(preferences);
-        } else if ("journal".equals(fieldName) || "publisher".equals(fieldName)) {
-            return new EntireFieldAutoCompleter(fieldName, preferences);
+        } else if (FieldName.JOURNAL.equals(fieldName) || FieldName.PUBLISHER.equals(fieldName)) {
+            return new JournalAutoCompleter(fieldName, preferences, abbreviationLoader);
         } else {
             return new DefaultAutoCompleter(fieldName, preferences);
         }
     }
 
     public AutoCompleter<String> getPersonAutoCompleter() {
-        return new NameFieldAutoCompleter(Arrays.asList("author", "editor"), true, preferences);
+        return new NameFieldAutoCompleter(Arrays.asList(FieldName.AUTHOR, FieldName.EDITOR), true, preferences);
     }
 
 }

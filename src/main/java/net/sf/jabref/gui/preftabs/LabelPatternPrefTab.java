@@ -25,12 +25,13 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.labelpattern.LabelPatternPanel;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
+import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -51,8 +52,8 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
     private final JRadioButton letterStartB = new JRadioButton(Localization.lang("Ensure unique keys using letters (b, c, ...)"));
     private final JRadioButton alwaysAddLetter = new JRadioButton(Localization.lang("Always add letter (a, b, ...) to generated keys"));
 
-    private final JTextField KeyPatternRegex = new JTextField(20);
-    private final JTextField KeyPatternReplacement = new JTextField(20);
+    private final JTextField keyPatternRegex = new JTextField(20);
+    private final JTextField keyPatternReplacement = new JTextField(20);
 
 
     public LabelPatternPrefTab(JabRefPreferences prefs, BasePanel panel) {
@@ -74,8 +75,8 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
         Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, warnBeforeOverwriting.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY, dontOverwrite.isSelected());
 
-        Globals.prefs.put(JabRefPreferences.KEY_PATTERN_REGEX, KeyPatternRegex.getText());
-        Globals.prefs.put(JabRefPreferences.KEY_PATTERN_REPLACEMENT, KeyPatternReplacement.getText());
+        Globals.prefs.put(JabRefPreferences.KEY_PATTERN_REGEX, keyPatternRegex.getText());
+        Globals.prefs.put(JabRefPreferences.KEY_PATTERN_REPLACEMENT, keyPatternReplacement.getText());
         Globals.prefs.putBoolean(JabRefPreferences.GENERATE_KEYS_AFTER_INSPECTION, autoGenerateOnImport.isSelected());
         Globals.prefs.putBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING, generateOnSave.isSelected());
 
@@ -90,7 +91,7 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
             Globals.prefs.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
         }
 
-        LabelPatternUtil.updateDefaultPattern();
+        LabelPatternUtil.updateDefaultPattern(LabelPatternPreferences.fromPreferences(Globals.prefs));
 
         // fetch entries from GUI
         GlobalLabelPattern keypatterns = getLabelPatternAsGlobalLabelPattern();
@@ -133,8 +134,8 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
 
         builder.nextLine();
         builder.append(pan);
-        builder.append(KeyPatternRegex);
-        builder.append(KeyPatternReplacement);
+        builder.append(keyPatternRegex);
+        builder.append(keyPatternReplacement);
 
         builder.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         con.gridx = 1;
@@ -177,11 +178,9 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
         // Warning before overwriting is only relevant if overwriting can happen:
         warnBeforeOverwriting.setEnabled(!dontOverwrite.isSelected());
 
-        KeyPatternRegex.setText(Globals.prefs.get(JabRefPreferences.KEY_PATTERN_REGEX));
-        KeyPatternReplacement.setText(Globals.prefs.get(JabRefPreferences.KEY_PATTERN_REPLACEMENT));
+        keyPatternRegex.setText(Globals.prefs.get(JabRefPreferences.KEY_PATTERN_REGEX));
+        keyPatternReplacement.setText(Globals.prefs.get(JabRefPreferences.KEY_PATTERN_REPLACEMENT));
 
-        //basenamePatternRegex.setText(Globals.prefs.get("basenamePatternRegex"));
-        //basenamePatternReplacement.setText(Globals.prefs.get("basenamePatternReplacement"));
     }
 
     @Override

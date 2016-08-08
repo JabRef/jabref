@@ -23,10 +23,11 @@ import java.util.List;
 import javax.swing.JLabel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import ca.odell.glazedlists.gui.TableFormat;
@@ -35,16 +36,12 @@ import ca.odell.glazedlists.gui.TableFormat;
  * Class defining the contents and column headers of the main table.
  */
 public class MainTableFormat implements TableFormat<BibEntry> {
-    // Character separating field names that are to be used in sequence as
-    // fallbacks for a single column (e.g. "author/editor" to use editor where
-    // author is not set):
-    public static final String COL_DEFINITION_FIELD_SEPARATOR = "/";
 
     // Values to gather iconImages for those columns
     // These values are also used to put a heading into the table; see getColumnName(int)
-    private static final List<String> URL_FIRST = Arrays.asList("url", "doi");
-    private static final List<String> DOI_FIRST = Arrays.asList("doi", "url");
-    private static final List<String> ARXIV = Collections.singletonList("eprint");
+    private static final List<String> URL_FIRST = Arrays.asList(FieldName.URL, FieldName.DOI);
+    private static final List<String> DOI_FIRST = Arrays.asList(FieldName.DOI, FieldName.URL);
+    private static final List<String> ARXIV = Collections.singletonList(FieldName.EPRINT);
 
     private final BibDatabase database;
 
@@ -140,7 +137,7 @@ public class MainTableFormat implements TableFormat<BibEntry> {
             // stored column name will be used as columnName
             // There might be more than one field to display, e.g., "author/editor" or "date/year" - so split
             // at MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR
-            String[] fields = columnName.split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
+            String[] fields = columnName.split(FieldName.FIELD_SEPARATOR);
             tableColumns.add(new MainTableColumn(columnName, Arrays.asList(fields), database));
         }
 

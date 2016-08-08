@@ -39,6 +39,7 @@ import java.awt.event.InputEvent;
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Vector;
 
@@ -49,12 +50,12 @@ import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.groups.AbstractGroup;
 import net.sf.jabref.logic.groups.EntriesGroupChange;
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.MoveGroupChange;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class GroupsTree extends JTree implements DragSourceListener,
         DropTargetListener, DragGestureListener {
@@ -300,7 +301,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
 
                 // warn if assignment has undesired side effects (modifies a
                 // field != keywords)
-                if (!Util.warnAssignmentSideEffects(group, groupSelector.frame))
+                if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(group, groupSelector.frame))
                  {
                     return; // user aborted operation
                 }
@@ -313,7 +314,6 @@ public class GroupsTree extends JTree implements DragSourceListener,
                 Optional<EntriesGroupChange> undo = target.addEntriesToGroup(selection.getSelection());
                 if (undo.isPresent()) {
                     dtde.getDropTargetContext().dropComplete(true);
-                    groupSelector.revalidateGroups();
                     groupSelector.concludeAssignment(UndoableChangeEntriesOfGroup.getUndoableEdit(target, undo.get()),
                             target.getNode(), assignedEntries);
                 }
@@ -392,15 +392,21 @@ public class GroupsTree extends JTree implements DragSourceListener,
         repaint();
     }
 
-    /** Highlights the specified cells or disables highlight if cells == null */
-    public void setHighlight2Cells(Object[] cells) {
-        localCellRenderer.setHighlight2Cells(cells);
+    /**
+     * Highlights the specified groups in red
+     **/
+    public void setOverlappingGroups(List<GroupTreeNode> nodes) {
+        Objects.requireNonNull(nodes);
+        localCellRenderer.setOverlappingGroups(nodes);
         repaint();
     }
 
-    /** Highlights the specified cells or disables highlight if cells == null */
-    public void setHighlight3Cells(Object[] cells) {
-        localCellRenderer.setHighlight3Cells(cells);
+    /**
+     * Highlights the specified groups by underlining
+     **/
+    public void setMatchingGroups(List<GroupTreeNode> nodes) {
+        Objects.requireNonNull(nodes);
+        localCellRenderer.setMatchingGroups(nodes);
         repaint();
     }
 

@@ -45,9 +45,6 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.BibtexSingleField;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.BasePanel;
@@ -55,8 +52,11 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.BibtexSingleField;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -175,22 +175,21 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             public Object getValueAt(int row, int column) {
                 int internalRow = row;
                 if (internalRow == 0) {
-                    return column == 0 ? InternalBibtexFields.NUMBER_COL : String.valueOf(ncWidth);
+                    return column == 0 ? FieldName.NUMBER_COL : String.valueOf(ncWidth);
                 }
                 internalRow--;
                 if (internalRow >= tableRows.size()) {
                     return "";
                 }
-                Object rowContent = tableRows.get(internalRow);
+                TableRow rowContent = tableRows.get(internalRow);
                 if (rowContent == null) {
                     return "";
                 }
-                TableRow tr = (TableRow) rowContent;
                 // Only two columns
                 if (column == 0) {
-                    return tr.getName();
+                    return rowContent.getName();
                 } else {
-                    return tr.getLength() > 0 ? Integer.toString(tr.getLength()) : "";
+                    return rowContent.getLength() > 0 ? Integer.toString(rowContent.getLength()) : "";
                 }
             }
 
@@ -305,7 +304,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         /*** begin: special table columns and special fields ***/
 
         JButton helpButton = new HelpAction(Localization.lang("Help on special fields"),
-                HelpFiles.SPECIAL_FIELDS).getHelpButton();
+                HelpFile.SPECIAL_FIELDS).getHelpButton();
 
         rankingColumn = new JCheckBox(Localization.lang("Show rank"));
         qualityColumn = new JCheckBox(Localization.lang("Show quality"));
@@ -631,8 +630,8 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             final HashMap<String, Integer> map = new HashMap<>();
 
             // first element (#) not inside tableRows
-            for (int i = 1; i < panel.mainTable.getColumnCount(); i++) {
-                String name = panel.mainTable.getColumnName(i);
+            for (int i = 1; i < panel.getMainTable().getColumnCount(); i++) {
+                String name = panel.getMainTable().getColumnName(i);
                 if ((name != null) && !name.isEmpty()) {
                     map.put(name.toLowerCase(), i);
                 }
@@ -664,11 +663,11 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             if (panel == null) {
                 return;
             }
-            TableColumnModel colMod = panel.mainTable.getColumnModel();
+            TableColumnModel colMod = panel.getMainTable().getColumnModel();
             colSetup.setValueAt(String.valueOf(colMod.getColumn(0).getWidth()), 0, 1);
             for (int i = 1; i < colMod.getColumnCount(); i++) {
                 try {
-                    String name = panel.mainTable.getColumnName(i).toLowerCase();
+                    String name = panel.getMainTable().getColumnName(i).toLowerCase();
                     int width = colMod.getColumn(i).getWidth();
                     if ((i <= tableRows.size()) && ((String) colSetup.getValueAt(i, 0)).equalsIgnoreCase(name)) {
                         colSetup.setValueAt(String.valueOf(width), i, 1);

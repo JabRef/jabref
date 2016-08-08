@@ -22,7 +22,6 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JSeparator;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
@@ -30,6 +29,7 @@ import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -113,7 +113,7 @@ public class MergeEntriesDialog extends JDialog {
             ce.addEdit(new UndoableRemoveEntry(panel.getDatabase(), two, panel));
             panel.getDatabase().removeEntry(two);
             ce.end();
-            panel.undoManager.addEdit(ce);
+            panel.getUndoManager().addEdit(ce);
             panel.output(Localization.lang("Merged entries"));
             dispose();
         });

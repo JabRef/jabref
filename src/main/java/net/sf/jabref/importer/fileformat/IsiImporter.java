@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -17,18 +17,19 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.MonthUtil;
 
 /**
@@ -57,60 +58,51 @@ public class IsiImporter extends ImportFormat {
     private static final Pattern ISI_PATTERN = Pattern.compile("FN ISI Export Format|VR 1.|PY \\d{4}");
 
 
-    /**
-     * Return the name of this import format.
-     */
     @Override
     public String getFormatName() {
         return "ISI";
     }
 
-    /*
-     * (non-Javadoc)
-     *
-     * @see net.sf.jabref.imports.ImportFormat#getCLIId()
-     */
     @Override
-    public String getCLIId() {
+    public List<String> getExtensions() {
+        return Arrays.asList(".isi",".txt");
+    }
+
+    @Override
+    public String getId() {
         return "isi";
     }
 
-
-
-    /**
-     * Check whether the source is in the correct format for this importer.
-     */
     @Override
-    public boolean isRecognizedFormat(InputStream stream) throws IOException {
+    public String getDescription() {
+        return "Importer for the ISI Web of Science, INSPEC and Medline format.";
+    }
 
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
+    @Override
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+        String str;
+        int i = 0;
+        while (((str = reader.readLine()) != null) && (i < 50)) {
 
-            String str;
-            int i = 0;
-            while (((str = in.readLine()) != null) && (i < 50)) {
-
-                /**
-                 * The following line gives false positives for RIS files, so it
-                 * should not be uncommented. The hypen is a characteristic of the
-                 * RIS format.
-                 *
-                 * str = str.replace(" - ", "")
-                 */
-                if (IsiImporter.ISI_PATTERN.matcher(str).find()) {
-                    return true;
-                }
-
-                i++;
+            /**
+             * The following line gives false positives for RIS files, so it
+             * should not be uncommented. The hypen is a characteristic of the
+             * RIS format.
+             *
+             * str = str.replace(" - ", "")
+             */
+            if (IsiImporter.ISI_PATTERN.matcher(str).find()) {
+                return true;
             }
+
+            i++;
         }
         return false;
     }
 
-
-
     public static void processSubSup(Map<String, String> map) {
 
-        String[] subsup = {"title", "abstract", "review", "notes"};
+        String[] subsup = {FieldName.TITLE, FieldName.ABSTRACT, FieldName.REVIEW, "notes"};
 
         for (String aSubsup : subsup) {
             if (map.containsKey(aSubsup)) {
@@ -141,7 +133,7 @@ public class IsiImporter extends ImportFormat {
 
     private static void processCapitalization(Map<String, String> map) {
 
-        String[] subsup = {"title", "journal", "publisher"};
+        String[] subsup = {FieldName.TITLE, FieldName.JOURNAL, FieldName.PUBLISHER};
 
         for (String aSubsup : subsup) {
 
@@ -156,45 +148,37 @@ public class IsiImporter extends ImportFormat {
         }
     }
 
-    /**
-     * Parse the entries in the source, and return a List of BibEntry
-     * objects.
-     */
     @Override
-    public List<BibEntry> importEntries(InputStream stream, OutputPrinter status) throws IOException {
-        if (stream == null) {
-            throw new IOException("No stream given.");
-        }
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
+        Objects.requireNonNull(reader);
 
         List<BibEntry> bibitems = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
 
-        try (BufferedReader in = new BufferedReader(ImportFormatReader.getReaderDefaultEncoding(stream))) {
-            // Pattern fieldPattern = Pattern.compile("^AU |^TI |^SO |^DT |^C1 |^AB
-            // |^ID |^BP |^PY |^SE |^PY |^VL |^IS ");
-            String str;
+        // Pattern fieldPattern = Pattern.compile("^AU |^TI |^SO |^DT |^C1 |^AB
+        // |^ID |^BP |^PY |^SE |^PY |^VL |^IS ");
+        String str;
 
-            while ((str = in.readLine()) != null) {
-                if (str.length() < 3) {
-                    continue;
-                }
+        while ((str = reader.readLine()) != null) {
+            if (str.length() < 3) {
+                continue;
+            }
 
-                // beginning of a new item
-                if ("PT ".equals(str.substring(0, 3))) {
-                    sb.append("::").append(str);
+            // beginning of a new item
+            if ("PT ".equals(str.substring(0, 3))) {
+                sb.append("::").append(str);
+            } else {
+                String beg = str.substring(0, 3).trim();
+
+                // I could have used the fieldPattern regular expression instead
+                // however this seems to be
+                // quick and dirty and it works!
+                if (beg.length() == 2) {
+                    sb.append(" ## "); // mark the beginning of each field
+                    sb.append(str);
                 } else {
-                    String beg = str.substring(0, 3).trim();
-
-                    // I could have used the fieldPattern regular expression instead
-                    // however this seems to be
-                    // quick and dirty and it works!
-                    if (beg.length() == 2) {
-                        sb.append(" ## "); // mark the beginning of each field
-                        sb.append(str);
-                    } else {
-                        sb.append("EOLEOL"); // mark the end of each line
-                        sb.append(str.trim()); // remove the initial spaces
-                    }
+                    sb.append("EOLEOL"); // mark the end of each line
+                    sb.append(str.trim()); // remove the initial spaces
                 }
             }
         }
@@ -243,33 +227,33 @@ public class IsiImporter extends ImportFormat {
                         Type = "inproceedings";
                     }
                 } else if ("JO".equals(beg)) {
-                    hm.put("booktitle", value);
+                    hm.put(FieldName.BOOKTITLE, value);
                 } else if ("AU".equals(beg)) {
                     String author = IsiImporter.isiAuthorsConvert(value.replace("EOLEOL", " and "));
 
                     // if there is already someone there then append with "and"
-                    if (hm.get("author") != null) {
-                        author = hm.get("author") + " and " + author;
+                    if (hm.get(FieldName.AUTHOR) != null) {
+                        author = hm.get(FieldName.AUTHOR) + " and " + author;
                     }
 
-                    hm.put("author", author);
+                    hm.put(FieldName.AUTHOR, author);
                 } else if ("TI".equals(beg)) {
-                    hm.put("title", value.replace("EOLEOL", " "));
+                    hm.put(FieldName.TITLE, value.replace("EOLEOL", " "));
                 } else if ("SO".equals(beg) || "JA".equals(beg)) {
-                    hm.put("journal", value.replace("EOLEOL", " "));
+                    hm.put(FieldName.JOURNAL, value.replace("EOLEOL", " "));
                 } else if ("ID".equals(beg) || "KW".equals(beg)) {
 
                     value = value.replace("EOLEOL", " ");
-                    String existingKeywords = hm.get("keywords");
+                    String existingKeywords = hm.get(FieldName.KEYWORDS);
                     if ((existingKeywords == null) || existingKeywords.contains(value)) {
                         existingKeywords = value;
                     } else {
                         existingKeywords += ", " + value;
                     }
-                    hm.put("keywords", existingKeywords);
+                    hm.put(FieldName.KEYWORDS, existingKeywords);
 
                 } else if ("AB".equals(beg)) {
-                    hm.put("abstract", value.replace("EOLEOL", " "));
+                    hm.put(FieldName.ABSTRACT, value.replace("EOLEOL", " "));
                 } else if ("BP".equals(beg) || "BR".equals(beg) || "SP".equals(beg)) {
                     pages = value;
                 } else if ("EP".equals(beg)) {
@@ -286,20 +270,20 @@ public class IsiImporter extends ImportFormat {
                 } else if ("AR".equals(beg)) {
                     pages = value;
                 } else if ("IS".equals(beg)) {
-                    hm.put("number", value);
+                    hm.put(FieldName.NUMBER, value);
                 } else if ("PY".equals(beg)) {
-                    hm.put("year", value);
+                    hm.put(FieldName.YEAR, value);
                 } else if ("VL".equals(beg)) {
-                    hm.put("volume", value);
+                    hm.put(FieldName.VOLUME, value);
                 } else if ("PU".equals(beg)) {
-                    hm.put("publisher", value);
+                    hm.put(FieldName.PUBLISHER, value);
                 } else if ("DI".equals(beg)) {
-                    hm.put("doi", value);
+                    hm.put(FieldName.DOI, value);
                 } else if ("PD".equals(beg)) {
 
                     String month = IsiImporter.parseMonth(value);
                     if (month != null) {
-                        hm.put("month", month);
+                        hm.put(FieldName.MONTH, month);
                     }
 
                 } else if ("DT".equals(beg)) {
@@ -309,7 +293,7 @@ public class IsiImporter extends ImportFormat {
                     } else if (Type.startsWith("Article") || Type.startsWith("Journal") || "article".equals(PT)) {
                         Type = "article";
                     } else {
-                        Type = "misc";
+                        Type = BibEntry.DEFAULT_TYPE;
                     }
                 } else if ("CR".equals(beg)) {
                     hm.put("CitedReferences", value.replace("EOLEOL", " ; ").trim());
@@ -323,7 +307,7 @@ public class IsiImporter extends ImportFormat {
             }
 
             if (!"".equals(pages)) {
-                hm.put("pages", pages);
+                hm.put(FieldName.PAGES, pages);
             }
 
             // Skip empty entries
@@ -355,7 +339,7 @@ public class IsiImporter extends ImportFormat {
 
             bibitems.add(b);
         }
-        return bibitems;
+        return new ParserResult(bibitems);
     }
 
     private static String parsePages(String value) {

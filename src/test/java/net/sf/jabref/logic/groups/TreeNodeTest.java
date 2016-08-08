@@ -663,7 +663,7 @@ public class TreeNodeTest {
     /**
      * This is just a dummy class deriving from TreeNode<T> so that we can test the generic class
      */
-    private class TreeNodeMock extends TreeNode<TreeNodeMock> {
+    private static class TreeNodeMock extends TreeNode<TreeNodeMock> {
 
         private final String name;
 
@@ -693,7 +693,7 @@ public class TreeNodeTest {
         }
     }
 
-    private class WrongTreeNodeImplementation extends TreeNode<TreeNodeMock> {
+    private static class WrongTreeNodeImplementation extends TreeNode<TreeNodeMock> {
         // This class is a wrong derived class of TreeNode<T>
         // since it does not extends TreeNode<WrongTreeNodeImplementation>
         // See test constructorChecksThatClassImplementsCorrectInterface

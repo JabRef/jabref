@@ -46,7 +46,7 @@ public class AutoLinkFilesAction extends AbstractAction {
                         // entry has been updated in Util.autoSetLinks, only treat nc and status message
                         if (nc.hasEdits()) {
                             nc.end();
-                            JabRefGUI.getMainFrame().getCurrentBasePanel().undoManager.addEdit(nc);
+                            JabRefGUI.getMainFrame().getCurrentBasePanel().getUndoManager().addEdit(nc);
                             JabRefGUI.getMainFrame().getCurrentBasePanel().markBaseChanged();
                         }
                         JabRefGUI.getMainFrame().output(Localization.lang("Finished automatically setting external links."));

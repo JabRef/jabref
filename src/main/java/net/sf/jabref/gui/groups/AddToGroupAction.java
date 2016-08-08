@@ -29,7 +29,6 @@ import net.sf.jabref.logic.groups.EntriesGroupChange;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.util.Util;
 
 public class AddToGroupAction extends AbstractAction {
 
@@ -79,7 +78,7 @@ public class AddToGroupAction extends AbstractAction {
 
         undoAll.end();
 
-        panel.undoManager.addEdit(undoAll);
+        panel.getUndoManager().addEdit(undoAll);
         panel.markBaseChanged();
         panel.updateEntryEditorIfShowing();
         panel.getGroupSelector().valueChanged(null);
@@ -93,7 +92,7 @@ public class AddToGroupAction extends AbstractAction {
         List<AbstractGroup> affectedGroups = groupsContainingEntries.stream().map(GroupTreeNode::getGroup).collect(
                 Collectors.toList());
         affectedGroups.add(node.getNode().getGroup());
-        if (!Util.warnAssignmentSideEffects(affectedGroups, panel.frame())) {
+        if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(affectedGroups, panel.frame())) {
             return; // user aborted operation
         }
 
@@ -113,7 +112,7 @@ public class AddToGroupAction extends AbstractAction {
     }
 
     public void addToGroup(List<BibEntry> entries, NamedCompound undo) {
-        if (!Util.warnAssignmentSideEffects(node.getNode().getGroup(), panel.frame())) {
+        if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(node.getNode().getGroup(), panel.frame())) {
             return; // user aborted operation
         }
 

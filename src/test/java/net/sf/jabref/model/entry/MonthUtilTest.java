@@ -75,5 +75,6 @@ public class MonthUtilTest {
         Assert.assertEquals(-1, MonthUtil.getMonth("#test#").index);
         Assert.assertEquals(-1, MonthUtil.getMonth("").index);
         Assert.assertFalse(MonthUtil.getMonth("8,").isValid());
+        Assert.assertTrue(MonthUtil.getMonth("jan").isValid());
     }
 }

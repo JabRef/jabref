@@ -16,7 +16,6 @@
 package net.sf.jabref.importer.fetcher;
 
 import java.io.IOException;
-import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -26,12 +25,14 @@ import java.util.regex.Pattern;
 
 import javax.swing.JPanel;
 
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.Globals;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
 
 import org.apache.commons.logging.Log;
@@ -88,8 +89,8 @@ public class CiteSeerXFetcher implements EntryFetcher {
     }
 
     @Override
-    public HelpFiles getHelpPage() {
-        return HelpFiles.FETCHER_CITESEERX;
+    public HelpFile getHelpPage() {
+        return HelpFile.FETCHER_CITESEERX;
     }
 
     @Override
@@ -128,8 +129,7 @@ public class CiteSeerXFetcher implements EntryFetcher {
     }
 
     private static String getCitationsFromUrl(String urlQuery, List<String> ids) throws IOException {
-        URL url = new URL(urlQuery);
-        String cont = new URLDownload(url).downloadToString();
+        String cont = new URLDownload(urlQuery).downloadToString(Globals.prefs.getDefaultEncoding());
         Matcher m = CiteSeerXFetcher.CITE_LINK_PATTERN.matcher(cont);
         while (m.find()) {
             ids.add(CiteSeerXFetcher.URL_START + m.group(1));
@@ -141,33 +141,31 @@ public class CiteSeerXFetcher implements EntryFetcher {
 
 
     private static BibEntry getSingleCitation(String urlString) throws IOException {
+        String cont = new URLDownload(urlString).downloadToString(StandardCharsets.UTF_8);
 
-        URL url = new URL(urlString);
-        String cont = new URLDownload(url).downloadToString(StandardCharsets.UTF_8);
-
-        // Find title, and create entry if we do. Otherwise assume we didn't get an entry:
+        // Find title, and create entry if we do. Otherwise assume we did not get an entry:
         Matcher m = CiteSeerXFetcher.TITLE_PATTERN.matcher(cont);
         if (m.find()) {
             BibEntry entry = new BibEntry(IdGenerator.next());
-            entry.setField("title", m.group(1));
+            entry.setField(FieldName.TITLE, m.group(1));
 
             // Find authors:
             m = CiteSeerXFetcher.AUTHOR_PATTERN.matcher(cont);
             if (m.find()) {
                 String authors = m.group(1);
-                entry.setField("author", new NormalizeNamesFormatter().format(authors));
+                entry.setField(FieldName.AUTHOR, new NormalizeNamesFormatter().format(authors));
             }
 
             // Find year:
             m = CiteSeerXFetcher.YEAR_PATTERN.matcher(cont);
             if (m.find()) {
-                entry.setField("year", m.group(1));
+                entry.setField(FieldName.YEAR, m.group(1));
             }
 
             // Find abstract:
             m = CiteSeerXFetcher.ABSTRACT_PATTERN.matcher(cont);
             if (m.find()) {
-                entry.setField("abstract", m.group(1));
+                entry.setField(FieldName.ABSTRACT, m.group(1));
             }
 
             return entry;

@@ -20,19 +20,25 @@ import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.logic.FieldChange;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class CleanupWorker {
 
     private final BibDatabaseContext databaseContext;
-    private final JournalAbbreviationRepository repository;
+    private final JournalAbbreviationLoader repositoryLoader;
+    private final JabRefPreferences prefs;
     private int unsuccessfulRenames;
 
-    public CleanupWorker(BibDatabaseContext databaseContext, JournalAbbreviationRepository repository) {
+
+    public CleanupWorker(BibDatabaseContext databaseContext, JournalAbbreviationLoader repositoryLoader,
+            JabRefPreferences prefs) {
         this.databaseContext = databaseContext;
-        this.repository = repository;
+        this.repositoryLoader = repositoryLoader;
+        this.prefs = prefs;
     }
 
     public int getUnsuccessfulRenames() {
@@ -57,10 +63,13 @@ public class CleanupWorker {
         List<CleanupJob> jobs = new ArrayList<>();
 
         if (preset.isCleanUpUpgradeExternalLinks()) {
-            jobs.add(new UpgradePdfPsToFileCleanup(Arrays.asList("pdf", "ps")));
+            jobs.add(new UpgradePdfPsToFileCleanup(Arrays.asList(FieldName.PDF, FieldName.PS)));
         }
         if (preset.isCleanUpDOI()) {
             jobs.add(new DoiCleanup());
+        }
+        if (preset.isCleanUpISSN()) {
+            jobs.add(new ISSNCleanup());
         }
         if (preset.isFixFileLinks()) {
             jobs.add(new FileLinksCleanup());
@@ -73,7 +82,7 @@ public class CleanupWorker {
         }
         if (preset.isRenamePDF()) {
             RenamePdfCleanup cleaner = new RenamePdfCleanup(preset.isRenamePdfOnlyRelativePaths(), databaseContext,
-                    repository);
+                    repositoryLoader, prefs);
             jobs.add(cleaner);
             unsuccessfulRenames += cleaner.getUnsuccessfulRenames();
         }

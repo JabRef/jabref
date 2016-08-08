@@ -1,6 +1,9 @@
 package net.sf.jabref.logic.search;
 
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.IdGenerator;
 
 import org.junit.Test;
 
@@ -33,9 +36,34 @@ public class SearchQueryTest {
     @Test
     public void testGrammarSearch() {
         BibEntry entry = new BibEntry();
-        entry.addKeyword("one two");
+        entry.addKeyword("one two", ", ");
         SearchQuery searchQuery = new SearchQuery("keywords=\"one two\"", false, false);
         assertTrue(searchQuery.isMatch(entry));
+    }
+
+    @Test
+    public void testGrammarSearchFullEntryLastCharMissing() {
+        BibEntry entry = new BibEntry();
+        entry.setField(FieldName.TITLE, "systematic revie");
+        SearchQuery searchQuery = new SearchQuery("title=\"systematic review\"", false, false);
+        assertFalse(searchQuery.isMatch(entry));
+    }
+
+    @Test
+    public void testGrammarSearchFullEntry() {
+        BibEntry entry = new BibEntry();
+        entry.setField(FieldName.TITLE, "systematic review");
+        SearchQuery searchQuery = new SearchQuery("title=\"systematic review\"", false, false);
+        assertTrue(searchQuery.isMatch(entry));
+    }
+
+    @Test
+    public void testSearchingForOpenBraketInBooktitle() {
+        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
+        e.setField(FieldName.BOOKTITLE, "Super Conference (SC)");
+
+        SearchQuery searchQuery = new SearchQuery("booktitle=\"(\"", false, false);
+        assertTrue(searchQuery.isMatch(e));
     }
 
 }
