@@ -27,6 +27,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - The arXiv fetcher now also supports free-text search queries
 - [#1345](https://github.com/JabRef/jabref/issues/1345) Cleanup ISSN
 - It is now possible to add your own lists of protected terms, see Options -> Manage protected terms
+- Automatically generated group names are now converted from LaTeX to Unicode
 
 ### Fixed
 - Fixed [#1632](https://github.com/JabRef/jabref/issues/1632) User comments (@Comment) with or without brackets are now kept
