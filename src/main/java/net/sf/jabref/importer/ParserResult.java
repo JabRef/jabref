@@ -52,7 +52,11 @@ public class ParserResult {
     }
 
     public ParserResult(Collection<BibEntry> entries) {
-        this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)), new MetaData(), new HashMap<>());
+        this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)));
+    }
+
+    public ParserResult(BibDatabase database) {
+        this(database, new MetaData(), new HashMap<>());
     }
 
     public ParserResult(BibDatabase base, MetaData metaData, Map<String, EntryType> entryTypes) {
