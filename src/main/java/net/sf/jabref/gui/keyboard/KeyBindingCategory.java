@@ -5,19 +5,19 @@ import net.sf.jabref.logic.l10n.Localization;
 public enum KeyBindingCategory {
 
     FILE(
-            Localization.lang("File")),
+            Localization.menuTitle("File")),
     EDIT(
-            Localization.lang("Edit")),
+            Localization.menuTitle("Edit")),
     SEARCH(
-            Localization.lang("Search")),
+            Localization.menuTitle("Search")),
     VIEW(
-            Localization.lang("View")),
+            Localization.menuTitle("View")),
     BIBTEX(
-            Localization.lang("BibTeX")),
+            Localization.menuTitle("BibTeX")),
     QUALITY(
-            Localization.lang("Quality")),
+            Localization.menuTitle("Quality")),
     TOOLS(
-            Localization.lang("Tools"));
+            Localization.menuTitle("Tools"));
 
     private final String name;
 
