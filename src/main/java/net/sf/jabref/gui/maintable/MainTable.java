@@ -92,6 +92,7 @@ public class MainTable extends JTable {
     private final BasePanel panel;
 
     private final boolean tableColorCodes;
+    private final boolean tableResolvedColorCodes;
     private final DefaultEventSelectionModel<BibEntry> localSelectionModel;
     private final TableComparatorChooser<BibEntry> comparatorChooser;
     private final JScrollPane pane;
@@ -103,12 +104,14 @@ public class MainTable extends JTable {
     // Enum used to define how a cell should be rendered.
     private enum CellRendererMode {
         REQUIRED,
+        RESOLVED,
         OPTIONAL,
         OTHER
     }
     private static GeneralRenderer defRenderer;
     private static GeneralRenderer reqRenderer;
     private static GeneralRenderer optRenderer;
+    private static GeneralRenderer resolvedRenderer;
     private static GeneralRenderer grayedOutRenderer;
     private static GeneralRenderer veryGrayedOutRenderer;
 
@@ -143,6 +146,7 @@ public class MainTable extends JTable {
                 .eventTableModelWithThreadProxyList(model.getTableRows(), tableFormat));
 
         tableColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON);
+        tableResolvedColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_RESOLVED_COLOR_CODES_ON);
         localSelectionModel = (DefaultEventSelectionModel<BibEntry>) GlazedListsSwing
                 .eventSelectionModelWithThreadProxyList(model.getTableRows());
         setSelectionModel(localSelectionModel);
@@ -221,8 +225,6 @@ public class MainTable extends JTable {
         int score = -3;
         DefaultTableCellRenderer renderer = MainTable.defRenderer;
 
-        CellRendererMode status = getCellStatus(row, column);
-
         if ((model.getSearchState() != MainTableDataModel.DisplayOption.FLOAT)
                 || matches(row, SearchMatcher.INSTANCE)) {
             score++;
@@ -268,11 +270,15 @@ public class MainTable extends JTable {
                 renderer = MainTable.incRenderer;
             }
             renderer.setHorizontalAlignment(JLabel.CENTER);
-        } else if (tableColorCodes) {
-            if (status == CellRendererMode.REQUIRED) {
+        } else if (tableColorCodes || tableResolvedColorCodes) {
+            CellRendererMode status = getCellStatus(row, column);
+
+            if (tableColorCodes && (status == CellRendererMode.REQUIRED)) {
                 renderer = MainTable.reqRenderer;
-            } else if (status == CellRendererMode.OPTIONAL) {
+            } else if (tableColorCodes && (status == CellRendererMode.OPTIONAL)) {
                 renderer = MainTable.optRenderer;
+            } else if (tableResolvedColorCodes && (status == CellRendererMode.RESOLVED)) {
+                renderer = MainTable.resolvedRenderer;
             }
         }
 
@@ -457,8 +463,11 @@ public class MainTable extends JTable {
     private CellRendererMode getCellStatus(int row, int col) {
         try {
             BibEntry be = getEntryAt(row);
+            if (tableFormat.getTableColumn(col).isResolved(be)) {
+                return CellRendererMode.RESOLVED;
+            }
             Optional<EntryType> type = EntryTypes.getType(be.getType(), panel.getBibDatabaseContext().getMode());
-            if(type.isPresent()) {
+            if (type.isPresent()) {
                 String columnName = getColumnName(col).toLowerCase();
                 if (columnName.equals(BibEntry.KEY_FIELD) || type.get().getRequiredFieldsFlat().contains(columnName)) {
                     return CellRendererMode.REQUIRED;
@@ -615,6 +624,9 @@ public class MainTable extends JTable {
                 (new JTable(), "", true, false, 0, 0).getBackground();
         MainTable.reqRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND), Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
         MainTable.optRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND), Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
+        MainTable.resolvedRenderer = new GeneralRenderer(
+                Globals.prefs.getColor(JabRefPreferences.TABLE_RESOLVED_FIELD_BACKGROUND),
+                Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
         MainTable.incRenderer = new IncompleteRenderer();
         MainTable.compRenderer = new CompleteRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND));
         MainTable.grayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor(JabRefPreferences.GRAYED_OUT_BACKGROUND));

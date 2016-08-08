@@ -7,11 +7,9 @@ import java.util.StringJoiner;
 
 import javax.swing.JLabel;
 
-import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
@@ -108,34 +106,25 @@ public class MainTableColumn {
             return null;
         }
 
-        String content = null;
+        Optional<String> content = Optional.empty();
         for (String field : bibtexFields) {
-            if (field.equals(BibEntry.TYPE_HEADER)) {
-                // Fancy typesetting
-                TypedBibEntry typedEntry = new TypedBibEntry(entry, BibDatabaseMode.BIBLATEX);
-                content = typedEntry.getTypeForDisplay();
-            } else {
-                if (database.isPresent()) {
-                    content = BibDatabase.getResolvedField(field, entry, database.get()).orElse(null);
-                } else {
-                    content = entry.getFieldOrAlias(field).orElse(null);
-                }
-            }
-            if (content != null) {
+            content = BibDatabase.getResolvedField(field, entry, database.orElse(null));
+            if (content.isPresent()) {
                 break;
             }
         }
 
+        String result = content.orElse(null);
+
         if (isNameColumn()) {
-            content = MainTableNameFormatter.formatName(content);
+            result = MainTableNameFormatter.formatName(result);
         }
 
-        if (content != null) {
-            content = toUnicode.format(content).trim();
+        if (result != null) {
+            result = toUnicode.format(result).trim();
         }
 
-        return content;
-
+        return result;
     }
 
     public JLabel getHeaderLabel() {
@@ -144,5 +133,27 @@ public class MainTableColumn {
         } else {
             return new JLabel(getDisplayName());
         }
+    }
+
+    public boolean isResolved(BibEntry entry) {
+        if (bibtexFields.isEmpty()) {
+            return false;
+        }
+
+        Optional<String> content = Optional.empty();
+        Optional<String> entryContent = Optional.empty();
+        for (String field : bibtexFields) {
+            if (BibEntry.TYPE_HEADER.equals(field) || "bibtextype".equals(field)) {
+                return false;
+            } else {
+                entryContent = entry.getFieldOptional(field);
+                content = BibDatabase.getResolvedField(field, entry, database.orElse(null));
+            }
+
+            if (content.isPresent()) {
+                break;
+            }
+        }
+        return (!content.equals(entryContent));
     }
 }

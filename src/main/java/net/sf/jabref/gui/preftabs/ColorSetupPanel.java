@@ -55,7 +55,7 @@ public class ColorSetupPanel extends JPanel {
 
         FormLayout layout = new FormLayout
                 ("30dlu, 4dlu, fill:pref, 4dlu, fill:pref, 8dlu, 30dlu, 4dlu, fill:pref, 4dlu, fill:pref",
-                        "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
+                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
         FormBuilder builder = FormBuilder.create().layout(layout);
 
         buttons.add(new ColorButton(JabRefPreferences.TABLE_TEXT, Localization.lang("Table text color")));
@@ -75,6 +75,8 @@ public class ColorSetupPanel extends JPanel {
         buttons.add(new ColorButton(JabRefPreferences.VALID_FIELD_BACKGROUND_COLOR, Localization.lang("Entry editor background color")));
         buttons.add(new ColorButton(JabRefPreferences.ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR, Localization.lang("Entry editor active background color")));
         buttons.add(new ColorButton(JabRefPreferences.INVALID_FIELD_BACKGROUND_COLOR, Localization.lang("Entry editor invalid field color")));
+        buttons.add(new ColorButton(JabRefPreferences.TABLE_RESOLVED_FIELD_BACKGROUND,
+                Localization.lang("Background color for resolved fields")));
 
         int rowcnt = 0;
         int col = 0;

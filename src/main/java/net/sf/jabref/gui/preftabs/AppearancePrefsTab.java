@@ -48,6 +48,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     private final JabRefPreferences prefs;
 
     private final JCheckBox colorCodes;
+    private final JCheckBox resolvedColorCodes;
     private final JCheckBox overrideFonts;
     private final JCheckBox showGrid;
     private final ColorSetupPanel colorPanel = new ColorSetupPanel();
@@ -102,6 +103,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
 
         colorCodes = new JCheckBox(
                 Localization.lang("Color codes for required and optional fields"));
+
+        resolvedColorCodes = new JCheckBox(Localization.lang("Color codes for resolved fields"));
 
         overrideFonts = new JCheckBox(Localization.lang("Override default font settings"));
 
@@ -169,6 +172,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.append(colorCodes);
         builder.nextLine();
+        builder.append(resolvedColorCodes);
+        builder.nextLine();
         builder.append(showGrid);
         builder.nextLine();
         JButton fontButton = new JButton(Localization.lang("Set table font"));
@@ -207,6 +212,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         classNamesLAF.setEnabled(!useDefaultLAF);
 
         colorCodes.setSelected(prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON));
+        resolvedColorCodes.setSelected(prefs.getBoolean(JabRefPreferences.TABLE_RESOLVED_COLOR_CODES_ON));
         fontSize.setText(String.valueOf(prefs.getInt(JabRefPreferences.MENU_FONT_SIZE)));
         rowPadding.setText(String.valueOf(prefs.getInt(JabRefPreferences.TABLE_ROW_PADDING)));
         oldMenuFontSize = prefs.getInt(JabRefPreferences.MENU_FONT_SIZE);
@@ -222,7 +228,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         // L&F
         prefs.putBoolean(JabRefPreferences.USE_DEFAULT_LOOK_AND_FEEL, !customLAF.isSelected());
         prefs.put(JabRefPreferences.WIN_LOOK_AND_FEEL, classNamesLAF.getSelectedItem().toString());
-        if (customLAF.isSelected() == useDefaultLAF || !currentLAF.equals(classNamesLAF.getSelectedItem().toString())) {
+        if ((customLAF.isSelected() == useDefaultLAF) || !currentLAF.equals(classNamesLAF.getSelectedItem().toString())) {
             JOptionPane.showMessageDialog(null,
                     Localization.lang("You have changed the look and feel setting.").concat(" ")
                             .concat(Localization.lang("You must restart JabRef for this to come into effect.")),
@@ -230,6 +236,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         }
 
         prefs.putBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON, colorCodes.isSelected());
+        prefs.putBoolean(JabRefPreferences.TABLE_RESOLVED_COLOR_CODES_ON, resolvedColorCodes.isSelected());
         prefs.put(JabRefPreferences.FONT_FAMILY, usedFont.getFamily());
         prefs.putInt(JabRefPreferences.FONT_STYLE, usedFont.getStyle());
         prefs.putInt(JabRefPreferences.FONT_SIZE, usedFont.getSize());

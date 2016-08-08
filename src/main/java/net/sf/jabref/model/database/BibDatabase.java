@@ -44,9 +44,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.event.source.EntryEventSource;
+import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
@@ -523,8 +523,10 @@ public class BibDatabase {
      */
     public static Optional<String> getResolvedField(String field, BibEntry entry, BibDatabase database) {
         Objects.requireNonNull(entry, "entry cannot be null");
+
         if (BibEntry.TYPE_HEADER.equals(field) || BibEntry.OBSOLETE_TYPE_HEADER.equals(field)) {
-            return Optional.of(EntryUtil.capitalizeFirst(entry.getType()));
+            TypedBibEntry typedEntry = new TypedBibEntry(entry, BibDatabaseMode.BIBLATEX);
+            return Optional.of(typedEntry.getTypeForDisplay());
         }
 
         // TODO: Changed this to also consider alias fields, which is the expected
