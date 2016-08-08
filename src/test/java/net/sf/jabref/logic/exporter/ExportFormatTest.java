@@ -11,6 +11,7 @@ import java.util.List;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -76,7 +77,11 @@ public class ExportFormatTest {
     public static Collection<Object[]> exportFormats() {
         Collection<Object[]> result = new ArrayList<>();
         Globals.prefs = JabRefPreferences.getInstance();
-        ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
+        JournalAbbreviationLoader journalAbbreviationLoader = new JournalAbbreviationLoader();
+
+        ExportFormats.initAllExports(
+                Globals.prefs.customExports.getCustomExportFormats(Globals.prefs, journalAbbreviationLoader),
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs, journalAbbreviationLoader));
         for (IExportFormat format : ExportFormats.getExportFormats().values()) {
             result.add(new Object[] {format, format.getDisplayName()});
         }

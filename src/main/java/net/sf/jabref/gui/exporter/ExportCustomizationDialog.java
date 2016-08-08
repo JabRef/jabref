@@ -45,6 +45,7 @@ import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
@@ -92,7 +93,8 @@ public class ExportCustomizationDialog extends JDialog {
             ecd.setVisible(true);
             if (ecd.okPressed()) {
                 List<String> newFormat = Arrays.asList(ecd.name(), ecd.layoutFile(), ecd.extension());
-                Globals.prefs.customExports.addFormat(newFormat);
+                Globals.prefs.customExports.addFormat(newFormat,
+                        LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
                 Globals.prefs.customExports.store(Globals.prefs);
             }
         });
@@ -126,8 +128,9 @@ public class ExportCustomizationDialog extends JDialog {
             for (int i = 0; i < rows.length; i++) {
                 entries.add(Globals.prefs.customExports.getSortedList().get(rows[i]));
             }
+            LayoutFormatterPreferences layoutPreferences = LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader);
             for (List<String> list : entries) {
-                Globals.prefs.customExports.remove(list);
+                Globals.prefs.customExports.remove(list, layoutPreferences);
             }
             Globals.prefs.customExports.store(Globals.prefs);
         });

@@ -17,6 +17,8 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fileformat.BibtexImporter;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -63,7 +65,8 @@ public class MSBibExportFormatTestFiles {
         Globals.prefs = JabRefPreferences.getInstance();
         databaseContext = new BibDatabaseContext();
         charset = Charsets.UTF_8;
-        msBibExportFormat = new MSBibExportFormat();
+        msBibExportFormat = new MSBibExportFormat(
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs, new JournalAbbreviationLoader()));
         tempFile = testFolder.newFile();
         testImporter = new BibtexImporter(ImportFormatPreferences.fromPreferences(Globals.prefs));
     }

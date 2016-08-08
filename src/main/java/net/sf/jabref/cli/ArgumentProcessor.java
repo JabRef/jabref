@@ -37,6 +37,7 @@ import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.logging.JabRefLogger;
 import net.sf.jabref.logic.search.DatabaseSearcher;
 import net.sf.jabref.logic.search.SearchQuery;
@@ -390,7 +391,10 @@ public class ArgumentProcessor {
         try {
             Globals.prefs.importPreferences(cli.getPreferencesImport());
             CustomEntryTypesManager.loadCustomEntryTypes(Globals.prefs);
-            ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
+            ExportFormats.initAllExports(
+                    Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
+                            Globals.journalAbbreviationLoader),
+                    LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }

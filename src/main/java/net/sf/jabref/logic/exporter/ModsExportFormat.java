@@ -31,6 +31,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.mods.MODSDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -39,8 +40,8 @@ import net.sf.jabref.model.entry.BibEntry;
  */
 class ModsExportFormat extends ExportFormat {
 
-    public ModsExportFormat() {
-        super("MODS", "mods", null, null, ".xml");
+    public ModsExportFormat(LayoutFormatterPreferences layoutPreferences) {
+        super("MODS", "mods", null, null, ".xml", layoutPreferences);
     }
 
     @Override

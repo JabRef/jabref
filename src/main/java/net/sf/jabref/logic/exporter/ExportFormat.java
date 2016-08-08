@@ -53,6 +53,7 @@ public class ExportFormat implements IExportFormat {
     private String extension;
     private Charset encoding; // If this value is set, it will be used to override
     // the default encoding for the getCurrentBasePanel.
+    private LayoutFormatterPreferences preferences;
 
     private boolean customExport;
     private static final String LAYOUT_PREFIX = "/resource/layout/";
@@ -69,12 +70,14 @@ public class ExportFormat implements IExportFormat {
      * @param directory   Directory in which to find the layout file.
      * @param extension   Should contain the . (for instance .txt).
      */
-    public ExportFormat(String displayName, String consoleName, String lfFileName, String directory, String extension) {
+    public ExportFormat(String displayName, String consoleName, String lfFileName, String directory, String extension,
+            LayoutFormatterPreferences preferences) {
         this.displayName = displayName;
         this.consoleName = consoleName;
         this.lfFileName = lfFileName;
         this.directory = directory;
         this.extension = extension;
+        this.preferences = preferences;
     }
 
     /**
@@ -213,15 +216,14 @@ public class ExportFormat implements IExportFormat {
             Layout beginLayout = null;
 
             // Check if this export filter has bundled name formatters:
-            // Set a global field, so all layouts have access to the custom name formatters:
-            Globals.prefs.customExportNameFormatters = readFormatterFile(lfFileName);
+            // Add these to the preferences, so all layouts have access to the custom name formatters:
+            readFormatterFile();
 
             List<String> missingFormatters = new ArrayList<>(1);
 
             // Print header
             try (Reader reader = getReader(lfFileName + ".begin.layout")) {
-                LayoutHelper layoutHelper = new LayoutHelper(reader,
-                        LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
+                LayoutHelper layoutHelper = new LayoutHelper(reader, preferences);
                 beginLayout = layoutHelper.getLayoutFromText();
             } catch (IOException ex) {
                 // If an exception was cast, export filter doesn't have a begin
@@ -247,8 +249,7 @@ public class ExportFormat implements IExportFormat {
             Layout defLayout;
             LayoutHelper layoutHelper;
             try (Reader reader = getReader(lfFileName + ".layout")) {
-                layoutHelper = new LayoutHelper(reader,
-                        LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
+                layoutHelper = new LayoutHelper(reader,preferences);
                 defLayout = layoutHelper.getLayoutFromText();
             }
             if (defLayout != null) {
@@ -270,8 +271,7 @@ public class ExportFormat implements IExportFormat {
                 } else {
                     try (Reader reader = getReader(lfFileName + '.' + type + ".layout")) {
                         // We try to get a type-specific layout for this entry.
-                        layoutHelper = new LayoutHelper(reader, LayoutFormatterPreferences
-                                .fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
+                        layoutHelper = new LayoutHelper(reader, preferences);
                         layout = layoutHelper.getLayoutFromText();
                         layouts.put(type, layout);
                         if (layout != null) {
@@ -295,8 +295,7 @@ public class ExportFormat implements IExportFormat {
             // changed section - begin (arudert)
             Layout endLayout = null;
             try (Reader reader = getReader(lfFileName + ".end.layout")) {
-                layoutHelper = new LayoutHelper(reader,
-                        LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
+                layoutHelper = new LayoutHelper(reader, preferences);
                 endLayout = layoutHelper.getLayoutFromText();
             } catch (IOException ex) {
                 // If an exception was thrown, export filter doesn't have an end
@@ -310,7 +309,7 @@ public class ExportFormat implements IExportFormat {
             }
 
             // Clear custom name formatters:
-            Globals.prefs.customExportNameFormatters = null;
+            preferences.getCustomExportNameFormatters().clear();
 
             if (!missingFormatters.isEmpty()) {
                 StringBuilder sb = new StringBuilder("The following formatters could not be found: ");
@@ -332,10 +331,8 @@ public class ExportFormat implements IExportFormat {
      * See if there is a name formatter file bundled with this export format. If so, read
      * all the name formatters so they can be used by the filter layouts.
      *
-     * @param lfFileName The layout filename.
      */
-    private static Map<String, String> readFormatterFile(String lfFileName) {
-        Map<String, String> formatters = new HashMap<>();
+    private void readFormatterFile() {
         File formatterFile = new File(lfFileName + ".formatters");
         if (formatterFile.exists()) {
             try (Reader in = new FileReader(formatterFile)) {
@@ -357,7 +354,7 @@ public class ExportFormat implements IExportFormat {
                     if ((index > 0) && ((index + 1) < line.length())) {
                         String formatterName = line.substring(0, index);
                         String contents = line.substring(index + 1);
-                        formatters.put(formatterName, contents);
+                        preferences.getCustomExportNameFormatters().put(formatterName, contents);
                     }
                 }
 
@@ -366,7 +363,6 @@ public class ExportFormat implements IExportFormat {
                 LOGGER.warn("Problem opening formatter file.", ex);
             }
         }
-        return formatters;
     }
 
     public void finalizeSaveSession(final SaveSession ss, Path file) throws SaveException, IOException {
