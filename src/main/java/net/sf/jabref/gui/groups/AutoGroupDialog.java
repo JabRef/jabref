@@ -74,8 +74,6 @@ class AutoGroupDialog extends JDialog implements CaretListener {
     private final JabRefFrame frame;
     private final BasePanel panel;
 
-    private static final LatexToUnicodeFormatter FORMATTER = new LatexToUnicodeFormatter();
-
 
     /**
      * @param groupsRoot The original set of groups, which is required as undo information when all groups are cleared.
@@ -123,8 +121,10 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                         fieldText = FieldName.EDITOR;
                     }
 
+                    LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
+
                     for (String keyword : hs) {
-                        KeywordGroup group = new KeywordGroup(FORMATTER.format(keyword), fieldText, keyword, false, false,
+                        KeywordGroup group = new KeywordGroup(formatter.format(keyword), fieldText, keyword, false, false,
                                 GroupHierarchyType.INDEPENDENT, Globals.prefs);
                         autoGroupsRoot.addChild(GroupTreeNode.fromGroup(group));
                     }
