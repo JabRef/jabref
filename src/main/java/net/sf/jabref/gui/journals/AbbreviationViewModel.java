@@ -28,7 +28,6 @@ import net.sf.jabref.logic.journals.Abbreviation;
  * This class provides a view model for abbreviation objects which can also
  * define placeholder objects of abbreviations. This is indicated by using the
  * {@code pseudoAbbreviation} property.
- *
  */
 public class AbbreviationViewModel {
 

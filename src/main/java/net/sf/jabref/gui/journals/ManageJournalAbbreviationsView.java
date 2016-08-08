@@ -24,11 +24,9 @@ import javafx.beans.value.ObservableValue;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
-import javafx.scene.control.ButtonBar.ButtonData;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
@@ -37,10 +35,13 @@ import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+
 import net.sf.jabref.JabRefException;
 import net.sf.jabref.gui.FXAlert;
 import net.sf.jabref.gui.FXDialogs;
@@ -52,7 +53,6 @@ import com.airhacks.afterburner.views.FXMLView;
 /**
  * This class controls the user interface of the journal abbreviations dialog.
  * The ui elements and their layout are defined in the fxml file in the resource folder.
- *
  */
 public class ManageJournalAbbreviationsView extends FXMLView {
 
@@ -180,19 +180,16 @@ public class ManageJournalAbbreviationsView extends FXMLView {
             protected void updateItem(Boolean isPseudoAbbreviation, boolean isEmpty) {
                 super.updateItem(isPseudoAbbreviation, isEmpty);
                 if (isPseudoAbbreviation != null) {
-
-                    if (!isEmpty) {
-                        if (isEditableAndRemovable.get()) {
-                            if (!isPseudoAbbreviation) {
-                                Text graphic = new Text(IconTheme.JabRefIcon.DELETE_ENTRY.getCode());
-                                graphic.getStyleClass().add("icon");
-                                setGraphic(graphic);
-                                setOnMouseClicked(evt -> {
-                                    removeAbbreviation();
-                                });
-                            } else {
-                                setGraphic(null);
-                            }
+                    if (!isEmpty && isEditableAndRemovable.get()) {
+                        if (!isPseudoAbbreviation) {
+                            Text graphic = new Text(IconTheme.JabRefIcon.DELETE_ENTRY.getCode());
+                            graphic.getStyleClass().add("icon");
+                            setGraphic(graphic);
+                            setOnMouseClicked(evt -> {
+                                removeAbbreviation();
+                            });
+                        } else {
+                            setGraphic(null);
                         }
                     }
                 } else {

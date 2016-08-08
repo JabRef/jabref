@@ -45,7 +45,6 @@ import org.junit.rules.TemporaryFolder;
 /**
  * This is the test class of the ManageAbbreviationsViewModel which is used to
  * create the underlying logic of the Manage Abbreviations Dialog UI.
- *
  */
 public class ManageJournalAbbreviationsTest {
 

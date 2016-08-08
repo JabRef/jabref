@@ -41,7 +41,6 @@ import org.apache.commons.logging.LogFactory;
  * It provides all necessary methods to create, modify or delete journal
  * abbreviations and files. To visualize the model one can bind the properties
  * to ui elements.
- *
  */
 public class ManageJournalAbbreviationsViewModel {
 
@@ -195,6 +194,7 @@ public class ManageJournalAbbreviationsViewModel {
      * Method to change the currentAbbrevaition property to a new abbreviation.
      * The name and the actual abbreviation will be taken from the abbreviationsName
      * and abbreviationsAbbreviation properties.
+     *
      * @throws JabRefException
      */
     public void editAbbreviation() throws JabRefException {
@@ -227,10 +227,9 @@ public class ManageJournalAbbreviationsViewModel {
             throw new JabRefException("Name can not be empty");
         } else if (abbreviation.trim().isEmpty()) {
             throw new JabRefException("Abbrevaition can not be empty");
-        } else {
-            currentAbbreviation.get().setName(name);
-            currentAbbreviation.get().setAbbreviation(abbreviation);
         }
+        currentAbbreviation.get().setName(name);
+        currentAbbreviation.get().setAbbreviation(abbreviation);
     }
 
     /**
@@ -261,10 +260,8 @@ public class ManageJournalAbbreviationsViewModel {
         journalFiles.forEach(file -> {
             try {
                 file.WriteOrCreate();
-            } catch (FileNotFoundException e) {
+            } catch (IOException e) {
                 logger.debug(e.getLocalizedMessage());
-            } catch (IOException ioe) {
-                logger.debug(ioe.getLocalizedMessage());
             }
         });
     }
