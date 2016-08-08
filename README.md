@@ -98,24 +98,9 @@ Sources for the integration test are kept in `src/integrationTest`.
 
 ## Release Process
 
-Requires [install4j].
-We've got an [Open Source License](https://www.ej-technologies.com/buy/install4j/openSource).
+Building a release requires [install4j]. We've got an [Open Source License](https://www.ej-technologies.com/buy/install4j/openSource).
+Releasing is done using [CircleCI](https://circleci.com/gh/JabRef/jabref). A full release howto is available [in our wiki](https://github.com/JabRef/jabref/wiki/Releasing-a-new-Version).
 
-To get a list of all targets, use `gradlew tasks`.
-```
-releaseJar - Creates a Jar release.
-media - Creates executables and installers.
-```
-
-All binaries are created inside the directory `build/releases`.
-
-### Releasing Developer Releases
-
-Run `gradlew -Pdev=true ANY_RELEASE_TASK` to execute any of the previously defined release tasks.
-The only difference is that the version contains the keyword *snapshot*, the *date*, the *branch name*, and the *shortened git hash*.
-
- * Normal: `JabRef--3.0dev.jar`
- * With `-Pdev=true`: `JabRef-3.0dev--snapshot--2015-11-20--master--cc4f5d1.jar`
 
 ## License
 
