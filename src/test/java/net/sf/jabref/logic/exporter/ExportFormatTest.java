@@ -81,7 +81,8 @@ public class ExportFormatTest {
 
         ExportFormats.initAllExports(
                 Globals.prefs.customExports.getCustomExportFormats(Globals.prefs, journalAbbreviationLoader),
-                LayoutFormatterPreferences.fromPreferences(Globals.prefs, journalAbbreviationLoader));
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs, journalAbbreviationLoader),
+                SavePreferences.loadForExportFromPreferences(Globals.prefs));
         for (IExportFormat format : ExportFormats.getExportFormats().values()) {
             result.add(new Object[] {format, format.getDisplayName()});
         }

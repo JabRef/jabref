@@ -394,7 +394,8 @@ public class ArgumentProcessor {
             ExportFormats.initAllExports(
                     Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
                             Globals.journalAbbreviationLoader),
-                    LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
+                    LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader),
+                    SavePreferences.loadForExportFromPreferences(Globals.prefs));
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }

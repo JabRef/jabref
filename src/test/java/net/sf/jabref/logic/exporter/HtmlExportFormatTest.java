@@ -34,10 +34,11 @@ public class HtmlExportFormatTest {
     @Before
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
-        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
+        JournalAbbreviationLoader journalAbbreviationLoader = new JournalAbbreviationLoader();
         ExportFormats.initAllExports(
-                Globals.prefs.customExports.getCustomExportFormats(Globals.prefs, Globals.journalAbbreviationLoader),
-                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
+                Globals.prefs.customExports.getCustomExportFormats(Globals.prefs, journalAbbreviationLoader),
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs, journalAbbreviationLoader),
+                SavePreferences.loadForExportFromPreferences(Globals.prefs));
         exportFormat = ExportFormats.getExportFormat("html");
 
         databaseContext = new BibDatabaseContext();

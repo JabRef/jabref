@@ -43,6 +43,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.logic.exporter.ExportFormats;
+import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.util.FileExtensions;
@@ -231,7 +232,8 @@ public class PreferencesDialog extends JDialog {
         setValues();
         ExportFormats.initAllExports(
                 Globals.prefs.customExports.getCustomExportFormats(Globals.prefs, Globals.journalAbbreviationLoader),
-                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader),
+                SavePreferences.loadForExportFromPreferences(Globals.prefs));
         frame.removeCachedEntryEditors();
         Globals.prefs.updateEntryEditorTabList();
     }

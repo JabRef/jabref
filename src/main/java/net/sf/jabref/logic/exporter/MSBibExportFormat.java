@@ -31,7 +31,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -40,8 +39,8 @@ import net.sf.jabref.model.entry.BibEntry;
  */
 class MSBibExportFormat extends ExportFormat {
 
-    public MSBibExportFormat(LayoutFormatterPreferences layoutPreferences) {
-        super("MS Office 2007", "MSBib", null, null, ".xml", layoutPreferences);
+    public MSBibExportFormat() {
+        super("MS Office 2007", "MSBib", null, null, ".xml");
     }
 
     @Override

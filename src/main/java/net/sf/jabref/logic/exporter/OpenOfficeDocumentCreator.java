@@ -40,7 +40,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -58,8 +57,8 @@ public class OpenOfficeDocumentCreator extends ExportFormat {
     /**
      * Creates a new instance of OpenOfficeDocumentCreator
      */
-    public OpenOfficeDocumentCreator(LayoutFormatterPreferences layoutPreferences) {
-        super("OpenOffice/LibreOffice Calc", "oocalc", null, null, ".sxc", layoutPreferences);
+    public OpenOfficeDocumentCreator() {
+        super("OpenOffice/LibreOffice Calc", "oocalc", null, null, ".sxc");
     }
 
     @Override

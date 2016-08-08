@@ -23,6 +23,7 @@ import net.sf.jabref.cli.ArgumentProcessor;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.exporter.ExportFormats;
+import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
@@ -81,7 +82,8 @@ public class JabRefMain {
         CustomEntryTypesManager.loadCustomEntryTypes(preferences);
         ExportFormats.initAllExports(
                 Globals.prefs.customExports.getCustomExportFormats(Globals.prefs, Globals.journalAbbreviationLoader),
-                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader),
+                SavePreferences.loadForExportFromPreferences(Globals.prefs));
 
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();

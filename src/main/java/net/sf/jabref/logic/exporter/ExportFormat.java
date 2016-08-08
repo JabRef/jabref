@@ -53,7 +53,8 @@ public class ExportFormat implements IExportFormat {
     private String extension;
     private Charset encoding; // If this value is set, it will be used to override
     // the default encoding for the getCurrentBasePanel.
-    private LayoutFormatterPreferences preferences;
+    private LayoutFormatterPreferences layoutPreferences;
+    private SavePreferences savePreferences;
 
     private boolean customExport;
     private static final String LAYOUT_PREFIX = "/resource/layout/";
@@ -70,14 +71,30 @@ public class ExportFormat implements IExportFormat {
      * @param directory   Directory in which to find the layout file.
      * @param extension   Should contain the . (for instance .txt).
      */
-    public ExportFormat(String displayName, String consoleName, String lfFileName, String directory, String extension,
-            LayoutFormatterPreferences preferences) {
+    public ExportFormat(String displayName, String consoleName, String lfFileName, String directory, String extension) {
         this.displayName = displayName;
         this.consoleName = consoleName;
         this.lfFileName = lfFileName;
         this.directory = directory;
         this.extension = extension;
-        this.preferences = preferences;
+    }
+
+    /**
+     * Initialize another export format based on templates stored in dir with
+     * layoutFile lfFilename.
+     *
+     * @param displayName Name to display to the user.
+     * @param consoleName Name to call this format in the console.
+     * @param lfFileName  Name of the main layout file.
+     * @param directory   Directory in which to find the layout file.
+     * @param extension   Should contain the . (for instance .txt).
+     * @param layoutPreferences Preferences for layout
+     */
+    public ExportFormat(String displayName, String consoleName, String lfFileName, String directory, String extension,
+            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
+        this(displayName, consoleName, lfFileName, directory, extension);
+        this.layoutPreferences = layoutPreferences;
+        this.savePreferences = savePreferences;
     }
 
     /**
@@ -223,7 +240,7 @@ public class ExportFormat implements IExportFormat {
 
             // Print header
             try (Reader reader = getReader(lfFileName + ".begin.layout")) {
-                LayoutHelper layoutHelper = new LayoutHelper(reader, preferences);
+                LayoutHelper layoutHelper = new LayoutHelper(reader, layoutPreferences);
                 beginLayout = layoutHelper.getLayoutFromText();
             } catch (IOException ex) {
                 // If an exception was cast, export filter doesn't have a begin
@@ -242,14 +259,13 @@ public class ExportFormat implements IExportFormat {
              * be non-null, and be used to choose entries. Otherwise, it will be
              * null, and be ignored.
              */
-            SavePreferences savePrefs = SavePreferences.loadForExportFromPreferences(Globals.prefs);
-            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(databaseContext, entries, savePrefs);
+            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(databaseContext, entries, savePreferences);
 
             // Load default layout
             Layout defLayout;
             LayoutHelper layoutHelper;
             try (Reader reader = getReader(lfFileName + ".layout")) {
-                layoutHelper = new LayoutHelper(reader,preferences);
+                layoutHelper = new LayoutHelper(reader,layoutPreferences);
                 defLayout = layoutHelper.getLayoutFromText();
             }
             if (defLayout != null) {
@@ -271,7 +287,7 @@ public class ExportFormat implements IExportFormat {
                 } else {
                     try (Reader reader = getReader(lfFileName + '.' + type + ".layout")) {
                         // We try to get a type-specific layout for this entry.
-                        layoutHelper = new LayoutHelper(reader, preferences);
+                        layoutHelper = new LayoutHelper(reader, layoutPreferences);
                         layout = layoutHelper.getLayoutFromText();
                         layouts.put(type, layout);
                         if (layout != null) {
@@ -295,7 +311,7 @@ public class ExportFormat implements IExportFormat {
             // changed section - begin (arudert)
             Layout endLayout = null;
             try (Reader reader = getReader(lfFileName + ".end.layout")) {
-                layoutHelper = new LayoutHelper(reader, preferences);
+                layoutHelper = new LayoutHelper(reader, layoutPreferences);
                 endLayout = layoutHelper.getLayoutFromText();
             } catch (IOException ex) {
                 // If an exception was thrown, export filter doesn't have an end
@@ -309,7 +325,7 @@ public class ExportFormat implements IExportFormat {
             }
 
             // Clear custom name formatters:
-            preferences.getCustomExportNameFormatters().clear();
+            layoutPreferences.getCustomExportNameFormatters().clear();
 
             if (!missingFormatters.isEmpty()) {
                 StringBuilder sb = new StringBuilder("The following formatters could not be found: ");
@@ -354,7 +370,7 @@ public class ExportFormat implements IExportFormat {
                     if ((index > 0) && ((index + 1) < line.length())) {
                         String formatterName = line.substring(0, index);
                         String contents = line.substring(index + 1);
-                        preferences.getCustomExportNameFormatters().put(formatterName, contents);
+                        layoutPreferences.getCustomExportNameFormatters().put(formatterName, contents);
                     }
                 }
 

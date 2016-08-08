@@ -42,7 +42,6 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -60,8 +59,8 @@ public class OpenDocumentSpreadsheetCreator extends ExportFormat {
     /**
      * Creates a new instance of OpenOfficeDocumentCreator
      */
-    public OpenDocumentSpreadsheetCreator(LayoutFormatterPreferences layoutPreferences) {
-        super(Localization.lang("OpenDocument spreadsheet"), "ods", null, null, ".ods", layoutPreferences);
+    public OpenDocumentSpreadsheetCreator() {
+        super(Localization.lang("OpenDocument spreadsheet"), "ods", null, null, ".ods");
     }
 
     @Override

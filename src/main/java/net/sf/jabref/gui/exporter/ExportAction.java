@@ -19,6 +19,7 @@ import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.exporter.IExportFormat;
+import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.entry.BibEntry;
@@ -62,7 +63,8 @@ public class ExportAction {
             public void actionPerformed(ActionEvent e) {
                 ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
                         Globals.journalAbbreviationLoader),
-                        LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
+                        LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader),
+                        SavePreferences.loadForExportFromPreferences(Globals.prefs));
                 JFileChooser fc = ExportAction
                         .createExportFileChooser(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
                 fc.showSaveDialog(frame);
