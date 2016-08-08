@@ -109,7 +109,7 @@ dependencies {
 
     compile 'org.jsoup:jsoup:1.9.2'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
-    compile 'info.debatty:java-string-similarity:0.13'
+    compile 'info.debatty:java-string-similarity:0.14'
 
     compile 'org.apache.logging.log4j:log4j-jcl:2.6.2'
     compile 'org.apache.logging.log4j:log4j-api:2.6.2'
