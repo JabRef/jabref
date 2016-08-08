@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -58,21 +59,41 @@ public class NewFileDialogs {
     private Collection<FileExtensions> extensions = EnumSet.noneOf(FileExtensions.class);
 
 
-    public NewFileDialogs(JFrame owner) {
-        this(owner, getWorkingDir());
+    /**
+     * Creates a new filedialog showing the current working dir {@link JabRefPreferences#WORKING_DIRECTORY}
+     * @param parent The parent frame associated with this dialog
+     */
+    public NewFileDialogs(JFrame parent) {
+        this(parent, getWorkingDir());
     }
 
-    public NewFileDialogs(JFrame owner, String dir) {
-        this.parent = owner;
+    /**
+     * Creates a new dialog in the given directory
+     * @param parent The parent frame associated with this dialog
+     * @param dir The starting directory to show in the dialog
+     */
+    public NewFileDialogs(JFrame parent, String dir) {
+        Objects.requireNonNull(dir, "Directory must not be null");
+
+        this.parent = parent;
         this.directory = dir;
         fileChooser.setCurrentDirectory(Paths.get(dir).toFile());
     }
 
+    /**
+     * Show only directories instead of files and folders
+     * @return NewFileDialogs
+     */
     public NewFileDialogs dirsOnly() {
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         return this;
     }
 
+    /**
+     * Add a single extension as filter
+     * @param singleExt The extension
+     * @return NewFileDialogs
+     */
     public NewFileDialogs withExtension(FileExtensions singleExt) {
         withExtensions(EnumSet.of(singleExt));
         return this;
@@ -89,11 +110,19 @@ public class NewFileDialogs {
         return this;
     }
 
-    public NewFileDialogs updateWorkingDirectory() {
+    /**
+     * Updates the working directory preference
+     * @return NewFileDialogs
+     */
+    public NewFileDialogs updateWorkingDirPref() {
         Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, this.directory);
         return this;
     }
 
+    /**
+     * Shows an {@link JFileChooser#OPEN_DIALOG} and allows to select multiple files
+     * @return List containing the paths of all files or an empty list if dialog is canceled
+     */
     public List<String> showDlgAndGetMultipleFiles() {
         fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
         fileChooser.setMultiSelectionEnabled(true);
@@ -109,6 +138,10 @@ public class NewFileDialogs {
 
     }
 
+    /**
+     * Shows an {@link JFileChooser#OPEN_DIALOG} and allows to select a single file/folder
+     * @return The path of the selected file/folder or {@link Optional#empty()} if dialog is aborted
+     */
     public Optional<Path> openDlgAndGetSelectedFile() {
         fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
 
@@ -118,6 +151,13 @@ public class NewFileDialogs {
         return Optional.empty();
     }
 
+    /**
+     *
+     * Shows an {@link JFileChooser#SAVE_DIALOG} and allows to save a new file <br>
+     * If an extension is provided, adds the extension to the file <br>
+     * Selecting an existing file will show an overwrite dialog
+     * @return The path of the new file, or {@link Optional#empty()} if dialog is aborted
+     */
     public Optional<Path> saveNewFile() {
         fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
         if (showDialogAndIsAccepted()) {
@@ -136,7 +176,7 @@ public class NewFileDialogs {
     }
 
     private static String getWorkingDir() {
-        return JabRefPreferences.getInstance().get(JabRefPreferences.WORKING_DIRECTORY);
+        return Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY);
     }
 
 }

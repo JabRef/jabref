@@ -81,7 +81,7 @@ public class AppendDatabaseAction implements BaseAction {
         md.setVisible(true);
         if (md.isOkPressed()) {
 
-            List<String> chosen = new NewFileDialogs(frame).updateWorkingDirectory().showDlgAndGetMultipleFiles();
+            List<String> chosen = new NewFileDialogs(frame).updateWorkingDirPref().showDlgAndGetMultipleFiles();
             if (chosen.isEmpty()) {
                 return;
             }
