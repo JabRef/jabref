@@ -242,23 +242,19 @@ public class BibtexParser {
         }
     }
 
-    private void parseJabRefComment(Map<String, String> meta) throws IOException {
-        StringBuilder buffer = parseBracketedTextExactly();
-        /**
-         *
-         * Metadata are used to store Bibkeeper-specific
-         * information in .bib files.
-         *
-         * Metadata are stored in bibtex files in the format
-         *
-         * @comment{jabref-meta: type:data0;data1;data2;...}
-         *
-         * Each comment that starts with the META_FLAG is stored
-         * in the meta HashMap, with type as key. Unluckily, the
-         * old META_FLAG bibkeeper-meta: was used in JabRef 1.0
-         * and 1.1, so we need to support it as well. At least
-         * for a while. We'll always save with the new one.
-         */
+    private void parseJabRefComment(Map<String, String> meta) {
+        StringBuilder buffer = null;
+        try {
+            buffer = parseBracketedTextExactly();
+        } catch (IOException e) {
+            /* if we get an IO Exception here, than we have an unbracketed comment,
+            * which means that we should just return and the comment will be picked up as arbitrary text
+            *  by the parser
+             */
+            LOGGER.info("Found unbracketed comment");
+            return;
+        }
+
         String comment = buffer.toString().replaceAll("[\\x0d\\x0a]", "");
         if (comment.substring(0,
                 Math.min(comment.length(), MetaData.META_FLAG.length())).equals(
@@ -297,11 +293,8 @@ public class BibtexParser {
 
             // custom entry types are always re-written by JabRef and not stored in the file
             dumpTextReadSoFarToString();
-        } else {
-            // FIXME: user comments are simply dropped
-            // at least, we log that we ignored the comment
-            LOGGER.info("Dropped comment from database: " + comment);
         }
+
     }
 
 
@@ -329,14 +322,14 @@ public class BibtexParser {
         // if there is no entry found, simply return the content (necessary to parse text remaining after the last entry)
         if (indexOfAt == -1) {
             return purgeEOFCharacters(result);
-        } else if(result.contains(SavePreferences.ENCODING_PREFIX)) {
+        } else if (result.contains(SavePreferences.ENCODING_PREFIX)) {
             // purge the encoding line if it exists
             int runningIndex = result.indexOf(SavePreferences.ENCODING_PREFIX);
-            while(runningIndex < indexOfAt) {
-                if(result.charAt(runningIndex) == '\n') {
+            while (runningIndex < indexOfAt) {
+                if (result.charAt(runningIndex) == '\n') {
                     break;
-                } else if(result.charAt(runningIndex) == '\r') {
-                    if(result.charAt(runningIndex + 1) == '\n') {
+                } else if (result.charAt(runningIndex) == '\r') {
+                    if (result.charAt(runningIndex + 1) == '\n') {
                         runningIndex++;
                     }
                     break;
@@ -413,10 +406,10 @@ public class BibtexParser {
 
     private void skipOneNewline() throws IOException {
         skipSpace();
-        if(peek() == '\r') {
+        if (peek() == '\r') {
             read();
         }
-        if(peek() == '\n') {
+        if (peek() == '\n') {
             read();
         }
     }
@@ -460,7 +453,7 @@ public class BibtexParser {
     private int read() throws IOException {
         int character = pushbackReader.read();
 
-        if(! isEOFCharacter(character)) {
+        if (!isEOFCharacter(character)) {
             pureTextFromFile.offerLast((char) character);
         }
         if (character == '\n') {
@@ -474,7 +467,7 @@ public class BibtexParser {
             line--;
         }
         pushbackReader.unread(character);
-        if(pureTextFromFile.getLast() == character) {
+        if (pureTextFromFile.getLast() == character) {
             pureTextFromFile.pollLast();
         }
     }
@@ -799,7 +792,7 @@ public class BibtexParser {
     private StringBuffer parseBracketedText() throws IOException {
         StringBuffer value = new StringBuffer();
 
-        consume('{','(');
+        consume('{', '(');
 
         int brackets = 0;
 
@@ -834,18 +827,18 @@ public class BibtexParser {
             }
         }
 
-        consume('}',')');
+        consume('}', ')');
 
         return value;
     }
 
-    private boolean isClosingBracketNext () {
+    private boolean isClosingBracketNext() {
         try {
             int peek = peek();
             boolean isCurlyBracket = peek == '}';
             boolean isRoundBracket = peek == ')';
             return isCurlyBracket || isRoundBracket;
-        } catch(IOException e) {
+        } catch (IOException e) {
             return false;
         }
     }

@@ -196,7 +196,8 @@ class EntryEditorTab {
 
         // Add the edit field for Bibtex-key.
         if (addKeyField) {
-            final TextField textField = new TextField(BibEntry.KEY_FIELD, parent.getEntry().getCiteKey(), true);
+            final TextField textField = new TextField(BibEntry.KEY_FIELD,
+                    parent.getEntry().getCiteKeyOptional().orElse(""), true);
             setupJTextComponent(textField, null);
 
             editors.put(BibEntry.KEY_FIELD, textField);

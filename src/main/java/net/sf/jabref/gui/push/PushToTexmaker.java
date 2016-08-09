@@ -1,4 +1,5 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2015 JabRef contributors.
+    Copyright (C) 2015 Oscar Gustafsson.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -13,33 +14,36 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.external.push;
+package net.sf.jabref.gui.push;
 
 import javax.swing.Icon;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-public class PushToWinEdt extends AbstractPushToApplication implements PushToApplication {
+/**
+ * Class for pushing entries into TexMaker.
+ */
+public class PushToTexmaker extends AbstractPushToApplication implements PushToApplication {
 
     @Override
     public String getApplicationName() {
-        return "WinEdt";
+        return "Texmaker";
     }
 
     @Override
     public Icon getIcon() {
-        return IconTheme.getImage("winedt");
+        return IconTheme.getImage("texmaker");
     }
 
     @Override
     protected String[] getCommandLine(String keyString) {
-        return new String[] {commandPath,
-                "\"[InsText('" + getCiteCommand() + "{" + keyString.replace("'", "''") + "}');]\""};
+        return new String[] {commandPath, "-insert", getCiteCommand() + "{" + keyString + "}"};
     }
 
     @Override
     protected void initParameters() {
-        commandPathPreferenceKey = JabRefPreferences.WIN_EDT_PATH;
+        commandPathPreferenceKey = JabRefPreferences.TEXMAKER_PATH;
     }
+
 }

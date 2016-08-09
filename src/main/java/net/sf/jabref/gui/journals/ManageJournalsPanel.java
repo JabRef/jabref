@@ -196,11 +196,14 @@ class ManageJournalsPanel extends JPanel {
         });
 
         browseNew.addActionListener(e -> {
-            Path old = null;
+            String name;
             if (!newNameTf.getText().isEmpty()) {
-                old = Paths.get(newNameTf.getText());
+                name = FileDialogs.getNewFile(frame, Paths.get(newNameTf.getText()).toFile(), Collections.emptyList(), JFileChooser.SAVE_DIALOG,
+                        false);
+            } else {
+                name = FileDialogs.getNewFile(frame, null, Collections.emptyList(), JFileChooser.SAVE_DIALOG, false);
             }
-            String name = FileDialogs.getNewFile(frame, old.toFile(), null, JFileChooser.SAVE_DIALOG, false);
+
             if (name != null) {
                 newNameTf.setText(name);
                 newFile.setSelected(true);
@@ -208,11 +211,14 @@ class ManageJournalsPanel extends JPanel {
         });
 
         browseOld.addActionListener(e -> {
-            Path old = null;
+            String name;
             if (!personalFile.getText().isEmpty()) {
-                old = Paths.get(personalFile.getText());
+                name = FileDialogs.getNewFile(frame, Paths.get(personalFile.getText()).toFile(),
+                        Collections.emptyList(), JFileChooser.OPEN_DIALOG, false);
+            } else {
+                name = FileDialogs.getNewFile(frame, null, Collections.emptyList(), JFileChooser.OPEN_DIALOG, false);
             }
-            String name = FileDialogs.getNewFile(frame, old.toFile(), null, JFileChooser.OPEN_DIALOG, false);
+
             if (name != null) {
                 personalFile.setText(name);
                 oldFile.setSelected(true);
@@ -419,7 +425,8 @@ class ManageJournalsPanel extends JPanel {
             }
             File toFile;
             try {
-                String toName = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")), null,
+                String toName = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")),
+                        Collections.emptyList(),
                         JFileChooser.SAVE_DIALOG, false);
                 if (toName == null) {
                     return;

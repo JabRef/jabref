@@ -390,7 +390,7 @@ public class BibEntryTests {
         be.setField("author", "Albert Einstein");
         be.setCiteKey("Einstein1931");
         Assert.assertTrue(be.hasCiteKey());
-        Assert.assertEquals("Einstein1931", be.getCiteKey());
+        Assert.assertEquals(Optional.of("Einstein1931"), be.getCiteKeyOptional());
         Assert.assertEquals(Optional.of("Albert Einstein"), be.getFieldOptional("author"));
         be.clearField("author");
         Assert.assertEquals(Optional.empty(), be.getFieldOptional("author"));

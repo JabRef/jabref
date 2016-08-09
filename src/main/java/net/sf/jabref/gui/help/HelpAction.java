@@ -31,16 +31,12 @@ import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * This Action keeps a reference to a URL. When activated, it shows the help
  * Dialog unless it is already visible, and shows the URL in it.
  */
 public class HelpAction extends MnemonicAwareAction {
 
-    private static final Log LOGGER = LogFactory.getLog(HelpAction.class);
     private HelpFile helpPage;
 
 

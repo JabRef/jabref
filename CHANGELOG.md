@@ -12,29 +12,46 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Externally fetched information can be merged for entries with an ISBN
+- Externally fetched information can be merged for entries with an ArXiv eprint
 - [#462](https://github.com/JabRef/jabref/issues/462) Extend the OpenConsoleFeature by offering a selection between default terminal emulator and configurable command execution.
 - [#1516](https://github.com/JabRef/jabref/issues/1516) Selected field names are written in uppercase in the entry editor
 - For developers: Moved the bst package into logic. This requires the regeneration of antlr sources, execute: gradlew generateSource
 - [#1026](https://github.com/JabRef/jabref/issues/1026) JabRef does no longer delete user comments outside of BibTeX entries and strings
 - [#1249](https://github.com/JabRef/jabref/issues/1249) Date layout formatter added
+- Undo/redo are enabled/disabled and show the action in the tool tip
 - Added ISBN integrity checker
 - Added filter to not show selected integrity checks
 - Enhance the entry customization dialog to give better visual feedback
+- It is now possible to generate a new BIB database from the citations in an OpenOffice/LibreOffice document
 - The arXiv fetcher now also supports free-text search queries
 - [#1345](https://github.com/JabRef/jabref/issues/1345) Cleanup ISSN
+- It is now possible to add your own lists of protected terms, see Options -> Manage protected terms
+- Automatically generated group names are now converted from LaTeX to Unicode
 
 ### Fixed
+- Fixed [#1632](https://github.com/JabRef/jabref/issues/1632) User comments (@Comment) with or without brackets are now kept
 - Fixed [#1264](https://github.com/JabRef/jabref/issues/1264): S with caron does not render correctly
 - LaTeX to Unicode converter now handles combining accents
+- Fixed NullPointerException when clicking Browse in Journal abbreviations with empty text field
+- Fixed NullPointerException when opening file in Plain text import
+- Fixed NullPointerException when appending database
 - Fixed [#636](https://github.com/JabRef/jabref/issues/636): DOI in export filters
 - Fixed [#1527](https://github.com/JabRef/jabref/issues/1527): 'Get BibTeX data from DOI' Removes Marking
 - Fixed [#1592](https://github.com/JabRef/jabref/issues/1592): LibreOffice: wrong numbers in citation labels
 - The merge entry dialog showed wrong heading after merging from DOI
 - Fixed [#1321](https://github.com/JabRef/jabref/issues/1321): LaTeX commands in fields not displayed in the list of references
+- Fixed [#1639](https://github.com/JabRef/jabref/issues/1639): Google Scholar fetching works again.
 - Date fields in the BibLatex standard are now always formatted in the correct way, independent of the preferences
+- Fixed [#1554](https://github.com/JabRef/jabref/issues/1554): Import dialog is no longer hidden behind main window
+- Fixed [#1643](https://github.com/JabRef/jabref/issues/1643): Searching with double quotes in a specific field ignores the last character
+- Fixed [#1288](https://github.com/JabRef/jabref/issues/1288): Newly opened bib-file is not focused
+- Fixed [#1669](https://github.com/JabRef/jabref/issues/1669): Dialog for manual connection to OpenOffice/LibreOffice works again on Linux
+
 
 ### Removed
 - It is not longer possible to choose to convert HTML sub- and superscripts to equations
+- [#1610](https://github.com/JabRef/jabref/issues/1610) Removed the possibility to auto show or hide the groups interface
 
 
 

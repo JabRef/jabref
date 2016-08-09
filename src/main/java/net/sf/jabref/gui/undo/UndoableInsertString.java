@@ -15,10 +15,9 @@
 */
 package net.sf.jabref.gui.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
-
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibtexString;
@@ -26,7 +25,7 @@ import net.sf.jabref.model.entry.BibtexString;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class UndoableInsertString extends AbstractUndoableEdit {
+public class UndoableInsertString extends AbstractUndoableJabRefEdit {
 
     private static final Log LOGGER = LogFactory.getLog(UndoableInsertString.class);
 
@@ -43,15 +42,8 @@ public class UndoableInsertString extends AbstractUndoableEdit {
     }
 
     @Override
-    public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": " +
-                Localization.lang("insert string");
-    }
-
-    @Override
-    public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": " +
-                Localization.lang("insert string");
+    public String getPresentationName() {
+        return Localization.lang("insert string %0", StringUtil.boldHTML(string.toString()));
     }
 
     @Override

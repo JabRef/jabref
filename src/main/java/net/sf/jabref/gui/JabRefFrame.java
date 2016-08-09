@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -73,8 +74,6 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.external.ExternalFileTypeEditor;
-import net.sf.jabref.external.push.PushToApplicationButton;
-import net.sf.jabref.external.push.PushToApplications;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.AutoLinkFilesAction;
 import net.sf.jabref.gui.actions.ErrorConsoleAction;
@@ -108,6 +107,9 @@ import net.sf.jabref.gui.menus.FileHistoryMenu;
 import net.sf.jabref.gui.menus.RightClickMenu;
 import net.sf.jabref.gui.openoffice.OpenOfficePanel;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
+import net.sf.jabref.gui.protectedterms.ProtectedTermsDialog;
+import net.sf.jabref.gui.push.PushToApplicationButton;
+import net.sf.jabref.gui.push.PushToApplications;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
@@ -122,6 +124,9 @@ import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.GuiAppender;
 import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
+import net.sf.jabref.logic.undo.AddUndoableActionEvent;
+import net.sf.jabref.logic.undo.UndoChangeEvent;
+import net.sf.jabref.logic.undo.UndoRedoEvent;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -139,6 +144,7 @@ import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.sql.importer.DbImportAction;
 
+import com.google.common.eventbus.Subscribe;
 import com.jgoodies.looks.HeaderStyle;
 import com.jgoodies.looks.Options;
 import org.apache.commons.logging.Log;
@@ -149,11 +155,10 @@ import osx.macadapter.MacAdapter;
  * The main window of the application.
  */
 public class JabRefFrame extends JFrame implements OutputPrinter {
+    private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
 
     // Frame titles.
     private static final String FRAME_TITLE = "JabRef";
-
-    private static final Log LOGGER = LogFactory.getLog(JabRefFrame.class);
     private static final String ELLIPSES = "...";
 
     private final JSplitPane splitPane = new JSplitPane();
@@ -463,6 +468,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AutoLinkFilesAction autoLinkFile = new AutoLinkFilesAction();
 
     private PushToApplicationButton pushExternalButton;
+    private PushToApplications pushApplications;
 
     private GeneralFetcher generalFetcher;
 
@@ -640,6 +646,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             bp.updateSearchManager();
             // Set correct enabled state for Back and Forward actions:
             bp.setBackAndForwardEnabledState();
+            bp.getUndoManager().postUndoRedoEvent();
             new FocusRequester(bp.getMainTable());
         });
 
@@ -653,6 +660,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 LOGGER.fatal("Could not interface with Mac OS X methods.", e);
             }
         }
+
     }
 
     private void positionWindowOnScreen() {
@@ -879,7 +887,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         setProgressBarVisible(false);
 
-        pushExternalButton = new PushToApplicationButton(this, PushToApplications.getApplications());
+        pushApplications = new PushToApplications();
+        pushExternalButton = new PushToApplicationButton(this, pushApplications.getApplications());
         fillMenu();
         createToolBar();
         getContentPane().setLayout(gbl);
@@ -982,7 +991,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      *
      */
     public List<BasePanel> getBasePanelList() {
-        List<BasePanel> returnList = new ArrayList<>(getBasePanelCount());
+        List<BasePanel> returnList = new ArrayList<>();
         for (int i=0; i< getBasePanelCount(); i++) {
             returnList.add((BasePanel) tabbedPane.getComponentAt(i));
         }
@@ -1339,12 +1348,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         options.add(showPrefs);
 
         AbstractAction genFieldsCustomization = new GenFieldsCustomizationAction();
+        AbstractAction protectTerms = new ProtectedTermsAction();
         options.add(genFieldsCustomization);
         options.add(customExpAction);
         options.add(customImpAction);
         options.add(customFileTypesAction);
         options.add(manageJournals);
         options.add(manageSelectors);
+        options.add(protectTerms);
         options.add(selectKeys);
         mb.add(options);
 
@@ -1377,19 +1388,26 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         return res;
     }
 
-    public void addParserResult(ParserResult pr, boolean raisePanel) {
+    public void addParserResult(ParserResult pr, boolean focusPanel) {
         if (pr.toOpenTab()) {
             // Add the entries to the open tab.
             BasePanel panel = getCurrentBasePanel();
             if (panel == null) {
                 // There is no open tab to add to, so we create a new tab:
-                addTab(pr.getDatabaseContext(), raisePanel);
+                addTab(pr.getDatabaseContext(), focusPanel);
             } else {
                 List<BibEntry> entries = new ArrayList<>(pr.getDatabase().getEntries());
                 addImportedEntries(panel, entries, false);
             }
         } else {
-            addTab(pr.getDatabaseContext(), raisePanel);
+            // only add tab if DB is not already open
+            Optional<BasePanel> panel = getBasePanelList().stream().filter(p -> p.getBibDatabaseContext().getDatabaseFile().equals(pr.getFile())).findFirst();
+
+            if (panel.isPresent()) {
+                tabbedPane.setSelectedComponent(panel.get());
+            } else {
+                addTab(pr.getDatabaseContext(), focusPanel);
+            }
         }
     }
 
@@ -1638,10 +1656,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         if (raisePanel) {
             tabbedPane.setSelectedComponent(bp);
         }
+
+        // Register undo/redo listener
+        bp.getUndoManager().registerListener(new UndoRedoEventManager());
     }
 
     public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
+
         BasePanel bp = new BasePanel(JabRefFrame.this, databaseContext);
         addTab(bp, raisePanel);
         return bp;
@@ -1932,6 +1954,19 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
+    private class ProtectedTermsAction extends MnemonicAwareAction {
+
+        public ProtectedTermsAction() {
+            putValue(Action.NAME, Localization.menuTitle("Manage protected terms"));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            ProtectedTermsDialog protectTermsDialog = new ProtectedTermsDialog(JabRefFrame.this,
+                    Globals.protectedTermsLoader);
+            protectTermsDialog.setVisible(true);
+        }
+    }
     private class DatabasePropertiesAction extends MnemonicAwareAction {
 
         private DatabasePropertiesDialog propertiesDialog;
@@ -2246,5 +2281,33 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public void setPreviewToggle(boolean enabled) {
         previewToggle.setSelected(enabled);
+    }
+
+    public PushToApplications getPushApplications() {
+        return pushApplications;
+    }
+
+
+    private class UndoRedoEventManager {
+
+        @Subscribe
+        public void listen(UndoRedoEvent event) {
+            updateTexts(event);
+            JabRefFrame.this.getCurrentBasePanel().updateEntryEditorIfShowing();
+        }
+
+        @Subscribe
+        public void listen(AddUndoableActionEvent event) {
+            updateTexts(event);
+        }
+
+        private void updateTexts(UndoChangeEvent event) {
+            if (JabRefFrame.this != null) {
+                undo.putValue(Action.SHORT_DESCRIPTION, event.getUndoDescription());
+                undo.setEnabled(event.isCanUndo());
+                redo.putValue(Action.SHORT_DESCRIPTION, event.getRedoDescription());
+                redo.setEnabled(event.isCanRedo());
+            }
+        }
     }
 }

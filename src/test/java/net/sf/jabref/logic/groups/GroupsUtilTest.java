@@ -1,7 +1,10 @@
 package net.sf.jabref.logic.groups;
 
-import java.io.FileReader;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -33,7 +36,8 @@ public class GroupsUtilTest {
 
     @Test
     public void test() throws IOException {
-        try (FileReader fr = new FileReader("src/test/resources/testbib/testjabref.bib")) {
+        try (BufferedReader fr = Files.newBufferedReader(Paths.get("src/test/resources/testbib/testjabref.bib"),
+                StandardCharsets.UTF_8)) {
 
             ParserResult result = BibtexParser.parse(fr);
 

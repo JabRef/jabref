@@ -85,12 +85,12 @@ public class FileUpdateMonitor implements Runnable {
      * force a report to all listeners before the next routine check.
      */
     public boolean hasBeenModified(String handle) {
-        Object o = entries.get(handle);
-        if (o == null) {
+        Entry entry = entries.get(handle);
+        if (entry == null) {
             return false;
         }
         try {
-            return ((Entry) o).hasBeenUpdated();
+            return entry.hasBeenUpdated();
         } catch (IOException ex) {
             // Thrown if file has been removed. We return false.
             return false;
@@ -105,11 +105,10 @@ public class FileUpdateMonitor implements Runnable {
      * @param handle the handle to the correct file.
      */
     public void perturbTimestamp(String handle) {
-        Object o = entries.get(handle);
-        if (o == null) {
-            return;
+        Entry entry = entries.get(handle);
+        if (entry != null) {
+            entry.decreaseTimeStamp();
         }
-        ((Entry) o).decreaseTimeStamp();
     }
 
     /**
@@ -121,9 +120,8 @@ public class FileUpdateMonitor implements Runnable {
     }
 
     public void updateTimeStamp(String key) {
-        Object o = entries.get(key);
-        if (o != null) {
-            Entry entry = (Entry) o;
+        Entry entry = entries.get(key);
+        if (entry != null) {
             entry.updateTimeStamp();
         }
     }
@@ -136,11 +134,11 @@ public class FileUpdateMonitor implements Runnable {
      * @return File The temporary file.
      */
     public Path getTempFile(String key) throws IllegalArgumentException {
-        Object o = entries.get(key);
-        if (o == null) {
+        Entry entry = entries.get(key);
+        if (entry == null) {
             throw new IllegalArgumentException("Entry not found");
         }
-        return ((Entry) o).getTmpFile();
+        return entry.getTmpFile();
     }
 
 

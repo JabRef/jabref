@@ -143,8 +143,13 @@ public class BibEntry implements Cloneable {
      *
      * Note: this is <emph>not</emph> the internal Id of this entry. The internal Id is always present, whereas the BibTeX key might not be present.
      */
+    @Deprecated
     public String getCiteKey() {
         return fields.get(KEY_FIELD);
+    }
+
+    public Optional<String> getCiteKeyOptional() {
+        return Optional.ofNullable(fields.get(KEY_FIELD));
     }
 
     public boolean hasCiteKey() {
@@ -353,7 +358,7 @@ public class BibEntry implements Cloneable {
             return clearField(fieldName);
         }
 
-        String oldValue = getField(fieldName);
+        String oldValue = getFieldOptional(fieldName).orElse(null);
         if (value.equals(oldValue)) {
             return Optional.empty();
         }
@@ -421,7 +426,7 @@ public class BibEntry implements Cloneable {
                     return false;
                 }
             } else {
-                if (BibDatabase.getResolvedField(fieldName, this, database) == null) {
+                if (!BibDatabase.getResolvedField(fieldName, this, database).isPresent()) {
                     return false;
                 }
             }
@@ -433,8 +438,8 @@ public class BibEntry implements Cloneable {
         for (String field : fieldsToCheck) {
             String fieldName = toLowerCase(field);
 
-            String value = BibDatabase.getResolvedField(fieldName, this, database);
-            if ((value != null) && !value.isEmpty()) {
+            Optional<String> value = BibDatabase.getResolvedField(fieldName, this, database);
+            if ((value.isPresent()) && !value.get().isEmpty()) {
                 return true;
             }
         }
@@ -634,7 +639,7 @@ public class BibEntry implements Cloneable {
 
             try {
                 // get the text before the entry
-                String prolog = parsedSerialization.substring(0, parsedSerialization.indexOf('@'));
+                String prolog = parsedSerialization.substring(0, parsedSerialization.lastIndexOf('@'));
 
                 // delete trailing whitespaces (between entry and text)
                 prolog = prolog.replaceFirst("\\s+$", "");

@@ -229,7 +229,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             // remove possible enclosing " symbols
             String right = ctx.right.getText();
             if(right.startsWith("\"") && right.endsWith("\"")) {
-                right = right.substring(1, right.length() - 2);
+                right = right.substring(1, right.length() - 1);
             }
 
             return comparison(ctx.left.getText(), ComparisonOperator.build(ctx.operator.getText()), right);

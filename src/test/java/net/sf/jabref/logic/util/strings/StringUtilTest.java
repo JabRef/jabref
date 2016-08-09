@@ -1,16 +1,14 @@
 package net.sf.jabref.logic.util.strings;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.FileField;
-import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class StringUtilTest {
@@ -24,11 +22,6 @@ public class StringUtilTest {
     private static final String[][] STRING_ARRAY_3 = {{"a", ":b"}, {"c;", "d"}};
     private static final String ENCODED_STRING_ARRAY_3 = "a:\\:b;c\\;:d";
 
-
-    @BeforeClass
-    public static void loadPreferences() {
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
 
     @Test
     public void testUnifyLineBreaks() {
@@ -244,6 +237,38 @@ public class StringUtilTest {
     }
 
     @Test
+    public void testIntValueOfWithNullSingleDigit() {
+        assertEquals(Integer.valueOf(1), StringUtil.intValueOfWithNull("1"));
+        assertEquals(Integer.valueOf(2), StringUtil.intValueOfWithNull("2"));
+        assertEquals(Integer.valueOf(8), StringUtil.intValueOfWithNull("8"));
+    }
+
+    @Test
+    public void testIntValueOfWithNullLongString() {
+        assertEquals(Integer.valueOf(1234567890), StringUtil.intValueOfWithNull("1234567890"));
+    }
+
+    @Test
+    public void testIntValueOfWithNullStartWithZeros() {
+        assertEquals(Integer.valueOf(1234), StringUtil.intValueOfWithNull("001234"));
+    }
+
+    @Test
+    public void testIntValueOfWithNullExceptionIfStringContainsLetter() {
+        assertNull(StringUtil.intValueOfWithNull("12A2"));
+    }
+
+    @Test
+    public void testIntValueOfWithNullExceptionIfStringNull() {
+        assertNull(StringUtil.intValueOfWithNull(null));
+    }
+
+    @Test
+    public void testIntValueOfWithNullExceptionfIfStringEmpty() {
+        assertNull(StringUtil.intValueOfWithNull(""));
+    }
+
+    @Test
     public void testQuoteSimple() {
         assertEquals("a::", StringUtil.quote("a:", "", ':'));
     }
@@ -302,5 +327,20 @@ public class StringUtilTest {
         assertEquals("", StringUtil.repeat(0, 'a'));
         assertEquals("a", StringUtil.repeat(1, 'a'));
         assertEquals("aaaaaaa", StringUtil.repeat(7, 'a'));
+    }
+
+    @Test
+    public void testBoldHTML() {
+        assertEquals("<b>AA</b>", StringUtil.boldHTML("AA"));
+    }
+
+    @Test
+    public void testBoldHTMLReturnsOriginalTextIfNonNull() {
+        assertEquals("<b>AA</b>", StringUtil.boldHTML("AA", "BB"));
+    }
+
+    @Test
+    public void testBoldHTMLReturnsAlternativeTextIfNull() {
+        assertEquals("<b>BB</b>", StringUtil.boldHTML(null, "BB"));
     }
 }

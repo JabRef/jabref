@@ -35,6 +35,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -439,7 +440,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         leftPan.add(closeBut, BorderLayout.NORTH);
 
         // Create type-label
-        TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.empty(), panel.getBibDatabaseContext().getMode());
+        TypedBibEntry typedEntry = new TypedBibEntry(entry, panel.getBibDatabaseContext().getMode());
         leftPan.add(new TypeLabel(typedEntry.getTypeForDisplay()), BorderLayout.CENTER);
         TypeButton typeButton = new TypeButton();
 
@@ -518,6 +519,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
             return FieldExtraComponents.getURLExtraComponent(editor, getStoreFieldAction());
         } else if (fieldExtras.contains(FieldProperties.DOI)) {
             return FieldExtraComponents.getDoiExtraComponent(panel, this, editor);
+        } else if (fieldExtras.contains(FieldProperties.EPRINT)) {
+            return FieldExtraComponents.getEprintExtraComponent(panel, this, editor);
+        } else if (fieldExtras.contains(FieldProperties.ISBN)) {
+            return FieldExtraComponents.getIsbnExtraComponent(panel, this, editor);
         } else if (fieldExtras.contains(FieldProperties.OWNER)) {
             return FieldExtraComponents.getSetOwnerExtraComponent(editor, getStoreFieldAction());
         } else if (fieldExtras.contains(FieldProperties.YES_NO)) {
@@ -793,7 +798,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             NamedCompound compound = new NamedCompound(Localization.lang("source edit"));
             BibEntry newEntry = database.getEntries().get(0);
-            String newKey = newEntry.getCiteKey();
+            String newKey = newEntry.getCiteKeyOptional().orElse(null);
             boolean entryChanged = false;
             boolean duplicateWarning = false;
             boolean emptyWarning = (newKey == null) || newKey.isEmpty();
@@ -803,25 +808,30 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
 
             // First, remove fields that the user has removed.
-            for (String field : entry.getFieldNames()) {
-                if (InternalBibtexFields.isDisplayableField(field) && !newEntry.hasField(field)) {
-                    compound.addEdit(new UndoableFieldChange(entry, field, entry.getField(field), null));
-                    entry.clearField(field);
+            for (Entry<String, String> field : entry.getFieldMap().entrySet()) {
+                String fieldName = field.getKey();
+                String fieldValue = field.getValue();
+
+                if (InternalBibtexFields.isDisplayableField(fieldName) && !newEntry.hasField(fieldName)) {
+                    compound.addEdit(
+                            new UndoableFieldChange(entry, fieldName, fieldValue, null));
+                    entry.clearField(fieldName);
                     entryChanged = true;
                 }
             }
 
             // Then set all fields that have been set by the user.
-            for (String field : newEntry.getFieldNames()) {
-                String oldValue = entry.getField(field);
-                String newValue = newEntry.getField(field);
+            for (Entry<String, String> field : newEntry.getFieldMap().entrySet()) {
+                String fieldName = field.getKey();
+                String oldValue = entry.getFieldOptional(fieldName).orElse(null);
+                String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
                     new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs))
-                            .format(newValue, field);
+                            .format(newValue, fieldName);
 
-                    compound.addEdit(new UndoableFieldChange(entry, field, oldValue, newValue));
-                    entry.setField(field, newValue);
+                    compound.addEdit(new UndoableFieldChange(entry, fieldName, oldValue, newValue));
+                    entry.setField(fieldName, newValue);
                     entryChanged = true;
                 }
             }
@@ -1091,7 +1101,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             if (event.getSource() instanceof TextField) {
                 // Storage from bibtex key field.
                 TextField textField = (TextField) event.getSource();
-                String oldValue = entry.getCiteKey();
+                String oldValue = entry.getCiteKeyOptional().orElse(null);
                 String newValue = textField.getText();
 
                 if (newValue.isEmpty()) {
@@ -1349,9 +1359,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             // this updates the table automatically, on close, but not
             // within the tab
-            Object oldValue = entry.getCiteKey();
+            Optional<String> oldValue = entry.getCiteKeyOptional();
 
-            if (oldValue != null) {
+            if (oldValue.isPresent()) {
                 if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
                     panel.output(Localization.lang("Not overwriting existing key. To change this setting, open Options -> Prefererences -> BibTeX key generator"));
                     return;
@@ -1374,10 +1384,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     LabelPatternPreferences.fromPreferences(Globals.prefs));
 
             // Store undo information:
-            panel.getUndoManager().addEdit(new UndoableKeyChange(panel.getDatabase(), entry, (String) oldValue, entry.getCiteKey()));
+            panel.getUndoManager().addEdit(
+                    new UndoableKeyChange(panel.getDatabase(), entry, oldValue.orElse(null),
+                            entry.getCiteKeyOptional().get())); // Cite key always set here
 
             // here we update the field
-            String bibtexKeyData = entry.getCiteKey();
+            String bibtexKeyData = entry.getCiteKeyOptional().get();
             setField(BibEntry.KEY_FIELD, bibtexKeyData);
             updateSource();
             panel.markBaseChanged();

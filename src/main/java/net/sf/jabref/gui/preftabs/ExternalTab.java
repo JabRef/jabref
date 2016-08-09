@@ -33,10 +33,9 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.external.ExternalFileTypeEditor;
-import net.sf.jabref.external.push.PushToApplication;
-import net.sf.jabref.external.push.PushToApplicationButton;
-import net.sf.jabref.external.push.PushToApplications;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.push.PushToApplication;
+import net.sf.jabref.gui.push.PushToApplicationButton;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -130,7 +129,7 @@ class ExternalTab extends JPanel implements PrefsTab {
 
         JPanel butpan = new JPanel();
         butpan.setLayout(new GridLayout(3, 3));
-        for(PushToApplication pushToApplication : PushToApplications.getApplications()) {
+        for (PushToApplication pushToApplication : frame.getPushApplications().getApplications()) {
             addSettingsButton(pushToApplication, butpan);
         }
         builder.append(new JPanel());

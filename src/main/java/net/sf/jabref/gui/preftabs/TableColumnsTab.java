@@ -181,16 +181,15 @@ class TableColumnsTab extends JPanel implements PrefsTab {
                 if (internalRow >= tableRows.size()) {
                     return "";
                 }
-                Object rowContent = tableRows.get(internalRow);
+                TableRow rowContent = tableRows.get(internalRow);
                 if (rowContent == null) {
                     return "";
                 }
-                TableRow tr = (TableRow) rowContent;
                 // Only two columns
                 if (column == 0) {
-                    return tr.getName();
+                    return rowContent.getName();
                 } else {
-                    return tr.getLength() > 0 ? Integer.toString(tr.getLength()) : "";
+                    return rowContent.getLength() > 0 ? Integer.toString(rowContent.getLength()) : "";
                 }
             }
 

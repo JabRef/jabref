@@ -70,6 +70,9 @@ public class CitationEntry implements Comparable<CitationEntry> {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
         if (o instanceof CitationEntry) {
             CitationEntry other = (CitationEntry) o;
             return this.refMarkName.equals(other.refMarkName);

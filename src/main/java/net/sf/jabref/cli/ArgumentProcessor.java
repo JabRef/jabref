@@ -51,14 +51,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class ArgumentProcessor {
+    private static final Log LOGGER = LogFactory.getLog(ArgumentProcessor.class);
 
     public enum Mode {
         INITIAL_START,
         REMOTE_START
     }
-
-
-    private static final Log LOGGER = LogFactory.getLog(ArgumentProcessor.class);
 
     private final JabRefCLI cli;
 
@@ -230,7 +228,7 @@ public class ArgumentProcessor {
     private List<ParserResult> importAndOpenFiles() {
         List<ParserResult> loaded = new ArrayList<>();
         List<String> toImport = new ArrayList<>();
-        if (!cli.isBlank() && (cli.getLeftOver().length > 0)) {
+        if (!cli.isBlank() && (!cli.getLeftOver().isEmpty())) {
             for (String aLeftOver : cli.getLeftOver()) {
                 // Leftover arguments that have a "bib" extension are interpreted as
                 // BIB files to open. Other files, and files that could not be opened

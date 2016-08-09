@@ -96,6 +96,9 @@ public class ExplicitGroup extends KeywordGroup {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
         if (!(o instanceof ExplicitGroup)) {
             return false;
         }

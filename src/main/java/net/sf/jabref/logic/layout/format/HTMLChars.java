@@ -53,11 +53,11 @@ public class HTMLChars implements LayoutFormatter {
                 if (incommand) {
                     /* Close Command */
                     String command = currentCommand.toString();
-                    Object result = HTML_CHARS.get(command);
+                    String result = HTML_CHARS.get(command);
                     if (result == null) {
                         sb.append(command);
                     } else {
-                        sb.append((String) result);
+                        sb.append(result);
                     }
                 }
                 escaped = true;
@@ -163,19 +163,19 @@ public class HTMLChars implements LayoutFormatter {
                         // This end brace terminates a command. This can be the case in
                         // constructs like {\aa}. The correct behaviour should be to
                         // substitute the evaluated command and swallow the brace:
-                        Object result = HTML_CHARS.get(command);
+                        String result = HTML_CHARS.get(command);
                         if (result == null) {
                             // If the command is unknown, just print it:
                             sb.append(command);
                         } else {
-                            sb.append((String) result);
+                            sb.append(result);
                         }
                     } else {
-                        Object result = HTML_CHARS.get(command);
+                        String result = HTML_CHARS.get(command);
                         if (result == null) {
                             sb.append(command);
                         } else {
-                            sb.append((String) result);
+                            sb.append(result);
                         }
                         sb.append(' ');
                     }

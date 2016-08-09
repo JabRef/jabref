@@ -19,7 +19,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -45,6 +44,7 @@ import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
 import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
@@ -111,11 +111,11 @@ public class PdfImporter {
      * @param fileNames states the names of the files to import
      * @return list of successful created BibTeX entries and list of non-PDF files
      */
-    public ImportPdfFilesResult importPdfFiles(String[] fileNames) {
+    public ImportPdfFilesResult importPdfFiles(List<String> fileNames) {
         // sort fileNames in PDFfiles to import and other files
         // PDFfiles: variable files
         // other files: variable noPdfFiles
-        List<String> files = new ArrayList<>(Arrays.asList(fileNames));
+        List<String> files = new ArrayList<>(fileNames);
         List<String> noPdfFiles = new ArrayList<>();
         PdfFileFilter pdfFilter = PdfFileFilter.INSTANCE;
         for (String file : files) {
@@ -127,7 +127,7 @@ public class PdfImporter {
         // files and noPdfFiles correctly sorted
 
         // import the files
-        List<BibEntry> entries = importPdfFiles(files);
+        List<BibEntry> entries = importPdfFilesInternal(files);
 
         return new ImportPdfFilesResult(noPdfFiles, entries);
     }
@@ -136,7 +136,7 @@ public class PdfImporter {
      * @param fileNames - PDF files to import
      * @return true if the import succeeded, false otherwise
      */
-    private List<BibEntry> importPdfFiles(List<String> fileNames) {
+    private List<BibEntry> importPdfFilesInternal(List<String> fileNames) {
         if (panel == null) {
             return Collections.emptyList();
         }
@@ -151,7 +151,7 @@ public class PdfImporter {
         for (String fileName : fileNames) {
             if (!neverShow && !doNotShowAgain) {
                 importDialog = new ImportDialog(dropRow >= 0, fileName);
-                if (!XMPUtil.hasMetadata(Paths.get(fileName), Globals.prefs)) {
+                if (!XMPUtil.hasMetadata(Paths.get(fileName), XMPPreferences.fromPreferences(Globals.prefs))) {
                     importDialog.disableXMPChoice();
                 }
                 importDialog.setLocationRelativeTo(frame);

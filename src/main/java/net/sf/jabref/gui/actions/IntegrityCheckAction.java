@@ -55,7 +55,7 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
             Object[][] model = new Object[messages.size()][3];
             int i = 0;
             for (IntegrityMessage message : messages) {
-                model[i][0] = message.getEntry().getCiteKey();
+                model[i][0] = message.getEntry().getCiteKeyOptional().orElse("");
                 model[i][1] = message.getFieldName();
                 model[i][2] = message.getMessage();
                 showMessage.put(message.getMessage(), true);

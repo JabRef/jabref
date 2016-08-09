@@ -46,6 +46,7 @@ import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -159,7 +160,7 @@ public class WriteXMPAction extends AbstractWorker {
                 for (File file : files) {
                     if (file.exists()) {
                         try {
-                            XMPUtil.writeXMP(file, entry, database);
+                            XMPUtil.writeXMP(file, entry, database, XMPPreferences.fromPreferences(Globals.prefs));
                             optDiag.getProgressArea().append("  " + Localization.lang("OK") + ".\n");
                             entriesChanged++;
                         } catch (Exception e) {

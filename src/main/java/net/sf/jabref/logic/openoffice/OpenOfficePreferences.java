@@ -133,6 +133,9 @@ public class OpenOfficePreferences {
         return preferences.get(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
     }
 
+    public void clearCurrentStyle() {
+        preferences.remove(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE);
+    }
     public void setCurrentStyle(String path) {
         preferences.put(JabRefPreferences.OO_BIBLIOGRAPHY_STYLE_FILE, path);
     }

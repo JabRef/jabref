@@ -632,7 +632,7 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType REPORT = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, "titleaddon", FieldName.NUMBER, "isrn", FieldName.CHAPTER,
+                .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, "titleaddon", FieldName.NUMBER, FieldName.ISRN, FieldName.CHAPTER,
                         FieldName.PAGES, FieldName.PAGETOTAL, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
                         FieldName.URL, FieldName.URLDATE));
 
@@ -640,7 +640,7 @@ public class BibLatexEntryTypes {
         {
             addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.TYPE, FieldName.INSTITUTION, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.NUMBER, FieldName.VERSION, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH,
-                    "isrn", FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI,
+                    FieldName.ISRN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI,
                     FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
@@ -825,7 +825,7 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType TECHREPORT = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections.unmodifiableList(
-                Arrays.asList(FieldName.SUBTITLE, "titleaddon", FieldName.TYPE, FieldName.NUMBER, "isrn", FieldName.CHAPTER, FieldName.PAGES,
+                Arrays.asList(FieldName.SUBTITLE, "titleaddon", FieldName.TYPE, FieldName.NUMBER, FieldName.ISRN, FieldName.CHAPTER, FieldName.PAGES,
                         FieldName.PAGETOTAL, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
                         FieldName.URLDATE));
 
@@ -834,7 +834,7 @@ public class BibLatexEntryTypes {
             // Treated as alias of "REPORT", except FieldName.TYPE field is optional
             addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.TYPE, FieldName.SUBTITLE, "titleaddon", FieldName.LANGUAGE, FieldName.NUMBER, FieldName.VERSION, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH,
-                    "isrn", FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI,
+                    FieldName.ISRN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, "addendum", "pubstate", FieldName.DOI,
                     FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
 

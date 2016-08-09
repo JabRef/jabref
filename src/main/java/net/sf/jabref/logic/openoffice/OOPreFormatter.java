@@ -108,7 +108,7 @@ public class OOPreFormatter implements LayoutFormatter {
                         //	Are we already at the end of the string?
                         if ((i + 1) == finalResult.length()) {
                             String command = currentCommand.toString();
-                            Object result = OOPreFormatter.CHARS.get(command);
+                            String result = OOPreFormatter.CHARS.get(command);
                             /* If found, then use translated version. If not,
                              * then keep
                              * the text of the parameter intact.
@@ -116,7 +116,7 @@ public class OOPreFormatter implements LayoutFormatter {
                             if (result == null) {
                                 sb.append(command);
                             } else {
-                                sb.append((String) result);
+                                sb.append(result);
                             }
 
                         }

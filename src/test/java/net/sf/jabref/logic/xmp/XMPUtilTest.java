@@ -1,10 +1,10 @@
 package net.sf.jabref.logic.xmp;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -13,6 +13,8 @@ import java.io.PrintStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
@@ -27,6 +29,7 @@ import java.util.TimeZone;
 import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.cli.XMPUtilMain;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
@@ -72,6 +75,8 @@ public class XMPUtilTest {
     private boolean use;
 
     private List<String> privacyFilters;
+
+    private XMPPreferences xmpPreferences;
 
 
     /**
@@ -239,6 +244,8 @@ public class XMPUtilTest {
             Globals.prefs = JabRefPreferences.getInstance();
         }
 
+        xmpPreferences = XMPPreferences.fromPreferences(Globals.prefs);
+
         // Store Privacy Settings
         prefs = JabRefPreferences.getInstance();
 
@@ -269,12 +276,12 @@ public class XMPUtilTest {
 
         writeManually(pdfFile, XMPUtilTest.bibtexXPacket(XMPUtilTest.bibtexDescription(bibtex)));
 
-        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), Globals.prefs);
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), xmpPreferences);
         Assert.assertEquals(1, l.size());
         BibEntry e = l.get(0);
 
         Assert.assertNotNull(e);
-        Assert.assertEquals("OezbekC06", e.getCiteKey());
+        Assert.assertEquals(Optional.of("OezbekC06"), e.getCiteKeyOptional());
         Assert.assertEquals(Optional.of("2003"), e.getFieldOptional("year"));
         Assert.assertEquals(Optional.of("Beach sand convolution by surf-wave optimzation"),
                 e.getFieldOptional("title"));
@@ -294,12 +301,12 @@ public class XMPUtilTest {
 
         writeManually(pdfFile, XMPUtilTest.bibtexXPacket(XMPUtilTest.bibtexDescription(bibtex)));
 
-        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), Globals.prefs);
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), xmpPreferences);
         Assert.assertEquals(1, l.size());
         BibEntry e = l.get(0);
 
         Assert.assertNotNull(e);
-        Assert.assertEquals("OezbekC06", e.getCiteKey());
+        Assert.assertEquals(Optional.of("OezbekC06"), e.getCiteKeyOptional());
         Assert.assertEquals(Optional.of("2003"), e.getFieldOptional("year"));
         Assert.assertEquals(Optional.of("�pt�mz�t��n"), e.getFieldOptional("title"));
         Assert.assertEquals("misc", e.getType());
@@ -320,9 +327,9 @@ public class XMPUtilTest {
             prefs.putBoolean("useXmpPrivacyFilter", true);
             prefs.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS, Arrays.asList("author", "title", "note"));
 
-            XMPUtil.writeXMP(pdfFile, e, null);
+            XMPUtil.writeXMP(pdfFile, e, null, XMPPreferences.fromPreferences(prefs));
 
-            List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), Globals.prefs);
+            List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), XMPPreferences.fromPreferences(prefs));
             Assert.assertEquals(1, l.size());
             BibEntry x = l.get(0);
 
@@ -338,9 +345,9 @@ public class XMPUtilTest {
 
         BibEntry e = t1BibtexEntry();
 
-        XMPUtil.writeXMP(pdfFile, e, null);
+        XMPUtil.writeXMP(pdfFile, e, null, XMPPreferences.fromPreferences(prefs));
 
-        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), Globals.prefs);
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), XMPPreferences.fromPreferences(prefs));
         Assert.assertEquals(1, l.size());
         BibEntry x = l.get(0);
         Set<String> ts = x.getFieldNames();
@@ -368,12 +375,12 @@ public class XMPUtilTest {
 
         writeManually(pdfFile, XMPUtilTest.bibtexXPacket(XMPUtilTest.bibtexDescription(bibtex)));
 
-        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), Globals.prefs);
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), xmpPreferences);
         Assert.assertEquals(1, l.size());
         BibEntry e = l.get(0);
 
         Assert.assertNotNull(e);
-        Assert.assertEquals("Clarkson06", e.getCiteKey());
+        Assert.assertEquals(Optional.of("Clarkson06"), e.getCiteKeyOptional());
         Assert.assertEquals("Kelly Clarkson and Ozzy Osbourne", e.getFieldOptional("author").get());
         Assert.assertEquals("Huey Duck and Dewey Duck and Louie Duck", e.getFieldOptional("editor").get());
         Assert.assertEquals("misc", e.getType());
@@ -392,7 +399,7 @@ public class XMPUtilTest {
 
         writeManually(pdfFile, XMPUtilTest.bibtexXPacket(XMPUtilTest.bibtexDescription(bibtex)));
 
-        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), Globals.prefs);
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), xmpPreferences);
         Assert.assertEquals(1, l.size());
         BibEntry e = l.get(0);
 
@@ -465,9 +472,9 @@ public class XMPUtilTest {
 
         BibEntry e = c.iterator().next();
 
-        XMPUtil.writeXMP(pdfFile, e, null);
+        XMPUtil.writeXMP(pdfFile, e, null, xmpPreferences);
 
-        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), Globals.prefs);
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), xmpPreferences);
         Assert.assertEquals(1, l.size());
         BibEntry x = l.get(0);
 
@@ -489,7 +496,7 @@ public class XMPUtilTest {
 
         writeManually(pdfFile, XMPUtilTest.bibtexXPacket(XMPUtilTest.bibtexDescription(bibtex)));
 
-        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), Globals.prefs);
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), xmpPreferences);
         Assert.assertEquals(1, l.size());
         BibEntry e = l.get(0);
 
@@ -513,7 +520,7 @@ public class XMPUtilTest {
 
         writeManually(pdfFile, XMPUtilTest.bibtexXPacket(bibtex));
 
-        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), Globals.prefs);
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), xmpPreferences);
         Assert.assertEquals(1, l.size());
         BibEntry e = l.get(0);
 
@@ -523,7 +530,7 @@ public class XMPUtilTest {
     @Test
     public void testEmpty() throws Exception {
 
-        Assert.assertEquals(Collections.emptyList(), XMPUtil.readXMP(pdfFile, Globals.prefs));
+        Assert.assertEquals(Collections.emptyList(), XMPUtil.readXMP(pdfFile, xmpPreferences));
 
     }
 
@@ -551,7 +558,7 @@ public class XMPUtilTest {
         writeManually(pdfFile, XMPUtilTest.bibtexXPacket(s));
 
         // Nothing there yet, but should not crash
-        Assert.assertEquals(Collections.emptyList(), XMPUtil.readXMP(pdfFile, Globals.prefs));
+        Assert.assertEquals(Collections.emptyList(), XMPUtil.readXMP(pdfFile, xmpPreferences));
 
         s = " <rdf:Description rdf:about=''" + "  xmlns:xmp='http://ns.adobe.com/xap/1.0/'>"
                 + "  <xmp:CreatorTool>Acrobat PDFMaker 7.0.7</xmp:CreatorTool>"
@@ -571,13 +578,13 @@ public class XMPUtilTest {
 
         // Title is Questionnaire.pdf so the DublinCore fallback should hit
         // in...
-        Assert.assertEquals(1, XMPUtil.readXMP(pdfFile, Globals.prefs).size());
+        Assert.assertEquals(1, XMPUtil.readXMP(pdfFile, xmpPreferences).size());
 
         {
             // Now write new packet and check if it was correctly written
-            XMPUtil.writeXMP(pdfFile, t1BibtexEntry(), null);
+            XMPUtil.writeXMP(pdfFile, t1BibtexEntry(), null, xmpPreferences);
 
-            List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), Globals.prefs);
+            List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), xmpPreferences);
             Assert.assertEquals(1, l.size());
             BibEntry e = l.get(0);
 
@@ -651,9 +658,9 @@ public class XMPUtilTest {
         BibEntry toSet = t1BibtexEntry();
         toSet.setField("author", "Pokemon!");
 
-        XMPUtil.writeXMP(pdfFile, toSet, null);
+        XMPUtil.writeXMP(pdfFile, toSet, null, xmpPreferences);
 
-        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), Globals.prefs);
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), xmpPreferences);
         Assert.assertEquals(1, l.size());
         BibEntry e = l.get(0);
 
@@ -742,9 +749,9 @@ public class XMPUtilTest {
 
         BibEntry e = c.iterator().next();
 
-        XMPUtil.writeXMP(pdfFile, e, null);
+        XMPUtil.writeXMP(pdfFile, e, null, xmpPreferences);
 
-        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), Globals.prefs);
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), xmpPreferences);
         Assert.assertEquals(1, l.size());
         BibEntry x = l.get(0);
 
@@ -754,7 +761,7 @@ public class XMPUtilTest {
     public void assertEqualsBibtexEntry(BibEntry expected, BibEntry actual) {
         Assert.assertNotNull(expected);
         Assert.assertNotNull(actual);
-        Assert.assertEquals(expected.getCiteKey(), actual.getCiteKey());
+        Assert.assertEquals(expected.getCiteKeyOptional(), actual.getCiteKeyOptional());
         Assert.assertEquals(expected.getType(), actual.getType());
 
         for (String field : expected.getFieldNames()) {
@@ -786,7 +793,7 @@ public class XMPUtilTest {
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(2, c.size());
 
-        String xmp = XMPUtil.toXMP(c, null);
+        String xmp = XMPUtil.toXMP(c, null, xmpPreferences);
 
         /* Test minimal syntaxical completeness */
         Assert.assertTrue(xmp.indexOf("xpacket") > 0);
@@ -804,7 +811,7 @@ public class XMPUtilTest {
         /* Test contents of string */
         writeManually(pdfFile, xmp);
 
-        List<BibEntry> l = XMPUtil.readXMP(pdfFile, Globals.prefs);
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile, xmpPreferences);
 
         Assert.assertEquals(2, l.size());
 
@@ -817,12 +824,12 @@ public class XMPUtilTest {
             b = tmp;
         }
 
-        Assert.assertEquals("canh05", a.getCiteKey());
+        Assert.assertEquals(Optional.of("canh05"), a.getCiteKeyOptional());
         Assert.assertEquals("K. Crowston and H. Annabi", a.getFieldOptional("author").get());
         Assert.assertEquals("Title A", a.getFieldOptional("title").get());
         Assert.assertEquals("article", a.getType());
 
-        Assert.assertEquals("foo", b.getCiteKey());
+        Assert.assertEquals(Optional.of("foo"), b.getCiteKeyOptional());
         Assert.assertEquals("Norton Bar", b.getFieldOptional("author").get());
         Assert.assertEquals("inproceedings", b.getType());
     }
@@ -839,7 +846,7 @@ public class XMPUtilTest {
         writeManually(pdfFile, XMPUtilTest.bibtexXPacket(bibtex));
 
         // Read from file
-        List<BibEntry> l = XMPUtil.readXMP(pdfFile, Globals.prefs);
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile, xmpPreferences);
 
         Assert.assertEquals(2, l.size());
 
@@ -868,9 +875,9 @@ public class XMPUtilTest {
         l.add(t2BibtexEntry());
         l.add(t3BibtexEntry());
 
-        XMPUtil.writeXMP(pdfFile, l, null, false);
+        XMPUtil.writeXMP(pdfFile, l, null, false, xmpPreferences);
 
-        l = XMPUtil.readXMP(pdfFile, Globals.prefs);
+        l = XMPUtil.readXMP(pdfFile, xmpPreferences);
 
         Assert.assertEquals(2, l.size());
 
@@ -893,7 +900,7 @@ public class XMPUtilTest {
     @Test
     public void testReadProtectedPDFHasMetaData() throws Exception {
         try (InputStream is = XMPUtilTest.class.getResourceAsStream("/pdfs/write-protected.pdf")) {
-            Assert.assertTrue(XMPUtil.hasMetadata(is, Globals.prefs));
+            Assert.assertTrue(XMPUtil.hasMetadata(is, xmpPreferences));
         }
     }
 
@@ -903,7 +910,7 @@ public class XMPUtilTest {
     @Test
     public void testReadProtectedPDFHasCorrectMetaData() throws Exception {
         try (InputStream is = XMPUtilTest.class.getResourceAsStream("/pdfs/write-protected.pdf")) {
-            List<BibEntry> readEntries = XMPUtil.readXMP(is, Globals.prefs);
+            List<BibEntry> readEntries = XMPUtil.readXMP(is, xmpPreferences);
 
             BibEntry entry = new BibEntry();
             entry.setType("misc");
@@ -919,7 +926,7 @@ public class XMPUtilTest {
         List<BibEntry> l = new LinkedList<>();
         l.add(t3BibtexEntry());
 
-        XMPUtil.writeXMP(pdfFile, l, null, true);
+        XMPUtil.writeXMP(pdfFile, l, null, true, xmpPreferences);
 
         try (PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile())) {
             if (document.isEncrypted()) {
@@ -974,7 +981,7 @@ public class XMPUtilTest {
             Assert.assertEquals(4, dcSchema.getRelationships().size());
 
             assertEqualsBibtexEntry(t3BibtexEntry(),
-                    XMPUtil.getBibtexEntryFromDublinCore(dcSchema, Globals.prefs).get());
+                    XMPUtil.getBibtexEntryFromDublinCore(dcSchema, xmpPreferences).get());
 
         }
 
@@ -985,7 +992,7 @@ public class XMPUtilTest {
         List<BibEntry> l = new LinkedList<>();
         l.add(t3BibtexEntry());
 
-        XMPUtil.writeXMP(pdfFile, l, null, true);
+        XMPUtil.writeXMP(pdfFile, l, null, true, xmpPreferences);
 
         try (PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile())) {
             if (document.isEncrypted()) {
@@ -1040,7 +1047,7 @@ public class XMPUtilTest {
             Assert.assertEquals(4, dcSchema.getRelationships().size());
 
             assertEqualsBibtexEntry(t3BibtexEntry(),
-                    XMPUtil.getBibtexEntryFromDublinCore(dcSchema, Globals.prefs).get());
+                    XMPUtil.getBibtexEntryFromDublinCore(dcSchema, xmpPreferences).get());
 
         }
     }
@@ -1060,7 +1067,7 @@ public class XMPUtilTest {
 
         BibEntry e = c.iterator().next();
 
-        XMPUtil.writeXMP(pdfFile, e, null);
+        XMPUtil.writeXMP(pdfFile, e, null, xmpPreferences);
 
         Optional<XMPMetadata> metadata = XMPUtil.readRawXMP(pdfFile);
 
@@ -1103,20 +1110,20 @@ public class XMPUtilTest {
 
         // First check conversion from .bib to .xmp
         File tempBib = File.createTempFile("JabRef", ".bib");
-        try (FileWriter fileWriter = new FileWriter(tempBib)) {
+        try (BufferedWriter fileWriter = Files.newBufferedWriter(tempBib.toPath(), StandardCharsets.UTF_8)) {
             fileWriter.write(t1BibtexString());
             fileWriter.close();
 
             try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
                 PrintStream oldOut = System.out;
                 System.setOut(new PrintStream(s));
-                XMPUtil.main(new String[] {tempBib.getAbsolutePath()});
+                XMPUtilMain.main(new String[] {tempBib.getAbsolutePath()});
                 System.setOut(oldOut);
                 String xmp = s.toString();
 
                 writeManually(pdfFile, xmp);
             }
-            List<BibEntry> l = XMPUtil.readXMP(pdfFile, Globals.prefs);
+            List<BibEntry> l = XMPUtil.readXMP(pdfFile, xmpPreferences);
             Assert.assertEquals(1, l.size());
             assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
 
@@ -1140,12 +1147,12 @@ public class XMPUtilTest {
 
             BibEntry e = t1BibtexEntry();
 
-            XMPUtil.writeXMP(pdfFile, e, null);
+            XMPUtil.writeXMP(pdfFile, e, null, xmpPreferences);
 
             try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
                 PrintStream oldOut = System.out;
                 System.setOut(new PrintStream(s));
-                XMPUtil.main(new String[] {pdfFile.getAbsolutePath()});
+                XMPUtilMain.main(new String[] {pdfFile.getAbsolutePath()});
                 System.setOut(oldOut);
                 String bibtex = s.toString();
 
@@ -1160,12 +1167,12 @@ public class XMPUtilTest {
         // Write XMP to file
         BibEntry e = t1BibtexEntry();
 
-        XMPUtil.writeXMP(pdfFile, e, null);
+        XMPUtil.writeXMP(pdfFile, e, null, xmpPreferences);
 
         try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
             PrintStream oldOut = System.out;
             System.setOut(new PrintStream(s));
-            XMPUtil.main(new String[] {"-x", pdfFile.getAbsolutePath()});
+            XMPUtilMain.main(new String[] {"-x", pdfFile.getAbsolutePath()});
             System.setOut(oldOut);
             s.close();
             String xmp = s.toString();
@@ -1185,7 +1192,7 @@ public class XMPUtilTest {
 
             /* Test contents of string */
             writeManually(pdfFile, xmp);
-            List<BibEntry> l = XMPUtil.readXMP(pdfFile, Globals.prefs);
+            List<BibEntry> l = XMPUtil.readXMP(pdfFile, xmpPreferences);
             Assert.assertEquals(1, l.size());
 
             assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
@@ -1203,7 +1210,7 @@ public class XMPUtilTest {
     public void testCommandLineByKey() throws IOException, TransformerException {
 
         File tempBib = File.createTempFile("JabRef", ".bib");
-        try (FileWriter fileWriter = new FileWriter(tempBib)) {
+        try (BufferedWriter fileWriter = Files.newBufferedWriter(tempBib.toPath(), StandardCharsets.UTF_8)) {
             fileWriter.write(t1BibtexString());
             fileWriter.write(t2BibtexString());
 
@@ -1211,13 +1218,13 @@ public class XMPUtilTest {
                 PrintStream oldOut = System.out;
                 try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
                     System.setOut(new PrintStream(s));
-                    XMPUtil.main(new String[] {"canh05", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
+                    XMPUtilMain.main(new String[] {"canh05", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
                 } finally {
                     System.setOut(oldOut);
                 }
 
                 // PDF should be annotated:
-                List<BibEntry> l = XMPUtil.readXMP(pdfFile, Globals.prefs);
+                List<BibEntry> l = XMPUtil.readXMP(pdfFile, xmpPreferences);
                 Assert.assertEquals(1, l.size());
                 assertEqualsBibtexEntry(t1BibtexEntry(), l.get(0));
             }
@@ -1226,14 +1233,14 @@ public class XMPUtilTest {
                 PrintStream oldOut = System.out;
                 System.setOut(new PrintStream(s));
                 try {
-                    XMPUtil.main(new String[] {"OezbekC06", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
+                    XMPUtilMain.main(new String[] {"OezbekC06", tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
                 } finally {
                     System.setOut(oldOut);
                 }
             }
 
             // PDF should be annotated:
-            List<BibEntry> l = XMPUtil.readXMP(pdfFile, Globals.prefs);
+            List<BibEntry> l = XMPUtil.readXMP(pdfFile, xmpPreferences);
             Assert.assertEquals(1, l.size());
             assertEqualsBibtexEntry(t2BibtexEntry(), l.get(0));
         } finally {
@@ -1254,7 +1261,7 @@ public class XMPUtilTest {
 
         File tempBib = File.createTempFile("JabRef", ".bib");
 
-        try (FileWriter fileWriter = new FileWriter(tempBib)) {
+        try (BufferedWriter fileWriter = Files.newBufferedWriter(tempBib.toPath(), StandardCharsets.UTF_8)) {
 
             fileWriter.write(t1BibtexString());
             fileWriter.write(t3BibtexString());
@@ -1263,10 +1270,10 @@ public class XMPUtilTest {
             try (ByteArrayOutputStream s = new ByteArrayOutputStream()) {
                 PrintStream oldOut = System.out;
                 System.setOut(new PrintStream(s));
-                XMPUtil.main(new String[] {tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
+                XMPUtilMain.main(new String[] {tempBib.getAbsolutePath(), pdfFile.getAbsolutePath()});
                 System.setOut(oldOut);
             }
-            List<BibEntry> l = XMPUtil.readXMP(pdfFile, Globals.prefs);
+            List<BibEntry> l = XMPUtil.readXMP(pdfFile, xmpPreferences);
 
             Assert.assertEquals(2, l.size());
 
@@ -1318,9 +1325,9 @@ public class XMPUtilTest {
 
         BibEntry e = c.iterator().next();
 
-        XMPUtil.writeXMP(pdfFile, e, original.getDatabase());
+        XMPUtil.writeXMP(pdfFile, e, original.getDatabase(), xmpPreferences);
 
-        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), Globals.prefs);
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), xmpPreferences);
         Assert.assertEquals(1, l.size());
         BibEntry x = l.get(0);
 
@@ -1331,13 +1338,13 @@ public class XMPUtilTest {
     @Test(expected = EncryptedPdfsNotSupportedException.class)
     public void expectedEncryptionNotSupportedExceptionAtRead() throws IOException {
         try (InputStream is = XMPUtilTest.class.getResourceAsStream("/pdfs/encrypted.pdf")) {
-            XMPUtil.readXMP(is, Globals.prefs);
+            XMPUtil.readXMP(is, xmpPreferences);
         }
     }
 
     @Test(expected = EncryptedPdfsNotSupportedException.class)
     public void expectedEncryptionNotSupportedExceptionAtWrite() throws IOException, TransformerException {
-        XMPUtil.writeXMP("src/test/resources/pdfs/encrypted.pdf", t1BibtexEntry(), null);
+        XMPUtil.writeXMP("src/test/resources/pdfs/encrypted.pdf", t1BibtexEntry(), null, xmpPreferences);
     }
 
     /**
@@ -1352,7 +1359,8 @@ public class XMPUtilTest {
     @Test
     public void testResolveStrings2() throws IOException, TransformerException {
 
-        try (FileReader fr = new FileReader("src/test/resources/net/sf/jabref/util/twente.bib")) {
+        try (BufferedReader fr = Files.newBufferedReader(Paths.get("src/test/resources/net/sf/jabref/util/twente.bib"),
+                StandardCharsets.UTF_8)) {
             ParserResult result = BibtexParser.parse(fr);
 
             Assert.assertEquals("Arvind", result.getDatabase().resolveForStrings("#Arvind#"));
@@ -1362,10 +1370,10 @@ public class XMPUtilTest {
 
             try {
                 XMPUtil.writeXMP(pdfFile, result.getDatabase().getEntryByKey("Patterson06").get(),
-                        result.getDatabase());
+                        result.getDatabase(), xmpPreferences);
 
                 // Test whether we the main function can load the bibtex correctly
-                BibEntry b = XMPUtil.readXMP(pdfFile, Globals.prefs).get(0);
+                BibEntry b = XMPUtil.readXMP(pdfFile, xmpPreferences).get(0);
                 Assert.assertNotNull(b);
                 Assert.assertEquals(originalAuthors, AuthorList.parse(b.getFieldOptional("author").get()));
 
@@ -1400,7 +1408,7 @@ public class XMPUtilTest {
                     Assert.assertEquals("Arvind", dcSchema.getCreators().get(1));
                     Assert.assertEquals("Krste Asanov\\'\\i{}c", dcSchema.getCreators().get(2));
 
-                    b = XMPUtil.getBibtexEntryFromDublinCore(dcSchema, Globals.prefs).get();
+                    b = XMPUtil.getBibtexEntryFromDublinCore(dcSchema, xmpPreferences).get();
                     Assert.assertNotNull(b);
                     Assert.assertEquals(originalAuthors, AuthorList.parse(b.getFieldOptional("author").get()));
                 }

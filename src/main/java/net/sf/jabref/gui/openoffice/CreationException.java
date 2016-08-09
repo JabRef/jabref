@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
+/*  Copyright (C) 2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,27 +15,14 @@
 */
 package net.sf.jabref.gui.openoffice;
 
-import net.sf.jabref.logic.openoffice.OOBibStyle;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.IdGenerator;
-
 /**
- * Subclass of BibEntry for representing entries referenced in a document that can't
- * be found in JabRef's current database.
+ * Exception used to indicate that the plugin attempted to set a character format that is
+ * not defined in the current OpenOffice document.
  */
-class UndefinedBibtexEntry extends BibEntry {
+class CreationException extends Exception {
 
-    private final String key;
-
-
-    public UndefinedBibtexEntry(String key) {
-        super(IdGenerator.next());
-        this.key = key;
-        setField(FieldName.AUTHOR, OOBibStyle.UNDEFINED_CITATION_MARKER);
+    public CreationException(String message) {
+        super(message);
     }
 
-    public String getKey() {
-        return key;
-    }
 }

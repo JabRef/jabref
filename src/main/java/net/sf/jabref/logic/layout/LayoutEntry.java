@@ -207,11 +207,8 @@ class LayoutEntry {
         case LayoutHelper.IS_LAYOUT_TEXT:
             return text;
         case LayoutHelper.IS_SIMPLE_FIELD:
-            String value = BibDatabase.getResolvedField(text, bibtex, database);
+            String value = BibDatabase.getResolvedField(text, bibtex, database).orElse("");
 
-            if (value == null) {
-                value = "";
-            }
             // If a post formatter has been set, call it:
             if (postFormatter != null) {
                 value = postFormatter.format(value);
@@ -229,7 +226,7 @@ class LayoutEntry {
             // Printing the encoding name is not supported in entry layouts, only
             // in begin/end layouts. This prevents breakage if some users depend
             // on a field called "encoding". We simply return this field instead:
-            return BibDatabase.getResolvedField("encoding", bibtex, database);
+            return BibDatabase.getResolvedField("encoding", bibtex, database).orElse(null);
         default:
             return "";
         }
@@ -243,14 +240,10 @@ class LayoutEntry {
         } else {
             // changed section begin - arudert
             // resolve field (recognized by leading backslash) or text
-            String fieldText = text.startsWith("\\") ? BibDatabase.getResolvedField(text.substring(1), bibtex,
-                    database) : BibDatabase.getText(text, database);
+            fieldEntry = text.startsWith("\\") ? BibDatabase
+                    .getResolvedField(text.substring(1), bibtex, database)
+                    .orElse("") : BibDatabase.getText(text, database);
             // changed section end - arudert
-            if (fieldText == null) {
-                fieldEntry = "";
-            } else {
-                fieldEntry = fieldText;
-            }
         }
 
         if (option != null) {
@@ -268,38 +261,37 @@ class LayoutEntry {
     }
 
     private String handleFieldOrGroupStart(BibEntry bibtex, BibDatabase database, Optional<Pattern> highlightPattern) {
-        String field;
+        Optional<String> field;
         if (type == LayoutHelper.IS_GROUP_START) {
             field = BibDatabase.getResolvedField(text, bibtex, database);
         } else if (text.matches(".*(;|(\\&+)).*")) {
             // split the strings along &, && or ; for AND formatter
             String[] parts = text.split("\\s*(;|(\\&+))\\s*");
-            field = null;
+            field = Optional.empty();
             for (String part : parts) {
                 field = BibDatabase.getResolvedField(part, bibtex, database);
-                if (field == null) {
+                if (!field.isPresent()) {
                     break;
                 }
-
             }
         } else {
             // split the strings along |, ||  for OR formatter
             String[] parts = text.split("\\s*(\\|+)\\s*");
-            field = null;
+            field = Optional.empty();
             for (String part : parts) {
                 field = BibDatabase.getResolvedField(part, bibtex, database);
-                if (field != null) {
+                if (field.isPresent()) {
                     break;
                 }
             }
         }
 
-        if ((field == null) || ((type == LayoutHelper.IS_GROUP_START)
-                && field.equalsIgnoreCase(LayoutHelper.getCurrentGroup()))) {
+        if ((!field.isPresent()) || ((type == LayoutHelper.IS_GROUP_START)
+                && field.get().equalsIgnoreCase(LayoutHelper.getCurrentGroup()))) {
             return null;
         } else {
             if (type == LayoutHelper.IS_GROUP_START) {
-                LayoutHelper.setCurrentGroup(field);
+                LayoutHelper.setCurrentGroup(field.get());
             }
             StringBuilder sb = new StringBuilder(100);
             String fieldText;

@@ -315,11 +315,9 @@ public class EntryTableTransferHandler extends TransferHandler {
      * @return success status for the operation
      */
     private boolean handleDraggedFiles(List<File> files, final int dropRow) {
-        final String[] fileNames = new String[files.size()];
-        int i = 0;
+        final List<String> fileNames = new ArrayList<>();
         for (File file : files) {
-            fileNames[i] = file.getAbsolutePath();
-            i++;
+            fileNames.add(file.getAbsolutePath());
         }
         // Try to load BIB files normally, and import the rest into the current
         // database.

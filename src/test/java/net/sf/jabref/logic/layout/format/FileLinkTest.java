@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.layout.format;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.layout.ParamLayoutFormatter;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -12,50 +11,52 @@ import static org.junit.Assert.assertEquals;
 
 public class FileLinkTest {
 
+    private FileLinkPreferences prefs;
     @Before
     public void setUp() throws Exception {
-        if (Globals.prefs == null) {
-            Globals.prefs = JabRefPreferences.getInstance();
-        }
+        prefs = FileLinkPreferences.fromPreferences(JabRefPreferences.getInstance());
     }
 
     @Test
     public void testEmpty() {
-        assertEquals("", new FileLink(FileLinkPreferences.fromPreferences(Globals.prefs)).format(""));
+        assertEquals("", new FileLink(prefs).format(""));
     }
 
     @Test
     public void testNull() {
-        assertEquals("", new FileLink(FileLinkPreferences.fromPreferences(Globals.prefs)).format(null));
+        assertEquals("",
+                new FileLink(prefs).format(null));
     }
 
     @Test
     public void testOnlyFilename() {
-        assertEquals("test.pdf", new FileLink(FileLinkPreferences.fromPreferences(Globals.prefs)).format("test.pdf"));
+        assertEquals("test.pdf",
+                new FileLink(prefs).format("test.pdf"));
     }
 
     @Test
     public void testCompleteRecord() {
         assertEquals("test.pdf",
-                new FileLink(FileLinkPreferences.fromPreferences(Globals.prefs)).format("paper:test.pdf:PDF"));
+                new FileLink(prefs)
+                        .format("paper:test.pdf:PDF"));
     }
 
     @Test
     public void testMultipleFiles() {
-        ParamLayoutFormatter a = new FileLink(FileLinkPreferences.fromPreferences(Globals.prefs));
+        ParamLayoutFormatter a = new FileLink(prefs);
         assertEquals("test.pdf", a.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
     }
 
     @Test
     public void testMultipleFilesPick() {
-        ParamLayoutFormatter a = new FileLink(FileLinkPreferences.fromPreferences(Globals.prefs));
+        ParamLayoutFormatter a = new FileLink(prefs);
         a.setArgument("ppt");
         assertEquals("pres.ppt", a.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
     }
 
     @Test
     public void testMultipleFilesPickNonExistant() {
-        ParamLayoutFormatter a = new FileLink(FileLinkPreferences.fromPreferences(Globals.prefs));
+        ParamLayoutFormatter a = new FileLink(prefs);
         a.setArgument("doc");
         assertEquals("", a.format("paper:test.pdf:PDF;presentation:pres.ppt:PPT"));
     }

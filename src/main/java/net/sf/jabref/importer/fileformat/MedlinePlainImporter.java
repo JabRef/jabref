@@ -127,6 +127,9 @@ public class MedlinePlainImporter extends ImportFormat {
                     }
                 }
                 String entry = current.toString();
+                if (!checkLineValidity(entry)) {
+                    continue;
+                }
 
                 String label = entry.substring(0, entry.indexOf('-')).trim();
                 String value = entry.substring(entry.indexOf('-') + 1).trim();
@@ -227,11 +230,14 @@ public class MedlinePlainImporter extends ImportFormat {
             // create one here
             b.setField(fields);
             bibitems.add(b);
-
         }
 
         return new ParserResult(bibitems);
 
+    }
+
+    private boolean checkLineValidity(String line) {
+        return (line.length() >= 5) && (line.charAt(4) == '-');
     }
 
     private String addSourceType(String value, String type) {

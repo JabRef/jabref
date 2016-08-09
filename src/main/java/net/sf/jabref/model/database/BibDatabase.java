@@ -197,7 +197,7 @@ public class BibDatabase {
         entry.registerListener(this);
 
         eventBus.post(new EntryAddedEvent(entry, isUndo));
-        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
+        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKeyOptional().orElse(null));
     }
 
     /**
@@ -210,7 +210,7 @@ public class BibDatabase {
         boolean anyRemoved =  entries.removeIf(entry -> entry.getId().equals(toBeDeleted.getId()));
         if (anyRemoved) {
             internalIDs.remove(toBeDeleted.getId());
-            duplicationChecker.removeKeyFromSet(toBeDeleted.getCiteKey());
+            toBeDeleted.getCiteKeyOptional().ifPresent(duplicationChecker::removeKeyFromSet);
             eventBus.post(new EntryRemovedEvent(toBeDeleted));
         }
     }
@@ -220,13 +220,13 @@ public class BibDatabase {
     }
 
     public synchronized boolean setCiteKeyForEntry(BibEntry entry, String key) {
-        String oldKey = entry.getCiteKey();
+        String oldKey = entry.getCiteKeyOptional().orElse(null);
         if (key == null) {
             entry.clearField(BibEntry.KEY_FIELD);
         } else {
             entry.setCiteKey(key);
         }
-        return duplicationChecker.checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey());
+        return duplicationChecker.checkForDuplicateKeyAndAdd(oldKey, key);
     }
 
     /**
@@ -487,6 +487,8 @@ public class BibDatabase {
         return res;
     }
 
+
+
     /**
      * Returns the text stored in the given field of the given bibtex entry
      * which belongs to the given database.
@@ -497,15 +499,15 @@ public class BibDatabase {
      * unset fields in the entry linked by the "crossref" field, if any.
      *
      * @param field    The field to return the value of.
-     * @param entry    maybenull
-     *                 The bibtex entry which contains the field.
+     * @param entry    The bibtex entry which contains the field.
      * @param database maybenull
      *                 The database of the bibtex entry.
      * @return The resolved field value or null if not found.
      */
-    public static String getResolvedField(String field, BibEntry entry, BibDatabase database) {
+    public static Optional<String> getResolvedField(String field, BibEntry entry, BibDatabase database) {
+        Objects.requireNonNull(entry, "entry cannot be null");
         if ("bibtextype".equals(field)) {
-            return EntryUtil.capitalizeFirst(entry.getType());
+            return Optional.of(EntryUtil.capitalizeFirst(entry.getType()));
         }
 
         // TODO: Changed this to also consider alias fields, which is the expected
@@ -527,7 +529,7 @@ public class BibDatabase {
             }
         }
 
-        return BibDatabase.getText(result.orElse(null), database);
+        return result.map(resultText -> BibDatabase.getText(resultText, database));
     }
 
     /**

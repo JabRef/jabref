@@ -73,11 +73,11 @@ public class SidePaneManager {
     }
 
     public synchronized boolean isComponentVisible(String name) {
-        Object o = components.get(name);
-        if (o == null) {
+        SidePaneComponent sidePaneComponent = components.get(name);
+        if (sidePaneComponent == null) {
             return false;
         } else {
-            return visible.contains(o);
+            return visible.contains(sidePaneComponent);
         }
     }
 
@@ -90,20 +90,20 @@ public class SidePaneManager {
     }
 
     public synchronized void show(String name) {
-        Object o = components.get(name);
-        if (o == null) {
+        SidePaneComponent sidePaneComponent = components.get(name);
+        if (sidePaneComponent == null) {
             LOGGER.warn("Side pane component '" + name + "' unknown.");
         } else {
-            show((SidePaneComponent) o);
+            show(sidePaneComponent);
         }
     }
 
     public synchronized void hide(String name) {
-        Object o = components.get(name);
-        if (o == null) {
+        SidePaneComponent sidePaneComponent = components.get(name);
+        if (sidePaneComponent == null) {
             LOGGER.warn("Side pane component '" + name + "' unknown.");
         } else {
-            hideComponent((SidePaneComponent) o);
+            hideComponent(sidePaneComponent);
         }
     }
 
