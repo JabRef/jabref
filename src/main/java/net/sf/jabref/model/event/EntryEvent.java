@@ -1,5 +1,6 @@
 package net.sf.jabref.model.event;
 
+import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -9,15 +10,30 @@ import net.sf.jabref.model.entry.BibEntry;
 public abstract class EntryEvent {
 
     private final BibEntry bibEntry;
+    private final EntryEventSource location;
+
 
     /**
-     * @param bibEntry BibEntry object which is involved in this event 
+     * @param bibEntry BibEntry object which is involved in this event
      */
     public EntryEvent(BibEntry bibEntry) {
+        this(bibEntry, EntryEventSource.LOCAL);
+    }
+
+    /**
+     * @param bibEntry BibEntry object which is involved in this event
+     * @param location Location affected by this event
+     */
+    public EntryEvent(BibEntry bibEntry, EntryEventSource location) {
         this.bibEntry = bibEntry;
+        this.location = location;
     }
 
     public BibEntry getBibEntry() {
         return this.bibEntry;
+    }
+
+    public EntryEventSource getEntryEventSource() {
+        return this.location;
     }
 }

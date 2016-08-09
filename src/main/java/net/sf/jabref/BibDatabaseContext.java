@@ -10,8 +10,10 @@ import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
+import net.sf.jabref.model.database.DatabaseLocation;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.shared.DBMSSynchronizer;
 
 /**
  * Represents everything related to a BIB file.
@@ -25,6 +27,8 @@ public class BibDatabaseContext {
     private final Defaults defaults;
     /** The file where this database was last saved to. */
     private File file;
+    private DBMSSynchronizer dbmsSynchronizer;
+    private DatabaseLocation location;
 
     public BibDatabaseContext() {
         this(new Defaults());
@@ -43,9 +47,15 @@ public class BibDatabaseContext {
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, Defaults defaults) {
+        this(database, metaData, defaults, DatabaseLocation.LOCAL);
+    }
+
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, Defaults defaults, DatabaseLocation location) {
         this.defaults = Objects.requireNonNull(defaults);
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
+
+        updateDatabaseLocation(location);
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData) {
@@ -60,6 +70,10 @@ public class BibDatabaseContext {
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, File file) {
         this(database, metaData, file, new Defaults());
+    }
+
+    public BibDatabaseContext(Defaults defaults, DatabaseLocation location) {
+        this(new BibDatabase(), new MetaData(), defaults, location);
     }
 
     public BibDatabaseMode getMode() {
@@ -180,5 +194,29 @@ public class BibDatabaseContext {
 
     public List<String> getFileDirectory() {
         return getFileDirectory(FieldName.FILE);
+    }
+
+    public DBMSSynchronizer getDBSynchronizer() {
+        return this.dbmsSynchronizer;
+    }
+
+    public DatabaseLocation getLocation() {
+        return this.location;
+    }
+
+    public void updateDatabaseLocation(DatabaseLocation newLocation) {
+
+        if ((this.location == DatabaseLocation.SHARED) && (newLocation == DatabaseLocation.LOCAL)) {
+            this.database.unregisterListener(dbmsSynchronizer);
+            this.metaData.unregisterListener(dbmsSynchronizer);
+        }
+
+        if (newLocation == DatabaseLocation.SHARED) {
+            this.dbmsSynchronizer = new DBMSSynchronizer(this);
+            this.database.registerListener(dbmsSynchronizer);
+            this.metaData.registerListener(dbmsSynchronizer);
+        }
+
+        this.location = newLocation;
     }
 }

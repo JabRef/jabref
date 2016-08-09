@@ -971,6 +971,10 @@ public class JabRefPreferences {
         return prefs.get(key, (String) defaults.get(key));
     }
 
+    public Optional<String> getAsOptional(String key) {
+        return Optional.ofNullable(prefs.get(key, (String) defaults.get(key)));
+    }
+
     public String get(String key, String def) {
         return prefs.get(key, def);
     }
