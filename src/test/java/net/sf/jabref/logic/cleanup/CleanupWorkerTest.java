@@ -60,6 +60,7 @@ public class CleanupWorkerTest {
             Globals.protectedTermsLoader = new ProtectedTermsLoader(
                     new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
                             Collections.emptyList(), Collections.emptyList()));
+            Assert.assertNotEquals(Collections.emptyList(), Globals.protectedTermsLoader.getProtectedTerms());
         }
 
         pdfFolder = bibFolder.newFolder();
@@ -293,6 +294,8 @@ public class CleanupWorkerTest {
         CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true,
                 Collections.singletonList(
                         new FieldFormatterCleanup("title", new ProtectTermsFormatter(Globals.protectedTermsLoader)))));
+        Assert.assertNotEquals(Collections.emptyList(), Globals.protectedTermsLoader.getProtectedTerms());
+
         BibEntry entry = new BibEntry();
         entry.setField("title", "AlGaAs");
 
