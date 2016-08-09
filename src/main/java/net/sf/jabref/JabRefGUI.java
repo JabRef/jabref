@@ -88,7 +88,6 @@ public class JabRefGUI {
 
     private void openWindow() {
         // Perform checks and changes for users with a preference set from an older JabRef version.
-        PreferencesMigrations.replaceAbstractField();
         PreferencesMigrations.upgradeSortOrder();
         PreferencesMigrations.upgradeFaultyEncodingStrings();
 

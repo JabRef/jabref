@@ -47,12 +47,8 @@ import static net.sf.jabref.logic.l10n.Languages.LANGUAGES;
 
 class GeneralTab extends JPanel implements PrefsTab {
 
-    private final JCheckBox defSort;
-    private final JCheckBox ctrlClick;
     private final JCheckBox useOwner;
     private final JCheckBox overwriteOwner;
-    private final JCheckBox keyDuplicateWarningDialog;
-    private final JCheckBox keyEmptyWarningDialog;
     private final JCheckBox enforceLegalKeys;
     private final JCheckBox confirmDelete;
     private final JCheckBox memoryStick;
@@ -90,8 +86,6 @@ class GeneralTab extends JPanel implements PrefsTab {
         biblatexMode.setRenderer(new DefaultBibModeRenderer());
 
         memoryStick = new JCheckBox(Localization.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
-        defSort = new JCheckBox(Localization.lang("Sort automatically"));
-        ctrlClick = new JCheckBox(Localization.lang("Open right-click menu with Ctrl+left button"));
         useOwner = new JCheckBox(Localization.lang("Mark new entries with owner name") + ':');
         updateTimeStamp = new JCheckBox(Localization.lang("Update timestamp on modification"));
         useTimeStamp = new JCheckBox(Localization.lang("Mark new entries with addition date") + ". "
@@ -103,8 +97,6 @@ class GeneralTab extends JPanel implements PrefsTab {
                 + "the field set, overwrite."));
         overwriteTimeStamp.setToolTipText(Localization.lang("If a pasted or imported entry already has "
                 + "the field set, overwrite."));
-        keyDuplicateWarningDialog = new JCheckBox(Localization.lang("Show warning dialog when a duplicate BibTeX key is entered"));
-        keyEmptyWarningDialog = new JCheckBox(Localization.lang("Show warning dialog when an empty BibTeX key is entered"));
         enforceLegalKeys = new JCheckBox(Localization.lang("Enforce legal characters in BibTeX keys"));
         confirmDelete = new JCheckBox(Localization.lang("Show confirmation dialog when deleting entries"));
 
@@ -126,13 +118,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.nextLine();
         builder.append(inspectionWarnDupli, 13);
         builder.nextLine();
-        builder.append(ctrlClick, 13);
-        builder.nextLine();
         builder.append(confirmDelete, 13);
-        builder.nextLine();
-        builder.append(keyDuplicateWarningDialog, 13);
-        builder.nextLine();
-        builder.append(keyEmptyWarningDialog, 13);
         builder.nextLine();
         builder.append(enforceLegalKeys, 13);
         builder.nextLine();
@@ -188,16 +174,12 @@ class GeneralTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        defSort.setSelected(prefs.getBoolean(JabRefPreferences.DEFAULT_AUTO_SORT));
-        ctrlClick.setSelected(prefs.getBoolean(JabRefPreferences.CTRL_CLICK));
         useOwner.setSelected(prefs.getBoolean(JabRefPreferences.USE_OWNER));
         overwriteOwner.setSelected(prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER));
         useTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP));
         overwriteTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
         updateTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
         updateTimeStamp.setEnabled(useTimeStamp.isSelected());
-        keyDuplicateWarningDialog.setSelected(prefs.getBoolean(JabRefPreferences.DIALOG_WARNING_FOR_DUPLICATE_KEY));
-        keyEmptyWarningDialog.setSelected(prefs.getBoolean(JabRefPreferences.DIALOG_WARNING_FOR_EMPTY_KEY));
         enforceLegalKeys.setSelected(prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
         memoryStick.setSelected(prefs.getBoolean(JabRefPreferences.MEMORY_STICK_MODE));
         confirmDelete.setSelected(prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE));
@@ -236,8 +218,6 @@ class GeneralTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.USE_TIME_STAMP, useTimeStamp.isSelected());
         prefs.putBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP, overwriteTimeStamp.isSelected());
         prefs.putBoolean(JabRefPreferences.UPDATE_TIMESTAMP, updateTimeStamp.isSelected());
-        prefs.putBoolean(JabRefPreferences.DIALOG_WARNING_FOR_DUPLICATE_KEY, keyDuplicateWarningDialog.isSelected());
-        prefs.putBoolean(JabRefPreferences.DIALOG_WARNING_FOR_EMPTY_KEY, keyEmptyWarningDialog.isSelected());
         prefs.putBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY, enforceLegalKeys.isSelected());
         if (prefs.getBoolean(JabRefPreferences.MEMORY_STICK_MODE) && !memoryStick.isSelected()) {
             JOptionPane.showMessageDialog(null, Localization.lang("To disable the memory stick mode"
@@ -247,7 +227,6 @@ class GeneralTab extends JPanel implements PrefsTab {
         }
         prefs.putBoolean(JabRefPreferences.MEMORY_STICK_MODE, memoryStick.isSelected());
         prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, confirmDelete.isSelected());
-        prefs.putBoolean(JabRefPreferences.CTRL_CLICK, ctrlClick.isSelected());
         prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, inspectionWarnDupli.isSelected());
         String owner = defOwnerField.getText().trim();
         prefs.put(JabRefPreferences.DEFAULT_OWNER, owner);
