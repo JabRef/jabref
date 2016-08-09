@@ -27,6 +27,16 @@ public class ProtectTermsFormatter implements Formatter {
 
     private static ProtectedTermsLoader protectedTermsLoader;
 
+    /**
+     * @deprecated Use ProtectTermsFormatter(ProtectedTermsLoader)
+     */
+    @Deprecated
+    public ProtectTermsFormatter() {
+    }
+
+    public ProtectTermsFormatter(ProtectedTermsLoader protectedTermsLoader) {
+        ProtectTermsFormatter.protectedTermsLoader = protectedTermsLoader;
+    }
 
     // This must be called from JabRefMain
     public static void setProtectedTermsLoader(ProtectedTermsLoader loader) {
@@ -46,11 +56,10 @@ public class ProtectTermsFormatter implements Formatter {
 
     @Override
     public String format(String text) {
-        Objects.requireNonNull(text);
-
-        if (text.isEmpty()) {
+        if (Objects.requireNonNull(text).isEmpty()) {
             return text;
         }
+        Objects.requireNonNull(ProtectTermsFormatter.protectedTermsLoader);
         return this.format(text, ProtectTermsFormatter.protectedTermsLoader.getProtectedTerms());
     }
 
