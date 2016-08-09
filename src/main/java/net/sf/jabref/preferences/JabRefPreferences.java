@@ -413,6 +413,8 @@ public class JabRefPreferences {
     private static final String CUSTOM_TYPE_OPT = "customTypeOpt_";
     private static final String CUSTOM_TYPE_PRIOPT = "customTypePriOpt_";
 
+    // Prefs node for BibtexKeyPatterns
+    private static final String BIBTEX_KEY_PATTERNS_NODE = "bibtexkeypatterns";
 
     public String WRAPPED_USERNAME;
     public final String MARKING_WITH_NUMBER_PATTERN;
@@ -1140,7 +1142,7 @@ public class JabRefPreferences {
      */
     public GlobalBibtexKeyPattern getKeyPattern() {
         keyPattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern.split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
-        Preferences pre = Preferences.userNodeForPackage(GlobalBibtexKeyPattern.class);
+        Preferences pre = Preferences.userNodeForPackage(JabRefMain.class).node(BIBTEX_KEY_PATTERNS_NODE);
         try {
             String[] keys = pre.keys();
             if (keys.length > 0) {
@@ -1163,7 +1165,7 @@ public class JabRefPreferences {
         keyPattern = pattern;
 
         // Store overridden definitions to Preferences.
-        Preferences pre = Preferences.userNodeForPackage(GlobalBibtexKeyPattern.class);
+        Preferences pre = Preferences.userNodeForPackage(JabRefMain.class).node(BIBTEX_KEY_PATTERNS_NODE);
         try {
             pre.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {
