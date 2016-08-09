@@ -42,9 +42,9 @@ import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 
 import com.google.common.eventbus.EventBus;
 import org.apache.commons.logging.Log;

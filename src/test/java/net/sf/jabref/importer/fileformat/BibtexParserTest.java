@@ -26,11 +26,11 @@ import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.BeforeClass;

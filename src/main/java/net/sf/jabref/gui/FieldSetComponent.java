@@ -47,8 +47,8 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
