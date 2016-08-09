@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -53,17 +52,9 @@ public class LabelPatternUtil {
 
     private static final Pattern REGEX_PATTERN = Pattern.compile(".*\\(\\{([A-Z]+)\\}\\).*");
 
-    private static List<String> defaultLabelPattern;
-
     private static final int CHARS_OF_FIRST = 5;
 
     private static BibDatabase database;
-
-
-    public static void updateDefaultPattern(LabelPatternPreferences labelPatternPreferences) {
-        defaultLabelPattern = LabelPatternUtil
-                .split(labelPatternPreferences.getDefaultLabelPattern());
-    }
 
     /**
      * Required for LabelPatternUtilTest
@@ -386,30 +377,6 @@ public class LabelPatternUtil {
                 + ((department == null)
                 || ((school != null) && department.equals(school)) ?
                         "" : department);
-    }
-
-    /**
-     * This method takes a string of the form [field1]spacer[field2]spacer[field3]...,
-     * where the fields are the (required) fields of a BibTex entry. The string is split
-     * into fields and spacers by recognizing the [ and ].
-     *
-     * @param labelPattern a <code>String</code>
-     * @return an <code>ArrayList</code> The first item of the list
-     * is a string representation of the key pattern (the parameter),
-     * the remaining items are the fields
-     */
-    public static List<String> split(String labelPattern) {
-        // A holder for fields of the entry to be used for the key
-        List<String> fieldList = new ArrayList<>();
-
-        // Before we do anything, we add the parameter to the ArrayLIst
-        fieldList.add(labelPattern);
-
-        StringTokenizer tok = new StringTokenizer(labelPattern, "[]", true);
-        while (tok.hasMoreTokens()) {
-            fieldList.add(tok.nextToken());
-        }
-        return fieldList;
     }
 
     /**
@@ -1418,7 +1385,4 @@ public class LabelPatternUtil {
         return StringUtil.replaceSpecialCharacters(newKey.toString());
     }
 
-    public static List<String> getDefaultLabelPattern() {
-        return defaultLabelPattern;
-    }
 }

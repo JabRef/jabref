@@ -15,13 +15,15 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.logic.labelpattern;
+package net.sf.jabref.model.labelpattern;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 /**
  * A small table, where an entry type is associated with a label pattern (an
@@ -34,7 +36,7 @@ public abstract class AbstractLabelPattern {
     protected Map<String, List<String>> data = new HashMap<>();
 
     public void addLabelPattern(String type, String pattern) {
-        data.put(type, LabelPatternUtil.split(pattern));
+        data.put(type, AbstractLabelPattern.split(pattern));
     }
 
     @Override
@@ -102,6 +104,30 @@ public abstract class AbstractLabelPattern {
     }
 
     /**
+     * This method takes a string of the form [field1]spacer[field2]spacer[field3]...,
+     * where the fields are the (required) fields of a BibTex entry. The string is split
+     * into fields and spacers by recognizing the [ and ].
+     *
+     * @param labelPattern a <code>String</code>
+     * @return an <code>ArrayList</code> The first item of the list
+     * is a string representation of the key pattern (the parameter),
+     * the remaining items are the fields
+     */
+    public static List<String> split(String labelPattern) {
+        // A holder for fields of the entry to be used for the key
+        List<String> fieldList = new ArrayList<>();
+
+        // Before we do anything, we add the parameter to the ArrayLIst
+        fieldList.add(labelPattern);
+
+        StringTokenizer tok = new StringTokenizer(labelPattern, "[]", true);
+        while (tok.hasMoreTokens()) {
+            fieldList.add(tok.nextToken());
+        }
+        return fieldList;
+    }
+
+    /**
      * Checks whether this pattern is customized or the default value.
      */
     public final boolean isDefaultValue(String key) {
@@ -122,7 +148,7 @@ public abstract class AbstractLabelPattern {
      * @param labelPattern the pattern to store
      */
     public void setDefaultValue(String labelPattern) {
-        this.defaultPattern = LabelPatternUtil.split(labelPattern);
+        this.defaultPattern = AbstractLabelPattern.split(labelPattern);
     }
 
     public Set<String> getAllKeys() {

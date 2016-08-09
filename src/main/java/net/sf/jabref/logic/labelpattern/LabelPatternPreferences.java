@@ -30,10 +30,6 @@ public class LabelPatternPreferences {
                 jabRefPreferences.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
     }
 
-    public String getDefaultLabelPattern() {
-        return defaultLabelPattern;
-    }
-
     public String getKeyPatternRegex() {
         return keyPatternRegex;
     }
@@ -53,4 +49,6 @@ public class LabelPatternPreferences {
     public boolean isEnforceLegalKey() {
         return enforceLegalKey;
     }
+
+    public String getDefaultLabelPattern() { return defaultLabelPattern;}
 }

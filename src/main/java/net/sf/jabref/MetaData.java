@@ -38,13 +38,13 @@ import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
-import net.sf.jabref.logic.labelpattern.DatabaseLabelPattern;
 import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.labelpattern.AbstractLabelPattern;
+import net.sf.jabref.model.labelpattern.DatabaseLabelPattern;
 
 import com.google.common.eventbus.EventBus;
 import org.apache.commons.logging.Log;

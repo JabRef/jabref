@@ -32,7 +32,7 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.gui.labelpattern.LabelPatternPanel;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelpattern.AbstractLabelPattern;
+import net.sf.jabref.model.labelpattern.AbstractLabelPattern;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
