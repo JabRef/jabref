@@ -11,6 +11,7 @@ import org.assertj.swing.dependency.jsr305.Nonnull;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
 import static org.assertj.swing.finder.WindowFinder.findDialog;
 
 @RunWith(Parameterized.class)
@@ -107,6 +108,8 @@ public class ParameterizedDialogTest extends AbstractUITest {
                 new Object[]{true, new String[]{"Groups", "Remove from group..."}, "Remove from group", "Close button", true},
                 new Object[]{true, new String[]{"Groups", "Move to group..."}, "Move to group", "Cancel", false},
                 new Object[]{true, new String[]{"Groups", "Move to group..."}, "Move to group", "Close button", true},
+                new Object[]{true, new String[]{"BibTeX", "New entry..."}, "Select entry type", "Cancel", false},
+                new Object[]{true, new String[]{"BibTeX", "New entry..."}, "Select entry type", "Close button", true},
                 new Object[]{true, new String[]{"BibTeX", "Edit preamble"}, "Edit preamble", "Close button", true},
                 new Object[]{true, new String[]{"BibTeX", "Edit strings"}, "Strings for database: untitled", "Close button", true},
                 new Object[]{true, new String[]{"BibTeX", "Customize entry types"}, "Customize entry types", "Cancel", false},

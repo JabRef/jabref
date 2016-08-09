@@ -2,10 +2,12 @@ package net.sf.jabref.gui;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
+
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
 import org.junit.Ignore;
 import org.junit.Test;
+
 import static org.assertj.swing.finder.WindowFinder.findDialog;
 
 public class DialogTest extends AbstractUITest {
