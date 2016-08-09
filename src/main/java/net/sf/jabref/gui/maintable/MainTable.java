@@ -217,12 +217,12 @@ public class MainTable extends JTable {
 
         CellRendererMode status = getCellStatus(row, column);
 
-        if ((model.getSearchState() != MainTableDataModel.DisplayOption.FLOAT) || matches(row,
-                model.getSearchState() != MainTableDataModel.DisplayOption.DISABLED ? SearchMatcher.INSTANCE : null)) {
+        if ((model.getSearchState() != MainTableDataModel.DisplayOption.FLOAT)
+                || matches(row, SearchMatcher.INSTANCE)) {
             score++;
         }
-        if ((model.getGroupingState() != MainTableDataModel.DisplayOption.FLOAT) || matches(row,
-                model.getGroupingState() != MainTableDataModel.DisplayOption.DISABLED ? GroupMatcher.INSTANCE : null)) {
+        if ((model.getGroupingState() != MainTableDataModel.DisplayOption.FLOAT)
+                || matches(row, GroupMatcher.INSTANCE)) {
             score += 2;
         }
 

@@ -15,9 +15,7 @@ import java.util.stream.Stream;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.importer.fileformat.BibtexImporter;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -62,7 +60,7 @@ public class MSBibExportFormatTestFiles {
     @Before
     public void setUp() throws Exception {
         Globals.prefs = JabRefPreferences.getInstance();
-        databaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
+        databaseContext = new BibDatabaseContext();
         charset = Charsets.UTF_8;
         msBibExportFormat = new MSBibExportFormat();
         tempFile = testFolder.newFile();

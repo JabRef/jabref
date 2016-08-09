@@ -20,8 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.swing.undo.AbstractUndoableEdit;
-
+import net.sf.jabref.gui.undo.AbstractUndoableJabRefEdit;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
@@ -29,18 +28,18 @@ import net.sf.jabref.model.entry.BibEntry;
 /**
  * @author jzieren
  */
-public class UndoableChangeAssignment extends AbstractUndoableEdit {
+public class UndoableChangeAssignment extends AbstractUndoableJabRefEdit {
 
     private final List<BibEntry> previousAssignments;
     private final List<BibEntry> newAssignments;
     /**
      * The path to the edited node
      */
-    private List<Integer> pathToNode;
+    private final List<Integer> pathToNode;
     /**
      * The root of the global groups tree
      */
-    private GroupTreeNode root;
+    private final GroupTreeNode root;
 
     /**
      * @param node The node whose assignments were edited.
@@ -53,14 +52,10 @@ public class UndoableChangeAssignment extends AbstractUndoableEdit {
         this.pathToNode = node.getNode().getIndexedPathFromRoot();
     }
 
-    @Override
-    public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": " + Localization.lang("change assignment of entries");
-    }
 
     @Override
-    public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": " + Localization.lang("change assignment of entries");
+    public String getPresentationName() {
+        return Localization.lang("change assignment of entries");
     }
 
     @Override

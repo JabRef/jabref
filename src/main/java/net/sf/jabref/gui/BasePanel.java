@@ -60,6 +60,7 @@ import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
+import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.external.AttachFileAction;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.external.ExternalFileType;
@@ -86,8 +87,8 @@ import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.maintable.MainTableFormat;
 import net.sf.jabref.gui.maintable.MainTableSelectionListener;
+import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
 import net.sf.jabref.gui.mergeentries.MergeEntriesDialog;
-import net.sf.jabref.gui.mergeentries.MergeEntryDOIDialog;
 import net.sf.jabref.gui.plaintextimport.TextInputDialog;
 import net.sf.jabref.gui.search.SearchBar;
 import net.sf.jabref.gui.undo.CountingUndoManager;
@@ -126,6 +127,7 @@ import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.DatabaseLocation;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
@@ -135,6 +137,7 @@ import net.sf.jabref.model.event.EntryAddedEvent;
 import net.sf.jabref.model.event.EntryChangedEvent;
 import net.sf.jabref.preferences.HighlightMatchingGroupPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.shared.DBMSSynchronizer;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -144,12 +147,6 @@ import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialFieldAction;
 import net.sf.jabref.specialfields.SpecialFieldDatabaseChangeListener;
 import net.sf.jabref.specialfields.SpecialFieldValue;
-import net.sf.jabref.sql.DBConnectDialog;
-import net.sf.jabref.sql.DBExporterAndImporterFactory;
-import net.sf.jabref.sql.DBStrings;
-import net.sf.jabref.sql.DbConnectAction;
-import net.sf.jabref.sql.SQLUtil;
-import net.sf.jabref.sql.exporter.DatabaseExporter;
 
 import ca.odell.glazedlists.event.ListEventListener;
 import com.google.common.eventbus.Subscribe;
@@ -189,10 +186,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // AutoCompleter used in the search bar
     private AutoCompleter<String> searchAutoCompleter;
     // The undo manager.
-    private final CountingUndoManager undoManager = new CountingUndoManager(this);
     private final UndoAction undoAction = new UndoAction();
-
     private final RedoAction redoAction = new RedoAction();
+    private final CountingUndoManager undoManager = new CountingUndoManager();
+
     private final List<BibEntry> previousEntries = new ArrayList<>();
 
     private final List<BibEntry> nextEntries = new ArrayList<>();
@@ -273,22 +270,28 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public String getTabTitle() {
         StringBuilder title = new StringBuilder();
+        DatabaseLocation databaseLocation = this.bibDatabaseContext.getLocation();
 
-        if (getBibDatabaseContext().getDatabaseFile() == null) {
-            title.append(GUIGlobals.UNTITLED_TITLE);
+        if (databaseLocation == DatabaseLocation.LOCAL) {
+            if (this.bibDatabaseContext.getDatabaseFile() == null) {
+                title.append(GUIGlobals.UNTITLED_TITLE);
 
-            if (getDatabase().hasEntries()) {
-                // if the database is not empty and no file is assigned,
-                // the database came from an import and has to be treated somehow
-                // -> mark as changed
-                // This also happens internally at basepanel to ensure consistency line 224
-                title.append('*');
+                if (getDatabase().hasEntries()) {
+                    // if the database is not empty and no file is assigned,
+                    // the database came from an import and has to be treated somehow
+                    // -> mark as changed
+                    // This also happens internally at basepanel to ensure consistency line 224
+                    title.append('*');
+                }
+            } else {
+                // check if file is modified
+                String changeFlag = isModified() ? "*" : "";
+                title.append(this.bibDatabaseContext.getDatabaseFile().getName()).append(changeFlag);
             }
-        } else {
-            // check if file is modified
-            String changeFlag = isModified() ? "*" : "";
-            title.append(getBibDatabaseContext().getDatabaseFile().getName()).append(changeFlag);
+        } else if (databaseLocation == DatabaseLocation.SHARED) {
+            title.append(this.bibDatabaseContext.getDBSynchronizer().getDBName() + " [shared]");
         }
+
         return title.toString();
     }
 
@@ -655,9 +658,27 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.OPEN_CONSOLE, (BaseAction) () -> JabRefDesktop
                 .openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile()));
 
+        actions.put(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, (BaseAction) () -> {
+            DBMSSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBSynchronizer();
+            dbmsSynchronizer.pullChanges();
+        });
+
         actions.put(Actions.OPEN_URL, new OpenURLAction());
 
-        actions.put(Actions.MERGE_DOI, (BaseAction) () -> new MergeEntryDOIDialog(BasePanel.this));
+        actions.put(Actions.MERGE_WITH_FETCHED_ENTRY, (BaseAction) () -> {
+            if (mainTable.getSelectedEntries().size() == 1) {
+                BibEntry originalEntry = mainTable.getSelectedEntries().get(0);
+                new FetchAndMergeEntry(originalEntry, this, FetchAndMergeEntry.SUPPORTED_FIELDS);
+            } else {
+                JOptionPane.showMessageDialog(frame(),
+                        Localization.lang("This operation requires exactly one item to be selected."),
+                        Localization.lang("Merge entry with %0 information",
+                                FieldName.orFields(FieldName.getDisplayName(FieldName.DOI),
+                                        FieldName.getDisplayName(FieldName.ISBN),
+                                        FieldName.getDisplayName(FieldName.EPRINT))),
+                        JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
 
         actions.put(Actions.REPLACE_ALL, (BaseAction) () -> {
             final ReplaceStringDialog rsd = new ReplaceStringDialog(frame);
@@ -1294,7 +1315,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         @Subscribe
         public void listen(EntryAddedEvent addedEntryEvent) {
             // if the added entry is an undo don't add it to the current group
-            if (addedEntryEvent.isUndo()) {
+            if (addedEntryEvent.getEntryEventSource() == EntryEventSource.UNDO) {
                 scheduleUpdate();
                 return;
             }
@@ -1481,8 +1502,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             public void keyPressed(KeyEvent e) {
                 final int keyCode = e.getKeyCode();
                 final TreePath path = frame.getGroupSelector().getSelectionPath();
-                final GroupTreeNodeViewModel node = path == null ? null : (GroupTreeNodeViewModel) path
-                        .getLastPathComponent();
+                final GroupTreeNodeViewModel node = path == null ? null : (GroupTreeNodeViewModel) path.getLastPathComponent();
 
                 if (e.isControlDown()) {
                     switch (keyCode) {
@@ -1542,8 +1562,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         adjustSplitter(); // restore last splitting state (before mainTable is created as creation affects the stored size of the entryEditors)
 
         // check whether a mainTable already existed and a floatSearch was active
-        boolean floatSearchActive = (mainTable != null)
-                && (this.tableModel.getSearchState() == MainTableDataModel.DisplayOption.FLOAT);
+        boolean floatSearchActive = (mainTable != null) && (this.tableModel.getSearchState() == MainTableDataModel.DisplayOption.FLOAT);
 
         createMainTable();
 
@@ -1822,8 +1841,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * Closes the entry editor or preview panel if it is showing the given entry.
      */
     public void ensureNotShowingBottomPanel(BibEntry entry) {
-        if (((mode == BasePanelMode.SHOWING_EDITOR) && (currentEditor.getEntry() == entry))
-                || ((mode == BasePanelMode.SHOWING_PREVIEW) && (currentPreview.getEntry() == entry))) {
+        if (((mode == BasePanelMode.SHOWING_EDITOR) && (currentEditor.getEntry() == entry)) ||
+                ((mode == BasePanelMode.SHOWING_PREVIEW) && (currentPreview.getEntry() == entry))) {
             hideBottomComponent();
         }
     }

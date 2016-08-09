@@ -58,7 +58,6 @@ class FileTab extends JPanel implements PrefsTab {
     private final JCheckBox openLast;
     private final JCheckBox autoSave;
     private final JCheckBox promptBeforeUsingAutoSave;
-    private final JComboBox<String> valueDelimiter;
     private final JComboBox<String> newlineSeparator;
     private final JCheckBox reformatFileOnSaveAndExport;
     private final JRadioButton resolveStringsStandard;
@@ -102,9 +101,6 @@ class FileTab extends JPanel implements PrefsTab {
         autoSave = new JCheckBox(Localization.lang("Autosave"));
         promptBeforeUsingAutoSave = new JCheckBox(Localization.lang("Prompt before recovering a database from an autosave file"));
         autoSaveInterval = new JSpinner(new SpinnerNumberModel(1, 1, 60, 1));
-        valueDelimiter = new JComboBox<>(new String[] {
-                Localization.lang("Quotes") + ": \", \"",
-                Localization.lang("Curly brackets") + ": {, }"});
         resolveStringsAll = new JRadioButton(Localization.lang("Resolve strings for all fields except") + ":");
         resolveStringsStandard = new JRadioButton(Localization.lang("Resolve strings for standard BibTeX fields only"));
         ButtonGroup bg = new ButtonGroup();
@@ -238,7 +234,6 @@ class FileTab extends JPanel implements PrefsTab {
         promptBeforeUsingAutoSave.setSelected(prefs.getBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE));
         autoSaveInterval.setValue(prefs.getInt(JabRefPreferences.AUTO_SAVE_INTERVAL));
         origAutoSaveSetting = autoSave.isSelected();
-        valueDelimiter.setSelectedIndex(prefs.getInt(JabRefPreferences.VALUE_DELIMITERS2));
     }
 
     @Override
@@ -277,7 +272,6 @@ class FileTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.AUTO_SAVE, autoSave.isSelected());
         prefs.putBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE, promptBeforeUsingAutoSave.isSelected());
         prefs.putInt(JabRefPreferences.AUTO_SAVE_INTERVAL, (Integer) autoSaveInterval.getValue());
-        prefs.putInt(JabRefPreferences.VALUE_DELIMITERS2, valueDelimiter.getSelectedIndex());
         doNotResolveStringsFor.setText(prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
 
         boolean updateSpecialFields = false;

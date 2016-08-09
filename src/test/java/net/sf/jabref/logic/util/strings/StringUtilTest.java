@@ -1,11 +1,8 @@
 package net.sf.jabref.logic.util.strings;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.FileField;
-import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -25,11 +22,6 @@ public class StringUtilTest {
     private static final String[][] STRING_ARRAY_3 = {{"a", ":b"}, {"c;", "d"}};
     private static final String ENCODED_STRING_ARRAY_3 = "a:\\:b;c\\;:d";
 
-
-    @BeforeClass
-    public static void loadPreferences() {
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
 
     @Test
     public void testUnifyLineBreaks() {
@@ -335,5 +327,20 @@ public class StringUtilTest {
         assertEquals("", StringUtil.repeat(0, 'a'));
         assertEquals("a", StringUtil.repeat(1, 'a'));
         assertEquals("aaaaaaa", StringUtil.repeat(7, 'a'));
+    }
+
+    @Test
+    public void testBoldHTML() {
+        assertEquals("<b>AA</b>", StringUtil.boldHTML("AA"));
+    }
+
+    @Test
+    public void testBoldHTMLReturnsOriginalTextIfNonNull() {
+        assertEquals("<b>AA</b>", StringUtil.boldHTML("AA", "BB"));
+    }
+
+    @Test
+    public void testBoldHTMLReturnsAlternativeTextIfNull() {
+        assertEquals("<b>BB</b>", StringUtil.boldHTML(null, "BB"));
     }
 }

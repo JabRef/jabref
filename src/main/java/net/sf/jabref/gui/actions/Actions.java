@@ -18,7 +18,6 @@ public class Actions {
     public static final String COPY_KEY_AND_TITLE = "copyKeyAndTitle";
     public static final String CUT = "cut";
     public static final String DB_CONNECT = "dbConnect";
-    public static final String DB_EXPORT = "dbExport";
     public static final String DELETE = "delete";
     public static final String DOWNLOAD_FULL_TEXT = "downloadFullText";
     public static final String DUPLI_CHECK = "dupliCheck";
@@ -33,7 +32,7 @@ public class Actions {
     public static final String MARK_ENTRIES = "markEntries";
     public static final String MERGE_DATABASE = "mergeDatabase";
     public static final String MERGE_ENTRIES = "mergeEntries";
-    public static final String MERGE_DOI = "mergeWithDOI";
+    public static final String MERGE_WITH_FETCHED_ENTRY = "mergeWithFetchedEntry";
     public static final String MOVE_TO_GROUP = "moveToGroup";
     public static final String OPEN_CONSOLE = "openConsole";
     public static final String OPEN_EXTERNAL_FILE = "openExternalFile";
@@ -41,6 +40,7 @@ public class Actions {
     public static final String OPEN_URL = "openUrl";
     public static final String PASTE = "paste";
     public static final String PLAIN_TEXT_IMPORT = "plainTextImport";
+    public static final String PULL_CHANGES_FROM_SHARED_DATABASE = "pullChangesFromSharedDatabase";
     public static final String REDO = "redo";
     public static final String REMOVE_FROM_GROUP = "removeFromGroup";
     public static final String REPLACE_ALL = "replaceAll";

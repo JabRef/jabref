@@ -15,9 +15,8 @@
 */
 package net.sf.jabref.gui.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
-
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -29,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
  * information is the BibEntry, the field name, the old and the
  * new value. Old/new values can be null.
  */
-public class UndoableFieldChange extends AbstractUndoableEdit {
+public class UndoableFieldChange extends AbstractUndoableJabRefEdit {
     private static final Log LOGGER = LogFactory.getLog(UndoableFieldChange.class);
 
     private final BibEntry entry;
@@ -52,19 +51,10 @@ public class UndoableFieldChange extends AbstractUndoableEdit {
 
     @Override
     public String getPresentationName() {
-        return Localization.lang("change field");
-    }
-
-    @Override
-    public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": " +
-                Localization.lang("change field");
-    }
-
-    @Override
-    public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": " +
-                Localization.lang("change field");
+        return Localization.lang("change field %0 of entry %1 from %2 to %3", StringUtil.boldHTML(field),
+                StringUtil.boldHTML(entry.getCiteKey(), ""),
+                StringUtil.boldHTML(oldValue, Localization.lang("undefined")),
+                StringUtil.boldHTML(newValue, Localization.lang("undefined")));
     }
 
     @Override

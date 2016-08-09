@@ -17,6 +17,7 @@ package net.sf.jabref.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -85,13 +86,12 @@ public class DuplicateCheck {
         EntryType type = EntryTypes.getTypeOrDefault(one.getType(), bibDatabaseMode);
 
         // The check if they have the same required fields:
-        java.util.List<String> var = type.getRequiredFieldsFlat();
-        String[] fields = var.toArray(new String[var.size()]);
+        List<String> var = type.getRequiredFieldsFlat();
         double[] req;
-        if (fields == null) {
+        if (var == null) {
             req = new double[]{0., 0.};
         } else {
-            req = DuplicateCheck.compareFieldSet(fields, one, two);
+            req = DuplicateCheck.compareFieldSet(var, one, two);
         }
 
         if (Math.abs(req[0] - DuplicateCheck.duplicateThreshold) > DuplicateCheck.DOUBT_RANGE) {
@@ -99,17 +99,16 @@ public class DuplicateCheck {
             return req[0] >= DuplicateCheck.duplicateThreshold;
         }
         // Close to the threshold value, so we take a look at the optional fields, if any:
-        java.util.List<String> optionalFields = type.getOptionalFields();
-        fields = optionalFields.toArray(new String[optionalFields.size()]);
-        if (fields != null) {
-            double[] opt = DuplicateCheck.compareFieldSet(fields, one, two);
+        List<String> optionalFields = type.getOptionalFields();
+        if (optionalFields != null) {
+            double[] opt = DuplicateCheck.compareFieldSet(optionalFields, one, two);
             double totValue = ((DuplicateCheck.REQUIRED_WEIGHT * req[0] * req[1]) + (opt[0] * opt[1])) / ((req[1] * DuplicateCheck.REQUIRED_WEIGHT) + opt[1]);
             return totValue >= DuplicateCheck.duplicateThreshold;
         }
         return req[0] >= DuplicateCheck.duplicateThreshold;
     }
 
-    private static double[] compareFieldSet(String[] fields, BibEntry one, BibEntry two) {
+    private static double[] compareFieldSet(List<String> fields, BibEntry one, BibEntry two) {
         double res = 0;
         double totWeights = 0.;
         for (String field : fields) {

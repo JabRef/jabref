@@ -49,6 +49,7 @@ import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.GroupsUtil;
 import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.model.entry.FieldName;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -120,8 +121,10 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                         fieldText = FieldName.EDITOR;
                     }
 
+                    LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
+
                     for (String keyword : hs) {
-                        KeywordGroup group = new KeywordGroup(keyword, fieldText, keyword, false, false,
+                        KeywordGroup group = new KeywordGroup(formatter.format(keyword), fieldText, keyword, false, false,
                                 GroupHierarchyType.INDEPENDENT, Globals.prefs);
                         autoGroupsRoot.addChild(GroupTreeNode.fromGroup(group));
                     }

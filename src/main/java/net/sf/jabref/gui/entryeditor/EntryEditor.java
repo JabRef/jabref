@@ -208,6 +208,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private final TabListener tabListener = new TabListener();
 
+
     public EntryEditor(JabRefFrame frame, BasePanel panel, BibEntry entry) {
         this.frame = frame;
         this.panel = panel;
@@ -519,6 +520,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
             return FieldExtraComponents.getURLExtraComponent(editor, getStoreFieldAction());
         } else if (fieldExtras.contains(FieldProperties.DOI)) {
             return FieldExtraComponents.getDoiExtraComponent(panel, this, editor);
+        } else if (fieldExtras.contains(FieldProperties.EPRINT)) {
+            return FieldExtraComponents.getEprintExtraComponent(panel, this, editor);
+        } else if (fieldExtras.contains(FieldProperties.ISBN)) {
+            return FieldExtraComponents.getIsbnExtraComponent(panel, this, editor);
         } else if (fieldExtras.contains(FieldProperties.OWNER)) {
             return FieldExtraComponents.getSetOwnerExtraComponent(editor, getStoreFieldAction());
         } else if (fieldExtras.contains(FieldProperties.YES_NO)) {

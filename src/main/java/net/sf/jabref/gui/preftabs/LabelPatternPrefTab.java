@@ -28,9 +28,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.labelpattern.LabelPatternPanel;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
-import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
-import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.model.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -90,8 +88,6 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
             Globals.prefs.putBoolean(JabRefPreferences.KEY_GEN_FIRST_LETTER_A, false);
             Globals.prefs.putBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER, false);
         }
-
-        LabelPatternUtil.updateDefaultPattern(LabelPatternPreferences.fromPreferences(Globals.prefs));
 
         // fetch entries from GUI
         GlobalLabelPattern keypatterns = getLabelPatternAsGlobalLabelPattern();

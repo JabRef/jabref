@@ -67,7 +67,6 @@ import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
@@ -80,6 +79,8 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.labelpattern.AbstractLabelPattern;
+import net.sf.jabref.model.labelpattern.GlobalLabelPattern;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import org.apache.commons.logging.Log;
@@ -88,7 +89,6 @@ import org.apache.commons.logging.LogFactory;
 public class JabRefPreferences {
 
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
-    public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
 
     /**
      * HashMap that contains all preferences which are set by default
@@ -98,15 +98,22 @@ public class JabRefPreferences {
     /* contents of the defaults HashMap that are defined in this class.
      * There are more default parameters in this map which belong to separate preference classes.
     */
+
+    // Push to application preferences
     public static final String EMACS_PATH = "emacsPath";
     public static final String EMACS_ADDITIONAL_PARAMETERS = "emacsParameters";
     public static final String EMACS_23 = "emacsUseV23InsertString";
-    public static final String FONT_FAMILY = "fontFamily";
-    public static final String WIN_LOOK_AND_FEEL = "lookAndFeel";
     public static final String LATEX_EDITOR_PATH = "latexEditorPath";
     public static final String TEXSTUDIO_PATH = "TeXstudioPath";
     public static final String WIN_EDT_PATH = "winEdtPath";
     public static final String TEXMAKER_PATH = "texmakerPath";
+    public static final String VIM_SERVER = "vimServer";
+    public static final String VIM = "vim";
+    public static final String LYXPIPE = "lyxpipe";
+
+    public static final String EXTERNAL_FILE_TYPES = "externalFileTypes";
+    public static final String FONT_FAMILY = "fontFamily";
+    public static final String WIN_LOOK_AND_FEEL = "lookAndFeel";
     public static final String LANGUAGE = "language";
     public static final String NAMES_LAST_ONLY = "namesLastOnly";
     public static final String ABBR_AUTHOR_NAMES = "abbrAuthorNames";
@@ -114,18 +121,10 @@ public class JabRefPreferences {
     public static final String NAMES_FIRST_LAST = "namesFf";
     public static final String BIBLATEX_DEFAULT_MODE = "biblatexMode";
     public static final String NAMES_AS_IS = "namesAsIs";
-    public static final String TABLE_COLOR_CODES_ON = "tableColorCodesOn";
     public static final String ENTRY_EDITOR_HEIGHT = "entryEditorHeight";
     public static final String PREVIEW_PANEL_HEIGHT = "previewPanelHeight";
     public static final String AUTO_RESIZE_MODE = "autoResizeMode";
     public static final String WINDOW_MAXIMISED = "windowMaximised";
-    public static final String SIZE_Y = "mainWindowSizeY";
-    public static final String SIZE_X = "mainWindowSizeX";
-    public static final String POS_Y = "mainWindowPosY";
-    public static final String POS_X = "mainWindowPosX";
-    public static final String VIM_SERVER = "vimServer";
-    public static final String VIM = "vim";
-    public static final String LYXPIPE = "lyxpipe";
     public static final String USE_DEFAULT_LOOK_AND_FEEL = "useDefaultLookAndFeel";
     public static final String PROXY_PORT = "proxyPort";
     public static final String PROXY_HOSTNAME = "proxyHostname";
@@ -157,8 +156,13 @@ public class JabRefPreferences {
     public static final String USE_XMP_PRIVACY_FILTER = "useXmpPrivacyFilter";
     public static final String SEARCH_MODE_FILTER = "searchModeFilter";
     public static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
-    public static final String DEFAULT_AUTO_SORT = "defaultAutoSort";
     public static final String DEFAULT_SHOW_SOURCE = "defaultShowSource";
+
+    // Window sizes
+    public static final String SIZE_Y = "mainWindowSizeY";
+    public static final String SIZE_X = "mainWindowSizeX";
+    public static final String POS_Y = "mainWindowPosY";
+    public static final String POS_X = "mainWindowPosX";
     public static final String STRINGS_SIZE_Y = "stringsSizeY";
     public static final String STRINGS_SIZE_X = "stringsSizeX";
     public static final String STRINGS_POS_Y = "stringsPosY";
@@ -179,12 +183,15 @@ public class JabRefPreferences {
     public static final String TERMS_SIZE_X = "termsSizeX";
     public static final String TERMS_POS_Y = "termsPosY";
     public static final String TERMS_POS_X = "termsPosX";
+    public static final String SEARCH_DIALOG_HEIGHT = "searchDialogHeight";
+    public static final String SEARCH_DIALOG_WIDTH = "searchDialogWidth";
+    public static final String IMPORT_INSPECTION_DIALOG_HEIGHT = "importInspectionDialogHeight";
+    public static final String IMPORT_INSPECTION_DIALOG_WIDTH = "importInspectionDialogWidth";
+
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
     public static final String LAST_FOCUSED = "lastFocused";
     public static final String BACKUP = "backup";
-    public static final String ENTRY_TYPE_FORM_WIDTH = "entryTypeFormWidth";
-    public static final String ENTRY_TYPE_FORM_HEIGHT_FACTOR = "entryTypeFormHeightFactor";
     public static final String AUTO_OPEN_FORM = "autoOpenForm";
     public static final String FILE_WORKING_DIRECTORY = "fileWorkingDirectory";
     public static final String IMPORT_WORKING_DIRECTORY = "importWorkingDirectory";
@@ -192,8 +199,6 @@ public class JabRefPreferences {
     public static final String WORKING_DIRECTORY = "workingDirectory";
     public static final String NUMBER_COL_WIDTH = "numberColWidth";
     public static final String AUTO_COMPLETE = "autoComplete";
-    public static final String SEARCH_PANE_POS_Y = "searchPanePosY";
-    public static final String SEARCH_PANE_POS_X = "searchPanePosX";
     public static final String SEARCH_REG_EXP = "regExpSearch";
     public static final String EDITOR_EMACS_KEYBINDINGS = "editorEMACSkeyBindings";
     public static final String EDITOR_EMACS_KEYBINDINGS_REBIND_CA = "editorEMACSkeyBindingsRebindCA";
@@ -216,8 +221,9 @@ public class JabRefPreferences {
     public static final String FILE_COLUMN = "fileColumn";
     public static final String PREFER_URL_DOI = "preferUrlDoi";
     public static final String URL_COLUMN = "urlColumn";
-    public static final String DISABLE_ON_MULTIPLE_SELECTION = "disableOnMultipleSelection";
-    public static final String CTRL_CLICK = "ctrlClick";
+
+    // Colors
+    public static final String TABLE_COLOR_CODES_ON = "tableColorCodesOn";
     public static final String INCOMPLETE_ENTRY_BACKGROUND = "incompleteEntryBackground";
     public static final String FIELD_EDITOR_TEXT_COLOR = "fieldEditorTextColor";
     public static final String ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR = "activeFieldEditorBackgroundColor";
@@ -237,7 +243,9 @@ public class JabRefPreferences {
     public static final String TABLE_TEXT = "tableText";
     public static final String TABLE_OPT_FIELD_BACKGROUND = "tableOptFieldBackground";
     public static final String TABLE_REQ_FIELD_BACKGROUND = "tableReqFieldBackground";
+    public static final String MARKED_ENTRY_BACKGROUND = "markedEntryBackground";
     public static final String TABLE_BACKGROUND = "tableBackground";
+
     public static final String TABLE_SHOW_GRID = "tableShowGrid";
     public static final String TABLE_ROW_PADDING = "tableRowPadding";
     public static final String MENU_FONT_SIZE = "menuFontSize";
@@ -245,11 +253,9 @@ public class JabRefPreferences {
     public static final String FONT_SIZE = "fontSize";
     public static final String FONT_STYLE = "fontStyle";
     public static final String RECENT_FILES = "recentFiles";
-    public static final String GENERAL_FIELDS = "generalFields";
     public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
     public static final String DEFAULT_OWNER = "defaultOwner";
-    public static final String GROUPS_VISIBLE_ROWS = "groupsVisibleRows";
     public static final String DEFAULT_ENCODING = "defaultEncoding";
     public static final String TOOLBAR_VISIBLE = "toolbarVisible";
     public static final String HIGHLIGHT_GROUPS_MATCHING = "highlightGroupsMatching";
@@ -271,15 +277,14 @@ public class JabRefPreferences {
     public static final String ACTIVE_PREVIEW = "activePreview";
     public static final String PREVIEW_ENABLED = "previewEnabled";
     public static final String MERGE_ENTRIES_DIFF_MODE = "mergeEntriesDiffMode";
-    public static final String MAX_BACK_HISTORY_SIZE = "maxBackHistorySize"; // The maximum number of "Back" operations stored.
-    public static final String LINE_LENGTH = "lineLength"; // Maximum
-    public static final String INDENT = "indent"; //	Indent for formatted bibtex output.
+    public static final String MAX_BACK_HISTORY_SIZE = "maxBackHistorySize"; // The maximum number of "Back" operations stored. TODO: Not changeable
+    public static final String LINE_LENGTH = "lineLength"; // Maximum TODO: Not changeable
+    public static final String INDENT = "indent"; //	Indent for formatted bibtex output. TODO: Not changeable
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
     public static final String BINDINGS = "bindings";
     public static final String BIND_NAMES = "bindNames";
-    public static final String MARKED_ENTRY_BACKGROUND = "markedEntryBackground";
     public static final String KEY_PATTERN_REGEX = "KeyPatternRegex";
     public static final String KEY_PATTERN_REPLACEMENT = "KeyPatternReplacement";
 
@@ -295,17 +300,11 @@ public class JabRefPreferences {
     public static final String CONFIRM_DELETE = "confirmDelete";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
-    public static final String DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP = "displayKeyWarningDialogAtStartup";
-    public static final String DIALOG_WARNING_FOR_EMPTY_KEY = "dialogWarningForEmptyKey";
-    public static final String DIALOG_WARNING_FOR_DUPLICATE_KEY = "dialogWarningForDuplicateKey";
+    public static final String DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP = "displayKeyWarningDialogAtStartup"; // TODO: Not changeable
     public static final String OVERWRITE_OWNER = "overwriteOwner";
     public static final String USE_OWNER = "useOwner";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
     public static final String SHOW_FILE_LINKS_UPGRADE_WARNING = "showFileLinksUpgradeWarning";
-    public static final String SEARCH_DIALOG_HEIGHT = "searchDialogHeight";
-    public static final String SEARCH_DIALOG_WIDTH = "searchDialogWidth";
-    public static final String IMPORT_INSPECTION_DIALOG_HEIGHT = "importInspectionDialogHeight";
-    public static final String IMPORT_INSPECTION_DIALOG_WIDTH = "importInspectionDialogWidth";
     public static final String SIDE_PANE_WIDTH = "sidePaneWidth";
     public static final String LAST_USED_EXPORT = "lastUsedExport";
     public static final String LAST_USED_IMPORT = "lastUsedImport";
@@ -318,15 +317,13 @@ public class JabRefPreferences {
     public static final String OPEN_FOLDERS_OF_ATTACHED_FILES = "openFoldersOfAttachedFiles";
     public static final String KEY_GEN_ALWAYS_ADD_LETTER = "keyGenAlwaysAddLetter";
     public static final String KEY_GEN_FIRST_LETTER_A = "keyGenFirstLetterA";
-    public static final String VALUE_DELIMITERS2 = "valueDelimiters";
     public static final String ENFORCE_LEGAL_BIBTEX_KEY = "enforceLegalBibtexKey";
     public static final String PROMPT_BEFORE_USING_AUTOSAVE = "promptBeforeUsingAutosave";
     public static final String AUTO_SAVE_INTERVAL = "autoSaveInterval";
     public static final String AUTO_SAVE = "autoSave";
-    public static final String USE_LOCK_FILES = "useLockFiles";
+    public static final String USE_LOCK_FILES = "useLockFiles"; // TODO: Not changeable
     public static final String RUN_AUTOMATIC_FILE_SEARCH = "runAutomaticFileSearch";
     public static final String NUMERIC_FIELDS = "numericFields";
-    public static final String DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY = "defaultRegExpSearchExpression";
     public static final String REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
     public static final String AUTOLINK_USE_REG_EXP_SEARCH_KEY = "useRegExpSearch";
     public static final String DB_CONNECT_USERNAME = "dbConnectUsername";
@@ -415,8 +412,6 @@ public class JabRefPreferences {
     private static final String CUSTOM_TYPE_REQ = "customTypeReq_";
     private static final String CUSTOM_TYPE_OPT = "customTypeOpt_";
     private static final String CUSTOM_TYPE_PRIOPT = "customTypePriOpt_";
-
-    private static final char[][] VALUE_DELIMITERS = new char[][] { {'"', '"'}, {'{', '}'}};
 
 
     public String WRAPPED_USERNAME;
@@ -606,13 +601,10 @@ public class JabRefPreferences {
         defaults.put(TERMS_SIZE_X, 500);
         defaults.put(TERMS_SIZE_Y, 500);
         defaults.put(DEFAULT_SHOW_SOURCE, Boolean.FALSE);
-        defaults.put(DEFAULT_AUTO_SORT, Boolean.FALSE);
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_MODE_FILTER, Boolean.TRUE);
 
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
-        defaults.put(SEARCH_PANE_POS_X, 0);
-        defaults.put(SEARCH_PANE_POS_Y, 0);
 
         defaults.put(MERGE_ENTRIES_DIFF_MODE, 2);
 
@@ -636,14 +628,9 @@ public class JabRefPreferences {
         defaults.put(HIGHLIGHT_GROUPS_MATCHING, "all");
         defaults.put(TOOLBAR_VISIBLE, Boolean.TRUE);
         defaults.put(DEFAULT_ENCODING, StandardCharsets.UTF_8.name());
-        defaults.put(GROUPS_VISIBLE_ROWS, 8);
         defaults.put(DEFAULT_OWNER, System.getProperty("user.name"));
         defaults.put(MEMORY_STICK_MODE, Boolean.FALSE);
         defaults.put(RENAME_ON_MOVE_FILE_TO_FILE_DIR, Boolean.TRUE);
-
-        // The general fields stuff is made obsolete by the CUSTOM_TAB_... entries.
-        defaults.put(GENERAL_FIELDS, "crossref;keywords;file;doi;url;urldate;"
-                + "pdf;comment;owner");
 
         defaults.put(FONT_STYLE, java.awt.Font.PLAIN);
         defaults.put(FONT_SIZE, 12);
@@ -674,8 +661,6 @@ public class JabRefPreferences {
 
         defaults.put(INCOMPLETE_ENTRY_BACKGROUND, "250:175:175");
 
-        defaults.put(CTRL_CLICK, Boolean.FALSE);
-        defaults.put(DISABLE_ON_MULTIPLE_SELECTION, Boolean.FALSE);
         defaults.put(URL_COLUMN, Boolean.TRUE);
         defaults.put(PREFER_URL_DOI, Boolean.FALSE);
         defaults.put(FILE_COLUMN, Boolean.TRUE);
@@ -731,8 +716,6 @@ public class JabRefPreferences {
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
-        defaults.put(DIALOG_WARNING_FOR_DUPLICATE_KEY, Boolean.TRUE);
-        defaults.put(DIALOG_WARNING_FOR_EMPTY_KEY, Boolean.TRUE);
         defaults.put(DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP, Boolean.TRUE);
         defaults.put(AVOID_OVERWRITING_KEY, Boolean.FALSE);
         defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
@@ -827,7 +810,6 @@ public class JabRefPreferences {
         defaults.put(ENFORCE_LEGAL_BIBTEX_KEY, Boolean.TRUE);
         // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
         // Currently, JabRef does not escape them
-        defaults.put(VALUE_DELIMITERS2, 1);
         defaults.put(KEY_GEN_FIRST_LETTER_A, Boolean.TRUE);
         defaults.put(KEY_GEN_ALWAYS_ADD_LETTER, Boolean.FALSE);
         defaults.put(EMAIL_SUBJECT, Localization.lang("References"));
@@ -871,7 +853,6 @@ public class JabRefPreferences {
         MARKING_WITH_NUMBER_PATTERN = "\\[" + get(DEFAULT_OWNER).replaceAll("\\\\", "\\\\\\\\") + ":(\\d+)\\]";
 
         String defaultExpression = "**/.*[bibtexkey].*\\\\.[extension]";
-        defaults.put(DEFAULT_REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(REG_EXP_SEARCH_EXPRESSION_KEY, defaultExpression);
         defaults.put(AUTOLINK_USE_REG_EXP_SEARCH_KEY, Boolean.FALSE);
         defaults.put(USE_IEEE_ABRV, Boolean.FALSE);
@@ -948,14 +929,6 @@ public class JabRefPreferences {
 
     }
 
-    public char getValueDelimiters(int index) {
-        return getValueDelimiters()[index];
-    }
-
-    private char[] getValueDelimiters() {
-        return JabRefPreferences.VALUE_DELIMITERS[getInt(VALUE_DELIMITERS2)];
-    }
-
     /**
      * Check whether a key is set (differently from null).
      *
@@ -968,6 +941,10 @@ public class JabRefPreferences {
 
     public String get(String key) {
         return prefs.get(key, (String) defaults.get(key));
+    }
+
+    public Optional<String> getAsOptional(String key) {
+        return Optional.ofNullable(prefs.get(key, (String) defaults.get(key)));
     }
 
     public String get(String key, String def) {
@@ -1162,7 +1139,7 @@ public class JabRefPreferences {
      * @return LabelPattern containing all keys. Returned LabelPattern has no parent
      */
     public GlobalLabelPattern getKeyPattern() {
-        keyPattern = new GlobalLabelPattern();
+        keyPattern = new GlobalLabelPattern(AbstractLabelPattern.split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_LABEL_PATTERN)));
         Preferences pre = Preferences.userNodeForPackage(GlobalLabelPattern.class);
         try {
             String[] keys = pre.keys();

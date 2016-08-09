@@ -12,11 +12,15 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- [#970](https://github.com/JabRef/jabref/issues/970): Implementation of shared database support (full system) with event based synchronization for MySQL, PostgreSQL and Oracle database systems.
+- Externally fetched information can be merged for entries with an ISBN
+- Externally fetched information can be merged for entries with an ArXiv eprint
 - [#462](https://github.com/JabRef/jabref/issues/462) Extend the OpenConsoleFeature by offering a selection between default terminal emulator and configurable command execution.
 - [#1516](https://github.com/JabRef/jabref/issues/1516) Selected field names are written in uppercase in the entry editor
 - For developers: Moved the bst package into logic. This requires the regeneration of antlr sources, execute: gradlew generateSource
 - [#1026](https://github.com/JabRef/jabref/issues/1026) JabRef does no longer delete user comments outside of BibTeX entries and strings
 - [#1249](https://github.com/JabRef/jabref/issues/1249) Date layout formatter added
+- Undo/redo are enabled/disabled and show the action in the tool tip
 - Added ISBN integrity checker
 - Added filter to not show selected integrity checks
 - Enhance the entry customization dialog to give better visual feedback
@@ -24,6 +28,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - The arXiv fetcher now also supports free-text search queries
 - [#1345](https://github.com/JabRef/jabref/issues/1345) Cleanup ISSN
 - It is now possible to add your own lists of protected terms, see Options -> Manage protected terms
+- Automatically generated group names are now converted from LaTeX to Unicode
 
 ### Fixed
 - Fixed [#1632](https://github.com/JabRef/jabref/issues/1632) User comments (@Comment) with or without brackets are now kept
@@ -43,11 +48,16 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1643](https://github.com/JabRef/jabref/issues/1643): Searching with double quotes in a specific field ignores the last character
 - Fixed [#1288](https://github.com/JabRef/jabref/issues/1288): Newly opened bib-file is not focused
 - Fixed [#1669](https://github.com/JabRef/jabref/issues/1669): Dialog for manual connection to OpenOffice/LibreOffice works again on Linux
+- Fixed [#16682](https://github.com/JabRef/jabref/issues/1682): An entry now must have a BibTeX key to be cited in OpenOffice/LibreOffice
 
 
 ### Removed
 - It is not longer possible to choose to convert HTML sub- and superscripts to equations
 - [#1610](https://github.com/JabRef/jabref/issues/1610) Removed the possibility to auto show or hide the groups interface
+- Removed option to open right-click menu with ctrl + left-click as it was not working
+- Removed option to disable entry editor when multiple entries are selected as it was not working
+- Removed option to show warning for empty key as it was not working
+- Removed option to show warning for duplicate key as it was not working
 
 
 
