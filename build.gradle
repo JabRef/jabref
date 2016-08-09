@@ -58,7 +58,10 @@ repositories {
 configurations {
     antlr3
     antlr4
-	
+
+    databaseTestCompile.extendsFrom testCompile
+    databaseTestRuntime.extendsFrom testRuntime
+
 	integrationTestCompile.extendsFrom testCompile
 	integrationTestRuntime.extendsFrom testRuntime
 }
@@ -126,7 +129,13 @@ sourceSets {
         java {
             srcDirs = ["src/main/java", "src/main/gen"]
         }
-    }	
+    }
+    databaseTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+        }
+    }
 	integrationTest {
         java {
             compileClasspath += main.output + test.output
@@ -225,7 +234,12 @@ test {
     }
 }
 
-  
+
+task databaseTest(type: Test) {
+    testClassesDir = sourceSets.databaseTest.output.classesDir
+    classpath = sourceSets.databaseTest.runtimeClasspath
+}
+
 task integrationTest(type: Test) {
     testClassesDir = sourceSets.integrationTest.output.classesDir
     classpath = sourceSets.integrationTest.runtimeClasspath
