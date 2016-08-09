@@ -12,7 +12,7 @@ buildscript {
 }
 
 plugins {
-    id "com.install4j.gradle" version "6.1.1"
+    id "com.install4j.gradle" version "6.1.2"
     id 'com.github.johnrengelman.shadow' version '1.2.3'
     // TODO replaced by spotless plugin, needs to be updated
     id "com.github.youribonnaffe.gradle.format" version "1.5"
