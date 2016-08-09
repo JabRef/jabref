@@ -348,7 +348,7 @@ public class FileListEntryEditor {
     }
 
 
-    ActionListener browsePressed = e -> {
+    private final ActionListener browsePressed = e -> {
         String filePath = link.getText().trim();
         Optional<File> file = FileUtil.expandFilename(this.databaseContext, filePath);
         String workingDir;

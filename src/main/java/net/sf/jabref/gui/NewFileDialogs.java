@@ -47,6 +47,8 @@ public class NewFileDialogs {
                 case JOptionPane.CANCEL_OPTION:
                     cancelSelection();
                     return;
+                default:
+                    return;
                 }
             }
             super.approveSelection();

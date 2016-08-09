@@ -408,100 +408,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             frame.groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
         });
 
-        // action for collecting database strings from user
-        actions.put(Actions.DB_CONNECT, new DbConnectAction(this));
-
-        // action for exporting database to external SQL database
-        actions.put(Actions.DB_EXPORT, new AbstractWorker() {
-
-            String errorMessage = "";
-            boolean connectedToDB;
-
-
-            // run first, in EDT:
-            @Override
-            public void init() {
-
-                DBStrings dbs = bibDatabaseContext.getMetaData().getDBStrings();
-
-                // get DBStrings from user if necessary
-                if (dbs.isConfigValid()) {
-                    connectedToDB = true;
-                } else {
-                    // init DB strings if necessary
-                    if (!dbs.isInitialized()) {
-                        dbs.initialize();
-                    }
-
-                    // show connection dialog
-                    DBConnectDialog dbd = new DBConnectDialog(frame(), dbs);
-                    dbd.setLocationRelativeTo(BasePanel.this);
-                    dbd.setVisible(true);
-
-                    connectedToDB = dbd.isConnectedToDB();
-
-                    // store database strings
-                    if (connectedToDB) {
-                        dbs = dbd.getDBStrings();
-                        bibDatabaseContext.getMetaData().setDBStrings(dbs);
-                        dbd.dispose();
-                    }
-                }
-            }
-
-            // run second, on a different thread:
-            @Override
-            public void run() {
-                if (!connectedToDB) {
-                    return;
-                }
-
-                final DBStrings dbs = bibDatabaseContext.getMetaData().getDBStrings();
-
-                try {
-                    frame.output(Localization.lang("Attempting SQL export..."));
-                    final DBExporterAndImporterFactory factory = new DBExporterAndImporterFactory();
-                    final DatabaseExporter exporter = factory.getExporter(dbs.getDbPreferences().getServerType());
-                    exporter.exportDatabaseToDBMS(bibDatabaseContext, getDatabase().getEntries(), dbs, frame);
-                    dbs.isConfigValid(true);
-                } catch (Exception ex) {
-                    final String preamble = Localization
-                            .lang("Could not export to SQL database for the following reason:");
-                    errorMessage = SQLUtil.getExceptionMessage(ex);
-                    LOGGER.info("Could not export to SQL database", ex);
-                    dbs.isConfigValid(false);
-                    JOptionPane.showMessageDialog(frame, preamble + '\n' + errorMessage,
-                            Localization.lang("Export to SQL database"), JOptionPane.ERROR_MESSAGE);
-                }
-
-                bibDatabaseContext.getMetaData().setDBStrings(dbs);
-            }
-
-            // run third, on EDT:
-            @Override
-            public void update() {
-
-                // if no error, report success
-                if (errorMessage.isEmpty()) {
-                    if (connectedToDB) {
-                        final DBStrings dbs = bibDatabaseContext.getMetaData().getDBStrings();
-                        frame.output(Localization.lang("%0 export successful",
-                                dbs.getDbPreferences().getServerType().getFormattedName()));
-                    }
-                } else { // show an error dialog if an error occurred
-                    final String preamble = Localization
-                            .lang("Could not export to SQL database for the following reason:");
-                    frame.output(preamble + "  " + errorMessage);
-
-                    JOptionPane.showMessageDialog(frame, preamble + '\n' + errorMessage,
-                            Localization.lang("Export to SQL database"), JOptionPane.ERROR_MESSAGE);
-
-                    errorMessage = "";
-                }
-            }
-
-        });
-
         actions.put(FindUnlinkedFilesDialog.ACTION_COMMAND, (BaseAction) () -> {
             final FindUnlinkedFilesDialog dialog = new FindUnlinkedFilesDialog(frame, frame, BasePanel.this);
             dialog.setLocationRelativeTo(frame);
@@ -1133,7 +1039,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(enc)
                     .withSaveType(saveType);
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
+            BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
+                    FileSaveSession::new);
             if (selectedOnly) {
                 session = databaseWriter.savePartOfDatabase(bibDatabaseContext, mainTable.getSelectedEntries(), prefs);
             } else {
@@ -1502,7 +1409,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             public void keyPressed(KeyEvent e) {
                 final int keyCode = e.getKeyCode();
                 final TreePath path = frame.getGroupSelector().getSelectionPath();
-                final GroupTreeNodeViewModel node = path == null ? null : (GroupTreeNodeViewModel) path.getLastPathComponent();
+                final GroupTreeNodeViewModel node = path == null ? null : (GroupTreeNodeViewModel) path
+                        .getLastPathComponent();
 
                 if (e.isControlDown()) {
                     switch (keyCode) {
@@ -1562,7 +1470,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         adjustSplitter(); // restore last splitting state (before mainTable is created as creation affects the stored size of the entryEditors)
 
         // check whether a mainTable already existed and a floatSearch was active
-        boolean floatSearchActive = (mainTable != null) && (this.tableModel.getSearchState() == MainTableDataModel.DisplayOption.FLOAT);
+        boolean floatSearchActive = (mainTable != null)
+                && (this.tableModel.getSearchState() == MainTableDataModel.DisplayOption.FLOAT);
 
         createMainTable();
 
@@ -1841,8 +1750,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * Closes the entry editor or preview panel if it is showing the given entry.
      */
     public void ensureNotShowingBottomPanel(BibEntry entry) {
-        if (((mode == BasePanelMode.SHOWING_EDITOR) && (currentEditor.getEntry() == entry)) ||
-                ((mode == BasePanelMode.SHOWING_PREVIEW) && (currentPreview.getEntry() == entry))) {
+        if (((mode == BasePanelMode.SHOWING_EDITOR) && (currentEditor.getEntry() == entry))
+                || ((mode == BasePanelMode.SHOWING_PREVIEW) && (currentPreview.getEntry() == entry))) {
             hideBottomComponent();
         }
     }
@@ -2396,8 +2305,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         public void action() throws SaveException {
             Optional<Path> chosenFile = new NewFileDialogs(frame).withExtension(FileExtensions.BIBTEX_DB).saveNewFile();
 
-            if (chosenFile.isPresent())
-            {
+            if (chosenFile.isPresent()) {
                 Path path = chosenFile.get();
                 saveDatabase(path.toFile(), true, Globals.prefs.getDefaultEncoding(), saveType);
                 frame.getFileHistory().newFile(path.toString());

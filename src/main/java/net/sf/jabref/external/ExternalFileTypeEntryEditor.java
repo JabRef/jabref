@@ -246,7 +246,7 @@ public class ExternalFileTypeEntryEditor {
     }
 
 
-    ActionListener browsePressed = e -> {
+    private final ActionListener browsePressed = e -> {
         String appDir = application.getText().trim();
         if (appDir.isEmpty()) {
             appDir = Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY);

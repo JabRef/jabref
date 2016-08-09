@@ -13,7 +13,7 @@ public enum FileExtensions {
 
     //important: No dot before the extension!
     BIBTEX_DB(
-            Localization.lang("BibTeX database"), "bib"),
+            String.format("%1s %2s", "BibTex", Localization.lang("Database")), "bib"),
     BIBTEXML(
             Localization.lang("%0 file", "BibTeXML"), "bibx"),
     AUX(
@@ -25,7 +25,7 @@ public enum FileExtensions {
     RIS(
             Localization.lang("%0 file", "RIS"), "ris"),
     ENDNOTE(
-            Localization.lang("Endnote/Refer file"), "ref"),
+            Localization.lang("%0 file", "Endnote/Refer"), "ref"),
     JSTYLE(
             Localization.lang("Style file"), "jstyle"),
     LAYOUT(

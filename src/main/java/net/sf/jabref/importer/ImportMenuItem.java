@@ -22,7 +22,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JMenuItem;
@@ -139,8 +138,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                             frame.showMessage(pr.getErrorMessage());
                         }
 
-                        imports.add(new ImportFormatReader.UnknownFormatImport(importer
-                                .getFormatName(), pr));
+                        imports.add(new ImportFormatReader.UnknownFormatImport(importer.getFormatName(), pr));
                     }
                 } catch (IOException e) {
                     // This indicates that a specific importer was specified, and that
@@ -223,8 +221,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 // Bibtex result. We must merge it into our main base.
                 ParserResult pr = importResult.parserResult;
 
-                anythingUseful = anythingUseful
-                        || pr.getDatabase().hasEntries() || (!pr.getDatabase().hasNoStrings());
+                anythingUseful = anythingUseful || pr.getDatabase().hasEntries() || (!pr.getDatabase().hasNoStrings());
 
                 // Record the parserResult, as long as this is the first bibtex result:
                 if (directParserResult == null) {
