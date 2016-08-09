@@ -58,7 +58,7 @@ public class BibtexKeyPatternDialog extends JDialog {
     public void setPanel(BasePanel panel) {
         this.panel = panel;
         this.metaData = panel.getBibDatabaseContext().getMetaData();
-        AbstractBibtexKeyPattern keypatterns = metaData.getLabelPattern();
+        AbstractBibtexKeyPattern keypatterns = metaData.getBibtexKeyPattern();
         bibtexKeyPatternPanel.setValues(keypatterns);
     }
 
@@ -84,7 +84,7 @@ public class BibtexKeyPatternDialog extends JDialog {
         pack();
 
         ok.addActionListener(e -> {
-            metaData.setLabelPattern(bibtexKeyPatternPanel.getLabelPatternAsDatabaseLabelPattern());
+            metaData.setBibtexKeyPattern(bibtexKeyPatternPanel.getKeyPatternAsDatabaseBibtexKeyPattern());
             panel.markNonUndoableBaseChanged();
             dispose();
         });

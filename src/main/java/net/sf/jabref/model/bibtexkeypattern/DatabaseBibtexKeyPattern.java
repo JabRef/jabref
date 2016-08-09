@@ -29,7 +29,7 @@ public class DatabaseBibtexKeyPattern extends AbstractBibtexKeyPattern {
     }
 
     @Override
-    public List<String> getLastLevelLabelPattern(String key) {
+    public List<String> getLastLevelBibtexKeyPattern(String key) {
         return prefs.getKeyPattern().getValue(key);
     }
 

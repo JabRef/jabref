@@ -401,7 +401,7 @@ public class BibtexKeyPatternUtil {
             // get the type of entry
             String entryType = entry.getType();
             // Get the arrayList corresponding to the type
-            List<String> typeList = new ArrayList<>(metaData.getLabelPattern().getValue(entryType));
+            List<String> typeList = new ArrayList<>(metaData.getBibtexKeyPattern().getValue(entryType));
             if (!typeList.isEmpty()) {
                 typeList.remove(0);
             }
