@@ -26,9 +26,9 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.labelpattern.LabelPatternPanel;
+import net.sf.jabref.gui.bibtexkeypattern.BibtexKeyPatternPanel;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.labelpattern.GlobalLabelPattern;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -37,7 +37,7 @@ import com.jgoodies.forms.layout.FormLayout;
 /**
  * The Preferences panel for key generation.
  */
-class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
+class BibtexKeyPatternPrefTab extends BibtexKeyPatternPanel implements PrefsTab {
 
     private final JabRefPreferences prefs;
 
@@ -54,7 +54,7 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
     private final JTextField keyPatternReplacement = new JTextField(20);
 
 
-    public LabelPatternPrefTab(JabRefPreferences prefs, BasePanel panel) {
+    public BibtexKeyPatternPrefTab(JabRefPreferences prefs, BasePanel panel) {
         super(panel);
         this.prefs = prefs;
         appendKeyGeneratorSettings();
@@ -90,7 +90,7 @@ class LabelPatternPrefTab extends LabelPatternPanel implements PrefsTab {
         }
 
         // fetch entries from GUI
-        GlobalLabelPattern keypatterns = getLabelPatternAsGlobalLabelPattern();
+        GlobalBibtexKeyPattern keypatterns = getLabelPatternAsGlobalLabelPattern();
         // store new patterns globally
         prefs.putKeyPattern(keypatterns);
     }

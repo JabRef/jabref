@@ -91,8 +91,8 @@ import net.sf.jabref.logic.groups.EntriesGroupChange;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
-import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.database.BibDatabase;
@@ -463,8 +463,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             database.insertEntry(entry);
 
             // Generate a unique key:
-            LabelPatternUtil.makeLabel(localMetaData, database, entry,
-                    LabelPatternPreferences.fromPreferences(Globals.prefs));
+            BibtexKeyPatternUtil.makeLabel(localMetaData, database, entry,
+                    BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
             // Remove the entry from the database again, since we only added it in
             // order to
             // make sure the key was unique:
@@ -505,8 +505,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 entry.setId(IdGenerator.next());
                 database.insertEntry(entry);
 
-                LabelPatternUtil.makeLabel(localMetaData, database, entry,
-                        LabelPatternPreferences.fromPreferences(Globals.prefs));
+                BibtexKeyPatternUtil.makeLabel(localMetaData, database, entry,
+                        BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
                 // Add the generated key to our list:   -- TODO: Why??
                 keys.add(entry.getCiteKeyOptional());
             }

@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -331,7 +331,7 @@ public class RegExpFileSearch {
 
         // If no field value was found, try to interpret it as a key generator field marker:
         String fieldValue = BibDatabase.getResolvedField(beforeColon, entry, database)
-                .orElse(LabelPatternUtil.makeLabel(entry, beforeColon));
+                .orElse(BibtexKeyPatternUtil.makeLabel(entry, beforeColon));
 
         if (fieldValue == null) {
             return "";
@@ -342,7 +342,7 @@ public class RegExpFileSearch {
         }
 
         String[] parts = afterColon.split(":");
-        fieldValue = LabelPatternUtil.applyModifiers(fieldValue, parts, 0);
+        fieldValue = BibtexKeyPatternUtil.applyModifiers(fieldValue, parts, 0);
 
         return fieldValue;
     }

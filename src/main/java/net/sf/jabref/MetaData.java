@@ -41,10 +41,10 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.labelpattern.AbstractLabelPattern;
-import net.sf.jabref.model.labelpattern.DatabaseLabelPattern;
+import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 
 import com.google.common.eventbus.EventBus;
 import org.apache.commons.logging.Log;
@@ -70,7 +70,7 @@ public class MetaData implements Iterable<String> {
     private GroupTreeNode groupsRoot;
     private final EventBus eventBus = new EventBus();
 
-    private AbstractLabelPattern labelPattern;
+    private AbstractBibtexKeyPattern labelPattern;
 
     private Charset encoding = Globals.prefs.getDefaultEncoding();
 
@@ -239,12 +239,12 @@ public class MetaData implements Iterable<String> {
     /**
      * @return the stored label patterns
      */
-    public AbstractLabelPattern getLabelPattern() {
+    public AbstractBibtexKeyPattern getLabelPattern() {
         if (labelPattern != null) {
             return labelPattern;
         }
 
-        labelPattern = new DatabaseLabelPattern(Globals.prefs);
+        labelPattern = new DatabaseBibtexKeyPattern(Globals.prefs);
 
         // read the data from the metadata and store it into the labelPattern
         for (String key : this) {
@@ -268,7 +268,7 @@ public class MetaData implements Iterable<String> {
      * @param labelPattern the key patterns to update to. <br />
      *                     A reference to this object is stored internally and is returned at getLabelPattern();
      */
-    public void setLabelPattern(AbstractLabelPattern labelPattern) {
+    public void setLabelPattern(AbstractBibtexKeyPattern labelPattern) {
         // remove all keypatterns from metadata
         Iterator<String> iterator = this.iterator();
         while (iterator.hasNext()) {

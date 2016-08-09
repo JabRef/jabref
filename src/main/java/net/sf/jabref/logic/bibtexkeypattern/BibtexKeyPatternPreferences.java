@@ -1,8 +1,8 @@
-package net.sf.jabref.logic.labelpattern;
+package net.sf.jabref.logic.bibtexkeypattern;
 
 import net.sf.jabref.preferences.JabRefPreferences;
 
-public class LabelPatternPreferences {
+public class BibtexKeyPatternPreferences {
 
     private final String defaultLabelPattern;
     private final String keyPatternRegex;
@@ -11,7 +11,7 @@ public class LabelPatternPreferences {
     private final boolean firstLetterA;
     private final boolean enforceLegalKey;
 
-    public LabelPatternPreferences(String defaultLabelPattern, String keyPatternRegex, String keyPatternReplacement,
+    public BibtexKeyPatternPreferences(String defaultLabelPattern, String keyPatternRegex, String keyPatternReplacement,
             boolean alwaysAddLetter, boolean firstLetterA, boolean enforceLegalKey) {
         this.defaultLabelPattern = defaultLabelPattern;
         this.keyPatternRegex = keyPatternRegex;
@@ -21,8 +21,8 @@ public class LabelPatternPreferences {
         this.enforceLegalKey = enforceLegalKey;
     }
 
-    public static LabelPatternPreferences fromPreferences(JabRefPreferences jabRefPreferences) {
-        return new LabelPatternPreferences(jabRefPreferences.get(JabRefPreferences.DEFAULT_LABEL_PATTERN),
+    public static BibtexKeyPatternPreferences fromPreferences(JabRefPreferences jabRefPreferences) {
+        return new BibtexKeyPatternPreferences(jabRefPreferences.get(JabRefPreferences.DEFAULT_LABEL_PATTERN),
                 jabRefPreferences.get(JabRefPreferences.KEY_PATTERN_REGEX),
                 jabRefPreferences.get(JabRefPreferences.KEY_PATTERN_REPLACEMENT),
                 jabRefPreferences.getBoolean(JabRefPreferences.KEY_GEN_ALWAYS_ADD_LETTER),

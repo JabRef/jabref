@@ -62,8 +62,8 @@ import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
-import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.openoffice.OOBibStyle;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
@@ -706,12 +706,13 @@ public class OpenOfficePanel extends AbstractWorker {
         BasePanel panel = frame.getCurrentBasePanel();
         if ((answer == JOptionPane.OK_OPTION) && (panel != null)) {
             // Generate keys
-            LabelPatternPreferences prefs = LabelPatternPreferences.fromPreferences(Globals.prefs);
+            BibtexKeyPatternPreferences prefs = BibtexKeyPatternPreferences.fromPreferences(Globals.prefs);
             NamedCompound undoCompound = new NamedCompound(Localization.lang("Cite"));
             for (BibEntry entry : entries) {
                 if (entry.getCiteKey() == null) {
                     // Generate key
-                    LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
+                    BibtexKeyPatternUtil
+                            .makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
                             prefs);
                     // Add undo change
                     undoCompound.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, null, entry.getCiteKey()));

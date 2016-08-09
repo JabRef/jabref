@@ -12,21 +12,25 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-package net.sf.jabref.model.labelpattern;
+*/
+package net.sf.jabref.model.bibtexkeypattern;
 
 import java.util.List;
 
-public class GlobalLabelPattern extends AbstractLabelPattern {
+import net.sf.jabref.preferences.JabRefPreferences;
 
-    private List<String> defaultLabelPattern;
+public class DatabaseBibtexKeyPattern extends AbstractBibtexKeyPattern {
 
-    public GlobalLabelPattern(List<String> labelPattern) {
-        defaultLabelPattern = labelPattern;
+    private final JabRefPreferences prefs;
+
+
+    public DatabaseBibtexKeyPattern(JabRefPreferences prefs) {
+        this.prefs = prefs;
     }
 
     @Override
     public List<String> getLastLevelLabelPattern(String key) {
-        return defaultLabelPattern;
+        return prefs.getKeyPattern().getValue(key);
     }
+
 }

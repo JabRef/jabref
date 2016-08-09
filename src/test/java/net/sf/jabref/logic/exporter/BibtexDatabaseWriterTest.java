@@ -31,8 +31,8 @@ import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.labelpattern.AbstractLabelPattern;
-import net.sf.jabref.model.labelpattern.DatabaseLabelPattern;
+import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.base.Charsets;
@@ -156,7 +156,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeMetadata() throws Exception {
-        DatabaseLabelPattern labelPattern = new DatabaseLabelPattern(Globals.prefs);
+        DatabaseBibtexKeyPattern labelPattern = new DatabaseBibtexKeyPattern(Globals.prefs);
         labelPattern.setDefaultValue("test");
         metaData.setLabelPattern(labelPattern);
 
@@ -169,7 +169,7 @@ public class BibtexDatabaseWriterTest {
     @Test
     public void writeMetadataAndEncoding() throws Exception {
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
-        DatabaseLabelPattern labelPattern = new DatabaseLabelPattern(Globals.prefs);
+        DatabaseBibtexKeyPattern labelPattern = new DatabaseBibtexKeyPattern(Globals.prefs);
         labelPattern.setDefaultValue("test");
         metaData.setLabelPattern(labelPattern);
 
@@ -422,7 +422,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeCustomKeyPattern() throws Exception {
-        AbstractLabelPattern pattern = new DatabaseLabelPattern(Globals.prefs);
+        AbstractBibtexKeyPattern pattern = new DatabaseBibtexKeyPattern(Globals.prefs);
         pattern.setDefaultValue("test");
         pattern.addLabelPattern("article", "articleTest");
         metaData.setLabelPattern(pattern);

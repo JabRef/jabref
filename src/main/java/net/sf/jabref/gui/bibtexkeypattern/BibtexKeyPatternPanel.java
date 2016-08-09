@@ -13,7 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.gui.labelpattern;
+package net.sf.jabref.gui.bibtexkeypattern;
 
 import java.awt.Container;
 import java.awt.Dimension;
@@ -40,14 +40,14 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.labelpattern.AbstractLabelPattern;
-import net.sf.jabref.model.labelpattern.DatabaseLabelPattern;
-import net.sf.jabref.model.labelpattern.GlobalLabelPattern;
+import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-public class LabelPatternPanel extends JPanel {
+public class BibtexKeyPatternPanel extends JPanel {
 
-    // used by both LabelPatternPanel and TabLabelPAttern
+    // used by both BibtexKeyPatternPanel and TabLabelPAttern
     protected final GridBagLayout gbl = new GridBagLayout();
     protected final GridBagConstraints con = new GridBagConstraints();
 
@@ -61,7 +61,7 @@ public class LabelPatternPanel extends JPanel {
     private final BasePanel panel;
 
 
-    public LabelPatternPanel(BasePanel panel) {
+    public BibtexKeyPatternPanel(BasePanel panel) {
         this.panel = panel;
         help = new HelpAction(Localization.lang("Help on key patterns"), HelpFile.LABEL_PATTERN);
         buildGUI();
@@ -222,7 +222,7 @@ public class LabelPatternPanel extends JPanel {
     /**
      * fill the given LabelPattern by values generated from the text fields
      */
-    private void fillPatternUsingPanelData(AbstractLabelPattern keypatterns) {
+    private void fillPatternUsingPanelData(AbstractBibtexKeyPattern keypatterns) {
         // each entry type
         for (Map.Entry<String, JTextField> entry : textFields.entrySet()) {
             String text = entry.getValue().getText();
@@ -238,14 +238,15 @@ public class LabelPatternPanel extends JPanel {
         }
     }
 
-    protected GlobalLabelPattern getLabelPatternAsGlobalLabelPattern() {
-        GlobalLabelPattern res = new GlobalLabelPattern(AbstractLabelPattern.split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_LABEL_PATTERN)));
+    protected GlobalBibtexKeyPattern getLabelPatternAsGlobalLabelPattern() {
+        GlobalBibtexKeyPattern res = new GlobalBibtexKeyPattern(
+                AbstractBibtexKeyPattern.split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_LABEL_PATTERN)));
         fillPatternUsingPanelData(res);
         return res;
     }
 
-    public DatabaseLabelPattern getLabelPatternAsDatabaseLabelPattern() {
-        DatabaseLabelPattern res = new DatabaseLabelPattern(Globals.prefs);
+    public DatabaseBibtexKeyPattern getLabelPatternAsDatabaseLabelPattern() {
+        DatabaseBibtexKeyPattern res = new DatabaseBibtexKeyPattern(Globals.prefs);
         fillPatternUsingPanelData(res);
         return res;
     }
@@ -255,7 +256,7 @@ public class LabelPatternPanel extends JPanel {
      *
      * @param keypatterns the LabelPattern to use as initial value
      */
-    public void setValues(AbstractLabelPattern keypatterns) {
+    public void setValues(AbstractBibtexKeyPattern keypatterns) {
         for (Map.Entry<String, JTextField> entry : textFields.entrySet()) {
             setValue(entry.getValue(), entry.getKey(), keypatterns);
         }
@@ -267,7 +268,7 @@ public class LabelPatternPanel extends JPanel {
         }
     }
 
-    private static void setValue(JTextField tf, String fieldName, AbstractLabelPattern keypatterns) {
+    private static void setValue(JTextField tf, String fieldName, AbstractBibtexKeyPattern keypatterns) {
         if (keypatterns.isDefaultValue(fieldName)) {
             tf.setText("");
         } else {

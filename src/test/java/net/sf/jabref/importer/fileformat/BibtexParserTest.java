@@ -25,12 +25,12 @@ import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.labelpattern.AbstractLabelPattern;
-import net.sf.jabref.model.labelpattern.DatabaseLabelPattern;
+import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.BeforeClass;
@@ -1393,9 +1393,9 @@ public class BibtexParserTest {
                                 + OS.NEWLINE
                                 + "@comment{jabref-meta: keypatterndefault:test;}"));
 
-        AbstractLabelPattern labelPattern = result.getMetaData().getLabelPattern();
+        AbstractBibtexKeyPattern labelPattern = result.getMetaData().getLabelPattern();
 
-        AbstractLabelPattern expectedPattern = new DatabaseLabelPattern(Globals.prefs);
+        AbstractBibtexKeyPattern expectedPattern = new DatabaseBibtexKeyPattern(Globals.prefs);
         expectedPattern.setDefaultValue("test");
         expectedPattern.addLabelPattern("article", "articleTest");
 

@@ -82,7 +82,7 @@ import net.sf.jabref.gui.groups.GroupSelector;
 import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
 import net.sf.jabref.gui.journals.AbbreviateAction;
 import net.sf.jabref.gui.journals.UnabbreviateAction;
-import net.sf.jabref.gui.labelpattern.SearchFixDuplicateLabels;
+import net.sf.jabref.gui.bibtexkeypattern.SearchFixDuplicateLabels;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.maintable.MainTableFormat;
@@ -117,8 +117,8 @@ import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.SaveSession;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
-import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
@@ -493,8 +493,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // Finally, set the new keys:
                 for (BibEntry entry : entries) {
                     bes = entry;
-                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes,
-                            LabelPatternPreferences.fromPreferences(Globals.prefs));
+                    BibtexKeyPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes,
+                            BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
                     ce.addEdit(new UndoableKeyChange(database, bes, (String) oldvals.get(bes),
                             bes.getCiteKeyOptional().orElse(null)));
                 }
@@ -1930,8 +1930,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             for (BibEntry bes : database.getEntries()) {
                 Optional<String> oldKey = bes.getCiteKeyOptional();
                 if (!(oldKey.isPresent()) || oldKey.get().isEmpty()) {
-                    LabelPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes,
-                            LabelPatternPreferences.fromPreferences(Globals.prefs));
+                    BibtexKeyPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), database, bes,
+                            BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
                     ce.addEdit(new UndoableKeyChange(database, bes, null, bes.getCiteKeyOptional().get())); // Cite key is set here
                     any = true;
                 }

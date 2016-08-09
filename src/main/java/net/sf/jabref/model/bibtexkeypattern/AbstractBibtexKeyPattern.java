@@ -15,7 +15,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.model.labelpattern;
+package net.sf.jabref.model.bibtexkeypattern;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,19 +29,19 @@ import java.util.StringTokenizer;
  * A small table, where an entry type is associated with a label pattern (an
  * <code>ArrayList</code>). A parent LabelPattern can be set.
  */
-public abstract class AbstractLabelPattern {
+public abstract class AbstractBibtexKeyPattern {
 
     protected List<String> defaultPattern;
 
     protected Map<String, List<String>> data = new HashMap<>();
 
     public void addLabelPattern(String type, String pattern) {
-        data.put(type, AbstractLabelPattern.split(pattern));
+        data.put(type, AbstractBibtexKeyPattern.split(pattern));
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("AbstractLabelPattern{");
+        final StringBuilder sb = new StringBuilder("AbstractBibtexKeyPattern{");
         sb.append("defaultPattern=").append(defaultPattern);
         sb.append(", data=").append(data);
         sb.append('}');
@@ -56,7 +56,7 @@ public abstract class AbstractLabelPattern {
         if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
-        AbstractLabelPattern that = (AbstractLabelPattern) o;
+        AbstractBibtexKeyPattern that = (AbstractBibtexKeyPattern) o;
         return Objects.equals(defaultPattern, that.defaultPattern) && Objects.equals(data, that.data);
     }
 
@@ -148,7 +148,7 @@ public abstract class AbstractLabelPattern {
      * @param labelPattern the pattern to store
      */
     public void setDefaultValue(String labelPattern) {
-        this.defaultPattern = AbstractLabelPattern.split(labelPattern);
+        this.defaultPattern = AbstractBibtexKeyPattern.split(labelPattern);
     }
 
     public Set<String> getAllKeys() {

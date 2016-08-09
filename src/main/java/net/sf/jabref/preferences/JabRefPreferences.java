@@ -79,8 +79,8 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.labelpattern.AbstractLabelPattern;
-import net.sf.jabref.model.labelpattern.GlobalLabelPattern;
+import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import org.apache.commons.logging.Log;
@@ -292,7 +292,7 @@ public class JabRefPreferences {
     public static final String USE_DEFAULT_CONSOLE_APPLICATION = "useDefaultConsoleApplication";
 
     // Currently, it is not possible to specify defaults for specific entry types
-    // When this should be made possible, the code to inspect is net.sf.jabref.gui.preftabs.LabelPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getLabelPattern(); etc
+    // When this should be made possible, the code to inspect is net.sf.jabref.gui.preftabs.BibtexKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getLabelPattern(); etc
     public static final String DEFAULT_LABEL_PATTERN = "defaultLabelPattern";
 
     public static final String SEARCH_MODE_FLOAT = "floatSearch";
@@ -420,7 +420,7 @@ public class JabRefPreferences {
     private final Preferences prefs;
 
     private final Set<String> nonWrappableFields = new HashSet<>(5);
-    private GlobalLabelPattern keyPattern;
+    private GlobalBibtexKeyPattern keyPattern;
 
     // Object containing custom export formats:
     public final CustomExportList customExports;
@@ -1138,9 +1138,9 @@ public class JabRefPreferences {
      *
      * @return LabelPattern containing all keys. Returned LabelPattern has no parent
      */
-    public GlobalLabelPattern getKeyPattern() {
-        keyPattern = new GlobalLabelPattern(AbstractLabelPattern.split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_LABEL_PATTERN)));
-        Preferences pre = Preferences.userNodeForPackage(GlobalLabelPattern.class);
+    public GlobalBibtexKeyPattern getKeyPattern() {
+        keyPattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern.split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_LABEL_PATTERN)));
+        Preferences pre = Preferences.userNodeForPackage(GlobalBibtexKeyPattern.class);
         try {
             String[] keys = pre.keys();
             if (keys.length > 0) {
@@ -1159,11 +1159,11 @@ public class JabRefPreferences {
      *
      * @param pattern the pattern to store
      */
-    public void putKeyPattern(GlobalLabelPattern pattern) {
+    public void putKeyPattern(GlobalBibtexKeyPattern pattern) {
         keyPattern = pattern;
 
         // Store overridden definitions to Preferences.
-        Preferences pre = Preferences.userNodeForPackage(GlobalLabelPattern.class);
+        Preferences pre = Preferences.userNodeForPackage(GlobalBibtexKeyPattern.class);
         try {
             pre.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {
@@ -1175,7 +1175,7 @@ public class JabRefPreferences {
             if (!pattern.isDefaultValue(key)) {
                 // no default value
                 // the first entry in the array is the full pattern
-                // see net.sf.jabref.logic.labelPattern.LabelPatternUtil.split(String)
+                // see net.sf.jabref.logic.labelPattern.BibtexKeyPatternUtil.split(String)
                 pre.put(key, pattern.getValue(key).get(0));
             }
         }

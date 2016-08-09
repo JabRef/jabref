@@ -48,7 +48,7 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
@@ -247,7 +247,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
             return;
         }
 
-        String testString = LabelPatternUtil.checkLegalKey(s,
+        String testString = BibtexKeyPatternUtil.checkLegalKey(s,
                 Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
         if (!testString.equals(s) || (s.indexOf('&') >= 0)) {
             // Report error and exit.
