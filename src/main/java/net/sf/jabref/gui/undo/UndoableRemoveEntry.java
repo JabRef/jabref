@@ -15,6 +15,7 @@
 */
 package net.sf.jabref.gui.undo;
 
+import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -54,7 +55,7 @@ public class UndoableRemoveEntry extends AbstractUndoableJabRefEdit {
     @Override
     public void undo() {
         super.undo();
-        base.insertEntry(entry, true);
+        base.insertEntry(entry, EntryEventSource.UNDO);
     }
 
     @Override

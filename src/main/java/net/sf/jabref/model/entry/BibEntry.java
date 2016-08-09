@@ -34,6 +34,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
+import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.event.FieldChangedEvent;
@@ -52,6 +53,9 @@ public class BibEntry implements Cloneable {
     public static final String DEFAULT_TYPE = "misc";
 
     private String id;
+
+    private final SharedBibEntryData sharedBibEntryData;
+
     private String type;
     private Map<String, String> fields = new HashMap<>();
     /*
@@ -104,6 +108,7 @@ public class BibEntry implements Cloneable {
 
         this.id = id;
         setType(type);
+        this.sharedBibEntryData = new SharedBibEntryData();
     }
 
     /**
@@ -166,7 +171,7 @@ public class BibEntry implements Cloneable {
     /**
      * Sets this entry's type.
      */
-    public void setType(String type) {
+    public void setType(String type, EntryEventSource eventSource) {
         String newType;
         if (Strings.isNullOrEmpty(type)) {
             newType = DEFAULT_TYPE;
@@ -179,7 +184,14 @@ public class BibEntry implements Cloneable {
         // sets off a change in database sorting etc.
         this.type = newType.toLowerCase(Locale.ENGLISH);
         changed = true;
-        eventBus.post(new FieldChangedEvent(this, TYPE_HEADER, newType));
+        eventBus.post(new FieldChangedEvent(this, TYPE_HEADER, newType, eventSource));
+    }
+
+    /**
+     * Sets this entry's type.
+     */
+    public void setType(String type) {
+        setType(type, EntryEventSource.LOCAL);
     }
 
     /**
@@ -345,10 +357,11 @@ public class BibEntry implements Cloneable {
 
     /**
      * Set a field, and notify listeners about the change.
-     *  @param name  The field to set.
-     * @param value The value to set.
+     * @param name  The field to set
+     * @param value The value to set
+     * @param eventSource Source the event is sent from
      */
-    public Optional<FieldChange> setField(String name, String value) {
+    public Optional<FieldChange> setField(String name, String value, EntryEventSource eventSource) {
         Objects.requireNonNull(name, "field name must not be null");
         Objects.requireNonNull(value, "field value must not be null");
 
@@ -373,8 +386,25 @@ public class BibEntry implements Cloneable {
         fieldsAsWords.remove(fieldName);
 
         FieldChange change = new FieldChange(this, fieldName, oldValue, value);
-        eventBus.post(new FieldChangedEvent(change));
+        eventBus.post(new FieldChangedEvent(change, eventSource));
         return Optional.of(change);
+    }
+
+    public Optional<FieldChange> setField(String name, Optional<String> value, EntryEventSource eventSource) {
+        if (value.isPresent()) {
+            return setField(name, value.get(), eventSource);
+        }
+        return Optional.empty();
+    }
+
+    /**
+     * Set a field, and notify listeners about the change.
+     *
+     * @param name  The field to set.
+     * @param value The value to set.
+     */
+    public Optional<FieldChange> setField(String name, String value) {
+        return setField(name, value, EntryEventSource.LOCAL);
     }
 
     /**
@@ -384,6 +414,17 @@ public class BibEntry implements Cloneable {
      * @param name The field to clear.
      */
     public Optional<FieldChange> clearField(String name) {
+        return clearField(name, EntryEventSource.LOCAL);
+    }
+
+    /**
+     * Remove the mapping for the field name, and notify listeners about
+     * the change including the {@link EntryEventSource}.
+     *
+     * @param name The field to clear.
+     * @param eventSource the source a new {@link FieldChangedEvent} should be posten from.
+     */
+    public Optional<FieldChange> clearField(String name, EntryEventSource eventSource) {
         String fieldName = toLowerCase(name);
 
         if (BibEntry.ID_FIELD.equals(fieldName)) {
@@ -400,7 +441,7 @@ public class BibEntry implements Cloneable {
         fields.remove(fieldName);
         fieldsAsWords.remove(fieldName);
         FieldChange change = new FieldChange(this, fieldName, oldValue.get(), null);
-        eventBus.post(new FieldChangedEvent(change));
+        eventBus.post(new FieldChangedEvent(change, eventSource));
         return Optional.of(change);
     }
 
@@ -598,6 +639,10 @@ public class BibEntry implements Cloneable {
 
     public Map<String, String> getFieldMap() {
         return fields;
+    }
+
+    public SharedBibEntryData getSharedBibEntryData() {
+        return sharedBibEntryData;
     }
 
     @Override

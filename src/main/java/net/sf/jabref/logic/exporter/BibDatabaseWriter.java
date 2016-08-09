@@ -19,6 +19,7 @@ package net.sf.jabref.logic.exporter;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -77,6 +78,10 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
         });
 
         return changes;
+    }
+
+    public static List<FieldChange> applySaveActions(BibEntry entry, MetaData metaData) {
+        return applySaveActions(Arrays.asList(entry), metaData);
     }
 
     private static List<Comparator<BibEntry>> getSaveComparators(SavePreferences preferences, MetaData metaData) {
