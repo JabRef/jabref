@@ -2,6 +2,7 @@ package net.sf.jabref.gui;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Locale;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -51,6 +52,125 @@ public class ParameterizedDialogNewEntryTest extends AbstractUITest {
         }).click();
 
         entryTable.requireRowCount(1);
+    }
+
+    @Test
+    public void addEntryPlainTextOfGivenType() {
+        mainFrame.menuItemWithPath("File", "New " + databaseMode + " database").click();
+        JTableFixture entryTable = mainFrame.table();
+
+        entryTable.requireRowCount(0);
+        mainFrame.menuItemWithPath("BibTeX", "New entry from plain text...").click();
+
+        GenericTypeMatcher<JDialog> matcher = new GenericTypeMatcher<JDialog>(JDialog.class) {
+
+            @Override
+            protected boolean isMatching(JDialog dialog) {
+                return "Select entry type".equals(dialog.getTitle());
+            }
+        };
+        findDialog(matcher).withTimeout(10_000).using(robot()).button(new GenericTypeMatcher<JButton>(JButton.class) {
+
+            @Override
+            protected boolean isMatching(@Nonnull JButton jButton) {
+                return entryType.equals(jButton.getText());
+            }
+        }).click();
+
+        GenericTypeMatcher<JDialog> matcher2 = new GenericTypeMatcher<JDialog>(JDialog.class) {
+
+            @Override
+            protected boolean isMatching(JDialog dialog) {
+                return ("Plain text import for " + entryType.toLowerCase(Locale.ENGLISH)).equals(dialog.getTitle());
+            }
+        };
+
+        findDialog(matcher2).withTimeout(10_000).using(robot()).button(new GenericTypeMatcher<JButton>(JButton.class) {
+
+            @Override
+            protected boolean isMatching(@Nonnull JButton jButton) {
+                return "Accept".equals(jButton.getText());
+            }
+        }).click();
+
+        entryTable.requireRowCount(1);
+    }
+
+    @Test
+    public void closeAddingEntryPlainTextOfGivenType() {
+        mainFrame.menuItemWithPath("File", "New " + databaseMode + " database").click();
+        JTableFixture entryTable = mainFrame.table();
+
+        entryTable.requireRowCount(0);
+        mainFrame.menuItemWithPath("BibTeX", "New entry from plain text...").click();
+
+        GenericTypeMatcher<JDialog> matcher = new GenericTypeMatcher<JDialog>(JDialog.class) {
+
+            @Override
+            protected boolean isMatching(JDialog dialog) {
+                return "Select entry type".equals(dialog.getTitle());
+            }
+        };
+        findDialog(matcher).withTimeout(10_000).using(robot()).button(new GenericTypeMatcher<JButton>(JButton.class) {
+
+            @Override
+            protected boolean isMatching(@Nonnull JButton jButton) {
+                return entryType.equals(jButton.getText());
+            }
+        }).click();
+
+        GenericTypeMatcher<JDialog> matcher2 = new GenericTypeMatcher<JDialog>(JDialog.class) {
+
+            @Override
+            protected boolean isMatching(JDialog dialog) {
+                return ("Plain text import for " + entryType.toLowerCase(Locale.ENGLISH)).equals(dialog.getTitle());
+            }
+        };
+
+        findDialog(matcher2).withTimeout(10_000).using(robot()).close();
+        entryTable.requireRowCount(0);
+    }
+
+    @Test
+    public void cancelAddingEntryPlainTextOfGivenType() {
+        mainFrame.menuItemWithPath("File", "New " + databaseMode + " database").click();
+        JTableFixture entryTable = mainFrame.table();
+
+        entryTable.requireRowCount(0);
+        mainFrame.menuItemWithPath("BibTeX", "New entry from plain text...").click();
+
+        GenericTypeMatcher<JDialog> matcher = new GenericTypeMatcher<JDialog>(JDialog.class) {
+
+            @Override
+            protected boolean isMatching(JDialog dialog) {
+                return "Select entry type".equals(dialog.getTitle());
+            }
+        };
+        findDialog(matcher).withTimeout(10_000).using(robot()).button(new GenericTypeMatcher<JButton>(JButton.class) {
+
+            @Override
+            protected boolean isMatching(@Nonnull JButton jButton) {
+                return entryType.equals(jButton.getText());
+            }
+        }).click();
+
+        GenericTypeMatcher<JDialog> matcher2 = new GenericTypeMatcher<JDialog>(JDialog.class) {
+
+            @Override
+            protected boolean isMatching(JDialog dialog) {
+                return ("Plain text import for " + entryType.toLowerCase(Locale.ENGLISH)).equals(dialog.getTitle());
+            }
+        };
+
+        findDialog(matcher2).withTimeout(10_000).using(robot()).button(new GenericTypeMatcher<JButton>(JButton.class) {
+
+            @Override
+            protected boolean isMatching(@Nonnull JButton jButton) {
+                return "Cancel".equals(jButton.getText());
+            }
+        }).click();
+
+        entryTable.requireRowCount(0);
     }
 
     @Parameterized.Parameters(name = "{index}: {0} : {1}")
