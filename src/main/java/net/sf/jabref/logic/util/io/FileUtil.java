@@ -407,7 +407,7 @@ public class FileUtil {
         }
         //Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);
-        return targetName;
+        return targetName.trim();
     }
 
 }
