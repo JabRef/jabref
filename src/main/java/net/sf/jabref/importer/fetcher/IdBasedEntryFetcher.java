@@ -48,7 +48,7 @@ public class IdBasedEntryFetcher implements EntryFetcher {
         status.setStatus(Localization.lang("Processing %0", query));
         try {
             Optional<BibEntry> match = fetcher.performSearchById(query);
-            inspector.addEntry(match.get());
+            match.ifPresent(inspector::addEntry);
             return match.isPresent();
         } catch (FetcherException e) {
             status.setStatus(Localization.lang("Error while fetching from %0", fetcher.getName()));

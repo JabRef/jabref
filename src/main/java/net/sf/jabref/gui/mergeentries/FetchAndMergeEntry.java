@@ -61,8 +61,9 @@ public class FetchAndMergeEntry {
 
                     try {
                         fetchedEntry = new IsbnFetcher().performSearchById(fieldContent.get());
-                    } catch (FetcherException fe) {
-                        fe.printStackTrace();
+                    } catch (FetcherException e) {
+                        panel.frame().setStatus(
+                                Localization.lang("Cannot get info based on given %0:_%1", type, fieldContent.get()));
                     }
 
                 } else if (FieldName.EPRINT.equals(field)) {

@@ -10,7 +10,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,23 +51,20 @@ public class IsbnFetcherTest {
 
     @Test
     public void testFetcher10() throws FetcherException, IOException {
-        Optional<BibEntry> isbn = fetcher.performSearchById("0321356683");
-        Assert.assertNotNull(isbn);
-        assertEquals(bibEntry, isbn.get());
-
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0321356683");
+        assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
     @Test
     public void testFetcher13() throws FetcherException, IOException {
-        Optional<BibEntry> isbn = fetcher.performSearchById("978-0321356680");
-        Assert.assertNotNull(isbn);
-        assertEquals(bibEntry, isbn.get());
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("978-0321356680");
+        assertEquals(Optional.of(bibEntry), fetchedEntry.get());
 
     }
 
     @Test(expected = NoSuchElementException.class)
     public void testFetcher10FetcherException() throws FetcherException {
-        Optional<BibEntry> isbn = fetcher.performSearchById("123456789");
-        assertEquals(Optional.empty(), isbn.get());
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("123456789");
+        assertEquals(Optional.empty(), fetchedEntry.get());
     }
 }

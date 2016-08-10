@@ -76,7 +76,7 @@ public class IsbnFetcher implements IdBasedFetcher {
                 entry = BibtexParser.singleFromString(bibtexString);
                 if (entry != null) {
                     // Optionally add curly brackets around key words to keep the case
-                    String title = entry.getField("title");
+                    String title = entry.getFieldOptional("title").get();
                     if (title != null) {
                         // Unit formatting
                         if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
@@ -93,7 +93,8 @@ public class IsbnFetcher implements IdBasedFetcher {
                     return result;
                 }
             } catch (IOException e) {
-                LOGGER.warn("Error opening URL");
+                LOGGER.error("Error opening URL");
+                throw new FetcherException("Error opening URL");
             }
         }
         return Optional.ofNullable(entry);
