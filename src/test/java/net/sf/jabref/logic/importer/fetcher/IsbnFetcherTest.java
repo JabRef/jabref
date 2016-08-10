@@ -1,7 +1,6 @@
 package net.sf.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import net.sf.jabref.Globals;
@@ -35,8 +34,7 @@ public class IsbnFetcherTest {
         bibEntry.setField("date", "2008-05-08");
         bibEntry.setField("ean", "9780321356680");
         bibEntry.setField("isbn", "0321356683");
-        bibEntry.setField("pagetotal", "384 Seiten");
-        bibEntry.setField("url", "http://www.ebook.de/de/product/6441328/joshua_bloch_effective_java.html");
+        bibEntry.setField("pagetotal", "384");
     }
 
     @Test
@@ -58,13 +56,6 @@ public class IsbnFetcherTest {
     @Test
     public void testFetcher13() throws FetcherException, IOException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("978-0321356680");
-        assertEquals(Optional.of(bibEntry), fetchedEntry.get());
-
-    }
-
-    @Test(expected = NoSuchElementException.class)
-    public void testFetcher10FetcherException() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("123456789");
-        assertEquals(Optional.empty(), fetchedEntry.get());
+        assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 }

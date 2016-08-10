@@ -1,37 +1,48 @@
+/*
+ * Copyright (C) 2003-2016 JabRef contributors.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
 package net.sf.jabref.logic.importer.fetcher;
 
-
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
-import java.util.Scanner;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
-import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
+import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.ISBN;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.utils.URIBuilder;
 
+/**
+ * Fetcher for ISBN.
+ */
 public class IsbnFetcher implements IdBasedFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(IsbnFetcher.class);
-
-    private static final String URL_PATTERN = "http://www.ebook.de/de/tools/isbn2bibtex?isbn=%s";
-    private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
-    private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
+    private static final String URL_PATTERN = "http://www.ebook.de/de/tools/isbn2bibtex?";
 
     @Override
     public String getName() {
@@ -46,57 +57,36 @@ public class IsbnFetcher implements IdBasedFetcher {
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         ISBN isbn = new ISBN(identifier);
-        String q = "";
-        Optional<BibEntry> result;
-        BibEntry entry = null;
+        Optional<BibEntry> result = Optional.empty();
 
         if (isbn.isValidChecksum() && isbn.isValidFormat()) {
+
             try {
-                q = URLEncoder.encode(identifier, StandardCharsets.UTF_8.name());
-            } catch (UnsupportedEncodingException e) {
-                LOGGER.warn("Shouldn't happen...", e);
-            }
+                //Build the URL. In this case: http://www.ebook.de/de/tools/isbn2bibtex?isbn=identifier
+                URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);
+                uriBuilder.addParameter("isbn", identifier);
+                URL url = uriBuilder.build().toURL();
 
-            String urlString = String.format(URL_PATTERN, q);
+                //Downloads the source code of the site and then creates a .bib file out of the String
+                URLDownload urlDownload = new URLDownload(url);
+                String bibtexString = urlDownload.downloadToString(StandardCharsets.UTF_8);
+                BibEntry entry = BibtexParser.singleFromString(bibtexString);
 
-            // Send the request
-            URL url = null;
-            try {
-                url = new URL(urlString);
-            } catch (MalformedURLException e) {
-                LOGGER.warn("Bad URL when fetching ISBN info", e);
-            }
+                entry.clearField(FieldName.URL);
 
-            try (InputStream source = url.openStream()) {
-                String bibtexString;
-                try (Scanner scan = new Scanner(source)) {
-                    bibtexString = scan.useDelimiter("\\A").next();
+                //Removes every non-digit character in the PAGETOTAL field.
+                if (entry.hasField(FieldName.PAGETOTAL)) {
+                    String pagetotal = entry.getFieldOptional(FieldName.PAGETOTAL).get();
+                    entry.setField(FieldName.PAGETOTAL, pagetotal.replaceAll("[\\D]", ""));
                 }
 
-                entry = BibtexParser.singleFromString(bibtexString);
-                if (entry != null) {
-                    // Optionally add curly brackets around key words to keep the case
-                    String title = entry.getFieldOptional("title").get();
-                    if (title != null) {
-                        // Unit formatting
-                        if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
-                            title = unitsToLatexFormatter.format(title);
-                        }
+                result = Optional.ofNullable(entry);
 
-                        // Case keeping
-                        if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
-                            title = protectTermsFormatter.format(title);
-                        }
-                        entry.setField("title", title);
-                    }
-                    result = Optional.ofNullable(entry);
-                    return result;
-                }
-            } catch (IOException e) {
-                LOGGER.error("Error opening URL");
-                throw new FetcherException("Error opening URL");
+            } catch (IOException | URISyntaxException e) {
+                LOGGER.error("Bad URL when fetching ISBN info", e);
+                throw new FetcherException("Bad URL when fetching ISBN info", e);
             }
         }
-        return Optional.ofNullable(entry);
+        return result;
     }
 }
