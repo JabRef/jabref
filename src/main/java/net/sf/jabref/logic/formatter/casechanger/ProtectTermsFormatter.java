@@ -27,8 +27,23 @@ public class ProtectTermsFormatter implements Formatter {
 
     private static ProtectedTermsLoader protectedTermsLoader;
 
+    /**
+     * @deprecated use ProtectTermsFormatter(ProtectedTermsLoader) instead
+     */
+    @Deprecated
+    public ProtectTermsFormatter() {
+    }
 
-    // This must be called from JabRefMain
+    public ProtectTermsFormatter(ProtectedTermsLoader protectedTermsLoader) {
+        ProtectTermsFormatter.protectedTermsLoader = protectedTermsLoader;
+    }
+
+    /**
+     * This must be called from JabRefMain
+     *
+     * @deprecated use ProtectTermsFormatter(ProtectedTermsLoader) instead
+     */
+    @Deprecated
     public static void setProtectedTermsLoader(ProtectedTermsLoader loader) {
         protectedTermsLoader = loader;
     }
@@ -47,10 +62,10 @@ public class ProtectTermsFormatter implements Formatter {
     @Override
     public String format(String text) {
         Objects.requireNonNull(text);
-
         if (text.isEmpty()) {
             return text;
         }
+        Objects.requireNonNull(ProtectTermsFormatter.protectedTermsLoader);
         return this.format(text, ProtectTermsFormatter.protectedTermsLoader.getProtectedTerms());
     }
 

@@ -3,7 +3,6 @@ package net.sf.jabref.shared;
 import java.sql.SQLException;
 import java.util.Collection;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -25,13 +24,7 @@ public class DBMSConnectorTest {
     @Test
     public void testGetNewConnection() throws ClassNotFoundException, SQLException {
         DBMSConnectionProperties properties = TestConnector.getConnectionProperties(dbmsType);
-
-        try {
-            DBMSConnector.getNewConnection(properties);
-        } catch (ClassNotFoundException | SQLException e) {
-            Assert.fail();
-            throw e;
-        }
+        DBMSConnector.getNewConnection(properties);
     }
 
     @Test(expected = SQLException.class)

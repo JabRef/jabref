@@ -23,13 +23,13 @@ services:
 # skip installation as this is also done during the script step
 install: true
 
-# allow gui testing on travis
 before_script:
   - psql -c 'create database jabref;' -U postgres
   - mysql -u root -e 'create database jabref'
 
 script:
   - ./gradlew check
+  - ./gradlew databaseTest
   # Integration tests currently often fail with "Process 'Gradle Test Executor 1' finished with non-zero exit value 137"
   # They should run, but the result is ignored
   - "export DISPLAY=:99.0"

@@ -41,6 +41,7 @@ public class FileNameCleaner {
     };
     // @formatter:on
 
+
     /**
      * Replaces illegal characters in given fileName by '_'
      *
@@ -48,7 +49,7 @@ public class FileNameCleaner {
      * @return a clean filename
      */
     public static String cleanFileName(String badFileName) {
-        StringBuilder cleanName = new StringBuilder();
+        StringBuilder cleanName = new StringBuilder(badFileName.length());
         for (int i = 0; i < badFileName.length(); i++) {
             char c = badFileName.charAt(i);
             if (FileNameCleaner.isCharLegal(c)) {
@@ -57,10 +58,10 @@ public class FileNameCleaner {
                 cleanName.append('_');
             }
         }
-        return cleanName.toString();
+        return cleanName.toString().trim();
     }
 
     private static boolean isCharLegal(char c) {
-        return Arrays.binarySearch(FileNameCleaner.ILLEGAL_CHARS, (int) c) < 0;
+        return Arrays.binarySearch(FileNameCleaner.ILLEGAL_CHARS, c) < 0;
     }
 }
