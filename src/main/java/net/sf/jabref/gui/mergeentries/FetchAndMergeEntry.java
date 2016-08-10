@@ -16,11 +16,16 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Class for fetching and merging information based on a specific field
  *
  */
 public class FetchAndMergeEntry {
+
+    private static final Log LOGGER = LogFactory.getLog(FetchAndMergeEntry.class);
 
     // A list of all field which are supported
     public static List<String> SUPPORTED_FIELDS = Arrays.asList(FieldName.DOI, FieldName.EPRINT, FieldName.ISBN);
@@ -58,20 +63,21 @@ public class FetchAndMergeEntry {
                     fetchedEntry = new DOItoBibTeX().getEntryFromDOI(fieldContent.get(),
                             ImportFormatPreferences.fromPreferences(Globals.prefs));
                 } else if (FieldName.ISBN.equals(field)) {
-
                     try {
                         fetchedEntry = new IsbnFetcher().performSearchById(fieldContent.get());
                     } catch (FetcherException e) {
+                        LOGGER.error("Info cannot be found", e);
                         panel.frame().setStatus(
-                                Localization.lang("Cannot get info based on given %0:_%1", type, fieldContent.get()));
+                                Localization.lang("Cannot get info based on given %0: %1", type, fieldContent.get()));
                     }
 
                 } else if (FieldName.EPRINT.equals(field)) {
                     try {
                         fetchedEntry = new ArXiv().performSearchById(fieldContent.get());
                     } catch (FetcherException e) {
+                        LOGGER.error("Info cannot be found", e);
                         panel.frame().setStatus(
-                                Localization.lang("Cannot get info based on given %0:_%1", type, fieldContent.get()));
+                                Localization.lang("Cannot get info based on given %0: %1", type, fieldContent.get()));
                     }
                 }
 
@@ -81,7 +87,7 @@ public class FetchAndMergeEntry {
                     dialog.setVisible(true);
                 } else {
                     panel.frame()
-                            .setStatus(Localization.lang("Cannot get info based on given %0:_%1", type,
+                            .setStatus(Localization.lang("Cannot get info based on given %0: %1", type,
                                     fieldContent.get()));
                 }
             } else {
