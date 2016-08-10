@@ -339,6 +339,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for copying selected entries.
         actions.put(Actions.COPY, (BaseAction) () -> copy());
 
+        actions.put(Actions.PRINT_PREVIEW, new PrintPreviewAction());
+
         //when you modify this action be sure to adjust Actions.DELETE
         //they are the same except of the Localization, delete confirmation and Actions.COPY call
         actions.put(Actions.CUT, (BaseAction) () -> {
@@ -2063,6 +2065,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
     }
 
+    private class PrintPreviewAction implements BaseAction {
+
+        @Override
+        public void action() throws Exception {
+            if (currentPreview == null) {
+                selectionListener.setPreviewActive(true);
+                showPreview(selectionListener.getPreview());
+            }
+            currentPreview.getPrintAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+        }
+    }
 
     // Method pertaining to the ClipboardOwner interface.
     @Override

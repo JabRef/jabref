@@ -575,4 +575,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     public void focusLost(FocusEvent e) {
         lastPressedCount = 0; // Reset quick jump when focus is lost.
     }
+
+    public PreviewPanel getPreview() {
+        return preview;
+    }
 }

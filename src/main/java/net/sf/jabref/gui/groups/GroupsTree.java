@@ -116,6 +116,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
         setShowsRootHandles(false);
         getSelectionModel().setSelectionMode(
                 TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+        this.setFocusable(true);
     }
 
     @Override

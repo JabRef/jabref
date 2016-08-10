@@ -325,8 +325,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final AbstractAction editPreamble = new GeneralAction(Actions.EDIT_PREAMBLE,
             Localization.menuTitle("Edit preamble"),
-            Localization.lang("Edit preamble"),
-            Globals.getKeyPrefs().getKey(KeyBinding.EDIT_PREAMBLE));
+            Localization.lang("Edit preamble"));
     private final AbstractAction editStrings = new GeneralAction(Actions.EDIT_STRINGS,
             Localization.menuTitle("Edit strings"),
             Localization.lang("Edit strings"),
@@ -336,7 +335,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final Action toggleToolbar = enableToggle(new AbstractAction(Localization.menuTitle("Hide/show toolbar")) {
 
         {
-            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.HIDE_SHOW_TOOLBAR));
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Hide/show toolbar"));
         }
 
