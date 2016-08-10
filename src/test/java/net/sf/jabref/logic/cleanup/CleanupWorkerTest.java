@@ -56,13 +56,9 @@ public class CleanupWorkerTest {
             Globals.journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
         }
 
-        if (Globals.protectedTermsLoader == null) {
-            Globals.protectedTermsLoader = new ProtectedTermsLoader(
-                    new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
-                            Collections.emptyList(), Collections.emptyList()));
-            Assert.assertNotEquals(Collections.emptyList(), Globals.protectedTermsLoader.getProtectedTerms());
-        }
-
+        ProtectedTermsLoader protectedTermsLoader = new ProtectedTermsLoader(
+                ProtectedTermsPreferences.fromPreferences(Globals.prefs));
+        ProtectTermsFormatter.setProtectedTermsLoader(protectedTermsLoader);
         pdfFolder = bibFolder.newFolder();
 
         MetaData metaData = new MetaData();
@@ -70,7 +66,6 @@ public class CleanupWorkerTest {
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
         worker = new CleanupWorker(context, mock(JournalAbbreviationLoader.class), Globals.prefs);
     }
-
 
     @SuppressWarnings("unused")
     @Test(expected = NullPointerException.class)
@@ -292,10 +287,7 @@ public class CleanupWorkerTest {
     @Test
     public void cleanupCasesAddsBracketAroundAluminiumGalliumArsenid() {
         CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true,
-                Collections.singletonList(
-                        new FieldFormatterCleanup("title", new ProtectTermsFormatter(Globals.protectedTermsLoader)))));
-        Assert.assertNotEquals(Collections.emptyList(), Globals.protectedTermsLoader.getProtectedTerms());
-
+                Collections.singletonList(new FieldFormatterCleanup("title", new ProtectTermsFormatter()))));
         BibEntry entry = new BibEntry();
         entry.setField("title", "AlGaAs");
 
