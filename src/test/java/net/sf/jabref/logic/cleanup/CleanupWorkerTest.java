@@ -57,8 +57,11 @@ public class CleanupWorkerTest {
         }
 
         ProtectedTermsLoader protectedTermsLoader = new ProtectedTermsLoader(
-                ProtectedTermsPreferences.fromPreferences(Globals.prefs));
+                new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
+                    Collections.emptyList(), Collections.emptyList()));
+        Assert.assertNotEquals(Collections.emptyList(), protectedTermsLoader.getProtectedTerms());
         ProtectTermsFormatter.setProtectedTermsLoader(protectedTermsLoader);
+
         pdfFolder = bibFolder.newFolder();
 
         MetaData metaData = new MetaData();
