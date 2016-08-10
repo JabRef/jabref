@@ -57,10 +57,13 @@ public class FindFullTextAction extends AbstractWorker {
 
     @Override
     public void run() {
-        // TODO: just download for all entries and save files without dialog
-        entry = basePanel.getSelectedEntries().get(0);
-        FulltextFetchers fft = new FulltextFetchers();
-        result = fft.findFullTextPDF(entry);
+        if (basePanel.getSelectedEntries().size() != 1) {
+            basePanel.output(Localization.lang("This operation requires exactly one item to be selected."));
+        } else {
+            entry = basePanel.getSelectedEntries().get(0);
+            FulltextFetchers fft = new FulltextFetchers();
+            result = fft.findFullTextPDF(entry);
+        }
     }
 
     @Override
