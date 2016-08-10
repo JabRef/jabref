@@ -75,18 +75,20 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
     @Override
     public void run() {
         BasePanel panel = frame.getCurrentBasePanel();
-        List<BibEntry> bes = panel.getSelectedEntries();
+        if (panel != null) {
+            List<BibEntry> bes = panel.getSelectedEntries();
 
-        // used at update() to determine output string
-        besLength = bes.size();
+            // used at update() to determine output string
+            besLength = bes.size();
 
-        if (!bes.isEmpty()) {
-            NamedCompound ce = new NamedCompound(Localization.lang("Mark entries"));
-            for (BibEntry be : bes) {
-                EntryMarker.markEntry(be, level + 1, false, ce);
+            if (!bes.isEmpty()) {
+                NamedCompound ce = new NamedCompound(Localization.lang("Mark entries"));
+                for (BibEntry be : bes) {
+                    EntryMarker.markEntry(be, level + 1, false, ce);
+                }
+                ce.end();
+                panel.getUndoManager().addEdit(ce);
             }
-            ce.end();
-            panel.getUndoManager().addEdit(ce);
         }
     }
 
