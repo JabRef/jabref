@@ -503,7 +503,7 @@ Since much functionality has changed during development, a release of this versi
 
 ## 2.11
 
-The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/dev_2.11/CHANGELOG) in the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
+The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG) in the [v2.11.1 tag](https://github.com/JabRef/jabref/tree/v2.11.1).
 
 [Unreleased]: https://github.com/JabRef/jabref/compare/v3.5...HEAD
 [3.5]: https://github.com/JabRef/jabref/compare/v3.4...v3.5
