@@ -23,7 +23,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -52,6 +51,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.PreviewPanel;
@@ -485,7 +485,7 @@ class StyleSelectDialog {
             super(diag, Localization.lang("Add style file"), true);
 
             JButton browse = new JButton(Localization.lang("Browse"));
-            browse.addActionListener(BrowseAction.buildForFile(newFile, null, Collections.singletonList(".jstyle")));
+            browse.addActionListener(BrowseAction.buildForFile(newFile, FileExtensions.JSTYLE));
 
             // Build content panel
             FormBuilder builder = FormBuilder.create();

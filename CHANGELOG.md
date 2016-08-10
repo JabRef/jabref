@@ -31,6 +31,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#1345](https://github.com/JabRef/jabref/issues/1345) Cleanup ISSN
 - It is now possible to add your own lists of protected terms, see Options -> Manage protected terms
 - Automatically generated group names are now converted from LaTeX to Unicode
+- Unified dialogs for opening/saving files
 
 ### Fixed
 - Fixed [#1632](https://github.com/JabRef/jabref/issues/1632) User comments (@Comment) with or without brackets are now kept
@@ -50,8 +51,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1643](https://github.com/JabRef/jabref/issues/1643): Searching with double quotes in a specific field ignores the last character
 - Fixed [#1288](https://github.com/JabRef/jabref/issues/1288): Newly opened bib-file is not focused
 - Fixed [#1669](https://github.com/JabRef/jabref/issues/1669): Dialog for manual connection to OpenOffice/LibreOffice works again on Linux
-- Fixed [#16682](https://github.com/JabRef/jabref/issues/1682): An entry now must have a BibTeX key to be cited in OpenOffice/LibreOffice
-
+- Fixed [#1682](https://github.com/JabRef/jabref/issues/1682): An entry now must have a BibTeX key to be cited in OpenOffice/LibreOffice
+- Fixed [#1324](https://github.com/JabRef/jabref/issues/1324): Save-Dialog for Lookup fulltext document now opens in the specified working directory
+- Fixed [#1609](https://github.com/JabRef/jabref/issues/1324): Adding a file to an entry opened dialog in the parent folder of the working directory
 
 ### Removed
 - It is not longer possible to choose to convert HTML sub- and superscripts to equations

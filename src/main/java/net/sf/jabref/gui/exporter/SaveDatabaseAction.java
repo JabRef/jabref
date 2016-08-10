@@ -20,9 +20,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
-import java.util.Collections;
+import java.nio.file.Path;
+import java.util.Optional;
 
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JTextArea;
 import javax.swing.SwingUtilities;
@@ -31,8 +31,9 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.Worker;
@@ -68,6 +69,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
     private static final Log LOGGER = LogFactory.getLog(SaveDatabaseAction.class);
 
+
     public SaveDatabaseAction(BasePanel panel) {
         this.panel = panel;
         this.frame = panel.frame();
@@ -96,8 +98,10 @@ public class SaveDatabaseAction extends AbstractWorker {
     public void update() {
         if (success) {
             // Reset title of tab
-            frame.setTabTitle(panel, panel.getTabTitle(), panel.getBibDatabaseContext().getDatabaseFile().getAbsolutePath());
-            frame.output(Localization.lang("Saved database") + " '" + panel.getBibDatabaseContext().getDatabaseFile().getPath() + "'.");
+            frame.setTabTitle(panel, panel.getTabTitle(),
+                    panel.getBibDatabaseContext().getDatabaseFile().getAbsolutePath());
+            frame.output(Localization.lang("Saved database") + " '"
+                    + panel.getBibDatabaseContext().getDatabaseFile().getPath() + "'.");
             frame.setWindowTitle();
             frame.updateAllTabTitles();
         } else if (!canceled) {
@@ -173,7 +177,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         frame.block();
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(encoding);
-            BibtexDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
+            BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
             if (selectedOnly) {
                 session = databaseWriter.savePartOfDatabase(panel.getBibDatabaseContext(), panel.getSelectedEntries(),
                         prefs);
@@ -184,8 +188,9 @@ public class SaveDatabaseAction extends AbstractWorker {
             panel.registerUndoableChanges(session);
 
         } catch (UnsupportedCharsetException ex2) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") +
-                            Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()),
+            JOptionPane.showMessageDialog(frame,
+                    Localization.lang("Could not save file.")
+                            + Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()),
                     Localization.lang("Save database"), JOptionPane.ERROR_MESSAGE);
             throw new SaveException("rt");
         } catch (SaveException ex) {
@@ -204,11 +209,8 @@ public class SaveDatabaseAction extends AbstractWorker {
                 LOGGER.error("Problem saving file", ex);
             }
 
-            JOptionPane.showMessageDialog
-                    (frame, Localization.lang("Could not save file.")
-                            + ".\n" + ex.getMessage(),
-                            Localization.lang("Save database"),
-                            JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + ".\n" + ex.getMessage(),
+                    Localization.lang("Save database"), JOptionPane.ERROR_MESSAGE);
             throw new SaveException("rt");
 
         } finally {
@@ -217,7 +219,8 @@ public class SaveDatabaseAction extends AbstractWorker {
 
         boolean commit = true;
         if (!session.getWriter().couldEncodeAll()) {
-            FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, fill:pref", "pref, 4dlu, pref"));
+            FormBuilder builder = FormBuilder.create()
+                    .layout(new FormLayout("left:pref, 4dlu, fill:pref", "pref, 4dlu, pref"));
             JTextArea ta = new JTextArea(session.getWriter().getProblemCharacters());
             ta.setEditable(false);
             builder.add(Localization.lang("The chosen encoding '%0' could not encode the following characters:",
@@ -227,8 +230,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             String tryDiff = Localization.lang("Try different encoding");
             int answer = JOptionPane.showOptionDialog(frame, builder.getPanel(), Localization.lang("Save database"),
                     JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE, null,
-                    new String[] {Localization.lang("Save"), tryDiff,
-                            Localization.lang("Cancel")}, tryDiff);
+                    new String[] {Localization.lang("Save"), tryDiff, Localization.lang("Cancel")}, tryDiff);
 
             if (answer == JOptionPane.NO_OPTION) {
                 // The user wants to use another encoding.
@@ -255,10 +257,10 @@ public class SaveDatabaseAction extends AbstractWorker {
                 session.cancel();
             }
         } catch (SaveException e) {
-            int ans = JOptionPane.showConfirmDialog(null, Localization.lang("Save failed during backup creation") + ". "
-                    + Localization.lang("Save without backup?"),
-                    Localization.lang("Unable to create backup"),
-                    JOptionPane.YES_NO_OPTION);
+            int ans = JOptionPane.showConfirmDialog(null,
+                    Localization.lang("Save failed during backup creation") + ". "
+                            + Localization.lang("Save without backup?"),
+                    Localization.lang("Unable to create backup"), JOptionPane.YES_NO_OPTION);
             if (ans == JOptionPane.YES_OPTION) {
                 session.setUseBackup(false);
                 session.commit(file.toPath());
@@ -306,27 +308,22 @@ public class SaveDatabaseAction extends AbstractWorker {
      * still runs synchronously using Spin (the method returns only after completing the operation).
      */
     public void saveAs() throws Throwable {
-        String chosenFile;
-        File f = null;
-        while (f == null) {
-            chosenFile = FileDialogs.getNewFile(frame, new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
-                    Collections.singletonList(".bib"), JFileChooser.SAVE_DIALOG, false, null);
-            if (chosenFile == null) {
+        File file = null;
+        while (file == null) {
+
+            Optional<Path> path = new NewFileDialogs(frame).withExtension(FileExtensions.BIBTEX_DB).saveNewFile();
+            if (path.isPresent()) {
+                file = path.get().toFile();
+
+            } else {
                 canceled = true;
                 return; // canceled
-            }
-            f = new File(chosenFile);
-            // Check if the file already exists:
-            if (f.exists() && (JOptionPane.showConfirmDialog(frame,
-                    Localization.lang("'%0' exists. Overwrite file?", f.getName()),
-                    Localization.lang("Save database"), JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION)) {
-                f = null;
             }
         }
 
         File oldFile = panel.getBibDatabaseContext().getDatabaseFile();
-        panel.getBibDatabaseContext().setDatabaseFile(f);
-        Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, f.getParent());
+        panel.getBibDatabaseContext().setDatabaseFile(file);
+        Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
         runCommand();
         // If the operation failed, revert the file field and return:
         if (!success) {
@@ -372,7 +369,8 @@ public class SaveDatabaseAction extends AbstractWorker {
      */
     private boolean checkExternalModification() {
         // Check for external modifications:
-        if (panel.isUpdatedExternally() || Globals.getFileUpdateMonitor().hasBeenModified(panel.getFileMonitorHandle())) {
+        if (panel.isUpdatedExternally()
+                || Globals.getFileUpdateMonitor().hasBeenModified(panel.getFileMonitorHandle())) {
             String[] opts = new String[] {Localization.lang("Review changes"), Localization.lang("Save"),
                     Localization.lang("Cancel")};
             int answer = JOptionPane.showOptionDialog(panel.frame(),
@@ -400,8 +398,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                         scanner.displayResult(resolved -> {
                             if (resolved) {
                                 panel.setUpdatedExternally(false);
-                                SwingUtilities
-                                        .invokeLater(() -> panel.getSidePaneManager().hide("fileUpdate"));
+                                SwingUtilities.invokeLater(() -> panel.getSidePaneManager().hide("fileUpdate"));
                             } else {
                                 canceled = true;
                             }

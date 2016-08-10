@@ -17,13 +17,11 @@ package net.sf.jabref.importer;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JMenuItem;
@@ -32,9 +30,9 @@ import javax.swing.JOptionPane;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryMarker;
-import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.ImportInspectionDialog;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.ParserResultWarningDialog;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
@@ -104,9 +102,8 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         @Override
         public void init() {
             importError = null;
-            filenames = FileDialogs.getMultipleFiles(frame,
-                    new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
-                    importer == null ? Collections.emptyList() : importer.getExtensions(), true);
+
+            filenames = new NewFileDialogs(frame).updateWorkingDirPref().showDlgAndGetMultipleFiles();
 
             if (!filenames.isEmpty()) {
                 frame.block();
@@ -141,8 +138,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                             frame.showMessage(pr.getErrorMessage());
                         }
 
-                        imports.add(new ImportFormatReader.UnknownFormatImport(importer
-                                .getFormatName(), pr));
+                        imports.add(new ImportFormatReader.UnknownFormatImport(importer.getFormatName(), pr));
                     }
                 } catch (IOException e) {
                     // This indicates that a specific importer was specified, and that
@@ -225,8 +221,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 // Bibtex result. We must merge it into our main base.
                 ParserResult pr = importResult.parserResult;
 
-                anythingUseful = anythingUseful
-                        || pr.getDatabase().hasEntries() || (!pr.getDatabase().hasNoStrings());
+                anythingUseful = anythingUseful || pr.getDatabase().hasEntries() || (!pr.getDatabase().hasNoStrings());
 
                 // Record the parserResult, as long as this is the first bibtex result:
                 if (directParserResult == null) {

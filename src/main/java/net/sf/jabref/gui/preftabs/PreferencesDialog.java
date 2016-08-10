@@ -20,17 +20,16 @@ import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -38,9 +37,11 @@ import javax.swing.ListSelectionModel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefException;
-import net.sf.jabref.gui.FileDialogs;
+
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.logic.exporter.ExportFormats;
@@ -132,7 +133,6 @@ public class PreferencesDialog extends JDialog {
             cardLayout.show(main, o);
         });
 
-
         JPanel buttons = new JPanel();
         buttons.setLayout(new GridLayout(4, 1));
         buttons.add(importPreferences, 0);
@@ -166,38 +166,33 @@ public class PreferencesDialog extends JDialog {
         // Import and export actions:
         exportPreferences.setToolTipText(Localization.lang("Export preferences to file"));
         exportPreferences.addActionListener(e -> {
-            String filename = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")),
-                    Collections.singletonList(".xml"), JFileChooser.SAVE_DIALOG, false);
-            if (filename == null) {
-                return;
-            }
-            File file = new File(filename);
-            if (!file.exists() || (JOptionPane.showConfirmDialog(PreferencesDialog.this,
-                    Localization.lang("'%0' exists. Overwrite file?", file.getName()),
-                    Localization.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
 
+            Optional<Path> path = new NewFileDialogs(frame, System.getProperty("user.home"))
+                    .withExtension(FileExtensions.XML).saveNewFile();
+            path.ifPresent(exportFile -> {
                 try {
-                    prefs.exportPreferences(filename);
+                    prefs.exportPreferences(exportFile.toString());
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
                             Localization.lang("Export preferences"), JOptionPane.ERROR_MESSAGE);
                 }
-            }
+            });
         });
 
         importPreferences.setToolTipText(Localization.lang("Import preferences from file"));
         importPreferences.addActionListener(e -> {
-            String filename = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")),
-                    Collections.singletonList(".xml"), JFileChooser.OPEN_DIALOG, false);
-            if (filename != null) {
+
+            Optional<Path> fileName = new NewFileDialogs(frame, System.getProperty("user.home"))
+                    .withExtension(FileExtensions.XML).openDlgAndGetSelectedFile();
+
+            if (fileName.isPresent()) {
                 try {
-                    prefs.importPreferences(filename);
+                    prefs.importPreferences(fileName.get().toString());
                     updateAfterPreferenceChanges();
                     JOptionPane.showMessageDialog(PreferencesDialog.this,
                             Localization.lang("You must restart JabRef for this to come into effect."),
-                            Localization.lang("Import preferences"),
-                            JOptionPane.WARNING_MESSAGE);
+                            Localization.lang("Import preferences"), JOptionPane.WARNING_MESSAGE);
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
@@ -207,8 +202,7 @@ public class PreferencesDialog extends JDialog {
         });
 
         showPreferences.addActionListener(
-                e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(Globals.prefs), frame)
-                        .setVisible(true));
+                e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(Globals.prefs), frame).setVisible(true));
         resetPreferences.addActionListener(e -> {
             if (JOptionPane.showConfirmDialog(PreferencesDialog.this,
                     Localization.lang("Are you sure you want to reset all settings to default values?"),
@@ -217,8 +211,7 @@ public class PreferencesDialog extends JDialog {
                     prefs.clear();
                     JOptionPane.showMessageDialog(PreferencesDialog.this,
                             Localization.lang("You must restart JabRef for this to come into effect."),
-                            Localization.lang("Reset preferences"),
-                            JOptionPane.WARNING_MESSAGE);
+                            Localization.lang("Reset preferences"), JOptionPane.WARNING_MESSAGE);
                 } catch (BackingStoreException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
@@ -240,6 +233,7 @@ public class PreferencesDialog extends JDialog {
         frame.removeCachedEntryEditors();
         Globals.prefs.updateEntryEditorTabList();
     }
+
 
     class OkAction extends AbstractAction {
 

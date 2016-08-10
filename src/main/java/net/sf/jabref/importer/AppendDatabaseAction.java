@@ -19,7 +19,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JOptionPane;
@@ -28,9 +27,9 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FileDialogs;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.MergeDialog;
+import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
@@ -81,11 +80,8 @@ public class AppendDatabaseAction implements BaseAction {
         md.setLocationRelativeTo(panel);
         md.setVisible(true);
         if (md.isOkPressed()) {
-            List<String> chosen = FileDialogs.getMultipleFiles(frame,
-                    new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)),
-                    Collections.emptyList(), false);
-            //String chosenFile = Globals.getNewFile(frame, new File(Globals.prefs.get("workingDirectory")),
-            //                                       null, JFileChooser.OPEN_DIALOG, false);
+
+            List<String> chosen = new NewFileDialogs(frame).updateWorkingDirPref().showDlgAndGetMultipleFiles();
             if (chosen.isEmpty()) {
                 return;
             }
@@ -95,14 +91,14 @@ public class AppendDatabaseAction implements BaseAction {
 
             // Run the actual open in a thread to prevent the program
             // locking until the file is loaded.
-            JabRefExecutorService.INSTANCE.execute(() -> openIt(md.importEntries(), md.importStrings(),
-                    md.importGroups(), md.importSelectorWords()));
+            JabRefExecutorService.INSTANCE.execute(
+                    () -> openIt(md.importEntries(), md.importStrings(), md.importGroups(), md.importSelectorWords()));
         }
 
     }
 
-    private void openIt(boolean importEntries, boolean importStrings,
-            boolean importGroups, boolean importSelectorWords) {
+    private void openIt(boolean importEntries, boolean importStrings, boolean importGroups,
+            boolean importSelectorWords) {
         if (filesToOpen.isEmpty()) {
             return;
         }
@@ -112,8 +108,8 @@ public class AppendDatabaseAction implements BaseAction {
                 // Should this be done _after_ we know it was successfully opened?
                 Charset encoding = Globals.prefs.getDefaultEncoding();
                 ParserResult pr = OpenDatabaseAction.loadDatabase(file, encoding);
-                AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings,
-                        importGroups, importSelectorWords);
+                AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings, importGroups,
+                        importSelectorWords);
                 panel.output(Localization.lang("Imported from database") + " '" + file.getPath() + "'");
             } catch (IOException | KeyCollisionException ex) {
                 LOGGER.warn("Could not open database", ex);
@@ -123,10 +119,8 @@ public class AppendDatabaseAction implements BaseAction {
         }
     }
 
-    private static void mergeFromBibtex(JabRefFrame frame, BasePanel panel, ParserResult pr,
-            boolean importEntries, boolean importStrings,
-            boolean importGroups, boolean importSelectorWords)
-                    throws KeyCollisionException {
+    private static void mergeFromBibtex(JabRefFrame frame, BasePanel panel, ParserResult pr, boolean importEntries,
+            boolean importStrings, boolean importGroups, boolean importSelectorWords) throws KeyCollisionException {
 
         BibDatabase fromDatabase = pr.getDatabase();
         List<BibEntry> appendedEntries = new ArrayList<>();
