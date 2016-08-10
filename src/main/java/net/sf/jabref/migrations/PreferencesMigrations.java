@@ -93,16 +93,27 @@ public class PreferencesMigrations {
      */
     public static void upgradeLabelPatternToBibtexKeyPattern() {
 
+        JabRefPreferences prefs = Globals.prefs;
+
         try {
             Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
 
+            if (mainPrefsNode.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, null)==null) {
+                // Check whether old defaultLabelPattern is set
+                String oldDefault = mainPrefsNode.get("defaultLabelPattern", null);
+                if(oldDefault!=null) {
+                    prefs.put(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN, oldDefault);
+                    LOGGER.info("Upgraded old default key generator pattern '"+oldDefault+"' to new version.");
+                }
+
+            }
             if (mainPrefsNode.nodeExists("bibtexkeypatterns")) {
                 return; //Pref node already exists do not migrate from previous version
             }
 
             if (mainPrefsNode.nodeExists("logic/labelpattern")) {
                 LOGGER.info("Found old Bibtex Key patterns which will be migrated to new version.");
-                JabRefPreferences prefs = Globals.prefs;
+
                 GlobalBibtexKeyPattern keyPattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern
                         .split(prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
                 Preferences oldPatternPrefs = mainPrefsNode.node("logic/labelpattern");
