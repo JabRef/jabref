@@ -2,13 +2,22 @@ package net.sf.jabref.migrations;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefMain;
+import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class PreferencesMigrations {
 
+    private static final Log LOGGER = LogFactory.getLog(PreferencesMigrations.class);
 
     /**
      * Added from Jabref 2.11 beta 4 onwards to fix wrong encoding names
@@ -76,6 +85,34 @@ public class PreferencesMigrations {
                 prefs.putBoolean(JabRefPreferences.EXPORT_SECONDARY_SORT_DESCENDING, false);
                 prefs.putBoolean(JabRefPreferences.EXPORT_TERTIARY_SORT_DESCENDING, false);
             }
+        }
+    }
+
+    /**
+     * Migrate LabelPattern configuration from version 3.3-3.5 to new BibtexKeyPatterns
+     */
+    public static void upgradeLabelPatternToBibtexKeyPattern() {
+
+        try {
+            Preferences mainPrefsNode = Preferences.userNodeForPackage(JabRefMain.class);
+
+            if (mainPrefsNode.nodeExists("bibtexkeypatterns")) {
+                return; //Pref node already exists do not migrate from previous version
+            }
+
+            if (mainPrefsNode.nodeExists("logic/labelpattern")) {
+                LOGGER.info("Found old Bibtex Key patterns which will be migrated to new version.");
+                JabRefPreferences prefs = Globals.prefs;
+                GlobalBibtexKeyPattern keyPattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern
+                        .split(prefs.get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
+                Preferences oldPatternPrefs = mainPrefsNode.node("logic/labelpattern");
+                for (String key : oldPatternPrefs.keys()) {
+                    keyPattern.addBibtexKeyPattern(key, oldPatternPrefs.get(key, null));
+                }
+                prefs.putKeyPattern(keyPattern);
+            }
+        } catch (BackingStoreException e) {
+            LOGGER.error("Migrating old bibtexKeyPatterns failed.", e);
         }
     }
 
