@@ -63,7 +63,7 @@ public class BibtexKeyPatternPanel extends JPanel {
 
     public BibtexKeyPatternPanel(BasePanel panel) {
         this.panel = panel;
-        help = new HelpAction(Localization.lang("Help on key patterns"), HelpFile.LABEL_PATTERN);
+        help = new HelpAction(Localization.lang("Help on key patterns"), HelpFile.BIBTEX_KEY_PATTERN);
         buildGUI();
     }
 

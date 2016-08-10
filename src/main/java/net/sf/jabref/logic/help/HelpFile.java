@@ -31,7 +31,7 @@ public enum HelpFile {
     GROUP("GroupsHelp"),
     CONTENT_SELECTOR("ContentSelectorHelp"),
     SPECIAL_FIELDS("SpecialFieldsHelp"),
-    LABEL_PATTERN("LabelPatterns"),
+    BIBTEX_KEY_PATTERN("BibtexKeyPatterns"),
     OWNER("OwnerHelp"),
     TIMESTAMP("TimeStampHelp"),
     CUSTOM_EXPORTS("CustomExports"),
