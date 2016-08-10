@@ -46,7 +46,6 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
-
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -154,9 +153,17 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         diag.pack();
 
         ok.addActionListener(e -> {
+            // Check that any field name is set
+            String fieldText = (String) field.getSelectedItem();
+            if ((fieldText == null) || fieldText.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(diag, Localization.lang("You must enter at least one field name"), "",
+                        JOptionPane.ERROR_MESSAGE);
+                return; // Do not close the dialog.
+            }
+
             // Check if the user tries to rename multiple fields:
             if (rename.isSelected()) {
-                String[] fields = getFieldNames((String) field.getSelectedItem());
+                String[] fields = getFieldNames(fieldText);
                 if (fields.length > 1) {
                     JOptionPane.showMessageDialog(diag, Localization.lang("You can only rename one field at a time"),
                             "", JOptionPane.ERROR_MESSAGE);
@@ -229,6 +236,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         if (toSet.isEmpty()) {
             toSet = null;
         }
+
         String[] fields = getFieldNames(((String) field.getSelectedItem()).trim().toLowerCase());
         NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
         if (rename.isSelected()) {
@@ -321,6 +329,9 @@ public class MassSetFieldAction extends MnemonicAwareAction {
     }
 
     private static String[] getFieldNames(String s) {
+        if (s == null) {
+            s = "";
+        }
         return s.split("[\\s;,]");
     }
 }
