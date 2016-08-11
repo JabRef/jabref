@@ -22,6 +22,7 @@ import javax.swing.Icon;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.SpecialFields;
 
 public class Relevance extends SpecialField {
 
@@ -39,7 +40,7 @@ public class Relevance extends SpecialField {
 
     @Override
     public String getFieldName() {
-        return SpecialFieldsUtils.FIELDNAME_RELEVANCE;
+        return SpecialFields.FIELDNAME_RELEVANCE;
     }
 
     @Override
