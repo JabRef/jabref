@@ -66,8 +66,12 @@ public class IntegrityCheck {
         result.addAll(new UrlChecker().check(entry));
         result.addAll(new FileChecker(bibDatabaseContext).check(entry));
         result.addAll(new TypeChecker().check(entry));
-        result.addAll(new AbbreviationChecker(FieldName.JOURNAL).check(entry));
-        result.addAll(new AbbreviationChecker(FieldName.BOOKTITLE).check(entry));
+        for (String journalField : InternalBibtexFields.getJournalNameFields()) {
+            result.addAll(new AbbreviationChecker(journalField).check(entry));
+        }
+        for (String bookNameField : InternalBibtexFields.getBookNameFields()) {
+            result.addAll(new AbbreviationChecker(bookNameField).check(entry));
+        }
         result.addAll(new BibStringChecker().check(entry));
         result.addAll(new HTMLCharacterChecker().check(entry));
         result.addAll(new BooktitleChecker().check(entry));

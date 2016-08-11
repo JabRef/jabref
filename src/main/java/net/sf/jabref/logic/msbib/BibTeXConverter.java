@@ -44,9 +44,9 @@ public class BibTeXConverter {
         }
 
         addAuthor(fieldValues, FieldName.AUTHOR, entry.authors);
-        addAuthor(fieldValues, MSBIB_PREFIX + "bookauthor", entry.bookAuthors);
+        addAuthor(fieldValues, MSBIB_PREFIX + FieldName.BOOKAUTHOR, entry.bookAuthors);
         addAuthor(fieldValues, FieldName.EDITOR, entry.editors);
-        addAuthor(fieldValues, MSBIB_PREFIX + "translator", entry.translators);
+        addAuthor(fieldValues, MSBIB_PREFIX + FieldName.TRANSLATOR, entry.translators);
         addAuthor(fieldValues, MSBIB_PREFIX + "producername", entry.producerNames);
         addAuthor(fieldValues, MSBIB_PREFIX + "composer", entry.composers);
         addAuthor(fieldValues, MSBIB_PREFIX + "conductor", entry.conductors);
