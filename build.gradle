@@ -32,7 +32,7 @@ apply plugin: 'checkstyle'
 
 apply from: 'eclipse.gradle'
 apply from: 'localization.gradle'
-apply from: 'medline.gradle'
+apply from: 'xjc.gradle'
 
 group = "net.sf.jabref"
 version = "3.6dev"

@@ -17,21 +17,37 @@ package net.sf.jabref.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 
 import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.importer.fileformat.bibtexml.Entry;
+import net.sf.jabref.importer.fileformat.bibtexml.File;
+import net.sf.jabref.importer.fileformat.bibtexml.Inbook;
+import net.sf.jabref.importer.fileformat.bibtexml.Incollection;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xml.sax.InputSource;
 
 /**
  * Importer for the BibTeXML format.
@@ -44,6 +60,10 @@ public class BibTeXMLImporter extends ImportFormat {
     private static final Log LOGGER = LogFactory.getLog(BibTeXMLImporter.class);
 
     private static final Pattern START_PATTERN = Pattern.compile("<(bibtex:)?file .*");
+
+    private static final List<String> FIELDS_TO_SKIP = Arrays.asList("getClass", "getAnnotate", "getContents",
+            "getPrice",
+            "getSize", "getChapter");
 
     @Override
     public String getFormatName() {
@@ -78,33 +98,177 @@ public class BibTeXMLImporter extends ImportFormat {
 
         List<BibEntry> bibItems = new ArrayList<>();
 
-        // Obtain a factory object for creating SAX parsers
-        SAXParserFactory parserFactory = SAXParserFactory.newInstance();
-        // Configure the factory object to specify attributes of the parsers it
-        // creates
-        // parserFactory.setValidating(true);
-        parserFactory.setNamespaceAware(true);
-        // Now create a SAXParser object
-
         try {
-            SAXParser parser = parserFactory.newSAXParser(); //May throw exceptions
-            BibTeXMLHandler handler = new BibTeXMLHandler();
-            // Start the parser. It reads the file and calls methods of the handler.
-            parser.parse(new InputSource(reader), handler);
-            // When you're done, report the results stored by your handler object
-            bibItems.addAll(handler.getItems());
+            JAXBContext context = JAXBContext.newInstance("net.sf.jabref.importer.fileformat.bibtexml");
+            XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+            XMLStreamReader xmlReader = xmlInputFactory.createXMLStreamReader(reader);
 
-        } catch (javax.xml.parsers.ParserConfigurationException e) {
+            //go to the root element
+            while (!xmlReader.isStartElement()) {
+                xmlReader.next();
+            }
+
+            Unmarshaller unmarshaller = context.createUnmarshaller();
+            File file = (File) unmarshaller.unmarshal(xmlReader);
+
+            List<Entry> entries = file.getEntry();
+            Map<String, String> fields = new HashMap<>();
+
+            for (Entry entry : entries) {
+                BibEntry bibEntry = new BibEntry(DEFAULT_BIBTEXENTRY_ID);
+                if (entry.getArticle() != null) {
+                    bibEntry.setType("article");
+                    parse(entry.getArticle(), fields);
+                }
+                if (entry.getBook() != null) {
+                    bibEntry.setType("book");
+                    parse(entry.getBook(), fields);
+                }
+                if (entry.getBooklet() != null) {
+                    bibEntry.setType("booklet");
+                    parse(entry.getBooklet(), fields);
+                }
+                if (entry.getConference() != null) {
+                    bibEntry.setType("conference");
+                    parse(entry.getConference(), fields);
+                }
+                if (entry.getInbook() != null) {
+                    bibEntry.setType("inbook");
+                    parseInbook(entry.getInbook(), fields);
+                }
+                if (entry.getIncollection() != null) {
+                    bibEntry.setType("incollection");
+                    Incollection incollection = entry.getIncollection();
+                    if (incollection.getChapter() != null) {
+                        fields.put(FieldName.CHAPTER, String.valueOf(incollection.getChapter()));
+                    }
+                    parse(incollection, fields);
+                }
+                if (entry.getInproceedings() != null) {
+                    bibEntry.setType("inproceedings");
+                    parse(entry.getInproceedings(), fields);
+                }
+                if (entry.getManual() != null) {
+                    bibEntry.setType("manual");
+                    parse(entry.getManual(), fields);
+                }
+                if (entry.getMastersthesis() != null) {
+                    bibEntry.setType("mastersthesis");
+                    parse(entry.getMastersthesis(), fields);
+                }
+                if (entry.getMisc() != null) {
+                    bibEntry.setType("misc");
+                    parse(entry.getMisc(), fields);
+                }
+                if (entry.getPhdthesis() != null) {
+                    bibEntry.setType("phdthesis");
+                    parse(entry.getPhdthesis(), fields);
+                }
+                if (entry.getProceedings() != null) {
+                    bibEntry.setType("proceedings");
+                    parse(entry.getProceedings(), fields);
+                }
+                if (entry.getTechreport() != null) {
+                    bibEntry.setType("techreport");
+                    parse(entry.getTechreport(), fields);
+                }
+                if (entry.getUnpublished() != null) {
+                    bibEntry.setType("unpublished");
+                    parse(entry.getUnpublished(), fields);
+                }
+                if (entry.getId() != null) {
+                    bibEntry.setCiteKey(entry.getId());
+                }
+                bibEntry.setField(fields);
+                bibItems.add(bibEntry);
+            }
+        } catch (JAXBException | XMLStreamException e) {
             LOGGER.error("Error with XML parser configuration", e);
-            return ParserResult.fromErrorMessage(e.getLocalizedMessage());
-        } catch (org.xml.sax.SAXException e) {
-            LOGGER.error("Error during XML parsing", e);
-            return ParserResult.fromErrorMessage(e.getLocalizedMessage());
-        } catch (IOException e) {
-            LOGGER.error("Error during file import", e);
             return ParserResult.fromErrorMessage(e.getLocalizedMessage());
         }
         return new ParserResult(bibItems);
     }
 
+    /**
+     * In this method, all <Code>get</Code> methods that t has will be used and their value will be put to fields,
+     * if it is not null. So for example if entryType has the method <Code>getAbstract</Code>, then
+     * "abstract" will be put as key to fields and the value of <Code>getAbstract</Code> will be put as value to fields.
+     * Some <Code>get</Code> methods shouldn't be mapped to fields, so <Code>getClass</Code> for example will be skipped.
+     *
+     * @param entryType This can be all possible BibTeX types. It contains all fields of the entry and their values.
+     * @param fields A map where the name and the value of all fields, that the entry contains, will be put.
+     */
+    private <T> void parse(T entryType, Map<String, String> fields) {
+        Method[] declaredMethods = entryType.getClass().getDeclaredMethods();
+        for (Method method : declaredMethods) {
+            try {
+                if (method.getName().equals("getYear")) {
+                    putYear(fields, (XMLGregorianCalendar) method.invoke(entryType));
+                    continue;
+                } else if (method.getName().equals("getNumber")) {
+                    putNumber(fields, (BigInteger) method.invoke(entryType));
+                    continue;
+                } else if (isFieldToSkip(method.getName())) {
+                    continue;
+                } else if (method.getName().contains("get")) {
+                    putIfValueNotNull(fields, method.getName().replace("get", ""), (String) method.invoke(entryType));
+                }
+            } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
+                LOGGER.error("Could not invoke method", e);
+            }
+        }
+    }
+
+    /**
+     * Returns whether the value of the given method name should be mapped or whether the field can be skipped.
+     *
+     * @param name of a method
+     * @return true if the field can be skipped, else false
+     */
+    private boolean isFieldToSkip(String name) {
+        return FIELDS_TO_SKIP.contains(name);
+    }
+
+    private void parseInbook(Inbook inbook, Map<String, String> fields) {
+        List<JAXBElement<?>> content = inbook.getContent();
+        for (JAXBElement<?> element : content) {
+            String localName = element.getName().getLocalPart();
+            Object elementValue = element.getValue();
+            if (elementValue instanceof String) {
+                String value = (String) elementValue;
+                putIfValueNotNull(fields, localName, value);
+            } else if (elementValue instanceof BigInteger) {
+                BigInteger value = (BigInteger) elementValue;
+                if (FieldName.NUMBER.equals(localName)) {
+                    putNumber(fields, value);
+                }
+                if (FieldName.CHAPTER.equals(localName) && (value != null)) {
+                    fields.put(FieldName.CHAPTER, String.valueOf(value));
+                }
+            } else if (elementValue instanceof XMLGregorianCalendar) {
+                XMLGregorianCalendar value = (XMLGregorianCalendar) elementValue;
+                if (FieldName.YEAR.equals(localName)) {
+                    putYear(fields, value);
+                }
+            }
+        }
+    }
+
+    private void putYear(Map<String, String> fields, XMLGregorianCalendar year) {
+        if (year != null) {
+            fields.put(FieldName.YEAR, String.valueOf(year));
+        }
+    }
+
+    private void putNumber(Map<String, String> fields, BigInteger number) {
+        if (number != null) {
+            fields.put(FieldName.NUMBER, String.valueOf(number));
+        }
+    }
+
+    private void putIfValueNotNull(Map<String, String> fields, String key, String value) {
+        if (value != null) {
+            fields.put(key, value);
+        }
+    }
 }

@@ -48,12 +48,6 @@ public class BibTeXMLImporterTest {
     }
 
     @Test
-    public void testGetItemsEmpty() {
-        BibTeXMLHandler handler = new BibTeXMLHandler();
-        Assert.assertEquals(Collections.emptyList(), handler.getItems());
-    }
-
-    @Test
     public void testGetFormatName() {
         Assert.assertEquals("BibTeXML", importer.getFormatName());
     }
