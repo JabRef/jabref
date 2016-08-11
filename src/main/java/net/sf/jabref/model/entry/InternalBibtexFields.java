@@ -184,10 +184,6 @@ public class InternalBibtexFields {
         dummy.setExtras(EnumSet.of(FieldProperties.FILE_EDITOR));
         add(dummy);
 
-        dummy = new BibtexSingleField(FieldName.RELATED, false);
-        dummy.setExtras(EnumSet.of(FieldProperties.MULTIPLE_ENTRY_LINK));
-        add(dummy);
-
         add(new BibtexSingleField("search", false, 75));
 
         // some BibLatex fields
@@ -511,6 +507,12 @@ public class InternalBibtexFields {
     public static List<String> getBookNameFields() {
         return InternalBibtexFields.getAllPublicFieldNames().stream()
                 .filter(fieldName -> InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.BOOK_NAME))
+                .collect(Collectors.toList());
+    }
+
+    public static List<String> getPersonNameFields() {
+        return InternalBibtexFields.getAllPublicFieldNames().stream().filter(
+                fieldName -> InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.PERSON_NAMES))
                 .collect(Collectors.toList());
     }
 
