@@ -37,6 +37,9 @@ import java.util.Objects;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import javafx.scene.Node;
+import javafx.scene.text.Text;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -196,6 +199,12 @@ public class IconTheme {
 
         public FontBasedIcon getSmallIcon() {
             return new FontBasedIcon(this.code, this.color, IconTheme.SMALL_SIZE);
+        }
+
+        public Node getGraphicNode() {
+            Text graphic = new Text(this.code);
+            graphic.getStyleClass().add("icon");
+            return graphic;
         }
 
         public String getCode() {

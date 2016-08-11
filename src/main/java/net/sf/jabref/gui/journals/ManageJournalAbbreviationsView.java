@@ -38,7 +38,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
@@ -47,6 +46,8 @@ import net.sf.jabref.JabRefException;
 import net.sf.jabref.gui.FXAlert;
 import net.sf.jabref.gui.FXDialogs;
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.logic.journals.DuplicatedJournalAbbreviationException;
+import net.sf.jabref.logic.journals.DuplicatedJournalFileException;
 import net.sf.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.FXMLView;
@@ -120,15 +121,9 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     }
 
     private void setButtonStyles() {
-        Text addJournalFileButtonGraphic = new Text(IconTheme.JabRefIcon.OPEN.getCode());
-        addJournalFileButtonGraphic.getStyleClass().add("icon");
-        addJournalFileButton.setGraphic(addJournalFileButtonGraphic);
-        Text addNewJournalFileButtonGraphic = new Text(IconTheme.JabRefIcon.NEW.getCode());
-        addNewJournalFileButtonGraphic.getStyleClass().add("icon");
-        addNewJournalFileButton.setGraphic(addNewJournalFileButtonGraphic);
-        Text removeJournalAbbreviationsButtonGraphic = new Text(IconTheme.JabRefIcon.CLOSE.getCode());
-        removeJournalAbbreviationsButtonGraphic.getStyleClass().add("icon");
-        removeJournalAbbreviationsButton.setGraphic(removeJournalAbbreviationsButtonGraphic);
+        addJournalFileButton.setGraphic(IconTheme.JabRefIcon.OPEN.getGraphicNode());
+        addNewJournalFileButton.setGraphic(IconTheme.JabRefIcon.NEW.getGraphicNode());
+        removeJournalAbbreviationsButton.setGraphic(IconTheme.JabRefIcon.CLOSE.getGraphicNode());
         ButtonBar.setButtonData(progressIndicator, ButtonData.LEFT);
         ButtonBar.setButtonData(loadingLabel, ButtonData.LEFT);
         ButtonBar.setButtonUniformSize(progressIndicator, false);
@@ -155,20 +150,12 @@ public class ManageJournalAbbreviationsView extends FXMLView {
                 if (isPseudoAbbreviation != null) {
                     if (!isEmpty) {
                         if (isEditableAndRemovable.get()) {
-                            if (!isPseudoAbbreviation) {
-                                Text graphic = new Text(IconTheme.JabRefIcon.EDIT.getCode());
-                                graphic.getStyleClass().add("icon");
-                                setGraphic(graphic);
-                                setOnMouseClicked(evt -> {
-                                    editAbbreviation();
-                                });
+                            if (isPseudoAbbreviation) {
+                                setGraphic(IconTheme.JabRefIcon.ADD.getGraphicNode());
+                                setOnMouseClicked(evt -> addAbbreviation());
                             } else {
-                                Text graphic = new Text(IconTheme.JabRefIcon.ADD.getCode());
-                                graphic.getStyleClass().add("icon");
-                                setGraphic(graphic);
-                                setOnMouseClicked(evt -> {
-                                    addAbbreviation();
-                                });
+                                setGraphic(IconTheme.JabRefIcon.EDIT.getGraphicNode());
+                                setOnMouseClicked(evt -> editAbbreviation());
                             }
                         }
                     }
@@ -184,15 +171,11 @@ public class ManageJournalAbbreviationsView extends FXMLView {
                 super.updateItem(isPseudoAbbreviation, isEmpty);
                 if (isPseudoAbbreviation != null) {
                     if (!isEmpty && isEditableAndRemovable.get()) {
-                        if (!isPseudoAbbreviation) {
-                            Text graphic = new Text(IconTheme.JabRefIcon.DELETE_ENTRY.getCode());
-                            graphic.getStyleClass().add("icon");
-                            setGraphic(graphic);
-                            setOnMouseClicked(evt -> {
-                                removeAbbreviation();
-                            });
-                        } else {
+                        if (isPseudoAbbreviation) {
                             setGraphic(null);
+                        } else {
+                            setGraphic(IconTheme.JabRefIcon.DELETE_ENTRY.getGraphicNode());
+                            setOnMouseClicked(evt -> removeAbbreviation());
                         }
                     }
                 } else {
@@ -251,13 +234,13 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     @FXML
     private void addNewFile() {
         FileChooser chooser = new FileChooser();
-        chooser.getExtensionFilters().add(new ExtensionFilter("TXT files (*.txt)", "*.txt"));
+        chooser.getExtensionFilters().add(new ExtensionFilter(Localization.lang("%0 file", "TXT"), "*.txt"));
         File file = chooser.showSaveDialog(null);
         if (file != null) {
             try {
                 viewModel.addNewFile(file.getAbsolutePath());
                 journalFilesBox.getSelectionModel().selectLast();
-            } catch (JabRefException e) {
+            } catch (DuplicatedJournalFileException e) {
                 showErrorDialog(e);
             }
         }
@@ -266,13 +249,13 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     @FXML
     private void openFile() {
         FileChooser chooser = new FileChooser();
-        chooser.getExtensionFilters().add(new ExtensionFilter("TXT files (*.txt)", "*.txt"));
+        chooser.getExtensionFilters().add(new ExtensionFilter(Localization.lang("%0 file", "TXT"), "*.txt"));
         File file = chooser.showOpenDialog(null);
         if (file != null) {
             try {
                 viewModel.openFile(file.getAbsolutePath());
                 journalFilesBox.getSelectionModel().selectLast();
-            } catch (JabRefException e) {
+            } catch (DuplicatedJournalFileException e) {
                 showErrorDialog(e);
             }
         }
@@ -290,11 +273,11 @@ public class ManageJournalAbbreviationsView extends FXMLView {
 
     @FXML
     private void addAbbreviation() {
-        viewModel.abbreviationsNameProperty().set("Name");
-        viewModel.abbreviationsAbbreviationProperty().set("Abbreviation");
+        viewModel.abbreviationsNameProperty().set(Localization.lang("Name"));
+        viewModel.abbreviationsAbbreviationProperty().set(Localization.lang("Abbreviation"));
         try {
             viewModel.addAbbreviation();
-        } catch (JabRefException e) {
+        } catch (DuplicatedJournalAbbreviationException e) {
             showErrorDialog(e);
         }
         selectNewAbbreviation();
@@ -330,9 +313,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
 
     @FXML
     private void saveAbbreviations() {
-        viewModel.saveExternalFilesList();
-        viewModel.saveJournalAbbreviationFiles();
-        viewModel.updateAbbreviationsAutoComplete();
+        viewModel.saveEverythingAndUpdateAutoCompleter();
         closeDialog();
     }
 
@@ -413,8 +394,8 @@ public class ManageJournalAbbreviationsView extends FXMLView {
             textField.focusedProperty().addListener(new ChangeListener<Boolean>() {
 
                 @Override
-                public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-                    if (!arg2) {
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    if (!newValue) {
                         commitEdit(textField.getText());
                     }
                 }
@@ -514,8 +495,8 @@ public class ManageJournalAbbreviationsView extends FXMLView {
             textField.focusedProperty().addListener(new ChangeListener<Boolean>() {
 
                 @Override
-                public void changed(ObservableValue<? extends Boolean> arg0, Boolean arg1, Boolean arg2) {
-                    if (!arg2) {
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    if (!newValue) {
                         commitEdit(textField.getText());
                     }
                 }

@@ -28,11 +28,14 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefException;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.journals.Abbreviation;
+import net.sf.jabref.logic.journals.DuplicatedJournalAbbreviationException;
+import net.sf.jabref.logic.journals.DuplicatedJournalFileException;
+import net.sf.jabref.logic.journals.EmptyFieldException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -91,7 +94,7 @@ public class ManageJournalAbbreviationsViewModel {
         externalFiles.forEach(name -> {
             try {
                 openFile(name);
-            } catch (JabRefException e) {
+            } catch (DuplicatedJournalFileException e) {
                 logger.debug(e);
             }
         });
@@ -103,9 +106,9 @@ public class ManageJournalAbbreviationsViewModel {
      * {@link #openFile(File file)} method
      *
      * @param filePath where the new file should be written to
-     * @throws JabRefException if journal file with same path is already open
+     * @throws DuplicatedJournalFileException if journal file with same path is already open
      */
-    public void addNewFile(String filePath) throws JabRefException {
+    public void addNewFile(String filePath) throws DuplicatedJournalFileException {
         openFile(filePath);
     }
 
@@ -116,12 +119,12 @@ public class ManageJournalAbbreviationsViewModel {
      * to the abbreviations property.
      *
      * @param filePath to the file
-     * @throws JabRefException if journal file with same path is already open
+     * @throws DuplicatedJournalFileException if journal file with same path is already open
      */
-    public void openFile(String filePath) throws JabRefException {
+    public void openFile(String filePath) throws DuplicatedJournalFileException {
         AbbreviationsFileViewModel abbreviationsFile = new AbbreviationsFileViewModel(filePath);
         if (journalFiles.contains(abbreviationsFile)) {
-            throw new JabRefException("Duplicated Journal File");
+            throw new DuplicatedJournalFileException("Duplicated Journal File");
         }
         journalFiles.add(abbreviationsFile);
         if (abbreviationsFile.exists()) {
@@ -179,12 +182,14 @@ public class ManageJournalAbbreviationsViewModel {
      * The name and the actual abbreviation will be taken from the abbreviationsName
      * and abbreviationsAbbreviation properties. It also sets the currentAbbreviation
      * property to the new abbreviation.
+     *
+     * @throws DuplicatedJournalAbbreviationException if the abbreviation already exists
      */
-    public void addAbbreviation() throws JabRefException {
+    public void addAbbreviation() throws DuplicatedJournalAbbreviationException {
         Abbreviation abbreviation = new Abbreviation(abbreviationsName.get(), abbreviationsAbbreviation.get());
         AbbreviationViewModel abbreviationViewModel = new AbbreviationViewModel(abbreviation);
         if (abbreviations.contains(abbreviationViewModel)) {
-            throw new JabRefException("Duplicated journal abbreviation");
+            throw new DuplicatedJournalAbbreviationException("Duplicated journal abbreviation");
         } else {
             abbreviations.add(abbreviationViewModel);
             currentAbbreviation.set(abbreviationViewModel);
@@ -196,9 +201,10 @@ public class ManageJournalAbbreviationsViewModel {
      * The name and the actual abbreviation will be taken from the abbreviationsName
      * and abbreviationsAbbreviation properties.
      *
-     * @throws JabRefException
+     * @throws EmptyFieldException
+     * @throws DuplicatedJournalAbbreviationException
      */
-    public void editAbbreviation() throws JabRefException {
+    public void editAbbreviation() throws EmptyFieldException, DuplicatedJournalAbbreviationException {
         if (abbreviationsCount.get() != 0) {
             Abbreviation abbreviation = new Abbreviation(abbreviationsName.get(), abbreviationsAbbreviation.get());
             AbbreviationViewModel abbViewModel = new AbbreviationViewModel(abbreviation);
@@ -206,7 +212,7 @@ public class ManageJournalAbbreviationsViewModel {
                 if (abbViewModel.equals(currentAbbreviation.get())) {
                     setCurrentAbbreviationNameAndAbbreviationIfValid();
                 } else {
-                    throw new JabRefException("Duplicated journal abbreviation");
+                    throw new DuplicatedJournalAbbreviationException("Duplicated journal abbreviation");
                 }
             } else {
                 setCurrentAbbreviationNameAndAbbreviationIfValid();
@@ -217,17 +223,17 @@ public class ManageJournalAbbreviationsViewModel {
     /**
      * Sets the name and the abbreviation of the {@code currentAbbreviation} property
      * to the values of the {@code abbreviationsName} and {@code abbreviationsAbbreviation}
-     * properties. If the values are not valid for the abbreviation it will throw a {@link JabRefException}.
+     * properties.
      *
-     * @throws JabRefException
+     * @throws EmptyFieldException if either the name or the abbreviation is empty
      */
-    private void setCurrentAbbreviationNameAndAbbreviationIfValid() throws JabRefException {
+    private void setCurrentAbbreviationNameAndAbbreviationIfValid() throws EmptyFieldException {
         String name = abbreviationsName.get();
         String abbreviation = abbreviationsAbbreviation.get();
         if (name.trim().isEmpty()) {
-            throw new JabRefException("Name can not be empty");
+            throw new EmptyFieldException("Name can not be empty");
         } else if (abbreviation.trim().isEmpty()) {
-            throw new JabRefException("Abbrevaition can not be empty");
+            throw new EmptyFieldException("Abbrevaition can not be empty");
         }
         currentAbbreviation.get().setName(name);
         currentAbbreviation.get().setAbbreviation(abbreviation);
@@ -308,12 +314,14 @@ public class ManageJournalAbbreviationsViewModel {
     }
 
     /**
-     * <p><b>This method is untested!</b></p>
-     * Should be called after the editing of the journal abbreviations has been
-     * finished and the files have been saved with {@link #saveExternalFilesList()}
-     * and {@link #saveJournalAbbreviationFiles()}.}
+     * This method first saves all external files to its internal list, then writes all abbreviations
+     * to their files and finally updates the abbreviations auto complete. It basically calls
+     * {@link #saveExternalFilesList()}, {@link #saveJournalAbbreviationFiles() }and finally
+     * {@link #updateAbbreviationsAutoComplete()}.
      */
-    public void updateAbbreviationsAutoComplete() {
+    public void saveEverythingAndUpdateAutoCompleter() {
+        saveExternalFilesList();
+        saveJournalAbbreviationFiles();
         // Update the autocompleter for the "journal" field in all base panels,
         // so added journal names are available:
         for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
