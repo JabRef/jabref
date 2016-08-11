@@ -414,7 +414,7 @@ public class JabRefPreferences {
     private static final String CUSTOM_TYPE_PRIOPT = "customTypePriOpt_";
 
     // Prefs node for BibtexKeyPatterns
-    private static final String BIBTEX_KEY_PATTERNS_NODE = "bibtexkeypatterns";
+    public static final String BIBTEX_KEY_PATTERNS_NODE = "bibtexkeypatterns";
 
     public String WRAPPED_USERNAME;
     public final String MARKING_WITH_NUMBER_PATTERN;
