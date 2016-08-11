@@ -7,7 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Determines which bibtex cite keys are duplicates in a single {@link BibDatabase}
+ * Determines which bibtex cite keys are duplicates in a single {@link BibDatabase}.
  */
 class DuplicationChecker {
 
@@ -16,14 +16,19 @@ class DuplicationChecker {
     // use a map instead of a set since i need to know how many of each key is in there
     private final Map<String, Integer> allKeys = new HashMap<>();
 
-    //##########################################
-    //  usage:
-    //  isDuplicate=checkForDuplicateKeyAndAdd( null, b.getKey() , issueDuplicateWarning);
-    //############################################
-    // if the newkey already exists and is not the same as oldkey it will give a warning
-    // else it will add the newkey to the to set and remove the oldkey
+    /**
+     * Usage:
+     * <br>
+     * isDuplicate=checkForDuplicateKeyAndAdd( null, b.getKey() , issueDuplicateWarning);
+     *
+     * If the newkey already exists and is not the same as oldkey it will give a warning
+     * else it will add the newkey to the to set and remove the oldkey
+     *
+     * @param oldKey
+     * @param newKey
+     * @return true, if there is a duplicate key, else false
+     */
     public boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey) {
-        // LOGGER.debug(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
 
         boolean duplicate;
         if (oldKey == null) {// this is a new entry so don't bother removing oldKey
@@ -64,10 +69,16 @@ class DuplicationChecker {
 
     }
 
-    //========================================================
-    // keep track of all the keys to warn if there are duplicates
-    //========================================================
-    public boolean addKeyToSet(String key) {
+    /**
+     * If the given key is null or the key is empty, then false will be returned and the key will not be added.
+     * If the given key exists in the allKeys set with value k, then the key will be put to allKeys with value k+1.
+     * If the given key not exists in the allKeys set, then the key will be put to the set with value 1.
+     *
+     * @param key as String
+     * @return true, if the key already exists in the allkeys set <br>
+     *         false, if the key is null, empty or already exists in the allkeys set
+     */
+    protected boolean addKeyToSet(String key) {
         if ((key == null) || key.isEmpty()) {
             return false;//don't put empty key
         }
@@ -75,27 +86,28 @@ class DuplicationChecker {
         if (allKeys.containsKey(key)) {
             // warning
             exists = true;
-            allKeys.put(key, allKeys.get(key) + 1);// incrementInteger( allKeys.get(key)));
+            allKeys.put(key, allKeys.get(key) + 1);
         } else {
             allKeys.put(key, 1);
         }
         return exists;
     }
 
-    //========================================================
-    // reduce the number of keys by 1. if this number goes to zero then remove from the set
-    // note: there is a good reason why we should not use a hashset but use hashmap instead
-    //========================================================
-    public void removeKeyFromSet(String key) {
+    /**
+     * Removes a key from the allKeys set. If the key is null, empty or the set doesn't contain the key, nothing will happen.
+     * If the key exists in the set with the value k, then if k is 1, the key will be removed from the set. If k is not 1,
+     * then the key will be put to the set with value k+1.
+     */
+    protected void removeKeyFromSet(String key) {
         if ((key == null) || key.isEmpty()) {
             return;
         }
         if (allKeys.containsKey(key)) {
-            Integer tI = allKeys.get(key); // if(allKeys.get(key) instanceof Integer)
+            Integer tI = allKeys.get(key);
             if (tI == 1) {
                 allKeys.remove(key);
             } else {
-                allKeys.put(key, tI - 1);//decrementInteger( tI ));
+                allKeys.put(key, tI - 1);
             }
         }
     }
