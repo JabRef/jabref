@@ -45,14 +45,14 @@ import org.apache.commons.logging.LogFactory;
 public class ManageJournalAbbreviationsViewModel {
 
     private final Log logger = LogFactory.getLog(ManageJournalAbbreviationsViewModel.class);
-    private final SimpleListProperty<AbbreviationsFile> journalFiles = new SimpleListProperty<>(
+    private final SimpleListProperty<AbbreviationsFileViewModel> journalFiles = new SimpleListProperty<>(
             FXCollections.observableArrayList());
     private final SimpleListProperty<AbbreviationViewModel> abbreviations = new SimpleListProperty<>(
             FXCollections.observableArrayList());
     private final SimpleIntegerProperty abbreviationsCount = new SimpleIntegerProperty();
     private final SimpleStringProperty abbreviationsName = new SimpleStringProperty();
     private final SimpleStringProperty abbreviationsAbbreviation = new SimpleStringProperty();
-    private final SimpleObjectProperty<AbbreviationsFile> currentFile = new SimpleObjectProperty<>();
+    private final SimpleObjectProperty<AbbreviationsFileViewModel> currentFile = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<AbbreviationViewModel> currentAbbreviation = new SimpleObjectProperty<>();
 
 
@@ -68,7 +68,8 @@ public class ManageJournalAbbreviationsViewModel {
         List<Abbreviation> builtInList = Globals.journalAbbreviationLoader.getBuiltInAbbreviations();
         List<AbbreviationViewModel> builtInListViewModel = new ArrayList<>();
         builtInList.forEach(abbreviation -> builtInListViewModel.add(new AbbreviationViewModel(abbreviation)));
-        AbbreviationsFile builtInFile = new AbbreviationsFile(builtInListViewModel, "JabRef built in list");
+        AbbreviationsFileViewModel builtInFile = new AbbreviationsFileViewModel(builtInListViewModel,
+                "JabRef built in list");
         journalFiles.add(builtInFile);
         List<Abbreviation> ieeeList;
         if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
@@ -78,7 +79,7 @@ public class ManageJournalAbbreviationsViewModel {
         }
         List<AbbreviationViewModel> ieeeListViewModel = new ArrayList<>();
         ieeeList.forEach(abbreviation -> ieeeListViewModel.add(new AbbreviationViewModel(abbreviation)));
-        AbbreviationsFile ieeeFile = new AbbreviationsFile(ieeeListViewModel, "IEEE built in list");
+        AbbreviationsFileViewModel ieeeFile = new AbbreviationsFileViewModel(ieeeListViewModel, "IEEE built in list");
         journalFiles.add(ieeeFile);
     }
 
@@ -118,7 +119,7 @@ public class ManageJournalAbbreviationsViewModel {
      * @throws JabRefException if journal file with same path is already open
      */
     public void openFile(String filePath) throws JabRefException {
-        AbbreviationsFile abbreviationsFile = new AbbreviationsFile(filePath);
+        AbbreviationsFileViewModel abbreviationsFile = new AbbreviationsFileViewModel(filePath);
         if (journalFiles.contains(abbreviationsFile)) {
             throw new JabRefException("Duplicated Journal File");
         }
@@ -138,7 +139,7 @@ public class ManageJournalAbbreviationsViewModel {
      *
      * @param abbreviationsFile as new active file
      */
-    public void changeActiveFile(AbbreviationsFile abbreviationsFile) {
+    public void changeActiveFile(AbbreviationsFileViewModel abbreviationsFile) {
         // unbind previous current file
         if (currentFile.get() != null) {
             abbreviations.unbindBidirectional(currentFile.get().abbreviationsProperty());
@@ -238,20 +239,21 @@ public class ManageJournalAbbreviationsViewModel {
      * in the abbreviations property if applicable. Else it will be set null.
      */
     public void deleteAbbreviation() {
-        int index = abbreviations.indexOf(currentAbbreviation.get());
-        // index > 1 because there is a pseudo abbreviation at the start of every editable abbreviation list
-        if (index > 1) {
-            currentAbbreviation.set(abbreviations.get(index - 1));
-        } else if ((index + 1) < abbreviationsCount.get()) {
-            currentAbbreviation.set(abbreviations.get(index + 1));
-        } else {
-            currentAbbreviation.set(null);
+        if ((currentAbbreviation.get() != null) && !currentAbbreviation.get().isPseudoAbbreviation()) {
+            int index = abbreviations.indexOf(currentAbbreviation.get());
+            if (index > 1) {
+                currentAbbreviation.set(abbreviations.get(index - 1));
+            } else if ((index + 1) < abbreviationsCount.get()) {
+                currentAbbreviation.set(abbreviations.get(index + 1));
+            } else {
+                currentAbbreviation.set(null);
+            }
+            abbreviations.remove(index);
         }
-        abbreviations.remove(index);
     }
 
     /**
-     * Calls the {@link AbbreviationsFile#WriteOrCreate()} method for each file
+     * Calls the {@link AbbreviationsFileViewModel#writeOrCreate()} method for each file
      * in the journalFiles property which will overwrite the existing files with
      * the content of the abbreviations property of the AbbriviationsFile. Non
      * existing files will be created.
@@ -259,7 +261,7 @@ public class ManageJournalAbbreviationsViewModel {
     public void saveJournalAbbreviationFiles() {
         journalFiles.forEach(file -> {
             try {
-                file.WriteOrCreate();
+                file.writeOrCreate();
             } catch (IOException e) {
                 logger.debug(e.getLocalizedMessage());
             }
@@ -273,7 +275,7 @@ public class ManageJournalAbbreviationsViewModel {
     public void saveExternalFilesList() {
         List<String> extFiles = new ArrayList<>();
         journalFiles.forEach(file -> {
-            if (!file.isPseudoFileProperty().get()) {
+            if (!file.isBuiltInListProperty().get()) {
                 extFiles.add(file.getAbsolutePath());
             }
         });
@@ -281,13 +283,24 @@ public class ManageJournalAbbreviationsViewModel {
     }
 
     /**
+     * This will set the {@code currentFile} property to the {@link AbbreviationsFileViewModel} object
+     * that was added to the {@code journalFiles} list property lastly. If there are no files in the list
+     * property this methode will do nothing as the {@code currentFile} property is already {@code null}.
+     */
+    public void selectLastJournalFile() {
+        if (journalFiles.size() > 0) {
+            currentFile.set(journalFilesProperty().get(journalFilesProperty().size() - 1));
+        }
+    }
+
+    /**
      * This will bind the given list property to the journal files list property of this class.
      * If the size of the given list property is bigger than 0 it will call
-     * {@link #changeActiveFile(AbbreviationsFile)} on the first  item of the list.
+     * {@link #changeActiveFile(AbbreviationsFileViewModel)} on the first  item of the list.
      *
-     * @param itemsProperty as list property of {@link AbbreviationsFile} objects
+     * @param itemsProperty as list property of {@link AbbreviationsFileViewModel} objects
      */
-    public void bindFileItems(SimpleListProperty<AbbreviationsFile> itemsProperty) {
+    public void bindFileItems(SimpleListProperty<AbbreviationsFileViewModel> itemsProperty) {
         journalFiles.bindBidirectional(itemsProperty);
         if (!itemsProperty.isEmpty()) {
             changeActiveFile(journalFilesProperty().get(0));
@@ -308,7 +321,7 @@ public class ManageJournalAbbreviationsViewModel {
         }
     }
 
-    public SimpleListProperty<AbbreviationsFile> journalFilesProperty() {
+    public SimpleListProperty<AbbreviationsFileViewModel> journalFilesProperty() {
         return this.journalFiles;
     }
 
@@ -328,7 +341,7 @@ public class ManageJournalAbbreviationsViewModel {
         return this.abbreviationsCount;
     }
 
-    public SimpleObjectProperty<AbbreviationsFile> currentFileProperty() {
+    public SimpleObjectProperty<AbbreviationsFileViewModel> currentFileProperty() {
         return this.currentFile;
     }
 

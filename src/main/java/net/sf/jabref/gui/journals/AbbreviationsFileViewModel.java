@@ -17,41 +17,43 @@ package net.sf.jabref.gui.journals;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.journals.Abbreviation;
+import net.sf.jabref.logic.journals.AbbreviationWriter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+
+import com.google.common.collect.Lists;
 
 /**
  * This class provides a model for abbreviation files.
  * It actually doesn't save the files as objects but rather saves
  * their paths. This also allows to specify pseudo files as placeholder objects.
  */
-public class AbbreviationsFile {
+public class AbbreviationsFileViewModel {
 
     private final SimpleListProperty<AbbreviationViewModel> abbreviations = new SimpleListProperty<>(
             FXCollections.observableArrayList());
-    private final ReadOnlyBooleanProperty isPseudoFile;
+    private final ReadOnlyBooleanProperty isBuiltInList;
     private final String name;
-    private final Path path;
+    private final Optional<Path> path;
 
 
-    public AbbreviationsFile(String filePath) {
-        this.path = Paths.get(filePath);
-        this.name = path.toString();
-        this.isPseudoFile = new SimpleBooleanProperty(false);
+    public AbbreviationsFileViewModel(String filePath) {
+        this.path = Optional.ofNullable(Paths.get(filePath));
+        this.name = path.get().toAbsolutePath().toString();
+        this.isBuiltInList = new SimpleBooleanProperty(false);
         this.abbreviations.add(new AbbreviationViewModel(null));
     }
 
@@ -60,37 +62,39 @@ public class AbbreviationsFile {
      * This means it is a placeholder and it's path will be null meaning it has no place on the filesystem.
      * It's isPseudoFile property will therefore be set to true.
      */
-    public AbbreviationsFile(List<AbbreviationViewModel> abbreviations, String name) {
+    public AbbreviationsFileViewModel(List<AbbreviationViewModel> abbreviations, String name) {
         this.abbreviations.addAll(abbreviations);
         this.name = name;
-        this.path = null;
-        this.isPseudoFile = new SimpleBooleanProperty(true);
+        this.path = Optional.empty();
+        this.isBuiltInList = new SimpleBooleanProperty(true);
     }
 
     public void readAbbreviations() throws FileNotFoundException {
-        List<Abbreviation> abbreviationList = JournalAbbreviationLoader.readJournalListFromFile(path.toFile());
-        abbreviationList.forEach(abbreviation -> abbreviations.addAll(new AbbreviationViewModel(abbreviation)));
+        if (path.isPresent()) {
+            List<Abbreviation> abbreviationList = JournalAbbreviationLoader
+                    .readJournalListFromFile(path.get().toFile());
+            abbreviationList.forEach(abbreviation -> abbreviations.addAll(new AbbreviationViewModel(abbreviation)));
+        } else {
+            throw new FileNotFoundException();
+        }
     }
 
     /**
      * This method will write all abbreviations of this abbreviation file to the file on the file system.
-     * If the file exists its content will be overridden, otherwise a new file will be created.
+     * It essentially will check if the current file is a built in list and if not it will call
+     * {@link AbbreviationWriter#writeOrCreate()}.
      *
      * @throws IOException
      */
-    public void WriteOrCreate() throws IOException {
-        if (!isPseudoFile.get()) {
-            try (OutputStream outStream = Files.newOutputStream(path);
-                    OutputStreamWriter writer = new OutputStreamWriter(outStream, Globals.prefs.getDefaultEncoding())) {
-                for (AbbreviationViewModel entry : abbreviations.get()) {
-                    if (!entry.isPseudoAbbreviation()) {
-                        writer.write(entry.getName());
-                        writer.write(" = ");
-                        writer.write(entry.getAbbreviation());
-                        writer.write(Globals.NEWLINE);
-                    }
+    public void writeOrCreate() throws IOException {
+        if (!isBuiltInList.get()) {
+            List<Abbreviation> actualAbbreviations = Lists.newArrayList();
+            abbreviations.forEach(abb -> {
+                if (!abb.isPseudoAbbreviation()) {
+                    actualAbbreviations.add(abb.getAbbreviationObject());
                 }
-            }
+            });
+            AbbreviationWriter.writeOrCreate(path.get(), actualAbbreviations, StandardCharsets.UTF_8);
         }
     }
 
@@ -99,15 +103,15 @@ public class AbbreviationsFile {
     }
 
     public boolean exists() {
-        return Files.exists(path);
+        return path.isPresent() && Files.exists(path.get());
     }
 
     public String getAbsolutePath() {
-        return path.toString();
+        return path.get().toAbsolutePath().toString();
     }
 
-    public ReadOnlyBooleanProperty isPseudoFileProperty() {
-        return this.isPseudoFile;
+    public ReadOnlyBooleanProperty isBuiltInListProperty() {
+        return this.isBuiltInList;
     }
 
     @Override
@@ -122,8 +126,8 @@ public class AbbreviationsFile {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof AbbreviationsFile) {
-            return Objects.equals(this.name, ((AbbreviationsFile) obj).name);
+        if (obj instanceof AbbreviationsFileViewModel) {
+            return Objects.equals(this.name, ((AbbreviationsFileViewModel) obj).name);
         } else {
             return false;
         }

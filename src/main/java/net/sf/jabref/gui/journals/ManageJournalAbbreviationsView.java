@@ -21,6 +21,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
@@ -74,7 +75,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     @FXML
     private Button saveButton;
     @FXML
-    private ComboBox<AbbreviationsFile> journalFilesBox;
+    private ComboBox<AbbreviationsFileViewModel> journalFilesBox;
     @FXML
     private Button addJournalFileButton;
     @FXML
@@ -97,23 +98,28 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         setUpTable();
         setBindings();
         setButtonStyles();
-        new Thread(new Runnable() {
+        loadListsInBackground();
+    }
+
+    private void loadListsInBackground() {
+        Task<Void> task = new Task<Void>() {
 
             @Override
-            public void run() {
+            protected Void call() {
                 loadingLabel.setVisible(true);
                 progressIndicator.setVisible(true);
                 viewModel.createFileObjects();
-                journalFilesBox.getSelectionModel().selectLast();
+                viewModel.selectLastJournalFile();
                 viewModel.addBuiltInLists();
                 loadingLabel.setVisible(false);
                 progressIndicator.setVisible(false);
+                return null;
             }
-        }).start();
+        };
+        new Thread(task).start();
     }
 
     private void setButtonStyles() {
-        journalFilesBox.setPromptText(Localization.lang("No abbreviation files loaded"));
         Text addJournalFileButtonGraphic = new Text(IconTheme.JabRefIcon.OPEN.getCode());
         addJournalFileButtonGraphic.getStyleClass().add("icon");
         addJournalFileButton.setGraphic(addJournalFileButtonGraphic);
@@ -132,10 +138,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     private void setUpTable() {
         journalAbbreviationsTable.setOnKeyPressed(event -> {
             if ((event.getCode() == KeyCode.DELETE) && isEditableAndRemovable.get()) {
-                if ((viewModel.currentAbbreviationProperty().get() != null)
-                        && !viewModel.currentAbbreviationProperty().get().isPseudoAbbreviation()) {
-                    viewModel.deleteAbbreviation();
-                }
+                viewModel.deleteAbbreviation();
             }
         });
         journalTableNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
@@ -204,7 +207,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         viewModel.currentFileProperty().addListener((observable, oldvalue, newvalue) -> {
             journalFilesBox.getSelectionModel().select(newvalue);
             if (newvalue != null) {
-                isEditableAndRemovable.set(!newvalue.isPseudoFileProperty().get());
+                isEditableAndRemovable.set(!newvalue.isBuiltInListProperty().get());
             }
             removeJournalAbbreviationsButton.setDisable((newvalue == null) || !isEditableAndRemovable.get());
         });

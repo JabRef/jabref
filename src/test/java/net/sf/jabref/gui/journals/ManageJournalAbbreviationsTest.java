@@ -297,10 +297,10 @@ public class ManageJournalAbbreviationsTest {
         viewModel.addNewFile(testFile5EntriesWithDuplicate);
         selectLastJournalFile();
         // retrieve object for testFile3Entries with 3 test entries
-        AbbreviationsFile test1 = viewModel.journalFilesProperty().get(0);
-        AbbreviationsFile test3 = viewModel.journalFilesProperty().get(1);
-        AbbreviationsFile test4 = viewModel.journalFilesProperty().get(2);
-        AbbreviationsFile test5 = viewModel.journalFilesProperty().get(3);
+        AbbreviationsFileViewModel test1 = viewModel.journalFilesProperty().get(0);
+        AbbreviationsFileViewModel test3 = viewModel.journalFilesProperty().get(1);
+        AbbreviationsFileViewModel test4 = viewModel.journalFilesProperty().get(2);
+        AbbreviationsFileViewModel test5 = viewModel.journalFilesProperty().get(3);
 
         // test if the last opened file is active, but duplicated entry has been removed
         Assert.assertEquals(5, viewModel.abbreviationsProperty().size());
@@ -509,9 +509,9 @@ public class ManageJournalAbbreviationsTest {
 
     @Test
     public void testBindings() throws FileNotFoundException {
-        AbbreviationsFile testFile = new AbbreviationsFile(testFile5EntriesWithDuplicate);
+        AbbreviationsFileViewModel testFile = new AbbreviationsFileViewModel(testFile5EntriesWithDuplicate);
         testFile.readAbbreviations();
-        SimpleListProperty<AbbreviationsFile> testProperty = new SimpleListProperty<>(
+        SimpleListProperty<AbbreviationsFileViewModel> testProperty = new SimpleListProperty<>(
                 FXCollections.observableArrayList(testFile));
 
         viewModel.bindFileItems(testProperty);

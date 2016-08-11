@@ -14,9 +14,10 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## JavaFX Changes
 (to be moved to `##Changed` as soon as JavaFX is integrated in the main branch)
 - Add tab which shows the MathSciNet review website if the `MRNumber` field is present.
-- Partly switched to new UI technology (JavaFX). Redesigned about dialog.
-- Partly switched to new UI technology (JavaFX). Redesigned key bindings dialog.
-- Partly switched to new UI technology (JavaFX). Redesigned journal abbreviations dialog.
+- Partly switched to new UI technology (JavaFX).
+    - Redesigned about dialog.
+    - Redesigned key bindings dialog.
+    - Redesigned journal abbreviations dialog.
 
 
 ### Changed

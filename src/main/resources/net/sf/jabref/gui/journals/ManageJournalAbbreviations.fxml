@@ -44,7 +44,7 @@
    <header>
       <HBox spacing="10.0" styleClass="custom-header">
          <children>
-            <ComboBox fx:id="journalFilesBox" minWidth="200.0" onAction="#fileChanged" styleClass="journal-lists" HBox.hgrow="ALWAYS" />
+            <ComboBox fx:id="journalFilesBox" minWidth="200.0" onAction="#fileChanged" promptText="%No abbreviation files loaded" styleClass="journal-lists" HBox.hgrow="ALWAYS" />
             <Pane HBox.hgrow="ALWAYS" />
             <Button fx:id="addNewJournalFileButton" mnemonicParsing="false" onAction="#addNewFile">
                <tooltip>
