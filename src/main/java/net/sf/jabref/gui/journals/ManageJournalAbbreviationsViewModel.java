@@ -28,12 +28,12 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.DuplicatedJournalAbbreviationException;
 import net.sf.jabref.logic.journals.DuplicatedJournalFileException;
 import net.sf.jabref.logic.journals.EmptyFieldException;
 import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

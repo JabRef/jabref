@@ -30,12 +30,12 @@ import javafx.collections.ObservableList;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefException;
-import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.DuplicatedJournalAbbreviationException;
 import net.sf.jabref.logic.journals.DuplicatedJournalFileException;
 import net.sf.jabref.logic.journals.EmptyFieldException;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.assertj.core.util.Files;
 import org.junit.AfterClass;
@@ -514,7 +514,7 @@ public class ManageJournalAbbreviationsTest {
         try {
             testFile = tempFolder.newFile(name);
             try (OutputStream outputStream = new FileOutputStream(testFile)) {
-                outputStream.write(content.getBytes());
+                outputStream.write(content.getBytes(StandardCharsets.UTF_8));
             }
         } catch (IOException e) {
             System.err.println(e.getLocalizedMessage());
