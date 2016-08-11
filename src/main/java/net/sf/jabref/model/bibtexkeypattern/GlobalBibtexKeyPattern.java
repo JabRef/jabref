@@ -13,20 +13,20 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.model.labelpattern;
+package net.sf.jabref.model.bibtexkeypattern;
 
 import java.util.List;
 
-public class GlobalLabelPattern extends AbstractLabelPattern {
+public class GlobalBibtexKeyPattern extends AbstractBibtexKeyPattern {
 
-    private List<String> defaultLabelPattern;
+    private List<String> defaultBibtexKeyPattern;
 
-    public GlobalLabelPattern(List<String> labelPattern) {
-        defaultLabelPattern = labelPattern;
+    public GlobalBibtexKeyPattern(List<String> bibtexKeyPattern) {
+        defaultBibtexKeyPattern = bibtexKeyPattern;
     }
 
     @Override
-    public List<String> getLastLevelLabelPattern(String key) {
-        return defaultLabelPattern;
+    public List<String> getLastLevelBibtexKeyPattern(String key) {
+        return defaultBibtexKeyPattern;
     }
 }

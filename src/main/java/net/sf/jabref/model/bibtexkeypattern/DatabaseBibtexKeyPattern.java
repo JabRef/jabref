@@ -13,23 +13,23 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.model.labelpattern;
+package net.sf.jabref.model.bibtexkeypattern;
 
 import java.util.List;
 
 import net.sf.jabref.preferences.JabRefPreferences;
 
-public class DatabaseLabelPattern extends AbstractLabelPattern {
+public class DatabaseBibtexKeyPattern extends AbstractBibtexKeyPattern {
 
     private final JabRefPreferences prefs;
 
 
-    public DatabaseLabelPattern(JabRefPreferences prefs) {
+    public DatabaseBibtexKeyPattern(JabRefPreferences prefs) {
         this.prefs = prefs;
     }
 
     @Override
-    public List<String> getLastLevelLabelPattern(String key) {
+    public List<String> getLastLevelBibtexKeyPattern(String key) {
         return prefs.getKeyPattern().getValue(key);
     }
 

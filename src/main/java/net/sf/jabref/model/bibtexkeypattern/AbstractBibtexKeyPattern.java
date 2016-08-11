@@ -15,7 +15,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.model.labelpattern;
+package net.sf.jabref.model.bibtexkeypattern;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -26,22 +26,22 @@ import java.util.Set;
 import java.util.StringTokenizer;
 
 /**
- * A small table, where an entry type is associated with a label pattern (an
- * <code>ArrayList</code>). A parent LabelPattern can be set.
+ * A small table, where an entry type is associated with a Bibtex key pattern (an
+ * <code>ArrayList</code>). A parent BibtexKeyPattern can be set.
  */
-public abstract class AbstractLabelPattern {
+public abstract class AbstractBibtexKeyPattern {
 
     protected List<String> defaultPattern;
 
     protected Map<String, List<String>> data = new HashMap<>();
 
-    public void addLabelPattern(String type, String pattern) {
-        data.put(type, AbstractLabelPattern.split(pattern));
+    public void addBibtexKeyPattern(String type, String pattern) {
+        data.put(type, AbstractBibtexKeyPattern.split(pattern));
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("AbstractLabelPattern{");
+        final StringBuilder sb = new StringBuilder("AbstractBibtexKeyPattern{");
         sb.append("defaultPattern=").append(defaultPattern);
         sb.append(", data=").append(data);
         sb.append('}');
@@ -56,7 +56,7 @@ public abstract class AbstractLabelPattern {
         if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
-        AbstractLabelPattern that = (AbstractLabelPattern) o;
+        AbstractBibtexKeyPattern that = (AbstractBibtexKeyPattern) o;
         return Objects.equals(defaultPattern, that.defaultPattern) && Objects.equals(data, that.data);
     }
 
@@ -66,20 +66,20 @@ public abstract class AbstractLabelPattern {
     }
 
     /**
-     * Remove a label pattern from the LabelPattern.
+     * Remove a Bibtex key pattern from the BibtexKeyPattern.
      *
      * @param type a <code>String</code>
      */
-    public void removeLabelPattern(String type) {
+    public void removeBibtexKeyPattern(String type) {
         if (data.containsKey(type)) {
             data.remove(type);
         }
     }
 
     /**
-     * Gets an object for a desired label from this LabelPattern or one of it's
-     * parents (in the case of DatabaseLAbelPattern). This method first tries to obtain the object from this
-     * LabelPattern via the <code>get</code> method of <code>Hashtable</code>.
+     * Gets an object for a desired key from this BibtexKeyPattern or one of it's
+     * parents (in the case of DatabaseBibtexKeyPattern). This method first tries to obtain the object from this
+     * BibtexKeyPattern via the <code>get</code> method of <code>Hashtable</code>.
      * If this fails, we try the default.<br />
      * If that fails, we try the parent.<br />
      * If that fails, we return the DEFAULT_LABELPATTERN<br />
@@ -96,7 +96,7 @@ public abstract class AbstractLabelPattern {
             if (result == null) {
                 // we are the "last" to ask
                 // we don't have anything left
-                return getLastLevelLabelPattern(key);
+                return getLastLevelBibtexKeyPattern(key);
             }
         }
         return result;
@@ -108,19 +108,19 @@ public abstract class AbstractLabelPattern {
      * where the fields are the (required) fields of a BibTex entry. The string is split
      * into fields and spacers by recognizing the [ and ].
      *
-     * @param labelPattern a <code>String</code>
+     * @param bibtexKeyPattern a <code>String</code>
      * @return an <code>ArrayList</code> The first item of the list
      * is a string representation of the key pattern (the parameter),
      * the remaining items are the fields
      */
-    public static List<String> split(String labelPattern) {
+    public static List<String> split(String bibtexKeyPattern) {
         // A holder for fields of the entry to be used for the key
         List<String> fieldList = new ArrayList<>();
 
         // Before we do anything, we add the parameter to the ArrayLIst
-        fieldList.add(labelPattern);
+        fieldList.add(bibtexKeyPattern);
 
-        StringTokenizer tok = new StringTokenizer(labelPattern, "[]", true);
+        StringTokenizer tok = new StringTokenizer(bibtexKeyPattern, "[]", true);
         while (tok.hasMoreTokens()) {
             fieldList.add(tok.nextToken());
         }
@@ -144,16 +144,16 @@ public abstract class AbstractLabelPattern {
     }
 
     /**
-     * Sets the DEFAULT PATTERN for this label pattern
-     * @param labelPattern the pattern to store
+     * Sets the DEFAULT PATTERN for this key pattern
+     * @param bibtexKeyPattern the pattern to store
      */
-    public void setDefaultValue(String labelPattern) {
-        this.defaultPattern = AbstractLabelPattern.split(labelPattern);
+    public void setDefaultValue(String bibtexKeyPattern) {
+        this.defaultPattern = AbstractBibtexKeyPattern.split(bibtexKeyPattern);
     }
 
     public Set<String> getAllKeys() {
         return data.keySet();
     }
 
-    public abstract List<String> getLastLevelLabelPattern(String key);
+    public abstract List<String> getLastLevelBibtexKeyPattern(String key);
 }

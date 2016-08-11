@@ -15,7 +15,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.logic.labelpattern;
+package net.sf.jabref.logic.bibtexkeypattern;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -41,14 +41,14 @@ import org.apache.commons.logging.LogFactory;
 /**
  * This is the utility class of the LabelPattern package.
  */
-public class LabelPatternUtil {
+public class BibtexKeyPatternUtil {
 
     private static final String STARTING_CAPITAL_PATTERN = "[^A-Z]";
 
     // All single characters that we can use for extending a key to make it unique:
     private static final String CHARS = "abcdefghijklmnopqrstuvwxyz";
 
-    private static final Log LOGGER = LogFactory.getLog(LabelPatternUtil.class);
+    private static final Log LOGGER = LogFactory.getLog(BibtexKeyPatternUtil.class);
 
     private static final Pattern REGEX_PATTERN = Pattern.compile(".*\\(\\{([A-Z]+)\\}\\).*");
 
@@ -390,7 +390,7 @@ public class LabelPatternUtil {
      * @return modified BibEntry
      */
     public static void makeLabel(MetaData metaData, BibDatabase dBase, BibEntry entry,
-            LabelPatternPreferences labelPatternPreferences) {
+            BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
         database = dBase;
         String key;
         StringBuilder stringBuilder = new StringBuilder();
@@ -401,7 +401,7 @@ public class LabelPatternUtil {
             // get the type of entry
             String entryType = entry.getType();
             // Get the arrayList corresponding to the type
-            List<String> typeList = new ArrayList<>(metaData.getLabelPattern().getValue(entryType));
+            List<String> typeList = new ArrayList<>(metaData.getBibtexKeyPattern().getValue(entryType));
             if (!typeList.isEmpty()) {
                 typeList.remove(0);
             }
@@ -434,12 +434,12 @@ public class LabelPatternUtil {
         }
 
         // Remove all illegal characters from the key.
-        key = checkLegalKey(stringBuilder.toString(), labelPatternPreferences.isEnforceLegalKey());
+        key = checkLegalKey(stringBuilder.toString(), bibtexKeyPatternPreferences.isEnforceLegalKey());
 
         // Remove Regular Expressions while generating Keys
-        String regex = labelPatternPreferences.getKeyPatternRegex();
+        String regex = bibtexKeyPatternPreferences.getKeyPatternRegex();
         if ((regex != null) && !regex.trim().isEmpty()) {
-            String replacement = labelPatternPreferences.getKeyPatternReplacement();
+            String replacement = bibtexKeyPatternPreferences.getKeyPatternReplacement();
             key = key.replaceAll(regex, replacement);
         }
 
@@ -457,8 +457,8 @@ public class LabelPatternUtil {
             occurrences--; // No change, so we can accept one dupe.
         }
 
-        boolean alwaysAddLetter = labelPatternPreferences.isAlwaysAddLetter();
-        boolean firstLetterA = labelPatternPreferences.isFirstLetterA();
+        boolean alwaysAddLetter = bibtexKeyPatternPreferences.isAlwaysAddLetter();
+        boolean firstLetterA = bibtexKeyPatternPreferences.isFirstLetterA();
 
         if (!alwaysAddLetter && (occurrences == 0)) {
             // No dupes found, so we can just go ahead.

@@ -97,10 +97,10 @@ import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
-import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.logic.util.date.TimeStamp;
 import net.sf.jabref.model.EntryTypes;
@@ -1114,7 +1114,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
 
                 // Make sure the key is legal:
-                String cleaned = LabelPatternUtil.checkLegalKey(newValue,
+                String cleaned = BibtexKeyPatternUtil.checkLegalKey(newValue,
                         Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
                 if ((cleaned == null) || cleaned.equals(newValue)) {
                     textField.setValidBackgroundColor();
@@ -1381,8 +1381,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
             }
 
-            LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
-                    LabelPatternPreferences.fromPreferences(Globals.prefs));
+            BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
+                    BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
 
             // Store undo information:
             panel.getUndoManager().addEdit(
