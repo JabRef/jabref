@@ -224,10 +224,14 @@ public class BibtexParser {
          * for the user.
          */
         try {
+            String commentsAndEntryTypeDefinitionString = dumpTextReadSoFarToString();
+
             BibEntry entry = parseEntry(type);
 
+            entry.setParsedSerialization(commentsAndEntryTypeDefinitionString+dumpTextReadSoFarToString());
+            entry.setCommentsBeforeEntry(commentsAndEntryTypeDefinitionString.substring(0,commentsAndEntryTypeDefinitionString.lastIndexOf('@')));
+
             boolean duplicateKey = database.insertEntry(entry);
-            entry.setParsedSerialization(dumpTextReadSoFarToString());
             if (duplicateKey) {
                 parserResult.addDuplicateKey(entry.getCiteKey());
             } else if ((entry.getCiteKey() == null) || entry.getCiteKey().isEmpty()) {

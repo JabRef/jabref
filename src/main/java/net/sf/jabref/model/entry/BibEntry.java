@@ -69,6 +69,8 @@ public class BibEntry implements Cloneable {
 
     private String parsedSerialization;
 
+    private String commentsBeforeEntry = "";
+
     /*
      * Marks whether the complete serialization, which was read from file, should be used.
      *
@@ -573,6 +575,11 @@ public class BibEntry implements Cloneable {
         return parsedSerialization;
     }
 
+    public void setCommentsBeforeEntry(String parsedComments) {
+        this.commentsBeforeEntry = parsedComments;
+    }
+
+
     public boolean hasChanged() {
         return changed;
     }
@@ -679,25 +686,8 @@ public class BibEntry implements Cloneable {
     * Returns user comments (arbitrary text before the entry), if they exist. If not, returns the empty String
      */
     public String getUserComments() {
-
-        if (parsedSerialization != null) {
-
-            try {
-                // get the text before the entry
-                String prolog = parsedSerialization.substring(0, parsedSerialization.lastIndexOf('@'));
-
-                // delete trailing whitespaces (between entry and text)
-                prolog = prolog.replaceFirst("\\s+$", "");
-
-                // if there is any non whitespace text, write it
-                if (prolog.length() > 0) {
-                    return prolog;
-                }
-            } catch (StringIndexOutOfBoundsException ignore) {
-                // if this occurs a broken parsed serialization has been set, so just do nothing
-            }
-        }
-        return "";
+        // delete trailing whitespaces (between entry and text) from stored serialization
+        return commentsBeforeEntry.replaceFirst("\\s+$", "");
     }
 
     public Set<String> getFieldAsWords(String field) {

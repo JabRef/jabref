@@ -58,6 +58,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed IndexOutOfBoundsException when trying to download a full text document without selecting an entry
 - Fixed NullPointerException when trying to set a special field or mark an entry through the menu without having an open database
 - Fixed [#1257](https://github.com/JabRef/jabref/issues/1324): Preferences for the BibTeX key generator set in a version prior to 3.2 are now migrated automatically to the new version
+- Fixed [#1716](https://github.com/JabRef/jabref/issues/1716): `@`-Symbols stored in BibTeX fields no longer break the database
 
 ### Removed
 - It is not longer possible to choose to convert HTML sub- and superscripts to equations
