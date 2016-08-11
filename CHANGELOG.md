@@ -34,7 +34,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Unified dialogs for opening/saving files
 
 ### Fixed
-- Fixed [#1632](https://github.com/JabRef/jabref/issues/1632) User comments (@Comment) with or without brackets are now kept
+- Fixed [#1632](https://github.com/JabRef/jabref/issues/1632): User comments (@Comment) with or without brackets are now kept
 - Fixed [#1264](https://github.com/JabRef/jabref/issues/1264): S with caron does not render correctly
 - LaTeX to Unicode converter now handles combining accents
 - Fixed NullPointerException when clicking Browse in Journal abbreviations with empty text field
@@ -57,6 +57,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed NullPointerException when clicking OK without specifying a field name in set/clear/rename fields
 - Fixed IndexOutOfBoundsException when trying to download a full text document without selecting an entry
 - Fixed NullPointerException when trying to set a special field or mark an entry through the menu without having an open database
+- Fixed [#1257](https://github.com/JabRef/jabref/issues/1324): Preferences for the BibTeX key generator set in a version prior to 3.2 are now migrated automatically to the new version
 
 ### Removed
 - It is not longer possible to choose to convert HTML sub- and superscripts to equations
