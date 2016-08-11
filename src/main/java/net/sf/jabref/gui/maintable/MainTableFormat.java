@@ -28,7 +28,6 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import ca.odell.glazedlists.gui.TableFormat;
 
@@ -143,23 +142,23 @@ public class MainTableFormat implements TableFormat<BibEntry> {
 
 
         // Add the "special" icon columns (e.g., ranking, file, ...) that are enabled in preferences.
-        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SPECIALFIELDSENABLED)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RANKING)) {
                 tableColumns.add(SpecialMainTableColumns.RANKING_COLUMN);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RELEVANCE)) {
                 tableColumns.add(SpecialMainTableColumns.RELEVANCE_COLUMN);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_QUALITY)) {
                 tableColumns.add(SpecialMainTableColumns.QUALITY_COLUMN);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRIORITY)) {
                 tableColumns.add(SpecialMainTableColumns.PRIORITY_COLUMN);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRINTED)) {
                 tableColumns.add(SpecialMainTableColumns.PRINTED_COLUMN);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_READ)) {
                 tableColumns.add(SpecialMainTableColumns.READ_STATUS_COLUMN);
             }
         }

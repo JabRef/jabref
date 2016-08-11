@@ -42,8 +42,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
-
 public class InternalBibtexFields {
 
     // contains all bibtex-field objects (BibtexSingleField)
@@ -65,14 +63,14 @@ public class InternalBibtexFields {
             "editorbtype", "editorctype");
     public static final List<String> BIBLATEX_PAGINATION_FIELDS = Arrays.asList("pagination", "bookpagination");
 
-    public static final List<String> SPECIAL_FIELDS = Arrays.asList(SpecialFieldsUtils.FIELDNAME_PRINTED,
-            SpecialFieldsUtils.FIELDNAME_PRIORITY, SpecialFieldsUtils.FIELDNAME_QUALITY,
-            SpecialFieldsUtils.FIELDNAME_RANKING, SpecialFieldsUtils.FIELDNAME_READ,
-            SpecialFieldsUtils.FIELDNAME_RELEVANCE);
+    public static final List<String> SPECIAL_FIELDS = Arrays.asList(SpecialFields.FIELDNAME_PRINTED,
+            SpecialFields.FIELDNAME_PRIORITY, SpecialFields.FIELDNAME_QUALITY,
+            SpecialFields.FIELDNAME_RANKING, SpecialFields.FIELDNAME_READ,
+            SpecialFields.FIELDNAME_RELEVANCE);
 
     // singleton instance
     private static InternalBibtexFields RUNTIME = new InternalBibtexFields(
-            SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS_DEFAULT, FieldName.TIMESTAMP);
+            SpecialFields.PREF_SERIALIZESPECIALFIELDS_DEFAULT, FieldName.TIMESTAMP);
 
 
     private InternalBibtexFields(boolean serializeSpecialFields, String timeStampFieldName) {

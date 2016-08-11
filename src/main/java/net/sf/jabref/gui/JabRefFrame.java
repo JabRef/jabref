@@ -143,7 +143,6 @@ import net.sf.jabref.specialfields.Quality;
 import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import com.google.common.eventbus.Subscribe;
 import com.jgoodies.looks.HeaderStyle;
@@ -1210,28 +1209,28 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         edit.add(unmark);
         edit.add(unmarkAll);
         edit.addSeparator();
-        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SPECIALFIELDSENABLED)) {
             JMenu m;
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RANKING)) {
                 m = new JMenu();
                 RightClickMenu.populateSpecialFieldMenu(m, Rank.getInstance(), this);
                 edit.add(m);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RELEVANCE)) {
                 edit.add(toggleRelevance);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_QUALITY)) {
                 edit.add(toggleQualityAssured);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRIORITY)) {
                 m = new JMenu();
                 RightClickMenu.populateSpecialFieldMenu(m, Priority.getInstance(), this);
                 edit.add(m);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRINTED)) {
                 edit.add(togglePrinted);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_READ)) {
                 m = new JMenu();
                 RightClickMenu.populateSpecialFieldMenu(m, ReadStatus.getInstance(), this);
                 edit.add(m);
@@ -1456,29 +1455,29 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addSeparator();
         tlb.addAction(mark);
         tlb.addAction(unmark);
-        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SPECIALFIELDSENABLED)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RANKING)) {
                 JButton button = net.sf.jabref.specialfields.SpecialFieldDropDown
                         .generateSpecialFieldButtonWithDropDown(Rank.getInstance(), this);
                 tlb.add(button);
                 specialFieldButtons.add(button);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RELEVANCE)) {
                 tlb.addAction(toggleRelevance);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_QUALITY)) {
                 tlb.addAction(toggleQualityAssured);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRIORITY)) {
                 JButton button = net.sf.jabref.specialfields.SpecialFieldDropDown
                         .generateSpecialFieldButtonWithDropDown(Priority.getInstance(), this);
                 tlb.add(button);
                 specialFieldButtons.add(button);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRINTED)) {
                 tlb.addAction(togglePrinted);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_READ)) {
                 JButton button = net.sf.jabref.specialfields.SpecialFieldDropDown
                         .generateSpecialFieldButtonWithDropDown(ReadStatus.getInstance(), this);
                 tlb.add(button);

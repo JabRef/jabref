@@ -81,7 +81,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
+import net.sf.jabref.model.entry.SpecialFields;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -407,6 +407,20 @@ public class JabRefPreferences {
     public static final String STYLES_POS_Y = "stylesPosY";
     public static final String STYLES_POS_X = "stylesPosX";
 
+    // Special field preferences
+    public static final String PREF_SHOWCOLUMN_RELEVANCE = "showRelevanceColumn";
+    public static final String PREF_SHOWCOLUMN_READ = "showReadColumn";
+    public static final String PREF_SHOWCOLUMN_RANKING = "showRankingColumn";
+    public static final String PREF_SHOWCOLUMN_QUALITY = "showQualityColumn";
+    public static final String PREF_SHOWCOLUMN_PRIORITY = "showPriorityColumn";
+    public static final String PREF_SHOWCOLUMN_PRINTED = "showPrintedColumn";
+    public static final String PREF_SPECIALFIELDSENABLED = "specialFieldsEnabled";
+    // The choice between PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS and PREF_SERIALIZESPECIALFIELDS is mutually exclusive
+    public static final String PREF_SERIALIZESPECIALFIELDS = "serializeSpecialFields";
+    // The choice between PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS and PREF_SERIALIZESPECIALFIELDS is mutually exclusive
+    // At least in the settings, not in the implementation. But having both confused the users, therefore, having activated both options at the same time has been disabled
+    public static final String PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
+
     //non-default preferences
     private static final String CUSTOM_TYPE_NAME = "customTypeName_";
     private static final String CUSTOM_TYPE_REQ = "customTypeReq_";
@@ -706,15 +720,15 @@ public class JabRefPreferences {
         defaults.put(STYLES_SIZE_X, 600);
         defaults.put(STYLES_SIZE_Y, 400);
 
-        defaults.put(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED, SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED_DEFAULT);
-        defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY, SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY_DEFAULT);
-        defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY, SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY_DEFAULT);
-        defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING, SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING_DEFAULT);
-        defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE, SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE_DEFAULT);
-        defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED, SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED_DEFAULT);
-        defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ, SpecialFieldsUtils.PREF_SHOWCOLUMN_READ_DEFAULT);
-        defaults.put(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS, SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT);
-        defaults.put(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS, SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS_DEFAULT);
+        defaults.put(JabRefPreferences.PREF_SPECIALFIELDSENABLED, SpecialFields.PREF_SPECIALFIELDSENABLED_DEFAULT);
+        defaults.put(JabRefPreferences.PREF_SHOWCOLUMN_PRIORITY, SpecialFields.PREF_SHOWCOLUMN_PRIORITY_DEFAULT);
+        defaults.put(JabRefPreferences.PREF_SHOWCOLUMN_QUALITY, SpecialFields.PREF_SHOWCOLUMN_QUALITY_DEFAULT);
+        defaults.put(JabRefPreferences.PREF_SHOWCOLUMN_RANKING, SpecialFields.PREF_SHOWCOLUMN_RANKING_DEFAULT);
+        defaults.put(JabRefPreferences.PREF_SHOWCOLUMN_RELEVANCE, SpecialFields.PREF_SHOWCOLUMN_RELEVANCE_DEFAULT);
+        defaults.put(JabRefPreferences.PREF_SHOWCOLUMN_PRINTED, SpecialFields.PREF_SHOWCOLUMN_PRINTED_DEFAULT);
+        defaults.put(JabRefPreferences.PREF_SHOWCOLUMN_READ, SpecialFields.PREF_SHOWCOLUMN_READ_DEFAULT);
+        defaults.put(JabRefPreferences.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS, SpecialFields.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT);
+        defaults.put(JabRefPreferences.PREF_SERIALIZESPECIALFIELDS, SpecialFields.PREF_SERIALIZESPECIALFIELDS_DEFAULT);
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);

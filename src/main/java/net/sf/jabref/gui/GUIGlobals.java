@@ -28,6 +28,7 @@ import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.keyboard.EmacsKeyBindings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.SpecialFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
@@ -35,7 +36,6 @@ import net.sf.jabref.specialfields.Quality;
 import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -135,31 +135,31 @@ public class GUIGlobals {
 
         label = new JLabel(Relevance.getInstance().getRepresentingIcon());
         label.setToolTipText(Relevance.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_RELEVANCE, label);
+        GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_RELEVANCE, label);
 
         label = new JLabel(Quality.getInstance().getRepresentingIcon());
         label.setToolTipText(Quality.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_QUALITY, label);
+        GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_QUALITY, label);
 
         // Ranking item in the menu uses one star
         label = new JLabel(Rank.getInstance().getRepresentingIcon());
         label.setToolTipText(Rank.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_RANKING, label);
+        GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_RANKING, label);
 
         // Priority icon used for the menu
         label = new JLabel(Priority.getInstance().getRepresentingIcon());
         label.setToolTipText(Priority.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_PRIORITY, label);
+        GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_PRIORITY, label);
 
         // Read icon used for menu
         label = new JLabel(ReadStatus.getInstance().getRepresentingIcon());
         label.setToolTipText(ReadStatus.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_READ, label);
+        GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_READ, label);
 
         // Print icon used for menu
         label = new JLabel(Printed.getInstance().getRepresentingIcon());
         label.setToolTipText(Printed.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_PRINTED, label);
+        GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_PRINTED, label);
 
         if (Globals.prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS)) {
             EmacsKeyBindings.load();
