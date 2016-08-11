@@ -30,11 +30,12 @@ import javafx.collections.ObservableList;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefException;
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.DuplicatedJournalAbbreviationException;
 import net.sf.jabref.logic.journals.DuplicatedJournalFileException;
 import net.sf.jabref.logic.journals.EmptyFieldException;
+import net.sf.jabref.logic.util.OS;
 
 import org.assertj.core.util.Files;
 import org.junit.AfterClass;
@@ -52,6 +53,7 @@ import org.junit.rules.TemporaryFolder;
 public class ManageJournalAbbreviationsTest {
 
     private ManageJournalAbbreviationsViewModel viewModel;
+    private final String NEWLINE = OS.NEWLINE;
 
     @Rule
     public TemporaryFolder tempFolder = new TemporaryFolder();
@@ -76,15 +78,15 @@ public class ManageJournalAbbreviationsTest {
         Globals.prefs.putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, null);
         viewModel = new ManageJournalAbbreviationsViewModel();
         emptyTestFile = createTemporaryTestFile("emptyTestFile.txt", "");
-        testFile1Entries = createTemporaryTestFile("testFile1Entries.txt", "Test Entry = TE" + Globals.NEWLINE + "");
-        testFile3Entries = createTemporaryTestFile("testFile3Entries.txt", "Abbreviations = Abb" + Globals.NEWLINE
-                + "Test Entry = TE" + Globals.NEWLINE + "MoreEntries = ME" + Globals.NEWLINE + "");
+        testFile1Entries = createTemporaryTestFile("testFile1Entries.txt", "Test Entry = TE" + NEWLINE + "");
+        testFile3Entries = createTemporaryTestFile("testFile3Entries.txt",
+                "Abbreviations = Abb" + NEWLINE + "Test Entry = TE" + NEWLINE + "MoreEntries = ME" + NEWLINE + "");
         testFile4Entries = createTemporaryTestFile("testFile4Entries.txt",
-                "Abbreviations = Abb" + Globals.NEWLINE + "Test Entry = TE" + Globals.NEWLINE + "MoreEntries = ME"
-                        + Globals.NEWLINE + "Entry = E" + Globals.NEWLINE + "");
+                "Abbreviations = Abb" + NEWLINE + "Test Entry = TE" + NEWLINE + "MoreEntries = ME" + NEWLINE
+                        + "Entry = E" + NEWLINE + "");
         testFile5EntriesWithDuplicate = createTemporaryTestFile("testFile5Entries.txt",
-                "Abbreviations = Abb" + Globals.NEWLINE + "Test Entry = TE" + Globals.NEWLINE + "Test Entry = TE"
-                        + Globals.NEWLINE + "MoreEntries = ME" + Globals.NEWLINE + "EntryEntry = EE" + Globals.NEWLINE
+                "Abbreviations = Abb" + NEWLINE + "Test Entry = TE" + NEWLINE + "Test Entry = TE" + NEWLINE
+                        + "MoreEntries = ME" + NEWLINE + "EntryEntry = EE" + NEWLINE
                         + "");
     }
 
@@ -474,13 +476,13 @@ public class ManageJournalAbbreviationsTest {
 
         viewModel.saveJournalAbbreviationFiles();
 
-        String expected = "Abbreviations = Abb" + Globals.NEWLINE + "Test Entry = TE" + Globals.NEWLINE
-                + "MoreEntries = ME" + Globals.NEWLINE + "JabRefTestEntry = JTE" + Globals.NEWLINE + "";
+        String expected = "Abbreviations = Abb" + NEWLINE + "Test Entry = TE" + NEWLINE + "MoreEntries = ME" + NEWLINE
+                + "JabRefTestEntry = JTE" + NEWLINE + "";
         String actual = Files.contentOf(new File(testFile4Entries), StandardCharsets.UTF_8);
         Assert.assertEquals(expected, actual);
 
-        expected = "Abbreviations = Abb" + Globals.NEWLINE + "Test Entry = TE" + Globals.NEWLINE + "MoreEntries = ME"
-                + Globals.NEWLINE + "SomeOtherEntry = SOE" + Globals.NEWLINE + "";
+        expected = "Abbreviations = Abb" + NEWLINE + "Test Entry = TE" + NEWLINE + "MoreEntries = ME" + NEWLINE
+                + "SomeOtherEntry = SOE" + NEWLINE + "";
         actual = Files.contentOf(new File(testFile5EntriesWithDuplicate), StandardCharsets.UTF_8);
         Assert.assertEquals(expected, actual);
     }

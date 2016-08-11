@@ -23,7 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.util.OS;
 
 /**
  * This class provides handy static methodes to save abbreviations to the file system.
@@ -45,7 +45,7 @@ public class AbbreviationWriter {
                 writer.write(entry.getName());
                 writer.write(" = ");
                 writer.write(entry.getAbbreviation());
-                writer.write(Globals.NEWLINE);
+                writer.write(OS.NEWLINE);
             }
         }
 

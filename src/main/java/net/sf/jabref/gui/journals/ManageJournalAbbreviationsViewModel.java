@@ -28,13 +28,12 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.DuplicatedJournalAbbreviationException;
 import net.sf.jabref.logic.journals.DuplicatedJournalFileException;
 import net.sf.jabref.logic.journals.EmptyFieldException;
+import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -322,11 +321,8 @@ public class ManageJournalAbbreviationsViewModel {
     public void saveEverythingAndUpdateAutoCompleter() {
         saveExternalFilesList();
         saveJournalAbbreviationFiles();
-        // Update the autocompleter for the "journal" field in all base panels,
-        // so added journal names are available:
-        for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
-            basePanel.getAutoCompleters().addJournalListToAutoCompleter();
-        }
+        // Update journal abbreviation loader
+        Globals.journalAbbreviationLoader.update(JournalAbbreviationPreferences.fromPreferences(Globals.prefs));
     }
 
     public SimpleListProperty<AbbreviationsFileViewModel> journalFilesProperty() {
