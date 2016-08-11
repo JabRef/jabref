@@ -32,6 +32,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - It is now possible to add your own lists of protected terms, see Options -> Manage protected terms
 - Automatically generated group names are now converted from LaTeX to Unicode
 - Unified dialogs for opening/saving files
+- Add integrity check to avoid non-ASCII characters in BibTeX files
 
 ### Fixed
 - Fixed [#1632](https://github.com/JabRef/jabref/issues/1632): User comments (@Comment) with or without brackets are now kept
