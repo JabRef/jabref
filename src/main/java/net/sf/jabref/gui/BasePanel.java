@@ -27,6 +27,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
 import java.nio.charset.UnsupportedCharsetException;
 import java.nio.file.Path;
@@ -1804,6 +1805,19 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void markBaseChanged() {
         baseChanged = true;
 
+        if (SwingUtilities.isEventDispatchThread()) {
+            markBasedChangedInternal();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(() -> markBasedChangedInternal());
+            } catch (InvocationTargetException | InterruptedException e) {
+                LOGGER.info("Problem marking database as changed", e);
+            }
+        }
+
+    }
+
+    private void markBasedChangedInternal() {
         // Put an asterisk behind the filename to indicate the database has changed.
         frame.setWindowTitle();
         frame.updateAllTabTitles();
@@ -1813,7 +1827,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         if (frame.getStatusLineText().startsWith(Localization.lang("Saved database"))) {
             frame.output(" ");
         }
-
     }
 
     public void markNonUndoableBaseChanged() {

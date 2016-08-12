@@ -42,7 +42,6 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
-import javax.swing.SwingUtilities;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
@@ -180,7 +179,8 @@ public class SynchronizeFileField extends AbstractWorker {
                             } else {
                                 answer = JOptionPane.showOptionDialog(panel.frame(),
                                         Localization.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
-                                                flEntry.link, aSel.getCiteKey()),
+                                                flEntry.link,
+                                                aSel.getCiteKeyOptional().orElse(Localization.lang("undefined"))),
                                         Localization.lang("Broken link"),
                                         JOptionPane.YES_NO_CANCEL_OPTION,
                                         JOptionPane.QUESTION_MESSAGE, null, brokenLinkOptions, brokenLinkOptions[0]
@@ -273,7 +273,7 @@ public class SynchronizeFileField extends AbstractWorker {
             // Add the undo edit:
             ce.end();
             panel.getUndoManager().addEdit(ce);
-            SwingUtilities.invokeLater(() -> panel.markBaseChanged());
+            panel.markBaseChanged();
             entriesChangedCount = changedEntries.size();
         }
     }

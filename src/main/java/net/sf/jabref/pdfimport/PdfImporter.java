@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.external.DroppedFileHandler;
@@ -299,7 +300,7 @@ public class PdfImporter {
                     panel.setMode(BasePanelMode.WILL_SHOW_EDITOR);
                 }
 
-                panel.showEntry(be);
+                SwingUtilities.invokeLater(() -> panel.showEntry(be));
 
                 // The database just changed.
                 panel.markBaseChanged();
