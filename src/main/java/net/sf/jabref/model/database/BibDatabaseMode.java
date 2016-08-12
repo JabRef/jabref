@@ -37,7 +37,6 @@ public enum BibDatabaseMode {
     /**
      * Returns the {@link BibDatabaseMode} from a given boolean.
      *
-     * @param isBibLatex
      * @return BIBLATEX if isBibLatex is true, else BIBTEX
      */
     public static BibDatabaseMode fromPreference(boolean isBibLatex) {
@@ -49,21 +48,19 @@ public enum BibDatabaseMode {
     }
 
     /**
-     * Returns the {@link BibDatabaseMode} that equals the given string.
-     * The use of capital and small letters in the string doesn't matter.
-     * If neither "bibtex" nor "biblatex" is the given string, then this will
-     * invoke {@link valueOf(String)}.
+     * Returns the {@link BibDatabaseMode} that equals the given string. The use of capital and small letters
+     * in the string doesn't matter.If neither "bibtex" nor "biblatex" is the given string, then an
+     * {@link IllegalArgumentException} will be thrown.
      *
-     * @param   data
-     * @return  BIBTEX, if the string is bibtex
-     *          BIBLATEX, if the string is biblatex
+     * @return  BIBTEX, if the string is bibtex<br>
+     *          BIBLATEX, if the string is biblatex<br>
      */
     public static BibDatabaseMode parse(String data) {
         return BibDatabaseMode.valueOf(data.toUpperCase(Locale.ENGLISH));
     }
 
     /**
-     * @return the mode as a string in lowercase
+     * @return The current mode as String in lowercase
      */
     public String getAsString() {
         return getFormattedName().toLowerCase(Locale.ENGLISH);

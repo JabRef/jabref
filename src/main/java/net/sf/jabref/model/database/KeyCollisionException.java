@@ -25,10 +25,6 @@ http://www.gnu.org/copyleft/gpl.ja.html
 */
 package net.sf.jabref.model.database;
 
-/**
- * Represents an Exception that will be thrown if a key will be insert in a Collection,
- * but the same key exists in the Collection.
- */
 public class KeyCollisionException extends RuntimeException {
 
     public KeyCollisionException() {

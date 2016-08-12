@@ -27,13 +27,6 @@ public class EntrySorter {
     private final List<BibEntry> entries;
 
 
-    /**
-     * Constructor for EntrySorter. Gets a list of {@link BibEntry}
-     * and then sorts them by the given comparator.
-     *
-     * @param entries a List of {@link BibEntry}
-     * @param comparator a {@link Comparator} by which the entries list will be sorted.
-     */
     public EntrySorter(List<BibEntry> entries, Comparator<BibEntry> comparator) {
         this.entries = new ArrayList<>(entries);
         Collections.sort(this.entries, comparator);

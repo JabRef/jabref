@@ -133,7 +133,7 @@ public class BibDatabase {
         for (BibEntry e : getEntries()) {
             allFields.addAll(e.getFieldNames());
         }
-        return allFields.stream().filter(n -> !isInternalField(n)).collect(Collectors.toSet());
+        return allFields.stream().filter(field -> !isInternalField(field)).collect(Collectors.toSet());
     }
 
     public static boolean isInternalField(String field) {
@@ -196,7 +196,7 @@ public class BibDatabase {
         entry.registerListener(this);
 
         eventBus.post(new EntryAddedEvent(entry, eventSource));
-        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKeyOptional().orElse(null));
+        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKeyOptional());
     }
 
     /**
@@ -211,6 +211,7 @@ public class BibDatabase {
     /**
      * Removes the given entry.
      * The Entry is removed based on the id {@link BibEntry#id}
+     *
      * @param toBeDeleted Entry to delete
      * @param eventSource Source the event is sent from
      */
@@ -233,18 +234,15 @@ public class BibDatabase {
      * Sets the given key to the given entry.
      * If the key is null, the entry field will be cleared.
      *
-     * @param entry a BibEntry
-     * @param key a String
      * @return true, if the entry contains the key, false if not
      */
     public synchronized boolean setCiteKeyForEntry(BibEntry entry, String key) {
-        String oldKey = entry.getCiteKeyOptional().orElse(null);
         if (key == null) {
             entry.clearField(BibEntry.KEY_FIELD);
         } else {
             entry.setCiteKey(key);
         }
-        return duplicationChecker.checkForDuplicateKeyAndAdd(oldKey, key);
+        return duplicationChecker.checkForDuplicateKeyAndAdd(entry.getCiteKeyOptional(), Optional.ofNullable(key));
     }
 
     /**
