@@ -2,16 +2,18 @@ package net.sf.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URI;
+import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -23,27 +25,14 @@ import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.utils.URIBuilder;
 import org.xml.sax.SAXException;
 
 public class GvkFetcher implements SearchBasedFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(GvkFetcher.class);
 
-    private final Map<String, String> searchKeys = new HashMap<>();
-
-    public GvkFetcher() {
-        searchKeys.put("all", "pica.all%3D");
-        searchKeys.put("tit", "pica.tit%3D");
-        searchKeys.put("per", "pica.per%3D");
-        searchKeys.put("thm", "pica.thm%3D");
-        searchKeys.put("slw", "pica.slw%3D");
-        searchKeys.put("txt", "pica.txt%3D");
-        searchKeys.put("num", "pica.num%3D");
-        searchKeys.put("kon", "pica.kon%3D");
-        searchKeys.put("ppn", "pica.ppn%3D");
-        searchKeys.put("bkl", "pica.bkl%3D");
-        searchKeys.put("erj", "pica.erj%3D");
-    }
+    private final Collection<String> searchKeys = Arrays.asList("all", "tit", "per", "thm", "slw", "txt", "num", "kon", "ppn", "bkl", "erj");
 
     @Override
     public String getName() {
@@ -55,86 +44,70 @@ public class GvkFetcher implements SearchBasedFetcher {
         return HelpFile.FETCHER_GVK;
     }
 
-    @Override
-    public List<BibEntry> performSearch(String query) throws FetcherException {
+    private String getSearchQueryStringForComplexQuery(List<String> queryList) {
+        StringJoiner gvkQueryJoiner = new StringJoiner(" and ");
+        if (!searchKeys.contains(queryList.get(0))) {
+            throw new IllegalStateException("First element of query list has to be a searchKey");
+        };
 
-        String[] qterms = query.trim().split("\\s");
-
-        // Null abfangen!
-        if (qterms.length == 0) {
-            System.err.println("False");
+        Iterator<String> iterator = queryList.iterator();
+        String query = iterator.next();
+        // query is a searchKey
+        while (iterator.hasNext()) {
+            String searchKey = query;
+            StringJoiner parameterJoiner = new StringJoiner(" ");
+            while (iterator.hasNext() && (!searchKeys.contains((query = iterator.next())))) {
+                parameterJoiner.add(query);
+            }
+            gvkQueryJoiner.add("pica.".concat(searchKey).concat("=").concat(parameterJoiner.toString()));
         }
 
-        // Jeden einzelnen Suchbegriff URL-Encodieren
-        for (int x = 0; x < qterms.length; x++) {
-            try {
-                qterms[x] = URLEncoder.encode(qterms[x], StandardCharsets.UTF_8.name());
-            } catch (UnsupportedEncodingException e) {
-                LOGGER.error("Unsupported encoding", e);
-            }
+        return gvkQueryJoiner.toString();
+    }
+
+    String getSearchQueryString(String query) {
+        Objects.requireNonNull(query);
+        LinkedList<String> queryList = new LinkedList(Arrays.asList(query.split("\\s")));
+
+        if (queryList.isEmpty()) {
+            return "";
         }
 
         String gvkQuery;
-        if (searchKeys.containsKey(qterms[0])) {
-            gvkQuery = processComplexQuery(qterms);
+        if (searchKeys.contains(queryList.get(0))) {
+            gvkQuery = getSearchQueryStringForComplexQuery(queryList);
         } else {
-            gvkQuery = "pica.all%3D";
-            gvkQuery = gvkQuery.concat(qterms[0]);
-
-            for (int x = 1; x < qterms.length; x++) {
-                gvkQuery = gvkQuery.concat("%20");
-                gvkQuery = gvkQuery.concat(qterms[x]);
-            }
+            // query as pica.all
+            gvkQuery = queryList.stream().collect(Collectors.joining(" ", "pica.all=", ""));
         }
 
-        List<BibEntry> bibs = fetchGVK(gvkQuery);
-
-
-        if (bibs.isEmpty()) {
-            LOGGER.error("No references found");
-        }
-
-        return bibs;
+        return gvkQuery;
     }
 
-    private String processComplexQuery(String[] s) {
-        String result = "";
-        boolean lastWasKey = false;
-
-        for (int x = 0; x < s.length; x++) {
-            if (searchKeys.containsKey(s[x])) {
-                if (x == 0) {
-                    result = searchKeys.get(s[x]);
-                } else {
-                    result = result.concat("%20and%20" + searchKeys.get(s[x]));
-                }
-                lastWasKey = true;
-            } else {
-                if (!lastWasKey) {
-                    result = result.concat("%20");
-                }
-                String encoded = s[x];
-                encoded = encoded.replace(",", "%2C").replace("?", "%3F");
-
-                result = result.concat(encoded);
-                lastWasKey = false;
-            }
-        }
-        return result;
+    URL getQueryURL(String query) throws URISyntaxException, MalformedURLException {
+        String gvkQuery = getSearchQueryString(query);
+        final String URL_PATTERN = "http://sru.gbv.de/gvk?";
+        URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);
+        uriBuilder.addParameter("version", "1.1");
+        uriBuilder.addParameter("operation", "searchRetrieve");
+        uriBuilder.addParameter("query", gvkQuery);
+        uriBuilder.addParameter("maximumRecords", "50");
+        uriBuilder.addParameter("recordSchema", "picaxml");
+        uriBuilder.addParameter("sortKeys", "Year,,1");
+        return uriBuilder.build().toURL();
     }
 
-    private List<BibEntry> fetchGVK(String query) {
+
+    @Override
+    public List<BibEntry> performSearch(String query) throws FetcherException {
+        if (query == null || query.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
+
         List<BibEntry> result;
 
-        String urlPrefix = "http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=";
-        String urlSuffix = "&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1";
-
-        String searchstring = urlPrefix + query + urlSuffix;
-        LOGGER.debug(searchstring);
         try {
-            URI uri = new URI(searchstring);
-            URL url = uri.toURL();
-            try (InputStream is = url.openStream()) {
+            try (InputStream is = getQueryURL(query).openStream()) {
                 result = (new GVKParser()).parseEntries(is);
             }
         } catch (URISyntaxException e) {
@@ -149,6 +122,10 @@ public class GvkFetcher implements SearchBasedFetcher {
         } catch (SAXException e) {
             LOGGER.error("An internal parser error occurred", e);
             return Collections.emptyList();
+        }
+
+        if (result.isEmpty()) {
+            LOGGER.info("No references found");
         }
 
         return result;
