@@ -31,6 +31,7 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.BeforeClass;
@@ -309,38 +310,32 @@ public class BibtexParserTest {
         assertEquals(Optional.of("Ed von Test"), e.getFieldOptional("author"));
     }
 
-    @Test
-    public void parseRecognizesEntryWithAtInField() throws IOException {
+    @Test public void parseRecognizesEntryWithAtInField() throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={Ed von T@st}}"));
 
         List<BibEntry> parsed = result.getDatabase().getEntries();
-        assertEquals(1, parsed.size());
 
-        BibEntry e = parsed.iterator().next();
-        assertEquals("article", e.getType());
-        assertEquals(Optional.of("test"), e.getCiteKeyOptional());
-        assertEquals(2, e.getFieldNames().size());
-        assertEquals(Optional.of("Ed von T@st"), e.getFieldOptional("author"));
+        BibEntry expected = new BibEntry(IdGenerator.next(), "article").withField(BibEntry.KEY_FIELD, "test")
+                .withField("author", "Ed von T@st");
+
+        assertEquals(Collections.singletonList(expected), parsed);
     }
 
-    @Test
-    public void parseRecognizesEntryPrecedingComment() throws IOException {
-        String comment = "@Comment{@article{myarticle,}" + OS.NEWLINE +
-                "@inproceedings{blabla, title={the proceedings of bl@bl@}; }" + OS.NEWLINE +
-                "}";
-        String entryWithComment = comment + OS.NEWLINE +
-                "@article{test,author={Ed von T@st}}";
+    @Test public void parseRecognizesEntryPrecedingComment() throws IOException {
+        String comment = "@Comment{@article{myarticle,}" + OS.NEWLINE
+                + "@inproceedings{blabla, title={the proceedings of bl@bl@}; }" + OS.NEWLINE + "}";
+        String entryWithComment = comment + OS.NEWLINE + "@article{test,author={Ed von T@st}}";
         ParserResult result = BibtexParser.parse(new StringReader(entryWithComment));
 
         List<BibEntry> parsed = result.getDatabase().getEntries();
-        assertEquals(1, parsed.size());
 
-        BibEntry e = parsed.iterator().next();
-        assertEquals("article", e.getType());
-        assertEquals(Optional.of("test"), e.getCiteKeyOptional());
-        assertEquals(2, e.getFieldNames().size());
-        assertEquals(Optional.of("Ed von T@st"), e.getFieldOptional("author"));
-        assertEquals(comment, e.getUserComments());
+        BibEntry expected = new BibEntry(IdGenerator.next(), "article").withField(BibEntry.KEY_FIELD, "test")
+                .withField("author", "Ed von T@st");
+        expected.setCommentsBeforeEntry(comment);
+
+        assertEquals(Collections.singletonList(expected), parsed);
+
+        assertEquals(expected.getUserComments(), parsed.get(0).getUserComments());
     }
 
     @Test
