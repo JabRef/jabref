@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -15,7 +15,6 @@
 */
 package net.sf.jabref.logic.autocompleter;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
@@ -44,9 +43,10 @@ public class AutoCompleterFactory {
 
         if (InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.PERSON_NAMES)) {
             return new NameFieldAutoCompleter(fieldName, preferences);
-        } else if (FieldName.CROSSREF.equals(fieldName)) {
+        } else if (InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.SINGLE_ENTRY_LINK)) {
             return new BibtexKeyAutoCompleter(preferences);
-        } else if (FieldName.JOURNAL.equals(fieldName) || FieldName.PUBLISHER.equals(fieldName)) {
+        } else if (InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.JOURNAL_NAME)
+                || FieldName.PUBLISHER.equals(fieldName)) {
             return new JournalAutoCompleter(fieldName, preferences, abbreviationLoader);
         } else {
             return new DefaultAutoCompleter(fieldName, preferences);
@@ -54,7 +54,7 @@ public class AutoCompleterFactory {
     }
 
     public AutoCompleter<String> getPersonAutoCompleter() {
-        return new NameFieldAutoCompleter(Arrays.asList(FieldName.AUTHOR, FieldName.EDITOR), true, preferences);
+        return new NameFieldAutoCompleter(InternalBibtexFields.getPersonNameFields(), true, preferences);
     }
 
 }

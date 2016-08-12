@@ -209,6 +209,7 @@ public class InternalBibtexFields {
 
         dummy = new BibtexSingleField(timeStampFieldName, false, BibtexSingleField.SMALL_W);
         timeStampField = timeStampFieldName;
+
         dummy.setExtras(EnumSet.of(FieldProperties.DATE));
         dummy.setPrivate();
         add(dummy);
@@ -506,6 +507,12 @@ public class InternalBibtexFields {
     public static List<String> getBookNameFields() {
         return InternalBibtexFields.getAllPublicFieldNames().stream()
                 .filter(fieldName -> InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.BOOK_NAME))
+                .collect(Collectors.toList());
+    }
+
+    public static List<String> getPersonNameFields() {
+        return InternalBibtexFields.getAllPublicFieldNames().stream().filter(
+                fieldName -> InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.PERSON_NAMES))
                 .collect(Collectors.toList());
     }
 
