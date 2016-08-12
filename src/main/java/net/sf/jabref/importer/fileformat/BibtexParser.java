@@ -224,10 +224,17 @@ public class BibtexParser {
          * for the user.
          */
         try {
+            // collect all comments and the entry type definition in front of the actual entry
+            // this is at least `@Type`
+            String commentsAndEntryTypeDefinition = dumpTextReadSoFarToString();
+
             BibEntry entry = parseEntry(type);
+            // store comments collected without type definition
+            entry.setCommentsBeforeEntry(commentsAndEntryTypeDefinition.substring(0,commentsAndEntryTypeDefinition.lastIndexOf('@')));
+            // store complete parsed serialization (comments, type definition + type contents)
+            entry.setParsedSerialization(commentsAndEntryTypeDefinition+dumpTextReadSoFarToString());
 
             boolean duplicateKey = database.insertEntry(entry);
-            entry.setParsedSerialization(dumpTextReadSoFarToString());
             if (duplicateKey) {
                 parserResult.addDuplicateKey(entry.getCiteKey());
             } else if ((entry.getCiteKey() == null) || entry.getCiteKey().isEmpty()) {
