@@ -11,9 +11,6 @@ import net.sf.jabref.model.entry.BibLatexEntryTypes;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 
-/**
- * In this class the detection of the {@link BibDatabaseMode} is handled.
- */
 public class BibDatabaseModeDetection {
 
     private static final List<EntryType> BIBTEX = BibtexEntryTypes.ALL;

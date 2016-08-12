@@ -133,7 +133,7 @@ public class BibDatabase {
         for (BibEntry e : getEntries()) {
             allFields.addAll(e.getFieldNames());
         }
-        return allFields.stream().filter(n -> !isInternalField(n)).collect(Collectors.toSet());
+        return allFields.stream().filter(field -> !isInternalField(field)).collect(Collectors.toSet());
     }
 
     public static boolean isInternalField(String field) {
@@ -239,7 +239,8 @@ public class BibDatabase {
      */
     public synchronized boolean setCiteKeyForEntry(BibEntry entry, String key) {
         String oldKey = entry.getCiteKeyOptional().orElse(null);
-        if (key == null) {
+        Optional<String> optionalKey = Optional.ofNullable(key);
+        if (!optionalKey.isPresent()) {
             entry.clearField(BibEntry.KEY_FIELD);
         } else {
             entry.setCiteKey(key);
