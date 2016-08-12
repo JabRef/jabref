@@ -114,12 +114,9 @@ public class GvkFetcher implements SearchBasedFetcher {
             LOGGER.error("URI malformed error", e);
             return Collections.emptyList();
         } catch (IOException e) {
-            LOGGER.error("GVK: An I/O exception occurred", e);
+            LOGGER.error("An I/O exception occurred", e);
             return Collections.emptyList();
-        } catch (ParserConfigurationException e) {
-            LOGGER.error("GVK: An internal parser error occurred", e);
-            return Collections.emptyList();
-        } catch (SAXException e) {
+        } catch (SAXException | ParserConfigurationException e) {
             LOGGER.error("An internal parser error occurred", e);
             return Collections.emptyList();
         }
