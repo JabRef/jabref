@@ -93,6 +93,10 @@ public class SpecialFieldsUtils {
         }
     }
 
+    public static void syncKeywordsFromSpecialFields(BibEntry be) {
+        syncKeywordsFromSpecialFields(be, null);
+    }
+
     /**
      * Update keywords according to values of special fields
      *
@@ -121,11 +125,15 @@ public class SpecialFieldsUtils {
                 .ifPresent(fieldChange -> nc.addEdit(new UndoableFieldChange(fieldChange)));
     }
 
+    public static void syncSpecialFieldsFromKeywords(BibEntry be) {
+        syncSpecialFieldsFromKeywords(be, null);
+    }
+
     /**
-     * updates field values according to keywords
-     *
-     * @param ce indicates the undo named compound. May be null
-     */
+    * updates field values according to keywords
+    *
+    * @param ce indicates the undo named compound. May be null
+    */
     public static void syncSpecialFieldsFromKeywords(BibEntry be, NamedCompound ce) {
         if (!be.hasField(FieldName.KEYWORDS)) {
             return;

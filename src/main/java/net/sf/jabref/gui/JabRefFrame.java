@@ -99,6 +99,11 @@ import net.sf.jabref.gui.groups.GroupSelector;
 import net.sf.jabref.gui.help.AboutAction;
 import net.sf.jabref.gui.help.AboutDialog;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.importer.ImportCustomizationDialog;
+import net.sf.jabref.gui.importer.ImportFormats;
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
+import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
+import net.sf.jabref.gui.importer.fetcher.GeneralFetcher;
 import net.sf.jabref.gui.journals.ManageJournalsAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.keyboard.KeyBindingRepository;
@@ -114,14 +119,10 @@ import net.sf.jabref.gui.push.PushToApplications;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
-import net.sf.jabref.importer.ImportCustomizationDialog;
-import net.sf.jabref.importer.ImportFormats;
-import net.sf.jabref.importer.OpenDatabaseAction;
-import net.sf.jabref.importer.OutputPrinter;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fetcher.GeneralFetcher;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.help.HelpFile;
+import net.sf.jabref.logic.importer.OutputPrinter;
+import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.GuiAppender;
 import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
@@ -2093,7 +2094,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     }
 
     @Override
-    public void showMessage(Object message, String title, int msgType) {
+    public void showMessage(String message, String title, int msgType) {
         JOptionPane.showMessageDialog(this, message, title, msgType);
     }
 

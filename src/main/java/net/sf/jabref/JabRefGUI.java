@@ -34,12 +34,14 @@ import javax.swing.plaf.FontUIResource;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.ParserResultWarningDialog;
+import net.sf.jabref.gui.importer.ParserResultWarningDialog;
+import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
+import net.sf.jabref.gui.importer.worker.AutosaveStartupPrompter;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.worker.VersionWorker;
-import net.sf.jabref.importer.AutosaveStartupPrompter;
-import net.sf.jabref.importer.OpenDatabaseAction;
-import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.OpenDatabase;
+import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.Version;
@@ -128,7 +130,7 @@ public class JabRefGUI {
                 ParserResult pr = parserResultIterator.next();
 
                 // Define focused tab
-                if (focusedFile != null && pr.getFile().getAbsolutePath().equals(focusedFile)) {
+                if ((focusedFile != null) && pr.getFile().getAbsolutePath().equals(focusedFile)) {
                     first = true;
                 }
 
@@ -234,7 +236,8 @@ public class JabRefGUI {
                 continue;
             }
 
-            ParserResult parsedDatabase = OpenDatabaseAction.loadDatabaseOrAutoSave(fileName, false);
+            ParserResult parsedDatabase = OpenDatabase.loadDatabaseOrAutoSave(fileName, false,
+                    ImportFormatPreferences.fromPreferences(Globals.prefs));
 
             if (parsedDatabase.isNullResult()) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
@@ -246,7 +249,7 @@ public class JabRefGUI {
 
     private boolean isLoaded(File fileToOpen) {
         for (ParserResult pr : bibDatabases) {
-            if (pr.getFile() != null && pr.getFile().equals(fileToOpen)) {
+            if ((pr.getFile() != null) && pr.getFile().equals(fileToOpen)) {
                 return true;
             }
         }

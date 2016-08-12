@@ -33,13 +33,13 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.jabref.importer.fetcher.OAI2Fetcher;
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.FulltextFetcher;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
 import net.sf.jabref.logic.importer.SearchBasedFetcher;
+import net.sf.jabref.logic.importer.util.OAI2Handler;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.io.XMLUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -252,7 +252,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
             // Title of the article
             // The result from the arXiv contains hard line breaks, try to remove them
-            title = XMLUtil.getNodeContent(item, "title").map(OAI2Fetcher::correctLineBreaks);
+            title = XMLUtil.getNodeContent(item, "title").map(OAI2Handler::correctLineBreaks);
 
             // The url leading to the abstract page
             urlAbstractPage = XMLUtil.getNodeContent(item, "id");
@@ -261,8 +261,8 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             publishedDate = XMLUtil.getNodeContent(item, "published");
 
             // Abstract of the article
-            abstractText = XMLUtil.getNodeContent(item, "summary").map(OAI2Fetcher::correctLineBreaks).map(
-                    String::trim);
+            abstractText = XMLUtil.getNodeContent(item, "summary").map(OAI2Handler::correctLineBreaks)
+                    .map(String::trim);
 
             // Authors of the article
             authorNames = new ArrayList<>();

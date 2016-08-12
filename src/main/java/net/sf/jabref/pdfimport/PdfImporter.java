@@ -36,11 +36,12 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.PdfContentImporter;
-import net.sf.jabref.importer.fileformat.PdfXmpImporter;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fileformat.PdfContentImporter;
+import net.sf.jabref.logic.importer.fileformat.PdfXmpImporter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -187,7 +188,7 @@ public class PdfImporter {
 
     private void doXMPImport(String fileName, List<BibEntry> res) {
         List<BibEntry> localRes = new ArrayList<>();
-        PdfXmpImporter importer = new PdfXmpImporter();
+        PdfXmpImporter importer = new PdfXmpImporter(XMPPreferences.fromPreferences(Globals.prefs));
         Path filePath = Paths.get(fileName);
         ParserResult result = importer.importDatabase(filePath, Globals.prefs.getDefaultEncoding());
         if (result.hasWarnings()) {
@@ -232,7 +233,8 @@ public class PdfImporter {
 
     private void doContentImport(String fileName, List<BibEntry> res) {
 
-        PdfContentImporter contentImporter = new PdfContentImporter();
+        PdfContentImporter contentImporter = new PdfContentImporter(
+                ImportFormatPreferences.fromPreferences(Globals.prefs));
         Path filePath = Paths.get(fileName);
         ParserResult result = contentImporter.importDatabase(filePath, Globals.prefs.getDefaultEncoding());
         if (result.hasWarnings()) {

@@ -18,7 +18,6 @@ package net.sf.jabref.specialfields;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.event.FieldChangedEvent;
@@ -43,21 +42,17 @@ public class SpecialFieldUpdateListener {
         // and re-fire this event
         // e.g., "keyword = {prio1}, priority = {prio2}" and a change at keyword to prio3 would not succeed.
         SwingUtilities.invokeLater(() -> {
-            NamedCompound compound = new NamedCompound("SpecialFieldSync");
             if (FieldName.KEYWORDS.equals(fieldName)) {
-                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
+                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry);
                 SwingUtilities
                         .invokeLater(() -> JabRefGUI.getMainFrame().getCurrentBasePanel().updateEntryEditorIfShowing());
             } else {
                 if (SpecialFieldsUtils.isSpecialField(fieldName)) {
-                    SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, compound);
+                    SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry);
                     SwingUtilities.invokeLater(
                             () -> JabRefGUI.getMainFrame().getCurrentBasePanel().updateEntryEditorIfShowing());
                 }
             }
-            // we do NOT pass the named component to the undo manager since we do not want to have undo capabilities
-            // if the user undoes the change in the keyword field, this method is also called and
-            // the special fields are updated accordingly
         });
     }
 

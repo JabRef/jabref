@@ -9,8 +9,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -22,9 +23,13 @@ import static org.junit.Assert.assertTrue;
 
 public class AuxParserTest {
 
+    private ImportFormatPreferences importFormatPreferences;
+
+
     @Before
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
     }
 
     @Test
@@ -32,7 +37,7 @@ public class AuxParserTest {
         InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
         File auxFile = Paths.get(AuxParserTest.class.getResource("paper.aux").toURI()).toFile();
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
-            ParserResult result = BibtexParser.parse(originalReader);
+            ParserResult result = BibtexParser.parse(originalReader, importFormatPreferences);
 
             AuxParser auxParser = new AuxParser(auxFile.getAbsolutePath(), result.getDatabase());
             AuxParserResult auxResult = auxParser.parse();
@@ -55,7 +60,7 @@ public class AuxParserTest {
         File auxFile = Paths.get(AuxParserTest.class.getResource("badpaper.aux").toURI()).toFile();
 
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
-            ParserResult result = BibtexParser.parse(originalReader);
+            ParserResult result = BibtexParser.parse(originalReader, importFormatPreferences);
 
             AuxParser auxParser = new AuxParser(auxFile.getAbsolutePath(), result.getDatabase());
             AuxParserResult auxResult = auxParser.parse();
@@ -77,7 +82,7 @@ public class AuxParserTest {
         InputStream originalStream = AuxParserTest.class.getResourceAsStream("config.bib");
         File auxFile = Paths.get(AuxParserTest.class.getResource("paper.aux").toURI()).toFile();
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
-            ParserResult result = BibtexParser.parse(originalReader);
+            ParserResult result = BibtexParser.parse(originalReader, importFormatPreferences);
 
             AuxParser auxParser = new AuxParser(auxFile.getAbsolutePath(), result.getDatabase());
             AuxParserResult auxResult = auxParser.parse();
@@ -93,7 +98,7 @@ public class AuxParserTest {
         InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
         File auxFile = Paths.get(AuxParserTest.class.getResource("nested.aux").toURI()).toFile();
         try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
-            ParserResult result = BibtexParser.parse(originalReader);
+            ParserResult result = BibtexParser.parse(originalReader, importFormatPreferences);
 
             AuxParser auxParser = new AuxParser(auxFile.getAbsolutePath(), result.getDatabase());
             AuxParserResult auxResult = auxParser.parse();

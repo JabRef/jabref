@@ -16,15 +16,10 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefException;
-import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.external.AutoSetLinks;
-import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.importer.ImportInspectionCommandLine;
-import net.sf.jabref.importer.OpenDatabaseAction;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fetcher.EntryFetcher;
-import net.sf.jabref.importer.fetcher.EntryFetchers;
+import net.sf.jabref.gui.importer.fetcher.EntryFetcher;
+import net.sf.jabref.gui.importer.fetcher.EntryFetchers;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
@@ -36,6 +31,11 @@ import net.sf.jabref.logic.exporter.IExportFormat;
 import net.sf.jabref.logic.exporter.SaveException;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.SaveSession;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.ImportFormatReader;
+import net.sf.jabref.logic.importer.OpenDatabase;
+import net.sf.jabref.logic.importer.OutputPrinter;
+import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.JabRefLogger;
 import net.sf.jabref.logic.search.DatabaseSearcher;
@@ -236,7 +236,8 @@ public class ArgumentProcessor {
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
                 ParserResult pr = null;
                 if (bibExtension) {
-                    pr = OpenDatabaseAction.loadDatabaseOrAutoSave(aLeftOver, false);
+                    pr = OpenDatabase.loadDatabaseOrAutoSave(aLeftOver, false,
+                            ImportFormatPreferences.fromPreferences(Globals.prefs));
                 }
 
                 if (!bibExtension || (pr.isNullResult())) {
@@ -516,6 +517,8 @@ public class ArgumentProcessor {
 
     private static Optional<ParserResult> importFile(String argument) {
         String[] data = argument.split(",");
+        OutputPrinter printer = new SystemOutputPrinter();
+
         try {
             if ((data.length > 1) && !"*".equals(data[1])) {
                 System.out.println(Localization.lang("Importing") + ": " + data[0]);
@@ -529,7 +532,7 @@ public class ArgumentProcessor {
                     ParserResult result = Globals.IMPORT_FORMAT_READER.importFromFile(data[1], file);
 
                     if(result.hasWarnings()) {
-                        JabRefGUI.getMainFrame().showMessage(result.getErrorMessage());
+                        printer.showMessage(result.getErrorMessage());
                     }
 
                     return Optional.of(result);
