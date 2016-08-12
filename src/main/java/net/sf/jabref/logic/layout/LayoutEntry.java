@@ -235,9 +235,15 @@ class LayoutEntry {
     private String handleOptionField(BibEntry bibtex, BibDatabase database) {
         String fieldEntry;
 
-        if (BibEntry.TYPE_HEADER.equals(text) || "bibtextype".equals(text)) {
+        if (BibEntry.TYPE_HEADER.equals(text)) {
+            fieldEntry = bibtex.getType();
+        } else if (BibEntry.OBSOLETE_TYPE_HEADER.equals(text)) {
+            LOGGER.warn("'" + BibEntry.OBSOLETE_TYPE_HEADER
+                    + "' is an obsolete name for the entry type. Please update your layout to use '"
+                    + BibEntry.TYPE_HEADER + "' instead.");
             fieldEntry = bibtex.getType();
         } else {
+
             // changed section begin - arudert
             // resolve field (recognized by leading backslash) or text
             fieldEntry = text.startsWith("\\") ? BibDatabase
