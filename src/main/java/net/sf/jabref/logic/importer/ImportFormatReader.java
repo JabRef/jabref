@@ -75,7 +75,7 @@ public class ImportFormatReader {
         formats.add(new BibtexImporter(importFormatPreferences));
         formats.add(new BibTeXMLImporter());
         formats.add(new CopacImporter());
-        formats.add(new EndnoteImporter());
+        formats.add(new EndnoteImporter(importFormatPreferences));
         formats.add(new FreeCiteImporter(importFormatPreferences));
         formats.add(new InspecImporter());
         formats.add(new IsiImporter());

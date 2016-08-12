@@ -333,7 +333,8 @@ public class BibtexParserTest {
     }
 
     @Test public void parseRecognizesEntryWithAtInField() throws IOException {
-        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={Ed von T@st}}"));
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={Ed von T@st}}"),
+                importFormatPreferences);
 
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
@@ -347,7 +348,7 @@ public class BibtexParserTest {
         String comment = "@Comment{@article{myarticle,}" + OS.NEWLINE
                 + "@inproceedings{blabla, title={the proceedings of bl@bl@}; }" + OS.NEWLINE + "}";
         String entryWithComment = comment + OS.NEWLINE + "@article{test,author={Ed von T@st}}";
-        ParserResult result = BibtexParser.parse(new StringReader(entryWithComment));
+        ParserResult result = BibtexParser.parse(new StringReader(entryWithComment), importFormatPreferences);
 
         List<BibEntry> parsed = result.getDatabase().getEntries();
 
@@ -1769,7 +1770,7 @@ public class BibtexParserTest {
                 "}";
         // @formatter:on
 
-        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
+        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry), importFormatPreferences);
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 

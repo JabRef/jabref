@@ -35,9 +35,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
@@ -227,7 +225,7 @@ public class FreeCiteImporter extends ImportFormat {
                     BibtexKeyPatternUtil.makeLabel(
                             JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getMetaData(),
                             JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabase(), e,
-                            BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
+                            importFormatPreferences.getBibtexKeyPatternPreferences());
 
                     res.add(e);
                 }

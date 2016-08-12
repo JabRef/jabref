@@ -24,13 +24,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * Importer for the Refer/Endnote format.
@@ -46,6 +45,12 @@ public class EndnoteImporter extends ImportFormat {
 
     private static final Pattern A_PATTERN = Pattern.compile("%A .*");
     private static final Pattern E_PATTERN = Pattern.compile("%E .*");
+
+    private final ImportFormatPreferences preferences;
+
+    public EndnoteImporter(ImportFormatPreferences preferences) {
+        this.preferences = preferences;
+    }
 
     @Override
     public String getFormatName() {
@@ -239,7 +244,7 @@ public class EndnoteImporter extends ImportFormat {
                     }
                 } else if ("F".equals(prefix)) {
                     hm.put(BibEntry.KEY_FIELD, BibtexKeyPatternUtil.checkLegalKey(val,
-                            Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY)));
+                            preferences.getBibtexKeyPatternPreferences().isEnforceLegalKey()));
                 }
             }
 

@@ -53,6 +53,7 @@ import net.sf.jabref.migrations.FileLinksUpgradeWarning;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.preferences.JabRefPreferences;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

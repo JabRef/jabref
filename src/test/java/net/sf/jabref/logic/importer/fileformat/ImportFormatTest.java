@@ -82,7 +82,7 @@ public class ImportFormatTest {
                 new Object[]{new BibtexImporter(importFormatPreferences)},
                 new Object[]{new BibTeXMLImporter()},
                 new Object[]{new CopacImporter()},
-                new Object[]{new EndnoteImporter()},
+                new Object[]{new EndnoteImporter(importFormatPreferences)},
                 new Object[]{new FreeCiteImporter(importFormatPreferences)},
                 new Object[]{new InspecImporter()},
                 new Object[]{new IsiImporter()},
