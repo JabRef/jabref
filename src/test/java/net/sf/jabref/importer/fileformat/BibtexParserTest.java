@@ -310,6 +310,40 @@ public class BibtexParserTest {
     }
 
     @Test
+    public void parseRecognizesEntryWithAtInField() throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader("@article{test,author={Ed von T@st}}"));
+
+        List<BibEntry> parsed = result.getDatabase().getEntries();
+        assertEquals(1, parsed.size());
+
+        BibEntry e = parsed.iterator().next();
+        assertEquals("article", e.getType());
+        assertEquals(Optional.of("test"), e.getCiteKeyOptional());
+        assertEquals(2, e.getFieldNames().size());
+        assertEquals(Optional.of("Ed von T@st"), e.getFieldOptional("author"));
+    }
+
+    @Test
+    public void parseRecognizesEntryPrecedingComment() throws IOException {
+        String comment = "@Comment{@article{myarticle,}" + OS.NEWLINE +
+                "@inproceedings{blabla, title={the proceedings of bl@bl@}; }" + OS.NEWLINE +
+                "}";
+        String entryWithComment = comment + OS.NEWLINE +
+                "@article{test,author={Ed von T@st}}";
+        ParserResult result = BibtexParser.parse(new StringReader(entryWithComment));
+
+        List<BibEntry> parsed = result.getDatabase().getEntries();
+        assertEquals(1, parsed.size());
+
+        BibEntry e = parsed.iterator().next();
+        assertEquals("article", e.getType());
+        assertEquals(Optional.of("test"), e.getCiteKeyOptional());
+        assertEquals(2, e.getFieldNames().size());
+        assertEquals(Optional.of("Ed von T@st"), e.getFieldOptional("author"));
+        assertEquals(comment, e.getUserComments());
+    }
+
+    @Test
     public void parseRecognizesMultipleEntries() throws IOException {
 
         ParserResult result = BibtexParser
