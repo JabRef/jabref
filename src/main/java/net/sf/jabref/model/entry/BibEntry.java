@@ -33,6 +33,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.regex.Pattern;
 
 import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.model.FieldChange;
@@ -51,6 +52,8 @@ public class BibEntry implements Cloneable {
     public static final String KEY_FIELD = "bibtexkey";
     protected static final String ID_FIELD = "id";
     public static final String DEFAULT_TYPE = "misc";
+
+    private static final Pattern REMOVE_TRAILING_WHITESPACE = Pattern.compile("\\s+$");
 
     private String id;
 
@@ -579,7 +582,6 @@ public class BibEntry implements Cloneable {
         this.commentsBeforeEntry = parsedComments;
     }
 
-
     public boolean hasChanged() {
         return changed;
     }
@@ -687,7 +689,7 @@ public class BibEntry implements Cloneable {
      */
     public String getUserComments() {
         // delete trailing whitespaces (between entry and text) from stored serialization
-        return commentsBeforeEntry.replaceFirst("\\s+$", "");
+        return REMOVE_TRAILING_WHITESPACE.matcher(commentsBeforeEntry).replaceFirst("");
     }
 
     public Set<String> getFieldAsWords(String field) {
