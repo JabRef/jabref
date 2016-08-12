@@ -61,9 +61,9 @@ public class BibTeXMLImporter extends ImportFormat {
 
     private static final Pattern START_PATTERN = Pattern.compile("<(bibtex:)?file .*");
 
-    private static final List<String> FIELDS_TO_SKIP = Arrays.asList("getClass", "getAnnotate", "getContents",
-            "getPrice",
-            "getSize", "getChapter");
+    private static final List<String> IGNORED_METHODS = Arrays.asList("getClass", "getAnnotate", "getContents",
+            "getPrice", "getSize", "getChapter");
+
 
     @Override
     public String getFormatName() {
@@ -190,13 +190,16 @@ public class BibTeXMLImporter extends ImportFormat {
     }
 
     /**
-     * In this method, all <Code>get</Code> methods that t has will be used and their value will be put to fields,
+     * We use a generic method and not work on the real classes, because they all have the same behaviour. They call all get methods
+     * that are needed and use the return value. So this will prevent writing similar methods for every type.
+     * <p>
+     * In this method, all <Code>get</Code> methods that entryType has will be used and their value will be put to fields,
      * if it is not null. So for example if entryType has the method <Code>getAbstract</Code>, then
      * "abstract" will be put as key to fields and the value of <Code>getAbstract</Code> will be put as value to fields.
      * Some <Code>get</Code> methods shouldn't be mapped to fields, so <Code>getClass</Code> for example will be skipped.
      *
      * @param entryType This can be all possible BibTeX types. It contains all fields of the entry and their values.
-     * @param fields A map where the name and the value of all fields, that the entry contains, will be put.
+     * @param fields A map where the name and the value of all fields that the entry contains will be put.
      */
     private <T> void parse(T entryType, Map<String, String> fields) {
         Method[] declaredMethods = entryType.getClass().getDeclaredMethods();
@@ -208,7 +211,7 @@ public class BibTeXMLImporter extends ImportFormat {
                 } else if (method.getName().equals("getNumber")) {
                     putNumber(fields, (BigInteger) method.invoke(entryType));
                     continue;
-                } else if (isFieldToSkip(method.getName())) {
+                } else if (isMethodToIgnore(method.getName())) {
                     continue;
                 } else if (method.getName().contains("get")) {
                     putIfValueNotNull(fields, method.getName().replace("get", ""), (String) method.invoke(entryType));
@@ -220,15 +223,19 @@ public class BibTeXMLImporter extends ImportFormat {
     }
 
     /**
-     * Returns whether the value of the given method name should be mapped or whether the field can be skipped.
+     * Returns whether the value of the given method name should be mapped or whether the method can be ignored.
      *
-     * @param name of a method
-     * @return true if the field can be skipped, else false
+     * @param methodName The name of the method as String
+     * @return true if the method can be ignored, else false
      */
-    private boolean isFieldToSkip(String name) {
-        return FIELDS_TO_SKIP.contains(name);
+    private boolean isMethodToIgnore(String methodName) {
+        return IGNORED_METHODS.contains(methodName);
     }
 
+    /**
+     * Inbook needs a special Treatment, because <Code>inbook.getContent()</Code> returns a list of <Code>JAXBElements</Code>.
+     * The other types have just <Code>get</Code> methods, which return the values as Strings.
+     */
     private void parseInbook(Inbook inbook, Map<String, String> fields) {
         List<JAXBElement<?>> content = inbook.getContent();
         for (JAXBElement<?> element : content) {
