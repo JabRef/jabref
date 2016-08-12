@@ -41,6 +41,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class InternalBibtexFields {
 
@@ -51,17 +52,28 @@ public class InternalBibtexFields {
     private String timeStampField;
 
     // Lists of fields with special properties
-    public static final List<String> IEEETRANBSTCTL_NUMERIC_FIELDS = Arrays.asList("ctlmax_names_forced_etal",
-            "ctlnames_show_etal", "ctlalt_stretch_factor");
+    public static final List<String> INTEGER_FIELDS = Arrays.asList("ctlmax_names_forced_etal", "ctlnames_show_etal",
+            "ctlalt_stretch_factor", FieldName.VOLUMES);
     public static final List<String> IEEETRANBSTCTL_YES_NO_FIELDS = Arrays.asList("ctluse_article_number",
             "ctluse_paper", "ctluse_url", "ctluse_forced_etal", "ctluse_alt_spacing", "ctldash_repeated_names");
     public static final List<String> BIBLATEX_DATE_FIELDS = Arrays.asList(FieldName.DATE, "eventdate", "origdate", FieldName.URLDATE);
-    public static final List<String> BIBLATEX_PERSON_NAME_FIELDS = Arrays.asList(FieldName.AUTHOR, FieldName.EDITOR, "editora",
-            "editorb", "editorc", "translator", "annotator", "commentator", "introduction", "foreword", "afterword",
-            "bookauthor", "holder", "shortauthor", "shorteditor", "sortname");
+    public static final List<String> BIBLATEX_PERSON_NAME_FIELDS = Arrays.asList(FieldName.AUTHOR, FieldName.EDITOR,
+            "editora", "editorb", "editorc", FieldName.TRANSLATOR, "annotator", "commentator", "introduction", "foreword",
+            "afterword", FieldName.BOOKAUTHOR, "holder", "shortauthor", "shorteditor", "sortname", "nameaddon");
     public static final List<String> BIBLATEX_EDITOR_TYPE_FIELDS = Arrays.asList("editortype", "editoratype",
             "editorbtype", "editorctype");
     public static final List<String> BIBLATEX_PAGINATION_FIELDS = Arrays.asList("pagination", "bookpagination");
+
+    public static final List<String> BIBLATEX_JOURNAL_NAME_FIELDS = Arrays.asList(FieldName.JOURNAL,
+            FieldName.JOURNALTITLE, FieldName.JOURNALSUBTITLE);
+
+    public static final List<String> BIBLATEX_BOOK_NAME_FIELDS = Arrays.asList(FieldName.BOOKTITLE, FieldName.MAINTITLE,
+            FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON, FieldName.BOOKSUBTITLE, FieldName.BOOKTITLEADDON);
+
+    public static final List<String> BIBLATEX_LANGUAGE_FIELDS = Arrays.asList(FieldName.LANGUAGE,
+            FieldName.ORIGLANGUAGE);
+
+    public static final List<String> BIBLATEX_MULTI_KEY_FIELDS = Arrays.asList(FieldName.RELATED, FieldName.ENTRYSET);
 
     public static final List<String> SPECIAL_FIELDS = Arrays.asList(SpecialFields.FIELDNAME_PRINTED,
             SpecialFields.FIELDNAME_PRIORITY, SpecialFields.FIELDNAME_QUALITY,
@@ -89,7 +101,7 @@ public class InternalBibtexFields {
         add(new BibtexSingleField(FieldName.BOOKTITLE, true, 175));
         add(new BibtexSingleField(FieldName.CHAPTER, true, BibtexSingleField.SMALL_W));
         dummy = new BibtexSingleField(FieldName.CROSSREF, true, BibtexSingleField.SMALL_W);
-        dummy.setExtras(EnumSet.of(FieldProperties.CROSSREF));
+        dummy.setExtras(EnumSet.of(FieldProperties.CROSSREF, FieldProperties.SINGLE_ENTRY_LINK));
         add(dummy);
         add(new BibtexSingleField(FieldName.EDITION, true, BibtexSingleField.SMALL_W));
         add(new BibtexSingleField(FieldName.EDITOR, true, BibtexSingleField.MEDIUM_W, 280));
@@ -175,8 +187,12 @@ public class InternalBibtexFields {
         add(new BibtexSingleField("search", false, 75));
 
         // some BibLatex fields
-        dummy = new BibtexSingleField("gender", true, BibtexSingleField.SMALL_W);
+        dummy = new BibtexSingleField(FieldName.GENDER, true, BibtexSingleField.SMALL_W);
         dummy.getExtras().add(FieldProperties.GENDER);
+        add(dummy);
+
+        dummy = new BibtexSingleField(FieldName.PUBSTATE, true, BibtexSingleField.SMALL_W);
+        dummy.getExtras().add(FieldProperties.PUBLICATION_STATE);
         add(dummy);
 
         // some internal fields ----------------------------------------------
@@ -219,14 +235,15 @@ public class InternalBibtexFields {
         dummy.setDisplayable(false);
         add(dummy);
 
-        // IEEEtranBSTCTL fields
+        // IEEEtranBSTCTL fields that should be "yes" or "no"
         for (String yesNoField : IEEETRANBSTCTL_YES_NO_FIELDS) {
             dummy = new BibtexSingleField(yesNoField, false);
             dummy.setExtras(EnumSet.of(FieldProperties.YES_NO));
             add(dummy);
         }
 
-        for (String numericField : IEEETRANBSTCTL_NUMERIC_FIELDS) {
+        // Fields that should be an integer value
+        for (String numericField : INTEGER_FIELDS) {
             dummy = new BibtexSingleField(numericField, false).setNumeric(true);
             dummy.getExtras().add(FieldProperties.INTEGER);
             add(dummy);
@@ -273,8 +290,46 @@ public class InternalBibtexFields {
             add(field);
         }
 
-    }
+        // Set all fields with journal names
+        for (String fieldText : BIBLATEX_JOURNAL_NAME_FIELDS) {
+            BibtexSingleField field = fieldSet.get(fieldText);
+            if (field == null) {
+                field = new BibtexSingleField(fieldText, true, BibtexSingleField.SMALL_W);
+            }
+            field.getExtras().add(FieldProperties.JOURNAL_NAME);
+            add(field);
+        }
 
+        // Set all fields with book names
+        for (String fieldText : BIBLATEX_BOOK_NAME_FIELDS) {
+            BibtexSingleField field = fieldSet.get(fieldText);
+            if (field == null) {
+                field = new BibtexSingleField(fieldText, true, BibtexSingleField.SMALL_W);
+            }
+            field.getExtras().add(FieldProperties.BOOK_NAME);
+            add(field);
+        }
+
+        // Set all fields containing a language
+        for (String fieldText : BIBLATEX_LANGUAGE_FIELDS) {
+            BibtexSingleField field = fieldSet.get(fieldText);
+            if (field == null) {
+                field = new BibtexSingleField(fieldText, true, BibtexSingleField.SMALL_W);
+            }
+            field.getExtras().add(FieldProperties.LANGUAGE);
+            add(field);
+        }
+
+        // Set all fields with multiple key links
+        for (String fieldText : BIBLATEX_MULTI_KEY_FIELDS) {
+            BibtexSingleField field = fieldSet.get(fieldText);
+            if (field == null) {
+                field = new BibtexSingleField(fieldText, true, BibtexSingleField.SMALL_W);
+            }
+            field.getExtras().add(FieldProperties.MULTIPLE_ENTRY_LINK);
+            add(field);
+        }
+    }
 
     public static void updateTimeStampField(String timeStampFieldName) {
         getField(RUNTIME.timeStampField).ifPresent(field -> {
@@ -442,7 +497,17 @@ public class InternalBibtexFields {
 
     }
 
+    public static List<String> getJournalNameFields() {
+        return InternalBibtexFields.getAllPublicFieldNames().stream().filter(
+                fieldName -> InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.JOURNAL_NAME))
+                .collect(Collectors.toList());
+    }
 
+    public static List<String> getBookNameFields() {
+        return InternalBibtexFields.getAllPublicFieldNames().stream()
+                .filter(fieldName -> InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.BOOK_NAME))
+                .collect(Collectors.toList());
+    }
 
     /*
        public static int getPreferredFieldLength(String name) {
