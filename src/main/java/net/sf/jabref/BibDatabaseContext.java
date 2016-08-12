@@ -6,12 +6,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
+import net.sf.jabref.model.database.DatabaseLocation;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.shared.DBMSSynchronizer;
 
 /**
- * Represents everything related to a .bib file.
+ * Represents everything related to a BIB file.
  * <p>
  * The entries are stored in BibDatabase, the other data in MetaData and the options relevant for this file in Defaults.
  */
@@ -22,6 +27,8 @@ public class BibDatabaseContext {
     private final Defaults defaults;
     /** The file where this database was last saved to. */
     private File file;
+    private DBMSSynchronizer dbmsSynchronizer;
+    private DatabaseLocation location;
 
     public BibDatabaseContext() {
         this(new Defaults());
@@ -40,9 +47,15 @@ public class BibDatabaseContext {
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, Defaults defaults) {
+        this(database, metaData, defaults, DatabaseLocation.LOCAL);
+    }
+
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, Defaults defaults, DatabaseLocation location) {
         this.defaults = Objects.requireNonNull(defaults);
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
+
+        updateDatabaseLocation(location);
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData) {
@@ -57,6 +70,10 @@ public class BibDatabaseContext {
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, File file) {
         this(database, metaData, file, new Defaults());
+    }
+
+    public BibDatabaseContext(Defaults defaults, DatabaseLocation location) {
+        this(new BibDatabase(), new MetaData(), defaults, location);
     }
 
     public BibDatabaseMode getMode() {
@@ -114,7 +131,7 @@ public class BibDatabaseContext {
      * 1. metadata user-specific directory
      * 2. metadata general directory
      * 3. preferences directory
-     * 4. bib file directory
+     * 4. BIB file directory
      *
      * @param fieldName The field type
      * @return The default directory for this field type.
@@ -135,12 +152,12 @@ public class BibDatabaseContext {
         }
 
         // 3. preferences directory
-        String dir = Globals.prefs.get(fieldName + Globals.DIR_SUFFIX); // FILE_DIR
+        String dir = Globals.prefs.get(fieldName + FileLinkPreferences.DIR_SUFFIX); // FILE_DIR
         if (dir != null) {
             fileDirs.add(dir);
         }
 
-        // 4. bib file directory
+        // 4. BIB file directory
         if (getDatabaseFile() != null) {
             String parentDir = getDatabaseFile().getParent();
             // Check if we should add it as primary file dir (first in the list) or not:
@@ -157,7 +174,7 @@ public class BibDatabaseContext {
     private String getFileDirectoryPath(String directoryName) {
         String dir = directoryName;
         // If this directory is relative, we try to interpret it as relative to
-        // the file path of this bib file:
+        // the file path of this BIB file:
         if (!new File(dir).isAbsolute() && (getDatabaseFile() != null)) {
             String relDir;
             if (".".equals(dir)) {
@@ -176,6 +193,30 @@ public class BibDatabaseContext {
     }
 
     public List<String> getFileDirectory() {
-        return getFileDirectory(Globals.FILE_FIELD);
+        return getFileDirectory(FieldName.FILE);
+    }
+
+    public DBMSSynchronizer getDBSynchronizer() {
+        return this.dbmsSynchronizer;
+    }
+
+    public DatabaseLocation getLocation() {
+        return this.location;
+    }
+
+    public void updateDatabaseLocation(DatabaseLocation newLocation) {
+
+        if ((this.location == DatabaseLocation.SHARED) && (newLocation == DatabaseLocation.LOCAL)) {
+            this.database.unregisterListener(dbmsSynchronizer);
+            this.metaData.unregisterListener(dbmsSynchronizer);
+        }
+
+        if (newLocation == DatabaseLocation.SHARED) {
+            this.dbmsSynchronizer = new DBMSSynchronizer(this);
+            this.database.registerListener(dbmsSynchronizer);
+            this.metaData.registerListener(dbmsSynchronizer);
+        }
+
+        this.location = newLocation;
     }
 }

@@ -29,9 +29,9 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.pdfimport.ImportDialog;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -84,7 +84,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
         JPanel pan = new JPanel();
 
-        builder.appendSeparator(Localization.lang("Default import style for drag&drop of PDFs"));
+        builder.appendSeparator(Localization.lang("Default import style for drag and drop of PDFs"));
         builder.nextLine();
         builder.append(pan);
         builder.append(radioButtonNoMeta);

@@ -18,8 +18,6 @@ package net.sf.jabref.logic.groups;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
@@ -42,11 +40,11 @@ public class SearchGroup extends AbstractGroup {
 
     private static final Log LOGGER = LogFactory.getLog(SearchGroup.class);
 
-
     /**
      * Creates a SearchGroup with the specified properties.
      */
-    public SearchGroup(String name, String searchExpression, boolean caseSensitive, boolean regExp, GroupHierarchyType context) {
+    public SearchGroup(String name, String searchExpression, boolean caseSensitive, boolean regExp,
+            GroupHierarchyType context) {
         super(name, context);
 
         this.query = new SearchQuery(searchExpression, caseSensitive, regExp);
@@ -121,6 +119,9 @@ public class SearchGroup extends AbstractGroup {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
         if (!(o instanceof SearchGroup)) {
             return false;
         }
@@ -170,10 +171,10 @@ public class SearchGroup extends AbstractGroup {
     }
 
     @Override
-    public String getShortDescription() {
+    public String getShortDescription(boolean showDynamic) {
         StringBuilder sb = new StringBuilder();
         sb.append("<b>");
-        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_SHOW_DYNAMIC)) {
+        if (showDynamic) {
             sb.append("<i>").append(StringUtil.quoteForHTML(getName())).append("</i>");
         } else {
             sb.append(StringUtil.quoteForHTML(getName()));

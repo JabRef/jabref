@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
@@ -29,6 +28,7 @@ import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * The interface EntryFromFileCreator does twice: <br>
@@ -108,11 +108,11 @@ public abstract class EntryFromFileCreator implements FileFilter {
         }
 
         if (addPathTokensAsKeywords) {
-            appendToField(newEntry.get(), "keywords", extractPathesToKeyWordsfield(f.getAbsolutePath()));
+            appendToField(newEntry.get(), FieldName.KEYWORDS, extractPathesToKeyWordsfield(f.getAbsolutePath()));
         }
 
-        if (!newEntry.get().hasField("title")) {
-            newEntry.get().setField("title", f.getName());
+        if (!newEntry.get().hasField(FieldName.TITLE)) {
+            newEntry.get().setField(FieldName.TITLE, f.getName());
         }
 
         addFileInfo(newEntry.get(), f);
@@ -162,22 +162,21 @@ public abstract class EntryFromFileCreator implements FileFilter {
         FileListTableModel model = new FileListTableModel();
         model.addEntry(0, fileListEntry);
 
-        entry.setField(Globals.FILE_FIELD, model.getStringRepresentation());
+        entry.setField(FieldName.FILE, model.getStringRepresentation());
     }
 
     protected void appendToField(BibEntry entry, String field, String value) {
         if ((value == null) || value.isEmpty()) {
             return;
         }
-        String oVal = entry.getField(field);
-        if (oVal == null) {
-            entry.setField(field, value);
-        } else {
+        Optional<String> oVal = entry.getFieldOptional(field);
+        if (oVal.isPresent()) {
             // TODO: find Jabref constant for delimter
-            if (!oVal.contains(value)) {
-                entry.setField(field, oVal + "," + value);
+            if (!oVal.get().contains(value)) {
+                entry.setField(field, oVal.get() + "," + value);
             }
-
+        } else {
+            entry.setField(field, value);
         }
     }
 
@@ -191,7 +190,7 @@ public abstract class EntryFromFileCreator implements FileFilter {
 
     protected void addEntryDataToEntry(BibEntry entry, BibEntry e) {
         for (String field : e.getFieldNames()) {
-            appendToField(entry, field, e.getField(field));
+            e.getFieldOptional(field).ifPresent(fieldContent -> appendToField(entry, field, fieldContent));
         }
     }
 

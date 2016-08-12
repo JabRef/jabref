@@ -20,11 +20,15 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
@@ -39,7 +43,6 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryMarker;
 import net.sf.jabref.gui.GUIGlobals;
@@ -59,7 +62,9 @@ import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexSingleField;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.SpecialFields;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.SortedList;
@@ -95,10 +100,6 @@ public class MainTable extends JTable {
     private final PersistenceTableColumnListener tableColumnListener;
     private final MainTableDataModel model;
 
-    public MainTableDataModel getTableModel() {
-        return model;
-    }
-
     // Enum used to define how a cell should be rendered.
     private enum CellRendererMode {
         REQUIRED,
@@ -131,7 +132,7 @@ public class MainTable extends JTable {
         super();
         this.model = model;
 
-        addFocusListener(Globals.focusListener);
+        addFocusListener(Globals.getFocusListener());
         setAutoResizeMode(Globals.prefs.getInt(JabRefPreferences.AUTO_RESIZE_MODE));
 
         this.tableFormat = tableFormat;
@@ -178,6 +179,8 @@ public class MainTable extends JTable {
         setupComparatorChooser();
         model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
         setWidths();
+
+        addKeyListener(new TableKeyListener());
     }
 
     public void addSelectionListener(ListEventListener<BibEntry> listener) {
@@ -186,6 +189,10 @@ public class MainTable extends JTable {
 
     public JScrollPane getPane() {
         return pane;
+    }
+
+    public MainTableDataModel getTableModel() {
+        return model;
     }
 
     @Override
@@ -216,10 +223,12 @@ public class MainTable extends JTable {
 
         CellRendererMode status = getCellStatus(row, column);
 
-        if (!(model.getSearchState() == MainTableDataModel.DisplayOption.FLOAT) || matches(row, model.getSearchState() != MainTableDataModel.DisplayOption.DISABLED ? SearchMatcher.INSTANCE : null)) {
+        if ((model.getSearchState() != MainTableDataModel.DisplayOption.FLOAT)
+                || matches(row, SearchMatcher.INSTANCE)) {
             score++;
         }
-        if (!(model.getGroupingState() == MainTableDataModel.DisplayOption.FLOAT) || matches(row, model.getGroupingState() != MainTableDataModel.DisplayOption.DISABLED ? GroupMatcher.INSTANCE : null)) {
+        if ((model.getGroupingState() != MainTableDataModel.DisplayOption.FLOAT)
+                || matches(row, GroupMatcher.INSTANCE)) {
             score += 2;
         }
 
@@ -286,7 +295,7 @@ public class MainTable extends JTable {
         cm.getColumn(0).setPreferredWidth(ncWidth);
         for (int i = 1; i < cm.getColumnCount(); i++) {
             MainTableColumn mainTableColumn = tableFormat.getTableColumn(cm.getColumn(i).getModelIndex());
-            if (SpecialFieldsUtils.FIELDNAME_RANKING.equals(mainTableColumn.getColumnName())) {
+            if (SpecialFields.FIELDNAME_RANKING.equals(mainTableColumn.getColumnName())) {
                 cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
                 cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
                 cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL_RANKING);
@@ -366,7 +375,7 @@ public class MainTable extends JTable {
             comparators = comparatorChooser.getComparatorsForColumn(i);
             comparators.clear();
 
-            if (SpecialFieldsUtils.FIELDNAME_RANKING.equals(tableColumn.getColumnName())) {
+            if (SpecialFields.FIELDNAME_RANKING.equals(tableColumn.getColumnName())) {
                 comparators.add(new RankingFieldComparator());
             } else if (tableColumn.isIconColumn()) {
                 comparators.add(new IconComparator(tableColumn.getBibtexFields()));
@@ -497,7 +506,7 @@ public class MainTable extends JTable {
      */
     public boolean isFileColumn(int modelIndex) {
         return (tableFormat.getTableColumn(modelIndex) != null) && tableFormat.getTableColumn(modelIndex)
-                .getBibtexFields().contains(Globals.FILE_FIELD);
+                .getBibtexFields().contains(FieldName.FILE);
     }
 
     private boolean matches(int row, Matcher<BibEntry> m) {
@@ -507,7 +516,7 @@ public class MainTable extends JTable {
     private boolean isComplete(int row) {
         try {
             BibEntry entry = getBibEntry(row);
-            TypedBibEntry typedEntry = new TypedBibEntry(entry, Optional.of(panel.getDatabase()), panel.getBibDatabaseContext().getMode());
+            TypedBibEntry typedEntry = new TypedBibEntry(entry, panel.getBibDatabaseContext());
             return typedEntry.hasAllRequiredFields();
         } catch (NullPointerException ex) {
             return true;
@@ -549,7 +558,8 @@ public class MainTable extends JTable {
     public void ensureVisible(int row) {
         JScrollBar vert = pane.getVerticalScrollBar();
         int y = row * getRowHeight();
-        if ((y < vert.getValue()) || ((y > (vert.getValue() + vert.getVisibleAmount())) && !(model.getSearchState() == MainTableDataModel.DisplayOption.FLOAT))) {
+        if ((y < vert.getValue()) || ((y > (vert.getValue() + vert.getVisibleAmount()))
+                && (model.getSearchState() != MainTableDataModel.DisplayOption.FLOAT))) {
             scrollToCenter(row, 1);
         }
 
@@ -635,6 +645,28 @@ public class MainTable extends JTable {
     private TableComparatorChooser<BibEntry> createTableComparatorChooser(JTable table, SortedList<BibEntry> list,
                                                                              Object sortingStrategy) {
         return TableComparatorChooser.install(table, list, sortingStrategy);
+    }
+
+    /**
+     * KeyEvent handling of Tab
+     */
+    private class TableKeyListener extends KeyAdapter {
+
+        private final Set<Integer> pressed = new HashSet<>();
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            pressed.add(e.getExtendedKeyCode());
+            if (pressed.contains(KeyEvent.VK_TAB)) {
+                int change = pressed.contains(KeyEvent.VK_SHIFT) ? -1 : 1;
+                setSelected((getSelectedRow() + change + getRowCount()) % getRowCount());
+            }
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e) {
+            pressed.remove(e.getExtendedKeyCode());
+        }
     }
 
     /**

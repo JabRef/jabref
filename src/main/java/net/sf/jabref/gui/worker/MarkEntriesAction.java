@@ -22,13 +22,13 @@ import java.util.List;
 import javax.swing.JMenuItem;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryMarker;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -75,18 +75,20 @@ public class MarkEntriesAction extends AbstractWorker implements ActionListener 
     @Override
     public void run() {
         BasePanel panel = frame.getCurrentBasePanel();
-        List<BibEntry> bes = panel.getSelectedEntries();
+        if (panel != null) {
+            List<BibEntry> bes = panel.getSelectedEntries();
 
-        // used at update() to determine output string
-        besLength = bes.size();
+            // used at update() to determine output string
+            besLength = bes.size();
 
-        if (!bes.isEmpty()) {
-            NamedCompound ce = new NamedCompound(Localization.lang("Mark entries"));
-            for (BibEntry be : bes) {
-                EntryMarker.markEntry(be, level + 1, false, ce);
+            if (!bes.isEmpty()) {
+                NamedCompound ce = new NamedCompound(Localization.lang("Mark entries"));
+                for (BibEntry be : bes) {
+                    EntryMarker.markEntry(be, level + 1, false, ce);
+                }
+                ce.end();
+                panel.getUndoManager().addEdit(ce);
             }
-            ce.end();
-            panel.getUndoManager().addEdit(ce);
         }
     }
 

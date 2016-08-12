@@ -25,10 +25,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -81,7 +81,7 @@ public class EntryFromFileCreatorManagerTest {
             boolean file1Found = false;
             boolean file2Found = false;
             for (BibEntry entry : database.getEntries()) {
-                String filesInfo = entry.getField("file");
+                String filesInfo = entry.getFieldOptional("file").get();
                 if (filesInfo.contains(files.get(0).getName())) {
                     file1Found = true;
                 }

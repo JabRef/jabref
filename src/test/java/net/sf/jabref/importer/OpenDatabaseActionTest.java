@@ -7,11 +7,12 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.util.Collection;
+import java.util.Optional;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -74,7 +75,7 @@ public class OpenDatabaseActionTest {
 
         // Entry
         Assert.assertEquals(1, db.getEntryCount());
-        Assert.assertEquals("2014", db.getEntryByKey("1").getField("year"));
+        Assert.assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getFieldOptional("year"));
     }
 
     @Test
@@ -84,7 +85,7 @@ public class OpenDatabaseActionTest {
 
         // Entry
         Assert.assertEquals(1, db.getEntryCount());
-        Assert.assertEquals("2014", db.getEntryByKey("1").getField("year"));
+        Assert.assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getFieldOptional("year"));
     }
 
     @Test
@@ -94,7 +95,7 @@ public class OpenDatabaseActionTest {
 
         // Entry
         Assert.assertEquals(1, db.getEntryCount());
-        Assert.assertEquals("2014", db.getEntryByKey("1").getField("year"));
+        Assert.assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getFieldOptional("year"));
     }
 
     /**
@@ -112,6 +113,6 @@ public class OpenDatabaseActionTest {
         Assert.assertEquals(1, entries.size());
 
         BibEntry entry = entries.iterator().next();
-        Assert.assertEquals("testArticle", entry.getCiteKey());
+        Assert.assertEquals(Optional.of("testArticle"), entry.getCiteKeyOptional());
     }
 }

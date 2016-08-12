@@ -21,12 +21,12 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class EntryMarker {
 
@@ -43,19 +43,19 @@ public class EntryMarker {
     public static void markEntry(BibEntry be, int markIncrement, boolean increment, NamedCompound ce) {
         int prevMarkLevel;
         String newValue = null;
-        if (be.hasField(InternalBibtexFields.MARKED)) {
-            String s = be.getField(InternalBibtexFields.MARKED);
-            int index = s.indexOf(Globals.prefs.WRAPPED_USERNAME);
+        if (be.hasField(FieldName.MARKED_INTERNAL)) {
+            String markerString = be.getFieldOptional(FieldName.MARKED_INTERNAL).get();
+            int index = markerString.indexOf(Globals.prefs.WRAPPED_USERNAME);
             if (index >= 0) {
                 // Already marked 1 for this user.
                 prevMarkLevel = 1;
-                newValue = s.substring(0, index) + s.substring(index + Globals.prefs.WRAPPED_USERNAME.length()) + Globals.prefs.WRAPPED_USERNAME.substring(0, Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":" + (increment ? Math.min(MAX_MARKING_LEVEL, prevMarkLevel + markIncrement) : markIncrement) + "]";
+                newValue = markerString.substring(0, index) + markerString.substring(index + Globals.prefs.WRAPPED_USERNAME.length()) + Globals.prefs.WRAPPED_USERNAME.substring(0, Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":" + (increment ? Math.min(MAX_MARKING_LEVEL, prevMarkLevel + markIncrement) : markIncrement) + "]";
             } else {
-                Matcher m = MARK_NUMBER_PATTERN.matcher(s);
+                Matcher m = MARK_NUMBER_PATTERN.matcher(markerString);
                 if (m.find()) {
                     try {
                         prevMarkLevel = Integer.parseInt(m.group(1));
-                        newValue = s.substring(0, m.start(1)) + (increment ? Math.min(MAX_MARKING_LEVEL, prevMarkLevel + markIncrement) : markIncrement) + s.substring(m.end(1));
+                        newValue = markerString.substring(0, m.start(1)) + (increment ? Math.min(MAX_MARKING_LEVEL, prevMarkLevel + markIncrement) : markIncrement) + markerString.substring(m.end(1));
                     } catch (NumberFormatException ex) {
                         // Do nothing.
                     }
@@ -66,44 +66,45 @@ public class EntryMarker {
             newValue = Globals.prefs.WRAPPED_USERNAME.substring(0, Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":" + markIncrement + "]";
         }
 
-        ce.addEdit(new UndoableFieldChange(be, InternalBibtexFields.MARKED, be.getField(InternalBibtexFields.MARKED), newValue));
-        be.setField(InternalBibtexFields.MARKED, newValue);
+        ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED_INTERNAL,
+                be.getFieldOptional(FieldName.MARKED_INTERNAL).orElse(null), newValue));
+        be.setField(FieldName.MARKED_INTERNAL, newValue);
     }
 
     /**
      * SIDE EFFECT: Unselects given entry
      */
     public static void unmarkEntry(BibEntry be, boolean onlyMaxLevel, BibDatabase database, NamedCompound ce) {
-        if (be.hasField(InternalBibtexFields.MARKED)) {
-            String s = be.getField(InternalBibtexFields.MARKED);
-            if ("0".equals(s)) {
+        if (be.hasField(FieldName.MARKED_INTERNAL)) {
+            String markerString = be.getFieldOptional(FieldName.MARKED_INTERNAL).get();
+            if ("0".equals(markerString)) {
                 if (!onlyMaxLevel) {
                     unmarkOldStyle(be, database, ce);
                 }
                 return;
             }
             String newValue = null;
-            int index = s.indexOf(Globals.prefs.WRAPPED_USERNAME);
+            int index = markerString.indexOf(Globals.prefs.WRAPPED_USERNAME);
             if (index >= 0) {
                 // Marked 1 for this user.
                 if (onlyMaxLevel) {
                     return;
                 } else {
-                    newValue = s.substring(0, index) + s.substring(index + Globals.prefs.WRAPPED_USERNAME.length());
+                    newValue = markerString.substring(0, index) + markerString.substring(index + Globals.prefs.WRAPPED_USERNAME.length());
                 }
             } else {
-                Matcher m = MARK_NUMBER_PATTERN.matcher(s);
+                Matcher m = MARK_NUMBER_PATTERN.matcher(markerString);
                 if (m.find()) {
                     try {
                         int prevMarkLevel = Integer.parseInt(m.group(1));
                         if (!onlyMaxLevel || (prevMarkLevel == MARK_COLOR_LEVELS)) {
                             if (prevMarkLevel > 1) {
-                                newValue = s.substring(0, m.start(1)) + s.substring(m.end(1));
+                                newValue = markerString.substring(0, m.start(1)) + markerString.substring(m.end(1));
                             } else {
                                 String toRemove = Globals.prefs.WRAPPED_USERNAME.substring(0, Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":1]";
-                                index = s.indexOf(toRemove);
+                                index = markerString.indexOf(toRemove);
                                 if (index >= 0) {
-                                    newValue = s.substring(0, index) + s.substring(index + toRemove.length());
+                                    newValue = markerString.substring(0, index) + markerString.substring(index + toRemove.length());
                                 }
                             }
                         } else {
@@ -127,11 +128,12 @@ public class EntryMarker {
             	sb.append(s.substring(piv));
             }
             String newVal = sb.length() > 0 ? sb.toString() : null;*/
-            ce.addEdit(new UndoableFieldChange(be, InternalBibtexFields.MARKED, be.getField(InternalBibtexFields.MARKED), newValue));
+            ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED_INTERNAL,
+                    be.getFieldOptional(FieldName.MARKED_INTERNAL).get(), newValue));
             if (newValue == null) {
-                be.clearField(InternalBibtexFields.MARKED);
+                be.clearField(FieldName.MARKED_INTERNAL);
             } else {
-                be.setField(InternalBibtexFields.MARKED, newValue);
+                be.setField(FieldName.MARKED_INTERNAL, newValue);
             }
         }
     }
@@ -150,7 +152,7 @@ public class EntryMarker {
     private static void unmarkOldStyle(BibEntry be, BibDatabase database, NamedCompound ce) {
         Set<Object> owners = new TreeSet<>();
         for (BibEntry entry : database.getEntries()) {
-            entry.getFieldOptional(InternalBibtexFields.OWNER).ifPresent(owners::add);
+            entry.getFieldOptional(FieldName.OWNER).ifPresent(owners::add);
         }
         owners.remove(Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER));
         StringBuilder sb = new StringBuilder();
@@ -161,19 +163,21 @@ public class EntryMarker {
         }
         String newVal = sb.toString();
         if (newVal.isEmpty()) {
-            ce.addEdit(new UndoableFieldChange(be, InternalBibtexFields.MARKED, be.getField(InternalBibtexFields.MARKED), null));
-            be.clearField(InternalBibtexFields.MARKED);
+            ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED_INTERNAL,
+                    be.getFieldOptional(FieldName.MARKED_INTERNAL).orElse(null), null));
+            be.clearField(FieldName.MARKED_INTERNAL);
         } else {
-            ce.addEdit(new UndoableFieldChange(be, InternalBibtexFields.MARKED, be.getField(InternalBibtexFields.MARKED), newVal));
-            be.setField(InternalBibtexFields.MARKED, newVal);
+            ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED_INTERNAL,
+                    be.getFieldOptional(FieldName.MARKED_INTERNAL).orElse(null), newVal));
+            be.setField(FieldName.MARKED_INTERNAL, newVal);
         }
     }
 
     public static int isMarked(BibEntry be) {
-        if (!be.hasField(InternalBibtexFields.MARKED)) {
+        if (!be.hasField(FieldName.MARKED_INTERNAL)) {
             return 0;
         }
-        String s = be.getField(InternalBibtexFields.MARKED);
+        String s = be.getFieldOptional(FieldName.MARKED_INTERNAL).get();
         if ("0".equals(s)) {
             return 1;
         }
@@ -196,8 +200,6 @@ public class EntryMarker {
     }
 
     public static boolean shouldMarkEntries() {
-        return (Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES)
-                && (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)
-                        || Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP)));
+        return Globals.prefs.getBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES);
     }
 }

@@ -44,10 +44,11 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.FieldName;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
@@ -100,7 +101,7 @@ class ContentSelectorDialog2 extends JDialog {
      */
     public ContentSelectorDialog2(Window owner, JabRefFrame frame, BasePanel panel, boolean modal,
             String fieldName) {
-        super(owner, Localization.lang("Setup selectors"));
+        super(owner, Localization.lang("Manage content selectors"));
         this.setModal(modal);
         this.metaData = panel.getBibDatabaseContext().getMetaData();
         this.frame = frame;
@@ -190,7 +191,7 @@ class ContentSelectorDialog2 extends JDialog {
                 applyChanges();
                 dispose();
             } catch (Exception ex) {
-                LOGGER.info("Could not apply changes in \"Setup selectors\"", ex);
+                LOGGER.info("Could not apply changes in \"Manage content selectors\"", ex);
                 JOptionPane.showMessageDialog(frame, Localization.lang("Could not apply changes."));
             }
         });
@@ -203,7 +204,7 @@ class ContentSelectorDialog2 extends JDialog {
             try {
                 applyChanges();
             } catch (Exception ex) {
-                LOGGER.info("Could not apply changes in \"Setup selectors\"", ex);
+                LOGGER.info("Could not apply changes in \"Manage content selectors\"", ex);
                 JOptionPane.showMessageDialog(frame, Localization.lang("Could not apply changes."));
             }
         });
@@ -268,12 +269,12 @@ class ContentSelectorDialog2 extends JDialog {
         }
 
         // Cycle through all fields that we have created listmodels for:
-        for (String fieldName : wordListModels.keySet()) {
+        for (Map.Entry<String, DefaultListModel<String>> entry : wordListModels.entrySet()) {
             // For each field name, store the values:
-            if ((fieldName == null) || FIELD_FIRST_LINE.equals(fieldName)) {
+            if ((entry.getKey() == null) || FIELD_FIRST_LINE.equals(entry.getKey())) {
                 continue;
             }
-            DefaultListModel<String> lm = wordListModels.get(fieldName);
+            DefaultListModel<String> lm = entry.getValue();
             int start = 0;
             // Avoid storing the <new word> marker if it is there:
             if (!lm.isEmpty()) {
@@ -282,14 +283,14 @@ class ContentSelectorDialog2 extends JDialog {
                 }
             }
 
-            if (metaData.getContentSelectors(fieldName).isEmpty()) {
+            if (metaData.getContentSelectors(entry.getKey()).isEmpty()) {
                 changedFieldSet = true;
                 List<String> data = new ArrayList<>();
                 for (int wrd = start; wrd < lm.size(); wrd++) {
                     String word = lm.get(wrd);
                     data.add(word);
                 }
-                metaData.setContentSelectors(fieldName, data);
+                metaData.setContentSelectors(entry.getKey(), data);
             }
         }
 
@@ -320,10 +321,10 @@ class ContentSelectorDialog2 extends JDialog {
         }
         if (contents.isEmpty()) {
             // if nothing was added, put the default fields (as described in the help)
-            fieldListModel.addElement("author");
-            fieldListModel.addElement("journal");
-            fieldListModel.addElement("keywords");
-            fieldListModel.addElement("publisher");
+            fieldListModel.addElement(FieldName.AUTHOR);
+            fieldListModel.addElement(FieldName.JOURNAL);
+            fieldListModel.addElement(FieldName.KEYWORDS);
+            fieldListModel.addElement(FieldName.PUBLISHER);
         } else {
             for (String s : contents) {
                 fieldListModel.addElement(s);
@@ -442,7 +443,7 @@ class ContentSelectorDialog2 extends JDialog {
         bsb.addButton(apply);
         bsb.addButton(cancel);
         bsb.addRelatedGap();
-        bsb.addButton(new HelpAction(HelpFiles.CONTENT_SELECTOR).getHelpButton());
+        bsb.addButton(new HelpAction(HelpFile.CONTENT_SELECTOR).getHelpButton());
         bsb.addGlue();
 
         // Add panels to dialog:

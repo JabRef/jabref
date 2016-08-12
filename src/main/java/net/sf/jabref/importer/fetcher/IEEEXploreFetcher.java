@@ -36,18 +36,20 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -73,11 +75,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
     private static final Pattern SUB_DETECTION_1 = Pattern.compile("/sub ([^/]+)/");
     private static final Pattern SUB_DETECTION_2 = Pattern.compile("\\(sub\\)([^(]+)\\(/sub\\)");
     private static final String SUB_TEXT_RESULT = "\\\\textsubscript\\{$1\\}";
-    private static final String SUB_EQ_RESULT = "\\$_\\{$1\\}\\$";
     private static final Pattern SUPER_DETECTION_1 = Pattern.compile("/sup ([^/]+)/");
     private static final Pattern SUPER_DETECTION_2 = Pattern.compile("\\(sup\\)([^(]+)\\(/sup\\)");
     private static final String SUPER_TEXT_RESULT = "\\\\textsuperscript\\{$1\\}";
-    private static final String SUPER_EQ_RESULT = "\\$\\^\\{$1\\}\\$";
 
     private final ProtectTermsFormatter protectTermsFormatter = new ProtectTermsFormatter();
     private final UnitsToLatexFormatter unitsToLatexFormatter = new UnitsToLatexFormatter();
@@ -156,7 +156,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
 
             //fetch the raw Bibtex results from IEEEXplore
-            String bibtexPage = new URLDownload(createBibtexQueryURL(searchResultsJson)).downloadToString();
+            String bibtexPage = new URLDownload(createBibtexQueryURL(searchResultsJson))
+                    .downloadToString(Globals.prefs.getDefaultEncoding());
 
             //preprocess the result (eg. convert HTML escaped characters to latex and do other formatting not performed by BibtexParser)
             bibtexPage = preprocessBibtexResultsPage(bibtexPage);
@@ -198,8 +199,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
     }
 
     @Override
-    public HelpFiles getHelpPage() {
-        return HelpFiles.FETCHER_IEEEXPLORE;
+    public HelpFile getHelpPage() {
+        return HelpFile.FETCHER_IEEEXPLORE;
     }
 
     /**
@@ -268,8 +269,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up title
-        if (entry.hasField("title")) {
-            String title = entry.getField("title");
+        if (entry.hasField(FieldName.TITLE)) {
+            String title = entry.getField(FieldName.TITLE);
             // USe the alt-text and replace image links
             title = title.replaceAll("[ ]?img src=[^ ]+ alt=\"([^\"]+)\">[ ]?", "\\$$1\\$");
             // Try to sort out most of the /spl / conversions
@@ -279,17 +280,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
             // Replace general expressions
             title = title.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
             // Deal with subscripts and superscripts
-            if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
-                title = SUPER_DETECTION_1.matcher(title).replaceAll(SUPER_EQ_RESULT);
-                title = SUB_DETECTION_1.matcher(title).replaceAll(SUB_EQ_RESULT);
-                title = SUPER_DETECTION_2.matcher(title).replaceAll(SUPER_EQ_RESULT);
-                title = SUB_DETECTION_2.matcher(title).replaceAll(SUB_EQ_RESULT);
-            } else {
-                title = SUPER_DETECTION_1.matcher(title).replaceAll(SUPER_TEXT_RESULT);
-                title = SUB_DETECTION_1.matcher(title).replaceAll(SUB_TEXT_RESULT);
-                title = SUPER_DETECTION_2.matcher(title).replaceAll(SUPER_TEXT_RESULT);
-                title = SUB_DETECTION_2.matcher(title).replaceAll(SUB_TEXT_RESULT);
-            }
+            title = SUPER_DETECTION_1.matcher(title).replaceAll(SUPER_TEXT_RESULT);
+            title = SUB_DETECTION_1.matcher(title).replaceAll(SUB_TEXT_RESULT);
+            title = SUPER_DETECTION_2.matcher(title).replaceAll(SUPER_TEXT_RESULT);
+            title = SUB_DETECTION_2.matcher(title).replaceAll(SUB_TEXT_RESULT);
 
             // Replace \infin with \infty
             title = title.replaceAll("\\\\infin", "\\\\infty");
@@ -304,12 +298,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 title = protectTermsFormatter.format(title);
             }
             // Write back
-            entry.setField("title", title);
+            entry.setField(FieldName.TITLE, title);
         }
 
         // clean up author
-        if (entry.hasField("author")) {
-            String author = entry.getField("author");
+        if (entry.hasField(FieldName.AUTHOR)) {
+            String author = entry.getField(FieldName.AUTHOR);
             author = author.replaceAll("\\s+", " ");
 
             //reorder the "Jr." "Sr." etc to the correct ordering
@@ -324,11 +318,11 @@ public class IEEEXploreFetcher implements EntryFetcher {
                     .replace(" ,", ",").replace("  ", " ");
             author = author.replaceAll("[ ,;]+$", "");
             //TODO: remove trailing commas
-            entry.setField("author", author);
+            entry.setField(FieldName.AUTHOR, author);
         }
 
         // clean up month
-        String month = entry.getField("month");
+        String month = entry.getField(FieldName.MONTH);
         if ((month != null) && !month.isEmpty()) {
             month = month.replace(".", "");
             month = month.toLowerCase();
@@ -358,18 +352,18 @@ public class IEEEXploreFetcher implements EntryFetcher {
                             .append(mm.group(3)).append(',');
                 }
             }
-            entry.setField("month", date.toString());
+            entry.setField(FieldName.MONTH, date.toString());
         }
 
         // clean up pages
-        if (entry.hasField("pages")) {
-            String pages = entry.getField("pages");
+        if (entry.hasField(FieldName.PAGES)) {
+            String pages = entry.getField(FieldName.PAGES);
             String[] pageNumbers = pages.split("-");
             if (pageNumbers.length == 2) {
                 if (pageNumbers[0].equals(pageNumbers[1])) {// single page
-                    entry.setField("pages", pageNumbers[0]);
+                    entry.setField(FieldName.PAGES, pageNumbers[0]);
                 } else {
-                    entry.setField("pages", pages.replace("-", "--"));
+                    entry.setField(FieldName.PAGES, pages.replace("-", "--"));
                 }
             }
         }
@@ -378,10 +372,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
         String type = entry.getType();
         String sourceField = "";
         if ("article".equals(type)) {
-            sourceField = "journal";
-            entry.clearField("booktitle");
+            sourceField = FieldName.JOURNAL;
+            entry.clearField(FieldName.BOOKTITLE);
         } else if ("inproceedings".equals(type)) {
-            sourceField = "booktitle";
+            sourceField = FieldName.BOOKTITLE;
         }
         if (entry.hasField(sourceField)) {
             String fullName = entry.getField(sourceField);
@@ -389,22 +383,22 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 int ind = fullName.indexOf(": Accepted for future publication");
                 if (ind > 0) {
                     fullName = fullName.substring(0, ind);
-                    entry.setField("year", "to be published");
-                    entry.clearField("month");
-                    entry.clearField("pages");
-                    entry.clearField("number");
+                    entry.setField(FieldName.YEAR, "to be published");
+                    entry.clearField(FieldName.MONTH);
+                    entry.clearField(FieldName.PAGES);
+                    entry.clearField(FieldName.NUMBER);
                 }
                 String[] parts = fullName.split("[\\[\\]]"); //[see also...], [legacy...]
                 fullName = parts[0];
                 if (parts.length == 3) {
                     fullName += parts[2];
                 }
-                String note = entry.getField("note");
+                String note = entry.getField(FieldName.NOTE);
                 if ("Early Access".equals(note)) {
-                    entry.setField("year", "to be published");
-                    entry.clearField("month");
-                    entry.clearField("pages");
-                    entry.clearField("number");
+                    entry.setField(FieldName.YEAR, "to be published");
+                    entry.clearField(FieldName.MONTH);
+                    entry.clearField(FieldName.PAGES);
+                    entry.clearField(FieldName.NUMBER);
                 }
             } else {
                 fullName = fullName.replace("Conference Proceedings", "Proceedings")
@@ -443,7 +437,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
                 fullName = fullName.trim();
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
-                    fullName = abbreviationLoader.getRepository().getMedlineAbbreviation(fullName).orElse(fullName);
+                    fullName = abbreviationLoader
+                            .getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs))
+                            .getMedlineAbbreviation(fullName)
+                            .orElse(fullName);
                 }
             }
             if ("inproceedings".equals(type)) {
@@ -475,7 +472,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 fullName = fullName.trim();
 
                 fullName = fullName.replaceAll("^[tT]he ", "").replaceAll("^\\d{4} ", "").replaceAll("[,.]$", "");
-                String year = entry.getField("year");
+                String year = entry.getField(FieldName.YEAR);
                 if (year != null) {
                     fullName = fullName.replaceAll(", " + year + "\\.?", "");
                 }
@@ -489,8 +486,8 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up abstract
-        if (entry.hasField("abstract")) {
-            String abstr = entry.getField("abstract");
+        if (entry.hasField(FieldName.ABSTRACT)) {
+            String abstr = entry.getField(FieldName.ABSTRACT);
             // Try to sort out most of the /spl / conversions
             // Deal with this specific nested type first
             abstr = abstr.replaceAll("/sub /spl infin//", "\\$_\\\\infty\\$");
@@ -498,29 +495,22 @@ public class IEEEXploreFetcher implements EntryFetcher {
             // Replace general expressions
             abstr = abstr.replaceAll("/[sS]pl ([^/]+)/", "\\$\\\\$1\\$");
             // Deal with subscripts and superscripts
-            if (Globals.prefs.getBoolean(JabRefPreferences.USE_CONVERT_TO_EQUATION)) {
-                abstr = SUPER_DETECTION_1.matcher(abstr).replaceAll(SUPER_EQ_RESULT);
-                abstr = SUB_DETECTION_1.matcher(abstr).replaceAll(SUB_EQ_RESULT);
-                abstr = SUPER_DETECTION_2.matcher(abstr).replaceAll(SUPER_EQ_RESULT);
-                abstr = SUB_DETECTION_2.matcher(abstr).replaceAll(SUB_EQ_RESULT);
-            } else {
-                abstr = SUPER_DETECTION_1.matcher(abstr).replaceAll(SUPER_TEXT_RESULT);
-                abstr = SUB_DETECTION_1.matcher(abstr).replaceAll(SUB_TEXT_RESULT);
-                abstr = SUPER_DETECTION_2.matcher(abstr).replaceAll(SUPER_TEXT_RESULT);
-                abstr = SUB_DETECTION_2.matcher(abstr).replaceAll(SUB_TEXT_RESULT);
-            }
+            abstr = SUPER_DETECTION_1.matcher(abstr).replaceAll(SUPER_TEXT_RESULT);
+            abstr = SUB_DETECTION_1.matcher(abstr).replaceAll(SUB_TEXT_RESULT);
+            abstr = SUPER_DETECTION_2.matcher(abstr).replaceAll(SUPER_TEXT_RESULT);
+            abstr = SUB_DETECTION_2.matcher(abstr).replaceAll(SUB_TEXT_RESULT);
             // Replace \infin with \infty
             abstr = abstr.replace("\\infin", "\\infty");
             // Write back
-            entry.setField("abstract", abstr);
+            entry.setField(FieldName.ABSTRACT, abstr);
         }
 
         // Clean up url
-        entry.getFieldOptional("url")
-                .ifPresent(url -> entry.setField("url", "http://ieeexplore.ieee.org" + url.replace("tp=&", "")));
+        entry.getFieldOptional(FieldName.URL)
+                .ifPresent(url -> entry.setField(FieldName.URL, "http://ieeexplore.ieee.org" + url.replace("tp=&", "")));
 
         // Replace ; as keyword separator
-        entry.getFieldOptional("keywords").ifPresent(keys -> entry.setField("keywords",
+        entry.getFieldOptional(FieldName.KEYWORDS).ifPresent(keys -> entry.setField(FieldName.KEYWORDS,
                 keys.replace(";", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR))));
         return entry;
     }

@@ -20,9 +20,33 @@ import java.util.Objects;
 
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.util.strings.StringLengthComparator;
 
 public class ProtectTermsFormatter implements Formatter {
+
+    private static ProtectedTermsLoader protectedTermsLoader;
+
+    /**
+     * @deprecated use ProtectTermsFormatter(ProtectedTermsLoader) instead
+     */
+    @Deprecated
+    public ProtectTermsFormatter() {
+    }
+
+    public ProtectTermsFormatter(ProtectedTermsLoader protectedTermsLoader) {
+        ProtectTermsFormatter.protectedTermsLoader = protectedTermsLoader;
+    }
+
+    /**
+     * This must be called from JabRefMain
+     *
+     * @deprecated use ProtectTermsFormatter(ProtectedTermsLoader) instead
+     */
+    @Deprecated
+    public static void setProtectedTermsLoader(ProtectedTermsLoader loader) {
+        protectedTermsLoader = loader;
+    }
 
     private String format(String text, List<String> listOfWords) {
         String result = text;
@@ -38,11 +62,11 @@ public class ProtectTermsFormatter implements Formatter {
     @Override
     public String format(String text) {
         Objects.requireNonNull(text);
-
         if (text.isEmpty()) {
             return text;
         }
-        return this.format(text, CaseKeeperList.getAll());
+        Objects.requireNonNull(ProtectTermsFormatter.protectedTermsLoader);
+        return this.format(text, ProtectTermsFormatter.protectedTermsLoader.getProtectedTerms());
     }
 
     @Override

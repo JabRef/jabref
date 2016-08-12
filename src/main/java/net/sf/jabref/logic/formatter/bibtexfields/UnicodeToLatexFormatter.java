@@ -15,8 +15,8 @@
  */
 package net.sf.jabref.logic.formatter.bibtexfields;
 
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -39,10 +39,9 @@ public class UnicodeToLatexFormatter implements LayoutFormatter, Formatter {
         }
 
         // Standard symbols
-        Set<Character> chars = HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP.keySet();
-        for (Character character : chars) {
-            result = result.replace(character.toString(),
-                    HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP.get(character));
+        for (Map.Entry<String, String> unicodeLatexPair : HTMLUnicodeConversionMaps.UNICODE_LATEX_CONVERSION_MAP
+                .entrySet()) {
+            result = result.replace(unicodeLatexPair.getKey(), unicodeLatexPair.getValue());
         }
 
         // Combining accents

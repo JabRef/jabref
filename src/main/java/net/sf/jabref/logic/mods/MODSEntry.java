@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -35,6 +36,7 @@ import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.format.XMLChars;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -87,34 +89,34 @@ class MODSEntry {
 
     public MODSEntry(BibEntry bibtex) {
         this();
-        handledExtensions.add(MODSEntry.BIBTEX + "publisher");
-        handledExtensions.add(MODSEntry.BIBTEX + "title");
+        handledExtensions.add(MODSEntry.BIBTEX + FieldName.PUBLISHER);
+        handledExtensions.add(MODSEntry.BIBTEX + FieldName.TITLE);
         handledExtensions.add(MODSEntry.BIBTEX + BibEntry.KEY_FIELD);
         handledExtensions.add(MODSEntry.BIBTEX + "author");
         populateFromBibtex(bibtex);
     }
 
     private void populateFromBibtex(BibEntry bibtex) {
-        if (bibtex.hasField("title")) {
+        if (bibtex.hasField(FieldName.TITLE)) {
             if (CHARFORMAT) {
-                title = chars.format(bibtex.getField("title"));
+                title = chars.format(bibtex.getFieldOptional(FieldName.TITLE).get());
             } else {
-                title = bibtex.getField("title");
+                title = bibtex.getFieldOptional(FieldName.TITLE).get();
             }
         }
 
-        if (bibtex.hasField("publisher")) {
+        if (bibtex.hasField(FieldName.PUBLISHER)) {
             if (CHARFORMAT) {
-                publisher = chars.format(bibtex.getField("publisher"));
+                publisher = chars.format(bibtex.getFieldOptional(FieldName.PUBLISHER).get());
             } else {
-                publisher = bibtex.getField("publisher");
+                publisher = bibtex.getFieldOptional(FieldName.PUBLISHER).get();
             }
         }
 
         if (bibtex.hasField(BibEntry.KEY_FIELD)) {
             id = bibtex.getCiteKey();
         }
-        if (bibtex.hasField("place")) {
+        if (bibtex.hasField("place")) { // TODO: "place" is the MODS version, in BibTeX: "address", BibLaTeX: "location"?
             if (CHARFORMAT) {
                 place = chars.format(bibtex.getField("place"));
             } else {
@@ -124,21 +126,21 @@ class MODSEntry {
 
         date = getDate(bibtex);
         genre = getMODSgenre(bibtex);
-        if (bibtex.hasField("author")) {
-            authors = getAuthors(bibtex.getField("author"));
+        if (bibtex.hasField(FieldName.AUTHOR)) {
+            authors = getAuthors(bibtex.getFieldOptional(FieldName.AUTHOR).get());
         }
         if ("article".equals(bibtex.getType()) || "inproceedings".equals(bibtex.getType())) {
             host = new MODSEntry();
             host.entryType = "relatedItem";
-            host.title = bibtex.getField("booktitle");
-            host.publisher = bibtex.getField("publisher");
-            host.number = bibtex.getField("number");
-            if (bibtex.hasField("volume")) {
-                host.volume = bibtex.getField("volume");
+            host.title = bibtex.getField(FieldName.BOOKTITLE);
+            host.publisher = bibtex.getField(FieldName.PUBLISHER);
+            host.number = bibtex.getField(FieldName.NUMBER);
+            if (bibtex.hasField(FieldName.VOLUME)) {
+                host.volume = bibtex.getFieldOptional(FieldName.VOLUME).get();
             }
             host.issuance = "continuing";
-            if (bibtex.hasField("pages")) {
-                host.pages = new PageNumbers(bibtex.getField("pages"));
+            if (bibtex.hasField(FieldName.PAGES)) {
+                host.pages = new PageNumbers(bibtex.getFieldOptional(FieldName.PAGES).get());
             }
         }
 
@@ -148,9 +150,8 @@ class MODSEntry {
 
     private void populateExtensionFields(BibEntry e) {
 
-        for (String field : e.getFieldNames()) {
-            String value = e.getField(field);
-            extensionFields.put(MODSEntry.BIBTEX + field, value);
+        for (Entry<String, String> field : e.getFieldMap().entrySet()) {
+            extensionFields.put(MODSEntry.BIBTEX + field.getKey(), field.getValue());
         }
     }
 
@@ -179,8 +180,8 @@ class MODSEntry {
     /* construct a MODS date object */
     private static String getDate(BibEntry bibtex) {
         StringBuilder result = new StringBuilder();
-        bibtex.getFieldOptional("year").ifPresent(result::append);
-        bibtex.getFieldOptional("month").ifPresent(result.append('-')::append);
+        bibtex.getFieldOptional(FieldName.YEAR).ifPresent(result::append);
+        bibtex.getFieldOptional(FieldName.MONTH).ifPresent(result.append('-')::append);
         return result.toString();
     }
 
@@ -249,7 +250,7 @@ class MODSEntry {
             Element originInfo = d.createElement("originInfo");
             mods.appendChild(originInfo);
             if (this.publisher != null) {
-                Element publisher = d.createElement("publisher");
+                Element publisher = d.createElement(FieldName.PUBLISHER);
                 publisher.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(this.publisher)));
                 originInfo.appendChild(publisher);
             }

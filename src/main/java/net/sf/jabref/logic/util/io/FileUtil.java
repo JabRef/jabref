@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -37,16 +36,17 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -55,7 +55,6 @@ public class FileUtil {
 
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
-    private static final String FILE_SEPARATOR = System.getProperty("file.separator");
     private static final Pattern SLASH = Pattern.compile("/");
     private static final Pattern BACKSLASH = Pattern.compile("\\\\");
 
@@ -177,7 +176,7 @@ public class FileUtil {
      * Uses <ul>
      * <li>the default directory associated with the extension of the file</li>
      * <li>the standard file directory</li>
-     * <li>the directory of the bib file</li>
+     * <li>the directory of the BIB file</li>
      * </ul>
      *
      * @param databaseContext The database this file belongs to.
@@ -189,7 +188,7 @@ public class FileUtil {
         List<String> directories = databaseContext.getFileDirectory(extension.orElse(null));
         // Include the standard "file" directory:
         List<String> fileDir = databaseContext.getFileDirectory();
-        // Include the directory of the bib file:
+        // Include the directory of the BIB file:
         List<String> al = new ArrayList<>();
         for (String dir : directories) {
             if (!al.contains(dir)) {
@@ -242,10 +241,10 @@ public class FileUtil {
             return Optional.of(file);
         }
 
-        if (dir.endsWith(FILE_SEPARATOR)) {
+        if (dir.endsWith(OS.FILE_SEPARATOR)) {
             name = dir + name;
         } else {
-            name = dir + FILE_SEPARATOR + name;
+            name = dir + OS.FILE_SEPARATOR + name;
         }
 
         // fix / and \ problems:
@@ -304,8 +303,8 @@ public class FileUtil {
             longName = fileName.toString();
         }
 
-        if (!dir.endsWith(FILE_SEPARATOR)) {
-            dir = dir.concat(FILE_SEPARATOR);
+        if (!dir.endsWith(OS.FILE_SEPARATOR)) {
+            dir = dir.concat(OS.FILE_SEPARATOR);
         }
 
         if (longName.startsWith(dir)) {
@@ -317,7 +316,8 @@ public class FileUtil {
         }
     }
 
-    public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries, Collection<String> extensions, Collection<File> directories) {
+    public static Map<BibEntry, List<File>> findAssociatedFiles(List<BibEntry> entries,
+            List<String> extensions, List<File> directories, boolean autolinkExactKeyOnly) {
         Map<BibEntry, List<File>> result = new HashMap<>();
 
         // First scan directories
@@ -328,7 +328,6 @@ public class FileUtil {
             result.put(entry, new ArrayList<>());
         }
 
-        boolean exactOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
         // Now look for keys
         nextFile: for (File file : filesWithExtension) {
 
@@ -336,18 +335,19 @@ public class FileUtil {
             int dot = name.lastIndexOf('.');
             // First, look for exact matches:
             for (BibEntry entry : entries) {
-                String citeKey = entry.getCiteKey();
-                if ((citeKey != null) && !citeKey.isEmpty() && (dot > 0) && name.substring(0, dot).equals(citeKey)) {
+                Optional<String> citeKey = entry.getCiteKeyOptional();
+                if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && (dot > 0)
+                        && name.substring(0, dot).equals(citeKey.get())) {
                     result.get(entry).add(file);
                     continue nextFile;
                 }
             }
-            // If we get here, we didn't find any exact matches. If non-exact
+            // If we get here, we did not find any exact matches. If non-exact
             // matches are allowed, try to find one:
-            if (!exactOnly) {
+            if (!autolinkExactKeyOnly) {
                 for (BibEntry entry : entries) {
-                    String citeKey = entry.getCiteKey();
-                    if ((citeKey != null) && !citeKey.isEmpty() && name.startsWith(citeKey)) {
+                    Optional<String> citeKey = entry.getCiteKeyOptional();
+                    if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && name.startsWith(citeKey.get())) {
                         result.get(entry).add(file);
                         continue nextFile;
                     }
@@ -372,10 +372,12 @@ public class FileUtil {
 
         List<File> result = new ArrayList<>();
         for (BibEntry entry : bes) {
-            List<ParsedFileField> fileList = FileField.parse(entry.getField(Globals.FILE_FIELD));
-            for (ParsedFileField file : fileList) {
-                expandFilename(file.getLink(), fileDirs).ifPresent(result::add);
-            }
+            entry.getFieldOptional(FieldName.FILE).ifPresent(fileField -> {
+                List<ParsedFileField> fileList = FileField.parse(fileField);
+                for (ParsedFileField file : fileList) {
+                    expandFilename(file.getLink(), fileDirs).ifPresent(result::add);
+                }
+            });
         }
 
         return result;
@@ -390,12 +392,13 @@ public class FileUtil {
      * @return a suggested fileName
      */
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry,
-            JournalAbbreviationLoader repositoryLoader) {
-        String targetName = entry.getCiteKey() == null ? "default" : entry.getCiteKey();
-        StringReader sr = new StringReader(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
+            JournalAbbreviationLoader repositoryLoader, JabRefPreferences prefs) {
+        String targetName = entry.getCiteKeyOptional().orElse("default");
+        StringReader sr = new StringReader(prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
         Layout layout = null;
         try {
-            layout = new LayoutHelper(sr, repositoryLoader).getLayoutFromText();
+            layout = new LayoutHelper(sr, LayoutFormatterPreferences.fromPreferences(prefs, repositoryLoader))
+                    .getLayoutFromText();
         } catch (IOException e) {
             LOGGER.info("Wrong format " + e.getMessage(), e);
         }

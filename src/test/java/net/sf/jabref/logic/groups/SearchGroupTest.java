@@ -10,6 +10,7 @@ import static org.junit.Assert.assertTrue;
 
 public class SearchGroupTest {
 
+
     @Test
     public void testContains() {
         SearchGroup group = new SearchGroup("myExplicitGroup", "review",
@@ -19,7 +20,7 @@ public class SearchGroupTest {
         BibEntry entry = new BibEntry();
         assertFalse(group.contains(entry));
 
-        entry.addKeyword("review");
+        entry.addKeyword("review", ", ");
         assertTrue(group.contains(entry));
     }
 

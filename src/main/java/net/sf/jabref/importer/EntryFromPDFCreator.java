@@ -2,19 +2,24 @@ package net.sf.jabref.importer;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.pdfimport.PdfImporter;
 import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentInformation;
@@ -57,8 +62,7 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
         }
 
         PdfImporter pi = new PdfImporter(JabRefGUI.getMainFrame(), JabRefGUI.getMainFrame().getCurrentBasePanel(), JabRefGUI.getMainFrame().getCurrentBasePanel().getMainTable(), -1);
-        String[] fileNames = {pdfFile.toString()};
-        ImportPdfFilesResult res = pi.importPdfFiles(fileNames);
+        ImportPdfFilesResult res = pi.importPdfFiles(Collections.singletonList(pdfFile.toString()));
         if (res.getEntries().size() == 1) {
             return Optional.of(res.getEntries().get(0));
         } else {
@@ -68,8 +72,8 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
         /*addEntryDataFromPDDocumentInformation(pdfFile, entry);
         addEntryDataFromXMP(pdfFile, entry);
 
-        if (entry.getField("title") == null) {
-        	entry.setField("title", pdfFile.getName());
+        if (entry.getField(FieldName.TITLE) == null) {
+        	entry.setField(FieldName.TITLE, pdfFile.getName());
         }
 
         return entry;*/
@@ -93,9 +97,9 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
                     Calendar creationDate = pdfDocInfo.getCreationDate();
                     if (creationDate != null) {
                         // default time stamp follows ISO-8601. Reason: https://xkcd.com/1179/
-                        String date = new SimpleDateFormat("yyyy-MM-dd")
-                                .format(creationDate.getTime());
-                        appendToField(entry, "timestamp", date);
+                        String date = LocalDate.of(creationDate.YEAR, creationDate.MONTH + 1, creationDate.DAY_OF_MONTH)
+                                .format(DateTimeFormatter.ISO_LOCAL_DATE);
+                        appendToField(entry, Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD), date);
                     }
 
                     if (pdfDocInfo.getCustomMetadataValue("bibtex/bibtexkey") != null) {
@@ -119,7 +123,8 @@ public class EntryFromPDFCreator extends EntryFromFileCreator {
      */
     private void addEntryDataFromXMP(File aFile, BibEntry entry) {
         try {
-            List<BibEntry> entrys = XMPUtil.readXMP(aFile.getAbsoluteFile());
+            List<BibEntry> entrys = XMPUtil.readXMP(aFile.getAbsoluteFile(),
+                    XMPPreferences.fromPreferences(Globals.prefs));
             addEntrysToEntry(entry, entrys);
         } catch (IOException e) {
             // no canceling here, just no data added.

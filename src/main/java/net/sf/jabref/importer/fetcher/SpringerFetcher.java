@@ -19,10 +19,10 @@ package net.sf.jabref.importer.fetcher;
     import javax.swing.JOptionPane;
     import javax.swing.JPanel;
 
-    import net.sf.jabref.gui.help.HelpFiles;
     import net.sf.jabref.importer.ImportInspector;
     import net.sf.jabref.importer.OutputPrinter;
     import net.sf.jabref.importer.fileformat.JSONEntryParser;
+    import net.sf.jabref.logic.help.HelpFile;
     import net.sf.jabref.logic.l10n.Localization;
     import net.sf.jabref.model.entry.BibEntry;
 
@@ -93,7 +93,7 @@ public class SpringerFetcher implements EntryFetcher {
                         break;
                     }
 
-                    int noToFetch = Math.min(MAX_PER_PAGE, numberToFetch - startItem);
+                    int noToFetch = Math.min(MAX_PER_PAGE, (numberToFetch - startItem) + 1);
                     jsonResponse = Unirest
                             .get(API_URL + encodedQuery + "&api_key=" + API_KEY + "&p=" + noToFetch + "&s=" + startItem)
                             .header("accept", "application/json").asJson();
@@ -130,8 +130,8 @@ public class SpringerFetcher implements EntryFetcher {
     }
 
     @Override
-    public HelpFiles getHelpPage() {
-        return HelpFiles.FETCHER_SPRINGER;
+    public HelpFile getHelpPage() {
+        return HelpFile.FETCHER_SPRINGER;
     }
 
     @Override

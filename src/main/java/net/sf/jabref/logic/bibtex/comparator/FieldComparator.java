@@ -21,12 +21,13 @@ import java.text.RuleBasedCollator;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
@@ -47,15 +48,6 @@ public class FieldComparator implements Comparator<BibEntry> {
 
     private static final Collator COLLATOR = getCollator();
 
-    private static Collator getCollator() {
-        try {
-            return new RuleBasedCollator(
-                    ((RuleBasedCollator) Collator.getInstance()).getRules().replace("<'\u005f'", "<' '<'\u005f'"));
-        } catch (ParseException e) {
-            return Collator.getInstance();
-        }
-    }
-
     enum FieldType {
         NAME, TYPE, YEAR, MONTH, OTHER
     }
@@ -72,7 +64,7 @@ public class FieldComparator implements Comparator<BibEntry> {
 
     public FieldComparator(String field, boolean reversed) {
         this.fieldName = Objects.requireNonNull(field);
-        this.field = fieldName.split(Globals.COL_DEFINITION_FIELD_SEPARATOR);
+        this.field = fieldName.split(FieldName.FIELD_SEPARATOR);
         fieldType = determineFieldType();
         isNumeric = InternalBibtexFields.isNumeric(this.field[0]);
 
@@ -88,22 +80,31 @@ public class FieldComparator implements Comparator<BibEntry> {
         }
     }
 
+    public FieldComparator(SaveOrderConfig.SortCriterion sortCriterion) {
+        this(sortCriterion.field, sortCriterion.descending);
+    }
+
+    private static Collator getCollator() {
+        try {
+            return new RuleBasedCollator(
+                    ((RuleBasedCollator) Collator.getInstance()).getRules().replace("<'\u005f'", "<' '<'\u005f'"));
+        } catch (ParseException e) {
+            return Collator.getInstance();
+        }
+    }
+
     private FieldType determineFieldType() {
         if(BibEntry.TYPE_HEADER.equals(this.field[0])) {
             return FieldType.TYPE;
         } else if (InternalBibtexFields.getFieldExtras(this.field[0]).contains(FieldProperties.PERSON_NAMES)) {
             return FieldType.NAME;
-        } else if ("year".equals(this.field[0])) {
+        } else if (FieldName.YEAR.equals(this.field[0])) {
             return FieldType.YEAR;
-        } else if("month".equals(this.field[0])) {
+        } else if(FieldName.MONTH.equals(this.field[0])) {
             return FieldType.MONTH;
         } else {
             return FieldType.OTHER;
         }
-    }
-
-    public FieldComparator(SaveOrderConfig.SortCriterion sortCriterion) {
-        this(sortCriterion.field, sortCriterion.descending);
     }
 
     @Override
@@ -170,9 +171,9 @@ public class FieldComparator implements Comparator<BibEntry> {
 
     private String getField(BibEntry entry) {
         for (String aField : field) {
-            String o = entry.getFieldOrAlias(aField);
-            if (o != null) {
-                return o;
+            Optional<String> o = entry.getFieldOrAlias(aField);
+            if (o.isPresent()) {
+                return o.get();
             }
         }
         return null;

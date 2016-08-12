@@ -8,10 +8,11 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -133,17 +134,18 @@ public class IsiImporterTest {
         List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
         Assert.assertEquals(1, entries.size());
         BibEntry entry = entries.get(0);
-        Assert.assertEquals("Optical properties of MgO doped LiNbO$_3$ single crystals", entry.getField("title"));
+        Assert.assertEquals(Optional.of("Optical properties of MgO doped LiNbO$_3$ single crystals"), entry.getFieldOptional("title"));
         Assert.assertEquals(
-                "James Brown and James Marc Brown and Brown, J. M. and Brown, J. and Brown, J. M. and Brown, J.",
-                entry.getField("author"));
+                Optional.of(
+                        "James Brown and James Marc Brown and Brown, J. M. and Brown, J. and Brown, J. M. and Brown, J."),
+                entry.getFieldOptional("author"));
 
         Assert.assertEquals("article", entry.getType());
-        Assert.assertEquals("Optical Materials", entry.getField("journal"));
-        Assert.assertEquals("2006", entry.getField("year"));
-        Assert.assertEquals("28", entry.getField("volume"));
-        Assert.assertEquals("5", entry.getField("number"));
-        Assert.assertEquals("467--72", entry.getField("pages"));
+        Assert.assertEquals(Optional.of("Optical Materials"), entry.getFieldOptional("journal"));
+        Assert.assertEquals(Optional.of("2006"), entry.getFieldOptional("year"));
+        Assert.assertEquals(Optional.of("28"), entry.getFieldOptional("volume"));
+        Assert.assertEquals(Optional.of("5"), entry.getFieldOptional("number"));
+        Assert.assertEquals(Optional.of("467--72"), entry.getFieldOptional("pages"));
     }
 
     @Test
@@ -152,14 +154,14 @@ public class IsiImporterTest {
         List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
         Assert.assertEquals(3, entries.size());
         BibEntry entry = entries.get(0);
-        Assert.assertEquals("Optical properties of MgO doped LiNbO$_3$ single crystals", entry.getField("title"));
+        Assert.assertEquals(Optional.of("Optical properties of MgO doped LiNbO$_3$ single crystals"), entry.getFieldOptional("title"));
 
         Assert.assertEquals("misc", entry.getType());
-        Assert.assertEquals("Optical Materials", entry.getField("journal"));
-        Assert.assertEquals("2006", entry.getField("year"));
-        Assert.assertEquals("28", entry.getField("volume"));
-        Assert.assertEquals("5", entry.getField("number"));
-        Assert.assertEquals("467-72", entry.getField("pages"));
+        Assert.assertEquals(Optional.of("Optical Materials"), entry.getFieldOptional("journal"));
+        Assert.assertEquals(Optional.of("2006"), entry.getFieldOptional("year"));
+        Assert.assertEquals(Optional.of("28"), entry.getFieldOptional("volume"));
+        Assert.assertEquals(Optional.of("5"), entry.getFieldOptional("number"));
+        Assert.assertEquals(Optional.of("467-72"), entry.getFieldOptional("pages"));
     }
 
     @Test
@@ -171,29 +173,31 @@ public class IsiImporterTest {
         BibEntry a = entries.get(0);
         BibEntry b = entries.get(1);
 
-        if (a.getField("title")
-                .equals("Optical and photoelectric spectroscopy of photorefractive Sn$_2$P$_2$S$_6$ crystals")) {
+        if (a.getFieldOptional("title").equals(
+                Optional.of("Optical and photoelectric spectroscopy of photorefractive Sn$_2$P$_2$S$_6$ crystals"))) {
             BibEntry tmp = a;
             a = b;
             b = tmp;
         }
 
         Assert.assertEquals(
-                "Second harmonic generation of continuous wave ultraviolet light and production of beta -BaB$_2$O$_4$ optical waveguides",
-                a.getField("title"));
+                Optional.of(
+                        "Second harmonic generation of continuous wave ultraviolet light and production of beta -BaB$_2$O$_4$ optical waveguides"),
+                a.getFieldOptional("title"));
         Assert.assertEquals("article", a.getType());
 
-        Assert.assertEquals("Degl'Innocenti, R. and Guarino, A. and Poberaj, G. and Gunter, P.", a.getField("author"));
-        Assert.assertEquals("Applied Physics Letters", a.getField("journal"));
-        Assert.assertEquals("2006", a.getField("year"));
-        Assert.assertEquals("#jul#", a.getField("month"));
-        Assert.assertEquals("89", a.getField("volume"));
-        Assert.assertEquals("4", a.getField("number"));
-        Assert.assertEquals("Lorem ipsum abstract", a.getField("abstract"));
-        Assert.assertEquals("Aip", a.getField("publisher"));
+        Assert.assertEquals(Optional.of("Degl'Innocenti, R. and Guarino, A. and Poberaj, G. and Gunter, P."), a.getFieldOptional("author"));
+        Assert.assertEquals(Optional.of("Applied Physics Letters"), a.getFieldOptional("journal"));
+        Assert.assertEquals(Optional.of("2006"), a.getFieldOptional("year"));
+        Assert.assertEquals(Optional.of("#jul#"), a.getFieldOptional("month"));
+        Assert.assertEquals(Optional.of("89"), a.getFieldOptional("volume"));
+        Assert.assertEquals(Optional.of("4"), a.getFieldOptional("number"));
+        Assert.assertEquals(Optional.of("Lorem ipsum abstract"), a.getFieldOptional("abstract"));
+        Assert.assertEquals(Optional.of("Aip"), a.getFieldOptional("publisher"));
 
-        Assert.assertEquals("Optical and photoelectric spectroscopy of photorefractive Sn$_2$P$_2$S$_6$ crystals",
-                b.getField("title"));
+        Assert.assertEquals(
+                Optional.of("Optical and photoelectric spectroscopy of photorefractive Sn$_2$P$_2$S$_6$ crystals"),
+                b.getFieldOptional("title"));
         Assert.assertEquals("article", b.getType());
     }
 
@@ -206,12 +210,12 @@ public class IsiImporterTest {
         BibEntry a = entries.get(0);
         BibEntry b = entries.get(1);
 
-        Assert.assertEquals("Optical and photoelectric spectroscopy of photorefractive Sn2P2S6 crystals",
-                a.getField("title"));
-        Assert.assertEquals("Optical waveguides in Sn2P2S6 by low fluence MeV He+ ion implantation",
-                b.getField("title"));
+        Assert.assertEquals(Optional.of("Optical and photoelectric spectroscopy of photorefractive Sn2P2S6 crystals"),
+                a.getFieldOptional("title"));
+        Assert.assertEquals(Optional.of("Optical waveguides in Sn2P2S6 by low fluence MeV He+ ion implantation"),
+                b.getFieldOptional("title"));
 
-        Assert.assertEquals("Journal of Physics-condensed Matter", a.getField("journal"));
+        Assert.assertEquals(Optional.of("Journal of Physics-condensed Matter"), a.getFieldOptional("journal"));
     }
 
     @Test
@@ -262,18 +266,18 @@ public class IsiImporterTest {
         Assert.assertEquals(1, entries.size());
         BibEntry a = entries.get(0);
         Assert.assertEquals("article", a.getType());
-        Assert.assertEquals("Geoscience and Remote Sensing Letters, IEEE", a.getField("journal"));
-        Assert.assertEquals("Improving Urban Road Extraction in High-Resolution "
-                + "Images Exploiting Directional Filtering, Perceptual " + "Grouping, and Simple Topological Concepts",
-                a.getField("title"));
-        Assert.assertEquals("4", a.getField("volume"));
-        Assert.assertEquals("3", a.getField("number"));
-        Assert.assertEquals("1545-598X", a.getField("SN"));
-        Assert.assertEquals("387--391", a.getField("pages"));
-        Assert.assertEquals("Gamba, P. and Dell'Acqua, F. and Lisini, G.", a.getField("author"));
-        Assert.assertEquals("2006", a.getField("year"));
-        Assert.assertEquals("Perceptual grouping, street extraction, urban remote sensing", a.getField("keywords"));
-        Assert.assertEquals("Lorem ipsum abstract", a.getField("abstract"));
+        Assert.assertEquals(Optional.of("Geoscience and Remote Sensing Letters, IEEE"), a.getFieldOptional("journal"));
+        Assert.assertEquals(Optional.of("Improving Urban Road Extraction in High-Resolution "
+                + "Images Exploiting Directional Filtering, Perceptual " + "Grouping, and Simple Topological Concepts"),
+                a.getFieldOptional("title"));
+        Assert.assertEquals(Optional.of("4"), a.getFieldOptional("volume"));
+        Assert.assertEquals(Optional.of("3"), a.getFieldOptional("number"));
+        Assert.assertEquals(Optional.of("1545-598X"), a.getFieldOptional("SN"));
+        Assert.assertEquals(Optional.of("387--391"), a.getFieldOptional("pages"));
+        Assert.assertEquals(Optional.of("Gamba, P. and Dell'Acqua, F. and Lisini, G."), a.getFieldOptional("author"));
+        Assert.assertEquals(Optional.of("2006"), a.getFieldOptional("year"));
+        Assert.assertEquals(Optional.of("Perceptual grouping, street extraction, urban remote sensing"), a.getFieldOptional("keywords"));
+        Assert.assertEquals(Optional.of("Lorem ipsum abstract"), a.getFieldOptional("abstract"));
     }
 
     @Test
@@ -285,18 +289,19 @@ public class IsiImporterTest {
         BibEntry a = entries.get(0);
 
         Assert.assertEquals("article", a.getType());
-        Assert.assertEquals("Geoscience and Remote Sensing Letters, IEEE", a.getField("journal"));
+        Assert.assertEquals(Optional.of("Geoscience and Remote Sensing Letters, IEEE"), a.getFieldOptional("journal"));
         Assert.assertEquals(
-                "Improving Urban Road Extraction in High-Resolution Images Exploiting Directional Filtering, Perceptual Grouping, and Simple Topological Concepts",
-                a.getField("title"));
-        Assert.assertEquals("4", a.getField("volume"));
-        Assert.assertEquals("3", a.getField("number"));
-        Assert.assertEquals("1545-598X", a.getField("SN"));
-        Assert.assertEquals("387--391", a.getField("pages"));
-        Assert.assertEquals("Gamba, P. and Dell'Acqua, F. and Lisini, G.", a.getField("author"));
-        Assert.assertEquals("2006", a.getField("year"));
-        Assert.assertEquals("Perceptual grouping, street extraction, urban remote sensing", a.getField("keywords"));
-        Assert.assertEquals("Lorem ipsum abstract", a.getField("abstract"));
+                Optional.of(
+                        "Improving Urban Road Extraction in High-Resolution Images Exploiting Directional Filtering, Perceptual Grouping, and Simple Topological Concepts"),
+                a.getFieldOptional("title"));
+        Assert.assertEquals(Optional.of("4"), a.getFieldOptional("volume"));
+        Assert.assertEquals(Optional.of("3"), a.getFieldOptional("number"));
+        Assert.assertEquals(Optional.of("1545-598X"), a.getFieldOptional("SN"));
+        Assert.assertEquals(Optional.of("387--391"), a.getFieldOptional("pages"));
+        Assert.assertEquals(Optional.of("Gamba, P. and Dell'Acqua, F. and Lisini, G."), a.getFieldOptional("author"));
+        Assert.assertEquals(Optional.of("2006"), a.getFieldOptional("year"));
+        Assert.assertEquals(Optional.of("Perceptual grouping, street extraction, urban remote sensing"), a.getFieldOptional("keywords"));
+        Assert.assertEquals(Optional.of("Lorem ipsum abstract"), a.getFieldOptional("abstract"));
     }
 
     @Test
@@ -309,29 +314,32 @@ public class IsiImporterTest {
         BibEntry a = entries.get(0);
         BibEntry b = entries.get(1);
 
-        Assert.assertEquals("Effects of modafinil on cognitive performance and alertness during sleep deprivation.",
-                a.getField("title"));
+        Assert.assertEquals(
+                Optional.of("Effects of modafinil on cognitive performance and alertness during sleep deprivation."),
+                a.getFieldOptional("title"));
 
-        Assert.assertEquals("Wesensten, Nancy J.", a.getField("author"));
-        Assert.assertEquals("Curr Pharm Des", a.getField("journal"));
-        Assert.assertEquals("2006", a.getField("year"));
-        Assert.assertEquals(null, a.getField("month"));
-        Assert.assertEquals("12", a.getField("volume"));
-        Assert.assertEquals("20", a.getField("number"));
-        Assert.assertEquals("2457--71", a.getField("pages"));
+        Assert.assertEquals(Optional.of("Wesensten, Nancy J."), a.getFieldOptional("author"));
+        Assert.assertEquals(Optional.of("Curr Pharm Des"), a.getFieldOptional("journal"));
+        Assert.assertEquals(Optional.of("2006"), a.getFieldOptional("year"));
+        Assert.assertEquals(Optional.empty(), a.getFieldOptional("month"));
+        Assert.assertEquals(Optional.of("12"), a.getFieldOptional("volume"));
+        Assert.assertEquals(Optional.of("20"), a.getFieldOptional("number"));
+        Assert.assertEquals(Optional.of("2457--71"), a.getFieldOptional("pages"));
         Assert.assertEquals("article", a.getType());
 
         Assert.assertEquals(
-                "Estrogen therapy selectively enhances prefrontal cognitive processes: a randomized, double-blind, placebo-controlled study with functional magnetic resonance imaging in perimenopausal and recently postmenopausal women.",
-                b.getField("title"));
+                Optional.of(
+                        "Estrogen therapy selectively enhances prefrontal cognitive processes: a randomized, double-blind, placebo-controlled study with functional magnetic resonance imaging in perimenopausal and recently postmenopausal women."),
+                b.getFieldOptional("title"));
         Assert.assertEquals(
-                "Joffe, Hadine and Hall, Janet E. and Gruber, Staci and Sarmiento, Ingrid A. and Cohen, Lee S. and Yurgelun-Todd, Deborah and Martin, Kathryn A.",
-                b.getField("author"));
-        Assert.assertEquals("2006", b.getField("year"));
-        Assert.assertEquals("#may#", b.getField("month"));
-        Assert.assertEquals("13", b.getField("volume"));
-        Assert.assertEquals("3", b.getField("number"));
-        Assert.assertEquals("411--22", b.getField("pages"));
+                Optional.of(
+                        "Joffe, Hadine and Hall, Janet E. and Gruber, Staci and Sarmiento, Ingrid A. and Cohen, Lee S. and Yurgelun-Todd, Deborah and Martin, Kathryn A."),
+                b.getFieldOptional("author"));
+        Assert.assertEquals(Optional.of("2006"), b.getFieldOptional("year"));
+        Assert.assertEquals(Optional.of("#may#"), b.getFieldOptional("month"));
+        Assert.assertEquals(Optional.of("13"), b.getFieldOptional("volume"));
+        Assert.assertEquals(Optional.of("3"), b.getFieldOptional("number"));
+        Assert.assertEquals(Optional.of("411--22"), b.getFieldOptional("pages"));
         Assert.assertEquals("article", b.getType());
     }
 

@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -8,7 +9,12 @@ import org.junit.Test;
  */
 public class NormalizeMonthFormatterTest {
 
-    private final NormalizeMonthFormatter formatter = new NormalizeMonthFormatter();
+    private NormalizeMonthFormatter formatter;
+
+    @Before
+    public void setUp() {
+        formatter = new NormalizeMonthFormatter();
+    }
 
     @Test
     public void formatExample() {

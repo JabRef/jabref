@@ -10,12 +10,13 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * Useful for checking out new algorithm improvements and thresholds. Not used inside the JabRef code itself.
@@ -46,7 +47,7 @@ public class CrossrefFetcherEvaluator {
 
                 @Override
                 public void run() {
-                    Optional<DOI> origDOI = DOI.build(entry.getField("doi"));
+                    Optional<DOI> origDOI = entry.getFieldOptional(FieldName.DOI).flatMap(DOI::build);
                     if (origDOI.isPresent()) {
                         dois.incrementAndGet();
                         Optional<DOI> crossrefDOI = CrossRef.findDOI(entry);

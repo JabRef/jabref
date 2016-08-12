@@ -23,21 +23,22 @@ import java.util.Map;
 import javax.swing.JLabel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
+import net.sf.jabref.gui.keyboard.EmacsKeyBindings;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.SpecialFields;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
 import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xnap.commons.gui.shortcut.EmacsKeyBindings;
 
 /**
  * Static variables for graphics files and keyboard shortcuts.
@@ -71,12 +72,12 @@ public class GUIGlobals {
     }
 
     public static JLabel getTableIcon(String fieldType) {
-        Object o = GUIGlobals.TABLE_ICONS.get(fieldType);
-        if (o == null) {
+        JLabel label = GUIGlobals.TABLE_ICONS.get(fieldType);
+        if (label == null) {
             LOGGER.info("Error: no table icon defined for type '" + fieldType + "'.");
             return null;
         } else {
-            return (JLabel) o;
+            return label;
         }
     }
 
@@ -96,11 +97,11 @@ public class GUIGlobals {
         JLabel label;
         label = new JLabel(IconTheme.JabRefIcon.PDF_FILE.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " PDF");
-        GUIGlobals.TABLE_ICONS.put("pdf", label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.PDF, label);
 
         label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " URL");
-        GUIGlobals.TABLE_ICONS.put("url", label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.URL, label);
 
         label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " CiteSeer URL");
@@ -108,23 +109,23 @@ public class GUIGlobals {
 
         label = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " ArXiv URL");
-        GUIGlobals.TABLE_ICONS.put("eprint", label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.EPRINT, label);
 
         label = new JLabel(IconTheme.JabRefIcon.DOI.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " DOI " + Localization.lang("web link"));
-        GUIGlobals.TABLE_ICONS.put("doi", label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.DOI, label);
 
         label = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
         label.setToolTipText(Localization.lang("Open") + " PS");
-        GUIGlobals.TABLE_ICONS.put("ps", label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.PS, label);
 
         label = new JLabel(IconTheme.JabRefIcon.FOLDER.getSmallIcon());
         label.setToolTipText(Localization.lang("Open folder"));
-        GUIGlobals.TABLE_ICONS.put(Globals.FOLDER_FIELD, label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.FOLDER, label);
 
         label = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
         label.setToolTipText(Localization.lang("Open file"));
-        GUIGlobals.TABLE_ICONS.put(Globals.FILE_FIELD, label);
+        GUIGlobals.TABLE_ICONS.put(FieldName.FILE, label);
 
         for (ExternalFileType fileType : ExternalFileTypes.getInstance().getExternalFileTypeSelection()) {
             label = new JLabel(fileType.getIcon());
@@ -134,31 +135,31 @@ public class GUIGlobals {
 
         label = new JLabel(Relevance.getInstance().getRepresentingIcon());
         label.setToolTipText(Relevance.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_RELEVANCE, label);
+        GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_RELEVANCE, label);
 
         label = new JLabel(Quality.getInstance().getRepresentingIcon());
         label.setToolTipText(Quality.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_QUALITY, label);
+        GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_QUALITY, label);
 
         // Ranking item in the menu uses one star
         label = new JLabel(Rank.getInstance().getRepresentingIcon());
         label.setToolTipText(Rank.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_RANKING, label);
+        GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_RANKING, label);
 
         // Priority icon used for the menu
         label = new JLabel(Priority.getInstance().getRepresentingIcon());
         label.setToolTipText(Priority.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_PRIORITY, label);
+        GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_PRIORITY, label);
 
         // Read icon used for menu
         label = new JLabel(ReadStatus.getInstance().getRepresentingIcon());
         label.setToolTipText(ReadStatus.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_READ, label);
+        GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_READ, label);
 
         // Print icon used for menu
         label = new JLabel(Printed.getInstance().getRepresentingIcon());
         label.setToolTipText(Printed.getInstance().getToolTip());
-        GUIGlobals.TABLE_ICONS.put(SpecialFieldsUtils.FIELDNAME_PRINTED, label);
+        GUIGlobals.TABLE_ICONS.put(SpecialFields.FIELDNAME_PRINTED, label);
 
         if (Globals.prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS)) {
             EmacsKeyBindings.load();

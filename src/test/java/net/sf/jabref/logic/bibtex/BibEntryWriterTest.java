@@ -7,11 +7,12 @@ import java.util.Collection;
 import java.util.Set;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -39,7 +40,8 @@ public class BibEntryWriterTest {
 
     @Before
     public void setUpWriter() {
-        writer = new BibEntryWriter(new LatexFieldFormatter(), true);
+        writer = new BibEntryWriter(
+                new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)), true);
     }
 
     @Test
@@ -59,12 +61,12 @@ public class BibEntryWriterTest {
         String actual = stringWriter.toString();
 
         // @formatter:off
-        String expected = Globals.NEWLINE + "@Article{," + Globals.NEWLINE +
-                "  author  = {Foo Bar}," + Globals.NEWLINE +
-                "  journal = {International Journal of Something}," + Globals.NEWLINE +
-                "  number  = {1}," + Globals.NEWLINE +
-                "  note    = {some note}," + Globals.NEWLINE +
-                "}" + Globals.NEWLINE;
+        String expected = OS.NEWLINE + "@Article{," + OS.NEWLINE +
+                "  author  = {Foo Bar}," + OS.NEWLINE +
+                "  journal = {International Journal of Something}," + OS.NEWLINE +
+                "  number  = {1}," + OS.NEWLINE +
+                "  note    = {some note}," + OS.NEWLINE +
+                "}" + OS.NEWLINE;
         // @formatter:on
 
         assertEquals(expected, actual);
@@ -73,26 +75,18 @@ public class BibEntryWriterTest {
     @Test
     public void roundTripTest() throws IOException {
         // @formatter:off
-        String bibtexEntry = "@Article{test," + Globals.NEWLINE +
-                "  Author                   = {Foo Bar}," + Globals.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
-                "  Note                     = {some note}," + Globals.NEWLINE +
-                "  Number                   = {1}" + Globals.NEWLINE +
+        String bibtexEntry = "@Article{test," + OS.NEWLINE +
+                "  Author                   = {Foo Bar}," + OS.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
+                "  Number                   = {1}" + OS.NEWLINE +
                 "}";
         // @formatter:on
 
         // read in bibtex string
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
-
         Collection<BibEntry> entries = result.getDatabase().getEntries();
-        assertEquals(1, entries.size());
-
         BibEntry entry = entries.iterator().next();
-        assertEquals("test", entry.getCiteKey());
-        assertEquals(5, entry.getFieldNames().size());
-        Set<String> fields = entry.getFieldNames();
-        assertTrue(fields.contains("author"));
-        assertEquals("Foo Bar", entry.getField("author"));
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -105,26 +99,18 @@ public class BibEntryWriterTest {
     @Test
     public void roundTripWithPrependingNewlines() throws IOException {
         // @formatter:off
-        String bibtexEntry = "\r\n@Article{test," + Globals.NEWLINE +
-                "  Author                   = {Foo Bar}," + Globals.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
-                "  Note                     = {some note}," + Globals.NEWLINE +
-                "  Number                   = {1}" + Globals.NEWLINE +
+        String bibtexEntry = "\r\n@Article{test," + OS.NEWLINE +
+                "  Author                   = {Foo Bar}," + OS.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
+                "  Number                   = {1}" + OS.NEWLINE +
                 "}";
         // @formatter:on
 
         // read in bibtex string
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
-
         Collection<BibEntry> entries = result.getDatabase().getEntries();
-        assertEquals(1, entries.size());
-
         BibEntry entry = entries.iterator().next();
-        assertEquals("test", entry.getCiteKey());
-        assertEquals(5, entry.getFieldNames().size());
-        Set<String> fields = entry.getFieldNames();
-        assertTrue(fields.contains("author"));
-        assertEquals("Foo Bar", entry.getField("author"));
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -137,30 +123,21 @@ public class BibEntryWriterTest {
     @Test
     public void roundTripWithModification() throws IOException {
         // @formatter:off
-        String bibtexEntry = Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
-                "  Author                   = {Foo Bar}," + Globals.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
-                "  Note                     = {some note}," + Globals.NEWLINE +
-                "  Number                   = {1}," + Globals.NEWLINE +
+        String bibtexEntry = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
+                "  Author                   = {Foo Bar}," + OS.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
+                "  Number                   = {1}," + OS.NEWLINE +
                 "}";
         // @formatter:on
 
         // read in bibtex string
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
-
         Collection<BibEntry> entries = result.getDatabase().getEntries();
-        assertEquals(1, entries.size());
-
         BibEntry entry = entries.iterator().next();
-        assertEquals("test", entry.getCiteKey());
-        assertEquals(5, entry.getFieldNames().size());
 
         // Modify entry
         entry.setField("author", "BlaBla");
-
-        Set<String> fields = entry.getFieldNames();
-        assertTrue(fields.contains("author"));
-        assertEquals("BlaBla", entry.getField("author"));
 
         // write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -168,12 +145,12 @@ public class BibEntryWriterTest {
         String actual = stringWriter.toString();
 
         // @formatter:off
-        String expected = Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
-                "  author  = {BlaBla}," + Globals.NEWLINE +
-                "  journal = {International Journal of Something}," + Globals.NEWLINE +
-                "  number  = {1}," + Globals.NEWLINE +
-                "  note    = {some note}," + Globals.NEWLINE +
-                "}" + Globals.NEWLINE;
+        String expected = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
+                "  author  = {BlaBla}," + OS.NEWLINE +
+                "  journal = {International Journal of Something}," + OS.NEWLINE +
+                "  number  = {1}," + OS.NEWLINE +
+                "  note    = {some note}," + OS.NEWLINE +
+                "}" + OS.NEWLINE;
         // @formatter:on
         assertEquals(expected, actual);
     }
@@ -181,73 +158,93 @@ public class BibEntryWriterTest {
     @Test
     public void roundTripWithCamelCasingInTheOriginalEntryAndResultInLowerCase() throws IOException {
         // @formatter:off
-        String bibtexEntry = Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
-                "  Author                   = {Foo Bar}," + Globals.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
-                "  Note                     = {some note}," + Globals.NEWLINE +
-                "  Number                   = {1}," + Globals.NEWLINE +
-                "  HowPublished             = {asdf}," + Globals.NEWLINE +
+        String bibtexEntry = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
+                "  Author                   = {Foo Bar}," + OS.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
+                "  Number                   = {1}," + OS.NEWLINE +
+                "  HowPublished             = {asdf}," + OS.NEWLINE +
                 "}";
         // @formatter:on
 
         // read in bibtex string
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
-
         Collection<BibEntry> entries = result.getDatabase().getEntries();
-        assertEquals(1, entries.size());
-
         BibEntry entry = entries.iterator().next();
-        assertEquals("test", entry.getCiteKey());
-        assertEquals(6, entry.getFieldNames().size());
 
         // modify entry
         entry.setField("author", "BlaBla");
 
-        Set<String> fields = entry.getFieldNames();
-        assertTrue(fields.contains("author"));
-        assertEquals("BlaBla", entry.getField("author"));
-
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
-
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
 
         // @formatter:off
-        String expected = Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
-                "  author       = {BlaBla}," + Globals.NEWLINE +
-                "  journal      = {International Journal of Something}," + Globals.NEWLINE +
-                "  number       = {1}," + Globals.NEWLINE +
-                "  note         = {some note}," + Globals.NEWLINE +
-                "  howpublished = {asdf}," + Globals.NEWLINE +
-                "}" + Globals.NEWLINE;
+        String expected = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
+                "  author       = {BlaBla}," + OS.NEWLINE +
+                "  journal      = {International Journal of Something}," + OS.NEWLINE +
+                "  number       = {1}," + OS.NEWLINE +
+                "  note         = {some note}," + OS.NEWLINE +
+                "  howpublished = {asdf}," + OS.NEWLINE +
+                "}" + OS.NEWLINE;
         // @formatter:on
         assertEquals(expected, actual);
     }
 
     @Test
+    public void testEntryTypeChange() throws IOException {
+        // @formatter:off
+        String expected = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
+                "  author       = {BlaBla}," + OS.NEWLINE +
+                "  journal      = {International Journal of Something}," + OS.NEWLINE +
+                "  number       = {1}," + OS.NEWLINE +
+                "  note         = {some note}," + OS.NEWLINE +
+                "  howpublished = {asdf}," + OS.NEWLINE +
+                "}" + OS.NEWLINE;
+        // @formatter:on
+
+        // read in bibtex string
+        ParserResult result = BibtexParser.parse(new StringReader(expected));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        // modify entry
+        entry.setType("inproceedings");
+
+        //write out bibtex string
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+        String actual = stringWriter.toString();
+
+        // @formatter:off
+        String expectedNewEntry = OS.NEWLINE + "@InProceedings{test," + OS.NEWLINE +
+                "  author       = {BlaBla}," + OS.NEWLINE +
+                "  number       = {1}," + OS.NEWLINE +
+                "  note         = {some note}," + OS.NEWLINE +
+                "  howpublished = {asdf}," + OS.NEWLINE +
+                "  journal      = {International Journal of Something}," + OS.NEWLINE +
+                "}" + OS.NEWLINE;
+        // @formatter:on
+        assertEquals(expectedNewEntry, actual);
+    }
+
+
+    @Test
     public void roundTripWithAppendedNewlines() throws IOException {
         // @formatter:off
-        String bibtexEntry = "@Article{test," + Globals.NEWLINE +
-                "  Author                   = {Foo Bar}," + Globals.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
-                "  Note                     = {some note}," + Globals.NEWLINE +
-                "  Number                   = {1}" + Globals.NEWLINE +
+        String bibtexEntry = "@Article{test," + OS.NEWLINE +
+                "  Author                   = {Foo Bar}," + OS.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
+                "  Number                   = {1}" + OS.NEWLINE +
                 "}\n\n";
         // @formatter:on
 
         // read in bibtex string
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
-
         Collection<BibEntry> entries = result.getDatabase().getEntries();
-        assertEquals(1, entries.size());
-
         BibEntry entry = entries.iterator().next();
-        assertEquals("test", entry.getCiteKey());
-        assertEquals(5, entry.getFieldNames().size());
-        Set<String> fields = entry.getFieldNames();
-        assertTrue(fields.contains("author"));
-        assertEquals("Foo Bar", entry.getField("author"));
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -261,11 +258,11 @@ public class BibEntryWriterTest {
     @Test
     public void multipleWritesWithoutModification() throws IOException {
         // @formatter:off
-        String bibtexEntry = "@Article{test," + Globals.NEWLINE +
-                "  Author                   = {Foo Bar}," + Globals.NEWLINE +
-                "  Journal                  = {International Journal of Something}," + Globals.NEWLINE +
-                "  Note                     = {some note}," + Globals.NEWLINE +
-                "  Number                   = {1}" + Globals.NEWLINE +
+        String bibtexEntry = "@Article{test," + OS.NEWLINE +
+                "  Author                   = {Foo Bar}," + OS.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
+                "  Number                   = {1}" + OS.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -279,16 +276,8 @@ public class BibEntryWriterTest {
     private String testSingleWrite(String bibtexEntry) throws IOException {
         // read in bibtex string
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
-
         Collection<BibEntry> entries = result.getDatabase().getEntries();
-        assertEquals(1, entries.size());
-
         BibEntry entry = entries.iterator().next();
-        assertEquals("test", entry.getCiteKey());
-        assertEquals(5, entry.getFieldNames().size());
-        Set<String> fields = entry.getFieldNames();
-        assertTrue(fields.contains("author"));
-        assertEquals("Foo Bar", entry.getField("author"));
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -302,25 +291,22 @@ public class BibEntryWriterTest {
     @Test
     public void monthFieldSpecialSyntax() throws IOException {
         // @formatter:off
-        String bibtexEntry = "@Article{test," + Globals.NEWLINE +
-                "  Author                   = {Foo Bar}," + Globals.NEWLINE +
-                "  Month                    = mar," + Globals.NEWLINE +
-                "  Number                   = {1}" + Globals.NEWLINE +
+        String bibtexEntry = "@Article{test," + OS.NEWLINE +
+                "  Author                   = {Foo Bar}," + OS.NEWLINE +
+                "  Month                    = mar," + OS.NEWLINE +
+                "  Number                   = {1}" + OS.NEWLINE +
                 "}";
         // @formatter:on
 
         // read in bibtex string
         ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
-
         Collection<BibEntry> entries = result.getDatabase().getEntries();
-        assertEquals(1, entries.size());
-
         BibEntry entry = entries.iterator().next();
-        assertEquals("test", entry.getCiteKey());
-        assertEquals(4, entry.getFieldNames().size());
+
+        // modify month field
         Set<String> fields = entry.getFieldNames();
         assertTrue(fields.contains("month"));
-        assertEquals("#mar#", entry.getField("month"));
+        assertEquals("#mar#", entry.getFieldOptional("month").get());
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
@@ -333,11 +319,11 @@ public class BibEntryWriterTest {
     @Test
     public void addFieldWithLongerLength() throws IOException {
         // @formatter:off
-        String bibtexEntry = Globals.NEWLINE + Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
-                "  author =  {BlaBla}," + Globals.NEWLINE +
-                "  journal = {International Journal of Something}," + Globals.NEWLINE +
-                "  number =  {1}," + Globals.NEWLINE +
-                "  note =    {some note}," + Globals.NEWLINE +
+        String bibtexEntry = OS.NEWLINE + OS.NEWLINE + "@Article{test," + OS.NEWLINE +
+                "  author =  {BlaBla}," + OS.NEWLINE +
+                "  journal = {International Journal of Something}," + OS.NEWLINE +
+                "  number =  {1}," + OS.NEWLINE +
+                "  note =    {some note}," + OS.NEWLINE +
                 "}";
         // @formatter:on
 
@@ -351,18 +337,17 @@ public class BibEntryWriterTest {
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();
-
         writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
         String actual = stringWriter.toString();
 
         // @formatter:off
-        String expected = Globals.NEWLINE + "@Article{test," + Globals.NEWLINE +
-                "  author       = {BlaBla}," + Globals.NEWLINE +
-                "  journal      = {International Journal of Something}," + Globals.NEWLINE +
-                "  number       = {1}," + Globals.NEWLINE +
-                "  note         = {some note}," + Globals.NEWLINE +
-                "  howpublished = {asdf}," + Globals.NEWLINE +
-                "}" + Globals.NEWLINE;
+        String expected = OS.NEWLINE + "@Article{test," + OS.NEWLINE +
+                "  author       = {BlaBla}," + OS.NEWLINE +
+                "  journal      = {International Journal of Something}," + OS.NEWLINE +
+                "  number       = {1}," + OS.NEWLINE +
+                "  note         = {some note}," + OS.NEWLINE +
+                "  howpublished = {asdf}," + OS.NEWLINE +
+                "}" + OS.NEWLINE;
         // @formatter:on
         assertEquals(expected, actual);
     }
@@ -379,9 +364,9 @@ public class BibEntryWriterTest {
 
         String actual = stringWriter.toString();
 
-        String expected = Globals.NEWLINE + "@Article{," + Globals.NEWLINE +
-                "  note   = {some note}," + Globals.NEWLINE +
-                "}" + Globals.NEWLINE;
+        String expected = OS.NEWLINE + "@Article{," + OS.NEWLINE +
+                "  note   = {some note}," + OS.NEWLINE +
+                "}" + OS.NEWLINE;
 
         assertEquals(expected, actual);
     }
@@ -397,10 +382,73 @@ public class BibEntryWriterTest {
 
         String actual = stringWriter.toString();
 
-        String expected = Globals.NEWLINE + "@Article{," + Globals.NEWLINE +
-                "  note = {some note}," + Globals.NEWLINE +
-                "}" + Globals.NEWLINE;
+        String expected = OS.NEWLINE + "@Article{," + OS.NEWLINE +
+                "  note = {some note}," + OS.NEWLINE +
+                "}" + OS.NEWLINE;
 
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void roundTripWithPrecedingCommentTest() throws IOException {
+        // @formatter:off
+        String bibtexEntry = "% Some random comment that should stay here" + OS.NEWLINE +
+                "@Article{test," + OS.NEWLINE +
+                "  Author                   = {Foo Bar}," + OS.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
+                "  Number                   = {1}" + OS.NEWLINE +
+                "}";
+        // @formatter:on
+
+        // read in bibtex string
+        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        //write out bibtex string
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+        String actual = stringWriter.toString();
+
+        assertEquals(bibtexEntry, actual);
+    }
+
+    @Test
+    public void roundTripWithPrecedingCommentAndModificationTest() throws IOException {
+        // @formatter:off
+        String bibtexEntry = "% Some random comment that should stay here" + OS.NEWLINE +
+                "@Article{test," + OS.NEWLINE +
+                "  Author                   = {Foo Bar}," + OS.NEWLINE +
+                "  Journal                  = {International Journal of Something}," + OS.NEWLINE +
+                "  Note                     = {some note}," + OS.NEWLINE +
+                "  Number                   = {1}" + OS.NEWLINE +
+                "}";
+        // @formatter:on
+
+        // read in bibtex string
+        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry));
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        // change the entry
+        entry.setField("author", "John Doe");
+
+        //write out bibtex string
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+        String actual = stringWriter.toString();
+        // @formatter:off
+        String expected = "% Some random comment that should stay here" + OS.NEWLINE + OS.NEWLINE +
+                "@Article{test," + OS.NEWLINE +
+                "  author  = {John Doe}," + OS.NEWLINE +
+                "  journal = {International Journal of Something}," + OS.NEWLINE +
+                "  number  = {1}," + OS.NEWLINE +
+                "  note    = {some note}," + OS.NEWLINE +
+                "}" + OS.NEWLINE;
+        // @formatter:on
+
+        assertEquals(expected, actual);
+    }
+
 }

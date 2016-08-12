@@ -10,18 +10,19 @@ import java.util.Optional;
 import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -55,8 +56,8 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
     }
 
     @Override
-    public HelpFiles getHelpPage() {
-        return HelpFiles.FETCHER_DOI_TO_BIBTEX;
+    public HelpFile getHelpPage() {
+        return HelpFile.FETCHER_DOI_TO_BIBTEX;
     }
 
     @Override
@@ -115,7 +116,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
     private void formatTitleField(BibEntry entry) {
         // Optionally add curly brackets around key words to keep the case
-        entry.getFieldOptional("title").ifPresent(title -> {
+        entry.getFieldOptional(FieldName.TITLE).ifPresent(title -> {
             // Unit formatting
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
                 title = unitsToLatexFormatter.format(title);
@@ -125,7 +126,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
             if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
                 title = protectTermsFormatter.format(title);
             }
-            entry.setField("title", title);
+            entry.setField(FieldName.TITLE, title);
         });
     }
 

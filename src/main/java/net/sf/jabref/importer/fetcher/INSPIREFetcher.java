@@ -28,11 +28,11 @@ import java.nio.charset.StandardCharsets;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 
@@ -128,7 +128,7 @@ public class INSPIREFetcher implements EntryFetcher {
                 return pr.getDatabase();
             }
         } catch (RuntimeException | IOException e) {
-            frame.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url) + "\n\n" + e,
+            frame.showMessage(Localization.lang("An exception occurred while accessing '%0'", url) + "\n\n" + e,
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         }
         return null;
@@ -139,8 +139,8 @@ public class INSPIREFetcher implements EntryFetcher {
      * @see net.sf.jabref.imports.fetcher.EntryFetcher
      */
     @Override
-    public HelpFiles getHelpPage() {
-        return HelpFiles.FETCHER_INSPIRE;
+    public HelpFile getHelpPage() {
+        return HelpFile.FETCHER_INSPIRE;
     }
 
     @Override

@@ -18,8 +18,7 @@ package net.sf.jabref.logic.bibtex;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
@@ -40,33 +39,27 @@ public class LatexFieldFormatter {
 
     private final boolean neverFailOnHashes;
 
-    private final boolean resolveStringsAllFields;
-    private final char valueDelimiterStartOfValue;
-    private final char valueDelimiterEndOfValue;
-    private final List<String> doNotResolveStringsFors;
-    private final int lineLength;
+    private final LatexFieldFormatterPreferences prefs;
 
     private final FieldContentParser parser;
 
+    private static final char FIELD_START = '{';
+    private static final char FIELD_END = '}';
 
-    public LatexFieldFormatter() {
-        this(true);
+
+    public LatexFieldFormatter(LatexFieldFormatterPreferences prefs) {
+        this(true, prefs);
     }
 
-    private LatexFieldFormatter(boolean neverFailOnHashes) {
+    private LatexFieldFormatter(boolean neverFailOnHashes, LatexFieldFormatterPreferences prefs) {
         this.neverFailOnHashes = neverFailOnHashes;
+        this.prefs = prefs;
 
-        this.resolveStringsAllFields = Globals.prefs.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS);
-        valueDelimiterStartOfValue = Globals.prefs.getValueDelimiters(0);
-        valueDelimiterEndOfValue = Globals.prefs.getValueDelimiters(1);
-        doNotResolveStringsFors = Globals.prefs.getStringList(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR);
-        lineLength = Globals.prefs.getInt(JabRefPreferences.LINE_LENGTH);
-
-        parser = new FieldContentParser();
+        parser = new FieldContentParser(prefs.getFieldContentParserPreferences());
     }
 
-    public static LatexFieldFormatter buildIgnoreHashes() {
-        return new LatexFieldFormatter(true);
+    public static LatexFieldFormatter buildIgnoreHashes(LatexFieldFormatterPreferences prefs) {
+        return new LatexFieldFormatter(true, prefs);
     }
 
     /**
@@ -81,17 +74,17 @@ public class LatexFieldFormatter {
             throws IllegalArgumentException {
 
         if (content == null) {
-            return valueDelimiterStartOfValue + String.valueOf(valueDelimiterEndOfValue);
+            return FIELD_START + String.valueOf(FIELD_END);
         }
 
         String result = content;
 
         // normalize newlines
-        boolean shouldNormalizeNewlines = !result.contains(Globals.NEWLINE) && result.contains("\n");
+        boolean shouldNormalizeNewlines = !result.contains(OS.NEWLINE) && result.contains("\n");
         if (shouldNormalizeNewlines) {
             // if we don't have real new lines, but pseudo newlines, we replace them
             // On Win 8.1, this is always true for multiline fields
-            result = result.replace("\n", Globals.NEWLINE);
+            result = result.replace("\n", OS.NEWLINE);
         }
 
         // If the field is non-standard, we will just append braces,
@@ -172,9 +165,9 @@ public class LatexFieldFormatter {
 
     private boolean shouldResolveStrings(String fieldName) {
         boolean resolveStrings = true;
-        if (resolveStringsAllFields) {
+        if (prefs.isResolveStringsAllFields()) {
             // Resolve strings for all fields except some:
-            for (String exception : doNotResolveStringsFors) {
+            for (String exception : prefs.getDoNotResolveStringsFor()) {
                 if (exception.equals(fieldName)) {
                     resolveStrings = false;
                     break;
@@ -192,18 +185,18 @@ public class LatexFieldFormatter {
         checkBraces(content);
 
         stringBuilder = new StringBuilder(
-                String.valueOf(valueDelimiterStartOfValue));
+                String.valueOf(FIELD_START));
 
         stringBuilder.append(parser.format(content, fieldName));
 
-        stringBuilder.append(valueDelimiterEndOfValue);
+        stringBuilder.append(FIELD_END);
 
         return stringBuilder.toString();
     }
 
     private void writeText(String text, int startPos, int endPos) {
 
-        stringBuilder.append(valueDelimiterStartOfValue);
+        stringBuilder.append(FIELD_START);
         boolean escape = false;
         boolean inCommandName = false;
         boolean inCommand = false;
@@ -262,7 +255,7 @@ public class LatexFieldFormatter {
             }
             escape = c == '\\';
         }
-        stringBuilder.append(valueDelimiterEndOfValue);
+        stringBuilder.append(FIELD_END);
     }
 
     private void writeStringLabel(String text, int startPos, int endPos,
@@ -272,7 +265,7 @@ public class LatexFieldFormatter {
     }
 
     private void putIn(String s) {
-        stringBuilder.append(StringUtil.wrap(s, lineLength));
+        stringBuilder.append(StringUtil.wrap(s, prefs.getLineLength()));
     }
 
     private static void checkBraces(String text) throws IllegalArgumentException {

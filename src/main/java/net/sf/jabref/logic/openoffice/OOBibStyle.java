@@ -31,21 +31,22 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.JabRefMain;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatter;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -54,7 +55,7 @@ import org.apache.commons.logging.LogFactory;
  * This class embodies a bibliography formatting for OpenOffice, which is composed
  * of the following elements:
  * <p>
- * 1) Each OO bib entry type must have a formatting. A formatting is an array of elements, each
+ * 1) Each OO BIB entry type must have a formatting. A formatting is an array of elements, each
  * of which is either a piece of constant text, an entry field value, or a tab. Each element has
  * a character format associated with it.
  * <p>
@@ -146,14 +147,15 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     private static final String AUTHOR_LAST_SEPARATOR = "AuthorLastSeparator";
     private static final String AUTHOR_SEPARATOR = "AuthorSeparator";
 
-    private final JournalAbbreviationLoader repositoryLoader;
+    private final LayoutFormatterPreferences prefs;
     private static final Pattern QUOTED = Pattern.compile("\".*\"");
 
     private static final Log LOGGER = LogFactory.getLog(OOBibStyle.class);
 
 
-    public OOBibStyle(File styleFile, JournalAbbreviationLoader repositoryLoader, Charset encoding) throws IOException {
-        this.repositoryLoader = Objects.requireNonNull(repositoryLoader);
+    public OOBibStyle(File styleFile, LayoutFormatterPreferences prefs,
+            Charset encoding) throws IOException {
+        this.prefs = Objects.requireNonNull(prefs);
         this.styleFile = Objects.requireNonNull(styleFile);
         this.encoding = Objects.requireNonNull(encoding);
         setDefaultProperties();
@@ -162,12 +164,12 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         path = styleFile.getPath();
     }
 
-    public OOBibStyle(String resourcePath, JournalAbbreviationLoader repositoryLoader)
+    public OOBibStyle(String resourcePath, LayoutFormatterPreferences prefs)
             throws IOException {
-        this.repositoryLoader = Objects.requireNonNull(repositoryLoader);
+        this.prefs = Objects.requireNonNull(prefs);
         this.encoding = StandardCharsets.UTF_8;
         setDefaultProperties();
-        initialize(JabRefMain.class.getResource(resourcePath).openStream());
+        initialize(OOBibStyle.class.getResource(resourcePath).openStream());
         fromResource = true;
         path = resourcePath;
     }
@@ -184,8 +186,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         properties.put(REFERENCE_HEADER_PARAGRAPH_FORMAT, "Heading 1");
 
         // Set default properties for the citation marker:
-        citProperties.put(AUTHOR_FIELD, "author/editor");
-        citProperties.put(YEAR_FIELD, "year");
+        citProperties.put(AUTHOR_FIELD, FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR));
+        citProperties.put(YEAR_FIELD, FieldName.YEAR);
         citProperties.put(MAX_AUTHORS, 3);
         citProperties.put(MAX_AUTHORS_FIRST, -1);
         citProperties.put(AUTHOR_SEPARATOR, ", ");
@@ -378,7 +380,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             boolean setDefault = line.substring(0, index).equals(OOBibStyle.DEFAULT_MARK);
             String type = line.substring(0, index);
             try {
-                Layout layout = new LayoutHelper(new StringReader(formatString), this.repositoryLoader).getLayoutFromText();
+                Layout layout = new LayoutHelper(new StringReader(formatString), this.prefs).getLayoutFromText();
                 if (setDefault) {
                     defaultBibLayout = layout;
                 } else {
@@ -508,7 +510,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
     }
 
     /**
-     * Format the marker for the in-text citation according to this bib style. Uniquefier letters are added as
+     * Format the marker for the in-text citation according to this BIB style. Uniquefier letters are added as
      * provided by the uniquefiers argument. If successive entries within the citation are uniquefied from each other,
      * this method will perform a grouping of these entries.
      *
@@ -723,20 +725,20 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
      * @param entry    The entry.
      * @param database The database the entry belongs to.
      * @param field    The field, or succession of fields, to look up. If backup fields are needed, separate
-     *                 field names by /. E.g. to use "author" with "editor" as backup, specify "author/editor".
+     *                 field names by /. E.g. to use "author" with "editor" as backup, specify FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR).
      * @return The resolved field content, or an empty string if the field(s) were empty.
      */
     private String getCitationMarkerField(BibEntry entry, BibDatabase database, String field) {
         String authorField = getStringCitProperty(AUTHOR_FIELD);
-        String[] fields = field.split("/");
+        String[] fields = field.split(FieldName.FIELD_SEPARATOR);
         for (String s : fields) {
-            String content = BibDatabase.getResolvedField(s, entry, database);
+            Optional<String> content = BibDatabase.getResolvedField(s, entry, database);
 
-            if ((content != null) && !content.trim().isEmpty()) {
-                if (field.equals(authorField) && StringUtil.isInCurlyBrackets(content)) {
-                    return "{" + fieldFormatter.format(content) + "}";
+            if ((content.isPresent()) && !content.get().trim().isEmpty()) {
+                if (field.equals(authorField) && StringUtil.isInCurlyBrackets(content.get())) {
+                    return "{" + fieldFormatter.format(content.get()) + "}";
                 }
-                return fieldFormatter.format(content);
+                return fieldFormatter.format(content.get());
             }
         }
         // No luck? Return an empty string:
@@ -887,15 +889,21 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
         if (o instanceof OOBibStyle) {
-            return path.equals(((OOBibStyle) o).path);
+            OOBibStyle otherStyle = (OOBibStyle) o;
+            return Objects.equals(path, otherStyle.path) && Objects.equals(name, otherStyle.name)
+                    && Objects.equals(citProperties, otherStyle.citProperties)
+                    && Objects.equals(properties, otherStyle.properties);
         }
         return false;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(path);
+        return Objects.hash(path, name, citProperties, properties);
     }
 
     private String createAuthorList(String author, int maxAuthors, String andString,

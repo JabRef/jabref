@@ -45,7 +45,6 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.BasePanel;
@@ -53,11 +52,11 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexSingleField;
-import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.CellConstraints;
@@ -175,22 +174,21 @@ class TableColumnsTab extends JPanel implements PrefsTab {
             public Object getValueAt(int row, int column) {
                 int internalRow = row;
                 if (internalRow == 0) {
-                    return column == 0 ? InternalBibtexFields.NUMBER_COL : String.valueOf(ncWidth);
+                    return column == 0 ? FieldName.NUMBER_COL : String.valueOf(ncWidth);
                 }
                 internalRow--;
                 if (internalRow >= tableRows.size()) {
                     return "";
                 }
-                Object rowContent = tableRows.get(internalRow);
+                TableRow rowContent = tableRows.get(internalRow);
                 if (rowContent == null) {
                     return "";
                 }
-                TableRow tr = (TableRow) rowContent;
                 // Only two columns
                 if (column == 0) {
-                    return tr.getName();
+                    return rowContent.getName();
                 } else {
-                    return tr.getLength() > 0 ? Integer.toString(tr.getLength()) : "";
+                    return rowContent.getLength() > 0 ? Integer.toString(rowContent.getLength()) : "";
                 }
             }
 
@@ -305,7 +303,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         /*** begin: special table columns and special fields ***/
 
         JButton helpButton = new HelpAction(Localization.lang("Help on special fields"),
-                HelpFiles.SPECIAL_FIELDS).getHelpButton();
+                HelpFile.SPECIAL_FIELDS).getHelpButton();
 
         rankingColumn = new JCheckBox(Localization.lang("Show rank"));
         qualityColumn = new JCheckBox(Localization.lang("Show quality"));
@@ -420,32 +418,32 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         /*** begin: special fields ***/
 
-        oldRankingColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING);
+        oldRankingColumn = prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RANKING);
         rankingColumn.setSelected(oldRankingColumn);
 
-        oldQualityColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY);
+        oldQualityColumn = prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_QUALITY);
         qualityColumn.setSelected(oldQualityColumn);
 
-        oldPriorityColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY);
+        oldPriorityColumn = prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRIORITY);
         priorityColumn.setSelected(oldPriorityColumn);
 
-        oldRelevanceColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE);
+        oldRelevanceColumn = prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RELEVANCE);
         relevanceColumn.setSelected(oldRelevanceColumn);
 
-        oldPrintedColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED);
+        oldPrintedColumn = prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRINTED);
         printedColumn.setSelected(oldPrintedColumn);
 
-        oldReadStatusColumn = prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ);
+        oldReadStatusColumn = prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_READ);
         readStatusColumn.setSelected(oldReadStatusColumn);
 
-        oldSyncKeyWords = prefs.getBoolean(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS);
+        oldSyncKeyWords = prefs.getBoolean(JabRefPreferences.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS);
         syncKeywords.setSelected(oldSyncKeyWords);
 
-        oldWriteSpecialFields = prefs.getBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS);
+        oldWriteSpecialFields = prefs.getBoolean(JabRefPreferences.PREF_SERIALIZESPECIALFIELDS);
         writeSpecialFields.setSelected(oldWriteSpecialFields);
 
         // has to be called as last to correctly enable/disable the other settings
-        oldSpecialFieldsEnabled = prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED);
+        oldSpecialFieldsEnabled = prefs.getBoolean(JabRefPreferences.PREF_SPECIALFIELDSENABLED);
         specialFieldsEnabled.setSelected(!oldSpecialFieldsEnabled);
         specialFieldsEnabled.setSelected(oldSpecialFieldsEnabled); // Call twice to make sure the ChangeListener is triggered
 
@@ -749,15 +747,15 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         // restart required implies that the settings have been changed
         // the seetings need to be stored
         if (restartRequired) {
-            prefs.putBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED, newSpecialFieldsEnabled);
-            prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING, newRankingColumn);
-            prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY, newPriorityColumn);
-            prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY, newQualityColumn);
-            prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE, newRelevanceColumn);
-            prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED, newPrintedColumn);
-            prefs.putBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ, newReadStatusColumn);
-            prefs.putBoolean(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS, newSyncKeyWords);
-            prefs.putBoolean(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS, newWriteSpecialFields);
+            prefs.putBoolean(JabRefPreferences.PREF_SPECIALFIELDSENABLED, newSpecialFieldsEnabled);
+            prefs.putBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RANKING, newRankingColumn);
+            prefs.putBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRIORITY, newPriorityColumn);
+            prefs.putBoolean(JabRefPreferences.PREF_SHOWCOLUMN_QUALITY, newQualityColumn);
+            prefs.putBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RELEVANCE, newRelevanceColumn);
+            prefs.putBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRINTED, newPrintedColumn);
+            prefs.putBoolean(JabRefPreferences.PREF_SHOWCOLUMN_READ, newReadStatusColumn);
+            prefs.putBoolean(JabRefPreferences.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS, newSyncKeyWords);
+            prefs.putBoolean(JabRefPreferences.PREF_SERIALIZESPECIALFIELDS, newWriteSpecialFields);
         }
 
         /*** end: special fields ***/

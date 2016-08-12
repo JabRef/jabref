@@ -6,25 +6,23 @@ import java.util.Optional;
 
 import javax.swing.JLabel;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.SpecialFields;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
 import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
-import net.sf.jabref.specialfields.SpecialFieldValue;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 public class SpecialMainTableColumns {
 
-    public static final MainTableColumn NUMBER_COL = new MainTableColumn(InternalBibtexFields.NUMBER_COL) {
+    public static final MainTableColumn NUMBER_COL = new MainTableColumn(FieldName.NUMBER_COL) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
@@ -37,76 +35,63 @@ public class SpecialMainTableColumns {
         }
     };
 
-    public static final MainTableColumn RANKING_COLUMN = new MainTableColumn(SpecialFieldsUtils.FIELDNAME_RANKING,
-            Collections.singletonList(SpecialFieldsUtils.FIELDNAME_RANKING),
-            new JLabel(SpecialFieldsUtils.FIELDNAME_RANKING)) {
+    public static final MainTableColumn RANKING_COLUMN = new MainTableColumn(SpecialFields.FIELDNAME_RANKING,
+            Collections.singletonList(SpecialFields.FIELDNAME_RANKING),
+            new JLabel(SpecialFields.FIELDNAME_RANKING)) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
-            SpecialFieldValue rank = Rank.getInstance().parse(entry.getField(SpecialFieldsUtils.FIELDNAME_RANKING));
-            if (rank == null) {
-                return null;
-            } else {
-                return rank.createLabel();
-            }
+
+            return entry.getFieldOptional(SpecialFields.FIELDNAME_RANKING)
+                    .flatMap(Rank.getInstance()::parse).map(rank -> rank.createLabel()).orElse(null);
         }
     };
 
-    public static final MainTableColumn PRIORITY_COLUMN = new MainTableColumn(SpecialFieldsUtils.FIELDNAME_PRIORITY,
-            Collections.singletonList(SpecialFieldsUtils.FIELDNAME_PRIORITY),
+    public static final MainTableColumn PRIORITY_COLUMN = new MainTableColumn(SpecialFields.FIELDNAME_PRIORITY,
+            Collections.singletonList(SpecialFields.FIELDNAME_PRIORITY),
             new JLabel(Priority.getInstance().getRepresentingIcon())) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
 
-            SpecialFieldValue prio = Priority.getInstance()
-                    .parse(entry.getField(SpecialFieldsUtils.FIELDNAME_PRIORITY));
-            if (prio == null) {
-                return null;
-            } else {
-                return prio.createLabel();
-            }
+            return entry.getFieldOptional(SpecialFields.FIELDNAME_PRIORITY)
+                    .flatMap(Priority.getInstance()::parse).map(prio -> prio.createLabel()).orElse(null);
         }
     };
 
-    public static final MainTableColumn READ_STATUS_COLUMN = new MainTableColumn(SpecialFieldsUtils.FIELDNAME_READ,
-            Collections.singletonList(SpecialFieldsUtils.FIELDNAME_READ),
+    public static final MainTableColumn READ_STATUS_COLUMN = new MainTableColumn(SpecialFields.FIELDNAME_READ,
+            Collections.singletonList(SpecialFields.FIELDNAME_READ),
             new JLabel(ReadStatus.getInstance().getRepresentingIcon())) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
 
-            SpecialFieldValue status = ReadStatus.getInstance()
-                    .parse(entry.getField(SpecialFieldsUtils.FIELDNAME_READ));
-            if (status == null) {
-                return null;
-            } else {
-                return status.createLabel();
-            }
+            return entry.getFieldOptional(SpecialFields.FIELDNAME_READ)
+                    .flatMap(ReadStatus.getInstance()::parse).map(status -> status.createLabel()).orElse(null);
         }
     };
 
-    public static final MainTableColumn RELEVANCE_COLUMN = createIconColumn(SpecialFieldsUtils.FIELDNAME_RELEVANCE,
-            Collections.singletonList(SpecialFieldsUtils.FIELDNAME_RELEVANCE),
+    public static final MainTableColumn RELEVANCE_COLUMN = createIconColumn(SpecialFields.FIELDNAME_RELEVANCE,
+            Collections.singletonList(SpecialFields.FIELDNAME_RELEVANCE),
             new JLabel(Relevance.getInstance().getRepresentingIcon()));
 
-    public static final MainTableColumn PRINTED_COLUMN = createIconColumn(SpecialFieldsUtils.FIELDNAME_PRINTED,
-            Collections.singletonList(SpecialFieldsUtils.FIELDNAME_PRINTED),
+    public static final MainTableColumn PRINTED_COLUMN = createIconColumn(SpecialFields.FIELDNAME_PRINTED,
+            Collections.singletonList(SpecialFields.FIELDNAME_PRINTED),
             new JLabel(Printed.getInstance().getRepresentingIcon()));
 
-    public static final MainTableColumn QUALITY_COLUMN = createIconColumn(SpecialFieldsUtils.FIELDNAME_QUALITY,
-            Collections.singletonList(SpecialFieldsUtils.FIELDNAME_QUALITY),
+    public static final MainTableColumn QUALITY_COLUMN = createIconColumn(SpecialFields.FIELDNAME_QUALITY,
+            Collections.singletonList(SpecialFields.FIELDNAME_QUALITY),
             new JLabel(Quality.getInstance().getRepresentingIcon()));
 
 
-    public static final MainTableColumn FILE_COLUMN = new MainTableColumn(Globals.FILE_FIELD,
-            Collections.singletonList(Globals.FILE_FIELD), new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon())) {
+    public static final MainTableColumn FILE_COLUMN = new MainTableColumn(FieldName.FILE,
+            Collections.singletonList(FieldName.FILE), new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon())) {
 
         @Override
         public Object getColumnValue(BibEntry entry) {
             // We use a FileListTableModel to parse the field content:
             FileListTableModel fileList = new FileListTableModel();
-            fileList.setContent(entry.getField(Globals.FILE_FIELD));
+            entry.getFieldOptional(FieldName.FILE).ifPresent(fileList::setContent);
             if (fileList.getRowCount() > 1) {
                 return new JLabel(IconTheme.JabRefIcon.FILE_MULTIPLE.getSmallIcon());
             } else if (fileList.getRowCount() == 1) {
@@ -167,7 +152,7 @@ public class SpecialMainTableColumns {
 
 
 
-        return new MainTableColumn(externalFileTypeName, Collections.singletonList(Globals.FILE_FIELD), new JLabel()) {
+        return new MainTableColumn(externalFileTypeName, Collections.singletonList(FieldName.FILE), new JLabel()) {
 
             @Override
             public boolean isFileFilter() {
@@ -185,7 +170,7 @@ public class SpecialMainTableColumns {
                 boolean iconFound = false;
                 JLabel iconLabel = null;
                 FileListTableModel fileList = new FileListTableModel();
-                fileList.setContent(entry.getField(Globals.FILE_FIELD));
+                entry.getFieldOptional(FieldName.FILE).ifPresent(fileList::setContent);
                 for (int i = 0; i < fileList.getRowCount(); i++) {
                     if ((fileList.getEntry(i).type.isPresent())
                             && externalFileTypeName.equalsIgnoreCase(fileList.getEntry(i).type.get().getName())) {

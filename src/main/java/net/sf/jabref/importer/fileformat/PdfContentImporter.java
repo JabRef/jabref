@@ -37,6 +37,7 @@ import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 
 import com.google.common.base.Strings;
 import org.apache.pdfbox.pdmodel.PDDocument;
@@ -216,7 +217,7 @@ public class PdfContentImporter extends ImportFormat {
             if (doi.isPresent()) {
                 ParserResult parserResult = new ParserResult(result);
                 Optional<BibEntry> entry = DOI_TO_BIBTEX_FETCHER.getEntryFromDOI(doi.get().getDOI(), parserResult);
-                entry.ifPresent(e -> parserResult.getDatabase().insertEntry(e));
+                entry.ifPresent(parserResult.getDatabase()::insertEntry);
                 return parserResult;
             }
 
@@ -389,7 +390,7 @@ public class PdfContentImporter extends ImportFormat {
                     if (DOI == null) {
                         pos = curString.indexOf("DOI");
                         if (pos < 0) {
-                            pos = curString.indexOf("doi");
+                            pos = curString.indexOf(FieldName.DOI);
                         }
                         if (pos >= 0) {
                             pos += 3;
@@ -442,43 +443,43 @@ public class PdfContentImporter extends ImportFormat {
             // TODO: institution parsing missing
 
             if (author != null) {
-                entry.setField("author", author);
+                entry.setField(FieldName.AUTHOR, author);
             }
             if (editor != null) {
-                entry.setField("editor", editor);
+                entry.setField(FieldName.EDITOR, editor);
             }
             if (abstractT != null) {
-                entry.setField("abstract", abstractT);
+                entry.setField(FieldName.ABSTRACT, abstractT);
             }
             if (!Strings.isNullOrEmpty(keywords)) {
-                entry.setField("keywords", keywords);
+                entry.setField(FieldName.KEYWORDS, keywords);
             }
             if (title != null) {
-                entry.setField("title", title);
+                entry.setField(FieldName.TITLE, title);
             }
             if (conference != null) {
-                entry.setField("booktitle", conference);
+                entry.setField(FieldName.BOOKTITLE, conference);
             }
             if (DOI != null) {
-                entry.setField("doi", DOI);
+                entry.setField(FieldName.DOI, DOI);
             }
             if (series != null) {
-                entry.setField("series", series);
+                entry.setField(FieldName.SERIES, series);
             }
             if (volume != null) {
-                entry.setField("volume", volume);
+                entry.setField(FieldName.VOLUME, volume);
             }
             if (number != null) {
-                entry.setField("number", number);
+                entry.setField(FieldName.NUMBER, number);
             }
             if (pages != null) {
-                entry.setField("pages", pages);
+                entry.setField(FieldName.PAGES, pages);
             }
             if (year != null) {
-                entry.setField("year", year);
+                entry.setField(FieldName.YEAR, year);
             }
             if (publisher != null) {
-                entry.setField("publisher", publisher);
+                entry.setField(FieldName.PUBLISHER, publisher);
             }
 
             result.add(entry);

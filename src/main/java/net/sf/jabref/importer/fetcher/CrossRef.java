@@ -8,6 +8,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -37,13 +38,13 @@ public class CrossRef {
         Optional<DOI> doi = Optional.empty();
 
         // title is minimum requirement
-        String title = entry.getField("title");
+        Optional<String> title = entry.getFieldOptional(FieldName.TITLE);
 
-        if ((title == null) || title.isEmpty()) {
+        if (!title.isPresent() || title.get().isEmpty()) {
             return doi;
         }
 
-        String query = enhanceQuery(title, entry);
+        String query = enhanceQuery(title.get(), entry);
 
         try {
             HttpResponse<JsonNode> response = Unirest.get(API_URL + "/works")
@@ -55,7 +56,7 @@ public class CrossRef {
             // quality check
             if (checkValidity(entry, items)) {
                 String dataDOI = items.getJSONObject(0).getString("DOI");
-                LOGGER.debug("DOI " + dataDOI + " for " + title + " found.");
+                LOGGER.debug("DOI " + dataDOI + " for " + title.get() + " found.");
                 return DOI.build(dataDOI);
             }
         } catch (UnirestException e) {
@@ -67,23 +68,25 @@ public class CrossRef {
     private static String enhanceQuery(String query, BibEntry entry) {
         StringBuilder enhancedQuery = new StringBuilder(query);
         // author
-        String author = entry.getField("author");
-        if ((author != null) && !author.isEmpty()) {
-            enhancedQuery.append('+').append(author);
-        }
+        entry.getFieldOptional(FieldName.AUTHOR).ifPresent(author -> {
+            if (!author.isEmpty()) {
+                enhancedQuery.append('+').append(author);
+            }
+        });
 
         // year
-        String year = entry.getField("year");
-        if ((year != null) && !year.isEmpty()) {
-            enhancedQuery.append('+').append(year);
-        }
+        entry.getFieldOptional(FieldName.YEAR).ifPresent(year -> {
+            if (!year.isEmpty()) {
+                enhancedQuery.append('+').append(year);
+            }
+        });
 
         return enhancedQuery.toString();
     }
 
     private static boolean checkValidity(BibEntry entry, JSONArray result) {
         // TODO: use latex-free version instead in the future
-        final String entryTitle = removeLaTeX(entry.getField("title"));
+        final String entryTitle = removeLaTeX(entry.getField(FieldName.TITLE));
 
         // currently only title-based
         // title: [ "How the Mind Hurts and Heals the Body." ]

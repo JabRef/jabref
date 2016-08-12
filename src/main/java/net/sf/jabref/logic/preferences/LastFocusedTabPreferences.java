@@ -19,7 +19,7 @@ package net.sf.jabref.logic.preferences;
 import java.io.File;
 import java.util.Objects;
 
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class LastFocusedTabPreferences {
 
@@ -31,7 +31,7 @@ public class LastFocusedTabPreferences {
 
     public void setLastFocusedTab(File file) {
         if (file == null) {
-            return; // no change detected
+            return;
         }
 
         String filePath = file.getAbsolutePath();

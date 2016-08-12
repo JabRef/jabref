@@ -23,7 +23,6 @@ import javax.swing.AbstractAction;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.groups.EntriesGroupChange;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.util.Util;
 
 public class RemoveFromGroupAction extends AbstractAction {
 
@@ -52,7 +51,7 @@ public class RemoveFromGroupAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent evt) {
         // warn if assignment has undesired side effects (modifies a field != keywords)
-        if (!Util.warnAssignmentSideEffects(mNode.getNode().getGroup(), mPanel.frame())) {
+        if (!WarnAssignmentSideEffects.warnAssignmentSideEffects(mNode.getNode().getGroup(), mPanel.frame())) {
             return; // user aborted operation
         }
 

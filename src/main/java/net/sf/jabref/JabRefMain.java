@@ -20,17 +20,22 @@ import java.net.Authenticator;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.cli.ArgumentProcessor;
-import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.logic.CustomEntryTypesManager;
+import net.sf.jabref.logic.exporter.ExportFormats;
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.ProxyAuthenticator;
 import net.sf.jabref.logic.net.ProxyPreferences;
 import net.sf.jabref.logic.net.ProxyRegisterer;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.client.RemoteListenerClient;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -59,16 +64,26 @@ public class JabRefMain {
         Localization.setLanguage(preferences.get(JabRefPreferences.LANGUAGE));
         Globals.prefs.setLanguageDependentDefaultValues();
 
+        // Update handling of special fields based on preferences
+        InternalBibtexFields
+                .updateSpecialFields(Globals.prefs.getBoolean(JabRefPreferences.PREF_SERIALIZESPECIALFIELDS));
+        // Update name of the time stamp field based on preferences
+        InternalBibtexFields.updateTimeStampField(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD));
         // Update which fields should be treated as numeric, based on preferences:
-        InternalBibtexFields.setNumericFieldsFromPrefs();
+        InternalBibtexFields.setNumericFields(Globals.prefs.getStringList(JabRefPreferences.NUMERIC_FIELDS));
 
         /* Build list of Import and Export formats */
         Globals.IMPORT_FORMAT_READER.resetImportFormats();
         CustomEntryTypesManager.loadCustomEntryTypes(preferences);
-        ExportFormats.initAllExports();
+        ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
 
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
+
+        // Initialize protected terms loader
+        Globals.protectedTermsLoader = new ProtectedTermsLoader(
+                ProtectedTermsPreferences.fromPreferences(Globals.prefs));
+        ProtectTermsFormatter.setProtectedTermsLoader(Globals.protectedTermsLoader);
 
         // Check for running JabRef
         RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);
@@ -91,7 +106,7 @@ public class JabRefMain {
 
         // override used newline character with the one stored in the preferences
         // The preferences return the system newline character sequence as default
-        Globals.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
+        OS.NEWLINE = Globals.prefs.get(JabRefPreferences.NEWLINE);
 
         // Process arguments
         ArgumentProcessor argumentProcessor = new ArgumentProcessor(args, ArgumentProcessor.Mode.INITIAL_START);

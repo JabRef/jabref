@@ -82,7 +82,6 @@ import javax.swing.tree.TreePath;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.importer.EntryFromFileCreator;
 import net.sf.jabref.importer.EntryFromFileCreatorManager;
@@ -92,6 +91,8 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
@@ -388,7 +389,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
             fileChooser = new JFileChooser();
             fileChooser.setAutoscrolls(true);
             fileChooser.setDialogTitle(Localization.lang("Select directory"));
-            fileChooser.setApproveButtonText(Localization.lang("Choose Directory"));
+            fileChooser.setApproveButtonText(Localization.lang("Choose directory"));
             fileChooser.setApproveButtonToolTipText(
                     Localization.lang("Use the selected directory to start with the search."));
             fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -654,7 +655,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private void setupActions() {
 
         /**
-         * Stores the selected Directory.
+         * Stores the selected directory.
          */
         buttonBrowse.addActionListener(e -> {
             Path selectedDirectory = chooseDirectory();
@@ -997,7 +998,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                             try {
                                 JabRefDesktop.openExternalViewer(
                                         JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext(),
-                                        fnw.file.getAbsolutePath(), "pdf");
+                                        fnw.file.getAbsolutePath(), FieldName.PDF);
                             } catch (IOException e1) {
                                 LOGGER.info("Error opening file", e1);
                             }

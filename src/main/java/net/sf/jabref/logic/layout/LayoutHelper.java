@@ -22,8 +22,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-
 /**
  * Helper class to get a Layout object.
  *
@@ -50,13 +48,13 @@ public class LayoutHelper {
 
     private final PushbackReader in;
     private final List<StringInt> parsedEntries = new ArrayList<>();
-    private final JournalAbbreviationLoader repositoryLoader;
+    private final LayoutFormatterPreferences prefs;
     private boolean endOfFile;
 
 
-    public LayoutHelper(Reader in, JournalAbbreviationLoader repositoryLoader) {
+    public LayoutHelper(Reader in, LayoutFormatterPreferences prefs) {
         this.in = new PushbackReader(Objects.requireNonNull(in));
-        this.repositoryLoader = Objects.requireNonNull(repositoryLoader);
+        this.prefs = Objects.requireNonNull(prefs);
     }
 
     public Layout getLayoutFromText() throws IOException {
@@ -70,7 +68,7 @@ public class LayoutHelper {
             }
         }
 
-        return new Layout(parsedEntries, repositoryLoader);
+        return new Layout(parsedEntries, prefs);
     }
 
     public static String getCurrentGroup() {
@@ -312,13 +310,13 @@ public class LayoutHelper {
                         return;
                     }
                 } else if ("filename".equalsIgnoreCase(name)) {
-                    // Print the name of the database bib file.
+                    // Print the name of the database BIB file.
                     // This is only supported in begin/end layouts, not in
                     // entry layouts.
                     parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILENAME));
                     return;
                 } else if ("filepath".equalsIgnoreCase(name)) {
-                    // Print the full path of the database bib file.
+                    // Print the full path of the database BIB file.
                     // This is only supported in begin/end layouts, not in
                     // entry layouts.
                     parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILEPATH));

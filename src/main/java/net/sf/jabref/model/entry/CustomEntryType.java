@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -51,23 +53,23 @@ public class CustomEntryType implements EntryType {
         this(name, Arrays.asList(required.split(";")), Arrays.asList(optional.split(";")));
     }
 
-    public static CustomEntryType parse(String comment) {
+    public static Optional<CustomEntryType> parse(String comment) {
         String rest = comment.substring(ENTRYTYPE_FLAG.length());
         int indexEndOfName = rest.indexOf(':');
         if(indexEndOfName < 0) {
-            return null;
+            return Optional.empty();
         }
         String fieldsDescription = rest.substring(indexEndOfName + 2);
 
         int indexEndOfRequiredFields = fieldsDescription.indexOf(']');
         int indexEndOfOptionalFields = fieldsDescription.indexOf(']', indexEndOfRequiredFields + 1);
-        if (indexEndOfRequiredFields < 4 || indexEndOfOptionalFields < indexEndOfRequiredFields + 6) {
-            return null;
+        if ((indexEndOfRequiredFields < 4) || (indexEndOfOptionalFields < (indexEndOfRequiredFields + 6))) {
+            return Optional.empty();
         }
         String name = rest.substring(0, indexEndOfName);
         String reqFields = fieldsDescription.substring(4, indexEndOfRequiredFields);
         String optFields = fieldsDescription.substring(indexEndOfRequiredFields + 6, indexEndOfOptionalFields);
-        return new CustomEntryType(name, reqFields, optFields);
+        return Optional.of(new CustomEntryType(name, reqFields, optFields));
     }
 
     @Override
@@ -77,8 +79,11 @@ public class CustomEntryType implements EntryType {
 
     @Override
     public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
         if (o instanceof CustomEntryType) {
-            return this.compareTo((CustomEntryType) o) == 0;
+            return Objects.equals(name, ((CustomEntryType) o).name);
         } else {
             return false;
         }
@@ -114,7 +119,7 @@ public class CustomEntryType implements EntryType {
     /**
      * Get a String describing the required field set for this entry type.
      *
-     * @return Description of required field set for storage in preferences or bib file.
+     * @return Description of required field set for storage in preferences or BIB file.
      */
     public String getRequiredFieldsString() {
         return String.join(";", required);

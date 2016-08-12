@@ -39,14 +39,15 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,8 +71,8 @@ public class ADSFetcher implements EntryFetcher {
     }
 
     @Override
-    public HelpFiles getHelpPage() {
-        return HelpFiles.FETCHER_ADS;
+    public HelpFile getHelpPage() {
+        return HelpFile.FETCHER_ADS;
     }
 
     @Override
@@ -127,12 +128,12 @@ public class ADSFetcher implements EntryFetcher {
                     getTitle(), JOptionPane.ERROR_MESSAGE);
             LOGGER.debug("File not found", e);
         } catch (IOException e) {
-            status.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url) + "\n\n" + e,
+            status.showMessage(Localization.lang("An exception occurred while accessing '%0'", url) + "\n\n" + e,
                     getTitle(), JOptionPane.ERROR_MESSAGE);
             LOGGER.debug("Problem accessing URL", e);
         } catch (RuntimeException e) {
             status.showMessage(
-                    Localization.lang("An Error occurred while fetching from ADS (%0):", url) + "\n\n" + e.getMessage(),
+                    Localization.lang("An error occurred while fetching from ADS (%0):", url) + "\n\n" + e.getMessage(),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
             LOGGER.warn("Problem fetching from ADS", e);
         }
@@ -159,7 +160,7 @@ public class ADSFetcher implements EntryFetcher {
             while (reader.hasNext()) {
                 reader.next();
                 if (reader.isStartElement() &&
-                        "abstract".equals(reader.getLocalName())) {
+                        FieldName.ABSTRACT.equals(reader.getLocalName())) {
                     isAbstract = true;
                 }
                 if (isAbstract && reader.isCharacters()) {
@@ -171,16 +172,16 @@ public class ADSFetcher implements EntryFetcher {
             }
             String abstractText = abstractSB.toString();
             abstractText = abstractText.replace("\n", " ");
-            entry.setField("abstract", abstractText);
+            entry.setField(FieldName.ABSTRACT, abstractText);
         } catch (XMLStreamException e) {
-            status.showMessage(Localization.lang("An Error occurred while parsing abstract"), getTitle(),
+            status.showMessage(Localization.lang("An error occurred while parsing abstract"), getTitle(),
                     JOptionPane.ERROR_MESSAGE);
         } catch (IOException e) {
-            status.showMessage(Localization.lang("An Exception occurred while accessing '%0'", url) + "\n\n" + e,
+            status.showMessage(Localization.lang("An exception occurred while accessing '%0'", url) + "\n\n" + e,
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         } catch (RuntimeException e) {
             status.showMessage(
-                    Localization.lang("An Error occurred while fetching from ADS (%0):", url) + "\n\n" + e.getMessage(),
+                    Localization.lang("An error occurred while fetching from ADS (%0):", url) + "\n\n" + e.getMessage(),
                     getTitle(), JOptionPane.ERROR_MESSAGE);
         }
     }

@@ -24,14 +24,12 @@ import javax.swing.JButton;
 import javax.swing.KeyStroke;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * This Action keeps a reference to a URL. When activated, it shows the help
@@ -39,31 +37,30 @@ import org.apache.commons.logging.LogFactory;
  */
 public class HelpAction extends MnemonicAwareAction {
 
-    private static final Log LOGGER = LogFactory.getLog(HelpAction.class);
-    private HelpFiles helpPage;
+    private HelpFile helpPage;
 
 
-    public HelpAction(String title, String tooltip, HelpFiles helpPage, KeyStroke key) {
+    public HelpAction(String title, String tooltip, HelpFile helpPage, KeyStroke key) {
         this(title, tooltip, helpPage, IconTheme.JabRefIcon.HELP.getSmallIcon());
         putValue(Action.ACCELERATOR_KEY, key);
     }
 
-    private HelpAction(String title, String tooltip, HelpFiles helpPage, Icon icon) {
+    private HelpAction(String title, String tooltip, HelpFile helpPage, Icon icon) {
         super(icon);
         this.helpPage = helpPage;
         putValue(Action.NAME, title);
         putValue(Action.SHORT_DESCRIPTION, tooltip);
     }
 
-    public HelpAction(String tooltip, HelpFiles helpPage) {
+    public HelpAction(String tooltip, HelpFile helpPage) {
         this(Localization.lang("Help"), tooltip, helpPage, IconTheme.JabRefIcon.HELP.getSmallIcon());
     }
 
-    public HelpAction(HelpFiles helpPage, Icon icon) {
+    public HelpAction(HelpFile helpPage, Icon icon) {
         this(Localization.lang("Help"), Localization.lang("Help"), helpPage, icon);
     }
 
-    public HelpAction(HelpFiles helpPage) {
+    public HelpAction(HelpFile helpPage) {
         this(Localization.lang("Help"), Localization.lang("Help"), helpPage, IconTheme.JabRefIcon.HELP.getSmallIcon());
     }
 
@@ -75,13 +72,13 @@ public class HelpAction extends MnemonicAwareAction {
         return button;
     }
 
-    public void setHelpFile(HelpFiles urlPart) {
+    public void setHelpFile(HelpFile urlPart) {
         this.helpPage = urlPart;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String url = "http://help.jabref.org/" + Globals.prefs.get(JabRefPreferences.LANGUAGE) + "/" + helpPage.getPageName();
+        String url = "https://help.jabref.org/" + Globals.prefs.get(JabRefPreferences.LANGUAGE) + "/" + helpPage.getPageName();
         JabRefDesktop.openBrowserShowPopup(url);
     }
 }

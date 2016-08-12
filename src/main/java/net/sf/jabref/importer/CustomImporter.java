@@ -1,5 +1,5 @@
 /*
- Copyright (C) 2005-2015 Andreas Rudert, Oscar Gustafsson extracted from CustomImportList
+ Copyright (C) 2005-2016 Andreas Rudert, Oscar Gustafsson extracted from CustomImportList
 
  All programs in this directory and
  subdirectories are published under the GNU General Public License as
@@ -35,6 +35,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import net.sf.jabref.importer.fileformat.ImportFormat;
 
@@ -60,11 +61,15 @@ public class CustomImporter implements Comparable<CustomImporter> {
     }
 
     public CustomImporter(String name, String cliId, String className, String basePath) {
-        super();
+        this();
         this.name = name;
         this.cliId = cliId;
         this.className = className;
         this.basePath = basePath;
+    }
+
+    public CustomImporter(ImportFormat importer) {
+        this(importer.getFormatName(), importer.getId(), importer.getClass().getName(), "src/main/java/net/sf/jabref/importer/fileformat/" + importer.getFormatName() + "Importer.java");
     }
 
     public String getName() {
@@ -112,13 +117,25 @@ public class CustomImporter implements Comparable<CustomImporter> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        return (o instanceof CustomImporter) && this.getName().equals(((CustomImporter) o).getName());
+    public boolean equals(Object other) {
+
+        if (this == other) {
+            return true;
+        }
+
+        if (!(other instanceof CustomImporter)) {
+            return false;
+        }
+
+        CustomImporter otherImporter = (CustomImporter) other;
+        return Objects.equals(name, otherImporter.name) && Objects.equals(cliId, otherImporter.cliId)
+                && Objects.equals(className, otherImporter.className)
+                && Objects.equals(basePath, otherImporter.basePath);
     }
 
     @Override
     public int hashCode() {
-        return name.hashCode();
+        return Objects.hash(name, cliId, className, basePath);
     }
 
     @Override

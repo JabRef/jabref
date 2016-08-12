@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sf.jabref.logic.importer.fetcher.ArXiv;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 
 public class EntryFetchers {
@@ -37,12 +38,13 @@ public class EntryFetchers {
         entryFetchers.add(new INSPIREFetcher());
         entryFetchers.add(new ISBNtoBibTeXFetcher());
         entryFetchers.add(new MedlineFetcher());
-        entryFetchers.add(new OAI2Fetcher());
+        // entryFetchers.add(new OAI2Fetcher()); - new arXiv fetcher in place, see below
         // entryFetchers.add(new ScienceDirectFetcher()); currently not working - removed see #409
         entryFetchers.add(new ACMPortalFetcher());
         entryFetchers.add(new GoogleScholarFetcher());
         entryFetchers.add(new DOAJFetcher());
         entryFetchers.add(new SpringerFetcher());
+        entryFetchers.add(new SearchBasedEntryFetcher(new ArXiv()));
     }
 
     public List<EntryFetcher> getEntryFetchers() {

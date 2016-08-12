@@ -8,6 +8,7 @@ import net.sf.jabref.logic.layout.format.RemoveBrackets;
 import net.sf.jabref.logic.mods.PageNumbers;
 import net.sf.jabref.logic.mods.PersonName;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 public class MSBibConverter {
     private static final String MSBIB_PREFIX = "msbib-";
@@ -31,12 +32,12 @@ public class MSBibConverter {
         }
 
         // Duplicate: also added as BookTitle
-        if (entry.hasField("booktitle")) {
-            result.conferenceName = entry.getField("booktitle");
+        if (entry.hasField(FieldName.BOOKTITLE)) {
+            result.conferenceName = entry.getField(FieldName.BOOKTITLE);
         }
 
-        if (entry.hasField("pages")) {
-            result.pages = new PageNumbers(entry.getField("pages"));
+        if (entry.hasField(FieldName.PAGES)) {
+            result.pages = new PageNumbers(entry.getField(FieldName.PAGES));
         }
 
         if (entry.hasField(MSBIB_PREFIX + "accessed")) {
@@ -44,26 +45,26 @@ public class MSBibConverter {
         }
 
         // TODO: currently this can never happen
-        if ("SoundRecording".equals(msbibType) && (entry.hasField("title"))) {
-            result.albumTitle = entry.getField("title");
+        if ("SoundRecording".equals(msbibType) && (entry.hasField(FieldName.TITLE))) {
+            result.albumTitle = entry.getField(FieldName.TITLE);
         }
 
         // TODO: currently this can never happen
-        if ("Interview".equals(msbibType) && (entry.hasField("title"))) {
-            result.broadcastTitle = entry.getField("title");
+        if ("Interview".equals(msbibType) && (entry.hasField(FieldName.TITLE))) {
+            result.broadcastTitle = entry.getField(FieldName.TITLE);
         }
 
         // Value must be converted
-        if (entry.hasField("language")) {
-            result.fields.put("LCID", String.valueOf(MSBibMapping.getLCID(entry.getField("language"))));
+        if (entry.hasField(FieldName.LANGUAGE)) {
+            result.fields.put("LCID", String.valueOf(MSBibMapping.getLCID(entry.getField(FieldName.LANGUAGE))));
         }
 
         result.standardNumber = "";
-        if (entry.hasField("isbn")) {
-            result.standardNumber += " ISBN: " + entry.getField("isbn");
+        if (entry.hasField(FieldName.ISBN)) {
+            result.standardNumber += " ISBN: " + entry.getField(FieldName.ISBN);
         }
-        if (entry.hasField("issn")) {
-            result.standardNumber += " ISSN: " + entry.getField("issn");
+        if (entry.hasField(FieldName.ISSN)) {
+            result.standardNumber += " ISSN: " + entry.getField(FieldName.ISSN);
         }
         if (entry.hasField("lccn")) {
             result.standardNumber += " LCCN: " + entry.getField("lccn");
@@ -71,19 +72,19 @@ public class MSBibConverter {
         if (entry.hasField("mrnumber")) {
             result.standardNumber += " MRN: " + entry.getField("mrnumber");
         }
-        if (entry.hasField("doi")) {
-            result.standardNumber += " DOI: " + entry.getField("doi");
+        if (entry.hasField(FieldName.DOI)) {
+            result.standardNumber += " DOI: " + entry.getField(FieldName.DOI);
         }
         if (result.standardNumber.isEmpty()) {
             result.standardNumber = null;
         }
 
-        if (entry.hasField("address")) {
-            result.address = entry.getField("address");
+        if (entry.hasField(FieldName.ADDRESS)) {
+            result.address = entry.getField(FieldName.ADDRESS);
         }
 
-        if (entry.hasField("type")) {
-            result.thesisType = entry.getField("type");
+        if (entry.hasField(FieldName.TYPE)) {
+            result.thesisType = entry.getField(FieldName.TYPE);
         } else {
             if ("techreport".equalsIgnoreCase(entry.getType())) {
                 result.thesisType = "Tech. rep.";
@@ -98,21 +99,21 @@ public class MSBibConverter {
 
         // TODO: currently this can never happen
         if (("InternetSite".equals(msbibType) || "DocumentFromInternetSite".equals(msbibType))
-                && (entry.hasField("title"))) {
-            result.internetSiteTitle = entry.getField("title");
+                && (entry.hasField(FieldName.TITLE))) {
+            result.internetSiteTitle = entry.getField(FieldName.TITLE);
         }
 
         // TODO: currently only Misc can happen
         if (("ElectronicSource".equals(msbibType) || "Art".equals(msbibType) || "Misc".equals(msbibType))
-                && (entry.hasField("title"))) {
-            result.publicationTitle = entry.getField("title");
+                && (entry.hasField(FieldName.TITLE))) {
+            result.publicationTitle = entry.getField(FieldName.TITLE);
         }
 
-        if (entry.hasField("author")) {
-            result.authors = getAuthors(entry.getField("author"));
+        if (entry.hasField(FieldName.AUTHOR)) {
+            result.authors = getAuthors(entry.getField(FieldName.AUTHOR));
         }
-        if (entry.hasField("editor")) {
-            result.editors = getAuthors(entry.getField("editor"));
+        if (entry.hasField(FieldName.EDITOR)) {
+            result.editors = getAuthors(entry.getField(FieldName.EDITOR));
         }
 
         return result;

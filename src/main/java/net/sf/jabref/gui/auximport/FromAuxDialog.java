@@ -27,7 +27,7 @@
 
  */
 
-// A wizard dialog for generating a new sub database from existing TeX aux file
+// A wizard dialog for generating a new sub database from existing TeX AUX file
 //
 // created by : r.nagel 23.08.2004
 //
@@ -38,8 +38,6 @@ package net.sf.jabref.gui.auximport;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.Collections;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -49,7 +47,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -60,8 +57,9 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.auxparser.AuxParser;
 import net.sf.jabref.logic.auxparser.AuxParserResult;
@@ -73,6 +71,7 @@ import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
 public class FromAuxDialog extends JDialog {
+
     private final JPanel statusPanel = new JPanel();
     private final JPanel buttons = new JPanel();
     private final JButton generateButton = new JButton();
@@ -95,8 +94,7 @@ public class FromAuxDialog extends JDialog {
     private final JabRefFrame parentFrame;
 
 
-    public FromAuxDialog(JabRefFrame frame, String title, boolean modal,
-                         JTabbedPane viewedDBs) {
+    public FromAuxDialog(JabRefFrame frame, String title, boolean modal, JTabbedPane viewedDBs) {
         super(frame, title, modal);
 
         parentTabbedPane = viewedDBs;
@@ -141,9 +139,11 @@ public class FromAuxDialog extends JDialog {
         this.setTitle(Localization.lang("AUX file import"));
         JLabel desc = new JLabel("<html><h3>" + Localization.lang("AUX file import") + "</h3><p>"
                 + Localization.lang("This feature generates a new database based on which entries "
-                + "are needed in an existing LaTeX document.") + "</p>"
-                + "<p>" + Localization.lang("You need to select one of your open databases from which to choose "
-                + "entries, as well as the AUX file produced by LaTeX when compiling your document.") + "</p></html>");
+                        + "are needed in an existing LaTeX document.")
+                + "</p>" + "<p>"
+                + Localization.lang("You need to select one of your open databases from which to choose "
+                        + "entries, as well as the AUX file produced by LaTeX when compiling your document.")
+                + "</p></html>");
         desc.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         panel1.add(desc, BorderLayout.NORTH);
 
@@ -160,6 +160,7 @@ public class FromAuxDialog extends JDialog {
         InputMap im = statusPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -184,15 +185,15 @@ public class FromAuxDialog extends JDialog {
 
         auxFileField = new JTextField("", 25);
         JButton browseAuxFileButton = new JButton(Localization.lang("Browse"));
-        browseAuxFileButton.addActionListener(new BrowseAction(auxFileField, parentFrame));
+        browseAuxFileButton.addActionListener(BrowseAction.buildForFile(auxFileField, FileExtensions.AUX));
         notFoundList = new JList<>();
         JScrollPane listScrollPane = new JScrollPane(notFoundList);
         statusInfos = new JTextArea("", 5, 20);
         JScrollPane statusScrollPane = new JScrollPane(statusInfos);
         statusInfos.setEditable(false);
 
-        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout(
-                "left:pref, 4dlu, fill:pref:grow, 4dlu, left:pref", ""), buttons);
+        DefaultFormBuilder b = new DefaultFormBuilder(
+                new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, left:pref", ""), buttons);
         b.appendSeparator(Localization.lang("Options"));
         b.append(Localization.lang("Reference database") + ":");
         b.append(dbChooser, 3);
@@ -202,8 +203,8 @@ public class FromAuxDialog extends JDialog {
         b.append(browseAuxFileButton);
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        b = new DefaultFormBuilder(new FormLayout(
-                "fill:pref:grow, 4dlu, fill:pref:grow", "pref, pref, fill:pref:grow"), statusPanel);
+        b = new DefaultFormBuilder(new FormLayout("fill:pref:grow, 4dlu, fill:pref:grow", "pref, pref, fill:pref:grow"),
+                statusPanel);
         b.appendSeparator(Localization.lang("Result"));
         b.append(Localization.lang("Unknown BibTeX entries") + ":");
         b.append(Localization.lang("Messages") + ":");
@@ -249,28 +250,4 @@ public class FromAuxDialog extends JDialog {
         return auxParser.parse().getGeneratedBibDatabase();
     }
 
-    /**
-     * Action used to produce a "Browse" button for one of the text fields.
-     */
-    static class BrowseAction extends AbstractAction {
-        private final JTextField comp;
-        private final JabRefFrame frame;
-
-
-        public BrowseAction(JTextField tc, JabRefFrame frame) {
-            super(Localization.lang("Browse"));
-            this.frame = frame;
-            comp = tc;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String chosen = FileDialogs.getNewFile(frame, new File(comp.getText()), Collections.singletonList(".aux"),
-                    JFileChooser.OPEN_DIALOG, false);
-            if (chosen != null) {
-                File newFile = new File(chosen);
-                comp.setText(newFile.getPath());
-            }
-        }
-    }
 }

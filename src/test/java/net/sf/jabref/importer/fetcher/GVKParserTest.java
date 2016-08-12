@@ -5,13 +5,14 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -64,19 +65,19 @@ public class GVKParserTest {
             Assert.assertEquals(5, entries.size());
 
             BibEntry entry = entries.get(0);
-            Assert.assertEquals(null, entry.getField("subtitle"));
+            Assert.assertEquals(Optional.empty(), entry.getFieldOptional("subtitle"));
 
             entry = entries.get(1);
-            Assert.assertEquals("C", entry.getField("subtitle"));
+            Assert.assertEquals(Optional.of("C"), entry.getFieldOptional("subtitle"));
 
             entry = entries.get(2);
-            Assert.assertEquals("Word", entry.getField("subtitle"));
+            Assert.assertEquals(Optional.of("Word"), entry.getFieldOptional("subtitle"));
 
             entry = entries.get(3);
-            Assert.assertEquals("Word1 word2", entry.getField("subtitle"));
+            Assert.assertEquals(Optional.of("Word1 word2"), entry.getFieldOptional("subtitle"));
 
             entry = entries.get(4);
-            Assert.assertEquals("Word1 word2", entry.getField("subtitle"));
+            Assert.assertEquals(Optional.of("Word1 word2"), entry.getFieldOptional("subtitle"));
         }
     }
 }

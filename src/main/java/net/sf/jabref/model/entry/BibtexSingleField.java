@@ -30,7 +30,7 @@ public class BibtexSingleField {
 
 
     // the field name
-    private final String name;
+    private String name;
 
     // contains the standard, private, displayable, writable infos
     // default is: not standard, public, displayable and writable
@@ -93,6 +93,10 @@ public class BibtexSingleField {
 
     public void setPrivate() {
         flags.add(Flag.PRIVATE);
+    }
+
+    public void setPublic() {
+        flags.remove(Flag.PRIVATE);
     }
 
     public boolean isPrivate() {
@@ -162,6 +166,10 @@ public class BibtexSingleField {
 
     public boolean isNumeric() {
         return extras.contains(FieldProperties.NUMERIC);
+    }
+
+    public void setName(String fieldName) {
+        name = fieldName;
     }
 
 }

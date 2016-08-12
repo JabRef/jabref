@@ -24,6 +24,7 @@ import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
@@ -34,8 +35,8 @@ import javax.swing.Timer;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileMenuItem;
+import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.BasePanelMode;
 import net.sf.jabref.gui.FileListEntry;
@@ -50,7 +51,8 @@ import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.specialfields.SpecialField;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
@@ -62,7 +64,7 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * List event, mouse, key and focus listener for the main table that makes up the
- * most part of the BasePanel for a single bib database.
+ * most part of the BasePanel for a single BIB database.
  */
 public class MainTableSelectionListener implements ListEventListener<BibEntry>, MouseListener,
         KeyListener, FocusListener {
@@ -119,7 +121,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             return;
         }
         EventList<BibEntry> selected = e.getSourceList();
-        Object newSelected = null;
+        BibEntry newSelected = null;
         while (e.next()) {
             if (e.getType() == ListEvent.INSERT) {
                 if (newSelected == null) {
@@ -135,7 +137,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         if (newSelected != null) {
 
             // Ok, we have a single new entry that has been selected. Now decide what to do with it:
-            final BibEntry toShow = (BibEntry) newSelected;
+            final BibEntry toShow = newSelected;
             final BasePanelMode mode = panel.getMode(); // What is the panel already showing?
             if ((mode == BasePanelMode.WILL_SHOW_EDITOR) || (mode == BasePanelMode.SHOWING_EDITOR)) {
                 // An entry is currently being edited.
@@ -293,11 +295,11 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 for (String fieldName : fieldNames) {
                     // Check if field is present, if not skip this field
                     if (entry.hasField(fieldName)) {
-                        String link = entry.getField(fieldName);
+                        String link = entry.getFieldOptional(fieldName).get();
 
                         // See if this is a simple file link field, or if it is a file-list
                         // field that can specify a list of links:
-                        if (fieldName.equals(Globals.FILE_FIELD)) {
+                        if (fieldName.equals(FieldName.FILE)) {
 
                             // We use a FileListTableModel to parse the field content:
                             FileListTableModel fileList = new FileListTableModel();
@@ -318,7 +320,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             }
                             if (flEntry != null) {
                                 ExternalFileMenuItem item = new ExternalFileMenuItem(panel.frame(), entry, "",
-                                        flEntry.link, flEntry.type.get().getIcon(),
+                                        flEntry.link, flEntry.type.map(ExternalFileType::getIcon).orElse(null),
                                         panel.getBibDatabaseContext(), flEntry.type);
                                 boolean success = item.openLink();
                                 if (!success) {
@@ -337,6 +339,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     }
                 }
             });
+        } else if (modelColumn.getBibtexFields().contains(FieldName.CROSSREF)) { // Clicking on crossref column
+            tableRows.get(row).getFieldOptional(FieldName.CROSSREF)
+                    .ifPresent(crossref -> panel.getDatabase().getEntryByKey(crossref).ifPresent(entry -> panel.highlightEntry(entry)));
         }
     }
 
@@ -348,19 +353,20 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
      * @param columnName the name of the specialfield column
      */
     private void handleSpecialFieldLeftClick(MouseEvent e, String columnName) {
-        SpecialField field = SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(columnName);
-        if ((e.getClickCount() == 1) && (field != null)) {
-            // special field found
-            if (field.isSingleValueField()) {
-                // directly execute toggle action instead of showing a menu with one action
-                field.getValues().get(0).getAction(panel.frame()).action();
-            } else {
-                JPopupMenu menu = new JPopupMenu();
-                for (SpecialFieldValue val : field.getValues()) {
-                    menu.add(val.getMenuAction(panel.frame()));
+        if ((e.getClickCount() == 1)) {
+            SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(columnName).ifPresent(field -> {
+                // special field found
+                if (field.isSingleValueField()) {
+                    // directly execute toggle action instead of showing a menu with one action
+                    field.getValues().get(0).getAction(panel.frame()).action();
+                } else {
+                    JPopupMenu menu = new JPopupMenu();
+                    for (SpecialFieldValue val : field.getValues()) {
+                        menu.add(val.getMenuAction(panel.frame()));
+                    }
+                    menu.show(table, e.getX(), e.getY());
                 }
-                menu.show(table, e.getX(), e.getY());
-            }
+            });
         }
     }
 
@@ -397,11 +403,10 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         // field that can specify a list of links:
         if(!column.getBibtexFields().isEmpty()) {
             for(String field : column.getBibtexFields()) {
-                if (Globals.FILE_FIELD.equals(field)) {
+                if (FieldName.FILE.equals(field)) {
                     // We use a FileListTableModel to parse the field content:
-                    String fileFieldContent = entry.getField(field);
                     FileListTableModel fileList = new FileListTableModel();
-                    fileList.setContent(fileFieldContent);
+                    entry.getFieldOptional(field).ifPresent(fileList::setContent);
                     for (int i = 0; i < fileList.getRowCount(); i++) {
                         FileListEntry flEntry = fileList.getEntry(i);
                         if (column.isFileFilter()
@@ -422,8 +427,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                         // full pop should be shown as left click already shows short popup
                         showDefaultPopup = true;
                     } else {
-                        if (entry.hasField(field)) {
-                            String content = entry.getField(field);
+                        Optional<String> content = entry.getFieldOptional(field);
+                        if (content.isPresent()) {
                             Icon icon;
                             JLabel iconLabel = GUIGlobals.getTableIcon(field);
                             if (iconLabel == null) {
@@ -431,7 +436,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             } else {
                                 icon = iconLabel.getIcon();
                             }
-                            menu.add(new ExternalFileMenuItem(panel.frame(), entry, content, content, icon,
+                            menu.add(new ExternalFileMenuItem(panel.frame(), entry, content.get(), content.get(), icon,
                                     panel.getBibDatabaseContext(), field));
                             showDefaultPopup = false;
                         }
@@ -569,5 +574,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     @Override
     public void focusLost(FocusEvent e) {
         lastPressedCount = 0; // Reset quick jump when focus is lost.
+    }
+
+    public PreviewPanel getPreview() {
+        return preview;
     }
 }

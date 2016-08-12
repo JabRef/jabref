@@ -29,7 +29,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -69,7 +68,6 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryUtil;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -100,7 +98,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         this.databaseContext = databaseContext;
         this.fieldName = fieldName;
         this.entryEditor = entryEditor;
-        label = new FieldNameLabel(" " + EntryUtil.capitalizeFirst(fieldName) + " ");
+        label = new FieldNameLabel(fieldName);
         tableModel = new FileListTableModel();
         setText(content);
         setModel(tableModel);
@@ -435,8 +433,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     public void autoSetLinks() {
         auto.setEnabled(false);
 
-        Collection<BibEntry> entries = new ArrayList<>();
-        entries.addAll(frame.getCurrentBasePanel().getSelectedEntries());
+        List<BibEntry> entries = new ArrayList<>(frame.getCurrentBasePanel().getSelectedEntries());
 
         // filesystem lookup
         JDialog dialog = new JDialog(frame, true);
@@ -464,8 +461,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
      * Run a file download operation.
      */
     private void downloadFile() {
-        String bibtexKey = entryEditor.getEntry().getCiteKey();
-        if (bibtexKey == null) {
+        Optional<String> bibtexKey = entryEditor.getEntry().getCiteKeyOptional();
+        if (!bibtexKey.isPresent()) {
             int answer = JOptionPane.showConfirmDialog(frame,
                     Localization.lang("This entry has no BibTeX key. Generate key now?"),
                     Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
@@ -473,11 +470,11 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             if (answer == JOptionPane.OK_OPTION) {
                 ActionListener l = entryEditor.getGenerateKeyAction();
                 l.actionPerformed(null);
-                bibtexKey = entryEditor.getEntry().getCiteKey();
+                bibtexKey = entryEditor.getEntry().getCiteKeyOptional();
             }
         }
         DownloadExternalFile def = new DownloadExternalFile(frame,
-                frame.getCurrentBasePanel().getBibDatabaseContext(), bibtexKey);
+                frame.getCurrentBasePanel().getBibDatabaseContext(), bibtexKey.orElse(null));
         try {
             def.download(this);
         } catch (IOException ex) {

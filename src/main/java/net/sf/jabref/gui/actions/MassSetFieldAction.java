@@ -19,6 +19,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.swing.AbstractAction;
@@ -153,9 +154,17 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         diag.pack();
 
         ok.addActionListener(e -> {
+            // Check that any field name is set
+            String fieldText = (String) field.getSelectedItem();
+            if ((fieldText == null) || fieldText.trim().isEmpty()) {
+                JOptionPane.showMessageDialog(diag, Localization.lang("You must enter at least one field name"), "",
+                        JOptionPane.ERROR_MESSAGE);
+                return; // Do not close the dialog.
+            }
+
             // Check if the user tries to rename multiple fields:
             if (rename.isSelected()) {
-                String[] fields = getFieldNames((String) field.getSelectedItem());
+                String[] fields = getFieldNames(fieldText);
                 if (fields.length > 1) {
                     JOptionPane.showMessageDialog(diag, Localization.lang("You can only rename one field at a time"),
                             "", JOptionPane.ERROR_MESSAGE);
@@ -228,6 +237,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
         if (toSet.isEmpty()) {
             toSet = null;
         }
+
         String[] fields = getFieldNames(((String) field.getSelectedItem()).trim().toLowerCase());
         NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
         if (rename.isSelected()) {
@@ -266,11 +276,11 @@ public class MassSetFieldAction extends MnemonicAwareAction {
 
         NamedCompound ce = new NamedCompound(Localization.lang("Set field"));
         for (BibEntry entry : entries) {
-            String oldVal = entry.getField(field);
+            Optional<String> oldVal = entry.getFieldOptional(field);
             // If we are not allowed to overwrite values, check if there is a
             // nonempty
             // value already for this entry:
-            if (!overwriteValues && (oldVal != null) && !oldVal.isEmpty()) {
+            if (!overwriteValues && (oldVal.isPresent()) && !oldVal.get().isEmpty()) {
                 continue;
             }
             if (text == null) {
@@ -278,7 +288,7 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             } else {
                 entry.setField(field, text);
             }
-            ce.addEdit(new UndoableFieldChange(entry, field, oldVal, text));
+            ce.addEdit(new UndoableFieldChange(entry, field, oldVal.orElse(null), text));
         }
         ce.end();
         return ce;
@@ -298,22 +308,22 @@ public class MassSetFieldAction extends MnemonicAwareAction {
             boolean overwriteValues) {
         NamedCompound ce = new NamedCompound(Localization.lang("Rename field"));
         for (BibEntry entry : entries) {
-            String valToMove = entry.getField(field);
+            Optional<String> valToMove = entry.getFieldOptional(field);
             // If there is no value, do nothing:
-            if ((valToMove == null) || valToMove.isEmpty()) {
+            if ((!valToMove.isPresent()) || valToMove.get().isEmpty()) {
                 continue;
             }
             // If we are not allowed to overwrite values, check if there is a
             // non-empty value already for this entry for the new field:
-            String valInNewField = entry.getField(newField);
-            if (!overwriteValues && (valInNewField != null) && !valInNewField.isEmpty()) {
+            Optional<String> valInNewField = entry.getFieldOptional(newField);
+            if (!overwriteValues && (valInNewField.isPresent()) && !valInNewField.get().isEmpty()) {
                 continue;
             }
 
-            entry.setField(newField, valToMove);
-            ce.addEdit(new UndoableFieldChange(entry, newField, valInNewField, valToMove));
+            entry.setField(newField, valToMove.get());
+            ce.addEdit(new UndoableFieldChange(entry, newField, valInNewField.orElse(null), valToMove.get()));
             entry.clearField(field);
-            ce.addEdit(new UndoableFieldChange(entry, field, valToMove, null));
+            ce.addEdit(new UndoableFieldChange(entry, field, valToMove.get(), null));
         }
         ce.end();
         return ce;

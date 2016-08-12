@@ -17,6 +17,7 @@ package net.sf.jabref.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -26,6 +27,7 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
@@ -61,10 +63,10 @@ public class DuplicateCheck {
 
 
     static {
-        DuplicateCheck.FIELD_WEIGHTS.put("author", 2.5);
-        DuplicateCheck.FIELD_WEIGHTS.put("editor", 2.5);
-        DuplicateCheck.FIELD_WEIGHTS.put("title", 3.);
-        DuplicateCheck.FIELD_WEIGHTS.put("journal", 2.);
+        DuplicateCheck.FIELD_WEIGHTS.put(FieldName.AUTHOR, 2.5);
+        DuplicateCheck.FIELD_WEIGHTS.put(FieldName.EDITOR, 2.5);
+        DuplicateCheck.FIELD_WEIGHTS.put(FieldName.TITLE, 3.);
+        DuplicateCheck.FIELD_WEIGHTS.put(FieldName.JOURNAL, 2.);
     }
 
 
@@ -84,13 +86,12 @@ public class DuplicateCheck {
         EntryType type = EntryTypes.getTypeOrDefault(one.getType(), bibDatabaseMode);
 
         // The check if they have the same required fields:
-        java.util.List<String> var = type.getRequiredFieldsFlat();
-        String[] fields = var.toArray(new String[var.size()]);
+        List<String> var = type.getRequiredFieldsFlat();
         double[] req;
-        if (fields == null) {
+        if (var == null) {
             req = new double[]{0., 0.};
         } else {
-            req = DuplicateCheck.compareFieldSet(fields, one, two);
+            req = DuplicateCheck.compareFieldSet(var, one, two);
         }
 
         if (Math.abs(req[0] - DuplicateCheck.duplicateThreshold) > DuplicateCheck.DOUBT_RANGE) {
@@ -98,17 +99,16 @@ public class DuplicateCheck {
             return req[0] >= DuplicateCheck.duplicateThreshold;
         }
         // Close to the threshold value, so we take a look at the optional fields, if any:
-        java.util.List<String> optionalFields = type.getOptionalFields();
-        fields = optionalFields.toArray(new String[optionalFields.size()]);
-        if (fields != null) {
-            double[] opt = DuplicateCheck.compareFieldSet(fields, one, two);
+        List<String> optionalFields = type.getOptionalFields();
+        if (optionalFields != null) {
+            double[] opt = DuplicateCheck.compareFieldSet(optionalFields, one, two);
             double totValue = ((DuplicateCheck.REQUIRED_WEIGHT * req[0] * req[1]) + (opt[0] * opt[1])) / ((req[1] * DuplicateCheck.REQUIRED_WEIGHT) + opt[1]);
             return totValue >= DuplicateCheck.duplicateThreshold;
         }
         return req[0] >= DuplicateCheck.duplicateThreshold;
     }
 
-    private static double[] compareFieldSet(String[] fields, BibEntry one, BibEntry two) {
+    private static double[] compareFieldSet(List<String> fields, BibEntry one, BibEntry two) {
         double res = 0;
         double totWeights = 0.;
         for (String field : fields) {
@@ -133,52 +133,56 @@ public class DuplicateCheck {
     }
 
     private static int compareSingleField(String field, BibEntry one, BibEntry two) {
-        String s1 = one.getField(field);
-        String s2 = two.getField(field);
-        if (s1 == null) {
-            if (s2 == null) {
+        Optional<String> optionalStringOne = one.getFieldOptional(field);
+        Optional<String> optionalStringTwo = two.getFieldOptional(field);
+        if (!optionalStringOne.isPresent()) {
+            if (!optionalStringTwo.isPresent()) {
                 return EMPTY_IN_BOTH;
             }
             return EMPTY_IN_ONE;
-        } else if (s2 == null) {
+        } else if (!optionalStringTwo.isPresent()) {
             return EMPTY_IN_TWO;
         }
+
+        // Both strings present
+        String stringOne = optionalStringOne.get();
+        String stringTwo = optionalStringTwo.get();
 
         if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
             // Specific for name fields.
             // Harmonise case:
-            String auth1 = AuthorList.fixAuthorLastNameOnlyCommas(s1, false).replace(" and ", " ").toLowerCase();
-            String auth2 = AuthorList.fixAuthorLastNameOnlyCommas(s2, false).replace(" and ", " ").toLowerCase();
-            double similarity = DuplicateCheck.correlateByWords(auth1, auth2);
+            String authorOne = AuthorList.fixAuthorLastNameOnlyCommas(stringOne, false).replace(" and ", " ").toLowerCase();
+            String authorTwo = AuthorList.fixAuthorLastNameOnlyCommas(stringTwo, false).replace(" and ", " ").toLowerCase();
+            double similarity = DuplicateCheck.correlateByWords(authorOne, authorTwo);
             if (similarity > 0.8) {
                 return EQUAL;
             }
             return NOT_EQUAL;
-        } else if ("pages".equals(field)) {
+        } else if (FieldName.PAGES.equals(field)) {
             // Pages can be given with a variety of delimiters, "-", "--", " - ", " -- ".
             // We do a replace to harmonize these to a simple "-":
             // After this, a simple test for equality should be enough:
-            s1 = s1.replaceAll("[- ]+", "-");
-            s2 = s2.replaceAll("[- ]+", "-");
-            if (s1.equals(s2)) {
+            stringOne = stringOne.replaceAll("[- ]+", "-");
+            stringTwo = stringTwo.replaceAll("[- ]+", "-");
+            if (stringOne.equals(stringTwo)) {
                 return EQUAL;
             }
             return NOT_EQUAL;
-        } else if ("journal".equals(field)) {
+        } else if (FieldName.JOURNAL.equals(field)) {
             // We do not attempt to harmonize abbreviation state of the journal names,
             // but we remove periods from the names in case they are abbreviated with
             // and without dots:
-            s1 = s1.replace(".", "").toLowerCase();
-            s2 = s2.replace(".", "").toLowerCase();
-            double similarity = DuplicateCheck.correlateByWords(s1, s2);
+            stringOne = stringOne.replace(".", "").toLowerCase();
+            stringTwo = stringTwo.replace(".", "").toLowerCase();
+            double similarity = DuplicateCheck.correlateByWords(stringOne, stringTwo);
             if (similarity > 0.8) {
                 return EQUAL;
             }
             return NOT_EQUAL;
         } else {
-            s1 = s1.toLowerCase();
-            s2 = s2.toLowerCase();
-            double similarity = DuplicateCheck.correlateByWords(s1, s2);
+            stringOne = stringOne.toLowerCase();
+            stringTwo = stringTwo.toLowerCase();
+            double similarity = DuplicateCheck.correlateByWords(stringOne, stringTwo);
             if (similarity > 0.8) {
                 return EQUAL;
             }
@@ -193,9 +197,9 @@ public class DuplicateCheck {
 
         int score = 0;
         for (String field : allFields) {
-            Object en = one.getField(field);
-            Object to = two.getField(field);
-            if (((en != null) && (to != null) && en.equals(to)) || ((en == null) && (to == null))) {
+            Optional<String> stringOne = one.getFieldOptional(field);
+            Optional<String> stringTwo = two.getFieldOptional(field);
+            if (stringOne.equals(stringTwo)) {
                 score++;
             }
         }

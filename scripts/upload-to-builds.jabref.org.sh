@@ -33,4 +33,4 @@ command="${command}exit\n"
 
 # now $command is complete
 
-echo -e "$command" | sftp -P 9922 builds_jabref_org@builds.jabref.org
+echo -e "$command" | sftp -P 9922 builds_jabref_org@build-upload.jabref.org

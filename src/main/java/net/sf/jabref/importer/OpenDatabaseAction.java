@@ -19,10 +19,12 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.nio.file.attribute.FileTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.Action;
 import javax.swing.JOptionPane;
@@ -32,16 +34,15 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.exporter.AutoSaveManager;
-import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.ParserResultWarningDialog;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import net.sf.jabref.gui.exporter.AutoSaveManager;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.importer.fileformat.BibtexImporter;
@@ -52,6 +53,7 @@ import net.sf.jabref.migrations.FileLinksUpgradeWarning;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
 import org.apache.commons.logging.Log;
@@ -71,7 +73,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     private static final List<PostOpenAction> POST_OPEN_ACTIONS = new ArrayList<>();
 
     static {
-        // Add the action for checking for new custom entry types loaded from the bib file:
+        // Add the action for checking for new custom entry types loaded from the BIB file:
         POST_OPEN_ACTIONS.add(new CheckForNewEntryTypesAction());
         // Add the action for converting legacy entries in ExplicitGroup
         POST_OPEN_ACTIONS.add(new ConvertLegacyExplicitGroups());
@@ -80,6 +82,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // Add the action for warning about and handling duplicate BibTeX keys:
         POST_OPEN_ACTIONS.add(new HandleDuplicateWarnings());
     }
+
 
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
         super(IconTheme.JabRefIcon.OPEN.getIcon());
@@ -95,13 +98,14 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         List<File> filesToOpen = new ArrayList<>();
 
         if (showDialog) {
-            List<String> chosenStrings = FileDialogs.getMultipleFiles(frame,
-                    new File(Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY)), Collections.singletonList(".bib"),
-                    true);
+
+            List<String> chosenStrings = new NewFileDialogs(frame).withExtension(FileExtensions.BIBTEX_DB)
+                    .showDlgAndGetMultipleFiles();
+
             for (String chosen : chosenStrings) {
-                if (chosen != null) {
-                    filesToOpen.add(new File(chosen));
-                }
+
+                filesToOpen.add(new File(chosen));
+
             }
         } else {
             LOGGER.info(Action.NAME + " " + e.getActionCommand());
@@ -110,6 +114,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         openFiles(filesToOpen, true);
     }
+
 
     /**
      * Opens the given file. If null or 404, nothing happens
@@ -141,11 +146,12 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         int removed = 0;
 
         // Check if any of the files are already open:
-        for (Iterator<File> iterator = filesToOpen.iterator(); iterator.hasNext(); ) {
+        for (Iterator<File> iterator = filesToOpen.iterator(); iterator.hasNext();) {
             File file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
                 BasePanel basePanel = frame.getBasePanelAt(i);
-                if ((basePanel.getBibDatabaseContext().getDatabaseFile() != null) && basePanel.getBibDatabaseContext().getDatabaseFile().equals(file)) {
+                if ((basePanel.getBibDatabaseContext().getDatabaseFile() != null)
+                        && basePanel.getBibDatabaseContext().getDatabaseFile().equals(file)) {
                     iterator.remove();
                     removed++;
                     // See if we removed the final one. If so, we must perhaps
@@ -175,7 +181,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // If no files are remaining to open, this could mean that a file was
         // already open. If so, we may have to raise the correct tab:
         else if (toRaise != null) {
-            frame.output(Localization.lang("File '%0' is already open.", toRaise.getBibDatabaseContext().getDatabaseFile().getPath()));
+            frame.output(Localization.lang("File '%0' is already open.",
+                    toRaise.getBibDatabaseContext().getDatabaseFile().getPath()));
             frame.getTabbedPane().setSelectedComponent(toRaise);
         }
 
@@ -199,12 +206,17 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             } else if (autoSaveFound) {
                 // We have found a newer autosave, but we are not allowed to use it without
                 // prompting.
-                int answer = JOptionPane.showConfirmDialog(null,
-                        "<html>" + Localization
-                                .lang("An autosave file was found for this database. This could indicate "
-                                        + "that JabRef didn't shut down cleanly last time the file was used.")
-                                + "<br>" + Localization.lang("Do you want to recover the database from the autosave file?")
-                                + "</html>", Localization.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
+                int answer = JOptionPane
+                        .showConfirmDialog(
+                                null, "<html>"
+                                        + Localization
+                                                .lang("An autosave file was found for this database. This could indicate "
+                                                        + "that JabRef did not shut down cleanly last time the file was used.")
+                                        + "<br>"
+                                        + Localization
+                                                .lang("Do you want to recover the database from the autosave file?")
+                                        + "</html>",
+                                Localization.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
                 if (answer == JOptionPane.YES_OPTION) {
                     fileToLoad = AutoSaveManager.getAutoSaveFile(file);
                     tryingAutosave = true;
@@ -217,10 +229,10 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getPath());
                 // Should this be done _after_ we know it was successfully opened?
 
-                if (FileBasedLock.hasLockFile(file)) {
-                    long modificationTIme = FileBasedLock.getLockFileTimeStamp(file);
-                    if ((modificationTIme != -1)
-                            && ((System.currentTimeMillis() - modificationTIme) > SaveSession.LOCKFILE_CRITICAL_AGE)) {
+                if (FileBasedLock.hasLockFile(file.toPath())) {
+                    Optional<FileTime> modificationTime = FileBasedLock.getLockFileTimeStamp(file.toPath());
+                    if ((modificationTime.isPresent()) && ((System.currentTimeMillis()
+                            - modificationTime.get().toMillis()) > FileBasedLock.LOCKFILE_CRITICAL_AGE)) {
                         // The lock file is fairly old, so we can offer to "steal" the file:
                         int answer = JOptionPane.showConfirmDialog(null,
                                 "<html>" + Localization.lang("Error opening file") + " '" + fileName + "'. "
@@ -228,11 +240,11 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                                         + Localization.lang("Do you want to override the file lock?"),
                                 Localization.lang("File locked"), JOptionPane.YES_NO_OPTION);
                         if (answer == JOptionPane.YES_OPTION) {
-                            FileBasedLock.deleteLockFile(file);
+                            FileBasedLock.deleteLockFile(file.toPath());
                         } else {
                             return;
                         }
-                    } else if (!FileBasedLock.waitForFileLock(file, 10)) {
+                    } else if (!FileBasedLock.waitForFileLock(file.toPath(), 10)) {
                         JOptionPane.showMessageDialog(null,
                                 Localization.lang("Error opening file") + " '" + fileName + "'. "
                                         + Localization.lang("File is locked by another JabRef instance."),
@@ -296,7 +308,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
      * Go through the list of post open actions, and perform those that need to be performed.
      *
      * @param panel  The BasePanel where the database is shown.
-     * @param result The result of the bib file parse operation.
+     * @param result The result of the BIB file parse operation.
      */
     public static void performPostOpenActions(BasePanel panel, ParserResult result, boolean mustRaisePanel) {
         for (PostOpenAction action : OpenDatabaseAction.POST_OPEN_ACTIONS) {
@@ -316,10 +328,12 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         MetaData meta = result.getMetaData();
 
         if (result.hasWarnings()) {
-            JabRefExecutorService.INSTANCE.execute(() -> ParserResultWarningDialog.showParserResultWarningDialog(result, frame));
+            JabRefExecutorService.INSTANCE
+                    .execute(() -> ParserResultWarningDialog.showParserResultWarningDialog(result, frame));
         }
 
-        Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
+        Defaults defaults = new Defaults(
+                BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
         BasePanel basePanel = new BasePanel(frame, new BibDatabaseContext(database, meta, file, defaults));
 
         // file is set to null inside the EventDispatcherThread
@@ -338,13 +352,13 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // Open and parse file
         ParserResult result = new BibtexImporter().importDatabase(fileToOpen.toPath(), defaultEncoding);
 
-            if (SpecialFieldsUtils.keywordSyncEnabled()) {
-                NamedCompound compound = new NamedCompound("SpecialFieldSync");
-                for (BibEntry entry : result.getDatabase().getEntries()) {
-                    SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
-                }
-                LOGGER.debug("Synchronized special fields based on keywords");
+        if (SpecialFieldsUtils.keywordSyncEnabled()) {
+            NamedCompound compound = new NamedCompound("SpecialFieldSync");
+            for (BibEntry entry : result.getDatabase().getEntries()) {
+                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
             }
+            LOGGER.debug("Synchronized special fields based on keywords");
+        }
 
         return result;
     }
@@ -352,7 +366,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
     /**
      * Load database (bib-file) or, if there exists, a newer autosave version, unless the flag is set to ignore the autosave
      *
-     * @param name Name of the bib-file to open
+     * @param name Name of the BIB-file to open
      * @param ignoreAutosave true if autosave version of the file should be ignored
      * @return ParserResult which never is null
      */
@@ -383,7 +397,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 }
             }
 
-            if (!FileBasedLock.waitForFileLock(file, 10)) {
+            if (!FileBasedLock.waitForFileLock(file.toPath(), 10)) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + name + "'. "
                         + "File is locked by another JabRef instance.");
                 return ParserResult.getNullResult();

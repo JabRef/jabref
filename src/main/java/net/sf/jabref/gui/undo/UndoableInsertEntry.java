@@ -15,9 +15,9 @@
 */
 package net.sf.jabref.gui.undo;
 
-import javax.swing.undo.AbstractUndoableEdit;
-
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -30,7 +30,7 @@ import org.apache.commons.logging.LogFactory;
  * The latter to be able to close the entry's editor if it is opened before
  * the insert is undone.
  */
-public class UndoableInsertEntry extends AbstractUndoableEdit {
+public class UndoableInsertEntry extends AbstractUndoableJabRefEdit {
 
     private final BibDatabase base;
     private final BibEntry entry;
@@ -45,14 +45,10 @@ public class UndoableInsertEntry extends AbstractUndoableEdit {
         this.panel = panel;
     }
 
-    @Override
-    public String getUndoPresentationName() {
-        return "Undo: insert entry";
-    }
 
     @Override
-    public String getRedoPresentationName() {
-        return "Redo: insert entry";
+    public String getPresentationName() {
+        return Localization.lang("insert entry %0", StringUtil.boldHTML(entry.getCiteKey(), ""));
     }
 
     @Override

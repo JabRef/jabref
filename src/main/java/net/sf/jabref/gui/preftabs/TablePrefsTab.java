@@ -16,7 +16,6 @@
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -31,10 +30,11 @@ import javax.swing.JRadioButton;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -83,7 +83,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
          *
          * http://sourceforge.net/tracker/index.php?func=detail&aid=1540646&group_id=92314&atid=600306
          */
-        List<String> fieldNames = new ArrayList<>(InternalBibtexFields.getAllFieldNames());
+        List<String> fieldNames = InternalBibtexFields.getAllPublicFieldNames();
         fieldNames.add(BibEntry.KEY_FIELD);
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
@@ -300,7 +300,7 @@ class TablePrefsTab extends JPanel implements PrefsTab {
         }
         if (!Objects.equals(oldVal, newVal)) {
             prefs.put(JabRefPreferences.NUMERIC_FIELDS, newVal);
-            InternalBibtexFields.setNumericFieldsFromPrefs();
+            InternalBibtexFields.setNumericFields(Globals.prefs.getStringList(JabRefPreferences.NUMERIC_FIELDS));
         }
 
     }

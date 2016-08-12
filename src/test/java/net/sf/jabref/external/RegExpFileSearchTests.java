@@ -25,13 +25,13 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.layout.format.NameFormatter;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -66,7 +66,7 @@ public class RegExpFileSearchTests {
         result = parser.parse();
 
         database = result.getDatabase();
-        entry = database.getEntryByKey("HipKro03");
+        entry = database.getEntryByKey("HipKro03").get();
 
         Assert.assertNotNull(database);
         Assert.assertNotNull(entry);

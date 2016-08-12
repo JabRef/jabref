@@ -18,9 +18,10 @@ package net.sf.jabref.specialfields;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.event.FieldChangedEvent;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.event.FieldChangedEvent;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -43,7 +44,7 @@ public class SpecialFieldUpdateListener {
         // e.g., "keyword = {prio1}, priority = {prio2}" and a change at keyword to prio3 would not succeed.
         SwingUtilities.invokeLater(() -> {
             NamedCompound compound = new NamedCompound("SpecialFieldSync");
-            if ("keywords".equals(fieldName)) {
+            if (FieldName.KEYWORDS.equals(fieldName)) {
                 SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, compound);
                 SwingUtilities
                         .invokeLater(() -> JabRefGUI.getMainFrame().getCurrentBasePanel().updateEntryEditorIfShowing());

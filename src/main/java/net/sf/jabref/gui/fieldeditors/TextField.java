@@ -33,7 +33,6 @@ import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
-import net.sf.jabref.model.entry.EntryUtil;
 
 /**
  * An implementation of the FieldEditor backed by a JTextField. Used for single-line input, only BibTex key at the
@@ -58,12 +57,12 @@ public class TextField extends JTextField implements FieldEditor {
         // Add the global focus listener, so a menu item can see if this field
         // was focused when
         // an action was called.
-        addFocusListener(Globals.focusListener);
+        addFocusListener(Globals.getFocusListener());
         if (changeColorOnFocus) {
             addFocusListener(new FieldEditorFocusListener());
         }
         this.fieldName = fieldName;
-        label = new FieldNameLabel(' ' + EntryUtil.capitalizeFirst(this.fieldName) + ' ');
+        label = new FieldNameLabel(this.fieldName);
         setBackground(GUIGlobals.validFieldBackgroundColor);
         setForeground(GUIGlobals.editorTextColor);
 

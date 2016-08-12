@@ -152,4 +152,33 @@ public class BibtexString implements Cloneable {
     public boolean hasChanged(){
         return hasChanged;
     }
+
+    /*
+    * Returns user comments (arbitrary text before the string) if there are any. If not returns the empty string
+     */
+    public String getUserComments() {
+        if(parsedSerialization != null) {
+
+            try {
+                // get the text before the string
+                String prolog = parsedSerialization.substring(0, parsedSerialization.indexOf('@'));
+
+                // delete trailing whitespaces (between string and text)
+                prolog = prolog.replaceFirst("\\s+$", "");
+                // if there is any non whitespace text, write it with proper line separation
+                if (prolog.length() > 0) {
+                    return prolog;
+                }
+            } catch(StringIndexOutOfBoundsException ignore) {
+                // if this occurs a broken parsed serialization has been set, so just do nothing
+            }
+        }
+
+        return "";
+    }
+
+    @Override
+    public String toString() {
+        return name + "=" + content;
+    }
 }

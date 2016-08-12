@@ -22,14 +22,14 @@ import java.util.Optional;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.logic.fulltext.FindFullText;
+import net.sf.jabref.logic.importer.FulltextFetchers;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,10 +57,13 @@ public class FindFullTextAction extends AbstractWorker {
 
     @Override
     public void run() {
-        // TODO: just download for all entries and save files without dialog
-        entry = basePanel.getSelectedEntries().get(0);
-        FindFullText fft = new FindFullText();
-        result = fft.findFullTextPDF(entry);
+        if (basePanel.getSelectedEntries().size() != 1) {
+            basePanel.output(Localization.lang("This operation requires exactly one item to be selected."));
+        } else {
+            entry = basePanel.getSelectedEntries().get(0);
+            FulltextFetchers fft = new FulltextFetchers();
+            result = fft.findFullTextPDF(entry);
+        }
     }
 
     @Override
@@ -80,12 +83,12 @@ public class FindFullTextAction extends AbstractWorker {
             try {
                 def.download(result.get(), file -> {
                     FileListTableModel tm = new FileListTableModel();
-                    String oldValue = entry.getField(Globals.FILE_FIELD);
-                    tm.setContent(oldValue);
+                    entry.getFieldOptional(FieldName.FILE).ifPresent(tm::setContent);
                     tm.addEntry(tm.getRowCount(), file);
                     String newValue = tm.getStringRepresentation();
-                    UndoableFieldChange edit = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue);
-                    entry.setField(Globals.FILE_FIELD, newValue);
+                    UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
+                            entry.getFieldOptional(FieldName.FILE).orElse(null), newValue);
+                    entry.setField(FieldName.FILE, newValue);
                     basePanel.getUndoManager().addEdit(edit);
                     basePanel.markBaseChanged();
                 });

@@ -4,15 +4,11 @@ import java.util.ArrayList;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.CustomEntryType;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -20,20 +16,6 @@ import static org.junit.Assert.assertNotEquals;
 
 
 public class EntryTypesTestBibtex {
-
-    private JabRefPreferences backup;
-
-
-    @Before
-    public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
-        backup = Globals.prefs;
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        Globals.prefs.overwritePreferences(backup);
-    }
 
     @Test
     public void testBibtexMode() {

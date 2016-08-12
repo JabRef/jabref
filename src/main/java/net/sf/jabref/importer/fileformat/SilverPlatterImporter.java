@@ -27,6 +27,7 @@ import java.util.regex.Pattern;
 import net.sf.jabref.importer.ParserResult;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 /**
  * Imports a SilverPlatter exported file. This is a poor format to parse,
@@ -100,41 +101,41 @@ public class SilverPlatterImporter extends ImportFormat {
                 String f3 = field.substring(0, 2);
                 String frest = field.substring(5);
                 if ("TI".equals(f3)) {
-                    h.put("title", frest);
+                    h.put(FieldName.TITLE, frest);
                 } else if ("AU".equals(f3)) {
                     if (frest.trim().endsWith("(ed)")) {
                         String ed = frest.trim();
                         ed = ed.substring(0, ed.length() - 4);
-                        h.put("editor",
+                        h.put(FieldName.EDITOR,
                                 AuthorList.fixAuthorLastNameFirst(ed.replace(",-", ", ").replace(";", " and ")));
                     } else {
-                        h.put("author",
+                        h.put(FieldName.AUTHOR,
                                 AuthorList.fixAuthorLastNameFirst(frest.replace(",-", ", ").replace(";", " and ")));
                     }
                 } else if ("AB".equals(f3)) {
-                    h.put("abstract", frest);
+                    h.put(FieldName.ABSTRACT, frest);
                 } else if ("DE".equals(f3)) {
                     String kw = frest.replace("-;", ",").toLowerCase();
-                    h.put("keywords", kw.substring(0, kw.length() - 1));
+                    h.put(FieldName.KEYWORDS, kw.substring(0, kw.length() - 1));
                 } else if ("SO".equals(f3)) {
                     int m = frest.indexOf('.');
                     if (m >= 0) {
                         String jr = frest.substring(0, m);
-                        h.put("journal", jr.replace("-", " "));
+                        h.put(FieldName.JOURNAL, jr.replace("-", " "));
                         frest = frest.substring(m);
                         m = frest.indexOf(';');
                         if (m >= 5) {
                             String yr = frest.substring(m - 5, m).trim();
-                            h.put("year", yr);
+                            h.put(FieldName.YEAR, yr);
                             frest = frest.substring(m);
                             m = frest.indexOf(':');
                             int issueIndex = frest.indexOf('(');
                             int endIssueIndex = frest.indexOf(')');
                             if (m >= 0) {
                                 String pg = frest.substring(m + 1).trim();
-                                h.put("pages", pg);
-                                h.put("volume", frest.substring(1, issueIndex).trim());
-                                h.put("issue", frest.substring(issueIndex + 1, endIssueIndex).trim());
+                                h.put(FieldName.PAGES, pg);
+                                h.put(FieldName.VOLUME, frest.substring(1, issueIndex).trim());
+                                h.put(FieldName.ISSUE, frest.substring(issueIndex + 1, endIssueIndex).trim());
                             }
                         }
                     }
@@ -142,14 +143,14 @@ public class SilverPlatterImporter extends ImportFormat {
                     int m = frest.indexOf(':');
                     if (m >= 0) {
                         String jr = frest.substring(0, m);
-                        h.put("publisher", jr.replace("-", " ").trim());
+                        h.put(FieldName.PUBLISHER, jr.replace("-", " ").trim());
                         frest = frest.substring(m);
                         m = frest.indexOf(", ");
                         if ((m + 2) < frest.length()) {
                             String yr = frest.substring(m + 2).trim();
                             try {
                                 Integer.parseInt(yr);
-                                h.put("year", yr);
+                                h.put(FieldName.YEAR, yr);
                             } catch (NumberFormatException ex) {
                                 // Let's assume that this wasn't a number, since it
                                 // couldn't be parsed as an integer.
@@ -159,7 +160,7 @@ public class SilverPlatterImporter extends ImportFormat {
 
                     }
                 } else if ("AF".equals(f3)) {
-                    h.put("school", frest.trim());
+                    h.put(FieldName.SCHOOL, frest.trim());
 
                 } else if ("DT".equals(f3)) {
                     frest = frest.trim();
@@ -167,7 +168,7 @@ public class SilverPlatterImporter extends ImportFormat {
                         type = "book";
                     } else if (frest.startsWith("Dissertation")) {
                         type = "phdthesis";
-                    } else if (frest.toLowerCase().contains("journal")) {
+                    } else if (frest.toLowerCase().contains(FieldName.JOURNAL)) {
                         type = "article";
                     } else if ("Contribution".equals(frest) || "Chapter".equals(frest)) {
                         type = "incollection";
@@ -181,12 +182,12 @@ public class SilverPlatterImporter extends ImportFormat {
             }
 
             if (isChapter) {
-                Object titleO = h.get("title");
+                String titleO = h.get(FieldName.TITLE);
                 if (titleO != null) {
-                    String title = ((String) titleO).trim();
+                    String title = titleO.trim();
                     int inPos = title.indexOf("\" in ");
                     if (inPos > 1) {
-                        h.put("title", title.substring(0, inPos));
+                        h.put(FieldName.TITLE, title.substring(0, inPos));
                     }
                 }
 

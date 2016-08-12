@@ -1,5 +1,11 @@
 package net.sf.jabref.logic.formatter.casechanger;
 
+import java.util.Collections;
+
+import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
+
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -10,16 +16,30 @@ import static org.junit.Assert.assertEquals;
  */
 public class ProtectTermsFormatterTest {
 
-    private final ProtectTermsFormatter formatter = new ProtectTermsFormatter();
+    private ProtectTermsFormatter formatter;
+
+    @Before
+    public void setUp() {
+        ProtectTermsFormatter
+                .setProtectedTermsLoader(
+                        new ProtectedTermsLoader(new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(),
+                                Collections.emptyList(), Collections.emptyList(), Collections.emptyList())));
+        formatter = new ProtectTermsFormatter();
+    }
 
     @Test
-    public void test() {
+    public void testSingleWord() {
         assertEquals("{VLSI}", formatter.format("VLSI"));
+    }
+
+    @Test
+    public void testDoNotProtectAlreadyProtected() {
         assertEquals("{VLSI}", formatter.format("{VLSI}"));
+    }
+
+    @Test
+    public void testCaseSensitivity() {
         assertEquals("VLsI", formatter.format("VLsI"));
-        assertEquals("{VLSI} {VLSI}", formatter.format("VLSI {VLSI}"));
-        assertEquals("{BPEL}", formatter.format("{BPEL}"));
-        assertEquals("{Testing BPEL Engine Performance: A Survey}", formatter.format("{Testing BPEL Engine Performance: A Survey}"));
     }
 
     @Test
@@ -27,4 +47,16 @@ public class ProtectTermsFormatterTest {
         assertEquals("In {CDMA}", formatter.format(formatter.getExampleInput()));
     }
 
+    @Test
+    public void testCorrectOrderingOfTerms() {
+        assertEquals("{3GPP} {3G}", formatter.format("3GPP 3G"));
+    }
+
+    @Test
+    public void test() {
+        assertEquals("{VLSI} {VLSI}", formatter.format("VLSI {VLSI}"));
+        assertEquals("{BPEL}", formatter.format("{BPEL}"));
+        assertEquals("{Testing BPEL Engine Performance: A Survey}",
+                formatter.format("{Testing BPEL Engine Performance: A Survey}"));
+    }
 }

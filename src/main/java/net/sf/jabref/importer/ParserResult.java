@@ -52,7 +52,11 @@ public class ParserResult {
     }
 
     public ParserResult(Collection<BibEntry> entries) {
-        this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)), new MetaData(), new HashMap<>());
+        this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)));
+    }
+
+    public ParserResult(BibDatabase database) {
+        this(database, new MetaData(), new HashMap<>());
     }
 
     public ParserResult(BibDatabase base, MetaData metaData, Map<String, EntryType> entryTypes) {
@@ -146,10 +150,10 @@ public class ParserResult {
     /**
      * Get all duplicated keys found in the database.
      *
-     * @return An array containing the duplicated keys.
+     * @return A list containing the duplicated keys.
      */
-    public String[] getDuplicateKeys() {
-        return duplicateKeys.toArray(new String[duplicateKeys.size()]);
+    public List<String> getDuplicateKeys() {
+        return duplicateKeys;
     }
 
     public boolean isPostponedAutosaveFound() {
@@ -181,7 +185,6 @@ public class ParserResult {
     }
 
     public boolean isNullResult() {
-        // TODO Auto-generated method stub
         return this == NULL_RESULT;
     }
 

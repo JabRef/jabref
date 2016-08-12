@@ -15,6 +15,8 @@
 */
 package net.sf.jabref.logic.layout.format;
 
+import java.util.List;
+
 import net.sf.jabref.logic.layout.AbstractParamLayoutFormatter;
 
 /**
@@ -54,13 +56,13 @@ public class Replace extends AbstractParamLayoutFormatter {
 
     @Override
     public void setArgument(String arg) {
-        String[] parts = AbstractParamLayoutFormatter.parseArgument(arg);
+        List<String> parts = AbstractParamLayoutFormatter.parseArgument(arg);
 
-        if (parts.length < 2) {
+        if (parts.size() < 2) {
             return; // TODO: too few arguments. Print an error message here?
         }
-        regex = parts[0];
-        replaceWith = parts[1];
+        regex = parts.get(0);
+        replaceWith = parts.get(1);
 
     }
 

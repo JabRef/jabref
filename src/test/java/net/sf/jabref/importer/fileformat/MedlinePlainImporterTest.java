@@ -12,17 +12,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.apache.commons.codec.Charsets;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class MedlinePlainImporterTest {
 
@@ -91,31 +94,33 @@ public class MedlinePlainImporterTest {
 
         BibEntry testEntry = entries.get(0);
         assertEquals("article", testEntry.getType());
-        Assert.assertNull(testEntry.getField("month"));
-        assertEquals("Long, Vicky and Marland, Hilary", testEntry.getField("author"));
+        assertEquals(Optional.empty(), testEntry.getFieldOptional("month"));
+        assertEquals(Optional.of("Long, Vicky and Marland, Hilary"), testEntry.getFieldOptional("author"));
         assertEquals(
-                "From danger and motherhood to health and beauty: health advice for the factory girl in early twentieth-century Britain.",
-                testEntry.getField("title"));
+                Optional.of(
+                        "From danger and motherhood to health and beauty: health advice for the factory girl in early twentieth-century Britain."),
+                testEntry.getFieldOptional("title"));
 
         testEntry = entries.get(1);
         assertEquals("conference", testEntry.getType());
-        assertEquals("06", testEntry.getField("month"));
-        Assert.assertNull(testEntry.getField("author"));
-        Assert.assertNull(testEntry.getField("title"));
+        assertEquals(Optional.of("06"), testEntry.getFieldOptional("month"));
+        assertEquals(Optional.empty(), testEntry.getFieldOptional("author"));
+        assertEquals(Optional.empty(), testEntry.getFieldOptional("title"));
 
         testEntry = entries.get(2);
         assertEquals("book", testEntry.getType());
         assertEquals(
-                "This is a Testtitle: This title should be appended: This title should also be appended. Another append to the Title? LastTitle",
-                testEntry.getField("title"));
+                Optional.of(
+                        "This is a Testtitle: This title should be appended: This title should also be appended. Another append to the Title? LastTitle"),
+                testEntry.getFieldOptional("title"));
 
         testEntry = entries.get(3);
         assertEquals("techreport", testEntry.getType());
-        Assert.assertNotNull(testEntry.getField("doi"));
+        Assert.assertTrue(testEntry.getFieldOptional("doi").isPresent());
 
         testEntry = entries.get(4);
         assertEquals("inproceedings", testEntry.getType());
-        assertEquals("Inproceedings book title", testEntry.getField("booktitle"));
+        assertEquals(Optional.of("Inproceedings book title"), testEntry.getFieldOptional("booktitle"));
 
         BibEntry expectedEntry5 = new BibEntry();
         expectedEntry5.setType("proceedings");
@@ -192,6 +197,30 @@ public class MedlinePlainImporterTest {
         Path file = Paths.get(MedlinePlainImporter.class.getResource("NbibImporterTest.nbib").toURI());
         List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
         BibEntryAssert.assertEquals(MedlinePlainImporter.class, "NbibImporterTest.bib", entries);
+    }
+
+    @Test
+    public void testWithMultipleEntries() throws IOException, URISyntaxException {
+        Path file = Paths
+                .get(MedlinePlainImporter.class.getResource("MedlinePlainImporterStringOutOfBounds.txt").toURI());
+        List<BibEntry> entries = importer.importDatabase(file, Charsets.UTF_8).getDatabase().getEntries();
+        BibEntryAssert.assertEquals(MedlinePlainImporter.class, "MedlinePlainImporterStringOutOfBounds.bib", entries);
+    }
+
+    @Test
+    public void testInvalidFormat() throws URISyntaxException, IOException {
+        Path file = Paths
+                .get(MedlinePlainImporter.class.getResource("MedlinePlainImporterTestInvalidFormat.xml").toURI());
+        List<BibEntry> entries = importer.importDatabase(file, Charsets.UTF_8).getDatabase().getEntries();
+        assertEquals(Collections.emptyList(), entries);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullReader() throws IOException {
+        try (BufferedReader reader = null) {
+            importer.importDatabase(reader);
+        }
+        fail();
     }
 
     @Test

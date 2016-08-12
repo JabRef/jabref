@@ -20,8 +20,8 @@ public class IEEETranEntryTypes {
     public static final EntryType ELECTRONIC = new BibtexEntryType() {
 
         {
-            addAllOptional("author", "month", "year", "title", "language", "howpublished", "organization", "address",
-                    "note", "url");
+            addAllOptional(FieldName.AUTHOR, FieldName.MONTH, FieldName.YEAR, FieldName.TITLE, FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.ORGANIZATION, FieldName.ADDRESS,
+                    FieldName.NOTE, FieldName.URL);
 
         }
 
@@ -58,8 +58,8 @@ public class IEEETranEntryTypes {
     public static final EntryType PERIODICAL = new BibtexEntryType() {
 
         {
-            addAllRequired("title", "year");
-            addAllOptional("editor", "language", "series", "volume", "number", "organization", "month", "note", "url");
+            addAllRequired(FieldName.TITLE, FieldName.YEAR);
+            addAllOptional(FieldName.EDITOR, FieldName.LANGUAGE, FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER, FieldName.ORGANIZATION, FieldName.MONTH, FieldName.NOTE, FieldName.URL);
         }
 
         @Override
@@ -77,9 +77,9 @@ public class IEEETranEntryTypes {
     public static final EntryType PATENT = new BibtexEntryType() {
 
         {
-            addAllRequired("nationality", "number", "year/yearfiled");
-            addAllOptional("author", "title", "language", "assignee", "address", "type", "number", "day", "dayfiled",
-                    "month", "monthfiled", "note", "url");
+            addAllRequired("nationality", FieldName.NUMBER, FieldName.orFields(FieldName.YEAR, FieldName.YEARFILED));
+            addAllOptional(FieldName.AUTHOR, FieldName.TITLE, FieldName.LANGUAGE, "assignee", FieldName.ADDRESS, FieldName.TYPE, FieldName.NUMBER, "day", "dayfiled",
+                    FieldName.MONTH, "monthfiled", FieldName.NOTE, FieldName.URL);
         }
 
         @Override
@@ -97,9 +97,9 @@ public class IEEETranEntryTypes {
     public static final EntryType STANDARD = new BibtexEntryType() {
 
         {
-            addAllRequired("title", "organization/institution");
-            addAllOptional("author", "language", "howpublished", "type", "number", "revision", "address", "month",
-                    "year", "note", "url");
+            addAllRequired(FieldName.TITLE, FieldName.orFields(FieldName.ORGANIZATION, FieldName.INSTITUTION));
+            addAllOptional(FieldName.AUTHOR, FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.TYPE, FieldName.NUMBER, "revision", FieldName.ADDRESS, FieldName.MONTH,
+                    FieldName.YEAR, FieldName.NOTE, FieldName.URL);
         }
 
         @Override

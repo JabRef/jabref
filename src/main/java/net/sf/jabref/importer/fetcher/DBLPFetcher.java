@@ -24,10 +24,11 @@ import java.util.List;
 
 import javax.swing.JPanel;
 
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.Globals;
 import net.sf.jabref.importer.ImportInspector;
 import net.sf.jabref.importer.OutputPrinter;
 import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.entry.BibEntry;
@@ -74,7 +75,7 @@ public class DBLPFetcher implements EntryFetcher {
             String address = makeSearchURL();
             URLDownload dl = new URLDownload(address);
 
-            String page = dl.downloadToString();
+            String page = dl.downloadToString(Globals.prefs.getDefaultEncoding());
 
             String[] lines = page.split("\n");
             List<String> bibtexUrlList = new ArrayList<>();
@@ -90,9 +91,9 @@ public class DBLPFetcher implements EntryFetcher {
 
             // 2014-11-08
             // DBLP now shows the BibTeX entry using ugly HTML entities
-            // but they also offer the download of a bib file
+            // but they also offer the download of a BIB file
             // we find this in the page which we get from "url"
-            // and this bib file is then in "biburl"
+            // and this BIB file is then in "biburl"
 
             int count = 1;
             for (String urlStr : bibtexUrlList) {
@@ -100,7 +101,8 @@ public class DBLPFetcher implements EntryFetcher {
                     break;
                 }
 
-                final String bibtexHTMLPage = new URLDownload(urlStr).downloadToString();
+                final String bibtexHTMLPage = new URLDownload(urlStr)
+                        .downloadToString(Globals.prefs.getDefaultEncoding());
 
                 final String[] htmlLines = bibtexHTMLPage.split("\n");
 
@@ -114,7 +116,8 @@ public class DBLPFetcher implements EntryFetcher {
                         // we do not access dblp.uni-trier.de as they will complain
                         bibtexUrl = bibtexUrl.replace("dblp.uni-trier.de", "www.dblp.org");
 
-                        final String bibtexPage = new URLDownload(bibtexUrl).downloadToString();
+                        final String bibtexPage = new URLDownload(bibtexUrl)
+                                .downloadToString(Globals.prefs.getDefaultEncoding());
 
                         Collection<BibEntry> bibtexEntries = BibtexParser.fromString(bibtexPage);
 
@@ -162,8 +165,8 @@ public class DBLPFetcher implements EntryFetcher {
     }
 
     @Override
-    public HelpFiles getHelpPage() {
-        return HelpFiles.FETCHER_DBLP;
+    public HelpFile getHelpPage() {
+        return HelpFile.FETCHER_DBLP;
     }
 
     @Override

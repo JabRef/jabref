@@ -24,16 +24,15 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.model.entry.FieldName;
 
 public class FieldNameLabel extends JLabel {
 
     public FieldNameLabel(String name) {
-        super(name, SwingConstants.LEFT);
+        super(FieldNameLabel.getFieldNameLabelText(name), SwingConstants.LEFT);
+
         setVerticalAlignment(SwingConstants.TOP);
-        //setFont(GUIGlobals.fieldNameFont);
         setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
-        //  setBorder(BorderFactory.createMatteBorder(1,0,0,0, Color.GRAY));
-        //setBorder(BorderFactory.createEtchedBorder());
         setBorder(BorderFactory.createEmptyBorder());
     }
 
@@ -46,5 +45,10 @@ public class FieldNameLabel extends JLabel {
                 RenderingHints.VALUE_RENDER_QUALITY);
         super.paintComponent(g2);
     }
+
+    private static String getFieldNameLabelText(String fieldName) {
+        return ' ' + FieldName.getDisplayName(fieldName) + ' ';
+    }
+
 
 }

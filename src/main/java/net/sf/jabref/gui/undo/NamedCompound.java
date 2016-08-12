@@ -43,18 +43,20 @@ public class NamedCompound extends CompoundEdit {
 
     @Override
     public String getUndoPresentationName() {
-        return Localization.lang("Undo") + ": " + name;
+        return "<html>" + Localization.lang("Undo") + ": " + name + "<ul>" + getPresentationName() + "</ul></html>";
     }
 
     @Override
     public String getRedoPresentationName() {
-        return Localization.lang("Redo") + ": " + name;
+        return "<html>" + Localization.lang("Redo") + ": " + name + "<ul>" + getPresentationName() + "</ul></html>";
     }
 
-    /**
-     * Returns the name of this compound, without the Undo or Redo prefix.
-     */
-    public String getNameOnly() {
-        return name;
+    @Override
+    public String getPresentationName() {
+        StringBuilder sb = new StringBuilder();
+        for (UndoableEdit edit : edits) {
+            sb.append("<li>").append(edit.getPresentationName());
+        }
+        return sb.toString();
     }
 }
