@@ -365,10 +365,12 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      */
     @Override
     public void setProgress(int current, int max) {
-        progressBar.setIndeterminate(false);
-        progressBar.setMinimum(0);
-        progressBar.setMaximum(max);
-        progressBar.setValue(current);
+        SwingUtilities.invokeLater(() -> {
+            progressBar.setIndeterminate(false);
+            progressBar.setMinimum(0);
+            progressBar.setMaximum(max);
+            progressBar.setValue(current);
+        });
     }
 
     /* (non-Javadoc)
@@ -434,19 +436,21 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      * @see net.sf.jabref.gui.ImportInspection#entryListComplete()
      */
     public void entryListComplete() {
-        progressBar.setIndeterminate(false);
-        progressBar.setVisible(false);
-        ok.setEnabled(true);
-        if (!generatedKeys) {
-            generate.setEnabled(true);
-        }
-        stop.setEnabled(false);
+        SwingUtilities.invokeLater(() -> {
+            progressBar.setIndeterminate(false);
+            progressBar.setVisible(false);
+            ok.setEnabled(true);
+            if (!generatedKeys) {
+                generate.setEnabled(true);
+            }
+            stop.setEnabled(false);
 
-        //This is for selecting and displaying the first entry in the glTable
-        this.glTable.repaint();
-        if ((this.glTable.getSelectedRowCount() == 0) && (this.glTable.getRowCount() > 0)) {
-            this.glTable.setRowSelectionInterval(0, 0); //Select first row in the table
-        }
+            //This is for selecting and displaying the first entry in the glTable
+            this.glTable.repaint();
+            if ((this.glTable.getSelectedRowCount() == 0) && (this.glTable.getRowCount() > 0)) {
+                this.glTable.setRowSelectionInterval(0, 0); //Select first row in the table
+            }
+        });
     }
 
     /**

@@ -45,7 +45,6 @@ public class FindFullTextAction extends AbstractWorker {
     private BibEntry entry;
     private Optional<URL> result;
 
-
     public FindFullTextAction(BasePanel basePanel) {
         this.basePanel = basePanel;
     }
@@ -59,6 +58,7 @@ public class FindFullTextAction extends AbstractWorker {
     public void run() {
         if (basePanel.getSelectedEntries().size() != 1) {
             basePanel.output(Localization.lang("This operation requires exactly one item to be selected."));
+            result = Optional.empty();
         } else {
             entry = basePanel.getSelectedEntries().get(0);
             FulltextFetchers fft = new FulltextFetchers();

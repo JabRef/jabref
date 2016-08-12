@@ -17,22 +17,29 @@ package net.sf.jabref.gui.fieldeditors;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * An implementation of the FieldEditor backed by a JTextArea.
  * Used for multi-line input, currently all BibTexFields except Bibtex key!
  */
 public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
+
+    private static final Log LOGGER = LogFactory.getLog(TextArea.class);
 
     private final JScrollPane scrollPane;
 
@@ -107,17 +114,41 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
     @Override
     public void setActiveBackgroundColor() {
-        setBackground(GUIGlobals.activeBackground);
+        if (SwingUtilities.isEventDispatchThread()) {
+            setBackground(GUIGlobals.activeBackground);
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(() -> setBackground(GUIGlobals.activeBackground));
+            } catch (InvocationTargetException | InterruptedException e) {
+                LOGGER.info("Problem setting background color", e);
+            }
+        }
     }
 
     @Override
     public void setValidBackgroundColor() {
-        setBackground(GUIGlobals.validFieldBackgroundColor);
+        if (SwingUtilities.isEventDispatchThread()) {
+            setBackground(GUIGlobals.validFieldBackgroundColor);
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(() -> setBackground(GUIGlobals.validFieldBackgroundColor));
+            } catch (InvocationTargetException | InterruptedException e) {
+                LOGGER.info("Problem setting background color", e);
+            }
+        }
     }
 
     @Override
     public void setInvalidBackgroundColor() {
-        setBackground(GUIGlobals.invalidFieldBackgroundColor);
+        if (SwingUtilities.isEventDispatchThread()) {
+            setBackground(GUIGlobals.invalidFieldBackgroundColor);
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(() -> setBackground(GUIGlobals.invalidFieldBackgroundColor));
+            } catch (InvocationTargetException | InterruptedException e) {
+                LOGGER.info("Problem setting background color", e);
+            }
+        }
     }
 
     @Override

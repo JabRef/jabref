@@ -42,6 +42,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.SwingUtilities;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
@@ -272,7 +273,7 @@ public class SynchronizeFileField extends AbstractWorker {
             // Add the undo edit:
             ce.end();
             panel.getUndoManager().addEdit(ce);
-            panel.markBaseChanged();
+            SwingUtilities.invokeLater(() -> panel.markBaseChanged());
             entriesChangedCount = changedEntries.size();
         }
     }

@@ -31,6 +31,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1788,7 +1789,16 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * This method shows a wait cursor and blocks all input to the JFrame's contents.
      */
     public void block() {
-        getGlassPane().setVisible(true);
+        if (SwingUtilities.isEventDispatchThread()) {
+            getGlassPane().setVisible(true);
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(() -> getGlassPane().setVisible(true));
+            } catch (InvocationTargetException | InterruptedException e) {
+                LOGGER.info("Problem blocking UI", e);
+            }
+        }
+
     }
 
     /**
@@ -1796,7 +1806,15 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * There are no adverse effects of calling this method redundantly.
      */
     public void unblock() {
-        getGlassPane().setVisible(false);
+        if (SwingUtilities.isEventDispatchThread()) {
+            getGlassPane().setVisible(false);
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(() -> getGlassPane().setVisible(false));
+            } catch (InvocationTargetException | InterruptedException e) {
+                LOGGER.info("Problem unblocking UI", e);
+            }
+        }
     }
 
     /**
@@ -2322,12 +2340,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
 
         private void updateTexts(UndoChangeEvent event) {
-            if (JabRefFrame.this != null) {
-                undo.putValue(Action.SHORT_DESCRIPTION, event.getUndoDescription());
-                undo.setEnabled(event.isCanUndo());
-                redo.putValue(Action.SHORT_DESCRIPTION, event.getRedoDescription());
-                redo.setEnabled(event.isCanRedo());
-            }
+            SwingUtilities.invokeLater(() -> {
+                if (JabRefFrame.this != null) {
+                    undo.putValue(Action.SHORT_DESCRIPTION, event.getUndoDescription());
+                    undo.setEnabled(event.isCanUndo());
+                    redo.putValue(Action.SHORT_DESCRIPTION, event.getRedoDescription());
+                    redo.setEnabled(event.isCanRedo());
+                }
+            });
         }
     }
 }
