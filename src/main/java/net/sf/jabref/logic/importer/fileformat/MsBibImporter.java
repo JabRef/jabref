@@ -22,6 +22,7 @@ import java.util.Objects;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
 import net.sf.jabref.logic.util.FileExtensions;
@@ -36,6 +37,13 @@ import org.xml.sax.InputSource;
  * ...
  */
 public class MsBibImporter extends ImportFormat {
+
+    private final ImportFormatPreferences importFormatPreferences;
+
+
+    public MsBibImporter(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+    }
 
     @Override
     public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
@@ -63,7 +71,7 @@ public class MsBibImporter extends ImportFormat {
         Objects.requireNonNull(reader);
 
         MSBibDatabase dbase = new MSBibDatabase();
-        return new ParserResult(dbase.importEntries(reader));
+        return new ParserResult(dbase.importEntries(reader), importFormatPreferences.getEncoding());
     }
 
     @Override

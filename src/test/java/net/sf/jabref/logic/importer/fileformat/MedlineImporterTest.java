@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -55,8 +55,7 @@ public class MedlineImporterTest {
 
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
-        this.importer = new MedlineImporter();
+        this.importer = new MedlineImporter(ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
     }
 
     @Test

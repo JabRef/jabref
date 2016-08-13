@@ -34,6 +34,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.bibtexml.Entry;
 import net.sf.jabref.logic.importer.fileformat.bibtexml.File;
@@ -61,6 +62,11 @@ public class BibTeXMLImporter extends ImportFormat {
     private static final List<String> IGNORED_METHODS = Arrays.asList("getClass", "getAnnotate", "getContents",
             "getPrice", "getSize", "getChapter");
 
+    private final ImportFormatPreferences importFormatPreferences;
+
+    public BibTeXMLImporter(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+    }
 
     @Override
     public String getFormatName() {
@@ -161,9 +167,9 @@ public class BibTeXMLImporter extends ImportFormat {
             }
         } catch (JAXBException e) {
             LOGGER.error("Error with XML parser configuration", e);
-            return ParserResult.fromErrorMessage(e.getLocalizedMessage());
+            return ParserResult.fromErrorMessage(e.getLocalizedMessage(), importFormatPreferences.getEncoding());
         }
-        return new ParserResult(bibItems);
+        return new ParserResult(bibItems, importFormatPreferences.getEncoding());
     }
 
     /**

@@ -23,7 +23,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
 
     @Override
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
-        ParserResult parserResult = new ParserResult();
+        ParserResult parserResult = new ParserResult(Globals.prefs.getDefaultEncoding());
         Optional<BibEntry> entry = DOItoBibTeX.getEntryFromDOI(query, parserResult,
                 ImportFormatPreferences.fromPreferences(Globals.prefs));
         if (parserResult.hasWarnings()) {

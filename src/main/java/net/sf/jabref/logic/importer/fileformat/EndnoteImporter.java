@@ -46,10 +46,10 @@ public class EndnoteImporter extends ImportFormat {
     private static final Pattern A_PATTERN = Pattern.compile("%A .*");
     private static final Pattern E_PATTERN = Pattern.compile("%E .*");
 
-    private final ImportFormatPreferences preferences;
+    private final ImportFormatPreferences importFormatPreferences;
 
-    public EndnoteImporter(ImportFormatPreferences preferences) {
-        this.preferences = preferences;
+    public EndnoteImporter(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
     }
 
     @Override
@@ -244,7 +244,7 @@ public class EndnoteImporter extends ImportFormat {
                     }
                 } else if ("F".equals(prefix)) {
                     hm.put(BibEntry.KEY_FIELD, BibtexKeyPatternUtil.checkLegalKey(val,
-                            preferences.getBibtexKeyPatternPreferences().isEnforceLegalKey()));
+                            importFormatPreferences.getBibtexKeyPatternPreferences().isEnforceLegalKey()));
                 }
             }
 
@@ -276,7 +276,7 @@ public class EndnoteImporter extends ImportFormat {
 
         }
 
-        return new ParserResult(bibitems);
+        return new ParserResult(bibitems, importFormatPreferences.getEncoding());
 
     }
 

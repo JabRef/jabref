@@ -8,8 +8,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -36,10 +36,12 @@ public class SilverPlatterImporterTest {
     public String bibName;
 
 
+    private ImportFormatPreferences importFormatPreferences;
+
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
-        testImporter = new SilverPlatterImporter();
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
+        testImporter = new SilverPlatterImporter(importFormatPreferences);
         txtFile = Paths.get(SilverPlatterImporterTest.class.getResource(filename + ".txt").toURI());
         bibName = filename + ".bib";
     }
@@ -69,7 +71,7 @@ public class SilverPlatterImporterTest {
     public final void testImportEntries() throws Exception {
         try (InputStream bibIn = SilverPlatterImporterTest.class.getResourceAsStream(bibName)) {
             List<BibEntry> entries = testImporter.importDatabase(txtFile, Charset.defaultCharset()).getDatabase().getEntries();
-            BibEntryAssert.assertEquals(bibIn, entries);
+            BibEntryAssert.assertEquals(bibIn, entries, importFormatPreferences);
         }
     }
 }

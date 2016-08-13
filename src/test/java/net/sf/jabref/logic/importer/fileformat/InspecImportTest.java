@@ -11,8 +11,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -30,8 +30,7 @@ public class InspecImportTest {
 
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
-        this.importer = new InspecImporter();
+        this.importer = new InspecImporter(ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
     }
 
     @Test

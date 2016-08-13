@@ -11,8 +11,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -24,12 +24,12 @@ import org.junit.Test;
 public class OvidImporterTest {
 
     private OvidImporter importer;
-
+    private ImportFormatPreferences importFormatPreferences;
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-        importer = new OvidImporter();
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
+        importer = new OvidImporter(importFormatPreferences);
     }
 
     @Test
@@ -151,7 +151,7 @@ public class OvidImporterTest {
                 List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
                 Assert.assertNotNull(entries);
                 Assert.assertEquals(1, entries.size());
-                BibEntryAssert.assertEquals(nis, entries.get(0));
+                BibEntryAssert.assertEquals(nis, entries.get(0), importFormatPreferences);
             }
         }
     }

@@ -12,8 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -33,15 +33,15 @@ public class MedlineImporterTestFiles {
     private final static String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/logic/importer/fileformat";
 
     private MedlineImporter medlineImporter;
-
+    private ImportFormatPreferences importFormatPreferences;
     @Parameter
     public Path importFile;
 
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-        medlineImporter = new MedlineImporter();
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
+        medlineImporter = new MedlineImporter(importFormatPreferences);
     }
 
     @Parameters(name = "{0}")
@@ -67,7 +67,8 @@ public class MedlineImporterTestFiles {
             if (medlineEntries.isEmpty()) {
                 assertEquals(Collections.emptyList(), medlineEntries);
             } else {
-                BibEntryAssert.assertEquals(MedlineImporterTest.class, bibFileName, medlineEntries);
+            BibEntryAssert.assertEquals(MedlineImporterTest.class, bibFileName, medlineEntries,
+                    importFormatPreferences);
             }
     }
 }

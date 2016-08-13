@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.OS;
@@ -40,6 +41,13 @@ import net.sf.jabref.model.entry.MonthUtil;
 public class RisImporter extends ImportFormat {
 
     private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY  - .*");
+
+    private final ImportFormatPreferences importFormatPreferences;
+
+
+    public RisImporter(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+    }
 
     @Override
     public String getFormatName() {
@@ -273,7 +281,7 @@ public class RisImporter extends ImportFormat {
 
         }
 
-        return new ParserResult(bibitems);
+        return new ParserResult(bibitems, importFormatPreferences.getEncoding());
 
     }
 }

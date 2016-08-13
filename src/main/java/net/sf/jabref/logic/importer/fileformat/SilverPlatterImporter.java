@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.AuthorList;
@@ -36,6 +37,13 @@ import net.sf.jabref.model.entry.FieldName;
 public class SilverPlatterImporter extends ImportFormat {
 
     private static final Pattern START_PATTERN = Pattern.compile("Record.*INSPEC.*");
+
+    private final ImportFormatPreferences importFormatPreferences;
+
+
+    public SilverPlatterImporter(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+    }
 
     @Override
     public String getFormatName() {
@@ -201,6 +209,6 @@ public class SilverPlatterImporter extends ImportFormat {
 
         }
 
-        return new ParserResult(bibitems);
+        return new ParserResult(bibitems, importFormatPreferences.getEncoding());
     }
 }

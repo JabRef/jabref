@@ -6,7 +6,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -21,8 +21,7 @@ public class RISImporterTest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-        importer = new RisImporter();
+        importer = new RisImporter(ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
     }
 
     @Test

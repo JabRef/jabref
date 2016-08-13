@@ -465,9 +465,9 @@ public class RepecNepImporter extends ImportFormat {
             }
             message += e.getLocalizedMessage();
             LOGGER.error(message, e);
-            return ParserResult.fromErrorMessage(message);
+            return ParserResult.fromErrorMessage(message, importFormatPreferences.getEncoding());
         }
 
-        return new ParserResult(bibitems);
+        return new ParserResult(bibitems, importFormatPreferences.getEncoding());
     }
 }

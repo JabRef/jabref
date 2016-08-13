@@ -502,7 +502,7 @@ public class ArgumentProcessor {
             return Optional.empty();
         }
 
-        return Optional.of(new ParserResult(result));
+        return Optional.of(new ParserResult(result, Globals.prefs.getDefaultEncoding()));
     }
 
     public boolean isBlank() {

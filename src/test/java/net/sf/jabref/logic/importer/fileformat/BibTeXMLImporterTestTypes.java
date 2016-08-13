@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -41,8 +41,8 @@ public class BibTeXMLImporterTestTypes {
 
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
-        bibteXMLImporter = new BibTeXMLImporter();
+        bibteXMLImporter = new BibTeXMLImporter(
+                ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
     }
 
     @Test

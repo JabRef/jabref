@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
@@ -35,6 +36,13 @@ import net.sf.jabref.model.entry.FieldName;
  * field "comment".
  */
 public class BiblioscapeImporter extends ImportFormat {
+
+    private final ImportFormatPreferences preferences;
+
+
+    public BiblioscapeImporter(ImportFormatPreferences preferences) {
+        this.preferences = preferences;
+    }
 
     @Override
     public String getFormatName() {
@@ -287,12 +295,12 @@ public class BiblioscapeImporter extends ImportFormat {
             }
             // continuation (folding) of previous line
             if (previousLine == null) {
-                return new ParserResult();
+                return new ParserResult(preferences.getEncoding());
             }
             previousLine.append(line.trim());
         }
 
-        return new ParserResult(bibItems);
+        return new ParserResult(bibItems, preferences.getEncoding());
     }
 
 }

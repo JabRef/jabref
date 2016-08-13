@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Objects;
 
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
@@ -33,10 +34,12 @@ import net.sf.jabref.logic.xmp.XMPUtil;
 public class PdfXmpImporter extends ImportFormat {
 
     private final XMPPreferences xmpPreferences;
+    private final ImportFormatPreferences importFormatPreferences;
 
 
-    public PdfXmpImporter(XMPPreferences xmpPreferences) {
+    public PdfXmpImporter(XMPPreferences xmpPreferences, ImportFormatPreferences importFormatPreferences) {
         this.xmpPreferences = xmpPreferences;
+        this.importFormatPreferences = importFormatPreferences;
     }
 
     @Override
@@ -61,9 +64,10 @@ public class PdfXmpImporter extends ImportFormat {
     public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
         Objects.requireNonNull(filePath);
         try {
-            return new ParserResult(XMPUtil.readXMP(filePath, xmpPreferences));
+            return new ParserResult(XMPUtil.readXMP(filePath, xmpPreferences), importFormatPreferences.getEncoding());
         } catch (IOException exception) {
-            return ParserResult.fromErrorMessage(exception.getLocalizedMessage());
+            return ParserResult.fromErrorMessage(exception.getLocalizedMessage(),
+                    importFormatPreferences.getEncoding());
         }
     }
 

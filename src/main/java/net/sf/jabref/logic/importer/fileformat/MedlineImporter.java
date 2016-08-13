@@ -33,6 +33,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.medline.Abstract;
 import net.sf.jabref.logic.importer.fileformat.medline.AbstractText;
@@ -101,6 +102,12 @@ public class MedlineImporter extends ImportFormat {
 
     private static final Locale ENGLISH = Locale.ENGLISH;
 
+    private final ImportFormatPreferences importFormatPreferences;
+
+
+    public MedlineImporter(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+    }
 
     @Override
     public String getFormatName() {
@@ -184,9 +191,9 @@ public class MedlineImporter extends ImportFormat {
             }
         } catch (JAXBException | XMLStreamException e) {
             LOGGER.debug("could not parse document", e);
-            return ParserResult.fromErrorMessage(e.getLocalizedMessage());
+            return ParserResult.fromErrorMessage(e.getLocalizedMessage(), importFormatPreferences.getEncoding());
         }
-        return new ParserResult(bibItems);
+        return new ParserResult(bibItems, importFormatPreferences.getEncoding());
     }
 
     private void parseBookArticle(PubmedBookArticle currentArticle, List<BibEntry> bibItems) {

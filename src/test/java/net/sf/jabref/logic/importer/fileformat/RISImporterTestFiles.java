@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -31,11 +31,12 @@ public class RISImporterTestFiles {
     public String fileName;
 
     private Path risFile;
+    private ImportFormatPreferences importFormatPreferences;
 
     @Before
     public void setUp() throws URISyntaxException {
-        Globals.prefs = JabRefPreferences.getInstance();
-        risImporter = new RisImporter();
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
+        risImporter = new RisImporter(importFormatPreferences);
         risFile = Paths.get(RISImporterTest.class.getResource(fileName + ".ris").toURI());
     }
 
@@ -53,6 +54,6 @@ public class RISImporterTestFiles {
     @Test
     public void testImportEntries() throws IOException {
         List<BibEntry> risEntries = risImporter.importDatabase(risFile, Charset.defaultCharset()).getDatabase().getEntries();
-        BibEntryAssert.assertEquals(RISImporterTest.class, fileName + ".bib", risEntries);
+        BibEntryAssert.assertEquals(RISImporterTest.class, fileName + ".bib", risEntries, importFormatPreferences);
     }
 }

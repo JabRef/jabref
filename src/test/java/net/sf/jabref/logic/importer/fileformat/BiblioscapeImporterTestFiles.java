@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -25,6 +25,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class BiblioscapeImporterTestFiles {
 
     private BiblioscapeImporter bsImporter;
+    private ImportFormatPreferences importFormatPreferences;
 
     public Path importFile;
     public String bibFile;
@@ -36,8 +37,8 @@ public class BiblioscapeImporterTestFiles {
 
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
-        bsImporter = new BiblioscapeImporter();
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
+        bsImporter = new BiblioscapeImporter(importFormatPreferences);
     }
 
     @Parameters(name = "{0}")
@@ -63,6 +64,6 @@ public class BiblioscapeImporterTestFiles {
     public void testImportEntries() throws IOException {
         List<BibEntry> bsEntries = bsImporter.importDatabase(importFile, Charset.defaultCharset()).getDatabase().getEntries();
         Assert.assertEquals(1, bsEntries.size());
-        BibEntryAssert.assertEquals(BiblioscapeImporterTest.class, bibFile, bsEntries);
+        BibEntryAssert.assertEquals(BiblioscapeImporterTest.class, bibFile, bsEntries, importFormatPreferences);
     }
 }

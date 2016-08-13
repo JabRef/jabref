@@ -219,7 +219,7 @@ public class PdfContentImporter extends ImportFormat {
 
             Optional<DOI> doi = DOI.findInText(firstPageContents);
             if (doi.isPresent()) {
-                ParserResult parserResult = new ParserResult(result);
+                ParserResult parserResult = new ParserResult(result, importFormatPreferences.getEncoding());
                 Optional<BibEntry> entry = DOItoBibTeX.getEntryFromDOI(doi.get().getDOI(), parserResult,
                         importFormatPreferences);
                 entry.ifPresent(parserResult.getDatabase()::insertEntry);
@@ -240,7 +240,7 @@ public class PdfContentImporter extends ImportFormat {
             if (i >= lines.length) {
                 // PDF could not be parsed or is empty
                 // return empty list
-                return new ParserResult();
+                return new ParserResult(importFormatPreferences.getEncoding());
             }
 
             // we start at the current line
@@ -489,12 +489,14 @@ public class PdfContentImporter extends ImportFormat {
 
             result.add(entry);
         } catch (EncryptedPdfsNotSupportedException e) {
-            return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
+            return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."),
+                    importFormatPreferences.getEncoding());
         } catch(IOException exception) {
-            return ParserResult.fromErrorMessage(exception.getLocalizedMessage());
+            return ParserResult.fromErrorMessage(exception.getLocalizedMessage(),
+                    importFormatPreferences.getEncoding());
         }
 
-        return new ParserResult(result);
+        return new ParserResult(result, importFormatPreferences.getEncoding());
     }
 
     private String getFirstPageContents(PDDocument document) throws IOException {

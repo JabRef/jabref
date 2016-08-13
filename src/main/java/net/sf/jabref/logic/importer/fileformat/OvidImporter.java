@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.AuthorList;
@@ -55,6 +56,13 @@ public class OvidImporter extends ImportFormat {
     private static final Pattern OVID_PATTERN = Pattern.compile(OVID_PATTERN_STRING);
 
     private static final int MAX_ITEMS = 50;
+
+    private final ImportFormatPreferences importFormatPreferences;
+
+
+    public OvidImporter(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+    }
 
     @Override
     public String getFormatName() {
@@ -229,7 +237,7 @@ public class OvidImporter extends ImportFormat {
 
         }
 
-        return new ParserResult(bibitems);
+        return new ParserResult(bibitems, importFormatPreferences.getEncoding());
     }
 
     /**

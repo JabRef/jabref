@@ -83,24 +83,15 @@ public class MetaData implements Iterable<String> {
     private MetaData(Map<String, String> inData, Charset encoding) throws ParseException {
         Objects.requireNonNull(inData);
         setData(inData);
-        this.encoding = encoding;
+        this.encoding = Objects.requireNonNull(encoding);
     }
 
     /**
-     * The MetaData object can be constructed with no data in it.
+     * The MetaData object can be constructed with no data in it, but needs encoding information
      */
-    @Deprecated
-    public MetaData() {
-        this(Globals.prefs.getDefaultEncoding());
-    }
 
     public MetaData(Charset encoding) {
         this.encoding = encoding;
-    }
-
-    @Deprecated
-    public static MetaData parse(Map<String, String> data) throws ParseException {
-        return new MetaData(data, Globals.prefs.getDefaultEncoding());
     }
 
     public static MetaData parse(Map<String, String> data, Charset encoding) throws ParseException {

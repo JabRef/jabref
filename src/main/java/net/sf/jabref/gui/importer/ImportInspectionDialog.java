@@ -465,7 +465,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // Relate to existing database, if any:
             if (panel == null) {
                 database = new BibDatabase();
-                localMetaData = new MetaData();
+                localMetaData = new MetaData(Globals.prefs.getDefaultEncoding());
             } else {
                 database = panel.getDatabase();
                 localMetaData = panel.getBibDatabaseContext().getMetaData();
@@ -503,7 +503,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // Relate to existing database, if any:
             if (panel == null) {
                 database = new BibDatabase();
-                localMetaData = new MetaData();
+                localMetaData = new MetaData(Globals.prefs.getDefaultEncoding());
             } else {
                 database = panel.getDatabase();
                 localMetaData = panel.getBibDatabaseContext().getMetaData();

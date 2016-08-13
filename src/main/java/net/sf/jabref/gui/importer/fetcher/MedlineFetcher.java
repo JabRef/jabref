@@ -29,7 +29,9 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.help.HelpFile;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.ParserResult;
@@ -238,8 +240,8 @@ public class MedlineFetcher implements EntryFetcher {
         try {
             URL url = new URL(baseUrl);
             URLConnection data = url.openConnection();
-            ParserResult result = new MedlineImporter().importDatabase(
-                    new BufferedReader(new InputStreamReader(data.getInputStream())));
+            ParserResult result = new MedlineImporter(ImportFormatPreferences.fromPreferences(Globals.prefs))
+                    .importDatabase(new BufferedReader(new InputStreamReader(data.getInputStream())));
             if (result.hasWarnings()) {
                 status.showMessage(result.getErrorMessage());
             }

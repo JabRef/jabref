@@ -96,10 +96,10 @@ public class FreeCiteImporter extends ImportFormat {
             conn = url.openConnection();
         } catch (MalformedURLException e) {
             LOGGER.warn("Bad URL", e);
-            return new ParserResult();
+            return new ParserResult(importFormatPreferences.getEncoding());
         } catch (IOException e) {
             LOGGER.warn("Could not download", e);
-            return new ParserResult();
+            return new ParserResult(importFormatPreferences.getEncoding());
         }
         try {
             conn.setRequestProperty("accept", "text/xml");
@@ -114,7 +114,8 @@ public class FreeCiteImporter extends ImportFormat {
             LOGGER.warn("Already connected.", e);
         } catch (IOException e) {
             LOGGER.warn("Unable to connect to FreeCite online service.", e);
-            return ParserResult.fromErrorMessage(Localization.lang("Unable to connect to FreeCite online service."));
+            return ParserResult.fromErrorMessage(Localization.lang("Unable to connect to FreeCite online service."),
+                    importFormatPreferences.getEncoding());
         }
         // output is in conn.getInputStream();
         // new InputStreamReader(conn.getInputStream())
@@ -229,10 +230,10 @@ public class FreeCiteImporter extends ImportFormat {
             parser.close();
         } catch (IOException | XMLStreamException ex) {
             LOGGER.warn("Could not parse", ex);
-            return new ParserResult();
+            return new ParserResult(importFormatPreferences.getEncoding());
         }
 
-        return new ParserResult(res);
+        return new ParserResult(res, importFormatPreferences.getEncoding());
     }
 
     @Override

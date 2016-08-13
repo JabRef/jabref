@@ -13,8 +13,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -30,6 +30,8 @@ import static org.junit.Assert.fail;
 public class MedlinePlainImporterTest {
 
     private MedlinePlainImporter importer;
+    private ImportFormatPreferences importFormatPreferences;
+
 
 
     private BufferedReader readerForString(String string) {
@@ -38,8 +40,8 @@ public class MedlinePlainImporterTest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-        importer = new MedlinePlainImporter();
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
+        importer = new MedlinePlainImporter(importFormatPreferences);
     }
 
     @Test
@@ -154,7 +156,7 @@ public class MedlinePlainImporterTest {
             List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
             Assert.assertNotNull(entries);
             assertEquals(1, entries.size());
-            BibEntryAssert.assertEquals(nis, entries.get(0));
+            BibEntryAssert.assertEquals(nis, entries.get(0), importFormatPreferences);
         }
     }
 
@@ -192,7 +194,8 @@ public class MedlinePlainImporterTest {
     public void testWithNbibFile() throws IOException, URISyntaxException {
         Path file = Paths.get(MedlinePlainImporter.class.getResource("NbibImporterTest.nbib").toURI());
         List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
-        BibEntryAssert.assertEquals(MedlinePlainImporter.class, "NbibImporterTest.bib", entries);
+        BibEntryAssert.assertEquals(MedlinePlainImporter.class, "NbibImporterTest.bib", entries,
+                importFormatPreferences);
     }
 
     @Test
@@ -200,7 +203,8 @@ public class MedlinePlainImporterTest {
         Path file = Paths
                 .get(MedlinePlainImporter.class.getResource("MedlinePlainImporterStringOutOfBounds.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(file, Charsets.UTF_8).getDatabase().getEntries();
-        BibEntryAssert.assertEquals(MedlinePlainImporter.class, "MedlinePlainImporterStringOutOfBounds.bib", entries);
+        BibEntryAssert.assertEquals(MedlinePlainImporter.class, "MedlinePlainImporterStringOutOfBounds.bib", entries,
+                importFormatPreferences);
     }
 
     @Test

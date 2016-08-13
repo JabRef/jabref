@@ -13,8 +13,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
@@ -30,6 +30,7 @@ public class CopacImporterTestFiles {
 
     private CopacImporter copacImporter;
     private final static String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/logic/importer/fileformat";
+    private ImportFormatPreferences importFormatPreferences;
 
     @Parameter
     public String fileName;
@@ -37,8 +38,8 @@ public class CopacImporterTestFiles {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-        copacImporter = new CopacImporter();
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
+        copacImporter = new CopacImporter(importFormatPreferences);
     }
 
     @Parameters(name = "{0}")
@@ -62,7 +63,8 @@ public class CopacImporterTestFiles {
         String bibFileName = fileName.replace(".txt", ".bib");
 
         try (InputStream bibStream = BibtexImporterTest.class.getResourceAsStream(bibFileName)) {
-            BibEntryAssert.assertEquals(bibStream, CopacImporterTest.class.getResource(fileName), copacImporter);
+            BibEntryAssert.assertEquals(bibStream, CopacImporterTest.class.getResource(fileName), copacImporter,
+                    importFormatPreferences);
         }
     }
 }
