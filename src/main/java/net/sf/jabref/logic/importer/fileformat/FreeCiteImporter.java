@@ -35,7 +35,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
@@ -76,11 +76,11 @@ public class FreeCiteImporter extends ImportFormat {
             throws IOException {
         try (Scanner scan = new Scanner(reader)) {
             String text = scan.useDelimiter("\\A").next();
-            return importEntries(text);
+            return importEntries(text, new BibDatabaseContext());
         }
     }
 
-    public ParserResult importEntries(String text) {
+    public ParserResult importEntries(String text, BibDatabaseContext databaseContext) {
         // URLencode the string for transmission
         String urlencodedCitation = null;
         try {
@@ -222,9 +222,7 @@ public class FreeCiteImporter extends ImportFormat {
                     e.setType(type);
 
                     // autogenerate label (BibTeX key)
-                    BibtexKeyPatternUtil.makeLabel(
-                            JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getMetaData(),
-                            JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabase(), e,
+                    BibtexKeyPatternUtil.makeLabel(databaseContext, e,
                             importFormatPreferences.getBibtexKeyPatternPreferences());
 
                     res.add(e);

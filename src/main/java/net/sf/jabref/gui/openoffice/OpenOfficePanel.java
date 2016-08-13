@@ -709,13 +709,12 @@ public class OpenOfficePanel extends AbstractWorker {
             BibtexKeyPatternPreferences prefs = BibtexKeyPatternPreferences.fromPreferences(Globals.prefs);
             NamedCompound undoCompound = new NamedCompound(Localization.lang("Cite"));
             for (BibEntry entry : entries) {
-                if (entry.getCiteKey() == null) {
+                if (!entry.getCiteKeyOptional().isPresent()) {
                     // Generate key
-                    BibtexKeyPatternUtil
-                            .makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
-                            prefs);
+                    BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext(), entry, prefs);
                     // Add undo change
-                    undoCompound.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, null, entry.getCiteKey()));
+                    undoCompound.addEdit(
+                            new UndoableKeyChange(panel.getDatabase(), entry, null, entry.getCiteKeyOptional().get()));
                 }
             }
             undoCompound.end();

@@ -68,7 +68,6 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.external.DownloadExternalFile;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.gui.BasePanel;
@@ -105,7 +104,6 @@ import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.DuplicateCheck;
-import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
@@ -456,29 +454,26 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         BibEntry entry = selectionModel.getSelected().get(0);
         entries.getReadWriteLock().writeLock().lock();
         try {
-            BibDatabase database;
-            MetaData localMetaData;
+            BibDatabaseContext databaseContext;
 
             // Relate to existing database, if any:
             if (panel == null) {
-                database = new BibDatabase();
-                localMetaData = new MetaData();
+                databaseContext = new BibDatabaseContext();
             } else {
-                database = panel.getDatabase();
-                localMetaData = panel.getBibDatabaseContext().getMetaData();
+                databaseContext = panel.getBibDatabaseContext();
             }
 
             entry.setId(IdGenerator.next());
             // Add the entry to the database we are working with:
-            database.insertEntry(entry);
+            databaseContext.getDatabase().insertEntry(entry);
 
             // Generate a unique key:
-            BibtexKeyPatternUtil.makeLabel(localMetaData, database, entry,
+            BibtexKeyPatternUtil.makeLabel(databaseContext, entry,
                     BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
             // Remove the entry from the database again, since we only added it in
             // order to
             // make sure the key was unique:
-            database.removeEntry(entry);
+            databaseContext.getDatabase().removeEntry(entry);
         } finally {
             entries.getReadWriteLock().writeLock().unlock();
         }
@@ -494,16 +489,13 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         entries.getReadWriteLock().writeLock().lock();
         try {
 
-            BibDatabase database;
-            MetaData localMetaData;
+            BibDatabaseContext databaseContext;
 
             // Relate to existing database, if any:
             if (panel == null) {
-                database = new BibDatabase();
-                localMetaData = new MetaData();
+                databaseContext = new BibDatabaseContext();
             } else {
-                database = panel.getDatabase();
-                localMetaData = panel.getBibDatabaseContext().getMetaData();
+                databaseContext = panel.getBibDatabaseContext();
             }
 
             List<Optional<String>> keys = new ArrayList<>(entries.size());
@@ -513,9 +505,9 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             for (BibEntry entry : entries) {
 
                 entry.setId(IdGenerator.next());
-                database.insertEntry(entry);
+                databaseContext.getDatabase().insertEntry(entry);
 
-                BibtexKeyPatternUtil.makeLabel(localMetaData, database, entry,
+                BibtexKeyPatternUtil.makeLabel(databaseContext, entry,
                         BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
                 // Add the generated key to our list:   -- TODO: Why??
                 keys.add(entry.getCiteKeyOptional());
@@ -529,7 +521,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // to keep
             // control over key uniqueness.
             for (BibEntry entry : entries) {
-                database.removeEntry(entry);
+                databaseContext.getDatabase().removeEntry(entry);
             }
         } finally {
             entries.getReadWriteLock().writeLock().unlock();

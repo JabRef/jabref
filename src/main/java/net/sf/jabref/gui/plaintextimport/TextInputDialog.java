@@ -508,7 +508,7 @@ public class TextInputDialog extends JDialog {
         text = text.replace(OS.NEWLINE, " ");
         text = text.replace("##NEWLINE##", OS.NEWLINE);
 
-        ParserResult importerResult = fimp.importEntries(text);
+        ParserResult importerResult = fimp.importEntries(text, frame.getCurrentBasePanel().getBibDatabaseContext());
         if (importerResult.hasWarnings()) {
             frame.showMessage(importerResult.getErrorMessage());
         }

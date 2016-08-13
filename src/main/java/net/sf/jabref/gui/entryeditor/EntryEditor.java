@@ -1383,7 +1383,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
             }
 
-            BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
+            BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext(), entry,
                     BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
 
             // Store undo information:
