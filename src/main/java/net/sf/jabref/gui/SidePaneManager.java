@@ -104,6 +104,8 @@ public class SidePaneManager {
             LOGGER.warn("Side pane component '" + name + "' unknown.");
         } else {
             hideComponent(sidePaneComponent);
+            frame.getCurrentBasePanel().getMainTable().setSelected(frame.getCurrentBasePanel().getMainTable().getSelectedRow());
+            frame.getCurrentBasePanel().getMainTable().requestFocus();
         }
     }
 
