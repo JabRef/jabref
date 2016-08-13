@@ -23,7 +23,7 @@ public class DiVA implements IdBasedFetcher {
 
     private static final String URL = "http://www.diva-portal.org/smash/getreferences"; // ?referenceFormat=BibTex&pids=%s";
 
-    ImportFormatPreferences importFormatPreferences;
+    private final ImportFormatPreferences importFormatPreferences;
 
 
     public DiVA(ImportFormatPreferences importFormatPreferences) {
@@ -42,25 +42,20 @@ public class DiVA implements IdBasedFetcher {
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        Optional<BibEntry> result = Optional.empty();
         try {
             URIBuilder uriBuilder = new URIBuilder(URL);
 
             uriBuilder.addParameter("referenceFormat", "BibTex");
             uriBuilder.addParameter("pids", identifier);
 
-            String bibtexString;
             URLDownload dl = new URLDownload(uriBuilder.build().toURL());
 
-            bibtexString = dl.downloadToString(StandardCharsets.UTF_8);
-            result = Optional.ofNullable(BibtexParser.singleFromString(bibtexString, importFormatPreferences));
+            String bibtexString = dl.downloadToString(StandardCharsets.UTF_8);
+            return Optional.ofNullable(BibtexParser.singleFromString(bibtexString, importFormatPreferences));
 
         } catch (URISyntaxException | IOException e) {
             throw new FetcherException("Problem getting information from DiVA", e);
         }
-
-        return result;
-
     }
 
     public boolean isValidId(String identifier) {
