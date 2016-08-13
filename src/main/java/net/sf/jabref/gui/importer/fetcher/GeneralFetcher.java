@@ -13,11 +13,7 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-<<<<<<< 9e9fa4faa175a9f839afb8176ad5baca2ee595f9:src/main/java/net/sf/jabref/gui/importer/fetcher/GeneralFetcher.java
 package net.sf.jabref.gui.importer.fetcher;
-=======
-package net.sf.jabref.importer.fetcher;
->>>>>>> fix codacy and refactor test ressources:src/main/java/net/sf/jabref/importer/fetcher/GeneralFetcher.java
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
