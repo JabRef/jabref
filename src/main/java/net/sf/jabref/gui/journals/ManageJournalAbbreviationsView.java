@@ -187,6 +187,8 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     }
 
     private void setBindings() {
+        journalAbbreviationsTable.itemsProperty().bindBidirectional(viewModel.abbreviationsProperty());
+        journalFilesBox.itemsProperty().bindBidirectional(viewModel.journalFilesProperty());
         viewModel.currentFileProperty().addListener((observable, oldvalue, newvalue) -> {
             journalFilesBox.getSelectionModel().select(newvalue);
             if (newvalue != null) {
@@ -201,24 +203,13 @@ public class ManageJournalAbbreviationsView extends FXMLView {
                 .addListener((observable, oldvalue, newvalue) -> {
                     viewModel.currentAbbreviationProperty().set(newvalue);
                 });
-        journalFilesBox.itemsProperty().addListener((observable, oldvalue, newvalue) -> {
-            viewModel.journalFilesProperty().set(newvalue);
-        });
         journalFilesBox.getSelectionModel().selectedItemProperty().addListener((observabe, oldvalue, newvalue) -> {
             viewModel.changeActiveFile(newvalue);
-        });
-        viewModel.journalFilesProperty().addListener((observable, oldvalue, newvalue) -> {
-            journalFilesBox.itemsProperty().set(newvalue);
-        });
-        viewModel.abbreviationsProperty().addListener((observable, oldvalue, newvalue) -> {
-            journalAbbreviationsTable.setItems(newvalue);
-        });
-        journalAbbreviationsTable.itemsProperty().addListener((observable, oldvalue, newvalue) -> {
-            viewModel.abbreviationsProperty().set(newvalue);
         });
         isEditableAndRemovable.addListener((observable, oldvalue, newvalue) -> {
             removeJournalAbbreviationsButton.setDisable(newvalue.booleanValue());
         });
+
     }
 
     public void showAndWait() {
