@@ -16,17 +16,18 @@
  */
 package net.sf.jabref.importer.fetcher;
 
-
 import java.util.Objects;
 import java.util.Optional;
 
 import javax.swing.JPanel;
 
-import net.sf.jabref.importer.ImportInspector;
-import net.sf.jabref.importer.OutputPrinter;
+import net.sf.jabref.gui.importer.fetcher.EntryFetcher;
+import net.sf.jabref.gui.importer.fetcher.SearchBasedEntryFetcher;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
+import net.sf.jabref.logic.importer.ImportInspector;
+import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 

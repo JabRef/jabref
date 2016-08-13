@@ -23,10 +23,12 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-import net.sf.jabref.importer.fileformat.BibtexParser;
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.ISBN;
 import net.sf.jabref.model.entry.BibEntry;
@@ -70,7 +72,7 @@ public class IsbnFetcher implements IdBasedFetcher {
                 //Downloads the source code of the site and then creates a .bib file out of the String
                 URLDownload urlDownload = new URLDownload(url);
                 String bibtexString = urlDownload.downloadToString(StandardCharsets.UTF_8);
-                BibEntry entry = BibtexParser.singleFromString(bibtexString);
+                BibEntry entry = BibtexParser.singleFromString(bibtexString, ImportFormatPreferences.fromPreferences(Globals.prefs));
 
                 entry.clearField(FieldName.URL);
 
