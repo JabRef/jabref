@@ -5,10 +5,11 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
-import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -22,6 +23,12 @@ public class DiVA implements IdBasedFetcher {
 
     private static final String URL = "http://www.diva-portal.org/smash/getreferences"; // ?referenceFormat=BibTex&pids=%s";
 
+    ImportFormatPreferences importFormatPreferences;
+
+
+    public DiVA(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+    }
 
     @Override
     public String getName() {
@@ -46,7 +53,7 @@ public class DiVA implements IdBasedFetcher {
             URLDownload dl = new URLDownload(uriBuilder.build().toURL());
 
             bibtexString = dl.downloadToString(StandardCharsets.UTF_8);
-            result = Optional.ofNullable(BibtexParser.singleFromString(bibtexString));
+            result = Optional.ofNullable(BibtexParser.singleFromString(bibtexString, importFormatPreferences));
 
         } catch (URISyntaxException | IOException e) {
             throw new FetcherException("Problem getting information from DiVA", e);

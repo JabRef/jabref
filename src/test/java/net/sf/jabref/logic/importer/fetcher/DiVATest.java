@@ -2,8 +2,8 @@ package net.sf.jabref.logic.importer.fetcher;
 
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.help.HelpFile;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -22,9 +22,7 @@ public class DiVATest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-        fetcher = new DiVA();
-
+        fetcher = new DiVA(ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
     }
 
     @Test
