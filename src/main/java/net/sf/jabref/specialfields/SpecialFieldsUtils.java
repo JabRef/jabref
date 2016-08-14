@@ -122,7 +122,11 @@ public class SpecialFieldsUtils {
             }
         }
         UpdateField.updateNonDisplayableField(be, c.getFieldName(), newValue)
-                .ifPresent(fieldChange -> nc.addEdit(new UndoableFieldChange(fieldChange)));
+                .ifPresent(fieldChange -> {
+                    if (nc != null) {
+                        nc.addEdit(new UndoableFieldChange(fieldChange));
+                    }
+                });
     }
 
     public static void syncSpecialFieldsFromKeywords(BibEntry be) {
