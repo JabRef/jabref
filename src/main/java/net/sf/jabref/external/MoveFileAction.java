@@ -102,10 +102,6 @@ public class MoveFileAction extends AbstractAction {
         }
         if ((file != null) && file.exists()) {
             // Ok, we found the file. Now get a new name:
-            String extension = null;
-            if (entry.type.isPresent()) {
-                extension = "." + entry.type.get().getExtension();
-            }
 
             File newFile = null;
             boolean repeat = true;
