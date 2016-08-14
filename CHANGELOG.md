@@ -43,6 +43,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed NullPointerException when opening file in Plain text import
 - Fixed NullPointerException when appending database
 - Fixed [#636](https://github.com/JabRef/jabref/issues/636): DOI in export filters
+- Fixed [#1519](https://github.com/JabRef/jabref/issues/1519): The word "Seiten" is automatically removed when fetching info from ISBN
 - Fixed [#1527](https://github.com/JabRef/jabref/issues/1527): 'Get BibTeX data from DOI' Removes Marking
 - Fixed [#1592](https://github.com/JabRef/jabref/issues/1592): LibreOffice: wrong numbers in citation labels
 - The merge entry dialog showed wrong heading after merging from DOI
