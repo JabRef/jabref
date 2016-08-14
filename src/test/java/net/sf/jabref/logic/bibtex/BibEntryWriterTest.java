@@ -6,7 +6,6 @@ import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Set;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
@@ -15,9 +14,7 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -26,26 +23,14 @@ import static org.junit.Assert.assertTrue;
 public class BibEntryWriterTest {
 
     private BibEntryWriter writer;
-    private static JabRefPreferences backup;
     private static ImportFormatPreferences importFormatPreferences;
 
 
-    @BeforeClass
-    public static void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-        backup = Globals.prefs;
-        importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
-    }
-
-    @AfterClass
-    public static void tearDown() {
-        Globals.prefs.overwritePreferences(backup);
-    }
-
     @Before
     public void setUpWriter() {
-        writer = new BibEntryWriter(
-                new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)), true);
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
+        writer = new BibEntryWriter(new LatexFieldFormatter(
+                LatexFieldFormatterPreferences.fromPreferences(JabRefPreferences.getInstance())), true);
     }
 
     @Test
