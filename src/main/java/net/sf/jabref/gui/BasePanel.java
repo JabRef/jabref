@@ -1984,10 +1984,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         storeCurrentEdit();
                     }
                 }
-                String name = getUndoManager().getUndoPresentationName();
                 getUndoManager().undo();
                 markBaseChanged();
-                frame.output(name);
+                frame.output(Localization.lang("Undo"));
             } catch (CannotUndoException ex) {
                 LOGGER.warn("Nothing to undo", ex);
                 frame.output(Localization.lang("Nothing to undo") + '.');
@@ -2062,10 +2061,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     storeCurrentEdit();
                 }
 
-                String name = getUndoManager().getRedoPresentationName();
                 getUndoManager().redo();
                 markBaseChanged();
-                frame.output(name);
+                frame.output(Localization.lang("Redo"));
             } catch (CannotRedoException ex) {
                 frame.output(Localization.lang("Nothing to redo") + '.');
             }
