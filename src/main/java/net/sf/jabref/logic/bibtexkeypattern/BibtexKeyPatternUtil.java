@@ -25,6 +25,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
@@ -377,6 +378,23 @@ public class BibtexKeyPatternUtil {
                 + ((department == null)
                 || ((school != null) && department.equals(school)) ?
                         "" : department);
+    }
+
+    /**
+     * Generates a BibTeX label according to the pattern for a given entry type, and saves the unique label in the
+     * <code>Bibtexentry</code>.
+     *
+     * The given database context is used to avoid duplicate keys.
+     *
+     * @param databaseContext a <code>BibDatabaseContext</code>
+     * @param entry a <code>BibEntry</code>
+     * @param bibtexKeyPatternPreferences the current <code>BibtexKeyPatternPreferences</code>
+     * @return modified BibEntry
+     */
+
+    public static void makeLabel(BibDatabaseContext databaseContext, BibEntry entry,
+            BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
+        makeLabel(databaseContext.getMetaData(), databaseContext.getDatabase(), entry, bibtexKeyPatternPreferences);
     }
 
     /**
@@ -1384,5 +1402,6 @@ public class BibtexKeyPatternUtil {
 
         return StringUtil.replaceSpecialCharacters(newKey.toString());
     }
+
 
 }
