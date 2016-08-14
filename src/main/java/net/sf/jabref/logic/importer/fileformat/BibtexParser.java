@@ -135,6 +135,15 @@ public class BibtexParser {
         return entries.iterator().next();
     }
 
+    public static Optional<BibEntry> singleFromStringOptional(String bibtexString,
+            ImportFormatPreferences importFormatPreferences) {
+        Collection<BibEntry> entries = BibtexParser.fromString(bibtexString, importFormatPreferences);
+        if ((entries == null) || entries.isEmpty()) {
+            return Optional.empty();
+        }
+        return Optional.of(entries.iterator().next());
+    }
+
     /**
      * Will parse the BibTex-Data found when reading from reader. Ignores any encoding supplied in the file by
      * "Encoding: myEncoding".

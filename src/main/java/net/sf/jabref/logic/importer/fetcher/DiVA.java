@@ -51,7 +51,7 @@ public class DiVA implements IdBasedFetcher {
             URLDownload dl = new URLDownload(uriBuilder.build().toURL());
 
             String bibtexString = dl.downloadToString(StandardCharsets.UTF_8);
-            return Optional.ofNullable(BibtexParser.singleFromString(bibtexString, importFormatPreferences));
+            return BibtexParser.singleFromStringOptional(bibtexString, importFormatPreferences);
 
         } catch (URISyntaxException | IOException e) {
             throw new FetcherException("Problem getting information from DiVA", e);
