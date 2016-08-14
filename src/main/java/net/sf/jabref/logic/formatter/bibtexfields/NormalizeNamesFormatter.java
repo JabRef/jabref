@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
-import java.util.StringJoiner;
 
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -36,7 +35,7 @@ public class NormalizeNamesFormatter implements Formatter {
         if (!value.contains(" and ") && !value.contains("{") && !value.contains(";")) {
             String[] valueParts = value.split(",");
             // Delete spaces for correct case identification
-            for(int i=0; i < valueParts.length; i++) {
+            for (int i=0; i < valueParts.length; i++) {
                 valueParts[i] = valueParts[i].trim();
             }
             // Looking for space between pre- and lastname
@@ -58,8 +57,10 @@ public class NormalizeNamesFormatter implements Formatter {
             } else {
                 // Looking for name affixes to avoid
                 // partCount need to reduce by the count off avoiding terms
+                //valuePartsCount holds the count of name parts without the avoided terms
+
                 int valuePartsCount = valueParts.length;
-                // Holding the index of every term, which need to avoid
+                // Holds the index of each term which needs to be avoided
                 Collection<Integer> avoidIndex = new HashSet<>();
 
                 for (int i = 0; i < valueParts.length; i++) {
@@ -72,7 +73,7 @@ public class NormalizeNamesFormatter implements Formatter {
                 if ((valuePartsCount % 2) == 0) {
                     // We hit the described special case with name affix like Jr
                     StringBuilder stringBuilder = new StringBuilder();
-                    // avoidedTimes need to increase the count of avoided terms for correct module calculation
+                    // avoidedTimes needs to be increased b< the count of avoided terms for correct odd/even calculation
                     int avoidedTimes = 0;
                     for (int i = 0; i < valueParts.length; i++) {
                         if (avoidIndex.contains(i)) {
@@ -111,14 +112,4 @@ public class NormalizeNamesFormatter implements Formatter {
         return "Albert Einstein and Alan Turing";
     }
 
-    private static boolean contains(final String[] array, final String[] searchTerms) {
-        for (String currentTerm : array) {
-            for (String beCompared : searchTerms) {
-                if (beCompared.trim().toLowerCase().equals(currentTerm.trim().toLowerCase())) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
 }

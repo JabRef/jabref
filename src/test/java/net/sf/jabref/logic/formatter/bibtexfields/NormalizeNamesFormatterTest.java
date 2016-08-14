@@ -110,10 +110,6 @@ public class NormalizeNamesFormatterTest {
         expectCorrect("Ali Babar, M., Dingsøyr, T., Lago P.", "Ali Babar, M., Dingsøyr T. Lago P.");
     }
 
-    private void expectCorrect(String input, String expected) {
-        Assert.assertEquals(expected, formatter.format(input));
-    }
-
     @Test
     public void formatExample() {
         assertEquals("Einstein, Albert and Turing, Alan", formatter.format(formatter.getExampleInput()));
@@ -164,5 +160,9 @@ public class NormalizeNamesFormatterTest {
     @Test
     public void testAvoidNameAffixes() {
         expectCorrect("Canon der Barbar, Alexander der Große","der Barbar, Canon and der Große, Alexander");
+    }
+
+    private void expectCorrect(String input, String expected) {
+        Assert.assertEquals(expected, formatter.format(input));
     }
 }
