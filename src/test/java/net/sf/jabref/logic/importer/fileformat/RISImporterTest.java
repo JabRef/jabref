@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
@@ -36,7 +37,7 @@ public class RISImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        Assert.assertEquals(".ris", importer.getExtensions().get(0));
+        Assert.assertEquals(FileExtensions.RIS, importer.getExtensions());
     }
 
     @Test

@@ -18,12 +18,12 @@ package net.sf.jabref.logic.importer.fileformat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
@@ -58,8 +58,8 @@ public class EndnoteImporter extends ImportFormat {
     }
 
     @Override
-    public List<String> getExtensions() {
-        return Collections.singletonList(".enw");
+    public FileExtensions getExtensions() {
+        return FileExtensions.ENDNOTE;
     }
 
     @Override

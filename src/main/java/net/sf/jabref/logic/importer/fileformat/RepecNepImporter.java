@@ -25,13 +25,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
@@ -190,8 +190,8 @@ public class RepecNepImporter extends ImportFormat {
     }
 
     @Override
-    public List<String> getExtensions() {
-        return Collections.singletonList(".txt");
+    public FileExtensions getExtensions() {
+        return FileExtensions.REPEC;
     }
 
     @Override

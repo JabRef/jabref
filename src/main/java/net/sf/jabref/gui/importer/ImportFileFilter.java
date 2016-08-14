@@ -16,30 +16,27 @@
 package net.sf.jabref.gui.importer;
 
 import java.io.File;
-import java.util.StringJoiner;
 
 import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 
-/**
- * File filter that lets the user choose export format while choosing file to
- * export to. Contains a reference to the ExportFormat in question.
- */
 class ImportFileFilter extends FileFilter implements Comparable<ImportFileFilter> {
 
     private final ImportFormat format;
     private final String name;
+    private final FileNameExtensionFilter filextFilter;
+    private final FileExtensions extensions;
 
 
     public ImportFileFilter(ImportFormat format) {
         this.format = format;
+        this.extensions = format.getExtensions();
+        this.name = extensions.getDescription();
 
-        StringJoiner sj = new StringJoiner(", ", format.getFormatName() + " (", ")");
-        for (String ext : format.getExtensions()) {
-            sj.add("*" + ext);
-        }
-        this.name = sj.toString();
+        filextFilter = new FileNameExtensionFilter(extensions.getDescription(), extensions.getExtensions());
     }
 
     public ImportFormat getImportFormat() {
@@ -48,17 +45,7 @@ class ImportFileFilter extends FileFilter implements Comparable<ImportFileFilter
 
     @Override
     public boolean accept(File file) {
-        if (format.getExtensions().isEmpty()) {
-            return true;
-        }
-
-        for (String extension : format.getExtensions()) {
-            if (file.getName().endsWith(extension)) {
-                return true;
-            }
-        }
-
-        return false;
+        return filextFilter.accept(file);
     }
 
     @Override
@@ -73,7 +60,7 @@ class ImportFileFilter extends FileFilter implements Comparable<ImportFileFilter
 
     @Override
     public boolean equals(Object o) {
-        if(this == o) {
+        if (this == o) {
             return true;
         }
         if (o instanceof ImportFileFilter) {

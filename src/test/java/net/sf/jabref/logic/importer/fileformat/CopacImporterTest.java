@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -48,10 +49,9 @@ public class CopacImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        List<String> extensions = new ArrayList<>();
-        extensions.add(".txt");
 
-        Assert.assertEquals(extensions.get(0), importer.getExtensions().get(0));
+
+        Assert.assertEquals(FileExtensions.COPAC, importer.getExtensions());
     }
 
     @Test

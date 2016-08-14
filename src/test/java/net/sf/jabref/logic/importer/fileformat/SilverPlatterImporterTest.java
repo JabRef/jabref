@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -43,7 +44,7 @@ public class SilverPlatterImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        Assert.assertEquals(".txt", testImporter.getExtensions().get(0));
+        Assert.assertEquals(FileExtensions.SILVER_PLATTER, testImporter.getExtensions());
     }
 
     @Test

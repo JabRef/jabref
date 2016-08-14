@@ -5,18 +5,20 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 public class MsBibImporterTest {
 
@@ -28,16 +30,13 @@ public class MsBibImporterTest {
     @Test
     public void testsGetExtensions() {
         MsBibImporter importer = new MsBibImporter();
-        List<String> extensions = new ArrayList<>();
-        extensions.add(".xml");
-
-        Assert.assertEquals(extensions.get(0), importer.getExtensions().get(0));
+        assertEquals(FileExtensions.MSBIB, importer.getExtensions());
     }
 
     @Test
     public void testGetDescription() {
         MsBibImporter importer = new MsBibImporter();
-        Assert.assertEquals("Importer for the MS Office 2007 XML bibliography format.", importer.getDescription());
+        assertEquals("Importer for the MS Office 2007 XML bibliography format.", importer.getDescription());
     }
 
     @Test
@@ -47,7 +46,7 @@ public class MsBibImporterTest {
                 "IsiImporterTestInspec.isi", "emptyFile.xml", "IsiImporterTestWOS.isi");
         for (String s : notAccepted) {
             Path file = Paths.get(MsBibImporter.class.getResource(s).toURI());
-            Assert.assertFalse(testImporter.isRecognizedFormat(file, Charset.defaultCharset()));
+            assertFalse(testImporter.isRecognizedFormat(file, Charset.defaultCharset()));
         }
     }
 
@@ -56,7 +55,7 @@ public class MsBibImporterTest {
         MsBibImporter testImporter = new MsBibImporter();
         Path file = Paths.get(MsBibImporter.class.getResource("MsBibImporterTest.xml").toURI());
         List<BibEntry> entries = testImporter.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
-        Assert.assertEquals(Collections.emptyList(), entries);
+        assertEquals(Collections.emptyList(), entries);
     }
 
     @Test
@@ -64,19 +63,19 @@ public class MsBibImporterTest {
         MsBibImporter testImporter = new MsBibImporter();
         Path file = Paths.get(MsBibImporter.class.getResource("CopacImporterTest1.txt").toURI());
         List<BibEntry> entries = testImporter.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
-        Assert.assertEquals(0, entries.size());
+        assertEquals(0, entries.size());
     }
 
     @Test
     public final void testGetFormatName() {
         MsBibImporter testImporter = new MsBibImporter();
-        Assert.assertEquals("MSBib", testImporter.getFormatName());
+        assertEquals("MSBib", testImporter.getFormatName());
     }
 
     @Test
     public final void testGetCommandLineId() {
         MsBibImporter testImporter = new MsBibImporter();
-        Assert.assertEquals("msbib", testImporter.getId());
+        assertEquals("msbib", testImporter.getId());
     }
 
 }

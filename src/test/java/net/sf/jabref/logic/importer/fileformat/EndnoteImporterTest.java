@@ -7,12 +7,12 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -47,10 +47,9 @@ public class EndnoteImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        List<String> extensions = new ArrayList<>();
-        extensions.add(".enw");
 
-        assertEquals(extensions.get(0), importer.getExtensions().get(0));
+        assertEquals(FileExtensions.ENDNOTE, importer.getExtensions());
+
     }
 
     @Test

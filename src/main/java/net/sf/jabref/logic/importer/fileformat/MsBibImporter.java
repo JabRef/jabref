@@ -17,13 +17,12 @@ package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
 
@@ -73,8 +72,8 @@ public class MsBibImporter extends ImportFormat {
     }
 
     @Override
-    public List<String> getExtensions() {
-        return Collections.singletonList(".xml");
+    public FileExtensions getExtensions() {
+        return FileExtensions.MSBIB;
     }
 
     @Override

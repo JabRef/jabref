@@ -18,13 +18,13 @@ package net.sf.jabref.logic.importer.fileformat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
@@ -62,8 +62,8 @@ public class OvidImporter extends ImportFormat {
     }
 
     @Override
-    public List<String> getExtensions() {
-        return Collections.singletonList(".txt");
+    public FileExtensions getExtensions() {
+        return FileExtensions.OVID;
     }
 
     @Override

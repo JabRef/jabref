@@ -23,9 +23,9 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Objects;
 
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.logic.importer.ParserResult;
 
 /**
@@ -119,11 +119,12 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
 
     /**
      * Returns the file extensions that this importer can read.
-     * The extension should contain the leading dot, so for example ".bib"
      *
-     * @return list of supported file extensions (not null but may be empty). The list should never be null. Instead return an empty list.
+     *
      */
-    public abstract List<String> getExtensions();
+    // public abstract List<String> getExtensions();
+
+    public abstract FileExtensions getExtensions();
 
     /**
      * Returns a one-word ID which identifies this import format.

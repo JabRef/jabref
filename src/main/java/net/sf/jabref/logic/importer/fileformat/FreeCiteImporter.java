@@ -25,7 +25,6 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
@@ -36,6 +35,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
@@ -72,8 +72,7 @@ public class FreeCiteImporter extends ImportFormat {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader)
-            throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         try (Scanner scan = new Scanner(reader)) {
             String text = scan.useDelimiter("\\A").next();
             return importEntries(text);
@@ -174,16 +173,11 @@ public class FreeCiteImporter extends ImportFormat {
                                 type = BibtexEntryTypes.TECHREPORT;
                                 // the content of the "tech" field seems to contain the number of the technical report
                                 e.setField(FieldName.NUMBER, parser.getElementText());
-                            } else if (FieldName.DOI.equals(ln)
-                                    || FieldName.INSTITUTION.equals(ln)
-                                    || FieldName.LOCATION.equals(ln)
-                                    || FieldName.NUMBER.equals(ln)
-                                    || FieldName.NOTE.equals(ln)
-                                    || FieldName.TITLE.equals(ln)
-                                    || FieldName.PAGES.equals(ln)
-                                    || FieldName.PUBLISHER.equals(ln)
-                                    || FieldName.VOLUME.equals(ln)
-                                    || FieldName.YEAR.equals(ln)) {
+                            } else if (FieldName.DOI.equals(ln) || FieldName.INSTITUTION.equals(ln)
+                                    || FieldName.LOCATION.equals(ln) || FieldName.NUMBER.equals(ln)
+                                    || FieldName.NOTE.equals(ln) || FieldName.TITLE.equals(ln)
+                                    || FieldName.PAGES.equals(ln) || FieldName.PUBLISHER.equals(ln)
+                                    || FieldName.VOLUME.equals(ln) || FieldName.YEAR.equals(ln)) {
                                 e.setField(ln, parser.getElementText());
                             } else if (FieldName.BOOKTITLE.equals(ln)) {
                                 String booktitle = parser.getElementText();
@@ -210,7 +204,8 @@ public class FreeCiteImporter extends ImportFormat {
                         String note;
                         if (e.hasField(FieldName.NOTE)) {
                             // "note" could have been set during the parsing as FreeCite also returns "note"
-                            note = e.getFieldOptional(FieldName.NOTE).get().concat(OS.NEWLINE).concat(noteSB.toString());
+                            note = e.getFieldOptional(FieldName.NOTE).get().concat(OS.NEWLINE)
+                                    .concat(noteSB.toString());
                         } else {
                             note = noteSB.toString();
                         }
@@ -246,8 +241,8 @@ public class FreeCiteImporter extends ImportFormat {
     }
 
     @Override
-    public List<String> getExtensions() {
-        return Arrays.asList(".txt",".xml");
+    public FileExtensions getExtensions() {
+        return FileExtensions.FREECITE;
     }
 
     @Override
