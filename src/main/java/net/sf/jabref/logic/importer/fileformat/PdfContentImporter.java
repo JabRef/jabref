@@ -64,11 +64,8 @@ public class PdfContentImporter extends ImportFormat {
 
     private String year;
 
-    private final ImportFormatPreferences importFormatPreferences;
-
-
     public PdfContentImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+        super(importFormatPreferences);
     }
     /**
      * Removes all non-letter characters at the end
@@ -240,7 +237,7 @@ public class PdfContentImporter extends ImportFormat {
             if (i >= lines.length) {
                 // PDF could not be parsed or is empty
                 // return empty list
-                return new ParserResult(importFormatPreferences.getEncoding());
+                return new ParserResult();
             }
 
             // we start at the current line
@@ -489,14 +486,12 @@ public class PdfContentImporter extends ImportFormat {
 
             result.add(entry);
         } catch (EncryptedPdfsNotSupportedException e) {
-            return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."),
-                    importFormatPreferences.getEncoding());
+            return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
         } catch(IOException exception) {
-            return ParserResult.fromErrorMessage(exception.getLocalizedMessage(),
-                    importFormatPreferences.getEncoding());
+            return ParserResult.fromErrorMessage(exception.getLocalizedMessage());
         }
 
-        return new ParserResult(result, importFormatPreferences.getEncoding());
+        return new ParserResult(result);
     }
 
     private String getFirstPageContents(PDDocument document) throws IOException {

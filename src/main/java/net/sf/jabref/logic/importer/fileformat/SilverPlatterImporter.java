@@ -38,11 +38,8 @@ public class SilverPlatterImporter extends ImportFormat {
 
     private static final Pattern START_PATTERN = Pattern.compile("Record.*INSPEC.*");
 
-    private final ImportFormatPreferences importFormatPreferences;
-
-
     public SilverPlatterImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+        super(importFormatPreferences);
     }
 
     @Override
@@ -209,6 +206,6 @@ public class SilverPlatterImporter extends ImportFormat {
 
         }
 
-        return new ParserResult(bibitems, importFormatPreferences.getEncoding());
+        return new ParserResult(bibitems);
     }
 }

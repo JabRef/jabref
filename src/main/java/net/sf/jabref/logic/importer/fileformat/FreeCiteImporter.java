@@ -34,13 +34,14 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
@@ -57,11 +58,9 @@ public class FreeCiteImporter extends ImportFormat {
 
     private static final Log LOGGER = LogFactory.getLog(FreeCiteImporter.class);
 
-    private final ImportFormatPreferences importFormatPreferences;
-
 
     public FreeCiteImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+        super(importFormatPreferences);
     }
 
     @Override
@@ -96,10 +95,10 @@ public class FreeCiteImporter extends ImportFormat {
             conn = url.openConnection();
         } catch (MalformedURLException e) {
             LOGGER.warn("Bad URL", e);
-            return new ParserResult(importFormatPreferences.getEncoding());
+            return new ParserResult();
         } catch (IOException e) {
             LOGGER.warn("Could not download", e);
-            return new ParserResult(importFormatPreferences.getEncoding());
+            return new ParserResult();
         }
         try {
             conn.setRequestProperty("accept", "text/xml");
@@ -114,8 +113,7 @@ public class FreeCiteImporter extends ImportFormat {
             LOGGER.warn("Already connected.", e);
         } catch (IOException e) {
             LOGGER.warn("Unable to connect to FreeCite online service.", e);
-            return ParserResult.fromErrorMessage(Localization.lang("Unable to connect to FreeCite online service."),
-                    importFormatPreferences.getEncoding());
+            return ParserResult.fromErrorMessage(Localization.lang("Unable to connect to FreeCite online service."));
         }
         // output is in conn.getInputStream();
         // new InputStreamReader(conn.getInputStream())
@@ -218,9 +216,7 @@ public class FreeCiteImporter extends ImportFormat {
                     e.setType(type);
 
                     // autogenerate label (BibTeX key)
-                    BibtexKeyPatternUtil.makeLabel(
-                            JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getMetaData(),
-                            JabRefGUI.getMainFrame().getCurrentBasePanel().getDatabase(), e,
+                    BibtexKeyPatternUtil.makeLabel(new MetaData(), new BibDatabase(), e,
                             importFormatPreferences.getBibtexKeyPatternPreferences());
 
                     res.add(e);
@@ -230,10 +226,10 @@ public class FreeCiteImporter extends ImportFormat {
             parser.close();
         } catch (IOException | XMLStreamException ex) {
             LOGGER.warn("Could not parse", ex);
-            return new ParserResult(importFormatPreferences.getEncoding());
+            return new ParserResult();
         }
 
-        return new ParserResult(res, importFormatPreferences.getEncoding());
+        return new ParserResult(res);
     }
 
     @Override

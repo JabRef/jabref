@@ -86,9 +86,13 @@ public class MetaData implements Iterable<String> {
         this.encoding = Objects.requireNonNull(encoding);
     }
 
+
     /**
-     * The MetaData object can be constructed with no data in it, but needs encoding information
+     * The MetaData object can be constructed with no data in it
      */
+
+    public MetaData() {
+    }
 
     public MetaData(Charset encoding) {
         this.encoding = encoding;
@@ -462,8 +466,8 @@ public class MetaData implements Iterable<String> {
     /**
      * Returns the encoding used during parsing.
      */
-    public Charset getEncoding() {
-        return encoding;
+    public Optional<Charset> getEncoding() {
+        return Optional.ofNullable(encoding);
     }
 
     public void setEncoding(Charset encoding) {

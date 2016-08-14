@@ -42,6 +42,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#1758](https://github.com/JabRef/jabref/issues/1758) Added a button to open Database Properties dialog help
 - Improve focus of the maintable after a sidepane gets closed (Before it would focus the toolbar or it would focus the wrong entry)
 - File open dialogs now use default extensions as primary file filter
+- Custom import formats must be slightly redesigned and recompiled as the constructor now takes an argument of the type `ImportFormatPreferences`. Just add a constructor and call `super` with the argument and you have a variable `importFormatPreferences` that contains some of the more relevant preference values. The reason behind the change is that we want to have a better architecture and not access `Globals.prefs` from all classes. It is still possible to access `Globals.prefs` in custom importers though.
 
 ### Fixed
 - Fixed [#1632](https://github.com/JabRef/jabref/issues/1632): User comments (@Comment) with or without brackets are now kept

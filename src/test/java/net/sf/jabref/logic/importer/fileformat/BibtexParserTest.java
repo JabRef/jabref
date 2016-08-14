@@ -514,7 +514,7 @@ public class BibtexParserTest {
                         + "\n"
                         + "}))"),
                 importFormatPreferences);
-        assertEquals(Globals.prefs.getDefaultEncoding(), result.getMetaData().getEncoding());
+        assertEquals(Globals.prefs.getDefaultEncoding(), result.getMetaData().getEncoding().get());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(1, c.size());

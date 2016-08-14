@@ -58,7 +58,7 @@ public class BibtexDatabaseWriterTest {
         databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new);
 
         database = new BibDatabase();
-        metaData = new MetaData(prefs.getDefaultEncoding());
+        metaData = new MetaData();
         bibtexContext = new BibDatabaseContext(database, metaData, new Defaults(BibDatabaseMode.BIBTEX));
         importFormatPreferences = ImportFormatPreferences.fromPreferences(prefs);
     }

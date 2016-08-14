@@ -22,6 +22,7 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.util.EnumSet;
 import java.util.Optional;
@@ -99,8 +100,9 @@ public class ImportCustomizationDialog extends JDialog {
         if (customImporterTable.getRowCount() > 0) {
             customImporterTable.setRowSelectionInterval(0, 0);
         }
-
         GUIUtil.correctRowHeight(customImporterTable);
+
+        ImportFormatPreferences importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
 
         JButton addFromFolderButton = new JButton(Localization.lang("Add from folder"));
         addFromFolderButton.addActionListener(e -> {
@@ -116,8 +118,9 @@ public class ImportCustomizationDialog extends JDialog {
 
                 try {
                     importer.setClassName(pathToClass(importer.getFileFromBasePath(), new File(chosenFileStr)));
-                    importer.setName(importer.getInstance().getFormatName());
-                    importer.setCliId(importer.getInstance().getId());
+                    ImportFormat importFormat = importer.getInstance(importFormatPreferences);
+                    importer.setName(importFormat.getFormatName());
+                    importer.setCliId(importFormat.getId());
                     addOrReplaceImporter(importer);
                     customImporterTable.revalidate();
                     customImporterTable.repaint();
@@ -171,9 +174,10 @@ public class ImportCustomizationDialog extends JDialog {
             } else {
                 CustomImporter importer = ((ImportTableModel) customImporterTable.getModel()).getImporter(row);
                 try {
-                    ImportFormat importFormat = importer.getInstance();
+                    ImportFormat importFormat = importer.getInstance(importFormatPreferences);
                     JOptionPane.showMessageDialog(frame, importFormat.getDescription());
-                } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException exc) {
+                } catch (IOException | ClassNotFoundException | InstantiationException | NoSuchMethodException |
+                        IllegalAccessException | InvocationTargetException exc) {
                     LOGGER.warn("Could not instantiate importer " + importer.getName(), exc);
                     JOptionPane.showMessageDialog(frame, Localization.lang("Could not instantiate %0 %1",
                             importer.getName() + ":\n", exc.getMessage()));

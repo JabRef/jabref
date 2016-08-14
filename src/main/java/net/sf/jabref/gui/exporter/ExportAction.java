@@ -124,7 +124,8 @@ public class ExportAction {
                             try {
                                 format.performExport(frame.getCurrentBasePanel().getBibDatabaseContext(),
                                         finFile.getPath(),
-                                        frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getEncoding(),
+                                        frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getEncoding()
+                                                .orElse(Globals.prefs.getDefaultEncoding()),
                                         finEntries);
                             } catch (Exception ex) {
                                 LOGGER.warn("Problem exporting", ex);

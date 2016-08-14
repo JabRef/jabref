@@ -52,17 +52,16 @@ import net.sf.jabref.model.entry.MonthUtil;
  */
 public class IsiImporter extends ImportFormat {
 
+
     private static final Pattern SUB_SUP_PATTERN = Pattern.compile("/(sub|sup)\\s+(.*?)\\s*/");
 
     // 2006.09.05: Modified pattern to avoid false positives for other files due to an
     // extra | at the end:
     private static final Pattern ISI_PATTERN = Pattern.compile("FN ISI Export Format|VR 1.|PY \\d{4}");
 
-    private final ImportFormatPreferences importFormatPreferences;
-
 
     public IsiImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+        super(importFormatPreferences);
     }
 
     @Override
@@ -346,7 +345,7 @@ public class IsiImporter extends ImportFormat {
 
             bibitems.add(b);
         }
-        return new ParserResult(bibitems, importFormatPreferences.getEncoding());
+        return new ParserResult(bibitems);
     }
 
     private static String parsePages(String value) {

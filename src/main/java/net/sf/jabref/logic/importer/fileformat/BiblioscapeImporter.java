@@ -37,11 +37,8 @@ import net.sf.jabref.model.entry.FieldName;
  */
 public class BiblioscapeImporter extends ImportFormat {
 
-    private final ImportFormatPreferences preferences;
-
-
-    public BiblioscapeImporter(ImportFormatPreferences preferences) {
-        this.preferences = preferences;
+    public BiblioscapeImporter(ImportFormatPreferences importFormatPreferences) {
+        super(importFormatPreferences);
     }
 
     @Override
@@ -295,12 +292,12 @@ public class BiblioscapeImporter extends ImportFormat {
             }
             // continuation (folding) of previous line
             if (previousLine == null) {
-                return new ParserResult(preferences.getEncoding());
+                return new ParserResult();
             }
             previousLine.append(line.trim());
         }
 
-        return new ParserResult(bibItems, preferences.getEncoding());
+        return new ParserResult(bibItems);
     }
 
 }

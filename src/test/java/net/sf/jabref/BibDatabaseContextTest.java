@@ -2,7 +2,6 @@ package net.sf.jabref;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Test;
 
@@ -13,7 +12,7 @@ public class BibDatabaseContextTest {
     @Test
     public void testTypeBasedOnDefaultBibtex() {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(),
-                new MetaData(JabRefPreferences.getInstance().getDefaultEncoding()),
+                new MetaData(),
                 new Defaults(BibDatabaseMode.BIBTEX));
         assertEquals(BibDatabaseMode.BIBTEX, bibDatabaseContext.getMode());
 
@@ -24,7 +23,7 @@ public class BibDatabaseContextTest {
     @Test
     public void testTypeBasedOnDefaultBiblatex() {
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new BibDatabase(),
-                new MetaData(JabRefPreferences.getInstance().getDefaultEncoding()),
+                new MetaData(),
                 new Defaults(BibDatabaseMode.BIBLATEX));
         assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());
 

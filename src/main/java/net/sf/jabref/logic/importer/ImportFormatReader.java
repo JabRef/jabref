@@ -16,6 +16,7 @@
 package net.sf.jabref.logic.importer;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -93,9 +94,11 @@ public class ImportFormatReader {
          */
         for (CustomImporter importer : importFormatPreferences.getCustomImportList()) {
             try {
-                ImportFormat imFo = importer.getInstance();
+                ImportFormat imFo = importer.getInstance(importFormatPreferences);
                 formats.add(imFo);
-            } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException |
+                    IllegalArgumentException | InvocationTargetException | NoSuchMethodException |
+                    SecurityException e) {
                 LOGGER.error("Could not instantiate " + importer.getName()
                         + " importer, will ignore it. Please check if the class is still available.", e);
             }

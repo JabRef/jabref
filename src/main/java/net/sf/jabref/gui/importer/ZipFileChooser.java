@@ -29,6 +29,7 @@ package net.sf.jabref.gui.importer;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -53,8 +54,10 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.GUIUtil;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
 import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
@@ -115,12 +118,14 @@ class ZipFileChooser extends JDialog {
                         .replace("/", ".");
                 importer.setClassName(className);
                 try {
-                    ImportFormat importFormat = importer.getInstance();
+                    ImportFormat importFormat = importer
+                            .getInstance(ImportFormatPreferences.fromPreferences(Globals.prefs));
                     importer.setName(importFormat.getFormatName());
                     importer.setCliId(importFormat.getId());
                     importCustomizationDialog.addOrReplaceImporter(importer);
                     dispose();
-                } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException exc) {
+                } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException |
+                        NoSuchMethodException | InvocationTargetException exc) {
                     LOGGER.warn("Could not instantiate importer: " + importer.getName(), exc);
                     JOptionPane.showMessageDialog(this, Localization.lang("Could not instantiate %0 %1",
                             importer.getName() + ":\n", exc.getMessage()));

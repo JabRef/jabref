@@ -8,6 +8,7 @@ import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class BibtexTestData {
 
@@ -26,7 +27,8 @@ public class BibtexTestData {
                         + "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n" + "  issn = {1526-5455},"
                         + "\n" + "  publisher = {INFORMS}\n" + "}");
 
-        BibtexParser parser = new BibtexParser(reader, ImportFormatPreferences.fromPreferences(Globals.prefs));
+        BibtexParser parser = new BibtexParser(reader,
+                ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
         ParserResult result = parser.parse();
 
         return result.getDatabase();

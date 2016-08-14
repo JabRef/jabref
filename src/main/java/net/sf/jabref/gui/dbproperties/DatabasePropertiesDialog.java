@@ -190,7 +190,8 @@ public class DatabasePropertiesDialog extends JDialog {
     }
 
     private void setValues() {
-        encoding.setSelectedItem(panel.getBibDatabaseContext().getMetaData().getEncoding());
+        encoding.setSelectedItem(
+                panel.getBibDatabaseContext().getMetaData().getEncoding().orElse(Globals.prefs.getDefaultEncoding()));
 
         Optional<SaveOrderConfig> storedSaveOrderConfig = metaData.getSaveOrderConfig();
         boolean selected;
@@ -235,7 +236,8 @@ public class DatabasePropertiesDialog extends JDialog {
 
     private void storeSettings() {
 
-        Charset oldEncoding = panel.getBibDatabaseContext().getMetaData().getEncoding();
+        Charset oldEncoding = panel.getBibDatabaseContext().getMetaData().getEncoding()
+                .orElse(Globals.prefs.getDefaultEncoding());
         Charset newEncoding = (Charset) encoding.getSelectedItem();
         panel.getBibDatabaseContext().getMetaData().setEncoding(newEncoding);
 

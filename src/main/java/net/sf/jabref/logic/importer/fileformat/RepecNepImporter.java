@@ -172,11 +172,9 @@ public class RepecNepImporter extends ImportFormat {
     private String preLine = "";
     private boolean inOverviewSection;
 
-    private final ImportFormatPreferences importFormatPreferences;
-
 
     public RepecNepImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+        super(importFormatPreferences);
     }
 
     @Override
@@ -465,9 +463,9 @@ public class RepecNepImporter extends ImportFormat {
             }
             message += e.getLocalizedMessage();
             LOGGER.error(message, e);
-            return ParserResult.fromErrorMessage(message, importFormatPreferences.getEncoding());
+            return ParserResult.fromErrorMessage(message);
         }
 
-        return new ParserResult(bibitems, importFormatPreferences.getEncoding());
+        return new ParserResult(bibitems);
     }
 }

@@ -42,11 +42,8 @@ public class RisImporter extends ImportFormat {
 
     private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY  - .*");
 
-    private final ImportFormatPreferences importFormatPreferences;
-
-
     public RisImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+        super(importFormatPreferences);
     }
 
     @Override
@@ -281,7 +278,7 @@ public class RisImporter extends ImportFormat {
 
         }
 
-        return new ParserResult(bibitems, importFormatPreferences.getEncoding());
+        return new ParserResult(bibitems);
 
     }
 }

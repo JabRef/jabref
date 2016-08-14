@@ -97,16 +97,15 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MedlineImporter extends ImportFormat {
 
+
     private static final Log LOGGER = LogFactory.getLog(MedlineImporter.class);
     private static final String KEYWORD_SEPARATOR = "; ";
 
     private static final Locale ENGLISH = Locale.ENGLISH;
 
-    private final ImportFormatPreferences importFormatPreferences;
-
 
     public MedlineImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+        super(importFormatPreferences);
     }
 
     @Override
@@ -191,9 +190,9 @@ public class MedlineImporter extends ImportFormat {
             }
         } catch (JAXBException | XMLStreamException e) {
             LOGGER.debug("could not parse document", e);
-            return ParserResult.fromErrorMessage(e.getLocalizedMessage(), importFormatPreferences.getEncoding());
+            return ParserResult.fromErrorMessage(e.getLocalizedMessage());
         }
-        return new ParserResult(bibItems, importFormatPreferences.getEncoding());
+        return new ParserResult(bibItems);
     }
 
     private void parseBookArticle(PubmedBookArticle currentArticle, List<BibEntry> bibItems) {

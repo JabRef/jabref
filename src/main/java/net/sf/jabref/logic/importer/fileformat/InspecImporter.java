@@ -35,14 +35,12 @@ import net.sf.jabref.model.entry.FieldName;
  */
 public class InspecImporter extends ImportFormat {
 
-    private static final Pattern INSPEC_PATTERN = Pattern.compile("Record.*INSPEC.*");
-
-    private final ImportFormatPreferences importFormatPreferences;
-
-
     public InspecImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+        super(importFormatPreferences);
     }
+
+
+    private static final Pattern INSPEC_PATTERN = Pattern.compile("Record.*INSPEC.*");
 
     @Override
     public String getFormatName() {
@@ -150,6 +148,6 @@ public class InspecImporter extends ImportFormat {
 
         }
 
-        return new ParserResult(bibitems, importFormatPreferences.getEncoding());
+        return new ParserResult(bibitems);
     }
 }

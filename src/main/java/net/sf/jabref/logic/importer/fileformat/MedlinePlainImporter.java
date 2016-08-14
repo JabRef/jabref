@@ -50,11 +50,9 @@ public class MedlinePlainImporter extends ImportFormat {
     private static final Pattern CREATE_DATE_PATTERN = Pattern.compile("\\d{4}/[0123]?\\d/\\s?[012]\\d:[0-5]\\d");
     private static final Pattern COMPLETE_DATE_PATTERN = Pattern.compile("\\d{8}");
 
-    private final ImportFormatPreferences importFormatPreferences;
-
 
     public MedlinePlainImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+        super(importFormatPreferences);
     }
 
     @Override
@@ -239,7 +237,7 @@ public class MedlinePlainImporter extends ImportFormat {
             bibitems.add(b);
         }
 
-        return new ParserResult(bibitems, importFormatPreferences.getEncoding());
+        return new ParserResult(bibitems);
 
     }
 

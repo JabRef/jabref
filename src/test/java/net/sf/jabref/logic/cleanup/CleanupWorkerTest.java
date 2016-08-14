@@ -55,7 +55,7 @@ public class CleanupWorkerTest {
 
         pdfFolder = bibFolder.newFolder();
 
-        MetaData metaData = new MetaData(Globals.prefs.getDefaultEncoding());
+        MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
         worker = new CleanupWorker(context, Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN),

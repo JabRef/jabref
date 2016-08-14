@@ -34,12 +34,11 @@ import net.sf.jabref.logic.xmp.XMPUtil;
 public class PdfXmpImporter extends ImportFormat {
 
     private final XMPPreferences xmpPreferences;
-    private final ImportFormatPreferences importFormatPreferences;
 
 
     public PdfXmpImporter(XMPPreferences xmpPreferences, ImportFormatPreferences importFormatPreferences) {
+        super(importFormatPreferences);
         this.xmpPreferences = xmpPreferences;
-        this.importFormatPreferences = importFormatPreferences;
     }
 
     @Override
@@ -64,10 +63,9 @@ public class PdfXmpImporter extends ImportFormat {
     public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
         Objects.requireNonNull(filePath);
         try {
-            return new ParserResult(XMPUtil.readXMP(filePath, xmpPreferences), importFormatPreferences.getEncoding());
+            return new ParserResult(XMPUtil.readXMP(filePath, xmpPreferences));
         } catch (IOException exception) {
-            return ParserResult.fromErrorMessage(exception.getLocalizedMessage(),
-                    importFormatPreferences.getEncoding());
+            return ParserResult.fromErrorMessage(exception.getLocalizedMessage());
         }
     }
 

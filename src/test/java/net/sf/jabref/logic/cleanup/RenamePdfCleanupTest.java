@@ -35,7 +35,7 @@ public class RenamePdfCleanupTest {
     @Before
     public void setUp() throws Exception {
         Globals.prefs = JabRefPreferences.getInstance();
-        MetaData metaData = new MetaData(Globals.prefs.getDefaultEncoding());
+        MetaData metaData = new MetaData();
         context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
         context.setDatabaseFile(testFolder.newFile("test.bib"));
 

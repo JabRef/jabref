@@ -55,6 +55,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class BibTeXMLImporter extends ImportFormat {
 
+
     private static final Log LOGGER = LogFactory.getLog(BibTeXMLImporter.class);
 
     private static final Pattern START_PATTERN = Pattern.compile("<(bibtex:)?file .*");
@@ -62,10 +63,9 @@ public class BibTeXMLImporter extends ImportFormat {
     private static final List<String> IGNORED_METHODS = Arrays.asList("getClass", "getAnnotate", "getContents",
             "getPrice", "getSize", "getChapter");
 
-    private final ImportFormatPreferences importFormatPreferences;
 
     public BibTeXMLImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+        super(importFormatPreferences);
     }
 
     @Override
@@ -167,7 +167,7 @@ public class BibTeXMLImporter extends ImportFormat {
             }
         } catch (JAXBException e) {
             LOGGER.error("Error with XML parser configuration", e);
-            return ParserResult.fromErrorMessage(e.getLocalizedMessage(), importFormatPreferences.getEncoding());
+            return ParserResult.fromErrorMessage(e.getLocalizedMessage());
         }
         return new ParserResult(bibItems, importFormatPreferences.getEncoding());
     }

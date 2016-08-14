@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Objects;
 
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 
@@ -40,6 +41,20 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      * TODO: Is this field really needed or would calling IdGenerator.next() suffice?
      */
     public static final String DEFAULT_BIBTEXENTRY_ID = "__ID";
+
+    /*
+     * The available preferences. If more are needed, add them to ImportFormatPreferences through a pull request.
+     */
+    protected final ImportFormatPreferences importFormatPreferences;
+
+
+    /**
+     * Any ImportFormat has a constructor with an ImportFormatPreferences argument
+     */
+
+    public ImportFormat(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
+    }
 
     /**
      * Check whether the source is in the correct format for this importer.

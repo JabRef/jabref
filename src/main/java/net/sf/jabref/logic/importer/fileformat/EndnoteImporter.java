@@ -46,10 +46,9 @@ public class EndnoteImporter extends ImportFormat {
     private static final Pattern A_PATTERN = Pattern.compile("%A .*");
     private static final Pattern E_PATTERN = Pattern.compile("%E .*");
 
-    private final ImportFormatPreferences importFormatPreferences;
 
     public EndnoteImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+        super(importFormatPreferences);
     }
 
     @Override
@@ -276,7 +275,7 @@ public class EndnoteImporter extends ImportFormat {
 
         }
 
-        return new ParserResult(bibitems, importFormatPreferences.getEncoding());
+        return new ParserResult(bibitems);
 
     }
 

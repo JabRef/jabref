@@ -118,7 +118,7 @@ public class DBMSSynchronizerTest {
 
     @Test
     public void testMetaDataChangedEventListener() {
-        MetaData testMetaData = new MetaData(Globals.prefs.getDefaultEncoding());
+        MetaData testMetaData = new MetaData();
         testMetaData.registerListener(dbmsSynchronizer);
         dbmsSynchronizer.setMetaData(testMetaData);
         testMetaData.putData("databaseType", Arrays.asList("bibtex"));
@@ -184,7 +184,7 @@ public class DBMSSynchronizerTest {
         BibEntry bibEntry = getBibEntryExample(1);
         bibDatabase.insertEntry(bibEntry);
 
-        MetaData testMetaData = new MetaData(Globals.prefs.getDefaultEncoding());
+        MetaData testMetaData = new MetaData();
         testMetaData.putData("saveActions", Arrays.asList("enabled", "author[lower_case]"));
         dbmsSynchronizer.setMetaData(testMetaData);
 

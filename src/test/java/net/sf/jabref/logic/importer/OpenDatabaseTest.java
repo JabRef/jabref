@@ -54,27 +54,27 @@ public class OpenDatabaseTest {
     @Test
     public void useFallbackEncodingIfNoHeader() throws IOException {
         ParserResult result = OpenDatabase.loadDatabase(bibNoHeader, importFormatPreferences);
-        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding());
+        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding().get());
     }
 
     @Test
     public void useFallbackEncodingIfUnknownHeader() throws IOException {
         ParserResult result = OpenDatabase.loadDatabase(bibWrongHeader, importFormatPreferences);
-        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding());
+        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding().get());
     }
 
     @Test
     public void useSpecifiedEncoding() throws IOException {
         ParserResult result = OpenDatabase.loadDatabase(bibHeader,
                 importFormatPreferences.withEncoding(StandardCharsets.US_ASCII));
-        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding());
+        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding().get());
     }
 
     @Test
     public void useSpecifiedEncodingWithSignature() throws IOException {
         ParserResult result = OpenDatabase.loadDatabase(bibHeaderAndSignature,
                 importFormatPreferences.withEncoding(StandardCharsets.US_ASCII));
-        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding());
+        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding().get());
     }
 
     @Test
@@ -113,7 +113,7 @@ public class OpenDatabaseTest {
     @Test
     public void correctlyParseEncodingWithoutNewline() throws IOException {
         ParserResult result = OpenDatabase.loadDatabase(bibEncodingWithoutNewline, importFormatPreferences);
-        Assert.assertEquals(StandardCharsets.US_ASCII, result.getMetaData().getEncoding());
+        Assert.assertEquals(StandardCharsets.US_ASCII, result.getMetaData().getEncoding().get());
 
         BibDatabase db = result.getDatabase();
         Assert.assertEquals("testPreamble", db.getPreamble());

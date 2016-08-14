@@ -63,8 +63,8 @@ public class Benchmarks {
         }
         BibtexDatabaseWriter<StringSaveSession> databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new);
         StringSaveSession saveSession = databaseWriter.savePartOfDatabase(
-                new BibDatabaseContext(database, new MetaData(Globals.prefs.getDefaultEncoding()), new Defaults()),
-                database.getEntries(), new SavePreferences());
+                new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries(),
+                new SavePreferences());
         bibtexString = saveSession.getStringValue();
 
         latexConversionString = "{A} \\textbf{bold} approach {\\it to} ${{\\Sigma}}{\\Delta}$ modulator \\textsuperscript{2} \\$";
@@ -84,8 +84,8 @@ public class Benchmarks {
     public String write() throws Exception {
         BibtexDatabaseWriter<StringSaveSession> databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new);
         StringSaveSession saveSession = databaseWriter.savePartOfDatabase(
-                new BibDatabaseContext(database, new MetaData(Globals.prefs.getDefaultEncoding()), new Defaults()),
-                database.getEntries(), new SavePreferences());
+                new BibDatabaseContext(database, new MetaData(), new Defaults()), database.getEntries(),
+                new SavePreferences());
         return saveSession.getStringValue();
     }
 

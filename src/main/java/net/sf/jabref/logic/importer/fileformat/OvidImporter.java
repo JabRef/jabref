@@ -57,11 +57,8 @@ public class OvidImporter extends ImportFormat {
 
     private static final int MAX_ITEMS = 50;
 
-    private final ImportFormatPreferences importFormatPreferences;
-
-
     public OvidImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+        super(importFormatPreferences);
     }
 
     @Override
@@ -237,7 +234,7 @@ public class OvidImporter extends ImportFormat {
 
         }
 
-        return new ParserResult(bibitems, importFormatPreferences.getEncoding());
+        return new ParserResult(bibitems);
     }
 
     /**

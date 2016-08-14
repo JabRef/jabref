@@ -38,11 +38,8 @@ import org.xml.sax.InputSource;
  */
 public class MsBibImporter extends ImportFormat {
 
-    private final ImportFormatPreferences importFormatPreferences;
-
-
     public MsBibImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+        super(importFormatPreferences);
     }
 
     @Override
@@ -71,7 +68,7 @@ public class MsBibImporter extends ImportFormat {
         Objects.requireNonNull(reader);
 
         MSBibDatabase dbase = new MSBibDatabase();
-        return new ParserResult(dbase.importEntries(reader), importFormatPreferences.getEncoding());
+        return new ParserResult(dbase.importEntries(reader));
     }
 
     @Override

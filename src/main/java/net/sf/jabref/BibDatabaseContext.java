@@ -43,7 +43,7 @@ public class BibDatabaseContext {
     }
 
     public BibDatabaseContext(BibDatabase database, Defaults defaults) {
-        this(database, new MetaData(Globals.prefs.getDefaultEncoding()), defaults);
+        this(database, new MetaData(), defaults);
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, Defaults defaults) {
@@ -73,7 +73,7 @@ public class BibDatabaseContext {
     }
 
     public BibDatabaseContext(Defaults defaults, DatabaseLocation location) {
-        this(new BibDatabase(), new MetaData(Globals.prefs.getDefaultEncoding()), defaults, location);
+        this(new BibDatabase(), new MetaData(), defaults, location);
     }
 
     public BibDatabaseMode getMode() {

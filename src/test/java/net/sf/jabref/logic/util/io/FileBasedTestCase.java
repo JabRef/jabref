@@ -12,10 +12,8 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.jabref.BibtexTestData;
-import net.sf.jabref.Globals;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -25,7 +23,6 @@ import org.junit.rules.TemporaryFolder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 public class FileBasedTestCase {
 
@@ -38,8 +35,6 @@ public class FileBasedTestCase {
 
     @Before
     public void setUp() throws IOException {
-        Globals.prefs = mock(JabRefPreferences.class);
-
         BibDatabase database = BibtexTestData.getBibtexDatabase();
         entry = database.getEntries().iterator().next();
 

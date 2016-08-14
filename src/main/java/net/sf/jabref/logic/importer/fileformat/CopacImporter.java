@@ -39,11 +39,9 @@ public class CopacImporter extends ImportFormat {
 
     private static final Pattern COPAC_PATTERN = Pattern.compile("^\\s*TI- ");
 
-    private final ImportFormatPreferences importFormatPreferences;
-
 
     public CopacImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+        super(importFormatPreferences);
     }
 
     @Override
@@ -158,7 +156,7 @@ public class CopacImporter extends ImportFormat {
             results.add(b);
         }
 
-        return new ParserResult(results, importFormatPreferences.getEncoding());
+        return new ParserResult(results);
     }
 
     private static void setOrAppend(BibEntry b, String field, String value, String separator) {

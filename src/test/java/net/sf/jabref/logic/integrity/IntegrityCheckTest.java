@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
+import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -16,6 +17,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -29,6 +31,12 @@ public class IntegrityCheckTest {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
+
+
+    @Before
+    public void setUp() {
+        Globals.prefs = JabRefPreferences.getInstance();
+    }
 
     @Test
     public void testUrlChecks() {
@@ -231,7 +239,7 @@ public class IntegrityCheckTest {
     }
 
     private BibDatabaseContext createContext(String field, String value) {
-        return createContext(field, value, new MetaData(JabRefPreferences.getInstance().getDefaultEncoding()));
+        return createContext(field, value, new MetaData());
     }
 
     private void assertWrong(BibDatabaseContext context) {

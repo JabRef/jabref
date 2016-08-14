@@ -49,12 +49,24 @@ public class ParserResult {
     private boolean toOpenTab;
 
 
+    public ParserResult() {
+        this(Collections.emptyList());
+    }
+
     public ParserResult(Charset encoding) {
         this(Collections.emptyList(), encoding);
     }
 
+    public ParserResult(Collection<BibEntry> entries) {
+        this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)));
+    }
+
     public ParserResult(Collection<BibEntry> entries, Charset encoding) {
         this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)), encoding);
+    }
+
+    public ParserResult(BibDatabase database) {
+        this(database, new MetaData(), new HashMap<>());
     }
 
     public ParserResult(BibDatabase database, Charset encoding) {
@@ -67,11 +79,12 @@ public class ParserResult {
         this.entryTypes = entryTypes;
     }
 
-    public static ParserResult fromErrorMessage(String message, Charset encoding) {
-        ParserResult parserResult = new ParserResult(encoding);
+    public static ParserResult fromErrorMessage(String message) {
+        ParserResult parserResult = new ParserResult();
         parserResult.addWarning(message);
         return parserResult;
     }
+
 
     /**
      * Check if this base is marked to be added to the currently open tab. Default is false.

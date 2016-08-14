@@ -37,7 +37,7 @@ public class MoveFilesCleanupTest {
         Globals.prefs = JabRefPreferences.getInstance();
 
         pdfFolder = bibFolder.newFolder();
-        MetaData metaData = new MetaData(Globals.prefs.getDefaultEncoding());
+        MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
         databaseContext = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
 

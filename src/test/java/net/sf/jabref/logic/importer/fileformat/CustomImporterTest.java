@@ -47,7 +47,7 @@ public class CustomImporterTest {
 
     @Test
     public void testGetInstance() throws Exception {
-        assertEquals(new CopacImporter(importFormatPreferences), importer.getInstance());
+        assertEquals(new CopacImporter(importFormatPreferences), importer.getInstance(importFormatPreferences));
     }
 
     @Test
