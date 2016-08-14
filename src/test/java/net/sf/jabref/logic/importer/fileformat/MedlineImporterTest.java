@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.FileExtensions;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
@@ -71,9 +71,7 @@ public class MedlineImporterTest {
 
     @Test
     public void testsGetExtensions() {
-
         assertEquals(FileExtensions.MEDLINE, importer.getExtensions());
-
     }
 
     @Test
@@ -83,7 +81,7 @@ public class MedlineImporterTest {
 
     @Test
     public void testIsRecognizedFormatReject() throws IOException {
-       List<Path> list = getTestFiles().stream().filter(n -> !n.getFileName().toString().startsWith("MedlineImporter"))
+        List<Path> list = getTestFiles().stream().filter(n -> !n.getFileName().toString().startsWith("MedlineImporter"))
                 .collect(Collectors.toList());
 
         for (Path file : list) {

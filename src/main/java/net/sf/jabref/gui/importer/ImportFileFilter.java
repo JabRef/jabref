@@ -20,22 +20,20 @@ import java.io.File;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.logic.importer.fileformat.ImportFormat;
+import net.sf.jabref.logic.util.FileExtensions;
 
 class ImportFileFilter extends FileFilter implements Comparable<ImportFileFilter> {
 
     private final ImportFormat format;
     private final String name;
     private final FileNameExtensionFilter filextFilter;
-    private final FileExtensions extensions;
 
 
     public ImportFileFilter(ImportFormat format) {
         this.format = format;
-        this.extensions = format.getExtensions();
+        FileExtensions extensions = format.getExtensions();
         this.name = extensions.getDescription();
-
         filextFilter = new FileNameExtensionFilter(extensions.getDescription(), extensions.getExtensions());
     }
 

@@ -22,9 +22,9 @@ import java.util.Objects;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
+import net.sf.jabref.logic.util.FileExtensions;
 
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;

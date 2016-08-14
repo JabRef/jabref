@@ -27,9 +27,9 @@ import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
-import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.FileExtensions;
 
 /**
  * Action used to produce a "Browse" button for one of the text fields.

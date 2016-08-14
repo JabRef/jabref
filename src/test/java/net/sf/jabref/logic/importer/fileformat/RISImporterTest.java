@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.FileExtensions;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;

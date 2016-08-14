@@ -25,8 +25,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Objects;
 
-import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.util.FileExtensions;
 
 /**
  * Role of an importer for JabRef.
@@ -117,13 +117,11 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      */
     public abstract String getFormatName();
 
-    /**
-     * Returns the file extensions that this importer can read.
-     *
-     *
-     */
-    // public abstract List<String> getExtensions();
 
+    /**
+     * Returns the file extensions that this importer can read
+     * @return {@link FileExtensions} correspoding to the importer
+     */
     public abstract FileExtensions getExtensions();
 
     /**

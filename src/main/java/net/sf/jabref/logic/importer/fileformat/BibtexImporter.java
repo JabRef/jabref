@@ -22,10 +22,10 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.util.FileExtensions;
 
 /**
  * This importer exists only to enable `--importToOpen someEntry.bib`

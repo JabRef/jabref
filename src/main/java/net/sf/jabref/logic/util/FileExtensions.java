@@ -1,4 +1,4 @@
-package net.sf.jabref.gui;
+package net.sf.jabref.logic.util;
 
 import java.util.StringJoiner;
 
@@ -37,7 +37,7 @@ public enum FileExtensions {
     JSTYLE(Localization.lang("Style file"), "jstyle"),
     LAYOUT(Localization.lang("Custom layout file"), "layout"),
     TERMS(Localization.lang("Protected terms file"), "terms"),
-    TXT(Localization.lang("%0 file", Localization.lang("plain text")), "txt"),
+    TXT(Localization.lang("%0 file", Localization.lang("Plain text")), "txt"),
     CLASS(Localization.lang("%0 file", "CLASS"), "class"),
     JAR(Localization.lang("%0 file", "JAR"), "jar"),
     XML(Localization.lang("%0 file", "XML"), "xml"),

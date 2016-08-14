@@ -9,8 +9,8 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -21,6 +21,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
+
+import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
 public class SilverPlatterImporterTest {
@@ -44,12 +46,12 @@ public class SilverPlatterImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        Assert.assertEquals(FileExtensions.SILVER_PLATTER, testImporter.getExtensions());
+        assertEquals(FileExtensions.SILVER_PLATTER, testImporter.getExtensions());
     }
 
     @Test
     public void testGetDescription() {
-        Assert.assertEquals("Imports a SilverPlatter exported file.", testImporter.getDescription());
+        assertEquals("Imports a SilverPlatter exported file.", testImporter.getDescription());
     }
 
     @Parameters(name = "{index}: {0}")
