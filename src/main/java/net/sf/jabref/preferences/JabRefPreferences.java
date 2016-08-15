@@ -740,7 +740,7 @@ public class JabRefPreferences {
         defaults.put(ACTIVE_PREVIEW, 0);
         defaults.put(PREVIEW_0,
                 "<font face=\"sans-serif\">"
-                        + "<b><i>\\entrytype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
+                        + "<b><i>\\format[EntryTypeFormatter]{\\entrytype}</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
                         + "\\end{bibtexkey}</b><br>__NEWLINE__"
                         + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
                         + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
@@ -760,7 +760,7 @@ public class JabRefPreferences {
                         + "</dd>__NEWLINE__<p></p></font>");
         defaults.put(PREVIEW_1,
                 "<font face=\"sans-serif\">"
-                        + "<b><i>\\entrytype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
+                        + "<b><i>\\format[EntryTypeFormatter]{\\entrytype}</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
                         + "\\end{bibtexkey}</b><br>__NEWLINE__"
                         + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
                         + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "

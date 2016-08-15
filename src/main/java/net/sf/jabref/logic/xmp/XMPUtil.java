@@ -821,19 +821,7 @@ public class XMPUtil {
                 continue;
             }
 
-            /**
-             * entrytype -> relation
-             *
-             * Field: dc:relation
-             *
-             * Type: bag Text
-             *
-             * Category: External
-             *
-             * Description: Relationships to other documents.
-             *
-             * Bibtex-Fields used: entrytype
-             */
+
             /**
              * All others (including the bibtex key) get packaged in the
              * relation attribute
@@ -854,7 +842,7 @@ public class XMPUtil {
         dcSchema.setFormat("application/pdf");
 
         /**
-         * Type -> Type
+         * entrytype -> Type
          *
          * Field: dc:type
          *
@@ -865,7 +853,7 @@ public class XMPUtil {
          * Description: A document type; for example, novel, poem, or working
          * paper.
          *
-         * Bibtex-Fields used: title
+         * Bibtex-Fields used: entrytype
          */
         TypedBibEntry typedEntry = new TypedBibEntry(entry, BibDatabaseMode.BIBTEX);
         String o = typedEntry.getTypeForDisplay();

@@ -56,6 +56,7 @@ import net.sf.jabref.logic.layout.format.DOICheck;
 import net.sf.jabref.logic.layout.format.DOIStrip;
 import net.sf.jabref.logic.layout.format.DateFormatter;
 import net.sf.jabref.logic.layout.format.Default;
+import net.sf.jabref.logic.layout.format.EntryTypeFormatter;
 import net.sf.jabref.logic.layout.format.FileLink;
 import net.sf.jabref.logic.layout.format.FirstPage;
 import net.sf.jabref.logic.layout.format.FormatPagesForHTML;
@@ -490,6 +491,8 @@ class LayoutEntry {
             return new DOICheck();
         case "DOIStrip":
             return new DOIStrip();
+        case "EntryTypeFormatter":
+            return new EntryTypeFormatter();
         case "FirstPage":
             return new FirstPage();
         case "FormatPagesForHTML":
