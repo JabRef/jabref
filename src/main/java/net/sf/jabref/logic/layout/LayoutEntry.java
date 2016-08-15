@@ -56,6 +56,7 @@ import net.sf.jabref.logic.layout.format.DOICheck;
 import net.sf.jabref.logic.layout.format.DOIStrip;
 import net.sf.jabref.logic.layout.format.DateFormatter;
 import net.sf.jabref.logic.layout.format.Default;
+import net.sf.jabref.logic.layout.format.EntryTypeFormatter;
 import net.sf.jabref.logic.layout.format.FileLink;
 import net.sf.jabref.logic.layout.format.FirstPage;
 import net.sf.jabref.logic.layout.format.FormatPagesForHTML;
@@ -235,9 +236,15 @@ class LayoutEntry {
     private String handleOptionField(BibEntry bibtex, BibDatabase database) {
         String fieldEntry;
 
-        if ("bibtextype".equals(text)) {
+        if (BibEntry.TYPE_HEADER.equals(text)) {
+            fieldEntry = bibtex.getType();
+        } else if (BibEntry.OBSOLETE_TYPE_HEADER.equals(text)) {
+            LOGGER.warn("'" + BibEntry.OBSOLETE_TYPE_HEADER
+                    + "' is an obsolete name for the entry type. Please update your layout to use '"
+                    + BibEntry.TYPE_HEADER + "' instead.");
             fieldEntry = bibtex.getType();
         } else {
+
             // changed section begin - arudert
             // resolve field (recognized by leading backslash) or text
             fieldEntry = text.startsWith("\\") ? BibDatabase
@@ -484,6 +491,8 @@ class LayoutEntry {
             return new DOICheck();
         case "DOIStrip":
             return new DOIStrip();
+        case "EntryTypeFormatter":
+            return new EntryTypeFormatter();
         case "FirstPage":
             return new FirstPage();
         case "FormatPagesForHTML":

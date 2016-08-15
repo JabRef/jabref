@@ -50,6 +50,7 @@ public class BibEntry implements Cloneable {
     private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
 
     public static final String TYPE_HEADER = "entrytype";
+    public static final String OBSOLETE_TYPE_HEADER = "bibtextype";
     public static final String KEY_FIELD = "bibtexkey";
     protected static final String ID_FIELD = "id";
     public static final String DEFAULT_TYPE = "misc";
