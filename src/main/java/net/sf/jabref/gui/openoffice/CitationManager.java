@@ -17,6 +17,7 @@ package net.sf.jabref.gui.openoffice;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -39,8 +40,6 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.openoffice.CitationEntry;
-import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -89,9 +88,9 @@ class CitationManager {
         }
         tableModel = new DefaultEventTableModel<>(list, new CitationEntryFormat());
         table = new JTable(tableModel);
-        if (OS.WINDOWS) { // Arbitrary tables scales with menu font size on Windows
-            table.setRowHeight(Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + 2);
-        }
+        // Fix table row height
+        FontMetrics metrics = table.getFontMetrics(table.getFont());
+        table.setRowHeight(Math.max(table.getRowHeight(), metrics.getHeight()));
 
         diag.add(new JScrollPane(table), BorderLayout.CENTER);
 

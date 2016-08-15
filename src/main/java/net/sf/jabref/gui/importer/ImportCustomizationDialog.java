@@ -19,6 +19,7 @@ package net.sf.jabref.gui.importer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
@@ -56,8 +57,6 @@ import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.xmp.XMPPreferences;
-import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
@@ -101,9 +100,9 @@ public class ImportCustomizationDialog extends JDialog {
             customImporterTable.setRowSelectionInterval(0, 0);
         }
 
-        if (OS.WINDOWS) { // Arbitrary tables scales with menu font size on Windows
-            customImporterTable.setRowHeight(Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + 2);
-        }
+        // Set table height
+        FontMetrics metrics = customImporterTable.getFontMetrics(customImporterTable.getFont());
+        customImporterTable.setRowHeight(Math.max(customImporterTable.getRowHeight(), metrics.getHeight()));
 
         JButton addFromFolderButton = new JButton(Localization.lang("Add from folder"));
         addFromFolderButton.addActionListener(e -> {

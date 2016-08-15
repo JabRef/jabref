@@ -19,6 +19,7 @@ import java.awt.AWTKeyStroke;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.KeyboardFocusManager;
 import java.awt.event.FocusListener;
 import java.util.Collections;
@@ -49,11 +50,9 @@ import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
-import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -155,9 +154,9 @@ class EntryEditorTab {
                 fieldEditor = new FileListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent);
 
                 fileListEditor = (FileListEditor) fieldEditor;
-                if (OS.WINDOWS) { // Arbitrary tables scales with menu font size on Windows
-                    fileListEditor.setRowHeight(Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + 2);
-                }
+                // Fix table row height
+                FontMetrics metrics = fileListEditor.getFontMetrics(fileListEditor.getFont());
+                fileListEditor.setRowHeight(Math.max(fileListEditor.getRowHeight(), metrics.getHeight()));
                 defaultHeight = 0;
             } else {
                 fieldEditor = new TextArea(field, null);

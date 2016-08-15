@@ -17,6 +17,7 @@ package net.sf.jabref.gui.exporter;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,8 +45,6 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.gui.TableFormat;
 import ca.odell.glazedlists.swing.DefaultEventTableModel;
@@ -85,9 +84,9 @@ public class ExportCustomizationDialog extends JDialog {
             table.setRowSelectionInterval(0, 0);
         }
 
-        if (OS.WINDOWS) { // Arbitrary tables scales with menu font size on Windows
-            table.setRowHeight(Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + 2);
-        }
+        // Fix table row height
+        FontMetrics metrics = table.getFontMetrics(table.getFont());
+        table.setRowHeight(Math.max(table.getRowHeight(), metrics.getHeight()));
 
         JButton addExport = new JButton(Localization.lang("Add new"));
         addExport.addActionListener(e -> {

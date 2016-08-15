@@ -18,6 +18,7 @@ package net.sf.jabref.gui.importer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -103,7 +104,6 @@ import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.database.BibDatabase;
@@ -238,9 +238,9 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         setupComparatorChooser();
         glTable.addMouseListener(new TableClickListener());
 
-        if (OS.WINDOWS) { // Arbitrary tables scales with menu font size on Windows
-            glTable.setRowHeight(Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + 2);
-        }
+        // Fix table row height
+        FontMetrics metrics = glTable.getFontMetrics(glTable.getFont());
+        glTable.setRowHeight(Math.max(glTable.getRowHeight(), metrics.getHeight()));
 
         setWidths();
 
