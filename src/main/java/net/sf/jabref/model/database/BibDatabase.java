@@ -201,7 +201,7 @@ public class BibDatabase {
         entry.registerListener(this);
 
         eventBus.post(new EntryAddedEvent(entry, eventSource));
-        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKeyOptional());
+        return duplicationChecker.checkForDuplicateKeyAndAdd(Optional.empty(), entry.getCiteKeyOptional());
     }
 
     /**

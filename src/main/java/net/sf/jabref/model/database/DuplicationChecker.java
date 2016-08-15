@@ -30,7 +30,7 @@ class DuplicationChecker {
     public boolean checkForDuplicateKeyAndAdd(Optional<String> oldKey, Optional<String> newKey) {
 
         boolean duplicate;
-        if (!oldKey.isPresent()) {// this is a new entry so don't bother removing oldKey
+        if (!oldKey.isPresent() && newKey.isPresent()) {// this is a new entry so don't bother removing oldKey
             duplicate = addKeyToSet(newKey.get());
         } else {
             if (oldKey.equals(newKey)) {// were OK because the user did not change keys
