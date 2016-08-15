@@ -35,10 +35,13 @@ import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
 import javax.swing.tree.DefaultMutableTreeNode;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
 
@@ -64,6 +67,9 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
         }
         tree = new JTree(root);
         tree.addTreeSelectionListener(this);
+        if (OS.WINDOWS) { // Arbitrary trees scale with menu font size on Windows
+            tree.setRowHeight(Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + 2);
+        }
         JSplitPane pane = new JSplitPane();
         pane.setLeftComponent(new JScrollPane(tree));
         JPanel infoBorder = new JPanel();
