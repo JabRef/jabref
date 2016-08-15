@@ -22,6 +22,7 @@ import javax.swing.Icon;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.SpecialFields;
 
 public class Rank extends SpecialField {
 
@@ -55,7 +56,7 @@ public class Rank extends SpecialField {
 
     @Override
     public String getFieldName() {
-        return SpecialFieldsUtils.FIELDNAME_RANKING;
+        return SpecialFields.FIELDNAME_RANKING;
     }
 
     @Override public String getLocalizedFieldName() {

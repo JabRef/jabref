@@ -25,6 +25,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Undo/redo are enabled/disabled and show the action in the tool tip
 - Added ISBN integrity checker
 - Added filter to not show selected integrity checks
+- The contents of `crossref` and `related` will be automatically updated if a linked entry changes key
 - Enhance the entry customization dialog to give better visual feedback
 - It is now possible to generate a new BIB database from the citations in an OpenOffice/LibreOffice document
 - The arXiv fetcher now also supports free-text search queries
@@ -32,21 +33,24 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - It is now possible to add your own lists of protected terms, see Options -> Manage protected terms
 - Automatically generated group names are now converted from LaTeX to Unicode
 - Unified dialogs for opening/saving files
+- Add integrity check to avoid non-ASCII characters in BibTeX files
 
 ### Fixed
-- Fixed [#1632](https://github.com/JabRef/jabref/issues/1632) User comments (@Comment) with or without brackets are now kept
+- Fixed [#1632](https://github.com/JabRef/jabref/issues/1632): User comments (@Comment) with or without brackets are now kept
 - Fixed [#1264](https://github.com/JabRef/jabref/issues/1264): S with caron does not render correctly
 - LaTeX to Unicode converter now handles combining accents
 - Fixed NullPointerException when clicking Browse in Journal abbreviations with empty text field
 - Fixed NullPointerException when opening file in Plain text import
 - Fixed NullPointerException when appending database
 - Fixed [#636](https://github.com/JabRef/jabref/issues/636): DOI in export filters
+- Fixed [#1519](https://github.com/JabRef/jabref/issues/1519): The word "Seiten" is automatically removed when fetching info from ISBN
 - Fixed [#1527](https://github.com/JabRef/jabref/issues/1527): 'Get BibTeX data from DOI' Removes Marking
 - Fixed [#1592](https://github.com/JabRef/jabref/issues/1592): LibreOffice: wrong numbers in citation labels
 - The merge entry dialog showed wrong heading after merging from DOI
 - Fixed [#1321](https://github.com/JabRef/jabref/issues/1321): LaTeX commands in fields not displayed in the list of references
 - Fixed [#1639](https://github.com/JabRef/jabref/issues/1639): Google Scholar fetching works again.
 - Date fields in the BibLatex standard are now always formatted in the correct way, independent of the preferences
+- Manage content selectors now saves edited existing lists again and only marks database as changed when the content selectors are changed
 - Fixed [#1554](https://github.com/JabRef/jabref/issues/1554): Import dialog is no longer hidden behind main window
 - Fixed [#1643](https://github.com/JabRef/jabref/issues/1643): Searching with double quotes in a specific field ignores the last character
 - Fixed [#1288](https://github.com/JabRef/jabref/issues/1288): Newly opened bib-file is not focused
@@ -57,6 +61,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed NullPointerException when clicking OK without specifying a field name in set/clear/rename fields
 - Fixed IndexOutOfBoundsException when trying to download a full text document without selecting an entry
 - Fixed NullPointerException when trying to set a special field or mark an entry through the menu without having an open database
+- Fixed [#1257](https://github.com/JabRef/jabref/issues/1324): Preferences for the BibTeX key generator set in a version prior to 3.2 are now migrated automatically to the new version
+- Fixed [#1716](https://github.com/JabRef/jabref/issues/1716): `@`-Symbols stored in BibTeX fields no longer break the database
 
 ### Removed
 - It is not longer possible to choose to convert HTML sub- and superscripts to equations

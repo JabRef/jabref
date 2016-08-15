@@ -206,7 +206,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
                 .layout(new FormLayout("left:pref:grow, 4dlu, left:pref:grow, 4dlu, pref:grow, 4dlu, right:pref",
                         "pref, 2dlu, pref:grow, 2dlu"));
 
-        List<String> fieldNames = new ArrayList<>(InternalBibtexFields.getAllFieldNames());
+        List<String> fieldNames = InternalBibtexFields.getAllPublicFieldNames();
         fieldNames.add(BibEntry.KEY_FIELD);
         fieldNames.add("all");
         Collections.sort(fieldNames);

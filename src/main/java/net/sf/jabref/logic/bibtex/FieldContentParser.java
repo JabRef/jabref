@@ -16,6 +16,7 @@
 package net.sf.jabref.logic.bibtex;
 
 import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -27,7 +28,8 @@ import net.sf.jabref.model.entry.FieldName;
  * writing the same fields.
  */
 public class FieldContentParser {
-    private final HashSet<String> multiLineFields;
+
+    private final Set<String> multiLineFields;
 
     // 's' matches a space, tab, new line, carriage return.
     private static final Pattern WHITESPACE = Pattern.compile("\\s+");

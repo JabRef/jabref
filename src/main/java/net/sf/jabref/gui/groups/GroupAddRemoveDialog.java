@@ -61,7 +61,6 @@ public class GroupAddRemoveDialog implements BaseAction {
     private final boolean move;
     private List<BibEntry> selection;
     private JTree tree;
-    private JButton ok;
 
 
     public GroupAddRemoveDialog(BasePanel panel, boolean add, boolean move) {
@@ -83,7 +82,7 @@ public class GroupAddRemoveDialog implements BaseAction {
                 (add ? (move ? Localization.lang("Move to group") : Localization.lang("Add to group")) : Localization
                         .lang("Remove from group")),
                 true);
-        ok = new JButton(Localization.lang("OK"));
+        JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
         tree = new JTree(new GroupTreeNodeViewModel(groups));
         tree.setCellRenderer(new AddRemoveGroupTreeCellRenderer());

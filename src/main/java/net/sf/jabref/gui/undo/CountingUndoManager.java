@@ -32,11 +32,6 @@ public class CountingUndoManager extends UndoManager {
 
     private final EventBus eventBus = new EventBus();
 
-
-    public CountingUndoManager() {
-        super();
-    }
-
     @Override
     public synchronized boolean addEdit(UndoableEdit edit) {
         current++;

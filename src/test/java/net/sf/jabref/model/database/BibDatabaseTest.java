@@ -1,20 +1,12 @@
 package net.sf.jabref.model.database;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.event.TestEventListener;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -37,27 +29,9 @@ public class BibDatabaseTest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance(); // set preferences for this test
-
         database = new BibDatabase();
     }
 
-    @Test
-    public void resolveStrings() throws IOException {
-        try (FileInputStream stream = new FileInputStream("src/test/resources/net/sf/jabref/util/twente.bib");
-                InputStreamReader fr = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            ParserResult result = BibtexParser.parse(fr);
-
-            BibDatabase db = result.getDatabase();
-
-            assertEquals("Arvind", db.resolveForStrings("#Arvind#"));
-            assertEquals("Patterson, David", db.resolveForStrings("#Patterson#"));
-            assertEquals("Arvind and Patterson, David", db.resolveForStrings("#Arvind# and #Patterson#"));
-
-            // Strings that are not found return just the given string.
-            assertEquals("#unknown#", db.resolveForStrings("#unknown#"));
-        }
-    }
 
     @Test
     public void insertEntryAddsEntryToEntriesList() {

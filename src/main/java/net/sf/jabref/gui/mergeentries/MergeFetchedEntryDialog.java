@@ -51,7 +51,6 @@ public class MergeFetchedEntryDialog extends JDialog {
     private NamedCompound ce;
     private MergeEntries mergeEntries;
     private final String type;
-
     private static final String MARGIN = "5px";
 
 

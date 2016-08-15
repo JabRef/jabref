@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.groups;
 
-import net.sf.jabref.importer.fileformat.ParseException;
+import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 

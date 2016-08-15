@@ -41,6 +41,7 @@ import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -214,7 +215,7 @@ public class FileListEntryEditor {
             public void windowActivated(WindowEvent event) {
                 if (openBrowseWhenShown && !dontOpenBrowseUntilDisposed) {
                     dontOpenBrowseUntilDisposed = true;
-                    // SwingUtilities.invokeLater(() -> browse.actionPerformed(new ActionEvent(browseBut, 0, "")));
+                    SwingUtilities.invokeLater(() -> browsePressed.actionPerformed(new ActionEvent(browseBut, 0, "")));
                 }
             }
 
@@ -345,6 +346,7 @@ public class FileListEntryEditor {
 
     public boolean okPressed() {
         return okPressed;
+
     }
 
 

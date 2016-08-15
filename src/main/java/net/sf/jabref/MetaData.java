@@ -33,18 +33,18 @@ import java.util.Vector;
 
 import net.sf.jabref.event.GroupUpdatedEvent;
 import net.sf.jabref.event.MetaDataChangedEvent;
-import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.labelpattern.AbstractLabelPattern;
-import net.sf.jabref.model.labelpattern.DatabaseLabelPattern;
 
 import com.google.common.eventbus.EventBus;
 import org.apache.commons.logging.Log;
@@ -70,9 +70,9 @@ public class MetaData implements Iterable<String> {
     private GroupTreeNode groupsRoot;
     private final EventBus eventBus = new EventBus();
 
-    private AbstractLabelPattern labelPattern;
+    private AbstractBibtexKeyPattern bibtexKeyPattern;
 
-    private Charset encoding = Globals.prefs.getDefaultEncoding();
+    private Charset encoding;
 
     /**
      * The MetaData object stores all meta data sets in Vectors. To ensure that
@@ -80,20 +80,31 @@ public class MetaData implements Iterable<String> {
      * must simply make sure the appropriate changes are reflected in the Vector
      * it has been passed.
      */
-    private MetaData(Map<String, String> inData) throws ParseException {
+    private MetaData(Map<String, String> inData, Charset encoding) throws ParseException {
         Objects.requireNonNull(inData);
         setData(inData);
+        this.encoding = encoding;
     }
 
     /**
      * The MetaData object can be constructed with no data in it.
      */
+    @Deprecated
     public MetaData() {
-        // No data
+        this(Globals.prefs.getDefaultEncoding());
     }
 
+    public MetaData(Charset encoding) {
+        this.encoding = encoding;
+    }
+
+    @Deprecated
     public static MetaData parse(Map<String, String> data) throws ParseException {
-        return new MetaData(data);
+        return new MetaData(data, Globals.prefs.getDefaultEncoding());
+    }
+
+    public static MetaData parse(Map<String, String> data, Charset encoding) throws ParseException {
+        return new MetaData(data, encoding);
     }
 
     public void setData(Map<String, String> inData) throws ParseException {
@@ -239,36 +250,36 @@ public class MetaData implements Iterable<String> {
     /**
      * @return the stored label patterns
      */
-    public AbstractLabelPattern getLabelPattern() {
-        if (labelPattern != null) {
-            return labelPattern;
+    public AbstractBibtexKeyPattern getBibtexKeyPattern() {
+        if (bibtexKeyPattern != null) {
+            return bibtexKeyPattern;
         }
 
-        labelPattern = new DatabaseLabelPattern(Globals.prefs);
+        bibtexKeyPattern = new DatabaseBibtexKeyPattern(Globals.prefs);
 
-        // read the data from the metadata and store it into the labelPattern
+        // read the data from the metadata and store it into the bibtexKeyPattern
         for (String key : this) {
             if (key.startsWith(PREFIX_KEYPATTERN)) {
                 List<String> value = getData(key);
                 String type = key.substring(PREFIX_KEYPATTERN.length());
-                labelPattern.addLabelPattern(type, value.get(0));
+                bibtexKeyPattern.addBibtexKeyPattern(type, value.get(0));
             }
         }
         List<String> defaultPattern = getData(KEYPATTERNDEFAULT);
         if (defaultPattern != null) {
-            labelPattern.setDefaultValue(defaultPattern.get(0));
+            bibtexKeyPattern.setDefaultValue(defaultPattern.get(0));
         }
 
-        return labelPattern;
+        return bibtexKeyPattern;
     }
 
     /**
      * Updates the stored key patterns to the given key patterns.
      *
-     * @param labelPattern the key patterns to update to. <br />
-     *                     A reference to this object is stored internally and is returned at getLabelPattern();
+     * @param bibtexKeyPattern the key patterns to update to. <br />
+     *                     A reference to this object is stored internally and is returned at getBibtexKeyPattern();
      */
-    public void setLabelPattern(AbstractLabelPattern labelPattern) {
+    public void setBibtexKeyPattern(AbstractBibtexKeyPattern bibtexKeyPattern) {
         // remove all keypatterns from metadata
         Iterator<String> iterator = this.iterator();
         while (iterator.hasNext()) {
@@ -279,26 +290,26 @@ public class MetaData implements Iterable<String> {
         }
 
         // set new value if it is not a default value
-        Set<String> allKeys = labelPattern.getAllKeys();
+        Set<String> allKeys = bibtexKeyPattern.getAllKeys();
         for (String key : allKeys) {
             String metaDataKey = PREFIX_KEYPATTERN + key;
-            if (!labelPattern.isDefaultValue(key)) {
+            if (!bibtexKeyPattern.isDefaultValue(key)) {
                 List<String> data = new ArrayList<>();
-                data.add(labelPattern.getValue(key).get(0));
+                data.add(bibtexKeyPattern.getValue(key).get(0));
                 this.putData(metaDataKey, data);
             }
         }
 
         // store default pattern
-        if (labelPattern.getDefaultValue() == null) {
+        if (bibtexKeyPattern.getDefaultValue() == null) {
             this.remove(KEYPATTERNDEFAULT);
         } else {
             List<String> data = new ArrayList<>();
-            data.add(labelPattern.getDefaultValue().get(0));
+            data.add(bibtexKeyPattern.getDefaultValue().get(0));
             this.putData(KEYPATTERNDEFAULT, data);
         }
 
-        this.labelPattern = labelPattern;
+        this.bibtexKeyPattern = bibtexKeyPattern;
     }
 
     public Optional<FieldFormatterCleanups> getSaveActions() {

@@ -26,7 +26,11 @@ public enum FieldProperties {
     CROSSREF,
     ISO_DATE,
     ISBN,
-    EPRINT;
+    EPRINT,
+    BOOK_NAME,
+    SINGLE_ENTRY_LINK,
+    MULTIPLE_ENTRY_LINK,
+    PUBLICATION_STATE;
 
     public static final Set<FieldProperties> ALL_OPTS = EnumSet.allOf(FieldProperties.class);
 

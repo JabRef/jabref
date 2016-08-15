@@ -52,7 +52,6 @@ import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
-import net.sf.jabref.importer.CustomImportList;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -74,14 +73,14 @@ import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.VersionPreferences;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.labelpattern.AbstractLabelPattern;
-import net.sf.jabref.model.labelpattern.GlobalLabelPattern;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
+import net.sf.jabref.model.entry.SpecialFields;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -292,8 +291,8 @@ public class JabRefPreferences {
     public static final String USE_DEFAULT_CONSOLE_APPLICATION = "useDefaultConsoleApplication";
 
     // Currently, it is not possible to specify defaults for specific entry types
-    // When this should be made possible, the code to inspect is net.sf.jabref.gui.preftabs.LabelPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getLabelPattern(); etc
-    public static final String DEFAULT_LABEL_PATTERN = "defaultLabelPattern";
+    // When this should be made possible, the code to inspect is net.sf.jabref.gui.preftabs.BibtexKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getBibtexKeyPattern(); etc
+    public static final String DEFAULT_BIBTEX_KEY_PATTERN = "defaultBibtexKeyPattern";
 
     public static final String SEARCH_MODE_FLOAT = "floatSearch";
     public static final String GRAY_OUT_NON_HITS = "grayOutNonHits";
@@ -407,12 +406,28 @@ public class JabRefPreferences {
     public static final String STYLES_POS_Y = "stylesPosY";
     public static final String STYLES_POS_X = "stylesPosX";
 
+    // Special field preferences
+    public static final String PREF_SHOWCOLUMN_RELEVANCE = "showRelevanceColumn";
+    public static final String PREF_SHOWCOLUMN_READ = "showReadColumn";
+    public static final String PREF_SHOWCOLUMN_RANKING = "showRankingColumn";
+    public static final String PREF_SHOWCOLUMN_QUALITY = "showQualityColumn";
+    public static final String PREF_SHOWCOLUMN_PRIORITY = "showPriorityColumn";
+    public static final String PREF_SHOWCOLUMN_PRINTED = "showPrintedColumn";
+    public static final String PREF_SPECIALFIELDSENABLED = "specialFieldsEnabled";
+    // The choice between PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS and PREF_SERIALIZESPECIALFIELDS is mutually exclusive
+    public static final String PREF_SERIALIZESPECIALFIELDS = "serializeSpecialFields";
+    // The choice between PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS and PREF_SERIALIZESPECIALFIELDS is mutually exclusive
+    // At least in the settings, not in the implementation. But having both confused the users, therefore, having activated both options at the same time has been disabled
+    public static final String PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
+
     //non-default preferences
     private static final String CUSTOM_TYPE_NAME = "customTypeName_";
     private static final String CUSTOM_TYPE_REQ = "customTypeReq_";
     private static final String CUSTOM_TYPE_OPT = "customTypeOpt_";
     private static final String CUSTOM_TYPE_PRIOPT = "customTypePriOpt_";
 
+    // Prefs node for BibtexKeyPatterns
+    public static final String BIBTEX_KEY_PATTERNS_NODE = "bibtexkeypatterns";
 
     public String WRAPPED_USERNAME;
     public final String MARKING_WITH_NUMBER_PATTERN;
@@ -420,7 +435,7 @@ public class JabRefPreferences {
     private final Preferences prefs;
 
     private final Set<String> nonWrappableFields = new HashSet<>(5);
-    private GlobalLabelPattern keyPattern;
+    private GlobalBibtexKeyPattern keyPattern;
 
     // Object containing custom export formats:
     public final CustomExportList customExports;
@@ -429,7 +444,7 @@ public class JabRefPreferences {
     private static final String USER_HOME = System.getProperty("user.home");
 
     /**
-     * Set with all custom {@link net.sf.jabref.importer.fileformat.ImportFormat}s
+     * Set with all custom {@link net.sf.jabref.logic.importer.fileformat.ImportFormat}s
      */
     public final CustomImportList customImports;
 
@@ -704,15 +719,15 @@ public class JabRefPreferences {
         defaults.put(STYLES_SIZE_X, 600);
         defaults.put(STYLES_SIZE_Y, 400);
 
-        defaults.put(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED, SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED_DEFAULT);
-        defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY, SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY_DEFAULT);
-        defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY, SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY_DEFAULT);
-        defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING, SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING_DEFAULT);
-        defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE, SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE_DEFAULT);
-        defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED, SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED_DEFAULT);
-        defaults.put(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ, SpecialFieldsUtils.PREF_SHOWCOLUMN_READ_DEFAULT);
-        defaults.put(SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS, SpecialFieldsUtils.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT);
-        defaults.put(SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS, SpecialFieldsUtils.PREF_SERIALIZESPECIALFIELDS_DEFAULT);
+        defaults.put(JabRefPreferences.PREF_SPECIALFIELDSENABLED, SpecialFields.PREF_SPECIALFIELDSENABLED_DEFAULT);
+        defaults.put(JabRefPreferences.PREF_SHOWCOLUMN_PRIORITY, SpecialFields.PREF_SHOWCOLUMN_PRIORITY_DEFAULT);
+        defaults.put(JabRefPreferences.PREF_SHOWCOLUMN_QUALITY, SpecialFields.PREF_SHOWCOLUMN_QUALITY_DEFAULT);
+        defaults.put(JabRefPreferences.PREF_SHOWCOLUMN_RANKING, SpecialFields.PREF_SHOWCOLUMN_RANKING_DEFAULT);
+        defaults.put(JabRefPreferences.PREF_SHOWCOLUMN_RELEVANCE, SpecialFields.PREF_SHOWCOLUMN_RELEVANCE_DEFAULT);
+        defaults.put(JabRefPreferences.PREF_SHOWCOLUMN_PRINTED, SpecialFields.PREF_SHOWCOLUMN_PRINTED_DEFAULT);
+        defaults.put(JabRefPreferences.PREF_SHOWCOLUMN_READ, SpecialFields.PREF_SHOWCOLUMN_READ_DEFAULT);
+        defaults.put(JabRefPreferences.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS, SpecialFields.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT);
+        defaults.put(JabRefPreferences.PREF_SERIALIZESPECIALFIELDS, SpecialFields.PREF_SERIALIZESPECIALFIELDS_DEFAULT);
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
@@ -722,7 +737,7 @@ public class JabRefPreferences {
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
         defaults.put(GRAY_OUT_NON_HITS, Boolean.TRUE);
         defaults.put(SEARCH_MODE_FLOAT, Boolean.FALSE);
-        defaults.put(DEFAULT_LABEL_PATTERN, "[auth][year]");
+        defaults.put(DEFAULT_BIBTEX_KEY_PATTERN, "[auth][year]");
         defaults.put(PREVIEW_ENABLED, Boolean.TRUE);
         defaults.put(ACTIVE_PREVIEW, 0);
         defaults.put(PREVIEW_0,
@@ -1138,14 +1153,14 @@ public class JabRefPreferences {
      *
      * @return LabelPattern containing all keys. Returned LabelPattern has no parent
      */
-    public GlobalLabelPattern getKeyPattern() {
-        keyPattern = new GlobalLabelPattern(AbstractLabelPattern.split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_LABEL_PATTERN)));
-        Preferences pre = Preferences.userNodeForPackage(GlobalLabelPattern.class);
+    public GlobalBibtexKeyPattern getKeyPattern() {
+        keyPattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern.split(JabRefPreferences.getInstance().get(JabRefPreferences.DEFAULT_BIBTEX_KEY_PATTERN)));
+        Preferences pre = Preferences.userNodeForPackage(JabRefMain.class).node(BIBTEX_KEY_PATTERNS_NODE);
         try {
             String[] keys = pre.keys();
             if (keys.length > 0) {
                 for (String key : keys) {
-                    keyPattern.addLabelPattern(key, pre.get(key, null));
+                    keyPattern.addBibtexKeyPattern(key, pre.get(key, null));
                 }
             }
         } catch (BackingStoreException ex) {
@@ -1159,11 +1174,11 @@ public class JabRefPreferences {
      *
      * @param pattern the pattern to store
      */
-    public void putKeyPattern(GlobalLabelPattern pattern) {
+    public void putKeyPattern(GlobalBibtexKeyPattern pattern) {
         keyPattern = pattern;
 
         // Store overridden definitions to Preferences.
-        Preferences pre = Preferences.userNodeForPackage(GlobalLabelPattern.class);
+        Preferences pre = Preferences.userNodeForPackage(JabRefMain.class).node(BIBTEX_KEY_PATTERNS_NODE);
         try {
             pre.clear(); // We remove all old entries.
         } catch (BackingStoreException ex) {
@@ -1175,7 +1190,7 @@ public class JabRefPreferences {
             if (!pattern.isDefaultValue(key)) {
                 // no default value
                 // the first entry in the array is the full pattern
-                // see net.sf.jabref.logic.labelPattern.LabelPatternUtil.split(String)
+                // see net.sf.jabref.logic.labelPattern.BibtexKeyPatternUtil.split(String)
                 pre.put(key, pattern.getValue(key).get(0));
             }
         }

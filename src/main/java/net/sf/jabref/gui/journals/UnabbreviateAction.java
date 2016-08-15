@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2014 JabRef contributors.
+/*  Copyright (C) 2003-2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -24,7 +24,7 @@ import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 /**
  * Converts journal abbreviations back to full name for all selected entries.
@@ -51,18 +51,16 @@ public class UnabbreviateAction extends AbstractWorker {
             return;
         }
 
-        UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(
-                Globals.journalAbbreviationLoader
-                        .getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs)));
+        UndoableUnabbreviator undoableAbbreviator = new UndoableUnabbreviator(Globals.journalAbbreviationLoader
+                .getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs)));
 
         NamedCompound ce = new NamedCompound(Localization.lang("Unabbreviate journal names"));
         int count = 0;
         for (BibEntry entry : entries) {
-            if (undoableAbbreviator.unabbreviate(panel.getDatabase(), entry, FieldName.JOURNAL, ce)) {
-                count++;
-            }
-            if (undoableAbbreviator.unabbreviate(panel.getDatabase(), entry, FieldName.JOURNALTITLE, ce)) {
-                count++;
+            for (String journalField : InternalBibtexFields.getJournalNameFields()) {
+                if (undoableAbbreviator.unabbreviate(panel.getDatabase(), entry, journalField, ce)) {
+                    count++;
+                }
             }
         }
         if (count > 0) {
