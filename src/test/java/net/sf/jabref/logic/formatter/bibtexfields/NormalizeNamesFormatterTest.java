@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
