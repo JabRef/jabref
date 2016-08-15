@@ -244,7 +244,6 @@ class LayoutEntry {
                     + BibEntry.TYPE_HEADER + "' instead.");
             fieldEntry = bibtex.getType();
         } else {
-
             // changed section begin - arudert
             // resolve field (recognized by leading backslash) or text
             fieldEntry = text.startsWith("\\") ? BibDatabase
