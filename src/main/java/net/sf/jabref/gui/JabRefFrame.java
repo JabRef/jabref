@@ -1475,6 +1475,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 specialFieldButtons.add(button);
             }
         }
+
         tlb.addSeparator();
 
         fetcherToggle = new JToggleButton(generalFetcher.getAction());
