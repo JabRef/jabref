@@ -14,8 +14,9 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class AbbreviationsTest {
 
-    @Mock JabRefPreferences prefs;
-    JournalAbbreviationLoader abbreviations;
+    @Mock
+    private JabRefPreferences prefs;
+    private JournalAbbreviationLoader abbreviations;
 
     @Before
     public void setUp() throws Exception {

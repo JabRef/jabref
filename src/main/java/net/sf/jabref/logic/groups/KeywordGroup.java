@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import net.sf.jabref.importer.fileformat.ParseException;
+import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;

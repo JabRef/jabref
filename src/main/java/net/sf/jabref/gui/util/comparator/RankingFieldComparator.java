@@ -19,7 +19,7 @@ import java.util.Comparator;
 import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
+import net.sf.jabref.model.entry.SpecialFields;
 
 /**
  * Comparator that handles the ranking icon column
@@ -32,8 +32,8 @@ public class RankingFieldComparator implements Comparator<BibEntry> {
 
     @Override
     public int compare(BibEntry e1, BibEntry e2) {
-        Optional<String> val1 = e1.getFieldOptional(SpecialFieldsUtils.FIELDNAME_RANKING);
-        Optional<String> val2 = e2.getFieldOptional(SpecialFieldsUtils.FIELDNAME_RANKING);
+        Optional<String> val1 = e1.getFieldOptional(SpecialFields.FIELDNAME_RANKING);
+        Optional<String> val2 = e2.getFieldOptional(SpecialFields.FIELDNAME_RANKING);
         if (val1.isPresent()) {
             if (val2.isPresent()) {
                 // val1 is not null AND val2 is not null

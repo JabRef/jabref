@@ -39,7 +39,7 @@ import static org.mockito.Mockito.when;
 public class SearchQueryHighlightListenerTest {
 
     @Mock
-    ProtectedTermsLoader loader;
+    private ProtectedTermsLoader loader;
 
 
     @Before

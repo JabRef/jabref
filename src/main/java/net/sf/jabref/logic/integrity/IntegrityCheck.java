@@ -23,6 +23,8 @@ import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.ParsedFileField;
 
+import com.google.common.base.CharMatcher;
+
 public class IntegrityCheck {
 
     private final BibDatabaseContext bibDatabaseContext;
@@ -50,9 +52,11 @@ public class IntegrityCheck {
 
         result.addAll(new AuthorNameChecker().check(entry));
 
+        // BibTeX only checkers
         if (!bibDatabaseContext.isBiblatexMode()) {
             result.addAll(new TitleChecker().check(entry));
             result.addAll(new PagesChecker().check(entry));
+            result.addAll(new ASCIICharacterChecker().check(entry));
         } else {
             result.addAll(new BiblatexPagesChecker().check(entry));
         }
@@ -62,8 +66,12 @@ public class IntegrityCheck {
         result.addAll(new UrlChecker().check(entry));
         result.addAll(new FileChecker(bibDatabaseContext).check(entry));
         result.addAll(new TypeChecker().check(entry));
-        result.addAll(new AbbreviationChecker(FieldName.JOURNAL).check(entry));
-        result.addAll(new AbbreviationChecker(FieldName.BOOKTITLE).check(entry));
+        for (String journalField : InternalBibtexFields.getJournalNameFields()) {
+            result.addAll(new AbbreviationChecker(journalField).check(entry));
+        }
+        for (String bookNameField : InternalBibtexFields.getBookNameFields()) {
+            result.addAll(new AbbreviationChecker(bookNameField).check(entry));
+        }
         result.addAll(new BibStringChecker().check(entry));
         result.addAll(new HTMLCharacterChecker().check(entry));
         result.addAll(new BooktitleChecker().check(entry));
@@ -394,7 +402,6 @@ public class IntegrityCheck {
         // Detect # if it doesn't have a \ in front of it or if it starts the string
         private static final Pattern UNESCAPED_HASH = Pattern.compile("(?<!\\\\)#|^#");
 
-
         /**
          * Checks, if there is an even number of unescaped #
          */
@@ -427,7 +434,6 @@ public class IntegrityCheck {
         // Detect any HTML encoded character,
         private static final Pattern HTML_CHARACTER_PATTERN = Pattern.compile("&[#\\p{Alnum}]+;");
 
-
         /**
          * Checks, if there are any HTML encoded characters in the fields
          */
@@ -438,6 +444,24 @@ public class IntegrityCheck {
                 Matcher characterMatcher = HTML_CHARACTER_PATTERN.matcher(field.getValue());
                 if (characterMatcher.find()) {
                     results.add(new IntegrityMessage(Localization.lang("HTML encoded character found"), entry,
+                            field.getKey()));
+                }
+            }
+            return results;
+        }
+    }
+
+    private static class ASCIICharacterChecker implements Checker {
+        /**
+         * Detect any non ASCII encoded characters, e.g., umlauts or unicode in the fields
+         */
+        @Override
+        public List<IntegrityMessage> check(BibEntry entry) {
+            List<IntegrityMessage> results = new ArrayList<>();
+            for (Map.Entry<String, String> field : entry.getFieldMap().entrySet()) {
+                boolean asciiOnly = CharMatcher.ascii().matchesAllOf(field.getValue());
+                if (!asciiOnly) {
+                    results.add(new IntegrityMessage(Localization.lang("Non-ASCII encoded character found"), entry,
                             field.getKey()));
                 }
             }

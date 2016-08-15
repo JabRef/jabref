@@ -30,11 +30,12 @@ import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.cli.XMPUtilMain;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
@@ -79,6 +80,7 @@ public class XMPUtilTest {
     private XMPPreferences xmpPreferences;
 
 
+    private ImportFormatPreferences importFormatPreferences;
     /**
      * Wrap bibtex-data (<bibtex:author>...) into an rdf:Description.
      *
@@ -138,16 +140,17 @@ public class XMPUtilTest {
         }
     }
 
-    public static BibEntry bibtexString2BibtexEntry(String s) throws IOException {
-        ParserResult result = BibtexParser.parse(new StringReader(s));
+    public static BibEntry bibtexString2BibtexEntry(String s, ImportFormatPreferences importFormatPreferences)
+            throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader(s), importFormatPreferences);
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
         return c.iterator().next();
     }
 
-    public static String bibtexEntry2BibtexString(BibEntry e) throws IOException {
+    public static String bibtexEntry2BibtexString(BibEntry e, JabRefPreferences preferences) throws IOException {
         StringWriter sw = new StringWriter();
-        new BibEntryWriter(new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)),
+        new BibEntryWriter(new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(preferences)),
                 false).write(e, sw, BibDatabaseMode.BIBTEX);
         return sw.getBuffer().toString();
     }
@@ -161,7 +164,7 @@ public class XMPUtilTest {
     }
 
     public BibEntry t1BibtexEntry() throws IOException {
-        return XMPUtilTest.bibtexString2BibtexEntry(t1BibtexString());
+        return XMPUtilTest.bibtexString2BibtexEntry(t1BibtexString(), importFormatPreferences);
     }
 
     public String t2XMP() {
@@ -173,7 +176,7 @@ public class XMPUtilTest {
     }
 
     public String t2BibtexString() throws IOException {
-        return XMPUtilTest.bibtexEntry2BibtexString(t2BibtexEntry());
+        return XMPUtilTest.bibtexEntry2BibtexString(t2BibtexEntry(), prefs);
     }
 
     public BibEntry t2BibtexEntry() {
@@ -206,7 +209,7 @@ public class XMPUtilTest {
     }
 
     public String t3BibtexString() throws IOException {
-        return XMPUtilTest.bibtexEntry2BibtexString(t3BibtexEntry());
+        return XMPUtilTest.bibtexEntry2BibtexString(t3BibtexEntry(), prefs);
     }
 
     public String t3XMP() {
@@ -244,7 +247,6 @@ public class XMPUtilTest {
             Globals.prefs = JabRefPreferences.getInstance();
         }
 
-        xmpPreferences = XMPPreferences.fromPreferences(Globals.prefs);
 
         // Store Privacy Settings
         prefs = JabRefPreferences.getInstance();
@@ -254,6 +256,9 @@ public class XMPUtilTest {
 
         // The code assumes privacy filters to be off
         prefs.putBoolean("useXmpPrivacyFilter", false);
+
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(prefs);
+        xmpPreferences = XMPPreferences.fromPreferences(prefs);
     }
 
     @After
@@ -465,7 +470,8 @@ public class XMPUtilTest {
                         + "  title = {Effective work practices for floss development: A model and propositions}," + "\n"
                         + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)}," + "\n"
                         + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29},"
-                        + "\n" + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"));
+                        + "\n" + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"),
+                importFormatPreferences);
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
@@ -742,7 +748,8 @@ public class XMPUtilTest {
                         + "  title = {</bibtex:title> \" bla \" '' '' && &  for floss development: A model and propositions},"
                         + "\n" + "  booktitle = {<randomXML>}," + "\n" + "  year = {2005}," + "\n"
                         + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29}," + "\n"
-                        + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"));
+                        + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"),
+                importFormatPreferences);
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
@@ -788,7 +795,8 @@ public class XMPUtilTest {
 
         ParserResult result = BibtexParser
                 .parse(new StringReader("@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
-                        + "  title = {Title A}}\n" + "@inProceedings{foo," + "  author={Norton Bar}}"));
+                        + "  title = {Title A}}\n" + "@inProceedings{foo," + "  author={Norton Bar}}"),
+                        importFormatPreferences);
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(2, c.size());
@@ -1060,7 +1068,8 @@ public class XMPUtilTest {
                         + "  title = {Effective work practices for floss development: A model and propositions},\n"
                         + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)},\n"
                         + "  year = {2005},\n" + "  owner = {oezbek},\n" + "  timestamp = {2006.05.29},\n"
-                        + "  url = {http://james.howison.name/publications.html}}"));
+                        + "  url = {http://james.howison.name/publications.html}}"),
+                importFormatPreferences);
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
@@ -1156,7 +1165,7 @@ public class XMPUtilTest {
                 System.setOut(oldOut);
                 String bibtex = s.toString();
 
-                ParserResult result = BibtexParser.parse(new StringReader(bibtex));
+                ParserResult result = BibtexParser.parse(new StringReader(bibtex), importFormatPreferences);
                 Collection<BibEntry> c = result.getDatabase().getEntries();
                 Assert.assertEquals(1, c.size());
                 BibEntry x = c.iterator().next();
@@ -1318,7 +1327,8 @@ public class XMPUtilTest {
                         + "  title = {Effective work practices for floss development: A model and propositions}," + "\n"
                         + "  booktitle = {Hawaii International Conference On System Sciences (HICSS)}," + "\n"
                         + "  year = {2005}," + "\n" + "  owner = {oezbek}," + "\n" + "  timestamp = {2006.05.29},"
-                        + "\n" + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"));
+                        + "\n" + "  url = {http://james.howison.name/publications.html}" + "\n" + "}"),
+                        importFormatPreferences);
 
         Collection<BibEntry> c = original.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
@@ -1361,7 +1371,7 @@ public class XMPUtilTest {
 
         try (BufferedReader fr = Files.newBufferedReader(Paths.get("src/test/resources/net/sf/jabref/util/twente.bib"),
                 StandardCharsets.UTF_8)) {
-            ParserResult result = BibtexParser.parse(fr);
+            ParserResult result = BibtexParser.parse(fr, importFormatPreferences);
 
             Assert.assertEquals("Arvind", result.getDatabase().resolveForStrings("#Arvind#"));
 

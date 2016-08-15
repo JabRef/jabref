@@ -120,11 +120,12 @@ import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.util.component.OverlayPanel;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.FreeCiteImporter;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fileformat.FreeCiteImporter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.UpdateField;
@@ -496,7 +497,7 @@ public class TextInputDialog extends JDialog {
      * @return true if successful, false otherwise
      */
     private boolean parseWithFreeCiteAndAddEntries() {
-        FreeCiteImporter fimp = new FreeCiteImporter();
+        FreeCiteImporter fimp = new FreeCiteImporter(ImportFormatPreferences.fromPreferences(Globals.prefs));
         String text = textPane.getText();
 
         // we have to remove line breaks (but keep empty lines)
@@ -551,8 +552,7 @@ public class TextInputDialog extends JDialog {
             requiredFields.addAll(type.get().getRequiredFieldsFlat());
             optionalFields.addAll(type.get().getPrimaryOptionalFields());
         }
-        List<String> internalFields = InternalBibtexFields.getAllFieldNames();
-        for (String field : internalFields) {
+        for (String field : InternalBibtexFields.getAllPublicFieldNames()) {
             if (!allFields.contains(field)) {
                 allFields.add(field);
             }

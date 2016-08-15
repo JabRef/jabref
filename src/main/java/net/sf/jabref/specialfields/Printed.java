@@ -22,6 +22,7 @@ import javax.swing.Icon;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.SpecialFields;
 
 public class Printed extends SpecialField {
 
@@ -38,7 +39,7 @@ public class Printed extends SpecialField {
 
     @Override
     public String getFieldName() {
-        return SpecialFieldsUtils.FIELDNAME_PRINTED;
+        return SpecialFields.FIELDNAME_PRINTED;
     }
 
     @Override

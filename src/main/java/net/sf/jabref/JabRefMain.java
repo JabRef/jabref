@@ -24,6 +24,7 @@ import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.ProxyAuthenticator;
@@ -34,6 +35,7 @@ import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.client.RemoteListenerClient;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -64,11 +66,17 @@ public class JabRefMain {
         Localization.setLanguage(preferences.get(JabRefPreferences.LANGUAGE));
         Globals.prefs.setLanguageDependentDefaultValues();
 
+        // Update handling of special fields based on preferences
+        InternalBibtexFields
+                .updateSpecialFields(Globals.prefs.getBoolean(JabRefPreferences.PREF_SERIALIZESPECIALFIELDS));
+        // Update name of the time stamp field based on preferences
+        InternalBibtexFields.updateTimeStampField(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD));
         // Update which fields should be treated as numeric, based on preferences:
         InternalBibtexFields.setNumericFields(Globals.prefs.getStringList(JabRefPreferences.NUMERIC_FIELDS));
 
         /* Build list of Import and Export formats */
-        Globals.IMPORT_FORMAT_READER.resetImportFormats();
+        Globals.IMPORT_FORMAT_READER.resetImportFormats(ImportFormatPreferences.fromPreferences(Globals.prefs),
+                XMPPreferences.fromPreferences(Globals.prefs));
         CustomEntryTypesManager.loadCustomEntryTypes(preferences);
         ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
 

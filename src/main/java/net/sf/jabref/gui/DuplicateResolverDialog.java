@@ -22,6 +22,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.gui.mergeentries.MergeEntries;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
@@ -35,14 +36,14 @@ import net.sf.jabref.preferences.JabRefPreferences;
 
 public class DuplicateResolverDialog extends JDialog {
 
-    enum DuplicateResolverType {
+    public enum DuplicateResolverType {
         DUPLICATE_SEARCH,
         IMPORT_CHECK,
         INSPECTION,
         DUPLICATE_SEARCH_WITH_EXACT
     }
 
-    enum DuplicateResolverResult {
+    public enum DuplicateResolverResult {
         NOT_CHOSEN,
         KEEP_BOTH,
         KEEP_LEFT,

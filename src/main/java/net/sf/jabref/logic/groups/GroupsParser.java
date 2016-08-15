@@ -19,7 +19,7 @@ package net.sf.jabref.logic.groups;
 
 import java.util.List;
 
-import net.sf.jabref.importer.fileformat.ParseException;
+import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.preferences.JabRefPreferences;
 

@@ -24,7 +24,9 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.any;
 import static com.github.tomakehurst.wiremock.client.WireMock.get;
+import static com.github.tomakehurst.wiremock.client.WireMock.head;
 import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static org.junit.Assert.assertFalse;
@@ -38,7 +40,7 @@ public class MimeTypeDetectorTest {
     public void handlePermanentRedirections() {
         String redirectedUrl = "http://localhost:8080/redirection";
 
-        stubFor(get(urlEqualTo("/redirection"))
+        stubFor(any(urlEqualTo("/redirection"))
                 .willReturn(
                         aResponse()
                                 .withStatus(301)
@@ -77,6 +79,37 @@ public class MimeTypeDetectorTest {
     public void beTrueForPDFMimeTypeVariations() {
         String mimeTypeVariation = "http://localhost:8080/mimevariation";
 
+        stubFor(any(urlEqualTo("/mimevariation"))
+                .willReturn(
+                        aResponse().withHeader("Content-Type", "application/pdf;charset=ISO-8859-1")
+                )
+        );
+
+        assertTrue(MimeTypeDetector.isPdfContentType(mimeTypeVariation));
+    }
+
+    @Test
+    public void beAbleToUseHeadRequest() {
+        String mimeTypeVariation = "http://localhost:8080/mimevariation";
+
+        stubFor(head(urlEqualTo("/mimevariation"))
+                .willReturn(
+                        aResponse().withHeader("Content-Type", "application/pdf;charset=ISO-8859-1")
+                )
+        );
+
+        assertTrue(MimeTypeDetector.isPdfContentType(mimeTypeVariation));
+    }
+
+    @Test
+    public void beAbleToUseGetRequest() {
+        String mimeTypeVariation = "http://localhost:8080/mimevariation";
+
+        stubFor(head(urlEqualTo("/mimevariation"))
+                .willReturn(
+                        aResponse().withStatus(404)
+                )
+        );
         stubFor(get(urlEqualTo("/mimevariation"))
                 .willReturn(
                         aResponse().withHeader("Content-Type", "application/pdf;charset=ISO-8859-1")

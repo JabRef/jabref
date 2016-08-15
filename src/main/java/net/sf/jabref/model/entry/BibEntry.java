@@ -33,6 +33,8 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.model.FieldChange;
@@ -52,12 +54,14 @@ public class BibEntry implements Cloneable {
     protected static final String ID_FIELD = "id";
     public static final String DEFAULT_TYPE = "misc";
 
+    private static final Pattern REMOVE_TRAILING_WHITESPACE = Pattern.compile("\\s+$");
+
     private String id;
 
     private final SharedBibEntryData sharedBibEntryData;
 
     private String type;
-    private Map<String, String> fields = new HashMap<>();
+    private Map<String, String> fields = new ConcurrentHashMap<>();
     /*
      * Map to store the words in every field
      */
@@ -68,6 +72,8 @@ public class BibEntry implements Cloneable {
     private boolean groupHit;
 
     private String parsedSerialization;
+
+    private String commentsBeforeEntry = "";
 
     /*
      * Marks whether the complete serialization, which was read from file, should be used.
@@ -120,7 +126,9 @@ public class BibEntry implements Cloneable {
     public void setId(String id) {
         Objects.requireNonNull(id, "Every BibEntry must have an ID");
 
-        eventBus.post(new FieldChangedEvent(this, BibEntry.ID_FIELD, id));
+        String oldId = this.id;
+
+        eventBus.post(new FieldChangedEvent(this, BibEntry.ID_FIELD, id, oldId));
         this.id = id;
         changed = true;
     }
@@ -178,13 +186,14 @@ public class BibEntry implements Cloneable {
         } else {
             newType = type;
         }
+        String oldType = getFieldOptional(TYPE_HEADER).orElse(null);
 
         // We set the type before throwing the changeEvent, to enable
         // the change listener to access the new value if the change
         // sets off a change in database sorting etc.
         this.type = newType.toLowerCase(Locale.ENGLISH);
         changed = true;
-        eventBus.post(new FieldChangedEvent(this, TYPE_HEADER, newType, eventSource));
+        eventBus.post(new FieldChangedEvent(this, TYPE_HEADER, newType, oldType, eventSource));
     }
 
     /**
@@ -573,6 +582,10 @@ public class BibEntry implements Cloneable {
         return parsedSerialization;
     }
 
+    public void setCommentsBeforeEntry(String parsedComments) {
+        this.commentsBeforeEntry = parsedComments;
+    }
+
     public boolean hasChanged() {
         return changed;
     }
@@ -679,25 +692,8 @@ public class BibEntry implements Cloneable {
     * Returns user comments (arbitrary text before the entry), if they exist. If not, returns the empty String
      */
     public String getUserComments() {
-
-        if (parsedSerialization != null) {
-
-            try {
-                // get the text before the entry
-                String prolog = parsedSerialization.substring(0, parsedSerialization.lastIndexOf('@'));
-
-                // delete trailing whitespaces (between entry and text)
-                prolog = prolog.replaceFirst("\\s+$", "");
-
-                // if there is any non whitespace text, write it
-                if (prolog.length() > 0) {
-                    return prolog;
-                }
-            } catch (StringIndexOutOfBoundsException ignore) {
-                // if this occurs a broken parsed serialization has been set, so just do nothing
-            }
-        }
-        return "";
+        // delete trailing whitespaces (between entry and text) from stored serialization
+        return REMOVE_TRAILING_WHITESPACE.matcher(commentsBeforeEntry).replaceFirst("");
     }
 
     public Set<String> getFieldAsWords(String field) {

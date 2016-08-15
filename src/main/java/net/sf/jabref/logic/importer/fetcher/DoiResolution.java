@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -67,14 +68,16 @@ public class DoiResolution implements FulltextFetcher {
 
                     Document html = connection.get();
                     // scan for PDF
-                    Elements elements = html.body().select("[href]");
+                    Elements elements = html.body().select("a[href]");
                     List<Optional<URL>> links = new ArrayList<>();
 
                     for (Element element : elements) {
-                        String href = element.attr("abs:href");
-                        // Only check if pdf is included in the link
-                        // See https://github.com/lehner/LocalCopy for scrape ideas
-                        if (href.contains("pdf") && MimeTypeDetector.isPdfContentType(href)) {
+                        String href = element.attr("abs:href").toLowerCase(Locale.ENGLISH);
+                        String hrefText = element.text().toLowerCase(Locale.ENGLISH);
+                        // Only check if pdf is included in the link or inside the text
+                        // ACM uses tokens without PDF inside the link
+                        // See https://github.com/lehner/LocalCopy for more scrape ideas
+                        if ((href.contains("pdf") || hrefText.contains("pdf")) && MimeTypeDetector.isPdfContentType(href)) {
                             links.add(Optional.of(new URL(href)));
                         }
                     }

@@ -19,7 +19,7 @@ import java.util.List;
 
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.cli.ArgumentProcessor;
-import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.remote.server.MessageHandler;
 
 public class JabRefMessageHandler implements MessageHandler {

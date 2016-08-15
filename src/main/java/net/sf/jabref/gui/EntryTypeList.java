@@ -27,8 +27,8 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.CustomEntryType;
@@ -72,7 +72,7 @@ public class EntryTypeList extends FieldSetComponent implements ListSelectionLis
             return;
         }
 
-        String testString = LabelPatternUtil.checkLegalKey(s,
+        String testString = BibtexKeyPatternUtil.checkLegalKey(s,
                 Globals.prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
         if (!testString.equals(s) || (s.indexOf('&') >= 0)) {
             // Report error and exit.

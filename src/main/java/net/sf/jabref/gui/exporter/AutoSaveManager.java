@@ -28,6 +28,7 @@ import net.sf.jabref.logic.exporter.FileSaveSession;
 import net.sf.jabref.logic.exporter.SaveException;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.SaveSession;
+import net.sf.jabref.logic.util.io.AutoSaveUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -81,22 +82,13 @@ public class AutoSaveManager {
 
 
     /**
-     * Get a File object pointing to the autosave file corresponding to the given file.
-     * @param f The database file.
-     * @return its corresponding autosave file.
-     */
-    public static File getAutoSaveFile(File f) {
-        return new File(f.getParentFile(), ".$" + f.getName() + '$');
-    }
-
-    /**
      * Perform an autosave.
      * @param panel The BasePanel to autosave for.
      * @return true if successful, false otherwise.
      */
     private static boolean autoSave(BasePanel panel) {
         File databaseFile = panel.getBibDatabaseContext().getDatabaseFile();
-        File backupFile = AutoSaveManager.getAutoSaveFile(databaseFile);
+        File backupFile = AutoSaveUtil.getAutoSaveFile(databaseFile);
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
                     .withMakeBackup(false)
@@ -121,7 +113,7 @@ public class AutoSaveManager {
         if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
             return true;
         }
-        File backupFile = AutoSaveManager.getAutoSaveFile(panel.getBibDatabaseContext().getDatabaseFile());
+        File backupFile = AutoSaveUtil.getAutoSaveFile(panel.getBibDatabaseContext().getDatabaseFile());
         if (backupFile.exists()) {
             return backupFile.delete();
         } else {
@@ -137,16 +129,5 @@ public class AutoSaveManager {
         for (BasePanel panel : frame.getBasePanelList()) {
             AutoSaveManager.deleteAutoSaveFile(panel);
         }
-    }
-
-    /**
-     * Check if a newer autosave exists for the given file.
-     * @param f The file to check.
-     * @return true if an autosave is found, and if the autosave is newer
-     *   than the given file.
-     */
-    public static boolean newerAutoSaveExists(File f) {
-        File asFile = AutoSaveManager.getAutoSaveFile(f);
-        return asFile.exists() && (asFile.lastModified() > f.lastModified());
     }
 }

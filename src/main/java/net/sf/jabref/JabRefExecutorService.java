@@ -45,7 +45,7 @@ public class JabRefExecutorService implements Executor {
     });
     private final ConcurrentLinkedQueue<Thread> startedThreads = new ConcurrentLinkedQueue<>();
 
-    private final Timer timer = new Timer("timer");
+    private final Timer timer = new Timer("timer", true);
 
     private JabRefExecutorService() {}
 
@@ -150,7 +150,7 @@ public class JabRefExecutorService implements Executor {
             thread.interrupt();
         }
         startedThreads.clear();
-        timer.cancel();
+        // timer doesn't need to be canceled as it is run in daemon mode, which ensures that it is stopped if the application is shut down
     }
 
 }
