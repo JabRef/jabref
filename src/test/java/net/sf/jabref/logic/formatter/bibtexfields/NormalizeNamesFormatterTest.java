@@ -20,149 +20,145 @@ public class NormalizeNamesFormatterTest {
 
     @Test
     public void testNormalizeAuthorList() {
-        expectCorrect("Staci D Bilbo", "Bilbo, Staci D.");
-        expectCorrect("Staci D. Bilbo", "Bilbo, Staci D.");
+        Assert.assertEquals("Bilbo, Staci D.", formatter.format("Staci D Bilbo"));
+        Assert.assertEquals("Bilbo, Staci D.", formatter.format("Staci D. Bilbo"));
 
-        expectCorrect("Staci D Bilbo and Smith SH and Jaclyn M Schwarz", "Bilbo, Staci D. and Smith, S. H. and Schwarz, Jaclyn M.");
+        Assert.assertEquals("Bilbo, Staci D. and Smith, S. H. and Schwarz, Jaclyn M.", formatter.format("Staci D Bilbo and Smith SH and Jaclyn M Schwarz"));
 
-        expectCorrect("Ølver MA", "Ølver, M. A.");
+        Assert.assertEquals("Ølver, M. A.", formatter.format("Ølver MA"));
 
-        expectCorrect("Ølver MA; GG Øie; Øie GG; Alfredsen JÅÅ; Jo Alfredsen; Olsen Y.Y. and Olsen YY.",
-                "Ølver, M. A. and Øie, G. G. and Øie, G. G. and Alfredsen, J. Å. Å. and Alfredsen, Jo and Olsen, Y. Y. and Olsen, Y. Y.");
+        Assert.assertEquals("Ølver, M. A. and Øie, G. G. and Øie, G. G. and Alfredsen, J. Å. Å. and Alfredsen, Jo and Olsen, Y. Y. and Olsen, Y. Y.",
+                formatter.format("Ølver MA; GG Øie; Øie GG; Alfredsen JÅÅ; Jo Alfredsen; Olsen Y.Y. and Olsen YY."));
 
-        expectCorrect("Ølver MA; GG Øie; Øie GG; Alfredsen JÅÅ; Jo Alfredsen; Olsen Y.Y.; Olsen YY.",
-                "Ølver, M. A. and Øie, G. G. and Øie, G. G. and Alfredsen, J. Å. Å. and Alfredsen, Jo and Olsen, Y. Y. and Olsen, Y. Y.");
+        Assert.assertEquals("Ølver, M. A. and Øie, G. G. and Øie, G. G. and Alfredsen, J. Å. Å. and Alfredsen, Jo and Olsen, Y. Y. and Olsen, Y. Y.",
+                formatter.format("Ølver MA; GG Øie; Øie GG; Alfredsen JÅÅ; Jo Alfredsen; Olsen Y.Y.; Olsen YY."));
 
-        expectCorrect("Alver, Morten and Alver, Morten O and Alfredsen, JA and Olsen, Y.Y.", "Alver, Morten and Alver, Morten O. and Alfredsen, J. A. and Olsen, Y. Y.");
+        Assert.assertEquals("Alver, Morten and Alver, Morten O. and Alfredsen, J. A. and Olsen, Y. Y.", formatter.format("Alver, Morten and Alver, Morten O and Alfredsen, JA and Olsen, Y.Y."));
 
-        expectCorrect("Alver, MA; Alfredsen, JA; Olsen Y.Y.", "Alver, M. A. and Alfredsen, J. A. and Olsen, Y. Y.");
+        Assert.assertEquals("Alver, M. A. and Alfredsen, J. A. and Olsen, Y. Y.", formatter.format("Alver, MA; Alfredsen, JA; Olsen Y.Y."));
 
-        expectCorrect("Kolb, Stefan and J{\\\"o}rg Lenhard and Wirtz, Guido", "Kolb, Stefan and Lenhard, J{\\\"o}rg and Wirtz, Guido");
+        Assert.assertEquals("Kolb, Stefan and Lenhard, J{\\\"o}rg and Wirtz, Guido", formatter.format("Kolb, Stefan and J{\\\"o}rg Lenhard and Wirtz, Guido"));
     }
 
     @Test
     public void twoAuthorsSeperatedByColon() {
-        expectCorrect("Staci Bilbo; Morten Alver", "Bilbo, Staci and Alver, Morten");
+        Assert.assertEquals("Bilbo, Staci and Alver, Morten", formatter.format("Staci Bilbo; Morten Alver"));
     }
 
     @Test
     public void threeAuthorsSeperatedByColon() {
-        expectCorrect("Staci Bilbo; Morten Alver; Test Name", "Bilbo, Staci and Alver, Morten and Name, Test");
+        Assert.assertEquals("Bilbo, Staci and Alver, Morten and Name, Test", formatter.format("Staci Bilbo; Morten Alver; Test Name"));
     }
 
     // Test for https://github.com/JabRef/jabref/issues/318
     @Test
     public void threeAuthorsSeperatedByAnd() {
-        expectCorrect("Stefan Kolb and J{\\\"o}rg Lenhard and Guido Wirtz", "Kolb, Stefan and Lenhard, J{\\\"o}rg and Wirtz, Guido");
+        Assert.assertEquals("Kolb, Stefan and Lenhard, J{\\\"o}rg and Wirtz, Guido", formatter.format("Stefan Kolb and J{\\\"o}rg Lenhard and Guido Wirtz"));
     }
 
     // Test for https://github.com/JabRef/jabref/issues/318
     @Test
     public void threeAuthorsSeperatedByAndWithDash() {
-        expectCorrect("Heng-Yu Jian and Xu, Z. and Chang, M.-C.F.", "Jian, Heng-Yu and Xu, Z. and Chang, M.-C. F.");
+        Assert.assertEquals("Jian, Heng-Yu and Xu, Z. and Chang, M.-C. F.", formatter.format("Heng-Yu Jian and Xu, Z. and Chang, M.-C.F."));
     }
 
     // Test for https://github.com/JabRef/jabref/issues/318
     @Test
     public void threeAuthorsSeperatedByAndWithLatex() {
-        expectCorrect("Oscar Gustafsson and Linda S. DeBrunner and Victor DeBrunner and H{\\aa}kan Johansson", "Gustafsson, Oscar and DeBrunner, Linda S. and DeBrunner, Victor and Johansson, H{\\aa}kan");
+        Assert.assertEquals("Gustafsson, Oscar and DeBrunner, Linda S. and DeBrunner, Victor and Johansson, H{\\aa}kan",
+                formatter.format("Oscar Gustafsson and Linda S. DeBrunner and Victor DeBrunner and H{\\aa}kan Johansson"));
     }
 
     @Test
     public void lastThenInitial() {
-        expectCorrect("Smith S", "Smith, S.");
+        Assert.assertEquals("Smith, S.", formatter.format("Smith S"));
     }
 
     @Test
     public void lastThenInitials() {
-        expectCorrect("Smith SH", "Smith, S. H.");
+        Assert.assertEquals("Smith, S. H.", formatter.format("Smith SH"));
     }
 
     @Test
     public void initialThenLast() {
-        expectCorrect("S Smith", "Smith, S.");
+        Assert.assertEquals("Smith, S.", formatter.format("S Smith"));
     }
 
     @Test
     public void initialDotThenLast() {
-        expectCorrect("S. Smith", "Smith, S.");
+        Assert.assertEquals("Smith, S.", formatter.format("S. Smith"));
     }
 
     @Test
     public void initialsThenLast() {
-        expectCorrect("SH Smith", "Smith, S. H.");
+        Assert.assertEquals("Smith, S. H.", formatter.format("SH Smith"));
     }
 
     @Test
     public void lastThenJuniorThenFirst() {
-        expectCorrect("Name, della, first", "Name, della, first");
+        Assert.assertEquals("Name, della, first", formatter.format("Name, della, first"));
     }
 
     @Test
     public void testConcatenationOfAuthorsWithCommas() {
-        expectCorrect("Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.",
-                "Ali Babar, M. and Dingsøyr, T. and Lago, P. and van der Vliet, H.");
-        expectCorrect("Ali Babar, M.", "Ali Babar, M.");
+        Assert.assertEquals("Ali Babar, M. and Dingsøyr, T. and Lago, P. and van der Vliet, H.", formatter.format("Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H."));
+        Assert.assertEquals("Ali Babar, M.", formatter.format("Ali Babar, M."));
     }
 
     @Test
     public void testOddCountOfCommas() {
-        expectCorrect("Ali Babar, M., Dingsøyr, T., Lago P.", "Ali Babar, M., Dingsøyr T. Lago P.");
+        Assert.assertEquals("Ali Babar, M., Dingsøyr T. Lago P.", formatter.format("Ali Babar, M., Dingsøyr, T., Lago P."));
     }
 
     @Test
     public void formatExample() {
-        assertEquals("Einstein, Albert and Turing, Alan", formatter.format(formatter.getExampleInput()));
+        assertEquals(formatter.format(formatter.getExampleInput()), "Einstein, Albert and Turing, Alan");
     }
 
     @Test
     public void testNameAffixe() {
-        expectCorrect("Surname, jr, First, Surname2, First2", "Surname, jr, First and Surname2, First2");
+        Assert.assertEquals("Surname, jr, First and Surname2, First2", formatter.format("Surname, jr, First, Surname2, First2"));
     }
 
     @Test
     public void testAvoidSpecialCharacter() {
-        expectCorrect("Surname, {, First; Surname2, First2", "Surname, {, First; Surname2, First2");
+        Assert.assertEquals("Surname, {, First; Surname2, First2", formatter.format("Surname, {, First; Surname2, First2"));
     }
 
     @Test
     public void testAndInName() {
-        expectCorrect("Surname, and , First, Surname2, First2", "Surname and , First, Surname2 First2");
+        Assert.assertEquals("Surname and , First, Surname2 First2", formatter.format("Surname, and , First, Surname2, First2"));
     }
 
     @Test
     public void testMultipleNameAffixes() {
-        expectCorrect("Mair, Jr, Daniel, Brühl, Sr, Daniel", "Mair, Jr, Daniel and Brühl, Sr, Daniel");
+        Assert.assertEquals("Mair, Jr, Daniel and Brühl, Sr, Daniel", formatter.format("Mair, Jr, Daniel, Brühl, Sr, Daniel"));
     }
 
     @Test
     public void testCommaSeperatedNames() {
-        expectCorrect("Cristina Bosoi, Mariana Oliveira, Rafael Ochoa Sanchez, Mélanie Tremblay, Gabrie TenHave, Nicoolas Deutz, Christopher F. Rose, Chantal Bemeur",
-                "Bosoi, Cristina and Oliveira, Mariana and Sanchez, Rafael Ochoa and Tremblay, Mélanie and TenHave, Gabrie and Deutz, Nicoolas and Rose, Christopher F. and Bemeur, Chantal");
+        Assert.assertEquals("Bosoi, Cristina and Oliveira, Mariana and Sanchez, Rafael Ochoa and Tremblay, Mélanie and TenHave, Gabrie and Deutz, Nicoolas and Rose, Christopher F. and Bemeur, Chantal",
+                formatter.format("Cristina Bosoi, Mariana Oliveira, Rafael Ochoa Sanchez, Mélanie Tremblay, Gabrie TenHave, Nicoolas Deutz, Christopher F. Rose, Chantal Bemeur"));
     }
 
     @Test
     public void testMultipleSpaces() {
-        expectCorrect("Cristina    Bosoi,    Mariana Oliveira, Rafael Ochoa Sanchez   ,   Mélanie Tremblay  , Gabrie TenHave, Nicoolas Deutz, Christopher F. Rose, Chantal Bemeur",
-                "Bosoi, Cristina and Oliveira, Mariana and Sanchez, Rafael Ochoa and Tremblay, Mélanie and TenHave, Gabrie and Deutz, Nicoolas and Rose, Christopher F. and Bemeur, Chantal");
+        Assert.assertEquals("Bosoi, Cristina and Oliveira, Mariana and Sanchez, Rafael Ochoa and Tremblay, Mélanie and TenHave, Gabrie and Deutz, Nicoolas and Rose, Christopher F. and Bemeur, Chantal",
+                formatter.format("Cristina    Bosoi,    Mariana Oliveira, Rafael Ochoa Sanchez   ,   Mélanie Tremblay  , Gabrie TenHave, Nicoolas Deutz, Christopher F. Rose, Chantal Bemeur"));
     }
 
     @Test
     public void testAvoidPreposition() {
-        expectCorrect("Hans von Zimmer, Michael van Oberbergern, Kevin zu Berger", "von Zimmer, Hans and van Oberbergern, Michael and zu Berger, Kevin");
+        Assert.assertEquals("von Zimmer, Hans and van Oberbergern, Michael and zu Berger, Kevin", formatter.format("Hans von Zimmer, Michael van Oberbergern, Kevin zu Berger"));
     }
 
     @Test
     public void testPreposition() {
-        expectCorrect("Hans von Zimmer, Michael van Oberbergern, Kevin zu Berger", "von Zimmer, Hans and van Oberbergern, Michael and zu Berger, Kevin");
+        Assert.assertEquals("von Zimmer, Hans and van Oberbergern, Michael and zu Berger, Kevin", formatter.format("Hans von Zimmer, Michael van Oberbergern, Kevin zu Berger"));
     }
 
     @Test
     public void testAvoidNameAffixes() {
-        expectCorrect("Canon der Barbar, Alexander der Große","der Barbar, Canon and der Große, Alexander");
-    }
-
-    private void expectCorrect(String input, String expected) {
-        Assert.assertEquals(expected, formatter.format(input));
+        Assert.assertEquals("der Barbar, Canon and der Große, Alexander", formatter.format("Canon der Barbar, Alexander der Große"));
     }
 }
