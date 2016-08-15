@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.Optional;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -94,11 +95,11 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
             return false;
         }
 
-        BibEntry entry = BibtexParser.singleFromString(bibtexString,
+        Optional<BibEntry> entry = BibtexParser.singleFromStringOptional(bibtexString,
                 ImportFormatPreferences.fromPreferences(Globals.prefs));
-        if (entry != null) {
+        if (entry.isPresent()) {
             // Optionally add curly brackets around key words to keep the case
-            entry.getFieldOptional(FieldName.TITLE).ifPresent(title -> {
+            entry.get().getFieldOptional(FieldName.TITLE).ifPresent(title -> {
                 // Unit formatting
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
                     title = unitsToLatexFormatter.format(title);
@@ -108,14 +109,15 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH)) {
                     title = protectTermsFormatter.format(title);
                 }
-                entry.setField(FieldName.TITLE, title);
+                entry.get().setField(FieldName.TITLE, title);
             });
 
-            entry.getFieldOptional(FieldName.INSTITUTION).ifPresent(
-                    institution -> entry.setField(FieldName.INSTITUTION, new UnicodeToLatexFormatter().format(institution)));
+            entry.get().getFieldOptional(FieldName.INSTITUTION).ifPresent(
+                    institution -> entry.get().setField(FieldName.INSTITUTION,
+                            new UnicodeToLatexFormatter().format(institution)));
             // Do not use the provided key
             // entry.clearField(InternalBibtexFields.KEY_FIELD);
-            inspector.addEntry(entry);
+            inspector.addEntry(entry.get());
 
             return true;
         }

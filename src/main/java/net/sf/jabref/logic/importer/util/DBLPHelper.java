@@ -84,7 +84,7 @@ public class DBLPHelper {
         String entry1 = tmpStr.substring(startIdx + START_PATTERN.length(),
                 endIdx);
         entry1 = cleanEntry(entry1);
-        bibtexList.add(BibtexParser.singleFromString(entry1, importFormatPreferences));
+        BibtexParser.singleFromStringOptional(entry1, importFormatPreferences).ifPresent(bibtexList::add);
 
         // let's see whether there is another entry (crossref)
         tmpStr = tmpStr
@@ -96,7 +96,7 @@ public class DBLPHelper {
             String entry2 = tmpStr.substring(startIdx + START_PATTERN.length(),
                     endIdx);
             entry2 = cleanEntry(entry2);
-            bibtexList.add(BibtexParser.singleFromString(entry2, importFormatPreferences));
+            BibtexParser.singleFromStringOptional(entry2, importFormatPreferences).ifPresent(bibtexList::add);
         }
 
         return bibtexList;
