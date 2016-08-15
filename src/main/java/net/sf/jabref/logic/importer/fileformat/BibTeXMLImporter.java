@@ -18,7 +18,6 @@ package net.sf.jabref.logic.importer.fileformat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
@@ -28,6 +27,7 @@ import javax.xml.parsers.SAXParserFactory;
 
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.util.BibTeXMLHandler;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
@@ -52,8 +52,8 @@ public class BibTeXMLImporter extends ImportFormat {
     }
 
     @Override
-    public List<String> getExtensions() {
-        return Collections.singletonList(".xml");
+    public FileExtensions getExtensions() {
+        return FileExtensions.BIBTEXML;
     }
 
     @Override

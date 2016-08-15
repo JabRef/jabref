@@ -26,6 +26,7 @@ import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+
 import javax.swing.filechooser.FileFilter;
 
 import net.sf.jabref.Globals;
@@ -40,7 +41,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class ImportFormats {
+
     private static final Log LOGGER = LogFactory.getLog(ImportFormats.class);
+
 
     private static JFileChooser createImportFileChooser(String currentDir) {
 
@@ -91,12 +94,14 @@ public class ImportFormats {
                 putValue(Action.NAME, openInNew ? Localization.menuTitle("Import into new database") : Localization
                         .menuTitle("Import into current database"));
                 putValue(Action.ACCELERATOR_KEY,
-                        openInNew ? Globals.getKeyPrefs().getKey(KeyBinding.IMPORT_INTO_NEW_DATABASE) : Globals.getKeyPrefs().getKey(KeyBinding.IMPORT_INTO_CURRENT_DATABASE));
+                        openInNew ? Globals.getKeyPrefs().getKey(KeyBinding.IMPORT_INTO_NEW_DATABASE) : Globals
+                                .getKeyPrefs().getKey(KeyBinding.IMPORT_INTO_CURRENT_DATABASE));
             }
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                JFileChooser fileChooser = createImportFileChooser(Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY));
+                JFileChooser fileChooser = createImportFileChooser(
+                        Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY));
                 int result = fileChooser.showOpenDialog(frame);
 
                 if (result != JFileChooser.APPROVE_OPTION) {
@@ -118,8 +123,7 @@ public class ImportFormats {
                     if (!file.exists()) {
                         // Warn that the file doesn't exists:
                         JOptionPane.showMessageDialog(frame,
-                                Localization.lang("File not found") +
-                                        ": '" + file.getName() + "'.",
+                                Localization.lang("File not found") + ": '" + file.getName() + "'.",
                                 Localization.lang("Import"), JOptionPane.ERROR_MESSAGE);
                         return;
                     }
