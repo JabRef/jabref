@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -33,8 +34,6 @@ import javafx.collections.FXCollections;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.AbbreviationWriter;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-
-import com.google.common.collect.Lists;
 
 /**
  * This class provides a model for abbreviation files.
@@ -88,12 +87,8 @@ public class AbbreviationsFileViewModel {
      */
     public void writeOrCreate() throws IOException {
         if (!isBuiltInList.get()) {
-            List<Abbreviation> actualAbbreviations = Lists.newArrayList();
-            abbreviations.forEach(abb -> {
-                if (!abb.isPseudoAbbreviation()) {
-                    actualAbbreviations.add(abb.getAbbreviationObject());
-                }
-            });
+            List<Abbreviation> actualAbbreviations = abbreviations.stream().filter(abb -> !abb.isPseudoAbbreviation())
+                    .map(abb -> abb.getAbbreviationObject()).collect(Collectors.toList());
             AbbreviationWriter.writeOrCreate(path.get(), actualAbbreviations, StandardCharsets.UTF_8);
         }
     }
@@ -106,8 +101,8 @@ public class AbbreviationsFileViewModel {
         return path.isPresent() && Files.exists(path.get());
     }
 
-    public String getAbsolutePath() {
-        return path.get().toAbsolutePath().toString();
+    public Optional<Path> getAbsolutePath() {
+        return path;
     }
 
     public ReadOnlyBooleanProperty isBuiltInListProperty() {

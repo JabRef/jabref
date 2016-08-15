@@ -162,7 +162,11 @@ public class ManageJournalAbbreviationsViewModel {
     /**
      * This method removes the currently selected file from the set of
      * journal abbreviation files. This will not remove existing files from
-     * the file system.
+     * the file system. The {@code activeFile} property will always change
+     * to the previous file in the {@code journalFiles} list property, except
+     * the first file is selected. If so the next file will be selected except if
+     * there are no more files than the {@code activeFile} property will be set
+     * to {@code null}.
      */
     public void removeCurrentList() {
         int index = journalFiles.indexOf(currentFile.get());
@@ -208,9 +212,7 @@ public class ManageJournalAbbreviationsViewModel {
             Abbreviation abbreviation = new Abbreviation(abbreviationsName.get(), abbreviationsAbbreviation.get());
             AbbreviationViewModel abbViewModel = new AbbreviationViewModel(abbreviation);
             if (abbreviations.contains(abbViewModel)) {
-                if (abbViewModel.equals(currentAbbreviation.get())) {
-                    setCurrentAbbreviationNameAndAbbreviationIfValid();
-                } else {
+                if (!abbViewModel.equals(currentAbbreviation.get())) {
                     throw new DuplicatedJournalAbbreviationException("Duplicated journal abbreviation");
                 }
             } else {
@@ -241,7 +243,8 @@ public class ManageJournalAbbreviationsViewModel {
     /**
      * Method to delete the abbreviation set in the currentAbbreviation property.
      * The currentAbbreviationProperty will be set to the previous or next abbreviation
-     * in the abbreviations property if applicable. Else it will be set null.
+     * in the abbreviations property if applicable. Else it will be set to {@code null}
+     * if there are no abbreviations left.
      */
     public void deleteAbbreviation() {
         if ((currentAbbreviation.get() != null) && !currentAbbreviation.get().isPseudoAbbreviation()) {
@@ -281,7 +284,7 @@ public class ManageJournalAbbreviationsViewModel {
         List<String> extFiles = new ArrayList<>();
         journalFiles.forEach(file -> {
             if (!file.isBuiltInListProperty().get()) {
-                extFiles.add(file.getAbsolutePath());
+                file.getAbsolutePath().ifPresent(path -> extFiles.add(path.toAbsolutePath().toString()));
             }
         });
         Globals.prefs.putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, extFiles);
@@ -294,7 +297,7 @@ public class ManageJournalAbbreviationsViewModel {
      */
     public void selectLastJournalFile() {
         if (journalFiles.size() > 0) {
-            currentFile.set(journalFilesProperty().get(journalFilesProperty().size() - 1));
+            changeActiveFile(journalFilesProperty().get(journalFilesProperty().size() - 1));
         }
     }
 

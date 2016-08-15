@@ -27,8 +27,8 @@ public class Abbreviation implements Comparable<Abbreviation> {
     private final SimpleStringProperty abbreviation = new SimpleStringProperty("");
 
     public Abbreviation(String name, String abbreviation) {
-        this.name.set(java.util.Objects.requireNonNull(name).trim());
-        this.abbreviation.set(java.util.Objects.requireNonNull(abbreviation).trim());
+        this.name.set(Objects.requireNonNull(name).trim());
+        this.abbreviation.set(Objects.requireNonNull(abbreviation).trim());
     }
 
     public String getName() {
