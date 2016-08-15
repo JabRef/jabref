@@ -28,6 +28,7 @@ import java.util.stream.Collectors;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -100,12 +101,13 @@ public class SidePaneManager {
 
     public synchronized void hide(String name) {
         SidePaneComponent sidePaneComponent = components.get(name);
+        MainTable mainTable = frame.getCurrentBasePanel().getMainTable();
         if (sidePaneComponent == null) {
             LOGGER.warn("Side pane component '" + name + "' unknown.");
         } else {
             hideComponent(sidePaneComponent);
-            frame.getCurrentBasePanel().getMainTable().setSelected(frame.getCurrentBasePanel().getMainTable().getSelectedRow());
-            frame.getCurrentBasePanel().getMainTable().requestFocus();
+            mainTable.setSelected(mainTable.getSelectedRow());
+            mainTable.requestFocus();
         }
     }
 
