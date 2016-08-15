@@ -31,7 +31,7 @@ public class AboutDialogView extends FXMLView {
     }
 
     public void show() {
-        FXAlert aboutDialog = new FXAlert(AlertType.INFORMATION, Localization.lang("About JabRef"));
+        FXAlert aboutDialog = new FXAlert(AlertType.INFORMATION, Localization.lang("About JabRef"), true);
         aboutDialog.setDialogPane((DialogPane) this.getView());
         aboutDialog.show();
     }

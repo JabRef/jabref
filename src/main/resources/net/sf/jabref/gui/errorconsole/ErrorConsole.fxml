@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ButtonBar?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.layout.BorderPane?>
+<DialogPane xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sf.jabref.gui.errorconsole.ErrorConsoleView">
+    <content>
+        <BorderPane>
+            <bottom>
+                <ButtonBar styleClass="custom-buttons" BorderPane.alignment="CENTER">
+                    <BorderPane.margin>
+                        <Insets top="10.0" />
+                    </BorderPane.margin>
+                    <buttons>
+                        <Button fx:id="closeButton" cancelButton="true" defaultButton="true" mnemonicParsing="false" onAction="#closeErrorDialog" text="Ok" textAlignment="CENTER" />
+                        <Button fx:id="copyLogButton" mnemonicParsing="false" onAction="#copyLogButton" text="Copy Log" />
+                        <ToggleButton fx:id="developerButton" mnemonicParsing="false" text="Developer information" />
+                        <Button fx:id="createIssueButton" mnemonicParsing="false" onAction="#createIssueButton" text="Create Issue" />
+                    </buttons>
+                </ButtonBar>
+            </bottom>
+            <center>
+                <ListView fx:id="allMessage" prefHeight="500.0" prefWidth="1200.0" styleClass="info-sections" BorderPane.alignment="CENTER" />
+            </center>
+        </BorderPane>
+    </content>
+</DialogPane>

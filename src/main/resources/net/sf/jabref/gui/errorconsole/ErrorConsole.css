@@ -1,0 +1,24 @@
+.info-sections {
+	-fx-padding: 5px;
+}
+
+.exception{
+    -fx-text-fill: red;
+}
+
+.log {
+-fx-text-fill: blue;
+}
+
+.output {
+-fx-text-fill: black;
+}
+
+.custom-buttons {
+	-fx-padding: 5px;
+}
+
+.dialog-pane *.button-bar {
+	-fx-max-height: 0;
+	-fx-pref-height: 0;
+}
