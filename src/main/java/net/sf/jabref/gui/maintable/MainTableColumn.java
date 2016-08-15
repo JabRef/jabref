@@ -135,25 +135,39 @@ public class MainTableColumn {
         }
     }
 
+    /**
+     * Check if the value returned by getColumnValue() is the same as a simple check of the entry's field(s) would give
+     * The reasons for being different are (combinations may also happen):
+     * - The entry has a crossref where the field content is obtained from
+     * - The field has a string in it (which getColumnValue() resolves)
+     * - There are some alias fields. For example, if the entry has a date field but no year field, getResolvedField()
+     *   will return the year value from the date field when queried for year
+     *
+     *
+     * @param entry the BibEntry
+     * @return true if the value returned by getColumnValue() is resolved as outlined above
+     */
     public boolean isResolved(BibEntry entry) {
         if (bibtexFields.isEmpty()) {
             return false;
         }
 
-        Optional<String> content = Optional.empty();
-        Optional<String> entryContent = Optional.empty();
+        Optional<String> resolvedFieldContent = Optional.empty();
+        Optional<String> plainFieldContent = Optional.empty();
         for (String field : bibtexFields) {
-            if (BibEntry.TYPE_HEADER.equals(field) || "bibtextype".equals(field)) {
+            // entry type or bibtex key will never be resolved
+            if (BibEntry.TYPE_HEADER.equals(field) || BibEntry.OBSOLETE_TYPE_HEADER.equals(field)
+                    || BibEntry.KEY_FIELD.equals(field)) {
                 return false;
             } else {
-                entryContent = entry.getFieldOptional(field);
-                content = BibDatabase.getResolvedField(field, entry, database.orElse(null));
+                plainFieldContent = entry.getFieldOptional(field);
+                resolvedFieldContent = BibDatabase.getResolvedField(field, entry, database.orElse(null));
             }
 
-            if (content.isPresent()) {
+            if (resolvedFieldContent.isPresent()) {
                 break;
             }
         }
-        return (!content.equals(entryContent));
+        return (!resolvedFieldContent.equals(plainFieldContent));
     }
 }

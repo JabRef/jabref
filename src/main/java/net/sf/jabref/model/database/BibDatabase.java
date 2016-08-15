@@ -44,9 +44,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.event.source.EntryEventSource;
-import net.sf.jabref.logic.TypedBibEntry;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
@@ -525,8 +527,16 @@ public class BibDatabase {
         Objects.requireNonNull(entry, "entry cannot be null");
 
         if (BibEntry.TYPE_HEADER.equals(field) || BibEntry.OBSOLETE_TYPE_HEADER.equals(field)) {
-            TypedBibEntry typedEntry = new TypedBibEntry(entry, BibDatabaseMode.BIBLATEX);
-            return Optional.of(typedEntry.getTypeForDisplay());
+            Optional<EntryType> entryType = EntryTypes.getType(entry.getType(), BibDatabaseMode.BIBLATEX);
+            if (entryType.isPresent()) {
+                return Optional.of(entryType.get().getName());
+            } else {
+                return Optional.of(EntryUtil.capitalizeFirst(entry.getType()));
+            }
+        }
+
+        if (BibEntry.KEY_FIELD.equals(field)) {
+            return entry.getCiteKeyOptional();
         }
 
         // TODO: Changed this to also consider alias fields, which is the expected
@@ -536,14 +546,14 @@ public class BibDatabase {
 
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry: Do not do this for the bibtex key.
-        if (!result.isPresent() && (database != null) && !field.equals(BibEntry.KEY_FIELD)) {
+        if (!result.isPresent() && (database != null)) {
             Optional<String> crossrefKey = entry.getFieldOptional(FieldName.CROSSREF);
-            if (crossrefKey.isPresent()) {
+            if (crossrefKey.isPresent() && !crossrefKey.get().isEmpty()) {
                 Optional<BibEntry> referred = database.getEntryByKey(crossrefKey.get());
                 if (referred.isPresent()) {
                     // Ok, we found the referred entry. Get the field value from that
                     // entry. If it is unset there, too, stop looking:
-                    result = referred.get().getFieldOptional(field);
+                    result = referred.get().getFieldOrAlias(field);
                 }
             }
         }
