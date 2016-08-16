@@ -155,7 +155,8 @@ class EntryEditorTab {
                 fileListEditor = (FileListEditor) fieldEditor;
                 defaultHeight = 0;
             } else if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.SINGLE_ENTRY_LINK)) {
-                fieldEditor = new EntryLinkListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent, true);
+                fieldEditor = new EntryLinkListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent,
+                        true);
                 defaultHeight = 0;
             } else if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.MULTIPLE_ENTRY_LINK)) {
                 fieldEditor = new EntryLinkListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent,

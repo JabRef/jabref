@@ -42,12 +42,12 @@ import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
@@ -71,7 +71,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
     private static final Log LOGGER = LogFactory.getLog(EntryLinkListEditor.class);
 
     private final FieldNameLabel label;
-    private FileListEntryEditor editor;
     private final JabRefFrame frame;
     private final BibDatabaseContext databaseContext;
     private final String fieldName;
@@ -80,8 +79,9 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
     private final EntryLinkListTableModel tableModel;
     private final JPopupMenu menu = new JPopupMenu();
     private final boolean singleEntry;
-
-    private final List<ParsedEntryLink> linkList;
+    private final JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
+    private final JButton remove = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getSmallIcon());
+    private AutoCompleteListener autoCompleteListener;
 
     public EntryLinkListEditor(JabRefFrame frame, BibDatabaseContext databaseContext, String fieldName, String content,
             EntryEditor entryEditor, boolean singleEntry) {
@@ -90,49 +90,46 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         this.fieldName = fieldName;
         this.entryEditor = entryEditor;
         this.singleEntry = singleEntry;
-        linkList = EntryLinkList.parse(content, databaseContext.getDatabase());
         label = new FieldNameLabel(fieldName);
-        tableModel = new EntryLinkListTableModel(linkList);
+        tableModel = new EntryLinkListTableModel(EntryLinkList.parse(content, databaseContext.getDatabase()));
         setText(content);
         setModel(tableModel);
         JScrollPane sPane = new JScrollPane(this);
         setTableHeader(null);
         addMouseListener(new TableClickListener());
 
-        JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
         add.setToolTipText(Localization.lang("New file link (INSERT)"));
-        JButton remove = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getSmallIcon());
         remove.setToolTipText(Localization.lang("Remove file link (DELETE)"));
-        JButton up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
-
-        JButton down = new JButton(IconTheme.JabRefIcon.DOWN.getSmallIcon());
         add.setMargin(new Insets(0, 0, 0, 0));
         remove.setMargin(new Insets(0, 0, 0, 0));
-        up.setMargin(new Insets(0, 0, 0, 0));
-        down.setMargin(new Insets(0, 0, 0, 0));
         add.addActionListener(e -> addEntry());
         remove.addActionListener(e -> removeEntries());
-        up.addActionListener(e -> moveEntry(-1));
-        down.addActionListener(e -> moveEntry(1));
 
         FormBuilder builder = FormBuilder.create()
-                .layout(new FormLayout
-        ("fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
+                .layout(new FormLayout("fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
+
         if (!singleEntry) {
+            JButton up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
+
+            JButton down = new JButton(IconTheme.JabRefIcon.DOWN.getSmallIcon());
+            up.setMargin(new Insets(0, 0, 0, 0));
+            down.setMargin(new Insets(0, 0, 0, 0));
+            up.addActionListener(e -> moveEntry(-1));
+            down.addActionListener(e -> moveEntry(1));
             builder.add(up).xy(1, 1);
-            builder.add(add).xy(3, 1);
+            builder.add(down).xy(1, 2);
         }
-        builder.add(down).xy(1, 2);
+        builder.add(add).xy(3, 1);
         builder.add(remove).xy(3, 2);
         panel = new JPanel();
         panel.setLayout(new BorderLayout());
         panel.add(sPane, BorderLayout.CENTER);
         panel.add(builder.getPanel(), BorderLayout.EAST);
 
-        TransferHandler transferHandler = new EntryLinkTransferHandler();
+        // TransferHandler transferHandler = new EntryLinkTransferHandler();
 
-        setTransferHandler(transferHandler);
-        panel.setTransferHandler(transferHandler);
+        // setTransferHandler(transferHandler);
+        // panel.setTransferHandler(transferHandler);
 
         // Add an input/action pair for deleting entries:
         getInputMap().put(KeyStroke.getKeyStroke("DELETE"), "delete");
@@ -185,6 +182,8 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         JMenuItem openLink = new JMenuItem(Localization.lang("Select"));
         menu.add(openLink);
         openLink.addActionListener(e -> selectEntry());
+
+        updateButtonStates();
     }
 
 
@@ -244,6 +243,8 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
     @Override
     public void setText(String newText) {
         tableModel.setContent(EntryLinkList.parse(newText, databaseContext.getDatabase()));
+        adjustColumnWidth();
+        updateButtonStates();
     }
 
     @Override
@@ -278,6 +279,7 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         tableModel.addEntry(row, entry);
         entryEditor.updateField(this);
         adjustColumnWidth();
+        updateButtonStates();
     }
 
 
@@ -290,8 +292,20 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         }
         entryEditor.updateField(this);
         adjustColumnWidth();
+        updateButtonStates();
     }
 
+    private void updateButtonStates() {
+        if (singleEntry) {
+            if (tableModel.isEmpty()) {
+                add.setEnabled(true);
+                remove.setEnabled(false);
+            } else {
+                add.setEnabled(false);
+                remove.setEnabled(true);
+            }
+        }
+    }
     private void moveEntry(int i) {
         int[] sel = getSelectedRows();
         if ((sel.length != 1) || (tableModel.getRowCount() < 2)) {
@@ -362,7 +376,8 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
 
     @Override
     public void setAutoCompleteListener(AutoCompleteListener listener) {
-        // Do nothing
+        this.autoCompleteListener = listener;
+        setDefaultRenderer(String.class, new BibtexKeyRenderer());
     }
 
     @Override
@@ -483,6 +498,14 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
             }
         }
 
+        public List<ParsedEntryLink> getList() {
+            return internalList;
+        }
+
+        public boolean isEmpty() {
+            return internalList.isEmpty();
+        }
+
         /**
          * Add an entry to the table model, and fire a change event. The change event
          * is fired on the event dispatch thread.
@@ -508,9 +531,9 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
 
         @Override
         public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-            /* synchronized (list) {
+            synchronized (internalList) {
                 if (columnIndex == 0) {
-                    list.get(rowIndex).setKey((String) aValue);
+                    internalList.get(rowIndex).setKey((String) aValue);
                     if (SwingUtilities.isEventDispatchThread()) {
                         fireTableRowsUpdated(rowIndex, rowIndex);
                     } else {
@@ -518,7 +541,7 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
                     }
 
                 }
-            } */
+            }
         }
 
         public void addEntry(ParsedEntryLink entry) {
@@ -532,6 +555,21 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
             }
         }
 
+
+    }
+
+    private class BibtexKeyRenderer extends DefaultTableCellRenderer {
+
+        public BibtexKeyRenderer() {
+            super();
+            addKeyListener(autoCompleteListener);
+        }
+
+        @Override
+        public void setValue(Object value) {
+            System.err.println(value);
+            super.setText((String) value);
+        }
     }
 
     private class EntryLinkTransferHandler extends TransferHandler {
