@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
+/*  Copyright (C) 2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -31,6 +31,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -59,6 +60,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
+import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryLinkList;
 import net.sf.jabref.model.entry.ParsedEntryLink;
@@ -101,8 +103,8 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         setTableHeader(null);
         addMouseListener(new TableClickListener());
 
-        add.setToolTipText(Localization.lang("New file link (INSERT)"));
-        remove.setToolTipText(Localization.lang("Remove file link (DELETE)"));
+        add.setToolTipText(("New entry link (INSERT)"));
+        remove.setToolTipText(("Remove entry link (DELETE)"));
         add.setMargin(new Insets(0, 0, 0, 0));
         remove.setMargin(new Insets(0, 0, 0, 0));
         add.addActionListener(e -> addEntry());
@@ -161,7 +163,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
                 int row = getSelectedRow();
-                System.err.println(row);
                 addEntry();
                 setRowSelectionInterval(row, row);
             }
@@ -289,11 +290,9 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
 
     private void addEntry() {
         int row = getSelectedRow();
-        System.err.println("Selected row: " + row);
         if (row == -1) {
             row = 0;
         }
-        System.err.println("Selected row: " + row);
         ParsedEntryLink entry = new ParsedEntryLink("", databaseContext.getDatabase());
         tableModel.addEntry(row, entry);
         entryEditor.updateField(this);
@@ -452,6 +451,7 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         }
 
         public void setContent(List<ParsedEntryLink> newList) {
+
             internalList.clear();
             internalList.addAll(newList);
             if (SwingUtilities.isEventDispatchThread()) {
@@ -489,7 +489,9 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
                 case 0:
                     return entry.getKey();
                 case 1:
-                    return entry.getLinkedEntry().map(bibEntry -> formatEntry(bibEntry)).orElse("Unknown entry");
+                    return entry.getLinkedEntry()
+                            .map(bibEntry -> formatEntry(bibEntry, entry.getDataBase()))
+                            .orElse("Unknown entry");
                 default:
                     return null;
                 }
@@ -528,7 +530,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
          */
         public void addEntry(final int index, final ParsedEntryLink entry) {
             synchronized (internalList) {
-                System.err.println("Insert entry " + entry.getKey() + " at position " + index);
                 internalList.add(index, entry);
                 if (SwingUtilities.isEventDispatchThread()) {
                     fireTableDataChanged();
@@ -581,7 +582,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
 
         @Override
         public void setValue(Object value) {
-            System.err.println(value);
             super.setText((String) value);
         }
     }
@@ -628,20 +628,21 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
     }
 
 
-    private static final String layoutFormat = "\\begin{author}\\format[Authors(2,1)]{\\author}\\end{author}\\begin{title}, \"\\title\"\\end{title}\\begin{year}, \\year\\end{year}";
+    private static final String layoutFormat = "\\begin{author}\\format[Authors(2,1),LatexToUnicode]{\\author}\\end{author}\\begin{title}, \"\\format[LatexToUnicode]{\\title}\"\\end{title}\\begin{year}, \\year\\end{year}";
 
 
-    private static String formatEntry(BibEntry entry) {
+    private static String formatEntry(BibEntry entry, BibDatabase database) {
         StringReader sr = new StringReader(layoutFormat);
         try {
             Layout layout = new LayoutHelper(sr,
                     LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader))
                             .getLayoutFromText();
 
-            return layout.doLayout(entry, null);
+            return layout.doLayout(entry, database);
         } catch (IOException e) {
             LOGGER.warn("Problem generating entry layout", e);
         }
         return "";
     }
+
 }

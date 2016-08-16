@@ -32,7 +32,7 @@ public class ParsedEntryLink {
 
     public void setKey(String newKey) {
         this.key = newKey;
-        this.linkedEntry = dataBase.getEntryByKey(this.key);
+        this.linkedEntry = getDataBase().getEntryByKey(this.key);
     }
 
     @Override
@@ -51,4 +51,9 @@ public class ParsedEntryLink {
         ParsedEntryLink other = (ParsedEntryLink) obj;
         return Objects.equals(key, other.key) && Objects.equals(linkedEntry, other.linkedEntry);
     }
+
+    public BibDatabase getDataBase() {
+        return dataBase;
+    }
+
 }

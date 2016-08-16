@@ -13,13 +13,11 @@ public class EntryLinkList {
 
     public static List<ParsedEntryLink> parse(String fieldValue, BibDatabase database) {
         List<ParsedEntryLink> result = new ArrayList<>();
-        if (fieldValue != null) {
+        if ((fieldValue != null) && !fieldValue.isEmpty()) {
             String[] entries = fieldValue.split(SEPARATOR);
 
             for (String entry : entries) {
-                if (!entry.isEmpty()) {
-                    result.add(new ParsedEntryLink(entry, database));
-                }
+                result.add(new ParsedEntryLink(entry, database));
             }
         }
         return result;
