@@ -36,6 +36,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Automatically generated group names are now converted from LaTeX to Unicode
 - Unified dialogs for opening/saving files
 - Add integrity check to avoid non-ASCII characters in BibTeX files
+- [#1751](https://github.com/JabRef/jabref/issues/1751) Added tooltip to web search button
+
 
 ### Fixed
 - Fixed [#1632](https://github.com/JabRef/jabref/issues/1632): User comments (@Comment) with or without brackets are now kept
