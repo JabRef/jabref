@@ -8,7 +8,7 @@ We also have [code howtos](https://github.com/JabRef/jabref/wiki/Code-Howtos) an
 For newcomers, [FLOSS Coach](http://www.flosscoach.com/) might be helpful.
 It contains steps to get started with JabRef development.
 
-In case you have any questions, you can use our [developers mailinglist](https://lists.sourceforge.net/lists/listinfo/jabref-devel).
+In case you have any question, do not hesitate to write one of our [JabRef developers](https://github.com/orgs/JabRef/teams/developers) an email.
 
 
 ## Formal requirements for a pull request

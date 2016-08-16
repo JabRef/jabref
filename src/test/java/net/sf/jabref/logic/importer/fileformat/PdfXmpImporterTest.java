@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -41,7 +42,7 @@ public class PdfXmpImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(".pdf", importer.getExtensions().get(0));
+        assertEquals(FileExtensions.XMP, importer.getExtensions());
     }
 
     @Test

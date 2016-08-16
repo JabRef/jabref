@@ -25,8 +25,10 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -111,13 +113,21 @@ class ContentSelectorDialog2 extends JDialog {
         initLayout();
 
         setupFieldSelector();
+        if (currentField != null) {
+            int fieldInd = fieldListModel.indexOf(currentField);
+            if (fieldInd >= 0) {
+                fieldList.setSelectedIndex(fieldInd);
+            }
+        } else {
+            if (!fieldListModel.isEmpty()) {
+                fieldList.setSelectedIndex(0);
+                currentField = fieldList.getSelectedValue();
+            }
+        }
+
         setupWordSelector();
         setupActions();
         KeyBinder.bindCloseDialogKeyToCancelAction(this.rootPane, cancel.getAction());
-        int fieldInd = fieldListModel.indexOf(currentField);
-        if (fieldInd >= 0) {
-            fieldList.setSelectedIndex(fieldInd);
-        }
 
         pack();
     }
@@ -259,6 +269,7 @@ class ContentSelectorDialog2 extends JDialog {
 
     private void applyChanges() {
         boolean changedFieldSet = false; // Watch if we need to rebuild entry editors
+        boolean anythingChanged = false; // Watch if we should mark as there is data changed
 
         // First remove the mappings for fields that have been deleted.
         // If these were re-added, they will be added below, so it doesn't
@@ -266,6 +277,7 @@ class ContentSelectorDialog2 extends JDialog {
         for (String fieldName : removedFields) {
             metaData.clearContentSelectors(fieldName);
             changedFieldSet = true;
+            anythingChanged = true;
         }
 
         // Cycle through all fields that we have created listmodels for:
@@ -283,26 +295,39 @@ class ContentSelectorDialog2 extends JDialog {
                 }
             }
 
-            if (metaData.getContentSelectors(entry.getKey()).isEmpty()) {
-                changedFieldSet = true;
-                List<String> data = new ArrayList<>();
-                for (int wrd = start; wrd < lm.size(); wrd++) {
-                    String word = lm.get(wrd);
-                    data.add(word);
-                }
-                metaData.setContentSelectors(entry.getKey(), data);
+            Set<String> data = new HashSet<>();
+            for (int wrd = start; wrd < lm.size(); wrd++) {
+                String word = lm.get(wrd);
+                data.add(word);
             }
-        }
 
-        // TODO: remove metadata for removed selector field.
-        panel.markNonUndoableBaseChanged();
+            // Check if any words have been added
+            if (!data.equals(new HashSet<>(metaData.getContentSelectors(entry.getKey())))) {
+                anythingChanged = true;
+            }
+
+            // Check if there are words to be added and previously there were no content selector for the field
+            if (!data.isEmpty() && metaData.getContentSelectors(entry.getKey()).isEmpty()) {
+                changedFieldSet = true;
+            }
+
+            metaData.setContentSelectors(entry.getKey(), new ArrayList<>(data));
+        }
 
         // Update all selectors in the current BasePanel.
         if (changedFieldSet) {
+            // We have added or removed content selectors, update the entry editor
             panel.rebuildAllEntryEditors();
-        } else {
+        } else if (anythingChanged) {
+            // Enough to update the content selectors, if anything changed
             panel.updateAllContentSelectors();
         }
+
+        if (anythingChanged) {
+            // Mark the database updated so changes are not lost
+            panel.markNonUndoableBaseChanged();
+        }
+
         panel.getAutoCompleters().addContentSelectorValuesToAutoCompleters(panel.getBibDatabaseContext().getMetaData());
 
     }

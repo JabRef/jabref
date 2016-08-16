@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -61,6 +60,6 @@ public class OrdinalsToSuperscriptFormatterTest {
     }
 
     private void expectCorrect(String input, String expected) {
-        Assert.assertEquals(expected, formatter.format(input));
+        assertEquals(expected, formatter.format(input));
     }
 }

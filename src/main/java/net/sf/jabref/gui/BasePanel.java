@@ -122,6 +122,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -1984,10 +1985,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         storeCurrentEdit();
                     }
                 }
-                String name = getUndoManager().getUndoPresentationName();
                 getUndoManager().undo();
                 markBaseChanged();
-                frame.output(name);
+                frame.output(Localization.lang("Undo"));
             } catch (CannotUndoException ex) {
                 LOGGER.warn("Nothing to undo", ex);
                 frame.output(Localization.lang("Nothing to undo") + '.');
@@ -2062,10 +2062,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     storeCurrentEdit();
                 }
 
-                String name = getUndoManager().getRedoPresentationName();
                 getUndoManager().redo();
                 markBaseChanged();
-                frame.output(name);
+                frame.output(Localization.lang("Redo"));
             } catch (CannotRedoException ex) {
                 frame.output(Localization.lang("Nothing to redo") + '.');
             }

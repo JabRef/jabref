@@ -19,10 +19,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.xml.bind.JAXBContext;
@@ -78,6 +78,7 @@ import net.sf.jabref.logic.importer.fileformat.medline.QualifierName;
 import net.sf.jabref.logic.importer.fileformat.medline.Section;
 import net.sf.jabref.logic.importer.fileformat.medline.Sections;
 import net.sf.jabref.logic.importer.fileformat.medline.Text;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -107,8 +108,8 @@ public class MedlineImporter extends ImportFormat {
     }
 
     @Override
-    public List<String> getExtensions() {
-        return Arrays.asList(".nbib", ".xml");
+    public FileExtensions getExtensions() {
+        return FileExtensions.MEDLINE;
     }
 
     @Override
@@ -189,7 +190,7 @@ public class MedlineImporter extends ImportFormat {
     }
 
     private void parseBookArticle(PubmedBookArticle currentArticle, List<BibEntry> bibItems) {
-        HashMap<String, String> fields = new HashMap<>();
+        Map<String, String> fields = new HashMap<>();
         if (currentArticle.getBookDocument() != null) {
             BookDocument bookDocument = currentArticle.getBookDocument();
             fields.put("pmid", bookDocument.getPMID().getContent());
@@ -258,7 +259,7 @@ public class MedlineImporter extends ImportFormat {
         bibItems.add(entry);
     }
 
-    private void addBookInformation(HashMap<String, String> fields, Book book) {
+    private void addBookInformation(Map<String, String> fields, Book book) {
         if (book.getPublisher() != null) {
             Publisher publisher = book.getPublisher();
             putIfValueNotNull(fields, "publocation", publisher.getPublisherLocation());
@@ -298,7 +299,7 @@ public class MedlineImporter extends ImportFormat {
         }
     }
 
-    private void putStringFromSerializableList(HashMap<String, String> fields, String medlineKey,
+    private void putStringFromSerializableList(Map<String, String> fields, String medlineKey,
             List<Serializable> contentList) {
         StringBuilder result = new StringBuilder();
         for (Serializable content : contentList) {
@@ -311,7 +312,7 @@ public class MedlineImporter extends ImportFormat {
         }
     }
 
-    private void addContributionDate(HashMap<String, String> fields, ContributionDate contributionDate) {
+    private void addContributionDate(Map<String, String> fields, ContributionDate contributionDate) {
         if ((contributionDate.getDay() != null) && (contributionDate.getMonth() != null)
                 && (contributionDate.getYear() != null)) {
             String result = convertToDateFormat(contributionDate.getYear(), contributionDate.getMonth(),
@@ -325,7 +326,7 @@ public class MedlineImporter extends ImportFormat {
     }
 
     private void parseArticle(PubmedArticle article, List<BibEntry> bibItems) {
-        HashMap<String, String> fields = new HashMap<>();
+        Map<String, String> fields = new HashMap<>();
 
         if (article.getPubmedData() != null) {
             if (article.getMedlineCitation().getDateRevised() != null) {
@@ -400,7 +401,7 @@ public class MedlineImporter extends ImportFormat {
         bibItems.add(entry);
     }
 
-    private void addNotes(HashMap<String, String> fields, List<GeneralNote> generalNote) {
+    private void addNotes(Map<String, String> fields, List<GeneralNote> generalNote) {
         List<String> notes = new ArrayList<>();
         for (GeneralNote note : generalNote) {
             if (note != null) {
@@ -410,7 +411,7 @@ public class MedlineImporter extends ImportFormat {
         fields.put(FieldName.NOTE, join(notes, ", "));
     }
 
-    private void addInvestigators(HashMap<String, String> fields, InvestigatorList investigatorList) {
+    private void addInvestigators(Map<String, String> fields, InvestigatorList investigatorList) {
         List<String> investigatorNames = new ArrayList<>();
         List<String> affiliationInfos = new ArrayList<>();
         String name = "";
@@ -440,7 +441,7 @@ public class MedlineImporter extends ImportFormat {
         }
     }
 
-    private void addKeyWords(HashMap<String, String> fields, List<KeywordList> allKeywordLists) {
+    private void addKeyWords(Map<String, String> fields, List<KeywordList> allKeywordLists) {
         List<String> keywordStrings = new ArrayList<>();
         //add keywords to the list
         for (KeywordList keywordList : allKeywordLists) {
@@ -465,7 +466,7 @@ public class MedlineImporter extends ImportFormat {
         }
     }
 
-    private void addOtherId(HashMap<String, String> fields, List<OtherID> otherID) {
+    private void addOtherId(Map<String, String> fields, List<OtherID> otherID) {
         for (OtherID id : otherID) {
             if ((id.getSource() != null) && (id.getContent() != null)) {
                 fields.put(id.getSource(), id.getContent());
@@ -473,7 +474,7 @@ public class MedlineImporter extends ImportFormat {
         }
     }
 
-    private void addPersonalNames(HashMap<String, String> fields, PersonalNameSubjectList personalNameSubjectList) {
+    private void addPersonalNames(Map<String, String> fields, PersonalNameSubjectList personalNameSubjectList) {
         if (fields.get(FieldName.AUTHOR) == null) {
             //if no authors appear, then add the personal names as authors
             List<String> personalNames = new ArrayList<>();
@@ -491,7 +492,7 @@ public class MedlineImporter extends ImportFormat {
         }
     }
 
-    private void addMeashHeading(HashMap<String, String> fields, MeshHeadingList meshHeadingList) {
+    private void addMeashHeading(Map<String, String> fields, MeshHeadingList meshHeadingList) {
         ArrayList<String> keywords = new ArrayList<>();
         for (MeshHeading keyword : meshHeadingList.getMeshHeading()) {
             String result = keyword.getDescriptorName().getContent();
@@ -505,12 +506,12 @@ public class MedlineImporter extends ImportFormat {
         fields.put(FieldName.KEYWORDS, join(keywords, KEYWORD_SEPARATOR));
     }
 
-    private void addGeneSymbols(HashMap<String, String> fields, GeneSymbolList geneSymbolList) {
+    private void addGeneSymbols(Map<String, String> fields, GeneSymbolList geneSymbolList) {
         List<String> geneSymbols = geneSymbolList.getGeneSymbol();
         fields.put("gene-symbols", join(geneSymbols, ", "));
     }
 
-    private void addChemicals(HashMap<String, String> fields, List<Chemical> chemicals) {
+    private void addChemicals(Map<String, String> fields, List<Chemical> chemicals) {
         List<String> chemicalNames = new ArrayList<>();
         for (Chemical chemical : chemicals) {
             if (chemical != null) {
@@ -520,7 +521,7 @@ public class MedlineImporter extends ImportFormat {
         fields.put("chemicals", join(chemicalNames, ", "));
     }
 
-    private void addArticleInformation(HashMap<String, String> fields, List<Object> content) {
+    private void addArticleInformation(Map<String, String> fields, List<Object> content) {
         for (Object object : content) {
             if (object instanceof Journal) {
                 Journal journal = (Journal) object;
@@ -553,7 +554,7 @@ public class MedlineImporter extends ImportFormat {
         }
     }
 
-    private void addElocationID(HashMap<String, String> fields, ELocationID eLocationID) {
+    private void addElocationID(Map<String, String> fields, ELocationID eLocationID) {
         if (FieldName.DOI.equals(eLocationID.getEIdType())) {
             fields.put(FieldName.DOI, eLocationID.getContent());
         }
@@ -562,7 +563,7 @@ public class MedlineImporter extends ImportFormat {
         }
     }
 
-    private void addPubDate(HashMap<String, String> fields, PubDate pubDate) {
+    private void addPubDate(Map<String, String> fields, PubDate pubDate) {
         if (pubDate.getYear() == null) {
             //if year of the pubdate is null, the medlineDate shouldn't be null
             fields.put(FieldName.YEAR, extractYear(pubDate.getMedlineDate()));
@@ -576,7 +577,7 @@ public class MedlineImporter extends ImportFormat {
         }
     }
 
-    private void addAbstract(HashMap<String, String> fields, Abstract abs) {
+    private void addAbstract(Map<String, String> fields, Abstract abs) {
         putIfValueNotNull(fields, "copyright", abs.getCopyrightInformation());
         List<String> abstractText = new ArrayList<>();
         for (AbstractText text : abs.getAbstractText()) {
@@ -589,7 +590,7 @@ public class MedlineImporter extends ImportFormat {
         fields.put(FieldName.ABSTRACT, join(abstractText, " "));
     }
 
-    private void addPagination(HashMap<String, String> fields, Pagination pagination) {
+    private void addPagination(Map<String, String> fields, Pagination pagination) {
         String startPage = "";
         String endPage = "";
         for (JAXBElement<String> element : pagination.getContent()) {
@@ -612,7 +613,7 @@ public class MedlineImporter extends ImportFormat {
         return medlineDate.substring(0, 4);
     }
 
-    private void handleAuthors(HashMap<String, String> fields, AuthorList authors) {
+    private void handleAuthors(Map<String, String> fields, AuthorList authors) {
         List<String> authorNames = new ArrayList<>();
         for (Author author : authors.getAuthor()) {
             if (author.getCollectiveName() != null) {
@@ -637,14 +638,14 @@ public class MedlineImporter extends ImportFormat {
         return Joiner.on(string).join(list);
     }
 
-    private void addDateRevised(HashMap<String, String> fields, DateRevised dateRevised) {
+    private void addDateRevised(Map<String, String> fields, DateRevised dateRevised) {
         if ((dateRevised.getDay() != null) && (dateRevised.getMonth() != null) && (dateRevised.getYear() != null)) {
             fields.put("revised",
                     convertToDateFormat(dateRevised.getYear(), dateRevised.getMonth(), dateRevised.getDay()));
         }
     }
 
-    private void putIfValueNotNull(HashMap<String, String> fields, String medlineKey, String value) {
+    private void putIfValueNotNull(Map<String, String> fields, String medlineKey, String value) {
         if (value != null) {
             fields.put(medlineKey, value);
         }

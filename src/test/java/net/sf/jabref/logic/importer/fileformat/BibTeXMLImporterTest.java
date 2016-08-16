@@ -13,13 +13,16 @@ import java.util.stream.Collectors;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.util.BibTeXMLHandler;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 @RunWith(MockitoJUnitRunner.class)
 public class BibTeXMLImporterTest {
@@ -52,27 +55,27 @@ public class BibTeXMLImporterTest {
     @Test
     public void testGetItemsEmpty() {
         BibTeXMLHandler handler = new BibTeXMLHandler();
-        Assert.assertEquals(Collections.emptyList(), handler.getItems());
+        assertEquals(Collections.emptyList(), handler.getItems());
     }
 
     @Test
     public void testGetFormatName() {
-        Assert.assertEquals("BibTeXML", importer.getFormatName());
+        assertEquals("BibTeXML", importer.getFormatName());
     }
 
     @Test
     public void testGetCLIId() {
-        Assert.assertEquals("bibtexml", importer.getId());
+        assertEquals("bibtexml", importer.getId());
     }
 
     @Test
     public void testsGetExtensions() {
-        Assert.assertEquals(Collections.singletonList(".xml"), importer.getExtensions());
+        assertEquals(FileExtensions.BIBTEXML, importer.getExtensions());
     }
 
     @Test
     public void testGetDescription() {
-        Assert.assertEquals("Importer for the BibTeXML format.", importer.getDescription());
+        assertEquals("Importer for the BibTeXML format.", importer.getDescription());
     }
 
     @Test
@@ -82,7 +85,7 @@ public class BibTeXMLImporterTest {
                 .collect(Collectors.toList());
 
         for (Path file : list) {
-            Assert.assertFalse(file.toString(), importer.isRecognizedFormat(file, Charset.defaultCharset()));
+            assertFalse(file.toString(), importer.isRecognizedFormat(file, Charset.defaultCharset()));
         }
     }
 }

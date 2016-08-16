@@ -15,9 +15,11 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#970](https://github.com/JabRef/jabref/issues/970): Implementation of shared database support (full system) with event based synchronization for MySQL, PostgreSQL and Oracle database systems.
 - Externally fetched information can be merged for entries with an ISBN
 - Externally fetched information can be merged for entries with an ArXiv eprint
+- Added EntryTypeFormatter to add camel casing to entry type in layouts, e.g., InProceedings
 - [#1225](https://github.com/JabRef/jabref/issues/1225): Hotkey-system is now consistent
 - Added print entry preview to the right click menu
 - [#462](https://github.com/JabRef/jabref/issues/462) Extend the OpenConsoleFeature by offering a selection between default terminal emulator and configurable command execution.
+- The field name in the layout files for entry type is changed from `bibtextype` to `entrytype`. Please update your existing files as support for `bibtextype` will be removed eventually.
 - [#1516](https://github.com/JabRef/jabref/issues/1516) Selected field names are written in uppercase in the entry editor
 - For developers: Moved the bst package into logic. This requires the regeneration of antlr sources, execute: gradlew generateSource
 - [#1026](https://github.com/JabRef/jabref/issues/1026) JabRef does no longer delete user comments outside of BibTeX entries and strings
@@ -43,12 +45,14 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed NullPointerException when opening file in Plain text import
 - Fixed NullPointerException when appending database
 - Fixed [#636](https://github.com/JabRef/jabref/issues/636): DOI in export filters
+- Fixed [#1519](https://github.com/JabRef/jabref/issues/1519): The word "Seiten" is automatically removed when fetching info from ISBN
 - Fixed [#1527](https://github.com/JabRef/jabref/issues/1527): 'Get BibTeX data from DOI' Removes Marking
 - Fixed [#1592](https://github.com/JabRef/jabref/issues/1592): LibreOffice: wrong numbers in citation labels
 - The merge entry dialog showed wrong heading after merging from DOI
 - Fixed [#1321](https://github.com/JabRef/jabref/issues/1321): LaTeX commands in fields not displayed in the list of references
 - Fixed [#1639](https://github.com/JabRef/jabref/issues/1639): Google Scholar fetching works again.
 - Date fields in the BibLatex standard are now always formatted in the correct way, independent of the preferences
+- Manage content selectors now saves edited existing lists again and only marks database as changed when the content selectors are changed
 - Fixed [#1554](https://github.com/JabRef/jabref/issues/1554): Import dialog is no longer hidden behind main window
 - Fixed [#1643](https://github.com/JabRef/jabref/issues/1643): Searching with double quotes in a specific field ignores the last character
 - Fixed [#1288](https://github.com/JabRef/jabref/issues/1288): Newly opened bib-file is not focused

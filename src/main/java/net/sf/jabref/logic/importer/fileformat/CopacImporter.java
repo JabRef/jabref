@@ -17,13 +17,13 @@ package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
@@ -44,8 +44,8 @@ public class CopacImporter extends ImportFormat {
     }
 
     @Override
-    public List<String> getExtensions() {
-        return Collections.singletonList(".txt");
+    public FileExtensions getExtensions() {
+        return FileExtensions.COPAC;
     }
 
     @Override
