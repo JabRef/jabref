@@ -66,11 +66,6 @@ public class GUIGlobals {
     public static final int WIDTH_ICON_COL = 26;
     public static final int WIDTH_ICON_COL_RANKING = 80; // Width of Ranking Icon Column
 
-    static {
-        // Set up entry editor colors, first time:
-        GUIGlobals.updateEntryEditorColors();
-    }
-
     public static JLabel getTableIcon(String fieldType) {
         JLabel label = GUIGlobals.TABLE_ICONS.get(fieldType);
         if (label == null) {
@@ -164,6 +159,13 @@ public class GUIGlobals {
         if (Globals.prefs.getBoolean(JabRefPreferences.EDITOR_EMACS_KEYBINDINGS)) {
             EmacsKeyBindings.load();
         }
+
+        // Set up entry editor colors, first time:
+        GUIGlobals.updateEntryEditorColors();
+
+        GUIGlobals.currentFont = new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY),
+                Globals.prefs.getInt(JabRefPreferences.FONT_STYLE), Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
+
     }
 
 }
