@@ -17,8 +17,8 @@ public class ParsedEntryLink {
         this.dataBase = dataBase;
     }
 
-    public ParsedEntryLink(String key, BibEntry bibEntry) {
-        this.key = key;
+    public ParsedEntryLink(BibEntry bibEntry) {
+        this.key = bibEntry.getCiteKeyOptional().orElse("");
         this.linkedEntry = Optional.of(bibEntry);
     }
 

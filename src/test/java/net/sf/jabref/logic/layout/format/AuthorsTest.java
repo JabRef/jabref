@@ -129,4 +129,20 @@ public class AuthorsTest {
         Assert.assertEquals("B C Bruce, C K von Manson and J Jumper",
                 a.format("Bruce, Bob Croydon and Charles Kermit von Manson and Jumper, Jolly"));
     }
+
+    @Test
+    public void testEtAl() {
+        ParamLayoutFormatter a = new Authors();
+        a.setArgument("2,1");
+        Assert.assertEquals("B. C. Bruce et al.",
+                a.format("Bruce, Bob Croydon and Charles Kermit von Manson and Jumper, Jolly"));
+    }
+
+    @Test
+    public void testEtAlNotEnoughAuthors() {
+        ParamLayoutFormatter a = new Authors();
+        a.setArgument("2,1");
+        Assert.assertEquals("B. C. Bruce and C. K. von Manson",
+                a.format("Bruce, Bob Croydon and Charles Kermit von Manson"));
+    }
 }

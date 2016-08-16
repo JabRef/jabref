@@ -18,6 +18,7 @@ package net.sf.jabref.gui.fieldeditors;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.FontMetrics;
 import java.awt.Insets;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.Transferable;
@@ -26,10 +27,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JComponent;
@@ -55,9 +56,11 @@ import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.groups.TransferableEntrySelection;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
+import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryLinkList;
-import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.ParsedEntryLink;
 
 import com.jgoodies.forms.builder.FormBuilder;
@@ -106,7 +109,8 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         remove.addActionListener(e -> removeEntries());
 
         FormBuilder builder = FormBuilder.create()
-                .layout(new FormLayout("fill:pref,1dlu,fill:pref", "fill:pref,fill:pref"));
+                .layout(new FormLayout("fill:pref:grow,1dlu,fill:pref:grow",
+                        "fill:pref,fill:pref,1dlu,fill:pref"));
 
         if (!singleEntry) {
             JButton up = new JButton(IconTheme.JabRefIcon.UP.getSmallIcon());
@@ -121,6 +125,10 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         }
         builder.add(add).xy(3, 1);
         builder.add(remove).xy(3, 2);
+        JButton button = new JButton(Localization.lang("Select"));
+        button.addActionListener(e -> selectEntry());
+        builder.add(button).xyw(1, 4, 3);
+
         panel = new JPanel();
         panel.setLayout(new BorderLayout());
         panel.add(sPane, BorderLayout.CENTER);
@@ -183,12 +191,23 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         menu.add(openLink);
         openLink.addActionListener(e -> selectEntry());
 
+        // Set table row height
+        FontMetrics metrics = getFontMetrics(getFont());
+        setRowHeight(Math.max(getRowHeight(), metrics.getHeight()));
+
         updateButtonStates();
     }
 
 
     private void selectEntry() {
-        // TODO Auto-generated method stub
+        int selectedRow = getSelectedRow();
+
+        if (selectedRow != -1) {
+            String crossref = tableModel.getEntry(selectedRow).getKey();
+
+            frame.getCurrentBasePanel().getDatabase().getEntryByKey(crossref)
+                    .ifPresent(entry -> frame.getCurrentBasePanel().highlightEntry(entry));
+        }
     }
 
     public void adjustColumnWidth() {
@@ -470,8 +489,7 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
                 case 0:
                     return entry.getKey();
                 case 1:
-                    return entry.getLinkedEntry().flatMap(bibEntry -> bibEntry.getFieldOptional(FieldName.TITLE))
-                            .orElse("Unknown entry");
+                    return entry.getLinkedEntry().map(bibEntry -> formatEntry(bibEntry)).orElse("Unknown entry");
                 default:
                     return null;
                 }
@@ -496,10 +514,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
             } else {
                 SwingUtilities.invokeLater(() -> fireTableRowsDeleted(index, index));
             }
-        }
-
-        public List<ParsedEntryLink> getList() {
-            return internalList;
         }
 
         public boolean isEmpty() {
@@ -599,7 +613,7 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
                 TransferableEntrySelection entrySelection = (TransferableEntrySelection) transferable
                         .getTransferData(supportedFlavor);
                 for (BibEntry entry : entrySelection.getSelection()) {
-                    tableModel.addEntry(new ParsedEntryLink(entry.getCiteKey(), entry));
+                    tableModel.addEntry(new ParsedEntryLink(entry));
                 }
             } catch (IOException | UnsupportedFlavorException e) {
                 LOGGER.warn("Problem dropping on entry link field", e);
@@ -611,5 +625,23 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
             return true;
         }
 
+    }
+
+
+    private static final String layoutFormat = "\\begin{author}\\format[Authors(2,1)]{\\author}\\end{author}\\begin{title}, \"\\title\"\\end{title}\\begin{year}, \\year\\end{year}";
+
+
+    private static String formatEntry(BibEntry entry) {
+        StringReader sr = new StringReader(layoutFormat);
+        try {
+            Layout layout = new LayoutHelper(sr,
+                    LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader))
+                            .getLayoutFromText();
+
+            return layout.doLayout(entry, null);
+        } catch (IOException e) {
+            LOGGER.warn("Problem generating entry layout", e);
+        }
+        return "";
     }
 }
