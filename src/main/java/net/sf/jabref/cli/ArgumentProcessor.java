@@ -47,6 +47,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.preferences.SearchPreferences;
 import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
 
 import org.apache.commons.logging.Log;
@@ -166,9 +167,10 @@ public class ArgumentProcessor {
         BibDatabaseContext databaseContext = pr.getDatabaseContext();
         BibDatabase dataBase = pr.getDatabase();
 
+        SearchPreferences searchPreferences = new SearchPreferences(Globals.prefs);
         SearchQuery query = new SearchQuery(searchTerm,
-                Globals.prefs.getBoolean(JabRefPreferences.SEARCH_CASE_SENSITIVE),
-                Globals.prefs.getBoolean(JabRefPreferences.SEARCH_REG_EXP));
+                searchPreferences.isCaseSensitive(),
+                searchPreferences.isRegularExpression());
         List<BibEntry> matches = new DatabaseSearcher(query, dataBase).getMatches();
 
         //export matches

@@ -3,6 +3,7 @@ package net.sf.jabref.gui;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Frame;
 import java.awt.GraphicsEnvironment;
@@ -11,6 +12,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.WindowAdapter;
@@ -103,6 +106,7 @@ import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.gui.protectedterms.ProtectedTermsDialog;
 import net.sf.jabref.gui.push.PushToApplicationButton;
 import net.sf.jabref.gui.push.PushToApplications;
+import net.sf.jabref.gui.search.GlobalSearchBar;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
@@ -166,6 +170,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final IntegrityCheckAction checkIntegrity = new IntegrityCheckAction(this);
 
     private final ToolBar tlb = new ToolBar();
+    private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this);
 
     private final JMenuBar mb = new JMenuBar();
 
@@ -305,6 +310,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Manage content selectors"));
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
             Localization.lang("Search"), Globals.getKeyPrefs().getKey(KeyBinding.SEARCH), IconTheme.JabRefIcon.SEARCH.getIcon());
+    private final AbstractAction globalSearch = new GeneralAction(Actions.GLOBAL_SEARCH,
+            Localization.menuTitle("Global search"),
+            Localization.lang("Global search"),
+            Globals.getKeyPrefs().getKey(KeyBinding.GLOBAL_SEARCH),
+            IconTheme.JabRefIcon.SEARCH.getIcon());
 
     private final AbstractAction copyKey = new GeneralAction(Actions.COPY_KEY, Localization.menuTitle("Copy BibTeX key"),
             Globals.getKeyPrefs().getKey(KeyBinding.COPY_BIBTEX_KEY));
@@ -1482,10 +1492,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addJToogleButton(fetcherToggle);
 
         previewToggle = new JToggleButton(togglePreview);
-        tlb.addJToogleButton(previewToggle);
+        tlb.addJToggleButton(previewToggle);
 
         groupToggle = new JToggleButton(toggleGroups);
-        tlb.addJToogleButton(groupToggle);
+        tlb.addJToggleButton(groupToggle);
 
         tlb.addSeparator();
 
@@ -1509,7 +1519,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private void initActions() {
         openDatabaseOnlyActions.clear();
-        openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save,
+        openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save, globalSearch,
                 saveAs, saveSelectedAs, saveSelectedAsPlain, editModeAction, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
                 unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings,
                 toggleGroups, makeKeyAction, normalSearch, generalFetcher.getAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,

@@ -1,0 +1,121 @@
+/*  Copyright (C) 2016 JabRef contributors.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+*/
+package net.sf.jabref.preferences;
+
+import java.util.Map;
+import java.util.Objects;
+
+import net.sf.jabref.gui.search.SearchDisplayMode;
+
+
+public class SearchPreferences {
+
+    private static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
+    private static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
+    private static final String SEARCH_REG_EXP = "regExpSearch";
+
+    private static final String SEARCH_DIALOG_HEIGHT = "searchDialogHeight";
+    private static final String SEARCH_DIALOG_WIDTH = "searchDialogWidth";
+    private static final String SEARCH_DIALOG_POS_X = "searchDialogPosX";
+    private static final String SEARCH_DIALOG_POS_Y = "searchDialogPosY";
+
+    private final JabRefPreferences preferences;
+
+
+    public SearchPreferences(JabRefPreferences preferences) {
+        this.preferences = Objects.requireNonNull(preferences);
+    }
+
+    public static void putDefaults(Map<String, Object> defaults) {
+        defaults.put(SEARCH_DISPLAY_MODE, SearchDisplayMode.FILTER.toString());
+        defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
+        defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
+
+        defaults.put(SEARCH_DIALOG_WIDTH, 650);
+        defaults.put(SEARCH_DIALOG_HEIGHT, 500);
+        defaults.put(SEARCH_DIALOG_POS_X, 0);
+        defaults.put(SEARCH_DIALOG_POS_Y, 0);
+    }
+
+    public SearchDisplayMode getSearchMode() {
+        try {
+            return SearchDisplayMode.valueOf(preferences.get(SEARCH_DISPLAY_MODE));
+        } catch (IllegalArgumentException ex) {
+            // Should only occur when the searchmode is set directly via preferences.put and the enum was not used
+            return SearchDisplayMode.valueOf((String) preferences.defaults.get(SEARCH_DISPLAY_MODE));
+        }
+    }
+
+    public SearchPreferences setSearchMode(SearchDisplayMode searchDisplayMode) {
+        preferences.put(SEARCH_DISPLAY_MODE, Objects.requireNonNull(searchDisplayMode).toString());
+        return this;
+    }
+
+    public boolean isCaseSensitive() {
+        return preferences.getBoolean(SEARCH_CASE_SENSITIVE);
+    }
+
+    public SearchPreferences setCaseSensitive(boolean isCaseSensitive) {
+        preferences.putBoolean(SEARCH_CASE_SENSITIVE, isCaseSensitive);
+        return this;
+    }
+
+    public boolean isRegularExpression() {
+        return preferences.getBoolean(SEARCH_REG_EXP);
+    }
+
+    public SearchPreferences setRegularExpression(boolean isRegularExpression) {
+        preferences.putBoolean(SEARCH_REG_EXP, isRegularExpression);
+        return this;
+    }
+
+    public int getSeachDialogWidth() {
+        return preferences.getInt(SEARCH_DIALOG_WIDTH);
+    }
+
+    public SearchPreferences setSearchDialogWidth(int width) {
+        preferences.putInt(SEARCH_DIALOG_WIDTH, width);
+        return this;
+    }
+
+    public int getSeachDialogHeight() {
+        return preferences.getInt(SEARCH_DIALOG_HEIGHT);
+    }
+
+    public SearchPreferences setSearchDialogHeight(int height) {
+        preferences.putInt(SEARCH_DIALOG_HEIGHT, height);
+        return this;
+    }
+
+    public int getSearchDialogPosX() {
+        return preferences.getInt(SEARCH_DIALOG_POS_X);
+    }
+
+    public SearchPreferences setSearchDialogPosX(int x) {
+        preferences.putInt(SEARCH_DIALOG_POS_X, x);
+        return this;
+    }
+
+    public int getSearchDialogPosY() {
+        return preferences.getInt(SEARCH_DIALOG_POS_Y);
+    }
+
+    public SearchPreferences setSearchDialogPosY(int y) {
+        preferences.putInt(SEARCH_DIALOG_POS_Y, y);
+        return this;
+    }
+
+}

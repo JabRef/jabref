@@ -2,10 +2,10 @@ package net.sf.jabref.gui.search;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -17,17 +17,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
+import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
-import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
@@ -50,12 +53,15 @@ import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.logic.bibtex.comparator.EntryComparator;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.preferences.SearchPreferences;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -75,19 +81,20 @@ import org.apache.commons.logging.LogFactory;
  * Dialog to display search results, potentially from more than one BasePanel, with
  * possibility to preview and to locate each entry in the main window.
  */
-public class SearchResultsDialog {
+public class SearchResultFrame {
 
-    private static final Log LOGGER = LogFactory.getLog(SearchResultsDialog.class);
+    private static final Log LOGGER = LogFactory.getLog(SearchResultFrame.class);
 
     private final JabRefFrame frame;
 
-    private JDialog diag;
+    private JFrame searchResultFrame;
     private static final String[] FIELDS = new String[] {
             FieldName.AUTHOR, FieldName.TITLE, FieldName.YEAR, FieldName.JOURNAL
     };
-    private static final int FILE_COL = 0;
-    private static final int URL_COL = 1;
-    private static final int PAD = 2;
+    private static final int DATABASE_COL = 0;
+    private static final int FILE_COL = 1;
+    private static final int URL_COL = 2;
+    private static final int PAD = 3;
     private final JLabel fileLabel = new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
     private final JLabel urlLabel = new JLabel(IconTheme.JabRefIcon.WWW.getSmallIcon());
 
@@ -103,14 +110,22 @@ public class SearchResultsDialog {
     private JTable entryTable;
     private PreviewPanel preview;
 
+    private SearchQuery searchQuery;
+    private boolean globalSearch;
 
-    public SearchResultsDialog(JabRefFrame frame, String title) {
+
+    public SearchResultFrame(JabRefFrame frame, String title, SearchQuery searchQuery, boolean globalSearch) {
         this.frame = Objects.requireNonNull(frame);
+        this.searchQuery = searchQuery;
+        this.globalSearch = globalSearch;
+        frame.getGlobalSearchBar().setSearchResultFrame(this);
         init(Objects.requireNonNull(title));
     }
 
     private void init(String title) {
-        diag = new JDialog(frame, title, false);
+        searchResultFrame = new JFrame();
+        searchResultFrame.setTitle(title);
+        searchResultFrame.setIconImage(new ImageIcon(IconTheme.getIconUrl("jabrefIcon48")).getImage());
 
         int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
         String layoutFile = activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs
@@ -144,15 +159,16 @@ public class SearchResultsDialog {
 
         // Key bindings:
         AbstractAction closeAction = new AbstractAction() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
-                diag.dispose();
+                dispose();
             }
         };
+
         ActionMap am = contentPane.getActionMap();
         InputMap im = contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DATABASE), "close");
         am.put("close", closeAction);
 
         entryTable.getActionMap().put("copy", new AbstractAction() {
@@ -172,8 +188,17 @@ public class SearchResultsDialog {
             }
         });
 
-        diag.addWindowListener(new WindowAdapter() {
+        // override standard enter-action; enter opens the selected entry
+        entryTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "Enter");
+        entryTable.getActionMap().put("Enter", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                BibEntry entry = sortedEntries.get(entryTable.getSelectedRow());
+                selectEntryInBasePanel(entry);
+            }
+        });
 
+        searchResultFrame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowOpened(WindowEvent e) {
                 contentPane.setDividerLocation(0.5f);
@@ -181,16 +206,16 @@ public class SearchResultsDialog {
 
             @Override
             public void windowClosing(WindowEvent event) {
-                Globals.prefs.putInt(JabRefPreferences.SEARCH_DIALOG_WIDTH, diag.getSize().width);
-                Globals.prefs.putInt(JabRefPreferences.SEARCH_DIALOG_HEIGHT, diag.getSize().height);
+                dispose();
             }
         });
 
-        diag.getContentPane().add(contentPane, BorderLayout.CENTER);
+        searchResultFrame.getContentPane().add(contentPane, BorderLayout.CENTER);
+
         // Remember and default to last size:
-        diag.setSize(new Dimension(Globals.prefs.getInt(JabRefPreferences.SEARCH_DIALOG_WIDTH), Globals.prefs
-                .getInt(JabRefPreferences.SEARCH_DIALOG_HEIGHT)));
-        diag.setLocationRelativeTo(frame);
+        SearchPreferences searchPreferences = new SearchPreferences(Globals.prefs);
+        searchResultFrame.setSize(searchPreferences.getSeachDialogWidth(), searchPreferences.getSeachDialogHeight());
+        searchResultFrame.setLocation(searchPreferences.getSearchDialogPosX(), searchPreferences.getSearchDialogPosY());
     }
 
     /**
@@ -198,7 +223,7 @@ public class SearchResultsDialog {
      * @param visible true to show dialog, false to hide.
      */
     public void setVisible(boolean visible) {
-        diag.setVisible(visible);
+        searchResultFrame.setVisible(visible);
     }
 
     public void selectFirstEntry() {
@@ -215,13 +240,7 @@ public class SearchResultsDialog {
      * @param comparatorChooser The comparator chooser controlling the sort order.
      */
     private void setupComparatorChooser(TableComparatorChooser<BibEntry> comparatorChooser) {
-        // First column:
-        List<Comparator> comparators = comparatorChooser.getComparatorsForColumn(0);
-        comparators.clear();
-
-        comparators = comparatorChooser.getComparatorsForColumn(1);
-        comparators.clear();
-
+        List<Comparator> comparators;
         // Icon columns:
         for (int i = 0; i < PAD; i++) {
             comparators = comparatorChooser.getComparatorsForColumn(i);
@@ -230,6 +249,12 @@ public class SearchResultsDialog {
                 comparators.add(new IconComparator(Collections.singletonList(FieldName.FILE)));
             } else if (i == URL_COL) {
                 comparators.add(new IconComparator(Collections.singletonList(FieldName.URL)));
+            } else if (i == DATABASE_COL) {
+                comparators.add((entry1, entry2) -> {
+                    String databaseTitle1 = entryHome.get(entry1).getTabTitle();
+                    String databaseTitle2 = entryHome.get(entry2).getTabTitle();
+                    return databaseTitle1.compareTo(databaseTitle2);
+                });
             }
 
         }
@@ -252,15 +277,25 @@ public class SearchResultsDialog {
      */
     private void setWidths() {
         TableColumnModel cm = entryTable.getColumnModel();
-        for (int i = 0; i < PAD; i++) {
-            cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
-            cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
-            cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
-        }
-
-        for (int i = 0; i < FIELDS.length; i++) {
-            int width = InternalBibtexFields.getFieldLength(FIELDS[i]);
-            cm.getColumn(i + PAD).setPreferredWidth(width);
+        for (int i = 0; i < PAD + FIELDS.length; i++) {
+            switch (i) {
+                case FILE_COL:
+                case URL_COL:
+                    cm.getColumn(i).setPreferredWidth(GUIGlobals.WIDTH_ICON_COL);
+                    cm.getColumn(i).setMinWidth(GUIGlobals.WIDTH_ICON_COL);
+                    cm.getColumn(i).setMaxWidth(GUIGlobals.WIDTH_ICON_COL);
+                    break;
+                case DATABASE_COL: {
+                    int width = InternalBibtexFields.getFieldLength(FieldName.AUTHOR);
+                    cm.getColumn(i).setPreferredWidth(width);
+                    break;
+                }
+                default: {
+                    int width = InternalBibtexFields.getFieldLength(FIELDS[i - PAD]);
+                    cm.getColumn(i).setPreferredWidth(width);
+                    break;
+                }
+            }
         }
     }
 
@@ -283,6 +318,36 @@ public class SearchResultsDialog {
     private void addEntry(BibEntry entry, BasePanel panel) {
         entries.add(entry);
         entryHome.put(entry, panel);
+    }
+
+    private void selectEntryInBasePanel(BibEntry entry){
+        BasePanel basePanel = entryHome.get(entry);
+        frame.showBasePanel(basePanel);
+        basePanel.requestFocus();
+        basePanel.highlightEntry(entry);
+    }
+
+    public void dispose(){
+        new SearchPreferences(Globals.prefs)
+                .setSearchDialogWidth(searchResultFrame.getSize().width)
+                .setSearchDialogHeight(searchResultFrame.getSize().height)
+                .setSearchDialogPosX(searchResultFrame.getLocation().x)
+                .setSearchDialogPosY(searchResultFrame.getLocation().y);
+        frame.getGlobalSearchBar().setSearchResultFrame(null);
+        searchResultFrame.dispose();
+        frame.getGlobalSearchBar().focus();
+    }
+
+    public void focus(){
+        entryTable.requestFocus();
+    }
+
+    public SearchQuery getSearchQuery() {
+        return searchQuery;
+    }
+
+    public boolean isGlobalSearch() {
+        return globalSearch;
     }
 
     /**
@@ -310,14 +375,7 @@ public class SearchResultsDialog {
 
             // A double click on an entry should highlight the entry in its BasePanel:
             if (e.getClickCount() == 2) {
-                // Get the selected entry:
-                BibEntry toShow = model.getElementAt(row);
-                // Look up which BasePanel it belongs to:
-                BasePanel p = entryHome.get(toShow);
-                // Show the correct tab in the main window:
-                frame.showBasePanel(p);
-                // Highlight the entry:
-                p.highlightEntry(toShow);
+                selectEntryInBasePanel(model.getElementAt(row));
             }
         }
 
@@ -409,9 +467,9 @@ public class SearchResultsDialog {
             if (listEvent.getSourceList().size() == 1) {
                 BibEntry entry = listEvent.getSourceList().get(0);
                 // Find out which BasePanel the selected entry belongs to:
-                BasePanel p = entryHome.get(entry);
+                BasePanel basePanel = entryHome.get(entry);
                 // Update the preview's database context:
-                preview.setDatabaseContext(p.getBibDatabaseContext());
+                preview.setDatabaseContext(basePanel.getBibDatabaseContext());
                 // Update the preview's entry:
                 preview.setEntry(entry);
                 contentPane.setDividerLocation(0.5f);
@@ -435,6 +493,8 @@ public class SearchResultsDialog {
         public String getColumnName(int column) {
             if (column >= PAD) {
                 return EntryUtil.capitalizeFirst(FIELDS[column - PAD]);
+            } else if (column == DATABASE_COL){
+                return Localization.lang("Database");
             } else {
                 return "";
             }
@@ -444,6 +504,8 @@ public class SearchResultsDialog {
         public Object getColumnValue(BibEntry entry, int column) {
             if (column < PAD) {
                 switch (column) {
+                case DATABASE_COL:
+                    return entryHome.get(entry).getTabTitle();
                 case FILE_COL:
                     if (entry.hasField(FieldName.FILE)) {
                         FileListTableModel tmpModel = new FileListTableModel();
@@ -460,36 +522,41 @@ public class SearchResultsDialog {
                     } else {
                         return null;
                     }
-                case URL_COL:
-                    if (entry.hasField(FieldName.URL)) {
-                        urlLabel.setToolTipText(entry.getField(FieldName.URL).get());
+                case URL_COL: {
+                    Optional<String> urlField = entry.getField(FieldName.URL);
+                    if (urlField.isPresent()) {
+                        urlLabel.setToolTipText(urlField.get());
                         return urlLabel;
-                    } else {
-                        return null;
                     }
+                    return null;
+                }
                 default:
                     return null;
                 }
             }
             else {
                 String field = FIELDS[column - PAD];
+
+                String fieldContent = entry.getField(field).orElse("");
+                fieldContent = new LatexToUnicodeFormatter().format(fieldContent);
+
                 if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES)) {
                     // For name fields, tap into a MainTableFormat instance and use
                     // the same name formatting as is used in the entry table:
-                    if (frame.getCurrentBasePanel() != null) {
-                        return MainTableNameFormatter.formatName(entry.getField(field).orElse(null));
-                    }
+                    return MainTableNameFormatter.formatName(fieldContent);
                 }
-                return entry.getField(field).orElse(null);
+                return fieldContent;
             }
         }
 
         @Override
         public Class<?> getColumnClass(int i) {
-            if (i < PAD) {
-                return JLabel.class;
-            } else {
-                return String.class;
+            switch (i) {
+                case FILE_COL:
+                case URL_COL:
+                    return JLabel.class;
+                default:
+                    return String.class;
             }
         }
 
@@ -498,4 +565,5 @@ public class SearchResultsDialog {
             return null;
         }
     }
+
 }

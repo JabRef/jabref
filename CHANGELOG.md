@@ -12,6 +12,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Implemented [#825](https://github.com/JabRef/jabref/issues/825): Search Bar across all bib files instead each having its own
+- Implemented [#573](https://github.com/JabRef/jabref/issues/573): Add key shortcut for global search (`ctrl+shift+f`, if the searchfile is empty it will be focused instead)
+- The search result Window will now show which entry belongs to which bib file
+- The search result Window will now remember its location
+- The search result Window won't stay on top anymore if the mani Window is focused
+- Implemented [#573 (comment)](https://github.com/JabRef/jabref/issues/573#issuecomment-232284156): Added shorcut: closing the search result window with `ctrl+w`
 - Added integrity check for fields with BibTeX keys, e.g., `crossref` and `related`, to check that the key exists
 - [#1496](https://github.com/JabRef/jabref/issues/1496) Keep track of which entry a downloaded file belongs to
 - Made it possible to download multiple entries in one action
@@ -26,6 +32,13 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Fixed
 - Fixed selecting an entry out of multiple duplicates
+- Fixed [#617](https://github.com/JabRef/jabref/issues/617): `Enter` in global search opens the selected entry & `Enter` in search dialog window opens the selected entry  
+- Entries in the SearchResultPanel will be shown correctly (Latex to Unicode)
+- Suggestions in the autocomplete will be shown correctly (Latex to Unicode) 
+- Fixed: When searching the first match will be selected if the current selection is no match
+- Selecting an entry in the search result Window will now select the correct entry in the bib file
+- Entries in the SearchResultDialog are now converted to Unicode
+- Suggestions in the autocomplete (search) are now in Unicode       
 - Fixed NullPointerException when opening search result window for an untitled database 
 - Fixed entry table traversal with Tab (no column traversal thus no double jump)
 - Fixed [#1757](https://github.com/JabRef/jabref/issues/1757): Crash after saving illegal argument in entry editor

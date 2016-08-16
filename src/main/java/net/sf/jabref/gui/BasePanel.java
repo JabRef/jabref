@@ -76,7 +76,6 @@ import net.sf.jabref.gui.maintable.MainTableSelectionListener;
 import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
 import net.sf.jabref.gui.mergeentries.MergeEntriesDialog;
 import net.sf.jabref.gui.plaintextimport.TextInputDialog;
-import net.sf.jabref.gui.search.SearchBar;
 import net.sf.jabref.gui.undo.CountingUndoManager;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableChangeType;
@@ -203,7 +202,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     private final SidePaneManager sidePaneManager;
 
-    private final SearchBar searchBar;
     private ContentAutoCompleters autoCompleters;
 
 
@@ -217,17 +215,16 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.frame = frame;
         this.tableModel = new MainTableDataModel(getBibDatabaseContext());
 
-        searchBar = new SearchBar(this);
-
         setupMainPanel();
 
         setupActions();
 
-        Optional<File> file = bibDatabaseContext.getDatabaseFile();
+        this.getDatabase().registerListener(new SearchListener());
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
         this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
 
+        Optional<File> file = bibDatabaseContext.getDatabaseFile();
         if (file.isPresent()) {
             // Register so we get notifications about outside changes to the file.
             try {
@@ -517,7 +514,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.MERGE_ENTRIES, (BaseAction) () -> new MergeEntriesDialog(BasePanel.this));
 
-        actions.put(Actions.SEARCH, (BaseAction) searchBar::focus);
+        actions.put(Actions.SEARCH, (BaseAction) frame.getGlobalSearchBar()::focus);
+        actions.put(Actions.GLOBAL_SEARCH, (BaseAction) frame.getGlobalSearchBar()::performGlobalSearch);
 
         // The action for copying the selected entry's key.
         actions.put(Actions.COPY_KEY, (BaseAction) () -> copyKey());
@@ -1164,11 +1162,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return null;
     }
 
-    public SearchBar getSearchBar() {
-        return searchBar;
-    }
-
-
     private class GroupTreeListener {
 
         private final Runnable task = new Runnable() {
@@ -1268,6 +1261,21 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         @Subscribe
         public void listen(EntryChangedEvent entryChangedEvent) {
             BasePanel.this.autoCompleters.addEntry(entryChangedEvent.getBibEntry());
+        }
+    }
+
+    /**
+     * Ensures that the results of the current search are updated when a new entry is inserted into the database
+     */
+    private class SearchListener {
+        @Subscribe
+        public void listen(EntryAddedEvent addedEntryEvent) {
+            frame.getGlobalSearchBar().performSearch();
+        }
+
+        @Subscribe
+        public void listen(EntryChangedEvent entryChangedEvent) {
+            frame.getGlobalSearchBar().performSearch();
         }
     }
 
@@ -1475,7 +1483,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         setLayout(new BorderLayout());
         removeAll();
-        add(searchBar, BorderLayout.NORTH);
         add(splitPane, BorderLayout.CENTER);
 
         // Set up name autocompleter for search:
@@ -1509,7 +1516,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void updateSearchManager() {
-        searchBar.setAutoCompleter(searchAutoCompleter);
+        frame.getGlobalSearchBar().setAutoCompleter(searchAutoCompleter);
     }
 
     private void instantiateSearchAutoCompleter() {
