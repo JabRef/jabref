@@ -8,7 +8,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
@@ -28,8 +27,7 @@ public class AuxParserTest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-        importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
     }
 
     @Test

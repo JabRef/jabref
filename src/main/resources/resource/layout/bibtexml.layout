@@ -1,5 +1,5 @@
 <bibtex:entry id="\bibtexkey">
-  <bibtex:\format[ToLowerCase]{\bibtextype}>
+  <bibtex:\format[ToLowerCase]{\entrytype}>
 \begin{author}    <bibtex:author>\format[XMLChars,AuthorFirstFirst]{\author}</bibtex:author>\end{author}
 \begin{editor}    <bibtex:editor>\format[XMLChars,AuthorFirstFirst]{\editor}</bibtex:editor>\end{editor}
 \begin{title}    <bibtex:title>\format[XMLChars]{\title}</bibtex:title>\end{title}
@@ -32,5 +32,5 @@
 \begin{key}    <bibtex:key>\format[XMLChars]{\key}</bibtex:key>\end{key}
 \begin{review}    <bibtex:nstandard name="review">\format[XMLChars]{\review}</bibtex:nstandard>\end{review}
 \begin{file}\format[WrapFileLinks(    <bibtex:nstandard name="file" type="\x" description="\d">\p</bibtex:nstandard>\n)]{\file}\end{file}
-  </bibtex:\format[ToLowerCase]{\bibtextype}>
+  </bibtex:\format[ToLowerCase]{\entrytype}>
 </bibtex:entry>

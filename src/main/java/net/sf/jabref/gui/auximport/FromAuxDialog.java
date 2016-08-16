@@ -57,13 +57,13 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.auxparser.AuxParser;
 import net.sf.jabref.logic.auxparser.AuxParserResult;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.database.BibDatabase;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;

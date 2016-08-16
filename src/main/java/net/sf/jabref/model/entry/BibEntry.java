@@ -33,6 +33,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.event.source.EntryEventSource;
@@ -49,6 +50,7 @@ public class BibEntry implements Cloneable {
     private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
 
     public static final String TYPE_HEADER = "entrytype";
+    public static final String OBSOLETE_TYPE_HEADER = "bibtextype";
     public static final String KEY_FIELD = "bibtexkey";
     protected static final String ID_FIELD = "id";
     public static final String DEFAULT_TYPE = "misc";
@@ -60,7 +62,7 @@ public class BibEntry implements Cloneable {
     private final SharedBibEntryData sharedBibEntryData;
 
     private String type;
-    private Map<String, String> fields = new HashMap<>();
+    private Map<String, String> fields = new ConcurrentHashMap<>();
     /*
      * Map to store the words in every field
      */

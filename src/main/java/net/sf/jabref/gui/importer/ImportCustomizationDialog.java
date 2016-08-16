@@ -44,7 +44,6 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.help.HelpAction;
@@ -55,6 +54,7 @@ import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
 import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.xmp.XMPPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;

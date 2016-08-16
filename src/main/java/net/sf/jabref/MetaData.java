@@ -72,7 +72,7 @@ public class MetaData implements Iterable<String> {
 
     private AbstractBibtexKeyPattern bibtexKeyPattern;
 
-    private Charset encoding = Globals.prefs.getDefaultEncoding();
+    private Charset encoding;
 
     /**
      * The MetaData object stores all meta data sets in Vectors. To ensure that
@@ -80,20 +80,31 @@ public class MetaData implements Iterable<String> {
      * must simply make sure the appropriate changes are reflected in the Vector
      * it has been passed.
      */
-    private MetaData(Map<String, String> inData) throws ParseException {
+    private MetaData(Map<String, String> inData, Charset encoding) throws ParseException {
         Objects.requireNonNull(inData);
         setData(inData);
+        this.encoding = encoding;
     }
 
     /**
      * The MetaData object can be constructed with no data in it.
      */
+    @Deprecated
     public MetaData() {
-        // No data
+        this(Globals.prefs.getDefaultEncoding());
     }
 
+    public MetaData(Charset encoding) {
+        this.encoding = encoding;
+    }
+
+    @Deprecated
     public static MetaData parse(Map<String, String> data) throws ParseException {
-        return new MetaData(data);
+        return new MetaData(data, Globals.prefs.getDefaultEncoding());
+    }
+
+    public static MetaData parse(Map<String, String> data, Charset encoding) throws ParseException {
+        return new MetaData(data, encoding);
     }
 
     public void setData(Map<String, String> inData) throws ParseException {

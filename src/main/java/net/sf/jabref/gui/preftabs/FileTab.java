@@ -279,10 +279,6 @@ class FileTab extends JPanel implements PrefsTab {
             prefs.put(JabRefPreferences.NON_WRAPPABLE_FIELDS, nonWrappableFields.getText());
             updateSpecialFields = true;
         }
-        // If either of the two last entries were changed, run the update for special field handling:
-        if (updateSpecialFields) {
-            prefs.updateSpecialFieldHandling();
-        }
 
         // See if we should start or stop the auto save manager:
         if (!origAutoSaveSetting && autoSave.isSelected()) {

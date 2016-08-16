@@ -9,15 +9,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -25,22 +22,14 @@ import static org.junit.Assert.assertTrue;
 
 public class GroupsUtilTest {
 
-    @Before
-    public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
-
-    @After
-    public void tearDown() {
-        Globals.prefs = null;
-    }
 
     @Test
     public void test() throws IOException {
         try (BufferedReader fr = Files.newBufferedReader(Paths.get("src/test/resources/testbib/testjabref.bib"),
                 StandardCharsets.UTF_8)) {
 
-            ParserResult result = BibtexParser.parse(fr, ImportFormatPreferences.fromPreferences(Globals.prefs));
+            ParserResult result = BibtexParser.parse(fr,
+                    ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
 
             BibDatabase db = result.getDatabase();
 

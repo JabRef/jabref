@@ -7,12 +7,12 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -94,7 +94,7 @@ public class RepecNepImporterTest {
 
     @Test
     public void testGetExtension() {
-        Assert.assertEquals(Collections.singletonList(".txt"), testImporter.getExtensions());
+        Assert.assertEquals(FileExtensions.REPEC, testImporter.getExtensions());
     }
 
     @Test

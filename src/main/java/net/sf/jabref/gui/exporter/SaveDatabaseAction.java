@@ -31,7 +31,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FileExtensions;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.worker.AbstractWorker;
@@ -44,6 +43,7 @@ import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.SaveSession;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.preferences.JabRefPreferences;
 

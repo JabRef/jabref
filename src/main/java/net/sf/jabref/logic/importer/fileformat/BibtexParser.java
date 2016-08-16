@@ -118,21 +118,26 @@ public class BibtexParser {
         }
     }
 
+    @Deprecated
+    public static BibEntry singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences) {
+        return BibtexParser.singleFromStringOptional(bibtexString, importFormatPreferences).orElse(null);
+    }
+
     /**
      * Parses BibtexEntries from the given string and returns one entry found (or null if none found)
      * <p>
      * It is undetermined which entry is returned, so use this in case you know there is only one entry in the string.
      *
      * @param bibtexString
-     * @return The BibEntry or null if non was found or an error occurred.
+     * @return An Optional<BibEntry>. Optional.empty() if non was found or an error occurred.
      */
-    public static BibEntry singleFromString(String bibtexString,
+    public static Optional<BibEntry> singleFromStringOptional(String bibtexString,
             ImportFormatPreferences importFormatPreferences) {
         Collection<BibEntry> entries = BibtexParser.fromString(bibtexString, importFormatPreferences);
         if ((entries == null) || entries.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
-        return entries.iterator().next();
+        return Optional.of(entries.iterator().next());
     }
 
     /**
@@ -204,7 +209,7 @@ public class BibtexParser {
 
         // Instantiate meta data:
         try {
-            parserResult.setMetaData(MetaData.parse(meta));
+            parserResult.setMetaData(MetaData.parse(meta, importFormatPreferences.getEncoding()));
         } catch (ParseException exception) {
             parserResult.addWarning(exception.getLocalizedMessage());
         }
@@ -239,7 +244,7 @@ public class BibtexParser {
             boolean duplicateKey = database.insertEntry(entry);
             if (duplicateKey) {
                 parserResult.addDuplicateKey(entry.getCiteKey());
-            } else if ((entry.getCiteKey() == null) || entry.getCiteKey().isEmpty()) {
+            } else if (!entry.getCiteKeyOptional().isPresent() || entry.getCiteKeyOptional().get().isEmpty()) {
                 parserResult.addWarning(Localization.lang("Empty BibTeX key") + ": " + entry.getAuthorTitleYear(40)
                         + " (" + Localization.lang("Grouping may not work for this entry.") + ")");
             }

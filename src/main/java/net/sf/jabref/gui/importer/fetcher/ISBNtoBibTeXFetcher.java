@@ -105,6 +105,10 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
             BibEntry entry = BibtexParser.singleFromString(bibtexString,
                     ImportFormatPreferences.fromPreferences(Globals.prefs));
             if (entry != null) {
+                // Remove the added " Seiten" from the "pagetotal" field
+                entry.getFieldOptional(FieldName.PAGETOTAL)
+                        .ifPresent(pagetotal -> entry.setField(FieldName.PAGETOTAL, pagetotal.replace(" Seiten", "")));
+
                 // Optionally add curly brackets around key words to keep the case
                 entry.getFieldOptional(FieldName.TITLE).ifPresent(title -> {
                     // Unit formatting

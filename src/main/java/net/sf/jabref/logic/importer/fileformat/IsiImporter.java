@@ -18,7 +18,6 @@ package net.sf.jabref.logic.importer.fileformat;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +27,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.formatter.casechanger.TitleCaseFormatter;
 import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.MonthUtil;
@@ -64,8 +64,8 @@ public class IsiImporter extends ImportFormat {
     }
 
     @Override
-    public List<String> getExtensions() {
-        return Arrays.asList(".isi",".txt");
+    public FileExtensions getExtensions() {
+        return FileExtensions.ISI;
     }
 
     @Override

@@ -7,11 +7,12 @@ import java.util.StringJoiner;
 
 import javax.swing.JLabel;
 
+import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperties;
 import net.sf.jabref.model.entry.InternalBibtexFields;
@@ -110,7 +111,9 @@ public class MainTableColumn {
         String content = null;
         for (String field : bibtexFields) {
             if (field.equals(BibEntry.TYPE_HEADER)) {
-                content = EntryUtil.capitalizeFirst(entry.getType());
+                // Fancy typesetting
+                TypedBibEntry typedEntry = new TypedBibEntry(entry, BibDatabaseMode.BIBLATEX);
+                content = typedEntry.getTypeForDisplay();
             } else {
                 Optional<String> newContent = entry.getFieldOrAlias(field);
                 if (newContent.isPresent()) {
