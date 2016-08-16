@@ -78,7 +78,7 @@ public class MainTableColumn {
      *
      * @return true if the bibtex fields contains author or editor
      */
-    public boolean isNameColumn() {
+    private boolean isNameColumn() {
         for (String field : bibtexFields) {
             if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
                 return true;
@@ -129,13 +129,14 @@ public class MainTableColumn {
             }
         }
 
-        if (content != null) {
-            content = toUnicode.format(content);
+        if (isNameColumn()) {
+            content = MainTableNameFormatter.formatName(content);
         }
 
-        if (isNameColumn()) {
-            return MainTableNameFormatter.formatName(content);
+        if (content != null) {
+            content = toUnicode.format(content).trim();
         }
+
         return content;
 
     }
