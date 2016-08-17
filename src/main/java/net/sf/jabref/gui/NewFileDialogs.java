@@ -93,12 +93,15 @@ public class NewFileDialogs {
     }
 
     /**
-     * Add a single extension as filter
+     * Add a single extension as filter, the single extension filter is preselected
      * @param singleExt The extension
      * @return NewFileDialogs
      */
     public NewFileDialogs withExtension(FileExtensions singleExt) {
-        withExtensions(EnumSet.of(singleExt));
+        this.extensions = EnumSet.of(singleExt);
+        extFilter = new FileNameExtensionFilter(singleExt.getDescription(), singleExt.getExtensions());
+        fileChooser.setFileFilter(extFilter);
+
         return this;
     }
 
