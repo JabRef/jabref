@@ -11,6 +11,8 @@ import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.mods.PersonName;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.MonthUtil;
+import net.sf.jabref.model.entry.MonthUtil.Month;
 
 public class BibTeXConverter {
     private static final String MSBIB_PREFIX = "msbib-";
@@ -19,12 +21,14 @@ public class BibTeXConverter {
         BibEntry result;
         Map<String, String> fieldValues = new HashMap<>();
 
+        String bibTexEntryType = MSBibMapping.getBibTeXEntryType(entry.getType());
         if (entry.getCiteKey() == null) {
-            result = new BibEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID, MSBibMapping.getBibTeXEntryType(entry.getType()));
+            result = new BibEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID, bibTexEntryType);
+
         } else {
             // TODO: the cite key should not be the ID?!
             // id assumes an existing database so don't
-            result = new BibEntry(entry.getCiteKey(), MSBibMapping.getBibTeXEntryType(entry.getType()));
+            result = new BibEntry(entry.getCiteKey(), bibTexEntryType);
         }
 
         // add String fields
@@ -77,11 +81,25 @@ public class BibTeXConverter {
             fieldValues.put(MSBIB_PREFIX + "accessed", entry.dateAccessed);
         }
 
+        if(entry.journalName != null)
+        {
+            fieldValues.put(FieldName.JOURNALTITLE, entry.journalName);
+        }
+        if (entry.month != null) {
+            Month month = MonthUtil.getMonth(entry.month);
+            fieldValues.put(FieldName.MONTH, month.shortName);
+        }
+        if (entry.number != null) {
+            fieldValues.put(FieldName.NUMBER, entry.number);
+        }
+
+
         // set all fields
         result.setField(fieldValues);
 
         return result;
     }
+
 
     private static void addAuthor(Map<String, String> map, String type, List<PersonName> authors) {
         if (authors == null) {

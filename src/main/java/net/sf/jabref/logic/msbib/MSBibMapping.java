@@ -4,12 +4,19 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibLatexEntryTypes;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.FieldName;
 
 import com.google.common.collect.HashBiMap;
 
+/**
+ * Mapping between Msbib and Bibtex
+ * All Fields: <a href = "https://msdn.microsoft.com/de-de/library/office/documentformat.openxml.bibliography">List of all MSBib fields</a>
+ *
+ */
 public class MSBibMapping {
+
     private static final String BIBTEX_PREFIX = "BIBTEX_";
     private static final String MSBIB_PREFIX = "msbib-";
 
@@ -19,7 +26,6 @@ public class MSBibMapping {
         bibtexToMSBib.put(BibEntry.KEY_FIELD, "Tag");
         bibtexToMSBib.put(FieldName.TITLE, "Title");
         bibtexToMSBib.put(FieldName.YEAR, "Year");
-        bibtexToMSBib.put(FieldName.MONTH, "Month");
         bibtexToMSBib.put(FieldName.NOTE, "Comments");
         bibtexToMSBib.put(FieldName.VOLUME, "Volume");
         bibtexToMSBib.put(FieldName.LANGUAGE, "LCID");
@@ -29,8 +35,8 @@ public class MSBibMapping {
         //bibtexToMSBib.put(FieldName.BOOKTITLE, "ConferenceName");
         //bibtexToMSBib.put(FieldName.PAGES, "Pages");
         bibtexToMSBib.put(FieldName.CHAPTER, "ChapterNumber");
-        bibtexToMSBib.put(FieldName.JOURNAL, "JournalName");
-        bibtexToMSBib.put(FieldName.NUMBER, "Issue");
+
+        bibtexToMSBib.put(FieldName.ISSUE, "Issue");
         bibtexToMSBib.put(FieldName.SCHOOL, "Department");
         bibtexToMSBib.put(FieldName.INSTITUTION, "Institution");
         bibtexToMSBib.put(FieldName.DOI, "DOI");
@@ -52,8 +58,8 @@ public class MSBibMapping {
         // MSBib only fields
         bibtexToMSBib.put(MSBIB_PREFIX + "numberofvolume", "NumberVolumes");
         bibtexToMSBib.put(MSBIB_PREFIX + "periodical", "PeriodicalTitle");
-        //bibtexToMSBib.put(MSBIB_PREFIX + "day", "Day");
-        //bibtexToMSBib.put(PREFIX + "accessed", "Accessed");
+        bibtexToMSBib.put(MSBIB_PREFIX + "day", "Day");
+        bibtexToMSBib.put(MSBIB_PREFIX + "accessed", "Accessed");
         bibtexToMSBib.put(MSBIB_PREFIX + "medium", "Medium");
         bibtexToMSBib.put(MSBIB_PREFIX + "recordingnumber", "RecordingNumber");
         bibtexToMSBib.put(MSBIB_PREFIX + "theater", "Theater");
@@ -61,7 +67,6 @@ public class MSBibMapping {
         bibtexToMSBib.put(MSBIB_PREFIX + "broadcaster", "Broadcaster");
         bibtexToMSBib.put(MSBIB_PREFIX + "station", "Station");
         bibtexToMSBib.put(MSBIB_PREFIX + FieldName.TYPE, "Type");
-        bibtexToMSBib.put(MSBIB_PREFIX + "patentnumber", "PatentNumber");
         bibtexToMSBib.put(MSBIB_PREFIX + "court", "Court");
         bibtexToMSBib.put(MSBIB_PREFIX + "reporter", "Reporter");
         bibtexToMSBib.put(MSBIB_PREFIX + "casenumber", "CaseNumber");
@@ -69,17 +74,20 @@ public class MSBibMapping {
         bibtexToMSBib.put(MSBIB_PREFIX + "productioncompany", "ProductionCompany");
     }
 
+
     public static String getBibTeXEntryType(String msbibType) {
         final String defaultType = BibtexEntryTypes.MISC.getName();
 
         Map<String, String> entryTypeMapping = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
 
-        entryTypeMapping.put("Book", BibtexEntryTypes.BOOK.getName());
-        entryTypeMapping.put("BookSection", BibtexEntryTypes.INBOOK.getName());
-        entryTypeMapping.put("JournalArticle", BibtexEntryTypes.ARTICLE.getName());
-        entryTypeMapping.put("ArticleInAPeriodical", BibtexEntryTypes.ARTICLE.getName());
-        entryTypeMapping.put("ConferenceProceedings", BibtexEntryTypes.CONFERENCE.getName());
-        entryTypeMapping.put("Report", BibtexEntryTypes.TECHREPORT.getName());
+        entryTypeMapping.put("Book", BibLatexEntryTypes.BOOK.getName());
+        entryTypeMapping.put("BookSection", BibLatexEntryTypes.BOOK.getName());
+        entryTypeMapping.put("JournalArticle", BibLatexEntryTypes.ARTICLE.getName());
+        entryTypeMapping.put("ArticleInAPeriodical", BibLatexEntryTypes.PERIODICAL.getName());
+        entryTypeMapping.put("ConferenceProceedings", BibLatexEntryTypes.INPROCEEDINGS.getName());
+        entryTypeMapping.put("Report", BibLatexEntryTypes.TECHREPORT.getName());
+        entryTypeMapping.put("Patent", BibLatexEntryTypes.PATENT.getName());
+        entryTypeMapping.put("InternetSite", BibLatexEntryTypes.ONLINE.getName());
 
         return entryTypeMapping.getOrDefault(msbibType, defaultType);
     }
@@ -103,12 +111,19 @@ public class MSBibMapping {
         entryTypeMapping.put("unpublished", MSBibEntryType.Report);
         entryTypeMapping.put("patent", MSBibEntryType.Patent);
         entryTypeMapping.put("misc", MSBibEntryType.Misc);
-        entryTypeMapping.put("electronic", MSBibEntryType.Misc);
+        entryTypeMapping.put("electronic", MSBibEntryType.ElectronicSource);
+        entryTypeMapping.put("online", MSBibEntryType.InternetSite);
 
         return entryTypeMapping.getOrDefault(bibtexType, MSBibEntryType.Misc);
     }
 
     // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
+    /**
+     *  Only English is supported
+     * @param language
+     * @return Returns 0 for English
+     */
+    @Deprecated
     public static int getLCID(String language) {
         // TODO: add language to LCID mapping
         // 0 is English
@@ -116,6 +131,12 @@ public class MSBibMapping {
     }
 
     // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
+    /**
+     * Only English is supported
+     * @param language
+     * @return Returns english
+     */
+    @Deprecated
     public static String getLanguage(int LCID) {
         // TODO: add language to LCID mapping
         return "english";
