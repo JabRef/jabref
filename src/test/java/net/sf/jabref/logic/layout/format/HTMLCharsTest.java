@@ -39,7 +39,7 @@ public class HTMLCharsTest {
 
         assertEquals("&Ccedil;", layout.format("{\\c{C}}"));
 
-        assertEquals("&Lmidot;&imath;", layout.format("\\Lmidot\\i"));
+        assertEquals("&Oogon;&imath;", layout.format("\\k{O}\\i"));
 
         assertEquals("&ntilde; &ntilde; &iacute; &imath; &imath;", layout.format("\\~{n} \\~n \\'i \\i \\i"));
     }

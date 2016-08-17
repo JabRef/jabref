@@ -644,7 +644,7 @@ public class HTMLUnicodeConversionMaps {
             {"8244", "", "{$\\prime\\prime\\prime$}"}, // triple prime
             {"8251", "", "{\\textreferencemark}"}, {"8253", "", "{\\textinterrobang}"},
             {"8450", "complexes", "$\\mathbb{C}$"}, // double struck capital C -- requires e.g. amsfonts
-            {"8451", "", "$\\textcelsius"}, // Degree Celsius
+            {"8451", "", "{\\textcelsius}"}, // Degree Celsius
             {"8459", "Hscr", "{{$\\mathcal{H}$}}"}, // script capital H -- possibly use \mathscr
             {"8460", "Hfr", "{{$\\mathbb{H}$}}"}, // black letter capital H -- requires e.g. amsfonts
             {"8466", "Lscr", "{{$\\mathcal{L}$}}"}, // script capital L -- possibly use \mathscr

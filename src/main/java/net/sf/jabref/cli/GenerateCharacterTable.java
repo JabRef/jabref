@@ -28,14 +28,17 @@ public class GenerateCharacterTable {
         System.out.println("\\DeclareTextSymbolDefault{\\uhorn}{T5}");
         System.out.println("\\begin{document}");
         System.out.println("\\twocolumn");
-        System.out.println("\\begin{supertabular}{c|c|c|c}");
-        System.out.println("No. & Uni & \\LaTeX & Code \\\\ \n \\hline");
+        System.out.println("\\begin{supertabular}{c|c|c|c|c}");
+        System.out.println("No. & Uni & Symb & \\LaTeX & Code \\\\ \n \\hline");
 
         for (Map.Entry<Integer, String> character : characterMap.entrySet()) {
-            System.out.println(character.getKey() + " & \\symbol{" + Integer.toString(character.getKey()) + "} & "
-                    + character.getValue()
-                    + " & \\verb+" + character.getValue()
-                            + "+ \\\\");
+            System.out
+                    .println(
+                            character.getKey() + " & "
+                                    + ((character.getKey() > 128) ? String
+                                            .valueOf(Character.toChars(character.getKey())) : "")
+                                    + " & \\symbol{" + Integer.toString(character.getKey()) + "} & "
+                                    + character.getValue() + " & \\verb+" + character.getValue() + "+ \\\\");
         }
         System.out.println("\\end{supertabular}");
         System.out.println("\\end{document}");
