@@ -18,7 +18,6 @@ package net.sf.jabref.gui.importer;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -92,6 +91,7 @@ import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
@@ -238,9 +238,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         setupComparatorChooser();
         glTable.addMouseListener(new TableClickListener());
 
-        // Fix table row height
-        FontMetrics metrics = glTable.getFontMetrics(glTable.getFont());
-        glTable.setRowHeight(Math.max(glTable.getRowHeight(), metrics.getHeight()));
+        GUIUtil.correctRowHeight(glTable);
 
         setWidths();
 

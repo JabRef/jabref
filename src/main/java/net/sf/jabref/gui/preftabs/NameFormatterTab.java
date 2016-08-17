@@ -17,7 +17,6 @@ package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +38,7 @@ import javax.swing.table.TableModel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.format.NameFormatter;
@@ -170,9 +170,7 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
         };
 
         table = new JTable(tableModel);
-        // Fix table row height
-        FontMetrics metrics = table.getFontMetrics(table.getFont());
-        table.setRowHeight(Math.max(table.getRowHeight(), metrics.getHeight()));
+        GUIUtil.correctRowHeight(table);
 
         TableColumnModel columnModel = table.getColumnModel();
         columnModel.getColumn(0).setPreferredWidth(140);

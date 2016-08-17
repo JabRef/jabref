@@ -17,7 +17,6 @@ package net.sf.jabref.gui.protectedterms;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -59,6 +58,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsList;
@@ -203,9 +203,7 @@ public class ProtectedTermsDialog {
         cm.getColumn(0).setMaxWidth((cm.getColumn(0).getPreferredWidth() * 11) / 10);
         cm.getColumn(1).setPreferredWidth(100);
         cm.getColumn(2).setPreferredWidth(100);
-        // Fix table row height
-        FontMetrics metrics = table.getFontMetrics(table.getFont());
-        table.setRowHeight(Math.max(table.getRowHeight(), metrics.getHeight()));
+        GUIUtil.correctRowHeight(table);
 
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.addMouseListener(new MouseAdapter() {

@@ -17,7 +17,6 @@ package net.sf.jabref.gui.openoffice;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -38,6 +37,7 @@ import javax.swing.JTextField;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.openoffice.CitationEntry;
 
@@ -88,9 +88,7 @@ class CitationManager {
         }
         tableModel = new DefaultEventTableModel<>(list, new CitationEntryFormat());
         table = new JTable(tableModel);
-        // Fix table row height
-        FontMetrics metrics = table.getFontMetrics(table.getFont());
-        table.setRowHeight(Math.max(table.getRowHeight(), metrics.getHeight()));
+        GUIUtil.correctRowHeight(table);
 
         diag.add(new JScrollPane(table), BorderLayout.CENTER);
 

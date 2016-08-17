@@ -17,7 +17,6 @@ package net.sf.jabref.external;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -51,6 +50,7 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -182,9 +182,7 @@ public class ExternalFileTypeEditor extends JDialog {
         table.getColumnModel().getColumn(3).setMinWidth(100);
         table.getColumnModel().getColumn(0).setResizable(false);
 
-        // Set table height
-        FontMetrics metrics = table.getFontMetrics(table.getFont());
-        table.setRowHeight(Math.max(table.getRowHeight(), metrics.getHeight()));
+        GUIUtil.correctRowHeight(table);
 
         JScrollPane sp = new JScrollPane(table);
 

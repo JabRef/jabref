@@ -17,7 +17,6 @@ package net.sf.jabref.gui.openoffice;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -58,6 +57,7 @@ import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.openoffice.OOBibStyle;
@@ -229,9 +229,7 @@ class StyleSelectDialog {
         cm.getColumn(0).setPreferredWidth(100);
         cm.getColumn(1).setPreferredWidth(200);
         cm.getColumn(2).setPreferredWidth(80);
-        // Fix table row height
-        FontMetrics metrics = table.getFontMetrics(table.getFont());
-        table.setRowHeight(Math.max(table.getRowHeight(), metrics.getHeight()));
+        GUIUtil.correctRowHeight(table);
 
         selectionModel = (DefaultEventSelectionModel<OOBibStyle>) GlazedListsSwing
                 .eventSelectionModelWithThreadProxyList(sortedStyles);

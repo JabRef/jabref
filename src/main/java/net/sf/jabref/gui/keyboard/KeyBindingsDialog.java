@@ -17,7 +17,6 @@ package net.sf.jabref.gui.keyboard;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
@@ -31,6 +30,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
@@ -94,9 +94,7 @@ public class KeyBindingsDialog extends JDialog {
         table.setColumnSelectionAllowed(false);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setAutoCreateRowSorter(true);
-        // Fix table row height
-        FontMetrics metrics = table.getFontMetrics(table.getFont());
-        table.setRowHeight(Math.max(table.getRowHeight(), metrics.getHeight()));
+        GUIUtil.correctRowHeight(table);
 
         return table;
     }

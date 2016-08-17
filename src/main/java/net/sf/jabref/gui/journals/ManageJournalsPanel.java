@@ -17,7 +17,6 @@ package net.sf.jabref.gui.journals;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -67,7 +66,7 @@ import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
-
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
@@ -193,9 +192,7 @@ class ManageJournalsPanel extends JPanel {
         viewBuiltin.addActionListener(e -> {
             JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbreviationLoader
                     .getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs)).getAbbreviations()));
-            // Fix table row height
-            FontMetrics metrics = table.getFontMetrics(table.getFont());
-            table.setRowHeight(Math.max(table.getRowHeight(), metrics.getHeight()));
+            GUIUtil.correctRowHeight(table);
 
             JScrollPane pane = new JScrollPane(table);
             JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"),
@@ -330,9 +327,7 @@ class ManageJournalsPanel extends JPanel {
 
         tableModel.setJournals(userAbbreviations);
         userTable = new JTable(tableModel);
-        // Fix table row height
-        FontMetrics metrics = userTable.getFontMetrics(userTable.getFont());
-        userTable.setRowHeight(Math.max(userTable.getRowHeight(), metrics.getHeight()));
+        GUIUtil.correctRowHeight(userTable);
 
         userTable.addMouseListener(tableModel.getMouseListener());
         userPanel.add(new JScrollPane(userTable), BorderLayout.CENTER);
@@ -589,9 +584,7 @@ class ManageJournalsPanel extends JPanel {
                             .readJournalListFromFile(new File(tf.getText()));
 
                     JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(abbreviations));
-                    // Fix table row height
-                    FontMetrics metrics = table.getFontMetrics(table.getFont());
-                    table.setRowHeight(Math.max(table.getRowHeight(), metrics.getHeight()));
+                    GUIUtil.correctRowHeight(table);
 
                     JScrollPane pane = new JScrollPane(table);
                     JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"),

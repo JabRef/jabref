@@ -18,7 +18,6 @@ package net.sf.jabref.gui;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.FontMetrics;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -53,6 +52,7 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
 import net.sf.jabref.gui.undo.UndoableStringChange;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
@@ -123,10 +123,7 @@ class StringDialog extends JDialog {
         if (!base.hasNoStrings()) {
             table.setRowSelectionInterval(0, 0);
         }
-
-        // Fix tree row height
-        FontMetrics metrics = table.getFontMetrics(table.getFont());
-        table.setRowHeight(Math.max(table.getRowHeight(), metrics.getHeight()));
+        GUIUtil.correctRowHeight(table);
 
         gbl.setConstraints(table.getPane(), con);
         pan.add(table.getPane());

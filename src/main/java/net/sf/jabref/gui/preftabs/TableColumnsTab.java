@@ -17,7 +17,6 @@ package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -53,6 +52,7 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibtexSingleField;
@@ -248,9 +248,7 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         TableColumnModel cm = colSetup.getColumnModel();
         cm.getColumn(0).setPreferredWidth(140);
         cm.getColumn(1).setPreferredWidth(80);
-        // Fix table row height
-        FontMetrics metrics = colSetup.getFontMetrics(colSetup.getFont());
-        colSetup.setRowHeight(Math.max(colSetup.getRowHeight(), metrics.getHeight()));
+        GUIUtil.correctRowHeight(colSetup);
 
         FormLayout layout = new FormLayout
                 ("1dlu, 8dlu, left:pref, 4dlu, fill:pref","");

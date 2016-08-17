@@ -18,7 +18,6 @@ package net.sf.jabref.gui;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
 import java.awt.Frame;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -89,6 +88,7 @@ import net.sf.jabref.gui.importer.EntryFromFileCreator;
 import net.sf.jabref.gui.importer.EntryFromFileCreatorManager;
 import net.sf.jabref.gui.importer.UnlinkedFilesCrawler;
 import net.sf.jabref.gui.importer.UnlinkedPDFFileFilter;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
@@ -799,9 +799,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
         labelImportingInfo.setVisible(false);
 
         tree = new JTree();
-        // Fix tree row height
-        FontMetrics metrics = tree.getFontMetrics(tree.getFont());
-        tree.setRowHeight(Math.max(tree.getRowHeight(), metrics.getHeight()));
+        GUIUtil.correctRowHeight(tree);
 
         scrollpaneTree = new JScrollPane(tree);
         scrollpaneTree.setWheelScrollingEnabled(true);

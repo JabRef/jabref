@@ -16,7 +16,6 @@
 package net.sf.jabref.collab;
 
 import java.awt.BorderLayout;
-import java.awt.FontMetrics;
 import java.awt.Insets;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -38,6 +37,7 @@ import javax.swing.tree.DefaultMutableTreeNode;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 
@@ -65,9 +65,7 @@ class ChangeDisplayDialog extends JDialog implements TreeSelectionListener {
         }
         tree = new JTree(root);
         tree.addTreeSelectionListener(this);
-        // Fix tree row height
-        FontMetrics metrics = tree.getFontMetrics(tree.getFont());
-        tree.setRowHeight(Math.max(tree.getRowHeight(), metrics.getHeight()));
+        GUIUtil.correctRowHeight(tree);
 
         JSplitPane pane = new JSplitPane();
         pane.setLeftComponent(new JScrollPane(tree));

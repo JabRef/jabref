@@ -18,7 +18,6 @@ package net.sf.jabref.gui.fieldeditors;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.FontMetrics;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -66,6 +65,7 @@ import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
@@ -107,9 +107,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         setTableHeader(null);
         addMouseListener(new TableClickListener());
 
-        // Fix table row height
-        FontMetrics metrics = getFontMetrics(getFont());
-        setRowHeight(Math.max(getRowHeight(), metrics.getHeight()));
+        GUIUtil.correctRowHeight(this);
 
         JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
         add.setToolTipText(Localization.lang("New file link (INSERT)"));

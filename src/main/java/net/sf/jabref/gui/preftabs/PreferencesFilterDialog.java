@@ -2,7 +2,6 @@ package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FontMetrics;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,6 +15,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.gui.WrapLayout;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.preferences.JabRefPreferencesFilter;
 
@@ -49,9 +49,7 @@ class PreferencesFilterDialog extends JDialog {
 
         table = new JTable();
         table.setAutoCreateRowSorter(true);
-        // Fix table row height
-        FontMetrics metrics = table.getFontMetrics(table.getFont());
-        table.setRowHeight(Math.max(table.getRowHeight(), metrics.getHeight()));
+        GUIUtil.correctRowHeight(table);
 
         updateModel();
         panel.add(new JScrollPane(table), BorderLayout.CENTER);

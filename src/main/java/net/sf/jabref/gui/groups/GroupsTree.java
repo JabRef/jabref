@@ -16,7 +16,6 @@
 package net.sf.jabref.gui.groups;
 
 import java.awt.Cursor;
-import java.awt.FontMetrics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.datatransfer.Transferable;
@@ -49,6 +48,7 @@ import javax.swing.ToolTipManager;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.groups.AbstractGroup;
 import net.sf.jabref.logic.groups.EntriesGroupChange;
 import net.sf.jabref.logic.groups.GroupTreeNode;
@@ -96,9 +96,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
      * @param groupSelector the parent UI component
      */
     public GroupsTree(GroupSelector groupSelector) {
-        // Adjust height according to http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4760081
-        FontMetrics metrics = getFontMetrics(getFont());
-        setRowHeight(Math.max(getRowHeight(), metrics.getHeight()));
+        GUIUtil.correctRowHeight(this);
 
         this.groupSelector = groupSelector;
         DragGestureRecognizer dgr = DragSource.getDefaultDragSource()

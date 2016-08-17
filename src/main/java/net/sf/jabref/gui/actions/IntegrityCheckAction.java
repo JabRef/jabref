@@ -1,6 +1,5 @@
 package net.sf.jabref.gui.actions;
 
-import java.awt.FontMetrics;
 import java.awt.event.ActionEvent;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +20,7 @@ import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.integrity.IntegrityCheck;
 import net.sf.jabref.logic.integrity.IntegrityMessage;
 import net.sf.jabref.logic.l10n.Localization;
@@ -94,9 +94,7 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
                 }
             });
 
-            // Set table row height
-            FontMetrics metrics = table.getFontMetrics(table.getFont());
-            table.setRowHeight(Math.max(table.getRowHeight(), metrics.getHeight()));
+            GUIUtil.correctRowHeight(table);
 
             table.getColumnModel().getColumn(0).setPreferredWidth(100);
             table.getColumnModel().getColumn(1).setPreferredWidth(60);
