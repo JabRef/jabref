@@ -381,31 +381,22 @@ public class AuthorListTest {
     @Test
     public void testCompanyAuthor() {
         Author author = AuthorList.parse("{JabRef Developers}").getAuthor(0);
-        Assert.assertNull(author.getFirst());
-        Assert.assertNull(author.getFirstAbbr());
-        Assert.assertEquals("JabRef Developers", author.getLast());
-        Assert.assertNull(author.getJr());
-        Assert.assertNull(author.getVon());
+        Author expected = new Author(null, null, null, "JabRef Developers", null);
+        Assert.assertEquals(expected, author);
     }
 
     @Test
     public void testCompanyAuthorWithLowerCaseWord() {
         Author author = AuthorList.parse("{JabRef Developers on Fire}").getAuthor(0);
-        Assert.assertNull(author.getFirst());
-        Assert.assertNull(author.getFirstAbbr());
-        Assert.assertEquals("JabRef Developers on Fire", author.getLast());
-        Assert.assertNull(author.getJr());
-        Assert.assertNull(author.getVon());
+        Author expected = new Author(null, null, null, "JabRef Developers on Fire", null);
+        Assert.assertEquals(expected, author);
     }
 
     @Test
     public void testAbbreviationWithRelax() {
         Author author = AuthorList.parse("{\\relax Ch}ristoph Cholera").getAuthor(0);
-        Assert.assertEquals("{\\relax Ch}ristoph", author.getFirst());
-        Assert.assertEquals("{\\relax Ch}.", author.getFirstAbbr());
-        Assert.assertEquals("Cholera", author.getLast());
-        Assert.assertNull(author.getJr());
-        Assert.assertNull(author.getVon());
+        Author expected = new Author("{\\relax Ch}ristoph", "{\\relax Ch}.", null, "Cholera", null);
+        Assert.assertEquals(expected, author);
     }
 
     @Test
