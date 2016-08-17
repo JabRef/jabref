@@ -23,14 +23,13 @@ import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.importer.util.GVKParser;
 import net.sf.jabref.model.entry.BibEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.utils.URIBuilder;
+import org.jsoup.helper.StringUtil;
 import org.xml.sax.SAXException;
 
 public class GvkFetcher implements SearchBasedFetcher {
 
-    private static final Log LOGGER = LogFactory.getLog(GvkFetcher.class);
+    private static final String URL_PATTERN = "http://sru.gbv.de/gvk?";
 
     private final Collection<String> searchKeys = Arrays.asList("all", "tit", "per", "thm", "slw", "txt", "num", "kon", "ppn", "bkl", "erj");
 
@@ -44,11 +43,8 @@ public class GvkFetcher implements SearchBasedFetcher {
         return HelpFile.FETCHER_GVK;
     }
 
-    private String getSearchQueryStringForComplexQuery(List<String> queryList) {
+    private String getSearchQueryStringForComplexQuery(List<String> queryList) throws FetcherException {
         StringJoiner gvkQueryJoiner = new StringJoiner(" and ");
-        if (!searchKeys.contains(queryList.get(0))) {
-            throw new IllegalStateException("First element of query list has to be a searchKey");
-        };
 
         Iterator<String> iterator = queryList.iterator();
         String query = iterator.next();
@@ -61,32 +57,23 @@ public class GvkFetcher implements SearchBasedFetcher {
             }
             gvkQueryJoiner.add("pica.".concat(searchKey).concat("=").concat(parameterJoiner.toString()));
         }
-
         return gvkQueryJoiner.toString();
     }
 
-    String getSearchQueryString(String query) {
+    protected String getSearchQueryString(String query) throws FetcherException {
         Objects.requireNonNull(query);
         LinkedList<String> queryList = new LinkedList(Arrays.asList(query.split("\\s")));
 
-        if (queryList.isEmpty()) {
-            return "";
-        }
-
-        String gvkQuery;
         if (searchKeys.contains(queryList.get(0))) {
-            gvkQuery = getSearchQueryStringForComplexQuery(queryList);
+            return getSearchQueryStringForComplexQuery(queryList);
         } else {
             // query as pica.all
-            gvkQuery = queryList.stream().collect(Collectors.joining(" ", "pica.all=", ""));
+            return queryList.stream().collect(Collectors.joining(" ", "pica.all=", ""));
         }
-
-        return gvkQuery;
     }
 
-    URL getQueryURL(String query) throws URISyntaxException, MalformedURLException {
+    protected URL getQueryURL(String query) throws URISyntaxException, MalformedURLException, FetcherException {
         String gvkQuery = getSearchQueryString(query);
-        final String URL_PATTERN = "http://sru.gbv.de/gvk?";
         URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);
         uriBuilder.addParameter("version", "1.1");
         uriBuilder.addParameter("operation", "searchRetrieve");
@@ -100,34 +87,21 @@ public class GvkFetcher implements SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
-        if (query == null || query.trim().isEmpty()) {
+        if (StringUtil.isBlank(query)) {
             return Collections.emptyList();
         }
-
-        List<BibEntry> result;
 
         try {
             try (InputStream is = getQueryURL(query).openStream()) {
-                result = (new GVKParser()).parseEntries(is);
+                return (new GVKParser()).parseEntries(is);
             }
         } catch (URISyntaxException e) {
-            LOGGER.error("URI malformed error", e);
-            return Collections.emptyList();
+            throw new FetcherException("URI malformed error", e);
         } catch (IOException e) {
-            LOGGER.error("An I/O exception occurred", e);
-            return Collections.emptyList();
+            throw new FetcherException("An I/O exception occurred", e);
         } catch (SAXException | ParserConfigurationException e) {
-            LOGGER.error("An internal parser error occurred", e);
-            return Collections.emptyList();
+            throw new FetcherException("An internal parser error occurred", e);
         }
-
-        if (result.isEmpty()) {
-            LOGGER.info("No references found");
-        }
-
-        return result;
     }
 
 }
-
-
