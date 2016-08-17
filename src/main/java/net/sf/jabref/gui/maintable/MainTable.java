@@ -271,13 +271,12 @@ public class MainTable extends JTable {
             }
             renderer.setHorizontalAlignment(JLabel.CENTER);
         } else if (tableColorCodes || tableResolvedColorCodes) {
-            CellRendererMode status = getCellStatus(row, column);
-
-            if (tableColorCodes && (status == CellRendererMode.REQUIRED)) {
+            CellRendererMode status = getCellStatus(row, column, tableResolvedColorCodes);
+            if (status == CellRendererMode.REQUIRED) {
                 renderer = MainTable.reqRenderer;
-            } else if (tableColorCodes && (status == CellRendererMode.OPTIONAL)) {
+            } else if (status == CellRendererMode.OPTIONAL) {
                 renderer = MainTable.optRenderer;
-            } else if (tableResolvedColorCodes && (status == CellRendererMode.RESOLVED)) {
+            } else if (status == CellRendererMode.RESOLVED) {
                 renderer = MainTable.resolvedRenderer;
             }
         }
@@ -460,10 +459,10 @@ public class MainTable extends JTable {
 
     }
 
-    private CellRendererMode getCellStatus(int row, int col) {
+    private CellRendererMode getCellStatus(int row, int col, boolean checkResolved) {
         try {
             BibEntry be = getEntryAt(row);
-            if (tableFormat.getTableColumn(col).isResolved(be)) {
+            if (checkResolved && tableFormat.getTableColumn(col).isResolved(be)) {
                 return CellRendererMode.RESOLVED;
             }
             Optional<EntryType> type = EntryTypes.getType(be.getType(), panel.getBibDatabaseContext().getMode());
