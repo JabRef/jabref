@@ -88,6 +88,7 @@ import net.sf.jabref.gui.importer.EntryFromFileCreator;
 import net.sf.jabref.gui.importer.EntryFromFileCreatorManager;
 import net.sf.jabref.gui.importer.UnlinkedFilesCrawler;
 import net.sf.jabref.gui.importer.UnlinkedPDFFileFilter;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
@@ -798,6 +799,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
         labelImportingInfo.setVisible(false);
 
         tree = new JTree();
+        GUIUtil.correctRowHeight(tree);
+
         scrollpaneTree = new JScrollPane(tree);
         scrollpaneTree.setWheelScrollingEnabled(true);
 

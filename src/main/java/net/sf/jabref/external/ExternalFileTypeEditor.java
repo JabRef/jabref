@@ -50,6 +50,7 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -180,6 +181,8 @@ public class ExternalFileTypeEditor extends JDialog {
         table.getColumnModel().getColumn(2).setMinWidth(60);
         table.getColumnModel().getColumn(3).setMinWidth(100);
         table.getColumnModel().getColumn(0).setResizable(false);
+
+        GUIUtil.correctRowHeight(table);
 
         JScrollPane sp = new JScrollPane(table);
 

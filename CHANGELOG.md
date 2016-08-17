@@ -21,6 +21,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#462](https://github.com/JabRef/jabref/issues/462) Extend the OpenConsoleFeature by offering a selection between default terminal emulator and configurable command execution.
 - The field name in the layout files for entry type is changed from `bibtextype` to `entrytype`. Please update your existing files as support for `bibtextype` will be removed eventually.
 - [#1516](https://github.com/JabRef/jabref/issues/1516) Selected field names are written in uppercase in the entry editor
+- Table row height is adjusted on Windows which is useful for high resolution displays
 - For developers: Moved the bst package into logic. This requires the regeneration of antlr sources, execute: gradlew generateSource
 - [#1026](https://github.com/JabRef/jabref/issues/1026) JabRef does no longer delete user comments outside of BibTeX entries and strings
 - [#1249](https://github.com/JabRef/jabref/issues/1249) Date layout formatter added

@@ -42,6 +42,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -83,6 +84,7 @@ public class ExportCustomizationDialog extends JDialog {
             table.setRowSelectionInterval(0, 0);
         }
 
+        GUIUtil.correctRowHeight(table);
 
         JButton addExport = new JButton(Localization.lang("Add new"));
         addExport.addActionListener(e -> {

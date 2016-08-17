@@ -66,7 +66,7 @@ import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
-
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
@@ -192,6 +192,8 @@ class ManageJournalsPanel extends JPanel {
         viewBuiltin.addActionListener(e -> {
             JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbreviationLoader
                     .getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs)).getAbbreviations()));
+            GUIUtil.correctRowHeight(table);
+
             JScrollPane pane = new JScrollPane(table);
             JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"),
                     JOptionPane.INFORMATION_MESSAGE);
@@ -325,6 +327,8 @@ class ManageJournalsPanel extends JPanel {
 
         tableModel.setJournals(userAbbreviations);
         userTable = new JTable(tableModel);
+        GUIUtil.correctRowHeight(userTable);
+
         userTable.addMouseListener(tableModel.getMouseListener());
         userPanel.add(new JScrollPane(userTable), BorderLayout.CENTER);
     }
@@ -580,6 +584,8 @@ class ManageJournalsPanel extends JPanel {
                             .readJournalListFromFile(new File(tf.getText()));
 
                     JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(abbreviations));
+                    GUIUtil.correctRowHeight(table);
+
                     JScrollPane pane = new JScrollPane(table);
                     JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"),
                             JOptionPane.INFORMATION_MESSAGE);
