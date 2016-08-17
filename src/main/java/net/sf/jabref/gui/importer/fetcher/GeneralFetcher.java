@@ -277,6 +277,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             //if ((activeFetcher.getKeyName() != null) && (activeFetcher.getKeyName().length() > 0))
             putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.WEB_SEARCH));
             putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcon.WWW.getIcon());
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Toggle web search interface"));
         }
 
         @Override

@@ -3,10 +3,10 @@ package net.sf.jabref.logic.importer.fileformat;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collections;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
@@ -31,7 +31,7 @@ public class BiblioscapeImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        Assert.assertEquals(Arrays.asList(".txt"), importer.getExtensions());
+        Assert.assertEquals(FileExtensions.BILBIOSCAPE, importer.getExtensions());
     }
 
     @Test

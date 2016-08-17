@@ -15,9 +15,11 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#970](https://github.com/JabRef/jabref/issues/970): Implementation of shared database support (full system) with event based synchronization for MySQL, PostgreSQL and Oracle database systems.
 - Externally fetched information can be merged for entries with an ISBN
 - Externally fetched information can be merged for entries with an ArXiv eprint
+- Added EntryTypeFormatter to add camel casing to entry type in layouts, e.g., InProceedings
 - [#1225](https://github.com/JabRef/jabref/issues/1225): Hotkey-system is now consistent
 - Added print entry preview to the right click menu
 - [#462](https://github.com/JabRef/jabref/issues/462) Extend the OpenConsoleFeature by offering a selection between default terminal emulator and configurable command execution.
+- The field name in the layout files for entry type is changed from `bibtextype` to `entrytype`. Please update your existing files as support for `bibtextype` will be removed eventually.
 - [#1516](https://github.com/JabRef/jabref/issues/1516) Selected field names are written in uppercase in the entry editor
 - For developers: Moved the bst package into logic. This requires the regeneration of antlr sources, execute: gradlew generateSource
 - [#1026](https://github.com/JabRef/jabref/issues/1026) JabRef does no longer delete user comments outside of BibTeX entries and strings
@@ -34,6 +36,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Automatically generated group names are now converted from LaTeX to Unicode
 - Unified dialogs for opening/saving files
 - Add integrity check to avoid non-ASCII characters in BibTeX files
+- [#1751](https://github.com/JabRef/jabref/issues/1751) Added tooltip to web search button
+
 
 ### Fixed
 - Fixed [#1632](https://github.com/JabRef/jabref/issues/1632): User comments (@Comment) with or without brackets are now kept
@@ -63,6 +67,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed NullPointerException when trying to set a special field or mark an entry through the menu without having an open database
 - Fixed [#1257](https://github.com/JabRef/jabref/issues/1324): Preferences for the BibTeX key generator set in a version prior to 3.2 are now migrated automatically to the new version
 - Fixed [#1716](https://github.com/JabRef/jabref/issues/1716): `@`-Symbols stored in BibTeX fields no longer break the database
+- Fixed [#1499](https://github.com/JabRef/jabref/issues/1499): {} braces are now treated correctly in in author/editor
+- Fixed [#1531](https://github.com/JabRef/jabref/issues/1531): `\relax` can be used for abbreviation of author names
+ 
 
 ### Removed
 - It is not longer possible to choose to convert HTML sub- and superscripts to equations

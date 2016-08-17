@@ -19,14 +19,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.util.FileExtensions;
 
 /**
  * This importer exists only to enable `--importToOpen someEntry.bib`
@@ -91,8 +90,8 @@ public class BibtexImporter extends ImportFormat {
     }
 
     @Override
-    public List<String> getExtensions() {
-        return Collections.singletonList(".bib");
+    public FileExtensions getExtensions() {
+        return FileExtensions.BIBTEX_DB;
     }
 
     @Override

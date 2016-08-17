@@ -19,7 +19,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -79,6 +78,7 @@ import net.sf.jabref.logic.importer.fileformat.medline.QualifierName;
 import net.sf.jabref.logic.importer.fileformat.medline.Section;
 import net.sf.jabref.logic.importer.fileformat.medline.Sections;
 import net.sf.jabref.logic.importer.fileformat.medline.Text;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -108,8 +108,8 @@ public class MedlineImporter extends ImportFormat {
     }
 
     @Override
-    public List<String> getExtensions() {
-        return Arrays.asList(".nbib", ".xml");
+    public FileExtensions getExtensions() {
+        return FileExtensions.MEDLINE;
     }
 
     @Override

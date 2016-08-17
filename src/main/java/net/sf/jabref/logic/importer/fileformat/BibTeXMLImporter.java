@@ -22,7 +22,6 @@ import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +42,7 @@ import net.sf.jabref.importer.fileformat.bibtexml.File;
 import net.sf.jabref.importer.fileformat.bibtexml.Inbook;
 import net.sf.jabref.importer.fileformat.bibtexml.Incollection;
 import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
@@ -71,8 +71,8 @@ public class BibTeXMLImporter extends ImportFormat {
     }
 
     @Override
-    public List<String> getExtensions() {
-        return Collections.singletonList(".xml");
+    public FileExtensions getExtensions() {
+        return FileExtensions.BIBTEXML;
     }
 
     @Override
