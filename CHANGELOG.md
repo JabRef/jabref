@@ -12,7 +12,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
-- Improve focus of the maintable after a sidepane gets closed
 - [#970](https://github.com/JabRef/jabref/issues/970): Implementation of shared database support (full system) with event based synchronization for MySQL, PostgreSQL and Oracle database systems.
 - Externally fetched information can be merged for entries with an ISBN
 - Externally fetched information can be merged for entries with an ArXiv eprint
@@ -41,6 +40,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#1758](https://github.com/JabRef/jabref/issues/1758) Added a button to open Database Properties dialog help
 
 
+- Improve focus of the maintable after a sidepane gets closed (Before it would focus the toolbar or it would focus the wrong entry)
 
 ### Fixed
 - Fixed [#1632](https://github.com/JabRef/jabref/issues/1632): User comments (@Comment) with or without brackets are now kept
