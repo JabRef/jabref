@@ -43,7 +43,7 @@ public class HTMLUnicodeConversionMaps {
             //                                 U+00AE ISOnum
             {"175", "macr", "{\\={}}"}, // macron = spacing macron = overline
             //                                 = APL overbar, U+00AF ISOdia
-            {"176", "deg", "$\\deg$"}, // degree sign, U+00B0 ISOnum
+            {"176", "deg", "{$^{\\circ}$}"}, // degree sign, U+00B0 ISOnum
             {"177", "plusmn", "$\\pm$"}, // plus-minus sign = plus-or-minus sign,
             //                                 U+00B1 ISOnum
             {"178", "sup2", "\\textsuperscript{2}"}, // superscript two = superscript digit two
@@ -428,15 +428,11 @@ public class HTMLUnicodeConversionMaps {
             {"62", "gt", "$>$"}, // greater-than sign, U+003E ISOnum
 
 
-            /* Spacing Modifier Letters */
-            {"710", "circ", "{\\textasciicircum}"}, // modifier letter circumflex accent,
-            //                                   U+02C6 ISOpub
-            {"732", "tilde", "{\\textasciitilde}"}, // small tilde, U+02DC ISOdia
-
             /* General Punctuation */
             {"8194", "ensp", "\\hspace{0.5em}"}, // en space, U+2002 ISOpub
             {"8195", "emsp", "\\hspace{1em}"}, // em space, U+2003 ISOpub
             {"8201", "thinsp", "\\hspace{0.167em}"}, // thin space, U+2009 ISOpub
+            {"8202", "", "\\hspace{0.1em}"}, // hair space, U+2010 ISOpub
             {"8204", "zwnj", "\\/{}"}, // zero width non-joiner,
             //                                   U+200C NEW RFC 2070
             {"8205", "zwj", ""}, // zero width joiner, U+200D NEW RFC 2070
@@ -576,29 +572,62 @@ public class HTMLUnicodeConversionMaps {
             {"326", "", "{\\c{n}}"}, // small n with cedilla
             {"327", "", "{{\\v{N}}}"}, // capital N with caron
             {"328", "", "{\\v{n}}"}, // small n with caron
-
+            {"329", "", "{'n}"}, // small n preceded with apostroph
             {"330", "", "{{\\NG}}"}, // upper case letter Eng
             {"331", "", "{{\\ng}}"}, // lower case letter Eng
-            {"332", "Omacro", "{{\\={O}}}"}, // the small letter o with macron
-            {"333", "omacro", "{\\={o}}"}, // the big letter O with macron
-
+            {"332", "Omacro", "{{\\={O}}}"}, // the capital letter O with macron
+            {"333", "omacro", "{\\={o}}"}, // the small letter o with macron
+            {"334", "", "{{\\u{O}}}"}, // the capital letter O with breve
+            {"335", "", "{\\u{o}}"}, // the small letter o with breve
+            {"336", "", "{{\\H{O}}}"}, // the capital letter O with double acute
+            {"337", "", "{\\H{o}}"}, // the small letter o with double acute
             {"338", "OElig", "{{\\OE}}"}, // OE-ligature
             {"339", "oelig", "{{\\oe}}"}, // oe-ligature
-
+            {"340", "", "{{\\'{R}}}"}, // upper case R with acute
+            {"341", "", "{{\\'{r}}}"}, // lower case r with acute
+            {"342", "", "{{\\c{R}}}"}, // upper case R with cedilla
+            {"343", "", "{{\\c{r}}}"}, // lower case r with cedilla
+            {"344", "", "{{\\v{R}}}"}, // upper case R with caron
+            {"345", "", "{{\\v{r}}}"}, // lower case r with caron
+            {"346", "", "{{\\'{S}}}"}, // upper case S with acute
+            {"347", "", "{{\\'{s}}}"}, // lower case s with acute
             {"348", "Scirc", "{{\\^{S}}}"}, // upper case S with circumflex
             {"349", "scirc", "{\\^{s}}"}, // lower case s with circumflex
             {"350", "Scedil", "{{\\c{S}}}"}, // upper case S with cedilla
             {"351", "scedil", "{\\c{s}}"}, // lower case s with cedilla
             {"352", "Scaron", "{{\\v{S}}}"}, // latin capital letter S with caron,
             {"353", "scaron", "{\\v{s}}"}, // latin small letter s with caron,
-
+            {"354", "", "{{\\c{T}}}"}, // upper case T with cedilla
+            {"355", "", "{{\\c{T}}}"}, // lower case t with cedilla
+            {"356", "", "{{\\v{T}}}"}, // latin capital letter T with caron,
+            {"357", "", "{\\v{t}}"}, // latin small letter t with caron,
+            {"358", "", "{{\\B{T}}}"}, // latin capital letter T with stroke,
+            {"359", "", "{\\B{t}}"}, // latin small letter t with stroke,
+            {"360", "", "{{\\~{U}}}"}, // capital U with tilde
+            {"361", "", "{\\~{u}}"}, // small u with tilde
+            {"362", "", "{{\\={U}}}"}, // capital U with macron
+            {"363", "", "{\\={u}}"}, // small u with macron
+            {"364", "", "{{\\u{U}}}"}, // capital U with breve
+            {"365", "", "{\\u{u}}"}, // small u with breve
+            {"366", "", "{{\\r{U}}}"}, // capital U with ring
+            {"367", "", "{\\r{u}}"}, // small u with ring
+            {"368", "", "{{\\={U}}}"}, // capital U with double acute
+            {"369", "", "{\\={u}}"}, // small u with double acute
             {"370", "Uogon", "{{\\k{U}}}"}, // capital U with ogonek
             {"371", "uogon", "{\\k{u}}"}, // small u with ogonek
-
+            {"372", "", "{{\\^{W}}}"}, // capital W with circumflex
+            {"373", "", "{\\^{w}}"}, // small w with circumflex
+            {"374", "", "{{\\^{Y}}}"}, // capital Y with circumflex
+            {"375", "", "{\\^{y}}"}, // small y with circumflex
             {"376", "Yuml", "{{\\\"{Y}}}"}, // latin capital letter Y with diaeresis,
-
+            {"377", "", "{{\\'{Z}}}"}, // capital Z with acute
+            {"378", "", "{\\'{z}}"}, // small z with acute
+            {"379", "", "{{\\.{Z}}}"}, // capital Z with dot above
+            {"380", "", "{\\.{z}}"}, // small z with dot above
             {"381", "Zcaron", "{{\\v{Z}}}"}, // capital Z with caron
             {"382", "zcaron", "{\\v{z}}"}, // small z with caron
+            // {"383", "", ""}, // long s
+            {"384", "", "{\\B{b}}"}, // small b with stroke
 
             {"402", "fnof", "\\textit{f}"}, // latin small f with hook = function
 
@@ -619,13 +648,15 @@ public class HTMLUnicodeConversionMaps {
             {"537", "", "{\\cb{s}}"}, // small letter S with comma below, require combelow
             {"538", "", "{{\\cb{T}}}"}, // capital letter T with comma below, require combelow
             {"539", "", "{\\cb{t}}"}, // small letter T with comma below, require combelow
-            {"727", "caron", "{\\v{}}"}, // Caron
-            {"", "Hacek", "{\\v{}}"}, // Caron
+            {"710", "circ", "{\\^{}}"}, // modifier letter circumflex accent,
+            {"726", "", "+"}, // Modifier plus sign
+            {"727", "", "-"}, // Modifier minus sign
             {"728", "breve", "{\\u{}}"}, // Breve
             {"", "Breve", "{\\u{}}"}, // Breve
             {"729", "dot", "{\\.{}}"}, // Dot above
             {"730", "ring", "{\\r{}}"}, // Ring above
             {"731", "ogon", "{\\k{}}"}, // Ogonek
+            {"732", "tilde", "\\~{}"}, // Small tilde
             {"733", "dblac", "{{\\H{}}}"}, // Double acute
             {"949", "epsi", "$\\epsilon$"}, // Epsilon - double check
             {"1013", "epsiv", "$\\varepsilonup$"}, // lunate epsilon, requires txfonts

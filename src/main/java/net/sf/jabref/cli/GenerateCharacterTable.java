@@ -22,6 +22,7 @@ public class GenerateCharacterTable {
         System.out.println("\\usepackage[a4paper,margin=1cm]{geometry}");
         System.out.println("\\usepackage{supertabular}");
         System.out.println("\\usepackage{mathabx}");
+        System.out.println("\\fontspec{Cambria}");
         System.out.println("\\DeclareTextSymbolDefault{\\OHORN}{T5}");
         System.out.println("\\DeclareTextSymbolDefault{\\UHORN}{T5}");
         System.out.println("\\DeclareTextSymbolDefault{\\ohorn}{T5}");
