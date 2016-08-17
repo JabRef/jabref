@@ -37,6 +37,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Unified dialogs for opening/saving files
 - Add integrity check to avoid non-ASCII characters in BibTeX files
 - [#1751](https://github.com/JabRef/jabref/issues/1751) Added tooltip to web search button
+- [#1758](https://github.com/JabRef/jabref/issues/1758) Added a button to open Database Properties dialog help
+
 
 
 ### Fixed
