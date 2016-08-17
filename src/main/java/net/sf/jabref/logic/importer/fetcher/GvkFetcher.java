@@ -51,16 +51,16 @@ public class GvkFetcher implements SearchBasedFetcher {
 
             if (isKey) {
                 if (lastWasNoKey) {
-                    query = query + " and ";
+                    query = query + "and ";
                 }
                 query = query + "pica." + key + "=";
             } else {
-                query = query + key;
+                query = query + key + " ";
                 lastWasNoKey = true;
             }
         }
 
-        return query;
+        return query.trim();
     }
 
     protected String getSearchQueryString(String query) throws FetcherException {
@@ -94,10 +94,8 @@ public class GvkFetcher implements SearchBasedFetcher {
             return Collections.emptyList();
         }
 
-        try {
-            try (InputStream is = getQueryURL(query).openStream()) {
-                return (new GVKParser()).parseEntries(is);
-            }
+        try (InputStream is = getQueryURL(query).openStream()) {
+            return (new GVKParser()).parseEntries(is);
         } catch (URISyntaxException e) {
             throw new FetcherException("URI malformed error", e);
         } catch (IOException e) {
@@ -106,5 +104,4 @@ public class GvkFetcher implements SearchBasedFetcher {
             throw new FetcherException("An internal parser error occurred", e);
         }
     }
-
 }

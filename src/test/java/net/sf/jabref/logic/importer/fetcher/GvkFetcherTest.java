@@ -3,6 +3,7 @@ package net.sf.jabref.logic.importer.fetcher;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,27 +21,27 @@ import static org.junit.Assert.assertEquals;
 public class GvkFetcherTest {
 
     private GvkFetcher fetcher;
-    private BibEntry bibEntry;
+    private BibEntry bibEntryPPN591166003;
 
     @Before
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
         fetcher = new GvkFetcher();
 
-        bibEntry = new BibEntry();
-        bibEntry.setType(BibLatexEntryTypes.BOOK);
-        bibEntry.setField("title", "Effective Java");
-        bibEntry.setField("publisher", "Addison-Wesley");
-        bibEntry.setField("year", "2008");
-        bibEntry.setField("author", "Joshua Bloch");
-        bibEntry.setField("series", "The @Java series");
-        bibEntry.setField("address", "Upper Saddle River, NJ [u.a.]");
-        bibEntry.setField("edition", "2. ed., 5. print.");
-        bibEntry.setField("note", "Literaturverz. S. 321 - 325");
-        bibEntry.setField("isbn", "9780321356680");
-        bibEntry.setField("pagetotal", "XXI, 346");
-        bibEntry.setField("ppn_gvk", "591166003");
-        bibEntry.setField("subtitle", "[revised and updated for JAVA SE 6]");
+        bibEntryPPN591166003 = new BibEntry();
+        bibEntryPPN591166003.setType(BibLatexEntryTypes.BOOK);
+        bibEntryPPN591166003.setField("title", "Effective Java");
+        bibEntryPPN591166003.setField("publisher", "Addison-Wesley");
+        bibEntryPPN591166003.setField("year", "2008");
+        bibEntryPPN591166003.setField("author", "Joshua Bloch");
+        bibEntryPPN591166003.setField("series", "The @Java series");
+        bibEntryPPN591166003.setField("address", "Upper Saddle River, NJ [u.a.]");
+        bibEntryPPN591166003.setField("edition", "2. ed., 5. print.");
+        bibEntryPPN591166003.setField("note", "Literaturverz. S. 321 - 325");
+        bibEntryPPN591166003.setField("isbn", "9780321356680");
+        bibEntryPPN591166003.setField("pagetotal", "XXI, 346");
+        bibEntryPPN591166003.setField("ppn_gvk", "591166003");
+        bibEntryPPN591166003.setField("subtitle", "[revised and updated for JAVA SE 6]");
     }
 
     @Test
@@ -82,17 +83,24 @@ public class GvkFetcherTest {
     }
 
     @Test
-    public void testPerformSearch() throws FetcherException {
+    public void testPerformSearchMatchingMultipleEntries() throws FetcherException {
         List<BibEntry> list = fetcher.performSearch("tit effective java");
-        Optional<BibEntry> entryToCompare = Optional.empty();
 
+        //Search result may vary over time. PPN 591166003 is contained for sure.
+        Optional<BibEntry> entryToCompare = Optional.empty();
         for (BibEntry entry : list) {
             if (entry.getFieldOptional("ppn_gvk").get().equals("591166003")) {
                 entryToCompare = Optional.of(entry);
                 break;
             }
         }
-        assertEquals(Optional.of(bibEntry), entryToCompare);
+        assertEquals(Optional.of(bibEntryPPN591166003), entryToCompare);
+    }
+
+    @Test
+    public void testPerformSearch() throws FetcherException {
+        List<BibEntry> list = fetcher.performSearch("ppn 591166003");
+        assertEquals(Collections.singletonList(bibEntryPPN591166003), list);
     }
 
     @Test
