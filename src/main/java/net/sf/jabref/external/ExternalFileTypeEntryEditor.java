@@ -35,7 +35,7 @@ import javax.swing.event.DocumentListener;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.NewFileDialogs;
+import net.sf.jabref.gui.NewFileDialog;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -73,7 +73,7 @@ public class ExternalFileTypeEntryEditor {
             appDir = Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY);
         }
 
-        Optional<Path> path = new NewFileDialogs(fParent, appDir).openDlgAndGetSelectedFile();
+        Optional<Path> path = new NewFileDialog(fParent, appDir).openDialogAndGetSelectedFile();
         path.ifPresent(applicationDir -> {
             if (applicationDir.getParent() != null) {
                 Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, applicationDir.getParent().toString());

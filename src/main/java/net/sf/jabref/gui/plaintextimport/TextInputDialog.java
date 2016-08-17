@@ -114,7 +114,7 @@ import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.EntryMarker;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.NewFileDialogs;
+import net.sf.jabref.gui.NewFileDialog;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -594,8 +594,8 @@ public class TextInputDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                Optional<Path> path = new NewFileDialogs(frame).withExtension(FileExtensions.TXT)
-                        .openDlgAndGetSelectedFile();
+                Optional<Path> path = new NewFileDialog(frame).withExtension(FileExtensions.TXT)
+                        .openDialogAndGetSelectedFile();
                 if (path.isPresent()) {
                     File newFile = path.get().toFile();
                     document.remove(0, document.getLength());

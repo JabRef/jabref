@@ -3,6 +3,7 @@ package net.sf.jabref.gui;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -22,14 +23,12 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-public class NewFileDialogs {
-
+public class NewFileDialog {
     /**
      * Custom confirmation dialog
      * http://stackoverflow.com/a/3729157
      */
     private final JFileChooser fileChooser = new JFileChooser() {
-
         @Override
         public void approveSelection() {
             File file = getSelectedFile();
@@ -58,15 +57,14 @@ public class NewFileDialogs {
 
     private final JFrame parent;
     private final String directory;
-    private FileNameExtensionFilter extFilter;
+    private List<FileNameExtensionFilter> fileFilters = new ArrayList<>();
     private Collection<FileExtensions> extensions = EnumSet.noneOf(FileExtensions.class);
-
 
     /**
      * Creates a new filedialog showing the current working dir {@link JabRefPreferences#WORKING_DIRECTORY}
      * @param parent The parent frame associated with this dialog
      */
-    public NewFileDialogs(JFrame parent) {
+    public NewFileDialog(JFrame parent) {
         this(parent, getWorkingDir());
     }
 
@@ -75,7 +73,7 @@ public class NewFileDialogs {
      * @param parent The parent frame associated with this dialog
      * @param dir The starting directory to show in the dialog
      */
-    public NewFileDialogs(JFrame parent, String dir) {
+    public NewFileDialog(JFrame parent, String dir) {
         Objects.requireNonNull(dir, "Directory must not be null");
 
         this.parent = parent;
@@ -85,39 +83,58 @@ public class NewFileDialogs {
 
     /**
      * Show only directories instead of files and folders
-     * @return NewFileDialogs
+     * @return NewFileDialog
      */
-    public NewFileDialogs dirsOnly() {
+    public NewFileDialog dirsOnly() {
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         return this;
     }
 
     /**
-     * Add a single extension as filter
+     * Add a single extension as file filter
      * @param singleExt The extension
-     * @return NewFileDialogs
+     * @return NewFileDialog
      */
-    public NewFileDialogs withExtension(FileExtensions singleExt) {
+    public NewFileDialog withExtension(FileExtensions singleExt) {
         withExtensions(EnumSet.of(singleExt));
         return this;
     }
 
-    public NewFileDialogs withExtensions(Collection<FileExtensions> fileExtensions) {
+    /**
+     * Add a multiple extensions as file filter
+     * @param fileExtensions The extensions
+     * @return NewFileDialog
+     */
+    public NewFileDialog withExtensions(Collection<FileExtensions> fileExtensions) {
         this.extensions = fileExtensions;
 
         for (FileExtensions ext : fileExtensions) {
-            extFilter = new FileNameExtensionFilter(ext.getDescription(), ext.getExtensions());
+            FileNameExtensionFilter extFilter = new FileNameExtensionFilter(ext.getDescription(), ext.getExtensions());
             fileChooser.addChoosableFileFilter(extFilter);
+            fileFilters.add(extFilter);
         }
 
         return this;
     }
 
     /**
-     * Updates the working directory preference
-     * @return NewFileDialogs
+     * Sets the default file filter extension for the file dialog.
+     * If the desired extension is not found nothing is changed.
+     *
+     * @param extension the file extension
      */
-    public NewFileDialogs updateWorkingDirPref() {
+    public void setDefaultExtension(FileExtensions extension) {
+        Arrays.stream(fileChooser.getChoosableFileFilters())
+                .filter(f -> Objects.equals(f.getDescription(), extension.getDescription()))
+                .findFirst()
+                .ifPresent(fileChooser::setFileFilter);
+    }
+
+    /**
+     * Updates the working directory preference
+     * @return NewFileDialog
+     */
+    public NewFileDialog updateWorkingDirPref() {
         Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, this.directory);
         return this;
     }
@@ -126,7 +143,7 @@ public class NewFileDialogs {
      * Shows an {@link JFileChooser#OPEN_DIALOG} and allows to select multiple files
      * @return List containing the paths of all files or an empty list if dialog is canceled
      */
-    public List<String> showDlgAndGetMultipleFiles() {
+    public List<String> showDialogAndGetMultipleFiles() {
         fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
         fileChooser.setMultiSelectionEnabled(true);
 
@@ -138,24 +155,23 @@ public class NewFileDialogs {
         }
 
         return Collections.emptyList();
-
     }
 
     /**
      * Shows an {@link JFileChooser#OPEN_DIALOG} and allows to select a single file/folder
      * @return The path of the selected file/folder or {@link Optional#empty()} if dialog is aborted
      */
-    public Optional<Path> openDlgAndGetSelectedFile() {
+    public Optional<Path> openDialogAndGetSelectedFile() {
         fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
 
         if (showDialogAndIsAccepted()) {
             return Optional.of(fileChooser.getSelectedFile().toPath());
         }
+
         return Optional.empty();
     }
 
     /**
-     *
      * Shows an {@link JFileChooser#SAVE_DIALOG} and allows to save a new file <br>
      * If an extension is provided, adds the extension to the file <br>
      * Selecting an existing file will show an overwrite dialog
@@ -165,10 +181,11 @@ public class NewFileDialogs {
         fileChooser.setDialogType(JFileChooser.SAVE_DIALOG);
         if (showDialogAndIsAccepted()) {
             File file = fileChooser.getSelectedFile();
-            if (!extensions.isEmpty() && !fileChooser.accept(file)) {
 
+            if (!extensions.isEmpty() && !fileChooser.accept(file)) {
                 return Optional.of(Paths.get(file.getPath() + extensions.iterator().next().getFirstExtensionWithDot()));
             }
+
             return Optional.of(file.toPath());
         }
         return Optional.empty();

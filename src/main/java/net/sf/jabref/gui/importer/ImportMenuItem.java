@@ -31,7 +31,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryMarker;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.NewFileDialogs;
+import net.sf.jabref.gui.NewFileDialog;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.importer.ImportFormatReader;
@@ -103,7 +103,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         public void init() {
             importError = null;
 
-            filenames = new NewFileDialogs(frame).updateWorkingDirPref().showDlgAndGetMultipleFiles();
+            filenames = new NewFileDialog(frame).updateWorkingDirPref().showDialogAndGetMultipleFiles();
 
             if (!filenames.isEmpty()) {
                 frame.block();

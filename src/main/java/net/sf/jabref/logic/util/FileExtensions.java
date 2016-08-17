@@ -5,14 +5,11 @@ import java.util.StringJoiner;
 import net.sf.jabref.logic.l10n.Localization;
 
 /**
+ * This enum contains all kind of file extensions for open and save dialogs.
  *
- *
- *This enum contains all kind of file extensions for open and save dialogs
- *Important: Enter the extension without a dot!
- *The dot is added implicit
+ * Important: Enter the extension without a dot! The dot is added implicitly.
  */
 public enum FileExtensions {
-
     //important: No dot before the extension!
     BIBTEX_DB(String.format("%1s %2s", "BibTex", Localization.lang("Database")), "bib"),
     BIBTEXML(Localization.lang("%0 file", "BibTeXML"), "bibx"),
@@ -46,7 +43,6 @@ public enum FileExtensions {
     private final String[] extension;
     private final String description;
 
-
     private FileExtensions(String description, String... extension) {
         this.extension = extension;
         this.description = description;
@@ -58,7 +54,6 @@ public enum FileExtensions {
     }
 
     public String getDescription() {
-
         StringJoiner sj = new StringJoiner(", ", description + " (", ")");
         for (String ext : extension) {
             sj.add("*." + ext);

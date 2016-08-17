@@ -45,7 +45,7 @@ import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.NewFileDialogs;
+import net.sf.jabref.gui.NewFileDialog;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
@@ -103,8 +103,8 @@ public class ImportCustomizationDialog extends JDialog {
         addFromFolderButton.addActionListener(e -> {
             CustomImporter importer = new CustomImporter();
 
-            Optional<Path> selectedFile = new NewFileDialogs(frame).withExtension(FileExtensions.CLASS)
-                    .openDlgAndGetSelectedFile();
+            Optional<Path> selectedFile = new NewFileDialog(frame).withExtension(FileExtensions.CLASS)
+                    .openDialogAndGetSelectedFile();
 
             if (selectedFile.isPresent() && (selectedFile.get().getParent() != null)) {
                 importer.setBasePath(selectedFile.get().getParent().toString());
@@ -133,8 +133,8 @@ public class ImportCustomizationDialog extends JDialog {
 
         JButton addFromJarButton = new JButton(Localization.lang("Add from JAR"));
         addFromJarButton.addActionListener(e -> {
-            Optional<Path> jarZipFile = new NewFileDialogs(frame)
-                    .withExtensions(EnumSet.of(FileExtensions.ZIP, FileExtensions.JAR)).openDlgAndGetSelectedFile();
+            Optional<Path> jarZipFile = new NewFileDialog(frame)
+                    .withExtensions(EnumSet.of(FileExtensions.ZIP, FileExtensions.JAR)).openDialogAndGetSelectedFile();
 
             if (jarZipFile.isPresent()) {
                 try (ZipFile zipFile = new ZipFile(jarZipFile.get().toFile(), ZipFile.OPEN_READ)) {

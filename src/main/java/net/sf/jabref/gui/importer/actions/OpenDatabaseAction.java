@@ -37,7 +37,7 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.NewFileDialogs;
+import net.sf.jabref.gui.NewFileDialog;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.importer.ParserResultWarningDialog;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -97,8 +97,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         if (showDialog) {
 
-            List<String> chosenStrings = new NewFileDialogs(frame).withExtension(FileExtensions.BIBTEX_DB)
-                    .showDlgAndGetMultipleFiles();
+            List<String> chosenStrings = new NewFileDialog(frame).withExtension(FileExtensions.BIBTEX_DB)
+                    .showDialogAndGetMultipleFiles();
 
             for (String chosen : chosenStrings) {
 

@@ -30,7 +30,7 @@ import javax.swing.JOptionPane;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.NewFileDialogs;
+import net.sf.jabref.gui.NewFileDialog;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
@@ -142,7 +142,7 @@ public class MoveFileAction extends AbstractAction {
                     }
                     chosenFile = sb.toString();
                 } else {
-                    Optional<Path> path = new NewFileDialogs(frame, file.getPath()).saveNewFile();
+                    Optional<Path> path = new NewFileDialog(frame, file.getPath()).saveNewFile();
                     if (path.isPresent()) {
                         chosenFile = path.get().toString();
                     } else {

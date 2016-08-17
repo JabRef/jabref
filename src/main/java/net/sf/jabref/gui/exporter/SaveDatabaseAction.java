@@ -32,7 +32,7 @@ import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.NewFileDialogs;
+import net.sf.jabref.gui.NewFileDialog;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.CallBack;
 import net.sf.jabref.gui.worker.Worker;
@@ -312,14 +312,17 @@ public class SaveDatabaseAction extends AbstractWorker {
     public void saveAs() throws Throwable {
         File file = null;
         while (file == null) {
+            // configure file dialog
+            NewFileDialog dialog = new NewFileDialog(frame);
+            dialog.withExtension(FileExtensions.BIBTEX_DB);
+            dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
 
-            Optional<Path> path = new NewFileDialogs(frame).withExtension(FileExtensions.BIBTEX_DB).saveNewFile();
+            Optional<Path> path = dialog.saveNewFile();
             if (path.isPresent()) {
                 file = path.get().toFile();
-
             } else {
                 canceled = true;
-                return; // canceled
+                return;
             }
         }
 

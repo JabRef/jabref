@@ -39,7 +39,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefException;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.NewFileDialogs;
+import net.sf.jabref.gui.NewFileDialog;
 import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.logic.exporter.ExportFormats;
@@ -166,7 +166,7 @@ public class PreferencesDialog extends JDialog {
         exportPreferences.setToolTipText(Localization.lang("Export preferences to file"));
         exportPreferences.addActionListener(e -> {
 
-            Optional<Path> path = new NewFileDialogs(frame, System.getProperty("user.home"))
+            Optional<Path> path = new NewFileDialog(frame, System.getProperty("user.home"))
                     .withExtension(FileExtensions.XML).saveNewFile();
             path.ifPresent(exportFile -> {
                 try {
@@ -182,8 +182,8 @@ public class PreferencesDialog extends JDialog {
         importPreferences.setToolTipText(Localization.lang("Import preferences from file"));
         importPreferences.addActionListener(e -> {
 
-            Optional<Path> fileName = new NewFileDialogs(frame, System.getProperty("user.home"))
-                    .withExtension(FileExtensions.XML).openDlgAndGetSelectedFile();
+            Optional<Path> fileName = new NewFileDialog(frame, System.getProperty("user.home"))
+                    .withExtension(FileExtensions.XML).openDialogAndGetSelectedFile();
 
             if (fileName.isPresent()) {
                 try {
