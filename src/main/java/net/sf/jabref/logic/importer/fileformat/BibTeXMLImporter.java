@@ -33,10 +33,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-
 import net.sf.jabref.importer.fileformat.bibtexml.Entry;
 import net.sf.jabref.importer.fileformat.bibtexml.File;
 import net.sf.jabref.importer.fileformat.bibtexml.Inbook;
@@ -100,89 +96,69 @@ public class BibTeXMLImporter extends ImportFormat {
 
         try {
             JAXBContext context = JAXBContext.newInstance("net.sf.jabref.importer.fileformat.bibtexml");
-            XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
-            XMLStreamReader xmlReader = xmlInputFactory.createXMLStreamReader(reader);
-
-            //go to the root element
-            while (!xmlReader.isStartElement()) {
-                xmlReader.next();
-            }
-
             Unmarshaller unmarshaller = context.createUnmarshaller();
-            File file = (File) unmarshaller.unmarshal(xmlReader);
+            File file = (File) unmarshaller.unmarshal(reader);
 
             List<Entry> entries = file.getEntry();
             Map<String, String> fields = new HashMap<>();
 
             for (Entry entry : entries) {
-                BibEntry bibEntry = new BibEntry(DEFAULT_BIBTEXENTRY_ID);
+                BibEntry bibEntry = new BibEntry();
                 if (entry.getArticle() != null) {
                     bibEntry.setType("article");
                     parse(entry.getArticle(), fields);
-                }
-                if (entry.getBook() != null) {
+                } else if (entry.getBook() != null) {
                     bibEntry.setType("book");
                     parse(entry.getBook(), fields);
-                }
-                if (entry.getBooklet() != null) {
+                } else if (entry.getBooklet() != null) {
                     bibEntry.setType("booklet");
                     parse(entry.getBooklet(), fields);
-                }
-                if (entry.getConference() != null) {
+                } else if (entry.getConference() != null) {
                     bibEntry.setType("conference");
                     parse(entry.getConference(), fields);
-                }
-                if (entry.getInbook() != null) {
+                } else if (entry.getInbook() != null) {
                     bibEntry.setType("inbook");
                     parseInbook(entry.getInbook(), fields);
-                }
-                if (entry.getIncollection() != null) {
+                } else if (entry.getIncollection() != null) {
                     bibEntry.setType("incollection");
                     Incollection incollection = entry.getIncollection();
                     if (incollection.getChapter() != null) {
                         fields.put(FieldName.CHAPTER, String.valueOf(incollection.getChapter()));
                     }
                     parse(incollection, fields);
-                }
-                if (entry.getInproceedings() != null) {
+                } else if (entry.getInproceedings() != null) {
                     bibEntry.setType("inproceedings");
                     parse(entry.getInproceedings(), fields);
-                }
-                if (entry.getManual() != null) {
+                } else if (entry.getManual() != null) {
                     bibEntry.setType("manual");
                     parse(entry.getManual(), fields);
-                }
-                if (entry.getMastersthesis() != null) {
+                } else if (entry.getMastersthesis() != null) {
                     bibEntry.setType("mastersthesis");
                     parse(entry.getMastersthesis(), fields);
-                }
-                if (entry.getMisc() != null) {
+                } else if (entry.getMisc() != null) {
                     bibEntry.setType("misc");
                     parse(entry.getMisc(), fields);
-                }
-                if (entry.getPhdthesis() != null) {
+                } else if (entry.getPhdthesis() != null) {
                     bibEntry.setType("phdthesis");
                     parse(entry.getPhdthesis(), fields);
-                }
-                if (entry.getProceedings() != null) {
+                } else if (entry.getProceedings() != null) {
                     bibEntry.setType("proceedings");
                     parse(entry.getProceedings(), fields);
-                }
-                if (entry.getTechreport() != null) {
+                } else if (entry.getTechreport() != null) {
                     bibEntry.setType("techreport");
                     parse(entry.getTechreport(), fields);
-                }
-                if (entry.getUnpublished() != null) {
+                } else if (entry.getUnpublished() != null) {
                     bibEntry.setType("unpublished");
                     parse(entry.getUnpublished(), fields);
                 }
+
                 if (entry.getId() != null) {
                     bibEntry.setCiteKey(entry.getId());
                 }
                 bibEntry.setField(fields);
                 bibItems.add(bibEntry);
             }
-        } catch (JAXBException | XMLStreamException e) {
+        } catch (JAXBException e) {
             LOGGER.error("Error with XML parser configuration", e);
             return ParserResult.fromErrorMessage(e.getLocalizedMessage());
         }
@@ -213,7 +189,7 @@ public class BibTeXMLImporter extends ImportFormat {
                     continue;
                 } else if (isMethodToIgnore(method.getName())) {
                     continue;
-                } else if (method.getName().contains("get")) {
+                } else if (method.getName().startsWith("get")) {
                     putIfValueNotNull(fields, method.getName().replace("get", ""), (String) method.invoke(entryType));
                 }
             } catch (IllegalArgumentException | InvocationTargetException | IllegalAccessException e) {
@@ -246,11 +222,12 @@ public class BibTeXMLImporter extends ImportFormat {
                 putIfValueNotNull(fields, localName, value);
             } else if (elementValue instanceof BigInteger) {
                 BigInteger value = (BigInteger) elementValue;
-                if (FieldName.NUMBER.equals(localName)) {
-                    putNumber(fields, value);
-                }
-                if (FieldName.CHAPTER.equals(localName) && (value != null)) {
-                    fields.put(FieldName.CHAPTER, String.valueOf(value));
+                if (value != null) {
+                    if (FieldName.NUMBER.equals(localName)) {
+                        fields.put(FieldName.NUMBER, String.valueOf(value));
+                    } else if (FieldName.CHAPTER.equals(localName)) {
+                        fields.put(FieldName.CHAPTER, String.valueOf(value));
+                    }
                 }
             } else if (elementValue instanceof XMLGregorianCalendar) {
                 XMLGregorianCalendar value = (XMLGregorianCalendar) elementValue;

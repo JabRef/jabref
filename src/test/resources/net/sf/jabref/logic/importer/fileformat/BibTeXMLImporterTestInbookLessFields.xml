@@ -17,6 +17,7 @@
     <bibtex:keywords>java</bibtex:keywords>
     <bibtex:edition>10</bibtex:edition>
     <bibtex:note>some note</bibtex:note>
+    <bibtex:school>should not be mapped</bibtex:school>
   </bibtex:inbook>
 </bibtex:entry>
 </bibtex:file>
