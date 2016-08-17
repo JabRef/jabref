@@ -45,6 +45,7 @@ import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.io.FileBasedLock;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
@@ -134,24 +135,21 @@ public class SaveDatabaseAction extends AbstractWorker {
                     return;
                 }
 
-                // Save the database:
-                success = saveDatabase(panel.getBibDatabaseContext().getDatabaseFile(), false,
-                        panel.getBibDatabaseContext().getMetaData().getEncoding());
+                // Save the database
+                success = saveDatabase(panel.getBibDatabaseContext().getDatabaseFile(), false, panel.getBibDatabaseContext().getMetaData().getEncoding());
 
                 Globals.getFileUpdateMonitor().updateTimeStamp(panel.getFileMonitorHandle());
             } else {
-                // No file lock
                 success = false;
                 fileLockedError = true;
             }
+
+            // release panel from save status
             panel.setSaving(false);
+
             if (success) {
                 panel.getUndoManager().markUnchanged();
-
-                if (!AutoSaveManager.deleteAutoSaveFile(panel)) {
-                    //System.out.println("Deletion of autosave file failed");
-                } /* else
-                     System.out.println("Deleted autosave file (if it existed)");*/
+                AutoSaveManager.deleteAutoSaveFile(panel);
                 // (Only) after a successful save the following
                 // statement marks that the base is unchanged
                 // since last save:
@@ -159,69 +157,69 @@ public class SaveDatabaseAction extends AbstractWorker {
                 panel.setBaseChanged(false);
                 panel.setUpdatedExternally(false);
             }
-        } catch (SaveException ex2) {
-            if (ex2 == SaveException.FILE_LOCKED) {
+        } catch (SaveException ex) {
+            if (ex == SaveException.FILE_LOCKED) {
                 success = false;
                 fileLockedError = true;
                 return;
             }
-            LOGGER.error("Problem saving file", ex2);
+            LOGGER.error("Problem saving file", ex);
         }
     }
 
     private boolean saveDatabase(File file, boolean selectedOnly, Charset encoding) throws SaveException {
         SaveSession session;
+
+        // block user input
         frame.block();
+
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withEncoding(encoding);
             BibtexDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
+
             if (selectedOnly) {
-                session = databaseWriter.savePartOfDatabase(panel.getBibDatabaseContext(), panel.getSelectedEntries(),
-                        prefs);
+                session = databaseWriter.savePartOfDatabase(panel.getBibDatabaseContext(), panel.getSelectedEntries(), prefs);
             } else {
                 session = databaseWriter.saveDatabase(panel.getBibDatabaseContext(), prefs);
-
             }
+
             panel.registerUndoableChanges(session);
 
-        } catch (UnsupportedCharsetException ex2) {
+        } catch (UnsupportedCharsetException ex) {
             JOptionPane.showMessageDialog(frame,
                     Localization.lang("Could not save file.")
                             + Localization.lang("Character encoding '%0' is not supported.", encoding.displayName()),
                     Localization.lang("Save database"), JOptionPane.ERROR_MESSAGE);
+            // FIXME: rethrow anti-pattern
             throw new SaveException("rt");
         } catch (SaveException ex) {
             if (ex == SaveException.FILE_LOCKED) {
                 throw ex;
             }
             if (ex.specificEntry()) {
-                // Error occured during processing of
-                // be. Highlight it:
-                int row = panel.getMainTable().findEntry(ex.getEntry());
-                int topShow = Math.max(0, row - 3);
-                panel.getMainTable().setRowSelectionInterval(row, row);
-                panel.getMainTable().scrollTo(topShow);
-                panel.showEntry(ex.getEntry());
+                BibEntry entry = ex.getEntry();
+                // Error occured during processing of an entry. Highlight it!
+                highlightEntry(entry);
             } else {
-                LOGGER.error("Problem saving file", ex);
+                LOGGER.error("A problem occured when trying to save the file", ex);
             }
 
             JOptionPane.showMessageDialog(frame, Localization.lang("Could not save file.") + ".\n" + ex.getMessage(),
                     Localization.lang("Save database"), JOptionPane.ERROR_MESSAGE);
+            // FIXME: rethrow anti-pattern
             throw new SaveException("rt");
-
         } finally {
+            // re-enable user input
             frame.unblock();
         }
 
-        boolean commit = true;
+        // handle encoding problems
+        boolean success = true;
         if (!session.getWriter().couldEncodeAll()) {
-            FormBuilder builder = FormBuilder.create()
-                    .layout(new FormLayout("left:pref, 4dlu, fill:pref", "pref, 4dlu, pref"));
+            FormBuilder builder = FormBuilder.create().layout(new FormLayout("left:pref, 4dlu, fill:pref", "pref, 4dlu, pref"));
             JTextArea ta = new JTextArea(session.getWriter().getProblemCharacters());
             ta.setEditable(false);
-            builder.add(Localization.lang("The chosen encoding '%0' could not encode the following characters:",
-                    session.getEncoding().displayName())).xy(1, 1);
+            builder.add(Localization.lang("The chosen encoding '%0' could not encode the following characters:", session.getEncoding().displayName())).xy(1, 1);
             builder.add(ta).xy(3, 1);
             builder.add(Localization.lang("What do you want to do?")).xy(1, 3);
             String tryDiff = Localization.lang("Try different encoding");
@@ -235,19 +233,19 @@ public class SaveDatabaseAction extends AbstractWorker {
                         Localization.lang("Save database"), JOptionPane.QUESTION_MESSAGE, null,
                         Encodings.ENCODINGS_DISPLAYNAMES, encoding);
                 if (choice == null) {
-                    commit = false;
+                    success = false;
                 } else {
                     Charset newEncoding = Charset.forName((String) choice);
                     return saveDatabase(file, selectedOnly, newEncoding);
                 }
             } else if (answer == JOptionPane.CANCEL_OPTION) {
-                commit = false;
+                success = false;
             }
-
         }
 
+        // backup file?
         try {
-            if (commit) {
+            if (success) {
                 session.commit(file.toPath());
                 panel.getBibDatabaseContext().getMetaData().setEncoding(encoding); // Make sure to remember which encoding we used.
             } else {
@@ -263,11 +261,19 @@ public class SaveDatabaseAction extends AbstractWorker {
                 session.commit(file.toPath());
                 panel.getBibDatabaseContext().getMetaData().setEncoding(encoding);
             } else {
-                commit = false;
+                success = false;
             }
         }
 
-        return commit;
+        return success;
+    }
+
+    private void highlightEntry(BibEntry entry) {
+        int row = panel.getMainTable().findEntry(entry);
+        int topShow = Math.max(0, row - 3);
+        panel.getMainTable().setRowSelectionInterval(row, row);
+        panel.getMainTable().scrollTo(topShow);
+        panel.showEntry(entry);
     }
 
     /**
@@ -276,11 +282,11 @@ public class SaveDatabaseAction extends AbstractWorker {
      */
     public void runCommand() throws Throwable {
         // This part uses Spin's features:
-        Worker wrk = getWorker();
+        Worker worker = getWorker();
         // The Worker returned by getWorker() has been wrapped
         // by Spin.off(), which makes its methods be run in
         // a different thread from the EDT.
-        CallBack clb = getCallBack();
+        CallBack callback = getCallBack();
 
         init(); // This method runs in this same thread, the EDT.
         // Useful for initial GUI actions, like printing a message.
@@ -288,11 +294,10 @@ public class SaveDatabaseAction extends AbstractWorker {
         // The CallBack returned by getCallBack() has been wrapped
         // by Spin.over(), which makes its methods be run on
         // the EDT.
-        wrk.run(); // Runs the potentially time-consuming action
+        worker.run(); // Runs the potentially time-consuming action
         // without freezing the GUI. The magic is that THIS line
         // of execution will not continue until run() is finished.
-        clb.update(); // Runs the update() method on the EDT.
-
+        callback.update(); // Runs the update() method on the EDT.
     }
 
     public void save() throws Throwable {

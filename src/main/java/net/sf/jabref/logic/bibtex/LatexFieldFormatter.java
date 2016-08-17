@@ -269,7 +269,6 @@ public class LatexFieldFormatter {
     }
 
     private static void checkBraces(String text) throws IllegalArgumentException {
-
         List<Integer> left = new ArrayList<>(5);
         List<Integer> right = new ArrayList<>(5);
         int current = -1;

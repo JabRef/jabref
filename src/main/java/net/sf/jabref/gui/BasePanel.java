@@ -1049,8 +1049,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
 
             registerUndoableChanges(session);
-
-        } catch (UnsupportedCharsetException ex2) {
+        }
+        // FIXME: not sure if this is really thrown anywhere
+        catch (UnsupportedCharsetException ex) {
             JOptionPane.showMessageDialog(frame,
                     Localization.lang("Could not save file.") + ' '
                             + Localization.lang("Character encoding '%0' is not supported.", enc.displayName()),
@@ -1058,8 +1059,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             throw new SaveException("rt");
         } catch (SaveException ex) {
             if (ex.specificEntry()) {
-                // Error occurred during processing of
-                // be. Highlight it:
+                // Error occurred during processing of the entry. Highlight it:
                 final int row = mainTable.findEntry(ex.getEntry());
                 final int topShow = Math.max(0, row - 3);
                 mainTable.setRowSelectionInterval(row, row);

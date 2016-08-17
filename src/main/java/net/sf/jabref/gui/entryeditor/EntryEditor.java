@@ -1164,10 +1164,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 FieldEditor fieldEditor = (FieldEditor) event.getSource();
                 boolean set;
                 // Trim the whitespace off this value
-                String currentText = fieldEditor.getText();
-                String trim = currentText.trim();
-                if (!trim.isEmpty()) {
-                    toSet = trim;
+                String currentText = fieldEditor.getText().trim();
+                if (!currentText.isEmpty()) {
+                    toSet = currentText;
                 }
 
                 // We check if the field has changed, since we don't want to
