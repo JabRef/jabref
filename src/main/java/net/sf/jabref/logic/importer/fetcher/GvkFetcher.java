@@ -8,11 +8,9 @@ import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -44,20 +42,25 @@ public class GvkFetcher implements SearchBasedFetcher {
     }
 
     private String getSearchQueryStringForComplexQuery(List<String> queryList) throws FetcherException {
-        StringJoiner gvkQueryJoiner = new StringJoiner(" and ");
+        String query = "";
+        boolean lastWasNoKey = false;
+        boolean isKey;
 
-        Iterator<String> iterator = queryList.iterator();
-        String query = iterator.next();
-        // query is a searchKey
-        while (iterator.hasNext()) {
-            String searchKey = query;
-            StringJoiner parameterJoiner = new StringJoiner(" ");
-            while (iterator.hasNext() && (!searchKeys.contains((query = iterator.next())))) {
-                parameterJoiner.add(query);
+        for (String key : queryList) {
+            isKey = searchKeys.contains(key);
+
+            if (isKey) {
+                if (lastWasNoKey) {
+                    query = query + " and ";
+                }
+                query = query + "pica." + key + "=";
+            } else {
+                query = query + key;
+                lastWasNoKey = true;
             }
-            gvkQueryJoiner.add("pica.".concat(searchKey).concat("=").concat(parameterJoiner.toString()));
         }
-        return gvkQueryJoiner.toString();
+
+        return query;
     }
 
     protected String getSearchQueryString(String query) throws FetcherException {
