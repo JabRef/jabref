@@ -293,7 +293,7 @@ public class HTMLUnicodeConversionMaps {
             {"8230", "hellip", "{\\ldots}"}, // horizontal ellipsis = three dot leader,
             //                                    U+2026 ISOpub
             {"8242", "prime", "$\\prime$"}, // prime = minutes = feet, U+2032 ISOtech
-            {"8243", "Prime", "${''}$"}, // double prime = seconds = inches,
+            {"8243", "Prime", "$\\prime\\prime$"}, // double prime = seconds = inches,
             //                                    U+2033 ISOtech
             {"8254", "oline", "{\\={}}"}, // overline = spacing overscore,
             //                                    U+203E NEW
@@ -364,7 +364,7 @@ public class HTMLUnicodeConversionMaps {
             {"8745", "cap", "$\\cap$"}, // intersection = cap, U+2229 ISOtech
             {"8746", "cup", "$\\cup$"}, // union = cup, U+222A ISOtech
             {"8747", "int", "$\\int$"}, // integral, U+222B ISOtech
-            {"8756", "there4", "$\\uptherefore$"}, // therefore, U+2234 ISOtech; only in LaTeX package MnSymbol
+            {"8756", "there4", "$\\therefore$"}, // therefore, U+2234 ISOtech; AMSSymb
             {"8764", "sim", "$\\sim$"}, // tilde operator = varies with = similar to,
             //                                    U+223C ISOtech
             /*  tilde operator is NOT the same character as the tilde, U+007E,
@@ -382,7 +382,7 @@ public class HTMLUnicodeConversionMaps {
             /*    note that nsup, 'not a superset of, U+2283' is not covered by the Symbol
              font encoding and is not included. Should it be, for symmetry?
              It is in ISOamsn   */
-            {"8836", "nsub", "$\\nsubset$"}, // not a subset of, U+2284 ISOamsn
+            {"8836", "nsub", "$\\not\\subset$"}, // not a subset of, U+2284 ISOamsn
             {"8838", "sube", "$\\subseteq$"}, // subset of or equal to, U+2286 ISOtech
             {"8839", "supe", "$\\supseteq$"}, // superset of or equal to,
             //                                    U+2287 ISOtech
@@ -473,10 +473,10 @@ public class HTMLUnicodeConversionMaps {
             {"40", "lpar", "("}, // Left bracket
             {"41", "rpar", ")"}, // Right bracket
             {"42", "", "*"}, // Asterisk
-            {"43", "plus", "\\+"}, // Plus
+            {"43", "plus", "+"}, // Plus
             {"44", "comma", ","}, // Comma
             {"45", "hyphen", "-"}, // Hyphen
-            {"46", "period", "\\."}, // Period
+            {"46", "period", "."}, // Period
             {"47", "slash", "/"}, // Slash (solidus)
             {"58", "colon", ":"}, // Colon
             {"59", "semi", ";"}, // Semi colon
@@ -512,8 +512,8 @@ public class HTMLUnicodeConversionMaps {
             {"263", "cacute", "{\\'{c}}"}, // small C with acute
             {"264", "Ccirc", "{{\\^{C}}}"}, // capital C with circumflex
             {"265", "ccirc", "{\\^{c}}"}, // small C with circumflex
-            {"266", "Cdot", "{{\\\\.{C}}}"}, // capital C with dot above
-            {"267", "cdot", "{\\\\.{c}}"}, // small C with dot above
+            {"266", "Cdot", "{{\\.{C}}}"}, // capital C with dot above
+            {"267", "cdot", "{\\.{c}}"}, // small C with dot above
             {"268", "Ccaron", "{{\\v{C}}}"}, // capital C with caron
             {"269", "ccaron", "{\\v{c}}"}, // small C with caron
             {"270", "", "{{\\v{D}}}"}, // capital D with caron
@@ -566,8 +566,8 @@ public class HTMLUnicodeConversionMaps {
             {"316", "", "{\\c{l}}"}, // small l with cedilla
             {"317", "", "{{\\v{L}}}"}, // capital L with caron
             {"318", "", "{\\v{l}}"}, // small l with caron
-            {"319", "Lmidot", "{\\Lmidot}"}, // upper case L with mid dot
-            {"320", "lmidot", "{\\lmidot}"}, // lower case l with stroke
+            //{"319", "Lmidot", "{\\Lmidot}"}, // upper case L with mid dot
+            //{"320", "lmidot", "{\\lmidot}"}, // lower case l with mid dot
             {"321", "Lstrok", "{{\\L}}"}, // upper case L with stroke
             {"322", "lstrok", "{{\\l}}"}, // lower case l with stroke
             {"323", "Nacute", "{{\\'{N}}}"}, // upper case N with acute
@@ -600,7 +600,7 @@ public class HTMLUnicodeConversionMaps {
             {"381", "Zcaron", "{{\\v{Z}}}"}, // capital Z with caron
             {"382", "zcaron", "{\\v{z}}"}, // small z with caron
 
-            {"402", "fnof", "\textit{f}"}, // latin small f with hook = function
+            {"402", "fnof", "\\textit{f}"}, // latin small f with hook = function
 
             {"405", "", "{{\\hv}}"}, // small letter Hv
 
@@ -629,8 +629,8 @@ public class HTMLUnicodeConversionMaps {
             {"733", "dblac", "{{\\H{}}}"}, // Double acute
             {"949", "epsi", "$\\epsilon$"}, // Epsilon - double check
             {"1013", "epsiv", "$\\varepsilonup$"}, // lunate epsilon, requires txfonts
-            {"1055", "", "{{\\cyrchar\\CYRP}}"}, // Cyrillic capital Pe
-            {"1082", "", "{\\cyrchar\\cyrk}"}, // Cyrillic small Ka
+            //{"1055", "", "{{\\cyrchar\\CYRP}}"}, // Cyrillic capital Pe
+            //{"1082", "", "{\\cyrchar\\cyrk}"}, // Cyrillic small Ka
             // {"2013", "", ""},    // NKO letter FA -- Maybe en dash = 0x2013?
             // {"2014", "", ""},    // NKO letter FA -- Maybe em dash = 0x2014?
             {"8192", "", "\\hspace{0.5em}"}, // en quad
@@ -639,16 +639,16 @@ public class HTMLUnicodeConversionMaps {
             {"8197", "", "\\hspace{0.25em}"}, // Four-Per-Em Space
             {"8198", "", "\\hspace{0.167em}"}, // Six-Per-Em Space
             {"8208", "hyphen", "-"}, // Hyphen
-            {"8229", "nldr", "\\.\\."}, // Double dots - en leader
+            {"8229", "nldr", "\\.{}\\.{}"}, // Double dots - en leader
             {"8241", "", "{\\textpertenthousand}"}, // per ten thousands sign
-            {"8244", "", "{\\prime\\prime\\prime}"}, // triple prime
+            {"8244", "", "{$\\prime\\prime\\prime$}"}, // triple prime
             {"8251", "", "{\\textreferencemark}"}, {"8253", "", "{\\textinterrobang}"},
             {"8450", "complexes", "$\\mathbb{C}$"}, // double struck capital C -- requires e.g. amsfonts
-            {"8451", "", "$\\deg${{C}}"}, // Degree Celsius
-            {"8459", "Hscr", "{{$\\mathcal{H}}}$"}, // script capital H -- possibly use \mathscr
+            {"8451", "", "$\\textcelsius"}, // Degree Celsius
+            {"8459", "Hscr", "{{$\\mathcal{H}$}}"}, // script capital H -- possibly use \mathscr
             {"8460", "Hfr", "{{$\\mathbb{H}$}}"}, // black letter capital H -- requires e.g. amsfonts
             {"8466", "Lscr", "{{$\\mathcal{L}$}}"}, // script capital L -- possibly use \mathscr
-            {"8467", "ell", "{\\ell}"}, // script small l
+            {"8467", "ell", "{$\\ell$}"}, // script small l
             {"8469", "naturals", "{{$\\mathbb{N}$}}"}, // double struck capital N -- requires e.g. amsfonts
             {"8474", "Qopf", "{{$\\mathbb{Q}$}}"}, // double struck capital Q -- requires e.g. amsfonts
             {"8477", "reals", "{{$\\mathbb{R}$}}"}, // double struck capital R -- requires e.g. amsfonts
