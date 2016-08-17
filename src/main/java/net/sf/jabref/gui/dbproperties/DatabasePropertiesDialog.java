@@ -42,9 +42,11 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.SaveOrderConfigDisplay;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.cleanup.FieldFormatterCleanupsPanel;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -135,6 +137,8 @@ public class DatabasePropertiesDialog extends JDialog {
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);
+        bb.addRelatedGap();
+        bb.addButton(new HelpAction(HelpFile.DATABASE_PROPERTIES).getHelpButton());
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
