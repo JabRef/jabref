@@ -83,7 +83,6 @@ public class SaveDatabaseAction extends AbstractWorker {
         if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
             saveAs();
         } else {
-
             // Check for external modifications: if true, save not performed so do not tell the user a save is underway but return instead.
             if (checkExternalModification()) {
                 return;
@@ -121,15 +120,13 @@ public class SaveDatabaseAction extends AbstractWorker {
         }
 
         try {
-
-            // Make sure the current edit is stored:
+            // Make sure the current edit is stored
             panel.storeCurrentEdit();
 
-            // If the option is set, autogenerate keys for all entries that are
-            // lacking keys, before saving:
+            // If set in preferences, generate missing BibTeX keys
             panel.autoGenerateKeysBeforeSaving();
 
-            if (FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile().toPath(), 10)) {
+            if (FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile().toPath())) {
                 // Check for external modifications to alleviate multiuser concurrency issue when near
                 // simultaneous saves occur to a shared database file: if true, do not perform the save
                 // rather return instead.
@@ -386,7 +383,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
                 JabRefExecutorService.INSTANCE.execute(() -> {
 
-                    if (!FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile().toPath(), 10)) {
+                    if (!FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile().toPath())) {
                         // TODO: GUI handling of the situation when the externally modified file keeps being locked.
                         LOGGER.error("File locked, this will be trouble.");
                     }

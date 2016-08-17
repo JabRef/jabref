@@ -102,7 +102,7 @@ public class FileSaveSession extends SaveSession {
                 try {
                     if (FileBasedLock.createLockFile(file)) {
                         // Oops, the lock file already existed. Try to wait it out:
-                        if (!FileBasedLock.waitForFileLock(file, 10)) {
+                        if (!FileBasedLock.waitForFileLock(file)) {
                             throw SaveException.FILE_LOCKED;
                         }
                     }

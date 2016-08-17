@@ -242,7 +242,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                         } else {
                             return;
                         }
-                    } else if (!FileBasedLock.waitForFileLock(file.toPath(), 10)) {
+                    } else if (!FileBasedLock.waitForFileLock(file.toPath())) {
                         JOptionPane.showMessageDialog(null,
                                 Localization.lang("Error opening file") + " '" + fileName + "'. "
                                         + Localization.lang("File is locked by another JabRef instance."),
