@@ -78,6 +78,9 @@ public class JabRefMain {
         // Update which fields should be treated as numeric, based on preferences:
         InternalBibtexFields.setNumericFields(Globals.prefs.getStringList(JabRefPreferences.NUMERIC_FIELDS));
 
+        // Read list(s) of journal names and abbreviations
+        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
+
         /* Build list of Import and Export formats */
         Globals.IMPORT_FORMAT_READER.resetImportFormats(ImportFormatPreferences.fromPreferences(Globals.prefs),
                 XMPPreferences.fromPreferences(Globals.prefs));
@@ -88,9 +91,6 @@ public class JabRefMain {
                 Globals.journalAbbreviationLoader);
         SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
         ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
-
-        // Read list(s) of journal names and abbreviations
-        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
 
         // Initialize protected terms loader
         Globals.protectedTermsLoader = new ProtectedTermsLoader(
