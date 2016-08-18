@@ -15,7 +15,6 @@
 */
 package net.sf.jabref;
 
-import java.awt.Font;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -117,8 +116,6 @@ public class JabRefGUI {
         }
 
         GUIGlobals.init();
-        GUIGlobals.currentFont = new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY),
-                Globals.prefs.getInt(JabRefPreferences.FONT_STYLE), Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
 
         LOGGER.debug("Initializing frame");
         JabRefGUI.mainFrame = new JabRefFrame();
