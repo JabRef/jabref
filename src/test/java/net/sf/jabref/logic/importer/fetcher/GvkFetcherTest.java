@@ -6,11 +6,9 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +24,6 @@ public class GvkFetcherTest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
         fetcher = new GvkFetcher();
 
         bibEntryPPN591166003 = new BibEntry();
