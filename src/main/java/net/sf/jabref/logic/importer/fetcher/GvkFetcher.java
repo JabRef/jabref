@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2003-2016 JabRef contributors.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
 package net.sf.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
@@ -18,7 +35,6 @@ import javax.xml.parsers.ParserConfigurationException;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.SearchBasedFetcher;
-import net.sf.jabref.logic.importer.util.GVKParser;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.http.client.utils.URIBuilder;
@@ -29,6 +45,10 @@ public class GvkFetcher implements SearchBasedFetcher {
 
     private static final String URL_PATTERN = "http://sru.gbv.de/gvk?";
 
+    /**
+     * Searchkeys are used to specify a search request. For example "tit" stands for "title".
+     * If no searchkey is used, the default searchkey "all" is used.
+     */
     private final Collection<String> searchKeys = Arrays.asList("all", "tit", "per", "thm", "slw", "txt", "num", "kon", "ppn", "bkl", "erj");
 
     @Override
