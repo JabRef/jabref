@@ -16,6 +16,8 @@
 package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.Box;
 import javax.swing.JButton;
@@ -28,11 +30,6 @@ import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
-
-// created by : ?
-//
-// modified : r.nagel 2.09.2004
-//            - insert close button
 
 public class DuplicateResolverDialog extends JDialog {
 
@@ -125,7 +122,14 @@ public class DuplicateResolverDialog extends JDialog {
         if (removeExact != null) {
             removeExact.addActionListener(e -> buttonPressed(DuplicateResolverResult.AUTOREMOVE_EXACT));
         }
+
         cancel.addActionListener(e -> buttonPressed(DuplicateResolverResult.BREAK));
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                buttonPressed(DuplicateResolverResult.BREAK);
+            }
+        });
 
         getContentPane().add(me.getMergeEntryPanel());
         getContentPane().add(options, BorderLayout.SOUTH);
@@ -137,12 +141,11 @@ public class DuplicateResolverDialog extends JDialog {
         pw.setWindowPosition();
 
         both.requestFocus();
-
     }
 
 
-    private void buttonPressed(DuplicateResolverResult button) {
-        status = button;
+    private void buttonPressed(DuplicateResolverResult result) {
+        status = result;
         dispose();
     }
 
