@@ -74,6 +74,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
     private static final String API_URL = "http://export.arxiv.org/api/query";
 
+
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
         Objects.requireNonNull(entry);
@@ -234,6 +235,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         return searchForEntryById(identifier).map(ArXivEntry::toBibEntry);
     }
 
+
     private static class ArXivEntry {
 
         private final Optional<String> title;
@@ -246,6 +248,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         private final Optional<String> doi;
         private final Optional<String> journalReferenceText;
         private final Optional<String> primaryCategory;
+
 
         public ArXivEntry(Node item) {
             // see http://arxiv.org/help/api/user-manual#_details_of_atom_results_returned
@@ -302,8 +305,8 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
             // Primary category
             // Ex: <arxiv:primary_category xmlns:arxiv="http://arxiv.org/schemas/atom" term="math-ph" scheme="http://arxiv.org/schemas/atom"/>
-            primaryCategory = XMLUtil.getNode(item, "arxiv:primary_category").flatMap(
-                    node -> XMLUtil.getAttributeContent(node, "term"));
+            primaryCategory = XMLUtil.getNode(item, "arxiv:primary_category")
+                    .flatMap(node -> XMLUtil.getAttributeContent(node, "term"));
         }
 
         /**
