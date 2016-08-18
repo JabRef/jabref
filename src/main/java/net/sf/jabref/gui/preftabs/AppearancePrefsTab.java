@@ -104,7 +104,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         colorCodes = new JCheckBox(
                 Localization.lang("Color codes for required and optional fields"));
 
-        resolvedColorCodes = new JCheckBox(Localization.lang("Color codes for resolved fields"));
+        resolvedColorCodes = new JCheckBox(Localization.lang("Color code for resolved fields"));
 
         overrideFonts = new JCheckBox(Localization.lang("Override default font settings"));
 
