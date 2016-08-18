@@ -31,7 +31,6 @@ import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
@@ -324,7 +323,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             Collection<BibEntry> items = null;
             try (BufferedReader in = new BufferedReader(
                     new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
-                items = BibtexParser.parse(in, ImportFormatPreferences.fromPreferences(Globals.prefs)).getDatabase()
+                items = BibtexParser.parse(in, Globals.prefs.getImportFormatPreferences()).getDatabase()
                         .getEntries();
             } catch (IOException e) {
                 LOGGER.info("Download of BibTeX information from ACM Portal failed.", e);

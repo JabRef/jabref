@@ -152,7 +152,7 @@ public class ProtectedTermsDialog {
             @Override
             public void actionPerformed(ActionEvent event) {
                 // Restore from preferences
-                loader.update(ProtectedTermsPreferences.fromPreferences(Globals.prefs));
+                loader.update(Globals.prefs.getProtectedTermsPreferences());
                 diag.dispose();
             }
         };

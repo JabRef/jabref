@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fileformat.BibtexImporter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -63,7 +62,7 @@ public class MSBibExportFormatTestFiles {
         charset = StandardCharsets.UTF_8;
         msBibExportFormat = new MSBibExportFormat();
         tempFile = testFolder.newFile();
-        testImporter = new BibtexImporter(ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
+        testImporter = new BibtexImporter(JabRefPreferences.getInstance().getImportFormatPreferences());
     }
 
     @Test

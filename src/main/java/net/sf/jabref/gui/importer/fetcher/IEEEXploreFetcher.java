@@ -26,12 +26,10 @@ import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
@@ -151,7 +149,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             //parse the page into Bibtex entries
             Collection<BibEntry> parsedBibtexCollection = BibtexParser.fromString(bibtexPage,
-                    ImportFormatPreferences.fromPreferences(Globals.prefs));
+                    Globals.prefs.getImportFormatPreferences());
             if (parsedBibtexCollection == null) {
                 status.showMessage(Localization.lang("Error while fetching from %0", getTitle()),
                         DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
@@ -421,7 +419,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 fullName = fullName.trim();
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
                     fullName = abbreviationLoader
-                            .getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs))
+                            .getRepository(Globals.prefs.getJournalAbbreviationPreferences())
                             .getMedlineAbbreviation(fullName)
                             .orElse(fullName);
                 }

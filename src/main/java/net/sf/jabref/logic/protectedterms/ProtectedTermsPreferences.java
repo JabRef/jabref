@@ -21,15 +21,6 @@ public class ProtectedTermsPreferences {
         this.disabledExternalTermLists = disabledExternalTermLists;
     }
 
-    public static ProtectedTermsPreferences fromPreferences(JabRefPreferences jabRefPreferences) {
-        return new ProtectedTermsPreferences(
-                jabRefPreferences.getStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_INTERNAL),
-                jabRefPreferences.getStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_EXTERNAL),
-                jabRefPreferences.getStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_INTERNAL),
-                jabRefPreferences.getStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_EXTERNAL));
-    }
-
-
     public List<String> getEnabledInternalTermLists() {
         return enabledInternalTermLists;
     }

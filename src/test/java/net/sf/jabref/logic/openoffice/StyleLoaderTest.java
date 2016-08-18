@@ -33,8 +33,8 @@ public class StyleLoaderTest {
     @Before
     public void setUp() {
         preferences = new OpenOfficePreferences(JabRefPreferences.getInstance());
-        layoutPreferences = LayoutFormatterPreferences.fromPreferences(JabRefPreferences.getInstance(),
-                mock(JournalAbbreviationLoader.class));
+        layoutPreferences = JabRefPreferences.getInstance()
+                .getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class));
         encoding = JabRefPreferences.getInstance().getDefaultEncoding();
 
     }
@@ -48,7 +48,7 @@ public class StyleLoaderTest {
     @Test(expected = NullPointerException.class)
     public void throwNPEWithNullRepository() {
         loader = new StyleLoader(mock(OpenOfficePreferences.class),
-                LayoutFormatterPreferences.fromPreferences(JabRefPreferences.getInstance(), null), mock(Charset.class));
+                JabRefPreferences.getInstance().getLayoutFormatterPreferences(null), mock(Charset.class));
         fail();
     }
 

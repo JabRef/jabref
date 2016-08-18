@@ -28,7 +28,7 @@ public class AuxParserTest {
 
     @Before
     public void setUp() {
-        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
+        importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
     }
 
     @Test

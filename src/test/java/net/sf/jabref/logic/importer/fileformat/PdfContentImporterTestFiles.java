@@ -10,7 +10,6 @@ import java.util.Collection;
 import java.util.List;
 
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -45,7 +44,7 @@ public class PdfContentImporterTestFiles {
         String pdfFileName = fileName + ".pdf";
         String bibFileName = fileName + ".bib";
         PdfContentImporter importer = new PdfContentImporter(
-                ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
+                JabRefPreferences.getInstance().getImportFormatPreferences());
         Path pdfFile = Paths.get(PdfContentImporter.class.getResource(pdfFileName).toURI());
         List<BibEntry> result = importer.importDatabase(pdfFile, StandardCharsets.UTF_8).getDatabase().getEntries();
         BibEntryAssert.assertEquals(PdfContentImporterTest.class, bibFileName, result);

@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.jabref.JabRefMain;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.importer.fileformat.ImportFormat;
@@ -42,8 +41,8 @@ public class OOBibStyleTest {
 
     @Before
     public void setUp() {
-        layoutFormatterPreferences = LayoutFormatterPreferences.fromPreferences(JabRefPreferences.getInstance(),
-                mock(JournalAbbreviationLoader.class));
+        layoutFormatterPreferences = JabRefPreferences.getInstance()
+                .getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class));
     }
 
     @Test
@@ -144,7 +143,7 @@ public class OOBibStyleTest {
     public void testGetCitationMarker() throws IOException {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, StandardCharsets.UTF_8),
-                ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
+                JabRefPreferences.getInstance().getImportFormatPreferences());
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
@@ -166,7 +165,7 @@ public class OOBibStyleTest {
     public void testLayout() throws IOException {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, StandardCharsets.UTF_8),
-                ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
+                JabRefPreferences.getInstance().getImportFormatPreferences());
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
         BibDatabase db = result.getDatabase();

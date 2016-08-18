@@ -43,7 +43,7 @@ public class BibtexKeyPatternUtilTest {
 
     @Before
     public void setUp() {
-        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
+        importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
         BibtexKeyPatternUtil.setDataBase(new BibDatabase());
     }
 

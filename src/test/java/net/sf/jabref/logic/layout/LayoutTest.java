@@ -4,7 +4,11 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Collection;
 
+<<<<<<< 37a4f29080b77845f0d4a227a527e2699e199026
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+=======
+import net.sf.jabref.Globals;
+>>>>>>> Moved some logic preference instantiation to JabRefPreferences
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
@@ -28,8 +32,13 @@ public class LayoutTest {
      */
     @Before
     public void setUp() {
+<<<<<<< 37a4f29080b77845f0d4a227a527e2699e199026
         prefs = LayoutFormatterPreferences.fromPreferences(JabRefPreferences.getInstance(),
                 mock(JournalAbbreviationLoader.class));
+=======
+        Globals.prefs = JabRefPreferences.getInstance();
+        prefs = JabRefPreferences.getInstance().getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class));
+>>>>>>> Moved some logic preference instantiation to JabRefPreferences
     }
 
     /**
@@ -46,7 +55,11 @@ public class LayoutTest {
 
     public static BibEntry bibtexString2BibtexEntry(String s) throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader(s),
+<<<<<<< 37a4f29080b77845f0d4a227a527e2699e199026
                 ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
+=======
+                Globals.prefs.getImportFormatPreferences());
+>>>>>>> Moved some logic preference instantiation to JabRefPreferences
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
         return c.iterator().next();

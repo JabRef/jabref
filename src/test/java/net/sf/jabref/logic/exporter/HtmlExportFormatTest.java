@@ -37,8 +37,7 @@ public class HtmlExportFormatTest {
         JournalAbbreviationLoader journalAbbreviationLoader = new JournalAbbreviationLoader();
         Map<String, ExportFormat> customFormats = prefs.customExports.getCustomExportFormats(prefs,
                 journalAbbreviationLoader);
-        LayoutFormatterPreferences layoutPreferences = LayoutFormatterPreferences.fromPreferences(prefs,
-                journalAbbreviationLoader);
+        LayoutFormatterPreferences layoutPreferences = prefs.getLayoutFormatterPreferences(journalAbbreviationLoader);
         SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(prefs);
         ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
 

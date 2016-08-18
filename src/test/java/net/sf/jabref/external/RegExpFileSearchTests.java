@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.layout.format.NameFormatter;
@@ -46,7 +45,7 @@ public class RegExpFileSearchTests {
                         + "\n" + "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n"
                         + "  issn = {1526-5455}," + "\n" + "  publisher = {INFORMS}" + "\n" + "}");
 
-        BibtexParser parser = new BibtexParser(reader, ImportFormatPreferences.fromPreferences(Globals.prefs));
+        BibtexParser parser = new BibtexParser(reader, Globals.prefs.getImportFormatPreferences());
         ParserResult result = null;
 
         result = parser.parse();

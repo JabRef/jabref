@@ -17,7 +17,6 @@ import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
@@ -82,7 +81,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
         }
 
         Optional<BibEntry> entry = BibtexParser.singleFromString(bibtexString,
-                ImportFormatPreferences.fromPreferences(Globals.prefs));
+                Globals.prefs.getImportFormatPreferences());
         if (entry.isPresent()) {
             // Optionally add curly brackets around key words to keep the case
             entry.get().getFieldOptional(FieldName.TITLE).ifPresent(title -> {

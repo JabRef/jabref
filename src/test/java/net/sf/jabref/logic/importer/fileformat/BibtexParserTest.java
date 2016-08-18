@@ -56,7 +56,7 @@ public class BibtexParserTest {
     @BeforeClass
     public static void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
-        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
+        importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
     }
 
     @SuppressWarnings("unused")

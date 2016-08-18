@@ -12,7 +12,6 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
@@ -95,7 +94,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
             for (BibEntry entry : toGenerateFor) {
                 String oldKey = entry.getCiteKeyOptional().orElse(null);
                 BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
-                        BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
+                        Globals.prefs.getBibtexKeyPatternPreferences());
                 ce.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, oldKey, entry.getCiteKeyOptional().get()));
             }
             ce.end();

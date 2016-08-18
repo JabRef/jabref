@@ -27,7 +27,6 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.importer.ParserResultWarningDialog;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
@@ -234,7 +233,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 String errorMessage = null;
                 try {
                     result = OpenDatabase.loadDatabase(fileToLoad,
-                            ImportFormatPreferences.fromPreferences(Globals.prefs));
+                            Globals.prefs.getImportFormatPreferences());
                 } catch (IOException ex) {
                     LOGGER.error("Error loading database " + fileToLoad, ex);
                     result = ParserResult.getNullResult();

@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fetcher.DOItoBibTeX;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.util.DOI;
@@ -88,12 +87,12 @@ public class ClipBoardManager implements ClipboardOwner {
                 if (DOI.build(data).isPresent()) {
                     LOGGER.info("Found DOI in clipboard");
                     Optional<BibEntry> entry = DOItoBibTeX.getEntryFromDOI(new DOI(data).getDOI(),
-                            ImportFormatPreferences.fromPreferences(Globals.prefs));
+                            Globals.prefs.getImportFormatPreferences());
                     entry.ifPresent(result::add);
                 } else {
                     // parse bibtex string
                     BibtexParser bp = new BibtexParser(new StringReader(data),
-                            ImportFormatPreferences.fromPreferences(Globals.prefs));
+                            Globals.prefs.getImportFormatPreferences());
                     BibDatabase db = bp.parse().getDatabase();
                     LOGGER.info("Parsed " + db.getEntryCount() + " entries from clipboard text");
                     if (db.hasEntries()) {
