@@ -143,7 +143,7 @@ public class FileDialog {
      *
      * @param filter the custom file filter
      */
-    public void setFileFiler(FileFilter filter) {
+    public void setFileFilter(FileFilter filter) {
         fileChooser.setFileFilter(filter);
     }
 

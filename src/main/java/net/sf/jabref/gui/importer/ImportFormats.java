@@ -81,7 +81,7 @@ public class ImportFormats {
                 FileDialog dialog = new FileDialog(frame, Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY));
                 // Add file filter for all supported types
                 List<String> flatExtensions = extensions.stream().flatMap(extList -> Stream.of(extList.getExtensions())).collect(Collectors.toList());
-                dialog.setFileFiler(new FileNameExtensionFilter(Localization.lang("Available import formats"), flatExtensions.toArray(new String[flatExtensions.size()])));
+                dialog.setFileFilter(new FileNameExtensionFilter(Localization.lang("Available import formats"), flatExtensions.toArray(new String[flatExtensions.size()])));
                 // Add filters for extensions
                 dialog.withExtensions(extensions);
 
