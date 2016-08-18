@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<modsCollection xmlns="http://www.loc.gov/mods/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-0.xsd">
+<mods ID="ShruthiVinodhkumarSelvamani2016" version="3.0">
+<titleInfo>
+<title>Proteomics: A new perspective for cancer.</title>
+</titleInfo>
+<name type="personal">
+<namePart type="family">Shruthi</namePart>
+<namePart type="given">Basavaradhya Sahukar</namePart>
+<role>
+<roleTerm type="text">author</roleTerm>
+</role>
+</name>
+<name type="personal">
+<namePart type="family">Vinodhkumar</namePart>
+<namePart type="given">Palani</namePart>
+<role>
+<roleTerm type="text">author</roleTerm>
+</role>
+</name>
+<name type="personal">
+<namePart type="family">Selvamani</namePart>
+<namePart type="given"/>
+<role>
+<roleTerm type="text">author</roleTerm>
+</role>
+</name>
+<originInfo>
+<dateIssued>2016-</dateIssued>
+<issuance>monographic</issuance>
+</originInfo>
+<identifier>ShruthiVinodhkumarSelvamani2016</identifier>
+<typeOfResource>text</typeOfResource>
+<genre authority="marc">article</genre>
+<relatedItem type="host" version="3.0">
+<originInfo>
+<issuance>continuing</issuance>
+</originInfo>
+<typeOfResource>text</typeOfResource>
+</relatedItem>
+<extension>
+<bibtex_year>2016</bibtex_year>
+</extension>
+<extension>
+<bibtex_journal>Advanced biomedical research</bibtex_journal>
+</extension>
+</mods>
+</modsCollection>

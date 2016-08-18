@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<modsCollection xmlns="http://www.loc.gov/mods/v3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-0.xsd">
+<mods version="3.0">
+<originInfo>
+<dateIssued>-</dateIssued>
+<issuance>monographic</issuance>
+</originInfo>
+<typeOfResource>text</typeOfResource>
+<genre authority="marc">misc</genre>
+</mods>
+</modsCollection>

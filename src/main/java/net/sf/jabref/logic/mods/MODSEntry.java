@@ -66,7 +66,7 @@ class MODSEntry {
     private String number;
     private String volume;
     private String genre;
-    private String place;
+    private String address;
     private final Set<String> handledExtensions;
 
     private MODSEntry host;
@@ -116,11 +116,11 @@ class MODSEntry {
         if (bibtex.hasField(BibEntry.KEY_FIELD)) {
             id = bibtex.getCiteKey();
         }
-        if (bibtex.hasField("place")) { // TODO: "place" is the MODS version, in BibTeX: "address", BibLaTeX: "location"?
+        if (bibtex.hasField("address")) { // TODO: "place" is the MODS version, in BibTeX: "address", BibLaTeX: "location"?
             if (CHARFORMAT) {
-                place = chars.format(bibtex.getField("place"));
+                address = chars.format(bibtex.getField("address"));
             } else {
-                place = bibtex.getField("place");
+                address = bibtex.getField("address");
             }
         }
 
@@ -194,6 +194,10 @@ class MODSEntry {
         return bibtex.getType();
     }
 
+    /**
+     * 
+     * TODO: Only usage for this method is the toString() method. So can this be deleted ?
+     */
     private Node getDOMrepresentation() {
         Node result;
         try {
@@ -309,12 +313,11 @@ class MODSEntry {
             LOGGER.warn("Exception caught...", e);
             throw new Error(e);
         }
-        // return result;
     }
 
     /*
      * render as XML
-     *
+     * TODO: Couldn't find any usage of this. Can this be deleted?
      */
     @Override
     public String toString() {
