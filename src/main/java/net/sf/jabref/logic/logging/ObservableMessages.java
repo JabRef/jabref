@@ -7,6 +7,11 @@ import javafx.collections.FXCollections;
 
 import net.sf.jabref.logic.error.ObservableMessageWithPriority;
 
+/**
+ * This ObservableMessages enum will be save all message entries in a ListProperty.
+ * <p></p>
+ * This list will be use late in ErrorConsoleViewModel class to filter message after their priority
+ */
 public enum ObservableMessages {
 
     INSTANCE;

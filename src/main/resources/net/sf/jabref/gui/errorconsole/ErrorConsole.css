@@ -1,6 +1,9 @@
 .info-sections {
 	-fx-padding: 5px;
 }
+.list-cell {
+ -fx-background-color: white;
+ }
 
 .exception{
     -fx-text-fill: red;

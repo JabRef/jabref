@@ -15,25 +15,32 @@
 */
 package net.sf.jabref.gui.errorconsole;
 
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.DialogPane;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.ToggleButton;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 import net.sf.jabref.gui.FXAlert;
+import net.sf.jabref.logic.error.MessagePriority;
 import net.sf.jabref.logic.error.ObservableMessageWithPriority;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.logging.ObservableMessages;
 
 import com.airhacks.afterburner.views.FXMLView;
 
 public class ErrorConsoleView extends FXMLView {
 
     private final ErrorConsoleViewModel errorViewModel = new ErrorConsoleViewModel();
+    private BooleanProperty isDeveloperButtonEnable = new SimpleBooleanProperty();
 
     @FXML
     private Button closeButton;
@@ -41,8 +48,6 @@ public class ErrorConsoleView extends FXMLView {
     private Button copyLogButton;
     @FXML
     private Button createIssueButton;
-    @FXML
-    private ToggleButton developerButton;
     @FXML
     private ListView<ObservableMessageWithPriority> allMessage;
 
@@ -68,9 +73,12 @@ public class ErrorConsoleView extends FXMLView {
 
     @FXML
     private void initialize() {
-        ButtonBar.setButtonData(developerButton, ButtonBar.ButtonData.LEFT);
+        ButtonBar.setButtonData(copyLogButton, ButtonBar.ButtonData.LEFT);
         ButtonBar.setButtonData(createIssueButton, ButtonBar.ButtonData.LEFT);
-        errorViewModel.setUpListView(allMessage, developerButton);
+
+        ObservableList<ObservableMessageWithPriority> masterData = ObservableMessages.INSTANCE.messagesPropety();
+        listViewStyle();
+        allMessage.setItems(masterData);
     }
 
     @FXML
@@ -80,14 +88,40 @@ public class ErrorConsoleView extends FXMLView {
 
     @FXML
     private void createIssueButton() {
-        errorViewModel.createIssue();
+        errorViewModel.reportIssue();
     }
 
-    // handler for close of error console
     @FXML
     private void closeErrorDialog() {
         Stage stage = (Stage) closeButton.getScene().getWindow();
         stage.close();
     }
 
+    private void listViewStyle(){
+        // handler for listCell appearance (example for exception Cell)
+        allMessage.setCellFactory(new Callback<ListView<ObservableMessageWithPriority>, ListCell<ObservableMessageWithPriority>>() {
+            @Override
+            public ListCell<ObservableMessageWithPriority> call(ListView<ObservableMessageWithPriority> listView) {
+                return new ListCell<ObservableMessageWithPriority>() {
+                    @Override
+                    public void updateItem(ObservableMessageWithPriority omp, boolean empty) {
+                        super.updateItem(omp, empty);
+                        if (omp != null) {
+                            setText(omp.getMessage());
+                            getStyleClass().clear();
+                            if (omp.getPriority() == MessagePriority.HIGH) {
+                                    getStyleClass().add("exception");
+                            } else if (omp.getPriority() == MessagePriority.MEDIUM) {
+                                    getStyleClass().add("output");
+                            } else {
+                                getStyleClass().add("log");
+                            }
+                        } else {
+                            setText("");
+                        }
+                    }
+                };
+            }
+        });
+    }
 }

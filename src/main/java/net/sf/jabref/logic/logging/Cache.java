@@ -31,7 +31,6 @@ public class Cache {
     private final Queue<String> queue = new LinkedList<>();
 
     private String cache = "";
-    private boolean cacheRefreshNeeded = true;
 
     public Cache() {
         this(DEFAULT_CAPACITY);
@@ -41,14 +40,8 @@ public class Cache {
         this.capacity = capacity;
     }
 
-    public Queue<String> get() {
+    public synchronized Queue<String> get() {
         return queue;
-    }
-
-    private void ensureCacheIsFresh() {
-        if (cacheRefreshNeeded) {
-            cache = String.join("", queue);
-        }
     }
 
     public synchronized void add(String message) {
@@ -58,7 +51,6 @@ public class Cache {
 
         if (isCapacityExceeded()) {
             // if we reached capacity, we switch to the "real" caching method and remove old lines
-            cacheRefreshNeeded = true;
             truncateLog();
         } else {
             // if we did not yet reach capacity, we just append the string to the cache

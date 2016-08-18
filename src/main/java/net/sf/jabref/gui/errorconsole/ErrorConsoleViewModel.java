@@ -21,14 +21,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
-import javafx.scene.control.ToggleButton;
-import javafx.util.Callback;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
@@ -41,67 +35,15 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.ObservableMessages;
 import net.sf.jabref.logic.util.BuildInfo;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class ErrorConsoleViewModel {
 
-    private BooleanProperty developerInformation = new SimpleBooleanProperty();
-    private final String CREATEISSUEURL = "https://github.com/JabRef/jabref/issues/new";
+    private static final Log LOGGER = LogFactory.getLog(ErrorConsoleViewModel.class);
+    private final String REPORTISSUEURL = "https://github.com/JabRef/jabref/issues/new";
     private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     private final Date date = new Date();
-
-    /**
-     * Create allMessage ListView, which shows the filtered entries (default at first only the Log entries),
-     * when the ToggleButton "developerButton" is disable.
-     * If ToggleButton "developerButton" is enable, then it should show all entries
-     * @param allMessage
-     * @param developerButton (default is disable at start)
-     */
-
-    public void setUpListView(ListView allMessage, ToggleButton developerButton) {
-        ObservableList<ObservableMessageWithPriority> masterData = ObservableMessages.INSTANCE.messagesPropety();
-
-        FilteredList<ObservableMessageWithPriority> filteredList = new FilteredList<>(masterData, t -> !t.isFilteredProperty().get());
-        allMessage.setItems(filteredList);
-
-        developerInformation.bind(developerButton.selectedProperty());
-        developerInformation.addListener((observable, oldValue, newValue) -> {
-            if (newValue) {
-                masterData.forEach(message -> message.setIsFiltered(false));
-
-            } else {
-                masterData.forEach(message -> message.setIsFiltered(message.getPriority() != MessagePriority.LOW));
-            }
-        });
-
-        // handler for listCell appearance (example for exception Cell)
-        allMessage.setCellFactory(new Callback<ListView<ObservableMessageWithPriority>, ListCell<ObservableMessageWithPriority>>() {
-            @Override
-            public ListCell<ObservableMessageWithPriority> call(ListView<ObservableMessageWithPriority> listView) {
-                return new ListCell<ObservableMessageWithPriority>() {
-                    @Override
-                    public void updateItem(ObservableMessageWithPriority omp, boolean empty) {
-                        super.updateItem(omp, empty);
-                        if (omp != null) {
-                            setText(omp.getMessage());
-                            getStyleClass().clear();
-                            if (omp.getPriority() == MessagePriority.HIGH) {
-                                if (developerInformation.getValue()) {
-                                    getStyleClass().add("exception");
-                                }
-                            } else if (omp.getPriority() == MessagePriority.MEDIUM) {
-                                if (developerInformation.getValue()) {
-                                    getStyleClass().add("output");
-                                }
-                            } else {
-                                getStyleClass().add("log");
-                            }
-                        } else {
-                            setText("");
-                        }
-                    }
-                };
-            }
-        });
-    }
 
     // handler for copy of Log Entry in the List by click of Copy Log Button
     public void copyLog() {
@@ -117,19 +59,19 @@ public class ErrorConsoleViewModel {
         JabRefGUI.getMainFrame().output(Localization.lang("Log is copied"));
     }
 
-    // handler for create Issues on GitHub by click of Create Issue Button
-    public void createIssue() {
+    // handler for report Issues on GitHub by click of Report Issue Button
+    public void reportIssue() {
         try {
             String info = String.format("JabRef %s%n%s %s %s %nJava %s\n\n", Globals.BUILD_INFO.getVersion(), BuildInfo.OS,
                     BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION);
-            String issueTitle = "?title=" + URLEncoder.encode(Localization.lang("Automatic Bug Report-") + dateFormat.format(date), "UTF-8");
+            String issueTitle = "?title=" + URLEncoder.encode("Automatic Bug Report-" + dateFormat.format(date), "UTF-8");
             String issueBody = "&body=" + URLEncoder.encode(info, "UTF-8");
-            JabRefGUI.getMainFrame().output(Localization.lang("Create Issue on GitHub is successful!"));
-            FXDialogs.showInformationDialogAndWait(Localization.lang("Create Issue successful!"),
-                    Localization.lang("Your issue was created in your browser!") + "\n\n" +
-                            Localization.lang("The log and exception information was copied to your clipboard.") + "\n\n" +
-                            Localization.lang("Please paste this information (with Ctrl+V) in the issue description!"));
-            JabRefDesktop.openBrowser(CREATEISSUEURL + issueTitle + issueBody);
+            JabRefGUI.getMainFrame().output(Localization.lang("Report Issue on GitHub is successful."));
+            FXDialogs.showInformationDialogAndWait("Report Issue successful.",
+                    "Your issue was reported in your browser." + "\n\n" +
+                            "The log and exception information was copied to your clipboard." + "\n\n" +
+                            "Please paste this information (with Ctrl+V) in the issue description.");
+            JabRefDesktop.openBrowser(REPORTISSUEURL + issueTitle + issueBody);
             //get contents of listview
             ObservableList<ObservableMessageWithPriority> masterData = ObservableMessages.INSTANCE.messagesPropety();
             String listViewContent = "";
@@ -137,10 +79,10 @@ public class ErrorConsoleViewModel {
                 listViewContent += message.getMessage() + System.lineSeparator();
             }
             // format the contents of listview in Issue Description
-            String issueDetails = ("<details>\n" + "<summary>" + Localization.lang("Detail information:") + "</summary>\n```\n" + listViewContent + "\n```\n</details>");
+            String issueDetails = ("<details>\n" + "<summary>" + "Detail information:" + "</summary>\n```\n" + listViewContent + "\n```\n</details>");
             new ClipBoardManager().setClipboardContents(issueDetails);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.error(e);
         }
 
     }
