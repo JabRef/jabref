@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.FetcherException;
@@ -17,11 +16,13 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class GvkFetcherTest {
 
     private GvkFetcher fetcher;
     private BibEntry bibEntryPPN591166003;
+    private BibEntry bibEntryPPN66391437X;
 
     @Before
     public void setUp() {
@@ -42,6 +43,18 @@ public class GvkFetcherTest {
         bibEntryPPN591166003.setField("pagetotal", "XXI, 346");
         bibEntryPPN591166003.setField("ppn_gvk", "591166003");
         bibEntryPPN591166003.setField("subtitle", "[revised and updated for JAVA SE 6]");
+
+        bibEntryPPN66391437X = new BibEntry();
+        bibEntryPPN66391437X.setType(BibLatexEntryTypes.BOOK);
+        bibEntryPPN66391437X.setField("title", "Effective unit testing");
+        bibEntryPPN66391437X.setField("publisher", "Manning");
+        bibEntryPPN66391437X.setField("year", "2013");
+        bibEntryPPN66391437X.setField("author", "Lasse Koskela");
+        bibEntryPPN66391437X.setField("address", "Shelter Island, NY");
+        bibEntryPPN66391437X.setField("isbn", "9781935182573");
+        bibEntryPPN66391437X.setField("pagetotal", "XXIV, 223");
+        bibEntryPPN66391437X.setField("ppn_gvk", "66391437X");
+        bibEntryPPN66391437X.setField("subtitle", "A guide for Java developers");
     }
 
     @Test
@@ -84,28 +97,26 @@ public class GvkFetcherTest {
 
     @Test
     public void testPerformSearchMatchingMultipleEntries() throws FetcherException {
-        List<BibEntry> list = fetcher.performSearch("tit effective java");
-
-        //Search result may vary over time. PPN 591166003 is contained for sure.
-        Optional<BibEntry> entryToCompare = Optional.empty();
-        for (BibEntry entry : list) {
-            if (entry.getFieldOptional("ppn_gvk").get().equals("591166003")) {
-                entryToCompare = Optional.of(entry);
-                break;
-            }
-        }
-        assertEquals(Optional.of(bibEntryPPN591166003), entryToCompare);
+        List<BibEntry> searchResult = fetcher.performSearch("tit effective java");
+        assertTrue(searchResult.contains(bibEntryPPN591166003));
+        assertTrue(searchResult.contains(bibEntryPPN66391437X));
     }
 
     @Test
-    public void testPerformSearch() throws FetcherException {
-        List<BibEntry> list = fetcher.performSearch("ppn 591166003");
-        assertEquals(Collections.singletonList(bibEntryPPN591166003), list);
+    public void testPerformSearch591166003() throws FetcherException {
+        List<BibEntry> searchResult = fetcher.performSearch("ppn 591166003");
+        assertEquals(Collections.singletonList(bibEntryPPN591166003), searchResult);
+    }
+
+    @Test
+    public void testPerformSearch66391437X() throws FetcherException {
+        List<BibEntry> searchResult = fetcher.performSearch("ppn 66391437X");
+        assertEquals(Collections.singletonList(bibEntryPPN66391437X), searchResult);
     }
 
     @Test
     public void testPerformSearchEmpty() throws FetcherException {
-        List<BibEntry> list = fetcher.performSearch("");
-        assertEquals(0, list.size());
+        List<BibEntry> searchResult = fetcher.performSearch("");
+        assertEquals(Collections.emptyList(), searchResult);
     }
 }

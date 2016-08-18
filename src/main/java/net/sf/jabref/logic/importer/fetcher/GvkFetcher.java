@@ -44,12 +44,9 @@ public class GvkFetcher implements SearchBasedFetcher {
     private String getSearchQueryStringForComplexQuery(List<String> queryList) throws FetcherException {
         String query = "";
         boolean lastWasNoKey = false;
-        boolean isKey;
 
         for (String key : queryList) {
-            isKey = searchKeys.contains(key);
-
-            if (isKey) {
+            if (searchKeys.contains(key)) {
                 if (lastWasNoKey) {
                     query = query + "and ";
                 }
@@ -59,7 +56,6 @@ public class GvkFetcher implements SearchBasedFetcher {
                 lastWasNoKey = true;
             }
         }
-
         return query.trim();
     }
 
