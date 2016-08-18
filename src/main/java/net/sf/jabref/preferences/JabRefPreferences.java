@@ -64,6 +64,7 @@ import net.sf.jabref.logic.layout.format.NameFormatter;
 import net.sf.jabref.logic.layout.format.NameFormatterPreferences;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsList;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.logic.util.OS;
@@ -1459,4 +1460,34 @@ public class JabRefPreferences {
                 getStringList(EXTERNAL_JOURNAL_LISTS), get(PERSONAL_JOURNAL_LIST), getBoolean(USE_IEEE_ABRV),
                 getDefaultEncoding());
     }
+
+    public void setProtectedTermsPreferences(ProtectedTermsLoader loader) {
+        List<String> enabledExternalList = new ArrayList<>();
+        List<String> disabledExternalList = new ArrayList<>();
+        List<String> enabledInternalList = new ArrayList<>();
+        List<String> disabledInternalList = new ArrayList<>();
+
+        for (ProtectedTermsList list : loader.getProtectedTermsLists()) {
+            if (list.isInternalList()) {
+                if (list.isEnabled()) {
+                    enabledInternalList.add(list.getLocation());
+                } else {
+                    disabledInternalList.add(list.getLocation());
+                }
+            } else {
+                if (list.isEnabled()) {
+                    enabledExternalList.add(list.getLocation());
+                } else {
+                    disabledExternalList.add(list.getLocation());
+                }
+            }
+        }
+
+        putStringList(PROTECTED_TERMS_ENABLED_EXTERNAL, enabledExternalList);
+        putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, disabledExternalList);
+        putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, enabledInternalList);
+        putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, disabledInternalList);
+
+    }
+
 }

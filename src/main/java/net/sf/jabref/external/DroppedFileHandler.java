@@ -25,7 +25,6 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
@@ -345,7 +344,7 @@ public class DroppedFileHandler {
         // Determine which name to suggest:
         String targetName = FileUtil.createFileNameFromPattern(database, entry,
                 Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
-                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
+                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader));
 
         renameToTextBox.setText(targetName.concat(".").concat(fileType.getExtension()));
 

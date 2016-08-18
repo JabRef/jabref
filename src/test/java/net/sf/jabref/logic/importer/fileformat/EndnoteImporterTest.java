@@ -12,11 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-<<<<<<< 37a4f29080b77845f0d4a227a527e2699e199026
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
-=======
-import net.sf.jabref.Globals;
->>>>>>> Moved some logic preference instantiation to JabRefPreferences
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;

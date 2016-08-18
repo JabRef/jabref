@@ -1,9 +1,6 @@
 package net.sf.jabref.logic.protectedterms;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import net.sf.jabref.preferences.JabRefPreferences;
 
 public class ProtectedTermsPreferences {
 
@@ -37,32 +34,4 @@ public class ProtectedTermsPreferences {
         return disabledExternalTermLists;
     }
 
-    public static void toPreferences(JabRefPreferences jabRefPreferences, ProtectedTermsLoader loader) {
-        List<String> enabledExternalList = new ArrayList<>();
-        List<String> disabledExternalList = new ArrayList<>();
-        List<String> enabledInternalList = new ArrayList<>();
-        List<String> disabledInternalList = new ArrayList<>();
-
-        for (ProtectedTermsList list : loader.getProtectedTermsLists()) {
-            if (list.isInternalList()) {
-                if (list.isEnabled()) {
-                    enabledInternalList.add(list.getLocation());
-                } else {
-                    disabledInternalList.add(list.getLocation());
-                }
-            } else {
-                if (list.isEnabled()) {
-                    enabledExternalList.add(list.getLocation());
-                } else {
-                    disabledExternalList.add(list.getLocation());
-                }
-            }
-        }
-
-        jabRefPreferences.putStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_EXTERNAL, enabledExternalList);
-        jabRefPreferences.putStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_EXTERNAL, disabledExternalList);
-        jabRefPreferences.putStringList(JabRefPreferences.PROTECTED_TERMS_ENABLED_INTERNAL, enabledInternalList);
-        jabRefPreferences.putStringList(JabRefPreferences.PROTECTED_TERMS_DISABLED_INTERNAL, disabledInternalList);
-
-    }
 }

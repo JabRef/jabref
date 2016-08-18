@@ -27,8 +27,8 @@ public class FileUtilTest {
         entry.setField("title", "mytitle");
 
         assertEquals("1234 - mytitle",
-                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern, LayoutFormatterPreferences
-                        .fromPreferences(JabRefPreferences.getInstance(), mock(JournalAbbreviationLoader.class))));
+                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern, JabRefPreferences.getInstance()
+                        .getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class))));
     }
 
     @Test

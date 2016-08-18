@@ -31,6 +31,8 @@ public class CrossrefFetcherEvaluator {
             ParserResult result = parser.parse();
             BibDatabase db = result.getDatabase();
 
+            int total = db.getEntryCount();
+
             AtomicInteger dois = new AtomicInteger();
             AtomicInteger doiFound = new AtomicInteger();
             AtomicInteger doiNew = new AtomicInteger();
