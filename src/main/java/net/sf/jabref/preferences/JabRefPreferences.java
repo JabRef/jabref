@@ -545,7 +545,7 @@ public class JabRefPreferences {
         defaults.put(PREVIEW_PANEL_HEIGHT, 200);
         defaults.put(ENTRY_EDITOR_HEIGHT, 400);
         defaults.put(TABLE_COLOR_CODES_ON, Boolean.FALSE);
-        defaults.put(TABLE_RESOLVED_COLOR_CODES_ON, Boolean.TRUE);
+        defaults.put(TABLE_RESOLVED_COLOR_CODES_ON, Boolean.FALSE);
         defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
         defaults.put(NAMES_FIRST_LAST, Boolean.FALSE); // "Show 'Firstname Lastname'"
         defaults.put(NAMES_NATBIB, Boolean.TRUE); // "Natbib style"

@@ -51,7 +51,7 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
     private final JCheckBox resolvedColorCodes;
     private final JCheckBox overrideFonts;
     private final JCheckBox showGrid;
-    private final ColorSetupPanel colorPanel = new ColorSetupPanel();
+    private final ColorSetupPanel colorPanel;
     private Font usedFont = GUIGlobals.currentFont;
     private int oldMenuFontSize;
     private boolean oldOverrideFontSize;
@@ -120,6 +120,8 @@ class AppearancePrefsTab extends JPanel implements PrefsTab {
         classNamesLAF.setEditable(true);
         final JComboBox<String> clName = classNamesLAF;
         customLAF.addChangeListener(e -> clName.setEnabled(((JCheckBox) e.getSource()).isSelected()));
+
+        colorPanel = new ColorSetupPanel(colorCodes, resolvedColorCodes, showGrid);
 
         // only the default L&F shows the the OSX specific first dropdownmenu
         if (!OS.OS_X) {
