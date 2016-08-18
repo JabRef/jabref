@@ -45,7 +45,7 @@ import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.NewFileDialog;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
@@ -106,7 +106,7 @@ public class ImportCustomizationDialog extends JDialog {
         addFromFolderButton.addActionListener(e -> {
             CustomImporter importer = new CustomImporter();
 
-            Optional<Path> selectedFile = new NewFileDialog(frame).withExtension(FileExtensions.CLASS)
+            Optional<Path> selectedFile = new FileDialog(frame).withExtension(FileExtensions.CLASS)
                     .openDialogAndGetSelectedFile();
 
             if (selectedFile.isPresent() && (selectedFile.get().getParent() != null)) {
@@ -136,7 +136,7 @@ public class ImportCustomizationDialog extends JDialog {
 
         JButton addFromJarButton = new JButton(Localization.lang("Add from JAR"));
         addFromJarButton.addActionListener(e -> {
-            Optional<Path> jarZipFile = new NewFileDialog(frame)
+            Optional<Path> jarZipFile = new FileDialog(frame)
                     .withExtensions(EnumSet.of(FileExtensions.ZIP, FileExtensions.JAR)).openDialogAndGetSelectedFile();
 
             if (jarZipFile.isPresent()) {

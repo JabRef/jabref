@@ -26,9 +26,9 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.MergeDialog;
-import net.sf.jabref.gui.NewFileDialog;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
@@ -83,7 +83,7 @@ public class AppendDatabaseAction implements BaseAction {
         md.setVisible(true);
         if (md.isOkPressed()) {
 
-            List<String> chosen = new NewFileDialog(frame).updateWorkingDirPref().showDialogAndGetMultipleFiles();
+            List<String> chosen = new FileDialog(frame).updateWorkingDirPref().showDialogAndGetMultipleFiles();
             if (chosen.isEmpty()) {
                 return;
             }

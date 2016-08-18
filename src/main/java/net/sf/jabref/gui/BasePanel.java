@@ -2314,7 +2314,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         @Override
         public void action() throws SaveException {
-            NewFileDialog dialog = new NewFileDialog(frame).withExtension(FileExtensions.BIBTEX_DB);
+            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.BIBTEX_DB);
             dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
             Optional<Path> chosenFile = dialog.saveNewFile();
 

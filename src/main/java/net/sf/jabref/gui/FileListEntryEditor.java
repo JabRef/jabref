@@ -361,7 +361,7 @@ public class FileListEntryEditor {
             workingDir = Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY);
         }
 
-        Optional<Path> path = new NewFileDialog(this.frame, workingDir).openDialogAndGetSelectedFile();
+        Optional<Path> path = new FileDialog(this.frame, workingDir).openDialogAndGetSelectedFile();
 
         path.ifPresent(selection -> {
 

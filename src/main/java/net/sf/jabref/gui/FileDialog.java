@@ -23,7 +23,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-public class NewFileDialog {
+public class FileDialog {
     /**
      * Custom confirmation dialog
      * http://stackoverflow.com/a/3729157
@@ -64,7 +64,7 @@ public class NewFileDialog {
      * Creates a new filedialog showing the current working dir {@link JabRefPreferences#WORKING_DIRECTORY}
      * @param parent The parent frame associated with this dialog
      */
-    public NewFileDialog(JFrame parent) {
+    public FileDialog(JFrame parent) {
         this(parent, getWorkingDir());
     }
 
@@ -73,7 +73,7 @@ public class NewFileDialog {
      * @param parent The parent frame associated with this dialog
      * @param dir The starting directory to show in the dialog
      */
-    public NewFileDialog(JFrame parent, String dir) {
+    public FileDialog(JFrame parent, String dir) {
         Objects.requireNonNull(dir, "Directory must not be null");
 
         this.parent = parent;
@@ -83,9 +83,9 @@ public class NewFileDialog {
 
     /**
      * Show only directories instead of files and folders
-     * @return NewFileDialog
+     * @return FileDialog
      */
-    public NewFileDialog dirsOnly() {
+    public FileDialog dirsOnly() {
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         return this;
     }
@@ -93,9 +93,9 @@ public class NewFileDialog {
     /**
      * Add a single extension as file filter
      * @param singleExt The extension
-     * @return NewFileDialog
+     * @return FileDialog
      */
-    public NewFileDialog withExtension(FileExtensions singleExt) {
+    public FileDialog withExtension(FileExtensions singleExt) {
         withExtensions(EnumSet.of(singleExt));
         return this;
     }
@@ -103,9 +103,9 @@ public class NewFileDialog {
     /**
      * Add a multiple extensions as file filter
      * @param fileExtensions The extensions
-     * @return NewFileDialog
+     * @return FileDialog
      */
-    public NewFileDialog withExtensions(Collection<FileExtensions> fileExtensions) {
+    public FileDialog withExtensions(Collection<FileExtensions> fileExtensions) {
         this.extensions = fileExtensions;
 
         for (FileExtensions ext : fileExtensions) {
@@ -132,9 +132,9 @@ public class NewFileDialog {
 
     /**
      * Updates the working directory preference
-     * @return NewFileDialog
+     * @return FileDialog
      */
-    public NewFileDialog updateWorkingDirPref() {
+    public FileDialog updateWorkingDirPref() {
         Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, this.directory);
         return this;
     }

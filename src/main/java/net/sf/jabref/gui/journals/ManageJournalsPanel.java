@@ -59,9 +59,9 @@ import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.Globals;
 
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.NewFileDialog;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -200,7 +200,7 @@ class ManageJournalsPanel extends JPanel {
         });
 
         browseNew.addActionListener(e -> {
-            Optional<Path> path = new NewFileDialog(frame, newNameTf.getText()).saveNewFile();
+            Optional<Path> path = new FileDialog(frame, newNameTf.getText()).saveNewFile();
             path.ifPresent(fileName -> {
                 newNameTf.setText(fileName.toString());
                 newFile.setSelected(true);
@@ -209,7 +209,7 @@ class ManageJournalsPanel extends JPanel {
         });
 
         browseOld.addActionListener(e -> {
-            Optional<Path> path = new NewFileDialog(frame, personalFile.getText()).openDialogAndGetSelectedFile();
+            Optional<Path> path = new FileDialog(frame, personalFile.getText()).openDialogAndGetSelectedFile();
 
             path.ifPresent(fileName -> {
                 personalFile.setText(fileName.toString());
@@ -420,7 +420,7 @@ class ManageJournalsPanel extends JPanel {
             File toFile;
             try {
 
-                Optional<Path> path = new NewFileDialog(frame, System.getProperty("user.home")).saveNewFile();
+                Optional<Path> path = new FileDialog(frame, System.getProperty("user.home")).saveNewFile();
                 if (path.isPresent()) {
                     toFile = new File(path.get().toString());
                 } else {
