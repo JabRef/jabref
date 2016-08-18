@@ -2239,6 +2239,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @param entry The entry that is now to be shown.
      */
     public void newEntryShowing(BibEntry entry) {
+
         // If this call is the result of a Back or Forward operation, we must take
         // care not to make any history changes, since the necessary changes will
         // already have been done in the back() or forward() method:
@@ -2253,7 +2254,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // Add the entry we are leaving to the history:
             if (showing != null) {
                 previousEntries.add(showing);
-                if (previousEntries.size() > Globals.prefs.getInt(JabRefPreferences.MAX_BACK_HISTORY_SIZE)) {
+                if (previousEntries.size() > GUIGlobals.MAX_BACK_HISTORY_SIZE) {
                     previousEntries.remove(0);
                 }
             }

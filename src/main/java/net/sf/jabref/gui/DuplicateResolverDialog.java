@@ -24,9 +24,11 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.gui.mergeentries.MergeEntries;
 import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -52,6 +54,7 @@ public class DuplicateResolverDialog extends JDialog {
 
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final JButton merge = new JButton(Localization.lang("Keep merged entry only"));
+    JButton helpButton = new HelpAction(Localization.lang("Help"), HelpFile.FIND_DUPLICATES).getHelpButton();
     private final JabRefFrame frame;
     private final JPanel options = new JPanel();
     private DuplicateResolverResult status = DuplicateResolverResult.NOT_CHOSEN;
@@ -114,6 +117,7 @@ public class DuplicateResolverDialog extends JDialog {
         options.add(merge);
         options.add(Box.createHorizontalStrut(5));
         options.add(cancel);
+        options.add(helpButton);
 
         first.addActionListener(e -> buttonPressed(DuplicateResolverResult.KEEP_LEFT));
         second.addActionListener(e -> buttonPressed(DuplicateResolverResult.KEEP_RIGHT));

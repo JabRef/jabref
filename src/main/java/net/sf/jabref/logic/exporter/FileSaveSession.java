@@ -22,11 +22,9 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,7 +51,6 @@ public class FileSaveSession extends SaveSession {
     private static final String BACKUP_EXTENSION = ".bak";
     private static final String TEMP_PREFIX = "jabref";
     private static final String TEMP_SUFFIX = "save.bib";
-    private final boolean useLockFile;
     private final Path temporaryFile;
 
     public FileSaveSession(Charset encoding, boolean backup) throws SaveException {
@@ -63,7 +60,6 @@ public class FileSaveSession extends SaveSession {
     public FileSaveSession(Charset encoding, boolean backup, Path temporaryFile) throws SaveException {
         super(encoding, backup, getWriterForFile(encoding, temporaryFile));
         this.temporaryFile = temporaryFile;
-        this.useLockFile = Globals.prefs.getBoolean(JabRefPreferences.USE_LOCK_FILES);
     }
 
     private static VerifyingWriter getWriterForFile(Charset encoding, Path file) throws SaveException {
@@ -98,17 +94,16 @@ public class FileSaveSession extends SaveSession {
             }
         }
         try {
-            if (useLockFile) {
-                try {
-                    if (FileBasedLock.createLockFile(file)) {
-                        // Oops, the lock file already existed. Try to wait it out:
-                        if (!FileBasedLock.waitForFileLock(file)) {
-                            throw SaveException.FILE_LOCKED;
-                        }
+            // Always use a lock file
+            try {
+                if (FileBasedLock.createLockFile(file)) {
+                    // Oops, the lock file already existed. Try to wait it out:
+                    if (!FileBasedLock.waitForFileLock(file)) {
+                        throw SaveException.FILE_LOCKED;
                     }
-                } catch (IOException ex) {
-                    LOGGER.error("Error when creating lock file.", ex);
                 }
+            } catch (IOException ex) {
+                LOGGER.error("Error when creating lock file.", ex);
             }
 
             FileUtil.copyFile(temporaryFile.toFile(), file.toFile(), true);
@@ -120,9 +115,7 @@ public class FileSaveSession extends SaveSession {
             throw new SaveException("Save failed while committing changes: " + ex2.getMessage(),
                     Localization.lang("Save failed while committing changes: %0", ex2.getMessage()));
         } finally {
-            if (useLockFile) {
-                FileBasedLock.deleteLockFile(file);
-            }
+            FileBasedLock.deleteLockFile(file);
         }
         try {
             Files.delete(temporaryFile);

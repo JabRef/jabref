@@ -34,11 +34,11 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-import net.sf.jabref.importer.fileformat.bibtexml.Entry;
-import net.sf.jabref.importer.fileformat.bibtexml.File;
-import net.sf.jabref.importer.fileformat.bibtexml.Inbook;
-import net.sf.jabref.importer.fileformat.bibtexml.Incollection;
 import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fileformat.bibtexml.Entry;
+import net.sf.jabref.logic.importer.fileformat.bibtexml.File;
+import net.sf.jabref.logic.importer.fileformat.bibtexml.Inbook;
+import net.sf.jabref.logic.importer.fileformat.bibtexml.Incollection;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -96,7 +96,7 @@ public class BibTeXMLImporter extends ImportFormat {
         List<BibEntry> bibItems = new ArrayList<>();
 
         try {
-            JAXBContext context = JAXBContext.newInstance("net.sf.jabref.importer.fileformat.bibtexml");
+            JAXBContext context = JAXBContext.newInstance("net.sf.jabref.logic.importer.fileformat.bibtexml");
             Unmarshaller unmarshaller = context.createUnmarshaller();
             File file = (File) unmarshaller.unmarshal(reader);
 
