@@ -108,7 +108,7 @@ public class AutosaveStartupPrompter implements Runnable {
                 }
             } while (!done);
 
-            if (!pr.isInvalid() && Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
+            if (!pr.isInvalid()) {
                 ParserResultWarningDialog.showParserResultWarningDialog(pr, frame);
             }
         }

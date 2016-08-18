@@ -66,6 +66,8 @@ public class GUIGlobals {
     public static final int WIDTH_ICON_COL = 26;
     public static final int WIDTH_ICON_COL_RANKING = 80; // Width of Ranking Icon Column
 
+    public static final int MAX_BACK_HISTORY_SIZE = 10; // The maximum number of "Back" operations stored.
+
     public static JLabel getTableIcon(String fieldType) {
         JLabel label = GUIGlobals.TABLE_ICONS.get(fieldType);
         if (label == null) {
