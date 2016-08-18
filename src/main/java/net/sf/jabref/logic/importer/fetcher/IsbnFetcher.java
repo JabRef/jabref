@@ -34,8 +34,6 @@ import net.sf.jabref.logic.util.ISBN;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.utils.URIBuilder;
 
 /**
@@ -43,7 +41,6 @@ import org.apache.http.client.utils.URIBuilder;
  */
 public class IsbnFetcher implements IdBasedFetcher {
 
-    private static final Log LOGGER = LogFactory.getLog(IsbnFetcher.class);
     private static final String URL_PATTERN = "http://www.ebook.de/de/tools/isbn2bibtex?";
 
     @Override
@@ -62,7 +59,6 @@ public class IsbnFetcher implements IdBasedFetcher {
         Optional<BibEntry> result = Optional.empty();
 
         if (isbn.isValidChecksum() && isbn.isValidFormat()) {
-
             try {
                 //Build the URL. In this case: http://www.ebook.de/de/tools/isbn2bibtex?isbn=identifier
                 URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);
@@ -72,20 +68,23 @@ public class IsbnFetcher implements IdBasedFetcher {
                 //Downloads the source code of the site and then creates a .bib file out of the String
                 URLDownload urlDownload = new URLDownload(url);
                 String bibtexString = urlDownload.downloadToString(StandardCharsets.UTF_8);
-                BibEntry entry = BibtexParser.singleFromString(bibtexString, ImportFormatPreferences.fromPreferences(Globals.prefs));
+                Optional<BibEntry> entry = BibtexParser.singleFromStringOptional(bibtexString, ImportFormatPreferences.fromPreferences(Globals.prefs));
 
-                entry.clearField(FieldName.URL);
+                if (entry.isPresent()) {
+                    BibEntry bibEntry = entry.get();
+                    if (bibEntry.hasField(FieldName.URL)) {
+                        bibEntry.clearField(FieldName.URL);
+                    }
 
-                //Removes every non-digit character in the PAGETOTAL field.
-                if (entry.hasField(FieldName.PAGETOTAL)) {
-                    String pagetotal = entry.getFieldOptional(FieldName.PAGETOTAL).get();
-                    entry.setField(FieldName.PAGETOTAL, pagetotal.replaceAll("[\\D]", ""));
+                    //Removes every non-digit character in the PAGETOTAL field.
+                    Optional<String> pagetotal = bibEntry.getFieldOptional(FieldName.PAGETOTAL);
+                    if (pagetotal.isPresent()) {
+                        bibEntry.setField(FieldName.PAGETOTAL, pagetotal.get().replaceAll("[\\D]", ""));
+                    }
+
+                    result = Optional.of(bibEntry);
                 }
-
-                result = Optional.ofNullable(entry);
-
             } catch (IOException | URISyntaxException e) {
-                LOGGER.error("Bad URL when fetching ISBN info", e);
                 throw new FetcherException("Bad URL when fetching ISBN info", e);
             }
         }

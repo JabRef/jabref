@@ -26,7 +26,7 @@ public class IsbnFetcherTest {
 
         bibEntry = new BibEntry();
         bibEntry.setType(BibLatexEntryTypes.BOOK);
-        bibEntry.setField("bibtexkey","9780321356680");
+        bibEntry.setField("bibtexkey", "9780321356680");
         bibEntry.setField("title", "Effective Java");
         bibEntry.setField("publisher", "Addison Wesley");
         bibEntry.setField("year", "2008");
