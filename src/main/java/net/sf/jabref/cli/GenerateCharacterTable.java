@@ -39,7 +39,7 @@ public class GenerateCharacterTable {
                                     + ((character.getKey() > 128) ? String
                                             .valueOf(Character.toChars(character.getKey())) : "")
                                     + " & \\symbol{" + Integer.toString(character.getKey()) + "} & "
-                                    + character.getValue() + " & \\verb+" + character.getValue() + "+ \\\\");
+                                    + character.getValue() + " & \\verb¤" + character.getValue() + "¤ \\\\");
         }
         System.out.println("\\end{supertabular}");
         System.out.println("\\end{document}");

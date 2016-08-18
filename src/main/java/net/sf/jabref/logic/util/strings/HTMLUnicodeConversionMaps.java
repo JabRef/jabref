@@ -674,6 +674,21 @@ public class HTMLUnicodeConversionMaps {
             {"8241", "", "{\\textpertenthousand}"}, // per ten thousands sign
             {"8244", "", "{$\\prime\\prime\\prime$}"}, // triple prime
             {"8251", "", "{\\textreferencemark}"}, {"8253", "", "{\\textinterrobang}"},
+            {"8320", "", "$_{0}$"}, // sub-script 0
+            {"8321", "", "$_{1}$"}, // sub-script 1
+            {"8322", "", "$_{2}$"}, // sub-script 2
+            {"8323", "", "$_{3}$"}, // sub-script 3
+            {"8324", "", "$_{4}$"}, // sub-script 4
+            {"8325", "", "$_{5}$"}, // sub-script 5
+            {"8326", "", "$_{6}$"}, // sub-script 6
+            {"8327", "", "$_{7}$"}, // sub-script 7
+            {"8328", "", "$_{8}$"}, // sub-script 8
+            {"8329", "", "$_{9}$"}, // sub-script 9
+            {"8330", "", "$_{+}$"}, // sub-script +
+            {"8331", "", "$_{-}$"}, // sub-script -
+            {"8332", "", "$_{-}$"}, // sub-script =
+            {"8333", "", "$_{(}$"}, // sub-script (
+            {"8334", "", "$_{)}$"}, // sub-script )
             {"8450", "complexes", "$\\mathbb{C}$"}, // double struck capital C -- requires e.g. amsfonts
             {"8451", "", "{\\textcelsius}"}, // Degree Celsius
             {"8459", "Hscr", "{{$\\mathcal{H}$}}"}, // script capital H -- possibly use \mathscr
@@ -702,6 +717,7 @@ public class HTMLUnicodeConversionMaps {
             {"8714", "", "$\\in$"}, // Small element in
             {"8723", "mp", "$\\mp$"}, // Minus-plus
             {"8729", "bullet", "$\\bullet$"}, // Bullet operator
+            {"8741", "", "$\\parallel$"}, // Parallel to
             {"8758", "ratio", ":"}, // Colon/ratio
             {"8771", "sime", "$\\simeq$"}, // almost equal to = asymptotic to,
             {"8776", "ap", "$\\approx$"}, // almost equal to = asymptotic to,
@@ -730,6 +746,11 @@ public class HTMLUnicodeConversionMaps {
             // better but requires amssymb
             {"10877", "les", "$\\leqslant$"}, // Less than slanted equal -- requires amssymb
             {"10878", "ges", "$\\geqslant$"}, // Less than slanted equal -- requires amssymb
+            {"64256", "", "ff"}, // ff ligature (which LaTeX solves by itself)
+            {"64257", "", "fi"}, // fi ligature (which LaTeX solves by itself)
+            {"64258", "", "fl"}, // fl ligature (which LaTeX solves by itself)
+            {"64259", "", "ffi"}, // ffi ligature (which LaTeX solves by itself)
+            {"64260", "", "ffl"}, // ffl ligature (which LaTeX solves by itself)
             {"119978", "Oscr", "$\\mathcal{O}$"}, // script capital O -- possibly use \mathscr
             {"119984", "Uscr", "$\\mathcal{U}$"} // script capital U -- possibly use \mathscr
 
