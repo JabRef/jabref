@@ -209,7 +209,7 @@ class ManageJournalsPanel extends JPanel {
         });
 
         browseOld.addActionListener(e -> {
-            Optional<Path> path = new FileDialog(frame, personalFile.getText()).openDialogAndGetSelectedFile();
+            Optional<Path> path = new FileDialog(frame, personalFile.getText()).showDialogAndGetSelectedFile();
 
             path.ifPresent(fileName -> {
                 personalFile.setText(fileName.toString());

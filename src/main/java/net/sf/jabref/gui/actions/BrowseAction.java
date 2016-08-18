@@ -87,13 +87,13 @@ public final class BrowseAction extends AbstractAction {
     private String askUser() {
         if (dirsOnly) {
             Path path  = new FileDialog(frame, comp.getText()).dirsOnly().withExtensions(extensions)
-                    .openDialogAndGetSelectedFile().orElse(Paths.get(""));
+                    .showDialogAndGetSelectedFile().orElse(Paths.get(""));
             String file = path.toString();
 
             return file;
         } else {
             Path path = new FileDialog(frame, comp.getText()).withExtensions(extensions)
-                    .openDialogAndGetSelectedFile().orElse(Paths.get(""));
+                    .showDialogAndGetSelectedFile().orElse(Paths.get(""));
             String file = path.toString();
 
             return file;
