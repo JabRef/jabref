@@ -62,17 +62,16 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 public class PreferencesDialog extends JDialog {
+    private static final Log LOGGER = LogFactory.getLog(PreferencesDialog.class);
 
     private final JPanel main;
 
     private final JabRefFrame frame;
-
     private final JButton importPreferences = new JButton(Localization.lang("Import preferences"));
     private final JButton exportPreferences = new JButton(Localization.lang("Export preferences"));
     private final JButton showPreferences = new JButton(Localization.lang("Show preferences"));
-    private final JButton resetPreferences = new JButton(Localization.lang("Reset preferences"));
 
-    private static final Log LOGGER = LogFactory.getLog(PreferencesDialog.class);
+    private final JButton resetPreferences = new JButton(Localization.lang("Reset preferences"));
 
 
     public PreferencesDialog(JabRefFrame parent) {
@@ -165,9 +164,10 @@ public class PreferencesDialog extends JDialog {
         // Import and export actions:
         exportPreferences.setToolTipText(Localization.lang("Export preferences to file"));
         exportPreferences.addActionListener(e -> {
+            NewFileDialog dialog = new NewFileDialog(frame, System.getProperty("user.home")).withExtension(FileExtensions.XML);
+            dialog.setDefaultExtension(FileExtensions.XML);
+            Optional<Path> path = dialog.saveNewFile();
 
-            Optional<Path> path = new NewFileDialog(frame, System.getProperty("user.home"))
-                    .withExtension(FileExtensions.XML).saveNewFile();
             path.ifPresent(exportFile -> {
                 try {
                     prefs.exportPreferences(exportFile.toString());
@@ -181,9 +181,9 @@ public class PreferencesDialog extends JDialog {
 
         importPreferences.setToolTipText(Localization.lang("Import preferences from file"));
         importPreferences.addActionListener(e -> {
-
-            Optional<Path> fileName = new NewFileDialog(frame, System.getProperty("user.home"))
-                    .withExtension(FileExtensions.XML).openDialogAndGetSelectedFile();
+            NewFileDialog dialog = new NewFileDialog(frame, System.getProperty("user.home")).withExtension(FileExtensions.XML);
+            dialog.setDefaultExtension(FileExtensions.XML);
+            Optional<Path> fileName = dialog.openDialogAndGetSelectedFile();
 
             if (fileName.isPresent()) {
                 try {

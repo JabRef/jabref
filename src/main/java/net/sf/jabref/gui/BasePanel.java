@@ -2307,14 +2307,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         private final SavePreferences.DatabaseSaveType saveType;
 
-
         public SaveSelectedAction(SavePreferences.DatabaseSaveType saveType) {
             this.saveType = saveType;
         }
 
         @Override
         public void action() throws SaveException {
-            Optional<Path> chosenFile = new NewFileDialog(frame).withExtension(FileExtensions.BIBTEX_DB).saveNewFile();
+            NewFileDialog dialog = new NewFileDialog(frame).withExtension(FileExtensions.BIBTEX_DB);
+            dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
+            Optional<Path> chosenFile = dialog.saveNewFile();
 
             if (chosenFile.isPresent()) {
                 Path path = chosenFile.get();
@@ -2326,10 +2327,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     private static class SearchAndOpenFile {
-
         private final BibEntry entry;
         private final BasePanel basePanel;
-
 
         public SearchAndOpenFile(final BibEntry entry, final BasePanel basePanel) {
             this.entry = entry;

@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.Action;
 import javax.swing.JOptionPane;
@@ -96,15 +97,10 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         List<File> filesToOpen = new ArrayList<>();
 
         if (showDialog) {
-
-            List<String> chosenStrings = new NewFileDialog(frame).withExtension(FileExtensions.BIBTEX_DB)
-                    .showDialogAndGetMultipleFiles();
-
-            for (String chosen : chosenStrings) {
-
-                filesToOpen.add(new File(chosen));
-
-            }
+            NewFileDialog dialog = new NewFileDialog(frame).withExtension(FileExtensions.BIBTEX_DB);
+            dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
+            List<String> chosenStrings = dialog.showDialogAndGetMultipleFiles();
+            filesToOpen.addAll(chosenStrings.stream().map(File::new).collect(Collectors.toList()));
         } else {
             LOGGER.info(Action.NAME + " " + e.getActionCommand());
             filesToOpen.add(new File(StringUtil.getCorrectFileName(e.getActionCommand(), "bib")));
