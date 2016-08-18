@@ -105,7 +105,6 @@ import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
-import net.sf.jabref.logic.util.UpdateFieldPreferences;
 import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -724,7 +723,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             boolean groupingCanceled = false;
 
             // Set owner/timestamp if options are enabled:
-            UpdateField.setAutomaticFields(selected, UpdateFieldPreferences.fromPreferences(Globals.prefs));
+            UpdateField.setAutomaticFields(selected, Globals.prefs.getUpdateFieldPreferences());
 
             // Mark entries if we should
             if (EntryMarker.shouldMarkEntries()) {

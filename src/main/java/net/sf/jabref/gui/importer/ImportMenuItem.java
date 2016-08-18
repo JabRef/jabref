@@ -39,7 +39,6 @@ import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
-import net.sf.jabref.logic.util.UpdateFieldPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
@@ -249,7 +248,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 anythingUseful = anythingUseful | !entries.isEmpty();
 
                 // set timestamp and owner
-                UpdateField.setAutomaticFields(entries, UpdateFieldPreferences.fromPreferences(Globals.prefs)); // set timestamp and owner
+                UpdateField.setAutomaticFields(entries, Globals.prefs.getUpdateFieldPreferences()); // set timestamp and owner
 
                 boolean markEntries = !openInNew && EntryMarker.shouldMarkEntries();
                 for (BibEntry entry : entries) {
