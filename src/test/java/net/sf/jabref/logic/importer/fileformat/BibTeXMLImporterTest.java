@@ -7,12 +7,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.importer.util.BibTeXMLHandler;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -50,12 +48,6 @@ public class BibTeXMLImporterTest {
     public void setUp() throws Exception {
         Globals.prefs = JabRefPreferences.getInstance();
         importer = new BibTeXMLImporter();
-    }
-
-    @Test
-    public void testGetItemsEmpty() {
-        BibTeXMLHandler handler = new BibTeXMLHandler();
-        assertEquals(Collections.emptyList(), handler.getItems());
     }
 
     @Test
