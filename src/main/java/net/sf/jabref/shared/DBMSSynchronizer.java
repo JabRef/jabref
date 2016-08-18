@@ -94,7 +94,7 @@ public class DBMSSynchronizer {
     public void listen(FieldChangedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntryEvents may be posted.
         // In this case DBSynchronizer should not try to update the bibEntry entry again (but it would not harm).
-        if (isEventSourceAccepted(event) && checkCurrentConnection()) {
+        if (isPresentLocalBibEntry(event.getBibEntry()) && isEventSourceAccepted(event) && checkCurrentConnection()) {
             synchronizeLocalMetaData();
             BibEntry bibEntry = event.getBibEntry();
             synchronizeSharedEntry(bibEntry);
@@ -346,6 +346,10 @@ public class DBMSSynchronizer {
 
     public void openSharedDatabase(DBMSConnectionProperties properties) throws ClassNotFoundException, SQLException {
         openSharedDatabase(DBMSConnector.getNewConnection(properties), properties.getType(), properties.getDatabase());
+    }
+
+    private boolean isPresentLocalBibEntry(BibEntry bibEntry) {
+        return bibDatabase.getEntries().contains(bibEntry);
     }
 
     public String getDBName() {
