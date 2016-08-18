@@ -182,11 +182,10 @@ public class JabRefGUI {
                     JOptionPane.ERROR_MESSAGE);
         }
 
-        if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
-            int i = 0;
-            for (ParserResult pr : bibDatabases) {
-                ParserResultWarningDialog.showParserResultWarningDialog(pr, JabRefGUI.getMainFrame(), i++);
-            }
+        // Display warnings, if any
+        int tabNumber = 0;
+        for (ParserResult pr : bibDatabases) {
+            ParserResultWarningDialog.showParserResultWarningDialog(pr, JabRefGUI.getMainFrame(), tabNumber++);
         }
 
         // After adding the databases, go through each and see if

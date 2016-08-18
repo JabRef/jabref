@@ -158,9 +158,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             for (ImportFormatReader.UnknownFormatImport p : imports) {
                 if (p != null) {
                     ParserResult pr = p.parserResult;
-                    if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
-                        ParserResultWarningDialog.showParserResultWarningDialog(pr, frame);
-                    }
+                    ParserResultWarningDialog.showParserResultWarningDialog(pr, frame);
                 }
             }
         }
