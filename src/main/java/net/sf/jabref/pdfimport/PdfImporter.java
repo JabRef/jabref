@@ -44,6 +44,7 @@ import net.sf.jabref.logic.importer.fileformat.PdfContentImporter;
 import net.sf.jabref.logic.importer.fileformat.PdfXmpImporter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
+import net.sf.jabref.logic.util.UpdateFieldPreferences;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
@@ -284,7 +285,7 @@ public class PdfImporter {
                 // Set owner/timestamp if options are enabled:
                 List<BibEntry> list = new ArrayList<>();
                 list.add(be);
-                UpdateField.setAutomaticFields(list, true, true, Globals.prefs);
+                UpdateField.setAutomaticFields(list, true, true, UpdateFieldPreferences.fromPreferences(Globals.prefs));
 
                 // Create an UndoableInsertEntry object.
                 panel.getUndoManager().addEdit(new UndoableInsertEntry(panel.getDatabase(), be, panel));

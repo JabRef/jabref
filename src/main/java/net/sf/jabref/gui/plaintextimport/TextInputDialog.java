@@ -129,6 +129,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.UpdateField;
+import net.sf.jabref.logic.util.UpdateFieldPreferences;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
@@ -516,7 +517,8 @@ public class TextInputDialog extends JDialog {
         if (importedEntries.isEmpty()) {
             return false;
         } else {
-            UpdateField.setAutomaticFields(importedEntries, false, false, Globals.prefs);
+            UpdateField.setAutomaticFields(importedEntries, false, false,
+                    UpdateFieldPreferences.fromPreferences(Globals.prefs));
             boolean markEntries = EntryMarker.shouldMarkEntries();
 
             for (BibEntry e : importedEntries) {

@@ -7,7 +7,6 @@ import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 public class UpdateField {
 
@@ -85,16 +84,18 @@ public class UpdateField {
      * @param overwriteTimestamp Indicates whether timestamp should be set if it is already set.
      */
     public static void setAutomaticFields(BibEntry entry, boolean overwriteOwner, boolean overwriteTimestamp,
-            JabRefPreferences prefs) {
-        String defaultOwner = prefs.get(JabRefPreferences.DEFAULT_OWNER);
-        String timestamp = EasyDateFormat.fromPreferences(prefs).getCurrentDate();
-        String timeStampField = prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
-        boolean setOwner = prefs.getBoolean(JabRefPreferences.USE_OWNER)
-                && (overwriteOwner || (!entry.hasField(FieldName.OWNER)));
-        boolean setTimeStamp = prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP)
-                && (overwriteTimestamp || (!entry.hasField(timeStampField)));
+            UpdateFieldPreferences prefs) {
+        String defaultOwner = prefs.getDefaultOwner();
+        String timestamp = EasyDateFormat.fromTimeStampFormat(prefs.getTimeStampFormat()).getCurrentDate();
+        String timeStampField = prefs.getTimeStampField();
+        boolean setOwner = prefs.isUseOwner() && (overwriteOwner || (!entry.hasField(FieldName.OWNER)));
+        boolean setTimeStamp = prefs.isUseTimeStamp() && (overwriteTimestamp || (!entry.hasField(timeStampField)));
 
         setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
+    }
+
+    public static void setAutomaticFields(BibEntry entry, UpdateFieldPreferences prefs) {
+        UpdateField.setAutomaticFields(entry, prefs.isOverwriteOwner(), prefs.isOverwriteTimeStamp(), prefs);
     }
 
     private static void setAutomaticFields(BibEntry entry, boolean setOwner, String owner, boolean setTimeStamp,
@@ -118,19 +119,19 @@ public class UpdateField {
      * @param bibs List of bibtex entries
      */
     public static void setAutomaticFields(Collection<BibEntry> bibs, boolean overwriteOwner,
-            boolean overwriteTimestamp, JabRefPreferences prefs) {
+            boolean overwriteTimestamp, UpdateFieldPreferences prefs) {
 
-        boolean globalSetOwner = prefs.getBoolean(JabRefPreferences.USE_OWNER);
-        boolean globalSetTimeStamp = prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP);
+        boolean globalSetOwner = prefs.isUseOwner();
+        boolean globalSetTimeStamp = prefs.isUseTimeStamp();
 
         // Do not need to do anything if all options are disabled
         if (!(globalSetOwner || globalSetTimeStamp)) {
             return;
         }
 
-        String timeStampField = prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
-        String defaultOwner = prefs.get(JabRefPreferences.DEFAULT_OWNER);
-        String timestamp = EasyDateFormat.fromPreferences(prefs).getCurrentDate();
+        String timeStampField = prefs.getTimeStampField();
+        String defaultOwner = prefs.getDefaultOwner();
+        String timestamp = EasyDateFormat.fromTimeStampFormat(prefs.getTimeStampFormat()).getCurrentDate();
 
         // Iterate through all entries
         for (BibEntry curEntry : bibs) {
@@ -140,4 +141,7 @@ public class UpdateField {
         }
     }
 
+    public static void setAutomaticFields(Collection<BibEntry> bibs, UpdateFieldPreferences prefs) {
+        UpdateField.setAutomaticFields(bibs, prefs.isOverwriteOwner(), prefs.isOverwriteTimeStamp(), prefs);
+    }
 }
