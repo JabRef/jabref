@@ -33,6 +33,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.datatype.XMLGregorianCalendar;
+
 import net.sf.jabref.importer.fileformat.bibtexml.Entry;
 import net.sf.jabref.importer.fileformat.bibtexml.File;
 import net.sf.jabref.importer.fileformat.bibtexml.Inbook;
@@ -233,7 +234,11 @@ public class BibTeXMLImporter extends ImportFormat {
                 XMLGregorianCalendar value = (XMLGregorianCalendar) elementValue;
                 if (FieldName.YEAR.equals(localName)) {
                     putYear(fields, value);
+                } else {
+                    LOGGER.info("Unexpected field was found");
                 }
+            } else {
+                LOGGER.info("Unexpected field was found");
             }
         }
     }
