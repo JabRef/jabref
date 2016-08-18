@@ -18,6 +18,7 @@ package net.sf.jabref.logic.exporter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.TreeMap;
 
@@ -55,6 +56,8 @@ public class CustomExportList {
 
     public Map<String, ExportFormat> getCustomExportFormats(JabRefPreferences prefs,
             JournalAbbreviationLoader loader) {
+        Objects.requireNonNull(prefs);
+        Objects.requireNonNull(loader);
         formats.clear();
         readPrefs(prefs, loader);
         return formats;
@@ -69,6 +72,8 @@ public class CustomExportList {
     }
 
     private void readPrefs(JabRefPreferences prefs, JournalAbbreviationLoader loader) {
+        Objects.requireNonNull(prefs);
+        Objects.requireNonNull(loader);
         formats.clear();
         list.clear();
         int i = 0;
