@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
@@ -35,10 +36,13 @@ public class HtmlExportFormatTest {
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
         JournalAbbreviationLoader journalAbbreviationLoader = new JournalAbbreviationLoader();
-        ExportFormats.initAllExports(
-                Globals.prefs.customExports.getCustomExportFormats(Globals.prefs, journalAbbreviationLoader),
-                LayoutFormatterPreferences.fromPreferences(Globals.prefs, journalAbbreviationLoader),
-                SavePreferences.loadForExportFromPreferences(Globals.prefs));
+        Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
+                journalAbbreviationLoader);
+        LayoutFormatterPreferences layoutPreferences = LayoutFormatterPreferences.fromPreferences(Globals.prefs,
+                journalAbbreviationLoader);
+        SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+        ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
+
         exportFormat = ExportFormats.getExportFormat("html");
 
         databaseContext = new BibDatabaseContext();

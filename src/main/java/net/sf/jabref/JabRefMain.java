@@ -16,12 +16,14 @@
 package net.sf.jabref;
 
 import java.net.Authenticator;
+import java.util.Map;
 
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.cli.ArgumentProcessor;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.logic.CustomEntryTypesManager;
+import net.sf.jabref.logic.exporter.ExportFormat;
 import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
@@ -80,10 +82,12 @@ public class JabRefMain {
         Globals.IMPORT_FORMAT_READER.resetImportFormats(ImportFormatPreferences.fromPreferences(Globals.prefs),
                 XMPPreferences.fromPreferences(Globals.prefs));
         CustomEntryTypesManager.loadCustomEntryTypes(preferences);
-        ExportFormats.initAllExports(
-                Globals.prefs.customExports.getCustomExportFormats(Globals.prefs, Globals.journalAbbreviationLoader),
-                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader),
-                SavePreferences.loadForExportFromPreferences(Globals.prefs));
+        Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
+                Globals.journalAbbreviationLoader);
+        LayoutFormatterPreferences layoutPreferences = LayoutFormatterPreferences.fromPreferences(Globals.prefs,
+                Globals.journalAbbreviationLoader);
+        SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+        ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
 
         // Read list(s) of journal names and abbreviations
         Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();

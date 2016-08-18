@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
@@ -25,6 +26,7 @@ import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.exporter.BibDatabaseWriter;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
+import net.sf.jabref.logic.exporter.ExportFormat;
 import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.exporter.FileSaveSession;
 import net.sf.jabref.logic.exporter.IExportFormat;
@@ -391,11 +393,12 @@ public class ArgumentProcessor {
         try {
             Globals.prefs.importPreferences(cli.getPreferencesImport());
             CustomEntryTypesManager.loadCustomEntryTypes(Globals.prefs);
-            ExportFormats.initAllExports(
-                    Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
-                            Globals.journalAbbreviationLoader),
-                    LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader),
-                    SavePreferences.loadForExportFromPreferences(Globals.prefs));
+            Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
+                    Globals.journalAbbreviationLoader);
+            LayoutFormatterPreferences layoutPreferences = LayoutFormatterPreferences.fromPreferences(Globals.prefs,
+                    Globals.journalAbbreviationLoader);
+            SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+            ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }

@@ -89,6 +89,7 @@ public class ExportFormat implements IExportFormat {
      * @param directory   Directory in which to find the layout file.
      * @param extension   Should contain the . (for instance .txt).
      * @param layoutPreferences Preferences for layout
+     * @param savePreferences Preferences for saving
      */
     public ExportFormat(String displayName, String consoleName, String lfFileName, String directory, String extension,
             LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
@@ -100,7 +101,7 @@ public class ExportFormat implements IExportFormat {
     /**
      * Empty default constructor for subclasses
      */
-    ExportFormat() {
+    protected ExportFormat() {
         // intentionally empty
     }
 

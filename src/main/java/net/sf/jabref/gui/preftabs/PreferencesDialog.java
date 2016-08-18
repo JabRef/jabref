@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
@@ -42,6 +43,7 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.gui.maintable.MainTable;
+import net.sf.jabref.logic.exporter.ExportFormat;
 import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.l10n.Localization;
@@ -230,10 +232,13 @@ public class PreferencesDialog extends JDialog {
 
     private void updateAfterPreferenceChanges() {
         setValues();
-        ExportFormats.initAllExports(
-                Globals.prefs.customExports.getCustomExportFormats(Globals.prefs, Globals.journalAbbreviationLoader),
-                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader),
-                SavePreferences.loadForExportFromPreferences(Globals.prefs));
+        Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
+                Globals.journalAbbreviationLoader);
+        LayoutFormatterPreferences layoutPreferences = LayoutFormatterPreferences.fromPreferences(Globals.prefs,
+                Globals.journalAbbreviationLoader);
+        SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+        ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
+
         frame.removeCachedEntryEditors();
         Globals.prefs.updateEntryEditorTabList();
     }
