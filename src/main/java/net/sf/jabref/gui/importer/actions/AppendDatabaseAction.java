@@ -139,7 +139,8 @@ public class AppendDatabaseAction implements BaseAction {
             for (BibEntry originalEntry : fromDatabase.getEntries()) {
                 BibEntry be = (BibEntry) originalEntry.clone();
                 be.setId(IdGenerator.next());
-                UpdateField.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp, Globals.prefs);
+                UpdateField.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp,
+                        Globals.prefs.getUpdateFieldPreferences());
                 database.insertEntry(be);
                 appendedEntries.add(be);
                 originalEntries.add(originalEntry);

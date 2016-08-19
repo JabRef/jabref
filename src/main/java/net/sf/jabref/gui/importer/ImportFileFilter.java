@@ -28,7 +28,6 @@ import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.util.FileExtensions;
 
 class ImportFileFilter extends FileFilter implements Comparable<ImportFileFilter> {
-
     private final String description;
     private final FileNameExtensionFilter fileFilter;
 
@@ -48,7 +47,7 @@ class ImportFileFilter extends FileFilter implements Comparable<ImportFileFilter
 
     @Override
     public boolean accept(File file) {
-        return fileFilter.accept(file);
+        return (file != null) && (file.isDirectory() || fileFilter.accept(file));
     }
 
     @Override
