@@ -24,12 +24,10 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JOptionPane;
-import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.FileDialog;
