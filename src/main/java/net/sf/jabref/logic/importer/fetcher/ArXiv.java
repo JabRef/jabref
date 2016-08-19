@@ -71,7 +71,6 @@ import org.xml.sax.SAXException;
 public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(ArXiv.class);
-
     private static final String API_URL = "http://export.arxiv.org/api/query";
 
 
