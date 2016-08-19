@@ -55,11 +55,11 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     private boolean hasRunConfig;
     private static final int MAX_ENTRIES_TO_LOAD = 50;
     private static final String QUERY_MARKER = "___QUERY___";
-    private static final String URL_START = "http://scholar.google.com";
-    private static final String URL_SETTING = "http://scholar.google.com/scholar_settings";
-    private static final String URL_SETPREFS = "http://scholar.google.com/scholar_setprefs";
+    private static final String URL_START = "https://scholar.google.com";
+    private static final String URL_SETTING = "https://scholar.google.com/scholar_settings";
+    private static final String URL_SETPREFS = "https://scholar.google.com/scholar_setprefs";
     private static final String SEARCH_URL = GoogleScholarFetcher.URL_START + "/scholar?q=" + GoogleScholarFetcher.QUERY_MARKER
-            + "&amp;hl=en&amp;btnG=Search";
+            + "&hl=en&btnG=Search&oe=utf-8";
 
     private static final Pattern BIBTEX_LINK_PATTERN = Pattern.compile("<a href=\"([^\"]*)\"[^>]*>[A-Za-z ]*BibTeX");
     private static final Pattern TITLE_START_PATTERN = Pattern.compile("<div class=\"gs_ri\">");
@@ -176,10 +176,10 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private static void runConfig() throws IOException {
         try {
-            new URLDownload("http://scholar.google.com").downloadToString(Globals.prefs.getDefaultEncoding());
+            new URLDownload("http://scholar.google.com").downloadToString(StandardCharsets.UTF_8);
             //save("setting.html", ud.getStringContent());
             String settingsPage = new URLDownload(GoogleScholarFetcher.URL_SETTING)
-                    .downloadToString(Globals.prefs.getDefaultEncoding());
+                    .downloadToString(StandardCharsets.UTF_8);
             // Get the form items and their values from the page:
             Map<String, String> formItems = GoogleScholarFetcher.getFormElements(settingsPage);
             // Override the important ones:
@@ -220,7 +220,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     }
 
     private String getCitationsFromUrl(String urlQuery, Map<String, JLabel> ids) throws IOException {
-        String cont = new URLDownload(urlQuery).downloadToString(Globals.prefs.getDefaultEncoding());
+        String cont = new URLDownload(urlQuery).downloadToString(StandardCharsets.UTF_8);
         Matcher m = GoogleScholarFetcher.BIBTEX_LINK_PATTERN.matcher(cont);
         int lastRegionStart = 0;
 
