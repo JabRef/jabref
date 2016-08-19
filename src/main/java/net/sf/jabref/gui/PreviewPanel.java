@@ -16,7 +16,6 @@
 package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
@@ -40,9 +39,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 
@@ -61,7 +58,6 @@ import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.event.FieldChangedEvent;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
@@ -162,14 +158,6 @@ public class PreviewPanel extends JPanel
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setBorder(null);
 
-        /*
-         * If we have been given a panel and the preference option
-         * previewPrintButton is set, show the tool bar
-         */
-        if (this.basePanel.isPresent()
-                && JabRefPreferences.getInstance().getBoolean(JabRefPreferences.PREVIEW_PRINT_BUTTON)) {
-            add(createToolBar(), BorderLayout.LINE_START);
-        }
 
         add(scrollPane, BorderLayout.CENTER);
 
@@ -195,27 +183,6 @@ public class PreviewPanel extends JPanel
         menu.add(this.copyPreviewAction);
         this.basePanel.ifPresent(p -> menu.add(p.frame().getSwitchPreviewAction()));
         return menu;
-    }
-
-    private JToolBar createToolBar() {
-        JToolBar toolBar = new OSXCompatibleToolbar(SwingConstants.VERTICAL);
-        toolBar.setMargin(new Insets(0, 0, 0, 2));
-        toolBar.setFloatable(false);
-
-        // Add actions (and thus buttons)
-        toolBar.add(this.closeAction);
-        toolBar.addSeparator();
-        toolBar.add(this.copyPreviewAction);
-        toolBar.addSeparator();
-        toolBar.add(this.printAction);
-
-        Component[] comps = toolBar.getComponents();
-
-        for (Component comp : comps) {
-            ((JComponent) comp).setOpaque(false);
-        }
-
-        return toolBar;
     }
 
     private void createPreviewPane() {

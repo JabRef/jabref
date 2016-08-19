@@ -45,11 +45,16 @@ public class EntryMarker {
         String newValue = null;
         if (be.hasField(FieldName.MARKED_INTERNAL)) {
             String markerString = be.getFieldOptional(FieldName.MARKED_INTERNAL).get();
-            int index = markerString.indexOf(Globals.prefs.WRAPPED_USERNAME);
+            int index = markerString.indexOf(Globals.prefs.getWrappedUsername());
             if (index >= 0) {
                 // Already marked 1 for this user.
                 prevMarkLevel = 1;
-                newValue = markerString.substring(0, index) + markerString.substring(index + Globals.prefs.WRAPPED_USERNAME.length()) + Globals.prefs.WRAPPED_USERNAME.substring(0, Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":" + (increment ? Math.min(MAX_MARKING_LEVEL, prevMarkLevel + markIncrement) : markIncrement) + "]";
+                newValue = markerString.substring(0, index)
+                        + markerString.substring(index + Globals.prefs.getWrappedUsername().length())
+                        + Globals.prefs.getWrappedUsername().substring(0,
+                                Globals.prefs.getWrappedUsername().length() - 1)
+                        + ":" + (increment ? Math.min(MAX_MARKING_LEVEL, prevMarkLevel + markIncrement) : markIncrement)
+                        + "]";
             } else {
                 Matcher m = MARK_NUMBER_PATTERN.matcher(markerString);
                 if (m.find()) {
@@ -63,7 +68,7 @@ public class EntryMarker {
             }
         }
         if (newValue == null) {
-            newValue = Globals.prefs.WRAPPED_USERNAME.substring(0, Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":" + markIncrement + "]";
+            newValue = Globals.prefs.getWrappedUsername().substring(0, Globals.prefs.getWrappedUsername().length() - 1) + ":" + markIncrement + "]";
         }
 
         ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED_INTERNAL,
@@ -84,13 +89,14 @@ public class EntryMarker {
                 return;
             }
             String newValue = null;
-            int index = markerString.indexOf(Globals.prefs.WRAPPED_USERNAME);
+            int index = markerString.indexOf(Globals.prefs.getWrappedUsername());
             if (index >= 0) {
                 // Marked 1 for this user.
                 if (onlyMaxLevel) {
                     return;
                 } else {
-                    newValue = markerString.substring(0, index) + markerString.substring(index + Globals.prefs.WRAPPED_USERNAME.length());
+                    newValue = markerString.substring(0, index)
+                            + markerString.substring(index + Globals.prefs.getWrappedUsername().length());
                 }
             } else {
                 Matcher m = MARK_NUMBER_PATTERN.matcher(markerString);
@@ -101,7 +107,8 @@ public class EntryMarker {
                             if (prevMarkLevel > 1) {
                                 newValue = markerString.substring(0, m.start(1)) + markerString.substring(m.end(1));
                             } else {
-                                String toRemove = Globals.prefs.WRAPPED_USERNAME.substring(0, Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":1]";
+                                String toRemove = Globals.prefs.getWrappedUsername().substring(0,
+                                        Globals.prefs.getWrappedUsername().length() - 1) + ":1]";
                                 index = markerString.indexOf(toRemove);
                                 if (index >= 0) {
                                     newValue = markerString.substring(0, index) + markerString.substring(index + toRemove.length());
@@ -181,7 +188,7 @@ public class EntryMarker {
         if ("0".equals(s)) {
             return 1;
         }
-        int index = s.indexOf(Globals.prefs.WRAPPED_USERNAME);
+        int index = s.indexOf(Globals.prefs.getWrappedUsername());
         if (index >= 0) {
             return 1;
         }

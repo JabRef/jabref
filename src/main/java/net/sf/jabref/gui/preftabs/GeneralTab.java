@@ -232,7 +232,6 @@ class GeneralTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, inspectionWarnDupli.isSelected());
         String owner = defOwnerField.getText().trim();
         prefs.put(JabRefPreferences.DEFAULT_OWNER, owner);
-        prefs.WRAPPED_USERNAME = '[' + owner + ']';
         prefs.put(JabRefPreferences.TIME_STAMP_FORMAT, timeStampFormat.getText().trim());
         prefs.put(JabRefPreferences.TIME_STAMP_FIELD, timeStampField.getText().trim());
         // Update name of the time stamp field based on preferences
