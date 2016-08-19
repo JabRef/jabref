@@ -70,6 +70,7 @@ import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.util.UpdateFieldPreferences;
 import net.sf.jabref.logic.util.VersionPreferences;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
@@ -303,7 +304,6 @@ public class JabRefPreferences {
     public static final String SHOW_FILE_LINKS_UPGRADE_WARNING = "showFileLinksUpgradeWarning";
     public static final String SIDE_PANE_WIDTH = "sidePaneWidth";
     public static final String LAST_USED_EXPORT = "lastUsedExport";
-    public static final String LAST_USED_IMPORT = "lastUsedImport";
     public static final String FLOAT_MARKED_ENTRIES = "floatMarkedEntries";
     public static final String CITE_COMMAND = "citeCommand";
     public static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
@@ -453,10 +453,6 @@ public class JabRefPreferences {
     // string to be formatted and possible formatter arguments.
     public List<String> fileDirForDatabase;
 
-    // The following field is used as a global variable during the export of a database.
-    // It is used to hold custom name formatters defined by a custom export filter.
-    // It is set before the export starts:
-    public Map<String, String> customExportNameFormatters;
 
     // The only instance of this class:
     private static JabRefPreferences singleton;
@@ -1378,6 +1374,12 @@ public class JabRefPreferences {
         storage.put(CLEANUP_CONVERT_TO_BIBLATEX, preset.isConvertToBiblatex());
         storage.put(CLEANUP_FIX_FILE_LINKS, preset.isFixFileLinks());
         storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().getAsStringList()));
+    }
+
+    public UpdateFieldPreferences getUpdateFieldPreferences() {
+        return new UpdateFieldPreferences(getBoolean(USE_OWNER), getBoolean(OVERWRITE_OWNER), get(DEFAULT_OWNER),
+                getBoolean(USE_TIME_STAMP), getBoolean(OVERWRITE_TIME_STAMP), get(TIME_STAMP_FIELD),
+                get(TIME_STAMP_FORMAT));
     }
 
 }

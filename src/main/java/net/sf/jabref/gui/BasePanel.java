@@ -634,7 +634,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             tidialog.setVisible(true);
 
             if (tidialog.okPressed()) {
-                UpdateField.setAutomaticFields(Collections.singletonList(bibEntry), false, false, Globals.prefs);
+                UpdateField.setAutomaticFields(Collections.singletonList(bibEntry), false, false,
+                        Globals.prefs.getUpdateFieldPreferences());
                 insertEntry(bibEntry);
             }
         });
@@ -832,8 +833,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 if (firstBE == null) {
                     firstBE = be;
                 }
-                UpdateField.setAutomaticFields(be, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
-                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs);
+                UpdateField.setAutomaticFields(be, Globals.prefs.getUpdateFieldPreferences());
 
                 // We have to clone the
                 // entries, since the pasted
@@ -1155,7 +1155,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // Set owner/timestamp if options are enabled:
                 List<BibEntry> list = new ArrayList<>();
                 list.add(be);
-                UpdateField.setAutomaticFields(list, true, true, Globals.prefs);
+                UpdateField.setAutomaticFields(list, true, true, Globals.prefs.getUpdateFieldPreferences());
 
                 // Create an UndoableInsertEntry object.
                 getUndoManager().addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), be, BasePanel.this));
@@ -1308,7 +1308,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 bibDatabaseContext.getDatabase().insertEntry(bibEntry);
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)) {
                     // Set owner field to default value
-                    UpdateField.setAutomaticFields(bibEntry, true, true, Globals.prefs);
+                    UpdateField.setAutomaticFields(bibEntry, true, true, Globals.prefs.getUpdateFieldPreferences());
                 }
                 // Create an UndoableInsertEntry object.
                 getUndoManager()

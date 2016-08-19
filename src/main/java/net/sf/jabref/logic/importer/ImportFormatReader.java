@@ -52,6 +52,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class ImportFormatReader {
+    private static final Log LOGGER = LogFactory.getLog(ImportFormatReader.class);
 
     public static final String BIBTEX_FORMAT = "BibTeX";
 
@@ -60,8 +61,6 @@ public class ImportFormatReader {
      * Sorted accordingly to {@link ImportFormat#compareTo}, which defaults to alphabetically by the name
      */
     private final SortedSet<ImportFormat> formats = new TreeSet<>();
-
-    private static final Log LOGGER = LogFactory.getLog(ImportFormatReader.class);
 
     private ImportFormatPreferences importFormatPreferences;
 

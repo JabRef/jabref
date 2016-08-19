@@ -284,7 +284,7 @@ public class PdfImporter {
                 // Set owner/timestamp if options are enabled:
                 List<BibEntry> list = new ArrayList<>();
                 list.add(be);
-                UpdateField.setAutomaticFields(list, true, true, Globals.prefs);
+                UpdateField.setAutomaticFields(list, true, true, Globals.prefs.getUpdateFieldPreferences());
 
                 // Create an UndoableInsertEntry object.
                 panel.getUndoManager().addEdit(new UndoableInsertEntry(panel.getDatabase(), be, panel));

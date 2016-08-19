@@ -3,7 +3,6 @@ package net.sf.jabref.gui;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -16,6 +15,7 @@ import java.util.stream.Collectors;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import net.sf.jabref.Globals;
@@ -57,7 +57,6 @@ public class FileDialog {
 
     private final JFrame parent;
     private final String directory;
-    private List<FileNameExtensionFilter> fileFilters = new ArrayList<>();
     private Collection<FileExtensions> extensions = EnumSet.noneOf(FileExtensions.class);
 
     /**
@@ -111,7 +110,6 @@ public class FileDialog {
         for (FileExtensions ext : fileExtensions) {
             FileNameExtensionFilter extFilter = new FileNameExtensionFilter(ext.getDescription(), ext.getExtensions());
             fileChooser.addChoosableFileFilter(extFilter);
-            fileFilters.add(extFilter);
         }
 
         return this;
@@ -128,6 +126,25 @@ public class FileDialog {
                 .filter(f -> Objects.equals(f.getDescription(), extension.getDescription()))
                 .findFirst()
                 .ifPresent(fileChooser::setFileFilter);
+    }
+
+    /**
+     * Returns the currently selected file filter.
+     *
+     * @return FileFilter
+     */
+    public FileFilter getFileFilter() {
+        return fileChooser.getFileFilter();
+    }
+
+    /**
+     * Sets a custom file filter.
+     * Only use when withExtension() does not suffice.
+     *
+     * @param filter the custom file filter
+     */
+    public void setFileFilter(FileFilter filter) {
+        fileChooser.setFileFilter(filter);
     }
 
     /**
@@ -161,7 +178,7 @@ public class FileDialog {
      * Shows an {@link JFileChooser#OPEN_DIALOG} and allows to select a single file/folder
      * @return The path of the selected file/folder or {@link Optional#empty()} if dialog is aborted
      */
-    public Optional<Path> openDialogAndGetSelectedFile() {
+    public Optional<Path> showDialogAndGetSelectedFile() {
         fileChooser.setDialogType(JFileChooser.OPEN_DIALOG);
 
         if (showDialogAndIsAccepted()) {
@@ -198,5 +215,4 @@ public class FileDialog {
     private static String getWorkingDir() {
         return Globals.prefs.get(JabRefPreferences.WORKING_DIRECTORY);
     }
-
 }
