@@ -534,9 +534,13 @@ public class FindUnlinkedFilesDialog extends JDialog {
                         @Override
                         public void stateChanged(ChangeEvent e) {
                             counter++;
-                            SwingUtilities.invokeLater(() -> progressBarSearching
-                                    .setString(counter > 1 ? Localization.lang("%0 files found",
-                                            Integer.toString(counter)) : Localization.lang("One file found")));
+                            String message;
+                            if (counter == 1) {
+                                message = Localization.lang("One file found");
+                            } else {
+                                message = Localization.lang("%0 files found", Integer.toString(counter));
+                            }
+                            SwingUtilities.invokeLater(() -> progressBarSearching.setString(message));
                         }
                     });
             SwingUtilities.invokeLater(() -> searchFinishedHandler(rootNode));
@@ -614,11 +618,15 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private void importFinishedHandler(List<String> errors) {
 
         if ((errors != null) && !errors.isEmpty()) {
+            String message;
+            if (errors.size() == 1) {
+                message = Localization.lang("There was one file that could not be imported.");
+            } else {
+                message = Localization.lang("There were %0 files which could not be imported.",
+                        Integer.toString(errors.size()));
+            }
             JOptionPane.showMessageDialog(this,
-                    Localization.lang("The import finished with warnings:") + "\n"
-                            + (errors.size() > 1 ? Localization.lang("There were %0 files which could not be imported.",
-                                    Integer.toString(errors.size())) : Localization
-                                            .lang("There was one file that could not be imported.")),
+                    Localization.lang("The import finished with warnings:") + "\n" + message,
                     Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
         }
 

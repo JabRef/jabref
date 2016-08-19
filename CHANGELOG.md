@@ -70,6 +70,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed IndexOutOfBoundsException when trying to download a full text document without selecting an entry
 - Fixed NullPointerException when trying to set a special field or mark an entry through the menu without having an open database
 - Fixed NullPointerException when trying to synchronize file field with an entry without BibTeX key
+- Fixed NullPointerException when importing PDFs and pressing cancel when selecting entry type
 - Fixed a number of issues related to accessing the GUI from outside the EDT
 - Added a few missing translation strings
 - Fixed [#1257](https://github.com/JabRef/jabref/issues/1324): Preferences for the BibTeX key generator set in a version prior to 3.2 are now migrated automatically to the new version

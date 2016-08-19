@@ -114,37 +114,25 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
     @Override
     public void setActiveBackgroundColor() {
-        if (SwingUtilities.isEventDispatchThread()) {
-            setBackground(GUIGlobals.activeBackground);
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(() -> setBackground(GUIGlobals.activeBackground));
-            } catch (InvocationTargetException | InterruptedException e) {
-                LOGGER.info("Problem setting background color", e);
-            }
-        }
+        setBackgroundColor(GUIGlobals.activeBackgroundColor);
     }
 
     @Override
     public void setValidBackgroundColor() {
-        if (SwingUtilities.isEventDispatchThread()) {
-            setBackground(GUIGlobals.validFieldBackgroundColor);
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(() -> setBackground(GUIGlobals.validFieldBackgroundColor));
-            } catch (InvocationTargetException | InterruptedException e) {
-                LOGGER.info("Problem setting background color", e);
-            }
-        }
+        setBackgroundColor(GUIGlobals.validFieldBackgroundColor);
     }
 
     @Override
     public void setInvalidBackgroundColor() {
+        setBackgroundColor(GUIGlobals.invalidFieldBackgroundColor);
+    }
+
+    private void setBackgroundColor(Color color) {
         if (SwingUtilities.isEventDispatchThread()) {
-            setBackground(GUIGlobals.invalidFieldBackgroundColor);
+            setBackground(color);
         } else {
             try {
-                SwingUtilities.invokeAndWait(() -> setBackground(GUIGlobals.invalidFieldBackgroundColor));
+                SwingUtilities.invokeAndWait(() -> setBackground(color));
             } catch (InvocationTargetException | InterruptedException e) {
                 LOGGER.info("Problem setting background color", e);
             }

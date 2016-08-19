@@ -1789,16 +1789,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * This method shows a wait cursor and blocks all input to the JFrame's contents.
      */
     public void block() {
-        if (SwingUtilities.isEventDispatchThread()) {
-            getGlassPane().setVisible(true);
-        } else {
-            try {
-                SwingUtilities.invokeAndWait(() -> getGlassPane().setVisible(true));
-            } catch (InvocationTargetException | InterruptedException e) {
-                LOGGER.info("Problem blocking UI", e);
-            }
-        }
-
+        changeBlocking(true);
     }
 
     /**
@@ -1806,13 +1797,22 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * There are no adverse effects of calling this method redundantly.
      */
     public void unblock() {
+        changeBlocking(false);
+    }
+
+    /**
+     * Do the actual blocking/unblocking
+     *
+     * @param blocked true if input should be blocked
+     */
+    private void changeBlocking(boolean blocked) {
         if (SwingUtilities.isEventDispatchThread()) {
-            getGlassPane().setVisible(false);
+            getGlassPane().setVisible(blocked);
         } else {
             try {
-                SwingUtilities.invokeAndWait(() -> getGlassPane().setVisible(false));
+                SwingUtilities.invokeAndWait(() -> getGlassPane().setVisible(blocked));
             } catch (InvocationTargetException | InterruptedException e) {
-                LOGGER.info("Problem unblocking UI", e);
+                LOGGER.error("Problem " + (blocked ? "" : "un") + "blocking UI", e);
             }
         }
     }
