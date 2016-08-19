@@ -226,6 +226,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
         while (m.find()) {
             String link = m.group(1).replace("&amp;", "&");
+            link = link+"&oe=utf-8"; // append param 'oe=utf-8' to tell google to serve UTF-8 encoded results
             String pText;
             String part = cont.substring(lastRegionStart, m.start());
             Matcher titleS = GoogleScholarFetcher.TITLE_START_PATTERN.matcher(part);
@@ -267,7 +268,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private BibEntry downloadEntry(String link) throws IOException {
         try {
-            String s = new URLDownload(link).downloadToString(Globals.prefs.getDefaultEncoding());
+            String s = new URLDownload(link).downloadToString(StandardCharsets.UTF_8);
             BibtexParser bp = new BibtexParser(new StringReader(s),
                     ImportFormatPreferences.fromPreferences(Globals.prefs));
             ParserResult pr = bp.parse();
