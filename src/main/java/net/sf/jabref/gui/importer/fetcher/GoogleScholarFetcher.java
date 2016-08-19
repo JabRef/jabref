@@ -69,8 +69,6 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     private static final Pattern INPUT_PATTERN = Pattern.compile("<input type=([^ ]+) name=([^ ]+) value=([^> ]+)");
 
     private final Map<String, String> entryLinks = new HashMap<>();
-    //final static Pattern NEXT_PAGE_PATTERN = Pattern.compile(
-    //        "<a href=\"([^\"]*)\"><span class=\"SPRITE_nav_next\"> </span><br><span style=\".*\">Next</span></a>");
 
     private boolean stopFetching;
 
@@ -166,18 +164,9 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         stopFetching = true;
     }
 
-    /*  Used for debugging */
-    /*    private static void save(String filename, String content) throws IOException {
-        try (BufferedWriter out = new BufferedWriter(new FileWriter(filename))) {
-            out.write(content);
-        }
-    }
-    */
-
     private static void runConfig() throws IOException {
         try {
             new URLDownload("http://scholar.google.com").downloadToString(StandardCharsets.UTF_8);
-            //save("setting.html", ud.getStringContent());
             String settingsPage = new URLDownload(GoogleScholarFetcher.URL_SETTING)
                     .downloadToString(StandardCharsets.UTF_8);
             // Get the form items and their values from the page:
