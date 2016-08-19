@@ -401,7 +401,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     .containsDuplicate(panel.getDatabase(), entry, panel.getBibDatabaseContext().getMode()).isPresent()
                     || (internalDuplicate(this.entries, entry).isPresent()))) {
                 entry.setGroupHit(true);
-                deselectAllDuplicates.setEnabled(true);
+                SwingUtilities.invokeLater(() -> deselectAllDuplicates.setEnabled(true));
             }
             this.entries.getReadWriteLock().writeLock().lock();
             try {
