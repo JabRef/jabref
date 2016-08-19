@@ -27,14 +27,14 @@ class ImportFileFilter extends FileFilter implements Comparable<ImportFileFilter
 
     private final ImportFormat format;
     private final String name;
-    private final FileNameExtensionFilter filextFilter;
+    private final FileNameExtensionFilter extensionFilter;
 
 
     public ImportFileFilter(ImportFormat format) {
         this.format = format;
         FileExtensions extensions = format.getExtensions();
         this.name = extensions.getDescription();
-        filextFilter = new FileNameExtensionFilter(extensions.getDescription(), extensions.getExtensions());
+        this.extensionFilter = new FileNameExtensionFilter(extensions.getDescription(), extensions.getExtensions());
     }
 
     public ImportFormat getImportFormat() {
@@ -43,7 +43,7 @@ class ImportFileFilter extends FileFilter implements Comparable<ImportFileFilter
 
     @Override
     public boolean accept(File file) {
-        return filextFilter.accept(file);
+        return (file != null) && (file.isDirectory() || extensionFilter.accept(file));
     }
 
     @Override
