@@ -91,6 +91,7 @@ import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
@@ -236,6 +237,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 AbstractTableComparatorChooser.MULTIPLE_COLUMN_KEYBOARD);
         setupComparatorChooser();
         glTable.addMouseListener(new TableClickListener());
+
+        GUIUtil.correctRowHeight(glTable);
 
         setWidths();
 
@@ -720,8 +723,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             boolean groupingCanceled = false;
 
             // Set owner/timestamp if options are enabled:
-            UpdateField.setAutomaticFields(selected, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
-                    Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs);
+            UpdateField.setAutomaticFields(selected, Globals.prefs.getUpdateFieldPreferences());
 
             // Mark entries if we should
             if (EntryMarker.shouldMarkEntries()) {

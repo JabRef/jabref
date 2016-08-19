@@ -48,6 +48,7 @@ import net.sf.jabref.gui.fieldeditors.TextArea;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldProperties;
@@ -151,7 +152,10 @@ class EntryEditorTab {
             int wHeight = (int) (50.0 * InternalBibtexFields.getFieldWeight(field));
             if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.FILE_EDITOR)) {
                 fieldEditor = new FileListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent);
+
                 fileListEditor = (FileListEditor) fieldEditor;
+                GUIUtil.correctRowHeight(fileListEditor);
+
                 defaultHeight = 0;
             } else {
                 fieldEditor = new TextArea(field, null);

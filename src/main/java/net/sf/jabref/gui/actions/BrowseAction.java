@@ -27,7 +27,7 @@ import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
-import net.sf.jabref.gui.NewFileDialogs;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
 
@@ -86,14 +86,14 @@ public final class BrowseAction extends AbstractAction {
 
     private String askUser() {
         if (dirsOnly) {
-            Path path  = new NewFileDialogs(frame, comp.getText()).dirsOnly().withExtensions(extensions)
-                    .openDlgAndGetSelectedFile().orElse(Paths.get(""));
+            Path path  = new FileDialog(frame, comp.getText()).dirsOnly().withExtensions(extensions)
+                    .showDialogAndGetSelectedFile().orElse(Paths.get(""));
             String file = path.toString();
 
             return file;
         } else {
-            Path path = new NewFileDialogs(frame, comp.getText()).withExtensions(extensions)
-                    .openDlgAndGetSelectedFile().orElse(Paths.get(""));
+            Path path = new FileDialog(frame, comp.getText()).withExtensions(extensions)
+                    .showDialogAndGetSelectedFile().orElse(Paths.get(""));
             String file = path.toString();
 
             return file;

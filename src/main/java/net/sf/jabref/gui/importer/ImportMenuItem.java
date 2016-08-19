@@ -30,8 +30,8 @@ import javax.swing.JOptionPane;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryMarker;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.importer.ImportFormatReader;
@@ -47,7 +47,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 
 /*
  * TODO: could separate the "menu item" functionality from the importing functionality
- *
  */
 public class ImportMenuItem extends JMenuItem implements ActionListener {
 
@@ -55,7 +54,6 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
     private final boolean openInNew;
     private final ImportFormat importer;
     private IOException importError;
-
 
     public ImportMenuItem(JabRefFrame frame, boolean openInNew) {
         this(frame, openInNew, null);
@@ -98,12 +96,11 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         private ParserResult bibtexResult; // Contains the merged import results
         private boolean fileOk;
 
-
         @Override
         public void init() {
             importError = null;
 
-            filenames = new NewFileDialogs(frame).updateWorkingDirPref().showDlgAndGetMultipleFiles();
+            filenames = new FileDialog(frame).updateWorkingDirPref().showDialogAndGetMultipleFiles();
 
             if (!filenames.isEmpty()) {
                 frame.block();
@@ -134,10 +131,6 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         frame.output(Localization.lang("Importing in %0 format", importer.getFormatName()) + "...");
                         // Specific importer:
                         ParserResult pr = importer.importDatabase(file, Globals.prefs.getDefaultEncoding());
-                        if (pr.hasWarnings()) {
-                            frame.showMessage(pr.getErrorMessage());
-                        }
-
                         imports.add(new ImportFormatReader.UnknownFormatImport(importer.getFormatName(), pr));
                     }
                 } catch (IOException e) {
@@ -158,9 +151,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             for (ImportFormatReader.UnknownFormatImport p : imports) {
                 if (p != null) {
                     ParserResult pr = p.parserResult;
-                    if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
-                        ParserResultWarningDialog.showParserResultWarningDialog(pr, frame);
-                    }
+                    ParserResultWarningDialog.showParserResultWarningDialog(pr, frame);
                 }
             }
         }
@@ -250,8 +241,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 anythingUseful = anythingUseful | !entries.isEmpty();
 
                 // set timestamp and owner
-                UpdateField.setAutomaticFields(entries, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
-                        Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs); // set timestamp and owner
+                UpdateField.setAutomaticFields(entries, Globals.prefs.getUpdateFieldPreferences()); // set timestamp and owner
 
                 boolean markEntries = !openInNew && EntryMarker.shouldMarkEntries();
                 for (BibEntry entry : entries) {

@@ -44,11 +44,12 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
@@ -99,12 +100,14 @@ public class ImportCustomizationDialog extends JDialog {
             customImporterTable.setRowSelectionInterval(0, 0);
         }
 
+        GUIUtil.correctRowHeight(customImporterTable);
+
         JButton addFromFolderButton = new JButton(Localization.lang("Add from folder"));
         addFromFolderButton.addActionListener(e -> {
             CustomImporter importer = new CustomImporter();
 
-            Optional<Path> selectedFile = new NewFileDialogs(frame).withExtension(FileExtensions.CLASS)
-                    .openDlgAndGetSelectedFile();
+            Optional<Path> selectedFile = new FileDialog(frame).withExtension(FileExtensions.CLASS)
+                    .showDialogAndGetSelectedFile();
 
             if (selectedFile.isPresent() && (selectedFile.get().getParent() != null)) {
                 importer.setBasePath(selectedFile.get().getParent().toString());
@@ -133,8 +136,8 @@ public class ImportCustomizationDialog extends JDialog {
 
         JButton addFromJarButton = new JButton(Localization.lang("Add from JAR"));
         addFromJarButton.addActionListener(e -> {
-            Optional<Path> jarZipFile = new NewFileDialogs(frame)
-                    .withExtensions(EnumSet.of(FileExtensions.ZIP, FileExtensions.JAR)).openDlgAndGetSelectedFile();
+            Optional<Path> jarZipFile = new FileDialog(frame)
+                    .withExtensions(EnumSet.of(FileExtensions.ZIP, FileExtensions.JAR)).showDialogAndGetSelectedFile();
 
             if (jarZipFile.isPresent()) {
                 try (ZipFile zipFile = new ZipFile(jarZipFile.get().toFile(), ZipFile.OPEN_READ)) {

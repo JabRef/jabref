@@ -65,6 +65,7 @@ import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
@@ -105,6 +106,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         JScrollPane sPane = new JScrollPane(this);
         setTableHeader(null);
         addMouseListener(new TableClickListener());
+
+        GUIUtil.correctRowHeight(this);
 
         JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
         add.setToolTipText(Localization.lang("New file link (INSERT)"));

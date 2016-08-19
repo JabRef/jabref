@@ -17,9 +17,12 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.logic.exporter.ExportFormat;
 import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.exporter.IExportFormat;
+import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -59,7 +62,11 @@ public class ExportAction {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
+                Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
+                        Globals.journalAbbreviationLoader);
+                LayoutFormatterPreferences layoutPreferences = LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader);
+                SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+                ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
                 JFileChooser fc = ExportAction
                         .createExportFileChooser(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
                 fc.showSaveDialog(frame);

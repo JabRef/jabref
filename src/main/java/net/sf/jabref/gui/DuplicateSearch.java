@@ -215,7 +215,6 @@ public class DuplicateSearch implements Runnable {
 
 
         public DuplicateCallBack(JabRefFrame frame, BibEntry one, BibEntry two, DuplicateResolverType dialogType) {
-
             this.frame = frame;
             this.one = one;
             this.two = two;

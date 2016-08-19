@@ -112,9 +112,9 @@ import javax.swing.text.StyledDocument;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.EntryMarker;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -516,7 +516,7 @@ public class TextInputDialog extends JDialog {
         if (importedEntries.isEmpty()) {
             return false;
         } else {
-            UpdateField.setAutomaticFields(importedEntries, false, false, Globals.prefs);
+            UpdateField.setAutomaticFields(importedEntries, false, false, Globals.prefs.getUpdateFieldPreferences());
             boolean markEntries = EntryMarker.shouldMarkEntries();
 
             for (BibEntry e : importedEntries) {
@@ -594,8 +594,8 @@ public class TextInputDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                Optional<Path> path = new NewFileDialogs(frame).withExtension(FileExtensions.TXT)
-                        .openDlgAndGetSelectedFile();
+                Optional<Path> path = new FileDialog(frame).withExtension(FileExtensions.TXT)
+                        .showDialogAndGetSelectedFile();
                 if (path.isPresent()) {
                     File newFile = path.get().toFile();
                     document.remove(0, document.getLength());

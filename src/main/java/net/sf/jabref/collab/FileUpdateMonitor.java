@@ -32,7 +32,6 @@ import org.apache.commons.logging.LogFactory;
  * in the file's last modification time stamp. The
  */
 public class FileUpdateMonitor implements Runnable {
-
     private static final Log LOGGER = LogFactory.getLog(FileUpdateMonitor.class);
 
     private static final int WAIT = 4000;

@@ -62,7 +62,9 @@ public enum HelpFile {
     FETCHER_OAI2_ARXIV("arXivHelp"),
     FETCHER_SPRINGER("SpringerHelp"),
     FETCHER_SCIENCEDIRECT(""),
-    FETCHER_BIBSONOMY_SCRAPER("");
+    FETCHER_BIBSONOMY_SCRAPER(""),
+    DATABASE_PROPERTIES("DatabaseProperties"),
+    FIND_DUPLICATES("FindDuplicates");
 
     private final String pageName;
 

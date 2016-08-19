@@ -26,9 +26,9 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.MergeDialog;
-import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
@@ -83,7 +83,7 @@ public class AppendDatabaseAction implements BaseAction {
         md.setVisible(true);
         if (md.isOkPressed()) {
 
-            List<String> chosen = new NewFileDialogs(frame).updateWorkingDirPref().showDlgAndGetMultipleFiles();
+            List<String> chosen = new FileDialog(frame).updateWorkingDirPref().showDialogAndGetMultipleFiles();
             if (chosen.isEmpty()) {
                 return;
             }
@@ -139,7 +139,8 @@ public class AppendDatabaseAction implements BaseAction {
             for (BibEntry originalEntry : fromDatabase.getEntries()) {
                 BibEntry be = (BibEntry) originalEntry.clone();
                 be.setId(IdGenerator.next());
-                UpdateField.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp, Globals.prefs);
+                UpdateField.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp,
+                        Globals.prefs.getUpdateFieldPreferences());
                 database.insertEntry(be);
                 appendedEntries.add(be);
                 originalEntries.add(originalEntry);

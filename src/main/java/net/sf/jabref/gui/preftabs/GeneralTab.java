@@ -111,8 +111,9 @@ class GeneralTab extends JPanel implements PrefsTab {
         encodings = new JComboBox<>();
         encodings.setModel(new DefaultComboBoxModel<>(Encodings.ENCODINGS));
 
-        FormLayout layout = new FormLayout
-                ("8dlu, 1dlu, left:170dlu, 4dlu, fill:pref, 4dlu, fill:pref, 4dlu, left:pref, 4dlu, left:pref, 4dlu, left:pref", "");
+        FormLayout layout = new FormLayout(
+                "8dlu, 1dlu, left:pref:grow, 4dlu, fill:pref, 4dlu, fill:pref, 4dlu, left:pref, 1dlu, left:pref, 4dlu, left:pref",
+                "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
         builder.appendSeparator(Localization.lang("General"));
@@ -146,7 +147,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.nextLine();
 
         builder.append(new JPanel());
-        builder.append(updateTimeStamp, 2);
+        builder.append(updateTimeStamp, 11);
         builder.nextLine();
 
         builder.append(markImportedEntries, 13);

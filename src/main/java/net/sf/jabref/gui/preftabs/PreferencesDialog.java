@@ -23,6 +23,7 @@ import java.awt.event.ActionEvent;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
@@ -37,13 +38,16 @@ import javax.swing.ListSelectionModel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefException;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.gui.maintable.MainTable;
+import net.sf.jabref.logic.exporter.ExportFormat;
 import net.sf.jabref.logic.exporter.ExportFormats;
+import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.JabRefPreferencesFilter;
@@ -62,17 +66,16 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 public class PreferencesDialog extends JDialog {
+    private static final Log LOGGER = LogFactory.getLog(PreferencesDialog.class);
 
     private final JPanel main;
 
     private final JabRefFrame frame;
-
     private final JButton importPreferences = new JButton(Localization.lang("Import preferences"));
     private final JButton exportPreferences = new JButton(Localization.lang("Export preferences"));
     private final JButton showPreferences = new JButton(Localization.lang("Show preferences"));
-    private final JButton resetPreferences = new JButton(Localization.lang("Reset preferences"));
 
-    private static final Log LOGGER = LogFactory.getLog(PreferencesDialog.class);
+    private final JButton resetPreferences = new JButton(Localization.lang("Reset preferences"));
 
 
     public PreferencesDialog(JabRefFrame parent) {
@@ -165,9 +168,10 @@ public class PreferencesDialog extends JDialog {
         // Import and export actions:
         exportPreferences.setToolTipText(Localization.lang("Export preferences to file"));
         exportPreferences.addActionListener(e -> {
+            FileDialog dialog = new FileDialog(frame, System.getProperty("user.home")).withExtension(FileExtensions.XML);
+            dialog.setDefaultExtension(FileExtensions.XML);
+            Optional<Path> path = dialog.saveNewFile();
 
-            Optional<Path> path = new NewFileDialogs(frame, System.getProperty("user.home"))
-                    .withExtension(FileExtensions.XML).saveNewFile();
             path.ifPresent(exportFile -> {
                 try {
                     prefs.exportPreferences(exportFile.toString());
@@ -181,9 +185,9 @@ public class PreferencesDialog extends JDialog {
 
         importPreferences.setToolTipText(Localization.lang("Import preferences from file"));
         importPreferences.addActionListener(e -> {
-
-            Optional<Path> fileName = new NewFileDialogs(frame, System.getProperty("user.home"))
-                    .withExtension(FileExtensions.XML).openDlgAndGetSelectedFile();
+            FileDialog dialog = new FileDialog(frame, System.getProperty("user.home")).withExtension(FileExtensions.XML);
+            dialog.setDefaultExtension(FileExtensions.XML);
+            Optional<Path> fileName = dialog.showDialogAndGetSelectedFile();
 
             if (fileName.isPresent()) {
                 try {
@@ -228,7 +232,13 @@ public class PreferencesDialog extends JDialog {
 
     private void updateAfterPreferenceChanges() {
         setValues();
-        ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
+        Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
+                Globals.journalAbbreviationLoader);
+        LayoutFormatterPreferences layoutPreferences = LayoutFormatterPreferences.fromPreferences(Globals.prefs,
+                Globals.journalAbbreviationLoader);
+        SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+        ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
+
         frame.removeCachedEntryEditors();
         Globals.prefs.updateEntryEditorTabList();
     }

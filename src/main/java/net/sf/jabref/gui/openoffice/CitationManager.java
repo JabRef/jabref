@@ -37,6 +37,7 @@ import javax.swing.JTextField;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.openoffice.CitationEntry;
 
@@ -87,6 +88,8 @@ class CitationManager {
         }
         tableModel = new DefaultEventTableModel<>(list, new CitationEntryFormat());
         table = new JTable(tableModel);
+        GUIUtil.correctRowHeight(table);
+
         diag.add(new JScrollPane(table), BorderLayout.CENTER);
 
         ButtonBarBuilder bb = new ButtonBarBuilder();

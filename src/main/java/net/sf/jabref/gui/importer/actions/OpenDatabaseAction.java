@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.Action;
 import javax.swing.JOptionPane;
@@ -35,9 +36,9 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.importer.ParserResultWarningDialog;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -96,15 +97,10 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         List<File> filesToOpen = new ArrayList<>();
 
         if (showDialog) {
-
-            List<String> chosenStrings = new NewFileDialogs(frame).withExtension(FileExtensions.BIBTEX_DB)
-                    .showDlgAndGetMultipleFiles();
-
-            for (String chosen : chosenStrings) {
-
-                filesToOpen.add(new File(chosen));
-
-            }
+            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.BIBTEX_DB);
+            dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
+            List<String> chosenStrings = dialog.showDialogAndGetMultipleFiles();
+            filesToOpen.addAll(chosenStrings.stream().map(File::new).collect(Collectors.toList()));
         } else {
             LOGGER.info(Action.NAME + " " + e.getActionCommand());
             filesToOpen.add(new File(StringUtil.getCorrectFileName(e.getActionCommand(), "bib")));
@@ -242,7 +238,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                         } else {
                             return;
                         }
-                    } else if (!FileBasedLock.waitForFileLock(file.toPath(), 10)) {
+                    } else if (!FileBasedLock.waitForFileLock(file.toPath())) {
                         JOptionPane.showMessageDialog(null,
                                 Localization.lang("Error opening file") + " '" + fileName + "'. "
                                         + Localization.lang("File is locked by another JabRef instance."),

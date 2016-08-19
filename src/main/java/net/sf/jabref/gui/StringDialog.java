@@ -52,6 +52,7 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
 import net.sf.jabref.gui.undo.UndoableStringChange;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
@@ -122,6 +123,7 @@ class StringDialog extends JDialog {
         if (!base.hasNoStrings()) {
             table.setRowSelectionInterval(0, 0);
         }
+        GUIUtil.correctRowHeight(table);
 
         gbl.setConstraints(table.getPane(), con);
         pan.add(table.getPane());

@@ -70,6 +70,7 @@ import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.util.UpdateFieldPreferences;
 import net.sf.jabref.logic.util.VersionPreferences;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
@@ -222,6 +223,7 @@ public class JabRefPreferences {
 
     // Colors
     public static final String TABLE_COLOR_CODES_ON = "tableColorCodesOn";
+    public static final String TABLE_RESOLVED_COLOR_CODES_ON = "tableResolvedColorCodesOn";
     public static final String INCOMPLETE_ENTRY_BACKGROUND = "incompleteEntryBackground";
     public static final String FIELD_EDITOR_TEXT_COLOR = "fieldEditorTextColor";
     public static final String ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR = "activeFieldEditorBackgroundColor";
@@ -242,6 +244,7 @@ public class JabRefPreferences {
     public static final String TABLE_OPT_FIELD_BACKGROUND = "tableOptFieldBackground";
     public static final String TABLE_REQ_FIELD_BACKGROUND = "tableReqFieldBackground";
     public static final String MARKED_ENTRY_BACKGROUND = "markedEntryBackground";
+    public static final String TABLE_RESOLVED_FIELD_BACKGROUND = "tableResolvedFieldBackground";
     public static final String TABLE_BACKGROUND = "tableBackground";
 
     public static final String TABLE_SHOW_GRID = "tableShowGrid";
@@ -275,9 +278,6 @@ public class JabRefPreferences {
     public static final String ACTIVE_PREVIEW = "activePreview";
     public static final String PREVIEW_ENABLED = "previewEnabled";
     public static final String MERGE_ENTRIES_DIFF_MODE = "mergeEntriesDiffMode";
-    public static final String MAX_BACK_HISTORY_SIZE = "maxBackHistorySize"; // The maximum number of "Back" operations stored. TODO: Not changeable
-    public static final String LINE_LENGTH = "lineLength"; // Maximum TODO: Not changeable
-    public static final String INDENT = "indent"; //	Indent for formatted bibtex output. TODO: Not changeable
 
     public static final String CUSTOM_EXPORT_FORMAT = "customExportFormat";
     public static final String CUSTOM_IMPORT_FORMAT = "customImportFormat";
@@ -298,14 +298,12 @@ public class JabRefPreferences {
     public static final String CONFIRM_DELETE = "confirmDelete";
     public static final String WARN_BEFORE_OVERWRITING_KEY = "warnBeforeOverwritingKey";
     public static final String AVOID_OVERWRITING_KEY = "avoidOverwritingKey";
-    public static final String DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP = "displayKeyWarningDialogAtStartup"; // TODO: Not changeable
     public static final String OVERWRITE_OWNER = "overwriteOwner";
     public static final String USE_OWNER = "useOwner";
     public static final String AUTOLINK_EXACT_KEY_ONLY = "autolinkExactKeyOnly";
     public static final String SHOW_FILE_LINKS_UPGRADE_WARNING = "showFileLinksUpgradeWarning";
     public static final String SIDE_PANE_WIDTH = "sidePaneWidth";
     public static final String LAST_USED_EXPORT = "lastUsedExport";
-    public static final String LAST_USED_IMPORT = "lastUsedImport";
     public static final String FLOAT_MARKED_ENTRIES = "floatMarkedEntries";
     public static final String CITE_COMMAND = "citeCommand";
     public static final String EXTERNAL_JOURNAL_LISTS = "externalJournalLists";
@@ -319,7 +317,6 @@ public class JabRefPreferences {
     public static final String PROMPT_BEFORE_USING_AUTOSAVE = "promptBeforeUsingAutosave";
     public static final String AUTO_SAVE_INTERVAL = "autoSaveInterval";
     public static final String AUTO_SAVE = "autoSave";
-    public static final String USE_LOCK_FILES = "useLockFiles"; // TODO: Not changeable
     public static final String RUN_AUTOMATIC_FILE_SEARCH = "runAutomaticFileSearch";
     public static final String NUMERIC_FIELDS = "numericFields";
     public static final String REG_EXP_SEARCH_EXPRESSION_KEY = "regExpSearchExpression";
@@ -456,10 +453,6 @@ public class JabRefPreferences {
     // string to be formatted and possible formatter arguments.
     public List<String> fileDirForDatabase;
 
-    // The following field is used as a global variable during the export of a database.
-    // It is used to hold custom name formatters defined by a custom export filter.
-    // It is set before the export starts:
-    public Map<String, String> customExportNameFormatters;
 
     // The only instance of this class:
     private static JabRefPreferences singleton;
@@ -543,6 +536,7 @@ public class JabRefPreferences {
         defaults.put(PREVIEW_PANEL_HEIGHT, 200);
         defaults.put(ENTRY_EDITOR_HEIGHT, 400);
         defaults.put(TABLE_COLOR_CODES_ON, Boolean.FALSE);
+        defaults.put(TABLE_RESOLVED_COLOR_CODES_ON, Boolean.FALSE);
         defaults.put(NAMES_AS_IS, Boolean.FALSE); // "Show names unchanged"
         defaults.put(NAMES_FIRST_LAST, Boolean.FALSE); // "Show 'Firstname Lastname'"
         defaults.put(NAMES_NATBIB, Boolean.TRUE); // "Natbib style"
@@ -655,6 +649,7 @@ public class JabRefPreferences {
         defaults.put(TABLE_BACKGROUND, "255:255:255");
         defaults.put(TABLE_REQ_FIELD_BACKGROUND, "230:235:255");
         defaults.put(TABLE_OPT_FIELD_BACKGROUND, "230:255:230");
+        defaults.put(TABLE_RESOLVED_FIELD_BACKGROUND, "240:240:240");
         defaults.put(TABLE_TEXT, "0:0:0");
         defaults.put(GRID_COLOR, "210:210:210");
         defaults.put(GRAYED_OUT_BACKGROUND, "210:210:210");
@@ -729,7 +724,6 @@ public class JabRefPreferences {
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
-        defaults.put(DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP, Boolean.TRUE);
         defaults.put(AVOID_OVERWRITING_KEY, Boolean.FALSE);
         defaults.put(WARN_BEFORE_OVERWRITING_KEY, Boolean.TRUE);
         defaults.put(CONFIRM_DELETE, Boolean.TRUE);
@@ -816,7 +810,6 @@ public class JabRefPreferences {
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
         defaults.put(NUMERIC_FIELDS, "mittnum;author");
         defaults.put(RUN_AUTOMATIC_FILE_SEARCH, Boolean.FALSE);
-        defaults.put(USE_LOCK_FILES, Boolean.TRUE);
         defaults.put(AUTO_SAVE, Boolean.TRUE);
         defaults.put(AUTO_SAVE_INTERVAL, 5);
         defaults.put(PROMPT_BEFORE_USING_AUTOSAVE, Boolean.TRUE);
@@ -870,9 +863,6 @@ public class JabRefPreferences {
         defaults.put(USE_IEEE_ABRV, Boolean.FALSE);
         defaults.put(USE_CASE_KEEPER_ON_SEARCH, Boolean.TRUE);
         defaults.put(USE_UNIT_FORMATTER_ON_SEARCH, Boolean.TRUE);
-        defaults.put(MAX_BACK_HISTORY_SIZE, 10);
-        defaults.put(LINE_LENGTH, 65);
-        defaults.put(INDENT, 4);
 
         defaults.put(USE_DEFAULT_CONSOLE_APPLICATION, Boolean.TRUE);
         if (OS.WINDOWS) {
@@ -1384,6 +1374,12 @@ public class JabRefPreferences {
         storage.put(CLEANUP_CONVERT_TO_BIBLATEX, preset.isConvertToBiblatex());
         storage.put(CLEANUP_FIX_FILE_LINKS, preset.isFixFileLinks());
         storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().getAsStringList()));
+    }
+
+    public UpdateFieldPreferences getUpdateFieldPreferences() {
+        return new UpdateFieldPreferences(getBoolean(USE_OWNER), getBoolean(OVERWRITE_OWNER), get(DEFAULT_OWNER),
+                getBoolean(USE_TIME_STAMP), getBoolean(OVERWRITE_TIME_STAMP), get(TIME_STAMP_FIELD),
+                get(TIME_STAMP_FORMAT));
     }
 
 }
