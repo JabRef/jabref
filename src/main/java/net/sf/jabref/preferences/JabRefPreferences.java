@@ -47,7 +47,6 @@ import javax.swing.UIManager;
 
 import net.sf.jabref.JabRefException;
 import net.sf.jabref.JabRefMain;
-import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
@@ -68,10 +67,8 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
-import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.UpdateFieldPreferences;
-import net.sf.jabref.logic.util.VersionPreferences;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -340,7 +337,7 @@ public class JabRefPreferences {
     public static final String PROTECTED_TERMS_ENABLED_INTERNAL = "protectedTermsEnabledInternal";
     public static final String PROTECTED_TERMS_DISABLED_INTERNAL = "protectedTermsDisabledInternal";
 
-    public static final String AKS_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
+    public static final String ASK_AUTO_NAMING_PDFS_AGAIN = "AskAutoNamingPDFsAgain";
     public static final String CLEANUP_DOI = "CleanUpDOI";
     public static final String CLEANUP_ISSN = "CleanUpISSN";
     public static final String CLEANUP_MOVE_PDF = "CleanUpMovePDF";
@@ -370,9 +367,9 @@ public class JabRefPreferences {
         CLEANUP_DEFAULT_PRESET = new CleanupPreset(EnumSet.complementOf(deactivedJobs), formatterCleanups);
     }
 
-    public static final String PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE = "importDefaultPDFimportStyle";
-    public static final String PREF_IMPORT_ALWAYSUSE = "importAlwaysUsePDFImportStyle";
-    public static final String PREF_IMPORT_FILENAMEPATTERN = "importFileNamePattern";
+    public static final String IMPORT_DEFAULT_PDF_IMPORT_STYLE = "importDefaultPDFimportStyle";
+    public static final String IMPORT_ALWAYSUSE = "importAlwaysUsePDFImportStyle";
+    public static final String IMPORT_FILENAMEPATTERN = "importFileNamePattern";
 
 
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
@@ -403,18 +400,18 @@ public class JabRefPreferences {
     public static final String STYLES_POS_X = "stylesPosX";
 
     // Special field preferences
-    public static final String PREF_SHOWCOLUMN_RELEVANCE = "showRelevanceColumn";
-    public static final String PREF_SHOWCOLUMN_READ = "showReadColumn";
-    public static final String PREF_SHOWCOLUMN_RANKING = "showRankingColumn";
-    public static final String PREF_SHOWCOLUMN_QUALITY = "showQualityColumn";
-    public static final String PREF_SHOWCOLUMN_PRIORITY = "showPriorityColumn";
-    public static final String PREF_SHOWCOLUMN_PRINTED = "showPrintedColumn";
-    public static final String PREF_SPECIALFIELDSENABLED = "specialFieldsEnabled";
-    // The choice between PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS and PREF_SERIALIZESPECIALFIELDS is mutually exclusive
-    public static final String PREF_SERIALIZESPECIALFIELDS = "serializeSpecialFields";
-    // The choice between PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS and PREF_SERIALIZESPECIALFIELDS is mutually exclusive
+    public static final String SHOWCOLUMN_RELEVANCE = "showRelevanceColumn";
+    public static final String SHOWCOLUMN_READ = "showReadColumn";
+    public static final String SHOWCOLUMN_RANKING = "showRankingColumn";
+    public static final String SHOWCOLUMN_QUALITY = "showQualityColumn";
+    public static final String SHOWCOLUMN_PRIORITY = "showPriorityColumn";
+    public static final String SHOWCOLUMN_PRINTED = "showPrintedColumn";
+    public static final String SPECIALFIELDSENABLED = "specialFieldsEnabled";
+    // The choice between AUTOSYNCSPECIALFIELDSTOKEYWORDS and SERIALIZESPECIALFIELDS is mutually exclusive
+    public static final String SERIALIZESPECIALFIELDS = "serializeSpecialFields";
+    // The choice between AUTOSYNCSPECIALFIELDSTOKEYWORDS and SERIALIZESPECIALFIELDS is mutually exclusive
     // At least in the settings, not in the implementation. But having both confused the users, therefore, having activated both options at the same time has been disabled
-    public static final String PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
+    public static final String AUTOSYNCSPECIALFIELDSTOKEYWORDS = "autoSyncSpecialFieldsToKeywords";
 
     //non-default preferences
     private static final String CUSTOM_TYPE_NAME = "customTypeName_";
@@ -424,6 +421,19 @@ public class JabRefPreferences {
 
     // Prefs node for BibtexKeyPatterns
     public static final String BIBTEX_KEY_PATTERNS_NODE = "bibtexkeypatterns";
+
+    // Version
+    public static final String VERSION_IGNORED_UPDATE = "versionIgnoreUpdate";
+
+    // Dropped file handler
+    public static final String DROPPEDFILEHANDLER_RENAME = "DroppedFileHandler_RenameFile";
+    public static final String DROPPEDFILEHANDLER_MOVE = "DroppedFileHandler_MoveFile";
+    public static final String DROPPEDFILEHANDLER_COPY = "DroppedFileHandler_CopyFile";
+    public static final String DROPPEDFILEHANDLER_LEAVE = "DroppedFileHandler_LeaveFileInDir";
+
+    // Remote
+    public static final String USE_REMOTE_SERVER = "useRemoteServer";
+    public static final String REMOTE_SERVER_PORT = "remoteServerPort";
 
     public String WRAPPED_USERNAME;
     public final String MARKING_WITH_NUMBER_PATTERN;
@@ -452,7 +462,6 @@ public class JabRefPreferences {
     // to solve the problem of formatters not having access to any context except for the
     // string to be formatted and possible formatter arguments.
     public List<String> fileDirForDatabase;
-
 
     // The only instance of this class:
     private static JabRefPreferences singleton;
@@ -712,15 +721,15 @@ public class JabRefPreferences {
         defaults.put(STYLES_SIZE_X, 600);
         defaults.put(STYLES_SIZE_Y, 400);
 
-        defaults.put(JabRefPreferences.PREF_SPECIALFIELDSENABLED, SpecialFields.PREF_SPECIALFIELDSENABLED_DEFAULT);
-        defaults.put(JabRefPreferences.PREF_SHOWCOLUMN_PRIORITY, SpecialFields.PREF_SHOWCOLUMN_PRIORITY_DEFAULT);
-        defaults.put(JabRefPreferences.PREF_SHOWCOLUMN_QUALITY, SpecialFields.PREF_SHOWCOLUMN_QUALITY_DEFAULT);
-        defaults.put(JabRefPreferences.PREF_SHOWCOLUMN_RANKING, SpecialFields.PREF_SHOWCOLUMN_RANKING_DEFAULT);
-        defaults.put(JabRefPreferences.PREF_SHOWCOLUMN_RELEVANCE, SpecialFields.PREF_SHOWCOLUMN_RELEVANCE_DEFAULT);
-        defaults.put(JabRefPreferences.PREF_SHOWCOLUMN_PRINTED, SpecialFields.PREF_SHOWCOLUMN_PRINTED_DEFAULT);
-        defaults.put(JabRefPreferences.PREF_SHOWCOLUMN_READ, SpecialFields.PREF_SHOWCOLUMN_READ_DEFAULT);
-        defaults.put(JabRefPreferences.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS, SpecialFields.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT);
-        defaults.put(JabRefPreferences.PREF_SERIALIZESPECIALFIELDS, SpecialFields.PREF_SERIALIZESPECIALFIELDS_DEFAULT);
+        defaults.put(JabRefPreferences.SPECIALFIELDSENABLED, SpecialFields.PREF_SPECIALFIELDSENABLED_DEFAULT);
+        defaults.put(JabRefPreferences.SHOWCOLUMN_PRIORITY, SpecialFields.PREF_SHOWCOLUMN_PRIORITY_DEFAULT);
+        defaults.put(JabRefPreferences.SHOWCOLUMN_QUALITY, SpecialFields.PREF_SHOWCOLUMN_QUALITY_DEFAULT);
+        defaults.put(JabRefPreferences.SHOWCOLUMN_RANKING, SpecialFields.PREF_SHOWCOLUMN_RANKING_DEFAULT);
+        defaults.put(JabRefPreferences.SHOWCOLUMN_RELEVANCE, SpecialFields.PREF_SHOWCOLUMN_RELEVANCE_DEFAULT);
+        defaults.put(JabRefPreferences.SHOWCOLUMN_PRINTED, SpecialFields.PREF_SHOWCOLUMN_PRINTED_DEFAULT);
+        defaults.put(JabRefPreferences.SHOWCOLUMN_READ, SpecialFields.PREF_SHOWCOLUMN_READ_DEFAULT);
+        defaults.put(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS, SpecialFields.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS_DEFAULT);
+        defaults.put(JabRefPreferences.SERIALIZESPECIALFIELDS, SpecialFields.PREF_SERIALIZESPECIALFIELDS_DEFAULT);
 
         defaults.put(USE_OWNER, Boolean.FALSE);
         defaults.put(OVERWRITE_OWNER, Boolean.FALSE);
@@ -791,8 +800,8 @@ public class JabRefPreferences {
 
         defaults.put(GENERATE_KEYS_BEFORE_SAVING, Boolean.FALSE);
 
-        defaults.put(RemotePreferences.USE_REMOTE_SERVER, Boolean.TRUE);
-        defaults.put(RemotePreferences.REMOTE_SERVER_PORT, 6050);
+        defaults.put(JabRefPreferences.USE_REMOTE_SERVER, Boolean.TRUE);
+        defaults.put(JabRefPreferences.REMOTE_SERVER_PORT, 6050);
 
         defaults.put(PERSONAL_JOURNAL_LIST, "");
         defaults.put(EXTERNAL_JOURNAL_LISTS, "");
@@ -829,14 +838,14 @@ public class JabRefPreferences {
         defaults.put(DB_CONNECT_DATABASE, "jabref");
         defaults.put(DB_CONNECT_USERNAME, "root");
 
-        defaults.put(AKS_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
+        defaults.put(ASK_AUTO_NAMING_PDFS_AGAIN, Boolean.TRUE);
         insertCleanupPreset(defaults, CLEANUP_DEFAULT_PRESET);
 
         // defaults for DroppedFileHandler UI
-        defaults.put(DroppedFileHandler.DFH_LEAVE, Boolean.FALSE);
-        defaults.put(DroppedFileHandler.DFH_COPY, Boolean.TRUE);
-        defaults.put(DroppedFileHandler.DFH_MOVE, Boolean.FALSE);
-        defaults.put(DroppedFileHandler.DFH_RENAME, Boolean.FALSE);
+        defaults.put(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE, Boolean.FALSE);
+        defaults.put(JabRefPreferences.DROPPEDFILEHANDLER_COPY, Boolean.TRUE);
+        defaults.put(JabRefPreferences.DROPPEDFILEHANDLER_MOVE, Boolean.FALSE);
+        defaults.put(JabRefPreferences.DROPPEDFILEHANDLER_RENAME, Boolean.FALSE);
 
         //defaults.put("lastAutodetectedImport", "");
         //defaults.put("autoRemoveExactDuplicates", Boolean.FALSE);
@@ -845,11 +854,11 @@ public class JabRefPreferences {
         LOGGER.debug("Temporary directory: " + System.getProperty("java.io.tempdir"));
         //defaults.put("keyPattern", new LabelPattern(KEY_PATTERN));
 
-        defaults.put(PREF_IMPORT_ALWAYSUSE, Boolean.FALSE);
-        defaults.put(PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, ImportSettingsTab.DEFAULT_STYLE);
+        defaults.put(IMPORT_ALWAYSUSE, Boolean.FALSE);
+        defaults.put(IMPORT_DEFAULT_PDF_IMPORT_STYLE, ImportSettingsTab.DEFAULT_STYLE);
 
         // use BibTeX key appended with filename as default pattern
-        defaults.put(PREF_IMPORT_FILENAMEPATTERN, ImportSettingsTab.DEFAULT_FILENAMEPATTERNS[1]);
+        defaults.put(IMPORT_FILENAMEPATTERN, ImportSettingsTab.DEFAULT_FILENAMEPATTERNS[1]);
 
         customExports = new CustomExportList(new ExportComparator());
         customImports = new CustomImportList(this);
@@ -872,7 +881,7 @@ public class JabRefPreferences {
         }
 
         //versioncheck defaults
-        defaults.put(VersionPreferences.VERSION_IGNORED_UPDATE, "");
+        defaults.put(JabRefPreferences.VERSION_IGNORED_UPDATE, "");
     }
 
     public String getUser() {

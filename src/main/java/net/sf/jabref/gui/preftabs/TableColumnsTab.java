@@ -420,32 +420,32 @@ class TableColumnsTab extends JPanel implements PrefsTab {
 
         /*** begin: special fields ***/
 
-        oldRankingColumn = prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RANKING);
+        oldRankingColumn = prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING);
         rankingColumn.setSelected(oldRankingColumn);
 
-        oldQualityColumn = prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_QUALITY);
+        oldQualityColumn = prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY);
         qualityColumn.setSelected(oldQualityColumn);
 
-        oldPriorityColumn = prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRIORITY);
+        oldPriorityColumn = prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY);
         priorityColumn.setSelected(oldPriorityColumn);
 
-        oldRelevanceColumn = prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RELEVANCE);
+        oldRelevanceColumn = prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE);
         relevanceColumn.setSelected(oldRelevanceColumn);
 
-        oldPrintedColumn = prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRINTED);
+        oldPrintedColumn = prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED);
         printedColumn.setSelected(oldPrintedColumn);
 
-        oldReadStatusColumn = prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_READ);
+        oldReadStatusColumn = prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ);
         readStatusColumn.setSelected(oldReadStatusColumn);
 
-        oldSyncKeyWords = prefs.getBoolean(JabRefPreferences.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS);
+        oldSyncKeyWords = prefs.getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
         syncKeywords.setSelected(oldSyncKeyWords);
 
-        oldWriteSpecialFields = prefs.getBoolean(JabRefPreferences.PREF_SERIALIZESPECIALFIELDS);
+        oldWriteSpecialFields = prefs.getBoolean(JabRefPreferences.SERIALIZESPECIALFIELDS);
         writeSpecialFields.setSelected(oldWriteSpecialFields);
 
         // has to be called as last to correctly enable/disable the other settings
-        oldSpecialFieldsEnabled = prefs.getBoolean(JabRefPreferences.PREF_SPECIALFIELDSENABLED);
+        oldSpecialFieldsEnabled = prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED);
         specialFieldsEnabled.setSelected(!oldSpecialFieldsEnabled);
         specialFieldsEnabled.setSelected(oldSpecialFieldsEnabled); // Call twice to make sure the ChangeListener is triggered
 
@@ -749,15 +749,15 @@ class TableColumnsTab extends JPanel implements PrefsTab {
         // restart required implies that the settings have been changed
         // the seetings need to be stored
         if (restartRequired) {
-            prefs.putBoolean(JabRefPreferences.PREF_SPECIALFIELDSENABLED, newSpecialFieldsEnabled);
-            prefs.putBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RANKING, newRankingColumn);
-            prefs.putBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRIORITY, newPriorityColumn);
-            prefs.putBoolean(JabRefPreferences.PREF_SHOWCOLUMN_QUALITY, newQualityColumn);
-            prefs.putBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RELEVANCE, newRelevanceColumn);
-            prefs.putBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRINTED, newPrintedColumn);
-            prefs.putBoolean(JabRefPreferences.PREF_SHOWCOLUMN_READ, newReadStatusColumn);
-            prefs.putBoolean(JabRefPreferences.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS, newSyncKeyWords);
-            prefs.putBoolean(JabRefPreferences.PREF_SERIALIZESPECIALFIELDS, newWriteSpecialFields);
+            prefs.putBoolean(JabRefPreferences.SPECIALFIELDSENABLED, newSpecialFieldsEnabled);
+            prefs.putBoolean(JabRefPreferences.SHOWCOLUMN_RANKING, newRankingColumn);
+            prefs.putBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY, newPriorityColumn);
+            prefs.putBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY, newQualityColumn);
+            prefs.putBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE, newRelevanceColumn);
+            prefs.putBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED, newPrintedColumn);
+            prefs.putBoolean(JabRefPreferences.SHOWCOLUMN_READ, newReadStatusColumn);
+            prefs.putBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS, newSyncKeyWords);
+            prefs.putBoolean(JabRefPreferences.SERIALIZESPECIALFIELDS, newWriteSpecialFields);
         }
 
         /*** end: special fields ***/

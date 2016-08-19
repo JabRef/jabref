@@ -14,12 +14,10 @@
  51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-package net.sf.jabref.logic.preferences;
+package net.sf.jabref.preferences;
 
 import java.io.File;
 import java.util.Objects;
-
-import net.sf.jabref.preferences.JabRefPreferences;
 
 public class LastFocusedTabPreferences {
 

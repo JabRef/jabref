@@ -99,7 +99,7 @@ public class RenamePdfCleanupTest {
 
     @Test
     public void cleanupRenamePdfRenamesFileInSameFolder() throws IOException {
-        when(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN)).thenReturn("\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}");
+        when(Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN)).thenReturn("\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}");
         testFolder.newFile("Toot.pdf");
         ParsedFileField fileField = new ParsedFileField("", "Toot.pdf", "PDF");
         entry.setField("file", FileField.getStringRepresentation(fileField));
