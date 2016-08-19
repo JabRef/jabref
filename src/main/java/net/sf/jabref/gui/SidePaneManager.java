@@ -101,13 +101,15 @@ public class SidePaneManager {
 
     public synchronized void hide(String name) {
         SidePaneComponent sidePaneComponent = components.get(name);
-        MainTable mainTable = frame.getCurrentBasePanel().getMainTable();
         if (sidePaneComponent == null) {
             LOGGER.warn("Side pane component '" + name + "' unknown.");
         } else {
             hideComponent(sidePaneComponent);
-            mainTable.setSelected(mainTable.getSelectedRow());
-            mainTable.requestFocus();
+            if (frame.getCurrentBasePanel() != null) {
+                MainTable mainTable = frame.getCurrentBasePanel().getMainTable();
+                mainTable.setSelected(mainTable.getSelectedRow());
+                mainTable.requestFocus();
+            }
         }
     }
 
