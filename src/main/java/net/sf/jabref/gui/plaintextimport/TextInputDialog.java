@@ -595,7 +595,7 @@ public class TextInputDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             try {
                 Optional<Path> path = new FileDialog(frame).withExtension(FileExtensions.TXT)
-                        .openDialogAndGetSelectedFile();
+                        .showDialogAndGetSelectedFile();
                 if (path.isPresent()) {
                     File newFile = path.get().toFile();
                     document.remove(0, document.getLength());

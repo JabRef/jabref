@@ -187,7 +187,7 @@ public class PreferencesDialog extends JDialog {
         importPreferences.addActionListener(e -> {
             FileDialog dialog = new FileDialog(frame, System.getProperty("user.home")).withExtension(FileExtensions.XML);
             dialog.setDefaultExtension(FileExtensions.XML);
-            Optional<Path> fileName = dialog.openDialogAndGetSelectedFile();
+            Optional<Path> fileName = dialog.showDialogAndGetSelectedFile();
 
             if (fileName.isPresent()) {
                 try {

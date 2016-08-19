@@ -47,7 +47,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 
 /*
  * TODO: could separate the "menu item" functionality from the importing functionality
- *
  */
 public class ImportMenuItem extends JMenuItem implements ActionListener {
 
@@ -55,7 +54,6 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
     private final boolean openInNew;
     private final ImportFormat importer;
     private IOException importError;
-
 
     public ImportMenuItem(JabRefFrame frame, boolean openInNew) {
         this(frame, openInNew, null);
@@ -98,7 +96,6 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
         private ParserResult bibtexResult; // Contains the merged import results
         private boolean fileOk;
 
-
         @Override
         public void init() {
             importError = null;
@@ -134,10 +131,6 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         frame.output(Localization.lang("Importing in %0 format", importer.getFormatName()) + "...");
                         // Specific importer:
                         ParserResult pr = importer.importDatabase(file, Globals.prefs.getDefaultEncoding());
-                        if (pr.hasWarnings()) {
-                            frame.showMessage(pr.getErrorMessage());
-                        }
-
                         imports.add(new ImportFormatReader.UnknownFormatImport(importer.getFormatName(), pr));
                     }
                 } catch (IOException e) {

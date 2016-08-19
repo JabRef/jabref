@@ -107,7 +107,7 @@ public class ImportCustomizationDialog extends JDialog {
             CustomImporter importer = new CustomImporter();
 
             Optional<Path> selectedFile = new FileDialog(frame).withExtension(FileExtensions.CLASS)
-                    .openDialogAndGetSelectedFile();
+                    .showDialogAndGetSelectedFile();
 
             if (selectedFile.isPresent() && (selectedFile.get().getParent() != null)) {
                 importer.setBasePath(selectedFile.get().getParent().toString());
@@ -137,7 +137,7 @@ public class ImportCustomizationDialog extends JDialog {
         JButton addFromJarButton = new JButton(Localization.lang("Add from JAR"));
         addFromJarButton.addActionListener(e -> {
             Optional<Path> jarZipFile = new FileDialog(frame)
-                    .withExtensions(EnumSet.of(FileExtensions.ZIP, FileExtensions.JAR)).openDialogAndGetSelectedFile();
+                    .withExtensions(EnumSet.of(FileExtensions.ZIP, FileExtensions.JAR)).showDialogAndGetSelectedFile();
 
             if (jarZipFile.isPresent()) {
                 try (ZipFile zipFile = new ZipFile(jarZipFile.get().toFile(), ZipFile.OPEN_READ)) {
