@@ -28,6 +28,7 @@ import javax.swing.JDialog;
 import javax.swing.JPanel;
 import javax.swing.WindowConstants;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.bibtexkeypattern.BibtexKeyPatternPanel;
 import net.sf.jabref.gui.keyboard.KeyBinder;
@@ -58,7 +59,7 @@ public class BibtexKeyPatternDialog extends JDialog {
     public void setPanel(BasePanel panel) {
         this.panel = panel;
         this.metaData = panel.getBibDatabaseContext().getMetaData();
-        AbstractBibtexKeyPattern keypatterns = metaData.getBibtexKeyPattern();
+        AbstractBibtexKeyPattern keypatterns = metaData.getBibtexKeyPattern(Globals.prefs.getKeyPattern());
         bibtexKeyPatternPanel.setValues(keypatterns);
     }
 
