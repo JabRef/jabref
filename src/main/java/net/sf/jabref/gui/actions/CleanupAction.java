@@ -87,14 +87,14 @@ public class CleanupAction extends AbstractWorker {
         CleanupPreset cleanupPreset = presetPanel.getCleanupPreset();
         cleanupPreset.storeInPreferences(preferences);
 
-        if (cleanupPreset.isRenamePDF() && Globals.prefs.getBoolean(JabRefPreferences.AKS_AUTO_NAMING_PDFS_AGAIN)) {
+        if (cleanupPreset.isRenamePDF() && Globals.prefs.getBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN)) {
             CheckBoxMessage cbm = new CheckBoxMessage(
                     Localization.lang("Auto-generating PDF-Names does not support undo. Continue?"),
                     Localization.lang("Disable this confirmation dialog"), false);
             int answer = JOptionPane.showConfirmDialog(frame, cbm, Localization.lang("Autogenerate PDF Names"),
                     JOptionPane.YES_NO_OPTION);
             if (cbm.isSelected()) {
-                Globals.prefs.putBoolean(JabRefPreferences.AKS_AUTO_NAMING_PDFS_AGAIN, false);
+                Globals.prefs.putBoolean(JabRefPreferences.ASK_AUTO_NAMING_PDFS_AGAIN, false);
             }
             if (answer == JOptionPane.NO_OPTION) {
                 canceled = true;

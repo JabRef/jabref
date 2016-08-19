@@ -13,14 +13,12 @@
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 */
-package net.sf.jabref.logic.util;
+package net.sf.jabref.preferences;
 
-import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.logic.util.Version;
 
 
 public class VersionPreferences {
-
-    public static final String VERSION_IGNORED_UPDATE = "versionIgnoreUpdate";
 
     private final JabRefPreferences preferences;
 
@@ -30,11 +28,11 @@ public class VersionPreferences {
     }
 
     public void setAsIgnoredVersion(Version version) {
-        preferences.put(VERSION_IGNORED_UPDATE, version.toString());
+        preferences.put(JabRefPreferences.VERSION_IGNORED_UPDATE, version.toString());
     }
 
     public Version getIgnoredVersion() {
-        return new Version(preferences.get(VERSION_IGNORED_UPDATE));
+        return new Version(preferences.get(JabRefPreferences.VERSION_IGNORED_UPDATE));
     }
 
 }

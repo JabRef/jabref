@@ -142,23 +142,23 @@ public class MainTableFormat implements TableFormat<BibEntry> {
 
 
         // Add the "special" icon columns (e.g., ranking, file, ...) that are enabled in preferences.
-        if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SPECIALFIELDSENABLED)) {
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RANKING)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
                 tableColumns.add(SpecialMainTableColumns.RANKING_COLUMN);
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RELEVANCE)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
                 tableColumns.add(SpecialMainTableColumns.RELEVANCE_COLUMN);
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_QUALITY)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY)) {
                 tableColumns.add(SpecialMainTableColumns.QUALITY_COLUMN);
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRIORITY)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
                 tableColumns.add(SpecialMainTableColumns.PRIORITY_COLUMN);
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRINTED)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
                 tableColumns.add(SpecialMainTableColumns.PRINTED_COLUMN);
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_READ)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
                 tableColumns.add(SpecialMainTableColumns.READ_STATUS_COLUMN);
             }
         }

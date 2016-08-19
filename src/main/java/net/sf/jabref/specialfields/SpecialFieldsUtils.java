@@ -182,8 +182,8 @@ public class SpecialFieldsUtils {
     }
 
     public static boolean keywordSyncEnabled() {
-        return Globals.prefs.getBoolean(JabRefPreferences.PREF_SPECIALFIELDSENABLED) &&
-                Globals.prefs.getBoolean(JabRefPreferences.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS);
+        return Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED) &&
+                Globals.prefs.getBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS);
     }
 
 }

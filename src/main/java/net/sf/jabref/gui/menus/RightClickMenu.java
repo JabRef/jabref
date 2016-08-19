@@ -122,8 +122,8 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         }
 
-        if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SPECIALFIELDSENABLED)) {
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RANKING)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
                 JMenu rankingMenu = new JMenu();
                 RightClickMenu.populateSpecialFieldMenu(rankingMenu, Rank.getInstance(), frame);
                 add(rankingMenu);
@@ -132,23 +132,23 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             // TODO: multiple handling for relevance and quality-assurance
             // if multiple values are selected ("if (multiple)"), two options (set / clear) should be offered
             // if one value is selected either set or clear should be offered
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RELEVANCE)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
                 add(Relevance.getInstance().getValues().get(0).getMenuAction(frame));
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_QUALITY)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY)) {
                 add(Quality.getInstance().getValues().get(0).getMenuAction(frame));
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRINTED)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
                 add(Printed.getInstance().getValues().get(0).getMenuAction(frame));
             }
 
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRIORITY)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
                 JMenu priorityMenu = new JMenu();
                 RightClickMenu.populateSpecialFieldMenu(priorityMenu, Priority.getInstance(), frame);
                 add(priorityMenu);
             }
 
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_READ)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
                 JMenu readStatusMenu = new JMenu();
                 RightClickMenu.populateSpecialFieldMenu(readStatusMenu, ReadStatus.getInstance(), frame);
                 add(readStatusMenu);
