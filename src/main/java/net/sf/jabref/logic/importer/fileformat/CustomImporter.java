@@ -30,12 +30,15 @@ package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 
 /**
  * Object with data for a custom importer.
@@ -147,11 +150,14 @@ public class CustomImporter implements Comparable<CustomImporter> {
         return this.name;
     }
 
-    public ImportFormat getInstance() throws IOException, ClassNotFoundException,
-            InstantiationException, IllegalAccessException {
+    public ImportFormat getInstance(ImportFormatPreferences importFormatPreferences)
+            throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException,
+            IllegalArgumentException, InvocationTargetException, NoSuchMethodException, SecurityException {
         try (URLClassLoader cl = new URLClassLoader(new URL[] {getBasePathUrl()})) {
             Class<?> clazz = Class.forName(className, true, cl);
-            ImportFormat importFormat = (ImportFormat) clazz.newInstance();
+            ImportFormat importFormat = (ImportFormat) clazz
+                    .getDeclaredConstructor(new Class[] {ImportFormatPreferences.class})
+                    .newInstance(importFormatPreferences);
             return importFormat;
         }
     }

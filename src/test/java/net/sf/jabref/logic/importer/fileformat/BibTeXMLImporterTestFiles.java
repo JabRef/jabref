@@ -13,8 +13,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -33,6 +33,7 @@ public class BibTeXMLImporterTestFiles {
     private final static String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/logic/importer/fileformat";
 
     private BibTeXMLImporter bibtexmlImporter;
+    private ImportFormatPreferences importFormatPreferences;
 
     @Parameter
     public Path importFile;
@@ -40,8 +41,8 @@ public class BibTeXMLImporterTestFiles {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-        bibtexmlImporter = new BibTeXMLImporter();
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
+        bibtexmlImporter = new BibTeXMLImporter(importFormatPreferences);
     }
 
     @Parameters(name = "{0}")
@@ -70,7 +71,8 @@ public class BibTeXMLImporterTestFiles {
         if (bibtexmlEntries.isEmpty()) {
             Assert.assertEquals(Collections.emptyList(), bibtexmlEntries);
         } else {
-            BibEntryAssert.assertEquals(BibTeXMLImporterTest.class, bibFileName, bibtexmlEntries);
+            BibEntryAssert.assertEquals(BibTeXMLImporterTest.class, bibFileName, bibtexmlEntries,
+                    importFormatPreferences);
         }
     }
 }

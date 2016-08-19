@@ -33,6 +33,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.medline.Abstract;
 import net.sf.jabref.logic.importer.fileformat.medline.AbstractText;
@@ -96,11 +97,16 @@ import org.apache.commons.logging.LogFactory;
  */
 public class MedlineImporter extends ImportFormat {
 
+
     private static final Log LOGGER = LogFactory.getLog(MedlineImporter.class);
     private static final String KEYWORD_SEPARATOR = "; ";
 
     private static final Locale ENGLISH = Locale.ENGLISH;
 
+
+    public MedlineImporter(ImportFormatPreferences importFormatPreferences) {
+        super(importFormatPreferences);
+    }
 
     @Override
     public String getFormatName() {

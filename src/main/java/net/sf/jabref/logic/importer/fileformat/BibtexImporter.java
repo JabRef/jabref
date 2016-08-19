@@ -38,12 +38,12 @@ public class BibtexImporter extends ImportFormat {
     // Signature written at the top of the .bib file in earlier versions.
     private static final String SIGNATURE = "This file was created with JabRef";
 
-    private final ImportFormatPreferences importFormatPreferences;
-
 
     public BibtexImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+        super(importFormatPreferences);
     }
+
+
     /**
      * @return true as we have no effective way to decide whether a file is in bibtex format or not. See
      *         https://github.com/JabRef/jabref/pull/379#issuecomment-158685726 for more details.

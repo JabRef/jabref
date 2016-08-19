@@ -11,6 +11,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -35,7 +36,8 @@ public class GVKParserTest {
             Assert.assertEquals(expectedSize, entries.size());
             int i = 0;
             for (String resourceName : resourceNames) {
-                BibEntryAssert.assertEquals(GVKParser.class, resourceName, entries.get(i));
+                BibEntryAssert.assertEquals(GVKParser.class, resourceName, entries.get(i),
+                        ImportFormatPreferences.fromPreferences(Globals.prefs));
                 i++;
             }
         }

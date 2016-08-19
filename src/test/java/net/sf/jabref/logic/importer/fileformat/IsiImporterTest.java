@@ -10,12 +10,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -29,15 +29,15 @@ import static org.junit.Assert.assertTrue;
  */
 public class IsiImporterTest {
 
-    private final IsiImporter importer = new IsiImporter();
+    private IsiImporter importer;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
 
-    @BeforeClass
-    public static void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
+    @Before
+    public void setUp() {
+        importer = new IsiImporter(ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
     }
 
     @Test

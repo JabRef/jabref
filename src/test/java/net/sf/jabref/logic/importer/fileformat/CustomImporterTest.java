@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
@@ -17,11 +17,11 @@ import static org.junit.Assert.assertTrue;
 public class CustomImporterTest {
 
     private CustomImporter importer;
-
+    private ImportFormatPreferences importFormatPreferences;
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-        importer = new CustomImporter(new CopacImporter());
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
+        importer = new CustomImporter(new CopacImporter(importFormatPreferences));
     }
 
     @Test
@@ -47,7 +47,7 @@ public class CustomImporterTest {
 
     @Test
     public void testGetInstance() throws Exception {
-        assertEquals(new CopacImporter(), importer.getInstance());
+        assertEquals(new CopacImporter(importFormatPreferences), importer.getInstance(importFormatPreferences));
     }
 
     @Test
@@ -79,27 +79,28 @@ public class CustomImporterTest {
 
     @Test
     public void testEqualsFalse() {
-        assertNotEquals(new CopacImporter(), importer);
+        assertNotEquals(new CopacImporter(importFormatPreferences), importer);
     }
 
     @Test
     public void testCompareToSmaller() {
-        CustomImporter ovidImporter = new CustomImporter(new OvidImporter());
+        CustomImporter ovidImporter = new CustomImporter(new OvidImporter(importFormatPreferences));
 
         assertTrue(importer.compareTo(ovidImporter) < 0);
     }
 
     @Test
     public void testCompareToGreater() {
-        CustomImporter bibtexmlImporter = new CustomImporter(new BibTeXMLImporter());
-        CustomImporter ovidImporter = new CustomImporter(new OvidImporter());
+        CustomImporter bibtexmlImporter = new CustomImporter(
+                new BibTeXMLImporter(importFormatPreferences));
+        CustomImporter ovidImporter = new CustomImporter(new OvidImporter(importFormatPreferences));
 
         assertTrue(ovidImporter.compareTo(bibtexmlImporter) > 0);
     }
 
     @Test
     public void testCompareToEven() {
-        assertEquals(0, importer.compareTo(new CustomImporter(new CopacImporter())));
+        assertEquals(0, importer.compareTo(new CustomImporter(new CopacImporter(importFormatPreferences))));
     }
 
     @Test
@@ -120,7 +121,7 @@ public class CustomImporterTest {
         List<String> dataTest = Arrays.asList("Ovid", "ovid", "net.sf.jabref.logic.importer.fileformat.OvidImporter",
                 "src/main/java/net/sf/jabref/logic/importer/fileformat/OvidImporter.java");
         CustomImporter customImporter = new CustomImporter(dataTest);
-        CustomImporter customOvidImporter = new CustomImporter(new OvidImporter());
+        CustomImporter customOvidImporter = new CustomImporter(new OvidImporter(importFormatPreferences));
 
         assertEquals(customImporter, customOvidImporter);
     }
@@ -133,7 +134,7 @@ public class CustomImporterTest {
         customImporter.setClassName("net.sf.jabref.logic.importer.fileformat.OvidImporter");
         customImporter.setBasePath("src/main/java/net/sf/jabref/logic/importer/fileformat/OvidImporter.java");
 
-        CustomImporter customOvidImporter = new CustomImporter(new OvidImporter());
+        CustomImporter customOvidImporter = new CustomImporter(new OvidImporter(importFormatPreferences));
 
         assertEquals(customImporter, customOvidImporter);
     }

@@ -78,23 +78,23 @@ public class ImportFormatTest {
         XMPPreferences xmpPreferences = XMPPreferences.fromPreferences(JabRefPreferences.getInstance());
         // @formatter:off
         return Arrays.asList(
-                new Object[]{new BiblioscapeImporter()},
+                new Object[]{new BiblioscapeImporter(importFormatPreferences)},
                 new Object[]{new BibtexImporter(importFormatPreferences)},
-                new Object[]{new BibTeXMLImporter()},
-                new Object[]{new CopacImporter()},
+                new Object[]{new BibTeXMLImporter(importFormatPreferences)},
+                new Object[]{new CopacImporter(importFormatPreferences)},
                 new Object[]{new EndnoteImporter(importFormatPreferences)},
                 new Object[]{new FreeCiteImporter(importFormatPreferences)},
-                new Object[]{new InspecImporter()},
-                new Object[]{new IsiImporter()},
-                new Object[]{new MedlineImporter()},
-                new Object[]{new MedlinePlainImporter()},
-                new Object[]{new MsBibImporter()},
-                new Object[]{new OvidImporter()},
+                new Object[]{new InspecImporter(importFormatPreferences)},
+                new Object[]{new IsiImporter(importFormatPreferences)},
+                new Object[]{new MedlineImporter(importFormatPreferences)},
+                new Object[]{new MedlinePlainImporter(importFormatPreferences)},
+                new Object[]{new MsBibImporter(importFormatPreferences)},
+                new Object[]{new OvidImporter(importFormatPreferences)},
                 new Object[]{new PdfContentImporter(importFormatPreferences)},
-                new Object[]{new PdfXmpImporter(xmpPreferences)},
+                new Object[]{new PdfXmpImporter(xmpPreferences, importFormatPreferences)},
                 new Object[]{new RepecNepImporter(importFormatPreferences)},
-                new Object[]{new RisImporter()},
-                new Object[]{new SilverPlatterImporter()}
+                new Object[]{new RisImporter(importFormatPreferences)},
+                new Object[]{new SilverPlatterImporter(importFormatPreferences)}
         );
         // @formatter:on
     }

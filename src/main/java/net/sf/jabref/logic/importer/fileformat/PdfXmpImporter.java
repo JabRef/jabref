@@ -21,6 +21,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Objects;
 
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
@@ -35,7 +36,8 @@ public class PdfXmpImporter extends ImportFormat {
     private final XMPPreferences xmpPreferences;
 
 
-    public PdfXmpImporter(XMPPreferences xmpPreferences) {
+    public PdfXmpImporter(XMPPreferences xmpPreferences, ImportFormatPreferences importFormatPreferences) {
+        super(importFormatPreferences);
         this.xmpPreferences = xmpPreferences;
     }
 

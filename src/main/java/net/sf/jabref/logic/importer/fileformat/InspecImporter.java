@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.AuthorList;
@@ -33,6 +34,11 @@ import net.sf.jabref.model.entry.FieldName;
  * INSPEC format importer.
  */
 public class InspecImporter extends ImportFormat {
+
+    public InspecImporter(ImportFormatPreferences importFormatPreferences) {
+        super(importFormatPreferences);
+    }
+
 
     private static final Pattern INSPEC_PATTERN = Pattern.compile("Record.*INSPEC.*");
 

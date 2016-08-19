@@ -261,7 +261,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
             return directParserResult;
         } else {
 
-            return new ParserResult(database);
+            return new ParserResult(database, Globals.prefs.getDefaultEncoding());
 
         }
     }

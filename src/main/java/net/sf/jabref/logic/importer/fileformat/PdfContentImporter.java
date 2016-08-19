@@ -64,11 +64,8 @@ public class PdfContentImporter extends ImportFormat {
 
     private String year;
 
-    private final ImportFormatPreferences importFormatPreferences;
-
-
     public PdfContentImporter(ImportFormatPreferences importFormatPreferences) {
-        this.importFormatPreferences = importFormatPreferences;
+        super(importFormatPreferences);
     }
     /**
      * Removes all non-letter characters at the end
@@ -219,7 +216,7 @@ public class PdfContentImporter extends ImportFormat {
 
             Optional<DOI> doi = DOI.findInText(firstPageContents);
             if (doi.isPresent()) {
-                ParserResult parserResult = new ParserResult(result);
+                ParserResult parserResult = new ParserResult(result, importFormatPreferences.getEncoding());
                 Optional<BibEntry> entry = DOItoBibTeX.getEntryFromDOI(doi.get().getDOI(), parserResult,
                         importFormatPreferences);
                 entry.ifPresent(parserResult.getDatabase()::insertEntry);

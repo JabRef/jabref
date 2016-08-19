@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.OS;
@@ -49,6 +50,10 @@ public class MedlinePlainImporter extends ImportFormat {
     private static final Pattern CREATE_DATE_PATTERN = Pattern.compile("\\d{4}/[0123]?\\d/\\s?[012]\\d:[0-5]\\d");
     private static final Pattern COMPLETE_DATE_PATTERN = Pattern.compile("\\d{8}");
 
+
+    public MedlinePlainImporter(ImportFormatPreferences importFormatPreferences) {
+        super(importFormatPreferences);
+    }
 
     @Override
     public String getFormatName() {

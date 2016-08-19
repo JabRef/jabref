@@ -26,6 +26,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.formatter.casechanger.TitleCaseFormatter;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
@@ -51,12 +52,17 @@ import net.sf.jabref.model.entry.MonthUtil;
  */
 public class IsiImporter extends ImportFormat {
 
+
     private static final Pattern SUB_SUP_PATTERN = Pattern.compile("/(sub|sup)\\s+(.*?)\\s*/");
 
     // 2006.09.05: Modified pattern to avoid false positives for other files due to an
     // extra | at the end:
     private static final Pattern ISI_PATTERN = Pattern.compile("FN ISI Export Format|VR 1.|PY \\d{4}");
 
+
+    public IsiImporter(ImportFormatPreferences importFormatPreferences) {
+        super(importFormatPreferences);
+    }
 
     @Override
     public String getFormatName() {

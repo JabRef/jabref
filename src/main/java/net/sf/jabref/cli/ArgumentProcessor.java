@@ -200,7 +200,9 @@ public class ArgumentProcessor {
                 // We have an ExportFormat instance:
                 try {
                     System.out.println(Localization.lang("Exporting") + ": " + data[1]);
-                    format.performExport(databaseContext, data[1], databaseContext.getMetaData().getEncoding(), matches);
+                    format.performExport(databaseContext, data[1],
+                            databaseContext.getMetaData().getEncoding().orElse(Globals.prefs.getDefaultEncoding()),
+                            matches);
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
                             + ex.getMessage());
@@ -378,8 +380,8 @@ public class ArgumentProcessor {
             } else {
                 // We have an ExportFormat instance:
                 try {
-                    format.performExport(pr.getDatabaseContext(), data[0],
-                            pr.getDatabaseContext().getMetaData().getEncoding(), null);
+                    format.performExport(pr.getDatabaseContext(), data[0], pr.getDatabaseContext().getMetaData()
+                            .getEncoding().orElse(Globals.prefs.getDefaultEncoding()), null);
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
                             + ex.getMessage());
@@ -502,7 +504,7 @@ public class ArgumentProcessor {
             return Optional.empty();
         }
 
-        return Optional.of(new ParserResult(result));
+        return Optional.of(new ParserResult(result, Globals.prefs.getDefaultEncoding()));
     }
 
     public boolean isBlank() {

@@ -40,6 +40,7 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPPreferences;
@@ -48,6 +49,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -353,8 +355,9 @@ public class DroppedFileHandler {
         renameCheckBox.setText(Localization.lang("Rename file to").concat(": "));
 
         // Determine which name to suggest:
-        String targetName = FileUtil.createFileNameFromPattern(database, entry, Globals.journalAbbreviationLoader,
-                Globals.prefs);
+        String targetName = FileUtil.createFileNameFromPattern(database, entry,
+                Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN),
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
 
         renameToTextBox.setText(targetName.concat(".").concat(fileType.getExtension()));
 

@@ -52,7 +52,7 @@ public class BibtexDatabaseWriterTest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
+        JabRefPreferences prefs = JabRefPreferences.getInstance();
 
         // Write to a string instead of to a file
         databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new);
@@ -60,7 +60,7 @@ public class BibtexDatabaseWriterTest {
         database = new BibDatabase();
         metaData = new MetaData();
         bibtexContext = new BibDatabaseContext(database, metaData, new Defaults(BibDatabaseMode.BIBTEX));
-        importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(prefs);
     }
 
     @Test(expected = NullPointerException.class)

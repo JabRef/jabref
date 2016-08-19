@@ -77,7 +77,8 @@ public class ConvertLegacyExplicitGroupsTest {
     }
 
     private ParserResult generateParserResult(BibEntry entry, GroupTreeNode groupRoot) {
-        ParserResult parserResult = new ParserResult(Collections.singletonList(entry));
+        ParserResult parserResult = new ParserResult(Collections.singletonList(entry),
+                Globals.prefs.getDefaultEncoding());
         parserResult.getMetaData().setGroups(groupRoot);
         return parserResult;
     }

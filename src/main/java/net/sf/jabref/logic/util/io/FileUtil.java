@@ -36,7 +36,6 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
@@ -46,7 +45,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -392,13 +390,12 @@ public class FileUtil {
      * @return a suggested fileName
      */
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry,
-            JournalAbbreviationLoader repositoryLoader, JabRefPreferences prefs) {
+            String importFilenamePattern, LayoutFormatterPreferences prefs) {
         String targetName = entry.getCiteKeyOptional().orElse("default");
-        StringReader sr = new StringReader(prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
+        StringReader sr = new StringReader(importFilenamePattern);
         Layout layout = null;
         try {
-            layout = new LayoutHelper(sr, LayoutFormatterPreferences.fromPreferences(prefs, repositoryLoader))
-                    .getLayoutFromText();
+            layout = new LayoutHelper(sr, prefs).getLayoutFromText();
         } catch (IOException e) {
             LOGGER.info("Wrong format " + e.getMessage(), e);
         }

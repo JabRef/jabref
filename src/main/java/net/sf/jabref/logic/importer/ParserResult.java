@@ -16,6 +16,7 @@
 package net.sf.jabref.logic.importer;
 
 import java.io.File;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,16 +48,29 @@ public class ParserResult {
     private boolean invalid;
     private boolean toOpenTab;
 
+
     public ParserResult() {
         this(Collections.emptyList());
+    }
+
+    public ParserResult(Charset encoding) {
+        this(Collections.emptyList(), encoding);
     }
 
     public ParserResult(Collection<BibEntry> entries) {
         this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)));
     }
 
+    public ParserResult(Collection<BibEntry> entries, Charset encoding) {
+        this(BibDatabases.createDatabase(BibDatabases.purgeEmptyEntries(entries)), encoding);
+    }
+
     public ParserResult(BibDatabase database) {
         this(database, new MetaData(), new HashMap<>());
+    }
+
+    public ParserResult(BibDatabase database, Charset encoding) {
+        this(database, new MetaData(encoding), new HashMap<>());
     }
 
     public ParserResult(BibDatabase base, MetaData metaData, Map<String, EntryType> entryTypes) {
@@ -70,6 +84,7 @@ public class ParserResult {
         parserResult.addWarning(message);
         return parserResult;
     }
+
 
     /**
      * Check if this base is marked to be added to the currently open tab. Default is false.

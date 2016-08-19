@@ -9,7 +9,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.util.FileExtensions;
@@ -24,11 +23,11 @@ public class RepecNepImporterTest {
 
     private RepecNepImporter testImporter;
 
-
+    private ImportFormatPreferences importFormatPreferences;
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-        testImporter = new RepecNepImporter(ImportFormatPreferences.fromPreferences(Globals.prefs));
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
+        testImporter = new RepecNepImporter(importFormatPreferences);
     }
 
     @Test
@@ -57,7 +56,7 @@ public class RepecNepImporterTest {
         try (InputStream bibIn = RepecNepImporter.class.getResourceAsStream("RepecNepImporterTest1.bib")) {
             List<BibEntry> entries = testImporter.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
             Assert.assertEquals(1, entries.size());
-            BibEntryAssert.assertEquals(bibIn, entries.get(0));
+            BibEntryAssert.assertEquals(bibIn, entries.get(0), importFormatPreferences);
         }
     }
 
@@ -67,7 +66,7 @@ public class RepecNepImporterTest {
         try (InputStream bibIn = RepecNepImporter.class.getResourceAsStream("RepecNepImporterTest2.bib")) {
             List<BibEntry> entries = testImporter.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
             Assert.assertEquals(1, entries.size());
-            BibEntryAssert.assertEquals(bibIn, entries.get(0));
+            BibEntryAssert.assertEquals(bibIn, entries.get(0), importFormatPreferences);
         }
     }
 
@@ -77,7 +76,7 @@ public class RepecNepImporterTest {
         try (InputStream bibIn = RepecNepImporter.class.getResourceAsStream("RepecNepImporterTest3.bib")) {
             List<BibEntry> entries = testImporter.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
             Assert.assertEquals(1, entries.size());
-            BibEntryAssert.assertEquals(bibIn, entries.get(0));
+            BibEntryAssert.assertEquals(bibIn, entries.get(0), importFormatPreferences);
         }
     }
 

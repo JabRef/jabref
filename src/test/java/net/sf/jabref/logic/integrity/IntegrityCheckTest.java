@@ -32,6 +32,7 @@ public class IntegrityCheckTest {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
+
     @Before
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();

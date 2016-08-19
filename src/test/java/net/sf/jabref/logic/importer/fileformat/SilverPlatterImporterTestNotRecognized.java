@@ -7,7 +7,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
@@ -23,8 +23,8 @@ public class SilverPlatterImporterTestNotRecognized {
 
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
-        testImporter = new SilverPlatterImporter();
+        testImporter = new SilverPlatterImporter(
+                ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
     }
 
     @Test

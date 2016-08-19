@@ -16,6 +16,7 @@
 package net.sf.jabref.logic.importer;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -70,32 +71,34 @@ public class ImportFormatReader {
 
         formats.clear();
 
-        formats.add(new BiblioscapeImporter());
+        formats.add(new BiblioscapeImporter(importFormatPreferences));
         formats.add(new BibtexImporter(importFormatPreferences));
-        formats.add(new BibTeXMLImporter());
-        formats.add(new CopacImporter());
+        formats.add(new BibTeXMLImporter(importFormatPreferences));
+        formats.add(new CopacImporter(importFormatPreferences));
         formats.add(new EndnoteImporter(importFormatPreferences));
         formats.add(new FreeCiteImporter(importFormatPreferences));
-        formats.add(new InspecImporter());
-        formats.add(new IsiImporter());
-        formats.add(new MedlineImporter());
-        formats.add(new MedlinePlainImporter());
-        formats.add(new MsBibImporter());
-        formats.add(new OvidImporter());
+        formats.add(new InspecImporter(importFormatPreferences));
+        formats.add(new IsiImporter(importFormatPreferences));
+        formats.add(new MedlineImporter(importFormatPreferences));
+        formats.add(new MedlinePlainImporter(importFormatPreferences));
+        formats.add(new MsBibImporter(importFormatPreferences));
+        formats.add(new OvidImporter(importFormatPreferences));
         formats.add(new PdfContentImporter(importFormatPreferences));
-        formats.add(new PdfXmpImporter(xmpPreferences));
+        formats.add(new PdfXmpImporter(xmpPreferences, importFormatPreferences));
         formats.add(new RepecNepImporter(importFormatPreferences));
-        formats.add(new RisImporter());
-        formats.add(new SilverPlatterImporter());
+        formats.add(new RisImporter(importFormatPreferences));
+        formats.add(new SilverPlatterImporter(importFormatPreferences));
 
         /**
          * Get custom import formats
          */
         for (CustomImporter importer : importFormatPreferences.getCustomImportList()) {
             try {
-                ImportFormat imFo = importer.getInstance();
+                ImportFormat imFo = importer.getInstance(importFormatPreferences);
                 formats.add(imFo);
-            } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
+            } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException |
+                    IllegalArgumentException | InvocationTargetException | NoSuchMethodException |
+                    SecurityException e) {
                 LOGGER.error("Could not instantiate " + importer.getName()
                         + " importer, will ignore it. Please check if the class is still available.", e);
             }
@@ -237,7 +240,7 @@ public class ImportFormatReader {
 
         if (bestResult != null) {
             // we found something
-            ParserResult parserResult = new ParserResult(bestResult);
+            ParserResult parserResult = new ParserResult(bestResult, importFormatPreferences.getEncoding());
             return new UnknownFormatImport(bestFormatName, parserResult);
         }
 

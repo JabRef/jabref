@@ -9,8 +9,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -29,10 +29,11 @@ public class MsBibImporterTestfiles {
     public String fileName;
 
     private Path xmlFile;
+    private ImportFormatPreferences importFormatPreferences;
 
     @Before
     public void setUp() throws URISyntaxException {
-        Globals.prefs = JabRefPreferences.getInstance();
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
         xmlFile = Paths.get(MsBibImporter.class.getResource(fileName + ".xml").toURI());
     }
 
@@ -46,7 +47,7 @@ public class MsBibImporterTestfiles {
 
     @Test
     public final void testIsRecognizedFormat() throws Exception {
-        MsBibImporter testImporter = new MsBibImporter();
+        MsBibImporter testImporter = new MsBibImporter(importFormatPreferences);
         Assert.assertTrue(testImporter.isRecognizedFormat(xmlFile, Charset.defaultCharset()));
     }
 
@@ -55,9 +56,9 @@ public class MsBibImporterTestfiles {
     public void testImportEntries() throws IOException {
 
         String bibFileName = fileName + ".bib";
-        MsBibImporter testImporter = new MsBibImporter();
+        MsBibImporter testImporter = new MsBibImporter(importFormatPreferences);
         List<BibEntry> result = testImporter.importDatabase(xmlFile, Charset.defaultCharset()).getDatabase().getEntries();
-        BibEntryAssert.assertEquals(MsBibImporterTest.class, bibFileName, result);
+        BibEntryAssert.assertEquals(MsBibImporterTest.class, bibFileName, result, importFormatPreferences);
     }
 
 }

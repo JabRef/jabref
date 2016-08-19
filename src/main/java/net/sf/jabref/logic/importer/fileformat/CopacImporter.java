@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
@@ -37,6 +38,11 @@ import net.sf.jabref.model.entry.FieldName;
 public class CopacImporter extends ImportFormat {
 
     private static final Pattern COPAC_PATTERN = Pattern.compile("^\\s*TI- ");
+
+
+    public CopacImporter(ImportFormatPreferences importFormatPreferences) {
+        super(importFormatPreferences);
+    }
 
     @Override
     public String getFormatName() {
