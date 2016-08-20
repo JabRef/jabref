@@ -28,7 +28,6 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.CookieHandler;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -79,24 +78,12 @@ public class URLDownload {
 
         addParameters("User-Agent", "JabRef");
 
-        URLDownload.setCookieHandler();
     }
 
     public URL getSource() {
         return source;
     }
 
-    private static void setCookieHandler() {
-        try {
-            // This should set up JabRef to receive cookies properly
-            if (CookieHandler.getDefault() == null) {
-                CookieHandler.setDefault(new CookieHandlerImpl());
-            }
-        } catch (SecurityException ignored) {
-            // Setting or getting the system default cookie handler is forbidden
-            // In this case cookie handling is not possible.
-        }
-    }
 
     public String determineMimeType() throws IOException {
         // this does not cause a real performance issue as the underlying HTTP/TCP connection is reused

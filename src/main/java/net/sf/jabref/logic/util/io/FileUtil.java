@@ -394,7 +394,7 @@ public class FileUtil {
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry,
             JournalAbbreviationLoader repositoryLoader, JabRefPreferences prefs) {
         String targetName = entry.getCiteKeyOptional().orElse("default");
-        StringReader sr = new StringReader(prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
+        StringReader sr = new StringReader(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
         Layout layout = null;
         try {
             layout = new LayoutHelper(sr, LayoutFormatterPreferences.fromPreferences(prefs, repositoryLoader))

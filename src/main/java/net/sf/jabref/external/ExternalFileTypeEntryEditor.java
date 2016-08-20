@@ -73,7 +73,7 @@ public class ExternalFileTypeEntryEditor {
             appDir = Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY);
         }
 
-        Optional<Path> path = new FileDialog(fParent, appDir).openDialogAndGetSelectedFile();
+        Optional<Path> path = new FileDialog(fParent, appDir).showDialogAndGetSelectedFile();
         path.ifPresent(applicationDir -> {
             if (applicationDir.getParent() != null) {
                 Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, applicationDir.getParent().toString());

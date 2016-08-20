@@ -516,7 +516,7 @@ public class TextInputDialog extends JDialog {
         if (importedEntries.isEmpty()) {
             return false;
         } else {
-            UpdateField.setAutomaticFields(importedEntries, false, false, Globals.prefs);
+            UpdateField.setAutomaticFields(importedEntries, false, false, Globals.prefs.getUpdateFieldPreferences());
             boolean markEntries = EntryMarker.shouldMarkEntries();
 
             for (BibEntry e : importedEntries) {
@@ -595,7 +595,7 @@ public class TextInputDialog extends JDialog {
         public void actionPerformed(ActionEvent e) {
             try {
                 Optional<Path> path = new FileDialog(frame).withExtension(FileExtensions.TXT)
-                        .openDialogAndGetSelectedFile();
+                        .showDialogAndGetSelectedFile();
                 if (path.isPresent()) {
                     File newFile = path.get().toFile();
                     document.remove(0, document.getLength());

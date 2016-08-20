@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.importer.util;
+package net.sf.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.io.InputStream;

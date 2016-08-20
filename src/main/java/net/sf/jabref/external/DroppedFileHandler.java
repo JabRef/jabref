@@ -48,6 +48,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -69,11 +70,6 @@ import org.apache.commons.logging.LogFactory;
 public class DroppedFileHandler {
 
     private static final Log LOGGER = LogFactory.getLog(DroppedFileHandler.class);
-
-    public static final String DFH_LEAVE = "DroppedFileHandler_LeaveFileInDir";
-    public static final String DFH_COPY = "DroppedFileHandler_CopyFile";
-    public static final String DFH_MOVE = "DroppedFileHandler_MoveFile";
-    public static final String DFH_RENAME = "DroppedFileHandler_RenameFile";
 
     private final JabRefFrame frame;
 
@@ -358,10 +354,10 @@ public class DroppedFileHandler {
 
         renameToTextBox.setText(targetName.concat(".").concat(fileType.getExtension()));
 
-        linkInPlace.setSelected(frame.prefs().getBoolean(DroppedFileHandler.DFH_LEAVE));
-        copyRadioButton.setSelected(frame.prefs().getBoolean(DroppedFileHandler.DFH_COPY));
-        moveRadioButton.setSelected(frame.prefs().getBoolean(DroppedFileHandler.DFH_MOVE));
-        renameCheckBox.setSelected(frame.prefs().getBoolean(DroppedFileHandler.DFH_RENAME));
+        linkInPlace.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE));
+        copyRadioButton.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_COPY));
+        moveRadioButton.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_MOVE));
+        renameCheckBox.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_RENAME));
 
         linkInPlace.addChangeListener(cl);
         cl.stateChanged(new ChangeEvent(linkInPlace));
@@ -373,10 +369,10 @@ public class DroppedFileHandler {
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (reply == JOptionPane.OK_OPTION) {
                 // store user's choice
-                frame.prefs().putBoolean(DroppedFileHandler.DFH_LEAVE, linkInPlace.isSelected());
-                frame.prefs().putBoolean(DroppedFileHandler.DFH_COPY, copyRadioButton.isSelected());
-                frame.prefs().putBoolean(DroppedFileHandler.DFH_MOVE, moveRadioButton.isSelected());
-                frame.prefs().putBoolean(DroppedFileHandler.DFH_RENAME, renameCheckBox.isSelected());
+                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE, linkInPlace.isSelected());
+                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_COPY, copyRadioButton.isSelected());
+                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_MOVE, moveRadioButton.isSelected());
+                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_RENAME, renameCheckBox.isSelected());
                 return true;
             } else {
                 return false;

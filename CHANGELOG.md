@@ -41,6 +41,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#1751](https://github.com/JabRef/jabref/issues/1751) Added tooltip to web search button
 - [#1758](https://github.com/JabRef/jabref/issues/1758) Added a button to open Database Properties dialog help
 - Improve focus of the maintable after a sidepane gets closed (Before it would focus the toolbar or it would focus the wrong entry)
+- File open dialogs now use default extensions as primary file filter
 
 ### Fixed
 - Fixed [#1632](https://github.com/JabRef/jabref/issues/1632): User comments (@Comment) with or without brackets are now kept
@@ -68,10 +69,16 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed NullPointerException when clicking OK without specifying a field name in set/clear/rename fields
 - Fixed IndexOutOfBoundsException when trying to download a full text document without selecting an entry
 - Fixed NullPointerException when trying to set a special field or mark an entry through the menu without having an open database
+- Fixed NullPointerException when trying to synchronize file field with an entry without BibTeX key
+- Fixed NullPointerException when importing PDFs and pressing cancel when selecting entry type
+- Fixed a number of issues related to accessing the GUI from outside the EDT
+- Added a few missing translation strings
+- Fixed NullPointerException when opening Customize entry type dialog without an open database
 - Fixed [#1257](https://github.com/JabRef/jabref/issues/1324): Preferences for the BibTeX key generator set in a version prior to 3.2 are now migrated automatically to the new version
 - Fixed [#1716](https://github.com/JabRef/jabref/issues/1716): `@`-Symbols stored in BibTeX fields no longer break the database
 - Fixed [#1499](https://github.com/JabRef/jabref/issues/1499): {} braces are now treated correctly in in author/editor
 - Fixed [#1531](https://github.com/JabRef/jabref/issues/1531): `\relax` can be used for abbreviation of author names
+- Fixed [#1771](https://github.com/JabRef/jabref/issues/1771): Show all supported import types as default
  
 
 ### Removed
