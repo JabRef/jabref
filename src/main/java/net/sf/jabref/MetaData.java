@@ -65,27 +65,28 @@ public class MetaData implements Iterable<String> {
      * must simply make sure the appropriate changes are reflected in the Vector
      * it has been passed.
      */
-    private MetaData(Map<String, String> inData, Charset encoding) throws ParseException {
+    private MetaData(Map<String, String> inData) throws ParseException {
         Objects.requireNonNull(inData);
         setData(inData);
-        this.encoding = encoding;
+    }
+    private MetaData(Map<String, String> inData, Charset encoding) throws ParseException {
+        this(inData);
+        this.encoding = Objects.requireNonNull(encoding);
     }
 
     /**
      * The MetaData object can be constructed with no data in it.
      */
-    @Deprecated
     public MetaData() {
-        this(Globals.prefs.getDefaultEncoding());
+        // Do nothing
     }
 
     public MetaData(Charset encoding) {
         this.encoding = encoding;
     }
 
-    @Deprecated
     public static MetaData parse(Map<String, String> data) throws ParseException {
-        return new MetaData(data, Globals.prefs.getDefaultEncoding());
+        return new MetaData(data);
     }
 
     public static MetaData parse(Map<String, String> data, Charset encoding) throws ParseException {
@@ -456,8 +457,8 @@ public class MetaData implements Iterable<String> {
     /**
      * Returns the encoding used during parsing.
      */
-    public Charset getEncoding() {
-        return encoding;
+    public Optional<Charset> getEncoding() {
+        return Optional.ofNullable(encoding);
     }
 
     public void setEncoding(Charset encoding) {
