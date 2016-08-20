@@ -21,8 +21,10 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.external.DroppedFileHandler;
@@ -170,8 +172,7 @@ public class PdfImporter {
                     doContentImport(fileName, res);
                     break;
                 case ImportDialog.NOMETA:
-                    BibEntry entry = createNewBlankEntry(fileName);
-                    res.add(entry);
+                    createNewBlankEntry(fileName).ifPresent(res::add);
                     break;
                 case ImportDialog.ONLYATTACH:
                     DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
@@ -200,8 +201,7 @@ public class PdfImporter {
         if (localRes.isEmpty()) {
             // import failed -> generate default entry
             LOGGER.info("Import failed");
-            entry = createNewBlankEntry(fileName);
-            res.add(entry);
+            createNewBlankEntry(fileName).ifPresent(res::add);
             return;
         }
 
@@ -222,12 +222,13 @@ public class PdfImporter {
         res.add(entry);
 
     }
-    private BibEntry createNewBlankEntry(String fileName) {
-        BibEntry newEntry = createNewEntry();
-        if (newEntry != null) {
+
+    private Optional<BibEntry> createNewBlankEntry(String fileName) {
+        Optional<BibEntry> newEntry = createNewEntry();
+        newEntry.ifPresent(bibEntry -> {
             DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
-            dfh.linkPdfToEntry(fileName, newEntry);
-        }
+            dfh.linkPdfToEntry(fileName, bibEntry);
+        });
         return newEntry;
     }
 
@@ -243,8 +244,7 @@ public class PdfImporter {
 
         if (!result.getDatabase().hasEntries()) {
             // import failed -> generate default entry
-            BibEntry entry = createNewBlankEntry(fileName);
-            res.add(entry);
+            createNewBlankEntry(fileName).ifPresent(res::add);
             return;
         }
 
@@ -267,7 +267,7 @@ public class PdfImporter {
         res.add(entry);
     }
 
-    private BibEntry createNewEntry() {
+    private Optional<BibEntry> createNewEntry() {
         // Find out what type is desired
         EntryTypeDialog etd = new EntryTypeDialog(frame);
         // We want to center the dialog, to make it look nicer.
@@ -277,17 +277,17 @@ public class PdfImporter {
 
         if (type != null) { // Only if the dialog was not canceled.
             String id = IdGenerator.next();
-            final BibEntry be = new BibEntry(id, type.getName());
+            final BibEntry bibEntry = new BibEntry(id, type.getName());
             try {
-                panel.getDatabase().insertEntry(be);
+                panel.getDatabase().insertEntry(bibEntry);
 
                 // Set owner/timestamp if options are enabled:
                 List<BibEntry> list = new ArrayList<>();
-                list.add(be);
+                list.add(bibEntry);
                 UpdateField.setAutomaticFields(list, true, true, Globals.prefs.getUpdateFieldPreferences());
 
                 // Create an UndoableInsertEntry object.
-                panel.getUndoManager().addEdit(new UndoableInsertEntry(panel.getDatabase(), be, panel));
+                panel.getUndoManager().addEdit(new UndoableInsertEntry(panel.getDatabase(), bibEntry, panel));
                 panel.output(Localization.lang("Added new") + " '" + type.getName().toLowerCase() + "' "
                         + Localization.lang("entry") + ".");
 
@@ -299,16 +299,16 @@ public class PdfImporter {
                     panel.setMode(BasePanelMode.WILL_SHOW_EDITOR);
                 }
 
-                panel.showEntry(be);
+                SwingUtilities.invokeLater(() -> panel.showEntry(bibEntry));
 
                 // The database just changed.
                 panel.markBaseChanged();
 
-                return be;
+                return Optional.of(bibEntry);
             } catch (KeyCollisionException ex) {
                 LOGGER.info("Key collision occurred", ex);
             }
         }
-        return null;
+        return Optional.empty();
     }
 }

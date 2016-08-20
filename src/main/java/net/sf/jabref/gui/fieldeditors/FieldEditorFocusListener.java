@@ -31,7 +31,7 @@ public class FieldEditorFocusListener implements FocusListener {
         if (event.getSource() instanceof FieldEditor) {
             ((FieldEditor) event.getSource()).setActiveBackgroundColor();
         } else {
-            ((JComponent) event.getSource()).setBackground(GUIGlobals.activeBackground);
+            ((JComponent) event.getSource()).setBackground(GUIGlobals.activeBackgroundColor);
         }
     }
 
