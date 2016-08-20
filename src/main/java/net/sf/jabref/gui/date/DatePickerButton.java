@@ -31,6 +31,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.michaelbaranov.microba.calendar.DatePicker;
 
@@ -59,7 +60,9 @@ public class DatePickerButton implements ActionListener {
             if (isoFormat) {
                 editor.setText(EasyDateFormat.isoDateFormat().getDateAt(date));
             } else {
-                editor.setText(EasyDateFormat.fromPreferences(Globals.prefs).getDateAt(date));
+                editor.setText(EasyDateFormat
+                        .fromTimeStampFormat(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT))
+                        .getDateAt(date));
             }
             // Set focus to editor component after changing its text:
             new FocusRequester(editor.getTextComponent());

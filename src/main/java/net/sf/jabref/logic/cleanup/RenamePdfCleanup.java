@@ -22,29 +22,28 @@ import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.logic.TypedBibEntry;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.ParsedFileField;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 public class RenamePdfCleanup implements CleanupJob {
 
     private final BibDatabaseContext databaseContext;
     private final boolean onlyRelativePaths;
-    private final JournalAbbreviationLoader repositoryLoader;
-    private final JabRefPreferences prefs;
+    private final String fileNamePattern;
+    private final LayoutFormatterPreferences prefs;
 
     private int unsuccessfulRenames;
 
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext,
-            JournalAbbreviationLoader repositoryLoader, JabRefPreferences prefs) {
+            String fileNamePattern, LayoutFormatterPreferences prefs) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
-        this.repositoryLoader = Objects.requireNonNull(repositoryLoader);
+        this.fileNamePattern = Objects.requireNonNull(fileNamePattern);
         this.prefs = Objects.requireNonNull(prefs);
     }
 
@@ -63,9 +62,8 @@ public class RenamePdfCleanup implements CleanupJob {
                 continue;
             }
 
-            StringBuilder newFilename = new StringBuilder(
-                    FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, repositoryLoader, prefs)
-                            .trim());
+            StringBuilder newFilename = new StringBuilder(FileUtil
+                    .createFileNameFromPattern(databaseContext.getDatabase(), entry, fileNamePattern, prefs).trim());
 
             //Add extension to newFilename
             newFilename.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));

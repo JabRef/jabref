@@ -19,7 +19,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.model.FieldChange;
@@ -52,16 +52,14 @@ public class CleanupWorkerTest {
         if (Globals.prefs == null) {
             Globals.prefs = JabRefPreferences.getInstance();
         }
-        if (Globals.journalAbbreviationLoader == null) {
-            Globals.journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
-        }
 
         pdfFolder = bibFolder.newFolder();
 
         MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
-        worker = new CleanupWorker(context, mock(JournalAbbreviationLoader.class), Globals.prefs);
+        worker = new CleanupWorker(context, Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
+                mock(LayoutFormatterPreferences.class));
     }
 
     @SuppressWarnings("unused")
