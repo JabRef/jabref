@@ -64,7 +64,7 @@ public class PreviewPanel extends JPanel
     /**
      * The bibtex entry currently shown
      */
-    private Optional<BibEntry> entry = Optional.empty();
+    private Optional<BibEntry> bibEntry = Optional.empty();
 
     /**
      * If a database is set, the preview will attempt to resolve strings in the
@@ -260,9 +260,9 @@ public class PreviewPanel extends JPanel
 
     public void setEntry(BibEntry newEntry) {
 
-        entry.filter(e -> e != newEntry).ifPresent(e -> e.unregisterListener(this));
-        entry = Optional.ofNullable(newEntry);
-        entry.ifPresent(e -> e.registerListener(this));
+        bibEntry.filter(e -> e != newEntry).ifPresent(e -> e.unregisterListener(this));
+        bibEntry = Optional.ofNullable(newEntry);
+        bibEntry.ifPresent(e -> e.registerListener(this));
 
         updateLayout();
         update();
@@ -272,6 +272,7 @@ public class PreviewPanel extends JPanel
     /**
     * Listener for ChangedFieldEvent.
     */
+    @SuppressWarnings("unused")
     @Subscribe
     public void listen(FieldChangedEvent fieldChangedEvent) {
         update();
@@ -279,14 +280,14 @@ public class PreviewPanel extends JPanel
 
     @Override
     public BibEntry getEntry() {
-        return this.entry.orElse(null);
+        return this.bibEntry.orElse(null);
     }
 
     public void update() {
         StringBuilder sb = new StringBuilder();
         ExportFormats.entryNumber = 1; // Set entry number in case that is included in the preview layout.
-        entry.ifPresent(entry ->
-                layout.ifPresent(layout -> sb.append(layout
+        bibEntry.ifPresent(entry ->
+                layout.ifPresent(acutalLayout -> sb.append(acutalLayout
                         .doLayout(entry, databaseContext.map(BibDatabaseContext::getDatabase).orElse(null),
                                 highlightPattern)))
         );
@@ -334,7 +335,7 @@ public class PreviewPanel extends JPanel
             JabRefExecutorService.INSTANCE.execute(() -> {
                 try {
                     PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
-                    pras.add(new JobName(entry.flatMap(BibEntry::getCiteKeyOptional).orElse("NO ENTRY"), null));
+                    pras.add(new JobName(bibEntry.flatMap(BibEntry::getCiteKeyOptional).orElse("NO ENTRY"), null));
                     previewPane.print(null, null, true, null, pras, false);
 
                 } catch (PrinterException e) {

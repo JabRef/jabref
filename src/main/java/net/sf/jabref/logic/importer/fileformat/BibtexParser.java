@@ -103,10 +103,6 @@ public class BibtexParser {
         }
     }
 
-    @Deprecated
-    public static BibEntry singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences) {
-        return BibtexParser.singleFromStringOptional(bibtexString, importFormatPreferences).orElse(null);
-    }
 
     /**
      * Parses BibtexEntries from the given string and returns one entry found (or null if none found)
@@ -116,7 +112,7 @@ public class BibtexParser {
      * @param bibtexString
      * @return An Optional<BibEntry>. Optional.empty() if non was found or an error occurred.
      */
-    public static Optional<BibEntry> singleFromStringOptional(String bibtexString,
+    public static Optional<BibEntry> singleFromString(String bibtexString,
             ImportFormatPreferences importFormatPreferences) {
         Collection<BibEntry> entries = BibtexParser.fromString(bibtexString, importFormatPreferences);
         if ((entries == null) || entries.isEmpty()) {

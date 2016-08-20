@@ -64,7 +64,7 @@ public class GvkFetcher implements SearchBasedFetcher {
 
     protected String getSearchQueryString(String query) throws FetcherException {
         Objects.requireNonNull(query);
-        LinkedList<String> queryList = new LinkedList(Arrays.asList(query.split("\\s")));
+        LinkedList<String> queryList = new LinkedList<>(Arrays.asList(query.split("\\s")));
 
         if (searchKeys.contains(queryList.get(0))) {
             return getSearchQueryStringForComplexQuery(queryList);

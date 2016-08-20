@@ -164,7 +164,7 @@ class FieldSetComponent extends JPanel implements ActionListener {
         gbl.setConstraints(add, con);
         add(add);
 
-        FieldListFocusListener fieldListFocusListener = new FieldListFocusListener(list);
+        FieldListFocusListener<String> fieldListFocusListener = new FieldListFocusListener<>(list);
         list.addFocusListener(fieldListFocusListener);
     }
 

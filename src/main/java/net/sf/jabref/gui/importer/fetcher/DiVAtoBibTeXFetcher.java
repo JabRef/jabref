@@ -81,7 +81,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
             return false;
         }
 
-        Optional<BibEntry> entry = BibtexParser.singleFromStringOptional(bibtexString,
+        Optional<BibEntry> entry = BibtexParser.singleFromString(bibtexString,
                 ImportFormatPreferences.fromPreferences(Globals.prefs));
         if (entry.isPresent()) {
             // Optionally add curly brackets around key words to keep the case

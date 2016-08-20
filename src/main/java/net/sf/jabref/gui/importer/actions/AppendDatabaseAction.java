@@ -149,14 +149,14 @@ public class AppendDatabaseAction implements BaseAction {
                 // ensure that there is always only one AllEntriesGroup
                 if (newGroups.getGroup() instanceof AllEntriesGroup) {
                     // create a dummy group
-                    ExplicitGroup group = null;
                     try {
-                        group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT, Globals.prefs);
+                        ExplicitGroup group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT,
+                                Globals.prefs);
+                        newGroups.setGroup(group);
+                        group.add(appendedEntries);
                     } catch (ParseException e) {
                         LOGGER.error(e);
                     }
-                    newGroups.setGroup(group);
-                    group.add(appendedEntries);
                 }
 
                 // groupsSelector is always created, even when no groups

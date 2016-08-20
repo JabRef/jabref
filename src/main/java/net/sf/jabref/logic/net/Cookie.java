@@ -43,36 +43,36 @@ class Cookie {
             if (equals == -1) {
                 continue;
             }
-            String name = nameValue.substring(0, equals);
-            String value = nameValue.substring(equals + 1);
-            if ("domain".equalsIgnoreCase(name)) {
+            String attributeName = nameValue.substring(0, equals);
+            String attributeValue = nameValue.substring(equals + 1);
+            if ("domain".equalsIgnoreCase(attributeName)) {
                 String uriDomain = uri.getHost();
-                if (uriDomain.equals(value)) {
-                    this.domain = value;
+                if (uriDomain.equals(attributeValue)) {
+                    this.domain = attributeValue;
                 } else {
-                    if (!value.startsWith(".")) {
-                        value = '.' + value;
+                    if (!attributeValue.startsWith(".")) {
+                        attributeValue = '.' + attributeValue;
                     }
                     uriDomain = uriDomain.substring(uriDomain.indexOf('.'));
-                    if (!uriDomain.equals(value) && !uriDomain.endsWith(value)
-                            && !value.endsWith(uriDomain)) {
+                    if (!uriDomain.equals(attributeValue) && !uriDomain.endsWith(attributeValue)
+                            && !attributeValue.endsWith(uriDomain)) {
                         throw new IllegalArgumentException("Trying to set foreign cookie");
                     }
-                    this.domain = value;
+                    this.domain = attributeValue;
                 }
-            } else if ("path".equalsIgnoreCase(name)) {
-                this.path = value;
-            } else if ("expires".equalsIgnoreCase(name)) {
+            } else if ("path".equalsIgnoreCase(attributeName)) {
+                this.path = attributeValue;
+            } else if ("expires".equalsIgnoreCase(attributeName)) {
                 try {
-                    this.expires = ZonedDateTime.parse(value, whiteSpaceFormat);
+                    this.expires = ZonedDateTime.parse(attributeValue, whiteSpaceFormat);
                 } catch (DateTimeParseException e) {
                     try {
-                        this.expires = ZonedDateTime.parse(value, hyphenFormat);
+                        this.expires = ZonedDateTime.parse(attributeValue, hyphenFormat);
                     } catch (DateTimeParseException e2) {
                         try {
-                            this.expires = ZonedDateTime.parse(value, hyphenTwoDigitYearFormat);
+                            this.expires = ZonedDateTime.parse(attributeValue, hyphenTwoDigitYearFormat);
                         } catch (DateTimeParseException e3) {
-                            throw new IllegalArgumentException("Bad date format in header: " + value);
+                            throw new IllegalArgumentException("Bad date format in header: " + attributeValue);
                         }
                     }
                 }

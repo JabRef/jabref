@@ -349,7 +349,6 @@ class ManageJournalsPanel extends JPanel {
             }
         } else {
             filePath = Paths.get(personalFile.getText());
-
         }
 
         if (filePath != null) {

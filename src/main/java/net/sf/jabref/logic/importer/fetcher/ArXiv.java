@@ -334,9 +334,9 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             bibEntry.setField(FieldName.AUTHOR, StringUtils.join(authorNames, " and "));
             bibEntry.addKeywords(categories, ", "); // TODO: Should use separator value from preferences
             getId().ifPresent(id -> bibEntry.setField(FieldName.EPRINT, id));
-            title.ifPresent(title -> bibEntry.setField(FieldName.TITLE, title));
-            doi.ifPresent(doi -> bibEntry.setField(FieldName.DOI, doi));
-            abstractText.ifPresent(abstractText -> bibEntry.setField(FieldName.ABSTRACT, abstractText));
+            title.ifPresent(titleContent -> bibEntry.setField(FieldName.TITLE, titleContent));
+            doi.ifPresent(doiContent -> bibEntry.setField(FieldName.DOI, doiContent));
+            abstractText.ifPresent(abstractContent -> bibEntry.setField(FieldName.ABSTRACT, abstractContent));
             getDate().ifPresent(date -> bibEntry.setField(FieldName.DATE, date));
             primaryCategory.ifPresent(category -> bibEntry.setField(FieldName.EPRINTCLASS, category));
             journalReferenceText.ifPresent(journal -> bibEntry.setField(FieldName.JOURNALTITLE, journal));

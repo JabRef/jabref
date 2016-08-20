@@ -289,7 +289,9 @@ public class ExportFormat implements IExportFormat {
                 }
 
                 // Write the entry
-                ps.write(layout.doLayout(entry, databaseContext.getDatabase()));
+                if (layout != null) {
+                    ps.write(layout.doLayout(entry, databaseContext.getDatabase()));
+                }
             }
 
             // Print footer

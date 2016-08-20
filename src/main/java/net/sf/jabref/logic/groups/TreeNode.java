@@ -36,7 +36,7 @@ import java.util.function.Consumer;
     /**
      * Array of children, may be empty if this node has no children (but never null)
      */
-    private List<T> children;
+    private final List<T> children;
 
     /**
      * Constructs a tree node without parent and no children.
@@ -166,7 +166,7 @@ import java.util.function.Consumer;
         Objects.requireNonNull(target);
 
         Optional<T> oldParent = getParent();
-        if (oldParent.isPresent() && oldParent.get() == target) {
+        if (oldParent.isPresent() && (oldParent.get() == target)) {
             this.moveTo(target, target.getNumberOfChildren() - 1);
         } else {
             this.moveTo(target, target.getNumberOfChildren());
@@ -274,7 +274,7 @@ import java.util.function.Consumer;
      * @return returns true when index is at least 0 and less then the count of children
      */
     protected boolean childIndexExists(int index) {
-        return index >= 0 && index < children.size();
+        return (index >= 0) && (index < children.size());
     }
 
     /**
@@ -576,7 +576,8 @@ import java.util.function.Consumer;
     /**
      * The function which is invoked when something changed in the subtree.
      */
-    private Consumer<T> onDescendantChanged = t -> {};
+    private Consumer<T> onDescendantChanged = t -> {
+        /* Do nothing */ };
 
     /**
      * Adds the given function to the list of subscribers which are notified when something changes in the subtree.
