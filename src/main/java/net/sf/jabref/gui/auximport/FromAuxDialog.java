@@ -38,7 +38,6 @@ package net.sf.jabref.gui.auximport;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -62,7 +61,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.auxparser.AuxParser;
 import net.sf.jabref.logic.auxparser.AuxParserResult;
