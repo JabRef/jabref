@@ -2,6 +2,7 @@ package net.sf.jabref.logic.search.rules;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -151,13 +152,11 @@ public class GrammarBasedSearchRule implements SearchRule {
             List<String> matchedFieldKeys = fieldsKeys.stream().filter(matchFieldKey()).collect(Collectors.toList());
 
             for (String field : matchedFieldKeys) {
-                String fieldValue = entry.getField(field);
-                if (fieldValue == null) {
-                    continue; // paranoia
-                }
-
-                if (matchFieldValue(fieldValue)) {
-                    return true;
+                Optional<String> fieldValue = entry.getFieldOptional(field);
+                if (fieldValue.isPresent()) {
+                    if (matchFieldValue(fieldValue.get())) {
+                        return true;
+                    }
                 }
             }
 

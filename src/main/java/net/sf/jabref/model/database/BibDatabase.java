@@ -124,7 +124,7 @@ public class BibDatabase {
      */
     public synchronized Optional<BibEntry> getEntryByKey(String key) {
         for (BibEntry entry : entries) {
-            if (key.equals(entry.getCiteKey())) {
+            if (key.equals(entry.getCiteKeyOptional().orElse(null))) {
                 return Optional.of(entry);
             }
         }
@@ -135,9 +135,11 @@ public class BibDatabase {
         List<BibEntry> result = new ArrayList<>();
 
         for (BibEntry entry : entries) {
-            if (key.equals(entry.getCiteKey())) {
-                result.add(entry);
-            }
+            entry.getCiteKeyOptional().ifPresent(entryKey -> {
+                if (key.equals(entryKey)) {
+                    result.add(entry);
+                }
+            });
         }
         return result;
     }

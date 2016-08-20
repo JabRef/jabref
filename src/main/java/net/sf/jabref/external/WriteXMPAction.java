@@ -137,7 +137,8 @@ public class WriteXMPAction extends AbstractWorker {
                 }
             }
 
-            SwingUtilities.invokeLater(() -> optDiag.getProgressArea().append(entry.getCiteKey() + "\n"));
+            SwingUtilities.invokeLater(() -> optDiag.getProgressArea()
+                    .append(entry.getCiteKeyOptional().orElse(Localization.lang("undefined")) + "\n"));
 
             if (files.isEmpty()) {
                 skipped++;

@@ -40,9 +40,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
         Map<String, BibEntry> foundKeys = new HashMap<>();
         BibDatabase db = panel.getDatabase();
         for (BibEntry entry : db.getEntries()) {
-            String key = entry.getCiteKey();
-            // Only handle keys that are actually set:
-            if ((key != null) && !key.isEmpty()) {
+            entry.getCiteKeyOptional().filter(key -> !key.isEmpty()).ifPresent(key -> {
                 // See whether this entry's key is already known:
                 if (foundKeys.containsKey(key)) {
                     // Already known, so we have found a dupe. See if it was already found as a dupe:
@@ -62,7 +60,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
                     // Not already known. Add key and entry to map:
                     foundKeys.put(key, entry);
                 }
-            }
+            });
         }
     }
 
@@ -95,10 +93,10 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
         if (!toGenerateFor.isEmpty()) {
             NamedCompound ce = new NamedCompound(Localization.lang("Resolve duplicate BibTeX keys"));
             for (BibEntry entry : toGenerateFor) {
-                String oldKey = entry.getCiteKey();
+                String oldKey = entry.getCiteKeyOptional().orElse(null);
                 BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
                         BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
-                ce.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, oldKey, entry.getCiteKey()));
+                ce.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, oldKey, entry.getCiteKeyOptional().get()));
             }
             ce.end();
             panel.getUndoManager().addEdit(ce);

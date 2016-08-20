@@ -64,7 +64,6 @@ public class CleanupWorkerTest {
         worker = new CleanupWorker(context, mock(JournalAbbreviationLoader.class), Globals.prefs);
     }
 
-    @SuppressWarnings("unused")
     @Test(expected = NullPointerException.class)
     public void cleanupWithNullPresetThrowsException() {
         worker.cleanup(null, new BibEntry());

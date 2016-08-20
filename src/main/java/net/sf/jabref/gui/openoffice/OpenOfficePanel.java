@@ -670,7 +670,7 @@ public class OpenOfficePanel extends AbstractWorker {
         // Check if there are empty keys
         boolean emptyKeys = false;
         for (BibEntry entry : entries) {
-            if (entry.getCiteKey() == null) {
+            if (!entry.getCiteKeyOptional().isPresent()) {
                 // Found one, no need to look further for now
                 emptyKeys = true;
                 break;
@@ -694,13 +694,14 @@ public class OpenOfficePanel extends AbstractWorker {
             BibtexKeyPatternPreferences prefs = BibtexKeyPatternPreferences.fromPreferences(Globals.prefs);
             NamedCompound undoCompound = new NamedCompound(Localization.lang("Cite"));
             for (BibEntry entry : entries) {
-                if (entry.getCiteKey() == null) {
+                if (!entry.getCiteKeyOptional().isPresent()) {
                     // Generate key
                     BibtexKeyPatternUtil
                             .makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
                             prefs);
                     // Add undo change
-                    undoCompound.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, null, entry.getCiteKey()));
+                    undoCompound.addEdit(
+                            new UndoableKeyChange(panel.getDatabase(), entry, null, entry.getCiteKeyOptional().get()));
                 }
             }
             undoCompound.end();

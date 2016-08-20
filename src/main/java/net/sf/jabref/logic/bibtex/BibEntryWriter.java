@@ -130,7 +130,7 @@ public class BibEntryWriter {
     }
 
     private void writeKeyField(BibEntry entry, Writer out) throws IOException {
-        String keyField = StringUtil.shaveString(entry.getCiteKey());
+        String keyField = StringUtil.shaveString(entry.getCiteKeyOptional().orElse(""));
         out.write(keyField + ',' + OS.NEWLINE);
     }
 
