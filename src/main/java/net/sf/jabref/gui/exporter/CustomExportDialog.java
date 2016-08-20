@@ -37,6 +37,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -104,7 +105,12 @@ class CustomExportDialog extends JDialog {
         cancel.addActionListener(e -> dispose());
 
         JButton browse = new JButton(Localization.lang("Browse"));
-        browse.addActionListener(BrowseAction.buildForFile(layoutFile, FileExtensions.LAYOUT));
+        FileDialog dialog = new FileDialog(null).withExtension(FileExtensions.LAYOUT);
+        dialog.setDefaultExtension(FileExtensions.LAYOUT);
+        browse.addActionListener(e ->
+                dialog.showDialogAndGetSelectedFile()
+                        .ifPresent(f -> layoutFile.setText(f.toAbsolutePath().toString()))
+        );
 
         AbstractAction cancelAction = new AbstractAction() {
 

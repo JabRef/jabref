@@ -22,6 +22,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -53,6 +54,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.BrowseAction;
@@ -450,7 +452,12 @@ public class ProtectedTermsDialog {
             super(diag, Localization.lang("Add protected terms file"), true);
 
             JButton browse = new JButton(Localization.lang("Browse"));
-            browse.addActionListener(BrowseAction.buildForFile(newFile, FileExtensions.TERMS));
+            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.TERMS);
+            dialog.setDefaultExtension(FileExtensions.TERMS);
+            browse.addActionListener(e -> {
+                Optional<Path> file = dialog.showDialogAndGetSelectedFile();
+                file.ifPresent(f -> newFile.setText(f.toAbsolutePath().toString()));
+            });
 
             // Build content panel
             FormBuilder builder = FormBuilder.create();

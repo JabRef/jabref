@@ -565,7 +565,10 @@ class ManageJournalsPanel extends JPanel {
 
         private void setupPanel() {
             tf.setEditable(false);
-            browse.addActionListener(BrowseAction.buildForFile(tf));
+            browse.addActionListener(e ->
+                    new FileDialog(frame).showDialogAndGetSelectedFile()
+                            .ifPresent(f -> tf.setText(f.toAbsolutePath().toString()))
+            );
             DownloadAction da = new DownloadAction(tf);
             download.addActionListener(da);
             FormBuilder builder = FormBuilder.create().layout(new FormLayout(

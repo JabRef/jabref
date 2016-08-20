@@ -51,16 +51,6 @@ public final class BrowseAction extends AbstractAction {
         return new BrowseAction(null, tc, true, Collections.emptySet());
     }
 
-    public static BrowseAction buildForFile(JTextField tc) {
-
-        return new BrowseAction(null, tc, false, Collections.emptySet());
-    }
-
-    public static BrowseAction buildForFile(JTextField tc, FileExtensions extensions) {
-
-        return new BrowseAction(null, tc, false, EnumSet.of(extensions));
-    }
-
     private BrowseAction(JFrame frame, JTextField tc, boolean dirsOnly, Set<FileExtensions> extensions) {
         super(Localization.lang("Browse"));
         this.frame = frame;
