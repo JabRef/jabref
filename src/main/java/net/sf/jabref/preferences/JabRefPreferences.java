@@ -54,6 +54,7 @@ import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.UpdateFieldPreferences;
+import net.sf.jabref.logic.util.io.FileHistory;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -1368,6 +1369,16 @@ public class JabRefPreferences {
         storage.put(CLEANUP_CONVERT_TO_BIBLATEX, preset.isConvertToBiblatex());
         storage.put(CLEANUP_FIX_FILE_LINKS, preset.isFixFileLinks());
         storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().getAsStringList()));
+    }
+
+    public FileHistory getFileHistory() {
+        return new FileHistory(getStringList(RECENT_FILES));
+    }
+
+    public void storeFileHistory(FileHistory history) {
+        if (!history.isEmpty()) {
+            putStringList(RECENT_FILES, history.getHistory());
+        }
     }
 
     public UpdateFieldPreferences getUpdateFieldPreferences() {
