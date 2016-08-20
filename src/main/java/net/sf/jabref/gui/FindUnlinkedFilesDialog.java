@@ -45,6 +45,7 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Vector;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -107,7 +108,6 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 public class FindUnlinkedFilesDialog extends JDialog {
-
     private static final Log LOGGER = LogFactory.getLog(FindUnlinkedFilesDialog.class);
 
     /**
@@ -368,56 +368,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
     }
 
     /**
-     * Opens a {@link JFileChooser} and receives the user input as a
-     * {@link File} object, which this method returns. <br>
-     * <br>
-     * The "Open file" dialog will start at the path that is set in the
-     * "directory" textfield, or at the last stored path for this dialog, if the
-     * textfield is empty. <br>
-     * <br>
-     * If the user cancels the "Open file" dialog, this method returns null. <br>
-     * <br>
-     * If the user has selected a valid directory in the "Open file" dialog,
-     * this path will be stored persistently for this dialog, so that it can be
-     * preset at the next time this dialog is opened.
-     *
-     * @return The selected directory from the user, or <code>null</code>, if
-     *         the user has aborted the selection.
-     */
-    private Path chooseDirectory() {
-
-        if (fileChooser == null) {
-            fileChooser = new JFileChooser();
-            fileChooser.setAutoscrolls(true);
-            fileChooser.setDialogTitle(Localization.lang("Select directory"));
-            fileChooser.setApproveButtonText(Localization.lang("Choose directory"));
-            fileChooser.setApproveButtonToolTipText(
-                    Localization.lang("Use the selected directory to start with the search."));
-            fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        }
-
-        String path = textfieldDirectoryPath.getText();
-        if (path.isEmpty()) {
-            fileChooser.setCurrentDirectory(lastSelectedDirectory.toFile());
-        } else {
-            fileChooser.setCurrentDirectory(Paths.get(path).toFile());
-        }
-
-        int result = fileChooser.showOpenDialog(frame);
-        if (result == JFileChooser.CANCEL_OPTION) {
-            return null;
-        }
-        Path selectedDirectory = fileChooser.getSelectedFile().toPath();
-        String filepath = "";
-        if (selectedDirectory != null) {
-            filepath = selectedDirectory.toAbsolutePath().toString();
-        }
-        textfieldDirectoryPath.setText(filepath);
-
-        return selectedDirectory;
-    }
-
-    /**
      * Disables or enables all visible Elements in this Dialog. <br>
      * <br>
      * This also removes the {@link MouseListener} from the Tree-View to prevent
@@ -435,7 +385,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
             tree.removeMouseListener(treeMouseListener);
         }
         disOrEnableAllElements(FindUnlinkedFilesDialog.this, enable);
-
     }
 
     /**
@@ -660,8 +609,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
          * Stores the selected directory.
          */
         buttonBrowse.addActionListener(e -> {
-            Path selectedDirectory = chooseDirectory();
-            storeLastSelectedDirectory(selectedDirectory);
+            Optional<Path> selectedDirectory = new FileDialog(frame).showDialogAndGetSelectedDirectory();
+            selectedDirectory.ifPresent(d -> storeLastSelectedDirectory(d));
         });
 
         buttonScan.addActionListener(e -> startSearch());
