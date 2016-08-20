@@ -72,8 +72,8 @@ public final class BrowseAction extends AbstractAction {
 
     private String askUser() {
         if (dirsOnly) {
-            Path path  = new FileDialog(frame, comp.getText()).dirsOnly().withExtensions(extensions)
-                    .showDialogAndGetSelectedFile().orElse(Paths.get(""));
+            Path path  = new FileDialog(frame, comp.getText()).withExtensions(extensions)
+                    .showDialogAndGetSelectedDirectory().orElse(Paths.get(""));
             String file = path.toString();
 
             return file;
