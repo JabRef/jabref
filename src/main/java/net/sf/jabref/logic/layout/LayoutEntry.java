@@ -585,14 +585,13 @@ class LayoutEntry {
             String className = strings.get(0).trim();
 
             // Check if this is a name formatter defined by this export filter:
-            if (!prefs.getCustomExportNameFormatters().isEmpty()) {
-                String contents = prefs.getCustomExportNameFormatters().get(className);
-                if (contents != null) {
-                    NameFormatter nf = new NameFormatter();
-                    nf.setParameter(contents);
-                    results.add(nf);
-                    continue;
-                }
+
+            String contents = prefs.getCustomExportNameFormatter(className);
+            if (contents != null) {
+                NameFormatter nf = new NameFormatter();
+                nf.setParameter(contents);
+                results.add(nf);
+                continue;
             }
 
             // Try to load from formatters in formatter folder

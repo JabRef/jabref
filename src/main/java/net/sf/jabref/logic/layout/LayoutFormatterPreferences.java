@@ -45,15 +45,23 @@ public class LayoutFormatterPreferences {
         return journalAbbreviationPreferences;
     }
 
-    public Map<String, String> getCustomExportNameFormatters() {
-        return customExportNameFormatters;
-    }
-
     public FileLinkPreferences getFileLinkPreferences() {
         return fileLinkPreferences;
     }
 
     public JournalAbbreviationLoader getJournalAbbreviationLoader() {
         return journalAbbreviationLoader;
+    }
+
+    public void clearCustomExportNameFormatters() {
+        customExportNameFormatters.clear();
+    }
+
+    public void putCustomExportNameFormatter(String formatterName, String contents) {
+        customExportNameFormatters.put(formatterName, contents);
+    }
+
+    public String getCustomExportNameFormatter(String className) {
+        return customExportNameFormatters.get(className);
     }
 }

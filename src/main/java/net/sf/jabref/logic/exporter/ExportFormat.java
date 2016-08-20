@@ -32,7 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefMain;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
@@ -177,7 +177,7 @@ public class ExportFormat implements IExportFormat {
         String name = dir + filename;
         Reader reader;
         // Try loading as a resource first. This works for files inside the JAR:
-        URL reso = Globals.class.getResource(name);
+        URL reso = JabRefMain.class.getResource(name);
 
         // If that did not work, try loading as a normal file URL:
         try {
@@ -326,7 +326,7 @@ public class ExportFormat implements IExportFormat {
             }
 
             // Clear custom name formatters:
-            layoutPreferences.getCustomExportNameFormatters().clear();
+            layoutPreferences.clearCustomExportNameFormatters();
 
             if (!missingFormatters.isEmpty()) {
                 StringBuilder sb = new StringBuilder("The following formatters could not be found: ");
@@ -371,7 +371,7 @@ public class ExportFormat implements IExportFormat {
                     if ((index > 0) && ((index + 1) < line.length())) {
                         String formatterName = line.substring(0, index);
                         String contents = line.substring(index + 1);
-                        layoutPreferences.getCustomExportNameFormatters().put(formatterName, contents);
+                        layoutPreferences.putCustomExportNameFormatter(formatterName, contents);
                     }
                 }
 
