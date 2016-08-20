@@ -38,10 +38,13 @@
 <issuance>continuing</issuance>
 </originInfo>
 <typeOfResource>text</typeOfResource>
-<extent unit="page">67</extent>
+<extent unit="page">
+<start>67</start>
+<end>68</end>
+</extent>
 </relatedItem>
 <extension>
-<bibtex_pages>67</bibtex_pages>
+<bibtex_pages>67-68</bibtex_pages>
 </extension>
 <extension>
 <bibtex_keywords>Biomarkers, electrophoresis, neoplasia, spectrometry, translation</bibtex_keywords>

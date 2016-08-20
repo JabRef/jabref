@@ -97,7 +97,7 @@ class MODSEntry {
     }
 
     private void populateFromBibtex(BibEntry bibtex) {
-        if (bibtex.hasField(FieldName.TITLE)) {
+        if (bibtex.getFieldOptional(FieldName.TITLE).isPresent()) {
             if (CHARFORMAT) {
                 title = chars.format(bibtex.getFieldOptional(FieldName.TITLE).get());
             } else {
@@ -105,7 +105,7 @@ class MODSEntry {
             }
         }
 
-        if (bibtex.hasField(FieldName.PUBLISHER)) {
+        if (bibtex.getFieldOptional(FieldName.PUBLISHER).isPresent()) {
             if (CHARFORMAT) {
                 publisher = chars.format(bibtex.getFieldOptional(FieldName.PUBLISHER).get());
             } else {
@@ -113,14 +113,15 @@ class MODSEntry {
             }
         }
 
-        if (bibtex.hasField(BibEntry.KEY_FIELD)) {
-            id = bibtex.getCiteKey();
+        if (bibtex.getFieldOptional(BibEntry.KEY_FIELD).isPresent()) {
+            id = bibtex.getCiteKeyOptional().get();
         }
-        if (bibtex.hasField("address")) { // TODO: "place" is the MODS version, in BibTeX: "address", BibLaTeX: "location"?
+
+        if (bibtex.getFieldOrAlias(FieldName.ADDRESS).isPresent()) { // TODO: "place" is the MODS version, in BibTeX: "address", BibLaTeX: "location"?
             if (CHARFORMAT) {
-                address = chars.format(bibtex.getField("address"));
+                address = chars.format(bibtex.getFieldOrAlias(FieldName.ADDRESS).get());
             } else {
-                address = bibtex.getField("address");
+                address = bibtex.getFieldOrAlias(FieldName.ADDRESS).get();
             }
         }
 
@@ -135,7 +136,7 @@ class MODSEntry {
             host.title = bibtex.getField(FieldName.BOOKTITLE);
             host.publisher = bibtex.getField(FieldName.PUBLISHER);
             host.number = bibtex.getField(FieldName.NUMBER);
-            if (bibtex.hasField(FieldName.VOLUME)) {
+            if (bibtex.getFieldOptional(FieldName.VOLUME).isPresent()) {
                 host.volume = bibtex.getFieldOptional(FieldName.VOLUME).get();
             }
             host.issuance = "continuing";
@@ -194,10 +195,6 @@ class MODSEntry {
         return bibtex.getType();
     }
 
-    /**
-     * 
-     * TODO: Only usage for this method is the toString() method. So can this be deleted ?
-     */
     private Node getDOMrepresentation() {
         Node result;
         try {
@@ -317,7 +314,6 @@ class MODSEntry {
 
     /*
      * render as XML
-     * TODO: Couldn't find any usage of this. Can this be deleted?
      */
     @Override
     public String toString() {

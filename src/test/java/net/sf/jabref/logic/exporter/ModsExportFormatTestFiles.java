@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -20,7 +21,6 @@ import net.sf.jabref.logic.importer.fileformat.BibtexImporter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-import com.google.common.base.Charsets;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -33,7 +33,7 @@ import org.junit.runners.Parameterized.Parameters;
 import static org.junit.Assert.assertEquals;
 
 @RunWith(Parameterized.class)
-public class ModsExportFormatTest {
+public class ModsExportFormatTestFiles {
 
     public BibDatabaseContext databaseContext;
     public Charset charset;
@@ -62,7 +62,7 @@ public class ModsExportFormatTest {
     public void setUp() throws Exception {
         Globals.prefs = JabRefPreferences.getInstance();
         databaseContext = new BibDatabaseContext();
-        charset = Charsets.UTF_8;
+        charset = StandardCharsets.UTF_8;
         modsExportFormat = new ModsExportFormat();
         tempFile = testFolder.newFile();
         testImporter = new BibtexImporter(ImportFormatPreferences.fromPreferences(Globals.prefs));
@@ -71,7 +71,7 @@ public class ModsExportFormatTest {
     @Test
     public final void testPerformExport() throws IOException, URISyntaxException, SaveException {
         String xmlFileName = filename.replace(".bib", ".xml");
-        Path importFile = Paths.get(ModsExportFormatTest.class.getResource(filename).toURI());
+        Path importFile = Paths.get(ModsExportFormatTestFiles.class.getResource(filename).toURI());
         String tempFilename = tempFile.getCanonicalPath();
         List<BibEntry> entries = testImporter.importDatabase(importFile, Charset.defaultCharset()).getDatabase()
                 .getEntries();
