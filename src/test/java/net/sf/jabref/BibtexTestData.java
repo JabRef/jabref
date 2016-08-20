@@ -26,7 +26,8 @@ public class BibtexTestData {
                         + "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n" + "  issn = {1526-5455},"
                         + "\n" + "  publisher = {INFORMS}\n" + "}");
 
-        BibtexParser parser = new BibtexParser(reader, ImportFormatPreferences.fromPreferences(Globals.prefs));
+        BibtexParser parser = new BibtexParser(reader,
+                ImportFormatPreferences.fromPreferences(Globals.prefs));
         ParserResult result = parser.parse();
 
         return result.getDatabase();

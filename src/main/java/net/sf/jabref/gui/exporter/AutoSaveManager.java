@@ -92,7 +92,8 @@ public class AutoSaveManager {
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
                     .withMakeBackup(false)
-                    .withEncoding(panel.getBibDatabaseContext().getMetaData().getEncoding());
+                    .withEncoding(panel.getBibDatabaseContext().getMetaData().getEncoding()
+                            .orElse(Globals.prefs.getDefaultEncoding()));
 
             BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
             SaveSession ss = databaseWriter.saveDatabase(panel.getBibDatabaseContext(), prefs);

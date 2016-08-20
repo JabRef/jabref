@@ -235,7 +235,8 @@ public class DatabasePropertiesDialog extends JDialog {
 
     private void storeSettings() {
 
-        Charset oldEncoding = panel.getBibDatabaseContext().getMetaData().getEncoding();
+        Charset oldEncoding = panel.getBibDatabaseContext().getMetaData().getEncoding()
+                .orElse(Globals.prefs.getDefaultEncoding());
         Charset newEncoding = (Charset) encoding.getSelectedItem();
         panel.getBibDatabaseContext().getMetaData().setEncoding(newEncoding);
 

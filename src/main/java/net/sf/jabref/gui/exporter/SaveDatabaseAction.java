@@ -136,7 +136,9 @@ public class SaveDatabaseAction extends AbstractWorker {
                 }
 
                 // Save the database
-                success = saveDatabase(panel.getBibDatabaseContext().getDatabaseFile(), false, panel.getBibDatabaseContext().getMetaData().getEncoding());
+                success = saveDatabase(panel.getBibDatabaseContext().getDatabaseFile(), false,
+                        panel.getBibDatabaseContext().getMetaData().getEncoding()
+                                .orElse(Globals.prefs.getDefaultEncoding()));
 
                 Globals.getFileUpdateMonitor().updateTimeStamp(panel.getFileMonitorHandle());
             } else {
