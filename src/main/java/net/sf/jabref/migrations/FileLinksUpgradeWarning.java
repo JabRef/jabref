@@ -27,7 +27,7 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.actions.BrowseAction;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.importer.actions.PostOpenAction;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -138,7 +138,10 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             builderPanel.add(setFileDir);
             builderPanel.add(fileDir);
             JButton browse = new JButton(Localization.lang("Browse"));
-            browse.addActionListener(BrowseAction.buildForDir(fileDir));
+            browse.addActionListener(e ->
+                    new FileDialog(null).showDialogAndGetSelectedFile()
+                            .ifPresent(f -> fileDir.setText(f.toAbsolutePath().toString()))
+            );
             builderPanel.add(browse);
             formBuilder.appendRows("2dlu, p");
             row += 2;
