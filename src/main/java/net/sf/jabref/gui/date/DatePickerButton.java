@@ -15,6 +15,9 @@ import net.sf.jabref.logic.util.date.EasyDateFormat;
 
 import com.michaelbaranov.microba.calendar.DatePicker;
 
+/**
+ * wrapper and service class for the DatePicker handling at the EntryEditor
+ */
 public class DatePickerButton implements ActionListener {
 
     private final DatePicker datePicker = new DatePicker();

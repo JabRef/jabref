@@ -13,6 +13,18 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Handling of bibtex fields.
+ * All bibtex-field related stuff should be placed here!
+ * Because we can export these informations into additional
+ * config files -> simple extension and definition of new fields....
+ *
+ * TODO:
+ *  - handling of identically fields with different names
+ *    e.g. LCCN = lib-congress
+ *  - group id for each fields, e.g. standard, jurabib, bio....
+ *  - add a additional properties functionality into the BibtexSingleField class
+ */
 public class InternalBibtexFields {
 
     // contains all bibtex-field objects (BibtexSingleField)

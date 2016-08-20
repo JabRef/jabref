@@ -7,6 +7,9 @@ import java.util.Map;
 
 import javax.swing.text.StyledDocument;
 
+/**
+ * Save the textposition for tags in a recent TextInputDialog context
+ */
 public class TagToMarkedTextStore {
 
     private final Map<String, List<TMarkedStoreItem>> tagMap;
