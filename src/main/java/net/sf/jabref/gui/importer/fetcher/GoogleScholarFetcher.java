@@ -40,11 +40,11 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     private boolean hasRunConfig;
     private static final int MAX_ENTRIES_TO_LOAD = 50;
     private static final String QUERY_MARKER = "___QUERY___";
-    private static final String URL_START = "http://scholar.google.com";
-    private static final String URL_SETTING = "http://scholar.google.com/scholar_settings";
-    private static final String URL_SETPREFS = "http://scholar.google.com/scholar_setprefs";
+    private static final String URL_START = "https://scholar.google.com";
+    private static final String URL_SETTING = "https://scholar.google.com/scholar_settings";
+    private static final String URL_SETPREFS = "https://scholar.google.com/scholar_setprefs";
     private static final String SEARCH_URL = GoogleScholarFetcher.URL_START + "/scholar?q=" + GoogleScholarFetcher.QUERY_MARKER
-            + "&amp;hl=en&amp;btnG=Search";
+            + "&hl=en&btnG=Search&oe=utf-8";
 
     private static final Pattern BIBTEX_LINK_PATTERN = Pattern.compile("<a href=\"([^\"]*)\"[^>]*>[A-Za-z ]*BibTeX");
     private static final Pattern TITLE_START_PATTERN = Pattern.compile("<div class=\"gs_ri\">");
@@ -54,8 +54,6 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     private static final Pattern INPUT_PATTERN = Pattern.compile("<input type=([^ ]+) name=([^ ]+) value=([^> ]+)");
 
     private final Map<String, String> entryLinks = new HashMap<>();
-    //final static Pattern NEXT_PAGE_PATTERN = Pattern.compile(
-    //        "<a href=\"([^\"]*)\"><span class=\"SPRITE_nav_next\"> </span><br><span style=\".*\">Next</span></a>");
 
     private boolean stopFetching;
 
@@ -151,20 +149,11 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         stopFetching = true;
     }
 
-    /*  Used for debugging */
-    /*    private static void save(String filename, String content) throws IOException {
-        try (BufferedWriter out = new BufferedWriter(new FileWriter(filename))) {
-            out.write(content);
-        }
-    }
-    */
-
     private static void runConfig() throws IOException {
         try {
-            new URLDownload("http://scholar.google.com").downloadToString(Globals.prefs.getDefaultEncoding());
-            //save("setting.html", ud.getStringContent());
+            new URLDownload("http://scholar.google.com").downloadToString(StandardCharsets.UTF_8);
             String settingsPage = new URLDownload(GoogleScholarFetcher.URL_SETTING)
-                    .downloadToString(Globals.prefs.getDefaultEncoding());
+                    .downloadToString(StandardCharsets.UTF_8);
             // Get the form items and their values from the page:
             Map<String, String> formItems = GoogleScholarFetcher.getFormElements(settingsPage);
             // Override the important ones:
@@ -205,12 +194,13 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     }
 
     private String getCitationsFromUrl(String urlQuery, Map<String, JLabel> ids) throws IOException {
-        String cont = new URLDownload(urlQuery).downloadToString(Globals.prefs.getDefaultEncoding());
+        String cont = new URLDownload(urlQuery).downloadToString(StandardCharsets.UTF_8);
         Matcher m = GoogleScholarFetcher.BIBTEX_LINK_PATTERN.matcher(cont);
         int lastRegionStart = 0;
 
         while (m.find()) {
             String link = m.group(1).replace("&amp;", "&");
+            link = link+"&oe=utf-8"; // append param 'oe=utf-8' to tell google to serve UTF-8 encoded results
             String pText;
             String part = cont.substring(lastRegionStart, m.start());
             Matcher titleS = GoogleScholarFetcher.TITLE_START_PATTERN.matcher(part);
@@ -252,7 +242,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private BibEntry downloadEntry(String link) throws IOException {
         try {
-            String s = new URLDownload(link).downloadToString(Globals.prefs.getDefaultEncoding());
+            String s = new URLDownload(link).downloadToString(StandardCharsets.UTF_8);
             BibtexParser bp = new BibtexParser(new StringReader(s),
                     ImportFormatPreferences.fromPreferences(Globals.prefs));
             ParserResult pr = bp.parse();
