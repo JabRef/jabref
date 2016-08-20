@@ -33,6 +33,7 @@ import net.sf.jabref.logic.util.FileExtensions;
 
 /**
  * Action used to produce a "Browse" button for one of the text fields.
+ * TODO: Replace by FileDialog usage and remove afterwards
  */
 public final class BrowseAction extends AbstractAction {
 
@@ -59,11 +60,6 @@ public final class BrowseAction extends AbstractAction {
 
         return new BrowseAction(null, tc, false, EnumSet.of(extensions));
     }
-
-    public static BrowseAction buildForFile(JTextField tc, Set<FileExtensions> extensions) {
-        return new BrowseAction(null, tc, false, extensions);
-    }
-
 
     private BrowseAction(JFrame frame, JTextField tc, boolean dirsOnly, Set<FileExtensions> extensions) {
         super(Localization.lang("Browse"));

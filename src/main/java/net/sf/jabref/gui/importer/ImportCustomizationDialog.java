@@ -66,22 +66,17 @@ import org.apache.commons.logging.LogFactory;
  * Dialog to manage custom importers.
  */
 public class ImportCustomizationDialog extends JDialog {
+    private static final Log LOGGER = LogFactory.getLog(ImportCustomizationDialog.class);
 
     // Column widths for import customization dialog table:
     private static final int COL_0_WIDTH = 200;
     private static final int COL_1_WIDTH = 80;
     private static final int COL_2_WIDTH = 200;
+
     private static final int COL_3_WIDTH = 200;
 
     private final JTable customImporterTable;
-
-    private static final Log LOGGER = LogFactory.getLog(ImportCustomizationDialog.class);
-
-
-    /**
-     *
-     * @param frame
-     */
+    
     public ImportCustomizationDialog(final JabRefFrame frame) {
         super(frame, Localization.lang("Manage custom imports"), false);
 
