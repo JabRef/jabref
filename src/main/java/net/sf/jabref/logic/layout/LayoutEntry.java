@@ -582,21 +582,21 @@ class LayoutEntry {
 
         for (List<String> strings : formatterStrings) {
 
-            String className = strings.get(0).trim();
+            String nameFormatterName = strings.get(0).trim();
 
             // Check if this is a name formatter defined by this export filter:
 
-            String contents = prefs.getCustomExportNameFormatter(className);
-            if (contents != null) {
+            Optional<String> contents = prefs.getCustomExportNameFormatter(nameFormatterName);
+            if (contents.isPresent()) {
                 NameFormatter nf = new NameFormatter();
-                nf.setParameter(contents);
+                nf.setParameter(contents.get());
                 results.add(nf);
                 continue;
             }
 
             // Try to load from formatters in formatter folder
             try {
-                LayoutFormatter f = getLayoutFormatterByName(className);
+                LayoutFormatter f = getLayoutFormatterByName(nameFormatterName);
                 // If this formatter accepts an argument, check if we have one, and
                 // set it if so:
                 if ((f instanceof ParamLayoutFormatter) && (strings.size() >= 2)) {
@@ -609,7 +609,7 @@ class LayoutEntry {
             }
 
             // Then check whether this is a user defined formatter
-            String formatterParameter = userNameFormatter.get(className);
+            String formatterParameter = userNameFormatter.get(nameFormatterName);
 
             if (formatterParameter != null) {
                 NameFormatter nf = new NameFormatter();
@@ -618,7 +618,7 @@ class LayoutEntry {
                 continue;
             }
 
-            results.add(new NotFoundFormatter(className));
+            results.add(new NotFoundFormatter(nameFormatterName));
         }
 
         return results;

@@ -3,6 +3,7 @@ package net.sf.jabref.logic.layout;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
@@ -61,7 +62,7 @@ public class LayoutFormatterPreferences {
         customExportNameFormatters.put(formatterName, contents);
     }
 
-    public String getCustomExportNameFormatter(String className) {
-        return customExportNameFormatters.get(className);
+    public Optional<String> getCustomExportNameFormatter(String formatterName) {
+        return Optional.ofNullable(customExportNameFormatters.get(formatterName));
     }
 }
