@@ -88,9 +88,9 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
                 bibtexString = scan.useDelimiter("\\A").next();
             }
 
-            BibEntry entry = BibtexParser.singleFromString(bibtexString,
+            Optional<BibEntry> bibEntry = BibtexParser.singleFromString(bibtexString,
                     ImportFormatPreferences.fromPreferences(Globals.prefs));
-            if (entry != null) {
+            bibEntry.ifPresent(entry -> {
                 // Remove the added " Seiten" from the "pagetotal" field
                 entry.getFieldOptional(FieldName.PAGETOTAL)
                         .ifPresent(pagetotal -> entry.setField(FieldName.PAGETOTAL, pagetotal.replace(" Seiten", "")));
@@ -108,9 +108,8 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
                     }
                     entry.setField(FieldName.TITLE, title);
                 });
-                return Optional.of(entry);
-            }
-            return Optional.empty();
+            });
+            return bibEntry;
         } catch (FileNotFoundException e) {
             // invalid ISBN --> 404--> FileNotFoundException
             if (status != null) {

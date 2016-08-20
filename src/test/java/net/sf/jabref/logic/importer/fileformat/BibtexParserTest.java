@@ -94,7 +94,7 @@ public class BibtexParserTest {
 
     @Test
     public void singleFromStringRecognizesEntry() {
-        Optional<BibEntry> parsed = BibtexParser.singleFromStringOptional(
+        Optional<BibEntry> parsed = BibtexParser.singleFromString(
                 "@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n",
                 importFormatPreferences);
 
@@ -109,7 +109,7 @@ public class BibtexParserTest {
     @Test
     public void singleFromStringRecognizesEntryInMultiple() {
         Optional<BibEntry> parsed = BibtexParser
-                .singleFromStringOptional("@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
+                .singleFromString("@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
                         + "  title = {Title A}}\n" + "@inProceedings{foo," + "  author={Norton Bar}}",
                         importFormatPreferences);
 
@@ -119,13 +119,13 @@ public class BibtexParserTest {
 
     @Test
     public void singleFromStringReturnsNullFromEmptyString() {
-        Optional<BibEntry> parsed = BibtexParser.singleFromStringOptional("", importFormatPreferences);
+        Optional<BibEntry> parsed = BibtexParser.singleFromString("", importFormatPreferences);
         assertEquals(Optional.empty(), parsed);
     }
 
     @Test
     public void singleFromStringReturnsNullIfNoEntryRecognized() {
-        Optional<BibEntry> parsed = BibtexParser.singleFromStringOptional("@@article@@{{{{{{}",
+        Optional<BibEntry> parsed = BibtexParser.singleFromString("@@article@@{{{{{{}",
                 importFormatPreferences);
         assertEquals(Optional.empty(), parsed);
     }

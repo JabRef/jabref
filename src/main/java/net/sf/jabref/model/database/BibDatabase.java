@@ -339,18 +339,18 @@ public class BibDatabase {
      * Take the given collection of BibEntry and resolve any string
      * references.
      *
-     * @param entries A collection of BibtexEntries in which all strings of the form
+     * @param entriesToResolve A collection of BibtexEntries in which all strings of the form
      *                #xxx# will be resolved against the hash map of string
      *                references stored in the database.
      * @param inPlace If inPlace is true then the given BibtexEntries will be modified, if false then copies of the BibtexEntries are made before resolving the strings.
      * @return a list of bibtexentries, with all strings resolved. It is dependent on the value of inPlace whether copies are made or the given BibtexEntries are modified.
      */
-    public List<BibEntry> resolveForStrings(Collection<BibEntry> entries, boolean inPlace) {
-        Objects.requireNonNull(entries, "entries must not be null.");
+    public List<BibEntry> resolveForStrings(Collection<BibEntry> entriesToResolve, boolean inPlace) {
+        Objects.requireNonNull(entriesToResolve, "entries must not be null.");
 
-        List<BibEntry> results = new ArrayList<>(entries.size());
+        List<BibEntry> results = new ArrayList<>(entriesToResolve.size());
 
-        for (BibEntry entry : entries) {
+        for (BibEntry entry : entriesToResolve) {
             results.add(this.resolveForStrings(entry, inPlace));
         }
         return results;

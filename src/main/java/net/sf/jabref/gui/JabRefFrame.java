@@ -1569,10 +1569,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         if (tabCount > 0) {
             BasePanel current = getCurrentBasePanel();
-            if(current != null) {
-                boolean saved = current.getBibDatabaseContext().getDatabaseFile() != null;
-                setEnabled(openAndSavedDatabasesOnlyActions, saved);
-            }
+            boolean saved = current.getBibDatabaseContext().getDatabaseFile() != null;
+            setEnabled(openAndSavedDatabasesOnlyActions, saved);
             boolean isShared = current.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED;
             setEnabled(sharedDatabaseOnlyActions, isShared);
             setEnabled(noSharedDatabaseActions, !isShared);
