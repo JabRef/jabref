@@ -21,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
@@ -136,44 +137,52 @@ public class WriteXMPAction extends AbstractWorker {
                 }
             }
 
-            optDiag.getProgressArea().append(entry.getCiteKey() + "\n");
+            SwingUtilities.invokeLater(() -> optDiag.getProgressArea().append(entry.getCiteKey() + "\n"));
 
             if (files.isEmpty()) {
                 skipped++;
-                optDiag.getProgressArea().append("  " + Localization.lang("Skipped - No PDF linked") + ".\n");
+                SwingUtilities.invokeLater(() -> optDiag.getProgressArea()
+                        .append("  " + Localization.lang("Skipped - No PDF linked") + ".\n"));
             } else {
                 for (File file : files) {
                     if (file.exists()) {
                         try {
                             XMPUtil.writeXMP(file, entry, database, XMPPreferences.fromPreferences(Globals.prefs));
-                            optDiag.getProgressArea().append("  " + Localization.lang("OK") + ".\n");
+                            SwingUtilities.invokeLater(
+                                    () -> optDiag.getProgressArea().append("  " + Localization.lang("OK") + ".\n"));
                             entriesChanged++;
                         } catch (Exception e) {
-                            optDiag.getProgressArea().append(
-                                    "  " + Localization.lang("Error while writing") + " '" + file.getPath() + "':\n");
-                            optDiag.getProgressArea().append("    " + e.getLocalizedMessage() + "\n");
+                            SwingUtilities.invokeLater(() -> {
+                                optDiag.getProgressArea().append("  " + Localization.lang("Error while writing") + " '"
+                                        + file.getPath() + "':\n");
+                                optDiag.getProgressArea().append("    " + e.getLocalizedMessage() + "\n");
+                            });
                             errors++;
                         }
                     } else {
                         skipped++;
-                        optDiag.getProgressArea()
-                                .append("  " + Localization.lang("Skipped - PDF does not exist") + ":\n");
-                        optDiag.getProgressArea().append("    " + file.getPath() + "\n");
+                        SwingUtilities.invokeLater(() -> {
+                            optDiag.getProgressArea()
+                                    .append("  " + Localization.lang("Skipped - PDF does not exist") + ":\n");
+                            optDiag.getProgressArea().append("    " + file.getPath() + "\n");
+                        });
                     }
                 }
             }
 
             if (optDiag.isCanceled()) {
-                optDiag.getProgressArea().append("\n"
-                        + Localization.lang("Operation canceled.") +"\n");
+                SwingUtilities.invokeLater(
+                        () -> optDiag.getProgressArea().append("\n" + Localization.lang("Operation canceled.") + "\n"));
                 break;
             }
         }
-        optDiag.getProgressArea()
+        SwingUtilities.invokeLater(() -> {
+            optDiag.getProgressArea()
                 .append("\n"
                 + Localization.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).", String
                 .valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
-        optDiag.done();
+            optDiag.done();
+        });
     }
 
     @Override

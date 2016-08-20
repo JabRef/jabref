@@ -43,7 +43,7 @@ public class GUIGlobals {
     static final Color INACTIVE_TABBED_COLOR = Color.black; // inactive Database
     public static Color editorTextColor;
     public static Color validFieldBackgroundColor;
-    public static Color activeBackground;
+    public static Color activeBackgroundColor;
     public static Color invalidFieldBackgroundColor;
     public static final Color NULL_FIELD_COLOR = new Color(75, 130, 95); // Valid field, green.
     public static final Color ACTIVE_EDITOR_COLOR = new Color(230, 230, 255);
@@ -64,7 +64,7 @@ public class GUIGlobals {
     }
 
     public static void updateEntryEditorColors() {
-        GUIGlobals.activeBackground = JabRefPreferences.getInstance().getColor(JabRefPreferences.ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR);
+        GUIGlobals.activeBackgroundColor = JabRefPreferences.getInstance().getColor(JabRefPreferences.ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR);
         GUIGlobals.validFieldBackgroundColor = JabRefPreferences.getInstance().getColor(JabRefPreferences.VALID_FIELD_BACKGROUND_COLOR);
         GUIGlobals.invalidFieldBackgroundColor = JabRefPreferences.getInstance().getColor(JabRefPreferences.INVALID_FIELD_BACKGROUND_COLOR);
         GUIGlobals.editorTextColor = JabRefPreferences.getInstance().getColor(JabRefPreferences.FIELD_EDITOR_TEXT_COLOR);

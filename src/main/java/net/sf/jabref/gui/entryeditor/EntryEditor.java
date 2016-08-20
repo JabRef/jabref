@@ -931,7 +931,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
     @Subscribe
     public void listen(FieldChangedEvent fieldChangedEvent) {
         String newValue = fieldChangedEvent.getNewValue() == null ? "" : fieldChangedEvent.getNewValue();
-        setField(fieldChangedEvent.getFieldName(), newValue);
+        if (SwingUtilities.isEventDispatchThread()) {
+            setField(fieldChangedEvent.getFieldName(), newValue);
+        } else {
+            SwingUtilities.invokeLater(() -> setField(fieldChangedEvent.getFieldName(), newValue));
+        }
     }
 
     public void updateField(final Object sourceObject) {

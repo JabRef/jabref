@@ -2,11 +2,13 @@ package net.sf.jabref.gui.fieldeditors;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
@@ -19,11 +21,16 @@ import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * An implementation of the FieldEditor backed by a JTextField. Used for single-line input, only BibTex key at the
  * moment?!
  */
 public class TextField extends JTextField implements FieldEditor {
+
+    private static final Log LOGGER = LogFactory.getLog(TextField.class);
 
     private final String fieldName;
     private final JLabel label;
@@ -98,18 +105,32 @@ public class TextField extends JTextField implements FieldEditor {
 
     @Override
     public void setActiveBackgroundColor() {
-        setBackground(GUIGlobals.activeBackground);
+        setBackgroundColor(GUIGlobals.activeBackgroundColor);
     }
 
     @Override
     public void setValidBackgroundColor() {
-        setBackground(GUIGlobals.validFieldBackgroundColor);
+        setBackgroundColor(GUIGlobals.validFieldBackgroundColor);
     }
 
     @Override
     public void setInvalidBackgroundColor() {
-        setBackground(GUIGlobals.invalidFieldBackgroundColor);
+        setBackgroundColor(GUIGlobals.invalidFieldBackgroundColor);
     }
+
+    private void setBackgroundColor(Color color) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            setBackground(color);
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(() -> setBackground(color));
+            } catch (InvocationTargetException | InterruptedException e) {
+                LOGGER.info("Problem setting background color", e);
+            }
+        }
+
+    }
+
 
     @Override
     public void updateFontColor() {

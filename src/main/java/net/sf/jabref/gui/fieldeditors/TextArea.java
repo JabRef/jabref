@@ -2,22 +2,29 @@ package net.sf.jabref.gui.fieldeditors;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * An implementation of the FieldEditor backed by a JTextArea.
  * Used for multi-line input, currently all BibTexFields except Bibtex key!
  */
 public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
+
+    private static final Log LOGGER = LogFactory.getLog(TextArea.class);
 
     private final JScrollPane scrollPane;
 
@@ -92,17 +99,29 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
     @Override
     public void setActiveBackgroundColor() {
-        setBackground(GUIGlobals.activeBackground);
+        setBackgroundColor(GUIGlobals.activeBackgroundColor);
     }
 
     @Override
     public void setValidBackgroundColor() {
-        setBackground(GUIGlobals.validFieldBackgroundColor);
+        setBackgroundColor(GUIGlobals.validFieldBackgroundColor);
     }
 
     @Override
     public void setInvalidBackgroundColor() {
-        setBackground(GUIGlobals.invalidFieldBackgroundColor);
+        setBackgroundColor(GUIGlobals.invalidFieldBackgroundColor);
+    }
+
+    private void setBackgroundColor(Color color) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            setBackground(color);
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(() -> setBackground(color));
+            } catch (InvocationTargetException | InterruptedException e) {
+                LOGGER.info("Problem setting background color", e);
+            }
+        }
     }
 
     @Override

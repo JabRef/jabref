@@ -30,6 +30,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -646,7 +647,11 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      * selection and expansion state.
      */
     public void revalidateGroups() {
-        revalidateGroups(null);
+        if (SwingUtilities.isEventDispatchThread()) {
+            revalidateGroups(null);
+        } else {
+            SwingUtilities.invokeLater(() -> revalidateGroups(null));
+        }
     }
 
     /**
