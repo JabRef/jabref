@@ -192,11 +192,9 @@ public class FromAuxDialog extends JDialog {
 
         FileDialog dialog = new FileDialog(parentFrame).withExtension(FileExtensions.AUX);
         dialog.setDefaultExtension(FileExtensions.AUX);
-        browseAuxFileButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent ae) {
-                Optional<Path> file = dialog.showDialogAndGetSelectedFile();
-                file.ifPresent(f -> auxFileField.setText(f.toAbsolutePath().toString()));
-            }
+        browseAuxFileButton.addActionListener(e -> {
+            Optional<Path> file = dialog.showDialogAndGetSelectedFile();
+            file.ifPresent(f -> auxFileField.setText(f.toAbsolutePath().toString()));
         });
 
         notFoundList = new JList<>();
