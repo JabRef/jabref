@@ -498,13 +498,4 @@ public class InternalBibtexFields {
                 .collect(Collectors.toList());
     }
 
-    /*
-       public static int getPreferredFieldLength(String name) {
-       int l = DEFAULT_FIELD_LENGTH;
-       Object o = fieldLength.get(name.toLowerCase());
-       if (o != null)
-       l = ((Integer)o).intValue();
-       return l;
-       }*/
-
 }
