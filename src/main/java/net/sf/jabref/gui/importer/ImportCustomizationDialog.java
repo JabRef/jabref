@@ -116,8 +116,7 @@ public class ImportCustomizationDialog extends JDialog {
         JButton addFromJarButton = new JButton(Localization.lang("Add from JAR"));
         addFromJarButton.addActionListener(e -> {
             FileDialog dialog = new FileDialog(frame).withExtensions(EnumSet.of(FileExtensions.ZIP, FileExtensions.JAR));
-            // TODO: global FileFilter supportedFiles = new ImportFileFilter("", );
-            //dialog.setFileFilter(supportedFiles);
+            dialog.setDefaultExtension(FileExtensions.JAR);
             Optional<Path> jarZipFile = dialog.showDialogAndGetSelectedFile();
 
             if (jarZipFile.isPresent()) {
