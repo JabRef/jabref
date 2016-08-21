@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.layout;
 
 import java.io.File;
@@ -56,6 +41,7 @@ import net.sf.jabref.logic.layout.format.DOICheck;
 import net.sf.jabref.logic.layout.format.DOIStrip;
 import net.sf.jabref.logic.layout.format.DateFormatter;
 import net.sf.jabref.logic.layout.format.Default;
+import net.sf.jabref.logic.layout.format.EntryTypeFormatter;
 import net.sf.jabref.logic.layout.format.FileLink;
 import net.sf.jabref.logic.layout.format.FirstPage;
 import net.sf.jabref.logic.layout.format.FormatPagesForHTML;
@@ -235,7 +221,12 @@ class LayoutEntry {
     private String handleOptionField(BibEntry bibtex, BibDatabase database) {
         String fieldEntry;
 
-        if ("bibtextype".equals(text)) {
+        if (BibEntry.TYPE_HEADER.equals(text)) {
+            fieldEntry = bibtex.getType();
+        } else if (BibEntry.OBSOLETE_TYPE_HEADER.equals(text)) {
+            LOGGER.warn("'" + BibEntry.OBSOLETE_TYPE_HEADER
+                    + "' is an obsolete name for the entry type. Please update your layout to use '"
+                    + BibEntry.TYPE_HEADER + "' instead.");
             fieldEntry = bibtex.getType();
         } else {
             // changed section begin - arudert
@@ -484,6 +475,8 @@ class LayoutEntry {
             return new DOICheck();
         case "DOIStrip":
             return new DOIStrip();
+        case "EntryTypeFormatter":
+            return new EntryTypeFormatter();
         case "FirstPage":
             return new FirstPage();
         case "FormatPagesForHTML":
@@ -574,22 +567,21 @@ class LayoutEntry {
 
         for (List<String> strings : formatterStrings) {
 
-            String className = strings.get(0).trim();
+            String nameFormatterName = strings.get(0).trim();
 
             // Check if this is a name formatter defined by this export filter:
-            if (prefs.getCustomExportNameFormatters() != null) {
-                String contents = prefs.getCustomExportNameFormatters().get(className);
-                if (contents != null) {
-                    NameFormatter nf = new NameFormatter();
-                    nf.setParameter(contents);
-                    results.add(nf);
-                    continue;
-                }
+
+            Optional<String> contents = prefs.getCustomExportNameFormatter(nameFormatterName);
+            if (contents.isPresent()) {
+                NameFormatter nf = new NameFormatter();
+                nf.setParameter(contents.get());
+                results.add(nf);
+                continue;
             }
 
             // Try to load from formatters in formatter folder
             try {
-                LayoutFormatter f = getLayoutFormatterByName(className);
+                LayoutFormatter f = getLayoutFormatterByName(nameFormatterName);
                 // If this formatter accepts an argument, check if we have one, and
                 // set it if so:
                 if ((f instanceof ParamLayoutFormatter) && (strings.size() >= 2)) {
@@ -602,7 +594,7 @@ class LayoutEntry {
             }
 
             // Then check whether this is a user defined formatter
-            String formatterParameter = userNameFormatter.get(className);
+            String formatterParameter = userNameFormatter.get(nameFormatterName);
 
             if (formatterParameter != null) {
                 NameFormatter nf = new NameFormatter();
@@ -611,7 +603,7 @@ class LayoutEntry {
                 continue;
             }
 
-            results.add(new NotFoundFormatter(className));
+            results.add(new NotFoundFormatter(nameFormatterName));
         }
 
         return results;

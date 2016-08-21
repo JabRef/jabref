@@ -7,10 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.FieldChange;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,10 +18,10 @@ public class BibEntryTests {
     private BibEntry keywordEntry;
     private BibEntry emptyEntry;
 
+
+
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-
         // Default entry for most keyword and some type tests
         keywordEntry = new BibEntry();
         keywordEntry.setType(BibtexEntryTypes.ARTICLE);
@@ -35,6 +32,7 @@ public class BibEntryTests {
         emptyEntry = new BibEntry();
         emptyEntry.setType("article");
         emptyEntry.setChanged(false);
+
     }
 
     @Test
@@ -115,31 +113,6 @@ public class BibEntryTests {
         Assert.assertEquals("misc", keywordEntry.getType());
     }
 
-    @Test
-    public void testGetPublicationDate() {
-
-        Assert.assertEquals(Optional.of("2003-02"),
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }"))
-                        .getPublicationDate());
-
-        Assert.assertEquals(Optional.of("2003-03"),
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = 3 }")).getPublicationDate()
-        );
-
-        Assert.assertEquals(Optional.of("2003"),
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}}")).getPublicationDate());
-
-        Assert.assertEquals(Optional.empty(),
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, month = 3 }")).getPublicationDate());
-
-        Assert.assertEquals(Optional.empty(),
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, author={bla}}")).getPublicationDate());
-
-        Assert.assertEquals(Optional.of("2003-12"),
-                (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #DEC# }"))
-                        .getPublicationDate());
-
-    }
 
     @Test
     public void getFieldOrAliasDateWithYearNumericalMonthString() {
@@ -390,7 +363,7 @@ public class BibEntryTests {
         be.setField("author", "Albert Einstein");
         be.setCiteKey("Einstein1931");
         Assert.assertTrue(be.hasCiteKey());
-        Assert.assertEquals("Einstein1931", be.getCiteKey());
+        Assert.assertEquals(Optional.of("Einstein1931"), be.getCiteKeyOptional());
         Assert.assertEquals(Optional.of("Albert Einstein"), be.getFieldOptional("author"));
         be.clearField("author");
         Assert.assertEquals(Optional.empty(), be.getFieldOptional("author"));

@@ -1,22 +1,6 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.groups;
 
 import java.awt.Cursor;
-import java.awt.FontMetrics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.datatransfer.Transferable;
@@ -49,13 +33,12 @@ import javax.swing.ToolTipManager;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
-import net.sf.jabref.Globals;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.groups.AbstractGroup;
 import net.sf.jabref.logic.groups.EntriesGroupChange;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.groups.MoveGroupChange;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 public class GroupsTree extends JTree implements DragSourceListener,
         DropTargetListener, DragGestureListener {
@@ -98,9 +81,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
      * @param groupSelector the parent UI component
      */
     public GroupsTree(GroupSelector groupSelector) {
-        // Adjust height according to http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4760081
-        FontMetrics metrics = getFontMetrics(getFont());
-        setRowHeight(Math.max(getRowHeight(), metrics.getHeight()));
+        GUIUtil.correctRowHeight(this);
 
         this.groupSelector = groupSelector;
         DragGestureRecognizer dgr = DragSource.getDefaultDragSource()
@@ -116,9 +97,9 @@ public class GroupsTree extends JTree implements DragSourceListener,
         setToggleClickCount(0);
         ToolTipManager.sharedInstance().registerComponent(this);
         setShowsRootHandles(false);
-        setVisibleRowCount(Globals.prefs.getInt(JabRefPreferences.GROUPS_VISIBLE_ROWS));
         getSelectionModel().setSelectionMode(
                 TreeSelectionModel.DISCONTIGUOUS_TREE_SELECTION);
+        this.setFocusable(true);
     }
 
     @Override

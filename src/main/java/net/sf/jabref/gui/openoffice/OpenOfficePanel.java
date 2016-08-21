@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.openoffice;
 
 import java.awt.BorderLayout;
@@ -57,7 +42,11 @@ import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
@@ -174,6 +163,7 @@ public class OpenOfficePanel extends AbstractWorker {
         JMenuItem item = new JMenuItem(Localization.lang("OpenOffice/LibreOffice connection"),
                 IconTheme.getImage("openoffice"));
         item.addActionListener(event -> manager.show(getName()));
+        item.setAccelerator(Globals.getKeyPrefs().getKey(KeyBinding.OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION));
         return item;
     }
 
@@ -571,7 +561,7 @@ public class OpenOfficePanel extends AbstractWorker {
             builder.add(ooExec).xy(3, 1);
             builder.add(browseOOExec).xy(5, 1);
 
-            builder.appendColumns("4dlu, pref");
+            builder.appendRows("4dlu, pref");
             builder.add(Localization.lang("Path to OpenOffice/LibreOffice library dir")).xy(1, 3);
             builder.add(ooJars).xy(3, 3);
             builder.add(browseOOJars).xy(5, 3);
@@ -638,7 +628,8 @@ public class OpenOfficePanel extends AbstractWorker {
         if (panel != null) {
             final BibDatabase database = panel.getDatabase();
             List<BibEntry> entries = panel.getSelectedEntries();
-            if (!entries.isEmpty()) {
+            if (!entries.isEmpty() && checkThatEntriesHaveKeys(entries)) {
+
                 try {
                     if (style == null) {
                         style = loader.getUsedStyle();
@@ -667,6 +658,60 @@ public class OpenOfficePanel extends AbstractWorker {
 
         }
 
+    }
+
+    /**
+     * Check that all entries in the list have BibTeX keys, if not ask if they should be generated
+     *
+     * @param entries A list of entries to be checked
+     * @return true if all entries have BibTeX keys, if it so may be after generating them
+     */
+    private boolean checkThatEntriesHaveKeys(List<BibEntry> entries) {
+        // Check if there are empty keys
+        boolean emptyKeys = false;
+        for (BibEntry entry : entries) {
+            if (entry.getCiteKey() == null) {
+                // Found one, no need to look further for now
+                emptyKeys = true;
+                break;
+            }
+        }
+
+        // If no empty keys, return true
+        if (!emptyKeys) {
+            return true;
+        }
+
+        // Ask if keys should be generated
+        String[] options = {Localization.lang("Generate keys"), Localization.lang("Cancel")};
+        int answer = JOptionPane.showOptionDialog(this.frame,
+                Localization.lang("Cannot cite entries without BibTeX keys. Generate keys now?"),
+                Localization.lang("Cite"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE, null, options,
+                null);
+        BasePanel panel = frame.getCurrentBasePanel();
+        if ((answer == JOptionPane.OK_OPTION) && (panel != null)) {
+            // Generate keys
+            BibtexKeyPatternPreferences prefs = BibtexKeyPatternPreferences.fromPreferences(Globals.prefs);
+            NamedCompound undoCompound = new NamedCompound(Localization.lang("Cite"));
+            for (BibEntry entry : entries) {
+                if (entry.getCiteKey() == null) {
+                    // Generate key
+                    BibtexKeyPatternUtil
+                            .makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
+                            prefs);
+                    // Add undo change
+                    undoCompound.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, null, entry.getCiteKey()));
+                }
+            }
+            undoCompound.end();
+            // Add all undos
+            panel.getUndoManager().addEdit(undoCompound);
+            // Now every entry has a key
+            return true;
+        } else {
+            // No, we canceled (or there is no panel to get the database from, highly unlikely)
+            return false;
+        }
     }
 
     private void showConnectionLostErrorMessage() {

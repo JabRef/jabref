@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
@@ -20,17 +5,17 @@ import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -38,13 +23,17 @@ import javax.swing.ListSelectionModel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefException;
-import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.gui.maintable.MainTable;
+import net.sf.jabref.logic.exporter.ExportFormat;
 import net.sf.jabref.logic.exporter.ExportFormats;
+import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.JabRefPreferencesFilter;
 
@@ -62,17 +51,16 @@ import org.apache.commons.logging.LogFactory;
  *
  */
 public class PreferencesDialog extends JDialog {
+    private static final Log LOGGER = LogFactory.getLog(PreferencesDialog.class);
 
     private final JPanel main;
 
     private final JabRefFrame frame;
-
     private final JButton importPreferences = new JButton(Localization.lang("Import preferences"));
     private final JButton exportPreferences = new JButton(Localization.lang("Export preferences"));
     private final JButton showPreferences = new JButton(Localization.lang("Show preferences"));
-    private final JButton resetPreferences = new JButton(Localization.lang("Reset preferences"));
 
-    private static final Log LOGGER = LogFactory.getLog(PreferencesDialog.class);
+    private final JButton resetPreferences = new JButton(Localization.lang("Reset preferences"));
 
 
     public PreferencesDialog(JabRefFrame parent) {
@@ -102,7 +90,7 @@ public class PreferencesDialog extends JDialog {
         tabs.add(new ExternalTab(frame, this, prefs));
         tabs.add(new TablePrefsTab(prefs));
         tabs.add(new TableColumnsTab(prefs, parent));
-        tabs.add(new LabelPatternPrefTab(prefs, parent.getCurrentBasePanel()));
+        tabs.add(new BibtexKeyPatternPrefTab(prefs, parent.getCurrentBasePanel()));
         tabs.add(new PreviewPrefsTab(prefs));
         tabs.add(new NameFormatterTab(prefs));
         tabs.add(new ImportSettingsTab(prefs));
@@ -131,7 +119,6 @@ public class PreferencesDialog extends JDialog {
             String o = chooser.getSelectedValue();
             cardLayout.show(main, o);
         });
-
 
         JPanel buttons = new JPanel();
         buttons.setLayout(new GridLayout(4, 1));
@@ -166,38 +153,34 @@ public class PreferencesDialog extends JDialog {
         // Import and export actions:
         exportPreferences.setToolTipText(Localization.lang("Export preferences to file"));
         exportPreferences.addActionListener(e -> {
-            String filename = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")),
-                    Collections.singletonList(".xml"), JFileChooser.SAVE_DIALOG, false);
-            if (filename == null) {
-                return;
-            }
-            File file = new File(filename);
-            if (!file.exists() || (JOptionPane.showConfirmDialog(PreferencesDialog.this,
-                    Localization.lang("'%0' exists. Overwrite file?", file.getName()),
-                    Localization.lang("Export preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION)) {
+            FileDialog dialog = new FileDialog(frame, System.getProperty("user.home")).withExtension(FileExtensions.XML);
+            dialog.setDefaultExtension(FileExtensions.XML);
+            Optional<Path> path = dialog.saveNewFile();
 
+            path.ifPresent(exportFile -> {
                 try {
-                    prefs.exportPreferences(filename);
+                    prefs.exportPreferences(exportFile.toString());
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
                             Localization.lang("Export preferences"), JOptionPane.ERROR_MESSAGE);
                 }
-            }
+            });
         });
 
         importPreferences.setToolTipText(Localization.lang("Import preferences from file"));
         importPreferences.addActionListener(e -> {
-            String filename = FileDialogs.getNewFile(frame, new File(System.getProperty("user.home")),
-                    Collections.singletonList(".xml"), JFileChooser.OPEN_DIALOG, false);
-            if (filename != null) {
+            FileDialog dialog = new FileDialog(frame, System.getProperty("user.home")).withExtension(FileExtensions.XML);
+            dialog.setDefaultExtension(FileExtensions.XML);
+            Optional<Path> fileName = dialog.showDialogAndGetSelectedFile();
+
+            if (fileName.isPresent()) {
                 try {
-                    prefs.importPreferences(filename);
+                    prefs.importPreferences(fileName.get().toString());
                     updateAfterPreferenceChanges();
                     JOptionPane.showMessageDialog(PreferencesDialog.this,
                             Localization.lang("You must restart JabRef for this to come into effect."),
-                            Localization.lang("Import preferences"),
-                            JOptionPane.WARNING_MESSAGE);
+                            Localization.lang("Import preferences"), JOptionPane.WARNING_MESSAGE);
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
@@ -207,8 +190,7 @@ public class PreferencesDialog extends JDialog {
         });
 
         showPreferences.addActionListener(
-                e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(Globals.prefs), frame)
-                        .setVisible(true));
+                e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(Globals.prefs), frame).setVisible(true));
         resetPreferences.addActionListener(e -> {
             if (JOptionPane.showConfirmDialog(PreferencesDialog.this,
                     Localization.lang("Are you sure you want to reset all settings to default values?"),
@@ -217,8 +199,7 @@ public class PreferencesDialog extends JDialog {
                     prefs.clear();
                     JOptionPane.showMessageDialog(PreferencesDialog.this,
                             Localization.lang("You must restart JabRef for this to come into effect."),
-                            Localization.lang("Reset preferences"),
-                            JOptionPane.WARNING_MESSAGE);
+                            Localization.lang("Reset preferences"), JOptionPane.WARNING_MESSAGE);
                 } catch (BackingStoreException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
@@ -236,10 +217,17 @@ public class PreferencesDialog extends JDialog {
 
     private void updateAfterPreferenceChanges() {
         setValues();
-        ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
+        Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
+                Globals.journalAbbreviationLoader);
+        LayoutFormatterPreferences layoutPreferences = LayoutFormatterPreferences.fromPreferences(Globals.prefs,
+                Globals.journalAbbreviationLoader);
+        SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+        ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
+
         frame.removeCachedEntryEditors();
         Globals.prefs.updateEntryEditorTabList();
     }
+
 
     class OkAction extends AbstractAction {
 

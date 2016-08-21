@@ -12,37 +12,82 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- [#970](https://github.com/JabRef/jabref/issues/970): Implementation of shared database support (full system) with event based synchronization for MySQL, PostgreSQL and Oracle database systems.
+- Externally fetched information can be merged for entries with an ISBN
+- Externally fetched information can be merged for entries with an ArXiv eprint
+- Added EntryTypeFormatter to add camel casing to entry type in layouts, e.g., InProceedings
+- [#1225](https://github.com/JabRef/jabref/issues/1225): Hotkey-system is now consistent
+- Added print entry preview to the right click menu
 - [#462](https://github.com/JabRef/jabref/issues/462) Extend the OpenConsoleFeature by offering a selection between default terminal emulator and configurable command execution.
+- The field name in the layout files for entry type is changed from `bibtextype` to `entrytype`. Please update your existing files as support for `bibtextype` will be removed eventually.
 - [#1516](https://github.com/JabRef/jabref/issues/1516) Selected field names are written in uppercase in the entry editor
+- Table row height is adjusted on Windows which is useful for high resolution displays
 - For developers: Moved the bst package into logic. This requires the regeneration of antlr sources, execute: gradlew generateSource
 - [#1026](https://github.com/JabRef/jabref/issues/1026) JabRef does no longer delete user comments outside of BibTeX entries and strings
 - [#1249](https://github.com/JabRef/jabref/issues/1249) Date layout formatter added
+- Undo/redo are enabled/disabled and show the action in the tool tip
 - Added ISBN integrity checker
 - Added filter to not show selected integrity checks
+- The contents of `crossref` and `related` will be automatically updated if a linked entry changes key
+- The information shown in the main table now resolves crossrefs and strings and it can be shown which fields are resolved in this way (Preferences -> Appearance -> Color codes for resolved fields)
 - Enhance the entry customization dialog to give better visual feedback
 - It is now possible to generate a new BIB database from the citations in an OpenOffice/LibreOffice document
 - The arXiv fetcher now also supports free-text search queries
 - [#1345](https://github.com/JabRef/jabref/issues/1345) Cleanup ISSN
+- It is now possible to add your own lists of protected terms, see Options -> Manage protected terms
+- Automatically generated group names are now converted from LaTeX to Unicode
+- Unified dialogs for opening/saving files
+- Add integrity check to avoid non-ASCII characters in BibTeX files
+- [#1751](https://github.com/JabRef/jabref/issues/1751) Added tooltip to web search button
+- [#1758](https://github.com/JabRef/jabref/issues/1758) Added a button to open Database Properties dialog help
+- Improve focus of the maintable after a sidepane gets closed (Before it would focus the toolbar or it would focus the wrong entry)
+- File open dialogs now use default extensions as primary file filter
 
 ### Fixed
-- Fixed [#1632](https://github.com/JabRef/jabref/issues/1632) User comments (@Comment) with or without brackets are now kept
+- Fixed [#1632](https://github.com/JabRef/jabref/issues/1632): User comments (@Comment) with or without brackets are now kept
 - Fixed [#1264](https://github.com/JabRef/jabref/issues/1264): S with caron does not render correctly
 - LaTeX to Unicode converter now handles combining accents
 - Fixed NullPointerException when clicking Browse in Journal abbreviations with empty text field
 - Fixed NullPointerException when opening file in Plain text import
 - Fixed NullPointerException when appending database
 - Fixed [#636](https://github.com/JabRef/jabref/issues/636): DOI in export filters
+- Fixed [#1519](https://github.com/JabRef/jabref/issues/1519): The word "Seiten" is automatically removed when fetching info from ISBN
 - Fixed [#1527](https://github.com/JabRef/jabref/issues/1527): 'Get BibTeX data from DOI' Removes Marking
 - Fixed [#1592](https://github.com/JabRef/jabref/issues/1592): LibreOffice: wrong numbers in citation labels
 - The merge entry dialog showed wrong heading after merging from DOI
 - Fixed [#1321](https://github.com/JabRef/jabref/issues/1321): LaTeX commands in fields not displayed in the list of references
 - Fixed [#1639](https://github.com/JabRef/jabref/issues/1639): Google Scholar fetching works again.
 - Date fields in the BibLatex standard are now always formatted in the correct way, independent of the preferences
-- Fixed [#1554]: Import dialog is no longer hidden behind main window
-- Fixed [#1643]: Searching with double quotes in a specific field ignores the last character
+- Manage content selectors now saves edited existing lists again and only marks database as changed when the content selectors are changed
+- Fixed [#1554](https://github.com/JabRef/jabref/issues/1554): Import dialog is no longer hidden behind main window
+- Fixed [#1643](https://github.com/JabRef/jabref/issues/1643): Searching with double quotes in a specific field ignores the last character
+- Fixed [#1288](https://github.com/JabRef/jabref/issues/1288): Newly opened bib-file is not focused
+- Fixed [#1669](https://github.com/JabRef/jabref/issues/1669): Dialog for manual connection to OpenOffice/LibreOffice works again on Linux
+- Fixed [#1682](https://github.com/JabRef/jabref/issues/1682): An entry now must have a BibTeX key to be cited in OpenOffice/LibreOffice
+- Fixed [#1324](https://github.com/JabRef/jabref/issues/1324): Save-Dialog for Lookup fulltext document now opens in the specified working directory
+- Fixed [#1609](https://github.com/JabRef/jabref/issues/1324): Adding a file to an entry opened dialog in the parent folder of the working directory
+- Fixed NullPointerException when clicking OK without specifying a field name in set/clear/rename fields
+- Fixed IndexOutOfBoundsException when trying to download a full text document without selecting an entry
+- Fixed NullPointerException when trying to set a special field or mark an entry through the menu without having an open database
+- Fixed NullPointerException when trying to synchronize file field with an entry without BibTeX key
+- Fixed NullPointerException when importing PDFs and pressing cancel when selecting entry type
+- Fixed a number of issues related to accessing the GUI from outside the EDT
+- Added a few missing translation strings
+- Fixed NullPointerException when opening Customize entry type dialog without an open database
+- Fixed [#1257](https://github.com/JabRef/jabref/issues/1324): Preferences for the BibTeX key generator set in a version prior to 3.2 are now migrated automatically to the new version
+- Fixed [#1716](https://github.com/JabRef/jabref/issues/1716): `@`-Symbols stored in BibTeX fields no longer break the database
+- Fixed [#1499](https://github.com/JabRef/jabref/issues/1499): {} braces are now treated correctly in in author/editor
+- Fixed [#1531](https://github.com/JabRef/jabref/issues/1531): `\relax` can be used for abbreviation of author names
+- Fixed [#1771](https://github.com/JabRef/jabref/issues/1771): Show all supported import types as default
+ 
 
 ### Removed
 - It is not longer possible to choose to convert HTML sub- and superscripts to equations
+- [#1610](https://github.com/JabRef/jabref/issues/1610) Removed the possibility to auto show or hide the groups interface
+- Removed option to open right-click menu with ctrl + left-click as it was not working
+- Removed option to disable entry editor when multiple entries are selected as it was not working
+- Removed option to show warning for empty key as it was not working
+- Removed option to show warning for duplicate key as it was not working
 
 
 
@@ -481,7 +526,7 @@ Since much functionality has changed during development, a release of this versi
 
 ## 2.11
 
-The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/dev_2.11/CHANGELOG) in the [dev_2.11 branch](https://github.com/JabRef/jabref/tree/dev_2.11).
+The changelog of 2.11 and versions before is maintained as [text file](https://github.com/JabRef/jabref/blob/v2.11.1/CHANGELOG) in the [v2.11.1 tag](https://github.com/JabRef/jabref/tree/v2.11.1).
 
 [Unreleased]: https://github.com/JabRef/jabref/compare/v3.5...HEAD
 [3.5]: https://github.com/JabRef/jabref/compare/v3.4...v3.5

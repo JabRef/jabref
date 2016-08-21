@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.groups;
 
 import java.awt.BorderLayout;
@@ -45,6 +30,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -59,6 +45,7 @@ import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
+import net.sf.jabref.event.GroupUpdatedEvent;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
@@ -82,6 +69,7 @@ import net.sf.jabref.logic.search.matchers.NotMatcher;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -262,6 +250,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 groupsRoot.addNewGroup(newGroup, panel.getUndoManager());
                 panel.markBaseChanged();
                 frame.output(Localization.lang("Created group \"%0\".", newGroup.getName()));
+                panel.getBibDatabaseContext().getMetaData().postChange();
             }
         });
         andCb.addActionListener(e -> valueChanged(null));
@@ -658,7 +647,11 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
      * selection and expansion state.
      */
     public void revalidateGroups() {
-        revalidateGroups(null);
+        if (SwingUtilities.isEventDispatchThread()) {
+            revalidateGroups(null);
+        } else {
+            SwingUtilities.invokeLater(() -> revalidateGroups(null));
+        }
     }
 
     /**
@@ -792,13 +785,14 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                         Localization.lang("Assign the original group's entries to this group?"),
                         Localization.lang("Change of Grouping Method"),
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
-                boolean keepPreviousAssignments = i == JOptionPane.YES_OPTION &&
+                boolean keepPreviousAssignments = (i == JOptionPane.YES_OPTION) &&
                         WarnAssignmentSideEffects.warnAssignmentSideEffects(newGroup, panel.frame());
 
                 AbstractUndoableEdit undoAddPreviousEntries = null;
                 UndoableModifyGroup undo = new UndoableModifyGroup(GroupSelector.this, groupsRoot, node, newGroup);
                 Optional<EntriesGroupChange> addChange = node.getNode().setGroup(newGroup, keepPreviousAssignments,
                         panel.getDatabase().getEntries());
+                panel.getBibDatabaseContext().getMetaData().postChange();
                 if (addChange.isPresent()) {
                     undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange.get());
                 }
@@ -877,6 +871,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             panel.getUndoManager().addEdit(undo);
             panel.markBaseChanged();
             frame.output(Localization.lang("Added group \"%0\".", newGroup.getName()));
+            panel.getBibDatabaseContext().getMetaData().postChange();
         }
     }
 
@@ -901,6 +896,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 panel.getUndoManager().addEdit(undo);
                 panel.markBaseChanged();
                 frame.output(Localization.lang("Removed group \"%0\" and its subgroups.", group.getName()));
+                panel.getBibDatabaseContext().getMetaData().postChange();
             }
         }
     }
@@ -926,6 +922,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 panel.getUndoManager().addEdit(undo);
                 panel.markBaseChanged();
                 frame.output(Localization.lang("Removed all subgroups of group \"%0\".", node.getName()));
+                panel.getBibDatabaseContext().getMetaData().postChange();
             }
         }
     }
@@ -953,6 +950,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 panel.getUndoManager().addEdit(undo);
                 panel.markBaseChanged();
                 frame.output(Localization.lang("Removed group \"%0\".", group.getName()));
+                panel.getBibDatabaseContext().getMetaData().postChange();
             }
         }
     }
@@ -978,6 +976,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             panel.getUndoManager().addEdit(undo);
             panel.markBaseChanged();
             frame.output(Localization.lang("Sorted immediate subgroups."));
+            panel.getBibDatabaseContext().getMetaData().postChange();
         }
     }
 
@@ -996,6 +995,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             panel.getUndoManager().addEdit(undo);
             panel.markBaseChanged();
             frame.output(Localization.lang("Sorted all subgroups recursively."));
+            panel.getBibDatabaseContext().getMetaData().postChange();
         }
     }
 
@@ -1224,14 +1224,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             setGroups(metaData.getGroups());
         }
 
-        // auto show/hide groups interface
-        if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_AUTO_SHOW) && !groupsRoot.isLeaf()) { // groups were defined
-            frame.getSidePaneManager().show("groups");
-            frame.groupToggle.setSelected(true);
-        } else if (Globals.prefs.getBoolean(JabRefPreferences.GROUP_AUTO_HIDE) && groupsRoot.isLeaf()) { // groups were not defined
-            frame.getSidePaneManager().hide("groups");
-            frame.groupToggle.setSelected(false);
-        }
+        metaData.registerListener(this);
 
         synchronized (getTreeLock()) {
             validateTree();
@@ -1271,4 +1264,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         return this.groupsTree;
     }
 
+    @Subscribe
+    public void listen(GroupUpdatedEvent updateEvent) {
+        setGroups(updateEvent.getMetaData().getGroups());
+    }
 }

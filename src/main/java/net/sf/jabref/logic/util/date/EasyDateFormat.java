@@ -55,6 +55,9 @@ public class EasyDateFormat {
         return dateTime.format(dateFormatter);
     }
 
+    public static EasyDateFormat fromTimeStampFormat(String timeStampFormat) {
+        return new EasyDateFormat(timeStampFormat);
+    }
 
     public static EasyDateFormat fromPreferences(JabRefPreferences preferences) {
      return new EasyDateFormat(preferences.get(JabRefPreferences.TIME_STAMP_FORMAT));

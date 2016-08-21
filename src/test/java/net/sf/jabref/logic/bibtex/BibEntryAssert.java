@@ -13,9 +13,11 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.importer.fileformat.ImportFormat;
+import net.sf.jabref.Globals;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
@@ -61,7 +63,8 @@ public class BibEntryAssert {
     private static List<BibEntry> getListFromInputStream(InputStream is) throws IOException {
         ParserResult result;
         try (Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-            BibtexParser parser = new BibtexParser(reader);
+            BibtexParser parser = new BibtexParser(reader,
+                    ImportFormatPreferences.fromPreferences(Globals.prefs));
             result = parser.parse();
         }
         Assert.assertNotNull(result);

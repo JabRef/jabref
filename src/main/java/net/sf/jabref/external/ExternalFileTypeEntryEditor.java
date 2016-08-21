@@ -1,32 +1,15 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.external;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.util.Collections;
+import java.nio.file.Path;
+import java.util.Optional;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -36,7 +19,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
@@ -69,6 +52,20 @@ public class ExternalFileTypeEntryEditor {
     private ExternalFileType entry;
     private boolean okPressed;
 
+    private final ActionListener browsePressed = e -> {
+        String appDir = application.getText().trim();
+        if (appDir.isEmpty()) {
+            appDir = Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY);
+        }
+
+        Optional<Path> path = new FileDialog(fParent, appDir).showDialogAndGetSelectedFile();
+        path.ifPresent(applicationDir -> {
+            if (applicationDir.getParent() != null) {
+                Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, applicationDir.getParent().toString());
+            }
+            application.setText(applicationDir.toString());
+        });
+    };
 
     public ExternalFileTypeEntryEditor(JFrame parent, ExternalFileType entry) {
         fParent = parent;
@@ -89,8 +86,8 @@ public class ExternalFileTypeEntryEditor {
         bg.add(other);
 
         FormBuilder builder = FormBuilder.create();
-        builder.layout(new FormLayout
-                ("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref", "p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p"));
+        builder.layout(new FormLayout("left:pref, 4dlu, fill:150dlu, 4dlu, fill:pref",
+                "p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p, 2dlu, p"));
         builder.add(Localization.lang("Icon")).xy(1, 1);
         builder.add(icon).xy(3, 1);
         builder.add(Localization.lang("Name")).xy(1, 3);
@@ -128,6 +125,7 @@ public class ExternalFileTypeEntryEditor {
 
         ok.addActionListener(e -> {
             okPressed = true;
+
             storeSettings(ExternalFileTypeEntryEditor.this.entry);
             diag.dispose();
 
@@ -177,8 +175,7 @@ public class ExternalFileTypeEntryEditor {
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
         diag.pack();
 
-        BrowseListener browse = new BrowseListener(application);
-        browseBut.addActionListener(browse);
+        browseBut.addActionListener(browsePressed);
 
         if (dParent == null) {
             diag.setLocationRelativeTo(fParent);
@@ -248,31 +245,5 @@ public class ExternalFileTypeEntryEditor {
     }
 
 
-    static class BrowseListener implements ActionListener {
 
-        private final JTextField comp;
-
-
-        public BrowseListener(JTextField comp) {
-            this.comp = comp;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            File initial = new File(comp.getText().trim());
-            if (comp.getText().trim().isEmpty()) {
-                // Nothing in the field. Go to the last file dir used:
-                initial = new File(Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY));
-            }
-            String chosen = FileDialogs.getNewFile(null, initial, Collections.emptyList(),
-                    JFileChooser.OPEN_DIALOG, false);
-            if (chosen != null) {
-                File newFile = new File(chosen);
-                // Store the directory for next time:
-                Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getParent());
-                comp.setText(newFile.getPath());
-                comp.requestFocus();
-            }
-        }
-    }
 }

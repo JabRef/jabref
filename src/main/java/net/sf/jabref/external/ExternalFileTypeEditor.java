@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.external;
 
 import java.awt.BorderLayout;
@@ -21,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -49,6 +35,7 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -58,6 +45,7 @@ import com.jgoodies.forms.builder.ButtonStackBuilder;
  * Editor for external file types.
  */
 public class ExternalFileTypeEditor extends JDialog {
+
     private JFrame frame;
     private JDialog dialog;
     private List<ExternalFileType> fileTypes;
@@ -111,6 +99,7 @@ public class ExternalFileTypeEditor extends JDialog {
             dispose();
         });
         Action cancelAction = new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -134,9 +123,10 @@ public class ExternalFileTypeEditor extends JDialog {
             //}
         });
 
-        add.addActionListener(e ->  {
+        add.addActionListener(e -> {
             // Generate a new file type:
-            ExternalFileType type = new ExternalFileType("", "", "", "", "new", IconTheme.JabRefIcon.FILE.getSmallIcon());
+            ExternalFileType type = new ExternalFileType("", "", "", "", "new",
+                    IconTheme.JabRefIcon.FILE.getSmallIcon());
             // Show the file type editor:
             getEditor(type).setVisible(true);
             if (entryEditor.okPressed()) {
@@ -176,6 +166,8 @@ public class ExternalFileTypeEditor extends JDialog {
         table.getColumnModel().getColumn(2).setMinWidth(60);
         table.getColumnModel().getColumn(3).setMinWidth(100);
         table.getColumnModel().getColumn(0).setResizable(false);
+
+        GUIUtil.correctRowHeight(table);
 
         JScrollPane sp = new JScrollPane(table);
 
@@ -246,6 +238,7 @@ public class ExternalFileTypeEditor extends JDialog {
         return new EditExternalFileTypesAction(dialog);
     }
 
+
     class EditListener implements ActionListener {
 
         @Override
@@ -276,6 +269,7 @@ public class ExternalFileTypeEditor extends JDialog {
     }
 
     private class FileTypeTableModel extends AbstractTableModel {
+
         @Override
         public int getColumnCount() {
             return 5;
@@ -354,6 +348,7 @@ public class ExternalFileTypeEditor extends JDialog {
     }
 
     public static class EditExternalFileTypesAction extends MnemonicAwareAction {
+
         private JabRefFrame frame;
         private JDialog dialog;
         private ExternalFileTypeEditor editor;

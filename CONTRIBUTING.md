@@ -8,7 +8,7 @@ We also have [code howtos](https://github.com/JabRef/jabref/wiki/Code-Howtos) an
 For newcomers, [FLOSS Coach](http://www.flosscoach.com/) might be helpful.
 It contains steps to get started with JabRef development.
 
-In case you have any questions, you can use our [developers mailinglist](https://lists.sourceforge.net/lists/listinfo/jabref-devel).
+In case you have any question, do not hesitate to write one of our [JabRef developers](https://github.com/orgs/JabRef/teams/developers) an email.
 
 
 ## Formal requirements for a pull request
@@ -39,25 +39,11 @@ Please make sure there are no duplicates or alternate spellings of your name lis
 If you need to merge different Git usernames or email addresses you can do so by editing `.mailmap`.
 More information on this can be found via `man git-shortlog`.
 
-
-### Modify the header
-The headers of each `.java` file states "JabRef contributors".
-Author credits are given using the `AUTHORS` file and by using the `git blame` functionality.
-
-For instance,
-
-```plain
-/*  Copyright (C) 2003-2011 JabRef contributors.
-```
-
-gets
-
-```plain
-/*  Copyright (C) 2003-2016 JabRef contributors.
-```
-
 Please, **do not add yourself at `@authors`**.
-We have track this information in the header only.
+The contribution information is tracked via the version control system.
+
+We are currently in transition from [GPL](https://tldrlegal.com/license/gnu-general-public-license-v2) to the [MIT license](https://tldrlegal.com/license/mit-license).
+Thus, all your contributions are considered being made under MIT license.
 
 
 ### Write a good commit message

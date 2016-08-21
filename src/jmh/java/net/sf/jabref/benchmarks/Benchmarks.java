@@ -11,15 +11,16 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.BibtexParser;
-import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.StringSaveSession;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.logic.groups.KeywordGroup;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.layout.format.HTMLChars;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.search.SearchQuery;
@@ -74,7 +75,8 @@ public class Benchmarks {
     @Benchmark
     public ParserResult parse() throws IOException {
         StringReader bibtexStringReader = new StringReader(bibtexString);
-        BibtexParser parser = new BibtexParser(bibtexStringReader);
+        BibtexParser parser = new BibtexParser(bibtexStringReader,
+                ImportFormatPreferences.fromPreferences(Globals.prefs));
         return parser.parse();
     }
 
@@ -127,7 +129,7 @@ public class Benchmarks {
     }
 
     @Benchmark
-    public boolean keywordGroupContainsWord() throws ParseException {
+    public boolean keywordGroupContainsWord() {
         return KeywordGroup.containsWord("testWord", "Some longer test string containing testWord the test word");
     }
 

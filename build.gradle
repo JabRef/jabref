@@ -12,7 +12,7 @@ buildscript {
 }
 
 plugins {
-    id "com.install4j.gradle" version "6.1.1"
+    id "com.install4j.gradle" version "6.1.2"
     id 'com.github.johnrengelman.shadow' version '1.2.3'
     // TODO replaced by spotless plugin, needs to be updated
     id "com.github.youribonnaffe.gradle.format" version "1.5"
@@ -32,7 +32,7 @@ apply plugin: 'checkstyle'
 
 apply from: 'eclipse.gradle'
 apply from: 'localization.gradle'
-apply from: 'medline.gradle'
+apply from: 'xjc.gradle'
 
 group = "net.sf.jabref"
 version = "3.6dev"
@@ -47,7 +47,7 @@ install4j {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.14'
+    gradleVersion = '2.14.1'
 }
 
 
@@ -58,7 +58,10 @@ repositories {
 configurations {
     antlr3
     antlr4
-	
+
+    databaseTestCompile.extendsFrom testCompile
+    databaseTestRuntime.extendsFrom testRuntime
+
 	integrationTestCompile.extendsFrom testCompile
 	integrationTestRuntime.extendsFrom testRuntime
 }
@@ -109,7 +112,7 @@ dependencies {
 
     compile 'org.jsoup:jsoup:1.9.2'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
-    compile 'info.debatty:java-string-similarity:0.13'
+    compile 'info.debatty:java-string-similarity:0.16'
 
     compile 'org.apache.logging.log4j:log4j-jcl:2.6.2'
     compile 'org.apache.logging.log4j:log4j-api:2.6.2'
@@ -117,7 +120,7 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile 'com.github.tomakehurst:wiremock:2.1.7'
+    testCompile 'com.github.tomakehurst:wiremock:2.1.10'
     testCompile 'org.assertj:assertj-swing-junit:3.4.0'
 }
 
@@ -126,7 +129,13 @@ sourceSets {
         java {
             srcDirs = ["src/main/java", "src/main/gen"]
         }
-    }	
+    }
+    databaseTest {
+        java {
+            compileClasspath += main.output + test.output
+            runtimeClasspath += main.output + test.output
+        }
+    }
 	integrationTest {
         java {
             compileClasspath += main.output + test.output
@@ -225,7 +234,12 @@ test {
     }
 }
 
-  
+
+task databaseTest(type: Test) {
+    testClassesDir = sourceSets.databaseTest.output.classesDir
+    classpath = sourceSets.databaseTest.runtimeClasspath
+}
+
 task integrationTest(type: Test) {
     testClassesDir = sourceSets.integrationTest.output.classesDir
     classpath = sourceSets.integrationTest.runtimeClasspath

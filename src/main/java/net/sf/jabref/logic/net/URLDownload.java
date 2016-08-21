@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.net;
 
 import java.io.BufferedInputStream;
@@ -28,7 +13,6 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.net.CookieHandler;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -79,24 +63,12 @@ public class URLDownload {
 
         addParameters("User-Agent", "JabRef");
 
-        URLDownload.setCookieHandler();
     }
 
     public URL getSource() {
         return source;
     }
 
-    private static void setCookieHandler() {
-        try {
-            // This should set up JabRef to receive cookies properly
-            if (CookieHandler.getDefault() == null) {
-                CookieHandler.setDefault(new CookieHandlerImpl());
-            }
-        } catch (SecurityException ignored) {
-            // Setting or getting the system default cookie handler is forbidden
-            // In this case cookie handling is not possible.
-        }
-    }
 
     public String determineMimeType() throws IOException {
         // this does not cause a real performance issue as the underlying HTTP/TCP connection is reused

@@ -34,7 +34,7 @@ public class XMPSchemaBibtexTest {
     public void assertEqualsBibtexEntry(BibEntry e, BibEntry x) {
         Assert.assertNotNull(e);
         Assert.assertNotNull(x);
-        Assert.assertEquals(e.getCiteKey(), x.getCiteKey());
+        Assert.assertEquals(e.getCiteKeyOptional(), x.getCiteKeyOptional());
         Assert.assertEquals(e.getType(), x.getType());
 
         Assert.assertEquals(e.getFieldNames().size(), x.getFieldNames().size());

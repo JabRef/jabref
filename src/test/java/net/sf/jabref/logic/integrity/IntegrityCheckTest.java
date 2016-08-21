@@ -213,6 +213,13 @@ public class IntegrityCheckTest {
         assertWrong(createContext("isbn", "978-0-306-40615-8"));
     }
 
+    @Test
+    public void testASCIIChecks() {
+        assertCorrect(createContext("title", "Only ascii characters!'@12"));
+        assertWrong(createContext("month", "Umlauts are nöt ällowed"));
+        assertWrong(createContext("author", "Some unicode ⊕"));
+    }
+
     private BibDatabaseContext createContext(String field, String value, String type) {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);

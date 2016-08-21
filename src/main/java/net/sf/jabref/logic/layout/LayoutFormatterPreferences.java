@@ -1,7 +1,9 @@
 package net.sf.jabref.logic.layout;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
@@ -14,15 +16,14 @@ public class LayoutFormatterPreferences {
     private final NameFormatterPreferences nameFormatterPreferences;
     private final JournalAbbreviationPreferences journalAbbreviationPreferences;
     private final FileLinkPreferences fileLinkPreferences;
-    private final Map<String, String> customExportNameFormatters;
+    private final Map<String, String> customExportNameFormatters = new HashMap<>();
     private final JournalAbbreviationLoader journalAbbreviationLoader;
 
     public LayoutFormatterPreferences(NameFormatterPreferences nameFormatterPreferences,
             JournalAbbreviationPreferences journalAbbreviationPreferences, FileLinkPreferences fileLinkPreferences,
-            Map<String, String> customExportNameFormatters, JournalAbbreviationLoader journalAbbreviationLoader) {
+            JournalAbbreviationLoader journalAbbreviationLoader) {
         this.nameFormatterPreferences = nameFormatterPreferences;
         this.journalAbbreviationPreferences = journalAbbreviationPreferences;
-        this.customExportNameFormatters = customExportNameFormatters;
         this.fileLinkPreferences = fileLinkPreferences;
         this.journalAbbreviationLoader = journalAbbreviationLoader;
     }
@@ -34,7 +35,7 @@ public class LayoutFormatterPreferences {
         return new LayoutFormatterPreferences(NameFormatterPreferences.fromPreferences(jabRefPreferences),
                 JournalAbbreviationPreferences.fromPreferences(jabRefPreferences),
                 FileLinkPreferences.fromPreferences(jabRefPreferences),
-                jabRefPreferences.customExportNameFormatters, journalAbbreviationLoader);
+                journalAbbreviationLoader);
     }
 
     public NameFormatterPreferences getNameFormatterPreferences() {
@@ -45,15 +46,23 @@ public class LayoutFormatterPreferences {
         return journalAbbreviationPreferences;
     }
 
-    public Map<String, String> getCustomExportNameFormatters() {
-        return customExportNameFormatters;
-    }
-
     public FileLinkPreferences getFileLinkPreferences() {
         return fileLinkPreferences;
     }
 
     public JournalAbbreviationLoader getJournalAbbreviationLoader() {
         return journalAbbreviationLoader;
+    }
+
+    public void clearCustomExportNameFormatters() {
+        customExportNameFormatters.clear();
+    }
+
+    public void putCustomExportNameFormatter(String formatterName, String contents) {
+        customExportNameFormatters.put(formatterName, contents);
+    }
+
+    public Optional<String> getCustomExportNameFormatter(String formatterName) {
+        return Optional.ofNullable(customExportNameFormatters.get(formatterName));
     }
 }

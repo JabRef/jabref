@@ -1,25 +1,10 @@
-/*  Copyright (C) 2012 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.util.comparator;
 
 import java.util.Comparator;
 import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
+import net.sf.jabref.model.entry.SpecialFields;
 
 /**
  * Comparator that handles the ranking icon column
@@ -32,8 +17,8 @@ public class RankingFieldComparator implements Comparator<BibEntry> {
 
     @Override
     public int compare(BibEntry e1, BibEntry e2) {
-        Optional<String> val1 = e1.getFieldOptional(SpecialFieldsUtils.FIELDNAME_RANKING);
-        Optional<String> val2 = e2.getFieldOptional(SpecialFieldsUtils.FIELDNAME_RANKING);
+        Optional<String> val1 = e1.getFieldOptional(SpecialFields.FIELDNAME_RANKING);
+        Optional<String> val2 = e2.getFieldOptional(SpecialFields.FIELDNAME_RANKING);
         if (val1.isPresent()) {
             if (val2.isPresent()) {
                 // val1 is not null AND val2 is not null

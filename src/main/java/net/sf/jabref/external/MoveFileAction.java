@@ -1,33 +1,19 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.external;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
-import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
@@ -44,6 +30,7 @@ import org.apache.commons.logging.LogFactory;
  * Action for moving or renaming a file that is linked to from an entry in JabRef.
  */
 public class MoveFileAction extends AbstractAction {
+
     private static final Log LOGGER = LogFactory.getLog(MoveFileAction.class);
 
     private final JabRefFrame frame;
@@ -53,6 +40,7 @@ public class MoveFileAction extends AbstractAction {
     private final boolean toFileDir;
 
     private static final String MOVE_RENAME = Localization.lang("Move/Rename file");
+
 
     public MoveFileAction(JabRefFrame frame, EntryEditor eEditor, FileListEditor editor, boolean toFileDir) {
         this.frame = frame;
@@ -89,7 +77,8 @@ public class MoveFileAction extends AbstractAction {
             }
         }
         if (found < 0) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("File_directory_is_not_set_or_does_not_exist!"), MOVE_RENAME, JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, Localization.lang("File_directory_is_not_set_or_does_not_exist!"),
+                    MOVE_RENAME, JOptionPane.ERROR_MESSAGE);
             return;
         }
         File file = new File(ln);
@@ -98,10 +87,6 @@ public class MoveFileAction extends AbstractAction {
         }
         if ((file != null) && file.exists()) {
             // Ok, we found the file. Now get a new name:
-            String extension = null;
-            if (entry.type.isPresent()) {
-                extension = "." + entry.type.get().getExtension();
-            }
 
             File newFile = null;
             boolean repeat = true;
@@ -123,8 +108,7 @@ public class MoveFileAction extends AbstractAction {
                         answer = JOptionPane.showConfirmDialog(frame, Localization.lang("Move file to file directory?"),
                                 MOVE_RENAME, JOptionPane.YES_NO_OPTION);
                     } else {
-                        answer = JOptionPane.showConfirmDialog(frame, cbm, MOVE_RENAME,
-                                JOptionPane.YES_NO_OPTION);
+                        answer = JOptionPane.showConfirmDialog(frame, cbm, MOVE_RENAME, JOptionPane.YES_NO_OPTION);
                     }
                     if (answer != JOptionPane.YES_OPTION) {
                         return;
@@ -143,23 +127,15 @@ public class MoveFileAction extends AbstractAction {
                     }
                     chosenFile = sb.toString();
                 } else {
-                    chosenFile = FileDialogs.getNewFile(frame, file, Collections.singletonList(extension),
-                            JFileChooser.SAVE_DIALOG, false);
-                }
-                if (chosenFile == null) {
-                    return; // canceled
-                }
-                newFile = new File(chosenFile);
-                // Check if the file already exists:
-                if (newFile.exists() && (JOptionPane.showConfirmDialog(frame,
-                        Localization.lang("'%0' exists. Overwrite file?", newFile.getName()), MOVE_RENAME,
-                        JOptionPane.OK_CANCEL_OPTION) != JOptionPane.OK_OPTION)) {
-                    if (toFileDir) {
-                        return;
+                    Optional<Path> path = new FileDialog(frame, file.getPath()).saveNewFile();
+                    if (path.isPresent()) {
+                        chosenFile = path.get().toString();
                     } else {
-                        repeat = true;
+                        return;
                     }
                 }
+                newFile = new File(chosenFile);
+
             }
 
             if (!newFile.equals(file)) {
@@ -170,29 +146,29 @@ public class MoveFileAction extends AbstractAction {
                     }
                     if (success) {
                         // Remove the original file:
-                        if (!file.delete()) {
-                            LOGGER.info("Cannot delete original file");
-                        }
+                        Files.deleteIfExists(file.toPath());
+
                         // Relativise path, if possible.
                         String canPath = new File(dirs.get(found)).getCanonicalPath();
                         if (newFile.getCanonicalPath().startsWith(canPath)) {
-                            if ((newFile.getCanonicalPath().length() > canPath.length()) &&
-                                    (newFile.getCanonicalPath().charAt(canPath.length()) == File.separatorChar)) {
+                            if ((newFile.getCanonicalPath().length() > canPath.length())
+                                    && (newFile.getCanonicalPath().charAt(canPath.length()) == File.separatorChar)) {
 
                                 String newLink = newFile.getCanonicalPath().substring(1 + canPath.length());
-                                editor.getTableModel().setEntry(selected, new FileListEntry(entry.description, newLink, entry.type));
+                                editor.getTableModel().setEntry(selected,
+                                        new FileListEntry(entry.description, newLink, entry.type));
                             } else {
                                 String newLink = newFile.getCanonicalPath().substring(canPath.length());
-                                editor.getTableModel().setEntry(selected, new FileListEntry(entry.description, newLink, entry.type));
+                                editor.getTableModel().setEntry(selected,
+                                        new FileListEntry(entry.description, newLink, entry.type));
                             }
 
                         } else {
                             String newLink = newFile.getCanonicalPath();
-                            editor.getTableModel().setEntry(selected, new FileListEntry(entry.description, newLink, entry.type));
+                            editor.getTableModel().setEntry(selected,
+                                    new FileListEntry(entry.description, newLink, entry.type));
                         }
                         eEditor.updateField(editor);
-                        //JOptionPane.showMessageDialog(frame, Globals.lang("File moved"),
-                        //        Globals.lang("Move/Rename file"), JOptionPane.INFORMATION_MESSAGE);
                         frame.output(Localization.lang("File moved"));
                     } else {
                         JOptionPane.showMessageDialog(frame, Localization.lang("Move file failed"), MOVE_RENAME,

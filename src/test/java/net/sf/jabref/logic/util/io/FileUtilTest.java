@@ -5,12 +5,10 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,21 +19,19 @@ import static org.mockito.Mockito.when;
 
 public class FileUtilTest {
 
+    private JabRefPreferences prefs;
+
+
     @Before
     public void setUp() {
-        Globals.prefs = mock(JabRefPreferences.class);
+        prefs = mock(JabRefPreferences.class);
     }
 
-    @After
-    public void tearDown() {
-        Globals.prefs = null;
-        Globals.journalAbbreviationLoader = null;
-    }
 
     @Test
     public void testGetLinkedFileNameDefault() {
         // bibkey - title
-        when(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN))
+        when(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN))
                 .thenReturn("\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}");
 
         BibEntry entry = new BibEntry();
@@ -43,20 +39,20 @@ public class FileUtilTest {
         entry.setField("title", "mytitle");
 
         assertEquals("1234 - mytitle",
-                FileUtil.createFileNameFromPattern(null, entry, mock(JournalAbbreviationLoader.class), Globals.prefs));
+                FileUtil.createFileNameFromPattern(null, entry, mock(JournalAbbreviationLoader.class), prefs));
     }
 
     @Test
     public void testGetLinkedFileNameBibTeXKey() {
         // bibkey
-        when(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN)).thenReturn("\\bibtexkey");
+        when(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN)).thenReturn("\\bibtexkey");
 
         BibEntry entry = new BibEntry();
         entry.setCiteKey("1234");
         entry.setField("title", "mytitle");
 
         assertEquals("1234",
-                FileUtil.createFileNameFromPattern(null, entry, mock(JournalAbbreviationLoader.class), Globals.prefs));
+                FileUtil.createFileNameFromPattern(null, entry, mock(JournalAbbreviationLoader.class), prefs));
     }
 
     @Test

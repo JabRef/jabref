@@ -1,32 +1,3 @@
-/* Copyright (C) 2003-2016 JabRef contributors
-Copyright (C) 2003 David Weitzman, Morten O. Alver
-
-All programs in this directory and
-subdirectories are published under the GNU General Public License as
-described below.
-
-This program is free software; you can redistribute it and/or modify
-it under the terms of the GNU General Public License as published by
-the Free Software Foundation; either version 2 of the License, or (at
-your option) any later version.
-
-This program is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
-USA
-
-Further information about the GNU GPL is available at:
-http://www.gnu.org/copyleft/gpl.ja.html
-
-Note:
-Modified for use in JabRef
-
- */
 package net.sf.jabref.model.database;
 
 import java.util.ArrayList;
@@ -43,8 +14,11 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.event.source.EntryEventSource;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
@@ -88,6 +62,11 @@ public class BibDatabase {
 
 
     private final EventBus eventBus = new EventBus();
+
+
+    public BibDatabase() {
+        this.registerListener(new KeyChangeListener(this));
+    }
 
     /**
      * Returns the number of entries.
@@ -167,24 +146,24 @@ public class BibDatabase {
      * Inserts the entry, given that its ID is not already in use.
      * use Util.createId(...) to make up a unique ID for an entry.
      *
-     * @param entry the entry to insert into the database
+     * @param entry BibEntry to insert into the database
      * @return false if the insert was done without a duplicate warning
      * @throws KeyCollisionException thrown if the entry id ({@link BibEntry#getId()}) is already  present in the database
      */
     public synchronized boolean insertEntry(BibEntry entry) throws KeyCollisionException {
-        return this.insertEntry(entry, false);
+        return insertEntry(entry, EntryEventSource.LOCAL);
     }
 
     /**
      * Inserts the entry, given that its ID is not already in use.
      * use Util.createId(...) to make up a unique ID for an entry.
      *
-     * @param entry  the entry to insert into the database
-     * @param isUndo set to true if the insertion is caused by an undo
+     * @param entry BibEntry to insert
+     * @param eventSource Source the event is sent from
      * @return false if the insert was done without a duplicate warning
-     * @throws KeyCollisionException thrown if the entry id ({@link BibEntry#getId()}) is already  present in the database
      */
-    public synchronized boolean insertEntry(BibEntry entry, boolean isUndo) throws KeyCollisionException {
+    public synchronized boolean insertEntry(BibEntry entry, EntryEventSource eventSource)
+            throws KeyCollisionException {
         Objects.requireNonNull(entry);
 
         String id = entry.getId();
@@ -196,22 +175,33 @@ public class BibDatabase {
         entries.add(entry);
         entry.registerListener(this);
 
-        eventBus.post(new EntryAddedEvent(entry, isUndo));
-        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
+        eventBus.post(new EntryAddedEvent(entry, eventSource));
+        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKeyOptional().orElse(null));
     }
 
     /**
      * Removes the given entry.
      * The Entry is removed based on the id {@link BibEntry#id}
+     * @param toBeDeleted Entry to delete
      */
     public synchronized void removeEntry(BibEntry toBeDeleted) {
+        removeEntry(toBeDeleted, EntryEventSource.LOCAL);
+    }
+
+    /**
+     * Removes the given entry.
+     * The Entry is removed based on the id {@link BibEntry#id}
+     * @param toBeDeleted Entry to delete
+     * @param eventSource Source the event is sent from
+     */
+    public synchronized void removeEntry(BibEntry toBeDeleted, EntryEventSource eventSource) {
         Objects.requireNonNull(toBeDeleted);
 
         boolean anyRemoved =  entries.removeIf(entry -> entry.getId().equals(toBeDeleted.getId()));
         if (anyRemoved) {
             internalIDs.remove(toBeDeleted.getId());
-            duplicationChecker.removeKeyFromSet(toBeDeleted.getCiteKey());
-            eventBus.post(new EntryRemovedEvent(toBeDeleted));
+            toBeDeleted.getCiteKeyOptional().ifPresent(duplicationChecker::removeKeyFromSet);
+            eventBus.post(new EntryRemovedEvent(toBeDeleted, eventSource));
         }
     }
 
@@ -220,13 +210,13 @@ public class BibDatabase {
     }
 
     public synchronized boolean setCiteKeyForEntry(BibEntry entry, String key) {
-        String oldKey = entry.getCiteKey();
+        String oldKey = entry.getCiteKeyOptional().orElse(null);
         if (key == null) {
             entry.clearField(BibEntry.KEY_FIELD);
         } else {
             entry.setCiteKey(key);
         }
-        return duplicationChecker.checkForDuplicateKeyAndAdd(oldKey, entry.getCiteKey());
+        return duplicationChecker.checkForDuplicateKeyAndAdd(oldKey, key);
     }
 
     /**
@@ -349,18 +339,18 @@ public class BibDatabase {
      * Take the given collection of BibEntry and resolve any string
      * references.
      *
-     * @param entries A collection of BibtexEntries in which all strings of the form
+     * @param entriesToResolve A collection of BibtexEntries in which all strings of the form
      *                #xxx# will be resolved against the hash map of string
      *                references stored in the database.
      * @param inPlace If inPlace is true then the given BibtexEntries will be modified, if false then copies of the BibtexEntries are made before resolving the strings.
      * @return a list of bibtexentries, with all strings resolved. It is dependent on the value of inPlace whether copies are made or the given BibtexEntries are modified.
      */
-    public List<BibEntry> resolveForStrings(Collection<BibEntry> entries, boolean inPlace) {
-        Objects.requireNonNull(entries, "entries must not be null.");
+    public List<BibEntry> resolveForStrings(Collection<BibEntry> entriesToResolve, boolean inPlace) {
+        Objects.requireNonNull(entriesToResolve, "entries must not be null.");
 
-        List<BibEntry> results = new ArrayList<>(entries.size());
+        List<BibEntry> results = new ArrayList<>(entriesToResolve.size());
 
-        for (BibEntry entry : entries) {
+        for (BibEntry entry : entriesToResolve) {
             results.add(this.resolveForStrings(entry, inPlace));
         }
         return results;
@@ -506,8 +496,18 @@ public class BibDatabase {
      */
     public static Optional<String> getResolvedField(String field, BibEntry entry, BibDatabase database) {
         Objects.requireNonNull(entry, "entry cannot be null");
-        if ("bibtextype".equals(field)) {
-            return Optional.of(EntryUtil.capitalizeFirst(entry.getType()));
+
+        if (BibEntry.TYPE_HEADER.equals(field) || BibEntry.OBSOLETE_TYPE_HEADER.equals(field)) {
+            Optional<EntryType> entryType = EntryTypes.getType(entry.getType(), BibDatabaseMode.BIBLATEX);
+            if (entryType.isPresent()) {
+                return Optional.of(entryType.get().getName());
+            } else {
+                return Optional.of(EntryUtil.capitalizeFirst(entry.getType()));
+            }
+        }
+
+        if (BibEntry.KEY_FIELD.equals(field)) {
+            return entry.getCiteKeyOptional();
         }
 
         // TODO: Changed this to also consider alias fields, which is the expected
@@ -517,14 +517,14 @@ public class BibDatabase {
 
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry: Do not do this for the bibtex key.
-        if (!result.isPresent() && (database != null) && !field.equals(BibEntry.KEY_FIELD)) {
+        if (!result.isPresent() && (database != null)) {
             Optional<String> crossrefKey = entry.getFieldOptional(FieldName.CROSSREF);
-            if (crossrefKey.isPresent()) {
+            if (crossrefKey.isPresent() && !crossrefKey.get().isEmpty()) {
                 Optional<BibEntry> referred = database.getEntryByKey(crossrefKey.get());
                 if (referred.isPresent()) {
                     // Ok, we found the referred entry. Get the field value from that
                     // entry. If it is unset there, too, stop looking:
-                    result = referred.get().getFieldOptional(field);
+                    result = referred.get().getFieldOrAlias(field);
                 }
             }
         }
@@ -566,6 +566,14 @@ public class BibDatabase {
      */
     public void registerListener(Object listener) {
         this.eventBus.register(listener);
+    }
+
+    /**
+     * Unregisters an listener object.
+     * @param listener listener (subscriber) to remove
+     */
+    public void unregisterListener(Object listener) {
+        this.eventBus.unregister(listener);
     }
 
     @Subscribe

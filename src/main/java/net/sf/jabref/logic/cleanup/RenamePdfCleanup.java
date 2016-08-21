@@ -1,16 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.cleanup;
 
 import java.io.File;
@@ -39,6 +26,7 @@ public class RenamePdfCleanup implements CleanupJob {
 
     private int unsuccessfulRenames;
 
+
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext,
             JournalAbbreviationLoader repositoryLoader, JabRefPreferences prefs) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
@@ -63,7 +51,8 @@ public class RenamePdfCleanup implements CleanupJob {
             }
 
             StringBuilder newFilename = new StringBuilder(
-                    FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, repositoryLoader, prefs));
+                    FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, repositoryLoader, prefs)
+                            .trim());
 
             //Add extension to newFilename
             newFilename.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
@@ -77,13 +66,12 @@ public class RenamePdfCleanup implements CleanupJob {
                 newFileList.add(flEntry);
                 continue;
             }
-            String newPath = expandedOldFile.get().getParent().concat(OS.FILE_SEPARATOR)
-                    .concat(newFilename.toString());
+            String newPath = expandedOldFile.get().getParent().concat(OS.FILE_SEPARATOR).concat(newFilename.toString());
 
             String expandedOldFilePath = expandedOldFile.get().toString();
-            boolean pathsDifferOnlyByCase = newPath.equalsIgnoreCase(expandedOldFilePath) && !newPath.equals(
-                    expandedOldFilePath);
-            if (new File(newPath).exists() && ! pathsDifferOnlyByCase) {
+            boolean pathsDifferOnlyByCase = newPath.equalsIgnoreCase(expandedOldFilePath)
+                    && !newPath.equals(expandedOldFilePath);
+            if (new File(newPath).exists() && !pathsDifferOnlyByCase) {
                 // we do not overwrite files
                 // Since File.exists is sometimes not case-sensitive, the check pathsDifferOnlyByCase ensures that we
                 // nonetheless rename files to a new name which just differs by case.
@@ -108,8 +96,7 @@ public class RenamePdfCleanup implements CleanupJob {
                 if ((parent == null) || databaseContext.getFileDirectory().contains(parent.getAbsolutePath())) {
                     newFileEntryFileName = newFilename.toString();
                 } else {
-                    newFileEntryFileName = parent.toString().concat(OS.FILE_SEPARATOR)
-                            .concat(newFilename.toString());
+                    newFileEntryFileName = parent.toString().concat(OS.FILE_SEPARATOR).concat(newFilename.toString());
                 }
                 newFileList.add(new ParsedFileField(description, newFileEntryFileName, type));
             } else {
@@ -122,7 +109,7 @@ public class RenamePdfCleanup implements CleanupJob {
             //we put an undo of the field content here
             //the file is not being renamed back, which leads to inconsistencies
             //if we put a null undo object here, the change by "doMakePathsRelative" would overwrite the field value nevertheless.
-            if(change.isPresent()) {
+            if (change.isPresent()) {
                 return Collections.singletonList(change.get());
             } else {
                 return Collections.emptyList();

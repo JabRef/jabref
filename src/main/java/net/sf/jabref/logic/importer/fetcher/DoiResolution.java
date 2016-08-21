@@ -1,25 +1,10 @@
-/*
- * Copyright (C) 2003-2016 JabRef contributors.
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -57,6 +42,9 @@ public class DoiResolution implements FulltextFetcher {
             if (!sciLink.isEmpty()) {
                 try {
                     Connection connection = Jsoup.connect(sciLink);
+                    // pretend to be a browser (agent & referrer)
+                    connection.userAgent("Mozilla/5.0 (Windows; U; WindowsNT 5.1; en-US; rv1.8.1.6) Gecko/20070725 Firefox/2.0.0.6");
+                    connection.referrer("http://www.google.com");
                     connection.followRedirects(true);
                     connection.ignoreHttpErrors(true);
                     // some publishers are quite slow (default is 3s)
@@ -64,14 +52,16 @@ public class DoiResolution implements FulltextFetcher {
 
                     Document html = connection.get();
                     // scan for PDF
-                    Elements elements = html.body().select("[href]");
+                    Elements elements = html.body().select("a[href]");
                     List<Optional<URL>> links = new ArrayList<>();
 
                     for (Element element : elements) {
-                        String href = element.attr("abs:href");
-                        // Only check if pdf is included in the link
-                        // See https://github.com/lehner/LocalCopy for scrape ideas
-                        if (href.contains("pdf") && MimeTypeDetector.isPdfContentType(href)) {
+                        String href = element.attr("abs:href").toLowerCase(Locale.ENGLISH);
+                        String hrefText = element.text().toLowerCase(Locale.ENGLISH);
+                        // Only check if pdf is included in the link or inside the text
+                        // ACM uses tokens without PDF inside the link
+                        // See https://github.com/lehner/LocalCopy for more scrape ideas
+                        if ((href.contains("pdf") || hrefText.contains("pdf")) && MimeTypeDetector.isPdfContentType(href)) {
                             links.add(Optional.of(new URL(href)));
                         }
                     }

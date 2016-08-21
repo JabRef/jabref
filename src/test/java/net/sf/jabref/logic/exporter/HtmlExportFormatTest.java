@@ -5,12 +5,12 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -35,11 +35,17 @@ public class HtmlExportFormatTest {
     @Before
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance();
-        ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
+        JournalAbbreviationLoader journalAbbreviationLoader = new JournalAbbreviationLoader();
+        Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
+                journalAbbreviationLoader);
+        LayoutFormatterPreferences layoutPreferences = LayoutFormatterPreferences.fromPreferences(Globals.prefs,
+                journalAbbreviationLoader);
+        SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+        ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
+
         exportFormat = ExportFormats.getExportFormat("html");
 
-        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
-        databaseContext = new BibDatabaseContext(new BibDatabase(), new MetaData());
+        databaseContext = new BibDatabaseContext();
         charset = Charsets.UTF_8;
         BibEntry entry = new BibEntry();
         entry.setField("title", "my paper title");

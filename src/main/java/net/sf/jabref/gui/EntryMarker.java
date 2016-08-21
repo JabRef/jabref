@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui;
 
 import java.util.Set;
@@ -43,8 +28,8 @@ public class EntryMarker {
     public static void markEntry(BibEntry be, int markIncrement, boolean increment, NamedCompound ce) {
         int prevMarkLevel;
         String newValue = null;
-        if (be.hasField(FieldName.MARKED)) {
-            String markerString = be.getFieldOptional(FieldName.MARKED).get();
+        if (be.hasField(FieldName.MARKED_INTERNAL)) {
+            String markerString = be.getFieldOptional(FieldName.MARKED_INTERNAL).get();
             int index = markerString.indexOf(Globals.prefs.WRAPPED_USERNAME);
             if (index >= 0) {
                 // Already marked 1 for this user.
@@ -66,17 +51,17 @@ public class EntryMarker {
             newValue = Globals.prefs.WRAPPED_USERNAME.substring(0, Globals.prefs.WRAPPED_USERNAME.length() - 1) + ":" + markIncrement + "]";
         }
 
-        ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED,
-                be.getFieldOptional(FieldName.MARKED).orElse(null), newValue));
-        be.setField(FieldName.MARKED, newValue);
+        ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED_INTERNAL,
+                be.getFieldOptional(FieldName.MARKED_INTERNAL).orElse(null), newValue));
+        be.setField(FieldName.MARKED_INTERNAL, newValue);
     }
 
     /**
      * SIDE EFFECT: Unselects given entry
      */
     public static void unmarkEntry(BibEntry be, boolean onlyMaxLevel, BibDatabase database, NamedCompound ce) {
-        if (be.hasField(FieldName.MARKED)) {
-            String markerString = be.getFieldOptional(FieldName.MARKED).get();
+        if (be.hasField(FieldName.MARKED_INTERNAL)) {
+            String markerString = be.getFieldOptional(FieldName.MARKED_INTERNAL).get();
             if ("0".equals(markerString)) {
                 if (!onlyMaxLevel) {
                     unmarkOldStyle(be, database, ce);
@@ -128,12 +113,12 @@ public class EntryMarker {
             	sb.append(s.substring(piv));
             }
             String newVal = sb.length() > 0 ? sb.toString() : null;*/
-            ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED,
-                    be.getFieldOptional(FieldName.MARKED).get(), newValue));
+            ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED_INTERNAL,
+                    be.getFieldOptional(FieldName.MARKED_INTERNAL).get(), newValue));
             if (newValue == null) {
-                be.clearField(FieldName.MARKED);
+                be.clearField(FieldName.MARKED_INTERNAL);
             } else {
-                be.setField(FieldName.MARKED, newValue);
+                be.setField(FieldName.MARKED_INTERNAL, newValue);
             }
         }
     }
@@ -163,21 +148,21 @@ public class EntryMarker {
         }
         String newVal = sb.toString();
         if (newVal.isEmpty()) {
-            ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED,
-                    be.getFieldOptional(FieldName.MARKED).orElse(null), null));
-            be.clearField(FieldName.MARKED);
+            ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED_INTERNAL,
+                    be.getFieldOptional(FieldName.MARKED_INTERNAL).orElse(null), null));
+            be.clearField(FieldName.MARKED_INTERNAL);
         } else {
-            ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED,
-                    be.getFieldOptional(FieldName.MARKED).orElse(null), newVal));
-            be.setField(FieldName.MARKED, newVal);
+            ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED_INTERNAL,
+                    be.getFieldOptional(FieldName.MARKED_INTERNAL).orElse(null), newVal));
+            be.setField(FieldName.MARKED_INTERNAL, newVal);
         }
     }
 
     public static int isMarked(BibEntry be) {
-        if (!be.hasField(FieldName.MARKED)) {
+        if (!be.hasField(FieldName.MARKED_INTERNAL)) {
             return 0;
         }
-        String s = be.getFieldOptional(FieldName.MARKED).get();
+        String s = be.getFieldOptional(FieldName.MARKED_INTERNAL).get();
         if ("0".equals(s)) {
             return 1;
         }

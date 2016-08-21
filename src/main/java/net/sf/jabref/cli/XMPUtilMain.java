@@ -12,11 +12,12 @@ import java.util.Optional;
 import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -60,6 +61,7 @@ public class XMPUtilMain {
         }
 
         XMPPreferences xmpPreferences = XMPPreferences.fromPreferences(Globals.prefs);
+        ImportFormatPreferences importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
 
         switch (args.length) {
         case 0:
@@ -83,7 +85,7 @@ public class XMPUtilMain {
             } else if (args[0].endsWith(".bib")) {
                 // Read from BIB and write as XMP
                 try (FileReader fr = new FileReader(args[0])) {
-                    ParserResult result = BibtexParser.parse(fr);
+                    ParserResult result = BibtexParser.parse(fr, importFormatPreferences);
                     Collection<BibEntry> entries = result.getDatabase().getEntries();
 
                     if (entries.isEmpty()) {
@@ -110,7 +112,7 @@ public class XMPUtilMain {
             }
 
             if (args[0].endsWith(".bib") && args[1].endsWith(".pdf")) {
-                ParserResult result = BibtexParser.parse(new FileReader(args[0]));
+                ParserResult result = BibtexParser.parse(new FileReader(args[0]), importFormatPreferences);
 
                 Collection<BibEntry> entries = result.getDatabase().getEntries();
 
@@ -131,7 +133,7 @@ public class XMPUtilMain {
                 break;
             }
 
-            ParserResult result = BibtexParser.parse(new FileReader(args[1]));
+            ParserResult result = BibtexParser.parse(new FileReader(args[1]), importFormatPreferences);
 
             Optional<BibEntry> bibEntry = result.getDatabase().getEntryByKey(args[0]);
 

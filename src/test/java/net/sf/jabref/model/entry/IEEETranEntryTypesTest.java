@@ -15,12 +15,4 @@ public class IEEETranEntryTypesTest {
         Assert.assertTrue(ctlFields.containsAll(ynFields));
     }
 
-    @Test
-    public void ctlTypeContainsNumericFields() {
-        List<String> ctlFields = IEEETranEntryTypes.IEEETRANBSTCTL.getAllFields();
-        List<String> numericFields = InternalBibtexFields.IEEETRANBSTCTL_NUMERIC_FIELDS;
-
-        Assert.assertTrue(ctlFields.containsAll(numericFields));
-    }
-
 }

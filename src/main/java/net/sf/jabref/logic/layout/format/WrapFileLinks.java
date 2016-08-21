@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.logic.layout.format;
 
 import java.io.File;
@@ -132,14 +117,14 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
 
     @Override
     public void setArgument(String arg) {
-        String[] parts = AbstractParamLayoutFormatter.parseArgument(arg);
-        format = parseFormatString(parts[0]);
-        if ((parts.length > 1) && !parts[1].trim().isEmpty()) {
-            fileType = parts[1];
+        List<String> parts = AbstractParamLayoutFormatter.parseArgument(arg);
+        format = parseFormatString(parts.get(0));
+        if ((parts.size() > 1) && !parts.get(1).trim().isEmpty()) {
+            fileType = parts.get(1);
         }
-        if (parts.length > 2) {
-            for (int i = 2; i < (parts.length - 1); i += 2) {
-                replacements.put(parts[i], parts[i + 1]);
+        if (parts.size() > 2) {
+            for (int i = 2; i < (parts.size() - 1); i += 2) {
+                replacements.put(parts.get(i), parts.get(i + 1));
             }
         }
     }

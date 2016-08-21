@@ -1,11 +1,9 @@
 package net.sf.jabref.logic.bibtex;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -14,14 +12,10 @@ public class LatexFieldFormatterTests {
 
     private LatexFieldFormatter formatter;
 
-    @BeforeClass
-    public static void setUpBeforeClass(){
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
-
     @Before
     public void setUp() {
-        this.formatter = new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs));
+        this.formatter = new LatexFieldFormatter(
+                LatexFieldFormatterPreferences.fromPreferences(JabRefPreferences.getInstance()));
     }
 
     @Test

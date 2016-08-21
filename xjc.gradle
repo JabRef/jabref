@@ -1,0 +1,27 @@
+configurations {
+    xjc
+}
+
+dependencies {
+    xjc 'com.sun.xml.bind:jaxb-xjc:2.2.4-1'
+}
+
+task xjc {
+    inputs.dir "src/main/resources/xjc/medline/"
+    inputs.dir "src/main/resources/xjc/bibtexml/"
+    outputs.dir "src/main/gen/net/sf/jabref/logic/importer/fileformat/medline"
+    outputs.dir "src/main/gen/net/sf/jabref/logic/importer/fileformat/bibtexml"
+
+    ant.taskdef(name: 'xjc', classname: 'com.sun.tools.xjc.XJCTask', classpath: configurations.xjc.asPath)
+
+    doLast {
+        ant.xjc(destdir: 'src/main/gen/', package: 'net.sf.jabref.logic.importer.fileformat.medline') {
+            schema(dir: 'src/main/resources/xjc/medline', includes: 'medline.xsd')
+        }
+        ant.xjc(destdir: 'src/main/gen/', package: 'net.sf.jabref.logic.importer.fileformat.bibtexml') {
+            schema(dir: 'src/main/resources/xjc/bibtexml', includes: 'bibtexml.xsd')
+        }
+    }
+}
+
+tasks.compileJava.dependsOn xjc
