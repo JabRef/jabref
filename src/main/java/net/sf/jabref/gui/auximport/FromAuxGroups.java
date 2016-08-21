@@ -29,6 +29,7 @@ import net.sf.jabref.logic.auxparser.AuxParser;
 import net.sf.jabref.logic.auxparser.AuxParserResult;
 import net.sf.jabref.logic.groups.ExplicitGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
+import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
@@ -214,7 +215,7 @@ public class FromAuxGroups extends JDialog {
 
         parseButton.setEnabled(true);
 
-        getGeneratedGroup();
+        parentFrame.getGroupSelector().addGroups(GroupTreeNode.fromGroup(getGeneratedGroup()), null);
     }
 
     public boolean generatePressed() {
