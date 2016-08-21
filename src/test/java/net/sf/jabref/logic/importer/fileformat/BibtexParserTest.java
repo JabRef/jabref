@@ -43,7 +43,6 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -95,7 +94,7 @@ public class BibtexParserTest {
 
     @Test
     public void singleFromStringRecognizesEntry() {
-        BibEntry parsed = BibtexParser.singleFromString(
+        Optional<BibEntry> parsed = BibtexParser.singleFromString(
                 "@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n",
                 importFormatPreferences);
 
@@ -104,29 +103,31 @@ public class BibtexParserTest {
         expected.setCiteKey("canh05");
         expected.setField("author", "Crowston, K. and Annabi, H.");
         expected.setField("title", "Title A");
-        assertEquals(expected, parsed);
+        assertEquals(Optional.of(expected), parsed);
     }
 
     @Test
     public void singleFromStringRecognizesEntryInMultiple() {
-        BibEntry parsed = BibtexParser
+        Optional<BibEntry> parsed = BibtexParser
                 .singleFromString("@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n"
                         + "  title = {Title A}}\n" + "@inProceedings{foo," + "  author={Norton Bar}}",
                         importFormatPreferences);
 
-        assertTrue(parsed.getCiteKey().equals("canh05") || parsed.getCiteKey().equals("foo"));
+        assertTrue(parsed.get().getCiteKeyOptional().equals(Optional.of("canh05"))
+                || parsed.get().getCiteKeyOptional().equals(Optional.of("foo")));
     }
 
     @Test
     public void singleFromStringReturnsNullFromEmptyString() {
-        BibEntry parsed = BibtexParser.singleFromString("", importFormatPreferences);
-        assertNull(parsed);
+        Optional<BibEntry> parsed = BibtexParser.singleFromString("", importFormatPreferences);
+        assertEquals(Optional.empty(), parsed);
     }
 
     @Test
     public void singleFromStringReturnsNullIfNoEntryRecognized() {
-        BibEntry parsed = BibtexParser.singleFromString("@@article@@{{{{{{}", importFormatPreferences);
-        assertNull(parsed);
+        Optional<BibEntry> parsed = BibtexParser.singleFromString("@@article@@{{{{{{}",
+                importFormatPreferences);
+        assertEquals(Optional.empty(), parsed);
     }
 
     @Test
@@ -513,7 +514,7 @@ public class BibtexParserTest {
                         + "\n"
                         + "}))"),
                 importFormatPreferences);
-        assertEquals(Globals.prefs.getDefaultEncoding(), result.getMetaData().getEncoding());
+        assertEquals(Optional.empty(), result.getMetaData().getEncoding());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(1, c.size());
@@ -1394,7 +1395,7 @@ public class BibtexParserTest {
         BibEntry b = i.next();
 
         // Sort them because we can't be sure about the order
-        if (a.getCiteKey().equals("test2")) {
+        if (a.getCiteKeyOptional().equals(Optional.of("test2"))) {
             BibEntry tmp = a;
             a = b;
             b = tmp;

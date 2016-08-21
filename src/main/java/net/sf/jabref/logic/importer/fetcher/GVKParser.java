@@ -1,7 +1,4 @@
-/**
- * License: GPLv2, but Jan Frederik Maas agreed to change license upon request
- */
-package net.sf.jabref.logic.importer.util;
+package net.sf.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,17 +22,17 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-public class GVKParser {
+class GVKParser {
     private static final Log LOGGER = LogFactory.getLog(GVKParser.class);
 
-    public List<BibEntry> parseEntries(InputStream is)
+    List<BibEntry> parseEntries(InputStream is)
             throws ParserConfigurationException, SAXException, IOException {
         DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
         Document content = dbuild.parse(is);
         return this.parseEntries(content);
     }
 
-    public List<BibEntry> parseEntries(Document content) {
+    List<BibEntry> parseEntries(Document content) {
         List<BibEntry> result = new LinkedList<>();
 
         // used for creating test cases
@@ -186,8 +183,6 @@ public class GVKParser {
                     if (title.startsWith("@")) {
                         // "@" indicates a number
                         title = title.substring(1);
-                    } else {
-                        // we nevertheless keep the old title data
                     }
                     number = title;
                 }

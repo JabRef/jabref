@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.actions;
 
 import java.awt.event.ActionEvent;
@@ -27,9 +12,9 @@ import javax.swing.AbstractAction;
 import javax.swing.JFrame;
 import javax.swing.JTextField;
 
-import net.sf.jabref.gui.FileExtensions;
-import net.sf.jabref.gui.NewFileDialogs;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.FileExtensions;
 
 /**
  * Action used to produce a "Browse" button for one of the text fields.
@@ -86,14 +71,14 @@ public final class BrowseAction extends AbstractAction {
 
     private String askUser() {
         if (dirsOnly) {
-            Path path  = new NewFileDialogs(frame, comp.getText()).dirsOnly().withExtensions(extensions)
-                    .openDlgAndGetSelectedFile().orElse(Paths.get(""));
+            Path path  = new FileDialog(frame, comp.getText()).dirsOnly().withExtensions(extensions)
+                    .showDialogAndGetSelectedFile().orElse(Paths.get(""));
             String file = path.toString();
 
             return file;
         } else {
-            Path path = new NewFileDialogs(frame, comp.getText()).withExtensions(extensions)
-                    .openDlgAndGetSelectedFile().orElse(Paths.get(""));
+            Path path = new FileDialog(frame, comp.getText()).withExtensions(extensions)
+                    .showDialogAndGetSelectedFile().orElse(Paths.get(""));
             String file = path.toString();
 
             return file;

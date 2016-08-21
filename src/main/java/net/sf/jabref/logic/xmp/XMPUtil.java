@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.logic.xmp;
 
 import java.io.ByteArrayInputStream;
@@ -821,19 +806,7 @@ public class XMPUtil {
                 continue;
             }
 
-            /**
-             * bibtextype -> relation
-             *
-             * Field: dc:relation
-             *
-             * Type: bag Text
-             *
-             * Category: External
-             *
-             * Description: Relationships to other documents.
-             *
-             * Bibtex-Fields used: bibtextype
-             */
+
             /**
              * All others (including the bibtex key) get packaged in the
              * relation attribute
@@ -854,7 +827,7 @@ public class XMPUtil {
         dcSchema.setFormat("application/pdf");
 
         /**
-         * Type -> Type
+         * entrytype -> Type
          *
          * Field: dc:type
          *
@@ -865,7 +838,7 @@ public class XMPUtil {
          * Description: A document type; for example, novel, poem, or working
          * paper.
          *
-         * Bibtex-Fields used: title
+         * Bibtex-Fields used: entrytype
          */
         TypedBibEntry typedEntry = new TypedBibEntry(entry, BibDatabaseMode.BIBTEX);
         String o = typedEntry.getTypeForDisplay();

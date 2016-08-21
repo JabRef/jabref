@@ -13,19 +13,20 @@ import static org.junit.Assert.fail;
 
 public class CookieTest {
 
+    @SuppressWarnings("unused")
     @Test(expected = IllegalArgumentException.class)
     public void testIncorrectExpiresFormat() throws URISyntaxException {
-        Cookie cookie = new Cookie(new URI("http://jabref.org/"),
-                "name=TestCookie; expires=Tue, 25/07/10 16:43:15 GMT");
+        new Cookie(new URI("http://jabref.org/"), "name=TestCookie; expires=Tue, 25/07/10 16:43:15 GMT");
         fail();
     }
 
+    @SuppressWarnings("unused")
     @Test(expected = IllegalArgumentException.class)
     public void testIncorrectDomain() throws URISyntaxException {
-        Cookie cookie = new Cookie(new URI("http://jabref.org/"),
-                "name=TestCookie; domain=google.com");
+        new Cookie(new URI("http://jabref.org/"), "name=TestCookie; domain=google.com");
         fail();
     }
+
     @Test
     public void testHasExpiredFalse() throws URISyntaxException {
         Cookie cookie = new Cookie(new URI("http://jabref.org/"),

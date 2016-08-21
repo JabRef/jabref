@@ -5,12 +5,12 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -110,7 +110,7 @@ public class BibtexImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(Arrays.asList(".bib"), importer.getExtensions());
+        assertEquals(FileExtensions.BIBTEX_DB, importer.getExtensions());
     }
 
     @Test

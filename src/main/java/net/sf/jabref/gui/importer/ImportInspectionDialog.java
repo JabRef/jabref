@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.importer;
 
 import java.awt.BorderLayout;
@@ -91,6 +76,7 @@ import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
@@ -237,6 +223,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         setupComparatorChooser();
         glTable.addMouseListener(new TableClickListener());
 
+        GUIUtil.correctRowHeight(glTable);
+
         setWidths();
 
         getContentPane().setLayout(new BorderLayout());
@@ -362,10 +350,12 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      */
     @Override
     public void setProgress(int current, int max) {
-        progressBar.setIndeterminate(false);
-        progressBar.setMinimum(0);
-        progressBar.setMaximum(max);
-        progressBar.setValue(current);
+        SwingUtilities.invokeLater(() -> {
+            progressBar.setIndeterminate(false);
+            progressBar.setMinimum(0);
+            progressBar.setMaximum(max);
+            progressBar.setValue(current);
+        });
     }
 
     /* (non-Javadoc)
@@ -396,7 +386,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     .containsDuplicate(panel.getDatabase(), entry, panel.getBibDatabaseContext().getMode()).isPresent()
                     || (internalDuplicate(this.entries, entry).isPresent()))) {
                 entry.setGroupHit(true);
-                deselectAllDuplicates.setEnabled(true);
+                SwingUtilities.invokeLater(() -> deselectAllDuplicates.setEnabled(true));
             }
             this.entries.getReadWriteLock().writeLock().lock();
             try {
@@ -431,19 +421,21 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
      * @see net.sf.jabref.gui.ImportInspection#entryListComplete()
      */
     public void entryListComplete() {
-        progressBar.setIndeterminate(false);
-        progressBar.setVisible(false);
-        ok.setEnabled(true);
-        if (!generatedKeys) {
-            generate.setEnabled(true);
-        }
-        stop.setEnabled(false);
+        SwingUtilities.invokeLater(() -> {
+            progressBar.setIndeterminate(false);
+            progressBar.setVisible(false);
+            ok.setEnabled(true);
+            if (!generatedKeys) {
+                generate.setEnabled(true);
+            }
+            stop.setEnabled(false);
 
-        //This is for selecting and displaying the first entry in the glTable
-        this.glTable.repaint();
-        if ((this.glTable.getSelectedRowCount() == 0) && (this.glTable.getRowCount() > 0)) {
-            this.glTable.setRowSelectionInterval(0, 0); //Select first row in the table
-        }
+            //This is for selecting and displaying the first entry in the glTable
+            this.glTable.repaint();
+            if ((this.glTable.getSelectedRowCount() == 0) && (this.glTable.getRowCount() > 0)) {
+                this.glTable.setRowSelectionInterval(0, 0); //Select first row in the table
+            }
+        });
     }
 
     /**
@@ -720,8 +712,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             boolean groupingCanceled = false;
 
             // Set owner/timestamp if options are enabled:
-            UpdateField.setAutomaticFields(selected, Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER),
-                    Globals.prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP), Globals.prefs);
+            UpdateField.setAutomaticFields(selected, Globals.prefs.getUpdateFieldPreferences());
 
             // Mark entries if we should
             if (EntryMarker.shouldMarkEntries()) {

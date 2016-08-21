@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.external;
 
 import java.awt.BorderLayout;
@@ -34,8 +19,8 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -73,7 +58,7 @@ public class ExternalFileTypeEntryEditor {
             appDir = Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY);
         }
 
-        Optional<Path> path = new NewFileDialogs(fParent, appDir).openDlgAndGetSelectedFile();
+        Optional<Path> path = new FileDialog(fParent, appDir).showDialogAndGetSelectedFile();
         path.ifPresent(applicationDir -> {
             if (applicationDir.getParent() != null) {
                 Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, applicationDir.getParent().toString());

@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.exporter;
 
 import java.io.File;
@@ -32,7 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefMain;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
@@ -53,6 +38,8 @@ public class ExportFormat implements IExportFormat {
     private String extension;
     private Charset encoding; // If this value is set, it will be used to override
     // the default encoding for the getCurrentBasePanel.
+    private LayoutFormatterPreferences layoutPreferences;
+    private SavePreferences savePreferences;
 
     private boolean customExport;
     private static final String LAYOUT_PREFIX = "/resource/layout/";
@@ -78,9 +65,28 @@ public class ExportFormat implements IExportFormat {
     }
 
     /**
+     * Initialize another export format based on templates stored in dir with
+     * layoutFile lfFilename.
+     *
+     * @param displayName Name to display to the user.
+     * @param consoleName Name to call this format in the console.
+     * @param lfFileName  Name of the main layout file.
+     * @param directory   Directory in which to find the layout file.
+     * @param extension   Should contain the . (for instance .txt).
+     * @param layoutPreferences Preferences for layout
+     * @param savePreferences Preferences for saving
+     */
+    public ExportFormat(String displayName, String consoleName, String lfFileName, String directory, String extension,
+            LayoutFormatterPreferences layoutPreferences, SavePreferences savePreferences) {
+        this(displayName, consoleName, lfFileName, directory, extension);
+        this.layoutPreferences = layoutPreferences;
+        this.savePreferences = savePreferences;
+    }
+
+    /**
      * Empty default constructor for subclasses
      */
-    ExportFormat() {
+    protected ExportFormat() {
         // intentionally empty
     }
 
@@ -156,7 +162,7 @@ public class ExportFormat implements IExportFormat {
         String name = dir + filename;
         Reader reader;
         // Try loading as a resource first. This works for files inside the JAR:
-        URL reso = Globals.class.getResource(name);
+        URL reso = JabRefMain.class.getResource(name);
 
         // If that did not work, try loading as a normal file URL:
         try {
@@ -213,15 +219,14 @@ public class ExportFormat implements IExportFormat {
             Layout beginLayout = null;
 
             // Check if this export filter has bundled name formatters:
-            // Set a global field, so all layouts have access to the custom name formatters:
-            Globals.prefs.customExportNameFormatters = readFormatterFile(lfFileName);
+            // Add these to the preferences, so all layouts have access to the custom name formatters:
+            readFormatterFile();
 
             List<String> missingFormatters = new ArrayList<>(1);
 
             // Print header
             try (Reader reader = getReader(lfFileName + ".begin.layout")) {
-                LayoutHelper layoutHelper = new LayoutHelper(reader,
-                        LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
+                LayoutHelper layoutHelper = new LayoutHelper(reader, layoutPreferences);
                 beginLayout = layoutHelper.getLayoutFromText();
             } catch (IOException ex) {
                 // If an exception was cast, export filter doesn't have a begin
@@ -240,15 +245,13 @@ public class ExportFormat implements IExportFormat {
              * be non-null, and be used to choose entries. Otherwise, it will be
              * null, and be ignored.
              */
-            SavePreferences savePrefs = SavePreferences.loadForExportFromPreferences(Globals.prefs);
-            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(databaseContext, entries, savePrefs);
+            List<BibEntry> sorted = BibDatabaseWriter.getSortedEntries(databaseContext, entries, savePreferences);
 
             // Load default layout
             Layout defLayout;
             LayoutHelper layoutHelper;
             try (Reader reader = getReader(lfFileName + ".layout")) {
-                layoutHelper = new LayoutHelper(reader,
-                        LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
+                layoutHelper = new LayoutHelper(reader,layoutPreferences);
                 defLayout = layoutHelper.getLayoutFromText();
             }
             if (defLayout != null) {
@@ -270,8 +273,7 @@ public class ExportFormat implements IExportFormat {
                 } else {
                     try (Reader reader = getReader(lfFileName + '.' + type + ".layout")) {
                         // We try to get a type-specific layout for this entry.
-                        layoutHelper = new LayoutHelper(reader, LayoutFormatterPreferences
-                                .fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
+                        layoutHelper = new LayoutHelper(reader, layoutPreferences);
                         layout = layoutHelper.getLayoutFromText();
                         layouts.put(type, layout);
                         if (layout != null) {
@@ -287,7 +289,9 @@ public class ExportFormat implements IExportFormat {
                 }
 
                 // Write the entry
-                ps.write(layout.doLayout(entry, databaseContext.getDatabase()));
+                if (layout != null) {
+                    ps.write(layout.doLayout(entry, databaseContext.getDatabase()));
+                }
             }
 
             // Print footer
@@ -295,8 +299,7 @@ public class ExportFormat implements IExportFormat {
             // changed section - begin (arudert)
             Layout endLayout = null;
             try (Reader reader = getReader(lfFileName + ".end.layout")) {
-                layoutHelper = new LayoutHelper(reader,
-                        LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
+                layoutHelper = new LayoutHelper(reader, layoutPreferences);
                 endLayout = layoutHelper.getLayoutFromText();
             } catch (IOException ex) {
                 // If an exception was thrown, export filter doesn't have an end
@@ -310,7 +313,7 @@ public class ExportFormat implements IExportFormat {
             }
 
             // Clear custom name formatters:
-            Globals.prefs.customExportNameFormatters = null;
+            layoutPreferences.clearCustomExportNameFormatters();
 
             if (!missingFormatters.isEmpty()) {
                 StringBuilder sb = new StringBuilder("The following formatters could not be found: ");
@@ -332,10 +335,8 @@ public class ExportFormat implements IExportFormat {
      * See if there is a name formatter file bundled with this export format. If so, read
      * all the name formatters so they can be used by the filter layouts.
      *
-     * @param lfFileName The layout filename.
      */
-    private static Map<String, String> readFormatterFile(String lfFileName) {
-        Map<String, String> formatters = new HashMap<>();
+    private void readFormatterFile() {
         File formatterFile = new File(lfFileName + ".formatters");
         if (formatterFile.exists()) {
             try (Reader in = new FileReader(formatterFile)) {
@@ -357,7 +358,7 @@ public class ExportFormat implements IExportFormat {
                     if ((index > 0) && ((index + 1) < line.length())) {
                         String formatterName = line.substring(0, index);
                         String contents = line.substring(index + 1);
-                        formatters.put(formatterName, contents);
+                        layoutPreferences.putCustomExportNameFormatter(formatterName, contents);
                     }
                 }
 
@@ -366,7 +367,6 @@ public class ExportFormat implements IExportFormat {
                 LOGGER.warn("Problem opening formatter file.", ex);
             }
         }
-        return formatters;
     }
 
     public void finalizeSaveSession(final SaveSession ss, Path file) throws SaveException, IOException {

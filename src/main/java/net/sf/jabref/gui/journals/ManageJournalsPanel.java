@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.journals;
 
 import java.awt.BorderLayout;
@@ -59,14 +44,14 @@ import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.Globals;
 
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
-
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
@@ -192,13 +177,15 @@ class ManageJournalsPanel extends JPanel {
         viewBuiltin.addActionListener(e -> {
             JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbreviationLoader
                     .getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs)).getAbbreviations()));
+            GUIUtil.correctRowHeight(table);
+
             JScrollPane pane = new JScrollPane(table);
             JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"),
                     JOptionPane.INFORMATION_MESSAGE);
         });
 
         browseNew.addActionListener(e -> {
-            Optional<Path> path = new NewFileDialogs(frame, newNameTf.getText()).saveNewFile();
+            Optional<Path> path = new FileDialog(frame, newNameTf.getText()).saveNewFile();
             path.ifPresent(fileName -> {
                 newNameTf.setText(fileName.toString());
                 newFile.setSelected(true);
@@ -207,7 +194,7 @@ class ManageJournalsPanel extends JPanel {
         });
 
         browseOld.addActionListener(e -> {
-            Optional<Path> path = new NewFileDialogs(frame, personalFile.getText()).openDlgAndGetSelectedFile();
+            Optional<Path> path = new FileDialog(frame, personalFile.getText()).showDialogAndGetSelectedFile();
 
             path.ifPresent(fileName -> {
                 personalFile.setText(fileName.toString());
@@ -325,6 +312,8 @@ class ManageJournalsPanel extends JPanel {
 
         tableModel.setJournals(userAbbreviations);
         userTable = new JTable(tableModel);
+        GUIUtil.correctRowHeight(userTable);
+
         userTable.addMouseListener(tableModel.getMouseListener());
         userPanel.add(new JScrollPane(userTable), BorderLayout.CENTER);
     }
@@ -360,7 +349,6 @@ class ManageJournalsPanel extends JPanel {
             }
         } else {
             filePath = Paths.get(personalFile.getText());
-
         }
 
         if (filePath != null) {
@@ -416,7 +404,7 @@ class ManageJournalsPanel extends JPanel {
             File toFile;
             try {
 
-                Optional<Path> path = new NewFileDialogs(frame, System.getProperty("user.home")).saveNewFile();
+                Optional<Path> path = new FileDialog(frame, System.getProperty("user.home")).saveNewFile();
                 if (path.isPresent()) {
                     toFile = new File(path.get().toString());
                 } else {
@@ -580,6 +568,8 @@ class ManageJournalsPanel extends JPanel {
                             .readJournalListFromFile(new File(tf.getText()));
 
                     JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(abbreviations));
+                    GUIUtil.correctRowHeight(table);
+
                     JScrollPane pane = new JScrollPane(table);
                     JOptionPane.showMessageDialog(null, pane, Localization.lang("Journal list preview"),
                             JOptionPane.INFORMATION_MESSAGE);

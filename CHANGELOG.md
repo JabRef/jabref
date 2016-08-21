@@ -15,10 +15,13 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#970](https://github.com/JabRef/jabref/issues/970): Implementation of shared database support (full system) with event based synchronization for MySQL, PostgreSQL and Oracle database systems.
 - Externally fetched information can be merged for entries with an ISBN
 - Externally fetched information can be merged for entries with an ArXiv eprint
+- Added EntryTypeFormatter to add camel casing to entry type in layouts, e.g., InProceedings
 - [#1225](https://github.com/JabRef/jabref/issues/1225): Hotkey-system is now consistent
 - Added print entry preview to the right click menu
 - [#462](https://github.com/JabRef/jabref/issues/462) Extend the OpenConsoleFeature by offering a selection between default terminal emulator and configurable command execution.
+- The field name in the layout files for entry type is changed from `bibtextype` to `entrytype`. Please update your existing files as support for `bibtextype` will be removed eventually.
 - [#1516](https://github.com/JabRef/jabref/issues/1516) Selected field names are written in uppercase in the entry editor
+- Table row height is adjusted on Windows which is useful for high resolution displays
 - For developers: Moved the bst package into logic. This requires the regeneration of antlr sources, execute: gradlew generateSource
 - [#1026](https://github.com/JabRef/jabref/issues/1026) JabRef does no longer delete user comments outside of BibTeX entries and strings
 - [#1249](https://github.com/JabRef/jabref/issues/1249) Date layout formatter added
@@ -26,6 +29,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Added ISBN integrity checker
 - Added filter to not show selected integrity checks
 - The contents of `crossref` and `related` will be automatically updated if a linked entry changes key
+- The information shown in the main table now resolves crossrefs and strings and it can be shown which fields are resolved in this way (Preferences -> Appearance -> Color codes for resolved fields)
 - Enhance the entry customization dialog to give better visual feedback
 - It is now possible to generate a new BIB database from the citations in an OpenOffice/LibreOffice document
 - The arXiv fetcher now also supports free-text search queries
@@ -34,6 +38,10 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Automatically generated group names are now converted from LaTeX to Unicode
 - Unified dialogs for opening/saving files
 - Add integrity check to avoid non-ASCII characters in BibTeX files
+- [#1751](https://github.com/JabRef/jabref/issues/1751) Added tooltip to web search button
+- [#1758](https://github.com/JabRef/jabref/issues/1758) Added a button to open Database Properties dialog help
+- Improve focus of the maintable after a sidepane gets closed (Before it would focus the toolbar or it would focus the wrong entry)
+- File open dialogs now use default extensions as primary file filter
 
 ### Fixed
 - Fixed [#1632](https://github.com/JabRef/jabref/issues/1632): User comments (@Comment) with or without brackets are now kept
@@ -61,8 +69,17 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed NullPointerException when clicking OK without specifying a field name in set/clear/rename fields
 - Fixed IndexOutOfBoundsException when trying to download a full text document without selecting an entry
 - Fixed NullPointerException when trying to set a special field or mark an entry through the menu without having an open database
+- Fixed NullPointerException when trying to synchronize file field with an entry without BibTeX key
+- Fixed NullPointerException when importing PDFs and pressing cancel when selecting entry type
+- Fixed a number of issues related to accessing the GUI from outside the EDT
+- Added a few missing translation strings
+- Fixed NullPointerException when opening Customize entry type dialog without an open database
 - Fixed [#1257](https://github.com/JabRef/jabref/issues/1324): Preferences for the BibTeX key generator set in a version prior to 3.2 are now migrated automatically to the new version
 - Fixed [#1716](https://github.com/JabRef/jabref/issues/1716): `@`-Symbols stored in BibTeX fields no longer break the database
+- Fixed [#1499](https://github.com/JabRef/jabref/issues/1499): {} braces are now treated correctly in in author/editor
+- Fixed [#1531](https://github.com/JabRef/jabref/issues/1531): `\relax` can be used for abbreviation of author names
+- Fixed [#1771](https://github.com/JabRef/jabref/issues/1771): Show all supported import types as default
+ 
 
 ### Removed
 - It is not longer possible to choose to convert HTML sub- and superscripts to equations

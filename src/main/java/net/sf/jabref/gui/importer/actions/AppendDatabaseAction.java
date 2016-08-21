@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.importer.actions;
 
 import java.io.File;
@@ -26,9 +11,9 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.MergeDialog;
-import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
@@ -83,7 +68,7 @@ public class AppendDatabaseAction implements BaseAction {
         md.setVisible(true);
         if (md.isOkPressed()) {
 
-            List<String> chosen = new NewFileDialogs(frame).updateWorkingDirPref().showDlgAndGetMultipleFiles();
+            List<String> chosen = new FileDialog(frame).updateWorkingDirPref().showDialogAndGetMultipleFiles();
             if (chosen.isEmpty()) {
                 return;
             }
@@ -139,7 +124,8 @@ public class AppendDatabaseAction implements BaseAction {
             for (BibEntry originalEntry : fromDatabase.getEntries()) {
                 BibEntry be = (BibEntry) originalEntry.clone();
                 be.setId(IdGenerator.next());
-                UpdateField.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp, Globals.prefs);
+                UpdateField.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp,
+                        Globals.prefs.getUpdateFieldPreferences());
                 database.insertEntry(be);
                 appendedEntries.add(be);
                 originalEntries.add(originalEntry);
@@ -163,14 +149,14 @@ public class AppendDatabaseAction implements BaseAction {
                 // ensure that there is always only one AllEntriesGroup
                 if (newGroups.getGroup() instanceof AllEntriesGroup) {
                     // create a dummy group
-                    ExplicitGroup group = null;
                     try {
-                        group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT, Globals.prefs);
+                        ExplicitGroup group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT,
+                                Globals.prefs);
+                        newGroups.setGroup(group);
+                        group.add(appendedEntries);
                     } catch (ParseException e) {
                         LOGGER.error(e);
                     }
-                    newGroups.setGroup(group);
-                    group.add(appendedEntries);
                 }
 
                 // groupsSelector is always created, even when no groups

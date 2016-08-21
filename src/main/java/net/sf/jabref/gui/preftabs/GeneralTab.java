@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
@@ -111,8 +96,9 @@ class GeneralTab extends JPanel implements PrefsTab {
         encodings = new JComboBox<>();
         encodings.setModel(new DefaultComboBoxModel<>(Encodings.ENCODINGS));
 
-        FormLayout layout = new FormLayout
-                ("8dlu, 1dlu, left:170dlu, 4dlu, fill:pref, 4dlu, fill:pref, 4dlu, left:pref, 4dlu, left:pref, 4dlu, left:pref", "");
+        FormLayout layout = new FormLayout(
+                "8dlu, 1dlu, left:pref:grow, 4dlu, fill:pref, 4dlu, fill:pref, 4dlu, left:pref, 1dlu, left:pref, 4dlu, left:pref",
+                "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
         builder.appendSeparator(Localization.lang("General"));
@@ -146,7 +132,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.nextLine();
 
         builder.append(new JPanel());
-        builder.append(updateTimeStamp, 2);
+        builder.append(updateTimeStamp, 11);
         builder.nextLine();
 
         builder.append(markImportedEntries, 13);

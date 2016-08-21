@@ -31,7 +31,7 @@ public class FileUtilTest {
     @Test
     public void testGetLinkedFileNameDefault() {
         // bibkey - title
-        when(prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN))
+        when(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN))
                 .thenReturn("\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}");
 
         BibEntry entry = new BibEntry();
@@ -45,7 +45,7 @@ public class FileUtilTest {
     @Test
     public void testGetLinkedFileNameBibTeXKey() {
         // bibkey
-        when(prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN)).thenReturn("\\bibtexkey");
+        when(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN)).thenReturn("\\bibtexkey");
 
         BibEntry entry = new BibEntry();
         entry.setCiteKey("1234");

@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.shared;
 
 import java.sql.Connection;
@@ -94,7 +79,7 @@ public class DBMSSynchronizer {
     public void listen(FieldChangedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntryEvents may be posted.
         // In this case DBSynchronizer should not try to update the bibEntry entry again (but it would not harm).
-        if (isEventSourceAccepted(event) && checkCurrentConnection()) {
+        if (isPresentLocalBibEntry(event.getBibEntry()) && isEventSourceAccepted(event) && checkCurrentConnection()) {
             synchronizeLocalMetaData();
             BibEntry bibEntry = event.getBibEntry();
             synchronizeSharedEntry(bibEntry);
@@ -346,6 +331,10 @@ public class DBMSSynchronizer {
 
     public void openSharedDatabase(DBMSConnectionProperties properties) throws ClassNotFoundException, SQLException {
         openSharedDatabase(DBMSConnector.getNewConnection(properties), properties.getType(), properties.getDatabase());
+    }
+
+    private boolean isPresentLocalBibEntry(BibEntry bibEntry) {
+        return bibDatabase.getEntries().contains(bibEntry);
     }
 
     public String getDBName() {

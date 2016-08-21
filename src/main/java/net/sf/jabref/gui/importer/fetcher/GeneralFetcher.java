@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.importer.fetcher;
 
 import java.awt.BorderLayout;
@@ -77,12 +62,6 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         String[] choices = new String[fetcherArray.length];
         for (int i = 0; i < fetcherArray.length; i++) {
             choices[i] = fetcherArray[i].getTitle();
-            //choices[i] = new JLabel(fetchers.get(i).getTitle(), new ImageIcon(fetchers.get(i).getIcon()),
-            //        JLabel.HORIZONTAL);
-            /*if (fetchers.get(i).getOptionsPanel() != null)
-                optionsPanel.add(fetchers.get(i).getOptionsPanel(), String.valueOf(i));
-            else
-                optionsPanel.add(new JPanel(), String.valueOf(i));*/
         }
         JComboBox<String> fetcherChoice = new JComboBox<>(choices);
         int defaultFetcher = Globals.prefs.getInt(JabRefPreferences.SELECTED_FETCHER_INDEX);
@@ -97,26 +76,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         HelpAction help = new HelpAction(activeFetcher.getHelpPage());
         JButton helpBut = help.getHelpButton();
         helpBut.setEnabled(activeFetcher.getHelpPage() != null);
-
-        //optionsCards.show(optionsPanel, String.valueOf(defaultFetcher));
-
-        /*fetcherChoice.setRenderer(new ListCellRenderer() {
-            JLabel label = new JLabel();
-            public Component getListCellRendererComponent(JList jList, Object o, int i, boolean isSelected,
-                boolean cellHasFocus) {
-                JLabel theLab = (JLabel)o;
-                label.setIcon(theLab.getIcon());
-                label.setText(theLab.getText());
-                if (cellHasFocus) {
-                    label.setBackground(UIManager.getDefaults().getColor("ComboBox.selectionBackground").darker());
-                    label.setForeground(UIManager.getDefaults().getColor("ComboBox.foreground"));
-                } else {
-                    label.setBackground(UIManager.getDefaults().getColor("ComboBox.background"));
-                    label.setForeground(UIManager.getDefaults().getColor("ComboBox.foreground"));
-                }
-                return label;
-            }
-        });*/
+        
         fetcherChoice.addActionListener(actionEvent -> {
             activeFetcher = fetcherArray[fetcherChoice.getSelectedIndex()];
             Globals.prefs.putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, fetcherChoice.getSelectedIndex());
@@ -277,6 +237,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             //if ((activeFetcher.getKeyName() != null) && (activeFetcher.getKeyName().length() > 0))
             putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.WEB_SEARCH));
             putValue(Action.LARGE_ICON_KEY, IconTheme.JabRefIcon.WWW.getIcon());
+            putValue(Action.SHORT_DESCRIPTION, Localization.lang("Toggle web search interface"));
         }
 
         @Override

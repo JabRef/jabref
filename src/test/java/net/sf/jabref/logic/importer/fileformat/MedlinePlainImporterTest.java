@@ -8,7 +8,6 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -16,6 +15,7 @@ import java.util.Optional;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -31,6 +31,7 @@ public class MedlinePlainImporterTest {
 
     private MedlinePlainImporter importer;
 
+
     private BufferedReader readerForString(String string) {
         return new BufferedReader(new StringReader(string));
     }
@@ -43,12 +44,7 @@ public class MedlinePlainImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        List<String> extensions = new ArrayList<>();
-        extensions.add(".nbib");
-        extensions.add(".txt");
-
-        assertEquals(extensions.get(0), importer.getExtensions().get(0));
-        assertEquals(extensions.get(1), importer.getExtensions().get(1));
+        assertEquals(FileExtensions.MEDLINE_PLAIN, importer.getExtensions());
     }
 
     @Test
@@ -85,8 +81,8 @@ public class MedlinePlainImporterTest {
 
     @Test
     public void testImportMultipleEntriesInSingleFile() throws IOException, URISyntaxException {
-        Path inputFile = Paths.get(
-                MedlinePlainImporter.class.getResource("MedlinePlainImporterTestMultipleEntries.txt").toURI());
+        Path inputFile = Paths
+                .get(MedlinePlainImporter.class.getResource("MedlinePlainImporterTestMultipleEntries.txt").toURI());
 
         List<BibEntry> entries = importer.importDatabase(inputFile, Charset.defaultCharset()).getDatabase()
                 .getEntries();
@@ -164,21 +160,21 @@ public class MedlinePlainImporterTest {
 
     @Test
     public void testMultiLineComments() throws IOException {
-        BufferedReader reader = readerForString(
-                "PMID-22664220" + "\n" + "CON - Comment1" + "\n" + "CIN - Comment2" + "\n" + "EIN - Comment3" + "\n"
-                        + "EFR - Comment4" + "\n" + "CRI - Comment5" + "\n" + "CRF - Comment6" + "\n" + "PRIN- Comment7"
-                        + "\n" + "PROF- Comment8" + "\n" + "RPI - Comment9" + "\n" + "RPF - Comment10" + "\n"
-                        + "RIN - Comment11" + "\n" + "ROF - Comment12" + "\n" + "UIN - Comment13" + "\n"
-                        + "UOF - Comment14" + "\n" + "SPIN- Comment15" + "\n" + "ORI - Comment16");
-        List<BibEntry> actualEntries = importer.importDatabase(reader).getDatabase().getEntries();
+        try (BufferedReader reader = readerForString("PMID-22664220" + "\n" + "CON - Comment1" + "\n" + "CIN - Comment2"
+                + "\n" + "EIN - Comment3" + "\n" + "EFR - Comment4" + "\n" + "CRI - Comment5" + "\n" + "CRF - Comment6"
+                + "\n" + "PRIN- Comment7" + "\n" + "PROF- Comment8" + "\n" + "RPI - Comment9" + "\n" + "RPF - Comment10"
+                + "\n" + "RIN - Comment11" + "\n" + "ROF - Comment12" + "\n" + "UIN - Comment13" + "\n"
+                + "UOF - Comment14" + "\n" + "SPIN- Comment15" + "\n" + "ORI - Comment16")) {
+            List<BibEntry> actualEntries = importer.importDatabase(reader).getDatabase().getEntries();
 
-        BibEntry expectedEntry = new BibEntry();
-        expectedEntry.setField("comment",
-                "Comment1" + "\n" + "Comment2" + "\n" + "Comment3" + "\n" + "Comment4" + "\n" + "Comment5" + "\n"
-                        + "Comment6" + "\n" + "Comment7" + "\n" + "Comment8" + "\n" + "Comment9" + "\n"
-                        + "Comment10" + "\n" + "Comment11" + "\n" + "Comment12" + "\n" + "Comment13" + "\n"
-                        + "Comment14" + "\n" + "Comment15" + "\n" + "Comment16");
-        assertEquals(Collections.singletonList(expectedEntry), actualEntries);
+            BibEntry expectedEntry = new BibEntry();
+            expectedEntry.setField("comment",
+                    "Comment1" + "\n" + "Comment2" + "\n" + "Comment3" + "\n" + "Comment4" + "\n" + "Comment5" + "\n"
+                            + "Comment6" + "\n" + "Comment7" + "\n" + "Comment8" + "\n" + "Comment9" + "\n"
+                            + "Comment10" + "\n" + "Comment11" + "\n" + "Comment12" + "\n" + "Comment13" + "\n"
+                            + "Comment14" + "\n" + "Comment15" + "\n" + "Comment16");
+            assertEquals(Collections.singletonList(expectedEntry), actualEntries);
+        }
     }
 
     @Test
@@ -225,12 +221,9 @@ public class MedlinePlainImporterTest {
 
     @Test
     public void testAllArticleTypes() throws IOException {
-        try (BufferedReader reader = readerForString("PMID-22664795" + "\n" +
-                "MH  - Female\n" +
-                "PT  - journal article" + "\n" +
-                "PT  - classical article" + "\n" +
-                "PT  - corrected and republished article" + "\n" +
-                "PT  - introductory journal article" + "\n" + "PT  - newspaper article")) {
+        try (BufferedReader reader = readerForString("PMID-22664795" + "\n" + "MH  - Female\n" + "PT  - journal article"
+                + "\n" + "PT  - classical article" + "\n" + "PT  - corrected and republished article" + "\n"
+                + "PT  - introductory journal article" + "\n" + "PT  - newspaper article")) {
             List<BibEntry> actualEntries = importer.importDatabase(reader).getDatabase().getEntries();
 
             BibEntry expectedEntry = new BibEntry();

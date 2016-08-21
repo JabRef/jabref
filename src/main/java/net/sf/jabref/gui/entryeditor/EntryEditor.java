@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.entryeditor;
 
 import java.awt.AWTKeyStroke;
@@ -551,7 +536,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         source.setEditable(true);
         source.setLineWrap(true);
-        source.setTabSize(Globals.prefs.getInt(JabRefPreferences.INDENT));
         source.addFocusListener(new FieldEditorFocusListener());
         // Add the global focus listener, so a menu item can see if this field was focused when an action was called.
         source.addFocusListener(Globals.getFocusListener());
@@ -947,7 +931,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
     @Subscribe
     public void listen(FieldChangedEvent fieldChangedEvent) {
         String newValue = fieldChangedEvent.getNewValue() == null ? "" : fieldChangedEvent.getNewValue();
-        setField(fieldChangedEvent.getFieldName(), newValue);
+        if (SwingUtilities.isEventDispatchThread()) {
+            setField(fieldChangedEvent.getFieldName(), newValue);
+        } else {
+            SwingUtilities.invokeLater(() -> setField(fieldChangedEvent.getFieldName(), newValue));
+        }
     }
 
     public void updateField(final Object sourceObject) {
@@ -1164,10 +1152,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 FieldEditor fieldEditor = (FieldEditor) event.getSource();
                 boolean set;
                 // Trim the whitespace off this value
-                String currentText = fieldEditor.getText();
-                String trim = currentText.trim();
-                if (!trim.isEmpty()) {
-                    toSet = trim;
+                String currentText = fieldEditor.getText().trim();
+                if (!currentText.isEmpty()) {
+                    toSet = currentText;
                 }
 
                 // We check if the field has changed, since we don't want to

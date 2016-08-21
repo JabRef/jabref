@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui;
 
 import java.awt.Component;
@@ -68,6 +53,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JTree;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -88,6 +74,7 @@ import net.sf.jabref.gui.importer.EntryFromFileCreator;
 import net.sf.jabref.gui.importer.EntryFromFileCreatorManager;
 import net.sf.jabref.gui.importer.UnlinkedFilesCrawler;
 import net.sf.jabref.gui.importer.UnlinkedPDFFileFilter;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
@@ -532,10 +519,16 @@ public class FindUnlinkedFilesDialog extends JDialog {
                         @Override
                         public void stateChanged(ChangeEvent e) {
                             counter++;
-                            progressBarSearching.setString(counter + " files found");
+                            String message;
+                            if (counter == 1) {
+                                message = Localization.lang("One file found");
+                            } else {
+                                message = Localization.lang("%0 files found", Integer.toString(counter));
+                            }
+                            SwingUtilities.invokeLater(() -> progressBarSearching.setString(message));
                         }
                     });
-            searchFinishedHandler(rootNode);
+            SwingUtilities.invokeLater(() -> searchFinishedHandler(rootNode));
         });
 
     }
@@ -589,15 +582,17 @@ public class FindUnlinkedFilesDialog extends JDialog {
 
                         int counter;
 
-
                         @Override
                         public void stateChanged(ChangeEvent e) {
                             counter++;
-                            progressBarImporting.setValue(counter);
-                            progressBarImporting.setString(counter + " of " + progressBarImporting.getMaximum());
+                            SwingUtilities.invokeLater(() -> {
+                                progressBarImporting.setValue(counter);
+                                progressBarImporting.setString(Localization.lang("%0 of %1", Integer.toString(counter),
+                                        Integer.toString(progressBarImporting.getMaximum())));
+                            });
                         }
                     }, errors);
-            importFinishedHandler(errors);
+            SwingUtilities.invokeLater(() -> importFinishedHandler(errors));
         });
     }
 
@@ -608,11 +603,15 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private void importFinishedHandler(List<String> errors) {
 
         if ((errors != null) && !errors.isEmpty()) {
-
+            String message;
+            if (errors.size() == 1) {
+                message = Localization.lang("There was one file that could not be imported.");
+            } else {
+                message = Localization.lang("There were %0 files which could not be imported.",
+                        Integer.toString(errors.size()));
+            }
             JOptionPane.showMessageDialog(this,
-                    "The import finished with warnings:\n" + "There " + (errors.size() > 1 ? "were " : "was ")
-                            + errors.size() + (errors.size() > 1 ? " files" : " file")
-                            + (errors.size() > 1 ? " which" : " that") + " could not be imported.",
+                    Localization.lang("The import finished with warnings:") + "\n" + message,
                     Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
         }
 
@@ -798,6 +797,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
         labelImportingInfo.setVisible(false);
 
         tree = new JTree();
+        GUIUtil.correctRowHeight(tree);
+
         scrollpaneTree = new JScrollPane(tree);
         scrollpaneTree.setWheelScrollingEnabled(true);
 

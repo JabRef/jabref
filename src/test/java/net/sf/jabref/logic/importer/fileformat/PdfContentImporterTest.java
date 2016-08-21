@@ -4,11 +4,11 @@ import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -29,7 +29,7 @@ public class PdfContentImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(Arrays.asList(".pdf"), importer.getExtensions());
+        assertEquals(FileExtensions.PDF_CONTENT, importer.getExtensions());
     }
 
     @Test

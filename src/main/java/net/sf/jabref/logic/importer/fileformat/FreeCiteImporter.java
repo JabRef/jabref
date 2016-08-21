@@ -1,18 +1,3 @@
-/*  Copyright (C) 2012, 2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
@@ -25,7 +10,6 @@ import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
@@ -40,6 +24,7 @@ import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
@@ -72,8 +57,7 @@ public class FreeCiteImporter extends ImportFormat {
     }
 
     @Override
-    public ParserResult importDatabase(BufferedReader reader)
-            throws IOException {
+    public ParserResult importDatabase(BufferedReader reader) throws IOException {
         try (Scanner scan = new Scanner(reader)) {
             String text = scan.useDelimiter("\\A").next();
             return importEntries(text);
@@ -174,16 +158,11 @@ public class FreeCiteImporter extends ImportFormat {
                                 type = BibtexEntryTypes.TECHREPORT;
                                 // the content of the "tech" field seems to contain the number of the technical report
                                 e.setField(FieldName.NUMBER, parser.getElementText());
-                            } else if (FieldName.DOI.equals(ln)
-                                    || FieldName.INSTITUTION.equals(ln)
-                                    || FieldName.LOCATION.equals(ln)
-                                    || FieldName.NUMBER.equals(ln)
-                                    || FieldName.NOTE.equals(ln)
-                                    || FieldName.TITLE.equals(ln)
-                                    || FieldName.PAGES.equals(ln)
-                                    || FieldName.PUBLISHER.equals(ln)
-                                    || FieldName.VOLUME.equals(ln)
-                                    || FieldName.YEAR.equals(ln)) {
+                            } else if (FieldName.DOI.equals(ln) || FieldName.INSTITUTION.equals(ln)
+                                    || FieldName.LOCATION.equals(ln) || FieldName.NUMBER.equals(ln)
+                                    || FieldName.NOTE.equals(ln) || FieldName.TITLE.equals(ln)
+                                    || FieldName.PAGES.equals(ln) || FieldName.PUBLISHER.equals(ln)
+                                    || FieldName.VOLUME.equals(ln) || FieldName.YEAR.equals(ln)) {
                                 e.setField(ln, parser.getElementText());
                             } else if (FieldName.BOOKTITLE.equals(ln)) {
                                 String booktitle = parser.getElementText();
@@ -210,7 +189,8 @@ public class FreeCiteImporter extends ImportFormat {
                         String note;
                         if (e.hasField(FieldName.NOTE)) {
                             // "note" could have been set during the parsing as FreeCite also returns "note"
-                            note = e.getFieldOptional(FieldName.NOTE).get().concat(OS.NEWLINE).concat(noteSB.toString());
+                            note = e.getFieldOptional(FieldName.NOTE).get().concat(OS.NEWLINE)
+                                    .concat(noteSB.toString());
                         } else {
                             note = noteSB.toString();
                         }
@@ -246,8 +226,8 @@ public class FreeCiteImporter extends ImportFormat {
     }
 
     @Override
-    public List<String> getExtensions() {
-        return Arrays.asList(".txt",".xml");
+    public FileExtensions getExtensions() {
+        return FileExtensions.FREECITE;
     }
 
     @Override
