@@ -608,7 +608,10 @@ public class FindUnlinkedFilesDialog extends JDialog {
          */
         buttonBrowse.addActionListener(e -> {
             Optional<Path> selectedDirectory = new FileDialog(frame).showDialogAndGetSelectedDirectory();
-            selectedDirectory.ifPresent(d -> storeLastSelectedDirectory(d));
+            selectedDirectory.ifPresent(d -> {
+                textfieldDirectoryPath.setText(d.toAbsolutePath().toString());
+                storeLastSelectedDirectory(d);
+            });
         });
 
         buttonScan.addActionListener(e -> startSearch());
