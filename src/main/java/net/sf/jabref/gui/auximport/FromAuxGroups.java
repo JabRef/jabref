@@ -1,45 +1,7 @@
-/*
- Copyright (C) 2004 R. Nagel
- Copyright (C) 2016 JabRef Contributors
-
-
- All programs in this directory and
- subdirectories are published under the GNU General Public License as
- described below.
-
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or (at
- your option) any later version.
-
- This program is distributed in the hope that it will be useful, but
- WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
- USA
-
- Further information about the GNU GPL is available at:
- http://www.gnu.org/copyleft/gpl.ja.html
-
- */
-
-// A wizard dialog for generating a new sub database from existing TeX AUX file
-//
-// created by : r.nagel 23.08.2004
-//
-// modified : 18.04.2006 r.nagel
-//            insert a "short info" section
-
 package net.sf.jabref.gui.auximport;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.io.File;
-import java.util.Collections;
 import java.util.List;
 
 import javax.swing.AbstractAction;
@@ -50,7 +12,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -61,18 +22,18 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.importer.fileformat.ParseException;
 import net.sf.jabref.logic.auxparser.AuxParser;
 import net.sf.jabref.logic.auxparser.AuxParserResult;
 import net.sf.jabref.logic.groups.ExplicitGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
+import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -190,7 +151,14 @@ public class FromAuxGroups extends JDialog {
 
         auxFileField = new JTextField("", 25);
         JButton browseAuxFileButton = new JButton(Localization.lang("Browse"));
-        browseAuxFileButton.addActionListener(new BrowseAction(auxFileField, parentFrame));
+        final JTextField tc = auxFileField;
+        final JabRefFrame frame1 = parentFrame;
+        browseAuxFileButton.addActionListener(e -> {
+            FileDialog dialog = new FileDialog(frame1).withExtension(FileExtensions.AUX);
+            dialog.setDefaultExtension(FileExtensions.AUX);
+            dialog.showDialogAndGetSelectedFile().ifPresent(p -> tc.setText(p.toAbsolutePath().toString()));
+        });
+
         notFoundList = new JList<>();
         JScrollPane listScrollPane = new JScrollPane(notFoundList);
         statusInfos = new JTextArea("", 5, 20);
@@ -264,28 +232,4 @@ public class FromAuxGroups extends JDialog {
         }
     }
 
-    /**
-     * Action used to produce a "Browse" button for one of the text fields.
-     */
-    static class BrowseAction extends AbstractAction {
-        private final JTextField comp;
-        private final JabRefFrame frame;
-
-
-        public BrowseAction(JTextField tc, JabRefFrame frame) {
-            super(Localization.lang("Browse"));
-            this.frame = frame;
-            comp = tc;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String chosen = FileDialogs.getNewFile(frame, new File(comp.getText()), Collections.singletonList(".aux"),
-                    JFileChooser.OPEN_DIALOG, false);
-            if (chosen != null) {
-                File newFile = new File(chosen);
-                comp.setText(newFile.getPath());
-            }
-        }
-    }
 }
