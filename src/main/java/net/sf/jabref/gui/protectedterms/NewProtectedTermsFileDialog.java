@@ -12,6 +12,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
@@ -34,6 +35,7 @@ public class NewProtectedTermsFileDialog extends JDialog {
     private final JCheckBox enabled = new JCheckBox(Localization.lang("Enabled"));
     private boolean addOKPressed;
     private final ProtectedTermsLoader loader;
+    private JFrame parent;
 
     public NewProtectedTermsFileDialog(JDialog parent, ProtectedTermsLoader loader) {
         super(parent, Localization.lang("New protected terms file"), true);
@@ -44,6 +46,7 @@ public class NewProtectedTermsFileDialog extends JDialog {
 
     public NewProtectedTermsFileDialog(JabRefFrame mainFrame, ProtectedTermsLoader loader) {
         super(mainFrame, Localization.lang("New protected terms file"), true);
+        parent = mainFrame;
         this.loader = loader;
         setupDialog();
         setLocationRelativeTo(mainFrame);
@@ -51,7 +54,7 @@ public class NewProtectedTermsFileDialog extends JDialog {
 
     private void setupDialog() {
         JButton browse = new JButton(Localization.lang("Browse"));
-        FileDialog dialog = new FileDialog(null).withExtension(FileExtensions.TERMS);
+        FileDialog dialog = new FileDialog(parent).withExtension(FileExtensions.TERMS);
         dialog.setDefaultExtension(FileExtensions.TERMS);
         browse.addActionListener(e -> {
             Optional<Path> file = dialog.showDialogAndGetSelectedFile();

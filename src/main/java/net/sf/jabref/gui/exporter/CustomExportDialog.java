@@ -52,18 +52,18 @@ import org.apache.commons.logging.LogFactory;
  * Dialog for creating or modifying custom exports.
  */
 class CustomExportDialog extends JDialog {
-
     private static final Log LOGGER = LogFactory.getLog(CustomExportDialog.class);
 
     private final JTextField name = new JTextField(60);
     private final JTextField layoutFile = new JTextField(60);
     private final JTextField extension = new JTextField(60);
+    private JabRefFrame frame;
     private boolean okPressed;
-
 
     public CustomExportDialog(final JabRefFrame parent, final String exporterName, final String layoutFileName,
             final String extensionName) {
         this(parent);
+        frame = parent;
         name.setText(exporterName);
         layoutFile.setText(layoutFileName);
         extension.setText(extensionName);
@@ -71,6 +71,7 @@ class CustomExportDialog extends JDialog {
 
     public CustomExportDialog(final JabRefFrame parent) {
         super(parent, Localization.lang("Edit custom export"), true);
+        frame = parent;
         ActionListener okListener = e -> {
             Path layoutFileDir = Paths.get(layoutFile.getText()).getParent();
             if (layoutFileDir != null) {
@@ -104,7 +105,7 @@ class CustomExportDialog extends JDialog {
         cancel.addActionListener(e -> dispose());
 
         JButton browse = new JButton(Localization.lang("Browse"));
-        FileDialog dialog = new FileDialog(null).withExtension(FileExtensions.LAYOUT);
+        FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.LAYOUT);
         dialog.setDefaultExtension(FileExtensions.LAYOUT);
         browse.addActionListener(e ->
                 dialog.showDialogAndGetSelectedFile()

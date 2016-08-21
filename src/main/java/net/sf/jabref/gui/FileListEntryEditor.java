@@ -349,7 +349,6 @@ public class FileListEntryEditor {
 
     }
 
-
     private final ActionListener browsePressed = e -> {
         String filePath = link.getText().trim();
         Optional<File> file = FileUtil.expandFilename(this.databaseContext, filePath);
@@ -364,7 +363,6 @@ public class FileListEntryEditor {
         Optional<Path> path = new FileDialog(this.frame, workingDir).showDialogAndGetSelectedFile();
 
         path.ifPresent(selection -> {
-
             File newFile = selection.toFile();
             // Store the directory for next time:
             Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getPath());

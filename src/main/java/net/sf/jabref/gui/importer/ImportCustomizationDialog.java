@@ -155,7 +155,6 @@ public class ImportCustomizationDialog extends JDialog {
                                     + Localization.lang("Have you chosen the correct package path?"));
                 }
             }
-
         });
         addFromJarButton
                 .setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a ZIP-archive.")
