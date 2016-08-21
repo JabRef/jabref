@@ -6,6 +6,7 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.model.entry.BibEntry;
@@ -39,8 +40,8 @@ class TransferableEntrySelection implements Transferable {
     public TransferableEntrySelection(List<BibEntry> list) {
         this.selectedEntries = list;
         selectedEntriesCiteKeys = String.join(",",
-                this.selectedEntries.stream().map(BibEntry::getCiteKeyOptional).filter(key -> key.isPresent())
-                        .map(key -> key.get()).collect(Collectors.toList()));
+                this.selectedEntries.stream().map(BibEntry::getCiteKeyOptional).filter(Optional::isPresent)
+                        .map(Optional::get).collect(Collectors.toList()));
     }
 
     @Override
