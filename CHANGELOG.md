@@ -88,6 +88,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Removed option to disable entry editor when multiple entries are selected as it was not working
 - Removed option to show warning for empty key as it was not working
 - Removed option to show warning for duplicate key as it was not working
+- Removed preview toolbar (since long disabled)
 
 
 
