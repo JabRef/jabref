@@ -139,7 +139,7 @@ class FileTab extends JPanel implements PrefsTab {
         builder.append(lab);
         builder.append(fileDir);
 
-        JButton browse = new JButton();
+        JButton browse = new JButton(Localization.lang("Browse"));
         browse.addActionListener(e ->
                 new FileDialog(this.frame).showDialogAndGetSelectedDirectory()
                         .ifPresent(f -> fileDir.setText(f.toAbsolutePath().toString()))
