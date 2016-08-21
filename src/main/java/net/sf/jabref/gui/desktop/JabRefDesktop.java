@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.desktop;
 
 import java.io.File;
@@ -331,18 +316,12 @@ public class JabRefDesktop {
             if (!command.isEmpty()) {
                 command = command.replaceAll("\\s+", " "); // normalize white spaces
                 String[] subcommands = command.split(" ");
-                StringBuilder commandLoggingText = new StringBuilder();
 
-                for (int i = 0; i < subcommands.length; i++) {
-                    subcommands[i] = subcommands[i].replace("%DIR", absolutePath); // replace the placeholder if used
-                    commandLoggingText.append(subcommands[i]);
-                    if (i < (subcommands.length - 1)) {
-                        commandLoggingText.append(" ");
-                    }
-                }
+                // replace the placeholder if used
+                String commandLoggingText = command.replace("%DIR", absolutePath);
 
-                JabRefGUI.getMainFrame().output(Localization.lang("Executing command \"%0\"...", commandLoggingText.toString()));
-                LOGGER.info("Executing command \"" + commandLoggingText.toString() + "\"...");
+                JabRefGUI.getMainFrame().output(Localization.lang("Executing command \"%0\"...", commandLoggingText));
+                LOGGER.info("Executing command \"" + commandLoggingText + "\"...");
 
                 try {
                     new ProcessBuilder(subcommands).start();
@@ -350,7 +329,7 @@ public class JabRefDesktop {
                     LOGGER.error("Open console", exception);
 
                     JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(),
-                            Localization.lang("Error_occured_while_executing_the_command_\"%0\".", commandLoggingText.toString()),
+                            Localization.lang("Error_occured_while_executing_the_command_\"%0\".", commandLoggingText),
                             Localization.lang("Open console") + " - " + Localization.lang("Error"),
                             JOptionPane.ERROR_MESSAGE);
                     JabRefGUI.getMainFrame().output(null);

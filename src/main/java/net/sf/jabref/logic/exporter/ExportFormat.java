@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.exporter;
 
 import java.io.File;
@@ -32,7 +17,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefMain;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
@@ -177,7 +162,7 @@ public class ExportFormat implements IExportFormat {
         String name = dir + filename;
         Reader reader;
         // Try loading as a resource first. This works for files inside the JAR:
-        URL reso = Globals.class.getResource(name);
+        URL reso = JabRefMain.class.getResource(name);
 
         // If that did not work, try loading as a normal file URL:
         try {
@@ -304,7 +289,9 @@ public class ExportFormat implements IExportFormat {
                 }
 
                 // Write the entry
-                ps.write(layout.doLayout(entry, databaseContext.getDatabase()));
+                if (layout != null) {
+                    ps.write(layout.doLayout(entry, databaseContext.getDatabase()));
+                }
             }
 
             // Print footer
@@ -326,7 +313,7 @@ public class ExportFormat implements IExportFormat {
             }
 
             // Clear custom name formatters:
-            layoutPreferences.getCustomExportNameFormatters().clear();
+            layoutPreferences.clearCustomExportNameFormatters();
 
             if (!missingFormatters.isEmpty()) {
                 StringBuilder sb = new StringBuilder("The following formatters could not be found: ");
@@ -371,7 +358,7 @@ public class ExportFormat implements IExportFormat {
                     if ((index > 0) && ((index + 1) < line.length())) {
                         String formatterName = line.substring(0, index);
                         String contents = line.substring(index + 1);
-                        layoutPreferences.getCustomExportNameFormatters().put(formatterName, contents);
+                        layoutPreferences.putCustomExportNameFormatter(formatterName, contents);
                     }
                 }
 

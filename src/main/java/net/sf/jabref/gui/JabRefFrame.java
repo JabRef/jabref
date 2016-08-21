@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui;
 
 import java.awt.Component;
@@ -31,6 +16,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1583,10 +1569,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         if (tabCount > 0) {
             BasePanel current = getCurrentBasePanel();
-            if(current != null) {
-                boolean saved = current.getBibDatabaseContext().getDatabaseFile() != null;
-                setEnabled(openAndSavedDatabasesOnlyActions, saved);
-            }
+            boolean saved = current.getBibDatabaseContext().getDatabaseFile() != null;
+            setEnabled(openAndSavedDatabasesOnlyActions, saved);
             boolean isShared = current.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED;
             setEnabled(sharedDatabaseOnlyActions, isShared);
             setEnabled(noSharedDatabaseActions, !isShared);
@@ -1788,7 +1772,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * This method shows a wait cursor and blocks all input to the JFrame's contents.
      */
     public void block() {
-        getGlassPane().setVisible(true);
+        changeBlocking(true);
     }
 
     /**
@@ -1796,7 +1780,24 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * There are no adverse effects of calling this method redundantly.
      */
     public void unblock() {
-        getGlassPane().setVisible(false);
+        changeBlocking(false);
+    }
+
+    /**
+     * Do the actual blocking/unblocking
+     *
+     * @param blocked true if input should be blocked
+     */
+    private void changeBlocking(boolean blocked) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            getGlassPane().setVisible(blocked);
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(() -> getGlassPane().setVisible(blocked));
+            } catch (InvocationTargetException | InterruptedException e) {
+                LOGGER.error("Problem " + (blocked ? "" : "un") + "blocking UI", e);
+            }
+        }
     }
 
     /**
@@ -2322,12 +2323,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
 
         private void updateTexts(UndoChangeEvent event) {
-            if (JabRefFrame.this != null) {
-                undo.putValue(Action.SHORT_DESCRIPTION, event.getUndoDescription());
-                undo.setEnabled(event.isCanUndo());
-                redo.putValue(Action.SHORT_DESCRIPTION, event.getRedoDescription());
-                redo.setEnabled(event.isCanRedo());
-            }
+            SwingUtilities.invokeLater(() -> {
+                if (JabRefFrame.this != null) {
+                    undo.putValue(Action.SHORT_DESCRIPTION, event.getUndoDescription());
+                    undo.setEnabled(event.isCanUndo());
+                    redo.putValue(Action.SHORT_DESCRIPTION, event.getRedoDescription());
+                    redo.setEnabled(event.isCanRedo());
+                }
+            });
         }
     }
 }

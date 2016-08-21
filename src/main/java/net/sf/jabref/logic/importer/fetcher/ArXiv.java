@@ -1,20 +1,3 @@
-/*
- * Copyright (C) 2003-2016 JabRef contributors.
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-
 package net.sf.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
@@ -351,9 +334,9 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             bibEntry.setField(FieldName.AUTHOR, StringUtils.join(authorNames, " and "));
             bibEntry.addKeywords(categories, ", "); // TODO: Should use separator value from preferences
             getId().ifPresent(id -> bibEntry.setField(FieldName.EPRINT, id));
-            title.ifPresent(title -> bibEntry.setField(FieldName.TITLE, title));
-            doi.ifPresent(doi -> bibEntry.setField(FieldName.DOI, doi));
-            abstractText.ifPresent(abstractText -> bibEntry.setField(FieldName.ABSTRACT, abstractText));
+            title.ifPresent(titleContent -> bibEntry.setField(FieldName.TITLE, titleContent));
+            doi.ifPresent(doiContent -> bibEntry.setField(FieldName.DOI, doiContent));
+            abstractText.ifPresent(abstractContent -> bibEntry.setField(FieldName.ABSTRACT, abstractContent));
             getDate().ifPresent(date -> bibEntry.setField(FieldName.DATE, date));
             primaryCategory.ifPresent(category -> bibEntry.setField(FieldName.EPRINTCLASS, category));
             journalReferenceText.ifPresent(journal -> bibEntry.setField(FieldName.JOURNALTITLE, journal));

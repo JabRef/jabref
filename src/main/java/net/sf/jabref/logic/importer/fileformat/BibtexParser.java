@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
@@ -118,10 +103,6 @@ public class BibtexParser {
         }
     }
 
-    @Deprecated
-    public static BibEntry singleFromString(String bibtexString, ImportFormatPreferences importFormatPreferences) {
-        return BibtexParser.singleFromStringOptional(bibtexString, importFormatPreferences).orElse(null);
-    }
 
     /**
      * Parses BibtexEntries from the given string and returns one entry found (or null if none found)
@@ -131,7 +112,7 @@ public class BibtexParser {
      * @param bibtexString
      * @return An Optional<BibEntry>. Optional.empty() if non was found or an error occurred.
      */
-    public static Optional<BibEntry> singleFromStringOptional(String bibtexString,
+    public static Optional<BibEntry> singleFromString(String bibtexString,
             ImportFormatPreferences importFormatPreferences) {
         Collection<BibEntry> entries = BibtexParser.fromString(bibtexString, importFormatPreferences);
         if ((entries == null) || entries.isEmpty()) {
@@ -209,7 +190,7 @@ public class BibtexParser {
 
         // Instantiate meta data:
         try {
-            parserResult.setMetaData(MetaData.parse(meta, importFormatPreferences.getEncoding()));
+            parserResult.setMetaData(MetaData.parse(meta));
         } catch (ParseException exception) {
             parserResult.addWarning(exception.getLocalizedMessage());
         }
