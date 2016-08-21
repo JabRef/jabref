@@ -153,6 +153,10 @@ public class FileDialog {
      */
     public Optional<Path> showDialogAndGetSelectedDirectory() {
         fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setDialogTitle(Localization.lang("Select directory"));
+        fileChooser.setApproveButtonText(Localization.lang("Select"));
+        fileChooser.setApproveButtonToolTipText(Localization.lang("Select directory"));
+
         return showDialogAndGetSelectedFile();
     }
     /**
