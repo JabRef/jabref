@@ -242,12 +242,13 @@ public class BibDatabase {
      * @return true, if the entry contains the key, false if not
      */
     public synchronized boolean setCiteKeyForEntry(BibEntry entry, String key) {
+        Optional<String> oldKey = entry.getCiteKeyOptional();
         if (key == null) {
             entry.clearField(BibEntry.KEY_FIELD);
         } else {
             entry.setCiteKey(key);
         }
-        return duplicationChecker.checkForDuplicateKeyAndAdd(entry.getCiteKeyOptional(), Optional.ofNullable(key));
+        return duplicationChecker.checkForDuplicateKeyAndAdd(oldKey, Optional.ofNullable(key));
     }
 
     /**
