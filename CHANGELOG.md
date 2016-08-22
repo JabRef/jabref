@@ -30,6 +30,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Added filter to not show selected integrity checks
 - The contents of `crossref` and `related` will be automatically updated if a linked entry changes key
 - The information shown in the main table now resolves crossrefs and strings and it can be shown which fields are resolved in this way (Preferences -> Appearance -> Color codes for resolved fields)
+- The formatting of the main table is based on the actual field shown when using e.g. `title/author`
 - Enhance the entry customization dialog to give better visual feedback
 - It is now possible to generate a new BIB database from the citations in an OpenOffice/LibreOffice document
 - The arXiv fetcher now also supports free-text search queries

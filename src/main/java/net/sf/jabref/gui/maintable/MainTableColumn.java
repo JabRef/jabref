@@ -70,21 +70,6 @@ public class MainTableColumn {
         return joiner.toString();
     }
 
-    /**
-     * Checks whether the column should display names
-     * Relevant as name value format can be formatted.
-     *
-     * @return true if the bibtex fields contains author or editor
-     */
-    private boolean isNameColumn() {
-        for (String field : bibtexFields) {
-            if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public String getColumnName() {
         return columnName;
     }
@@ -105,18 +90,20 @@ public class MainTableColumn {
         if (bibtexFields.isEmpty()) {
             return null;
         }
+        boolean isNameColumn = false;
 
         Optional<String> content = Optional.empty();
         for (String field : bibtexFields) {
             content = BibDatabase.getResolvedField(field, entry, database.orElse(null));
             if (content.isPresent()) {
+                isNameColumn = InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES);
                 break;
             }
         }
 
         String result = content.orElse(null);
 
-        if (isNameColumn()) {
+        if (isNameColumn) {
             result = MainTableNameFormatter.formatName(result);
         }
 
