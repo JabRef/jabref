@@ -34,7 +34,7 @@ public class UndoableRemoveEntry extends AbstractUndoableJabRefEdit {
     @Override
     public String getPresentationName() {
         return Localization.lang("remove entry %0",
-                StringUtil.boldHTML(entry.getCiteKey(), ""));
+                StringUtil.boldHTML(entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
     }
 
     @Override

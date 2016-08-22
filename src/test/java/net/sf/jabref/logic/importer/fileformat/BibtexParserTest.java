@@ -404,7 +404,7 @@ public class BibtexParserTest {
         ParserResult result = BibtexParser.parse(new StringReader(firstEntry + secondEntry), importFormatPreferences);
 
         for (BibEntry entry : result.getDatabase().getEntries()) {
-            if (entry.getCiteKey().equals("canh05")) {
+            if (entry.getCiteKeyOptional().get().equals("canh05")) {
                 assertEquals(firstEntry, entry.getParsedSerialization());
             } else {
                 assertEquals(secondEntry, entry.getParsedSerialization());

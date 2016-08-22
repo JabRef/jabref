@@ -53,7 +53,7 @@ public class BibtexImporterTest {
 
         for (BibEntry entry : bibEntries) {
 
-            if (entry.getCiteKey().equals("aksin")) {
+            if (entry.getCiteKeyOptional().get().equals("aksin")) {
                 assertEquals(
                         Optional.of(
                                 "Aks{\\i}n, {\\\"O}zge and T{\\\"u}rkmen, Hayati and Artok, Levent and {\\c{C}}etinkaya, "
@@ -70,7 +70,7 @@ public class BibtexImporterTest {
                                 + "carbenes in {Mizoroki-Heck} reactions"),
                         entry.getFieldOptional("title"));
                 assertEquals(Optional.of("691"), entry.getFieldOptional("volume"));
-            } else if (entry.getCiteKey().equals("stdmodel")) {
+            } else if (entry.getCiteKeyOptional().get().equals("stdmodel")) {
                 assertEquals(Optional
                         .of("A \\texttt{set} with three members discussing the standard model of particle physics. " +
                                 "The \\texttt{crossref} field in the \\texttt{@set} entry and the \\texttt{entryset} field in " +
@@ -78,7 +78,7 @@ public class BibtexImporterTest {
                         entry.getFieldOptional("annotation"));
                 assertEquals(Optional.of("stdmodel"), entry.getFieldOptional("bibtexkey"));
                 assertEquals(Optional.of("glashow,weinberg,salam"), entry.getFieldOptional("entryset"));
-            } else if (entry.getCiteKey().equals("set")) {
+            } else if (entry.getCiteKeyOptional().get().equals("set")) {
                 assertEquals(Optional
                         .of("A \\texttt{set} with three members. The \\texttt{crossref} field in the \\texttt{@set} " +
                         "entry and the \\texttt{entryset} field in each set member entry is needed only when using " +
@@ -86,7 +86,7 @@ public class BibtexImporterTest {
                         entry.getFieldOptional("annotation"));
                 assertEquals(Optional.of("set"), entry.getFieldOptional("bibtexkey"));
                 assertEquals(Optional.of("herrmann,aksin,yoon"), entry.getFieldOptional("entryset"));
-            } else if (entry.getCiteKey().equals("Preissel2016")) {
+            } else if (entry.getCiteKeyOptional().get().equals("Preissel2016")) {
                 assertEquals(Optional.of("Heidelberg"), entry.getFieldOptional("address"));
                 assertEquals(Optional.of("Preißel, René"), entry.getFieldOptional("author"));
                 assertEquals(Optional.of("Preissel2016"), entry.getFieldOptional("bibtexkey"));

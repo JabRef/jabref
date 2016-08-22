@@ -1163,7 +1163,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     set = entry.hasField(fieldEditor.getFieldName());
                 } else {
                     set = !((entry.hasField(fieldEditor.getFieldName()))
-                            && toSet.equals(entry.getField(fieldEditor.getFieldName())));
+                            && toSet.equals(entry.getFieldOptional(fieldEditor.getFieldName()).orElse(null)));
                 }
 
                 if (set) {
@@ -1178,7 +1178,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                                     .format(toSet, fieldEditor.getFieldName());
                         }
 
-                        String oldValue = entry.getField(fieldEditor.getFieldName());
+                        String oldValue = entry.getFieldOptional(fieldEditor.getFieldName()).orElse(null);
 
                         if (toSet == null) {
                             entry.clearField(fieldEditor.getFieldName());

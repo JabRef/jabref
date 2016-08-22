@@ -51,7 +51,8 @@ public class RegexBasedSearchRule implements SearchRule {
 
         for (String field : bibEntry.getFieldNames()) {
             if (bibEntry.hasField(field)) {
-                String fieldContent = RegexBasedSearchRule.REMOVE_LATEX_COMMANDS.format(bibEntry.getField(field));
+                String fieldContent = RegexBasedSearchRule.REMOVE_LATEX_COMMANDS
+                        .format(bibEntry.getFieldOptional(field).get());
                 String fieldContentNoBrackets = RegexBasedSearchRule.REMOVE_LATEX_COMMANDS.format(fieldContent);
                 Matcher m = pattern.matcher(fieldContentNoBrackets);
                 if (m.find()) {

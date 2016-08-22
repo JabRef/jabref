@@ -86,7 +86,7 @@ public class CrossRef {
 
     private static boolean checkValidity(BibEntry entry, JSONArray result) {
         // TODO: use latex-free version instead in the future
-        final String entryTitle = removeLaTeX(entry.getField(FieldName.TITLE));
+        final String entryTitle = entry.getFieldOptional(FieldName.TITLE).map(CrossRef::removeLaTeX).orElse("");
 
         // currently only title-based
         // title: [ "How the Mind Hurts and Heals the Body." ]

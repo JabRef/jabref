@@ -33,7 +33,8 @@ public class UndoableInsertEntry extends AbstractUndoableJabRefEdit {
 
     @Override
     public String getPresentationName() {
-        return Localization.lang("insert entry %0", StringUtil.boldHTML(entry.getCiteKey(), ""));
+        return Localization.lang("insert entry %0",
+                StringUtil.boldHTML(entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
     }
 
     @Override
