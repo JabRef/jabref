@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -21,9 +20,7 @@ public class BibDatabaseTestsWithFiles {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance(); // set preferences for this test
-
-        importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
     }
 
     @Test

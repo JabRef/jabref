@@ -21,7 +21,7 @@ public class ImportFormatReaderTestParameterless {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
+        Globals.prefs = JabRefPreferences.getInstance(); // Needed for special fields
         reader = new ImportFormatReader();
         reader.resetImportFormats(ImportFormatPreferences.fromPreferences(Globals.prefs),
                 XMPPreferences.fromPreferences(Globals.prefs));

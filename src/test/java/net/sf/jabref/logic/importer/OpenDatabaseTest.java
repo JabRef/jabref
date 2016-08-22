@@ -42,13 +42,13 @@ public class OpenDatabaseTest {
 
     @BeforeClass
     public static void setUpGlobalsPrefs() {
-        // otherwise FieldContentParser (called by BibtexParser) crashes
+        // otherwise FieldContentParser (called by BibtexParser) and SpecialFields crashes
         Globals.prefs = JabRefPreferences.getInstance();
     }
 
     @Before
     public void setUp() {
-        importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
     }
 
     @Test
