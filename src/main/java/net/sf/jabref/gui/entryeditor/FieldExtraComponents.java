@@ -398,21 +398,6 @@ public class FieldExtraComponents {
     }
 
     /**
-     * Set up a drop target for URLs for fields with EXTRA_URL
-     *
-     * @param fieldEditor
-     * @param storeFieldAction
-     * @return
-     */
-    public static Optional<JComponent> getURLExtraComponent(FieldEditor fieldEditor,
-            StoreFieldAction storeFieldAction) {
-        ((JComponent) fieldEditor).setDropTarget(new DropTarget((Component) fieldEditor, DnDConstants.ACTION_NONE,
-                new SimpleUrlDragDrop(fieldEditor, storeFieldAction)));
-
-        return Optional.empty();
-    }
-
-    /**
      * Return a button opening a content selector for fields where one exists
      *
      * @param frame

@@ -5,7 +5,6 @@ import java.util.Set;
 
 public enum FieldProperties {
     YES_NO,
-    URL,
     DATE,
     JOURNAL_NAME,
     EXTERNAL,
