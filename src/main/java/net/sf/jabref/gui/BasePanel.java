@@ -1721,6 +1721,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void highlightEntry(final BibEntry be) {
         final int row = mainTable.findEntry(be);
         if (row >= 0) {
+//            the selection has to be cleared in case that a duplicate later in the list is selected thus the editor doesn't get refreshed
+            mainTable.clearSelection();
             mainTable.setRowSelectionInterval(row, row);
             mainTable.ensureVisible(row);
         }
@@ -1838,17 +1840,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         }
         frame.setWindowTitle();
-    }
-
-    /**
-     * Selects a single entry, and scrolls the table to center it.
-     *
-     * @param pos Current position of entry to select.
-     */
-    public void selectSingleEntry(int pos) {
-        mainTable.clearSelection();
-        mainTable.addRowSelectionInterval(pos, pos);
-        mainTable.scrollToCenter(pos, 0);
     }
 
     public BibDatabase getDatabase() {
