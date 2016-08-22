@@ -23,6 +23,7 @@ import net.sf.jabref.model.event.FieldChangedEvent;
 import net.sf.jabref.shared.event.ConnectionLostEvent;
 import net.sf.jabref.shared.event.SharedEntryNotPresentEvent;
 import net.sf.jabref.shared.event.UpdateRefusedEvent;
+import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.exception.OfflineLockException;
 import net.sf.jabref.shared.exception.SharedEntryNotPresentException;
 
@@ -119,16 +120,19 @@ public class DBMSSynchronizer {
      * Sets the table structure of shared database if needed and pulls all shared entries
      * to the new local database.
      * @param bibDatabase Local {@link BibDatabase}
+     * @throws DatabaseNotSupportedException if the version of shared database does not match
+     *          the version of current shared database support ({@link DBMSProcessor}).
      */
-    public void initializeDatabases() {
-        try {
-            if (!dbmsProcessor.checkBaseIntegrity()) {
-                LOGGER.info(Localization.lang("Integrity check failed. Fixing..."));
-                dbmsProcessor.setUpSharedDatabase();
+    public void initializeDatabases() throws DatabaseNotSupportedException, SQLException {
+        if (!dbmsProcessor.checkBaseIntegrity()) {
+            LOGGER.info(Localization.lang("Integrity check failed. Fixing..."));
+            dbmsProcessor.setUpSharedDatabase();
+
+            if (dbmsProcessor.checkOldIntergrity()) {
+                throw new DatabaseNotSupportedException();
             }
-        } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
         }
+
         synchronizeLocalMetaData();
         synchronizeLocalDatabase();
     }
@@ -321,7 +325,7 @@ public class DBMSSynchronizer {
         return ((eventSource == EntryEventSource.LOCAL) || (eventSource == EntryEventSource.UNDO));
     }
 
-    public void openSharedDatabase(Connection connection, DBMSType type, String name) {
+    public void openSharedDatabase(Connection connection, DBMSType type, String name) throws DatabaseNotSupportedException, SQLException {
         this.dbmsType = type;
         this.dbName = name;
         this.currentConnection = connection;
@@ -329,7 +333,7 @@ public class DBMSSynchronizer {
         initializeDatabases();
     }
 
-    public void openSharedDatabase(DBMSConnectionProperties properties) throws ClassNotFoundException, SQLException {
+    public void openSharedDatabase(DBMSConnectionProperties properties) throws ClassNotFoundException, SQLException, DatabaseNotSupportedException {
         openSharedDatabase(DBMSConnector.getNewConnection(properties), properties.getType(), properties.getDatabase());
     }
 

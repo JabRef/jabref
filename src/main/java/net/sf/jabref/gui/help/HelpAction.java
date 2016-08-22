@@ -1,11 +1,16 @@
 package net.sf.jabref.gui.help;
 
+import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 
 import net.sf.jabref.Globals;
@@ -57,12 +62,29 @@ public class HelpAction extends MnemonicAwareAction {
         return button;
     }
 
+    public JLabel getHelpLabel(String labelText) {
+        JLabel helpLabel = new JLabel("<html><u>" + labelText + "</u></html>");
+        helpLabel.setForeground(Color.BLUE);
+        helpLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        helpLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                callHelpPage();
+            }
+        });
+        return helpLabel;
+    }
+
     public void setHelpFile(HelpFile urlPart) {
         this.helpPage = urlPart;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        callHelpPage();
+    }
+
+    public void callHelpPage() {
         String url = "https://help.jabref.org/" + Globals.prefs.get(JabRefPreferences.LANGUAGE) + "/" + helpPage.getPageName();
         JabRefDesktop.openBrowserShowPopup(url);
     }

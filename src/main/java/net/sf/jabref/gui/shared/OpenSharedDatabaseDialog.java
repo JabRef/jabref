@@ -35,6 +35,7 @@ import net.sf.jabref.model.database.DatabaseLocation;
 import net.sf.jabref.shared.DBMSConnectionProperties;
 import net.sf.jabref.shared.DBMSConnector;
 import net.sf.jabref.shared.DBMSType;
+import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
@@ -70,6 +71,9 @@ public class OpenSharedDatabaseDialog extends JDialog {
     private static final String SHARED_DATABASE_NAME = "sharedDatabaseName";
     private static final String SHARED_DATABASE_USER = "sharedDatabaseUser";
 
+    private DBMSConnectionProperties connectionProperties;
+    private BibDatabaseContext bibDatabaseContext;
+
 
     /**
      * @param frame the JabRef Frame
@@ -84,6 +88,25 @@ public class OpenSharedDatabaseDialog extends JDialog {
         setLocationRelativeTo(frame);
     }
 
+    public void openSharedDatabase() {
+        try {
+            bibDatabaseContext.getDBSynchronizer().openSharedDatabase(connectionProperties);
+            frame.addTab(bibDatabaseContext, true);
+            setGlobalPrefs();
+            bibDatabaseContext.getDBSynchronizer().registerListener(new SharedDatabaseUIManager(frame));
+            frame.output(Localization.lang("Connection_to_%0_server_stablished.", connectionProperties.getType().toString()));
+            dispose();
+        } catch (ClassNotFoundException exception) {
+            JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this, exception.getMessage(),
+                    Localization.lang("Driver error"), JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException exception) {
+            JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this, exception.getMessage(),
+                    Localization.lang("Connection error"), JOptionPane.ERROR_MESSAGE);
+        } catch (DatabaseNotSupportedException exception) {
+            new MigrationHelpDialog(this).setVisible(true);
+        }
+    }
+
     /**
      * Defines and sets the different actions up.
      */
@@ -96,10 +119,10 @@ public class OpenSharedDatabaseDialog extends JDialog {
                     checkFields();
                     BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
 
-                    BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode),
+                    bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode),
                             DatabaseLocation.SHARED);
 
-                    DBMSConnectionProperties connectionProperties = new DBMSConnectionProperties();
+                    connectionProperties = new DBMSConnectionProperties();
                     connectionProperties.setType((DBMSType) dbmsTypeDropDown.getSelectedItem());
                     connectionProperties.setHost(hostField.getText());
                     connectionProperties.setPort(Integer.parseInt(portField.getText()));
@@ -107,21 +130,8 @@ public class OpenSharedDatabaseDialog extends JDialog {
                     connectionProperties.setUser(userField.getText());
                     connectionProperties.setPassword(new String(passwordField.getPassword())); //JPasswordField.getPassword() does not return a String, but a char array.
 
-                    bibDatabaseContext.getDBSynchronizer().openSharedDatabase(connectionProperties);
+                    openSharedDatabase();
 
-                    frame.addTab(bibDatabaseContext, true);
-
-                    setGlobalPrefs();
-
-                    bibDatabaseContext.getDBSynchronizer().registerListener(new SharedDatabaseUIManager(frame));
-                    frame.output(Localization.lang("Connection_to_%0_server_stablished.", connectionProperties.getType().toString()));
-                    dispose();
-                } catch (ClassNotFoundException exception) {
-                    JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this, exception.getMessage(), Localization.lang("Driver error"),
-                            JOptionPane.ERROR_MESSAGE);
-                } catch (SQLException exception) {
-                    JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this, exception.getMessage(),
-                            Localization.lang("Connection error"), JOptionPane.ERROR_MESSAGE);
                 } catch (JabRefException exception) {
                     JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this, exception.getMessage(),
                             Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
@@ -129,14 +139,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
             }
         };
         connectButton.addActionListener(openAction);
-
-        Action cancelAction = new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
-            }
-        };
-        cancelButton.addActionListener(cancelAction);
+        cancelButton.addActionListener(e -> dispose());
 
         /**
          * Set up a listener which updates the default port number once the selection in dbmsTypeDropDown has changed.

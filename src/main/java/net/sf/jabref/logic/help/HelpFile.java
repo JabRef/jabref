@@ -48,7 +48,8 @@ public enum HelpFile {
     FETCHER_SCIENCEDIRECT(""),
     FETCHER_BIBSONOMY_SCRAPER(""),
     DATABASE_PROPERTIES("DatabaseProperties"),
-    FIND_DUPLICATES("FindDuplicates");
+    FIND_DUPLICATES("FindDuplicates"),
+    MIGRATE_OLD_DATABASE("migrateOldDatabase");
 
     private final String pageName;
 

@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,9 +45,36 @@ public abstract class DBMSProcessor {
      * @throws SQLException
      */
     public boolean checkBaseIntegrity() throws SQLException {
-        List<String> requiredTables = new ArrayList<>(Arrays.asList("ENTRY", "FIELD", "METADATA")); // the list should be dynamic
-        DatabaseMetaData databaseMetaData = connection.getMetaData();
+        return checkTableAvailibility("ENTRY", "FIELD", "METADATA");
+    }
 
+    /**
+     * Determines whether the database is using an old structure.
+     * @return <code>true</code> if the structure is old, else <code>false</code>.
+     */
+    public boolean checkOldIntergrity() throws SQLException {
+        return checkTableAvailibility(
+                "ENTRIES",
+                "ENTRY_GROUP",
+                "ENTRY_TYPES",
+                "GROUPS",
+                "GROUP_TYPES",
+                "JABREF_DATABASE",
+                "STRINGS"); // old tables
+    }
+
+    /**
+     * Checks whether all given table names (<b>case insensitive</b>) exist in database.
+     * @param tableNames Table names to be checked
+     * @return <code>true</code> if <b>all</b> given tables are present, else <code>false</code>.
+     */
+    private boolean checkTableAvailibility(String... tableNames) throws SQLException {
+        List<String> requiredTables = new ArrayList<>();
+        for (String name : tableNames) {
+            requiredTables.add(name.toUpperCase());
+        }
+
+        DatabaseMetaData databaseMetaData = connection.getMetaData();
         // ...getTables(null, ...): no restrictions
         try (ResultSet databaseMetaDataResultSet = databaseMetaData.getTables(null, null, null, null)) {
             while (databaseMetaDataResultSet.next()) {
@@ -58,7 +84,6 @@ public abstract class DBMSProcessor {
             return requiredTables.isEmpty();
         }
     }
-
 
     /**
      * Creates and sets up the needed tables and columns according to the database type and
