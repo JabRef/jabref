@@ -1,5 +1,6 @@
 package net.sf.jabref.gui.shared;
 
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -29,6 +30,8 @@ import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefException;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.DatabaseLocation;
@@ -36,8 +39,6 @@ import net.sf.jabref.shared.DBMSConnectionProperties;
 import net.sf.jabref.shared.DBMSConnector;
 import net.sf.jabref.shared.DBMSType;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
-
-import com.jgoodies.forms.builder.ButtonBarBuilder;
 
 public class OpenSharedDatabaseDialog extends JDialog {
 
@@ -64,6 +65,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
 
     private final JButton connectButton = new JButton(Localization.lang("Connect"));
     private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
+    private final JButton helpButton = new HelpAction(HelpFile.SQL_DATABASE).getHelpButton();
 
     private static final String SHARED_DATABASE_TYPE = "sharedDatabaseType";
     private static final String SHARED_DATABASE_HOST = "sharedDatabaseHost";
@@ -263,24 +265,28 @@ public class OpenSharedDatabaseDialog extends JDialog {
         gridBagConstraints.insets = new Insets(4, 0, 4, 4);
         connectionPanel.add(portField, gridBagConstraints);
 
-        gridBagConstraints.insets = new Insets(4, 4, 4, 4);
+        // help button
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = 5;
+        gridBagConstraints.insets = new Insets(10, 10, 0, 0);
+        JPanel helpPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        helpPanel.add(helpButton);
+        connectionPanel.add(helpPanel, gridBagConstraints);
 
-        ButtonBarBuilder bsb = new ButtonBarBuilder(buttonPanel);
-        bsb.addGlue();
-        bsb.addButton(connectButton);
-        bsb.addRelatedGap();
-        bsb.addButton(cancelButton);
+        // control buttons
+        gridBagConstraints.gridx = 1;
+        buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+        buttonPanel.add(connectButton);
+        buttonPanel.add(cancelButton);
+        connectionPanel.add(buttonPanel, gridBagConstraints);
 
+        // add panel
         getContentPane().setLayout(gridBagLayout);
-
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagLayout.setConstraints(connectionPanel, gridBagConstraints);
         getContentPane().add(connectionPanel);
-        gridBagConstraints.gridy = 1;
-        gridBagConstraints.insets = new Insets(10, 0, 12, 13);
-        gridBagLayout.setConstraints(buttonPanel, gridBagConstraints);
-        getContentPane().add(buttonPanel);
 
         setModal(true); // Owner window should be disabled while this dialog is opened.
     }

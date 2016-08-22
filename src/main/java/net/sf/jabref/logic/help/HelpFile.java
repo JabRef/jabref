@@ -49,7 +49,8 @@ public enum HelpFile {
     FETCHER_BIBSONOMY_SCRAPER(""),
     DATABASE_PROPERTIES("DatabaseProperties"),
     FIND_DUPLICATES("FindDuplicates"),
-    SQL_DATABASE_MIGRATION("SQLDatabaseMigration");
+    SQL_DATABASE_MIGRATION("SQLDatabaseMigration"),
+    SQL_DATABASE("SQLDatabase");
 
     private final String pageName;
 
