@@ -36,7 +36,7 @@ public class MigrationHelpDialog extends JDialog {
         JLabel helpLabel = new HelpAction(HelpFile.SQL_DATABASE_MIGRATION).getHelpLabel(helpMessage);
         helpLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        String informationMessage = Localization.lang("However a new database was created alongside the pre-3.6 one.");
+        String informationMessage = Localization.lang("However, a new database was created alongside the pre-3.6 one.");
         JLabel informationLabel = new JLabel(informationMessage);
         informationLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
