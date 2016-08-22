@@ -36,8 +36,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class MetaData implements Iterable<String> {
-
     private static final Log LOGGER = LogFactory.getLog(MetaData.class);
+
     public static final String META_FLAG = "jabref-meta: ";
     private static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
 
