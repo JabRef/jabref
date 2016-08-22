@@ -46,7 +46,6 @@ import org.apache.commons.logging.LogFactory;
 // The action concerned with opening an existing database.
 
 public class OpenDatabaseAction extends MnemonicAwareAction {
-
     public static final Log LOGGER = LogFactory.getLog(OpenDatabaseAction.class);
 
     private final boolean showDialog;
@@ -66,7 +65,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // Add the action for warning about and handling duplicate BibTeX keys:
         POST_OPEN_ACTIONS.add(new HandleDuplicateWarnings());
     }
-
 
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
         super(IconTheme.JabRefIcon.OPEN.getIcon());
@@ -93,7 +91,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         openFiles(filesToOpen, true);
     }
-
 
     /**
      * Opens the given file. If null or 404, nothing happens
@@ -205,7 +202,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             boolean done = false;
             while (!done) {
                 String fileName = file.getPath();
-                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getPath());
+                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
                 // Should this be done _after_ we know it was successfully opened?
 
                 if (FileBasedLock.hasLockFile(file.toPath())) {
