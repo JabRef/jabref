@@ -20,6 +20,7 @@ import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -97,7 +98,9 @@ public class MoveFileAction extends AbstractAction {
                     // Determine which name to suggest:
                     String suggName = FileUtil
                             .createFileNameFromPattern(eEditor.getDatabase(), eEditor.getEntry(),
-                                    Globals.journalAbbreviationLoader, Globals.prefs)
+                                    Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
+                                    LayoutFormatterPreferences.fromPreferences(Globals.prefs,
+                                            Globals.journalAbbreviationLoader))
                             .concat(entry.type.isPresent() ? "." + entry.type.get().getExtension() : "");
                     CheckBoxMessage cbm = new CheckBoxMessage(Localization.lang("Move file to file directory?"),
                             Localization.lang("Rename to '%0'", suggName),

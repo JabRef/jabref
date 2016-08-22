@@ -18,9 +18,11 @@ import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -255,8 +257,9 @@ public class DownloadExternalFile {
     // FIXME: will break download if no bibtexkey is present!
     private String getSuggestedFileName(String suffix) {
         String plannedName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(),
-                frame.getCurrentBasePanel().getSelectedEntries().get(0), Globals.journalAbbreviationLoader,
-                Globals.prefs);
+                frame.getCurrentBasePanel().getSelectedEntries().get(0),
+                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
 
         if (!suffix.isEmpty()) {
             plannedName += "." + suffix;

@@ -17,6 +17,7 @@ import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.cleanup.CleanupWorker;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -146,7 +147,9 @@ public class CleanupAction extends AbstractWorker {
     private void doCleanup(CleanupPreset preset, BibEntry entry, NamedCompound ce) {
         // Create and run cleaner
         BibDatabaseContext bibDatabaseContext = panel.getBibDatabaseContext();
-        CleanupWorker cleaner = new CleanupWorker(bibDatabaseContext, Globals.journalAbbreviationLoader, Globals.prefs);
+        CleanupWorker cleaner = new CleanupWorker(bibDatabaseContext,
+                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
         List<FieldChange> changes = cleaner.cleanup(preset, entry);
 
         unsuccessfulRenames = cleaner.getUnsuccessfulRenames();

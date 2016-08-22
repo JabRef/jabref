@@ -88,8 +88,10 @@ import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
-import net.sf.jabref.logic.util.date.TimeStamp;
+import net.sf.jabref.logic.util.UpdateField;
+import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
@@ -1129,11 +1131,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                 // Add an UndoableKeyChange to the baseframe's undoManager.
                 UndoableKeyChange undoableKeyChange = new UndoableKeyChange(panel.getDatabase(), entry, oldValue, newValue);
-                if (TimeStamp.updateTimeStampIsSet(Globals.prefs)) {
+                if (updateTimeStampIsSet()) {
                     NamedCompound ce = new NamedCompound(undoableKeyChange.getPresentationName());
                     ce.addEdit(undoableKeyChange);
-                    TimeStamp.doUpdateTimeStamp(entry, Globals.prefs)
-                            .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
+                    doUpdateTimeStamp().ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
                     ce.end();
                     panel.getUndoManager().addEdit(ce);
                 } else {
@@ -1196,11 +1197,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                         // Add an UndoableFieldChange to the baseframe's undoManager.
                         UndoableFieldChange undoableFieldChange = new UndoableFieldChange(entry, fieldEditor.getFieldName(), oldValue, toSet);
-                        if (TimeStamp.updateTimeStampIsSet(Globals.prefs)) {
+                        if (updateTimeStampIsSet()) {
                             NamedCompound ce = new NamedCompound(undoableFieldChange.getPresentationName());
                             ce.addEdit(undoableFieldChange);
 
-                            TimeStamp.doUpdateTimeStamp(entry, Globals.prefs)
+                            doUpdateTimeStamp()
                                     .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
                             ce.end();
 
@@ -1501,6 +1502,22 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 localFileListEditor.autoSetLinks();
             }
         }
+    }
+
+
+    private boolean updateTimeStampIsSet() {
+        return Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP)
+                && Globals.prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP);
+    }
+
+    /**
+     * Updates the timestamp of the given entry and returns the FieldChange
+     */
+    private Optional<FieldChange> doUpdateTimeStamp() {
+        String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
+        String timeStampFormat = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT);
+        String timestamp = EasyDateFormat.fromTimeStampFormat(timeStampFormat).getCurrentDate();
+        return UpdateField.updateField(entry, timeStampField, timestamp);
     }
 
 }
