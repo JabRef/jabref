@@ -13,11 +13,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.codec.Charsets;
 import org.junit.Assert;
@@ -38,7 +36,6 @@ public class MedlinePlainImporterTest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
         importer = new MedlinePlainImporter();
     }
 

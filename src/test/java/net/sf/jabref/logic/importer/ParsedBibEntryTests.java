@@ -2,7 +2,6 @@ package net.sf.jabref.logic.importer;
 
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -18,10 +17,7 @@ public class ParsedBibEntryTests {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-
-
-        importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
+        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
     }
 
     @Test

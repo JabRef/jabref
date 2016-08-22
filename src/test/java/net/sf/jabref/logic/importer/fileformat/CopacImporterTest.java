@@ -12,10 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,7 +41,6 @@ public class CopacImporterTest {
 
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
         importer = new CopacImporter();
     }
 

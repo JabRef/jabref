@@ -28,7 +28,6 @@ import java.util.TimeZone;
 
 import javax.xml.transform.TransformerException;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.cli.XMPUtilMain;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
@@ -241,12 +240,6 @@ public class XMPUtilTest {
             pdf.addPage(new PDPage()); // Need page to open in Acrobat
             pdf.save(pdfFile.getAbsolutePath());
         }
-
-        // Don't forget to initialize the preferences
-        if (Globals.prefs == null) {
-            Globals.prefs = JabRefPreferences.getInstance();
-        }
-
 
         // Store Privacy Settings
         prefs = JabRefPreferences.getInstance();

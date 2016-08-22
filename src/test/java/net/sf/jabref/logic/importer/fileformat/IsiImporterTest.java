@@ -10,12 +10,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -34,11 +31,6 @@ public class IsiImporterTest {
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
-
-    @BeforeClass
-    public static void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
 
     @Test
     public void testParseMonthException() {

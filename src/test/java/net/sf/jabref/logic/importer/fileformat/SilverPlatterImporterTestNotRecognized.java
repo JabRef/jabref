@@ -7,9 +7,6 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.preferences.JabRefPreferences;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +20,6 @@ public class SilverPlatterImporterTestNotRecognized {
 
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
         testImporter = new SilverPlatterImporter();
     }
 

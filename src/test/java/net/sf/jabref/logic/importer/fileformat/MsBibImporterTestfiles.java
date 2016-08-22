@@ -9,10 +9,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -32,7 +30,6 @@ public class MsBibImporterTestfiles {
 
     @Before
     public void setUp() throws URISyntaxException {
-        Globals.prefs = JabRefPreferences.getInstance();
         xmlFile = Paths.get(MsBibImporter.class.getResource(fileName + ".xml").toURI());
     }
 
