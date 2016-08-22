@@ -1,9 +1,6 @@
 package net.sf.jabref.gui.entryeditor;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
