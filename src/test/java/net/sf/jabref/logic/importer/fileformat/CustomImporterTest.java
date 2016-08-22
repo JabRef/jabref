@@ -4,9 +4,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.preferences.JabRefPreferences;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,7 +17,6 @@ public class CustomImporterTest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
         importer = new CustomImporter(new CopacImporter());
     }
 

@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.xmp.XMPPreferences;
@@ -31,7 +30,6 @@ public class PdfXmpImporterTest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
         importer = new PdfXmpImporter(XMPPreferences.fromPreferences(JabRefPreferences.getInstance()));
     }
 

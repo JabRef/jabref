@@ -11,18 +11,9 @@ import net.sf.jabref.model.entry.BibEntry;
 
 public class BibtexTestData {
 
-    public static BibEntry getBibtexEntry() throws IOException {
-        BibDatabase database = getBibtexDatabase();
-        return database.getEntryByKey("HipKro03").get();
-    }
-
     public static BibEntry getBibtexEntry(ImportFormatPreferences importFormatPreferences) throws IOException {
         BibDatabase database = getBibtexDatabase(importFormatPreferences);
         return database.getEntryByKey("HipKro03").get();
-    }
-
-    public static BibDatabase getBibtexDatabase() throws IOException {
-        return getBibtexDatabase(ImportFormatPreferences.fromPreferences(Globals.prefs));
     }
 
     public static BibDatabase getBibtexDatabase(ImportFormatPreferences importFormatPreferences) throws IOException {

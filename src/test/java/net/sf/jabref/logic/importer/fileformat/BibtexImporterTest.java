@@ -8,7 +8,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
@@ -34,8 +33,7 @@ public class BibtexImporterTest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-        importer = new BibtexImporter(ImportFormatPreferences.fromPreferences(Globals.prefs));
+        importer = new BibtexImporter(ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
     }
 
     @Test

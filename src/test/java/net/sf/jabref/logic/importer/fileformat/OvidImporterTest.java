@@ -11,11 +11,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,7 +26,6 @@ public class OvidImporterTest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
         importer = new OvidImporter();
     }
 

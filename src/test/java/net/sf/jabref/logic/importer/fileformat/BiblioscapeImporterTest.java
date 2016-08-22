@@ -5,9 +5,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.FileExtensions;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,7 +18,6 @@ public class BiblioscapeImporterTest {
 
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
         importer = new BiblioscapeImporter();
     }
 
