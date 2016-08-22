@@ -33,6 +33,7 @@ import java.util.stream.Collectors;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 
+import net.sf.jabref.FileDirectoryPreferences;
 import net.sf.jabref.JabRefException;
 import net.sf.jabref.JabRefMain;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
@@ -1424,7 +1425,7 @@ public class JabRefPreferences {
     public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
         return new BibtexKeyPatternPreferences(get(DEFAULT_BIBTEX_KEY_PATTERN), get(KEY_PATTERN_REGEX),
                 get(KEY_PATTERN_REPLACEMENT), getBoolean(KEY_GEN_ALWAYS_ADD_LETTER), getBoolean(KEY_GEN_FIRST_LETTER_A),
-                getBoolean(ENFORCE_LEGAL_BIBTEX_KEY));
+                getBoolean(ENFORCE_LEGAL_BIBTEX_KEY), getKeyPattern());
     }
 
     public LayoutFormatterPreferences getLayoutFormatterPreferences(

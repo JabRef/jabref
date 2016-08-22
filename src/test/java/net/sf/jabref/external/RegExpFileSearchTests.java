@@ -34,7 +34,6 @@ public class RegExpFileSearchTests {
 
     @Before
     public void setUp() throws IOException {
-        Globals.prefs = JabRefPreferences.getInstance();
 
         StringReader reader = new StringReader(
                 "@ARTICLE{HipKro03," + "\n" + "  author = {Eric von Hippel and Georg von Krogh}," + "\n"
@@ -45,7 +44,7 @@ public class RegExpFileSearchTests {
                         + "\n" + "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n"
                         + "  issn = {1526-5455}," + "\n" + "  publisher = {INFORMS}" + "\n" + "}");
 
-        BibtexParser parser = new BibtexParser(reader, Globals.prefs.getImportFormatPreferences());
+        BibtexParser parser = new BibtexParser(reader, JabRefPreferences.getInstance().getImportFormatPreferences());
         ParserResult result = null;
 
         result = parser.parse();

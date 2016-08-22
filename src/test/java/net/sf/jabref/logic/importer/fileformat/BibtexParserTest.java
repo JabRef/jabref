@@ -29,6 +29,7 @@ import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
@@ -55,7 +56,6 @@ public class BibtexParserTest {
 
     @BeforeClass
     public static void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
         importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
     }
 
@@ -1465,10 +1465,10 @@ public class BibtexParserTest {
                 .parse(new StringReader("@comment{jabref-meta: keypattern_article:articleTest;}" + OS.NEWLINE
                         + "@comment{jabref-meta: keypatterndefault:test;}"), importFormatPreferences);
 
-        AbstractBibtexKeyPattern bibtexKeyPattern = result.getMetaData()
-                .getBibtexKeyPattern(Globals.prefs.getKeyPattern());
+        GlobalBibtexKeyPattern pattern = JabRefPreferences.getInstance().getKeyPattern();
+        AbstractBibtexKeyPattern bibtexKeyPattern = result.getMetaData().getBibtexKeyPattern(pattern);
 
-        AbstractBibtexKeyPattern expectedPattern = new DatabaseBibtexKeyPattern(Globals.prefs.getKeyPattern());
+        AbstractBibtexKeyPattern expectedPattern = new DatabaseBibtexKeyPattern(pattern);
         expectedPattern.setDefaultValue("test");
         expectedPattern.addBibtexKeyPattern("article", "articleTest");
 
