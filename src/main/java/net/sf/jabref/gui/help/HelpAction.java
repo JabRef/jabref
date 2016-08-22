@@ -69,7 +69,7 @@ public class HelpAction extends MnemonicAwareAction {
         helpLabel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                callHelpPage();
+                openHelpPage();
             }
         });
         return helpLabel;
@@ -81,10 +81,10 @@ public class HelpAction extends MnemonicAwareAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        callHelpPage();
+        openHelpPage();
     }
 
-    private void callHelpPage() {
+    private void openHelpPage() {
         String url = "https://help.jabref.org/" + Globals.prefs.get(JabRefPreferences.LANGUAGE) + "/" + helpPage.getPageName();
         JabRefDesktop.openBrowserShowPopup(url);
     }
