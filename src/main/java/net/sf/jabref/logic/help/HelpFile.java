@@ -49,7 +49,7 @@ public enum HelpFile {
     FETCHER_BIBSONOMY_SCRAPER(""),
     DATABASE_PROPERTIES("DatabaseProperties"),
     FIND_DUPLICATES("FindDuplicates"),
-    MIGRATE_OLD_DATABASE("migrateOldDatabase");
+    SQL_DATABASE_MIGRATION("SQLDatabaseMigration");
 
     private final String pageName;
 
