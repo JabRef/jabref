@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import javax.swing.AbstractAction;
@@ -175,7 +176,12 @@ public class DatabasePropertiesDialog extends JDialog {
     }
 
     private void setValues() {
-        encoding.setSelectedItem(panel.getBibDatabaseContext().getMetaData().getEncoding());
+        Optional<Charset> charset = panel.getBibDatabaseContext().getMetaData().getEncoding();
+        if (charset.isPresent()) {
+            encoding.setSelectedItem(charset.get());
+        } else {
+            encoding.setSelectedItem(StandardCharsets.UTF_8);
+        }
 
         Optional<SaveOrderConfig> storedSaveOrderConfig = metaData.getSaveOrderConfig();
         boolean selected;
