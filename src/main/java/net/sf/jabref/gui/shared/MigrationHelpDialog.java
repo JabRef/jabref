@@ -28,7 +28,7 @@ public class MigrationHelpDialog extends JDialog {
         super(openSharedDatabaseDialog, Localization.lang("Migration help information"));
         setModal(true);
 
-        String migrationMessage = Localization.lang("Entered database has obsolete structure and is not longer supported.");
+        String migrationMessage = Localization.lang("Entered database has obsolete structure and is no longer supported.");
         JLabel migrationLabel = new JLabel(migrationMessage);
         migrationLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 

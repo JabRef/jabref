@@ -128,7 +128,7 @@ public class DBMSSynchronizer {
             LOGGER.info(Localization.lang("Integrity check failed. Fixing..."));
             dbmsProcessor.setUpSharedDatabase();
 
-            if (dbmsProcessor.checkOldIntergrity()) {
+            if (dbmsProcessor.checkForPre3Dot6Intergrity()) {
                 throw new DatabaseNotSupportedException();
             }
         }

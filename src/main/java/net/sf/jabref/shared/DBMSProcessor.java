@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -49,10 +50,10 @@ public abstract class DBMSProcessor {
     }
 
     /**
-     * Determines whether the database is using an old structure.
+     * Determines whether the database is using an pre-3.6 structure.
      * @return <code>true</code> if the structure is old, else <code>false</code>.
      */
-    public boolean checkOldIntergrity() throws SQLException {
+    public boolean checkForPre3Dot6Intergrity() throws SQLException {
         return checkTableAvailibility(
                 "ENTRIES",
                 "ENTRY_GROUP",
@@ -71,7 +72,7 @@ public abstract class DBMSProcessor {
     private boolean checkTableAvailibility(String... tableNames) throws SQLException {
         List<String> requiredTables = new ArrayList<>();
         for (String name : tableNames) {
-            requiredTables.add(name.toUpperCase());
+            requiredTables.add(name.toUpperCase(Locale.ENGLISH));
         }
 
         DatabaseMetaData databaseMetaData = connection.getMetaData();

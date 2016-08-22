@@ -84,7 +84,7 @@ public class HelpAction extends MnemonicAwareAction {
         callHelpPage();
     }
 
-    public void callHelpPage() {
+    private void callHelpPage() {
         String url = "https://help.jabref.org/" + Globals.prefs.get(JabRefPreferences.LANGUAGE) + "/" + helpPage.getPageName();
         JabRefDesktop.openBrowserShowPopup(url);
     }
