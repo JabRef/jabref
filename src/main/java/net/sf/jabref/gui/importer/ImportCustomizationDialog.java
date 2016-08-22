@@ -49,22 +49,17 @@ import org.apache.commons.logging.LogFactory;
  * Dialog to manage custom importers.
  */
 public class ImportCustomizationDialog extends JDialog {
+    private static final Log LOGGER = LogFactory.getLog(ImportCustomizationDialog.class);
 
     // Column widths for import customization dialog table:
     private static final int COL_0_WIDTH = 200;
     private static final int COL_1_WIDTH = 80;
     private static final int COL_2_WIDTH = 200;
+
     private static final int COL_3_WIDTH = 200;
 
     private final JTable customImporterTable;
 
-    private static final Log LOGGER = LogFactory.getLog(ImportCustomizationDialog.class);
-
-
-    /**
-     *
-     * @param frame
-     */
     public ImportCustomizationDialog(final JabRefFrame frame) {
         super(frame, Localization.lang("Manage custom imports"), false);
 
@@ -89,8 +84,9 @@ public class ImportCustomizationDialog extends JDialog {
         addFromFolderButton.addActionListener(e -> {
             CustomImporter importer = new CustomImporter();
 
-            Optional<Path> selectedFile = new FileDialog(frame).withExtension(FileExtensions.CLASS)
-                    .showDialogAndGetSelectedFile();
+            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.CLASS);
+            dialog.setDefaultExtension(FileExtensions.CLASS);
+            Optional<Path> selectedFile = dialog.showDialogAndGetSelectedFile();
 
             if (selectedFile.isPresent() && (selectedFile.get().getParent() != null)) {
                 importer.setBasePath(selectedFile.get().getParent().toString());
@@ -119,8 +115,9 @@ public class ImportCustomizationDialog extends JDialog {
 
         JButton addFromJarButton = new JButton(Localization.lang("Add from JAR"));
         addFromJarButton.addActionListener(e -> {
-            Optional<Path> jarZipFile = new FileDialog(frame)
-                    .withExtensions(EnumSet.of(FileExtensions.ZIP, FileExtensions.JAR)).showDialogAndGetSelectedFile();
+            FileDialog dialog = new FileDialog(frame).withExtensions(EnumSet.of(FileExtensions.ZIP, FileExtensions.JAR));
+            dialog.setDefaultExtension(FileExtensions.JAR);
+            Optional<Path> jarZipFile = dialog.showDialogAndGetSelectedFile();
 
             if (jarZipFile.isPresent()) {
                 try (ZipFile zipFile = new ZipFile(jarZipFile.get().toFile(), ZipFile.OPEN_READ)) {
@@ -140,7 +137,6 @@ public class ImportCustomizationDialog extends JDialog {
                                     + Localization.lang("Have you chosen the correct package path?"));
                 }
             }
-
         });
         addFromJarButton
                 .setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a ZIP-archive.")

@@ -24,8 +24,8 @@ import javax.swing.JTextField;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.SaveOrderConfigDisplay;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.cleanup.FieldFormatterCleanupsPanel;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -83,8 +83,15 @@ public class DatabasePropertiesDialog extends JDialog {
 
         JButton browseFile = new JButton(Localization.lang("Browse"));
         JButton browseFileIndv = new JButton(Localization.lang("Browse"));
-        browseFile.addActionListener(BrowseAction.buildForDir(parent, fileDir));
-        browseFileIndv.addActionListener(BrowseAction.buildForDir(parent, fileDirIndv));
+
+        browseFile.addActionListener(e ->
+                new FileDialog(parent).showDialogAndGetSelectedDirectory()
+                        .ifPresent(f -> fileDir.setText(f.toAbsolutePath().toString()))
+        );
+        browseFileIndv.addActionListener(e ->
+                new FileDialog(parent).showDialogAndGetSelectedDirectory()
+                        .ifPresent(f -> fileDirIndv.setText(f.toAbsolutePath().toString()))
+        );
 
         setupSortOrderConfiguration();
         FormLayout form = new FormLayout("left:pref, 4dlu, pref:grow, 4dlu, pref:grow, 4dlu, pref",
