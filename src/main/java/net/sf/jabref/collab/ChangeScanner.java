@@ -344,16 +344,14 @@ public class ChangeScanner implements Runnable {
     }
 
     private void scanPreamble(BibDatabase inMem1, BibDatabase onTmp, BibDatabase onDisk) {
-        String mem = inMem1.getPreamble();
-        String tmp = onTmp.getPreamble();
-        String disk = onDisk.getPreamble();
-        if (tmp == null) {
-            if ((disk != null) && !disk.isEmpty()) {
-                changes.add(new PreambleChange(mem, disk));
-            }
+        String mem = inMem1.getPreamble().orElse(null);
+        Optional<String> tmp = onTmp.getPreamble();
+        Optional<String> disk = onDisk.getPreamble();
+        if (!tmp.isPresent()) {
+            disk.filter(diskContent -> !diskContent.isEmpty()).ifPresent(diskContent -> changes.add(new PreambleChange(mem, diskContent)));
         } else {
-            if ((disk == null) || !tmp.equals(disk)) {
-                changes.add(new PreambleChange(mem, disk));
+            if (!disk.isPresent() || !tmp.equals(disk)) {
+                changes.add(new PreambleChange(mem, disk.orElse(null)));
             }
         }
     }

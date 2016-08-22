@@ -76,9 +76,7 @@ class PreambleEditor extends JDialog {
         con.weighty = 1;
         con.insets = new Insets(10, 5, 10, 5);
 
-        String content = base.getPreamble();
-
-        ed = new TextArea(Localization.lang("Preamble"), content == null ? "" : content);
+        ed = new TextArea(Localization.lang("Preamble"), base.getPreamble().orElse(""));
 
         setupJTextComponent((TextArea) ed);
 
@@ -115,7 +113,7 @@ class PreambleEditor extends JDialog {
     }
 
     public void updatePreamble() {
-        ed.setText(base.getPreamble());
+        ed.setText(base.getPreamble().orElse(""));
     }
 
 
@@ -153,15 +151,14 @@ class PreambleEditor extends JDialog {
             // We check if the field has changed, since we don't want to mark the
             // base as changed unless we have a real change.
             if (toSet == null) {
-                set = base.getPreamble() != null;
+                set = base.getPreamble().isPresent();
             } else {
-                set = !((base.getPreamble() != null)
-                        && toSet.equals(base.getPreamble()));
+                set = !(base.getPreamble().isPresent() && toSet.equals(base.getPreamble().get()));
             }
 
             if (set) {
-                panel.getUndoManager().addEdit(new UndoablePreambleChange
-                        (base, panel, base.getPreamble(), toSet));
+                panel.getUndoManager()
+                        .addEdit(new UndoablePreambleChange(base, panel, base.getPreamble().get(), toSet));
                 base.setPreamble(toSet);
                 if ((toSet == null) || toSet.isEmpty()) {
                     ed.setLabelColor(GUIGlobals.NULL_FIELD_COLOR);

@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.Optional;
 
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
@@ -86,7 +87,7 @@ public class AuxParserTest {
             AuxParserResult auxResult = auxParser.parse();
             BibDatabase db = auxResult.getGeneratedBibDatabase();
 
-            assertEquals("\"Maintained by \" # maintainer", db.getPreamble());
+            assertEquals(Optional.of("\"Maintained by \" # maintainer"), db.getPreamble());
             assertEquals(1, db.getStringCount());
         }
     }

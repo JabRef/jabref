@@ -935,7 +935,7 @@ public class BibtexParserTest {
 
         ParserResult result = BibtexParser.parse(new StringReader("@preamble{some text and \\latex}"),
                 importFormatPreferences);
-        assertEquals("some text and \\latex", result.getDatabase().getPreamble());
+        assertEquals(Optional.of("some text and \\latex"), result.getDatabase().getPreamble());
     }
 
     @Test
@@ -943,7 +943,7 @@ public class BibtexParserTest {
 
         ParserResult result = BibtexParser.parse(new StringReader("@PREAMBLE{some text and \\latex}"),
                 importFormatPreferences);
-        assertEquals("some text and \\latex", result.getDatabase().getPreamble());
+        assertEquals(Optional.of("some text and \\latex"), result.getDatabase().getPreamble());
     }
 
     @Test
@@ -951,7 +951,7 @@ public class BibtexParserTest {
 
         ParserResult result = BibtexParser.parse(new StringReader("@preamble {some text and \\latex}"),
                 importFormatPreferences);
-        assertEquals("some text and \\latex", result.getDatabase().getPreamble());
+        assertEquals(Optional.of("some text and \\latex"), result.getDatabase().getPreamble());
     }
 
     @Test
@@ -959,7 +959,7 @@ public class BibtexParserTest {
 
         ParserResult result = BibtexParser.parse(new StringReader("@preamble(some text and \\latex)"),
                 importFormatPreferences);
-        assertEquals("some text and \\latex", result.getDatabase().getPreamble());
+        assertEquals(Optional.of("some text and \\latex"), result.getDatabase().getPreamble());
     }
 
     @Test
@@ -967,7 +967,7 @@ public class BibtexParserTest {
 
         ParserResult result = BibtexParser.parse(new StringReader("@preamble{\"some text\" # \"and \\latex\"}"),
                 importFormatPreferences);
-        assertEquals("\"some text\" # \"and \\latex\"", result.getDatabase().getPreamble());
+        assertEquals(Optional.of("\"some text\" # \"and \\latex\""), result.getDatabase().getPreamble());
     }
 
     @Test
@@ -1307,7 +1307,7 @@ public class BibtexParserTest {
                         importFormatPreferences);
         assertFalse(result.hasWarnings());
 
-        assertEquals("some text and \\latex", result.getDatabase().getPreamble());
+        assertEquals(Optional.of("some text and \\latex"), result.getDatabase().getPreamble());
 
         Collection<BibEntry> c = result.getDatabase().getEntries();
         assertEquals(1, c.size());
@@ -1329,7 +1329,7 @@ public class BibtexParserTest {
                         importFormatPreferences);
         assertFalse(result.hasWarnings());
 
-        assertEquals("some text and \\latex", result.getDatabase().getPreamble());
+        assertEquals(Optional.of("some text and \\latex"), result.getDatabase().getPreamble());
     }
 
     @Test
