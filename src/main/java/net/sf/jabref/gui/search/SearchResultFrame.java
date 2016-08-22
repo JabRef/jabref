@@ -21,7 +21,6 @@ import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
-import javax.swing.ImageIcon;
 import javax.swing.InputMap;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -125,7 +124,7 @@ public class SearchResultFrame {
     private void init(String title) {
         searchResultFrame = new JFrame();
         searchResultFrame.setTitle(title);
-        searchResultFrame.setIconImage(new ImageIcon(IconTheme.getIconUrl("jabrefIcon48")).getImage());
+        searchResultFrame.setIconImage(IconTheme.getImage("jabrefIcon48").getImage());
 
         int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
         String layoutFile = activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs

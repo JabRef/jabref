@@ -38,7 +38,7 @@ public enum KeyBinding {
     FIND_UNLINKED_FILES("Find unlinked files", Localization.lang("Find unlinked files"), "shift F7"),
     FOCUS_ENTRY_TABLE("Focus entry table", Localization.lang("Focus entry table"), "alt 1"),
     FORWARD("Forward", Localization.lang("Forward"), "alt RIGHT"),
-    GLOBAL_SEARCH("Global search", Localization.lang("Global search"), "ctrl shift F"),
+    GLOBAL_SEARCH("Search globally", Localization.lang("Search globally"), "ctrl shift F"),
     HELP("Help", Localization.lang("Help"), "F1"),
     IMPORT_INTO_CURRENT_DATABASE("Import into current database", Localization.lang("Import into current database"), "ctrl I"),
     IMPORT_INTO_NEW_DATABASE("Import into new database", Localization.lang("Import into new database"), "ctrl alt I"),

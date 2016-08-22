@@ -311,8 +311,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
             Localization.lang("Search"), Globals.getKeyPrefs().getKey(KeyBinding.SEARCH), IconTheme.JabRefIcon.SEARCH.getIcon());
     private final AbstractAction globalSearch = new GeneralAction(Actions.GLOBAL_SEARCH,
-            Localization.menuTitle("Global search"),
-            Localization.lang("Global search"),
+            Localization.menuTitle("Search globally"),
+            Localization.lang("Search globally"),
             Globals.getKeyPrefs().getKey(KeyBinding.GLOBAL_SEARCH),
             IconTheme.JabRefIcon.SEARCH.getIcon());
 

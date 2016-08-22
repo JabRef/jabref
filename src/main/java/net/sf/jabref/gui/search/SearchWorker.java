@@ -68,8 +68,14 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
             return;
         }
 
-        basePanel.getDatabase().getEntries().forEach(entry -> entry.setSearchHit(false));
-        matchedEntries.forEach(entry -> entry.setSearchHit(true));
+        // clear
+        for (BibEntry entry : basePanel.getDatabase().getEntries()) {
+            entry.setSearchHit(false);
+        }
+        // and mark
+        for (BibEntry entry : matchedEntries) {
+            entry.setSearchHit(true);
+        }
 
         basePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
         // Show the result in the chosen way:
@@ -87,14 +93,8 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
 
         // only selects the first match if the selected entries are no hits or no entry is selected
         List<BibEntry> selectedEntries = basePanel.getSelectedEntries();
-        boolean isHitSelected = !selectedEntries.isEmpty();
-        for (BibEntry entry : selectedEntries) {
-            if (!entry.isSearchHit()) {
-                isHitSelected = false;
-                break;
-            }
-        }
-        if (!isHitSelected && matchedEntries.size() > 0) {
+        boolean isHitSelected = selectedEntries.stream().anyMatch(BibEntry::isSearchHit);
+        if (!isHitSelected && !matchedEntries.isEmpty()) {
             for (int i = 0; i < basePanel.getMainTable().getRowCount(); i++) {
                 BibEntry entry = basePanel.getMainTable().getEntryAt(i);
                 if (entry.isSearchHit()) {
