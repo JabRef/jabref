@@ -92,7 +92,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                 frame.output(Localization.lang("Starting import"));
                 fileOk = true;
 
-                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, filenames.get(0));
+                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, Paths.get(filenames.get(0)).getParent().toString());
             }
         }
 
