@@ -35,11 +35,11 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.SidePaneComponent;
 import net.sf.jabref.gui.SidePaneManager;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -537,17 +537,26 @@ public class OpenOfficePanel extends AbstractWorker {
         final JTextField ooPath = new JTextField(30);
         JButton browseOOPath = new JButton(Localization.lang("Browse"));
         ooPath.setText(preferences.getOOPath());
-        browseOOPath.addActionListener(BrowseAction.buildForDir(ooPath));
+        browseOOPath.addActionListener(e ->
+                new FileDialog(frame).showDialogAndGetSelectedDirectory()
+                        .ifPresent(f -> ooPath.setText(f.toAbsolutePath().toString()))
+        );
 
         final JTextField ooExec = new JTextField(30);
         JButton browseOOExec = new JButton(Localization.lang("Browse"));
         ooExec.setText(preferences.getExecutablePath());
-        browseOOExec.addActionListener(BrowseAction.buildForFile(ooExec));
+        browseOOExec.addActionListener(e ->
+                new FileDialog(frame).showDialogAndGetSelectedFile()
+                        .ifPresent(f -> ooExec.setText(f.toAbsolutePath().toString()))
+        );
 
         final JTextField ooJars = new JTextField(30);
-        JButton browseOOJars = new JButton(Localization.lang("Browse"));
-        browseOOJars.addActionListener(BrowseAction.buildForDir(ooJars));
         ooJars.setText(preferences.getJarsPath());
+        JButton browseOOJars = new JButton(Localization.lang("Browse"));
+        browseOOJars.addActionListener(e ->
+                new FileDialog(frame).showDialogAndGetSelectedFile()
+                        .ifPresent(f -> ooJars.setText(f.toAbsolutePath().toString()))
+        );
 
         FormBuilder builder = FormBuilder.create()
                 .layout(

@@ -47,7 +47,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
@@ -549,7 +548,10 @@ class ManageJournalsPanel extends JPanel {
 
         private void setupPanel() {
             tf.setEditable(false);
-            browse.addActionListener(BrowseAction.buildForFile(tf));
+            browse.addActionListener(e ->
+                    new FileDialog(frame).showDialogAndGetSelectedFile()
+                            .ifPresent(f -> tf.setText(f.toAbsolutePath().toString()))
+            );
             DownloadAction da = new DownloadAction(tf);
             download.addActionListener(da);
             FormBuilder builder = FormBuilder.create().layout(new FormLayout(
