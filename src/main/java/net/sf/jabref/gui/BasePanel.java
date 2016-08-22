@@ -246,6 +246,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 LOGGER.warn("Could not register FileUpdateMonitor", ex);
             }
         }
+
+        // saves the divider position as soon as it changes
+        splitPane.addPropertyChangeListener(JSplitPane.DIVIDER_LOCATION_PROPERTY, propertyChangeEvent -> {
+            saveDividerLocation();
+        });
     }
 
     // Returns a collection of AutoCompleters, which are populated from the current database

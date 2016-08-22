@@ -747,10 +747,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         dispose();
 
-        if (getCurrentBasePanel() != null) {
-            getCurrentBasePanel().saveDividerLocation();
-        }
-
         //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, (getExtendedState()&MAXIMIZED_BOTH)>0);
         prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
 
