@@ -8,6 +8,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
@@ -32,7 +33,7 @@ public class FileHistoryMenu extends JMenu implements ActionListener {
         }
 
         this.frame = frame;
-        history = new FileHistory(prefs);
+        history = Globals.prefs.getFileHistory();
         if (history.size() > 0) {
             setItems();
         } else {
@@ -73,7 +74,7 @@ public class FileHistoryMenu extends JMenu implements ActionListener {
 
 
     public void storeHistory() {
-        history.storeHistory();
+        Globals.prefs.storeFileHistory(history);
     }
 
     @Override
