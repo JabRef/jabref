@@ -74,7 +74,6 @@ public class OpenSharedDatabaseDialog extends JDialog {
     private DBMSConnectionProperties connectionProperties;
     private BibDatabaseContext bibDatabaseContext;
 
-
     /**
      * @param frame the JabRef Frame
      */
