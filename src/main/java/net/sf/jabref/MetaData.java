@@ -28,6 +28,7 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.FieldName;
 
@@ -236,12 +237,12 @@ public class MetaData implements Iterable<String> {
     /**
      * @return the stored label patterns
      */
-    public AbstractBibtexKeyPattern getBibtexKeyPattern() {
+    public AbstractBibtexKeyPattern getBibtexKeyPattern(GlobalBibtexKeyPattern globalPattern) {
         if (bibtexKeyPattern != null) {
             return bibtexKeyPattern;
         }
 
-        bibtexKeyPattern = new DatabaseBibtexKeyPattern(Globals.prefs);
+        bibtexKeyPattern = new DatabaseBibtexKeyPattern(globalPattern);
 
         // read the data from the metadata and store it into the bibtexKeyPattern
         for (String key : this) {

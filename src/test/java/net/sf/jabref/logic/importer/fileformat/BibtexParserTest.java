@@ -1512,9 +1512,10 @@ public class BibtexParserTest {
                                 + "@comment{jabref-meta: keypatterndefault:test;}"),
                         importFormatPreferences);
 
-        AbstractBibtexKeyPattern bibtexKeyPattern = result.getMetaData().getBibtexKeyPattern();
+        AbstractBibtexKeyPattern bibtexKeyPattern = result.getMetaData()
+                .getBibtexKeyPattern(Globals.prefs.getKeyPattern());
 
-        AbstractBibtexKeyPattern expectedPattern = new DatabaseBibtexKeyPattern(Globals.prefs);
+        AbstractBibtexKeyPattern expectedPattern = new DatabaseBibtexKeyPattern(Globals.prefs.getKeyPattern());
         expectedPattern.setDefaultValue("test");
         expectedPattern.addBibtexKeyPattern("article", "articleTest");
 
