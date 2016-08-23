@@ -38,7 +38,8 @@ public class InternalBibtexFields {
             "ctlalt_stretch_factor", FieldName.VOLUMES);
     public static final List<String> IEEETRANBSTCTL_YES_NO_FIELDS = Arrays.asList("ctluse_article_number",
             "ctluse_paper", "ctluse_url", "ctluse_forced_etal", "ctluse_alt_spacing", "ctldash_repeated_names");
-    public static final List<String> BIBLATEX_DATE_FIELDS = Arrays.asList(FieldName.DATE, "eventdate", "origdate", FieldName.URLDATE);
+    public static final List<String> BIBLATEX_DATE_FIELDS = Arrays.asList(FieldName.DATE, "eventdate", "origdate",
+            FieldName.URLDATE);
     public static final List<String> BIBLATEX_PERSON_NAME_FIELDS = Arrays.asList(FieldName.AUTHOR, FieldName.EDITOR,
             "editora", "editorb", "editorc", FieldName.TRANSLATOR, "annotator", "commentator", "introduction", "foreword",
             "afterword", FieldName.BOOKAUTHOR, "holder", "shortauthor", "shorteditor", "sortname", "nameaddon");
@@ -156,14 +157,14 @@ public class InternalBibtexFields {
         add(new BibtexSingleField(FieldName.ABSTRACT, false, BibtexSingleField.LARGE_W, 400));
 
         dummy = new BibtexSingleField(FieldName.URL, false, BibtexSingleField.SMALL_W);
-        dummy.setExtras(EnumSet.of(FieldProperties.EXTERNAL));
+        dummy.setExtras(EnumSet.of(FieldProperties.EXTERNAL, FieldProperties.VERBATIM));
         add(dummy);
 
         add(new BibtexSingleField("comment", false, BibtexSingleField.MEDIUM_W));
         add(new BibtexSingleField(FieldName.KEYWORDS, false, BibtexSingleField.SMALL_W));
 
         dummy = new BibtexSingleField(FieldName.FILE, false);
-        dummy.setExtras(EnumSet.of(FieldProperties.FILE_EDITOR));
+        dummy.setExtras(EnumSet.of(FieldProperties.FILE_EDITOR, FieldProperties.VERBATIM));
         add(dummy);
 
         add(new BibtexSingleField("search", false, 75));
