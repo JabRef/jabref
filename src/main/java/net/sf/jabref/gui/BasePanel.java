@@ -846,7 +846,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 selectionListener.editSignalled(firstBE);
             }
 
-//            If we inserted a duplicate we want to select the duplicate
+            // If we inserted a duplicate we want to select the duplicate (thus we have to search from the back)
             highlightLastEntry(firstBE);
         }
     }
