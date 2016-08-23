@@ -1994,6 +1994,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 propertiesDialog = new DatabasePropertiesDialog(JabRefFrame.this);
             }
             propertiesDialog.setPanel(getCurrentBasePanel());
+            propertiesDialog.updateEnableStatus();
             propertiesDialog.setLocationRelativeTo(JabRefFrame.this);
             propertiesDialog.setVisible(true);
         }

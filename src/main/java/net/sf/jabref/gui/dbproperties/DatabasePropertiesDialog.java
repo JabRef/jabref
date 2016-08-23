@@ -34,6 +34,7 @@ import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.DatabaseLocation;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -77,6 +78,16 @@ public class DatabasePropertiesDialog extends JDialog {
     public void setPanel(BasePanel panel) {
         this.panel = panel;
         this.metaData = panel.getBibDatabaseContext().getMetaData();
+    }
+
+    public void updateEnableStatus() {
+        DatabaseLocation location = panel.getBibDatabaseContext().getLocation();
+        boolean isShared = (location == DatabaseLocation.SHARED);
+        encoding.setEnabled(!isShared); // the encoding of shared database is always UTF-8
+        saveInOriginalOrder.setEnabled(!isShared);
+        saveInSpecifiedOrder.setEnabled(!isShared);
+        saveOrderPanel.setEnabled(!isShared);
+        protect.setEnabled(!isShared);
     }
 
     private void init(JFrame parent) {
