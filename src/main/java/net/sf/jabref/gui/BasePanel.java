@@ -1718,8 +1718,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * This method selects the given entry, and scrolls it into view in the table. If an entryEditor is shown, it is
      * given focus afterwards.
      */
-    public void highlightEntry(final BibEntry be) {
-        final int row = mainTable.findEntry(be);
+    public void highlightEntry(final BibEntry bibEntry) {
+        final int row = mainTable.findEntry(bibEntry);
         if (row >= 0) {
 //            the selection has to be cleared in case that a duplicate later in the list is selected thus the editor doesn't get refreshed
             mainTable.clearSelection();
