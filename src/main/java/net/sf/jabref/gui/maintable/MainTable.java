@@ -490,6 +490,10 @@ public class MainTable extends JTable {
         return model.getTableRows().indexOf(entry);
     }
 
+    public int findLastEntry(BibEntry entry) {
+        return model.getTableRows().lastIndexOf(entry);
+    }
+
     /**
      * method to check whether a MainTableColumn at the modelIndex refers to the file field (either as a specific
      * file extension filter or not)

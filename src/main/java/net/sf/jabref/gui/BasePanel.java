@@ -845,7 +845,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
                 selectionListener.editSignalled(firstBE);
             }
-            highlightEntry(firstBE);
+
+//            If we inserted a duplicate we want to select the duplicate
+            highlightLastEntry(firstBE);
         }
     }
 
@@ -1719,12 +1721,26 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * given focus afterwards.
      */
     public void highlightEntry(final BibEntry bibEntry) {
-        final int row = mainTable.findEntry(bibEntry);
-        if (row >= 0) {
-//            the selection has to be cleared in case that a duplicate later in the list is selected thus the editor doesn't get refreshed
+        highlightEntry(mainTable.findEntry(bibEntry));
+    }
+
+    /**
+     * This method selects the given entry (searches from the back), and scrolls it into view in the table.
+     * If an entryEditor is shown, it is given focus afterwards.
+     */
+    public void highlightLastEntry(final BibEntry bibEntry) {
+        highlightEntry(mainTable.findLastEntry(bibEntry));
+    }
+
+    /**
+     * This method selects the entry on the given position, and scrolls it into view in the table.
+     * If an entryEditor is shown, it is given focus afterwards.
+     */
+    public void highlightEntry(int pos) {
+        if (pos >= 0) {
             mainTable.clearSelection();
-            mainTable.setRowSelectionInterval(row, row);
-            mainTable.ensureVisible(row);
+            mainTable.addRowSelectionInterval(pos, pos);
+            mainTable.ensureVisible(pos);
         }
     }
 
