@@ -1779,4 +1779,17 @@ public class BibtexParserTest {
         assertEquals(bibtexEntry, entry.getParsedSerialization());
     }
 
+    @Test
+    public void parseEmptyPreambleLeadsToEmptyString() throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader("@preamble{}"), importFormatPreferences);
+        assertFalse(result.hasWarnings());
+        assertEquals(Optional.of(""), result.getDatabase().getPreamble());
+    }
+
+    @Test
+    public void parseEmptyFileLeadsToPreamble() throws IOException {
+        ParserResult result = BibtexParser.parse(new StringReader(""), importFormatPreferences);
+        assertFalse(result.hasWarnings());
+        assertEquals(Optional.empty(), result.getDatabase().getPreamble());
+    }
 }

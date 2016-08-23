@@ -60,8 +60,6 @@ public class ChangeScanner implements Runnable {
     private BibDatabase databaseInTemp;
     private MetaData metadataInTemp;
 
-    private MetaData mdInTemp;
-
     private static final double MATCH_THRESHOLD = 0.4;
 
     /**
