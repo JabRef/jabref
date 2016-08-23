@@ -117,6 +117,8 @@ dependencies {
     compile 'org.apache.logging.log4j:log4j-jcl:2.6.2'
     compile 'org.apache.logging.log4j:log4j-api:2.6.2'
     compile 'org.apache.logging.log4j:log4j-core:2.6.2'
+    
+    compile 'com.kennycason:kumo:1.8'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
