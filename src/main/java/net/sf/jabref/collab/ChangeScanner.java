@@ -51,13 +51,14 @@ public class ChangeScanner implements Runnable {
 
     private static final String[] SORT_BY = new String[] {FieldName.YEAR, FieldName.AUTHOR, FieldName.TITLE};
 
-    private final File f;
-    private final BibDatabase inMem;
-    private final MetaData mdInMem;
+    private final File file;
+    private final BibDatabase databaseInMemory;
+    private final MetaData metadataInMemory;
     private final BasePanel panel;
 
     private final JabRefFrame frame;
-    private BibDatabase inTemp;
+    private BibDatabase databaseInTemp;
+    private MetaData metadataInTemp;
 
     private MetaData mdInTemp;
 
@@ -75,9 +76,9 @@ public class ChangeScanner implements Runnable {
     public ChangeScanner(JabRefFrame frame, BasePanel bp, File file) {
         this.panel = bp;
         this.frame = frame;
-        this.inMem = bp.getDatabase();
-        this.mdInMem = bp.getBibDatabaseContext().getMetaData();
-        this.f = file;
+        this.databaseInMemory = bp.getDatabase();
+        this.metadataInMemory = bp.getBibDatabaseContext().getMetaData();
+        this.file = file;
     }
 
     @Override
@@ -87,36 +88,36 @@ public class ChangeScanner implements Runnable {
             // Parse the temporary file.
             Path tempFile = Globals.getFileUpdateMonitor().getTempFile(panel.fileMonitorHandle());
             ImportFormatPreferences importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
-            ParserResult pr = OpenDatabase.loadDatabase(tempFile.toFile(), importFormatPreferences);
-            inTemp = pr.getDatabase();
-            mdInTemp = pr.getMetaData();
+            ParserResult result = OpenDatabase.loadDatabase(tempFile.toFile(), importFormatPreferences);
+            databaseInTemp = result.getDatabase();
+            metadataInTemp = result.getMetaData();
             // Parse the modified file.
-            pr = OpenDatabase.loadDatabase(f, importFormatPreferences);
-            BibDatabase onDisk = pr.getDatabase();
-            MetaData mdOnDisk = pr.getMetaData();
+            result = OpenDatabase.loadDatabase(file, importFormatPreferences);
+            BibDatabase databaseOnDisk = result.getDatabase();
+            MetaData metadataOnDisk = result.getMetaData();
 
             // Sort both databases according to a common sort key.
-            EntryComparator comp = new EntryComparator(false, true, SORT_BY[2]);
-            comp = new EntryComparator(false, true, SORT_BY[1], comp);
-            comp = new EntryComparator(false, true, SORT_BY[0], comp);
-            EntrySorter sInTemp = inTemp.getSorter(comp);
-            comp = new EntryComparator(false, true, SORT_BY[2]);
-            comp = new EntryComparator(false, true, SORT_BY[1], comp);
-            comp = new EntryComparator(false, true, SORT_BY[0], comp);
-            EntrySorter sOnDisk = onDisk.getSorter(comp);
-            comp = new EntryComparator(false, true, SORT_BY[2]);
-            comp = new EntryComparator(false, true, SORT_BY[1], comp);
-            comp = new EntryComparator(false, true, SORT_BY[0], comp);
-            EntrySorter sInMem = inMem.getSorter(comp);
+            EntryComparator comparator = new EntryComparator(false, true, SORT_BY[2]);
+            comparator = new EntryComparator(false, true, SORT_BY[1], comparator);
+            comparator = new EntryComparator(false, true, SORT_BY[0], comparator);
+            EntrySorter sorterInTemp = databaseInTemp.getSorter(comparator);
+            comparator = new EntryComparator(false, true, SORT_BY[2]);
+            comparator = new EntryComparator(false, true, SORT_BY[1], comparator);
+            comparator = new EntryComparator(false, true, SORT_BY[0], comparator);
+            EntrySorter sorterOnDisk = databaseOnDisk.getSorter(comparator);
+            comparator = new EntryComparator(false, true, SORT_BY[2]);
+            comparator = new EntryComparator(false, true, SORT_BY[1], comparator);
+            comparator = new EntryComparator(false, true, SORT_BY[0], comparator);
+            EntrySorter sorterInMem = databaseInMemory.getSorter(comparator);
 
             // Start looking at changes.
-            scanMetaData(mdInMem, mdInTemp, mdOnDisk);
-            scanPreamble(inMem, inTemp, onDisk);
-            scanStrings(inMem, inTemp, onDisk);
+            scanMetaData(metadataInMemory, metadataInTemp, metadataOnDisk);
+            scanPreamble(databaseInMemory, databaseInTemp, databaseOnDisk);
+            scanStrings(databaseInMemory, databaseInTemp, databaseOnDisk);
 
-            scanEntries(sInMem, sInTemp, sOnDisk);
+            scanEntries(sorterInMem, sorterInTemp, sorterOnDisk);
 
-            scanGroups(mdInTemp, mdOnDisk);
+            scanGroups(metadataInTemp, metadataOnDisk);
 
         } catch (IOException ex) {
             LOGGER.warn("Problem running", ex);
@@ -130,11 +131,11 @@ public class ChangeScanner implements Runnable {
     public void displayResult(final DisplayResultCallback fup) {
         if (changes.getChildCount() > 0) {
             SwingUtilities.invokeLater(() -> {
-                ChangeDisplayDialog dial = new ChangeDisplayDialog(frame, panel, inTemp, changes);
-                dial.setLocationRelativeTo(frame);
-                dial.setVisible(true);
-                fup.scanResultsResolved(dial.isOkPressed());
-                if (dial.isOkPressed()) {
+                ChangeDisplayDialog changeDialog = new ChangeDisplayDialog(frame, panel, databaseInTemp, changes);
+                changeDialog.setLocationRelativeTo(frame);
+                changeDialog.setVisible(true);
+                fup.scanResultsResolved(changeDialog.isOkPressed());
+                if (changeDialog.isOkPressed()) {
                     // Overwrite the temp database:
                     storeTempDatabase();
                 }
@@ -157,7 +158,7 @@ public class ChangeScanner implements Runnable {
                 Defaults defaults = new Defaults(BibDatabaseMode
                         .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
                 BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
-                SaveSession ss = databaseWriter.saveDatabase(new BibDatabaseContext(inTemp, mdInTemp, defaults), prefs);
+                SaveSession ss = databaseWriter.saveDatabase(new BibDatabaseContext(databaseInTemp, metadataInTemp, defaults), prefs);
                 ss.commit(Globals.getFileUpdateMonitor().getTempFile(panel.fileMonitorHandle()));
             } catch (SaveException ex) {
                 LOGGER.warn("Problem updating tmp file after accepting external changes", ex);
@@ -166,7 +167,7 @@ public class ChangeScanner implements Runnable {
     }
 
     private void scanMetaData(MetaData inMem1, MetaData inTemp1, MetaData onDisk) {
-        MetaDataChange mdc = new MetaDataChange(inMem1, inTemp1);
+        MetaDataChange metadataChange = new MetaDataChange(inMem1, inTemp1);
         List<String> handledOnDisk = new ArrayList<>();
         // Loop through the metadata entries of the "tmp" database, looking for
         // matches
@@ -174,12 +175,12 @@ public class ChangeScanner implements Runnable {
             // See if the key is missing in the disk database:
             List<String> vod = onDisk.getData(key);
             if (vod == null) {
-                mdc.insertMetaDataRemoval(key);
+                metadataChange.insertMetaDataRemoval(key);
             } else {
                 // Both exist. Check if they are different:
                 List<String> vit = inTemp1.getData(key);
                 if (!vod.equals(vit)) {
-                    mdc.insertMetaDataChange(key, vod);
+                    metadataChange.insertMetaDataChange(key, vod);
                 }
                 // Remember that we've handled this one:
                 handledOnDisk.add(key);
@@ -189,16 +190,16 @@ public class ChangeScanner implements Runnable {
         // See if there are unhandled keys in the disk database:
         for (String key : onDisk) {
             if (!handledOnDisk.contains(key)) {
-                mdc.insertMetaDataAddition(key, onDisk.getData(key));
+                metadataChange.insertMetaDataAddition(key, onDisk.getData(key));
             }
         }
 
-        if (mdc.getChangeCount() > 0) {
-            changes.add(mdc);
+        if (metadataChange.getChangeCount() > 0) {
+            changes.add(metadataChange);
         }
     }
 
-    private void scanEntries(EntrySorter mem, EntrySorter tmp, EntrySorter disk) {
+    private void scanEntries(EntrySorter memorySorter, EntrySorter tmpSorter, EntrySorter diskSorter) {
 
         // Create pointers that are incremented as the entries of each base are used in
         // successive order from the beginning. Entries "further down" in the "disk" base
@@ -208,21 +209,21 @@ public class ChangeScanner implements Runnable {
 
         // Create a HashSet where we can put references to entry numbers in the "disk"
         // database that we have matched. This is to avoid matching them twice.
-        Set<String> used = new HashSet<>(disk.getEntryCount());
-        Set<Integer> notMatched = new HashSet<>(tmp.getEntryCount());
+        Set<String> used = new HashSet<>(diskSorter.getEntryCount());
+        Set<Integer> notMatched = new HashSet<>(tmpSorter.getEntryCount());
 
         // Loop through the entries of the "tmp" database, looking for exact matches in the "disk" one.
         // We must finish scanning for exact matches before looking for near matches, to avoid an exact
         // match being "stolen" from another entry.
         mainLoop:
-        for (piv1 = 0; piv1 < tmp.getEntryCount(); piv1++) {
+        for (piv1 = 0; piv1 < tmpSorter.getEntryCount(); piv1++) {
 
             // First check if the similarly placed entry in the other base matches exactly.
             double comp = -1;
             // (if there are not any entries left in the "disk" database, comp will stay at -1,
             // and this entry will be marked as nonmatched).
-            if (!used.contains(String.valueOf(piv2)) && (piv2 < disk.getEntryCount())) {
-                comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(piv2));
+            if (!used.contains(String.valueOf(piv2)) && (piv2 < diskSorter.getEntryCount())) {
+                comp = DuplicateCheck.compareEntriesStrictly(tmpSorter.getEntryAt(piv1), diskSorter.getEntryAt(piv2));
             }
             if (comp > 1) {
                 used.add(String.valueOf(piv2));
@@ -231,12 +232,12 @@ public class ChangeScanner implements Runnable {
             }
 
             // No? Then check if another entry matches exactly.
-            if (piv2 < (disk.getEntryCount() - 1)) {
-                for (int i = piv2 + 1; i < disk.getEntryCount(); i++) {
+            if (piv2 < (diskSorter.getEntryCount() - 1)) {
+                for (int i = piv2 + 1; i < diskSorter.getEntryCount(); i++) {
                     if (used.contains(String.valueOf(i))) {
                         comp = -1;
                     } else {
-                        comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(i));
+                        comp = DuplicateCheck.compareEntriesStrictly(tmpSorter.getEntryAt(piv1), diskSorter.getEntryAt(i));
                     }
 
                     if (comp > 1) {
@@ -264,12 +265,12 @@ public class ChangeScanner implements Runnable {
                 double bestMatch = 0;
                 double comp;
 
-                if (piv2 < (disk.getEntryCount() - 1)) {
-                    for (int i = piv2; i < disk.getEntryCount(); i++) {
+                if (piv2 < (diskSorter.getEntryCount() - 1)) {
+                    for (int i = piv2; i < diskSorter.getEntryCount(); i++) {
                         if (used.contains(String.valueOf(i))) {
                             comp = -1;
                         } else {
-                            comp = DuplicateCheck.compareEntriesStrictly(tmp.getEntryAt(piv1), disk.getEntryAt(i));
+                            comp = DuplicateCheck.compareEntriesStrictly(tmpSorter.getEntryAt(piv1), diskSorter.getEntryAt(i));
                         }
 
                         if (comp > bestMatch) {
@@ -283,12 +284,11 @@ public class ChangeScanner implements Runnable {
                     used.add(String.valueOf(bestMatchI));
                     it.remove();
 
-                    EntryChange ec = new EntryChange(bestFit(tmp, mem, piv1), tmp.getEntryAt(piv1),
-                            disk.getEntryAt(bestMatchI));
-                    changes.add(ec);
+                    changes.add(new EntryChange(bestFit(tmpSorter, memorySorter, piv1), tmpSorter.getEntryAt(piv1),
+                            diskSorter.getEntryAt(bestMatchI)));
                 } else {
-                    EntryDeleteChange ec = new EntryDeleteChange(bestFit(tmp, mem, piv1), tmp.getEntryAt(piv1));
-                    changes.add(ec);
+                    changes.add(
+                            new EntryDeleteChange(bestFit(tmpSorter, memorySorter, piv1), tmpSorter.getEntryAt(piv1)));
                 }
 
             }
@@ -297,21 +297,20 @@ public class ChangeScanner implements Runnable {
 
         // Finally, look if there are still untouched entries in the disk database. These
         // may have been added.
-        if (used.size() < disk.getEntryCount()) {
-            for (int i = 0; i < disk.getEntryCount(); i++) {
+        if (used.size() < diskSorter.getEntryCount()) {
+            for (int i = 0; i < diskSorter.getEntryCount(); i++) {
                 if (!used.contains(String.valueOf(i))) {
 
                     // See if there is an identical dupe in the mem database:
                     boolean hasAlready = false;
-                    for (int j = 0; j < mem.getEntryCount(); j++) {
-                        if (DuplicateCheck.compareEntriesStrictly(mem.getEntryAt(j), disk.getEntryAt(i)) >= 1) {
+                    for (int j = 0; j < memorySorter.getEntryCount(); j++) {
+                        if (DuplicateCheck.compareEntriesStrictly(memorySorter.getEntryAt(j), diskSorter.getEntryAt(i)) >= 1) {
                             hasAlready = true;
                             break;
                         }
                     }
                     if (!hasAlready) {
-                        EntryAddChange ec = new EntryAddChange(disk.getEntryAt(i));
-                        changes.add(ec);
+                        changes.add(new EntryAddChange(diskSorter.getEntryAt(i)));
                     }
                 }
             }
@@ -322,16 +321,16 @@ public class ChangeScanner implements Runnable {
      * Finds the entry in neu best fitting the specified entry in old. If no entries get a score
      * above zero, an entry is still returned.
      *
-     * @param old   EntrySorter
-     * @param neu   EntrySorter
+     * @param oldSorter   EntrySorter
+     * @param newSorter   EntrySorter
      * @param index int
      * @return BibEntry
      */
-    private static BibEntry bestFit(EntrySorter old, EntrySorter neu, int index) {
+    private static BibEntry bestFit(EntrySorter oldSorter, EntrySorter newSorter, int index) {
         double comp = -1;
         int found = 0;
-        for (int i = 0; i < neu.getEntryCount(); i++) {
-            double res = DuplicateCheck.compareEntriesStrictly(old.getEntryAt(index), neu.getEntryAt(i));
+        for (int i = 0; i < newSorter.getEntryCount(); i++) {
+            double res = DuplicateCheck.compareEntriesStrictly(oldSorter.getEntryAt(index), newSorter.getEntryAt(i));
             if (res > comp) {
                 comp = res;
                 found = i;
@@ -340,11 +339,11 @@ public class ChangeScanner implements Runnable {
                 break;
             }
         }
-        return neu.getEntryAt(found);
+        return newSorter.getEntryAt(found);
     }
 
-    private void scanPreamble(BibDatabase inMem1, BibDatabase onTmp, BibDatabase onDisk) {
-        String mem = inMem1.getPreamble().orElse(null);
+    private void scanPreamble(BibDatabase inMemory, BibDatabase onTmp, BibDatabase onDisk) {
+        String mem = inMemory.getPreamble().orElse(null);
         Optional<String> tmp = onTmp.getPreamble();
         Optional<String> disk = onDisk.getPreamble();
         if (!tmp.isPresent()) {
@@ -356,19 +355,19 @@ public class ChangeScanner implements Runnable {
         }
     }
 
-    private void scanStrings(BibDatabase inMem1, BibDatabase onTmp, BibDatabase onDisk) {
-        if (onTmp.hasNoStrings() && onDisk.hasNoStrings()) {
+    private void scanStrings(BibDatabase inMem1, BibDatabase inTmp, BibDatabase onDisk) {
+        if (inTmp.hasNoStrings() && onDisk.hasNoStrings()) {
             return;
         }
 
         Set<Object> used = new HashSet<>();
         Set<Object> usedInMem = new HashSet<>();
-        Set<String> notMatched = new HashSet<>(onTmp.getStringCount());
+        Set<String> notMatched = new HashSet<>(inTmp.getStringCount());
 
         // First try to match by string names.
         mainLoop:
-        for (String key : onTmp.getStringKeySet()) {
-            BibtexString tmp = onTmp.getString(key);
+        for (String key : inTmp.getStringKeySet()) {
+            BibtexString tmp = inTmp.getString(key);
 
             for (String diskId : onDisk.getStringKeySet()) {
                 if (!used.contains(diskId)) {
@@ -398,7 +397,7 @@ public class ChangeScanner implements Runnable {
         // See if we can detect a name change for those entries that we couldn't match.
         if (!notMatched.isEmpty()) {
             for (Iterator<String> i = notMatched.iterator(); i.hasNext(); ) {
-                BibtexString tmp = onTmp.getString(i.next());
+                BibtexString tmp = inTmp.getString(i.next());
 
                 // If we get to this point, we found no string with matching name. See if we
                 // can find one with matching content.
@@ -416,8 +415,8 @@ public class ChangeScanner implements Runnable {
 
                             for (String memId : inMem1.getStringKeySet()) {
                                 BibtexString bsMemCandidate = inMem1.getString(memId);
-                                if (bsMemCandidate.getContent().equals(disk.getContent()) && !usedInMem.contains(
-                                        memId)) {
+                                if (bsMemCandidate.getContent().equals(disk.getContent())
+                                        && !usedInMem.contains(memId)) {
                                     usedInMem.add(memId);
                                     bsMem = bsMemCandidate;
                                     break;
@@ -425,9 +424,8 @@ public class ChangeScanner implements Runnable {
                             }
 
                             if (bsMem != null) {
-                                changes.add(
-                                        new StringNameChange(bsMem, tmp, bsMem.getName(), tmp.getName(), disk.getName(),
-                                                tmp.getContent()));
+                                changes.add(new StringNameChange(bsMem, tmp, bsMem.getName(), tmp.getName(),
+                                        disk.getName(), tmp.getContent()));
                                 i.remove();
                                 used.add(diskId);
                             }
@@ -440,8 +438,8 @@ public class ChangeScanner implements Runnable {
 
         if (!notMatched.isEmpty()) {
             // Still one or more non-matched strings. So they must have been removed.
-            for (String nmId : notMatched) {
-                BibtexString tmp = onTmp.getString(nmId);
+            for (String notMatchedId : notMatched) {
+                BibtexString tmp = inTmp.getString(notMatchedId);
                 // The removed string is not removed from the mem version.
                 findString(inMem1, tmp.getName(), usedInMem).ifPresent(
                         x -> changes.add(new StringRemoveChange(tmp, tmp, x)));
@@ -477,8 +475,8 @@ public class ChangeScanner implements Runnable {
      * This method only detects whether a change took place or not. It does not determine the type of change. This would
      * be possible, but difficult to do properly, so I rather only report the change.
      */
-    private void scanGroups(MetaData onTmp, MetaData onDisk) {
-        final GroupTreeNode groupsTmp = onTmp.getGroups();
+    private void scanGroups(MetaData inTemp, MetaData onDisk) {
+        final GroupTreeNode groupsTmp = inTemp.getGroups();
         final GroupTreeNode groupsDisk = onDisk.getGroups();
         if ((groupsTmp == null) && (groupsDisk == null)) {
             return;
