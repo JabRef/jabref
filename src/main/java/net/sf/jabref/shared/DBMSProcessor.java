@@ -94,7 +94,7 @@ public abstract class DBMSProcessor {
      *
      * @throws SQLException
      */
-    public void setUpSharedDatabase() throws SQLException {
+    public void setupSharedDatabase() throws SQLException {
         setUp();
 
         if (!checkBaseIntegrity()) {

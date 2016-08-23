@@ -130,8 +130,10 @@ public class DBMSSynchronizer {
     public void initializeDatabases() throws DatabaseNotSupportedException, SQLException {
         if (!dbmsProcessor.checkBaseIntegrity()) {
             LOGGER.info("Integrity check failed. Fixing...");
-            dbmsProcessor.setUpSharedDatabase();
+            dbmsProcessor.setupSharedDatabase();
 
+            // This check should only be performed once on initial database setup.
+            // Calling dbmsProcessor.setupSharedDatabase() lets dbmsProcessor.checkBaseIntegrity() be true.
             if (dbmsProcessor.checkForPre3Dot6Intergrity()) {
                 throw new DatabaseNotSupportedException();
             }
