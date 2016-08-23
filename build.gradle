@@ -79,7 +79,7 @@ dependencies {
     compile 'org.apache.pdfbox:jempbox:1.8.12'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    compile 'org.bouncycastle:bcprov-jdk15on:1.54'
+    compile 'org.bouncycastle:bcprov-jdk15on:1.55'
 
     compile 'commons-cli:commons-cli:1.3.1'
 
@@ -120,7 +120,7 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile 'com.github.tomakehurst:wiremock:2.1.10'
+    testCompile 'com.github.tomakehurst:wiremock:2.1.11'
     testCompile 'org.assertj:assertj-swing-junit:3.4.0'
 }
 
