@@ -1549,7 +1549,7 @@ public class BibtexParserTest {
                         + "}"),
                 importFormatPreferences);
 
-        GroupTreeNode root = result.getMetaData().getGroups();
+        GroupTreeNode root = result.getMetaData().getGroups().get();
 
         assertEquals(new AllEntriesGroup(), root.getGroup());
         assertEquals(3, root.getNumberOfChildren());

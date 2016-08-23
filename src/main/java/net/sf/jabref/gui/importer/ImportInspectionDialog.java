@@ -241,7 +241,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         popup.add(deleteListener);
         popup.addSeparator();
         if (!newDatabase && (bibDatabaseContext != null)) {
-            GroupTreeNode node = bibDatabaseContext.getMetaData().getGroups();
+            GroupTreeNode node = bibDatabaseContext.getMetaData().getGroups().get();
             JMenu groupsAdd = new JMenu(Localization.lang("Add to group"));
             groupsAdd.setEnabled(false); // Will get enabled if there are groups that can be added to.
             insertNodes(groupsAdd, node);
