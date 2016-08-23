@@ -31,16 +31,15 @@ public class EntryLinkChecker implements Checker {
             Set<FieldProperties> properties = InternalBibtexFields.getFieldExtras(field.getKey());
             if (properties.contains(FieldProperties.SINGLE_ENTRY_LINK)) {
                 if (!database.getEntryByKey(field.getValue()).isPresent()) {
-                    result.add(
-                            new IntegrityMessage(Localization.lang("non-exisiting BibTeX key"), entry, field.getKey()));
+                    result.add(new IntegrityMessage(Localization.lang("BibTeX key does not exist"), entry,
+                            field.getKey()));
                 }
             } else if (properties.contains(FieldProperties.MULTIPLE_ENTRY_LINK)) {
                 List<String> keys = new ArrayList<>(Arrays.asList(field.getValue().split(",")));
                 for (String key : keys) {
                     if (!database.getEntryByKey(key).isPresent()) {
-                        result.add(new IntegrityMessage(Localization.lang("non-exisiting BibTeX key") + ": " + key,
-                                entry,
-                                field.getKey()));
+                        result.add(new IntegrityMessage(Localization.lang("BibTeX key does not exist") + ": " + key,
+                                entry, field.getKey()));
                     }
                 }
             }
