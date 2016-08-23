@@ -1357,18 +1357,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         helpMenu.add(help);
         helpMenu.add(openForumAction);
-        JMenu webMenu = JabRefFrame.subMenu(Localization.menuTitle("JabRef on the internet"));
-        webMenu.add(jabrefWebPageAction);
-        webMenu.add(jabrefBlogAction);
-        webMenu.add(jabrefFacebookAction);
-        helpMenu.add(webMenu);
         helpMenu.addSeparator();
         helpMenu.add(errorConsole);
         helpMenu.addSeparator();
-        helpMenu.add(forkMeOnGitHubAction);
-        helpMenu.add(donationAction);
-        helpMenu.addSeparator();
         helpMenu.add(new SearchForUpdateAction());
+        JMenu webMenu = JabRefFrame.subMenu(Localization.menuTitle("JabRef resources"));
+        webMenu.add(jabrefWebPageAction);
+        webMenu.add(jabrefBlogAction);
+        webMenu.add(jabrefFacebookAction);
+        webMenu.add(forkMeOnGitHubAction);
+        webMenu.add(donationAction);
+        helpMenu.add(webMenu);
         helpMenu.add(about);
         mb.add(helpMenu);
 
