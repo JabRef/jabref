@@ -58,7 +58,6 @@ import org.apache.commons.logging.LogFactory;
  * label that can be hidden when the download is complete.
  */
 public class FileListEntryEditor {
-
     private static final Log LOGGER = LogFactory.getLog(FileListEntryEditor.class);
 
     private JDialog diag;

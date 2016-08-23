@@ -1,9 +1,6 @@
 package net.sf.jabref.gui.entryeditor;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -395,21 +392,6 @@ public class FieldExtraComponents {
         });
         return Optional.of(button);
 
-    }
-
-    /**
-     * Set up a drop target for URLs for fields with EXTRA_URL
-     *
-     * @param fieldEditor
-     * @param storeFieldAction
-     * @return
-     */
-    public static Optional<JComponent> getURLExtraComponent(FieldEditor fieldEditor,
-            StoreFieldAction storeFieldAction) {
-        ((JComponent) fieldEditor).setDropTarget(new DropTarget((Component) fieldEditor, DnDConstants.ACTION_NONE,
-                new SimpleUrlDragDrop(fieldEditor, storeFieldAction)));
-
-        return Optional.empty();
     }
 
     /**
