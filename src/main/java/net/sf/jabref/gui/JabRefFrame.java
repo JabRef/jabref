@@ -206,6 +206,15 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction newBiblatexDatabaseAction = new NewDatabaseAction(this, BibDatabaseMode.BIBLATEX);
     private final AbstractAction openSharedDatabaseAction = new OpenSharedDatabaseAction(this);
     private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction(this);
+    private final AbstractAction jabrefWebPageAction = new OpenBrowserAction("https://jabref.org",
+            Localization.menuTitle("Web page"), Localization.lang("Opens JabRef's web page"),
+            IconTheme.getImage("about"), IconTheme.getImage("about"));
+    private final AbstractAction jabrefFacebookAction = new OpenBrowserAction("https://www.facebook.com/JabRef/",
+            "Facebook", Localization.lang("Opens JabRef's Facebook page"),
+            IconTheme.JabRefIcon.FACEBOOK.getSmallIcon(), IconTheme.JabRefIcon.FACEBOOK.getIcon());
+    private final AbstractAction jabrefBlogAction = new OpenBrowserAction("https://blog.jabref.org/",
+            Localization.menuTitle("Blog"), Localization.lang("Opens JabRef's blog"),
+            IconTheme.JabRefIcon.BLOG.getSmallIcon(), IconTheme.JabRefIcon.BLOG.getIcon());
     private final AbstractAction forkMeOnGitHubAction = new OpenBrowserAction("https://github.com/JabRef/jabref",
             Localization.menuTitle("Fork me on GitHub"), Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcon.GITHUB.getSmallIcon(), IconTheme.JabRefIcon.GITHUB.getIcon());
     private final AbstractAction donationAction = new OpenBrowserAction("https://github.com/JabRef/jabref/wiki/Donations",
@@ -1348,6 +1357,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         helpMenu.add(help);
         helpMenu.add(openForumAction);
+        JMenu webMenu = JabRefFrame.subMenu(Localization.menuTitle("JabRef on the internet"));
+        webMenu.add(jabrefWebPageAction);
+        webMenu.add(jabrefBlogAction);
+        webMenu.add(jabrefFacebookAction);
+        helpMenu.add(webMenu);
         helpMenu.addSeparator();
         helpMenu.add(errorConsole);
         helpMenu.addSeparator();
