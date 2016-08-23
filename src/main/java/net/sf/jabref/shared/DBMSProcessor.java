@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.event.source.EntryEventSource;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.shared.exception.OfflineLockException;
 import net.sf.jabref.shared.exception.SharedEntryNotPresentException;
@@ -100,7 +99,7 @@ public abstract class DBMSProcessor {
 
         if (!checkBaseIntegrity()) {
             // can only happen with users direct intervention on shared database
-            LOGGER.error(Localization.lang("Corrupt_shared_database_structure."));
+            LOGGER.error("Corrupt_shared_database_structure.");
         }
     }
 

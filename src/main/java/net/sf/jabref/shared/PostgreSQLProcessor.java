@@ -35,9 +35,10 @@ public class PostgreSQLProcessor extends DBMSProcessor {
                 "\"NAME\" VARCHAR, " +
                 "\"VALUE\" TEXT)");
 
-        connection.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS \"METADATA\" ("
-                    + "\"KEY\" VARCHAR,"
-                    + "\"VALUE\" TEXT)");
+        connection.createStatement().executeUpdate(
+                "CREATE TABLE IF NOT EXISTS \"METADATA\" ("
+                + "\"KEY\" VARCHAR,"
+                + "\"VALUE\" TEXT)");
     }
 
     @Override

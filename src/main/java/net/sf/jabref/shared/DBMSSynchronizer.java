@@ -13,7 +13,6 @@ import net.sf.jabref.event.MetaDataChangedEvent;
 import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.logic.exporter.BibDatabaseWriter;
 import net.sf.jabref.logic.importer.util.ParseException;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.event.EntryAddedEvent;
@@ -130,7 +129,7 @@ public class DBMSSynchronizer {
      */
     public void initializeDatabases() throws DatabaseNotSupportedException, SQLException {
         if (!dbmsProcessor.checkBaseIntegrity()) {
-            LOGGER.info(Localization.lang("Integrity check failed. Fixing..."));
+            LOGGER.info("Integrity check failed. Fixing...");
             dbmsProcessor.setUpSharedDatabase();
 
             if (dbmsProcessor.checkForPre3Dot6Intergrity()) {
