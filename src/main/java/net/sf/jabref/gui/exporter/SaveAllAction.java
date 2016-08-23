@@ -49,7 +49,7 @@ public class SaveAllAction extends MnemonicAwareAction implements Worker {
         for (int i = 0; i < databases; i++) {
             if (i < frame.getBasePanelCount()) {
                 BasePanel panel = frame.getBasePanelAt(i);
-                if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
+                if (!panel.getBibDatabaseContext().getDatabaseFile().isPresent()) {
                     frame.showBasePanelAt(i);
                 }
                 panel.runCommand(Actions.SAVE);

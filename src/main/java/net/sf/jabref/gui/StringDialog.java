@@ -8,6 +8,7 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -143,11 +144,8 @@ class StringDialog extends JDialog {
         conPane.add(tlb, BorderLayout.NORTH);
         conPane.add(pan, BorderLayout.CENTER);
 
-        if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
-            setTitle(STRINGS_TITLE + ": " + GUIGlobals.UNTITLED_TITLE);
-        } else {
-            setTitle(STRINGS_TITLE + ": " + panel.getBibDatabaseContext().getDatabaseFile().getName());
-        }
+        setTitle(STRINGS_TITLE + ": "
+                + panel.getBibDatabaseContext().getDatabaseFile().map(File::getName).orElse(GUIGlobals.UNTITLED_TITLE));
         PositionWindow pw = new PositionWindow(this, JabRefPreferences.STRINGS_POS_X, JabRefPreferences.STRINGS_POS_Y,
                 JabRefPreferences.STRINGS_SIZE_X, JabRefPreferences.STRINGS_SIZE_Y);
         pw.setWindowPosition();

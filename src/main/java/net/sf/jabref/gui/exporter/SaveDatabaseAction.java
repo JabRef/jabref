@@ -65,9 +65,7 @@ public class SaveDatabaseAction extends AbstractWorker {
         success = false;
         canceled = false;
         fileLockedError = false;
-        if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
-            saveAs();
-        } else {
+        if (panel.getBibDatabaseContext().getDatabaseFile().isPresent()) {
             // Check for external modifications: if true, save not performed so do not tell the user a save is underway but return instead.
             if (checkExternalModification()) {
                 return;
@@ -75,6 +73,8 @@ public class SaveDatabaseAction extends AbstractWorker {
 
             panel.frame().output(Localization.lang("Saving database") + "...");
             panel.setSaving(true);
+        } else {
+            saveAs();
         }
     }
 
@@ -83,9 +83,9 @@ public class SaveDatabaseAction extends AbstractWorker {
         if (success) {
             // Reset title of tab
             frame.setTabTitle(panel, panel.getTabTitle(),
-                    panel.getBibDatabaseContext().getDatabaseFile().getAbsolutePath());
+                    panel.getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
             frame.output(Localization.lang("Saved database") + " '"
-                    + panel.getBibDatabaseContext().getDatabaseFile().getPath() + "'.");
+                    + panel.getBibDatabaseContext().getDatabaseFile().get().getPath() + "'.");
             frame.setWindowTitle();
             frame.updateAllTabTitles();
         } else if (!canceled) {
@@ -100,7 +100,7 @@ public class SaveDatabaseAction extends AbstractWorker {
 
     @Override
     public void run() {
-        if (canceled || (panel.getBibDatabaseContext().getDatabaseFile() == null)) {
+        if (canceled || !panel.getBibDatabaseContext().getDatabaseFile().isPresent()) {
             return;
         }
 
@@ -111,7 +111,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             // If set in preferences, generate missing BibTeX keys
             panel.autoGenerateKeysBeforeSaving();
 
-            if (FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile().toPath())) {
+            if (FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile().get().toPath())) {
                 // Check for external modifications to alleviate multiuser concurrency issue when near
                 // simultaneous saves occur to a shared database file: if true, do not perform the save
                 // rather return instead.
@@ -120,9 +120,8 @@ public class SaveDatabaseAction extends AbstractWorker {
                 }
 
                 // Save the database
-                success = saveDatabase(panel.getBibDatabaseContext().getDatabaseFile(), false,
-                        panel.getBibDatabaseContext().getMetaData().getEncoding()
-                                .orElse(Globals.prefs.getDefaultEncoding()));
+                success = saveDatabase(panel.getBibDatabaseContext().getDatabaseFile().get(), false,
+                        panel.getBibDatabaseContext().getMetaData().getEncoding().orElse(Globals.prefs.getDefaultEncoding()));
 
                 Globals.getFileUpdateMonitor().updateTimeStamp(panel.getFileMonitorHandle());
             } else {
@@ -304,7 +303,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             }
         }
 
-        File oldFile = panel.getBibDatabaseContext().getDatabaseFile();
+        File oldFile = panel.getBibDatabaseContext().getDatabaseFile().orElse(null);
         panel.getBibDatabaseContext().setDatabaseFile(file);
         Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
         runCommand();
@@ -316,11 +315,11 @@ public class SaveDatabaseAction extends AbstractWorker {
         // Register so we get notifications about outside changes to the file.
         try {
             panel.setFileMonitorHandle(Globals.getFileUpdateMonitor().addUpdateListener(panel,
-                    panel.getBibDatabaseContext().getDatabaseFile()));
+                    panel.getBibDatabaseContext().getDatabaseFile().orElse(null)));
         } catch (IOException ex) {
             LOGGER.error("Problem registering file change notifications", ex);
         }
-        frame.getFileHistory().newFile(panel.getBibDatabaseContext().getDatabaseFile().getPath());
+        frame.getFileHistory().newFile(panel.getBibDatabaseContext().getDatabaseFile().get().getPath());
         frame.updateEnabledState();
     }
 
@@ -369,13 +368,14 @@ public class SaveDatabaseAction extends AbstractWorker {
 
                 JabRefExecutorService.INSTANCE.execute(() -> {
 
-                    if (!FileBasedLock.waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile().toPath())) {
+                    if (!FileBasedLock
+                            .waitForFileLock(panel.getBibDatabaseContext().getDatabaseFile().get().toPath())) {
                         // TODO: GUI handling of the situation when the externally modified file keeps being locked.
                         LOGGER.error("File locked, this will be trouble.");
                     }
 
                     ChangeScanner scanner = new ChangeScanner(panel.frame(), panel,
-                            panel.getBibDatabaseContext().getDatabaseFile());
+                            panel.getBibDatabaseContext().getDatabaseFile().get());
                     JabRefExecutorService.INSTANCE.executeWithLowPriorityInOwnThreadAndWait(scanner);
                     if (scanner.changesFound()) {
                         scanner.displayResult(resolved -> {

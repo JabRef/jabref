@@ -98,10 +98,10 @@ public class BibDatabaseContext {
     /**
      * Get the file where this database was last saved to or loaded from, if any.
      *
-     * @return The relevant File, or null if none is defined.
+     * @return Optional of the relevant File, or Optional.empty() if none is defined.
      */
-    public File getDatabaseFile() {
-        return file;
+    public Optional<File> getDatabaseFile() {
+        return Optional.ofNullable(file);
     }
 
     public void setDatabaseFile(File file) {
@@ -158,15 +158,15 @@ public class BibDatabaseContext {
         }
 
         // 4. BIB file directory
-        if (getDatabaseFile() != null) {
-            String parentDir = getDatabaseFile().getParent();
+        getDatabaseFile().ifPresent(databaseFile -> {
+            String parentDir = databaseFile.getParent();
             // Check if we should add it as primary file dir (first in the list) or not:
             if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR)) {
                 fileDirs.add(0, parentDir);
             } else {
                 fileDirs.add(parentDir);
             }
-        }
+        });
 
         return fileDirs;
     }
@@ -175,13 +175,14 @@ public class BibDatabaseContext {
         String dir = directoryName;
         // If this directory is relative, we try to interpret it as relative to
         // the file path of this BIB file:
-        if (!new File(dir).isAbsolute() && (getDatabaseFile() != null)) {
+        Optional<File> databaseFile = getDatabaseFile();
+        if (!new File(dir).isAbsolute() && databaseFile.isPresent()) {
             String relDir;
             if (".".equals(dir)) {
                 // if dir is only "current" directory, just use its parent (== real current directory) as path
-                relDir = getDatabaseFile().getParent();
+                relDir = databaseFile.get().getParent();
             } else {
-                relDir = getDatabaseFile().getParent() + File.separator + dir;
+                relDir = databaseFile.get().getParent() + File.separator + dir;
             }
             // If this directory actually exists, it is very likely that the
             // user wants us to use it:
