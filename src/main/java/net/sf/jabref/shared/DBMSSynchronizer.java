@@ -59,6 +59,7 @@ public class DBMSSynchronizer {
 
     /**
      * Listening method. Inserts a new {@link BibEntry} into shared database.
+     *
      * @param event {@link EntryAddedEvent} object
      */
     @Subscribe
@@ -74,6 +75,7 @@ public class DBMSSynchronizer {
 
     /**
      * Listening method. Updates an existing shared {@link BibEntry}.
+     *
      * @param event {@link FieldChangedEvent} object
      */
     @Subscribe
@@ -90,6 +92,7 @@ public class DBMSSynchronizer {
 
     /**
      * Listening method. Deletes the given {@link BibEntry} from shared database.
+     *
      * @param event {@link EntryRemovedEvent} object
      */
     @Subscribe
@@ -105,6 +108,7 @@ public class DBMSSynchronizer {
 
     /**
      * Listening method. Synchronizes the shared {@link MetaData} and applies them locally.
+     *
      * @param event
      */
     @Subscribe
@@ -119,6 +123,7 @@ public class DBMSSynchronizer {
     /**
      * Sets the table structure of shared database if needed and pulls all shared entries
      * to the new local database.
+     *
      * @param bibDatabase Local {@link BibDatabase}
      * @throws DatabaseNotSupportedException if the version of shared database does not match
      *          the version of current shared database support ({@link DBMSProcessor}).
@@ -317,6 +322,7 @@ public class DBMSSynchronizer {
 
     /**
      * Checks whether the {@link EntryEventSource} of an {@link EntryEvent} is crucial for this class.
+     *
      * @param event An {@link EntryEvent}
      * @return <code>true</code> if the event is able to trigger operations in {@link DBMSSynchronizer}, else <code>false</code>
      */

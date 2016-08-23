@@ -42,6 +42,7 @@ public abstract class DBMSProcessor {
 
     /**
      * Scans the database for required tables.
+     *
      * @return <code>true</code> if the structure matches the requirements, <code>false</code> if not.
      * @throws SQLException
      */
@@ -51,6 +52,7 @@ public abstract class DBMSProcessor {
 
     /**
      * Determines whether the database is using an pre-3.6 structure.
+     *
      * @return <code>true</code> if the structure is old, else <code>false</code>.
      */
     public boolean checkForPre3Dot6Intergrity() throws SQLException {
@@ -66,6 +68,7 @@ public abstract class DBMSProcessor {
 
     /**
      * Checks whether all given table names (<b>case insensitive</b>) exist in database.
+     *
      * @param tableNames Table names to be checked
      * @return <code>true</code> if <b>all</b> given tables are present, else <code>false</code>.
      */
@@ -103,6 +106,7 @@ public abstract class DBMSProcessor {
 
     /**
      * Creates and sets up the needed tables and columns according to the database type.
+     *
      * @throws SQLException
      */
     protected abstract void setUp() throws SQLException;
@@ -110,6 +114,7 @@ public abstract class DBMSProcessor {
     /**
      * Escapes parts of SQL expressions like table or field name to match the conventions
      * of the database system using the current dbmsType.
+     *
      * @param expression Table or field name
      * @return Correctly escaped expression
      */
@@ -118,6 +123,7 @@ public abstract class DBMSProcessor {
 
     /**
      * Inserts the given bibEntry into shared database.
+     *
      * @param bibEntry {@link BibEntry} to be inserted
      */
     public void insertEntry(BibEntry bibEntry) {
@@ -350,6 +356,7 @@ public abstract class DBMSProcessor {
 
     /**
      * Removes the shared bibEntry.
+     *
      * @param bibEntry {@link BibEntry} to be deleted
      */
     public void removeEntry(BibEntry bibEntry) {
@@ -480,6 +487,7 @@ public abstract class DBMSProcessor {
 
     /**
      * Clears and sets all shared meta data.
+     *
      * @param metaData JabRef meta data.
      * @throws SQLException
      */
