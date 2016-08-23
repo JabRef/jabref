@@ -81,6 +81,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1499](https://github.com/JabRef/jabref/issues/1499): {} braces are now treated correctly in in author/editor
 - Fixed [#1531](https://github.com/JabRef/jabref/issues/1531): `\relax` can be used for abbreviation of author names
 - Fixed [#1771](https://github.com/JabRef/jabref/issues/1771): Show all supported import types as default
+- Fixed [#1804](https://github.com/JabRef/jabref/issues/1804): Integrity check no longer removes URL field by mistake
+
  
 
 ### Removed

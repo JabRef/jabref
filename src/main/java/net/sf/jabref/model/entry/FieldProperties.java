@@ -30,7 +30,8 @@ public enum FieldProperties {
     BOOK_NAME,
     SINGLE_ENTRY_LINK,
     MULTIPLE_ENTRY_LINK,
-    PUBLICATION_STATE;
+    PUBLICATION_STATE,
+    VERBATIM;
 
     public static final Set<FieldProperties> ALL_OPTS = EnumSet.allOf(FieldProperties.class);
 

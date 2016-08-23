@@ -410,19 +410,19 @@ public class IntegrityCheck {
             List<IntegrityMessage> results = new ArrayList<>();
 
             Map<String, String> fields = entry.getFieldMap();
-            // the url field should not be checked for hashes, as they are legal in this field
-            fields.remove(FieldName.URL);
+
 
             for (Map.Entry<String, String> field : fields.entrySet()) {
-                Matcher hashMatcher = UNESCAPED_HASH.matcher(field.getValue());
-                int hashCount = 0;
-                while (hashMatcher.find()) {
-                    hashCount++;
-                }
-                if ((hashCount & 1) == 1) { // Check if odd
-                    results.add(
-                            new IntegrityMessage(Localization.lang("odd number of unescaped '#'"), entry,
-                                    field.getKey()));
+                if (!InternalBibtexFields.getFieldExtras(field.getKey()).contains(FieldProperties.VERBATIM)) {
+                    Matcher hashMatcher = UNESCAPED_HASH.matcher(field.getValue());
+                    int hashCount = 0;
+                    while (hashMatcher.find()) {
+                        hashCount++;
+                    }
+                    if ((hashCount & 1) == 1) { // Check if odd
+                        results.add(new IntegrityMessage(Localization.lang("odd number of unescaped '#'"), entry,
+                                field.getKey()));
+                    }
                 }
             }
             return results;
