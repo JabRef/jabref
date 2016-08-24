@@ -555,7 +555,7 @@ public class MainTable extends JTable {
     public void ensureVisible(int row) {
         JScrollBar vert = pane.getVerticalScrollBar();
         int y = row * getRowHeight();
-        if ((y < vert.getValue()) || ((y > (vert.getValue() + vert.getVisibleAmount()))
+        if ((y < vert.getValue()) || ((y >= (vert.getValue() + vert.getVisibleAmount()))
                 && (model.getSearchState() != MainTableDataModel.DisplayOption.FLOAT))) {
             scrollToCenter(row, 1);
         }
