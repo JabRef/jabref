@@ -1,28 +1,13 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -40,26 +25,25 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
-import javax.swing.JToolBar;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.event.HyperlinkEvent;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.event.FieldChangedEvent;
-import net.sf.jabref.exporter.ExportFormats;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.fieldeditors.PreviewPanelTransferHandler;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.event.FieldChangedEvent;
 
 import com.google.common.eventbus.Subscribe;
 import org.apache.commons.logging.Log;
@@ -76,7 +60,7 @@ public class PreviewPanel extends JPanel
     /**
      * The bibtex entry currently shown
      */
-    private Optional<BibEntry> entry = Optional.empty();
+    private Optional<BibEntry> bibEntry = Optional.empty();
 
     /**
      * If a database is set, the preview will attempt to resolve strings in the
@@ -160,14 +144,6 @@ public class PreviewPanel extends JPanel
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scrollPane.setBorder(null);
 
-        /*
-         * If we have been given a panel and the preference option
-         * previewPrintButton is set, show the tool bar
-         */
-        if (this.basePanel.isPresent()
-                && JabRefPreferences.getInstance().getBoolean(JabRefPreferences.PREVIEW_PRINT_BUTTON)) {
-            add(createToolBar(), BorderLayout.LINE_START);
-        }
 
         add(scrollPane, BorderLayout.CENTER);
 
@@ -185,10 +161,6 @@ public class PreviewPanel extends JPanel
         final String copy = "copy";
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.COPY_PREVIEW), copy);
         actionMap.put(copy, this.copyPreviewAction);
-
-        final String print = "print";
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.PRINT_ENTRY_PREVIEW), print);
-        actionMap.put(print, this.printAction);
     }
 
     private JPopupMenu createPopupMenu() {
@@ -197,27 +169,6 @@ public class PreviewPanel extends JPanel
         menu.add(this.copyPreviewAction);
         this.basePanel.ifPresent(p -> menu.add(p.frame().getSwitchPreviewAction()));
         return menu;
-    }
-
-    private JToolBar createToolBar() {
-        JToolBar toolBar = new OSXCompatibleToolbar(SwingConstants.VERTICAL);
-        toolBar.setMargin(new Insets(0, 0, 0, 2));
-        toolBar.setFloatable(false);
-
-        // Add actions (and thus buttons)
-        toolBar.add(this.closeAction);
-        toolBar.addSeparator();
-        toolBar.add(this.copyPreviewAction);
-        toolBar.addSeparator();
-        toolBar.add(this.printAction);
-
-        Component[] comps = toolBar.getComponents();
-
-        for (Component comp : comps) {
-            ((JComponent) comp).setOpaque(false);
-        }
-
-        return toolBar;
     }
 
     private void createPreviewPane() {
@@ -240,7 +191,7 @@ public class PreviewPanel extends JPanel
                     .isPresent()) {
                 try {
                     String address = hyperlinkEvent.getURL().toString();
-                    JabRefDesktop.openExternalViewer(PreviewPanel.this.databaseContext.get(), address, "url");
+                    JabRefDesktop.openExternalViewer(PreviewPanel.this.databaseContext.get(), address, FieldName.URL);
                 } catch (IOException e) {
                     LOGGER.warn("Could not open external viewer", e);
                 }
@@ -262,7 +213,8 @@ public class PreviewPanel extends JPanel
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         try {
             layout = Optional
-                    .of(new LayoutHelper(sr, Globals.journalAbbreviationLoader.getRepository()).getLayoutFromText());
+                    .of(new LayoutHelper(sr, LayoutFormatterPreferences.fromPreferences(Globals.prefs,
+                            Globals.journalAbbreviationLoader)).getLayoutFromText());
         } catch (IOException e) {
             layout = Optional.empty();
             LOGGER.debug("no layout could be set", e);
@@ -275,9 +227,9 @@ public class PreviewPanel extends JPanel
 
     public void setEntry(BibEntry newEntry) {
 
-        entry.filter(e -> e != newEntry).ifPresent(e -> e.unregisterListener(this));
-        entry = Optional.ofNullable(newEntry);
-        entry.ifPresent(e -> e.registerListener(this));
+        bibEntry.filter(e -> e != newEntry).ifPresent(e -> e.unregisterListener(this));
+        bibEntry = Optional.ofNullable(newEntry);
+        bibEntry.ifPresent(e -> e.registerListener(this));
 
         updateLayout();
         update();
@@ -287,6 +239,7 @@ public class PreviewPanel extends JPanel
     /**
     * Listener for ChangedFieldEvent.
     */
+    @SuppressWarnings("unused")
     @Subscribe
     public void listen(FieldChangedEvent fieldChangedEvent) {
         update();
@@ -294,22 +247,32 @@ public class PreviewPanel extends JPanel
 
     @Override
     public BibEntry getEntry() {
-        return this.entry.orElse(null);
+        return this.bibEntry.orElse(null);
     }
 
     public void update() {
         StringBuilder sb = new StringBuilder();
         ExportFormats.entryNumber = 1; // Set entry number in case that is included in the preview layout.
-        entry.ifPresent(entry ->
-                layout.ifPresent(layout -> sb.append(layout
+        bibEntry.ifPresent(entry ->
+                layout.ifPresent(acutalLayout -> sb.append(acutalLayout
                         .doLayout(entry, databaseContext.map(BibDatabaseContext::getDatabase).orElse(null),
                                 highlightPattern)))
         );
         String newValue = sb.toString();
 
-        previewPane.setText(newValue);
-        previewPane.revalidate();
-
+        if (SwingUtilities.isEventDispatchThread()) {
+            previewPane.setText(newValue);
+            previewPane.revalidate();
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(() -> {
+                    previewPane.setText(newValue);
+                    previewPane.revalidate();
+                });
+            } catch (InvocationTargetException | InterruptedException e) {
+                LOGGER.info("Problem setting preview text", e);
+            }
+        }
         // Scroll to top:
         scrollToTop();
     }
@@ -329,7 +292,6 @@ public class PreviewPanel extends JPanel
             super(Localization.lang("Print entry preview"), IconTheme.JabRefIcon.PRINTED.getIcon());
 
             putValue(Action.SHORT_DESCRIPTION, Localization.lang("Print entry preview"));
-            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(KeyBinding.PRINT_ENTRY_PREVIEW));
         }
 
 
@@ -340,7 +302,7 @@ public class PreviewPanel extends JPanel
             JabRefExecutorService.INSTANCE.execute(() -> {
                 try {
                     PrintRequestAttributeSet pras = new HashPrintRequestAttributeSet();
-                    pras.add(new JobName(entry.map(BibEntry::getCiteKey).orElse("NO ENTRY"), null));
+                    pras.add(new JobName(bibEntry.flatMap(BibEntry::getCiteKeyOptional).orElse("NO ENTRY"), null));
                     previewPane.print(null, null, true, null, pras, false);
 
                 } catch (PrinterException e) {
@@ -383,7 +345,11 @@ public class PreviewPanel extends JPanel
             previewPane.copy();
             previewPane.select(0, -1);
         }
-
     }
+
+    public PrintAction getPrintAction() {
+        return printAction;
+    }
+
 
 }

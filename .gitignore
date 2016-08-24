@@ -1,6 +1,9 @@
 # no generated files in version control
 src/main/gen/
 
+# do not distribute Oracle's JDBC driver
+lib/ojdbc.jar
+
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err*
 
@@ -45,3 +48,4 @@ bin/
 # UNKNWON
 jabref.xml
 install4j6/
+*.sonargraph

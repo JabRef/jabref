@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.layout;
 
 import java.io.File;
@@ -26,10 +11,8 @@ import java.util.Optional;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.layout.format.AuthorAbbreviator;
 import net.sf.jabref.logic.layout.format.AuthorAndsCommaReplacer;
 import net.sf.jabref.logic.layout.format.AuthorAndsReplacer;
@@ -56,7 +39,9 @@ import net.sf.jabref.logic.layout.format.CreateDocBookAuthors;
 import net.sf.jabref.logic.layout.format.CurrentDate;
 import net.sf.jabref.logic.layout.format.DOICheck;
 import net.sf.jabref.logic.layout.format.DOIStrip;
+import net.sf.jabref.logic.layout.format.DateFormatter;
 import net.sf.jabref.logic.layout.format.Default;
+import net.sf.jabref.logic.layout.format.EntryTypeFormatter;
 import net.sf.jabref.logic.layout.format.FileLink;
 import net.sf.jabref.logic.layout.format.FirstPage;
 import net.sf.jabref.logic.layout.format.FormatPagesForHTML;
@@ -116,10 +101,11 @@ class LayoutEntry {
 
     private static final Log LOGGER = LogFactory.getLog(LayoutEntry.class);
 
-    private final JournalAbbreviationRepository repository;
+    private final LayoutFormatterPreferences prefs;
 
-    public LayoutEntry(StringInt si, JournalAbbreviationRepository repository) {
-        this.repository = repository;
+
+    public LayoutEntry(StringInt si, LayoutFormatterPreferences prefs) {
+        this.prefs = prefs;
         type = si.i;
         switch (type) {
         case LayoutHelper.IS_LAYOUT_TEXT:
@@ -138,8 +124,8 @@ class LayoutEntry {
         }
     }
 
-    public LayoutEntry(List<StringInt> parsedEntries, int layoutType, JournalAbbreviationRepository repository) {
-        this.repository = repository;
+    public LayoutEntry(List<StringInt> parsedEntries, int layoutType, LayoutFormatterPreferences prefs) {
+        this.prefs = prefs;
         List<LayoutEntry> tmpEntries = new ArrayList<>();
         String blockStart = parsedEntries.get(0).s;
         String blockEnd = parsedEntries.get(parsedEntries.size() - 1).s;
@@ -164,7 +150,7 @@ class LayoutEntry {
                     blockEntries.add(parsedEntry);
                     int groupType = parsedEntry.i == LayoutHelper.IS_GROUP_END ? LayoutHelper.IS_GROUP_START :
                             LayoutHelper.IS_FIELD_START;
-                    LayoutEntry le = new LayoutEntry(blockEntries, groupType, repository);
+                    LayoutEntry le = new LayoutEntry(blockEntries, groupType, prefs);
                     tmpEntries.add(le);
                     blockEntries = null;
                 } else {
@@ -180,7 +166,7 @@ class LayoutEntry {
             }
 
             if (blockEntries == null) {
-                tmpEntries.add(new LayoutEntry(parsedEntry, repository));
+                tmpEntries.add(new LayoutEntry(parsedEntry, prefs));
             } else {
                 blockEntries.add(parsedEntry);
             }
@@ -207,11 +193,8 @@ class LayoutEntry {
         case LayoutHelper.IS_LAYOUT_TEXT:
             return text;
         case LayoutHelper.IS_SIMPLE_FIELD:
-            String value = BibDatabase.getResolvedField(text, bibtex, database);
+            String value = BibDatabase.getResolvedField(text, bibtex, database).orElse("");
 
-            if (value == null) {
-                value = "";
-            }
             // If a post formatter has been set, call it:
             if (postFormatter != null) {
                 value = postFormatter.format(value);
@@ -229,7 +212,7 @@ class LayoutEntry {
             // Printing the encoding name is not supported in entry layouts, only
             // in begin/end layouts. This prevents breakage if some users depend
             // on a field called "encoding". We simply return this field instead:
-            return BibDatabase.getResolvedField("encoding", bibtex, database);
+            return BibDatabase.getResolvedField("encoding", bibtex, database).orElse(null);
         default:
             return "";
         }
@@ -238,19 +221,20 @@ class LayoutEntry {
     private String handleOptionField(BibEntry bibtex, BibDatabase database) {
         String fieldEntry;
 
-        if ("bibtextype".equals(text)) {
+        if (BibEntry.TYPE_HEADER.equals(text)) {
+            fieldEntry = bibtex.getType();
+        } else if (BibEntry.OBSOLETE_TYPE_HEADER.equals(text)) {
+            LOGGER.warn("'" + BibEntry.OBSOLETE_TYPE_HEADER
+                    + "' is an obsolete name for the entry type. Please update your layout to use '"
+                    + BibEntry.TYPE_HEADER + "' instead.");
             fieldEntry = bibtex.getType();
         } else {
             // changed section begin - arudert
             // resolve field (recognized by leading backslash) or text
-            String fieldText = text.startsWith("\\") ? BibDatabase.getResolvedField(text.substring(1), bibtex,
-                    database) : BibDatabase.getText(text, database);
+            fieldEntry = text.startsWith("\\") ? BibDatabase
+                    .getResolvedField(text.substring(1), bibtex, database)
+                    .orElse("") : BibDatabase.getText(text, database);
             // changed section end - arudert
-            if (fieldText == null) {
-                fieldEntry = "";
-            } else {
-                fieldEntry = fieldText;
-            }
         }
 
         if (option != null) {
@@ -268,38 +252,37 @@ class LayoutEntry {
     }
 
     private String handleFieldOrGroupStart(BibEntry bibtex, BibDatabase database, Optional<Pattern> highlightPattern) {
-        String field;
+        Optional<String> field;
         if (type == LayoutHelper.IS_GROUP_START) {
             field = BibDatabase.getResolvedField(text, bibtex, database);
         } else if (text.matches(".*(;|(\\&+)).*")) {
             // split the strings along &, && or ; for AND formatter
             String[] parts = text.split("\\s*(;|(\\&+))\\s*");
-            field = null;
+            field = Optional.empty();
             for (String part : parts) {
                 field = BibDatabase.getResolvedField(part, bibtex, database);
-                if (field == null) {
+                if (!field.isPresent()) {
                     break;
                 }
-
             }
         } else {
             // split the strings along |, ||  for OR formatter
             String[] parts = text.split("\\s*(\\|+)\\s*");
-            field = null;
+            field = Optional.empty();
             for (String part : parts) {
                 field = BibDatabase.getResolvedField(part, bibtex, database);
-                if (field != null) {
+                if (field.isPresent()) {
                     break;
                 }
             }
         }
 
-        if ((field == null) || ((type == LayoutHelper.IS_GROUP_START)
-                && field.equalsIgnoreCase(LayoutHelper.getCurrentGroup()))) {
+        if ((!field.isPresent()) || ((type == LayoutHelper.IS_GROUP_START)
+                && field.get().equalsIgnoreCase(LayoutHelper.getCurrentGroup()))) {
             return null;
         } else {
             if (type == LayoutHelper.IS_GROUP_START) {
-                LayoutHelper.setCurrentGroup(field);
+                LayoutHelper.setCurrentGroup(field.get());
             }
             StringBuilder sb = new StringBuilder(100);
             String fieldText;
@@ -486,10 +469,14 @@ class LayoutEntry {
             return new CreateDocBookAuthors();
         case "CurrentDate":
             return new CurrentDate();
+        case "DateFormatter":
+            return new DateFormatter();
         case "DOICheck":
             return new DOICheck();
         case "DOIStrip":
             return new DOIStrip();
+        case "EntryTypeFormatter":
+            return new EntryTypeFormatter();
         case "FirstPage":
             return new FirstPage();
         case "FormatPagesForHTML":
@@ -507,7 +494,8 @@ class LayoutEntry {
         case "Iso690NamesAuthors":
             return new Iso690NamesAuthors();
         case "JournalAbbreviator":
-            return new JournalAbbreviator(repository);
+            return new JournalAbbreviator(prefs.getJournalAbbreviationLoader(),
+                    prefs.getJournalAbbreviationPreferences());
         case "LastPage":
             return new LastPage();
         case "FormatChars": // For backward compatibility
@@ -544,7 +532,7 @@ class LayoutEntry {
         case "Default":
             return new Default();
         case "FileLink":
-            return new FileLink();
+            return new FileLink(prefs.getFileLinkPreferences());
         case "Number":
             return new Number();
         case "RisAuthors":
@@ -558,7 +546,7 @@ class LayoutEntry {
         case "WrapContent":
             return new WrapContent();
         case "WrapFileLinks":
-            return new WrapFileLinks();
+            return new WrapFileLinks(prefs.getFileLinkPreferences());
         default:
             return new NotFoundFormatter(name);
         }
@@ -575,26 +563,25 @@ class LayoutEntry {
 
         List<LayoutFormatter> results = new ArrayList<>(formatterStrings.size());
 
-        Map<String, String> userNameFormatter = NameFormatter.getNameFormatters();
+        Map<String, String> userNameFormatter = NameFormatter.getNameFormatters(prefs.getNameFormatterPreferences());
 
         for (List<String> strings : formatterStrings) {
 
-            String className = strings.get(0).trim();
+            String nameFormatterName = strings.get(0).trim();
 
             // Check if this is a name formatter defined by this export filter:
-            if (Globals.prefs.customExportNameFormatters != null) {
-                String contents = Globals.prefs.customExportNameFormatters.get(className);
-                if (contents != null) {
-                    NameFormatter nf = new NameFormatter();
-                    nf.setParameter(contents);
-                    results.add(nf);
-                    continue;
-                }
+
+            Optional<String> contents = prefs.getCustomExportNameFormatter(nameFormatterName);
+            if (contents.isPresent()) {
+                NameFormatter nf = new NameFormatter();
+                nf.setParameter(contents.get());
+                results.add(nf);
+                continue;
             }
 
             // Try to load from formatters in formatter folder
             try {
-                LayoutFormatter f = getLayoutFormatterByName(className);
+                LayoutFormatter f = getLayoutFormatterByName(nameFormatterName);
                 // If this formatter accepts an argument, check if we have one, and
                 // set it if so:
                 if ((f instanceof ParamLayoutFormatter) && (strings.size() >= 2)) {
@@ -607,7 +594,7 @@ class LayoutEntry {
             }
 
             // Then check whether this is a user defined formatter
-            String formatterParameter = userNameFormatter.get(className);
+            String formatterParameter = userNameFormatter.get(nameFormatterName);
 
             if (formatterParameter != null) {
                 NameFormatter nf = new NameFormatter();
@@ -616,10 +603,7 @@ class LayoutEntry {
                 continue;
             }
 
-            // If not found throw exception...
-            //return new LayoutFormatter[] {new NotFoundFormatter(className)};
-            results.add(new NotFoundFormatter(className));
-            //throw new Exception(Globals.lang("Formatter not found") + ": "+ className);
+            results.add(new NotFoundFormatter(nameFormatterName));
         }
 
         return results;

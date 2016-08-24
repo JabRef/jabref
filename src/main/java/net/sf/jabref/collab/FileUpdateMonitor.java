@@ -1,22 +1,9 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.collab;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,7 +17,6 @@ import org.apache.commons.logging.LogFactory;
  * in the file's last modification time stamp. The
  */
 public class FileUpdateMonitor implements Runnable {
-
     private static final Log LOGGER = LogFactory.getLog(FileUpdateMonitor.class);
 
     private static final int WAIT = 4000;
@@ -83,12 +69,12 @@ public class FileUpdateMonitor implements Runnable {
      * force a report to all listeners before the next routine check.
      */
     public boolean hasBeenModified(String handle) {
-        Object o = entries.get(handle);
-        if (o == null) {
+        Entry entry = entries.get(handle);
+        if (entry == null) {
             return false;
         }
         try {
-            return ((Entry) o).hasBeenUpdated();
+            return entry.hasBeenUpdated();
         } catch (IOException ex) {
             // Thrown if file has been removed. We return false.
             return false;
@@ -103,11 +89,10 @@ public class FileUpdateMonitor implements Runnable {
      * @param handle the handle to the correct file.
      */
     public void perturbTimestamp(String handle) {
-        Object o = entries.get(handle);
-        if (o == null) {
-            return;
+        Entry entry = entries.get(handle);
+        if (entry != null) {
+            entry.decreaseTimeStamp();
         }
-        ((Entry) o).decreaseTimeStamp();
     }
 
     /**
@@ -119,9 +104,8 @@ public class FileUpdateMonitor implements Runnable {
     }
 
     public void updateTimeStamp(String key) {
-        Object o = entries.get(key);
-        if (o != null) {
-            Entry entry = (Entry) o;
+        Entry entry = entries.get(key);
+        if (entry != null) {
             entry.updateTimeStamp();
         }
     }
@@ -133,12 +117,12 @@ public class FileUpdateMonitor implements Runnable {
      * @throws IllegalArgumentException If the handle doesn't correspond to an entry.
      * @return File The temporary file.
      */
-    public File getTempFile(String key) throws IllegalArgumentException {
-        Object o = entries.get(key);
-        if (o == null) {
+    public Path getTempFile(String key) throws IllegalArgumentException {
+        Entry entry = entries.get(key);
+        if (entry == null) {
             throw new IllegalArgumentException("Entry not found");
         }
-        return ((Entry) o).getTmpFile();
+        return entry.getTmpFile();
     }
 
 
@@ -149,7 +133,7 @@ public class FileUpdateMonitor implements Runnable {
 
         private final FileUpdateListener listener;
         private final File file;
-        private final File tmpFile;
+        private final Path tmpFile;
         private long timeStamp;
         private long fileSize;
 
@@ -161,7 +145,7 @@ public class FileUpdateMonitor implements Runnable {
             fileSize = file.length();
             tmpFile = FileUpdateMonitor.getTempFile();
             if (tmpFile != null) {
-                tmpFile.deleteOnExit();
+                tmpFile.toFile().deleteOnExit();
                 copy();
             }
         }
@@ -194,9 +178,9 @@ public class FileUpdateMonitor implements Runnable {
 
             boolean res = false;
             try {
-                res = FileUtil.copyFile(file, tmpFile, true);
+                res = FileUtil.copyFile(file, tmpFile.toFile(), true);
             } catch (IOException ex) {
-                LOGGER.info("Cannot copy to temporary file '" + tmpFile.getPath() + '\'', ex);
+                LOGGER.info("Cannot copy to temporary file '" + tmpFile + '\'', ex);
             }
             return res;
         }
@@ -218,7 +202,7 @@ public class FileUpdateMonitor implements Runnable {
             listener.fileRemoved();
         }
 
-        public File getTmpFile() {
+        public Path getTmpFile() {
             return tmpFile;
         }
 
@@ -228,14 +212,14 @@ public class FileUpdateMonitor implements Runnable {
     }
 
 
-    private static synchronized File getTempFile() {
-        File f = null;
+    private static synchronized Path getTempFile() {
+        Path temporaryFile = null;
         try {
-            f = File.createTempFile("jabref", null);
-            f.deleteOnExit();
+            temporaryFile = Files.createTempFile("jabref", null);
+            temporaryFile.toFile().deleteOnExit();
         } catch (IOException ex) {
             LOGGER.warn("Could not create temporary file.", ex);
         }
-        return f;
+        return temporaryFile;
     }
 }

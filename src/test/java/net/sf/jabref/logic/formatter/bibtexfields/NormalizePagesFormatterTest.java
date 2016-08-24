@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 /**
@@ -8,7 +9,12 @@ import org.junit.Test;
  */
 public class NormalizePagesFormatterTest {
 
-    private final NormalizePagesFormatter formatter = new NormalizePagesFormatter();
+    private NormalizePagesFormatter formatter;
+
+    @Before
+    public void setUp() {
+        formatter = new NormalizePagesFormatter();
+    }
 
     @Test
     public void formatSinglePageResultsInNoChange() {
@@ -36,8 +42,9 @@ public class NormalizePagesFormatterTest {
     }
 
     @Test
-    public void removeWhitespaceForSinglePageNumber() {
+    public void removeWhitespace() {
         expectCorrect("   1  ", "1");
+        expectCorrect("   1 -- 2  ", "1--2");
     }
 
     @Test

@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.journals;
 
 import java.io.File;
@@ -21,9 +6,6 @@ import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,11 +21,7 @@ public class JournalAbbreviationLoader {
     private JournalAbbreviationRepository journalAbbrev;
 
 
-    public JournalAbbreviationLoader(JabRefPreferences preferences) {
-        update(preferences);
-    }
-
-    public void update(JabRefPreferences jabRefPreferences) {
+    public void update(JournalAbbreviationPreferences journalAbbreviationPreferences) {
         journalAbbrev = new JournalAbbreviationRepository();
 
         // the order of reading the journal lists is important
@@ -54,14 +32,14 @@ public class JournalAbbreviationLoader {
         journalAbbrev.addEntries(readJournalListFromResource(JOURNALS_FILE_BUILTIN));
 
         // read IEEE list
-        if (jabRefPreferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
+        if (journalAbbreviationPreferences.isUseIEEEAbbreviations()) {
             journalAbbrev.addEntries(getOfficialIEEEAbbreviations());
         } else {
             journalAbbrev.addEntries(getStandardIEEEAbbreviations());
         }
 
         // Read external lists
-        List<String> lists = jabRefPreferences.getStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS);
+        List<String> lists = journalAbbreviationPreferences.getExternalJournalLists();
         if (!(lists.isEmpty())) {
             Collections.reverse(lists);
             for (String filename : lists) {
@@ -75,11 +53,12 @@ public class JournalAbbreviationLoader {
         }
 
         // Read personal list
-        String personalJournalList = jabRefPreferences.get(JabRefPreferences.PERSONAL_JOURNAL_LIST);
+        String personalJournalList = journalAbbreviationPreferences.getPersonalJournalLists();
         if ((personalJournalList != null) && !personalJournalList.trim().isEmpty()) {
             try {
                 journalAbbrev.addEntries(
-                        readJournalListFromFile(new File(personalJournalList), Globals.prefs.getDefaultEncoding()));
+                        readJournalListFromFile(new File(personalJournalList),
+                                journalAbbreviationPreferences.getDefaultEncoding()));
             } catch (FileNotFoundException e) {
                 LOGGER.info("Personal journal list file '" + personalJournalList + "' not found.", e);
             }
@@ -99,7 +78,10 @@ public class JournalAbbreviationLoader {
         return readJournalListFromResource(JOURNALS_FILE_BUILTIN);
     }
 
-    public JournalAbbreviationRepository getRepository() {
+    public JournalAbbreviationRepository getRepository(JournalAbbreviationPreferences journalAbbreviationPreferences) {
+        if (journalAbbrev == null) {
+            update(journalAbbreviationPreferences);
+        }
         return journalAbbrev;
     }
 

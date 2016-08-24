@@ -1,0 +1,88 @@
+<PubmedArticle>
+<MedlineCitation Owner="NLM" Status="MEDLINE">
+<PMID Version="1">1</PMID>
+<PMID Version="2">10097079</PMID>
+<DateCreated>
+<Year>1976</Year>
+<Month>01</Month>
+<Day>16</Day>
+</DateCreated>
+<DateCompleted>
+<Year>1976</Year>
+<Month>01</Month>
+<Day>16</Day>
+</DateCompleted>
+<DateRevised>
+<Year>2013</Year>
+<Month>11</Month>
+<Day>21</Day>
+</DateRevised>
+<Article PubModel="Print">
+<Journal>
+<ISSN IssnType="Print">0006-2944</ISSN>
+<JournalIssue CitedMedium="Print">
+<Volume>13</Volume>
+<Issue>2</Issue>
+<PubDate>
+<MedlineDate>1999 Spring</MedlineDate>
+</PubDate>
+</JournalIssue>
+<Title>Biochemical medicine</Title>
+<ISOAbbreviation>Biochem Med</ISOAbbreviation>
+</Journal>
+<ArticleTitle>Formate assay in body fluids: application in methanol poisoning.</ArticleTitle>
+<Pagination>
+<StartPage>25</StartPage>
+<EndPage>138</EndPage>
+</Pagination>
+<Language>eng</Language>
+<PublicationTypeList>
+<PublicationType UI="D016428">Journal Article</PublicationType>
+<PublicationType UI="D013487">Research Support, U.S. Gov't, P.H.S.</PublicationType>
+</PublicationTypeList>
+</Article>
+<MedlineJournalInfo>
+<Country>UNITED STATES</Country>
+<MedlineTA>Biochem Med</MedlineTA>
+<NlmUniqueID>0151424</NlmUniqueID>
+<ISSNLinking>0006-2944</ISSNLinking>
+</MedlineJournalInfo>
+<ChemicalList>
+<Chemical>
+<RegistryNumber>0</RegistryNumber>
+<NameOfSubstance UI="D005561">Formates</NameOfSubstance>
+</Chemical>
+<Chemical>
+<RegistryNumber>142M471B3J</RegistryNumber>
+<NameOfSubstance UI="D002245">Carbon Dioxide</NameOfSubstance>
+</Chemical>
+<Chemical>
+<RegistryNumber>EC 1.2.-</RegistryNumber>
+<NameOfSubstance UI="D000445">Aldehyde Oxidoreductases</NameOfSubstance>
+</Chemical>
+<Chemical>
+<RegistryNumber>Y4S76JWI15</RegistryNumber>
+<NameOfSubstance UI="D000432">Methanol</NameOfSubstance>
+</Chemical>
+</ChemicalList>
+<CitationSubset>IM</CitationSubset>
+<KeywordList Owner="NOTNLM">
+<Keyword MajorTopicYN="N">apnea syndrome</Keyword>
+<Keyword MajorTopicYN="N">cardiovascular disease</Keyword>
+<Keyword MajorTopicYN="N">self management</Keyword>
+</KeywordList>
+<PersonalNameSubjectList>
+<PersonalNameSubject>
+<LastName>Koop</LastName>
+<ForeName>C Everett</ForeName>
+<Initials>CE</Initials>
+</PersonalNameSubject>
+</PersonalNameSubjectList>
+</MedlineCitation>
+<PubmedData>
+<PublicationStatus>ppublish</PublicationStatus>
+<ArticleIdList>
+<ArticleId IdType="pubmed">1</ArticleId>
+</ArticleIdList>
+</PubmedData>
+</PubmedArticle>

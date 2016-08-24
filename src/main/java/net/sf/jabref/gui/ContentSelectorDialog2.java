@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui;
 
 import java.awt.GridBagConstraints;
@@ -25,8 +10,10 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -44,10 +31,11 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.keyboard.KeyBinder;
 import net.sf.jabref.gui.util.FocusRequester;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.FieldName;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
@@ -63,8 +51,8 @@ class ContentSelectorDialog2 extends JDialog {
     private final JPanel fieldNamePan = new JPanel();
     private final JPanel wordEditPan = new JPanel();
 
-    private final String WORD_FIRSTLINE_TEXT = Localization.lang("<select word>");
-    private final String FIELD_FIRST_LINE = Localization.lang("<field name>");
+    private static final String WORD_FIRSTLINE_TEXT = Localization.lang("<select word>");
+    private static final String FIELD_FIRST_LINE = Localization.lang("<field name>");
     private final MetaData metaData;
     private String currentField;
     private final JabRefFrame frame;
@@ -96,14 +84,13 @@ class ContentSelectorDialog2 extends JDialog {
      * @param frame the JabRef Frame
      * @param panel the currently selected BasePanel
      * @param modal should this dialog be modal?
-     * @param metaData The metadata of the current database
      * @param fieldName the field this selector is initialized for. May be null.
      */
-    public ContentSelectorDialog2(Window owner, JabRefFrame frame, BasePanel panel, boolean modal, MetaData metaData,
+    public ContentSelectorDialog2(Window owner, JabRefFrame frame, BasePanel panel, boolean modal,
             String fieldName) {
-        super(owner, Localization.lang("Setup selectors"));
+        super(owner, Localization.lang("Manage content selectors"));
         this.setModal(modal);
-        this.metaData = metaData;
+        this.metaData = panel.getBibDatabaseContext().getMetaData();
         this.frame = frame;
         this.panel = panel;
         this.currentField = fieldName;
@@ -111,13 +98,21 @@ class ContentSelectorDialog2 extends JDialog {
         initLayout();
 
         setupFieldSelector();
+        if (currentField != null) {
+            int fieldInd = fieldListModel.indexOf(currentField);
+            if (fieldInd >= 0) {
+                fieldList.setSelectedIndex(fieldInd);
+            }
+        } else {
+            if (!fieldListModel.isEmpty()) {
+                fieldList.setSelectedIndex(0);
+                currentField = fieldList.getSelectedValue();
+            }
+        }
+
         setupWordSelector();
         setupActions();
         KeyBinder.bindCloseDialogKeyToCancelAction(this.rootPane, cancel.getAction());
-        int fieldInd = fieldListModel.indexOf(currentField);
-        if (fieldInd >= 0) {
-            fieldList.setSelectedIndex(fieldInd);
-        }
 
         pack();
     }
@@ -191,7 +186,7 @@ class ContentSelectorDialog2 extends JDialog {
                 applyChanges();
                 dispose();
             } catch (Exception ex) {
-                LOGGER.info("Could not apply changes in \"Setup selectors\"", ex);
+                LOGGER.info("Could not apply changes in \"Manage content selectors\"", ex);
                 JOptionPane.showMessageDialog(frame, Localization.lang("Could not apply changes."));
             }
         });
@@ -204,7 +199,7 @@ class ContentSelectorDialog2 extends JDialog {
             try {
                 applyChanges();
             } catch (Exception ex) {
-                LOGGER.info("Could not apply changes in \"Setup selectors\"", ex);
+                LOGGER.info("Could not apply changes in \"Manage content selectors\"", ex);
                 JOptionPane.showMessageDialog(frame, Localization.lang("Could not apply changes."));
             }
         });
@@ -259,6 +254,7 @@ class ContentSelectorDialog2 extends JDialog {
 
     private void applyChanges() {
         boolean changedFieldSet = false; // Watch if we need to rebuild entry editors
+        boolean anythingChanged = false; // Watch if we should mark as there is data changed
 
         // First remove the mappings for fields that have been deleted.
         // If these were re-added, they will be added below, so it doesn't
@@ -266,15 +262,16 @@ class ContentSelectorDialog2 extends JDialog {
         for (String fieldName : removedFields) {
             metaData.clearContentSelectors(fieldName);
             changedFieldSet = true;
+            anythingChanged = true;
         }
 
         // Cycle through all fields that we have created listmodels for:
-        for (String fieldName : wordListModels.keySet()) {
+        for (Map.Entry<String, DefaultListModel<String>> entry : wordListModels.entrySet()) {
             // For each field name, store the values:
-            if ((fieldName == null) || FIELD_FIRST_LINE.equals(fieldName)) {
+            if ((entry.getKey() == null) || FIELD_FIRST_LINE.equals(entry.getKey())) {
                 continue;
             }
-            DefaultListModel<String> lm = wordListModels.get(fieldName);
+            DefaultListModel<String> lm = entry.getValue();
             int start = 0;
             // Avoid storing the <new word> marker if it is there:
             if (!lm.isEmpty()) {
@@ -283,26 +280,39 @@ class ContentSelectorDialog2 extends JDialog {
                 }
             }
 
-            if (metaData.getContentSelectors(fieldName).isEmpty()) {
-                changedFieldSet = true;
-                List<String> data = new ArrayList<>();
-                for (int wrd = start; wrd < lm.size(); wrd++) {
-                    String word = lm.get(wrd);
-                    data.add(word);
-                }
-                metaData.setContentSelectors(fieldName, data);
+            Set<String> data = new HashSet<>();
+            for (int wrd = start; wrd < lm.size(); wrd++) {
+                String word = lm.get(wrd);
+                data.add(word);
             }
-        }
 
-        // System.out.println("TODO: remove metadata for removed selector field.");
-        panel.markNonUndoableBaseChanged();
+            // Check if any words have been added
+            if (!data.equals(new HashSet<>(metaData.getContentSelectors(entry.getKey())))) {
+                anythingChanged = true;
+            }
+
+            // Check if there are words to be added and previously there were no content selector for the field
+            if (!data.isEmpty() && metaData.getContentSelectors(entry.getKey()).isEmpty()) {
+                changedFieldSet = true;
+            }
+
+            metaData.setContentSelectors(entry.getKey(), new ArrayList<>(data));
+        }
 
         // Update all selectors in the current BasePanel.
         if (changedFieldSet) {
+            // We have added or removed content selectors, update the entry editor
             panel.rebuildAllEntryEditors();
-        } else {
+        } else if (anythingChanged) {
+            // Enough to update the content selectors, if anything changed
             panel.updateAllContentSelectors();
         }
+
+        if (anythingChanged) {
+            // Mark the database updated so changes are not lost
+            panel.markNonUndoableBaseChanged();
+        }
+
         panel.getAutoCompleters().addContentSelectorValuesToAutoCompleters(panel.getBibDatabaseContext().getMetaData());
 
     }
@@ -321,10 +331,10 @@ class ContentSelectorDialog2 extends JDialog {
         }
         if (contents.isEmpty()) {
             // if nothing was added, put the default fields (as described in the help)
-            fieldListModel.addElement("author");
-            fieldListModel.addElement("journal");
-            fieldListModel.addElement("keywords");
-            fieldListModel.addElement("publisher");
+            fieldListModel.addElement(FieldName.AUTHOR);
+            fieldListModel.addElement(FieldName.JOURNAL);
+            fieldListModel.addElement(FieldName.KEYWORDS);
+            fieldListModel.addElement(FieldName.PUBLISHER);
         } else {
             for (String s : contents) {
                 fieldListModel.addElement(s);
@@ -443,7 +453,7 @@ class ContentSelectorDialog2 extends JDialog {
         bsb.addButton(apply);
         bsb.addButton(cancel);
         bsb.addRelatedGap();
-        bsb.addButton(new HelpAction(HelpFiles.CONTENT_SELECTOR).getHelpButton());
+        bsb.addButton(new HelpAction(HelpFile.CONTENT_SELECTOR).getHelpButton());
         bsb.addGlue();
 
         // Add panels to dialog:

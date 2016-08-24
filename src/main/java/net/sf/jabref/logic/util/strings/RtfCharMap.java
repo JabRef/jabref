@@ -2,11 +2,8 @@ package net.sf.jabref.logic.util.strings;
 
 import java.util.HashMap;
 
-
 public class RtfCharMap extends HashMap<String, String> {
     public RtfCharMap () {
-
-
         put("`a", "\\'e0");
         put("`e", "\\'e8");
         put("`i", "\\'ec");
@@ -59,7 +56,7 @@ public class RtfCharMap extends HashMap<String, String> {
         put("\"A", "\\u196A"); // "Auml"
         put("AA", "\\u197A"); // "Aring"
         // RTFCHARS.put("AE", "{\\uc2\\u198AE}"); // "AElig"
-put("AE", "{\\u198A}"); // "AElig"
+        put("AE", "{\\u198A}"); // "AElig"
         put("cC", "\\u199C"); // "Ccedil"
         put("`E", "\\u200E"); // "Egrave"
         put("'E", "\\u201E"); // "Eacute"
@@ -97,7 +94,7 @@ put("AE", "{\\u198A}"); // "AElig"
         put("\"a", "\\u228a"); // "auml"
         put("aa", "\\u229a"); // "aring"
         //  RTFCHARS.put("ae", "{\\uc2\\u230ae}"); // "aelig" \\u230e6
-put("ae", "{\\u230a}"); // "aelig" \\u230e6
+        put("ae", "{\\u230a}"); // "aelig" \\u230e6
         put("cc", "\\u231c"); // "ccedil"
         put("`e", "\\u232e"); // "egrave"
         put("'e", "\\u233e"); // "eacute"
@@ -122,7 +119,7 @@ put("ae", "{\\u230a}"); // "aelig" \\u230e6
         put("'u", "\\u250u"); // "uacute"
         put("^u", "\\u251u"); // "ucirc"
         // RTFCHARS.put("\"u", "\\u252"); // "uuml" exists in standard
-// codepage
+        // codepage
         put("'y", "\\u253y"); // "yacute"
         put("th", "{\\uc2\\u254th}"); // "thorn"
         put("\"y", "\\u255y"); // "yuml"
@@ -256,5 +253,4 @@ put("ae", "{\\u230a}"); // "aelig" \\u230e6
         put("vz", "\\u382z"); // "zcaron"
         // Symbol #383 (f) has no special Latex command
     }
-
 }

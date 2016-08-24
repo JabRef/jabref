@@ -1,5 +1,6 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -10,8 +11,12 @@ import static org.junit.Assert.assertEquals;
  */
 public class RemoveBracesFormatterTest {
 
-    private final RemoveBracesFormatter formatter = new RemoveBracesFormatter();
+    private RemoveBracesFormatter formatter;
 
+    @Before
+    public void setUp() {
+        formatter = new RemoveBracesFormatter();
+    }
 
     @Test
     public void formatRemovesSingleEnclosingBraces() {

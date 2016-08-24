@@ -1,5 +1,6 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -10,8 +11,12 @@ import static org.junit.Assert.assertEquals;
  */
 public class UnitsToLatexFormatterTest {
 
-    private final UnitsToLatexFormatter formatter = new UnitsToLatexFormatter();
+    private UnitsToLatexFormatter formatter;
 
+    @Before
+    public void setUp() {
+        formatter = new UnitsToLatexFormatter();
+    }
 
     @Test
     public void test() {

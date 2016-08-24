@@ -2,7 +2,7 @@ package net.sf.jabref.logic.util.io;
 
 import java.util.List;
 
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.After;
 import org.junit.Before;
@@ -29,7 +29,7 @@ public class FileHistoryTest {
 
     @Test
     public void testFileHistory() {
-        FileHistory fh = new FileHistory(prefs);
+        FileHistory fh = prefs.getFileHistory();
 
         fh.newFile("aa");
         assertEquals("aa", fh.getFileName(0));
@@ -63,7 +63,7 @@ public class FileHistoryTest {
         fh.removeItem("cc");
         fh.removeItem("cc");
         fh.removeItem("aa");
-        fh.storeHistory();
+        prefs.storeFileHistory(fh);
         assertArrayEquals(new String[] {"ii", "hh", "gg"},
                 prefs.getStringList(JabRefPreferences.RECENT_FILES).toArray(new String[0]));
     }

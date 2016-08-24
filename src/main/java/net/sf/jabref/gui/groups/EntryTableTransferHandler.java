@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.groups;
 
 import java.awt.datatransfer.Clipboard;
@@ -44,10 +29,10 @@ import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.TransferableFileLinkSelection;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.importer.ImportMenuItem;
+import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
-import net.sf.jabref.importer.ImportMenuItem;
-import net.sf.jabref.importer.OpenDatabaseAction;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.pdfimport.PdfImporter;
 import net.sf.jabref.pdfimport.PdfImporter.ImportPdfFilesResult;
@@ -315,13 +300,11 @@ public class EntryTableTransferHandler extends TransferHandler {
      * @return success status for the operation
      */
     private boolean handleDraggedFiles(List<File> files, final int dropRow) {
-        final String[] fileNames = new String[files.size()];
-        int i = 0;
+        final List<String> fileNames = new ArrayList<>();
         for (File file : files) {
-            fileNames[i] = file.getAbsolutePath();
-            i++;
+            fileNames.add(file.getAbsolutePath());
         }
-        // Try to load bib files normally, and import the rest into the current
+        // Try to load BIB files normally, and import the rest into the current
         // database.
         // This process must be spun off into a background thread:
         JabRefExecutorService.INSTANCE.execute(() -> {
@@ -336,7 +319,7 @@ public class EntryTableTransferHandler extends TransferHandler {
     }
 
     /**
-     * Take a set of filenames. Those with names indicating bib files are opened as such if possible. All other files we
+     * Take a set of filenames. Those with names indicating BIB files are opened as such if possible. All other files we
      * will attempt to import into the current database.
      *
      * @param fileNames The names of the files to open.

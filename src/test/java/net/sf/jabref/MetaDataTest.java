@@ -1,13 +1,14 @@
 package net.sf.jabref;
 
-import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
 import java.util.TreeMap;
 
-import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,23 +21,24 @@ public class MetaDataTest {
 
     @Before
     public void setUp() {
+        Globals.prefs = JabRefPreferences.getInstance();
         metaData = new MetaData();
     }
 
     @Test
     public void serializeNewMetadataReturnsEmptyMap() throws Exception {
-        assertEquals(Collections.emptyMap(), metaData.serialize());
+        assertEquals(Collections.emptyMap(), metaData.getAsStringMap());
     }
 
     @Test
-    public void serializeSingleSaveAction() throws IOException {
+    public void serializeSingleSaveAction() {
         FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
                 Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())));
         metaData.setSaveActions(saveActions);
 
         Map<String, String> expectedSerialization = new TreeMap<>();
         expectedSerialization.put("saveActions",
-                "enabled;" + Globals.NEWLINE + "title[lower_case]" + Globals.NEWLINE + ";");
-        assertEquals(expectedSerialization, metaData.serialize());
+                "enabled;" + OS.NEWLINE + "title[lower_case]" + OS.NEWLINE + ";");
+        assertEquals(expectedSerialization, metaData.getAsStringMap());
     }
 }

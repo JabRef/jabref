@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.external;
 
 import java.io.IOException;
@@ -22,14 +7,14 @@ import java.util.Optional;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.logic.fulltext.FindFullText;
+import net.sf.jabref.logic.importer.FulltextFetchers;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,7 +30,6 @@ public class FindFullTextAction extends AbstractWorker {
     private BibEntry entry;
     private Optional<URL> result;
 
-
     public FindFullTextAction(BasePanel basePanel) {
         this.basePanel = basePanel;
     }
@@ -57,10 +41,14 @@ public class FindFullTextAction extends AbstractWorker {
 
     @Override
     public void run() {
-        // TODO: just download for all entries and save files without dialog
-        entry = basePanel.getSelectedEntries().get(0);
-        FindFullText fft = new FindFullText();
-        result = fft.findFullTextPDF(entry);
+        if (basePanel.getSelectedEntries().size() != 1) {
+            basePanel.output(Localization.lang("This operation requires exactly one item to be selected."));
+            result = Optional.empty();
+        } else {
+            entry = basePanel.getSelectedEntries().get(0);
+            FulltextFetchers fft = new FulltextFetchers();
+            result = fft.findFullTextPDF(entry);
+        }
     }
 
     @Override
@@ -80,13 +68,13 @@ public class FindFullTextAction extends AbstractWorker {
             try {
                 def.download(result.get(), file -> {
                     FileListTableModel tm = new FileListTableModel();
-                    String oldValue = entry.getField(Globals.FILE_FIELD);
-                    tm.setContent(oldValue);
+                    entry.getFieldOptional(FieldName.FILE).ifPresent(tm::setContent);
                     tm.addEntry(tm.getRowCount(), file);
                     String newValue = tm.getStringRepresentation();
-                    UndoableFieldChange edit = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue, newValue);
-                    entry.setField(Globals.FILE_FIELD, newValue);
-                    basePanel.undoManager.addEdit(edit);
+                    UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
+                            entry.getFieldOptional(FieldName.FILE).orElse(null), newValue);
+                    entry.setField(FieldName.FILE, newValue);
+                    basePanel.getUndoManager().addEdit(edit);
                     basePanel.markBaseChanged();
                 });
             } catch (IOException e) {

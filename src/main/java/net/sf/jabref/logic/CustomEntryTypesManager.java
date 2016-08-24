@@ -3,12 +3,13 @@ package net.sf.jabref.logic;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class CustomEntryTypesManager {
 
@@ -19,10 +20,10 @@ public class CustomEntryTypesManager {
      */
     public static void loadCustomEntryTypes(JabRefPreferences prefs) {
         int number = 0;
-        CustomEntryType type;
-        while ((type = prefs.getCustomEntryType(number)) != null) {
-            EntryTypes.addOrModifyCustomEntryType(type);
-            ALL.add(type);
+        Optional<CustomEntryType> type;
+        while ((type = prefs.getCustomEntryType(number)).isPresent()) {
+            EntryTypes.addOrModifyCustomEntryType(type.get());
+            ALL.add(type.get());
             number++;
         }
     }
@@ -50,22 +51,4 @@ public class CustomEntryTypesManager {
         prefs.purgeCustomEntryTypes(number);
     }
 
-    public static CustomEntryType parseEntryType(String comment) {
-        String rest = comment.substring(CustomEntryType.ENTRYTYPE_FLAG.length());
-        int indexEndOfName = rest.indexOf(':');
-        if(indexEndOfName < 0) {
-            return null;
-        }
-        String fieldsDescription = rest.substring(indexEndOfName + 2);
-
-        int indexEndOfRequiredFields = fieldsDescription.indexOf(']');
-        int indexEndOfOptionalFields = fieldsDescription.indexOf(']', indexEndOfRequiredFields + 1);
-        if (indexEndOfRequiredFields < 4 || indexEndOfOptionalFields < indexEndOfRequiredFields + 6) {
-            return null;
-        }
-        String name = rest.substring(0, indexEndOfName);
-        String reqFields = fieldsDescription.substring(4, indexEndOfRequiredFields);
-        String optFields = fieldsDescription.substring(indexEndOfRequiredFields + 6, indexEndOfOptionalFields);
-        return new CustomEntryType(name, reqFields, optFields);
-    }
 }

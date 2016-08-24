@@ -5,12 +5,44 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.mock;
 
 public class FileUtilTest {
+
+    @Test
+    public void testGetLinkedFileNameDefault() {
+        // bibkey - title
+        String fileNamePattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("1234");
+        entry.setField("title", "mytitle");
+
+        assertEquals("1234 - mytitle",
+                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern, LayoutFormatterPreferences
+                        .fromPreferences(JabRefPreferences.getInstance(), mock(JournalAbbreviationLoader.class))));
+    }
+
+    @Test
+    public void testGetLinkedFileNameBibTeXKey() {
+        // bibkey
+        String fileNamePattern = "\\bibtexkey";
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("1234");
+        entry.setField("title", "mytitle");
+
+        assertEquals("1234",
+                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
+                        mock(LayoutFormatterPreferences.class)));
+    }
 
     @Test
     public void testGetFileExtensionSimpleFile() {
@@ -64,20 +96,12 @@ public class FileUtilTest {
 
     @Test
     public void uniquePathSubstrings() {
-        String[] pathArr = {
-                Paths.get("C:/uniquefile.bib").toString(),
-                Paths.get("C:/downloads/filename.bib").toString(),
+        String[] pathArr = {Paths.get("C:/uniquefile.bib").toString(),
+                Paths.get("C:/downloads/filename.bib").toString(), Paths.get("C:/mypaper/bib/filename.bib").toString(),
+                Paths.get("C:/external/mypaper/bib/filename.bib").toString(), ""};
+        String[] uniqArr = {Paths.get("uniquefile.bib").toString(), Paths.get("downloads/filename.bib").toString(),
                 Paths.get("C:/mypaper/bib/filename.bib").toString(),
-                Paths.get("C:/external/mypaper/bib/filename.bib").toString(),
-                ""
-        };
-        String[] uniqArr = {
-                Paths.get("uniquefile.bib").toString(),
-                Paths.get("downloads/filename.bib").toString(),
-                Paths.get("C:/mypaper/bib/filename.bib").toString(),
-                Paths.get("external/mypaper/bib/filename.bib").toString(),
-                ""
-        };
+                Paths.get("external/mypaper/bib/filename.bib").toString(), ""};
         List<String> paths = Arrays.asList(pathArr);
         List<String> uniqPath = Arrays.asList(uniqArr);
 
@@ -85,5 +109,4 @@ public class FileUtilTest {
         assertEquals(uniqPath, result);
     }
 
-    
 }

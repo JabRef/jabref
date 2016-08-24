@@ -1,18 +1,3 @@
-/*  Copyright (C) 20013-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.groups;
 
 import java.awt.BorderLayout;
@@ -61,7 +46,6 @@ public class GroupAddRemoveDialog implements BaseAction {
     private final boolean move;
     private List<BibEntry> selection;
     private JTree tree;
-    private JButton ok;
 
 
     public GroupAddRemoveDialog(BasePanel panel, boolean add, boolean move) {
@@ -83,7 +67,7 @@ public class GroupAddRemoveDialog implements BaseAction {
                 (add ? (move ? Localization.lang("Move to group") : Localization.lang("Add to group")) : Localization
                         .lang("Remove from group")),
                 true);
-        ok = new JButton(Localization.lang("OK"));
+        JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
         tree = new JTree(new GroupTreeNodeViewModel(groups));
         tree.setCellRenderer(new AddRemoveGroupTreeCellRenderer());

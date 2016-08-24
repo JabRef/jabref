@@ -1,22 +1,8 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.collab;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -32,18 +18,20 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.bibtex.comparator.EntryComparator;
-import net.sf.jabref.exporter.BibDatabaseWriter;
-import net.sf.jabref.exporter.SaveException;
-import net.sf.jabref.exporter.SavePreferences;
-import net.sf.jabref.exporter.SaveSession;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.importer.OpenDatabaseAction;
-import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.logic.bibtex.comparator.EntryComparator;
+import net.sf.jabref.logic.exporter.BibDatabaseWriter;
+import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
+import net.sf.jabref.logic.exporter.FileSaveSession;
+import net.sf.jabref.logic.exporter.SaveException;
+import net.sf.jabref.logic.exporter.SavePreferences;
+import net.sf.jabref.logic.exporter.SaveSession;
 import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.OpenDatabase;
+import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.database.BibDatabase;
@@ -51,13 +39,15 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.EntrySorter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class ChangeScanner implements Runnable {
 
-    private static final String[] SORT_BY = new String[] {"year", "author", "title"};
+    private static final String[] SORT_BY = new String[] {FieldName.YEAR, FieldName.AUTHOR, FieldName.TITLE};
 
     private final File f;
 
@@ -95,12 +85,13 @@ public class ChangeScanner implements Runnable {
         try {
 
             // Parse the temporary file.
-            File tempFile = Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle());
-            ParserResult pr = OpenDatabaseAction.loadDatabase(tempFile, Globals.prefs.getDefaultEncoding());
+            Path tempFile = Globals.getFileUpdateMonitor().getTempFile(panel.fileMonitorHandle());
+            ImportFormatPreferences importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
+            ParserResult pr = OpenDatabase.loadDatabase(tempFile.toFile(), importFormatPreferences);
             inTemp = pr.getDatabase();
             mdInTemp = pr.getMetaData();
             // Parse the modified file.
-            pr = OpenDatabaseAction.loadDatabase(f, Globals.prefs.getDefaultEncoding());
+            pr = OpenDatabase.loadDatabase(f, importFormatPreferences);
             BibDatabase onDisk = pr.getDatabase();
             MetaData mdOnDisk = pr.getMetaData();
 
@@ -160,13 +151,14 @@ public class ChangeScanner implements Runnable {
         JabRefExecutorService.INSTANCE.execute(() -> {
             try {
                 SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs).withMakeBackup(false)
-                        .withEncoding(panel.getEncoding());
+                        .withEncoding(panel.getBibDatabaseContext().getMetaData().getEncoding()
+                                .orElse(Globals.prefs.getDefaultEncoding()));
 
                 Defaults defaults = new Defaults(BibDatabaseMode
                         .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-                BibDatabaseWriter databaseWriter = new BibDatabaseWriter();
+                BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
                 SaveSession ss = databaseWriter.saveDatabase(new BibDatabaseContext(inTemp, mdInTemp, defaults), prefs);
-                ss.commit(Globals.fileUpdateMonitor.getTempFile(panel.fileMonitorHandle()));
+                ss.commit(Globals.getFileUpdateMonitor().getTempFile(panel.fileMonitorHandle()));
             } catch (SaveException ex) {
                 LOGGER.warn("Problem updating tmp file after accepting external changes", ex);
             }

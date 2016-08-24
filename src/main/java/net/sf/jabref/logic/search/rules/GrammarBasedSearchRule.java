@@ -1,22 +1,8 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.search.rules;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -166,13 +152,11 @@ public class GrammarBasedSearchRule implements SearchRule {
             List<String> matchedFieldKeys = fieldsKeys.stream().filter(matchFieldKey()).collect(Collectors.toList());
 
             for (String field : matchedFieldKeys) {
-                String fieldValue = entry.getField(field);
-                if (fieldValue == null) {
-                    continue; // paranoia
-                }
-
-                if (matchFieldValue(fieldValue)) {
-                    return true;
+                Optional<String> fieldValue = entry.getFieldOptional(field);
+                if (fieldValue.isPresent()) {
+                    if (matchFieldValue(fieldValue.get())) {
+                        return true;
+                    }
                 }
             }
 
@@ -229,7 +213,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             // remove possible enclosing " symbols
             String right = ctx.right.getText();
             if(right.startsWith("\"") && right.endsWith("\"")) {
-                right = right.substring(1, right.length() - 2);
+                right = right.substring(1, right.length() - 1);
             }
 
             return comparison(ctx.left.getText(), ComparisonOperator.build(ctx.operator.getText()), right);

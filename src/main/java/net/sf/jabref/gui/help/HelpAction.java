@@ -1,39 +1,25 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.help;
 
+import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * This Action keeps a reference to a URL. When activated, it shows the help
@@ -41,31 +27,30 @@ import org.apache.commons.logging.LogFactory;
  */
 public class HelpAction extends MnemonicAwareAction {
 
-    private static final Log LOGGER = LogFactory.getLog(HelpAction.class);
-    private HelpFiles helpPage;
+    private HelpFile helpPage;
 
 
-    public HelpAction(String title, String tooltip, HelpFiles helpPage, KeyStroke key) {
+    public HelpAction(String title, String tooltip, HelpFile helpPage, KeyStroke key) {
         this(title, tooltip, helpPage, IconTheme.JabRefIcon.HELP.getSmallIcon());
         putValue(Action.ACCELERATOR_KEY, key);
     }
 
-    private HelpAction(String title, String tooltip, HelpFiles helpPage, Icon icon) {
+    private HelpAction(String title, String tooltip, HelpFile helpPage, Icon icon) {
         super(icon);
         this.helpPage = helpPage;
         putValue(Action.NAME, title);
         putValue(Action.SHORT_DESCRIPTION, tooltip);
     }
 
-    public HelpAction(String tooltip, HelpFiles helpPage) {
+    public HelpAction(String tooltip, HelpFile helpPage) {
         this(Localization.lang("Help"), tooltip, helpPage, IconTheme.JabRefIcon.HELP.getSmallIcon());
     }
 
-    public HelpAction(HelpFiles helpPage, Icon icon) {
+    public HelpAction(HelpFile helpPage, Icon icon) {
         this(Localization.lang("Help"), Localization.lang("Help"), helpPage, icon);
     }
 
-    public HelpAction(HelpFiles helpPage) {
+    public HelpAction(HelpFile helpPage) {
         this(Localization.lang("Help"), Localization.lang("Help"), helpPage, IconTheme.JabRefIcon.HELP.getSmallIcon());
     }
 
@@ -77,18 +62,30 @@ public class HelpAction extends MnemonicAwareAction {
         return button;
     }
 
-    public void setHelpFile(HelpFiles urlPart) {
+    public JLabel getHelpLabel(String labelText) {
+        JLabel helpLabel = new JLabel("<html><u>" + labelText + "</u></html>");
+        helpLabel.setForeground(Color.BLUE);
+        helpLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        helpLabel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                openHelpPage();
+            }
+        });
+        return helpLabel;
+    }
+
+    public void setHelpFile(HelpFile urlPart) {
         this.helpPage = urlPart;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        try {
-            JabRefDesktop.openBrowser("http://help.jabref.org/" + Globals.prefs.get(JabRefPreferences.LANGUAGE) + "/"
-                    + helpPage.getPageName());
-        } catch (IOException ex) {
-            LOGGER.warn("Could not open browser", ex);
-            JabRefGUI.getMainFrame().getCurrentBasePanel().output(Localization.lang("Could not open browser."));
-        }
+        openHelpPage();
+    }
+
+    private void openHelpPage() {
+        String url = "https://help.jabref.org/" + Globals.prefs.get(JabRefPreferences.LANGUAGE) + "/" + helpPage.getPageName();
+        JabRefDesktop.openBrowserShowPopup(url);
     }
 }

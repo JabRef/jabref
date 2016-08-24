@@ -1,18 +1,3 @@
-/*  Copyright (C) 2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.logic.openoffice;
 
 import java.io.File;
@@ -24,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,9 +25,9 @@ public class StyleLoader {
     private final List<String> internalStyleFiles = Arrays.asList(DEFAULT_AUTHORYEAR_STYLE_PATH,
             DEFAULT_NUMERICAL_STYLE_PATH);
 
-    private final JournalAbbreviationRepository repository;
     private final OpenOfficePreferences preferences;
     private final Charset encoding;
+    private final LayoutFormatterPreferences layoutFormatterPreferences;
 
     // Lists of the internal
     // and external styles
@@ -50,9 +35,10 @@ public class StyleLoader {
     private final List<OOBibStyle> externalStyles = new ArrayList<>();
 
 
-    public StyleLoader(OpenOfficePreferences preferences, JournalAbbreviationRepository repository, Charset encoding) {
-        this.repository = Objects.requireNonNull(repository);
+    public StyleLoader(OpenOfficePreferences preferences, LayoutFormatterPreferences jabrefPreferences,
+            Charset encoding) {
         this.preferences = Objects.requireNonNull(preferences);
+        this.layoutFormatterPreferences = Objects.requireNonNull(jabrefPreferences);
         this.encoding = Objects.requireNonNull(encoding);
         loadInternalStyles();
         loadExternalStyles();
@@ -72,7 +58,7 @@ public class StyleLoader {
     public boolean addStyleIfValid(String filename) {
         Objects.requireNonNull(filename);
         try {
-            OOBibStyle newStyle = new OOBibStyle(new File(filename), repository, encoding);
+            OOBibStyle newStyle = new OOBibStyle(new File(filename), layoutFormatterPreferences, encoding);
             if (externalStyles.contains(newStyle)) {
                 LOGGER.info("External style file " + filename + " already existing.");
             } else if (newStyle.isValid()) {
@@ -98,7 +84,7 @@ public class StyleLoader {
         List<String> lists = preferences.getExternalStyles();
         for (String filename : lists) {
             try {
-                OOBibStyle style = new OOBibStyle(new File(filename), repository, encoding);
+                OOBibStyle style = new OOBibStyle(new File(filename), layoutFormatterPreferences, encoding);
                 if (style.isValid()) { //Problem!
                     externalStyles.add(style);
                 } else {
@@ -117,7 +103,7 @@ public class StyleLoader {
         internalStyles.clear();
         for (String filename : internalStyleFiles) {
             try {
-                internalStyles.add(new OOBibStyle(filename, repository));
+                internalStyles.add(new OOBibStyle(filename, layoutFormatterPreferences));
             } catch (IOException e) {
                 LOGGER.info("Problem reading internal style file " + filename, e);
             }

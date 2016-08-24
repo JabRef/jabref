@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.sf.jabref.gui.actions;
 
 import java.awt.BorderLayout;
@@ -23,7 +8,7 @@ import java.awt.event.KeyListener;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -52,7 +37,10 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -70,7 +58,6 @@ import com.jgoodies.forms.layout.FormLayout;
  *
  */
 public class ManageKeywordsAction extends MnemonicAwareAction {
-    private static final String KEYWORDS_FIELD = "keywords";
 
     private final JabRefFrame frame;
 
@@ -192,7 +179,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         });
 
         AutoCompleter<String> autoComp = JabRefGUI.getMainFrame().getCurrentBasePanel().getAutoCompleters()
-                .get(KEYWORDS_FIELD);
+                .get(FieldName.KEYWORDS);
         AutoCompleteListener acl = new AutoCompleteListener(autoComp);
         keyword.addKeyListener(acl);
         keyword.addFocusListener(acl);
@@ -280,10 +267,10 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         Set<String> userSelectedKeywords = new HashSet<>();
         // build keywordsToAdd and userSelectedKeywords in parallel
         for (Enumeration<String> keywords = keywordListModel.elements(); keywords.hasMoreElements();) {
-            String kword = keywords.nextElement();
-            userSelectedKeywords.add(kword);
-            if (!sortedKeywordsOfAllEntriesBeforeUpdateByUser.contains(kword)) {
-                keywordsToAdd.add(kword);
+            String keyword = keywords.nextElement();
+            userSelectedKeywords.add(keyword);
+            if (!sortedKeywordsOfAllEntriesBeforeUpdateByUser.contains(keyword)) {
+                keywordsToAdd.add(keyword);
             }
         }
 
@@ -304,7 +291,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         }
 
         NamedCompound ce = updateKeywords(bp.getSelectedEntries(), keywordsToAdd, keywordsToRemove);
-        bp.undoManager.addEdit(ce);
+        bp.getUndoManager().addEdit(ce);
         bp.markBaseChanged();
     }
 
@@ -312,26 +299,17 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             Set<String> keywordsToRemove) {
         NamedCompound ce = new NamedCompound(Localization.lang("Update keywords"));
         for (BibEntry entry : entries) {
-            List<String> separatedKeywords = entry.getSeparatedKeywords();
-
-            // we "intercept" with a TreeSet
-            // pro: no duplicates
-            // possible con: alphabetical sorting of the keywords
-            Set<String> keywords = new TreeSet<>();
-            keywords.addAll(separatedKeywords);
+            Set<String> keywords = entry.getKeywords();
 
             // update keywords
             keywords.removeAll(keywordsToRemove);
             keywords.addAll(keywordsToAdd);
 
             // put keywords back
-            separatedKeywords.clear();
-            separatedKeywords.addAll(keywords);
-            String oldValue = entry.getField(KEYWORDS_FIELD);
-            entry.putKeywords(separatedKeywords);
-            String updatedValue = entry.getField(KEYWORDS_FIELD);
-            if (!Objects.equals(oldValue, updatedValue)) {
-                    ce.addEdit(new UndoableFieldChange(entry, KEYWORDS_FIELD, oldValue, updatedValue));
+            Optional<FieldChange> change = entry.putKeywords(keywords,
+                    Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+            if (change.isPresent()) {
+                ce.addEdit(new UndoableFieldChange(change.get()));
             }
 
             if (SpecialFieldsUtils.keywordSyncEnabled()) {
@@ -407,7 +385,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         if (mergeKeywords.isSelected()) {
             for (BibEntry entry : entries) {
-                List<String> separatedKeywords = entry.getSeparatedKeywords();
+                Set<String> separatedKeywords = entry.getKeywords();
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
             }
         } else {
@@ -415,14 +393,14 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
             // all keywords from first entry have to be added
             BibEntry firstEntry = entries.get(0);
-            List<String> separatedKeywords = firstEntry.getSeparatedKeywords();
+            Set<String> separatedKeywords = firstEntry.getKeywords();
             sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
 
             // for the remaining entries, intersection has to be used
             // this approach ensures that one empty keyword list leads to an empty set of common keywords
             for (int i = 1; i < entries.size(); i++) {
                 BibEntry entry = entries.get(i);
-                separatedKeywords = entry.getSeparatedKeywords();
+                separatedKeywords = entry.getKeywords();
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.retainAll(separatedKeywords);
             }
         }

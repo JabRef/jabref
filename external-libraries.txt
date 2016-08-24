@@ -72,6 +72,11 @@ Project: Unirest for Java
 URL:     https://github.com/Mashape/unirest-java
 License: MIT
 
+Id:      info.debatty:java-string-similarity
+Project: Java String Similarity
+URL:     https://github.com/tdebatty/java-string-similarity
+License: MIT
+
 Id:      mysql:mysql-connector-java
 Project: MySQL Connector/J
 URL:     http://www.mysql.de/downloads/connector/j/
@@ -81,6 +86,11 @@ Id:      net.java.dev.glazedlists:glazedlists_java15
 Project: Glazed Lists
 URL:     http://www.glazedlists.com/
 License: LPGL 2.1! (not explicitly, but no comments in the source header) and MPL
+
+Id:      org.apache.logging.log4j
+Project: Apache Log2j 2
+URL:     http://logging.apache.org/log4j/2.x/
+License: Apache 2.0
 
 Id:      org.apache.pdfbox:fontbox
 Project: Apache PDFBox

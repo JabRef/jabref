@@ -10,6 +10,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.EntryUtil;
 
 public class GroupsUtil {
 
@@ -17,13 +18,12 @@ public class GroupsUtil {
         Set<String> res = new TreeSet<>();
 
         for (BibEntry be : db.getEntries()) {
-            if (be.hasField(field)) {
-                String fieldValue = be.getField(field).trim();
-                StringTokenizer tok = new StringTokenizer(fieldValue, deliminator);
+            be.getFieldOptional(field).ifPresent(fieldValue -> {
+                StringTokenizer tok = new StringTokenizer(fieldValue.trim(), deliminator);
                 while (tok.hasMoreTokens()) {
-                    res.add(net.sf.jabref.model.entry.EntryUtil.capitalizeFirst(tok.nextToken().trim()));
+                    res.add(EntryUtil.capitalizeFirst(tok.nextToken().trim()));
                 }
-            }
+            });
         }
         return res;
     }
@@ -43,7 +43,7 @@ public class GroupsUtil {
             be.getFieldOptional(field).ifPresent(o -> {
                 StringTokenizer tok = new StringTokenizer(o, remove, false);
                 while (tok.hasMoreTokens()) {
-                    res.add(net.sf.jabref.model.entry.EntryUtil.capitalizeFirst(tok.nextToken().trim()));
+                    res.add(EntryUtil.capitalizeFirst(tok.nextToken().trim()));
                 }
             });
         }
@@ -61,14 +61,14 @@ public class GroupsUtil {
         Set<String> res = new TreeSet<>();
         for (BibEntry be : db.getEntries()) {
             for (String field : fields) {
-                String val = be.getField(field);
-                if ((val != null) && !val.isEmpty()) {
-                    AuthorList al = AuthorList.parse(val);
-                    res.addAll(al.getAuthors().stream().map(Author::getLast)
-                            .filter(lastName -> ((lastName != null) && !lastName.isEmpty()))
-                            .collect(Collectors.toList()));
-                }
-
+                be.getFieldOptional(field).ifPresent(val -> {
+                    if (!val.isEmpty()) {
+                        AuthorList al = AuthorList.parse(val);
+                        res.addAll(al.getAuthors().stream().map(Author::getLast)
+                                .filter(lastName -> ((lastName != null) && !lastName.isEmpty()))
+                                .collect(Collectors.toList()));
+                    }
+                });
             }
         }
 

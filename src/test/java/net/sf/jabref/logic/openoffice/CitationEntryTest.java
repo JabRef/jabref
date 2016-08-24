@@ -80,7 +80,6 @@ public class CitationEntryTest {
         CitationEntry citationEntry1 = new CitationEntry("RefMark", "Context", "Info");
         CitationEntry citationEntry2 = new CitationEntry("RefMark2", "Context", "Info");
         CitationEntry citationEntry3 = new CitationEntry("RefMark", "Other Context", "Other Info");
-        assertEquals(0, citationEntry1.compareTo(citationEntry1));
         assertEquals(0, citationEntry1.compareTo(citationEntry3));
         assertEquals(-1, citationEntry1.compareTo(citationEntry2));
         assertEquals(1, citationEntry2.compareTo(citationEntry1));

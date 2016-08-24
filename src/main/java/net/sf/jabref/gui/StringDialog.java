@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
@@ -46,22 +31,24 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.comparator.BibtexStringComparator;
-import net.sf.jabref.exporter.LatexFieldFormatter;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
 import net.sf.jabref.gui.undo.UndoableStringChange;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import net.sf.jabref.logic.bibtex.comparator.BibtexStringComparator;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 class StringDialog extends JDialog {
 
@@ -78,7 +65,7 @@ class StringDialog extends JDialog {
     // The action concerned with closing the window.
     private final CloseAction closeAction = new CloseAction();
 
-    public static final String STRINGS_TITLE = Localization.lang("Strings for database");
+    private static final String STRINGS_TITLE = Localization.lang("Strings for database");
 
 
     public StringDialog(JabRefFrame frame, BasePanel panel, BibDatabase base) {
@@ -88,7 +75,7 @@ class StringDialog extends JDialog {
 
         sortStrings();
 
-        helpAction = new HelpAction(Localization.lang("Help"), HelpFiles.STRING_EDITOR);
+        helpAction = new HelpAction(Localization.lang("Help"), HelpFile.STRING_EDITOR);
 
         addWindowListener(new WindowAdapter() {
 
@@ -121,6 +108,7 @@ class StringDialog extends JDialog {
         if (!base.hasNoStrings()) {
             table.setRowSelectionInterval(0, 0);
         }
+        GUIUtil.correctRowHeight(table);
 
         gbl.setConstraints(table.getPane(), con);
         pan.add(table.getPane());
@@ -253,7 +241,7 @@ class StringDialog extends JDialog {
                     } else {
                         // Store undo information.
                         BibtexString subject = strings.get(row);
-                        panel.undoManager.addEdit(
+                        panel.getUndoManager().addEdit(
                                 new UndoableStringChange(panel, subject, true, subject.getName(), (String) value));
                         subject.setName((String) value);
                         panel.markBaseChanged();
@@ -266,12 +254,13 @@ class StringDialog extends JDialog {
 
                 if (!value.equals(subject.getContent())) {
                     try {
-                        new LatexFieldFormatter().format((String) value, "__dummy");
+                        new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs))
+                                .format((String) value, "__dummy");
                     } catch (IllegalArgumentException ex) {
                         return;
                     }
                     // Store undo information.
-                    panel.undoManager.addEdit(
+                    panel.getUndoManager().addEdit(
                             new UndoableStringChange(panel, subject, false, subject.getContent(), (String) value));
 
                     subject.setContent((String) value);
@@ -377,7 +366,7 @@ class StringDialog extends JDialog {
                 BibtexString bs = new BibtexString(newId, name, "");
 
                 // Store undo information:
-                panel.undoManager.addEdit(new UndoableInsertString(panel, panel.getDatabase(), bs));
+                panel.getUndoManager().addEdit(new UndoableInsertString(panel, panel.getDatabase(), bs));
 
                 base.addString(bs);
                 refreshTable();
@@ -429,7 +418,7 @@ class StringDialog extends JDialog {
                 // keystroke. This makes the content hang on the screen.
                 assureNotEditing();
 
-                String msg = (sel.length > 1 ? Localization.lang("Really delete the selected %0 entries?",
+                String msg = (sel.length > 1 ? Localization.lang("Really delete the %0 selected entries?",
                         Integer.toString(sel.length)) : Localization.lang("Really delete the selected entry?"));
                 int answer = JOptionPane.showConfirmDialog(parent, msg, Localization.lang("Delete strings"),
                         JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -446,7 +435,7 @@ class StringDialog extends JDialog {
                         base.removeString(subject.getId());
                     }
                     ce.end();
-                    panel.undoManager.addEdit(ce);
+                    panel.getUndoManager().addEdit(ce);
 
                     refreshTable();
                     if (!base.hasNoStrings()) {

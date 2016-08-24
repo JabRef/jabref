@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui;
 
 import java.awt.Dimension;
@@ -43,6 +28,7 @@ import com.jgoodies.looks.Options;
  */
 public class FieldContentSelector extends JComponent {
 
+    private static final int MAX_CONTENT_SELECTOR_WIDTH = 240; // The max width of the combobox for content selectors.
     private final JComboBox<String> comboBox;
 
     private final FieldEditor editor;
@@ -67,10 +53,6 @@ public class FieldContentSelector extends JComponent {
      * @param editor
      *            The entry editor which will be appended by the text selected
      *            by the user from the combobox.
-     * @param metaData
-     *            The metadata that contains the list of items to display in the
-     *            combobox under the key Globals.SELECTOR_META_PREFIX +
-     *            editor.getFieldName().
      * @param action
      *            The action that will be performed to after an item from the
      *            combobox has been appended to the text in the entryeditor.
@@ -79,12 +61,12 @@ public class FieldContentSelector extends JComponent {
      *            button.
      */
     public FieldContentSelector(JabRefFrame frame, final BasePanel panel,
-            Window owner, final FieldEditor editor, final MetaData metaData,
+            Window owner, final FieldEditor editor,
             final AbstractAction action, boolean horizontalLayout, String delimiter) {
 
 
         this.editor = editor;
-        this.metaData = metaData;
+        this.metaData = panel.getBibDatabaseContext().getMetaData();
         this.action = action;
         this.delimiter = delimiter;
 
@@ -93,8 +75,8 @@ public class FieldContentSelector extends JComponent {
             @Override
             public Dimension getPreferredSize() {
                 Dimension parents = super.getPreferredSize();
-                if (parents.width > GUIGlobals.MAX_CONTENT_SELECTOR_WIDTH) {
-                    parents.width = GUIGlobals.MAX_CONTENT_SELECTOR_WIDTH;
+                if (parents.width > MAX_CONTENT_SELECTOR_WIDTH) {
+                    parents.width = MAX_CONTENT_SELECTOR_WIDTH;
                 }
                 return parents;
             }
@@ -154,7 +136,7 @@ public class FieldContentSelector extends JComponent {
         add(manage);
 
         manage.addActionListener(e -> {
-            ContentSelectorDialog2 csd = new ContentSelectorDialog2(owner, frame, panel, true, metaData,
+            ContentSelectorDialog2 csd = new ContentSelectorDialog2(owner, frame, panel, true,
                     editor.getFieldName());
             csd.setLocationRelativeTo(frame);
 

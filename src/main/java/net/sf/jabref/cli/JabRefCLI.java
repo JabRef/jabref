@@ -1,7 +1,10 @@
 package net.sf.jabref.cli;
 
+import java.util.Arrays;
+import java.util.List;
+
 import net.sf.jabref.Globals;
-import net.sf.jabref.exporter.ExportFormats;
+import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.l10n.Localization;
 
 import org.apache.commons.cli.CommandLine;
@@ -17,7 +20,7 @@ public class JabRefCLI {
 
     private static final Log LOGGER = LogFactory.getLog(JabRefCLI.class);
 
-    private String[] leftOver;
+    private List<String> leftOver;
     private final CommandLine cl;
 
 
@@ -27,7 +30,7 @@ public class JabRefCLI {
 
         try {
             this.cl = new DefaultParser().parse(options, args);
-            this.leftOver = cl.getArgs();
+            this.leftOver = Arrays.asList(cl.getArgs());
         } catch (ParseException e) {
             LOGGER.warn("Problem parsing arguments", e);
 
@@ -183,7 +186,7 @@ public class JabRefCLI {
 
         options.addOption(Option.builder("a").
                 longOpt("aux").
-                desc(String.format("%s: %s[.aux],%s[.bib]", Localization.lang("Subdatabase from aux"),
+                desc(String.format("%s: %s[.aux],%s[.bib]", Localization.lang("Subdatabase from AUX"),
                         Localization.lang("file"),
                         Localization.lang("new"))).
                 hasArg().
@@ -199,7 +202,7 @@ public class JabRefCLI {
 
         options.addOption(Option.builder("f").
                 longOpt("fetch").
-                desc(Localization.lang("Run Fetcher, e.g. \"--fetch=Medline:cancer\"")).
+                desc(Localization.lang("Run fetcher, e.g. \"--fetch=Medline:cancer\"")).
                 hasArg().
                 argName("FILE").
                 build());
@@ -247,7 +250,7 @@ public class JabRefCLI {
         return String.format("JabRef %s", Globals.BUILD_INFO.getVersion());
     }
 
-    public String[] getLeftOver() {
+    public List<String> getLeftOver() {
         return leftOver;
     }
 

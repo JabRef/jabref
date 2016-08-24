@@ -1,26 +1,10 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.layout.format;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.bst.BibtexNameFormatter;
+import net.sf.jabref.logic.bst.BibtexNameFormatter;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.model.entry.AuthorList;
 
@@ -184,12 +168,12 @@ public class NameFormatter implements LayoutFormatter {
         this.parameter = parameter;
     }
 
-    public static Map<String, String> getNameFormatters() {
+    public static Map<String, String> getNameFormatters(NameFormatterPreferences prefs) {
 
         Map<String, String> result = new HashMap<>();
 
-        List<String> names = Globals.prefs.getStringList(NameFormatter.NAME_FORMATER_KEY);
-        List<String> formats = Globals.prefs.getStringList(NameFormatter.NAME_FORMATTER_VALUE);
+        List<String> names = prefs.getNameFormatterKey();
+        List<String> formats = prefs.getNameFormatterValue();
 
         for (int i = 0; i < names.size(); i++) {
             if (i < formats.size()) {

@@ -2,7 +2,7 @@ package net.sf.jabref.logic.l10n;
 
 import java.util.Locale;
 
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.After;
 import org.junit.Before;

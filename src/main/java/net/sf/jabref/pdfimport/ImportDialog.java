@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.pdfimport;
 
 import java.awt.BorderLayout;
@@ -38,9 +23,9 @@ import javax.swing.KeyStroke;
 import javax.swing.WindowConstants;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -69,9 +54,9 @@ public class ImportDialog extends JDialog {
         setContentPane(contentPane);
         JPanel panel3 = new JPanel();
         panel3.setBackground(new Color(-1643275));
-        JLabel labelHeadline = new JLabel(Localization.lang("Import_metadata_from:"));
+        JLabel labelHeadline = new JLabel(Localization.lang("Import metadata from:"));
         labelHeadline.setFont(new Font(labelHeadline.getFont().getName(), Font.BOLD, 14));
-        JLabel labelSubHeadline = new JLabel(Localization.lang("Choose_the_source_for_the_metadata_import"));
+        JLabel labelSubHeadline = new JLabel(Localization.lang("Choose the source for the metadata import"));
         labelSubHeadline.setFont(new Font(labelSubHeadline.getFont().getName(), labelSubHeadline.getFont().getStyle(), 13));
         JLabel labelFileName = new JLabel();
         labelFileName.setFont(new Font(labelHeadline.getFont().getName(), Font.BOLD, 14));
@@ -86,20 +71,20 @@ public class ImportDialog extends JDialog {
         panel3.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
         panel3.add(headLinePanel);
         panel3.add(labelSubHeadline);
-        radioButtonNoMeta = new JRadioButton(Localization.lang("Create_blank_entry_linking_the_PDF"));
-        radioButtonXmp = new JRadioButton(Localization.lang("Create_entry_based_on_XMP_data"));
-        radioButtonPDFcontent = new JRadioButton(Localization.lang("Create_entry_based_on_content"));
-        radioButtononlyAttachPDF = new JRadioButton(Localization.lang("Only_attach_PDF"));
+        radioButtonNoMeta = new JRadioButton(Localization.lang("Create blank entry linking the PDF"));
+        radioButtonXmp = new JRadioButton(Localization.lang("Create entry based on XMP data"));
+        radioButtonPDFcontent = new JRadioButton(Localization.lang("Create entry based on content"));
+        radioButtononlyAttachPDF = new JRadioButton(Localization.lang("Only attach PDF"));
         JButton buttonOK = new JButton(Localization.lang("OK"));
         JButton buttonCancel = new JButton(Localization.lang("Cancel"));
         checkBoxDoNotShowAgain = new JCheckBox(Localization.lang("Do not show this box again for this import"));
         useDefaultPDFImportStyle = new JCheckBox(Localization.lang("Always use this PDF import style (and do not ask for each import)"));
         DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref, 5dlu, left:pref:grow", ""));
-        b.appendSeparator(Localization.lang("Create New Entry"));
+        b.appendSeparator(Localization.lang("Create new entry"));
         b.append(radioButtonNoMeta, 3);
         b.append(radioButtonXmp, 3);
         b.append(radioButtonPDFcontent, 3);
-        b.appendSeparator(Localization.lang("Update_Existing_Entry"));
+        b.appendSeparator(Localization.lang("Update existing entry"));
         b.append(radioButtononlyAttachPDF, 3);
         b.nextLine();
         b.append(checkBoxDoNotShowAgain);
@@ -121,7 +106,7 @@ public class ImportDialog extends JDialog {
         }
         String name = new File(fileName).getName();
         labelFileName.setText(StringUtil.limitStringLength(name, 34));
-        this.setTitle(Localization.lang("Import_Metadata_From_PDF"));
+        this.setTitle(Localization.lang("Import metadata from PDF"));
 
         setModal(true);
         getRootPane().setDefaultButton(buttonOK);
@@ -148,7 +133,7 @@ public class ImportDialog extends JDialog {
         contentPane.registerKeyboardAction(e -> onCancel(), KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
                 JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
 
-        switch (Globals.prefs.getInt(JabRefPreferences.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE)) {
+        switch (Globals.prefs.getInt(JabRefPreferences.IMPORT_DEFAULT_PDF_IMPORT_STYLE)) {
         case NOMETA:
             radioButtonNoMeta.setSelected(true);
             break;
@@ -172,9 +157,9 @@ public class ImportDialog extends JDialog {
 
     private void onOK() {
         this.result = JOptionPane.OK_OPTION;
-        Globals.prefs.putInt(JabRefPreferences.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, this.getChoice());
+        Globals.prefs.putInt(JabRefPreferences.IMPORT_DEFAULT_PDF_IMPORT_STYLE, this.getChoice());
         if (useDefaultPDFImportStyle.isSelected()) {
-            Globals.prefs.putBoolean(JabRefPreferences.PREF_IMPORT_ALWAYSUSE, true);
+            Globals.prefs.putBoolean(JabRefPreferences.IMPORT_ALWAYSUSE, true);
         }
         // checkBoxDoNotShowAgain handled by local variable
         dispose();

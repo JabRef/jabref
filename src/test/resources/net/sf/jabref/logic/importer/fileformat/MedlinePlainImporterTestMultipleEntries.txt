@@ -1,0 +1,101 @@
+PMID- 20481061
+OWN - NLM
+STAT- MEDLINE
+DA  - 20100520
+DCOM- 20100526
+LR  - 20150731
+IS  - 0955-2359 (Print)
+IS  - 0955-2359 (Linking)
+VI  - 20
+IP  - 4
+DP  - 2009
+TI  - From danger and motherhood to health and beauty: health advice for the factory
+      girl in early twentieth-century Britain.
+PG  - 454-81
+AB  - Lorem ipsum abstract
+FAU - Long, Vicky
+AU  - Long V
+AD  - Centre for the History of Science, Technology and Medicine, University of
+      Manchester. Vicky.Long@manchester.ac.uk
+FAU - Marland, Hilary
+AU  - Marland H
+LA  - eng
+GR  - /076053/Z/04/Z/Wellcome Trust/United Kingdom
+GR  - 076053/Wellcome Trust/United Kingdom
+PT  - Historical Article
+PT  - Journal Article
+PT  - Research Support, Non-U.S. Gov't
+PL  - England
+TA  - 20 Century Br Hist
+JT  - 20 century British history
+JID - 9015384
+SB  - QIS
+MH  - Attitude to Health
+MH  - Employment/psychology
+MH  - Female
+MH  - Gender Identity
+MH  - Great Britain
+MH  - History, 20th Century
+MH  - Humans
+MH  - Occupational Health/*history
+MH  - Reproductive Medicine/*history
+MH  - Women, Working/*history/psychology
+PMC - PMC4513071
+MID - EMS54115
+OID - NLM: EMS54115
+OID - NLM: PMC4513071
+EDAT- 2009/01/01 00:00
+MHDA- 2010/05/27 06:00
+CRDT- 2010/05/21 06:00
+PST - ppublish
+SO  - 20 Century Br Hist. 2009;20(4):454-81.
+
+This line should be omitted by the importer.
+
+PMC -22664230
+TI-
+BTI -    
+FAU -
+FED - Some Editor
+PT  - Clinical Conference
+PT  - Consensus Development Conference
+PT  - Consensus Development Conference, NIH
+FED - Some test data
+JT  - Test Journal
+PG  -
+PL  - 
+IS  -
+VI  -
+AB  - Old Abstract
+AB  - new abstract
+DP  - 2013 06 10
+MH  -
+AID -
+CON - First Comment
+CIN - Different Comment
+
+PMCR- 20481061
+CTI - TestBookTitle
+DP  - 2010   06
+TI  - This is a Testtitle
+TI  - This title should be appended:
+TI  - This title should also be appended.
+TI  - Another append to the Title?
+TI  - LastTitle
+PT  - Book
+
+PMID-22664220
+PT  - Technical Report
+AID - doi:10.1016/j.cpr.2005.02.002
+
+PMID-22664238
+PT  - Editorial
+JT  - Inproceedings book title
+
+PMID-96578310
+PT  - Overall
+MH  - Female
+
+PMID-45984220
+PT  -
+MH  - Female

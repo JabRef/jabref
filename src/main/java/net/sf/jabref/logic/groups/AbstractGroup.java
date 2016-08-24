@@ -1,28 +1,14 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.groups;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.importer.fileformat.ParseException;
+import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * A group of BibtexEntries.
@@ -62,9 +48,9 @@ public abstract class AbstractGroup implements SearchMatcher {
      * @throws ParseException If an error occurred and a group could not be created,
      *                        e.g. due to a malformed regular expression.
      */
-    public static AbstractGroup fromString(String s) throws ParseException {
+    public static AbstractGroup fromString(String s, JabRefPreferences jabRefPreferences) throws ParseException {
         if (s.startsWith(KeywordGroup.ID)) {
-            return KeywordGroup.fromString(s);
+            return KeywordGroup.fromString(s, jabRefPreferences);
         }
         if (s.startsWith(AllEntriesGroup.ID)) {
             return AllEntriesGroup.fromString(s);
@@ -73,7 +59,7 @@ public abstract class AbstractGroup implements SearchMatcher {
             return SearchGroup.fromString(s);
         }
         if (s.startsWith(ExplicitGroup.ID)) {
-            return ExplicitGroup.fromString(s);
+            return ExplicitGroup.fromString(s, jabRefPreferences);
         }
         return null; // unknown group
     }
@@ -169,21 +155,6 @@ public abstract class AbstractGroup implements SearchMatcher {
     }
 
     /**
-     * Determines the number of entries in the specified list which are matched by this group.
-     * @param entries list of entries to be searched
-     * @return number of hits
-     */
-    public int numberOfHits(List<BibEntry> entries) {
-        int hits = 0;
-        for (BibEntry entry : entries) {
-            if (this.contains(entry)) {
-                hits++;
-            }
-        }
-        return hits;
-    }
-
-    /**
      * Returns true if this group is dynamic, i.e. uses a search definition or
      * equiv. that might match new entries, or false if this group contains a
      * fixed set of entries and thus will never match a new entry that was not
@@ -223,7 +194,7 @@ public abstract class AbstractGroup implements SearchMatcher {
     /**
      * Returns a short description of the group in HTML (for a tooltip).
      */
-    public abstract String getShortDescription();
+    public abstract String getShortDescription(boolean showDynamic);
 
     // by general AbstractGroup contract, toString() must return
     // something from which this object can be reconstructed

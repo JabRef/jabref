@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.util;
 
 import java.io.IOException;
@@ -21,14 +6,14 @@ import java.util.Properties;
 
 public class BuildInfo {
 
-    private static final String UNKOWN_VERSION = "*unknown*";
+    public static final String UNKNOWN_VERSION = "*unknown*";
 
-    public final static String OS = System.getProperty("os.name", UNKOWN_VERSION).toLowerCase();
-    public final static String OS_VERSION = System.getProperty("os.version", UNKOWN_VERSION).toLowerCase();
-    public final static String OS_ARCH = System.getProperty("os.arch", UNKOWN_VERSION).toLowerCase();
-    public final static String JAVA_VERSION = System.getProperty("java.version", UNKOWN_VERSION).toLowerCase();
+    public static final String OS = System.getProperty("os.name", UNKNOWN_VERSION).toLowerCase();
+    public static final String OS_VERSION = System.getProperty("os.version", UNKNOWN_VERSION).toLowerCase();
+    public static final String OS_ARCH = System.getProperty("os.arch", UNKNOWN_VERSION).toLowerCase();
+    public static final String JAVA_VERSION = System.getProperty("java.version", UNKNOWN_VERSION).toLowerCase();
 
-    private final String version;
+    private final Version version;
     private final String authors;
     private final String developers;
     private final String year;
@@ -48,14 +33,14 @@ public class BuildInfo {
             // nothing to do -> default already set
         }
 
-        version = properties.getProperty("version", UNKOWN_VERSION);
+        version = new Version(properties.getProperty("version", UNKNOWN_VERSION));
         authors = properties.getProperty("authors", "");
         year = properties.getProperty("year", "");
         developers = properties.getProperty("developers", "");
 
     }
 
-    public String getVersion() {
+    public Version getVersion() {
         return version;
     }
 

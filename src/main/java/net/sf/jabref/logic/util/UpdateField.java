@@ -3,17 +3,12 @@ package net.sf.jabref.logic.util;
 import java.util.Collection;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.bibtex.InternalBibtexFields;
-import net.sf.jabref.logic.FieldChange;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 public class UpdateField {
-
-    private static final EasyDateFormat DATE_FORMATTER = new EasyDateFormat();
-
 
     /**
      * Updating a field will result in the entry being reformatted on save
@@ -53,7 +48,7 @@ public class UpdateField {
         String writtenValue = null;
         String oldValue = null;
         if (be.hasField(field)) {
-            oldValue = be.getField(field);
+            oldValue = be.getFieldOptional(field).get();
             if ((newValue == null) || (oldValue.equals(newValue) && nullFieldIfValueIsTheSame)) {
                 // If the new field value is null or the old and the new value are the same and flag is set
                 // Clear the field
@@ -88,16 +83,19 @@ public class UpdateField {
      * @param overwriteOwner     Indicates whether owner should be set if it is already set.
      * @param overwriteTimestamp Indicates whether timestamp should be set if it is already set.
      */
-    public static void setAutomaticFields(BibEntry entry, boolean overwriteOwner, boolean overwriteTimestamp) {
-        String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
-        String timestamp = DATE_FORMATTER.getCurrentDate();
-        String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
-        boolean setOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)
-                && (overwriteOwner || (!entry.hasField(InternalBibtexFields.OWNER)));
-        boolean setTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP)
-                && (overwriteTimestamp || (!entry.hasField(timeStampField)));
+    public static void setAutomaticFields(BibEntry entry, boolean overwriteOwner, boolean overwriteTimestamp,
+            UpdateFieldPreferences prefs) {
+        String defaultOwner = prefs.getDefaultOwner();
+        String timestamp = EasyDateFormat.fromTimeStampFormat(prefs.getTimeStampFormat()).getCurrentDate();
+        String timeStampField = prefs.getTimeStampField();
+        boolean setOwner = prefs.isUseOwner() && (overwriteOwner || (!entry.hasField(FieldName.OWNER)));
+        boolean setTimeStamp = prefs.isUseTimeStamp() && (overwriteTimestamp || (!entry.hasField(timeStampField)));
 
         setAutomaticFields(entry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
+    }
+
+    public static void setAutomaticFields(BibEntry entry, UpdateFieldPreferences prefs) {
+        UpdateField.setAutomaticFields(entry, prefs.isOverwriteOwner(), prefs.isOverwriteTimeStamp(), prefs);
     }
 
     private static void setAutomaticFields(BibEntry entry, boolean setOwner, String owner, boolean setTimeStamp,
@@ -106,7 +104,7 @@ public class UpdateField {
         // Set owner field if this option is enabled:
         if (setOwner) {
             // Set owner field to default value
-            entry.setField(InternalBibtexFields.OWNER, owner);
+            entry.setField(FieldName.OWNER, owner);
         }
 
         if (setTimeStamp) {
@@ -121,26 +119,29 @@ public class UpdateField {
      * @param bibs List of bibtex entries
      */
     public static void setAutomaticFields(Collection<BibEntry> bibs, boolean overwriteOwner,
-            boolean overwriteTimestamp) {
+            boolean overwriteTimestamp, UpdateFieldPreferences prefs) {
 
-        boolean globalSetOwner = Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER);
-        boolean globalSetTimeStamp = Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP);
+        boolean globalSetOwner = prefs.isUseOwner();
+        boolean globalSetTimeStamp = prefs.isUseTimeStamp();
 
         // Do not need to do anything if all options are disabled
         if (!(globalSetOwner || globalSetTimeStamp)) {
             return;
         }
 
-        String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
-        String defaultOwner = Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER);
-        String timestamp = DATE_FORMATTER.getCurrentDate();
+        String timeStampField = prefs.getTimeStampField();
+        String defaultOwner = prefs.getDefaultOwner();
+        String timestamp = EasyDateFormat.fromTimeStampFormat(prefs.getTimeStampFormat()).getCurrentDate();
 
         // Iterate through all entries
         for (BibEntry curEntry : bibs) {
-            boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(InternalBibtexFields.OWNER)));
+            boolean setOwner = globalSetOwner && (overwriteOwner || (!curEntry.hasField(FieldName.OWNER)));
             boolean setTimeStamp = globalSetTimeStamp && (overwriteTimestamp || (!curEntry.hasField(timeStampField)));
             setAutomaticFields(curEntry, setOwner, defaultOwner, setTimeStamp, timeStampField, timestamp);
         }
     }
 
+    public static void setAutomaticFields(Collection<BibEntry> bibs, UpdateFieldPreferences prefs) {
+        UpdateField.setAutomaticFields(bibs, prefs.isOverwriteOwner(), prefs.isOverwriteTimeStamp(), prefs);
+    }
 }

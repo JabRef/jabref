@@ -1,21 +1,5 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref;
 
-import java.awt.Font;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,15 +18,20 @@ import javax.swing.plaf.FontUIResource;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.ParserResultWarningDialog;
+import net.sf.jabref.gui.importer.ParserResultWarningDialog;
+import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
+import net.sf.jabref.gui.importer.worker.AutosaveStartupPrompter;
 import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.importer.AutosaveStartupPrompter;
-import net.sf.jabref.importer.OpenDatabaseAction;
-import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.gui.worker.VersionWorker;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.OpenDatabase;
+import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.util.Version;
 import net.sf.jabref.migrations.PreferencesMigrations;
+import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.preferences.VersionPreferences;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;
@@ -54,24 +43,40 @@ public class JabRefGUI {
 
     private static JabRefFrame mainFrame;
 
-    private final List<ParserResult> loaded;
+    private final List<ParserResult> bibDatabases;
     private final boolean isBlank;
-
     private final List<File> postponed = new ArrayList<>();
     private final List<ParserResult> failed = new ArrayList<>();
     private final List<ParserResult> toOpenTab = new ArrayList<>();
 
-    public JabRefGUI(List<ParserResult> loaded, boolean isBlank) {
-        this.loaded = loaded;
+    private String focusedFile;
+
+    public JabRefGUI(List<ParserResult> argsDatabases, boolean isBlank) {
+        this.bibDatabases = argsDatabases;
         this.isBlank = isBlank;
+
+        // passed file (we take the first one) should be focused
+        if (!argsDatabases.isEmpty()) {
+            focusedFile = argsDatabases.get(0).getFile().getAbsolutePath();
+        } else {
+            focusedFile = Globals.prefs.get(JabRefPreferences.LAST_FOCUSED);
+        }
+
         openWindow();
+        JabRefGUI.checkForNewVersion(false);
+    }
+
+    public static void checkForNewVersion(boolean manualExecution) {
+        Version toBeIgnored = new VersionPreferences(Globals.prefs).getIgnoredVersion();
+        Version currentVersion = Globals.BUILD_INFO.getVersion();
+        new VersionWorker(JabRefGUI.getMainFrame(), manualExecution, currentVersion, toBeIgnored).execute();
     }
 
     private void openWindow() {
         // Perform checks and changes for users with a preference set from an older JabRef version.
-        PreferencesMigrations.replaceAbstractField();
         PreferencesMigrations.upgradeSortOrder();
         PreferencesMigrations.upgradeFaultyEncodingStrings();
+        PreferencesMigrations.upgradeLabelPatternToBibtexKeyPattern();
 
         // This property is set to make the Mac OSX Java VM move the menu bar to the top of the screen
         if (OS.OS_X) {
@@ -87,35 +92,33 @@ public class JabRefGUI {
         // "lcd" instead of "on" because of http://wiki.netbeans.org/FaqFontRendering and http://docs.oracle.com/javase/6/docs/technotes/guides/2d/flags.html#aaFonts
         System.setProperty("awt.useSystemAAFontSettings", "lcd");
 
-        // Look & Feel. This MUST be the first thing to do before loading any Swing-specific code!
+        // look and feel. This MUST be the first thing to do before loading any Swing-specific code!
         setLookAndFeel();
 
         // If the option is enabled, open the last edited databases, if any.
-        if (!isBlank && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)
-                && (Globals.prefs.get(JabRefPreferences.LAST_EDITED) != null)) {
-            openLastEditedDatabase();
+        if (!isBlank && Globals.prefs.getBoolean(JabRefPreferences.OPEN_LAST_EDITED)) {
+            openLastEditedDatabases();
         }
 
         GUIGlobals.init();
-        GUIGlobals.currentFont = new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY),
-                Globals.prefs.getInt(JabRefPreferences.FONT_STYLE), Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
 
         LOGGER.debug("Initializing frame");
         JabRefGUI.mainFrame = new JabRefFrame();
 
-        // Add all loaded databases to the frame:
-        boolean first = true;
-        if (!loaded.isEmpty()) {
-            for (Iterator<ParserResult> i = loaded.iterator(); i.hasNext();) {
-                ParserResult pr = i.next();
+        // Add all bibDatabases databases to the frame:
+        boolean first = false;
+        if (!bibDatabases.isEmpty()) {
+            for (Iterator<ParserResult> parserResultIterator = bibDatabases.iterator(); parserResultIterator.hasNext();) {
+                ParserResult pr = parserResultIterator.next();
 
-                if (new LastFocusedTabPreferences(Globals.prefs).hadLastFocus(pr.getFile())) {
+                // Define focused tab
+                if ((focusedFile != null) && pr.getFile().getAbsolutePath().equals(focusedFile)) {
                     first = true;
                 }
 
                 if (pr.isInvalid()) {
                     failed.add(pr);
-                    i.remove();
+                    parserResultIterator.remove();
                 } else if (!pr.isPostponedAutosaveFound()) {
                     if (pr.toOpenTab()) {
                         // things to be appended to an opened tab should be done after opening all tabs
@@ -126,7 +129,7 @@ public class JabRefGUI {
                         first = false;
                     }
                 } else {
-                    i.remove();
+                    parserResultIterator.remove();
                     postponed.add(pr.getFile());
                 }
             }
@@ -164,11 +167,10 @@ public class JabRefGUI {
                     JOptionPane.ERROR_MESSAGE);
         }
 
-        if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
-            int i = 0;
-            for (ParserResult pr : loaded) {
-                ParserResultWarningDialog.showParserResultWarningDialog(pr, JabRefGUI.getMainFrame(), i++);
-            }
+        // Display warnings, if any
+        int tabNumber = 0;
+        for (ParserResult pr : bibDatabases) {
+            ParserResultWarningDialog.showParserResultWarningDialog(pr, JabRefGUI.getMainFrame(), tabNumber++);
         }
 
         // After adding the databases, go through each and see if
@@ -178,10 +180,10 @@ public class JabRefGUI {
         // in this version of JabRef.
         // Note that we have to check whether i does not go over getBasePanelCount().
         // This is because importToOpen might have been used, which adds to
-        // loaded, but not to getBasePanelCount()
+        // loadedDatabases, but not to getBasePanelCount()
 
-        for (int i = 0; (i < loaded.size()) && (i < JabRefGUI.getMainFrame().getBasePanelCount()); i++) {
-            ParserResult pr = loaded.get(i);
+        for (int i = 0; (i < bibDatabases.size()) && (i < JabRefGUI.getMainFrame().getBasePanelCount()); i++) {
+            ParserResult pr = bibDatabases.get(i);
             BasePanel panel = JabRefGUI.getMainFrame().getBasePanelAt(i);
             OpenDatabaseAction.performPostOpenActions(panel, pr, true);
         }
@@ -195,33 +197,44 @@ public class JabRefGUI {
             SwingUtilities.invokeLater(asp);
         }
 
-        if (!loaded.isEmpty()) {
-            new FocusRequester(JabRefGUI.getMainFrame().getCurrentBasePanel().mainTable);
+        if (!bibDatabases.isEmpty()) {
+            new FocusRequester(JabRefGUI.getMainFrame().getCurrentBasePanel().getMainTable());
         }
     }
 
-    private void openLastEditedDatabase() {
-        // How to handle errors in the databases to open?
-        List<String> names = Globals.prefs.getStringList(JabRefPreferences.LAST_EDITED);
-        lastEdLoop: for (String name : names) {
-            File fileToOpen = new File(name);
+    private void openLastEditedDatabases() {
+        if (Globals.prefs.get(JabRefPreferences.LAST_EDITED) == null) {
+            return;
+        }
 
-            for (ParserResult pr : loaded) {
-                if ((pr.getFile() != null) && pr.getFile().equals(fileToOpen)) {
-                    continue lastEdLoop;
-                }
+        List<String> lastFiles = Globals.prefs.getStringList(JabRefPreferences.LAST_EDITED);
+
+        for (String fileName : lastFiles) {
+            File dbFile = new File(fileName);
+
+            // Already parsed via command line parameter, e.g., "jabref.jar somefile.bib"
+            if (isLoaded(dbFile) || !dbFile.exists()) {
+                continue;
             }
 
-            if (fileToOpen.exists()) {
-                ParserResult pr = OpenDatabaseAction.loadDatabaseOrAutoSave(name, false);
+            ParserResult parsedDatabase = OpenDatabase.loadDatabaseOrAutoSave(fileName, false,
+                    ImportFormatPreferences.fromPreferences(Globals.prefs));
 
-                if (pr.isNullResult()) {
-                    LOGGER.error(Localization.lang("Error opening file") + " '" + fileToOpen.getPath() + "'");
-                } else {
-                    loaded.add(pr);
-                }
+            if (parsedDatabase.isNullResult()) {
+                LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
+            } else {
+                bibDatabases.add(parsedDatabase);
             }
         }
+    }
+
+    private boolean isLoaded(File fileToOpen) {
+        for (ParserResult pr : bibDatabases) {
+            if ((pr.getFile() != null) && pr.getFile().equals(fileToOpen)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void setLookAndFeel() {
@@ -264,9 +277,9 @@ public class JabRefGUI {
                     // notify the user
                     JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(),
                             Localization
-                                    .lang("Unable to find the requested Look & Feel and thus the default one is used."),
+                                    .lang("Unable to find the requested look and feel and thus the default one is used."),
                             Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
-                    LOGGER.warn("Unable to find requested Look and Feel", e);
+                    LOGGER.warn("Unable to find requested look and feel", e);
                 }
             }
         } catch (Exception e) {

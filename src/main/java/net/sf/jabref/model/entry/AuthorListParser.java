@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 public class AuthorListParser {
@@ -26,7 +27,7 @@ public class AuthorListParser {
     /** true if upper-case token, false if lower-case */
     private boolean tokenCase;
 
-    
+
     // Constant HashSet containing names of TeX special characters
     private static final Set<String> TEX_NAMES = new HashSet<>();
 
@@ -84,10 +85,7 @@ public class AuthorListParser {
         // Parse author by author
         List<Author> authors = new ArrayList<>(5); // 5 seems to be reasonable initial size
         while (tokenStart < original.length()) {
-            Author author = getAuthor();
-            if (author != null) {
-                authors.add(author);
-            }
+            getAuthor().ifPresent(authors::add);
         }
         return new AuthorList(authors);
     }
@@ -95,10 +93,10 @@ public class AuthorListParser {
     /**
      * Parses one author name and returns preformatted information.
      *
-     * @return Preformatted author name; <CODE>null</CODE> if author name is
+     * @return Preformatted author name; <CODE>Optional.empty()</CODE> if author name is
      * empty.
      */
-    private Author getAuthor() {
+    private Optional<Author> getAuthor() {
 
         List<Object> tokens = new ArrayList<>(); // initialization
         int vonStart = -1;
@@ -135,8 +133,8 @@ public class AuthorListParser {
                 }
                 if (vonStart < 0) {
                     if (!tokenCase) {
-                        int previousTermToken = tokens.size() - TOKEN_GROUP_LENGTH - TOKEN_GROUP_LENGTH + OFFSET_TOKEN_TERM;
-                        if(previousTermToken >= 0 && tokens.get(previousTermToken).equals('-')) {
+                        int previousTermToken = (tokens.size() - TOKEN_GROUP_LENGTH - TOKEN_GROUP_LENGTH) + OFFSET_TOKEN_TERM;
+                        if((previousTermToken >= 0) && tokens.get(previousTermToken).equals('-')) {
                             // We are in a first name which contained a hyphen
                             break;
                         }
@@ -156,7 +154,7 @@ public class AuthorListParser {
         // Second step: split name into parts (here: calculate indices
         // of parts in 'tokens' Vector)
         if (tokens.isEmpty()) {
-            return null; // no author information
+            return Optional.empty(); // no author information
         }
 
         // the following negatives indicate absence of the corresponding part
@@ -251,13 +249,13 @@ public class AuthorListParser {
                 false);
         String jrPart = jrPartStart < 0 ? null : concatTokens(tokens, jrPartStart, jrPartEnd, OFFSET_TOKEN, false);
 
-        if(firstPart != null && lastPart != null && lastPart.equals(lastPart.toUpperCase()) && lastPart.length() < 5) {
+        if((firstPart != null) && (lastPart != null) && lastPart.equals(lastPart.toUpperCase()) && (lastPart.length() < 5)) {
             // The last part is a small string in complete upper case, so interpret it as initial of the first name
             // This is the case for example in "Smith SH" which we think of as lastname=Smith and firstname=SH
             // The length < 5 constraint should allow for "Smith S.H." as input
-            return new Author(lastPart, lastPart, vonPart, firstPart, jrPart);
+            return Optional.of(new Author(lastPart, lastPart, vonPart, firstPart, jrPart));
         } else {
-            return new Author(firstPart, firstAbbr, vonPart, lastPart, jrPart);
+            return Optional.of(new Author(firstPart, firstAbbr, vonPart, lastPart, jrPart));
         }
     }
 
@@ -356,7 +354,7 @@ public class AuthorListParser {
             if (c == '{') {
                 bracesLevel++;
             }
-            if (firstLetterIsFound && (tokenAbbr < 0) && (bracesLevel == 0)) {
+            if (firstLetterIsFound && (tokenAbbr < 0) && ((bracesLevel == 0) || (c == '{'))) {
                 tokenAbbr = tokenEnd;
             }
             if ((c == '}') && (bracesLevel > 0)) {

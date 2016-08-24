@@ -10,12 +10,12 @@ import java.util.Optional;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -41,6 +41,7 @@ public class IntegrityCheckTest {
     public void testUrlChecks() {
         assertCorrect(createContext("url", "http://www.google.com"));
         assertCorrect(createContext("url", "file://c:/asdf/asdf"));
+        assertCorrect(createContext("url", "http://scikit-learn.org/stable/modules/ensemble.html#random-forests"));
 
         assertWrong(createContext("url", "www.google.com"));
         assertWrong(createContext("url", "google.com"));
@@ -196,11 +197,27 @@ public class IntegrityCheckTest {
     @Test
     public void testISSNChecks() {
         assertCorrect(createContext("issn", "0020-7217"));
-        assertCorrect(createContext("issn", "0020-7217"));
         assertCorrect(createContext("issn", "1687-6180"));
         assertCorrect(createContext("issn", "2434-561x"));
         assertWrong(createContext("issn", "Some other stuff"));
         assertWrong(createContext("issn", "0020-7218"));
+    }
+
+    @Test
+    public void testISBNChecks() {
+        assertCorrect(createContext("isbn", "0-201-53082-1"));
+        assertCorrect(createContext("isbn", "0-9752298-0-X"));
+        assertCorrect(createContext("isbn", "978-0-306-40615-7"));
+        assertWrong(createContext("isbn", "Some other stuff"));
+        assertWrong(createContext("isbn", "0-201-53082-2"));
+        assertWrong(createContext("isbn", "978-0-306-40615-8"));
+    }
+
+    @Test
+    public void testASCIIChecks() {
+        assertCorrect(createContext("title", "Only ascii characters!'@12"));
+        assertWrong(createContext("month", "Umlauts are nöt ällowed"));
+        assertWrong(createContext("author", "Some unicode ⊕"));
     }
 
     private BibDatabaseContext createContext(String field, String value, String type) {

@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.dbproperties;
 
 import java.awt.BorderLayout;
@@ -38,13 +23,15 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.SaveOrderConfigDisplay;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.cleanup.FieldFormatterCleanupsPanel;
+import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.config.SaveOrderConfig;
+import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 
@@ -96,8 +83,15 @@ public class DatabasePropertiesDialog extends JDialog {
 
         JButton browseFile = new JButton(Localization.lang("Browse"));
         JButton browseFileIndv = new JButton(Localization.lang("Browse"));
-        browseFile.addActionListener(BrowseAction.buildForDir(parent, fileDir));
-        browseFileIndv.addActionListener(BrowseAction.buildForDir(parent, fileDirIndv));
+
+        browseFile.addActionListener(e ->
+                new FileDialog(parent).showDialogAndGetSelectedDirectory()
+                        .ifPresent(f -> fileDir.setText(f.toAbsolutePath().toString()))
+        );
+        browseFileIndv.addActionListener(e ->
+                new FileDialog(parent).showDialogAndGetSelectedDirectory()
+                        .ifPresent(f -> fileDirIndv.setText(f.toAbsolutePath().toString()))
+        );
 
         setupSortOrderConfiguration();
         FormLayout form = new FormLayout("left:pref, 4dlu, pref:grow, 4dlu, pref:grow, 4dlu, pref",
@@ -135,6 +129,8 @@ public class DatabasePropertiesDialog extends JDialog {
         bb.addGlue();
         bb.addButton(ok);
         bb.addButton(cancel);
+        bb.addRelatedGap();
+        bb.addButton(new HelpAction(HelpFile.DATABASE_PROPERTIES).getHelpButton());
         bb.addGlue();
         bb.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
@@ -186,7 +182,8 @@ public class DatabasePropertiesDialog extends JDialog {
     }
 
     private void setValues() {
-        encoding.setSelectedItem(panel.getEncoding());
+        Optional<Charset> charset = panel.getBibDatabaseContext().getMetaData().getEncoding();
+        encoding.setSelectedItem(charset.orElse(Globals.prefs.getDefaultEncoding()));
 
         Optional<SaveOrderConfig> storedSaveOrderConfig = metaData.getSaveOrderConfig();
         boolean selected;
@@ -231,9 +228,10 @@ public class DatabasePropertiesDialog extends JDialog {
 
     private void storeSettings() {
 
-        Charset oldEncoding = panel.getEncoding();
+        Charset oldEncoding = panel.getBibDatabaseContext().getMetaData().getEncoding()
+                .orElse(Globals.prefs.getDefaultEncoding());
         Charset newEncoding = (Charset) encoding.getSelectedItem();
-        panel.setEncoding(newEncoding);
+        panel.getBibDatabaseContext().getMetaData().setEncoding(newEncoding);
 
         String text = fileDir.getText().trim();
         if (text.isEmpty()) {

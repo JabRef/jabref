@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.menus;
 
 import java.awt.event.ActionEvent;
@@ -23,11 +8,12 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileHistory;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class FileHistoryMenu extends JMenu implements ActionListener {
 
@@ -47,7 +33,7 @@ public class FileHistoryMenu extends JMenu implements ActionListener {
         }
 
         this.frame = frame;
-        history = new FileHistory(prefs);
+        history = Globals.prefs.getFileHistory();
         if (history.size() > 0) {
             setItems();
         } else {
@@ -88,7 +74,7 @@ public class FileHistoryMenu extends JMenu implements ActionListener {
 
 
     public void storeHistory() {
-        history.storeHistory();
+        Globals.prefs.storeFileHistory(history);
     }
 
     @Override

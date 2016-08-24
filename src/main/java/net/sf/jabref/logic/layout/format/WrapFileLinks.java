@@ -1,30 +1,13 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.logic.layout.format;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.layout.AbstractParamLayoutFormatter;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.FileField;
@@ -116,6 +99,7 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
     // Define which escape sequences give what results:
     private static final Map<Character, Integer> ESCAPE_SEQ = new HashMap<>();
 
+    private final FileLinkPreferences prefs;
 
     static {
         WrapFileLinks.ESCAPE_SEQ.put('i', WrapFileLinks.ITERATION_COUNT);
@@ -126,16 +110,21 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
         WrapFileLinks.ESCAPE_SEQ.put('d', WrapFileLinks.FILE_DESCRIPTION);
     }
 
+
+    public WrapFileLinks(FileLinkPreferences fileLinkPreferences) {
+        this.prefs = fileLinkPreferences;
+    }
+
     @Override
     public void setArgument(String arg) {
-        String[] parts = AbstractParamLayoutFormatter.parseArgument(arg);
-        format = parseFormatString(parts[0]);
-        if ((parts.length > 1) && !parts[1].trim().isEmpty()) {
-            fileType = parts[1];
+        List<String> parts = AbstractParamLayoutFormatter.parseArgument(arg);
+        format = parseFormatString(parts.get(0));
+        if ((parts.size() > 1) && !parts.get(1).trim().isEmpty()) {
+            fileType = parts.get(1);
         }
-        if (parts.length > 2) {
-            for (int i = 2; i < (parts.length - 1); i += 2) {
-                replacements.put(parts[i], parts[i + 1]);
+        if (parts.size() > 2) {
+            for (int i = 2; i < (parts.size() - 1); i += 2) {
+                replacements.put(parts.get(i), parts.get(i + 1));
             }
         }
     }
@@ -170,10 +159,10 @@ public class WrapFileLinks extends AbstractParamLayoutFormatter {
                         // but that is not available from a formatter. Therefore, as an
                         // ugly hack, the export routine has set a global variable before
                         // starting the export, which contains the database's file directory:
-                        if (Globals.prefs.fileDirForDatabase == null) {
-                            dirs = Collections.singletonList(Globals.prefs.get(Globals.FILE_FIELD + Globals.DIR_SUFFIX));
+                        if (prefs.getFileDirForDatabase() == null) {
+                            dirs = prefs.getGeneratedDirForDatabase();
                         } else {
-                            dirs = Globals.prefs.fileDirForDatabase;
+                            dirs = prefs.getFileDirForDatabase();
                         }
 
                         Optional<File> f = FileUtil.expandFilename(flEntry.getLink(), dirs);

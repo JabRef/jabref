@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
@@ -45,17 +30,17 @@ import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.bibtex.InternalBibtexFields;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 
@@ -75,7 +60,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
     protected JButton delete;
     protected JButton importTypes;
     protected JButton exportTypes;
-    private final List<String> preset = InternalBibtexFields.getAllFieldNames();
+    private final List<String> preset = InternalBibtexFields.getAllPublicFieldNames();
     private String lastSelected;
     private final Map<String, List<String>> reqLists = new HashMap<>();
     private final Map<String, List<String>> optLists = new HashMap<>();
@@ -84,7 +69,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
     private final Set<String> changed = new HashSet<>();
 
     private boolean biblatexMode;
-    private BibDatabaseContext bibDatabaseContext;
+    private BibDatabaseMode bibDatabaseMode;
 
     /**
      * Creates a new instance of EntryCustomizationDialog
@@ -100,8 +85,12 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
         Container pane = getContentPane();
         pane.setLayout(new BorderLayout());
 
-        bibDatabaseContext = frame.getCurrentBasePanel().getBibDatabaseContext();
-        biblatexMode = bibDatabaseContext.isBiblatexMode();
+        if (frame.getCurrentBasePanel() == null) {
+            bibDatabaseMode = Globals.prefs.getDefaultBibDatabaseMode();
+        } else {
+            bibDatabaseMode = frame.getCurrentBasePanel().getBibDatabaseContext().getMode();
+        }
+        biblatexMode = BibDatabaseMode.BIBLATEX.equals(bibDatabaseMode);
 
         JPanel main = new JPanel();
         JPanel buttons = new JPanel();
@@ -110,11 +99,11 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
         right.setLayout(new GridLayout(biblatexMode ? 2 : 1, 2));
 
         List<String> entryTypes = new ArrayList<>();
-        for (String s : EntryTypes.getAllTypes(bibDatabaseContext.getMode())) {
+        for (String s : EntryTypes.getAllTypes(bibDatabaseMode)) {
             entryTypes.add(s);
         }
 
-        typeComp = new EntryTypeList(entryTypes, bibDatabaseContext.getMode());
+        typeComp = new EntryTypeList(entryTypes, bibDatabaseMode);
         typeComp.addListSelectionListener(this);
         typeComp.addAdditionActionListener(this);
         typeComp.addDefaultActionListener(new DefaultListener());
@@ -204,7 +193,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
         }
         List<String> rl = reqLists.get(s);
         if (rl == null) {
-            Optional<EntryType> type = EntryTypes.getType(s, bibDatabaseContext.getMode());
+            Optional<EntryType> type = EntryTypes.getType(s, bibDatabaseMode);
             if (type.isPresent()) {
                 List<String> req = type.get().getRequiredFields();
 
@@ -272,13 +261,13 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
             if (defaulted.contains(stringListEntry.getKey())) {
                 // This type should be reverted to its default setup.
                 String nm = EntryUtil.capitalizeFirst(stringListEntry.getKey());
-                EntryTypes.removeType(nm, bibDatabaseContext.getMode());
+                EntryTypes.removeType(nm, bibDatabaseMode);
 
                 updateTypesForEntries(nm);
                 continue;
             }
 
-            Optional<EntryType> oldType = EntryTypes.getType(stringListEntry.getKey(), bibDatabaseContext.getMode());
+            Optional<EntryType> oldType = EntryTypes.getType(stringListEntry.getKey(), bibDatabaseMode);
             if (oldType.isPresent()) {
                 List<String> oldReq = oldType.get().getRequiredFieldsFlat();
                 List<String> oldOpt = oldType.get().getOptionalFields();
@@ -305,7 +294,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
         }
 
         Set<Object> toRemove = new HashSet<>();
-        for (String o : EntryTypes.getAllTypes(bibDatabaseContext.getMode())) {
+        for (String o : EntryTypes.getAllTypes(bibDatabaseMode)) {
             if (!types.contains(o)) {
                 toRemove.add(o);
             }
@@ -322,10 +311,10 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
     }
 
     private void typeDeletion(String name) {
-        Optional<EntryType> type = EntryTypes.getType(name, bibDatabaseContext.getMode());
+        Optional<EntryType> type = EntryTypes.getType(name, bibDatabaseMode);
 
-        if (type.isPresent() && type.get() instanceof CustomEntryType) {
-            if (! EntryTypes.getStandardType(name, bibDatabaseContext.getMode()).isPresent()) {
+        if (type.isPresent() && (type.get() instanceof CustomEntryType)) {
+            if (!EntryTypes.getStandardType(name, bibDatabaseMode).isPresent()) {
                 int reply = JOptionPane.showConfirmDialog
                         (frame, Localization.lang("All entries of this "
                                         + "type will be declared "
@@ -337,7 +326,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
                     return;
                 }
             }
-            EntryTypes.removeType(name, bibDatabaseContext.getMode());
+            EntryTypes.removeType(name, bibDatabaseMode);
             updateTypesForEntries(EntryUtil.capitalizeFirst(name));
             changed.remove(name);
             reqLists.remove(name);
@@ -378,7 +367,6 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
         } else if (e.getSource() == apply) {
             applyChanges();
         } else if (e.getSource() == typeComp) {
-            //System.out.println("add: "+e.getActionCommand());
             typeComp.selectField(e.getActionCommand());
         }
     }
@@ -393,10 +381,10 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
         for (BasePanel bp : frame.getBasePanelList()) {
 
             // Invalidate associated cached entry editor
-            bp.entryEditors.remove(typeName);
+            bp.getEntryEditors().remove(typeName);
 
             for (BibEntry entry : bp.getDatabase().getEntries()) {
-                EntryTypes.getType(entry.getType(), bibDatabaseContext.getMode()).ifPresent(entry::setType);
+                EntryTypes.getType(entry.getType(), bibDatabaseMode).ifPresent(entry::setType);
             }
         }
 
@@ -404,7 +392,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
 
     private void updateTables() {
         for (BasePanel basePanel : frame.getBasePanelList()) {
-            ((javax.swing.table.AbstractTableModel) basePanel.mainTable.getModel()).fireTableDataChanged();
+            ((javax.swing.table.AbstractTableModel) basePanel.getMainTable().getModel()).fireTableDataChanged();
         }
     }
 
@@ -420,7 +408,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
             }
             defaulted.add(lastSelected);
 
-            Optional<EntryType> type = EntryTypes.getStandardType(lastSelected, bibDatabaseContext.getMode());
+            Optional<EntryType> type = EntryTypes.getStandardType(lastSelected, bibDatabaseMode);
             if (type.isPresent()) {
                 List<String> of = type.get().getOptionalFields();
                 List<String> req = type.get().getRequiredFields();

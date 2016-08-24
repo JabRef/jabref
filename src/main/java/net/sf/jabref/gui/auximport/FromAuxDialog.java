@@ -1,44 +1,9 @@
-/*
- Copyright (C) 2004 R. Nagel
- Copyright (C) 2016 JabRef Contributors
-
-
- All programs in this directory and
- subdirectories are published under the GNU General Public License as
- described below.
-
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or (at
- your option) any later version.
-
- This program is distributed in the hope that it will be useful, but
- WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
- USA
-
- Further information about the GNU GPL is available at:
- http://www.gnu.org/copyleft/gpl.ja.html
-
- */
-
-// A wizard dialog for generating a new sub database from existing TeX aux file
-//
-// created by : r.nagel 23.08.2004
-//
-// modified : 18.04.2006 r.nagel
-//            insert a "short info" section
-
 package net.sf.jabref.gui.auximport;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
-import java.io.File;
+import java.nio.file.Path;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -48,7 +13,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -59,19 +23,24 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FileDialogs;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.auxparser.AuxParser;
 import net.sf.jabref.logic.auxparser.AuxParserResult;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.database.BibDatabase;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
+/**
+ * A wizard dialog for generating a new sub database from existing TeX AUX file
+ */
 public class FromAuxDialog extends JDialog {
+
     private final JPanel statusPanel = new JPanel();
     private final JPanel buttons = new JPanel();
     private final JButton generateButton = new JButton();
@@ -94,8 +63,7 @@ public class FromAuxDialog extends JDialog {
     private final JabRefFrame parentFrame;
 
 
-    public FromAuxDialog(JabRefFrame frame, String title, boolean modal,
-                         JTabbedPane viewedDBs) {
+    public FromAuxDialog(JabRefFrame frame, String title, boolean modal, JTabbedPane viewedDBs) {
         super(frame, title, modal);
 
         parentTabbedPane = viewedDBs;
@@ -140,9 +108,11 @@ public class FromAuxDialog extends JDialog {
         this.setTitle(Localization.lang("AUX file import"));
         JLabel desc = new JLabel("<html><h3>" + Localization.lang("AUX file import") + "</h3><p>"
                 + Localization.lang("This feature generates a new database based on which entries "
-                + "are needed in an existing LaTeX document.") + "</p>"
-                + "<p>" + Localization.lang("You need to select one of your open databases from which to choose "
-                + "entries, as well as the AUX file produced by LaTeX when compiling your document.") + "</p></html>");
+                        + "are needed in an existing LaTeX document.")
+                + "</p>" + "<p>"
+                + Localization.lang("You need to select one of your open databases from which to choose "
+                        + "entries, as well as the AUX file produced by LaTeX when compiling your document.")
+                + "</p></html>");
         desc.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
         panel1.add(desc, BorderLayout.NORTH);
 
@@ -159,6 +129,7 @@ public class FromAuxDialog extends JDialog {
         InputMap im = statusPanel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
         im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
         am.put("close", new AbstractAction() {
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 dispose();
@@ -183,15 +154,21 @@ public class FromAuxDialog extends JDialog {
 
         auxFileField = new JTextField("", 25);
         JButton browseAuxFileButton = new JButton(Localization.lang("Browse"));
-        browseAuxFileButton.addActionListener(new BrowseAction(auxFileField, parentFrame));
+
+        FileDialog dialog = new FileDialog(parentFrame).withExtension(FileExtensions.AUX);
+        dialog.setDefaultExtension(FileExtensions.AUX);
+        browseAuxFileButton.addActionListener(e -> {
+            Optional<Path> file = dialog.showDialogAndGetSelectedFile();
+            file.ifPresent(f -> auxFileField.setText(f.toAbsolutePath().toString()));
+        });
+
         notFoundList = new JList<>();
         JScrollPane listScrollPane = new JScrollPane(notFoundList);
         statusInfos = new JTextArea("", 5, 20);
         JScrollPane statusScrollPane = new JScrollPane(statusInfos);
         statusInfos.setEditable(false);
 
-        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout(
-                "left:pref, 4dlu, fill:pref:grow, 4dlu, left:pref", ""), buttons);
+        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, left:pref", ""), buttons);
         b.appendSeparator(Localization.lang("Options"));
         b.append(Localization.lang("Reference database") + ":");
         b.append(dbChooser, 3);
@@ -201,8 +178,8 @@ public class FromAuxDialog extends JDialog {
         b.append(browseAuxFileButton);
         b.getPanel().setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 
-        b = new DefaultFormBuilder(new FormLayout(
-                "fill:pref:grow, 4dlu, fill:pref:grow", "pref, pref, fill:pref:grow"), statusPanel);
+        b = new DefaultFormBuilder(new FormLayout("fill:pref:grow, 4dlu, fill:pref:grow", "pref, pref, fill:pref:grow"),
+                statusPanel);
         b.appendSeparator(Localization.lang("Result"));
         b.append(Localization.lang("Unknown BibTeX entries") + ":");
         b.append(Localization.lang("Messages") + ":");
@@ -248,30 +225,4 @@ public class FromAuxDialog extends JDialog {
         return auxParser.parse().getGeneratedBibDatabase();
     }
 
-    /**
-     * Action used to produce a "Browse" button for one of the text fields.
-     */
-    static class BrowseAction extends AbstractAction {
-        private final JTextField comp;
-        private final JabRefFrame frame;
-
-
-        public BrowseAction(JTextField tc, JabRefFrame frame) {
-            super(Localization.lang("Browse"));
-            this.frame = frame;
-            comp = tc;
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String chosen = FileDialogs.getNewFile(frame,
-                    new File(comp.getText()),
-                    ".aux",
-                    JFileChooser.OPEN_DIALOG, false);
-            if (chosen != null) {
-                File newFile = new File(chosen);
-                comp.setText(newFile.getPath());
-            }
-        }
-    }
 }

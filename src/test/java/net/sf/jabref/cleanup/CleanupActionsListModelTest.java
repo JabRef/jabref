@@ -8,9 +8,9 @@ import java.util.List;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import net.sf.jabref.exporter.FieldFormatterCleanups;
 import net.sf.jabref.gui.cleanup.CleanupActionsListModel;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 
 import org.junit.Test;

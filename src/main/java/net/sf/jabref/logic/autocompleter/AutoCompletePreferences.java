@@ -1,43 +1,29 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.autocompleter;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 public class AutoCompletePreferences {
 
     private final JabRefPreferences preferences;
 
-    private static final String PREF_SHORTEST_TO_COMPLETE = "shortestToComplete";
-    private static final String PREF_FIRSTNAME_MODE = "autoCompFirstNameMode";
-    private static final String PREF_LAST_FIRST = "autoCompLF";
-    private static final String PREF_FIRST_LAST = "autoCompFF";
-    private static final String PREF_COMPLETE_FIELDS = "autoCompleteFields";
+    private static final String AUTOCOMPLETER_SHORTEST_TO_COMPLETE = "shortestToComplete";
+    private static final String AUTOCOMPLETER_FIRSTNAME_MODE = "autoCompFirstNameMode";
+    private static final String AUTOCOMPLETER_LAST_FIRST = "autoCompLF";
+    private static final String AUTOCOMPLETER_FIRST_LAST = "autoCompFF";
+    private static final String AUTOCOMPLETER_COMPLETE_FIELDS = "autoCompleteFields";
 
 
     public static void putDefaults(Map<String, Object> defaults) {
-        defaults.put(PREF_SHORTEST_TO_COMPLETE, 1);
-        defaults.put(PREF_FIRSTNAME_MODE, AutoCompleteFirstNameMode.BOTH.name());
-        defaults.put(PREF_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
-        defaults.put(PREF_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
-        defaults.put(PREF_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref");
+        defaults.put(AUTOCOMPLETER_SHORTEST_TO_COMPLETE, 1);
+        defaults.put(AUTOCOMPLETER_FIRSTNAME_MODE, AutoCompleteFirstNameMode.BOTH.name());
+        defaults.put(AUTOCOMPLETER_FIRST_LAST, Boolean.FALSE); // "Autocomplete names in 'Firstname Lastname' format only"
+        defaults.put(AUTOCOMPLETER_LAST_FIRST, Boolean.FALSE); // "Autocomplete names in 'Lastname, Firstname' format only"
+        defaults.put(AUTOCOMPLETER_COMPLETE_FIELDS, "author;editor;title;journal;publisher;keywords;crossref");
     }
 
     public AutoCompletePreferences(JabRefPreferences preferences) {
@@ -45,11 +31,11 @@ public class AutoCompletePreferences {
     }
 
     public int getShortestLengthToComplete() {
-        return preferences.getInt(PREF_SHORTEST_TO_COMPLETE);
+        return preferences.getInt(AUTOCOMPLETER_SHORTEST_TO_COMPLETE);
     }
 
     public void setShortestLengthToComplete(Integer value) {
-        preferences.putInt(PREF_SHORTEST_TO_COMPLETE, value);
+        preferences.putInt(AUTOCOMPLETER_SHORTEST_TO_COMPLETE, value);
     }
 
     /**
@@ -60,7 +46,7 @@ public class AutoCompletePreferences {
      */
     public AutoCompleteFirstNameMode getFirstnameMode() {
         try {
-            return AutoCompleteFirstNameMode.valueOf(preferences.get(PREF_FIRSTNAME_MODE));
+            return AutoCompleteFirstNameMode.valueOf(preferences.get(AUTOCOMPLETER_FIRSTNAME_MODE));
         } catch (IllegalArgumentException ex) {
             // Should only occur when preferences are set directly via preferences.put and not via setFirstnameMode
             return AutoCompleteFirstNameMode.BOTH;
@@ -68,34 +54,38 @@ public class AutoCompletePreferences {
     }
 
     public void setFirstnameMode(AutoCompleteFirstNameMode mode) {
-        preferences.put(PREF_FIRSTNAME_MODE, mode.name());
+        preferences.put(AUTOCOMPLETER_FIRSTNAME_MODE, mode.name());
     }
 
     public boolean getOnlyCompleteLastFirst() {
-        return preferences.getBoolean(PREF_LAST_FIRST);
+        return preferences.getBoolean(AUTOCOMPLETER_LAST_FIRST);
     }
 
     public void setOnlyCompleteLastFirst(boolean value) {
-        preferences.putBoolean(PREF_LAST_FIRST, value);
+        preferences.putBoolean(AUTOCOMPLETER_LAST_FIRST, value);
     }
 
     public boolean getOnlyCompleteFirstLast() {
-        return preferences.getBoolean(PREF_FIRST_LAST);
+        return preferences.getBoolean(AUTOCOMPLETER_FIRST_LAST);
     }
 
     public void setOnlyCompleteFirstLast(boolean value) {
-        preferences.putBoolean(PREF_FIRST_LAST, value);
+        preferences.putBoolean(AUTOCOMPLETER_FIRST_LAST, value);
     }
 
     public List<String> getCompleteNames() {
-        return preferences.getStringList(PREF_COMPLETE_FIELDS);
+        return preferences.getStringList(AUTOCOMPLETER_COMPLETE_FIELDS);
     }
 
     public String getCompleteNamesAsString() {
-        return preferences.get(PREF_COMPLETE_FIELDS);
+        return preferences.get(AUTOCOMPLETER_COMPLETE_FIELDS);
     }
 
     public void setCompleteNames(String value) {
-        preferences.put(PREF_COMPLETE_FIELDS, value);
+        preferences.put(AUTOCOMPLETER_COMPLETE_FIELDS, value);
+    }
+
+    public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
+        return JournalAbbreviationPreferences.fromPreferences(preferences);
     }
 }

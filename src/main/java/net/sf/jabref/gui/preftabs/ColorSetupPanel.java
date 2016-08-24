@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
@@ -24,16 +9,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
 import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -51,30 +38,46 @@ public class ColorSetupPanel extends JPanel {
     private static final int ICON_HEIGHT = 20;
     private final List<ColorButton> buttons = new ArrayList<>();
 
-    public ColorSetupPanel() {
 
-        FormLayout layout = new FormLayout
-                ("30dlu, 4dlu, fill:pref, 4dlu, fill:pref, 8dlu, 30dlu, 4dlu, fill:pref, 4dlu, fill:pref",
-                        "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
+    public ColorSetupPanel(JCheckBox colorCodes, JCheckBox resolvedColorCodes, JCheckBox showGrid) {
+
+        FormLayout layout = new FormLayout(
+                "30dlu, 4dlu, fill:pref, 4dlu, fill:pref, 8dlu, 30dlu, 4dlu, fill:pref, 4dlu, fill:pref",
+                "pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref, 2dlu, pref");
         FormBuilder builder = FormBuilder.create().layout(layout);
 
         buttons.add(new ColorButton(JabRefPreferences.TABLE_TEXT, Localization.lang("Table text color")));
-        buttons.add(new ColorButton(JabRefPreferences.MARKED_ENTRY_BACKGROUND0, Localization.lang("Marking color %0", "1")));
+        buttons.add(new ColorButton(JabRefPreferences.MARKED_ENTRY_BACKGROUND0,
+                Localization.lang("Marking color %0", "1")));
         buttons.add(new ColorButton(JabRefPreferences.TABLE_BACKGROUND, Localization.lang("Table background color")));
-        buttons.add(new ColorButton(JabRefPreferences.MARKED_ENTRY_BACKGROUND1, Localization.lang("Marking color %0", "2")));
-        buttons.add(new ColorButton(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND, Localization.lang("Background color for required fields")));
-        buttons.add(new ColorButton(JabRefPreferences.MARKED_ENTRY_BACKGROUND2, Localization.lang("Marking color %0", "3")));
-        buttons.add(new ColorButton(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND, Localization.lang("Background color for optional fields")));
-        buttons.add(new ColorButton(JabRefPreferences.MARKED_ENTRY_BACKGROUND3, Localization.lang("Marking color %0", "4")));
-        buttons.add(new ColorButton(JabRefPreferences.INCOMPLETE_ENTRY_BACKGROUND, Localization.lang("Color for marking incomplete entries")));
-        buttons.add(new ColorButton(JabRefPreferences.MARKED_ENTRY_BACKGROUND4, Localization.lang("Marking color %0", "5")));
-        buttons.add(new ColorButton(JabRefPreferences.GRID_COLOR, Localization.lang("Table grid color")));
-        buttons.add(new ColorButton(JabRefPreferences.MARKED_ENTRY_BACKGROUND5, Localization.lang("Import marking color")));
+        buttons.add(new ColorButton(JabRefPreferences.MARKED_ENTRY_BACKGROUND1,
+                Localization.lang("Marking color %0", "2")));
+        buttons.add(new ColorButton(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND,
+                Localization.lang("Background color for required fields"), colorCodes));
+        buttons.add(new ColorButton(JabRefPreferences.MARKED_ENTRY_BACKGROUND2,
+                Localization.lang("Marking color %0", "3")));
+        buttons.add(new ColorButton(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND,
+                Localization.lang("Background color for optional fields"), colorCodes));
+        buttons.add(new ColorButton(JabRefPreferences.MARKED_ENTRY_BACKGROUND3,
+                Localization.lang("Marking color %0", "4")));
+        buttons.add(new ColorButton(JabRefPreferences.INCOMPLETE_ENTRY_BACKGROUND,
+                Localization.lang("Color for marking incomplete entries")));
+        buttons.add(new ColorButton(JabRefPreferences.MARKED_ENTRY_BACKGROUND4,
+                Localization.lang("Marking color %0", "5")));
+        buttons.add(new ColorButton(JabRefPreferences.GRID_COLOR, Localization.lang("Table grid color"), showGrid));
+        buttons.add(
+                new ColorButton(JabRefPreferences.MARKED_ENTRY_BACKGROUND5, Localization.lang("Import marking color")));
 
-        buttons.add(new ColorButton(JabRefPreferences.FIELD_EDITOR_TEXT_COLOR, Localization.lang("Entry editor font color")));
-        buttons.add(new ColorButton(JabRefPreferences.VALID_FIELD_BACKGROUND_COLOR, Localization.lang("Entry editor background color")));
-        buttons.add(new ColorButton(JabRefPreferences.ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR, Localization.lang("Entry editor active background color")));
-        buttons.add(new ColorButton(JabRefPreferences.INVALID_FIELD_BACKGROUND_COLOR, Localization.lang("Entry editor invalid field color")));
+        buttons.add(new ColorButton(JabRefPreferences.FIELD_EDITOR_TEXT_COLOR,
+                Localization.lang("Entry editor font color")));
+        buttons.add(new ColorButton(JabRefPreferences.VALID_FIELD_BACKGROUND_COLOR,
+                Localization.lang("Entry editor background color")));
+        buttons.add(new ColorButton(JabRefPreferences.ACTIVE_FIELD_EDITOR_BACKGROUND_COLOR,
+                Localization.lang("Entry editor active background color")));
+        buttons.add(new ColorButton(JabRefPreferences.INVALID_FIELD_BACKGROUND_COLOR,
+                Localization.lang("Entry editor invalid field color")));
+        buttons.add(new ColorButton(JabRefPreferences.TABLE_RESOLVED_FIELD_BACKGROUND,
+                Localization.lang("Background color for resolved fields"), resolvedColorCodes));
 
         int rowcnt = 0;
         int col = 0;
@@ -124,6 +127,7 @@ public class ColorSetupPanel extends JPanel {
             Color chosen = JColorChooser.showDialog(null, button.getName(), button.getColor());
             if (chosen != null) {
                 button.setColor(chosen);
+                button.getCheckBox().ifPresent(checkBox -> checkBox.setSelected(true));
             }
         }
     }
@@ -136,7 +140,12 @@ public class ColorSetupPanel extends JPanel {
         private Color color = Color.white;
         private final String key;
         private final String name;
+        private Optional<JCheckBox> checkBox = Optional.empty();
 
+        public ColorButton(String key, String name, JCheckBox checkBox) {
+            this(key, name);
+            this.checkBox = Optional.of(checkBox);
+        }
 
         public ColorButton(String key, String name) {
             setIcon(this);
@@ -186,6 +195,10 @@ public class ColorSetupPanel extends JPanel {
         @Override
         public int getIconHeight() {
             return ColorSetupPanel.ICON_HEIGHT;
+        }
+
+        public Optional<JCheckBox> getCheckBox() {
+            return checkBox;
         }
     }
 

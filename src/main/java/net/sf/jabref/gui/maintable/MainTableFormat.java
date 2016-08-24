@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2012 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.maintable;
 
 import java.util.ArrayList;
@@ -23,11 +8,11 @@ import java.util.List;
 import javax.swing.JLabel;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.specialfields.SpecialFieldsUtils;
+import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.gui.TableFormat;
 
@@ -35,16 +20,12 @@ import ca.odell.glazedlists.gui.TableFormat;
  * Class defining the contents and column headers of the main table.
  */
 public class MainTableFormat implements TableFormat<BibEntry> {
-    // Character separating field names that are to be used in sequence as
-    // fallbacks for a single column (e.g. "author/editor" to use editor where
-    // author is not set):
-    public static final String COL_DEFINITION_FIELD_SEPARATOR = "/";
 
     // Values to gather iconImages for those columns
     // These values are also used to put a heading into the table; see getColumnName(int)
-    private static final List<String> URL_FIRST = Arrays.asList("url", "doi");
-    private static final List<String> DOI_FIRST = Arrays.asList("doi", "url");
-    private static final List<String> ARXIV = Collections.singletonList("eprint");
+    private static final List<String> URL_FIRST = Arrays.asList(FieldName.URL, FieldName.DOI);
+    private static final List<String> DOI_FIRST = Arrays.asList(FieldName.DOI, FieldName.URL);
+    private static final List<String> ARXIV = Collections.singletonList(FieldName.EPRINT);
 
     private final BibDatabase database;
 
@@ -140,29 +121,29 @@ public class MainTableFormat implements TableFormat<BibEntry> {
             // stored column name will be used as columnName
             // There might be more than one field to display, e.g., "author/editor" or "date/year" - so split
             // at MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR
-            String[] fields = columnName.split(MainTableFormat.COL_DEFINITION_FIELD_SEPARATOR);
+            String[] fields = columnName.split(FieldName.FIELD_SEPARATOR);
             tableColumns.add(new MainTableColumn(columnName, Arrays.asList(fields), database));
         }
 
 
         // Add the "special" icon columns (e.g., ranking, file, ...) that are enabled in preferences.
-        if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SPECIALFIELDSENABLED)) {
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RANKING)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
                 tableColumns.add(SpecialMainTableColumns.RANKING_COLUMN);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_RELEVANCE)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
                 tableColumns.add(SpecialMainTableColumns.RELEVANCE_COLUMN);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_QUALITY)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY)) {
                 tableColumns.add(SpecialMainTableColumns.QUALITY_COLUMN);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRIORITY)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
                 tableColumns.add(SpecialMainTableColumns.PRIORITY_COLUMN);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_PRINTED)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
                 tableColumns.add(SpecialMainTableColumns.PRINTED_COLUMN);
             }
-            if (Globals.prefs.getBoolean(SpecialFieldsUtils.PREF_SHOWCOLUMN_READ)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
                 tableColumns.add(SpecialMainTableColumns.READ_STATUS_COLUMN);
             }
         }

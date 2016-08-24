@@ -1,21 +1,7 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.openoffice;
 
 import java.util.EnumSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -79,7 +65,6 @@ public class OOUtil {
      * @param entry The entry to insert.
      * @param database The database the entry belongs to.
      * @param uniquefier Uniqiefier letter, if any, to append to the entry's year.
-     * @throws Exception
      */
     public static void insertFullReferenceAtCurrentLocation(XText text, XTextCursor cursor,
             Layout layout, String parStyle, BibEntry entry, BibDatabase database, String uniquefier)
@@ -87,7 +72,7 @@ public class OOUtil {
                     WrappedTargetException, IllegalArgumentException {
 
         // Backup the value of the uniq field, just in case the entry already has it:
-        String oldUniqVal = entry.getField(UNIQUEFIER_FIELD);
+        Optional<String> oldUniqVal = entry.getFieldOptional(UNIQUEFIER_FIELD);
 
 
         // Set the uniq field with the supplied uniquefier:
@@ -101,10 +86,10 @@ public class OOUtil {
         String lText = layout.doLayout(entry, database);
 
         // Afterwards, reset the old value:
-        if (oldUniqVal == null) {
-            entry.clearField(UNIQUEFIER_FIELD);
+        if (oldUniqVal.isPresent()) {
+            entry.setField(UNIQUEFIER_FIELD, oldUniqVal.get());
         } else {
-            entry.setField(UNIQUEFIER_FIELD, oldUniqVal);
+            entry.clearField(UNIQUEFIER_FIELD);
         }
 
         // Insert the formatted text:

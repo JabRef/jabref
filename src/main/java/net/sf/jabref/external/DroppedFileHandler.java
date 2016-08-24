@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.external;
 
 import java.io.File;
@@ -40,11 +25,16 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -66,11 +56,6 @@ import org.apache.commons.logging.LogFactory;
 public class DroppedFileHandler {
 
     private static final Log LOGGER = LogFactory.getLog(DroppedFileHandler.class);
-
-    public static final String DFH_LEAVE = "DroppedFileHandler_LeaveFileInDir";
-    public static final String DFH_COPY = "DroppedFileHandler_CopyFile";
-    public static final String DFH_MOVE = "DroppedFileHandler_MoveFile";
-    public static final String DFH_RENAME = "DroppedFileHandler_RenameFile";
 
     private final JabRefFrame frame;
 
@@ -137,7 +122,7 @@ public class DroppedFileHandler {
 
         if (tryXmpImport(fileName, fileType, edits)) {
             edits.end();
-            panel.undoManager.addEdit(edits);
+            panel.getUndoManager().addEdit(edits);
             return;
         }
 
@@ -171,7 +156,7 @@ public class DroppedFileHandler {
             panel.updateEntryEditorIfShowing();
         }
         edits.end();
-        panel.undoManager.addEdit(edits);
+        panel.getUndoManager().addEdit(edits);
 
     }
 
@@ -220,7 +205,7 @@ public class DroppedFileHandler {
             panel.markBaseChanged();
         }
         edits.end();
-        panel.undoManager.addEdit(edits);
+        panel.getUndoManager().addEdit(edits);
     }
 
     // Done by MrDlib
@@ -233,7 +218,7 @@ public class DroppedFileHandler {
 
         List<BibEntry> xmpEntriesInFile;
         try {
-            xmpEntriesInFile = XMPUtil.readXMP(fileName);
+            xmpEntriesInFile = XMPUtil.readXMP(fileName, XMPPreferences.fromPreferences(Globals.prefs));
         } catch (IOException e) {
             LOGGER.warn("Problem reading XMP", e);
             return false;
@@ -350,14 +335,16 @@ public class DroppedFileHandler {
         renameCheckBox.setText(Localization.lang("Rename file to").concat(": "));
 
         // Determine which name to suggest:
-        String targetName = FileUtil.getLinkedFileName(database, entry, Globals.journalAbbreviationLoader.getRepository());
+        String targetName = FileUtil.createFileNameFromPattern(database, entry,
+                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
 
         renameToTextBox.setText(targetName.concat(".").concat(fileType.getExtension()));
 
-        linkInPlace.setSelected(frame.prefs().getBoolean(DroppedFileHandler.DFH_LEAVE));
-        copyRadioButton.setSelected(frame.prefs().getBoolean(DroppedFileHandler.DFH_COPY));
-        moveRadioButton.setSelected(frame.prefs().getBoolean(DroppedFileHandler.DFH_MOVE));
-        renameCheckBox.setSelected(frame.prefs().getBoolean(DroppedFileHandler.DFH_RENAME));
+        linkInPlace.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE));
+        copyRadioButton.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_COPY));
+        moveRadioButton.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_MOVE));
+        renameCheckBox.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_RENAME));
 
         linkInPlace.addChangeListener(cl);
         cl.stateChanged(new ChangeEvent(linkInPlace));
@@ -369,10 +356,10 @@ public class DroppedFileHandler {
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (reply == JOptionPane.OK_OPTION) {
                 // store user's choice
-                frame.prefs().putBoolean(DroppedFileHandler.DFH_LEAVE, linkInPlace.isSelected());
-                frame.prefs().putBoolean(DroppedFileHandler.DFH_COPY, copyRadioButton.isSelected());
-                frame.prefs().putBoolean(DroppedFileHandler.DFH_MOVE, moveRadioButton.isSelected());
-                frame.prefs().putBoolean(DroppedFileHandler.DFH_RENAME, renameCheckBox.isSelected());
+                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE, linkInPlace.isSelected());
+                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_COPY, copyRadioButton.isSelected());
+                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_MOVE, moveRadioButton.isSelected());
+                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_RENAME, renameCheckBox.isSelected());
                 return true;
             } else {
                 return false;
@@ -394,7 +381,7 @@ public class DroppedFileHandler {
     private void doLink(BibEntry entry, ExternalFileType fileType, String filename,
                         boolean avoidDuplicate, NamedCompound edits) {
 
-        Optional<String> oldValue = entry.getFieldOptional(Globals.FILE_FIELD);
+        Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
         FileListTableModel tm = new FileListTableModel();
         oldValue.ifPresent(tm::setContent);
 
@@ -440,11 +427,11 @@ public class DroppedFileHandler {
 
         tm.addEntry(tm.getRowCount(), new FileListEntry("", filename, fileType));
         String newValue = tm.getStringRepresentation();
-        UndoableFieldChange edit = new UndoableFieldChange(entry, Globals.FILE_FIELD, oldValue.orElse(null), newValue);
-        entry.setField(Globals.FILE_FIELD, newValue);
+        UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE, oldValue.orElse(null), newValue);
+        entry.setField(FieldName.FILE, newValue);
 
         if (edits == null) {
-            panel.undoManager.addEdit(edit);
+            panel.getUndoManager().addEdit(edit);
         } else {
             edits.addEdit(edit);
         }
@@ -476,7 +463,7 @@ public class DroppedFileHandler {
             LOGGER.warn("Cannot determine destination directory or destination directory does not exist");
             return false;
         }
-        File toFile = new File(dirs.get(found) + System.getProperty("file.separator") + destFilename);
+        File toFile = new File(dirs.get(found) + OS.FILE_SEPARATOR + destFilename);
         if (toFile.exists()) {
             int answer = JOptionPane.showConfirmDialog(frame,
                     Localization.lang("'%0' exists. Overwrite file?", toFile.getAbsolutePath()),
@@ -528,7 +515,7 @@ public class DroppedFileHandler {
         }
         String destinationFileName = new File(toFile).getName();
 
-        File destFile = new File(dirs.get(found) + System.getProperty("file.separator") + destinationFileName);
+        File destFile = new File(dirs.get(found) + OS.FILE_SEPARATOR + destinationFileName);
         if (destFile.equals(new File(fileName))) {
             // File is already in the correct position. Don't override!
             return true;

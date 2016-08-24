@@ -1,39 +1,30 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.fieldeditors;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.lang.reflect.InvocationTargetException;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
-import net.sf.jabref.model.entry.EntryUtil;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * An implementation of the FieldEditor backed by a JTextArea.
  * Used for multi-line input, currently all BibTexFields except Bibtex key!
  */
 public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
+
+    private static final Log LOGGER = LogFactory.getLog(TextArea.class);
 
     private final JScrollPane scrollPane;
 
@@ -52,7 +43,7 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
         // Add the global focus listener, so a menu item can see if this field
         // was focused when an action was called.
-        addFocusListener(Globals.focusListener);
+        addFocusListener(Globals.getFocusListener());
         addFocusListener(new FieldEditorFocusListener());
         scrollPane = new JScrollPane(this, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
                 ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -62,7 +53,7 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
         setWrapStyleWord(true);
         this.fieldName = fieldName;
 
-        label = new FieldNameLabel(' ' + EntryUtil.capitalizeFirst(this.fieldName) + ' ');
+        label = new FieldNameLabel(fieldName);
         setBackground(GUIGlobals.validFieldBackgroundColor);
         setForeground(GUIGlobals.editorTextColor);
 
@@ -108,17 +99,29 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
     @Override
     public void setActiveBackgroundColor() {
-        setBackground(GUIGlobals.activeBackground);
+        setBackgroundColor(GUIGlobals.activeBackgroundColor);
     }
 
     @Override
     public void setValidBackgroundColor() {
-        setBackground(GUIGlobals.validFieldBackgroundColor);
+        setBackgroundColor(GUIGlobals.validFieldBackgroundColor);
     }
 
     @Override
     public void setInvalidBackgroundColor() {
-        setBackground(GUIGlobals.invalidFieldBackgroundColor);
+        setBackgroundColor(GUIGlobals.invalidFieldBackgroundColor);
+    }
+
+    private void setBackgroundColor(Color color) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            setBackground(color);
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(() -> setBackground(color));
+            } catch (InvocationTargetException | InterruptedException e) {
+                LOGGER.info("Problem setting background color", e);
+            }
+        }
     }
 
     @Override

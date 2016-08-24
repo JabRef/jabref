@@ -1,24 +1,9 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.layout.format;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.StringInt;
 import net.sf.jabref.logic.util.strings.RtfCharMap;
+import net.sf.jabref.logic.util.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -39,16 +24,12 @@ import org.apache.commons.logging.LogFactory;
  *   5.) Replace --- by \emdash and -- by \endash.
  */
 public class RTFChars implements LayoutFormatter {
-
-    // Instantiate logger:
     private static final Log LOGGER = LogFactory.getLog(LayoutFormatter.class);
 
     private static final RtfCharMap RTF_CHARS = new RtfCharMap();
 
-
     @Override
     public String format(String field) {
-
         StringBuilder sb = new StringBuilder("");
         StringBuilder currentCommand = null;
         boolean escaped = false;
@@ -69,13 +50,13 @@ public class RTFChars implements LayoutFormatter {
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             } else if (Character.isLetter(c)
-                    || Globals.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
+                    || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
                 if (incommand) {
                     // Else we are in a command, and should not keep the letter.
                     currentCommand.append(c);
                     testCharCom: if ((currentCommand.length() == 1)
-                            && Globals.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
+                            && StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
                         if (i >= (field.length() - 1)) {
@@ -133,7 +114,7 @@ public class RTFChars implements LayoutFormatter {
 
                     // Then look for italics etc.,
                     // but first check if we are already at the end of the string.
-                    if (i >= (field.length() - 1)) {
+                    if (i >= field.length() - 1) {
                         break testContent;
                     }
 
@@ -204,7 +185,7 @@ public class RTFChars implements LayoutFormatter {
                 count++;
                 break;
             case ' ':
-                if (commandNestedInBraces) {
+                if (!commandNestedInBraces) {
                     // in any case, a space terminates the loop
                     break loop;
                 }

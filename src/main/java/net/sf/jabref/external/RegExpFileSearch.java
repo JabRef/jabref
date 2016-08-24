@@ -1,25 +1,9 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.external;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,7 +12,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -63,8 +47,8 @@ public class RegExpFileSearch {
      * @param regExp The expression deciding which names are acceptable.
      * @return A map linking each given entry to a list of files matching the given criteria.
      */
-    public static Map<BibEntry, List<File>> findFilesForSet(Collection<BibEntry> entries,
-            Collection<String> extensions, List<File> directories, String regExp) {
+    public static Map<BibEntry, List<File>> findFilesForSet(List<BibEntry> entries, List<String> extensions,
+            List<File> directories, String regExp) {
 
         Map<BibEntry, List<File>> res = new HashMap<>();
         for (BibEntry entry : entries) {
@@ -82,8 +66,8 @@ public class RegExpFileSearch {
      * @param regularExpression The expression deciding which names are acceptable.
      * @return A list of files paths matching the given criteria.
      */
-    private static List<File> findFiles(BibEntry entry, Collection<String> extensions,
-            Collection<File> directories, String regularExpression) {
+    private static List<File> findFiles(BibEntry entry, List<String> extensions, List<File> directories,
+            String regularExpression) {
 
         String extensionRegExp = '(' + String.join("|", extensions) + ')';
 
@@ -128,8 +112,7 @@ public class RegExpFileSearch {
      * @return Will return the first file found to match the given criteria or
      *         null if none was found.
      */
-    private static List<File> findFile(BibEntry entry, Collection<File> dirs, String file,
-            String extensionRegExp) {
+    private static List<File> findFile(BibEntry entry, List<File> dirs, String file, String extensionRegExp) {
         List<File> res = new ArrayList<>();
         for (File directory : dirs) {
             res.addAll(findFile(entry, directory.getPath(), file, extensionRegExp));
@@ -331,12 +314,9 @@ public class RegExpFileSearch {
             return "";
         }
 
-        String fieldValue = BibDatabase.getResolvedField(beforeColon, entry, database);
-
         // If no field value was found, try to interpret it as a key generator field marker:
-        if (fieldValue == null) {
-            fieldValue = LabelPatternUtil.makeLabel(entry, beforeColon);
-        }
+        String fieldValue = BibDatabase.getResolvedField(beforeColon, entry, database)
+                .orElse(BibtexKeyPatternUtil.makeLabel(entry, beforeColon));
 
         if (fieldValue == null) {
             return "";
@@ -347,7 +327,7 @@ public class RegExpFileSearch {
         }
 
         String[] parts = afterColon.split(":");
-        fieldValue = LabelPatternUtil.applyModifiers(fieldValue, parts, 0);
+        fieldValue = BibtexKeyPatternUtil.applyModifiers(fieldValue, parts, 0);
 
         return fieldValue;
     }

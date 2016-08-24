@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.layout;
 
 import java.io.IOException;
@@ -21,8 +6,6 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 
 /**
  * Helper class to get a Layout object.
@@ -50,13 +33,13 @@ public class LayoutHelper {
 
     private final PushbackReader in;
     private final List<StringInt> parsedEntries = new ArrayList<>();
-    private final JournalAbbreviationRepository repository;
+    private final LayoutFormatterPreferences prefs;
     private boolean endOfFile;
 
 
-    public LayoutHelper(Reader in, JournalAbbreviationRepository repository) {
+    public LayoutHelper(Reader in, LayoutFormatterPreferences prefs) {
         this.in = new PushbackReader(Objects.requireNonNull(in));
-        this.repository = Objects.requireNonNull(repository);
+        this.prefs = Objects.requireNonNull(prefs);
     }
 
     public Layout getLayoutFromText() throws IOException {
@@ -70,7 +53,7 @@ public class LayoutHelper {
             }
         }
 
-        return new Layout(parsedEntries, repository);
+        return new Layout(parsedEntries, prefs);
     }
 
     public static String getCurrentGroup() {
@@ -312,13 +295,13 @@ public class LayoutHelper {
                         return;
                     }
                 } else if ("filename".equalsIgnoreCase(name)) {
-                    // Print the name of the database bib file.
+                    // Print the name of the database BIB file.
                     // This is only supported in begin/end layouts, not in
                     // entry layouts.
                     parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILENAME));
                     return;
                 } else if ("filepath".equalsIgnoreCase(name)) {
-                    // Print the full path of the database bib file.
+                    // Print the full path of the database BIB file.
                     // This is only supported in begin/end layouts, not in
                     // entry layouts.
                     parsedEntries.add(new StringInt(name, LayoutHelper.IS_FILEPATH));

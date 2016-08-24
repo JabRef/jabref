@@ -1,34 +1,17 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.pdfimport;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.DroppedFileHandler;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.BasePanel;
@@ -40,17 +23,23 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
-import net.sf.jabref.importer.fileformat.PdfContentImporter;
-import net.sf.jabref.importer.fileformat.PdfXmpImporter;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.importer.fileformat.PdfContentImporter;
+import net.sf.jabref.logic.importer.fileformat.PdfXmpImporter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -59,8 +48,8 @@ public class PdfImporter {
 
     private final JabRefFrame frame;
     private final BasePanel panel;
-    private MainTable entryTable;
-    private int dropRow;
+    private final MainTable entryTable;
+    private final int dropRow;
 
     private static final Log LOGGER = LogFactory.getLog(PdfImporter.class);
 
@@ -110,11 +99,11 @@ public class PdfImporter {
      * @param fileNames states the names of the files to import
      * @return list of successful created BibTeX entries and list of non-PDF files
      */
-    public ImportPdfFilesResult importPdfFiles(String[] fileNames) {
+    public ImportPdfFilesResult importPdfFiles(List<String> fileNames) {
         // sort fileNames in PDFfiles to import and other files
         // PDFfiles: variable files
         // other files: variable noPdfFiles
-        List<String> files = new ArrayList<>(Arrays.asList(fileNames));
+        List<String> files = new ArrayList<>(fileNames);
         List<String> noPdfFiles = new ArrayList<>();
         PdfFileFilter pdfFilter = PdfFileFilter.INSTANCE;
         for (String file : files) {
@@ -126,7 +115,7 @@ public class PdfImporter {
         // files and noPdfFiles correctly sorted
 
         // import the files
-        List<BibEntry> entries = importPdfFiles(files);
+        List<BibEntry> entries = importPdfFilesInternal(files);
 
         return new ImportPdfFilesResult(noPdfFiles, entries);
     }
@@ -135,14 +124,14 @@ public class PdfImporter {
      * @param fileNames - PDF files to import
      * @return true if the import succeeded, false otherwise
      */
-    private List<BibEntry> importPdfFiles(List<String> fileNames) {
+    private List<BibEntry> importPdfFilesInternal(List<String> fileNames) {
         if (panel == null) {
             return Collections.emptyList();
         }
         ImportDialog importDialog = null;
         boolean doNotShowAgain = false;
-        boolean neverShow = Globals.prefs.getBoolean(JabRefPreferences.PREF_IMPORT_ALWAYSUSE);
-        int globalChoice = Globals.prefs.getInt(JabRefPreferences.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
+        boolean neverShow = Globals.prefs.getBoolean(JabRefPreferences.IMPORT_ALWAYSUSE);
+        int globalChoice = Globals.prefs.getInt(JabRefPreferences.IMPORT_DEFAULT_PDF_IMPORT_STYLE);
 
 
         List<BibEntry> res = new ArrayList<>();
@@ -150,7 +139,7 @@ public class PdfImporter {
         for (String fileName : fileNames) {
             if (!neverShow && !doNotShowAgain) {
                 importDialog = new ImportDialog(dropRow >= 0, fileName);
-                if (!XMPUtil.hasMetadata(Paths.get(fileName))) {
+                if (!XMPUtil.hasMetadata(Paths.get(fileName), XMPPreferences.fromPreferences(Globals.prefs))) {
                     importDialog.disableXMPChoice();
                 }
                 importDialog.setLocationRelativeTo(frame);
@@ -168,8 +157,7 @@ public class PdfImporter {
                     doContentImport(fileName, res);
                     break;
                 case ImportDialog.NOMETA:
-                    BibEntry entry = createNewBlankEntry(fileName);
-                    res.add(entry);
+                    createNewBlankEntry(fileName).ifPresent(res::add);
                     break;
                 case ImportDialog.ONLYATTACH:
                     DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
@@ -185,20 +173,20 @@ public class PdfImporter {
     }
 
     private void doXMPImport(String fileName, List<BibEntry> res) {
-        BibEntry entry;
         List<BibEntry> localRes = new ArrayList<>();
-        PdfXmpImporter importer = new PdfXmpImporter();
-        try (InputStream in = new FileInputStream(fileName)) {
-            localRes.addAll(importer.importEntries(in, frame));
-        } catch (IOException ex) {
-            LOGGER.warn("Cannot import entries", ex);
+        PdfXmpImporter importer = new PdfXmpImporter(XMPPreferences.fromPreferences(Globals.prefs));
+        Path filePath = Paths.get(fileName);
+        ParserResult result = importer.importDatabase(filePath, Globals.prefs.getDefaultEncoding());
+        if (result.hasWarnings()) {
+            frame.showMessage(result.getErrorMessage());
         }
+        localRes.addAll(result.getDatabase().getEntries());
 
+        BibEntry entry;
         if (localRes.isEmpty()) {
             // import failed -> generate default entry
             LOGGER.info("Import failed");
-            entry = createNewBlankEntry(fileName);
-            res.add(entry);
+            createNewBlankEntry(fileName).ifPresent(res::add);
             return;
         }
 
@@ -215,47 +203,44 @@ public class PdfImporter {
 
         tm.addEntry(0, new FileListEntry(toLink.getName(), FileUtil.shortenFileName(toLink, dirsS).getPath(),
                 ExternalFileTypes.getInstance().getExternalFileTypeByName("PDF")));
-        entry.setField(Globals.FILE_FIELD, tm.getStringRepresentation());
+        entry.setField(FieldName.FILE, tm.getStringRepresentation());
         res.add(entry);
 
     }
-    private BibEntry createNewBlankEntry(String fileName) {
-        BibEntry newEntry = createNewEntry();
-        if (newEntry != null) {
+
+    private Optional<BibEntry> createNewBlankEntry(String fileName) {
+        Optional<BibEntry> newEntry = createNewEntry();
+        newEntry.ifPresent(bibEntry -> {
             DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
-            dfh.linkPdfToEntry(fileName, newEntry);
-        }
+            dfh.linkPdfToEntry(fileName, bibEntry);
+        });
         return newEntry;
     }
 
     private void doContentImport(String fileName, List<BibEntry> res) {
-        File file = new File(fileName);
-        BibEntry entry;
-        try (InputStream in = new FileInputStream(file)) {
-            PdfContentImporter contentImporter = new PdfContentImporter();
-            List<BibEntry> localRes = contentImporter.importEntries(in, frame);
 
-            if (localRes.isEmpty()) {
-                // import failed -> generate default entry
-                entry = createNewBlankEntry(fileName);
-                res.add(entry);
-                return;
-            }
+        PdfContentImporter contentImporter = new PdfContentImporter(
+                ImportFormatPreferences.fromPreferences(Globals.prefs));
+        Path filePath = Paths.get(fileName);
+        ParserResult result = contentImporter.importDatabase(filePath, Globals.prefs.getDefaultEncoding());
+        if (result.hasWarnings()) {
+            frame.showMessage(result.getErrorMessage());
+        }
 
-            // only one entry is imported
-            entry = localRes.get(0);
-        } catch (IOException e) {
+        if (!result.getDatabase().hasEntries()) {
             // import failed -> generate default entry
-            LOGGER.info("Import failed", e);
-            entry = createNewBlankEntry(fileName);
-            res.add(entry);
+            createNewBlankEntry(fileName).ifPresent(res::add);
             return;
         }
+
+        // only one entry is imported
+        BibEntry entry = result.getDatabase().getEntries().get(0);
 
         // insert entry to database and link file
         panel.getDatabase().insertEntry(entry);
         panel.markBaseChanged();
-        LabelPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry);
+        BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
+                BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
         DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
         dfh.linkPdfToEntry(fileName, entry);
         panel.highlightEntry(entry);
@@ -267,7 +252,7 @@ public class PdfImporter {
         res.add(entry);
     }
 
-    private BibEntry createNewEntry() {
+    private Optional<BibEntry> createNewEntry() {
         // Find out what type is desired
         EntryTypeDialog etd = new EntryTypeDialog(frame);
         // We want to center the dialog, to make it look nicer.
@@ -277,17 +262,17 @@ public class PdfImporter {
 
         if (type != null) { // Only if the dialog was not canceled.
             String id = IdGenerator.next();
-            final BibEntry be = new BibEntry(id, type.getName());
+            final BibEntry bibEntry = new BibEntry(id, type.getName());
             try {
-                panel.getDatabase().insertEntry(be);
+                panel.getDatabase().insertEntry(bibEntry);
 
                 // Set owner/timestamp if options are enabled:
                 List<BibEntry> list = new ArrayList<>();
-                list.add(be);
-                UpdateField.setAutomaticFields(list, true, true);
+                list.add(bibEntry);
+                UpdateField.setAutomaticFields(list, true, true, Globals.prefs.getUpdateFieldPreferences());
 
                 // Create an UndoableInsertEntry object.
-                panel.undoManager.addEdit(new UndoableInsertEntry(panel.getDatabase(), be, panel));
+                panel.getUndoManager().addEdit(new UndoableInsertEntry(panel.getDatabase(), bibEntry, panel));
                 panel.output(Localization.lang("Added new") + " '" + type.getName().toLowerCase() + "' "
                         + Localization.lang("entry") + ".");
 
@@ -299,34 +284,16 @@ public class PdfImporter {
                     panel.setMode(BasePanelMode.WILL_SHOW_EDITOR);
                 }
 
-                panel.showEntry(be);
+                SwingUtilities.invokeLater(() -> panel.showEntry(bibEntry));
 
                 // The database just changed.
                 panel.markBaseChanged();
 
-                return be;
+                return Optional.of(bibEntry);
             } catch (KeyCollisionException ex) {
                 LOGGER.info("Key collision occurred", ex);
             }
         }
-        return null;
+        return Optional.empty();
     }
-
-    public MainTable getEntryTable() {
-        return entryTable;
-    }
-
-    public void setEntryTable(MainTable entryTable) {
-        this.entryTable = entryTable;
-    }
-
-    public int getDropRow() {
-        return dropRow;
-    }
-
-    public void setDropRow(int dropRow) {
-        this.dropRow = dropRow;
-    }
-
-
 }

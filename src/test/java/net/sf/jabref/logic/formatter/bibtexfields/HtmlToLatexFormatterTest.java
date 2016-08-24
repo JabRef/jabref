@@ -1,8 +1,5 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,11 +10,11 @@ import static org.junit.Assert.assertEquals;
  */
 public class HtmlToLatexFormatterTest {
 
-    private final HtmlToLatexFormatter formatter = new HtmlToLatexFormatter();
+    private HtmlToLatexFormatter formatter;
 
     @Before
-    public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
+    public void setUp() {
+        formatter = new HtmlToLatexFormatter();
     }
 
     @Test
@@ -45,7 +42,7 @@ public class HtmlToLatexFormatterTest {
         assertEquals("{\\\"{a}}", formatter.format("&auml;"));
         assertEquals("{\\\"{a}}", formatter.format("&#228;"));
         assertEquals("{\\\"{a}}", formatter.format("&#xe4;"));
-        assertEquals("{$\\Epsilon$}", formatter.format("&Epsilon;"));
+        assertEquals("{{$\\Epsilon$}}", formatter.format("&Epsilon;"));
     }
 
     @Test

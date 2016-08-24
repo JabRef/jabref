@@ -1,8 +1,5 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,11 +11,11 @@ import static org.junit.Assert.assertEquals;
  */
 public class UnicodeConverterTest {
 
-    private final UnicodeToLatexFormatter formatter = new UnicodeToLatexFormatter();
+    private  UnicodeToLatexFormatter formatter;
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
+        formatter = new UnicodeToLatexFormatter();
     }
 
     @Test
@@ -35,7 +32,7 @@ public class UnicodeConverterTest {
     @Test
     public void testUnicode() {
         assertEquals("{\\\"{a}}", formatter.format("ä"));
-        assertEquals("{$\\Epsilon$}", formatter.format("\u0395"));
+        assertEquals("{{$\\Epsilon$}}", formatter.format("\u0395"));
     }
 
     @Test

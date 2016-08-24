@@ -3,17 +3,19 @@ package net.sf.jabref.logic.cleanup;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -22,7 +24,6 @@ import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class RenamePdfCleanupTest {
 
@@ -48,61 +49,67 @@ public class RenamePdfCleanupTest {
      */
     @Test
     public void cleanupRenamePdfRenamesFileEvenIfOnlyDifferenceIsCase() throws IOException {
-        when(Globals.prefs.get("importFileNamePattern")).thenReturn("\\bibtexkey");
+        String fileNamePattern = "\\bibtexkey";
         File tempFile = testFolder.newFile("toot.tmp");
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationRepository.class));
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
+                mock(LayoutFormatterPreferences.class));
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot.tmp", "");
-        assertEquals(FileField.getStringRepresentation(newFileField), entry.getField("file"));
+        assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getFieldOptional("file"));
     }
 
     @Test
     public void cleanupRenamePdfRenamesWithMultipleFiles() throws IOException {
-        when(Globals.prefs.get("importFileNamePattern")).thenReturn("\\bibtexkey - \\title");
+        String fileNamePattern = "\\bibtexkey - \\title";
         File tempFile = testFolder.newFile("Toot.tmp");
 
         entry.setField("title", "test title");
         entry.setField("file", FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""),
                 new ParsedFileField("", tempFile.getAbsolutePath(), ""), new ParsedFileField("","",""))));
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationRepository.class));
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
+                mock(LayoutFormatterPreferences.class));
         cleanup.cleanup(entry);
 
-        assertEquals(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""),
-                new ParsedFileField("", "Toot - test title.tmp", ""), new ParsedFileField("","",""))), entry.getField("file"));
+        assertEquals(
+                Optional.of(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("", "", ""),
+                        new ParsedFileField("", "Toot - test title.tmp", ""), new ParsedFileField("", "", "")))),
+                entry.getFieldOptional("file"));
     }
 
     @Test
     public void cleanupRenamePdfRenamesFileStartingWithBibtexKey() throws IOException {
-        when(Globals.prefs.get("importFileNamePattern")).thenReturn("\\bibtexkey - \\title");
+        String fileNamePattern = "\\bibtexkey - \\title";
         File tempFile = testFolder.newFile("Toot.tmp");
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationRepository.class));
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
+                mock(LayoutFormatterPreferences.class));
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot - test title.tmp", "");
-        assertEquals(FileField.getStringRepresentation(newFileField), entry.getField("file"));
+        assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getFieldOptional("file"));
     }
 
     @Test
     public void cleanupRenamePdfRenamesFileInSameFolder() throws IOException {
-        when(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN)).thenReturn("\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}");
+        String fileNamePattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
         testFolder.newFile("Toot.pdf");
         ParsedFileField fileField = new ParsedFileField("", "Toot.pdf", "PDF");
         entry.setField("file", FileField.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationRepository.class));
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs, mock(JournalAbbreviationLoader.class)));
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot - test title.pdf", "PDF");
-        assertEquals(FileField.getStringRepresentation(newFileField), entry.getField("file"));
+        assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getFieldOptional("file"));
     }
 }

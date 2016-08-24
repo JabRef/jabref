@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.openoffice;
 
 import java.awt.BorderLayout;
@@ -23,6 +8,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -48,23 +34,25 @@ import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.PreviewPanel;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.openoffice.OOBibStyle;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
+import net.sf.jabref.logic.util.FileExtensions;
+import net.sf.jabref.logic.util.TestEntry;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.BasicEventList;
 import ca.odell.glazedlists.EventList;
@@ -107,7 +95,7 @@ class StyleSelectDialog {
     private final Rectangle toRect = new Rectangle(0, 0, 1, 1);
     private final JButton ok = new JButton(Localization.lang("OK"));
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
-    private final BibEntry prevEntry = new BibEntry(IdGenerator.next());
+    private final BibEntry prevEntry;
 
     private boolean okPressed;
     private final StyleLoader loader;
@@ -119,7 +107,7 @@ class StyleSelectDialog {
         this.frame = Objects.requireNonNull(frame);
         this.preferences = Objects.requireNonNull(preferences);
         this.loader = Objects.requireNonNull(loader);
-        setupPrevEntry();
+        prevEntry = TestEntry.getTestEntry();
         init();
 
     }
@@ -227,6 +215,8 @@ class StyleSelectDialog {
         cm.getColumn(0).setPreferredWidth(100);
         cm.getColumn(1).setPreferredWidth(200);
         cm.getColumn(2).setPreferredWidth(80);
+        GUIUtil.correctRowHeight(table);
+
         selectionModel = (DefaultEventSelectionModel<OOBibStyle>) GlazedListsSwing
                 .eventSelectionModelWithThreadProxyList(sortedStyles);
         table.setSelectionModel(selectionModel);
@@ -370,19 +360,6 @@ class StyleSelectDialog {
         return Optional.empty();
     }
 
-    private void setupPrevEntry() {
-        prevEntry.setField("author", "Smith, Bill and Jones, Bob and Williams, Jeff");
-        prevEntry.setField("editor", "Taylor, Phil");
-        prevEntry.setField("title", "Title of the test entry for reference styles");
-        prevEntry.setField("volume", "34");
-        prevEntry.setField("year", "2008");
-        prevEntry.setField("journal", "BibTeX journal");
-        prevEntry.setField("publisher", "JabRef publishing");
-        prevEntry.setField("address", "Trondheim");
-        prevEntry.setField("www", "https://github.com/JabRef");
-    }
-
-
     static class StyleTableFormat implements TableFormat<OOBibStyle> {
 
         @Override
@@ -497,7 +474,12 @@ class StyleSelectDialog {
             super(diag, Localization.lang("Add style file"), true);
 
             JButton browse = new JButton(Localization.lang("Browse"));
-            browse.addActionListener(BrowseAction.buildForFile(newFile, null, ".jstyle"));
+            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.JSTYLE);
+            dialog.setDefaultExtension(FileExtensions.JSTYLE);
+            browse.addActionListener(e -> {
+                Optional<Path> file = dialog.showDialogAndGetSelectedFile();
+                file.ifPresent(f -> newFile.setText(f.toAbsolutePath().toString()));
+            });
 
             // Build content panel
             FormBuilder builder = FormBuilder.create();

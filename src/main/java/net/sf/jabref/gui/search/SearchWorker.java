@@ -76,15 +76,15 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
             entry.setSearchHit(true);
         }
 
-        basePanel.mainTable.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
+        basePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
 
         // Show the result in the chosen way:
         switch (mode) {
         case FLOAT:
-            basePanel.mainTable.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FLOAT);
+            basePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FLOAT);
             break;
         case FILTER:
-            basePanel.mainTable.getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FILTER);
+            basePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FILTER);
             break;
         default:
             break;
@@ -92,8 +92,8 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
 
         // select first match (i.e., row) if there is any
         int hits = matchedEntries.size();
-        if ((hits > 0) && (basePanel.mainTable.getRowCount() > 0)) {
-            basePanel.mainTable.setSelected(0);
+        if ((hits > 0) && (basePanel.getMainTable().getRowCount() > 0)) {
+            basePanel.getMainTable().setSelected(0);
         }
 
         basePanel.getSearchBar().updateResults(hits, searchQuery.getDescription(), searchQuery.isGrammarBasedSearch());

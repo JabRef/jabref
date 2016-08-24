@@ -1,8 +1,8 @@
-<bibo:Document rdf:about="http://dx.doi.org/\doi">
+<bibo:Document rdf:about="\format[DOICheck]{\doi}">
 
 \begin{title}    <dc:title>\format[XMLChars]{\title}</dc:title>\end{title}
 \begin{year}    <dc:date>\year</dc:date>\end{year}
-\begin{doi}    <bibo:doi>\format[XMLChars]{\doi}</bibo:doi>\end{doi}
+\begin{doi}    <bibo:doi>\format[DOIStrip,XMLChars]{\doi}</bibo:doi>\end{doi}
 
 \begin{author}
    \format[XMLChars,CreateBibORDFAuthors]{\author}

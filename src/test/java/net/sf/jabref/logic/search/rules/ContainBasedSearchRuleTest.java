@@ -1,7 +1,5 @@
 package net.sf.jabref.logic.search.rules;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -16,8 +14,6 @@ public class ContainBasedSearchRuleTest {
 
     @Test
     public void testBasicSearchParsing() {
-        Globals.prefs = JabRefPreferences.getInstance();
-
         BibEntry be = makeBibtexEntry();
         ContainBasedSearchRule bsCaseSensitive = new ContainBasedSearchRule(true);
         ContainBasedSearchRule bsCaseInsensitive = new ContainBasedSearchRule(false);

@@ -1,24 +1,9 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.nio.charset.Charset;
-import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
@@ -33,12 +18,13 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.help.HelpFiles;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -47,12 +33,8 @@ import static net.sf.jabref.logic.l10n.Languages.LANGUAGES;
 
 class GeneralTab extends JPanel implements PrefsTab {
 
-    private final JCheckBox defSort;
-    private final JCheckBox ctrlClick;
     private final JCheckBox useOwner;
     private final JCheckBox overwriteOwner;
-    private final JCheckBox keyDuplicateWarningDialog;
-    private final JCheckBox keyEmptyWarningDialog;
     private final JCheckBox enforceLegalKeys;
     private final JCheckBox confirmDelete;
     private final JCheckBox memoryStick;
@@ -90,8 +72,6 @@ class GeneralTab extends JPanel implements PrefsTab {
         biblatexMode.setRenderer(new DefaultBibModeRenderer());
 
         memoryStick = new JCheckBox(Localization.lang("Load and Save preferences from/to jabref.xml on start-up (memory stick mode)"));
-        defSort = new JCheckBox(Localization.lang("Sort automatically"));
-        ctrlClick = new JCheckBox(Localization.lang("Open right-click menu with Ctrl+left button"));
         useOwner = new JCheckBox(Localization.lang("Mark new entries with owner name") + ':');
         updateTimeStamp = new JCheckBox(Localization.lang("Update timestamp on modification"));
         useTimeStamp = new JCheckBox(Localization.lang("Mark new entries with addition date") + ". "
@@ -103,8 +83,6 @@ class GeneralTab extends JPanel implements PrefsTab {
                 + "the field set, overwrite."));
         overwriteTimeStamp.setToolTipText(Localization.lang("If a pasted or imported entry already has "
                 + "the field set, overwrite."));
-        keyDuplicateWarningDialog = new JCheckBox(Localization.lang("Show warning dialog when a duplicate BibTeX key is entered"));
-        keyEmptyWarningDialog = new JCheckBox(Localization.lang("Show warning dialog when an empty BibTeX key is entered"));
         enforceLegalKeys = new JCheckBox(Localization.lang("Enforce legal characters in BibTeX keys"));
         confirmDelete = new JCheckBox(Localization.lang("Show confirmation dialog when deleting entries"));
 
@@ -118,21 +96,16 @@ class GeneralTab extends JPanel implements PrefsTab {
         encodings = new JComboBox<>();
         encodings.setModel(new DefaultComboBoxModel<>(Encodings.ENCODINGS));
 
-        FormLayout layout = new FormLayout
-                ("8dlu, 1dlu, left:170dlu, 4dlu, fill:pref, 4dlu, fill:pref, 4dlu, left:pref, 4dlu, left:pref, 4dlu, left:pref", "");
+        FormLayout layout = new FormLayout(
+                "8dlu, 1dlu, left:pref:grow, 4dlu, fill:pref, 4dlu, fill:pref, 4dlu, left:pref, 1dlu, left:pref, 4dlu, left:pref",
+                "");
         DefaultFormBuilder builder = new DefaultFormBuilder(layout);
 
         builder.appendSeparator(Localization.lang("General"));
         builder.nextLine();
         builder.append(inspectionWarnDupli, 13);
         builder.nextLine();
-        builder.append(ctrlClick, 13);
-        builder.nextLine();
         builder.append(confirmDelete, 13);
-        builder.nextLine();
-        builder.append(keyDuplicateWarningDialog, 13);
-        builder.nextLine();
-        builder.append(keyEmptyWarningDialog, 13);
         builder.nextLine();
         builder.append(enforceLegalKeys, 13);
         builder.nextLine();
@@ -144,7 +117,7 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(overwriteOwner);
         builder.append(new JPanel(), 3);
 
-        JButton help = new HelpAction(HelpFiles.OWNER).getHelpButton();
+        JButton help = new HelpAction(HelpFile.OWNER).getHelpButton();
         builder.append(help);
         builder.nextLine();
 
@@ -154,12 +127,12 @@ class GeneralTab extends JPanel implements PrefsTab {
         builder.append(Localization.lang("Field name") + ':');
         builder.append(timeStampField);
 
-        help = new HelpAction(HelpFiles.TIMESTAMP).getHelpButton();
+        help = new HelpAction(HelpFile.TIMESTAMP).getHelpButton();
         builder.append(help);
         builder.nextLine();
 
         builder.append(new JPanel());
-        builder.append(updateTimeStamp, 2);
+        builder.append(updateTimeStamp, 11);
         builder.nextLine();
 
         builder.append(markImportedEntries, 13);
@@ -188,16 +161,12 @@ class GeneralTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        defSort.setSelected(prefs.getBoolean(JabRefPreferences.DEFAULT_AUTO_SORT));
-        ctrlClick.setSelected(prefs.getBoolean(JabRefPreferences.CTRL_CLICK));
         useOwner.setSelected(prefs.getBoolean(JabRefPreferences.USE_OWNER));
         overwriteOwner.setSelected(prefs.getBoolean(JabRefPreferences.OVERWRITE_OWNER));
         useTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP));
         overwriteTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP));
         updateTimeStamp.setSelected(prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP));
         updateTimeStamp.setEnabled(useTimeStamp.isSelected());
-        keyDuplicateWarningDialog.setSelected(prefs.getBoolean(JabRefPreferences.DIALOG_WARNING_FOR_DUPLICATE_KEY));
-        keyEmptyWarningDialog.setSelected(prefs.getBoolean(JabRefPreferences.DIALOG_WARNING_FOR_EMPTY_KEY));
         enforceLegalKeys.setSelected(prefs.getBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY));
         memoryStick.setSelected(prefs.getBoolean(JabRefPreferences.MEMORY_STICK_MODE));
         confirmDelete.setSelected(prefs.getBoolean(JabRefPreferences.CONFIRM_DELETE));
@@ -236,24 +205,22 @@ class GeneralTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.USE_TIME_STAMP, useTimeStamp.isSelected());
         prefs.putBoolean(JabRefPreferences.OVERWRITE_TIME_STAMP, overwriteTimeStamp.isSelected());
         prefs.putBoolean(JabRefPreferences.UPDATE_TIMESTAMP, updateTimeStamp.isSelected());
-        prefs.putBoolean(JabRefPreferences.DIALOG_WARNING_FOR_DUPLICATE_KEY, keyDuplicateWarningDialog.isSelected());
-        prefs.putBoolean(JabRefPreferences.DIALOG_WARNING_FOR_EMPTY_KEY, keyEmptyWarningDialog.isSelected());
         prefs.putBoolean(JabRefPreferences.ENFORCE_LEGAL_BIBTEX_KEY, enforceLegalKeys.isSelected());
         if (prefs.getBoolean(JabRefPreferences.MEMORY_STICK_MODE) && !memoryStick.isSelected()) {
             JOptionPane.showMessageDialog(null, Localization.lang("To disable the memory stick mode"
                             + " rename or remove the jabref.xml file in the same folder as JabRef."),
-                    Localization.lang("Memory Stick Mode"),
+                    Localization.lang("Memory stick mode"),
                     JOptionPane.INFORMATION_MESSAGE);
         }
         prefs.putBoolean(JabRefPreferences.MEMORY_STICK_MODE, memoryStick.isSelected());
         prefs.putBoolean(JabRefPreferences.CONFIRM_DELETE, confirmDelete.isSelected());
-        prefs.putBoolean(JabRefPreferences.CTRL_CLICK, ctrlClick.isSelected());
         prefs.putBoolean(JabRefPreferences.WARN_ABOUT_DUPLICATES_IN_INSPECTION, inspectionWarnDupli.isSelected());
         String owner = defOwnerField.getText().trim();
         prefs.put(JabRefPreferences.DEFAULT_OWNER, owner);
-        prefs.WRAPPED_USERNAME = '[' + owner + ']';
         prefs.put(JabRefPreferences.TIME_STAMP_FORMAT, timeStampFormat.getText().trim());
         prefs.put(JabRefPreferences.TIME_STAMP_FIELD, timeStampField.getText().trim());
+        // Update name of the time stamp field based on preferences
+        InternalBibtexFields.updateTimeStampField(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD));
         prefs.setDefaultEncoding((Charset) encodings.getSelectedItem());
         prefs.putBoolean(JabRefPreferences.MARK_IMPORTED_ENTRIES, markImportedEntries.isSelected());
         prefs.putBoolean(JabRefPreferences.UNMARK_ALL_ENTRIES_BEFORE_IMPORTING, unmarkAllEntriesBeforeImporting.isSelected());
@@ -278,7 +245,7 @@ class GeneralTab extends JPanel implements PrefsTab {
     public boolean validateSettings() {
         try {
             // Test if date format is legal:
-            new SimpleDateFormat(timeStampFormat.getText());
+            DateTimeFormatter.ofPattern(timeStampFormat.getText());
 
         } catch (IllegalArgumentException ex2) {
             JOptionPane.showMessageDialog

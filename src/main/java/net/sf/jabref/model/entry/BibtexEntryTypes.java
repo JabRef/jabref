@@ -20,8 +20,8 @@ public class BibtexEntryTypes {
     public static final EntryType ARTICLE = new BibtexEntryType() {
 
         {
-            addAllRequired("author", "title", "journal", "year");
-            addAllOptional("volume", "number", "pages", "month", "note");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.JOURNAL, FieldName.YEAR);
+            addAllOptional(FieldName.VOLUME, FieldName.NUMBER, FieldName.PAGES, FieldName.MONTH, FieldName.NOTE);
         }
 
         @Override
@@ -39,8 +39,8 @@ public class BibtexEntryTypes {
     public static final EntryType BOOK = new BibtexEntryType() {
 
         {
-            addAllRequired("title", "publisher", "year", "author/editor");
-            addAllOptional("volume", "number", "series", "address", "edition", "month", "note");
+            addAllRequired(FieldName.TITLE, FieldName.PUBLISHER, FieldName.YEAR, FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR));
+            addAllOptional(FieldName.VOLUME, FieldName.NUMBER, FieldName.SERIES, FieldName.ADDRESS, FieldName.EDITION, FieldName.MONTH, FieldName.NOTE);
         }
 
         @Override
@@ -58,8 +58,8 @@ public class BibtexEntryTypes {
     public static final EntryType BOOKLET = new BibtexEntryType() {
 
         {
-            addAllRequired("title");
-            addAllOptional("author", "howpublished", "address", "month", "year", "note");
+            addAllRequired(FieldName.TITLE);
+            addAllOptional(FieldName.AUTHOR, FieldName.HOWPUBLISHED, FieldName.ADDRESS, FieldName.MONTH, FieldName.YEAR, FieldName.NOTE);
         }
 
         @Override
@@ -77,9 +77,9 @@ public class BibtexEntryTypes {
     public static final EntryType CONFERENCE = new BibtexEntryType() {
 
         {
-            addAllRequired("author", "title", "booktitle", "year");
-            addAllOptional("editor", "volume", "number", "series", "pages", "address", "month", "organization",
-                    "publisher", "note");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, FieldName.YEAR);
+            addAllOptional(FieldName.EDITOR, FieldName.VOLUME, FieldName.NUMBER, FieldName.SERIES, FieldName.PAGES, FieldName.ADDRESS, FieldName.MONTH, FieldName.ORGANIZATION,
+                    FieldName.PUBLISHER, FieldName.NOTE);
         }
 
         @Override
@@ -97,8 +97,8 @@ public class BibtexEntryTypes {
     public static final EntryType INBOOK = new BibtexEntryType() {
 
         {
-            addAllRequired("chapter/pages", "title", "publisher", "year", "author/editor");
-            addAllOptional("volume", "number", "series", "type", "address", "edition", "month", "note");
+            addAllRequired(FieldName.orFields(FieldName.CHAPTER, FieldName.PAGES), FieldName.TITLE, FieldName.PUBLISHER, FieldName.YEAR, FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR));
+            addAllOptional(FieldName.VOLUME, FieldName.NUMBER, FieldName.SERIES, FieldName.TYPE, FieldName.ADDRESS, FieldName.EDITION, FieldName.MONTH, FieldName.NOTE);
         }
 
         @Override
@@ -115,9 +115,9 @@ public class BibtexEntryTypes {
     public static final EntryType INCOLLECTION = new BibtexEntryType() {
 
         {
-            addAllRequired("author", "title", "booktitle", "publisher", "year");
-            addAllOptional("editor", "volume", "number", "series", "type", "chapter", "pages", "address", "edition",
-                    "month", "note");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, FieldName.PUBLISHER, FieldName.YEAR);
+            addAllOptional(FieldName.EDITOR, FieldName.VOLUME, FieldName.NUMBER, FieldName.SERIES, FieldName.TYPE, FieldName.CHAPTER, FieldName.PAGES, FieldName.ADDRESS, FieldName.EDITION,
+                    FieldName.MONTH, FieldName.NOTE);
         }
 
         @Override
@@ -135,9 +135,9 @@ public class BibtexEntryTypes {
     public static final EntryType INPROCEEDINGS = new BibtexEntryType() {
 
         {
-            addAllRequired("author", "title", "booktitle", "year");
-            addAllOptional("editor", "volume", "number", "series", "pages", "address", "month", "organization",
-                    "publisher", "note");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, FieldName.YEAR);
+            addAllOptional(FieldName.EDITOR, FieldName.VOLUME, FieldName.NUMBER, FieldName.SERIES, FieldName.PAGES, FieldName.ADDRESS, FieldName.MONTH, FieldName.ORGANIZATION,
+                    FieldName.PUBLISHER, FieldName.NOTE);
         }
 
         @Override
@@ -154,8 +154,8 @@ public class BibtexEntryTypes {
     public static final EntryType MANUAL = new BibtexEntryType() {
 
         {
-            addAllRequired("title");
-            addAllOptional("author", "organization", "address", "edition", "month", "year", "note");
+            addAllRequired(FieldName.TITLE);
+            addAllOptional(FieldName.AUTHOR, FieldName.ORGANIZATION, FieldName.ADDRESS, FieldName.EDITION, FieldName.MONTH, FieldName.YEAR, FieldName.NOTE);
         }
 
         @Override
@@ -173,8 +173,8 @@ public class BibtexEntryTypes {
     public static final EntryType MASTERSTHESIS = new BibtexEntryType() {
 
         {
-            addAllRequired("author", "title", "school", "year");
-            addAllOptional("type", "address", "month", "note");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.SCHOOL, FieldName.YEAR);
+            addAllOptional(FieldName.TYPE, FieldName.ADDRESS, FieldName.MONTH, FieldName.NOTE);
         }
 
         @Override
@@ -192,7 +192,7 @@ public class BibtexEntryTypes {
     public static final EntryType MISC = new BibtexEntryType() {
 
         {
-            addAllOptional("author", "title", "howpublished", "month", "year", "note");
+            addAllOptional(FieldName.AUTHOR, FieldName.TITLE, FieldName.HOWPUBLISHED, FieldName.MONTH, FieldName.YEAR, FieldName.NOTE);
         }
 
         @Override
@@ -210,8 +210,8 @@ public class BibtexEntryTypes {
     public static final EntryType PHDTHESIS = new BibtexEntryType() {
 
         {
-            addAllRequired("author", "title", "school", "year");
-            addAllOptional("type", "address", "month", "note");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.SCHOOL, FieldName.YEAR);
+            addAllOptional(FieldName.TYPE, FieldName.ADDRESS, FieldName.MONTH, FieldName.NOTE);
         }
 
         @Override
@@ -229,9 +229,9 @@ public class BibtexEntryTypes {
     public static final EntryType PROCEEDINGS = new BibtexEntryType() {
 
         {
-            addAllRequired("title", "year");
-            addAllOptional("editor", "volume", "number", "series", "address", "publisher", "note", "month",
-                    "organization");
+            addAllRequired(FieldName.TITLE, FieldName.YEAR);
+            addAllOptional(FieldName.EDITOR, FieldName.VOLUME, FieldName.NUMBER, FieldName.SERIES, FieldName.ADDRESS, FieldName.PUBLISHER, FieldName.NOTE, FieldName.MONTH,
+                    FieldName.ORGANIZATION);
         }
 
         @Override
@@ -249,8 +249,8 @@ public class BibtexEntryTypes {
     public static final EntryType TECHREPORT = new BibtexEntryType() {
 
         {
-            addAllRequired("author", "title", "institution", "year");
-            addAllOptional("type", "number", "address", "month", "note");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, FieldName.YEAR);
+            addAllOptional(FieldName.TYPE, FieldName.NUMBER, FieldName.ADDRESS, FieldName.MONTH, FieldName.NOTE);
         }
 
         @Override
@@ -268,8 +268,8 @@ public class BibtexEntryTypes {
     public static final EntryType UNPUBLISHED = new BibtexEntryType() {
 
         {
-            addAllRequired("author", "title", "note");
-            addAllOptional("month", "year");
+            addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.NOTE);
+            addAllOptional(FieldName.MONTH, FieldName.YEAR);
         }
 
         @Override

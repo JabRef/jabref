@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.preftabs;
 
 /*
@@ -101,7 +86,7 @@ import net.sf.jabref.logic.l10n.Localization;
  * Added more translations, and started work on a Replace string feature
  *
  * Revision 1.4  2004/02/17 09:14:02  mortenalver
- * Similar update in FontSelector preview.
+ * Similar update in Font selection preview.
  *
  * Revision 1.3  2004/02/17 07:35:22  mortenalver
  * Experimenting with antialiasing in table.
@@ -158,7 +143,7 @@ public class FontSelectorDialog extends JDialog {
 
     public FontSelectorDialog(Component comp, Font font) {
 
-        super(JOptionPane.getFrameForComponent(comp), Localization.lang("FontSelector"), true); //
+        super(JOptionPane.getFrameForComponent(comp), Localization.lang("Font selection"), true); //
         JPanel content = new JPanel(new BorderLayout());
         content.setBorder(new EmptyBorder(12, 12, 12, 12));
         setContentPane(content);
@@ -167,13 +152,13 @@ public class FontSelectorDialog extends JDialog {
 
         familyList = new JList<>(getFontList());
 
-        JPanel familyPanel = createTextFieldAndListPanel(Localization.lang("Font Family"), familyField, familyList);
+        JPanel familyPanel = createTextFieldAndListPanel(Localization.lang("Font family"), familyField, familyList);
         listPanel.add(familyPanel);
 
-        JPanel sizePanel = createTextFieldAndListPanel(Localization.lang("Font Size"), sizeField, sizeList);
+        JPanel sizePanel = createTextFieldAndListPanel(Localization.lang("Font size"), sizeField, sizeList);
         listPanel.add(sizePanel);
 
-        JPanel stylePanel = createTextFieldAndListPanel(Localization.lang("Font Style"), styleField, styleList);
+        JPanel stylePanel = createTextFieldAndListPanel(Localization.lang("Font style"), styleField, styleList);
         styleField.setEditable(false);
         listPanel.add(stylePanel);
 
@@ -196,7 +181,7 @@ public class FontSelectorDialog extends JDialog {
            |  enable antialiasing in the preview field, since I'm |
            |  working on introducing this in the table view.      |
            -------------------------------------------------------- */
-        preview = new JLabel(Localization.lang("Font Preview")) {
+        preview = new JLabel(Localization.lang("Font preview")) {
             @Override
             public void paint(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g;
@@ -208,7 +193,7 @@ public class FontSelectorDialog extends JDialog {
 
         };
 
-        preview.setBorder(new TitledBorder(Localization.lang("Font Preview")));
+        preview.setBorder(new TitledBorder(Localization.lang("Font preview")));
 
         updatePreview();
 

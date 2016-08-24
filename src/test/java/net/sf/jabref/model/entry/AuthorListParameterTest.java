@@ -14,6 +14,13 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class AuthorListParameterTest {
 
+    @Parameter(value = 0)
+    public String authorsString;
+
+    @Parameter(value = 1)
+    public AuthorList authorsParsed;
+
+
     @Parameters(name = "{index}: parse({0})={1}")
     public static Collection<Object[]> data() {
 
@@ -34,12 +41,6 @@ public class AuthorListParameterTest {
     public static AuthorList authorList(Author author) {
         return new AuthorList(Arrays.asList(author));
     }
-
-    @Parameter(value = 0)
-    public String authorsString;
-
-    @Parameter(value = 1)
-    public AuthorList authorsParsed;
 
     @Test
     public void parseCorrectly() {

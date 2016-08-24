@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.util.io;
 
 import java.io.BufferedInputStream;
@@ -24,7 +9,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -37,14 +21,13 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
-import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.layout.Layout;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
 
@@ -55,7 +38,6 @@ public class FileUtil {
 
     private static final Log LOGGER = LogFactory.getLog(FileUtil.class);
 
-    private static final String FILE_SEPARATOR = System.getProperty("file.separator");
     private static final Pattern SLASH = Pattern.compile("/");
     private static final Pattern BACKSLASH = Pattern.compile("\\\\");
 
@@ -177,7 +159,7 @@ public class FileUtil {
      * Uses <ul>
      * <li>the default directory associated with the extension of the file</li>
      * <li>the standard file directory</li>
-     * <li>the directory of the bib file</li>
+     * <li>the directory of the BIB file</li>
      * </ul>
      *
      * @param databaseContext The database this file belongs to.
@@ -189,7 +171,7 @@ public class FileUtil {
         List<String> directories = databaseContext.getFileDirectory(extension.orElse(null));
         // Include the standard "file" directory:
         List<String> fileDir = databaseContext.getFileDirectory();
-        // Include the directory of the bib file:
+        // Include the directory of the BIB file:
         List<String> al = new ArrayList<>();
         for (String dir : directories) {
             if (!al.contains(dir)) {
@@ -242,10 +224,10 @@ public class FileUtil {
             return Optional.of(file);
         }
 
-        if (dir.endsWith(FILE_SEPARATOR)) {
+        if (dir.endsWith(OS.FILE_SEPARATOR)) {
             name = dir + name;
         } else {
-            name = dir + FILE_SEPARATOR + name;
+            name = dir + OS.FILE_SEPARATOR + name;
         }
 
         // fix / and \ problems:
@@ -304,8 +286,8 @@ public class FileUtil {
             longName = fileName.toString();
         }
 
-        if (!dir.endsWith(FILE_SEPARATOR)) {
-            dir = dir.concat(FILE_SEPARATOR);
+        if (!dir.endsWith(OS.FILE_SEPARATOR)) {
+            dir = dir.concat(OS.FILE_SEPARATOR);
         }
 
         if (longName.startsWith(dir)) {
@@ -317,7 +299,8 @@ public class FileUtil {
         }
     }
 
-    public static Map<BibEntry, List<File>> findAssociatedFiles(Collection<BibEntry> entries, Collection<String> extensions, Collection<File> directories) {
+    public static Map<BibEntry, List<File>> findAssociatedFiles(List<BibEntry> entries,
+            List<String> extensions, List<File> directories, boolean autolinkExactKeyOnly) {
         Map<BibEntry, List<File>> result = new HashMap<>();
 
         // First scan directories
@@ -328,7 +311,6 @@ public class FileUtil {
             result.put(entry, new ArrayList<>());
         }
 
-        boolean exactOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
         // Now look for keys
         nextFile: for (File file : filesWithExtension) {
 
@@ -336,18 +318,19 @@ public class FileUtil {
             int dot = name.lastIndexOf('.');
             // First, look for exact matches:
             for (BibEntry entry : entries) {
-                String citeKey = entry.getCiteKey();
-                if ((citeKey != null) && !citeKey.isEmpty() && (dot > 0) && name.substring(0, dot).equals(citeKey)) {
+                Optional<String> citeKey = entry.getCiteKeyOptional();
+                if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && (dot > 0)
+                        && name.substring(0, dot).equals(citeKey.get())) {
                     result.get(entry).add(file);
                     continue nextFile;
                 }
             }
-            // If we get here, we didn't find any exact matches. If non-exact
+            // If we get here, we did not find any exact matches. If non-exact
             // matches are allowed, try to find one:
-            if (!exactOnly) {
+            if (!autolinkExactKeyOnly) {
                 for (BibEntry entry : entries) {
-                    String citeKey = entry.getCiteKey();
-                    if ((citeKey != null) && !citeKey.isEmpty() && name.startsWith(citeKey)) {
+                    Optional<String> citeKey = entry.getCiteKeyOptional();
+                    if ((citeKey.isPresent()) && !citeKey.get().isEmpty() && name.startsWith(citeKey.get())) {
                         result.get(entry).add(file);
                         continue nextFile;
                     }
@@ -372,10 +355,12 @@ public class FileUtil {
 
         List<File> result = new ArrayList<>();
         for (BibEntry entry : bes) {
-            List<ParsedFileField> fileList = FileField.parse(entry.getField(Globals.FILE_FIELD));
-            for (ParsedFileField file : fileList) {
-                expandFilename(file.getLink(), fileDirs).ifPresent(result::add);
-            }
+            entry.getFieldOptional(FieldName.FILE).ifPresent(fileField -> {
+                List<ParsedFileField> fileList = FileField.parse(fileField);
+                for (ParsedFileField file : fileList) {
+                    expandFilename(file.getLink(), fileDirs).ifPresent(result::add);
+                }
+            });
         }
 
         return result;
@@ -384,18 +369,19 @@ public class FileUtil {
     /**
      * Determines filename provided by an entry in a database
      *
-     * @param database the database, where the entry is located
-     * @param entry    the entry to which the file should be linked to
-     * @param repository
+     * @param database        the database, where the entry is located
+     * @param entry           the entry to which the file should be linked to
+     * @param fileNamePattern the filename pattern
+     * @param prefs           the layout preferences
      * @return a suggested fileName
      */
-    public static String getLinkedFileName(BibDatabase database, BibEntry entry,
-            JournalAbbreviationRepository repository) {
-        String targetName = entry.getCiteKey() == null ? "default" : entry.getCiteKey();
-        StringReader sr = new StringReader(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
+    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry,
+            String fileNamePattern, LayoutFormatterPreferences prefs) {
+        String targetName = entry.getCiteKeyOptional().orElse("default");
+        StringReader sr = new StringReader(fileNamePattern);
         Layout layout = null;
         try {
-            layout = new LayoutHelper(sr, repository).getLayoutFromText();
+            layout = new LayoutHelper(sr, prefs).getLayoutFromText();
         } catch (IOException e) {
             LOGGER.info("Wrong format " + e.getMessage(), e);
         }

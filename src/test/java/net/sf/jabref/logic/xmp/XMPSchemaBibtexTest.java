@@ -2,6 +2,7 @@ package net.sf.jabref.logic.xmp;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -10,36 +11,39 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.jabref.BibtexTestData;
-import net.sf.jabref.Globals;
-import net.sf.jabref.JabRefPreferences;
+import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import static org.mockito.Mockito.when;
+
+@RunWith(MockitoJUnitRunner.class)
 public class XMPSchemaBibtexTest {
 
-    @Before
-    public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
+    @Mock
+    private ImportFormatPreferences prefs;
 
     public void assertEqualsBibtexEntry(BibEntry e, BibEntry x) {
         Assert.assertNotNull(e);
         Assert.assertNotNull(x);
-        Assert.assertEquals(e.getCiteKey(), x.getCiteKey());
+        Assert.assertEquals(e.getCiteKeyOptional(), x.getCiteKeyOptional());
         Assert.assertEquals(e.getType(), x.getType());
 
         Assert.assertEquals(e.getFieldNames().size(), x.getFieldNames().size());
 
         for (String name : e.getFieldNames()) {
-            Assert.assertEquals(e.getField(name), x.getField(name));
+            Assert.assertEquals(e.getFieldOptional(name), x.getFieldOptional(name));
         }
     }
 
@@ -242,11 +246,11 @@ public class XMPSchemaBibtexTest {
 
     @Test
     public void testSetBibtexEntry() throws IOException {
+        when(prefs.getFieldContentParserPreferences()).thenReturn(new FieldContentParserPreferences());
 
         XMPMetadata xmp = new XMPMetadata();
         XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
-
-        BibEntry e = BibtexTestData.getBibtexEntry();
+        BibEntry e = BibtexTestData.getBibtexEntry(prefs);
         bibtex.setBibtexEntry(e, null);
 
         BibEntry e2 = bibtex.getBibtexEntry();
@@ -266,7 +270,7 @@ public class XMPSchemaBibtexTest {
                 .bibtexDescription(bibtexString));
 
         Document d = XMLUtil.parse(new ByteArrayInputStream(bibtexString
-                .getBytes()));
+                .getBytes(StandardCharsets.UTF_8)));
 
         Assert.assertEquals("Beach sand convolution by surf-wave optimzation",
                 XMPSchemaBibtex.getTextContent(

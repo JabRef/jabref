@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.external;
 
 import java.awt.datatransfer.DataFlavor;
@@ -23,11 +8,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,7 +29,7 @@ public class TransferableFileLinkSelection implements Transferable {
 
     public TransferableFileLinkSelection(BasePanel panel, List<BibEntry> selection) {
         FileListTableModel tm = new FileListTableModel();
-        selection.get(0).getFieldOptional(Globals.FILE_FIELD).ifPresent(tm::setContent);
+        selection.get(0).getFieldOptional(FieldName.FILE).ifPresent(tm::setContent);
         if (tm.getRowCount() > 0) {
             // Find the default directory for this field type, if any:
             List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
@@ -87,7 +72,7 @@ public class TransferableFileLinkSelection implements Transferable {
             String dir = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
             // Include the standard "file" directory:
             String fileDir = panel.metaData().getFileDirectory(GUIGlobals.FILE_FIELD);
-            // Include the directory of the bib file:
+            // Include the directory of the BIB file:
             String[] dirs;
             if (panel.metaData().getDatabaseFile() != null) {
                 String databaseDir = panel.metaData().getDatabaseFile().getParent();
