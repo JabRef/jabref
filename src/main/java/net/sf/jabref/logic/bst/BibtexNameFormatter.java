@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.bst;
 
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.model.entry.Author;
@@ -96,7 +97,7 @@ public class BibtexNameFormatter {
 
                 char type = control.charAt(0);
 
-                String tokenS;
+                Optional<String> tokenS;
                 switch (type) {
                 case 'f':
                     tokenS = author.getFirst();
@@ -114,11 +115,11 @@ public class BibtexNameFormatter {
                     throw new VMException("Internal error");
                 }
 
-                if (tokenS == null) {
+                if (!tokenS.isPresent()) {
                     i++;
                     continue;
                 }
-                String[] tokens = tokenS.split(" ");
+                String[] tokens = tokenS.get().split(" ");
 
                 boolean abbreviateThatIsSingleLetter = true;
 
