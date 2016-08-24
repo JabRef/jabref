@@ -3,15 +3,14 @@ package net.sf.jabref.logic.importer.fileformat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
-import java.nio.file.DirectoryStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.Collections;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 
@@ -27,7 +26,6 @@ import org.junit.runners.Parameterized.Parameters;
 public class CopacImporterTestFiles {
 
     private CopacImporter copacImporter;
-    private final static String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/logic/importer/fileformat";
 
     @Parameter
     public String fileName;
@@ -40,18 +38,23 @@ public class CopacImporterTestFiles {
 
     @Parameters(name = "{0}")
     public static Collection<String> fileNames() throws IOException {
-        List<String> files = new ArrayList<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(FILEFORMAT_PATH))) {
-            stream.forEach(n -> files.add(n.getFileName().toString()));
+
+        try (Stream<Path> stream = Files.list(Paths.get(CopacImporterTestFiles.class.getResource("").toURI()))) {
+            return stream
+                    .filter(n -> n.getFileName().toString().startsWith("CopacImporterTest")
+                            && n.getFileName().toString().endsWith(".txt"))
+                    .map(f -> f.getFileName().toString()).collect(Collectors.toList());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
         }
-        return files.stream().filter(n -> n.startsWith("CopacImporterTest")).filter(n -> n.endsWith(".txt"))
-                .collect(Collectors.toList());
+
+        return Collections.emptyList();
     }
 
     @Test
     public void testIsRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Paths.get(CopacImporterTest.class.getResource(fileName).toURI());
-        Assert.assertTrue(copacImporter.isRecognizedFormat(file, Charset.defaultCharset()));
+        Assert.assertTrue(copacImporter.isRecognizedFormat(file, StandardCharsets.UTF_8));
     }
 
     @Test

@@ -2,7 +2,7 @@ package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -51,14 +51,14 @@ public class PdfXmpImporterTest {
     @Test
     public void importEncryptedFileReturnsError() throws URISyntaxException {
         Path file = Paths.get(PdfXmpImporterTest.class.getResource("/pdfs/encrypted.pdf").toURI());
-        ParserResult result = importer.importDatabase(file, Charset.defaultCharset());
+        ParserResult result = importer.importDatabase(file, StandardCharsets.UTF_8);
         Assert.assertTrue(result.hasWarnings());
     }
 
     @Test
     public void testImportEntries() throws URISyntaxException {
         Path file = Paths.get(PdfXmpImporterTest.class.getResource("annotated.pdf").toURI());
-        List<BibEntry> bibEntries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
         assertEquals(1, bibEntries.size());
 
@@ -72,7 +72,7 @@ public class PdfXmpImporterTest {
     @Test
     public void testIsRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Paths.get(PdfXmpImporterTest.class.getResource("annotated.pdf").toURI());
-        assertTrue(importer.isRecognizedFormat(file, Charset.defaultCharset()));
+        assertTrue(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
     }
 
     @Test
@@ -82,7 +82,7 @@ public class PdfXmpImporterTest {
 
         for (String str : list) {
             Path file = Paths.get(PdfXmpImporterTest.class.getResource(str).toURI());
-            assertFalse(importer.isRecognizedFormat(file, Charset.defaultCharset()));
+            assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 

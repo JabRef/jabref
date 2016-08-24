@@ -2,7 +2,7 @@ package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -65,7 +65,7 @@ public class IsiImporterTest {
 
         for (String str : list) {
             Path file = Paths.get(IsiImporterTest.class.getResource(str).toURI());
-            assertTrue(importer.isRecognizedFormat(file, Charset.defaultCharset()));
+            assertTrue(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 
@@ -75,7 +75,7 @@ public class IsiImporterTest {
 
         for (String str : list) {
             Path file = Paths.get(IsiImporterTest.class.getResource(str).toURI());
-            assertFalse(importer.isRecognizedFormat(file, Charset.defaultCharset()));
+            assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 
@@ -127,7 +127,7 @@ public class IsiImporterTest {
     @Test
     public void testImportEntries1() throws IOException, URISyntaxException {
         Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTest1.isi").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         assertEquals(1, entries.size());
         BibEntry entry = entries.get(0);
         assertEquals(Optional.of("Optical properties of MgO doped LiNbO$_3$ single crystals"),
@@ -148,7 +148,7 @@ public class IsiImporterTest {
     @Test
     public void testImportEntries2() throws IOException, URISyntaxException {
         Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTest2.isi").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         assertEquals(3, entries.size());
         BibEntry entry = entries.get(0);
         assertEquals(Optional.of("Optical properties of MgO doped LiNbO$_3$ single crystals"),
@@ -165,7 +165,7 @@ public class IsiImporterTest {
     @Test
     public void testImportEntriesINSPEC() throws IOException, URISyntaxException {
         Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTestInspec.isi").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
         assertEquals(2, entries.size());
         BibEntry a = entries.get(0);
@@ -203,7 +203,7 @@ public class IsiImporterTest {
     @Test
     public void testImportEntriesWOS() throws IOException, URISyntaxException {
         Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTestWOS.isi").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
         assertEquals(2, entries.size());
         BibEntry a = entries.get(0);
@@ -260,7 +260,7 @@ public class IsiImporterTest {
     @Test
     public void testImportIEEEExport() throws IOException, URISyntaxException {
         Path file = Paths.get(IsiImporterTest.class.getResource("IEEEImport1.txt").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
         assertEquals(1, entries.size());
         BibEntry a = entries.get(0);
@@ -283,7 +283,7 @@ public class IsiImporterTest {
     @Test
     public void testIEEEImport() throws IOException, URISyntaxException {
         Path file = Paths.get(IsiImporterTest.class.getResource("IEEEImport1.txt").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
         assertEquals(1, entries.size());
         BibEntry a = entries.get(0);
@@ -309,7 +309,7 @@ public class IsiImporterTest {
     public void testImportEntriesMedline() throws IOException, URISyntaxException {
         Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTestMedline.isi").toURI());
 
-        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
         assertEquals(2, entries.size());
         BibEntry a = entries.get(0);
@@ -348,7 +348,7 @@ public class IsiImporterTest {
     public void testImportEntriesEmpty() throws IOException, URISyntaxException {
         Path file = Paths.get(IsiImporterTest.class.getResource("IsiImporterTestEmpty.isi").toURI());
 
-        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
         assertEquals(1, entries.size());
     }

@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.importer.fileformat;
 
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -31,7 +31,7 @@ public class SilverPlatterImporterTestNotRecognized {
             URL resource = SilverPlatterImporter.class.getResource(s);
             assertNotNull("resource " + s + " must be available", resource);
             Path file = Paths.get(resource.toURI());
-            Assert.assertFalse(testImporter.isRecognizedFormat(file, Charset.defaultCharset()));
+            Assert.assertFalse(testImporter.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 

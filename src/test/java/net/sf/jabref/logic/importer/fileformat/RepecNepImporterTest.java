@@ -3,7 +3,7 @@ package net.sf.jabref.logic.importer.fileformat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -35,7 +35,7 @@ public class RepecNepImporterTest {
                 "RepecNepImporterTest3.txt");
         for (String s : accepted) {
             Path file = Paths.get(RepecNepImporter.class.getResource(s).toURI());
-            Assert.assertTrue(testImporter.isRecognizedFormat(file, Charset.defaultCharset()));
+            Assert.assertTrue(testImporter.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 
@@ -45,7 +45,7 @@ public class RepecNepImporterTest {
                 "CopacImporterTest2.txt", "IEEEImport1.txt");
         for (String s : notAccepted) {
             Path file = Paths.get(RepecNepImporter.class.getResource(s).toURI());
-            Assert.assertFalse(testImporter.isRecognizedFormat(file, Charset.defaultCharset()));
+            Assert.assertFalse(testImporter.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 
@@ -53,7 +53,8 @@ public class RepecNepImporterTest {
     public final void testImportEntries1() throws IOException, URISyntaxException {
         Path file = Paths.get(RepecNepImporter.class.getResource("RepecNepImporterTest1.txt").toURI());
         try (InputStream bibIn = RepecNepImporter.class.getResourceAsStream("RepecNepImporterTest1.bib")) {
-            List<BibEntry> entries = testImporter.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+            List<BibEntry> entries = testImporter.importDatabase(file, StandardCharsets.UTF_8).getDatabase()
+                    .getEntries();
             Assert.assertEquals(1, entries.size());
             BibEntryAssert.assertEquals(bibIn, entries.get(0));
         }
@@ -63,7 +64,8 @@ public class RepecNepImporterTest {
     public final void testImportEntries2() throws IOException, URISyntaxException {
         Path file = Paths.get(RepecNepImporter.class.getResource("RepecNepImporterTest2.txt").toURI());
         try (InputStream bibIn = RepecNepImporter.class.getResourceAsStream("RepecNepImporterTest2.bib")) {
-            List<BibEntry> entries = testImporter.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+            List<BibEntry> entries = testImporter.importDatabase(file, StandardCharsets.UTF_8).getDatabase()
+                    .getEntries();
             Assert.assertEquals(1, entries.size());
             BibEntryAssert.assertEquals(bibIn, entries.get(0));
         }
@@ -73,7 +75,8 @@ public class RepecNepImporterTest {
     public final void testImportEntries3() throws IOException, URISyntaxException {
         Path file = Paths.get(RepecNepImporter.class.getResource("RepecNepImporterTest3.txt").toURI());
         try (InputStream bibIn = RepecNepImporter.class.getResourceAsStream("RepecNepImporterTest3.bib")) {
-            List<BibEntry> entries = testImporter.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+            List<BibEntry> entries = testImporter.importDatabase(file, StandardCharsets.UTF_8).getDatabase()
+                    .getEntries();
             Assert.assertEquals(1, entries.size());
             BibEntryAssert.assertEquals(bibIn, entries.get(0));
         }
@@ -97,6 +100,7 @@ public class RepecNepImporterTest {
 
     @Test
     public final void testGetDescription() {
-        Assert.assertEquals("Imports a New Economics Papers-Message from the REPEC-NEP Service.", testImporter.getDescription());
+        Assert.assertEquals("Imports a New Economics Papers-Message from the REPEC-NEP Service.",
+                testImporter.getDescription());
     }
 }

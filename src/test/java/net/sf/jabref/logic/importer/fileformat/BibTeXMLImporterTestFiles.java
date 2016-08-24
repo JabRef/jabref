@@ -1,17 +1,16 @@
 package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.DirectoryStream;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
@@ -28,7 +27,6 @@ import org.junit.runners.Parameterized.Parameters;
 public class BibTeXMLImporterTestFiles {
 
     private static final Pattern PATTERN = Pattern.compile("\\D*[0123456789]");
-    private final static String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/logic/importer/fileformat";
 
     private BibTeXMLImporter bibtexmlImporter;
 
@@ -42,23 +40,29 @@ public class BibTeXMLImporterTestFiles {
     }
 
     @Parameters(name = "{0}")
-    public static Collection<Path> files() throws IOException {
-        List<Path> files = new ArrayList<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(FILEFORMAT_PATH))) {
-            stream.forEach(files::add);
+    public static List<Path> files() throws IOException {
+        try (Stream<Path> stream = Files.list(Paths.get(BibTeXMLImporterTest.class.getResource("").toURI()))) {
+            return stream
+                    .filter(n -> n.getFileName().toString().startsWith("BibTeXMLImporterTest")
+                            && n.getFileName().toString().endsWith(".xml"))
+                    .collect(Collectors.toList());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+
         }
-        return files.stream().filter(n -> n.getFileName().toString().startsWith("BibTeXMLImporterTest") && n.getFileName().toString().endsWith(".xml"))
-                .collect(Collectors.toList());
+        return Collections.emptyList();
+
     }
 
     @Test
     public void testIsRecognizedFormat() throws IOException {
-        Assert.assertTrue(bibtexmlImporter.isRecognizedFormat(importFile, Charset.defaultCharset()));
+        Assert.assertTrue(bibtexmlImporter.isRecognizedFormat(importFile, StandardCharsets.UTF_8));
     }
 
     @Test
     public void testImportEntries() throws IOException {
-        List<BibEntry> bibtexmlEntries = bibtexmlImporter.importDatabase(importFile, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> bibtexmlEntries = bibtexmlImporter.importDatabase(importFile, StandardCharsets.UTF_8)
+                .getDatabase().getEntries();
 
         String bibFileName = importFile.getFileName().toString().replace(".xml", ".bib");
         while (PATTERN.matcher(bibFileName).find()) {

@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.importer.fileformat;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -46,6 +46,6 @@ public class BiblioscapeImporterTest {
     public void testImportEntriesAbortion() throws Throwable {
         Path file = Paths.get(BiblioscapeImporter.class.getResource("BiblioscapeImporterTestCorrupt.txt").toURI());
         Assert.assertEquals(Collections.emptyList(),
-                importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries());
+                importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries());
     }
 }

@@ -2,7 +2,7 @@ package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -30,6 +30,7 @@ public class RISImporterTestFiles {
 
     private Path risFile;
 
+
     @Before
     public void setUp() throws URISyntaxException {
         risImporter = new RisImporter();
@@ -39,17 +40,18 @@ public class RISImporterTestFiles {
     @Parameters(name = "{0}")
     public static Collection<String> fileNames() {
         return Arrays.asList("RisImporterTest1", "RisImporterTest3", "RisImporterTest4a", "RisImporterTest4b",
-                        "RisImporterTest4c", "RisImporterTest5a", "RisImporterTest5b", "RisImporterTest6");
+                "RisImporterTest4c", "RisImporterTest5a", "RisImporterTest5b", "RisImporterTest6");
     }
 
     @Test
     public void testIsRecognizedFormat() throws IOException {
-        Assert.assertTrue(risImporter.isRecognizedFormat(risFile, Charset.defaultCharset()));
+        Assert.assertTrue(risImporter.isRecognizedFormat(risFile, StandardCharsets.UTF_8));
     }
 
     @Test
     public void testImportEntries() throws IOException {
-        List<BibEntry> risEntries = risImporter.importDatabase(risFile, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> risEntries = risImporter.importDatabase(risFile, StandardCharsets.UTF_8).getDatabase()
+                .getEntries();
         BibEntryAssert.assertEquals(RISImporterTest.class, fileName + ".bib", risEntries);
     }
 }

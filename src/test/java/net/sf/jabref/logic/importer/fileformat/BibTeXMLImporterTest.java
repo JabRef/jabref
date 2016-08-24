@@ -1,14 +1,15 @@
 package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.DirectoryStream;
+import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.sf.jabref.logic.util.FileExtensions;
 
@@ -23,7 +24,6 @@ import static org.junit.Assert.assertFalse;
 @RunWith(MockitoJUnitRunner.class)
 public class BibTeXMLImporterTest {
 
-    private static final String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/logic/importer/fileformat";
     private BibTeXMLImporter importer;
 
 
@@ -34,11 +34,12 @@ public class BibTeXMLImporterTest {
      * @throws IOException
      */
     public List<Path> getTestFiles() throws IOException {
-        List<Path> files = new ArrayList<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(FILEFORMAT_PATH))) {
-            stream.forEach(files::add);
+        try (Stream<Path> stream = Files.list(Paths.get(BibTeXMLImporterTest.class.getResource("").toURI()))) {
+            return stream.filter(p -> !Files.isDirectory(p)).collect(Collectors.toList());
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
         }
-        return files;
+        return Collections.emptyList();
 
     }
 
@@ -74,7 +75,7 @@ public class BibTeXMLImporterTest {
                 .collect(Collectors.toList());
 
         for (Path file : list) {
-            assertFalse(file.toString(), importer.isRecognizedFormat(file, Charset.defaultCharset()));
+            assertFalse(file.toString(), importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 }
