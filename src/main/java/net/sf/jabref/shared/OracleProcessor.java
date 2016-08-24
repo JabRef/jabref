@@ -18,6 +18,7 @@ public class OracleProcessor extends DBMSProcessor {
 
     /**
      * Creates and sets up the needed tables and columns according to the database type.
+     *
      * @throws SQLException
      */
     @Override
@@ -42,9 +43,10 @@ public class OracleProcessor extends DBMSProcessor {
                 "CONSTRAINT \"ENTRY_SHARED_ID_FK\" FOREIGN KEY (\"ENTRY_SHARED_ID\") " +
                 "REFERENCES \"ENTRY\"(\"SHARED_ID\") ON DELETE CASCADE)");
 
-        connection.createStatement().executeUpdate("CREATE TABLE \"METADATA\" (" +
-                    "\"KEY\"  VARCHAR2(255) NULL," +
-                    "\"VALUE\"  CLOB NOT NULL)");
+        connection.createStatement().executeUpdate(
+                "CREATE TABLE \"METADATA\" (" +
+                "\"KEY\"  VARCHAR2(255) NULL," +
+                "\"VALUE\"  CLOB NOT NULL)");
     }
 
     @Override
