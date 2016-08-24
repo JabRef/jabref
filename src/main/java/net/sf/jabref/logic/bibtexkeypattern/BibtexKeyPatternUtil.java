@@ -888,14 +888,14 @@ public class BibtexKeyPatternUtil {
         if (authorList.isEmpty()) {
             return "";
         }
-        String vonAuthor = authorList.getAuthor(0).getVon().replaceAll(" ", "");
+        String vonAuthor = authorList.getAuthor(0).getVon();
         StringBuilder stringBuilder = new StringBuilder();
         if (vonAuthor != null) {
-            stringBuilder.append(vonAuthor);
+            stringBuilder.append(vonAuthor.replaceAll(" ", ""));
         }
-        vonAuthor = authorList.getAuthor(0).getLast();
-        if (vonAuthor != null) {
-            stringBuilder.append(vonAuthor);
+        String lastAuthor = authorList.getAuthor(0).getLast();
+        if (lastAuthor != null) {
+            stringBuilder.append(lastAuthor);
         }
         return stringBuilder.toString();
     }

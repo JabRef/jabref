@@ -65,7 +65,7 @@ public class ParserResultWarningDialog {
         if (dataBaseNumber < 0) {
             dialogTitle = Localization.lang("Warnings");
         } else {
-            dialogTitle = Localization.lang("Warnings") + " (" + parserResult.getFile().getName() + ")";
+            dialogTitle = Localization.lang("Warnings") + " (" + parserResult.getFile().get().getName() + ")";
         }
 
         // Create JTextArea with JScrollPane
