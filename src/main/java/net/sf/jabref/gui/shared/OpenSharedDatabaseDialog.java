@@ -90,13 +90,16 @@ public class OpenSharedDatabaseDialog extends JDialog {
     }
 
     public void openSharedDatabase() {
+        setLoadingConnectButton(true);
+
         try {
             bibDatabaseContext.getDBSynchronizer().openSharedDatabase(connectionProperties);
             frame.addTab(bibDatabaseContext, true);
             setGlobalPrefs();
             bibDatabaseContext.getDBSynchronizer().registerListener(new SharedDatabaseUIManager(frame));
-            frame.output(Localization.lang("Connection_to_%0_server_stablished.", connectionProperties.getType().toString()));
+            frame.output(Localization.lang("Connection_to_%0_server_established.", connectionProperties.getType().toString()));
             dispose();
+            return;
         } catch (ClassNotFoundException exception) {
             JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this, exception.getMessage(),
                     Localization.lang("Driver error"), JOptionPane.ERROR_MESSAGE);
@@ -106,6 +109,8 @@ public class OpenSharedDatabaseDialog extends JDialog {
         } catch (DatabaseNotSupportedException exception) {
             new MigrationHelpDialog(this).setVisible(true);
         }
+
+        setLoadingConnectButton(false);
     }
 
     /**
@@ -132,7 +137,6 @@ public class OpenSharedDatabaseDialog extends JDialog {
                     connectionProperties.setPassword(new String(passwordField.getPassword())); //JPasswordField.getPassword() does not return a String, but a char array.
 
                     openSharedDatabase();
-
                 } catch (JabRefException exception) {
                     JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this, exception.getMessage(),
                             Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
@@ -275,6 +279,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
 
         // control buttons
         gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridwidth = 2;
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.add(connectButton);
         buttonPanel.add(cancelButton);
@@ -284,6 +289,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
         getContentPane().setLayout(gridBagLayout);
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagLayout.setConstraints(connectionPanel, gridBagConstraints);
         getContentPane().add(connectionPanel);
@@ -326,6 +332,18 @@ public class OpenSharedDatabaseDialog extends JDialog {
         if (isEmptyField(userField)) {
             userField.requestFocus();
             throw new JabRefException(Localization.lang("Required_field_\"%0\"_is_empty.", Localization.lang("User")));
+        }
+    }
+
+    /**
+     * Sets the connectButton according to the current connection state.
+     */
+    private void setLoadingConnectButton(boolean isLoading) {
+        connectButton.setEnabled(!isLoading);
+        if (isLoading) {
+            connectButton.setText(Localization.lang("Connecting..."));
+        } else {
+            connectButton.setText(Localization.lang("Connect"));
         }
     }
 
