@@ -215,6 +215,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction jabrefBlogAction = new OpenBrowserAction("https://blog.jabref.org/",
             Localization.menuTitle("Blog"), Localization.lang("Opens JabRef's blog"),
             IconTheme.JabRefIcon.BLOG.getSmallIcon(), IconTheme.JabRefIcon.BLOG.getIcon());
+    private final AbstractAction developmentVersionAction = new OpenBrowserAction("https://builds.jabref.org/master/",
+            Localization.menuTitle("Development version"),
+            Localization.lang("Opens a link where the current development version can be downloaded"));
+    private final AbstractAction changeLogAction = new OpenBrowserAction(
+            "https://github.com/JabRef/jabref/blob/master/CHANGELOG.md", Localization.menuTitle("View change log"),
+            Localization.lang("See what has been changed in the JabRef versions"));
     private final AbstractAction forkMeOnGitHubAction = new OpenBrowserAction("https://github.com/JabRef/jabref",
             Localization.menuTitle("Fork me on GitHub"), Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcon.GITHUB.getSmallIcon(), IconTheme.JabRefIcon.GITHUB.getIcon());
     private final AbstractAction donationAction = new OpenBrowserAction("https://github.com/JabRef/jabref/wiki/Donations",
@@ -1365,7 +1371,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         webMenu.add(jabrefWebPageAction);
         webMenu.add(jabrefBlogAction);
         webMenu.add(jabrefFacebookAction);
+        webMenu.addSeparator();
         webMenu.add(forkMeOnGitHubAction);
+        webMenu.add(developmentVersionAction);
+        webMenu.add(changeLogAction);
+        webMenu.addSeparator();
         webMenu.add(donationAction);
         helpMenu.add(webMenu);
         helpMenu.add(about);
