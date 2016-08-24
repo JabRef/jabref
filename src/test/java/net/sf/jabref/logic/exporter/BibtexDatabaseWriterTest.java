@@ -159,7 +159,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeMetadata() throws Exception {
-        DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(Globals.prefs);
+        DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(Globals.prefs.getKeyPattern());
         bibtexKeyPattern.setDefaultValue("test");
         metaData.setBibtexKeyPattern(bibtexKeyPattern);
 
@@ -172,7 +172,7 @@ public class BibtexDatabaseWriterTest {
     @Test
     public void writeMetadataAndEncoding() throws Exception {
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
-        DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(Globals.prefs);
+        DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(Globals.prefs.getKeyPattern());
         bibtexKeyPattern.setDefaultValue("test");
         metaData.setBibtexKeyPattern(bibtexKeyPattern);
 
@@ -429,7 +429,7 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeCustomKeyPattern() throws Exception {
-        AbstractBibtexKeyPattern pattern = new DatabaseBibtexKeyPattern(Globals.prefs);
+        AbstractBibtexKeyPattern pattern = new DatabaseBibtexKeyPattern(Globals.prefs.getKeyPattern());
         pattern.setDefaultValue("test");
         pattern.addBibtexKeyPattern("article", "articleTest");
         metaData.setBibtexKeyPattern(pattern);

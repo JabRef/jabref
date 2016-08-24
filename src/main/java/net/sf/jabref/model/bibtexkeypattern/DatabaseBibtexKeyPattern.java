@@ -2,20 +2,18 @@ package net.sf.jabref.model.bibtexkeypattern;
 
 import java.util.List;
 
-import net.sf.jabref.preferences.JabRefPreferences;
-
 public class DatabaseBibtexKeyPattern extends AbstractBibtexKeyPattern {
 
-    private final JabRefPreferences prefs;
+    private final GlobalBibtexKeyPattern globalBibtexKeyPattern;
 
 
-    public DatabaseBibtexKeyPattern(JabRefPreferences prefs) {
-        this.prefs = prefs;
+    public DatabaseBibtexKeyPattern(GlobalBibtexKeyPattern globalBibtexKeyPattern) {
+        this.globalBibtexKeyPattern = globalBibtexKeyPattern;
     }
 
     @Override
     public List<String> getLastLevelBibtexKeyPattern(String key) {
-        return prefs.getKeyPattern().getValue(key);
+        return globalBibtexKeyPattern.getValue(key);
     }
 
 }
