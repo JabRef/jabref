@@ -207,7 +207,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction openSharedDatabaseAction = new OpenSharedDatabaseAction(this);
     private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction(this);
     private final AbstractAction jabrefWebPageAction = new OpenBrowserAction("https://jabref.org",
-            Localization.menuTitle("Web page"), Localization.lang("Opens JabRef's web page"),
+            Localization.menuTitle("Website"), Localization.lang("Opens JabRef's website"),
             IconTheme.getImage("about"), IconTheme.getImage("about"));
     private final AbstractAction jabrefFacebookAction = new OpenBrowserAction("https://www.facebook.com/JabRef/",
             "Facebook", Localization.lang("Opens JabRef's Facebook page"),
