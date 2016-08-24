@@ -15,6 +15,7 @@ import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.exception.OfflineLockException;
 import net.sf.jabref.shared.exception.SharedEntryNotPresentException;
 
@@ -40,7 +41,7 @@ public class DBMSSynchronizerTest {
 
 
     @Before
-    public void setUp() throws ClassNotFoundException, SQLException {
+    public void setUp() throws ClassNotFoundException, SQLException, DatabaseNotSupportedException {
 
         Globals.prefs = JabRefPreferences.getInstance();
 
@@ -130,7 +131,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void testInitializeDatabases() throws SQLException {
+    public void testInitializeDatabases() throws SQLException, DatabaseNotSupportedException {
         clear();
         dbmsSynchronizer.initializeDatabases();
         Assert.assertTrue(dbmsProcessor.checkBaseIntegrity());

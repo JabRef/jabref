@@ -231,7 +231,7 @@ public class BibtexKeyPatternPanel extends JPanel {
     }
 
     public DatabaseBibtexKeyPattern getKeyPatternAsDatabaseBibtexKeyPattern() {
-        DatabaseBibtexKeyPattern res = new DatabaseBibtexKeyPattern(Globals.prefs);
+        DatabaseBibtexKeyPattern res = new DatabaseBibtexKeyPattern(Globals.prefs.getKeyPattern());
         fillPatternUsingPanelData(res);
         return res;
     }
