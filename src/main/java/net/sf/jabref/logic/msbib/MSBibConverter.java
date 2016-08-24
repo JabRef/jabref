@@ -66,12 +66,13 @@ public class MSBibConverter {
         //Currently only english is supported
         entry.getFieldOptional(FieldName.LANGUAGE)
                 .ifPresent(lang -> result.fields.put("LCID", String.valueOf(MSBibMapping.getLCID(lang))));
-        result.standardNumber = "";
-        entry.getFieldOptional(FieldName.ISBN).ifPresent(isbn -> result.standardNumber += " ISBN: " + isbn);
-        entry.getFieldOptional(FieldName.ISSN).ifPresent(issn -> result.standardNumber += " ISSN: " + issn);
-        entry.getFieldOptional("lccn").ifPresent(lccn -> result.standardNumber += " LCCN: " + lccn);
-        entry.getFieldOptional("mrnumber").ifPresent(mrnumber -> result.standardNumber += " MRN: " + mrnumber);
+        StringBuilder sbNumber = new StringBuilder();
+        entry.getFieldOptional(FieldName.ISBN).ifPresent(isbn -> sbNumber.append(" ISBN: " + isbn));
+        entry.getFieldOptional(FieldName.ISSN).ifPresent(issn -> sbNumber.append(" ISSN: " + issn));
+        entry.getFieldOptional("lccn").ifPresent(lccn -> sbNumber.append("LCCN: " + lccn));
+        entry.getFieldOptional("mrnumber").ifPresent(mrnumber -> sbNumber.append(" MRN: " + mrnumber));
 
+        result.standardNumber = sbNumber.toString();
         if (result.standardNumber.isEmpty()) {
             result.standardNumber = null;
         }
@@ -94,9 +95,8 @@ public class MSBibConverter {
         }
 
         // TODO: currently this can never happen
-        if (("InternetSite".equals(msbibType) || "DocumentFromInternetSite".equals(msbibType))
-                && (entry.hasField(FieldName.TITLE))) {
-            result.internetSiteTitle = entry.getField(FieldName.TITLE);
+        if (("InternetSite".equals(msbibType) || "DocumentFromInternetSite".equals(msbibType))) {
+            result.internetSiteTitle = entry.getFieldOptional(FieldName.TITLE).orElse(null);
         }
 
         // TODO: currently only Misc can happen

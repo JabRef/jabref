@@ -154,17 +154,19 @@ class MSBibEntry {
         String dayAccessed = getXmlElementTextContent("DayAccessed", entry);
         String yearAccessed = getXmlElementTextContent("YearAccessed", entry);
 
-        dateAccessed = "";
+        StringBuilder sbDateAccesed = new StringBuilder();
         if (monthAccessed != null) {
-            dateAccessed += monthAccessed + ' ';
+            sbDateAccesed.append(monthAccessed);
+            sbDateAccesed.append(' ');
         }
         if (dayAccessed != null) {
-            dateAccessed += dayAccessed + ", ";
+            sbDateAccesed.append(dayAccessed);
+            sbDateAccesed.append(", ");
         }
         if (yearAccessed != null) {
-            dateAccessed += yearAccessed;
+            sbDateAccesed.append(yearAccessed);
         }
-        dateAccessed = dateAccessed.trim();
+        dateAccessed = sbDateAccesed.toString().trim();
         if (dateAccessed.isEmpty() || ",".equals(dateAccessed)) {
             dateAccessed = null;
         }
@@ -313,7 +315,6 @@ class MSBibEntry {
             nameList.appendChild(person);
         }
         authorTop.appendChild(nameList);
-
         allAuthors.appendChild(authorTop);
     }
 

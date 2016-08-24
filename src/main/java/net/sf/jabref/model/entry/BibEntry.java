@@ -215,7 +215,7 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Returns the contents of the given field as an Optional. The optional may contain null
+     * Returns the contents of the given field as an Optional.
      */
     public Optional<String> getFieldOptional(String name) {
         return Optional.ofNullable(fields.get(toLowerCase(name)));
@@ -235,8 +235,7 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Returns the contents of the given field, its alias or null if both are
-     * not set.
+     * Returns the contents of the given field or its alias as an Optional
      * <p>
      * The following aliases are considered (old bibtex <-> new biblatex) based
      * on the BibLatex documentation, chapter 2.2.5:<br>

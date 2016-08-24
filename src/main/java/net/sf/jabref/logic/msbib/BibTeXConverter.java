@@ -15,13 +15,15 @@ import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.model.entry.MonthUtil.Month;
 
 public class BibTeXConverter {
+
     private static final String MSBIB_PREFIX = "msbib-";
+
 
     public static BibEntry convert(MSBibEntry entry) {
         BibEntry result;
         Map<String, String> fieldValues = new HashMap<>();
 
-        String bibTexEntryType = MSBibMapping.getBibTeXEntryType(entry.getType());
+        String bibTexEntryType = MSBibMapping.getBibLaTeXEntryType(entry.getType());
         if (entry.getCiteKey() == null) {
             result = new BibEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID, bibTexEntryType);
 
@@ -81,8 +83,7 @@ public class BibTeXConverter {
             fieldValues.put(MSBIB_PREFIX + "accessed", entry.dateAccessed);
         }
 
-        if(entry.journalName != null)
-        {
+        if (entry.journalName != null) {
             fieldValues.put(FieldName.JOURNALTITLE, entry.journalName);
         }
         if (entry.month != null) {
@@ -93,13 +94,11 @@ public class BibTeXConverter {
             fieldValues.put(FieldName.NUMBER, entry.number);
         }
 
-
         // set all fields
         result.setField(fieldValues);
 
         return result;
     }
-
 
     private static void addAuthor(Map<String, String> map, String type, List<PersonName> authors) {
         if (authors == null) {
@@ -110,7 +109,8 @@ public class BibTeXConverter {
         map.put(type, allAuthors);
     }
 
-    private static void parseSingleStandardNumber(String type, String bibtype, String standardNum, Map<String, String> map) {
+    private static void parseSingleStandardNumber(String type, String bibtype, String standardNum,
+            Map<String, String> map) {
         Pattern pattern = Pattern.compile(':' + type + ":(.[^:]+)");
         Matcher matcher = pattern.matcher(standardNum);
         if (matcher.matches()) {

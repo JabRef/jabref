@@ -11,7 +11,7 @@ import net.sf.jabref.model.entry.FieldName;
 import com.google.common.collect.HashBiMap;
 
 /**
- * Mapping between Msbib and Bibtex
+ * Mapping between Msbib and BibLaTeX
  * All Fields: <a href = "https://msdn.microsoft.com/de-de/library/office/documentformat.openxml.bibliography">List of all MSBib fields</a>
  *
  */
@@ -20,62 +20,62 @@ public class MSBibMapping {
     private static final String BIBTEX_PREFIX = "BIBTEX_";
     private static final String MSBIB_PREFIX = "msbib-";
 
-    private static final HashBiMap<String, String> bibtexToMSBib = HashBiMap.create();
+    private static final HashBiMap<String, String> biblatexToMsBib = HashBiMap.create();
 
     static {
-        bibtexToMSBib.put(BibEntry.KEY_FIELD, "Tag");
-        bibtexToMSBib.put(FieldName.TITLE, "Title");
-        bibtexToMSBib.put(FieldName.YEAR, "Year");
-        bibtexToMSBib.put(FieldName.NOTE, "Comments");
-        bibtexToMSBib.put(FieldName.VOLUME, "Volume");
-        bibtexToMSBib.put(FieldName.LANGUAGE, "LCID");
-        bibtexToMSBib.put(FieldName.EDITION, "Edition");
-        bibtexToMSBib.put(FieldName.PUBLISHER, "Publisher");
-        bibtexToMSBib.put(FieldName.BOOKTITLE, "BookTitle");
-        //bibtexToMSBib.put(FieldName.BOOKTITLE, "ConferenceName");
-        //bibtexToMSBib.put(FieldName.PAGES, "Pages");
-        bibtexToMSBib.put(FieldName.CHAPTER, "ChapterNumber");
+        biblatexToMsBib.put(BibEntry.KEY_FIELD, "Tag");
+        biblatexToMsBib.put(FieldName.TITLE, "Title");
+        biblatexToMsBib.put(FieldName.YEAR, "Year");
+        biblatexToMsBib.put(FieldName.NOTE, "Comments");
+        biblatexToMsBib.put(FieldName.VOLUME, "Volume");
+        biblatexToMsBib.put(FieldName.LANGUAGE, "LCID");
+        biblatexToMsBib.put(FieldName.EDITION, "Edition");
+        biblatexToMsBib.put(FieldName.PUBLISHER, "Publisher");
+        biblatexToMsBib.put(FieldName.BOOKTITLE, "BookTitle");
+        //biblatexToMsBib.put(FieldName.BOOKTITLE, "ConferenceName");
+        //biblatexToMsBib.put(FieldName.PAGES, "Pages");
+        biblatexToMsBib.put(FieldName.CHAPTER, "ChapterNumber");
 
-        bibtexToMSBib.put(FieldName.ISSUE, "Issue");
-        bibtexToMSBib.put(FieldName.SCHOOL, "Department");
-        bibtexToMSBib.put(FieldName.INSTITUTION, "Institution");
-        bibtexToMSBib.put(FieldName.DOI, "DOI");
-        bibtexToMSBib.put(FieldName.URL, "URL");
+        biblatexToMsBib.put(FieldName.ISSUE, "Issue");
+        biblatexToMsBib.put(FieldName.SCHOOL, "Department");
+        biblatexToMsBib.put(FieldName.INSTITUTION, "Institution");
+        biblatexToMsBib.put(FieldName.DOI, "DOI");
+        biblatexToMsBib.put(FieldName.URL, "URL");
         // BibTeX/Biblatex only fields
-        bibtexToMSBib.put(FieldName.SERIES, BIBTEX_PREFIX + "Series");
-        bibtexToMSBib.put(FieldName.ABSTRACT, BIBTEX_PREFIX + "Abstract");
-        bibtexToMSBib.put(FieldName.KEYWORDS, BIBTEX_PREFIX + "KeyWords");
-        bibtexToMSBib.put(FieldName.CROSSREF, BIBTEX_PREFIX + "CrossRef");
-        bibtexToMSBib.put(FieldName.HOWPUBLISHED, BIBTEX_PREFIX + "HowPublished");
-        bibtexToMSBib.put("affiliation", BIBTEX_PREFIX + "Affiliation");
-        bibtexToMSBib.put("contents", BIBTEX_PREFIX + "Contents");
-        bibtexToMSBib.put("copyright", BIBTEX_PREFIX + "Copyright");
-        bibtexToMSBib.put("price", BIBTEX_PREFIX + "Price");
-        bibtexToMSBib.put("size", BIBTEX_PREFIX + "Size");
-        bibtexToMSBib.put("intype", BIBTEX_PREFIX + "InType");
-        bibtexToMSBib.put("paper", BIBTEX_PREFIX + "Paper");
-        bibtexToMSBib.put("shorttitle", "ShortTitle");
+        biblatexToMsBib.put(FieldName.SERIES, BIBTEX_PREFIX + "Series");
+        biblatexToMsBib.put(FieldName.ABSTRACT, BIBTEX_PREFIX + "Abstract");
+        biblatexToMsBib.put(FieldName.KEYWORDS, BIBTEX_PREFIX + "KeyWords");
+        biblatexToMsBib.put(FieldName.CROSSREF, BIBTEX_PREFIX + "CrossRef");
+        biblatexToMsBib.put(FieldName.HOWPUBLISHED, BIBTEX_PREFIX + "HowPublished");
+        biblatexToMsBib.put("affiliation", BIBTEX_PREFIX + "Affiliation");
+        biblatexToMsBib.put("contents", BIBTEX_PREFIX + "Contents");
+        biblatexToMsBib.put("copyright", BIBTEX_PREFIX + "Copyright");
+        biblatexToMsBib.put("price", BIBTEX_PREFIX + "Price");
+        biblatexToMsBib.put("size", BIBTEX_PREFIX + "Size");
+        biblatexToMsBib.put("intype", BIBTEX_PREFIX + "InType");
+        biblatexToMsBib.put("paper", BIBTEX_PREFIX + "Paper");
+        biblatexToMsBib.put("shorttitle", "ShortTitle");
         // MSBib only fields
-        bibtexToMSBib.put(MSBIB_PREFIX + "numberofvolume", "NumberVolumes");
-        bibtexToMSBib.put(MSBIB_PREFIX + "periodical", "PeriodicalTitle");
-        bibtexToMSBib.put(MSBIB_PREFIX + "day", "Day");
-        bibtexToMSBib.put(MSBIB_PREFIX + "accessed", "Accessed");
-        bibtexToMSBib.put(MSBIB_PREFIX + "medium", "Medium");
-        bibtexToMSBib.put(MSBIB_PREFIX + "recordingnumber", "RecordingNumber");
-        bibtexToMSBib.put(MSBIB_PREFIX + "theater", "Theater");
-        bibtexToMSBib.put(MSBIB_PREFIX + "distributor", "Distributor");
-        bibtexToMSBib.put(MSBIB_PREFIX + "broadcaster", "Broadcaster");
-        bibtexToMSBib.put(MSBIB_PREFIX + "station", "Station");
-        bibtexToMSBib.put(MSBIB_PREFIX + FieldName.TYPE, "Type");
-        bibtexToMSBib.put(MSBIB_PREFIX + "court", "Court");
-        bibtexToMSBib.put(MSBIB_PREFIX + "reporter", "Reporter");
-        bibtexToMSBib.put(MSBIB_PREFIX + "casenumber", "CaseNumber");
-        bibtexToMSBib.put(MSBIB_PREFIX + "abbreviatedcasenumber", "AbbreviatedCaseNumber");
-        bibtexToMSBib.put(MSBIB_PREFIX + "productioncompany", "ProductionCompany");
+        biblatexToMsBib.put(MSBIB_PREFIX + "numberofvolume", "NumberVolumes");
+        biblatexToMsBib.put(MSBIB_PREFIX + "periodical", "PeriodicalTitle");
+        biblatexToMsBib.put(MSBIB_PREFIX + "day", "Day");
+        biblatexToMsBib.put(MSBIB_PREFIX + "accessed", "Accessed");
+        biblatexToMsBib.put(MSBIB_PREFIX + "medium", "Medium");
+        biblatexToMsBib.put(MSBIB_PREFIX + "recordingnumber", "RecordingNumber");
+        biblatexToMsBib.put(MSBIB_PREFIX + "theater", "Theater");
+        biblatexToMsBib.put(MSBIB_PREFIX + "distributor", "Distributor");
+        biblatexToMsBib.put(MSBIB_PREFIX + "broadcaster", "Broadcaster");
+        biblatexToMsBib.put(MSBIB_PREFIX + "station", "Station");
+        biblatexToMsBib.put(MSBIB_PREFIX + FieldName.TYPE, "Type");
+        biblatexToMsBib.put(MSBIB_PREFIX + "court", "Court");
+        biblatexToMsBib.put(MSBIB_PREFIX + "reporter", "Reporter");
+        biblatexToMsBib.put(MSBIB_PREFIX + "casenumber", "CaseNumber");
+        biblatexToMsBib.put(MSBIB_PREFIX + "abbreviatedcasenumber", "AbbreviatedCaseNumber");
+        biblatexToMsBib.put(MSBIB_PREFIX + "productioncompany", "ProductionCompany");
     }
 
 
-    public static String getBibTeXEntryType(String msbibType) {
+    public static String getBibLaTeXEntryType(String msbibType) {
         final String defaultType = BibtexEntryTypes.MISC.getName();
 
         Map<String, String> entryTypeMapping = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
@@ -117,36 +117,34 @@ public class MSBibMapping {
         return entryTypeMapping.getOrDefault(bibtexType, MSBibEntryType.Misc);
     }
 
-    // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
     /**
-     *  Only English is supported
-     * @param language
+     * Only English is supported <br>
+     * <a href="http://www.microsoft.com/globaldev/reference/lcid-all.mspx">All LCID codes</a>
+     * @param language The language to transform
      * @return Returns 0 for English
      */
-    @Deprecated
     public static int getLCID(String language) {
         // TODO: add language to LCID mapping
         // 0 is English
         return 0;
     }
 
-    // http://www.microsoft.com/globaldev/reference/lcid-all.mspx
     /**
-     * Only English is supported
+     * Only English is supported <br>
+     * <a href="http://www.microsoft.com/globaldev/reference/lcid-all.mspx">All LCID codes</a>
      * @param language
      * @return Returns english
      */
-    @Deprecated
     public static String getLanguage(int LCID) {
         // TODO: add language to LCID mapping
         return "english";
     }
 
     public static String getMSBibField(String bibtexFieldName) {
-        return bibtexToMSBib.get(bibtexFieldName);
+        return biblatexToMsBib.get(bibtexFieldName);
     }
 
     public static String getBibTeXField(String msbibFieldName) {
-        return bibtexToMSBib.inverse().get(msbibFieldName);
+        return biblatexToMsBib.inverse().get(msbibFieldName);
     }
 }
