@@ -10,7 +10,7 @@ public class IEEETranEntryTypesTest {
     @Test
     public void ctlTypeContainsYesNoFields() {
         List<String> ctlFields = IEEETranEntryTypes.IEEETRANBSTCTL.getAllFields();
-        List<String> ynFields = InternalBibtexFields.IEEETRANBSTCTL_YES_NO_FIELDS;
+        List<String> ynFields = InternalBibtexFields.getIEEETranBSTctlYesNoFields();
 
         Assert.assertTrue(ctlFields.containsAll(ynFields));
     }

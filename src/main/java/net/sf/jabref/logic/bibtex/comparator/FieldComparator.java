@@ -13,7 +13,7 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
 
@@ -62,7 +62,7 @@ public class FieldComparator implements Comparator<BibEntry> {
     private FieldType determineFieldType() {
         if(BibEntry.TYPE_HEADER.equals(this.field[0])) {
             return FieldType.TYPE;
-        } else if (InternalBibtexFields.getFieldExtras(this.field[0]).contains(FieldProperties.PERSON_NAMES)) {
+        } else if (InternalBibtexFields.getFieldProperties(this.field[0]).contains(FieldProperty.PERSON_NAMES)) {
             return FieldType.NAME;
         } else if (FieldName.YEAR.equals(this.field[0])) {
             return FieldType.YEAR;

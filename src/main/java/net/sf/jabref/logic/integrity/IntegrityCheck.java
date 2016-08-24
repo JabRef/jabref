@@ -18,7 +18,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.ParsedFileField;
@@ -200,7 +200,7 @@ public class IntegrityCheck {
         public List<IntegrityMessage> check(BibEntry entry) {
             List<IntegrityMessage> result = new ArrayList<>();
             for (String field : entry.getFieldNames()) {
-                if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
+                if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES)) {
                     Optional<String> value = entry.getFieldOptional(field);
                     if (!value.isPresent()) {
                         return Collections.emptyList();
@@ -413,7 +413,7 @@ public class IntegrityCheck {
 
 
             for (Map.Entry<String, String> field : fields.entrySet()) {
-                if (!InternalBibtexFields.getFieldExtras(field.getKey()).contains(FieldProperties.VERBATIM)) {
+                if (!InternalBibtexFields.getFieldProperties(field.getKey()).contains(FieldProperty.VERBATIM)) {
                     Matcher hashMatcher = UNESCAPED_HASH.matcher(field.getValue());
                     int hashCount = 0;
                     while (hashMatcher.find()) {

@@ -3,7 +3,7 @@ package net.sf.jabref.model.entry;
 import java.util.EnumSet;
 import java.util.Set;
 
-public enum FieldProperties {
+public enum FieldProperty {
     YES_NO,
     DATE,
     JOURNAL_NAME,
@@ -30,6 +30,6 @@ public enum FieldProperties {
     PUBLICATION_STATE,
     VERBATIM;
 
-    public static final Set<FieldProperties> ALL_OPTS = EnumSet.allOf(FieldProperties.class);
+    public static final Set<FieldProperty> ALL_OPTS = EnumSet.allOf(FieldProperty.class);
 
 }

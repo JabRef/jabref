@@ -98,7 +98,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryConverter;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.event.FieldChangedEvent;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -487,44 +487,44 @@ public class EntryEditor extends JPanel implements EntryContainer {
     public Optional<JComponent> getExtra(final FieldEditor editor) {
         final String fieldName = editor.getFieldName();
 
-        final Set<FieldProperties> fieldExtras = InternalBibtexFields.getFieldExtras(fieldName);
+        final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
 
         // timestamp or a other field with datepicker command
         if (Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD).equals(fieldName)
-                || fieldExtras.contains(FieldProperties.DATE)) {
+                || fieldExtras.contains(FieldProperty.DATE)) {
             // double click AND datefield => insert the current date (today)
             return FieldExtraComponents.getDateTimeExtraComponent(editor,
-                    fieldExtras.contains(FieldProperties.DATE), fieldExtras.contains(FieldProperties.ISO_DATE));
-        } else if (fieldExtras.contains(FieldProperties.EXTERNAL)) {
+                    fieldExtras.contains(FieldProperty.DATE), fieldExtras.contains(FieldProperty.ISO_DATE));
+        } else if (fieldExtras.contains(FieldProperty.EXTERNAL)) {
             return FieldExtraComponents.getExternalExtraComponent(panel, editor);
-        } else if (fieldExtras.contains(FieldProperties.JOURNAL_NAME)) {
+        } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {
             // Add controls for switching between abbreviated and full journal names.
             // If this field also has a FieldContentSelector, we need to combine these.
             return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors,
                     getStoreFieldAction());
         } else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectors(fieldName).isEmpty()) {
             return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors, getStoreFieldAction());
-        } else if (fieldExtras.contains(FieldProperties.DOI)) {
+        } else if (fieldExtras.contains(FieldProperty.DOI)) {
             return FieldExtraComponents.getDoiExtraComponent(panel, this, editor);
-        } else if (fieldExtras.contains(FieldProperties.EPRINT)) {
+        } else if (fieldExtras.contains(FieldProperty.EPRINT)) {
             return FieldExtraComponents.getEprintExtraComponent(panel, this, editor);
-        } else if (fieldExtras.contains(FieldProperties.ISBN)) {
+        } else if (fieldExtras.contains(FieldProperty.ISBN)) {
             return FieldExtraComponents.getIsbnExtraComponent(panel, this, editor);
-        } else if (fieldExtras.contains(FieldProperties.OWNER)) {
+        } else if (fieldExtras.contains(FieldProperty.OWNER)) {
             return FieldExtraComponents.getSetOwnerExtraComponent(editor, getStoreFieldAction());
-        } else if (fieldExtras.contains(FieldProperties.YES_NO)) {
+        } else if (fieldExtras.contains(FieldProperty.YES_NO)) {
             return FieldExtraComponents.getYesNoExtraComponent(editor, this);
-        } else if (fieldExtras.contains(FieldProperties.MONTH)) {
+        } else if (fieldExtras.contains(FieldProperty.MONTH)) {
             return FieldExtraComponents.getMonthExtraComponent(editor, this, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
-        } else if (fieldExtras.contains(FieldProperties.GENDER)) {
+        } else if (fieldExtras.contains(FieldProperty.GENDER)) {
             return FieldExtraComponents.getGenderExtraComponent(editor, this);
-        } else if (fieldExtras.contains(FieldProperties.EDITOR_TYPE)) {
+        } else if (fieldExtras.contains(FieldProperty.EDITOR_TYPE)) {
             return FieldExtraComponents.getEditorTypeExtraComponent(editor, this);
-        } else if (fieldExtras.contains(FieldProperties.PAGINATION)) {
+        } else if (fieldExtras.contains(FieldProperty.PAGINATION)) {
             return FieldExtraComponents.getPaginationExtraComponent(editor, this);
-        } else if (fieldExtras.contains(FieldProperties.TYPE)) {
+        } else if (fieldExtras.contains(FieldProperty.TYPE)) {
             return FieldExtraComponents.getTypeExtraComponent(editor, this, "patent".equalsIgnoreCase(entry.getType()));
-        } else if (fieldExtras.contains(FieldProperties.CROSSREF)) {
+        } else if (fieldExtras.contains(FieldProperty.CROSSREF)) {
             return FieldExtraComponents.getCrossrefExtraComponent(editor, frame.getCurrentBasePanel());
         }
         return Optional.empty();
