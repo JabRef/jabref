@@ -32,6 +32,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class BibEntry implements Cloneable {
+
     private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
 
     public static final String TYPE_HEADER = "entrytype";
@@ -67,7 +68,6 @@ public class BibEntry implements Cloneable {
      * Is set to false, if parts of the entry change. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
      */
     private boolean changed;
-
 
     private final EventBus eventBus = new EventBus();
 
@@ -207,9 +207,9 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Returns the contents of the given field, or null if it is not set.
+     * Use {@link #getFieldOptional} instead
      */
-    @Deprecated //Use getFieldOptional instead
+    @Deprecated
     public String getField(String name) {
         return fields.get(toLowerCase(name));
     }
@@ -235,20 +235,19 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Returns the contents of the given field, its alias or null if both are
-     * not set.
+     * Returns the contents of the given field or its alias as an Optional
      * <p>
      * The following aliases are considered (old bibtex <-> new biblatex) based
-     * on the BibLatex documentation, chapter 2.2.5:
-     * address      <-> location
-     * annote           <-> annotation
-     * archiveprefix    <-> eprinttype
-     * journal      <-> journaltitle
-     * key              <-> sortkey
-     * pdf          <-> file
-     * primaryclass     <-> eprintclass
-     * school           <-> institution
-     * These work bidirectional.
+     * on the BibLatex documentation, chapter 2.2.5:<br>
+     * address      <-> location <br>
+     * annote           <-> annotation <br>
+     * archiveprefix    <-> eprinttype <br>
+     * journal      <-> journaltitle <br>
+     * key              <-> sortkey <br>
+     * pdf          <-> file <br
+     * primaryclass     <-> eprintclass <br>
+     * school           <-> institution <br>
+     * These work bidirectional. <br>
      * <p>
      * Special attention is paid to dates: (see the BibLatex documentation,
      * chapter 2.3.8)
@@ -295,6 +294,7 @@ public class BibEntry implements Cloneable {
                 static final String FORMAT2 = "yyyy-MM";
                 final SimpleDateFormat sdf1 = new SimpleDateFormat(FORMAT1);
                 final SimpleDateFormat sdf2 = new SimpleDateFormat(FORMAT2);
+
 
                 @Override
                 public StringBuffer format(Date dDate, StringBuffer toAppendTo, FieldPosition fieldPosition) {
@@ -526,8 +526,8 @@ public class BibEntry implements Cloneable {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[] {getFieldOptional(FieldName.AUTHOR).orElse("N/A"), getFieldOptional(FieldName.TITLE).orElse("N/A"),
-                getFieldOptional(FieldName.YEAR).orElse("N/A")};
+        String[] s = new String[] {getFieldOptional(FieldName.AUTHOR).orElse("N/A"),
+                getFieldOptional(FieldName.TITLE).orElse("N/A"), getFieldOptional(FieldName.YEAR).orElse("N/A")};
 
         String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
         if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
@@ -557,7 +557,6 @@ public class BibEntry implements Cloneable {
         }
         return year;
     }
-
 
     public void setParsedSerialization(String parsedSerialization) {
         changed = false;

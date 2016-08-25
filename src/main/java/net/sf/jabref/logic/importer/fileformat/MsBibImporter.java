@@ -33,9 +33,7 @@ public class MsBibImporter extends ImportFormat {
          */
         Document docin;
         try {
-            DocumentBuilder dbuild = DocumentBuilderFactory.
-                    newInstance().
-                    newDocumentBuilder();
+            DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             docin = dbuild.parse(new InputSource(reader));
         } catch (Exception e) {
             return false;

@@ -85,6 +85,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1531](https://github.com/JabRef/jabref/issues/1531): `\relax` can be used for abbreviation of author names
 - Fixed [#1771](https://github.com/JabRef/jabref/issues/1771): Show all supported import types as default
 - Fixed [#1804](https://github.com/JabRef/jabref/issues/1804): Integrity check no longer removes URL field by mistake
+- Fixed [#1750](https://github.com/JabRef/jabref/issues/1750): BibLaTeX `date` field is now correctly exported as `year` in MS-Office 2007 xml format
+- Fixed: LaTeX characters in author names are now converted to Unicode before export in MS-Office 2007 xml format
+- Fixed: `volume`, `journaltitle`, `issue` and `number`(for patents) fields are now exported correctly in MS-Office 2007 xml format
 - Fixed [#1687](https://github.com/JabRef/jabref/issues/1687): "month" field ascending/descending sorting swapped
 
  

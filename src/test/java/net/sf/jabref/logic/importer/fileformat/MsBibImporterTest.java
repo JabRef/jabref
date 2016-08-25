@@ -45,7 +45,7 @@ public class MsBibImporterTest {
     @Test
     public final void testImportEntriesEmpty() throws IOException, URISyntaxException {
         MsBibImporter testImporter = new MsBibImporter();
-        Path file = Paths.get(MsBibImporter.class.getResource("MsBibImporterTest.xml").toURI());
+        Path file = Paths.get(MsBibImporter.class.getResource("EmptyMsBib_Test.xml").toURI());
         List<BibEntry> entries = testImporter.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
         assertEquals(Collections.emptyList(), entries);
     }

@@ -2,17 +2,19 @@ package net.sf.jabref.logic.msbib;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
-import net.sf.jabref.logic.layout.format.RemoveBrackets;
 import net.sf.jabref.logic.mods.PageNumbers;
 import net.sf.jabref.logic.mods.PersonName;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
 public class MSBibConverter {
+
     private static final String MSBIB_PREFIX = "msbib-";
     private static final String BIBTEX_PREFIX = "BIBTEX_";
+
 
     public static MSBibEntry convert(BibEntry entry) {
         MSBibEntry result = new MSBibEntry();
@@ -24,7 +26,7 @@ public class MSBibConverter {
 
         for (String field : entry.getFieldNames()) {
             // clean field
-            String unicodeField = removeLaTeX(entry.getField(field));
+            String unicodeField = removeLaTeX(entry.getFieldOptional(field).orElse(""));
 
             if (MSBibMapping.getMSBibField(field) != null) {
                 result.fields.put(MSBibMapping.getMSBibField(field), unicodeField);
@@ -32,59 +34,54 @@ public class MSBibConverter {
         }
 
         // Duplicate: also added as BookTitle
-        if (entry.hasField(FieldName.BOOKTITLE)) {
-            result.conferenceName = entry.getField(FieldName.BOOKTITLE);
-        }
+        entry.getFieldOptional(FieldName.BOOKTITLE).ifPresent(booktitle -> result.conferenceName = booktitle);
+        entry.getFieldOptional(FieldName.PAGES).ifPresent(pages -> result.pages = new PageNumbers(pages));
+        entry.getFieldOptional(MSBIB_PREFIX + "accessed").ifPresent(accesed -> result.dateAccessed = accesed);
 
-        if (entry.hasField(FieldName.PAGES)) {
-            result.pages = new PageNumbers(entry.getField(FieldName.PAGES));
-        }
-
-        if (entry.hasField(MSBIB_PREFIX + "accessed")) {
-            result.dateAccessed = entry.getField(MSBIB_PREFIX + "accessed");
+        // TODO: currently this can never happen
+        if ("SoundRecording".equals(msbibType)) {
+            result.albumTitle = entry.getFieldOptional(FieldName.TITLE).orElse(null);
         }
 
         // TODO: currently this can never happen
-        if ("SoundRecording".equals(msbibType) && (entry.hasField(FieldName.TITLE))) {
-            result.albumTitle = entry.getField(FieldName.TITLE);
+        if ("Interview".equals(msbibType)) {
+            result.broadcastTitle = entry.getFieldOptional(FieldName.TITLE).orElse(null);
         }
 
-        // TODO: currently this can never happen
-        if ("Interview".equals(msbibType) && (entry.hasField(FieldName.TITLE))) {
-            result.broadcastTitle = entry.getField(FieldName.TITLE);
+        if ("Patent".equalsIgnoreCase(entry.getType())) {
+            result.patentNumber = entry.getFieldOptional(FieldName.NUMBER).orElse(null);
         }
 
+        result.journalName = entry.getFieldOrAlias(FieldName.JOURNAL).orElse(null);
+        result.month = entry.getFieldOrAlias(FieldName.MONTH).orElse(null);
+
+        if (!entry.getFieldOptional(FieldName.YEAR).isPresent()) {
+            result.year = entry.getFieldOrAlias(FieldName.YEAR).orElse(null);
+        }
+
+        if (!entry.getFieldOptional(FieldName.ISSUE).isPresent()) {
+            result.number = entry.getFieldOptional(FieldName.NUMBER).orElse(null);
+        }
         // Value must be converted
-        if (entry.hasField(FieldName.LANGUAGE)) {
-            result.fields.put("LCID", String.valueOf(MSBibMapping.getLCID(entry.getField(FieldName.LANGUAGE))));
-        }
+        //Currently only english is supported
+        entry.getFieldOptional(FieldName.LANGUAGE)
+                .ifPresent(lang -> result.fields.put("LCID", String.valueOf(MSBibMapping.getLCID(lang))));
+        StringBuilder sbNumber = new StringBuilder();
+        entry.getFieldOptional(FieldName.ISBN).ifPresent(isbn -> sbNumber.append(" ISBN: " + isbn));
+        entry.getFieldOptional(FieldName.ISSN).ifPresent(issn -> sbNumber.append(" ISSN: " + issn));
+        entry.getFieldOptional("lccn").ifPresent(lccn -> sbNumber.append("LCCN: " + lccn));
+        entry.getFieldOptional("mrnumber").ifPresent(mrnumber -> sbNumber.append(" MRN: " + mrnumber));
 
-        result.standardNumber = "";
-        if (entry.hasField(FieldName.ISBN)) {
-            result.standardNumber += " ISBN: " + entry.getField(FieldName.ISBN);
-        }
-        if (entry.hasField(FieldName.ISSN)) {
-            result.standardNumber += " ISSN: " + entry.getField(FieldName.ISSN);
-        }
-        if (entry.hasField("lccn")) {
-            result.standardNumber += " LCCN: " + entry.getField("lccn");
-        }
-        if (entry.hasField("mrnumber")) {
-            result.standardNumber += " MRN: " + entry.getField("mrnumber");
-        }
-        if (entry.hasField(FieldName.DOI)) {
-            result.standardNumber += " DOI: " + entry.getField(FieldName.DOI);
-        }
+        result.standardNumber = sbNumber.toString();
         if (result.standardNumber.isEmpty()) {
             result.standardNumber = null;
         }
 
-        if (entry.hasField(FieldName.ADDRESS)) {
-            result.address = entry.getField(FieldName.ADDRESS);
-        }
+        result.address = entry.getFieldOrAlias(FieldName.ADDRESS).orElse(null);
 
-        if (entry.hasField(FieldName.TYPE)) {
-            result.thesisType = entry.getField(FieldName.TYPE);
+        if (entry.getFieldOptional(FieldName.TYPE).isPresent()) {
+            result.thesisType = entry.getFieldOptional(FieldName.TYPE).get();
+
         } else {
             if ("techreport".equalsIgnoreCase(entry.getType())) {
                 result.thesisType = "Tech. rep.";
@@ -98,23 +95,17 @@ public class MSBibConverter {
         }
 
         // TODO: currently this can never happen
-        if (("InternetSite".equals(msbibType) || "DocumentFromInternetSite".equals(msbibType))
-                && (entry.hasField(FieldName.TITLE))) {
-            result.internetSiteTitle = entry.getField(FieldName.TITLE);
+        if (("InternetSite".equals(msbibType) || "DocumentFromInternetSite".equals(msbibType))) {
+            result.internetSiteTitle = entry.getFieldOptional(FieldName.TITLE).orElse(null);
         }
 
         // TODO: currently only Misc can happen
-        if (("ElectronicSource".equals(msbibType) || "Art".equals(msbibType) || "Misc".equals(msbibType))
-                && (entry.hasField(FieldName.TITLE))) {
-            result.publicationTitle = entry.getField(FieldName.TITLE);
+        if ("ElectronicSource".equals(msbibType) || "Art".equals(msbibType) || "Misc".equals(msbibType)) {
+            result.publicationTitle = entry.getFieldOptional(FieldName.TITLE).orElse(null);
         }
 
-        if (entry.hasField(FieldName.AUTHOR)) {
-            result.authors = getAuthors(entry.getField(FieldName.AUTHOR));
-        }
-        if (entry.hasField(FieldName.EDITOR)) {
-            result.editors = getAuthors(entry.getField(FieldName.EDITOR));
-        }
+        entry.getFieldOptional(FieldName.AUTHOR).ifPresent(authors -> result.authors = getAuthors(authors));
+        entry.getFieldOptional(FieldName.EDITOR).ifPresent(editors -> result.editors = getAuthors(editors));
 
         return result;
     }
@@ -122,9 +113,10 @@ public class MSBibConverter {
     private static List<PersonName> getAuthors(String authors) {
         List<PersonName> result = new ArrayList<>();
 
-        // TODO: case-insensitive?!
-        if (authors.contains(" and ")) {
-            String[] names = authors.split(" and ");
+        authors = removeLaTeX(authors);
+
+        if (authors.toUpperCase(Locale.ENGLISH).contains(" AND ")) {
+            String[] names = authors.split(" (?i)and ");
             for (String name : names) {
                 result.add(new PersonName(name));
             }
@@ -135,10 +127,6 @@ public class MSBibConverter {
     }
 
     private static String removeLaTeX(String text) {
-        // TODO: just use latex free version everywhere in the future
-        String result = new RemoveBrackets().format(text);
-        result = new LatexToUnicodeFormatter().format(result);
-
-        return result;
+        return new LatexToUnicodeFormatter().format(text);
     }
 }
