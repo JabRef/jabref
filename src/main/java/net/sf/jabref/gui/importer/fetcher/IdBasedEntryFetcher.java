@@ -34,7 +34,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class IdBasedEntryFetcher implements EntryFetcher {
 
-    private static final Log LOGGER = LogFactory.getLog(SearchBasedEntryFetcher.class);
+    private static final Log LOGGER = LogFactory.getLog(IdBasedEntryFetcher.class);
     private final IdBasedFetcher fetcher;
 
     public IdBasedEntryFetcher(IdBasedFetcher fetcher) {

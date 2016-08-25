@@ -42,6 +42,11 @@ import org.apache.http.client.utils.URIBuilder;
 public class IsbnFetcher implements IdBasedFetcher {
 
     private static final String URL_PATTERN = "http://www.ebook.de/de/tools/isbn2bibtex?";
+    private ImportFormatPreferences prefs;
+
+    public IsbnFetcher(){
+        prefs = ImportFormatPreferences.fromPreferences(Globals.prefs);
+    }
 
     @Override
     public String getName() {
@@ -67,7 +72,7 @@ public class IsbnFetcher implements IdBasedFetcher {
 
                 //Downloads the source code of the site and then creates a .bib file out of the String
                 String bibtexString = Unirest.get(url.toString()).asString().getBody();
-                Optional<BibEntry> entry = BibtexParser.singleFromString(bibtexString, ImportFormatPreferences.fromPreferences(Globals.prefs));
+                Optional<BibEntry> entry = BibtexParser.singleFromString(bibtexString, prefs);
 
                 if (entry.isPresent()) {
                     result = postProcessEntry(entry.get());
