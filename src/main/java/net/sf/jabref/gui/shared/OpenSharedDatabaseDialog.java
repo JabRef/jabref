@@ -90,7 +90,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
     }
 
     public void openSharedDatabase() {
-        setLoadingConnectButton(true);
+        setLoadingConnectButtonText(true);
 
         try {
             bibDatabaseContext.getDBSynchronizer().openSharedDatabase(connectionProperties);
@@ -99,7 +99,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
             bibDatabaseContext.getDBSynchronizer().registerListener(new SharedDatabaseUIManager(frame));
             frame.output(Localization.lang("Connection_to_%0_server_established.", connectionProperties.getType().toString()));
             dispose();
-            return;
+            return; // setLoadingConnectButtonText(false) should not be reached regularly.
         } catch (ClassNotFoundException exception) {
             JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this, exception.getMessage(),
                     Localization.lang("Driver error"), JOptionPane.ERROR_MESSAGE);
@@ -110,7 +110,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
             new MigrationHelpDialog(this).setVisible(true);
         }
 
-        setLoadingConnectButton(false);
+        setLoadingConnectButtonText(false);
     }
 
     /**
@@ -338,7 +338,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
     /**
      * Sets the connectButton according to the current connection state.
      */
-    private void setLoadingConnectButton(boolean isLoading) {
+    private void setLoadingConnectButtonText(boolean isLoading) {
         connectButton.setEnabled(!isLoading);
         if (isLoading) {
             connectButton.setText(Localization.lang("Connecting..."));
