@@ -43,10 +43,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#1758](https://github.com/JabRef/jabref/issues/1758) Added a button to open Database Properties dialog help
 - Improve focus of the maintable after a sidepane gets closed (Before it would focus the toolbar or it would focus the wrong entry)
 - File open dialogs now use default extensions as primary file filter
+- [#1841](https://github.com/JabRef/jabref/issues/1841) The "etal"-string in the Authors layout formatter can now be empty
 
 ### Fixed
 - Fixed [#1760](https://github.com/JabRef/jabref/issues/1760): Preview updated correctly when selecting a single entry after selecting multiple entries
 - Fixed [#1632](https://github.com/JabRef/jabref/issues/1632): User comments (@Comment) with or without brackets are now kept
+- When inserting a duplicate the right entry will be selected
 - Preview panel height is now saved immediately, thus is shown correctly if the panel height is changed, closed and opened again
 - Fixed [#1264](https://github.com/JabRef/jabref/issues/1264): S with caron does not render correctly
 - LaTeX to Unicode converter now handles combining accents
@@ -86,6 +88,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1750](https://github.com/JabRef/jabref/issues/1750): BibLaTeX `date` field is now correctly exported as `year` in MS-Office 2007 xml format
 - Fixed: LaTeX characters in author names are now converted to Unicode before export in MS-Office 2007 xml format
 - Fixed: `volume`, `journaltitle`, `issue` and `number`(for patents) fields are now exported correctly in MS-Office 2007 xml format
+- Fixed [#1687](https://github.com/JabRef/jabref/issues/1687): "month" field ascending/descending sorting swapped
+
+ 
 
 ### Removed
 - It is not longer possible to choose to convert HTML sub- and superscripts to equations

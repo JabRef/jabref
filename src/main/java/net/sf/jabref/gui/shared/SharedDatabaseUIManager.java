@@ -32,7 +32,7 @@ public class SharedDatabaseUIManager {
                 Localization.lang("Close database")};
 
         int answer = JOptionPane.showOptionDialog(jabRefFrame,
-                Localization.lang("The connection to the server has been determinated.") + "\n\n",
+                Localization.lang("The connection to the server has been terminated.") + "\n\n",
                 Localization.lang("Connection lost"), JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.WARNING_MESSAGE,
                 null, options, options[0]);
 

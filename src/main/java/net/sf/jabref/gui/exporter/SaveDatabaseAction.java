@@ -185,7 +185,7 @@ public class SaveDatabaseAction extends AbstractWorker {
             if (ex.specificEntry()) {
                 BibEntry entry = ex.getEntry();
                 // Error occured during processing of an entry. Highlight it!
-                highlightEntry(entry);
+                panel.highlightEntry(entry);
             } else {
                 LOGGER.error("A problem occured when trying to save the file", ex);
             }
@@ -252,14 +252,6 @@ public class SaveDatabaseAction extends AbstractWorker {
         }
 
         return success;
-    }
-
-    private void highlightEntry(BibEntry entry) {
-        int row = panel.getMainTable().findEntry(entry);
-        int topShow = Math.max(0, row - 3);
-        panel.getMainTable().setRowSelectionInterval(row, row);
-        panel.getMainTable().scrollTo(topShow);
-        panel.showEntry(entry);
     }
 
     /**
