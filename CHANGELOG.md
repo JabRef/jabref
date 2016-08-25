@@ -43,6 +43,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#1758](https://github.com/JabRef/jabref/issues/1758) Added a button to open Database Properties dialog help
 - Improve focus of the maintable after a sidepane gets closed (Before it would focus the toolbar or it would focus the wrong entry)
 - File open dialogs now use default extensions as primary file filter
+- [#1841](https://github.com/JabRef/jabref/issues/1841) The "etal"-string in the Authors layout formatter can now be empty
 
 ### Fixed
 - Fixed [#1760](https://github.com/JabRef/jabref/issues/1760): Preview updated correctly when selecting a single entry after selecting multiple entries
