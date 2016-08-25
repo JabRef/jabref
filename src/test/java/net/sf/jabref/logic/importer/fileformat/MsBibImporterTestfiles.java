@@ -37,7 +37,6 @@ public class MsBibImporterTestfiles {
 
     @Parameters(name = "{0}")
     public static Collection<String> fileNames() throws IOException, URISyntaxException {
-
         try (Stream<Path> stream = Files.list(Paths.get(MsBibImporterTestfiles.class.getResource("").toURI()))) {
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".xml"))
                     .filter(n -> n.startsWith("MsBib")).collect(Collectors.toList());
