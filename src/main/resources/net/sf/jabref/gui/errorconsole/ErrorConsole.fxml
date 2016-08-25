@@ -22,7 +22,7 @@
                 </ButtonBar>
             </bottom>
             <center>
-                <ListView fx:id="allMessage" prefHeight="500.0" prefWidth="1200.0" styleClass="info-sections" BorderPane.alignment="CENTER" />
+                <ListView fx:id="allMessage" prefHeight="300.0" prefWidth="900.0" styleClass="info-sections" BorderPane.alignment="CENTER" />
             </center>
         </BorderPane>
     </content>
