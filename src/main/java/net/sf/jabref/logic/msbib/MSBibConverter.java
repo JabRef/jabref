@@ -113,15 +113,15 @@ public class MSBibConverter {
     private static List<PersonName> getAuthors(String authors) {
         List<PersonName> result = new ArrayList<>();
 
-        authors = removeLaTeX(authors);
+        String cleanAuthors = removeLaTeX(authors);
 
-        if (authors.toUpperCase(Locale.ENGLISH).contains(" AND ")) {
-            String[] names = authors.split(" (?i)and ");
+        if (cleanAuthors.toUpperCase(Locale.ENGLISH).contains(" AND ")) {
+            String[] names = cleanAuthors.split(" (?i)and ");
             for (String name : names) {
                 result.add(new PersonName(name));
             }
         } else {
-            result.add(new PersonName(authors));
+            result.add(new PersonName(cleanAuthors));
         }
         return result;
     }

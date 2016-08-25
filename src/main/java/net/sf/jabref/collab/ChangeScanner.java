@@ -377,7 +377,7 @@ public class ChangeScanner implements Runnable {
                     BibtexString disk = onDisk.getString(diskId);
                     if (disk.getName().equals(tmp.getName())) {
                         // We have found a string with a matching name.
-                        if ((tmp.getContent() != null) && !tmp.getContent().equals(disk.getContent())) {
+                        if (!tmp.getContent().equals(disk.getContent())) {
                             // But they have nonmatching contents, so we've found a change.
                             Optional<BibtexString> mem = findString(inMem1, tmp.getName(), usedInMem);
                             if (mem.isPresent()) {

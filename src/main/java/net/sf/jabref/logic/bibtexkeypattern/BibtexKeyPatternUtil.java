@@ -866,8 +866,7 @@ public class BibtexKeyPatternUtil {
         if (authorList.isEmpty()) {
             return "";
         }
-        String s = authorList.getAuthor(0).getFirstAbbr();
-        return s == null ? "" : s.substring(0, 1);
+        return authorList.getAuthor(0).getFirstAbbr().map(s -> s.substring(0, 1)).orElse("");
     }
 
     /**
@@ -926,8 +925,8 @@ public class BibtexKeyPatternUtil {
         if (authorList.isEmpty()) {
             return "";
         }
-        String s = authorList.getAuthor(authorList.getNumberOfAuthors() - 1).getFirstAbbr();
-        return s == null ? "" : s.substring(0, 1);
+        return authorList.getAuthor(authorList.getNumberOfAuthors() - 1).getFirstAbbr().map(s -> s.substring(0, 1))
+                .orElse("");
     }
 
     /**

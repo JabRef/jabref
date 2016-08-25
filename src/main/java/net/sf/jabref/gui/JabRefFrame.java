@@ -2323,12 +2323,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         private void updateTexts(UndoChangeEvent event) {
             SwingUtilities.invokeLater(() -> {
-                if (JabRefFrame.this != null) {
-                    undo.putValue(Action.SHORT_DESCRIPTION, event.getUndoDescription());
-                    undo.setEnabled(event.isCanUndo());
-                    redo.putValue(Action.SHORT_DESCRIPTION, event.getRedoDescription());
-                    redo.setEnabled(event.isCanRedo());
-                }
+                undo.putValue(Action.SHORT_DESCRIPTION, event.getUndoDescription());
+                undo.setEnabled(event.isCanUndo());
+                redo.putValue(Action.SHORT_DESCRIPTION, event.getRedoDescription());
+                redo.setEnabled(event.isCanRedo());
             });
         }
     }

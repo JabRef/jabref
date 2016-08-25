@@ -169,23 +169,24 @@ public class RegExpFileSearch {
 
         List<File> res = new ArrayList<>();
 
+        String fileName = file;
         File actualDirectory;
-        if (file.startsWith("/")) {
+        if (fileName.startsWith("/")) {
             actualDirectory = new File(".");
-            file = file.substring(1);
+            fileName = fileName.substring(1);
         } else {
             actualDirectory = directory;
         }
 
         // Escape handling...
-        Matcher m = ESCAPE_PATTERN.matcher(file);
+        Matcher m = ESCAPE_PATTERN.matcher(fileName);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
             m.appendReplacement(s, m.group(1) + '/' + m.group(2));
         }
         m.appendTail(s);
-        file = s.toString();
-        String[] fileParts = file.split("/");
+        fileName = s.toString();
+        String[] fileParts = fileName.split("/");
 
         if (fileParts.length == 0) {
             return res;
