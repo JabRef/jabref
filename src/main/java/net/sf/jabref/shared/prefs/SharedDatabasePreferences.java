@@ -5,6 +5,7 @@ import java.util.prefs.BackingStoreException;
 import java.util.prefs.Preferences;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.JabRefMain;
 import net.sf.jabref.gui.shared.OpenSharedDatabaseDialog;
 
 /**
@@ -21,7 +22,7 @@ public class SharedDatabasePreferences {
     private static final String SHARED_DATABASE_REMEMBER_PASSWORD = "sharedDatabaseRememberPassword";
 
     // This {@link Preferences} is used only for things which should not appear in real JabRefPreferences due to security reasons.
-    private final Preferences internalPrefs = Preferences.userRoot().node("/net/sf/security/jabref");
+    private final Preferences internalPrefs = Preferences.userNodeForPackage(JabRefMain.class).parent().node("jabref-pwdstorage");
 
 
     public Optional<String> getType() {
