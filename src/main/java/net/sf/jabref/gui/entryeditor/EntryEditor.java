@@ -1085,7 +1085,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
 
         @Override
-        public void actionPerformed(ActionEvent event) {
+        public synchronized void actionPerformed(ActionEvent event) {
             boolean movingAway = movingToDifferentEntry;
             movingToDifferentEntry = false;
 
