@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import javax.swing.JOptionPane;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
@@ -53,7 +54,8 @@ public class FindFullTextAction extends AbstractWorker {
     @Override
     public void update() {
         if (result.isPresent()) {
-            List<String> dirs = basePanel.getBibDatabaseContext().getFileDirectory();
+            List<String> dirs = basePanel.getBibDatabaseContext()
+                    .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
             if (dirs.isEmpty()) {
                 JOptionPane.showMessageDialog(basePanel.frame(),
                         Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")

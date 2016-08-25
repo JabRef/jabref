@@ -69,7 +69,8 @@ public class MoveFileAction extends AbstractAction {
         }
 
         // Get an absolute path representation:
-        List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext().getFileDirectory();
+        List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext()
+                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {

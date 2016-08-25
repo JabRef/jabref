@@ -83,8 +83,8 @@ public class SendAsEMailAction extends AbstractWorker {
         //   the unofficial "mailto:attachment" property
         boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
 
-        List<File> fileList = FileUtil.getListOfLinkedFiles(bes,
-                frame.getCurrentBasePanel().getBibDatabaseContext().getFileDirectory());
+        List<File> fileList = FileUtil.getListOfLinkedFiles(bes, frame.getCurrentBasePanel().getBibDatabaseContext()
+                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences()));
         for (File f : fileList) {
             attachments.add(f.getPath());
             if (openFolders) {

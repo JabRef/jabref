@@ -6,13 +6,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
 import net.sf.jabref.model.database.DatabaseLocation;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.DBMSSynchronizer;
 
 /**
@@ -136,11 +133,11 @@ public class BibDatabaseContext {
      * @param fieldName The field type
      * @return The default directory for this field type.
      */
-    public List<String> getFileDirectory(String fieldName) {
+    public List<String> getFileDirectory(FileDirectoryPreferences preferences) {
         List<String> fileDirs = new ArrayList<>();
 
         // 1. metadata user-specific directory
-        Optional<String> userFileDirectory = metaData.getUserFileDirectory(Globals.prefs.getUser());
+        Optional<String> userFileDirectory = metaData.getUserFileDirectory(preferences.getUser());
         if(userFileDirectory.isPresent()) {
             fileDirs.add(getFileDirectoryPath(userFileDirectory.get()));
         }
@@ -152,16 +149,13 @@ public class BibDatabaseContext {
         }
 
         // 3. preferences directory
-        String dir = Globals.prefs.get(fieldName + FileLinkPreferences.DIR_SUFFIX); // FILE_DIR
-        if (dir != null) {
-            fileDirs.add(dir);
-        }
+        preferences.getFieldDirectory().ifPresent(fileDirs::add);
 
         // 4. BIB file directory
         if (getDatabaseFile() != null) {
             String parentDir = getDatabaseFile().getParent();
             // Check if we should add it as primary file dir (first in the list) or not:
-            if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR)) {
+            if (preferences.isBibLocationAsPrimary()) {
                 fileDirs.add(0, parentDir);
             } else {
                 fileDirs.add(parentDir);
@@ -190,10 +184,6 @@ public class BibDatabaseContext {
             }
         }
         return dir;
-    }
-
-    public List<String> getFileDirectory() {
-        return getFileDirectory(FieldName.FILE);
     }
 
     public DBMSSynchronizer getDBSynchronizer() {

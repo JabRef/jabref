@@ -21,6 +21,7 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
@@ -168,9 +169,10 @@ public class FileUtil {
     public static Optional<File> expandFilename(final BibDatabaseContext databaseContext, String name) {
         Optional<String> extension = getFileExtension(name);
         // Find the default directory for this field type, if any:
-        List<String> directories = databaseContext.getFileDirectory(extension.orElse(null));
+        List<String> directories = databaseContext
+                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences(extension.orElse(null)));
         // Include the standard "file" directory:
-        List<String> fileDir = databaseContext.getFileDirectory();
+        List<String> fileDir = databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         // Include the directory of the BIB file:
         List<String> al = new ArrayList<>();
         for (String dir : directories) {

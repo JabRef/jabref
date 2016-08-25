@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
@@ -140,7 +141,8 @@ public abstract class EntryFromFileCreator implements FileFilter {
         Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance()
                 .getExternalFileTypeByExt(externalFileType.getFieldName());
 
-        List<String> possibleFilePaths = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getFileDirectory();
+        List<String> possibleFilePaths = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext()
+                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         File shortenedFileName = FileUtil.shortenFileName(file, possibleFilePaths);
         FileListEntry fileListEntry = new FileListEntry("", shortenedFileName.getPath(), fileType);
 

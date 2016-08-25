@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.FileDirectoryPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -34,9 +35,10 @@ public class DatabaseFileLookup {
      *
      * @param database A {@link BibDatabase}.
      */
-    public DatabaseFileLookup(BibDatabaseContext databaseContext) {
+    public DatabaseFileLookup(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
         Objects.requireNonNull(databaseContext);
-        possibleFilePaths = Optional.ofNullable(databaseContext.getFileDirectory()).orElse(new ArrayList<>());
+        possibleFilePaths = Optional.ofNullable(databaseContext.getFileDirectory(fileDirectoryPreferences))
+                .orElse(new ArrayList<>());
 
         for (BibEntry entry : databaseContext.getDatabase().getEntries()) {
             fileCache.addAll(parseFileField(entry));

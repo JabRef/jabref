@@ -3,6 +3,7 @@ package net.sf.jabref.logic.cleanup;
 import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.FileDirectoryPreferences;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -19,7 +20,8 @@ public class ISSNCleanupTest {
 
     @Before
     public void setUp() {
-        worker = new CleanupWorker(mock(BibDatabaseContext.class), "", mock(LayoutFormatterPreferences.class));
+        worker = new CleanupWorker(mock(BibDatabaseContext.class), "", mock(LayoutFormatterPreferences.class),
+                mock(FileDirectoryPreferences.class));
     }
 
     @Test

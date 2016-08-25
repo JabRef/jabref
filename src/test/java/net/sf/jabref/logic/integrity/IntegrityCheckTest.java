@@ -32,8 +32,10 @@ public class IntegrityCheckTest {
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
 
+
     @Before
     public void setUp() {
+        // Needed for FileUtil.expandFilename
         Globals.prefs = JabRefPreferences.getInstance();
     }
 

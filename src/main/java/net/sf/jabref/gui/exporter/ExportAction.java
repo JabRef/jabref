@@ -105,7 +105,7 @@ public class ExportAction {
                     // so formatters can resolve linked files correctly.
                     // (This is an ugly hack!)
                     Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext()
-                            .getFileDirectory();
+                            .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
 
                     // Make sure we remember which filter was used, to set
                     // the default for next time:
