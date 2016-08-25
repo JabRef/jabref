@@ -222,7 +222,7 @@ public class PreviewPanel extends JPanel
     }
 
     public void setLayout(Layout layout) {
-        this.layout = Optional.of(layout);
+        this.layout = Optional.ofNullable(layout);
     }
 
     public void setEntry(BibEntry newEntry) {
