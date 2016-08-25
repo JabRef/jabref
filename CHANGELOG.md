@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Added integrity check for fields with BibTeX keys, e.g., `crossref` and `related`, to check that the key exists
 
 ### Fixed
 - Fixed NullPointerException when opening search result window for an untitled database 
