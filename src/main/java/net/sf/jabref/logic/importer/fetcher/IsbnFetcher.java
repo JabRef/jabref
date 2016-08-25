@@ -68,7 +68,7 @@ public class IsbnFetcher implements IdBasedFetcher {
                 //Downloads the source code of the site and then creates a .bib file out of the String
                 URLDownload urlDownload = new URLDownload(url);
                 String bibtexString = urlDownload.downloadToString(StandardCharsets.UTF_8);
-                Optional<BibEntry> entry = BibtexParser.singleFromStringOptional(bibtexString, ImportFormatPreferences.fromPreferences(Globals.prefs));
+                Optional<BibEntry> entry = BibtexParser.singleFromString(bibtexString, ImportFormatPreferences.fromPreferences(Globals.prefs));
 
                 if (entry.isPresent()) {
                     BibEntry bibEntry = entry.get();

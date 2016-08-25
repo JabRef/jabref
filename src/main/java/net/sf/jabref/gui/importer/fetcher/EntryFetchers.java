@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import net.sf.jabref.importer.fetcher.IdBasedEntryFetcher;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
 import net.sf.jabref.logic.importer.fetcher.GvkFetcher;
 import net.sf.jabref.logic.importer.fetcher.IsbnFetcher;

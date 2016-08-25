@@ -14,15 +14,13 @@
  * with this program; if not, write to the Free Software Foundation, Inc.,
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
-package net.sf.jabref.importer.fetcher;
+package net.sf.jabref.gui.importer.fetcher;
 
 import java.util.Objects;
 import java.util.Optional;
 
 import javax.swing.JPanel;
 
-import net.sf.jabref.gui.importer.fetcher.EntryFetcher;
-import net.sf.jabref.gui.importer.fetcher.SearchBasedEntryFetcher;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedFetcher;

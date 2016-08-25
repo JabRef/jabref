@@ -3,11 +3,9 @@ package net.sf.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +19,6 @@ public class IsbnFetcherTest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
         fetcher = new IsbnFetcher();
 
         bibEntry = new BibEntry();
