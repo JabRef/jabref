@@ -27,7 +27,7 @@ public class CurrentDate implements LayoutFormatter {
     @Override
     public String format(String fieldText) {
         String format = CurrentDate.DEFAULT_FORMAT;
-        if ((fieldText != null) && (fieldText.trim() != null) && !fieldText.trim().isEmpty()) {
+        if ((fieldText != null) && !fieldText.trim().isEmpty()) {
             format = fieldText;
         }
         return ZonedDateTime.now().format(DateTimeFormatter.ofPattern(format));

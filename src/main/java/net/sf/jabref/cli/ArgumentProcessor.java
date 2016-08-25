@@ -366,7 +366,7 @@ public class ArgumentProcessor {
             // Set the global variable for this database's file directory before exporting,
             // so formatters can resolve linked files correctly.
             // (This is an ugly hack!)
-            File theFile = pr.getFile();
+            File theFile = pr.getFile().get();
             if (!theFile.isAbsolute()) {
                 theFile = theFile.getAbsoluteFile();
             }

@@ -846,8 +846,7 @@ public class BibtexKeyPatternUtil {
         if (authorList.isEmpty()) {
             return "";
         }
-        String s = authorList.getAuthor(0).getLast();
-        return s == null ? "" : s;
+        return authorList.getAuthor(0).getLast().orElse("");
 
     }
 
@@ -888,15 +887,10 @@ public class BibtexKeyPatternUtil {
         if (authorList.isEmpty()) {
             return "";
         }
-        String vonAuthor = authorList.getAuthor(0).getVon().replaceAll(" ", "");
+
         StringBuilder stringBuilder = new StringBuilder();
-        if (vonAuthor != null) {
-            stringBuilder.append(vonAuthor);
-        }
-        vonAuthor = authorList.getAuthor(0).getLast();
-        if (vonAuthor != null) {
-            stringBuilder.append(vonAuthor);
-        }
+        authorList.getAuthor(0).getVon().ifPresent(vonAuthor -> stringBuilder.append(vonAuthor.replaceAll(" ", "")));
+        authorList.getAuthor(0).getLast().ifPresent(stringBuilder::append);
         return stringBuilder.toString();
     }
 

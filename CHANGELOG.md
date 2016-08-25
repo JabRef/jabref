@@ -79,6 +79,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed NullPointerException when importing PDFs and pressing cancel when selecting entry type
 - Fixed a number of issues related to accessing the GUI from outside the EDT
 - Added a few missing translation strings
+- Fixed NullPointerException when using BibTeX key pattern `authFirstFull` and the author does not have a "von"-part
 - Fixed NullPointerException when opening Customize entry type dialog without an open database
 - Fixed [#1257](https://github.com/JabRef/jabref/issues/1324): Preferences for the BibTeX key generator set in a version prior to 3.2 are now migrated automatically to the new version
 - Fixed [#1716](https://github.com/JabRef/jabref/issues/1716): `@`-Symbols stored in BibTeX fields no longer break the database

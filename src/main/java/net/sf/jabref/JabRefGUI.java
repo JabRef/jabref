@@ -57,7 +57,7 @@ public class JabRefGUI {
 
         // passed file (we take the first one) should be focused
         if (!argsDatabases.isEmpty()) {
-            focusedFile = argsDatabases.get(0).getFile().getAbsolutePath();
+            focusedFile = argsDatabases.get(0).getFile().get().getAbsolutePath();
         } else {
             focusedFile = Globals.prefs.get(JabRefPreferences.LAST_FOCUSED);
         }
@@ -112,7 +112,7 @@ public class JabRefGUI {
                 ParserResult pr = parserResultIterator.next();
 
                 // Define focused tab
-                if ((focusedFile != null) && pr.getFile().getAbsolutePath().equals(focusedFile)) {
+                if (pr.getFile().get().getAbsolutePath().equals(focusedFile)) {
                     first = true;
                 }
 
@@ -130,7 +130,7 @@ public class JabRefGUI {
                     }
                 } else {
                     parserResultIterator.remove();
-                    postponed.add(pr.getFile());
+                    postponed.add(pr.getFile().get());
                 }
             }
         }
@@ -160,7 +160,8 @@ public class JabRefGUI {
         }
 
         for (ParserResult pr : failed) {
-            String message = "<html>" + Localization.lang("Error opening file '%0'.", pr.getFile().getName()) + "<p>"
+            String message = "<html>" + Localization.lang("Error opening file '%0'.", pr.getFile().get().getName())
+                    + "<p>"
                     + pr.getErrorMessage() + "</html>";
 
             JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(), message, Localization.lang("Error opening file"),
@@ -230,7 +231,7 @@ public class JabRefGUI {
 
     private boolean isLoaded(File fileToOpen) {
         for (ParserResult pr : bibDatabases) {
-            if ((pr.getFile() != null) && pr.getFile().equals(fileToOpen)) {
+            if (pr.getFile().isPresent() && pr.getFile().get().equals(fileToOpen)) {
                 return true;
             }
         }

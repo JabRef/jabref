@@ -1,5 +1,7 @@
 package net.sf.jabref.model.entry;
 
+import java.util.Optional;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -343,38 +345,38 @@ public class AuthorListTest {
     public void testGetAuthor() {
 
         Author author = AuthorList.parse("John Smith and von Neumann, Jr, John").getAuthor(0);
-        Assert.assertEquals("John", author.getFirst());
+        Assert.assertEquals(Optional.of("John"), author.getFirst());
         Assert.assertEquals("J.", author.getFirstAbbr());
         Assert.assertEquals("John Smith", author.getFirstLast(false));
         Assert.assertEquals("J. Smith", author.getFirstLast(true));
-        Assert.assertEquals(null, author.getJr());
-        Assert.assertEquals("Smith", author.getLast());
+        Assert.assertEquals(Optional.empty(), author.getJr());
+        Assert.assertEquals(Optional.of("Smith"), author.getLast());
         Assert.assertEquals("Smith, John", author.getLastFirst(false));
         Assert.assertEquals("Smith, J.", author.getLastFirst(true));
         Assert.assertEquals("Smith", author.getLastOnly());
         Assert.assertEquals("Smith, J.", author.getNameForAlphabetization());
-        Assert.assertEquals(null, author.getVon());
+        Assert.assertEquals(Optional.empty(), author.getVon());
 
         author = AuthorList.parse("Peter Black Brown").getAuthor(0);
-        Assert.assertEquals("Peter Black", author.getFirst());
+        Assert.assertEquals(Optional.of("Peter Black"), author.getFirst());
         Assert.assertEquals("P. B.", author.getFirstAbbr());
         Assert.assertEquals("Peter Black Brown", author.getFirstLast(false));
         Assert.assertEquals("P. B. Brown", author.getFirstLast(true));
-        Assert.assertEquals(null, author.getJr());
-        Assert.assertEquals(null, author.getVon());
+        Assert.assertEquals(Optional.empty(), author.getJr());
+        Assert.assertEquals(Optional.empty(), author.getVon());
 
         author = AuthorList.parse("John Smith and von Neumann, Jr, John").getAuthor(1);
-        Assert.assertEquals("John", author.getFirst());
+        Assert.assertEquals(Optional.of("John"), author.getFirst());
         Assert.assertEquals("J.", author.getFirstAbbr());
         Assert.assertEquals("John von Neumann, Jr", author.getFirstLast(false));
         Assert.assertEquals("J. von Neumann, Jr", author.getFirstLast(true));
-        Assert.assertEquals("Jr", author.getJr());
-        Assert.assertEquals("Neumann", author.getLast());
+        Assert.assertEquals(Optional.of("Jr"), author.getJr());
+        Assert.assertEquals(Optional.of("Neumann"), author.getLast());
         Assert.assertEquals("von Neumann, Jr, John", author.getLastFirst(false));
         Assert.assertEquals("von Neumann, Jr, J.", author.getLastFirst(true));
         Assert.assertEquals("von Neumann", author.getLastOnly());
         Assert.assertEquals("Neumann, Jr, J.", author.getNameForAlphabetization());
-        Assert.assertEquals("von", author.getVon());
+        Assert.assertEquals(Optional.of("von"), author.getVon());
 
     }
 

@@ -1,6 +1,7 @@
 package net.sf.jabref.model.entry;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * This is an immutable class that keeps information regarding single
@@ -246,8 +247,8 @@ public class Author {
      *
      * @return first name of the author (may consist of several tokens)
      */
-    public String getFirst() {
-        return firstPart;
+    public Optional<String> getFirst() {
+        return Optional.ofNullable(firstPart);
     }
 
     /**
@@ -267,8 +268,8 @@ public class Author {
      *
      * @return von part of the author's name (may consist of several tokens)
      */
-    public String getVon() {
-        return vonPart;
+    public Optional<String> getVon() {
+        return Optional.ofNullable(vonPart);
     }
 
     /**
@@ -276,8 +277,8 @@ public class Author {
      *
      * @return last name of the author (may consist of several tokens)
      */
-    public String getLast() {
-        return lastPart;
+    public Optional<String> getLast() {
+        return Optional.ofNullable(lastPart);
     }
 
     /**
@@ -287,8 +288,8 @@ public class Author {
      * @return junior part of the author's name (may consist of several
      * tokens) or null if the author does not have a Jr. Part
      */
-    public String getJr() {
-        return jrPart;
+    public Optional<String> getJr() {
+        return Optional.ofNullable(jrPart);
     }
 
     /**

@@ -1388,7 +1388,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
         } else {
             // only add tab if DB is not already open
-            Optional<BasePanel> panel = getBasePanelList().stream().filter(p -> p.getBibDatabaseContext().getDatabaseFile().equals(pr.getFile())).findFirst();
+            Optional<BasePanel> panel = getBasePanelList().stream()
+                    .filter(p -> p.getBibDatabaseContext().getDatabaseFile().equals(pr.getFile().orElse(null)))
+                    .findFirst();
 
             if (panel.isPresent()) {
                 tabbedPane.setSelectedComponent(panel.get());
