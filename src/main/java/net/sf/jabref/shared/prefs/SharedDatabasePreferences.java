@@ -21,7 +21,8 @@ public class SharedDatabasePreferences {
     private static final String SHARED_DATABASE_REMEMBER_PASSWORD = "sharedDatabaseRememberPassword";
 
     // This {@link Preferences} is used only for things which should not appear in real JabRefPreferences due to security reasons.
-    private final Preferences internalPrefs = Preferences.userNodeForPackage(OpenSharedDatabaseDialog.class);
+    private final Preferences internalPrefs = Preferences.userRoot().node("/net/sf/security/jabref");
+
 
     public Optional<String> getType() {
         return Globals.prefs.getAsOptional(SHARED_DATABASE_TYPE);

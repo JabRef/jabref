@@ -11,6 +11,9 @@ import net.sf.jabref.shared.DBMSConnector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ *   {@link Password} contains methods which are useful to encrypt and decrypt phrases using symetric algorithms.
+ */
 public class Password {
 
     private static final Log LOGGER = LogFactory.getLog(DBMSConnector.class);
