@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
@@ -73,7 +58,6 @@ import org.apache.commons.logging.LogFactory;
  * label that can be hidden when the download is complete.
  */
 public class FileListEntryEditor {
-
     private static final Log LOGGER = LogFactory.getLog(FileListEntryEditor.class);
 
     private JDialog diag;
@@ -349,7 +333,6 @@ public class FileListEntryEditor {
 
     }
 
-
     private final ActionListener browsePressed = e -> {
         String filePath = link.getText().trim();
         Optional<File> file = FileUtil.expandFilename(this.databaseContext, filePath);
@@ -361,10 +344,9 @@ public class FileListEntryEditor {
             workingDir = Globals.prefs.get(JabRefPreferences.FILE_WORKING_DIRECTORY);
         }
 
-        Optional<Path> path = new NewFileDialogs(this.frame, workingDir).openDlgAndGetSelectedFile();
+        Optional<Path> path = new FileDialog(this.frame, workingDir).showDialogAndGetSelectedFile();
 
         path.ifPresent(selection -> {
-
             File newFile = selection.toFile();
             // Store the directory for next time:
             Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getPath());

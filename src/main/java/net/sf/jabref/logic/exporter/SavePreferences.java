@@ -84,8 +84,8 @@ public class SavePreferences {
         return saveInOriginalOrder;
     }
 
-    public SavePreferences withSaveInOriginalOrder(Boolean saveInOriginalOrder) {
-        return new SavePreferences(saveInOriginalOrder, this.saveOrder, this.encoding, this.makeBackup, this.saveType,
+    public SavePreferences withSaveInOriginalOrder(Boolean newSaveInOriginalOrder) {
+        return new SavePreferences(newSaveInOriginalOrder, this.saveOrder, this.encoding, this.makeBackup, this.saveType,
                 this.takeMetadataSaveOrderInAccount, this.reformatFile, this.latexFieldFormatterPreferences);
     }
 
@@ -93,8 +93,8 @@ public class SavePreferences {
         return makeBackup;
     }
 
-    public SavePreferences withMakeBackup(Boolean makeBackup) {
-        return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, this.encoding, makeBackup, this.saveType,
+    public SavePreferences withMakeBackup(Boolean newMakeBackup) {
+        return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, this.encoding, newMakeBackup, this.saveType,
                 this.takeMetadataSaveOrderInAccount, this.reformatFile, this.latexFieldFormatterPreferences);
     }
 
@@ -102,8 +102,8 @@ public class SavePreferences {
         return encoding;
     }
 
-    public SavePreferences withEncoding(Charset encoding) {
-        return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, encoding, this.makeBackup, this.saveType,
+    public SavePreferences withEncoding(Charset newEncoding) {
+        return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, newEncoding, this.makeBackup, this.saveType,
                 this.takeMetadataSaveOrderInAccount, this.reformatFile, this.latexFieldFormatterPreferences);
     }
 
@@ -111,8 +111,8 @@ public class SavePreferences {
         return saveType;
     }
 
-    public SavePreferences withSaveType(DatabaseSaveType saveType) {
-        return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, this.encoding, this.makeBackup, saveType,
+    public SavePreferences withSaveType(DatabaseSaveType newSaveType) {
+        return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, this.encoding, this.makeBackup, newSaveType,
                 this.takeMetadataSaveOrderInAccount, this.reformatFile, this.latexFieldFormatterPreferences);
     }
 
@@ -120,9 +120,9 @@ public class SavePreferences {
         return reformatFile;
     }
 
-    public SavePreferences withReformatFile(boolean reformatFile) {
+    public SavePreferences withReformatFile(boolean newReformatFile) {
         return new SavePreferences(this.saveInOriginalOrder, this.saveOrder, this.encoding, this.makeBackup,
-                this.saveType, this.takeMetadataSaveOrderInAccount, reformatFile, this.latexFieldFormatterPreferences);
+                this.saveType, this.takeMetadataSaveOrderInAccount, newReformatFile, this.latexFieldFormatterPreferences);
     }
 
     public Charset getEncodingOrDefault() {

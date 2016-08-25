@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.importer.util;
+package net.sf.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,22 +9,14 @@ import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
 public class GVKParserTest {
-
-    @Before
-    public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
 
     private void doTest(String xmlName, int expectedSize, List<String> resourceNames)
             throws ParserConfigurationException, SAXException, IOException {

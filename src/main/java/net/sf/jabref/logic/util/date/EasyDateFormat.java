@@ -5,8 +5,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
-import net.sf.jabref.preferences.JabRefPreferences;
-
 public class EasyDateFormat {
 
     /**
@@ -55,9 +53,8 @@ public class EasyDateFormat {
         return dateTime.format(dateFormatter);
     }
 
-
-    public static EasyDateFormat fromPreferences(JabRefPreferences preferences) {
-     return new EasyDateFormat(preferences.get(JabRefPreferences.TIME_STAMP_FORMAT));
+    public static EasyDateFormat fromTimeStampFormat(String timeStampFormat) {
+        return new EasyDateFormat(timeStampFormat);
     }
 
     public static EasyDateFormat isoDateFormat() {

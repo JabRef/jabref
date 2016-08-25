@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.migrations;
 
 import java.util.Arrays;
@@ -27,7 +12,7 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.actions.BrowseAction;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.importer.actions.PostOpenAction;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -138,7 +123,10 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             builderPanel.add(setFileDir);
             builderPanel.add(fileDir);
             JButton browse = new JButton(Localization.lang("Browse"));
-            browse.addActionListener(BrowseAction.buildForDir(fileDir));
+            browse.addActionListener(e ->
+                    new FileDialog(null).showDialogAndGetSelectedFile()
+                            .ifPresent(f -> fileDir.setText(f.toAbsolutePath().toString()))
+            );
             builderPanel.add(browse);
             formBuilder.appendRows("2dlu, p");
             row += 2;

@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.importer.actions;
 
 import java.io.File;
@@ -26,9 +11,9 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.MergeDialog;
-import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
@@ -42,6 +27,7 @@ import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
@@ -53,21 +39,13 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: May 18, 2006
- * Time: 9:49:02 PM
- * To change this template use File | Settings | File Templates.
- */
 public class AppendDatabaseAction implements BaseAction {
+    private static final Log LOGGER = LogFactory.getLog(AppendDatabaseAction.class);
 
     private final JabRefFrame frame;
     private final BasePanel panel;
+
     private final List<File> filesToOpen = new ArrayList<>();
-
-    private static final Log LOGGER = LogFactory.getLog(AppendDatabaseAction.class);
-
 
     public AppendDatabaseAction(JabRefFrame frame, BasePanel panel) {
         this.frame = frame;
@@ -82,8 +60,9 @@ public class AppendDatabaseAction implements BaseAction {
         md.setLocationRelativeTo(panel);
         md.setVisible(true);
         if (md.isOkPressed()) {
-
-            List<String> chosen = new NewFileDialogs(frame).updateWorkingDirPref().showDlgAndGetMultipleFiles();
+            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.BIBTEX_DB);
+            dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
+            List<String> chosen = dialog.showDialogAndGetMultipleFiles();
             if (chosen.isEmpty()) {
                 return;
             }
@@ -106,7 +85,7 @@ public class AppendDatabaseAction implements BaseAction {
         }
         for (File file : filesToOpen) {
             try {
-                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getPath());
+                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
                 // Should this be done _after_ we know it was successfully opened?
                 ParserResult pr = OpenDatabase.loadDatabase(file,
                         ImportFormatPreferences.fromPreferences(Globals.prefs));
@@ -139,7 +118,8 @@ public class AppendDatabaseAction implements BaseAction {
             for (BibEntry originalEntry : fromDatabase.getEntries()) {
                 BibEntry be = (BibEntry) originalEntry.clone();
                 be.setId(IdGenerator.next());
-                UpdateField.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp, Globals.prefs);
+                UpdateField.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp,
+                        Globals.prefs.getUpdateFieldPreferences());
                 database.insertEntry(be);
                 appendedEntries.add(be);
                 originalEntries.add(originalEntry);
@@ -163,14 +143,14 @@ public class AppendDatabaseAction implements BaseAction {
                 // ensure that there is always only one AllEntriesGroup
                 if (newGroups.getGroup() instanceof AllEntriesGroup) {
                     // create a dummy group
-                    ExplicitGroup group = null;
                     try {
-                        group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT, Globals.prefs);
+                        ExplicitGroup group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT,
+                                Globals.prefs);
+                        newGroups.setGroup(group);
+                        group.add(appendedEntries);
                     } catch (ParseException e) {
                         LOGGER.error(e);
                     }
-                    newGroups.setGroup(group);
-                    group.add(appendedEntries);
                 }
 
                 // groupsSelector is always created, even when no groups

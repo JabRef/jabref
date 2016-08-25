@@ -8,9 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -41,7 +39,6 @@ public class BiblioscapeImporterTestTypes {
 
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
         bsImporter = new BiblioscapeImporter();
     }
 

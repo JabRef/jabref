@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.bibtex.comparator;
 
 import java.text.Collator;
@@ -33,16 +18,7 @@ import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
 
 /**
- *
  * A comparator for BibEntry fields
- *
- * Initial Version:
- *
- * @author alver
- * @version Date: Oct 13, 2005 Time: 10:10:04 PM To
- *
- * TODO: Testcases
- *
  */
 public class FieldComparator implements Comparator<BibEntry> {
 
@@ -62,26 +38,16 @@ public class FieldComparator implements Comparator<BibEntry> {
         this(field, false);
     }
 
-    public FieldComparator(String field, boolean reversed) {
+    public FieldComparator(SaveOrderConfig.SortCriterion sortCriterion) {
+        this(sortCriterion.field, sortCriterion.descending);
+    }
+
+    public FieldComparator(String field, boolean descending) {
         this.fieldName = Objects.requireNonNull(field);
         this.field = fieldName.split(FieldName.FIELD_SEPARATOR);
         fieldType = determineFieldType();
         isNumeric = InternalBibtexFields.isNumeric(this.field[0]);
-
-        if(fieldType == FieldType.MONTH) {
-            /*
-             * [ 1598777 ] Month sorting
-             *
-             * http://sourceforge.net/tracker/index.php?func=detail&aid=1598777&group_id=92314&atid=600306
-             */
-            multiplier = reversed ? 1 : -1;
-        } else {
-            multiplier = reversed ? -1 : 1;
-        }
-    }
-
-    public FieldComparator(SaveOrderConfig.SortCriterion sortCriterion) {
-        this(sortCriterion.field, sortCriterion.descending);
+        multiplier = descending ? -1 : 1;
     }
 
     private static Collator getCollator() {
@@ -105,6 +71,16 @@ public class FieldComparator implements Comparator<BibEntry> {
         } else {
             return FieldType.OTHER;
         }
+    }
+
+    private String getField(BibEntry entry) {
+        for (String aField : field) {
+            Optional<String> o = entry.getFieldOrAlias(aField);
+            if (o.isPresent()) {
+                return o.get();
+            }
+        }
+        return null;
     }
 
     @Override
@@ -167,16 +143,6 @@ public class FieldComparator implements Comparator<BibEntry> {
         String ours = f1.toLowerCase(Locale.ENGLISH);
         String theirs = f2.toLowerCase(Locale.ENGLISH);
         return COLLATOR.compare(ours, theirs) * multiplier;
-    }
-
-    private String getField(BibEntry entry) {
-        for (String aField : field) {
-            Optional<String> o = entry.getFieldOrAlias(aField);
-            if (o.isPresent()) {
-                return o.get();
-            }
-        }
-        return null;
     }
 
     /**

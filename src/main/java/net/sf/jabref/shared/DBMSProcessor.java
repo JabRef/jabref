@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.shared;
 
 import java.sql.Connection;
@@ -21,16 +6,15 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.event.source.EntryEventSource;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.shared.exception.OfflineLockException;
 import net.sf.jabref.shared.exception.SharedEntryNotPresentException;
@@ -57,13 +41,43 @@ public abstract class DBMSProcessor {
 
     /**
      * Scans the database for required tables.
+     *
      * @return <code>true</code> if the structure matches the requirements, <code>false</code> if not.
      * @throws SQLException
      */
     public boolean checkBaseIntegrity() throws SQLException {
-        List<String> requiredTables = new ArrayList<>(Arrays.asList("ENTRY", "FIELD", "METADATA")); // the list should be dynamic
-        DatabaseMetaData databaseMetaData = connection.getMetaData();
+        return checkTableAvailibility("ENTRY", "FIELD", "METADATA");
+    }
 
+    /**
+     * Determines whether the database is using an pre-3.6 structure.
+     *
+     * @return <code>true</code> if the structure is old, else <code>false</code>.
+     */
+    public boolean checkForPre3Dot6Intergrity() throws SQLException {
+        return checkTableAvailibility(
+                "ENTRIES",
+                "ENTRY_GROUP",
+                "ENTRY_TYPES",
+                "GROUPS",
+                "GROUP_TYPES",
+                "JABREF_DATABASE",
+                "STRINGS"); // old tables
+    }
+
+    /**
+     * Checks whether all given table names (<b>case insensitive</b>) exist in database.
+     *
+     * @param tableNames Table names to be checked
+     * @return <code>true</code> if <b>all</b> given tables are present, else <code>false</code>.
+     */
+    private boolean checkTableAvailibility(String... tableNames) throws SQLException {
+        List<String> requiredTables = new ArrayList<>();
+        for (String name : tableNames) {
+            requiredTables.add(name.toUpperCase(Locale.ENGLISH));
+        }
+
+        DatabaseMetaData databaseMetaData = connection.getMetaData();
         // ...getTables(null, ...): no restrictions
         try (ResultSet databaseMetaDataResultSet = databaseMetaData.getTables(null, null, null, null)) {
             while (databaseMetaDataResultSet.next()) {
@@ -74,24 +88,24 @@ public abstract class DBMSProcessor {
         }
     }
 
-
     /**
      * Creates and sets up the needed tables and columns according to the database type and
      * performs a check whether the needed tables are present.
      *
      * @throws SQLException
      */
-    public void setUpSharedDatabase() throws SQLException {
+    public void setupSharedDatabase() throws SQLException {
         setUp();
 
         if (!checkBaseIntegrity()) {
             // can only happen with users direct intervention on shared database
-            LOGGER.error(Localization.lang("Corrupt_shared_database_structure."));
+            LOGGER.error("Corrupt_shared_database_structure.");
         }
     }
 
     /**
      * Creates and sets up the needed tables and columns according to the database type.
+     *
      * @throws SQLException
      */
     protected abstract void setUp() throws SQLException;
@@ -99,6 +113,7 @@ public abstract class DBMSProcessor {
     /**
      * Escapes parts of SQL expressions like table or field name to match the conventions
      * of the database system using the current dbmsType.
+     *
      * @param expression Table or field name
      * @return Correctly escaped expression
      */
@@ -107,6 +122,7 @@ public abstract class DBMSProcessor {
 
     /**
      * Inserts the given bibEntry into shared database.
+     *
      * @param bibEntry {@link BibEntry} to be inserted
      */
     public void insertEntry(BibEntry bibEntry) {
@@ -339,6 +355,7 @@ public abstract class DBMSProcessor {
 
     /**
      * Removes the shared bibEntry.
+     *
      * @param bibEntry {@link BibEntry} to be deleted
      */
     public void removeEntry(BibEntry bibEntry) {
@@ -469,6 +486,7 @@ public abstract class DBMSProcessor {
 
     /**
      * Clears and sets all shared meta data.
+     *
      * @param metaData JabRef meta data.
      * @throws SQLException
      */

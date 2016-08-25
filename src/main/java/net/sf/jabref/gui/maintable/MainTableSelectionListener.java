@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.maintable;
 
 import java.awt.event.FocusEvent;
@@ -120,24 +105,14 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         if (!enabled) {
             return;
         }
+
         EventList<BibEntry> selected = e.getSourceList();
-        BibEntry newSelected = null;
-        while (e.next()) {
-            if (e.getType() == ListEvent.INSERT) {
-                if (newSelected == null) {
-                    if (e.getIndex() < selected.size()) {
-                        newSelected = selected.get(e.getIndex());
-                    }
-                } else {
-                    return; // More than one new selected. Do nothing.
-                }
-            }
+        if (selected.isEmpty()){
+            return;
         }
 
+        final BibEntry newSelected = selected.get(0);
         if (newSelected != null) {
-
-            // Ok, we have a single new entry that has been selected. Now decide what to do with it:
-            final BibEntry toShow = newSelected;
             final BasePanelMode mode = panel.getMode(); // What is the panel already showing?
             if ((mode == BasePanelMode.WILL_SHOW_EDITOR) || (mode == BasePanelMode.SHOWING_EDITOR)) {
                 // An entry is currently being edited.
@@ -147,7 +122,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     visName = oldEditor.getVisiblePanelName();
                 }
                 // Get an old or new editor for the entry to edit:
-                EntryEditor newEditor = panel.getEntryEditor(toShow);
+                EntryEditor newEditor = panel.getEntryEditor(newSelected);
 
                 if (oldEditor != null) {
                     oldEditor.setMovingToDifferentEntry();
@@ -165,7 +140,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             } else {
                 // Either nothing or a preview was shown. Update the preview.
                 if (previewActive) {
-                    updatePreview(toShow, false);
+                    updatePreview(newSelected, false);
                 }
             }
         }

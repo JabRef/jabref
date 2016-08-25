@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.importer.fetcher;
 
 import java.util.Collections;
@@ -21,6 +6,7 @@ import java.util.List;
 
 import net.sf.jabref.importer.fetcher.IdBasedEntryFetcher;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
+import net.sf.jabref.logic.importer.fetcher.GvkFetcher;
 import net.sf.jabref.logic.importer.fetcher.IsbnFetcher;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 
@@ -34,7 +20,6 @@ public class EntryFetchers {
         entryFetchers.add(new DBLPFetcher());
         entryFetchers.add(new DiVAtoBibTeXFetcher());
         entryFetchers.add(new DOItoBibTeXFetcher());
-        entryFetchers.add(new GVKFetcher());
         entryFetchers.add(new IEEEXploreFetcher(abbreviationLoader));
         entryFetchers.add(new INSPIREFetcher());
         entryFetchers.add(new MedlineFetcher());
@@ -47,6 +32,7 @@ public class EntryFetchers {
 
         entryFetchers.add(new SearchBasedEntryFetcher(new ArXiv()));
         entryFetchers.add(new IdBasedEntryFetcher(new IsbnFetcher()));
+        entryFetchers.add(new SearchBasedEntryFetcher(new GvkFetcher()));
     }
 
     public List<EntryFetcher> getEntryFetchers() {

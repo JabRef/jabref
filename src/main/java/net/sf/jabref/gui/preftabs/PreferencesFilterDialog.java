@@ -15,6 +15,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.gui.WrapLayout;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.preferences.JabRefPreferencesFilter;
 
@@ -48,6 +49,8 @@ class PreferencesFilterDialog extends JDialog {
 
         table = new JTable();
         table.setAutoCreateRowSorter(true);
+        GUIUtil.correctRowHeight(table);
+
         updateModel();
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
 
@@ -102,7 +105,7 @@ class PreferencesFilterDialog extends JDialog {
 
         @Override
         public Object getValueAt(int rowIndex, int columnIndex) {
-            if (rowIndex < 0 || rowIndex - 1 > preferences.size()) {
+            if ((rowIndex < 0) || ((rowIndex - 1) > preferences.size())) {
                 return "n/a";
             }
 

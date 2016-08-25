@@ -7,7 +7,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -32,11 +31,10 @@ public class DatabaseFileLookupTest {
 
     @Before
     public void setUp() throws FileNotFoundException, IOException {
-        Globals.prefs = JabRefPreferences.getInstance();
-
         try (FileInputStream stream = new FileInputStream(ImportDataTest.UNLINKED_FILES_TEST_BIB);
                 InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            ParserResult result = BibtexParser.parse(reader, ImportFormatPreferences.fromPreferences(Globals.prefs));
+            ParserResult result = BibtexParser.parse(reader,
+                    ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
             database = result.getDatabase();
             entries = database.getEntries();
 

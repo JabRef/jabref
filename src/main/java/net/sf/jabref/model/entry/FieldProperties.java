@@ -5,11 +5,9 @@ import java.util.Set;
 
 public enum FieldProperties {
     YES_NO,
-    URL,
     DATE,
     JOURNAL_NAME,
     EXTERNAL,
-    BROWSE,
     OWNER,
     MONTH,
     FILE_EDITOR,
@@ -18,7 +16,6 @@ public enum FieldProperties {
     INTEGER,
     GENDER,
     LANGUAGE,
-    LANG_ID,
     DOI,
     EDITOR_TYPE,
     PAGINATION,
@@ -30,7 +27,8 @@ public enum FieldProperties {
     BOOK_NAME,
     SINGLE_ENTRY_LINK,
     MULTIPLE_ENTRY_LINK,
-    PUBLICATION_STATE;
+    PUBLICATION_STATE,
+    VERBATIM;
 
     public static final Set<FieldProperties> ALL_OPTS = EnumSet.allOf(FieldProperties.class);
 

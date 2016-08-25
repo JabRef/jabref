@@ -28,7 +28,6 @@ import java.util.TimeZone;
 
 import javax.xml.transform.TransformerException;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.cli.XMPUtilMain;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
@@ -241,12 +240,6 @@ public class XMPUtilTest {
             pdf.addPage(new PDPage()); // Need page to open in Acrobat
             pdf.save(pdfFile.getAbsolutePath());
         }
-
-        // Don't forget to initialize the preferences
-        if (Globals.prefs == null) {
-            Globals.prefs = JabRefPreferences.getInstance();
-        }
-
 
         // Store Privacy Settings
         prefs = JabRefPreferences.getInstance();
@@ -826,7 +819,7 @@ public class XMPUtilTest {
         BibEntry a = l.get(0);
         BibEntry b = l.get(1);
 
-        if (a.getCiteKey().equals("foo")) {
+        if (a.getCiteKeyOptional().get().equals("foo")) {
             BibEntry tmp = a;
             a = b;
             b = tmp;
@@ -861,7 +854,7 @@ public class XMPUtilTest {
         BibEntry a = l.get(0);
         BibEntry b = l.get(1);
 
-        if (a.getCiteKey().equals("Clarkson06")) {
+        if (a.getCiteKeyOptional().get().equals("Clarkson06")) {
             BibEntry tmp = a;
             a = b;
             b = tmp;
@@ -892,7 +885,7 @@ public class XMPUtilTest {
         BibEntry a = l.get(0);
         BibEntry b = l.get(1);
 
-        if (a.getCiteKey().equals("Clarkson06")) {
+        if (a.getCiteKeyOptional().get().equals("Clarkson06")) {
             BibEntry tmp = a;
             a = b;
             b = tmp;
@@ -978,7 +971,7 @@ public class XMPUtilTest {
             Assert.assertEquals("Dewey Duck", dcSchema.getContributors().get(1));
             Assert.assertEquals("Louie Duck", dcSchema.getContributors().get(2));
             Assert.assertEquals("InProceedings".toLowerCase(), dcSchema.getTypes().get(0).toLowerCase());
-            Assert.assertEquals("bibtex/bibtexkey/Clarkson06", dcSchema.getRelationships().get(0));
+            Assert.assertTrue(dcSchema.getRelationships().contains("bibtex/bibtexkey/Clarkson06"));
             Assert.assertEquals("peanut", dcSchema.getSubjects().get(0));
             Assert.assertEquals("butter", dcSchema.getSubjects().get(1));
             Assert.assertEquals("jelly", dcSchema.getSubjects().get(2));
@@ -1044,7 +1037,7 @@ public class XMPUtilTest {
             Assert.assertEquals("Dewey Duck", dcSchema.getContributors().get(1));
             Assert.assertEquals("Louie Duck", dcSchema.getContributors().get(2));
             Assert.assertEquals("InProceedings".toLowerCase(), dcSchema.getTypes().get(0).toLowerCase());
-            Assert.assertEquals("bibtex/bibtexkey/Clarkson06", dcSchema.getRelationships().get(0));
+            Assert.assertTrue(dcSchema.getRelationships().contains("bibtex/bibtexkey/Clarkson06"));
             Assert.assertEquals("peanut", dcSchema.getSubjects().get(0));
             Assert.assertEquals("butter", dcSchema.getSubjects().get(1));
             Assert.assertEquals("jelly", dcSchema.getSubjects().get(2));
@@ -1289,7 +1282,7 @@ public class XMPUtilTest {
             BibEntry a = l.get(0);
             BibEntry b = l.get(1);
 
-            if (a.getCiteKey().equals("Clarkson06")) {
+            if (a.getCiteKeyOptional().get().equals("Clarkson06")) {
                 BibEntry tmp = a;
                 a = b;
                 b = tmp;

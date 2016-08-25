@@ -91,7 +91,7 @@ public class LocalizationConsistencyTest {
 
                 List<String> duplicates = properties.getDuplicates();
 
-                assertEquals("Duplicate keys of " + lang, Collections.emptyList(), duplicates);
+                assertEquals("Duplicate keys inside bundle " + bundle + "_" + lang, Collections.emptyList(), duplicates);
             }
         }
     }

@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.logic.xmp;
 
 import java.io.ByteArrayInputStream;
@@ -603,14 +588,14 @@ public class XMPUtil {
 
         // Set all the values including key and entryType
 
-        for (String field : resolvedEntry.getFieldNames()) {
+        for (Entry<String, String> field : resolvedEntry.getFieldMap().entrySet()) {
 
-            if (useXmpPrivacyFilter && filters.contains(field)) {
+            if (useXmpPrivacyFilter && filters.contains(field.getKey())) {
                 continue;
             }
 
-            if (FieldName.EDITOR.equals(field)) {
-                String authors = resolvedEntry.getField(field);
+            if (FieldName.EDITOR.equals(field.getKey())) {
+                String authors = field.getValue();
 
                 /**
                  * Editor -> Contributor
@@ -657,8 +642,8 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: author
              */
-            if (FieldName.AUTHOR.equals(field)) {
-                String authors = resolvedEntry.getField(field);
+            if (FieldName.AUTHOR.equals(field.getKey())) {
+                String authors = field.getValue();
                 AuthorList list = AuthorList.parse(authors);
 
                 for (Author author : list.getAuthors()) {
@@ -667,12 +652,12 @@ public class XMPUtil {
                 continue;
             }
 
-            if (FieldName.MONTH.equals(field)) {
+            if (FieldName.MONTH.equals(field.getKey())) {
                 // Dealt with in year
                 continue;
             }
 
-            if (FieldName.YEAR.equals(field)) {
+            if (FieldName.YEAR.equals(field.getKey())) {
 
                 /**
                  * Year + Month -> Date
@@ -706,9 +691,8 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: abstract
              */
-            if (FieldName.ABSTRACT.equals(field)) {
-                String o = resolvedEntry.getField(field);
-                dcSchema.setDescription(o);
+            if (FieldName.ABSTRACT.equals(field.getKey())) {
+                dcSchema.setDescription(field.getValue());
                 continue;
             }
 
@@ -725,9 +709,8 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: doi
              */
-            if (FieldName.DOI.equals(field)) {
-                String o = resolvedEntry.getField(field);
-                dcSchema.setIdentifier(o);
+            if (FieldName.DOI.equals(field.getKey())) {
+                dcSchema.setIdentifier(field.getValue());
                 continue;
             }
 
@@ -753,9 +736,8 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: doi
              */
-            if (FieldName.PUBLISHER.equals(field)) {
-                String o = entry.getField(field);
-                dcSchema.addPublisher(o);
+            if (FieldName.PUBLISHER.equals(field.getKey())) {
+                dcSchema.addPublisher(field.getValue());
                 continue;
             }
 
@@ -791,8 +773,8 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: doi
              */
-            if (FieldName.KEYWORDS.equals(field)) {
-                String o = entry.getField(field);
+            if (FieldName.KEYWORDS.equals(field.getKey())) {
+                String o = field.getValue();
                 String[] keywords = o.split(",");
                 for (String keyword : keywords) {
                     dcSchema.addSubject(keyword.trim());
@@ -815,9 +797,8 @@ public class XMPUtil {
              *
              * Bibtex-Fields used: title
              */
-            if (FieldName.TITLE.equals(field)) {
-                String o = entry.getField(field);
-                dcSchema.setTitle(o);
+            if (FieldName.TITLE.equals(field.getKey())) {
+                dcSchema.setTitle(field.getValue());
                 continue;
             }
 
@@ -826,8 +807,8 @@ public class XMPUtil {
              * All others (including the bibtex key) get packaged in the
              * relation attribute
              */
-            String o = entry.getField(field);
-            dcSchema.addRelation("bibtex/" + field + '/' + o);
+            String o = field.getValue();
+            dcSchema.addRelation("bibtex/" + field.getKey() + '/' + o);
         }
 
         /**

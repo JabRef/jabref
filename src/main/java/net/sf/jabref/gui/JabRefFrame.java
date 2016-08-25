@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui;
 
 import java.awt.Component;
@@ -31,6 +16,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -125,7 +111,6 @@ import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.GuiAppender;
-import net.sf.jabref.logic.preferences.LastFocusedTabPreferences;
 import net.sf.jabref.logic.undo.AddUndoableActionEvent;
 import net.sf.jabref.logic.undo.UndoChangeEvent;
 import net.sf.jabref.logic.undo.UndoRedoEvent;
@@ -138,6 +123,7 @@ import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.preferences.HighlightMatchingGroupPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.preferences.LastFocusedTabPreferences;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -761,10 +747,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         dispose();
 
-        if (getCurrentBasePanel() != null) {
-            getCurrentBasePanel().saveDividerLocation();
-        }
-
         //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, (getExtendedState()&MAXIMIZED_BOTH)>0);
         prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
 
@@ -1210,28 +1192,28 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         edit.add(unmark);
         edit.add(unmarkAll);
         edit.addSeparator();
-        if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SPECIALFIELDSENABLED)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
             JMenu m;
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RANKING)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
                 m = new JMenu();
                 RightClickMenu.populateSpecialFieldMenu(m, Rank.getInstance(), this);
                 edit.add(m);
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RELEVANCE)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
                 edit.add(toggleRelevance);
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_QUALITY)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY)) {
                 edit.add(toggleQualityAssured);
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRIORITY)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
                 m = new JMenu();
                 RightClickMenu.populateSpecialFieldMenu(m, Priority.getInstance(), this);
                 edit.add(m);
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRINTED)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
                 edit.add(togglePrinted);
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_READ)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
                 m = new JMenu();
                 RightClickMenu.populateSpecialFieldMenu(m, ReadStatus.getInstance(), this);
                 edit.add(m);
@@ -1456,29 +1438,29 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addSeparator();
         tlb.addAction(mark);
         tlb.addAction(unmark);
-        if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SPECIALFIELDSENABLED)) {
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RANKING)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
                 JButton button = net.sf.jabref.specialfields.SpecialFieldDropDown
                         .generateSpecialFieldButtonWithDropDown(Rank.getInstance(), this);
                 tlb.add(button);
                 specialFieldButtons.add(button);
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RELEVANCE)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
                 tlb.addAction(toggleRelevance);
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_QUALITY)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY)) {
                 tlb.addAction(toggleQualityAssured);
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRIORITY)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
                 JButton button = net.sf.jabref.specialfields.SpecialFieldDropDown
                         .generateSpecialFieldButtonWithDropDown(Priority.getInstance(), this);
                 tlb.add(button);
                 specialFieldButtons.add(button);
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRINTED)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
                 tlb.addAction(togglePrinted);
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_READ)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
                 JButton button = net.sf.jabref.specialfields.SpecialFieldDropDown
                         .generateSpecialFieldButtonWithDropDown(ReadStatus.getInstance(), this);
                 tlb.add(button);
@@ -1583,10 +1565,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         if (tabCount > 0) {
             BasePanel current = getCurrentBasePanel();
-            if(current != null) {
-                boolean saved = current.getBibDatabaseContext().getDatabaseFile() != null;
-                setEnabled(openAndSavedDatabasesOnlyActions, saved);
-            }
+            boolean saved = current.getBibDatabaseContext().getDatabaseFile() != null;
+            setEnabled(openAndSavedDatabasesOnlyActions, saved);
             boolean isShared = current.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED;
             setEnabled(sharedDatabaseOnlyActions, isShared);
             setEnabled(noSharedDatabaseActions, !isShared);
@@ -1788,7 +1768,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * This method shows a wait cursor and blocks all input to the JFrame's contents.
      */
     public void block() {
-        getGlassPane().setVisible(true);
+        changeBlocking(true);
     }
 
     /**
@@ -1796,7 +1776,24 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * There are no adverse effects of calling this method redundantly.
      */
     public void unblock() {
-        getGlassPane().setVisible(false);
+        changeBlocking(false);
+    }
+
+    /**
+     * Do the actual blocking/unblocking
+     *
+     * @param blocked true if input should be blocked
+     */
+    private void changeBlocking(boolean blocked) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            getGlassPane().setVisible(blocked);
+        } else {
+            try {
+                SwingUtilities.invokeAndWait(() -> getGlassPane().setVisible(blocked));
+            } catch (InvocationTargetException | InterruptedException e) {
+                LOGGER.error("Problem " + (blocked ? "" : "un") + "blocking UI", e);
+            }
+        }
     }
 
     /**
@@ -1997,6 +1994,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 propertiesDialog = new DatabasePropertiesDialog(JabRefFrame.this);
             }
             propertiesDialog.setPanel(getCurrentBasePanel());
+            propertiesDialog.updateEnableStatus();
             propertiesDialog.setLocationRelativeTo(JabRefFrame.this);
             propertiesDialog.setVisible(true);
         }
@@ -2322,12 +2320,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
 
         private void updateTexts(UndoChangeEvent event) {
-            if (JabRefFrame.this != null) {
-                undo.putValue(Action.SHORT_DESCRIPTION, event.getUndoDescription());
-                undo.setEnabled(event.isCanUndo());
-                redo.putValue(Action.SHORT_DESCRIPTION, event.getRedoDescription());
-                redo.setEnabled(event.isCanRedo());
-            }
+            SwingUtilities.invokeLater(() -> {
+                if (JabRefFrame.this != null) {
+                    undo.putValue(Action.SHORT_DESCRIPTION, event.getUndoDescription());
+                    undo.setEnabled(event.isCanUndo());
+                    redo.putValue(Action.SHORT_DESCRIPTION, event.getRedoDescription());
+                    redo.setEnabled(event.isCanRedo());
+                }
+            });
         }
     }
 }

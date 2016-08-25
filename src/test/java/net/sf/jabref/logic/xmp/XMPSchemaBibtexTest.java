@@ -11,25 +11,28 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.jabref.BibtexTestData;
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.jempbox.impl.XMLUtil;
 import org.apache.jempbox.xmp.XMPMetadata;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import static org.mockito.Mockito.when;
+
+@RunWith(MockitoJUnitRunner.class)
 public class XMPSchemaBibtexTest {
 
-    @Before
-    public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
+    @Mock
+    private ImportFormatPreferences prefs;
 
     public void assertEqualsBibtexEntry(BibEntry e, BibEntry x) {
         Assert.assertNotNull(e);
@@ -243,11 +246,11 @@ public class XMPSchemaBibtexTest {
 
     @Test
     public void testSetBibtexEntry() throws IOException {
+        when(prefs.getFieldContentParserPreferences()).thenReturn(new FieldContentParserPreferences());
 
         XMPMetadata xmp = new XMPMetadata();
         XMPSchemaBibtex bibtex = new XMPSchemaBibtex(xmp);
-
-        BibEntry e = BibtexTestData.getBibtexEntry();
+        BibEntry e = BibtexTestData.getBibtexEntry(prefs);
         bibtex.setBibtexEntry(e, null);
 
         BibEntry e2 = bibtex.getBibtexEntry();

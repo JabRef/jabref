@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.shared;
 
 import java.sql.Connection;
@@ -28,7 +13,6 @@ import net.sf.jabref.event.MetaDataChangedEvent;
 import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.logic.exporter.BibDatabaseWriter;
 import net.sf.jabref.logic.importer.util.ParseException;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.event.EntryAddedEvent;
@@ -38,6 +22,7 @@ import net.sf.jabref.model.event.FieldChangedEvent;
 import net.sf.jabref.shared.event.ConnectionLostEvent;
 import net.sf.jabref.shared.event.SharedEntryNotPresentEvent;
 import net.sf.jabref.shared.event.UpdateRefusedEvent;
+import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.exception.OfflineLockException;
 import net.sf.jabref.shared.exception.SharedEntryNotPresentException;
 
@@ -73,6 +58,7 @@ public class DBMSSynchronizer {
 
     /**
      * Listening method. Inserts a new {@link BibEntry} into shared database.
+     *
      * @param event {@link EntryAddedEvent} object
      */
     @Subscribe
@@ -88,13 +74,14 @@ public class DBMSSynchronizer {
 
     /**
      * Listening method. Updates an existing shared {@link BibEntry}.
+     *
      * @param event {@link FieldChangedEvent} object
      */
     @Subscribe
     public void listen(FieldChangedEvent event) {
         // While synchronizing the local database (see synchronizeLocalDatabase() below), some EntryEvents may be posted.
         // In this case DBSynchronizer should not try to update the bibEntry entry again (but it would not harm).
-        if (isEventSourceAccepted(event) && checkCurrentConnection()) {
+        if (isPresentLocalBibEntry(event.getBibEntry()) && isEventSourceAccepted(event) && checkCurrentConnection()) {
             synchronizeLocalMetaData();
             BibEntry bibEntry = event.getBibEntry();
             synchronizeSharedEntry(bibEntry);
@@ -104,6 +91,7 @@ public class DBMSSynchronizer {
 
     /**
      * Listening method. Deletes the given {@link BibEntry} from shared database.
+     *
      * @param event {@link EntryRemovedEvent} object
      */
     @Subscribe
@@ -119,6 +107,7 @@ public class DBMSSynchronizer {
 
     /**
      * Listening method. Synchronizes the shared {@link MetaData} and applies them locally.
+     *
      * @param event
      */
     @Subscribe
@@ -133,17 +122,23 @@ public class DBMSSynchronizer {
     /**
      * Sets the table structure of shared database if needed and pulls all shared entries
      * to the new local database.
+     *
      * @param bibDatabase Local {@link BibDatabase}
+     * @throws DatabaseNotSupportedException if the version of shared database does not match
+     *          the version of current shared database support ({@link DBMSProcessor}).
      */
-    public void initializeDatabases() {
-        try {
-            if (!dbmsProcessor.checkBaseIntegrity()) {
-                LOGGER.info(Localization.lang("Integrity check failed. Fixing..."));
-                dbmsProcessor.setUpSharedDatabase();
+    public void initializeDatabases() throws DatabaseNotSupportedException, SQLException {
+        if (!dbmsProcessor.checkBaseIntegrity()) {
+            LOGGER.info("Integrity check failed. Fixing...");
+            dbmsProcessor.setupSharedDatabase();
+
+            // This check should only be performed once on initial database setup.
+            // Calling dbmsProcessor.setupSharedDatabase() lets dbmsProcessor.checkBaseIntegrity() be true.
+            if (dbmsProcessor.checkForPre3Dot6Intergrity()) {
+                throw new DatabaseNotSupportedException();
             }
-        } catch (SQLException e) {
-            LOGGER.error("SQL Error: ", e);
         }
+
         synchronizeLocalMetaData();
         synchronizeLocalDatabase();
     }
@@ -328,6 +323,7 @@ public class DBMSSynchronizer {
 
     /**
      * Checks whether the {@link EntryEventSource} of an {@link EntryEvent} is crucial for this class.
+     *
      * @param event An {@link EntryEvent}
      * @return <code>true</code> if the event is able to trigger operations in {@link DBMSSynchronizer}, else <code>false</code>
      */
@@ -336,7 +332,7 @@ public class DBMSSynchronizer {
         return ((eventSource == EntryEventSource.LOCAL) || (eventSource == EntryEventSource.UNDO));
     }
 
-    public void openSharedDatabase(Connection connection, DBMSType type, String name) {
+    public void openSharedDatabase(Connection connection, DBMSType type, String name) throws DatabaseNotSupportedException, SQLException {
         this.dbmsType = type;
         this.dbName = name;
         this.currentConnection = connection;
@@ -344,8 +340,12 @@ public class DBMSSynchronizer {
         initializeDatabases();
     }
 
-    public void openSharedDatabase(DBMSConnectionProperties properties) throws ClassNotFoundException, SQLException {
+    public void openSharedDatabase(DBMSConnectionProperties properties) throws ClassNotFoundException, SQLException, DatabaseNotSupportedException {
         openSharedDatabase(DBMSConnector.getNewConnection(properties), properties.getType(), properties.getDatabase());
+    }
+
+    private boolean isPresentLocalBibEntry(BibEntry bibEntry) {
+        return bibDatabase.getEntries().contains(bibEntry);
     }
 
     public String getDBName() {

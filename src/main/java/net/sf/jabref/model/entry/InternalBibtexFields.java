@@ -1,33 +1,3 @@
-/*  Copyright (C) 2003-2016 Raik Nagel and JabRef contributors
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-//
-// function : Handling of bibtex fields.
-//            All bibtex-field related stuff should be placed here!
-//            Because we can export these informations into additional
-//            config files -> simple extension and definition of new fields....
-//
-// todo     : - handling of identically fields with different names
-//              e.g. LCCN = lib-congress
-//            - group id for each fields, e.g. standard, jurabib, bio....
-//            - add a additional properties functionality into the
-//              BibtexSingleField class
-//
-// modified : r.nagel 25.04.2006
-//            export/import of some definition from/to a xml file
-
 package net.sf.jabref.model.entry;
 
 import java.util.ArrayList;
@@ -43,6 +13,18 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Handling of bibtex fields.
+ * All bibtex-field related stuff should be placed here!
+ * Because we can export these informations into additional
+ * config files -> simple extension and definition of new fields....
+ *
+ * TODO:
+ *  - handling of identically fields with different names
+ *    e.g. LCCN = lib-congress
+ *  - group id for each fields, e.g. standard, jurabib, bio....
+ *  - add a additional properties functionality into the BibtexSingleField class
+ */
 public class InternalBibtexFields {
 
     // contains all bibtex-field objects (BibtexSingleField)
@@ -56,7 +38,8 @@ public class InternalBibtexFields {
             "ctlalt_stretch_factor", FieldName.VOLUMES);
     public static final List<String> IEEETRANBSTCTL_YES_NO_FIELDS = Arrays.asList("ctluse_article_number",
             "ctluse_paper", "ctluse_url", "ctluse_forced_etal", "ctluse_alt_spacing", "ctldash_repeated_names");
-    public static final List<String> BIBLATEX_DATE_FIELDS = Arrays.asList(FieldName.DATE, "eventdate", "origdate", FieldName.URLDATE);
+    public static final List<String> BIBLATEX_DATE_FIELDS = Arrays.asList(FieldName.DATE, "eventdate", "origdate",
+            FieldName.URLDATE);
     public static final List<String> BIBLATEX_PERSON_NAME_FIELDS = Arrays.asList(FieldName.AUTHOR, FieldName.EDITOR,
             "editora", "editorb", "editorc", FieldName.TRANSLATOR, "annotator", "commentator", "introduction", "foreword",
             "afterword", FieldName.BOOKAUTHOR, "holder", "shortauthor", "shorteditor", "sortname", "nameaddon");
@@ -174,14 +157,14 @@ public class InternalBibtexFields {
         add(new BibtexSingleField(FieldName.ABSTRACT, false, BibtexSingleField.LARGE_W, 400));
 
         dummy = new BibtexSingleField(FieldName.URL, false, BibtexSingleField.SMALL_W);
-        dummy.setExtras(EnumSet.of(FieldProperties.EXTERNAL));
+        dummy.setExtras(EnumSet.of(FieldProperties.EXTERNAL, FieldProperties.VERBATIM));
         add(dummy);
 
         add(new BibtexSingleField("comment", false, BibtexSingleField.MEDIUM_W));
         add(new BibtexSingleField(FieldName.KEYWORDS, false, BibtexSingleField.SMALL_W));
 
         dummy = new BibtexSingleField(FieldName.FILE, false);
-        dummy.setExtras(EnumSet.of(FieldProperties.FILE_EDITOR));
+        dummy.setExtras(EnumSet.of(FieldProperties.FILE_EDITOR, FieldProperties.VERBATIM));
         add(dummy);
 
         add(new BibtexSingleField("search", false, 75));
@@ -515,14 +498,5 @@ public class InternalBibtexFields {
                 fieldName -> InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.PERSON_NAMES))
                 .collect(Collectors.toList());
     }
-
-    /*
-       public static int getPreferredFieldLength(String name) {
-       int l = DEFAULT_FIELD_LENGTH;
-       Object o = fieldLength.get(name.toLowerCase());
-       if (o != null)
-       l = ((Integer)o).intValue();
-       return l;
-       }*/
 
 }

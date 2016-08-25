@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref;
 
 import java.io.IOException;
@@ -43,6 +28,7 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.FieldName;
 
@@ -51,8 +37,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class MetaData implements Iterable<String> {
-
     private static final Log LOGGER = LogFactory.getLog(MetaData.class);
+
     public static final String META_FLAG = "jabref-meta: ";
     private static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
 
@@ -80,27 +66,28 @@ public class MetaData implements Iterable<String> {
      * must simply make sure the appropriate changes are reflected in the Vector
      * it has been passed.
      */
-    private MetaData(Map<String, String> inData, Charset encoding) throws ParseException {
+    private MetaData(Map<String, String> inData) throws ParseException {
         Objects.requireNonNull(inData);
         setData(inData);
-        this.encoding = encoding;
+    }
+    private MetaData(Map<String, String> inData, Charset encoding) throws ParseException {
+        this(inData);
+        this.encoding = Objects.requireNonNull(encoding);
     }
 
     /**
      * The MetaData object can be constructed with no data in it.
      */
-    @Deprecated
     public MetaData() {
-        this(Globals.prefs.getDefaultEncoding());
+        // Do nothing
     }
 
     public MetaData(Charset encoding) {
         this.encoding = encoding;
     }
 
-    @Deprecated
     public static MetaData parse(Map<String, String> data) throws ParseException {
-        return new MetaData(data, Globals.prefs.getDefaultEncoding());
+        return new MetaData(data);
     }
 
     public static MetaData parse(Map<String, String> data, Charset encoding) throws ParseException {
@@ -250,12 +237,12 @@ public class MetaData implements Iterable<String> {
     /**
      * @return the stored label patterns
      */
-    public AbstractBibtexKeyPattern getBibtexKeyPattern() {
+    public AbstractBibtexKeyPattern getBibtexKeyPattern(GlobalBibtexKeyPattern globalPattern) {
         if (bibtexKeyPattern != null) {
             return bibtexKeyPattern;
         }
 
-        bibtexKeyPattern = new DatabaseBibtexKeyPattern(Globals.prefs);
+        bibtexKeyPattern = new DatabaseBibtexKeyPattern(globalPattern);
 
         // read the data from the metadata and store it into the bibtexKeyPattern
         for (String key : this) {
@@ -471,8 +458,8 @@ public class MetaData implements Iterable<String> {
     /**
      * Returns the encoding used during parsing.
      */
-    public Charset getEncoding() {
-        return encoding;
+    public Optional<Charset> getEncoding() {
+        return Optional.ofNullable(encoding);
     }
 
     public void setEncoding(Charset encoding) {

@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.bibtexkeypattern;
 
 import java.util.ArrayList;
@@ -55,9 +40,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
         Map<String, BibEntry> foundKeys = new HashMap<>();
         BibDatabase db = panel.getDatabase();
         for (BibEntry entry : db.getEntries()) {
-            String key = entry.getCiteKey();
-            // Only handle keys that are actually set:
-            if ((key != null) && !key.isEmpty()) {
+            entry.getCiteKeyOptional().filter(key -> !key.isEmpty()).ifPresent(key -> {
                 // See whether this entry's key is already known:
                 if (foundKeys.containsKey(key)) {
                     // Already known, so we have found a dupe. See if it was already found as a dupe:
@@ -77,7 +60,7 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
                     // Not already known. Add key and entry to map:
                     foundKeys.put(key, entry);
                 }
-            }
+            });
         }
     }
 
@@ -110,10 +93,10 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
         if (!toGenerateFor.isEmpty()) {
             NamedCompound ce = new NamedCompound(Localization.lang("Resolve duplicate BibTeX keys"));
             for (BibEntry entry : toGenerateFor) {
-                String oldKey = entry.getCiteKey();
+                String oldKey = entry.getCiteKeyOptional().orElse(null);
                 BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
                         BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
-                ce.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, oldKey, entry.getCiteKey()));
+                ce.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, oldKey, entry.getCiteKeyOptional().get()));
             }
             ce.end();
             panel.getUndoManager().addEdit(ce);

@@ -11,6 +11,7 @@ import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.DatabaseLocation;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -36,7 +37,7 @@ public class SynchronizationTestSimulator {
 
 
     @Before
-    public void setUp() throws ClassNotFoundException, SQLException {
+    public void setUp() throws ClassNotFoundException, SQLException, DatabaseNotSupportedException {
         // Get only one connection for each parameter
         if (TestConnector.currentConnectionType != dbmsType) {
             connection = TestConnector.getTestConnection(dbmsType);

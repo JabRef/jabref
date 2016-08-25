@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.importer.fetcher;
 
 import java.awt.BorderLayout;
@@ -28,6 +13,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -271,8 +257,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up title
-        if (entry.hasField(FieldName.TITLE)) {
-            String title = entry.getField(FieldName.TITLE);
+        entry.getFieldOptional(FieldName.TITLE).ifPresent(title -> {
             // USe the alt-text and replace image links
             title = title.replaceAll("[ ]?img src=[^ ]+ alt=\"([^\"]+)\">[ ]?", "\\$$1\\$");
             // Try to sort out most of the /spl / conversions
@@ -301,11 +286,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
             }
             // Write back
             entry.setField(FieldName.TITLE, title);
-        }
+        });
 
         // clean up author
-        if (entry.hasField(FieldName.AUTHOR)) {
-            String author = entry.getField(FieldName.AUTHOR);
+        entry.getFieldOptional(FieldName.AUTHOR).ifPresent(author -> {
             author = author.replaceAll("\\s+", " ");
 
             //reorder the "Jr." "Sr." etc to the correct ordering
@@ -321,11 +305,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
             author = author.replaceAll("[ ,;]+$", "");
             //TODO: remove trailing commas
             entry.setField(FieldName.AUTHOR, author);
-        }
+        });
 
         // clean up month
-        String month = entry.getField(FieldName.MONTH);
-        if ((month != null) && !month.isEmpty()) {
+        entry.getFieldOptional(FieldName.MONTH).filter(month -> !month.isEmpty()).ifPresent(month -> {
             month = month.replace(".", "");
             month = month.toLowerCase();
 
@@ -355,11 +338,10 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 }
             }
             entry.setField(FieldName.MONTH, date.toString());
-        }
+        });
 
         // clean up pages
-        if (entry.hasField(FieldName.PAGES)) {
-            String pages = entry.getField(FieldName.PAGES);
+        entry.getFieldOptional(FieldName.PAGES).ifPresent(pages -> {
             String[] pageNumbers = pages.split("-");
             if (pageNumbers.length == 2) {
                 if (pageNumbers[0].equals(pageNumbers[1])) {// single page
@@ -368,7 +350,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                     entry.setField(FieldName.PAGES, pages.replace("-", "--"));
                 }
             }
-        }
+        });
 
         // clean up publication field
         String type = entry.getType();
@@ -380,7 +362,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             sourceField = FieldName.BOOKTITLE;
         }
         if (entry.hasField(sourceField)) {
-            String fullName = entry.getField(sourceField);
+            String fullName = entry.getFieldOptional(sourceField).get();
             if ("article".equals(type)) {
                 int ind = fullName.indexOf(": Accepted for future publication");
                 if (ind > 0) {
@@ -395,13 +377,12 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 if (parts.length == 3) {
                     fullName += parts[2];
                 }
-                String note = entry.getField(FieldName.NOTE);
-                if ("Early Access".equals(note)) {
+                entry.getFieldOptional(FieldName.NOTE).filter(note -> "Early Access".equals(note)).ifPresent(note -> {
                     entry.setField(FieldName.YEAR, "to be published");
                     entry.clearField(FieldName.MONTH);
                     entry.clearField(FieldName.PAGES);
                     entry.clearField(FieldName.NUMBER);
-                }
+                });
             } else {
                 fullName = fullName.replace("Conference Proceedings", "Proceedings")
                         .replace("Proceedings of", "Proceedings").replace("Proceedings.", "Proceedings");
@@ -474,9 +455,9 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 fullName = fullName.trim();
 
                 fullName = fullName.replaceAll("^[tT]he ", "").replaceAll("^\\d{4} ", "").replaceAll("[,.]$", "");
-                String year = entry.getField(FieldName.YEAR);
-                if (year != null) {
-                    fullName = fullName.replaceAll(", " + year + "\\.?", "");
+                Optional<String> year = entry.getFieldOptional(FieldName.YEAR);
+                if (year.isPresent()) {
+                    fullName = fullName.replaceAll(", " + year.get() + "\\.?", "");
                 }
 
                 if (!fullName.contains("Abstract") && !fullName.contains("Summaries")
@@ -488,8 +469,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up abstract
-        if (entry.hasField(FieldName.ABSTRACT)) {
-            String abstr = entry.getField(FieldName.ABSTRACT);
+        entry.getFieldOptional(FieldName.ABSTRACT).ifPresent(abstr -> {
             // Try to sort out most of the /spl / conversions
             // Deal with this specific nested type first
             abstr = abstr.replaceAll("/sub /spl infin//", "\\$_\\\\infty\\$");
@@ -505,7 +485,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             abstr = abstr.replace("\\infin", "\\infty");
             // Write back
             entry.setField(FieldName.ABSTRACT, abstr);
-        }
+        });
 
         // Clean up url
         entry.getFieldOptional(FieldName.URL)

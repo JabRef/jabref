@@ -13,10 +13,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -40,7 +38,6 @@ public class BibTeXMLImporterTestFiles {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
         bibtexmlImporter = new BibTeXMLImporter();
     }
 

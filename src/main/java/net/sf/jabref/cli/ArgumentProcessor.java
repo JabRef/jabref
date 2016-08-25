@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
@@ -25,6 +26,7 @@ import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.exporter.BibDatabaseWriter;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
+import net.sf.jabref.logic.exporter.ExportFormat;
 import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.exporter.FileSaveSession;
 import net.sf.jabref.logic.exporter.IExportFormat;
@@ -37,6 +39,7 @@ import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.logging.JabRefLogger;
 import net.sf.jabref.logic.search.DatabaseSearcher;
 import net.sf.jabref.logic.search.SearchQuery;
@@ -197,7 +200,9 @@ public class ArgumentProcessor {
                 // We have an ExportFormat instance:
                 try {
                     System.out.println(Localization.lang("Exporting") + ": " + data[1]);
-                    format.performExport(databaseContext, data[1], databaseContext.getMetaData().getEncoding(), matches);
+                    format.performExport(databaseContext, data[1],
+                            databaseContext.getMetaData().getEncoding().orElse(Globals.prefs.getDefaultEncoding()),
+                            matches);
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
                             + ex.getMessage());
@@ -376,7 +381,9 @@ public class ArgumentProcessor {
                 // We have an ExportFormat instance:
                 try {
                     format.performExport(pr.getDatabaseContext(), data[0],
-                            pr.getDatabaseContext().getMetaData().getEncoding(), null);
+                            pr.getDatabaseContext().getMetaData().getEncoding()
+                                    .orElse(Globals.prefs.getDefaultEncoding()),
+                            null);
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
                             + ex.getMessage());
@@ -390,7 +397,12 @@ public class ArgumentProcessor {
         try {
             Globals.prefs.importPreferences(cli.getPreferencesImport());
             CustomEntryTypesManager.loadCustomEntryTypes(Globals.prefs);
-            ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
+            Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
+                    Globals.journalAbbreviationLoader);
+            LayoutFormatterPreferences layoutPreferences = LayoutFormatterPreferences.fromPreferences(Globals.prefs,
+                    Globals.journalAbbreviationLoader);
+            SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+            ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }

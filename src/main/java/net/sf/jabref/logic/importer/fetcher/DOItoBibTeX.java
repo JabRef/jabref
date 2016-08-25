@@ -54,15 +54,11 @@ public class DOItoBibTeX {
             bibtexString = cleanupEncoding(bibtexString);
 
             // BibTeX entry
-            BibEntry entry = BibtexParser.singleFromString(bibtexString, importFormatPreferences);
+            Optional<BibEntry> bibEntry = BibtexParser.singleFromString(bibtexString, importFormatPreferences);
 
-            if (entry == null) {
-                return Optional.empty();
-            }
-            // Optionally re-format BibTeX entry
-            formatTitleField(entry, importFormatPreferences);
+            bibEntry.ifPresent(entry -> formatTitleField(entry, importFormatPreferences));
 
-            return Optional.of(entry);
+            return bibEntry;
         } catch (MalformedURLException e) {
             LOGGER.warn("Bad DOI URL", e);
             return Optional.empty();

@@ -9,23 +9,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 public class MsBibImporterTest {
-
-    @Before
-    public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
 
     @Test
     public void testsGetExtensions() {

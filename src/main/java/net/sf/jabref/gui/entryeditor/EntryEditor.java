@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.entryeditor;
 
 import java.awt.AWTKeyStroke;
@@ -103,8 +88,10 @@ import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
-import net.sf.jabref.logic.util.date.TimeStamp;
+import net.sf.jabref.logic.util.UpdateField;
+import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
@@ -517,8 +504,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     getStoreFieldAction());
         } else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectors(fieldName).isEmpty()) {
             return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors, getStoreFieldAction());
-        } else if (fieldExtras.contains(FieldProperties.URL)) {
-            return FieldExtraComponents.getURLExtraComponent(editor, getStoreFieldAction());
         } else if (fieldExtras.contains(FieldProperties.DOI)) {
             return FieldExtraComponents.getDoiExtraComponent(panel, this, editor);
         } else if (fieldExtras.contains(FieldProperties.EPRINT)) {
@@ -551,7 +536,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         source.setEditable(true);
         source.setLineWrap(true);
-        source.setTabSize(Globals.prefs.getInt(JabRefPreferences.INDENT));
         source.addFocusListener(new FieldEditorFocusListener());
         // Add the global focus listener, so a menu item can see if this field was focused when an action was called.
         source.addFocusListener(Globals.getFocusListener());
@@ -947,7 +931,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
     @Subscribe
     public void listen(FieldChangedEvent fieldChangedEvent) {
         String newValue = fieldChangedEvent.getNewValue() == null ? "" : fieldChangedEvent.getNewValue();
-        setField(fieldChangedEvent.getFieldName(), newValue);
+        if (SwingUtilities.isEventDispatchThread()) {
+            setField(fieldChangedEvent.getFieldName(), newValue);
+        } else {
+            SwingUtilities.invokeLater(() -> setField(fieldChangedEvent.getFieldName(), newValue));
+        }
     }
 
     public void updateField(final Object sourceObject) {
@@ -1141,11 +1129,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                 // Add an UndoableKeyChange to the baseframe's undoManager.
                 UndoableKeyChange undoableKeyChange = new UndoableKeyChange(panel.getDatabase(), entry, oldValue, newValue);
-                if (TimeStamp.updateTimeStampIsSet(Globals.prefs)) {
+                if (updateTimeStampIsSet()) {
                     NamedCompound ce = new NamedCompound(undoableKeyChange.getPresentationName());
                     ce.addEdit(undoableKeyChange);
-                    TimeStamp.doUpdateTimeStamp(entry, Globals.prefs)
-                            .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
+                    doUpdateTimeStamp().ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
                     ce.end();
                     panel.getUndoManager().addEdit(ce);
                 } else {
@@ -1164,10 +1151,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 FieldEditor fieldEditor = (FieldEditor) event.getSource();
                 boolean set;
                 // Trim the whitespace off this value
-                String currentText = fieldEditor.getText();
-                String trim = currentText.trim();
-                if (!trim.isEmpty()) {
-                    toSet = trim;
+                String currentText = fieldEditor.getText().trim();
+                if (!currentText.isEmpty()) {
+                    toSet = currentText;
                 }
 
                 // We check if the field has changed, since we don't want to
@@ -1176,7 +1162,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     set = entry.hasField(fieldEditor.getFieldName());
                 } else {
                     set = !((entry.hasField(fieldEditor.getFieldName()))
-                            && toSet.equals(entry.getField(fieldEditor.getFieldName())));
+                            && toSet.equals(entry.getFieldOptional(fieldEditor.getFieldName()).orElse(null)));
                 }
 
                 if (set) {
@@ -1191,7 +1177,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                                     .format(toSet, fieldEditor.getFieldName());
                         }
 
-                        String oldValue = entry.getField(fieldEditor.getFieldName());
+                        String oldValue = entry.getFieldOptional(fieldEditor.getFieldName()).orElse(null);
 
                         if (toSet == null) {
                             entry.clearField(fieldEditor.getFieldName());
@@ -1209,11 +1195,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                         // Add an UndoableFieldChange to the baseframe's undoManager.
                         UndoableFieldChange undoableFieldChange = new UndoableFieldChange(entry, fieldEditor.getFieldName(), oldValue, toSet);
-                        if (TimeStamp.updateTimeStampIsSet(Globals.prefs)) {
+                        if (updateTimeStampIsSet()) {
                             NamedCompound ce = new NamedCompound(undoableFieldChange.getPresentationName());
                             ce.addEdit(undoableFieldChange);
 
-                            TimeStamp.doUpdateTimeStamp(entry, Globals.prefs)
+                            doUpdateTimeStamp()
                                     .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
                             ce.end();
 
@@ -1514,6 +1500,22 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 localFileListEditor.autoSetLinks();
             }
         }
+    }
+
+
+    private boolean updateTimeStampIsSet() {
+        return Globals.prefs.getBoolean(JabRefPreferences.USE_TIME_STAMP)
+                && Globals.prefs.getBoolean(JabRefPreferences.UPDATE_TIMESTAMP);
+    }
+
+    /**
+     * Updates the timestamp of the given entry and returns the FieldChange
+     */
+    private Optional<FieldChange> doUpdateTimeStamp() {
+        String timeStampField = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD);
+        String timeStampFormat = Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT);
+        String timestamp = EasyDateFormat.fromTimeStampFormat(timeStampFormat).getCurrentDate();
+        return UpdateField.updateField(entry, timeStampField, timestamp);
     }
 
 }
