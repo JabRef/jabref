@@ -15,6 +15,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -40,6 +41,8 @@ import net.sf.jabref.shared.DBMSConnectionProperties;
 import net.sf.jabref.shared.DBMSConnector;
 import net.sf.jabref.shared.DBMSType;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
+import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
+import net.sf.jabref.shared.security.Password;
 
 public class OpenSharedDatabaseDialog extends JDialog {
 
@@ -68,11 +71,9 @@ public class OpenSharedDatabaseDialog extends JDialog {
     private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
     private final JButton helpButton = new HelpAction(HelpFile.SQL_DATABASE).getHelpButton();
 
-    private static final String SHARED_DATABASE_TYPE = "sharedDatabaseType";
-    private static final String SHARED_DATABASE_HOST = "sharedDatabaseHost";
-    private static final String SHARED_DATABASE_PORT = "sharedDatabasePort";
-    private static final String SHARED_DATABASE_NAME = "sharedDatabaseName";
-    private static final String SHARED_DATABASE_USER = "sharedDatabaseUser";
+    private final JCheckBox rememberPassword = new JCheckBox(Localization.lang("Remember password?"));
+
+    private final SharedDatabasePreferences prefs = new SharedDatabasePreferences();
 
     private DBMSConnectionProperties connectionProperties;
     private BibDatabaseContext bibDatabaseContext;
@@ -84,7 +85,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
         super(frame, Localization.lang("Open shared database"));
         this.frame = frame;
         initLayout();
-        applyGlobalPrefs();
+        applyPreferences();
         setupActions();
         pack();
         setLocationRelativeTo(frame);
@@ -96,7 +97,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
         try {
             bibDatabaseContext.getDBSynchronizer().openSharedDatabase(connectionProperties);
             frame.addTab(bibDatabaseContext, true);
-            setGlobalPrefs();
+            setPreferences();
             bibDatabaseContext.getDBSynchronizer()
                     .registerListener(
                             new SharedDatabaseUIManager(frame, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR)));
@@ -170,12 +171,14 @@ public class OpenSharedDatabaseDialog extends JDialog {
     /**
      * Fetches possibly saved data and configures the control elements respectively.
      */
-    private void applyGlobalPrefs() {
-        Optional<String> sharedDatabaseType = Globals.prefs.getAsOptional(SHARED_DATABASE_TYPE);
-        Optional<String> sharedDatabaseHost = Globals.prefs.getAsOptional(SHARED_DATABASE_HOST);
-        Optional<String> sharedDatabasePort = Globals.prefs.getAsOptional(SHARED_DATABASE_PORT);
-        Optional<String> sharedDatabaseName = Globals.prefs.getAsOptional(SHARED_DATABASE_NAME);
-        Optional<String> sharedDatabaseUser = Globals.prefs.getAsOptional(SHARED_DATABASE_USER);
+    private void applyPreferences() {
+        Optional<String> sharedDatabaseType = prefs.getType();
+        Optional<String> sharedDatabaseHost = prefs.getHost();
+        Optional<String> sharedDatabasePort = prefs.getPort();
+        Optional<String> sharedDatabaseName = prefs.getName();
+        Optional<String> sharedDatabaseUser = prefs.getUser();
+        Optional<String> sharedDatabasePassword = prefs.getPassword();
+        boolean sharedDatabaseRememberPassword = prefs.getRememberPassword();
 
         if (sharedDatabaseType.isPresent()) {
             Optional<DBMSType> dbmsType = DBMSType.fromString(sharedDatabaseType.get());
@@ -201,6 +204,12 @@ public class OpenSharedDatabaseDialog extends JDialog {
         if (sharedDatabaseUser.isPresent()) {
             userField.setText(sharedDatabaseUser.get());
         }
+
+        if (sharedDatabasePassword.isPresent()) {
+            passwordField.setText(new Password(sharedDatabasePassword.get()).decrypt());
+        }
+
+        rememberPassword.setSelected(sharedDatabaseRememberPassword);
     }
 
     /**
@@ -265,6 +274,9 @@ public class OpenSharedDatabaseDialog extends JDialog {
         gridBagConstraints.gridy = 4;
         connectionPanel.add(passwordField, gridBagConstraints);
 
+        gridBagConstraints.gridy = 5;
+        connectionPanel.add(rememberPassword, gridBagConstraints);
+
         // 3. column
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
@@ -274,7 +286,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
 
         // help button
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.insets = new Insets(10, 10, 0, 0);
         JPanel helpPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         helpPanel.add(helpButton);
@@ -303,12 +315,20 @@ public class OpenSharedDatabaseDialog extends JDialog {
     /**
      * Saves the data from this dialog persistently to facilitate the usage.
      */
-    public void setGlobalPrefs() {
-        Globals.prefs.put(SHARED_DATABASE_TYPE, ((DBMSType) dbmsTypeDropDown.getSelectedItem()).toString());
-        Globals.prefs.put(SHARED_DATABASE_HOST, hostField.getText());
-        Globals.prefs.put(SHARED_DATABASE_PORT, portField.getText());
-        Globals.prefs.put(SHARED_DATABASE_NAME, databaseField.getText());
-        Globals.prefs.put(SHARED_DATABASE_USER, userField.getText());
+    public void setPreferences() {
+        prefs.setType(((DBMSType) dbmsTypeDropDown.getSelectedItem()).toString());
+        prefs.setHost(hostField.getText());
+        prefs.setPort(portField.getText());
+        prefs.setName(databaseField.getText());
+        prefs.setUser(userField.getText());
+
+        if (rememberPassword.isSelected()) {
+            prefs.setPassword(new Password(new String(passwordField.getPassword())).encrypt());
+        } else {
+            prefs.clearPassword(); // for the case that the password is already set
+        }
+
+        prefs.setRememberPassword(rememberPassword.isSelected());
     }
 
     private boolean isEmptyField(JTextField field) {
