@@ -55,4 +55,28 @@ public class IsbnFetcherTest {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("978-0321356680");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
+
+    @Test
+    public void testFetcher10Empty() throws FetcherException, IOException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("");
+        assertEquals(Optional.empty(), fetchedEntry);
+    }
+
+    @Test
+    public void testFetcher10ShortISBN() throws FetcherException, IOException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("123456789");
+        assertEquals(Optional.empty(), fetchedEntry);
+    }
+
+    @Test
+    public void testFetcher10LongISBN() throws FetcherException, IOException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("012345678910");
+        assertEquals(Optional.empty(), fetchedEntry);
+    }
+
+    @Test
+    public void testFetcher10InvalidISBN() throws FetcherException, IOException {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("jabref-4-ever");
+        assertEquals(Optional.empty(), fetchedEntry);
+    }
 }

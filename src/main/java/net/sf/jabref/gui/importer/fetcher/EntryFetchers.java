@@ -29,8 +29,8 @@ public class EntryFetchers {
         entryFetchers.add(new DOAJFetcher());
         entryFetchers.add(new SpringerFetcher());
 
-        entryFetchers.add(new SearchBasedEntryFetcher(new ArXiv()));
         entryFetchers.add(new IdBasedEntryFetcher(new IsbnFetcher()));
+        entryFetchers.add(new SearchBasedEntryFetcher(new ArXiv()));
         entryFetchers.add(new SearchBasedEntryFetcher(new GvkFetcher()));
     }
 
