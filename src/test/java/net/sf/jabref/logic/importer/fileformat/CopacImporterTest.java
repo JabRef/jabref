@@ -1,7 +1,6 @@
 package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -29,16 +28,12 @@ public class CopacImporterTest {
      * @return A list of Names
      * @throws IOException
      */
-    public List<String> getTestFiles() throws IOException {
+    public List<String> getTestFiles() throws Exception {
         try (Stream<Path> stream = Files.list(Paths.get(CopacImporterTest.class.getResource("").toURI()))) {
             return stream.filter(p -> !Files.isDirectory(p)).map(f -> f.getFileName().toString())
                     .collect(Collectors.toList());
-        } catch (URISyntaxException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return Collections.emptyList();
 
+        }
     }
 
     @Before
@@ -58,7 +53,7 @@ public class CopacImporterTest {
     }
 
     @Test
-    public void testIsNotRecognizedFormat() throws IOException, URISyntaxException {
+    public void testIsNotRecognizedFormat() throws Exception {
         List<String> list = getTestFiles().stream().filter(n -> !n.startsWith("CopacImporterTest"))
                 .collect(Collectors.toList());
         for (String str : list) {
@@ -68,7 +63,7 @@ public class CopacImporterTest {
     }
 
     @Test
-    public void testImportEmptyEntries() throws IOException, URISyntaxException {
+    public void testImportEmptyEntries() throws Exception {
         Path path = Paths.get(CopacImporterTest.class.getResource("Empty.txt").toURI());
         List<BibEntry> entries = importer.importDatabase(path, StandardCharsets.UTF_8).getDatabase().getEntries();
         Assert.assertEquals(Collections.emptyList(), entries);

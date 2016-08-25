@@ -1,7 +1,6 @@
 package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -40,18 +39,11 @@ public class BibTeXMLImporterTestFiles {
     }
 
     @Parameters(name = "{0}")
-    public static List<Path> files() throws IOException {
+    public static List<Path> files() throws Exception {
         try (Stream<Path> stream = Files.list(Paths.get(BibTeXMLImporterTest.class.getResource("").toURI()))) {
-            return stream
-                    .filter(n -> n.getFileName().toString().startsWith("BibTeXMLImporterTest")
-                            && n.getFileName().toString().endsWith(".xml"))
-                    .collect(Collectors.toList());
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-
+            return stream.filter(n -> n.getFileName().toString().startsWith("BibTeXMLImporterTest")
+                    && n.getFileName().toString().endsWith(".xml")).collect(Collectors.toList());
         }
-        return Collections.emptyList();
-
     }
 
     @Test
