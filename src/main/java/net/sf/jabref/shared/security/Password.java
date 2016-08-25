@@ -6,8 +6,6 @@ import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-import net.sf.jabref.shared.DBMSConnector;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -16,7 +14,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class Password {
 
-    private static final Log LOGGER = LogFactory.getLog(DBMSConnector.class);
+    private static final Log LOGGER = LogFactory.getLog(Password.class);
 
     private static final String ALGORITHM = "AES";
     private static final String KEY = "ThisIsA128bitKey";
