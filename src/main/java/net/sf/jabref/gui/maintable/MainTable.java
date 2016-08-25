@@ -490,6 +490,10 @@ public class MainTable extends JTable {
         return model.getTableRows().indexOf(entry);
     }
 
+    public int findLastEntry(BibEntry entry) {
+        return model.getTableRows().lastIndexOf(entry);
+    }
+
     /**
      * method to check whether a MainTableColumn at the modelIndex refers to the file field (either as a specific
      * file extension filter or not)
@@ -551,7 +555,7 @@ public class MainTable extends JTable {
     public void ensureVisible(int row) {
         JScrollBar vert = pane.getVerticalScrollBar();
         int y = row * getRowHeight();
-        if ((y < vert.getValue()) || ((y > (vert.getValue() + vert.getVisibleAmount()))
+        if ((y < vert.getValue()) || ((y >= (vert.getValue() + vert.getVisibleAmount()))
                 && (model.getSearchState() != MainTableDataModel.DisplayOption.FLOAT))) {
             scrollToCenter(row, 1);
         }

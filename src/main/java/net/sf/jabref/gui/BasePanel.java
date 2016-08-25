@@ -840,7 +840,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
                 selectionListener.editSignalled(firstBE);
             }
-            highlightEntry(firstBE);
+
+            // If we inserted a duplicate we want to select the duplicate (thus we have to search from the back)
+            highlightLastEntry(firstBE);
         }
     }
 
@@ -1716,11 +1718,27 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * This method selects the given entry, and scrolls it into view in the table. If an entryEditor is shown, it is
      * given focus afterwards.
      */
-    public void highlightEntry(final BibEntry be) {
-        final int row = mainTable.findEntry(be);
-        if (row >= 0) {
-            mainTable.setRowSelectionInterval(row, row);
-            mainTable.ensureVisible(row);
+    public void highlightEntry(final BibEntry bibEntry) {
+        highlightEntry(mainTable.findEntry(bibEntry));
+    }
+
+    /**
+     * This method selects the given entry (searches from the back), and scrolls it into view in the table.
+     * If an entryEditor is shown, it is given focus afterwards.
+     */
+    public void highlightLastEntry(final BibEntry bibEntry) {
+        highlightEntry(mainTable.findLastEntry(bibEntry));
+    }
+
+    /**
+     * This method selects the entry on the given position, and scrolls it into view in the table.
+     * If an entryEditor is shown, it is given focus afterwards.
+     */
+    public void highlightEntry(int pos) {
+        if (pos >= 0) {
+            mainTable.clearSelection();
+            mainTable.addRowSelectionInterval(pos, pos);
+            mainTable.ensureVisible(pos);
         }
     }
 
@@ -1836,17 +1854,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         }
         frame.setWindowTitle();
-    }
-
-    /**
-     * Selects a single entry, and scrolls the table to center it.
-     *
-     * @param pos Current position of entry to select.
-     */
-    public void selectSingleEntry(int pos) {
-        mainTable.clearSelection();
-        mainTable.addRowSelectionInterval(pos, pos);
-        mainTable.scrollToCenter(pos, 0);
     }
 
     public BibDatabase getDatabase() {
