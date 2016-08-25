@@ -38,6 +38,7 @@ public class FileSaveSession extends SaveSession {
     private static final String TEMP_SUFFIX = "save.bib";
     private final Path temporaryFile;
 
+
     public FileSaveSession(Charset encoding, boolean backup) throws SaveException {
         this(encoding, backup, createTemporaryFile());
     }
@@ -72,7 +73,7 @@ public class FileSaveSession extends SaveSession {
             Path fileName = file.getFileName();
             Path backupFile = file.resolveSibling(fileName + BACKUP_EXTENSION);
             try {
-                FileUtil.copyFile(file.toFile(), backupFile.toFile(), true);
+                FileUtil.copyFile(file, backupFile, true);
             } catch (IOException ex) {
                 LOGGER.error("Problem copying file", ex);
                 throw SaveException.BACKUP_CREATION;
@@ -91,7 +92,7 @@ public class FileSaveSession extends SaveSession {
                 LOGGER.error("Error when creating lock file.", ex);
             }
 
-            FileUtil.copyFile(temporaryFile.toFile(), file.toFile(), true);
+            FileUtil.copyFile(temporaryFile, file, true);
         } catch (IOException ex2) {
             // If something happens here, what can we do to correct the problem? The file is corrupted, but we still
             // have a clean copy in tmp. However, we just failed to copy tmp to file, so it's not likely that

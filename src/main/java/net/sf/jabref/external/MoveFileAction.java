@@ -145,7 +145,7 @@ public class MoveFileAction extends AbstractAction {
                 try {
                     boolean success = file.renameTo(newFile);
                     if (!success) {
-                        success = FileUtil.copyFile(file, newFile, true);
+                        success = FileUtil.copyFile(file.toPath(), newFile.toPath(), true);
                     }
                     if (success) {
                         // Remove the original file:

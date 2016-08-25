@@ -32,6 +32,7 @@ public class MoveFilesCleanupTest {
     private BibDatabaseContext databaseContext;
     private MoveFilesCleanup cleanup;
 
+
     @Before
     public void setUp() throws IOException {
         Globals.prefs = JabRefPreferences.getInstance();
@@ -74,7 +75,8 @@ public class MoveFilesCleanupTest {
 
         BibEntry entry = new BibEntry();
         ParsedFileField fileField = new ParsedFileField("", fileBefore.getAbsolutePath(), "");
-        entry.setField("file", FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""), fileField, new ParsedFileField("","",""))));
+        entry.setField("file", FileField.getStringRepresentation(
+                Arrays.asList(new ParsedFileField("", "", ""), fileField, new ParsedFileField("", "", ""))));
 
         cleanup.cleanup(entry);
 
