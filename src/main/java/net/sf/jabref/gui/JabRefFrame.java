@@ -206,6 +206,21 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction newBiblatexDatabaseAction = new NewDatabaseAction(this, BibDatabaseMode.BIBLATEX);
     private final AbstractAction openSharedDatabaseAction = new OpenSharedDatabaseAction(this);
     private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction(this);
+    private final AbstractAction jabrefWebPageAction = new OpenBrowserAction("https://jabref.org",
+            Localization.menuTitle("Website"), Localization.lang("Opens JabRef's website"),
+            IconTheme.getImage("about"), IconTheme.getImage("about"));
+    private final AbstractAction jabrefFacebookAction = new OpenBrowserAction("https://www.facebook.com/JabRef/",
+            "Facebook", Localization.lang("Opens JabRef's Facebook page"),
+            IconTheme.JabRefIcon.FACEBOOK.getSmallIcon(), IconTheme.JabRefIcon.FACEBOOK.getIcon());
+    private final AbstractAction jabrefBlogAction = new OpenBrowserAction("https://blog.jabref.org/",
+            Localization.menuTitle("Blog"), Localization.lang("Opens JabRef's blog"),
+            IconTheme.JabRefIcon.BLOG.getSmallIcon(), IconTheme.JabRefIcon.BLOG.getIcon());
+    private final AbstractAction developmentVersionAction = new OpenBrowserAction("https://builds.jabref.org/master/",
+            Localization.menuTitle("Development version"),
+            Localization.lang("Opens a link where the current development version can be downloaded"));
+    private final AbstractAction changeLogAction = new OpenBrowserAction(
+            "https://github.com/JabRef/jabref/blob/master/CHANGELOG.md", Localization.menuTitle("View change log"),
+            Localization.lang("See what has been changed in the JabRef versions"));
     private final AbstractAction forkMeOnGitHubAction = new OpenBrowserAction("https://github.com/JabRef/jabref",
             Localization.menuTitle("Fork me on GitHub"), Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcon.GITHUB.getSmallIcon(), IconTheme.JabRefIcon.GITHUB.getIcon());
     private final AbstractAction donationAction = new OpenBrowserAction("https://github.com/JabRef/jabref/wiki/Donations",
@@ -1351,10 +1366,18 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         helpMenu.addSeparator();
         helpMenu.add(errorConsole);
         helpMenu.addSeparator();
-        helpMenu.add(forkMeOnGitHubAction);
-        helpMenu.add(donationAction);
-        helpMenu.addSeparator();
         helpMenu.add(new SearchForUpdateAction());
+        JMenu webMenu = JabRefFrame.subMenu(Localization.menuTitle("JabRef resources"));
+        webMenu.add(jabrefWebPageAction);
+        webMenu.add(jabrefBlogAction);
+        webMenu.add(jabrefFacebookAction);
+        webMenu.addSeparator();
+        webMenu.add(forkMeOnGitHubAction);
+        webMenu.add(developmentVersionAction);
+        webMenu.add(changeLogAction);
+        webMenu.addSeparator();
+        webMenu.add(donationAction);
+        helpMenu.add(webMenu);
         helpMenu.add(about);
         mb.add(helpMenu);
 

@@ -44,6 +44,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - File open dialogs now use default extensions as primary file filter
 - [#1841](https://github.com/JabRef/jabref/issues/1841) The "etal"-string in the Authors layout formatter can now be empty
 - For developers: Moved the bst package into logic. This requires the regeneration of antlr sources, execute: `gradlew generateSource`
+- Added links to JabRef internet resources
 
 ### Fixed
 - Fixed [#1760](https://github.com/JabRef/jabref/issues/1760): Preview updated correctly when selecting a single entry after selecting multiple entries
