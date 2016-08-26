@@ -23,7 +23,6 @@ import org.apache.commons.logging.LogFactory;
  * Try to download fulltext PDF for selected entry(ies) by following URL or DOI link.
  */
 public class FindFullTextAction extends AbstractWorker {
-
     private static final Log LOGGER = LogFactory.getLog(FindFullTextAction.class);
 
     private final BasePanel basePanel;
