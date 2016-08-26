@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -46,20 +47,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class ChangeScanner implements Runnable {
+    private static final Log LOGGER = LogFactory.getLog(ChangeScanner.class);
 
     private static final String[] SORT_BY = new String[] {FieldName.YEAR, FieldName.AUTHOR, FieldName.TITLE};
 
     private final File f;
-
     private final BibDatabase inMem;
     private final MetaData mdInMem;
     private final BasePanel panel;
+
     private final JabRefFrame frame;
-
     private BibDatabase inTemp;
-    private MetaData mdInTemp;
 
-    private static final Log LOGGER = LogFactory.getLog(ChangeScanner.class);
+    private MetaData mdInTemp;
 
     private static final double MATCH_THRESHOLD = 0.4;
 
@@ -377,7 +377,7 @@ public class ChangeScanner implements Runnable {
                     BibtexString disk = onDisk.getString(diskId);
                     if (disk.getName().equals(tmp.getName())) {
                         // We have found a string with a matching name.
-                        if (!tmp.getContent().equals(disk.getContent())) {
+                        if (!Objects.equals(tmp.getContent(), disk.getContent())) {
                             // But they have nonmatching contents, so we've found a change.
                             Optional<BibtexString> mem = findString(inMem1, tmp.getName(), usedInMem);
                             if (mem.isPresent()) {
