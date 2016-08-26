@@ -14,8 +14,6 @@ import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
-import net.sf.jabref.preferences.JabRefPreferences;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -32,7 +30,7 @@ public class KeywordGroup extends AbstractGroup {
     private final boolean regExp;
     private Pattern pattern;
     private final List<String> searchWords;
-    protected final JabRefPreferences jabRefPreferences;
+    protected final String keywordSeparator;
 
     private static final Log LOGGER = LogFactory.getLog(KeywordGroup.class);
 
@@ -42,7 +40,7 @@ public class KeywordGroup extends AbstractGroup {
      */
     public KeywordGroup(String name, String searchField,
                         String searchExpression, boolean caseSensitive, boolean regExp,
-            GroupHierarchyType context, JabRefPreferences jabRefPreferences) throws ParseException {
+            GroupHierarchyType context, String keywordSeparator) throws ParseException {
         super(name, context);
         this.searchField = searchField;
         this.searchExpression = searchExpression;
@@ -51,7 +49,7 @@ public class KeywordGroup extends AbstractGroup {
         if (this.regExp) {
             compilePattern();
         }
-        this.jabRefPreferences = jabRefPreferences;
+        this.keywordSeparator = keywordSeparator;
         this.searchWords = EntryUtil.getStringAsWords(searchExpression);
     }
 
@@ -70,7 +68,7 @@ public class KeywordGroup extends AbstractGroup {
      * @param s The String representation obtained from
      *          KeywordGroup.toString()
      */
-    public static AbstractGroup fromString(String s, JabRefPreferences jabRefPreferences) throws ParseException {
+    public static AbstractGroup fromString(String s, String keywordSeparator) throws ParseException {
         if (!s.startsWith(KeywordGroup.ID)) {
             throw new IllegalArgumentException("KeywordGroup cannot be created from \"" + s + "\".");
         }
@@ -86,7 +84,7 @@ public class KeywordGroup extends AbstractGroup {
         return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR),
                 StringUtil.unquote(field, AbstractGroup.QUOTE_CHAR),
                 StringUtil.unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
-                GroupHierarchyType.getByNumber(context), jabRefPreferences);
+                GroupHierarchyType.getByNumber(context), keywordSeparator);
     }
 
     /**
@@ -125,9 +123,8 @@ public class KeywordGroup extends AbstractGroup {
             for (BibEntry entry : entriesToAdd) {
                 if (!contains(entry)) {
                     String oldContent = entry.getFieldOptional(searchField).orElse(null);
-                    String pre = jabRefPreferences.get(JabRefPreferences.KEYWORD_SEPARATOR);
                     String newContent = (oldContent == null ? "" : oldContent
-                            + pre)
+                            + keywordSeparator)
                             + searchExpression;
                     entry.setField(searchField, newContent);
 
@@ -263,21 +260,20 @@ public class KeywordGroup extends AbstractGroup {
             int i;
             int j;
             int k;
-            final String separator = jabRefPreferences.get(JabRefPreferences.KEYWORD_SEPARATOR);
             while ((i = haystack.indexOf(needle)) >= 0) {
                 sbOrig.replace(i, i + needle.length(), "");
                 sbLower.replace(i, i + needle.length(), "");
                 // reduce spaces at i to 1
                 j = i;
                 k = i;
-                while (((j - 1) >= 0) && (separator.indexOf(haystack.charAt(j - 1)) >= 0)) {
+                while (((j - 1) >= 0) && (keywordSeparator.indexOf(haystack.charAt(j - 1)) >= 0)) {
                     --j;
                 }
-                while ((k < haystack.length()) && (separator.indexOf(haystack.charAt(k)) >= 0)) {
+                while ((k < haystack.length()) && (keywordSeparator.indexOf(haystack.charAt(k)) >= 0)) {
                     ++k;
                 }
-                sbOrig.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? separator : "");
-                sbLower.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? separator : "");
+                sbOrig.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? keywordSeparator : "");
+                sbLower.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? keywordSeparator : "");
             }
 
             String result = sbOrig.toString().trim();
@@ -293,7 +289,7 @@ public class KeywordGroup extends AbstractGroup {
     public AbstractGroup deepCopy() {
         try {
             return new KeywordGroup(getName(), searchField, searchExpression,
-                    caseSensitive, regExp, getContext(), jabRefPreferences);
+                    caseSensitive, regExp, getContext(), keywordSeparator);
         } catch (ParseException exception) {
             // this should never happen, because the constructor obviously succeeded in creating _this_ instance!
             LOGGER.error("Internal error in KeywordGroup.deepCopy(). "

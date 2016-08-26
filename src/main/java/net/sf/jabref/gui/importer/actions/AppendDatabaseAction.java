@@ -141,7 +141,7 @@ public class AppendDatabaseAction implements BaseAction {
                     // create a dummy group
                     try {
                         ExplicitGroup group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT,
-                                Globals.prefs);
+                                Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                         newGroups.setGroup(group);
                         group.add(appendedEntries);
                     } catch (ParseException e) {
