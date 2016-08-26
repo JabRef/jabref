@@ -98,6 +98,7 @@ import net.sf.jabref.gui.journals.ManageJournalsAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.keyboard.KeyBindingRepository;
 import net.sf.jabref.gui.keyboard.KeyBindingsDialog;
+import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.gui.menus.FileHistoryMenu;
 import net.sf.jabref.gui.menus.RightClickMenu;
@@ -116,6 +117,7 @@ import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.GuiAppender;
+import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.undo.AddUndoableActionEvent;
 import net.sf.jabref.logic.undo.UndoChangeEvent;
 import net.sf.jabref.logic.undo.UndoRedoEvent;
@@ -129,6 +131,7 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.preferences.HighlightMatchingGroupPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.LastFocusedTabPreferences;
+import net.sf.jabref.preferences.SearchPreferences;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -646,6 +649,19 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             BasePanel bp = getCurrentBasePanel();
             if (bp == null) {
                 return;
+            }
+
+            // need to perform the search on the changed tab
+            if (new SearchPreferences(Globals.prefs).isGlobalSearch()) {
+                globalSearchBar.performSearch();
+            } else {
+                SearchQuery currentSearchQuery = currentBasePanel.getCurrentSearchQuery();
+                if (currentSearchQuery != null) {
+                    globalSearchBar.setSearchTerm(currentSearchQuery.getQuery());
+                } else {
+                    globalSearchBar.setSearchTerm("");
+                    currentBasePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
+                }
             }
 
             groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));

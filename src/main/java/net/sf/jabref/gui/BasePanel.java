@@ -104,6 +104,7 @@ import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutHelper;
+import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.logic.util.io.FileBasedLock;
@@ -203,6 +204,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private final SidePaneManager sidePaneManager;
 
     private ContentAutoCompleters autoCompleters;
+
+    private SearchQuery currentSearchQuery;
 
 
     public BasePanel(JabRefFrame frame, BibDatabaseContext bibDatabaseContext) {
@@ -2418,5 +2421,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public BibDatabaseContext getDatabaseContext() {
         return bibDatabaseContext;
+    }
+
+    public SearchQuery getCurrentSearchQuery() {
+        return currentSearchQuery;
+    }
+
+    public void setCurrentSearchQuery(SearchQuery currentSearchQuery) {
+        this.currentSearchQuery = currentSearchQuery;
     }
 }

@@ -23,6 +23,7 @@ import net.sf.jabref.gui.search.SearchDisplayMode;
 
 public class SearchPreferences {
 
+    private static final String SEARCH_GLOBAL = "searchGlobal";
     private static final String SEARCH_DISPLAY_MODE = "searchDisplayMode";
     private static final String SEARCH_CASE_SENSITIVE = "caseSensitiveSearch";
     private static final String SEARCH_REG_EXP = "regExpSearch";
@@ -40,6 +41,7 @@ public class SearchPreferences {
     }
 
     public static void putDefaults(Map<String, Object> defaults) {
+        defaults.put(SEARCH_GLOBAL, Boolean.FALSE);
         defaults.put(SEARCH_DISPLAY_MODE, SearchDisplayMode.FILTER.toString());
         defaults.put(SEARCH_CASE_SENSITIVE, Boolean.FALSE);
         defaults.put(SEARCH_REG_EXP, Boolean.FALSE);
@@ -48,6 +50,15 @@ public class SearchPreferences {
         defaults.put(SEARCH_DIALOG_HEIGHT, 500);
         defaults.put(SEARCH_DIALOG_POS_X, 0);
         defaults.put(SEARCH_DIALOG_POS_Y, 0);
+    }
+
+    public boolean isGlobalSearch() {
+        return preferences.getBoolean(SEARCH_GLOBAL);
+    }
+
+    public SearchPreferences setGlobalSearch(boolean isGlobalSearch) {
+        preferences.putBoolean(SEARCH_GLOBAL, isGlobalSearch);
+        return this;
     }
 
     public SearchDisplayMode getSearchMode() {
