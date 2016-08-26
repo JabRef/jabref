@@ -231,8 +231,8 @@ public class BibDatabase {
     /**
      * Returns the database's preamble.
      */
-    public synchronized String getPreamble() {
-        return preamble;
+    public synchronized Optional<String> getPreamble() {
+        return Optional.ofNullable(preamble);
     }
 
     /**
@@ -301,7 +301,7 @@ public class BibDatabase {
      * @param database another BibDatabase
      */
     public void copyPreamble(BibDatabase database) {
-        setPreamble(database.getPreamble());
+        setPreamble(database.getPreamble().orElse(""));
     }
 
     /**
