@@ -1085,7 +1085,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
 
         @Override
-        public synchronized void actionPerformed(ActionEvent event) {
+        public void actionPerformed(ActionEvent event) {
             boolean movingAway = movingToDifferentEntry;
             movingToDifferentEntry = false;
 
@@ -1211,10 +1211,13 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         updateSource();
                         panel.markBaseChanged();
                     } catch (IllegalArgumentException ex) {
-                        JOptionPane.showMessageDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
+                        if(!SwingUtilities.isEventDispatchThread())
+                        {
+                            JOptionPane.showMessageDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
                                 Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
-                        fieldEditor.setInvalidBackgroundColor();
-                        LOGGER.debug("Error setting field", ex);
+                            fieldEditor.setInvalidBackgroundColor();
+                            LOGGER.debug("Error setting field", ex);
+                        }
                     }
                 } else {
                     // set == false
