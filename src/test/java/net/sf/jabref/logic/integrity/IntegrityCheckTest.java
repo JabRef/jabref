@@ -69,7 +69,7 @@ public class IntegrityCheckTest {
 
     @Test
     public void testAuthorNameChecks() {
-        for (String field : InternalBibtexFields.BIBLATEX_PERSON_NAME_FIELDS) {
+        for (String field : InternalBibtexFields.getPersonNameFields()) {
             assertCorrect(createContext(field, ""));
             assertCorrect(createContext(field, "Knuth"));
             assertCorrect(createContext(field, "   Knuth, Donald E. "));

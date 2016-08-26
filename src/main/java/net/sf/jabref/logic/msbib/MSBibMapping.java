@@ -58,7 +58,7 @@ public class MSBibMapping {
         // MSBib only fields
         biblatexToMsBib.put(MSBIB_PREFIX + "numberofvolume", "NumberVolumes");
         biblatexToMsBib.put(MSBIB_PREFIX + "periodical", "PeriodicalTitle");
-        biblatexToMsBib.put(MSBIB_PREFIX + "day", "Day");
+        biblatexToMsBib.put(MSBIB_PREFIX + FieldName.DAY, "Day");
         biblatexToMsBib.put(MSBIB_PREFIX + "accessed", "Accessed");
         biblatexToMsBib.put(MSBIB_PREFIX + "medium", "Medium");
         biblatexToMsBib.put(MSBIB_PREFIX + "recordingnumber", "RecordingNumber");

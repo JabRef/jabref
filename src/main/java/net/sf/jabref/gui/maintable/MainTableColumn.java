@@ -12,7 +12,7 @@ import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
 public class MainTableColumn {
@@ -96,7 +96,7 @@ public class MainTableColumn {
         for (String field : bibtexFields) {
             content = BibDatabase.getResolvedField(field, entry, database.orElse(null));
             if (content.isPresent()) {
-                isNameColumn = InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES);
+                isNameColumn = InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES);
                 break;
             }
         }
