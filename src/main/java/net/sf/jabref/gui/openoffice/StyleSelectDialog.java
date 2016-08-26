@@ -44,7 +44,7 @@ import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.GUIUtil;
-import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.openoffice.OOBibStyle;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
@@ -199,9 +199,9 @@ class StyleSelectDialog {
 
         diag.pack();
 
-        PositionWindow pw = new PositionWindow(diag, JabRefPreferences.STYLES_POS_X, JabRefPreferences.STYLES_POS_Y,
+        WindowLocation pw = new WindowLocation(diag, JabRefPreferences.STYLES_POS_X, JabRefPreferences.STYLES_POS_Y,
                 JabRefPreferences.STYLES_SIZE_X, JabRefPreferences.STYLES_SIZE_Y);
-        pw.setWindowPosition();
+        pw.displayWindowAtStoredLocation();
     }
 
     private void setupTable() {

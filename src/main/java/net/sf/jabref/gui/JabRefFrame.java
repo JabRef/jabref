@@ -103,7 +103,7 @@ import net.sf.jabref.gui.protectedterms.ProtectedTermsDialog;
 import net.sf.jabref.gui.push.PushToApplicationButton;
 import net.sf.jabref.gui.push.PushToApplications;
 import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.help.HelpFile;
@@ -162,7 +162,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final Insets marg = new Insets(1, 0, 2, 0);
 
-    private PositionWindow pw;
+    private WindowLocation pw;
 
     private final IntegrityCheckAction checkIntegrity = new IntegrityCheckAction(this);
 
@@ -617,7 +617,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.setVisible(Globals.prefs.getBoolean(JabRefPreferences.TOOLBAR_VISIBLE));
 
         setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
-        pw = new PositionWindow(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
+        pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
                 JabRefPreferences.SIZE_Y);
         positionWindowOnScreen();
 
@@ -666,7 +666,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private void positionWindowOnScreen() {
         if (!prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-            pw.setWindowPosition();
+            pw.displayWindowAtStoredLocation();
         }
     }
 
