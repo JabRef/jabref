@@ -161,8 +161,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final Insets marg = new Insets(1, 0, 2, 0);
 
-    private WindowLocation pw;
-
     private final IntegrityCheckAction checkIntegrity = new IntegrityCheckAction(this);
 
     private final ToolBar tlb = new ToolBar();
@@ -613,7 +611,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.setVisible(Globals.prefs.getBoolean(JabRefPreferences.TOOLBAR_VISIBLE));
 
         setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
-        pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
+        WindowLocation pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
                 JabRefPreferences.SIZE_Y);
         pw.displayWindowAtStoredLocation();
 
