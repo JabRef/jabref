@@ -83,7 +83,6 @@ import net.sf.jabref.gui.exporter.SaveDatabaseAction;
 import net.sf.jabref.gui.groups.EntryTableTransferHandler;
 import net.sf.jabref.gui.groups.GroupSelector;
 import net.sf.jabref.gui.help.AboutAction;
-import net.sf.jabref.gui.help.AboutDialog;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.importer.ImportCustomizationDialog;
 import net.sf.jabref.gui.importer.ImportFormats;
@@ -181,9 +180,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
 
-    // The help window.
-    private final AboutDialog aboutDiag = new AboutDialog(this);
-
     // Here we instantiate menu/toolbar actions. Actions regarding
     // the currently open database are defined as a GeneralAction
     // with a unique command string. This causes the appropriate
@@ -229,7 +225,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Online help forum"), Localization.lang("Online help forum"), IconTheme.JabRefIcon.FORUM.getSmallIcon(), IconTheme.JabRefIcon.FORUM.getIcon());
     private final AbstractAction help = new HelpAction(Localization.menuTitle("Online help"), Localization.lang("Online help"),
             HelpFile.CONTENTS, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
-    private final AbstractAction about = new AboutAction(Localization.menuTitle("About JabRef"), aboutDiag,
+    private final AbstractAction about = new AboutAction(Localization.menuTitle("About JabRef"), this,
             Localization.lang("About JabRef"), IconTheme.getImage("about"));
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, Localization.menuTitle("Edit entry"),
             Localization.lang("Edit entry"), Globals.getKeyPrefs().getKey(KeyBinding.EDIT_ENTRY), IconTheme.JabRefIcon.EDIT_ENTRY.getIcon());
