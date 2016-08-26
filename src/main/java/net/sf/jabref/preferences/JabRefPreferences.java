@@ -61,7 +61,6 @@ import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.format.FileLinkPreferences;
-import net.sf.jabref.logic.layout.format.NameFormatter;
 import net.sf.jabref.logic.layout.format.NameFormatterPreferences;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
@@ -373,6 +372,8 @@ public class JabRefPreferences {
     public static final String IMPORT_ALWAYSUSE = "importAlwaysUsePDFImportStyle";
     public static final String IMPORT_FILENAMEPATTERN = "importFileNamePattern";
 
+    public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
+    public static final String NAME_FORMATER_KEY = "nameFormatterNames";
 
     public static final String PUSH_TO_APPLICATION = "pushToApplication";
 
@@ -1173,16 +1174,16 @@ public class JabRefPreferences {
     }
 
     public Map<String, Object> getPreferences() {
-        Map<String, Object> prefs = new HashMap<>();
+        Map<String, Object> result = new HashMap<>();
         try {
             for(String key : this.prefs.keys()){
                 Object value = getObject(key);
-                prefs.put(key, value);
+                result.put(key, value);
             }
         } catch (BackingStoreException e) {
             LOGGER.info("could not retrieve preference keys", e);
         }
-        return prefs;
+        return result;
     }
 
     private Object getObject(String key) {
@@ -1441,8 +1442,7 @@ public class JabRefPreferences {
     }
 
     private NameFormatterPreferences getNameFormatterPreferences() {
-        return new NameFormatterPreferences(getStringList(NameFormatter.NAME_FORMATER_KEY),
-                getStringList(NameFormatter.NAME_FORMATTER_VALUE));
+        return new NameFormatterPreferences(getStringList(NAME_FORMATER_KEY), getStringList(NAME_FORMATTER_VALUE));
     }
 
     public FileLinkPreferences getFileLinkPreferences() {

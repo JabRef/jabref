@@ -1,4 +1,4 @@
-package net.sf.jabref.external;
+package net.sf.jabref.logic.util.io;
 
 import java.io.File;
 import java.io.IOException;
