@@ -195,7 +195,7 @@ public class DownloadExternalFile {
             }
 
             try {
-                boolean success = FileUtil.copyFile(tmp, toFile, true);
+                boolean success = FileUtil.copyFile(tmp.toPath(), toFile.toPath(), true);
                 if (!success) {
                     // OOps, the file exists!
                     LOGGER.error("File already exists! DownloadExternalFile.download()");

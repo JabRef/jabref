@@ -1,6 +1,9 @@
 package net.sf.jabref.logic.util.io;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -10,13 +13,20 @@ import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 public class FileUtilTest {
+
+    @Rule
+    public TemporaryFolder temp = new TemporaryFolder();
+
 
     @Test
     public void testGetLinkedFileNameDefault() {
@@ -39,9 +49,8 @@ public class FileUtilTest {
         entry.setCiteKey("1234");
         entry.setField("title", "mytitle");
 
-        assertEquals("1234",
-                FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
-                        mock(LayoutFormatterPreferences.class)));
+        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
+                mock(LayoutFormatterPreferences.class)));
     }
 
     @Test
@@ -92,6 +101,17 @@ public class FileUtilTest {
     @Test
     public void testGetFileExtensionNoExtension2String() {
         assertFalse(FileUtil.getFileExtension(".StartsWithADotIsNotAnExtension").isPresent());
+    }
+
+    @Test
+    public void testRenameFile() throws IOException {
+        Path testFile = temp.newFile("test").toPath();
+        String src = testFile.toString();
+        String target = "testRename";
+
+        assertTrue(FileUtil.renameFile(src, target));
+        assertTrue(Files.exists(testFile.resolveSibling(target)));
+
     }
 
     @Test

@@ -2,6 +2,7 @@ package net.sf.jabref.external;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -85,7 +86,7 @@ public class DroppedFileHandler {
         grp.add(moveRadioButton);
 
         FormLayout layout = new FormLayout("left:15dlu,pref,pref,pref", "bottom:14pt,pref,pref,pref,pref");
-        layout.setRowGroups(new int[][]{{1, 2, 3, 4, 5}});
+        layout.setRowGroups(new int[][] {{1, 2, 3, 4, 5}});
         FormBuilder builder = FormBuilder.create().layout(layout);
 
         builder.add(linkInPlace).xyw(1, 1, 4);
@@ -140,7 +141,8 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getFileDirectory()).toString();
+            destFilename = FileUtil
+                    .shortenFileName(new File(fileName), panel.getBibDatabaseContext().getFileDirectory()).toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
@@ -190,7 +192,8 @@ public class DroppedFileHandler {
         NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getFileDirectory()).toString();
+            destFilename = FileUtil
+                    .shortenFileName(new File(fileName), panel.getBibDatabaseContext().getFileDirectory()).toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
@@ -228,10 +231,8 @@ public class DroppedFileHandler {
             return false;
         }
 
-        JLabel confirmationMessage = new JLabel(
-                Localization.lang("The PDF contains one or several BibTeX-records.")
-                        + "\n"
-                        + Localization.lang("Do you want to import these as new entries into the current database?"));
+        JLabel confirmationMessage = new JLabel(Localization.lang("The PDF contains one or several BibTeX-records.")
+                + "\n" + Localization.lang("Do you want to import these as new entries into the current database?"));
 
         int reply = JOptionPane.showConfirmDialog(frame, confirmationMessage,
                 Localization.lang("XMP-metadata found in PDF: %0", fileName), JOptionPane.YES_NO_CANCEL_OPTION,
@@ -264,7 +265,8 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getFileDirectory()).toString();
+            destFilename = FileUtil
+                    .shortenFileName(new File(fileName), panel.getBibDatabaseContext().getFileDirectory()).toString();
         } else {
             if (renameCheckBox.isSelected()) {
                 destFilename = fileName;
@@ -350,10 +352,9 @@ public class DroppedFileHandler {
         cl.stateChanged(new ChangeEvent(linkInPlace));
 
         try {
-            Object[] messages = {Localization.lang("How would you like to link to '%0'?", linkFileName),
-                    optionsPanel};
-            int reply = JOptionPane.showConfirmDialog(frame, messages, dialogTitle,
-                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+            Object[] messages = {Localization.lang("How would you like to link to '%0'?", linkFileName), optionsPanel};
+            int reply = JOptionPane.showConfirmDialog(frame, messages, dialogTitle, JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
             if (reply == JOptionPane.OK_OPTION) {
                 // store user's choice
                 frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE, linkInPlace.isSelected());
@@ -378,8 +379,8 @@ public class DroppedFileHandler {
      * @param edits    An NamedCompound action this action is to be added to. If none
      *                 is given, the edit is added to the panel's undoManager.
      */
-    private void doLink(BibEntry entry, ExternalFileType fileType, String filename,
-                        boolean avoidDuplicate, NamedCompound edits) {
+    private void doLink(BibEntry entry, ExternalFileType fileType, String filename, boolean avoidDuplicate,
+            NamedCompound edits) {
 
         Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
         FileListTableModel tm = new FileListTableModel();
@@ -446,8 +447,7 @@ public class DroppedFileHandler {
      * @param edits        TODO we should be able to undo this action
      * @return true if the operation succeeded.
      */
-    private boolean doMove(String fileName, String destFilename,
-                           NamedCompound edits) {
+    private boolean doMove(String fileName, String destFilename, NamedCompound edits) {
         List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
@@ -467,8 +467,7 @@ public class DroppedFileHandler {
         if (toFile.exists()) {
             int answer = JOptionPane.showConfirmDialog(frame,
                     Localization.lang("'%0' exists. Overwrite file?", toFile.getAbsolutePath()),
-                    Localization.lang("Overwrite file?"),
-                    JOptionPane.YES_NO_OPTION);
+                    Localization.lang("Overwrite file?"), JOptionPane.YES_NO_OPTION);
             if (answer == JOptionPane.NO_OPTION) {
                 return false;
             }
@@ -479,8 +478,8 @@ public class DroppedFileHandler {
             return true;
         } else {
             JOptionPane.showMessageDialog(frame,
-                    Localization.lang("Could not move file '%0'.", toFile.getAbsolutePath()) +
-                            Localization.lang("Please move the file manually and link in place."),
+                    Localization.lang("Could not move file '%0'.", toFile.getAbsolutePath())
+                            + Localization.lang("Please move the file manually and link in place."),
                     Localization.lang("Move file failed"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -530,7 +529,7 @@ public class DroppedFileHandler {
             }
         }
         try {
-            FileUtil.copyFile(new File(fileName), destFile, true);
+            FileUtil.copyFile(Paths.get(fileName), destFile.toPath(), true);
         } catch (IOException e) {
             LOGGER.error("Problem copying file", e);
             return false;

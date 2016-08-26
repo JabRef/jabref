@@ -1,12 +1,12 @@
 package net.sf.jabref.logic.util.io;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -41,6 +41,7 @@ public class FileUtil {
     private static final Pattern SLASH = Pattern.compile("/");
     private static final Pattern BACKSLASH = Pattern.compile("\\\\");
 
+
     /**
      * Returns the extension of a file or Optional.empty() if the file does not have one (no . in name).
      *
@@ -73,6 +74,7 @@ public class FileUtil {
      * @return the minimal unique path substring for each file path
      */
     public static List<String> uniquePathSubstrings(List<String> paths) {
+
         List<Stack<String>> stackList = new ArrayList<>(paths.size());
         // prepare data structures
         for (String path : paths) {
@@ -112,44 +114,32 @@ public class FileUtil {
      *
      * @param source         File Source file
      * @param dest           File Destination file
-     * @param deleteIfExists boolean Determines whether the copy goes on even if the file
-     *                       exists.
-     * @return boolean Whether the copy succeeded, or was stopped due to the
-     * file already existing.
+     * @param replaceExisting boolean Determines whether an existing File is replaced or not
+     * @return boolean Whether the copy succeeded, or was skipped, because the file already exists
      * @throws IOException
      */
-    public static boolean copyFile(File source, File dest, boolean deleteIfExists) throws IOException {
-        // Check if the file already exists.
-        if (dest.exists() && !deleteIfExists) {
-            return false;
+    public static boolean copyFile(Path source, Path dest, boolean replaceExisting) throws IOException {
+        if (replaceExisting) {
+            return Files.copy(source, dest, StandardCopyOption.REPLACE_EXISTING) != null;
         }
-        try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(source));
-                BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dest))) {
-
-
-            int el;
-            while ((el = in.read()) >= 0) {
-                out.write(el);
-            }
-            out.flush();
-        }
-        return true;
+        return false;
     }
 
     /**
-     * @param fileName
-     * @param destFilename
-     * @return
+     * Renames a given file
+     * @param fileName The source filename to rename
+     * @param destFilename The target fileName
+     * @return True if the rename was succesful, false if an exception occured
      */
     public static boolean renameFile(String fileName, String destFilename) {
-        // File (or directory) with old name
-        File fromFile = new File(fileName);
+        try {
+            Path src = Paths.get(fileName);
+            return Files.move(src, src.resolveSibling(destFilename)) != null;
+        } catch (IOException e) {
+            LOGGER.error("Renaming Files failed", e);
+            return false;
+        }
 
-        // File (or directory) with new name
-        File toFile = new File(destFilename);
-
-        // Rename file (or directory)
-        return fromFile.renameTo(toFile);
     }
 
     /**
@@ -299,8 +289,8 @@ public class FileUtil {
         }
     }
 
-    public static Map<BibEntry, List<File>> findAssociatedFiles(List<BibEntry> entries,
-            List<String> extensions, List<File> directories, boolean autolinkExactKeyOnly) {
+    public static Map<BibEntry, List<File>> findAssociatedFiles(List<BibEntry> entries, List<String> extensions,
+            List<File> directories, boolean autolinkExactKeyOnly) {
         Map<BibEntry, List<File>> result = new HashMap<>();
 
         // First scan directories
@@ -375,8 +365,8 @@ public class FileUtil {
      * @param prefs           the layout preferences
      * @return a suggested fileName
      */
-    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry,
-            String fileNamePattern, LayoutFormatterPreferences prefs) {
+    public static String createFileNameFromPattern(BibDatabase database, BibEntry entry, String fileNamePattern,
+            LayoutFormatterPreferences prefs) {
         String targetName = entry.getCiteKeyOptional().orElse("default");
         StringReader sr = new StringReader(fileNamePattern);
         Layout layout = null;

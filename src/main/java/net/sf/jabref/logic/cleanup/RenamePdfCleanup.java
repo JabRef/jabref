@@ -26,8 +26,8 @@ public class RenamePdfCleanup implements CleanupJob {
     private int unsuccessfulRenames;
 
 
-    public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext,
-            String fileNamePattern, LayoutFormatterPreferences prefs) {
+    public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
+            LayoutFormatterPreferences prefs) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
         this.fileNamePattern = Objects.requireNonNull(fileNamePattern);
