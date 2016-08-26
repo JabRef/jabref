@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.importer.fileformat;
 
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -16,7 +15,7 @@ public class FreeCiteImporterTest {
 
     @Before
     public void setUp() {
-        importer = new FreeCiteImporter(ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
+        importer = new FreeCiteImporter(JabRefPreferences.getInstance().getImportFormatPreferences());
     }
 
     @Test

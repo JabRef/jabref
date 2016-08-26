@@ -14,7 +14,6 @@ import javax.xml.transform.TransformerException;
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
-import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
@@ -60,8 +59,8 @@ public class XMPUtilMain {
             Globals.prefs = JabRefPreferences.getInstance();
         }
 
-        XMPPreferences xmpPreferences = XMPPreferences.fromPreferences(Globals.prefs);
-        ImportFormatPreferences importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
+        XMPPreferences xmpPreferences = Globals.prefs.getXMPPreferences();
+        ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
 
         switch (args.length) {
         case 0:
@@ -74,7 +73,7 @@ public class XMPUtilMain {
                 List<BibEntry> l = XMPUtil.readXMP(new File(args[0]), xmpPreferences);
 
                 BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
-                        new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)), false);
+                        new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()), false);
 
                 for (BibEntry entry : l) {
                     StringWriter sw = new StringWriter();

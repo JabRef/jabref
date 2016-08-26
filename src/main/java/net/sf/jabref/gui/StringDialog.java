@@ -41,7 +41,6 @@ import net.sf.jabref.gui.undo.UndoableStringChange;
 import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
-import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
@@ -252,7 +251,7 @@ class StringDialog extends JDialog {
 
                 if (!value.equals(subject.getContent())) {
                     try {
-                        new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs))
+                        new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences())
                                 .format((String) value, "__dummy");
                     } catch (IllegalArgumentException ex) {
                         return;

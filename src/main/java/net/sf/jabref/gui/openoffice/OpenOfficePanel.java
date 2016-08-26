@@ -49,7 +49,6 @@ import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.openoffice.OOBibStyle;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
@@ -133,7 +132,7 @@ public class OpenOfficePanel extends AbstractWorker {
         update.setPreferredSize(new Dimension(24, 24));
         preferences = new OpenOfficePreferences(Globals.prefs);
         loader = new StyleLoader(preferences,
-                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader),
+                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
                 Globals.prefs.getDefaultEncoding());
     }
 
@@ -700,7 +699,7 @@ public class OpenOfficePanel extends AbstractWorker {
         BasePanel panel = frame.getCurrentBasePanel();
         if ((answer == JOptionPane.OK_OPTION) && (panel != null)) {
             // Generate keys
-            BibtexKeyPatternPreferences prefs = BibtexKeyPatternPreferences.fromPreferences(Globals.prefs);
+            BibtexKeyPatternPreferences prefs = Globals.prefs.getBibtexKeyPatternPreferences();
             NamedCompound undoCompound = new NamedCompound(Localization.lang("Cite"));
             for (BibEntry entry : entries) {
                 if (!entry.getCiteKeyOptional().isPresent()) {

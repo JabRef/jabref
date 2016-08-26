@@ -70,8 +70,6 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.util.component.OverlayPanel;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
-import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.FreeCiteImporter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -456,7 +454,7 @@ public class TextInputDialog extends JDialog {
      * @return true if successful, false otherwise
      */
     private boolean parseWithFreeCiteAndAddEntries() {
-        FreeCiteImporter fimp = new FreeCiteImporter(ImportFormatPreferences.fromPreferences(Globals.prefs));
+        FreeCiteImporter fimp = new FreeCiteImporter(Globals.prefs.getImportFormatPreferences());
         String text = textPane.getText();
 
         // we have to remove line breaks (but keep empty lines)
@@ -493,7 +491,7 @@ public class TextInputDialog extends JDialog {
     private void updateSourceView() {
         StringWriter sw = new StringWriter(200);
         try {
-            new BibEntryWriter(new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)),
+            new BibEntryWriter(new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()),
                     false).write(entry, sw, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
             sourcePreview.setText(sw.getBuffer().toString());
         } catch (IOException ex) {

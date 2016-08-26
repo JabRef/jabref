@@ -15,7 +15,6 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
-import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
@@ -67,7 +66,7 @@ public class SendAsEMailAction extends AbstractWorker {
 
         // write the entries using sw, which is used later to form the email content
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
-                new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)), true);
+                new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()), true);
 
         for (BibEntry entry : bes) {
             try {

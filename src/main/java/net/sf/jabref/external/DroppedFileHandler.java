@@ -25,10 +25,8 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -224,7 +222,7 @@ public class DroppedFileHandler {
 
         List<BibEntry> xmpEntriesInFile;
         try {
-            xmpEntriesInFile = XMPUtil.readXMP(fileName, XMPPreferences.fromPreferences(Globals.prefs));
+            xmpEntriesInFile = XMPUtil.readXMP(fileName, Globals.prefs.getXMPPreferences());
         } catch (IOException e) {
             LOGGER.warn("Problem reading XMP", e);
             return false;
@@ -346,7 +344,7 @@ public class DroppedFileHandler {
         // Determine which name to suggest:
         String targetName = FileUtil.createFileNameFromPattern(database, entry,
                 Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
-                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
+                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader));
 
         renameToTextBox.setText(targetName.concat(".").concat(fileType.getExtension()));
 

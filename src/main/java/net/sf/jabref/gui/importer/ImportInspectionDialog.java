@@ -80,7 +80,6 @@ import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
-import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.EntriesGroupChange;
@@ -466,7 +465,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             // Generate a unique key:
             BibtexKeyPatternUtil.makeLabel(localMetaData, database, entry,
-                    BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
+                    Globals.prefs.getBibtexKeyPatternPreferences());
             // Remove the entry from the database again, since we only added it in
             // order to
             // make sure the key was unique:
@@ -508,7 +507,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 database.insertEntry(entry);
 
                 BibtexKeyPatternUtil.makeLabel(localMetaData, database, entry,
-                        BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
+                        Globals.prefs.getBibtexKeyPatternPreferences());
                 // Add the generated key to our list:   -- TODO: Why??
                 keys.add(entry.getCiteKeyOptional());
             }

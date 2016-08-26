@@ -23,7 +23,6 @@ import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
 import net.sf.jabref.gui.importer.worker.AutosaveStartupPrompter;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.worker.VersionWorker;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
@@ -219,7 +218,7 @@ public class JabRefGUI {
             }
 
             ParserResult parsedDatabase = OpenDatabase.loadDatabaseOrAutoSave(fileName, false,
-                    ImportFormatPreferences.fromPreferences(Globals.prefs));
+                    Globals.prefs.getImportFormatPreferences());
 
             if (parsedDatabase.isNullResult()) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");

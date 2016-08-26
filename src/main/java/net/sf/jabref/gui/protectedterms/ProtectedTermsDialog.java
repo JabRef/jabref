@@ -49,7 +49,6 @@ import net.sf.jabref.gui.util.PositionWindow;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsList;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
-import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -152,7 +151,7 @@ public class ProtectedTermsDialog {
             @Override
             public void actionPerformed(ActionEvent event) {
                 // Restore from preferences
-                loader.update(ProtectedTermsPreferences.fromPreferences(Globals.prefs));
+                loader.update(Globals.prefs.getProtectedTermsPreferences());
                 diag.dispose();
             }
         };
@@ -496,6 +495,6 @@ public class ProtectedTermsDialog {
 
 
     private void storePreferences() {
-        ProtectedTermsPreferences.toPreferences(Globals.prefs, loader);
+        Globals.prefs.setProtectedTermsPreferences(loader);
     }
 }

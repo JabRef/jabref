@@ -85,10 +85,11 @@ public class ChangeScanner implements Runnable {
 
             // Parse the temporary file.
             Path tempFile = Globals.getFileUpdateMonitor().getTempFile(panel.fileMonitorHandle());
-            ImportFormatPreferences importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
+            ImportFormatPreferences importFormatPreferences = Globals.prefs.getImportFormatPreferences();
             ParserResult result = OpenDatabase.loadDatabase(tempFile.toFile(), importFormatPreferences);
             databaseInTemp = result.getDatabase();
             metadataInTemp = result.getMetaData();
+
             // Parse the modified file.
             result = OpenDatabase.loadDatabase(file, importFormatPreferences);
             BibDatabase databaseOnDisk = result.getDatabase();

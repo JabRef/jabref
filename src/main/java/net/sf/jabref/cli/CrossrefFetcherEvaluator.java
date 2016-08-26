@@ -10,7 +10,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fetcher.CrossRef;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
@@ -28,11 +27,11 @@ public class CrossrefFetcherEvaluator {
     public static void main(String[] args) throws IOException, InterruptedException {
         Globals.prefs = JabRefPreferences.getInstance();
         try (FileReader reader = new FileReader(args[0])) {
-            BibtexParser parser = new BibtexParser(reader, ImportFormatPreferences.fromPreferences(Globals.prefs));
+            BibtexParser parser = new BibtexParser(new FileReader(args[0]), Globals.prefs.getImportFormatPreferences());
             ParserResult result = parser.parse();
             BibDatabase db = result.getDatabase();
 
-            int total = result.getDatabase().getEntryCount();
+            int total = db.getEntryCount();
 
             AtomicInteger dois = new AtomicInteger();
             AtomicInteger doiFound = new AtomicInteger();

@@ -14,7 +14,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.remote.JabRefMessageHandler;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.RemoteUtil;
@@ -105,7 +104,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
     public void storeSettings() {
         if (preferences.getBoolean(JabRefPreferences.USE_IEEE_ABRV) != useIEEEAbrv.isSelected()) {
             preferences.putBoolean(JabRefPreferences.USE_IEEE_ABRV, useIEEEAbrv.isSelected());
-            Globals.journalAbbreviationLoader.update(JournalAbbreviationPreferences.fromPreferences(preferences));
+            Globals.journalAbbreviationLoader.update(Globals.prefs.getJournalAbbreviationPreferences());
         }
         storeRemoteSettings();
 

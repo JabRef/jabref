@@ -16,11 +16,13 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.prefs.BackingStoreException;
@@ -38,6 +40,9 @@ import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.preftabs.ImportSettingsTab;
 import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
+import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
+import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.exporter.CustomExportList;
@@ -50,15 +55,24 @@ import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.format.FileLinkPreferences;
+import net.sf.jabref.logic.layout.format.NameFormatter;
+import net.sf.jabref.logic.layout.format.NameFormatterPreferences;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsList;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
+import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.UpdateFieldPreferences;
 import net.sf.jabref.logic.util.io.FileHistory;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -1391,6 +1405,90 @@ public class JabRefPreferences {
         return new UpdateFieldPreferences(getBoolean(USE_OWNER), getBoolean(OVERWRITE_OWNER), get(DEFAULT_OWNER),
                 getBoolean(USE_TIME_STAMP), getBoolean(OVERWRITE_TIME_STAMP), get(TIME_STAMP_FIELD),
                 get(TIME_STAMP_FORMAT));
+    }
+
+    public LatexFieldFormatterPreferences getLatexFieldFormatterPreferences() {
+        return new LatexFieldFormatterPreferences(getBoolean(RESOLVE_STRINGS_ALL_FIELDS),
+                getStringList(DO_NOT_RESOLVE_STRINGS_FOR), getFieldContentParserPreferences());
+    }
+
+    public FieldContentParserPreferences getFieldContentParserPreferences() {
+        return new FieldContentParserPreferences(getStringList(NON_WRAPPABLE_FIELDS));
+    }
+
+    public ImportFormatPreferences getImportFormatPreferences() {
+        return new ImportFormatPreferences(customImports, getDefaultEncoding(), get(KEYWORD_SEPARATOR),
+                getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(),
+                getBoolean(USE_UNIT_FORMATTER_ON_SEARCH), getBoolean(USE_CASE_KEEPER_ON_SEARCH));
+    }
+
+    public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
+        return new BibtexKeyPatternPreferences(get(DEFAULT_BIBTEX_KEY_PATTERN), get(KEY_PATTERN_REGEX),
+                get(KEY_PATTERN_REPLACEMENT), getBoolean(KEY_GEN_ALWAYS_ADD_LETTER), getBoolean(KEY_GEN_FIRST_LETTER_A),
+                getBoolean(ENFORCE_LEGAL_BIBTEX_KEY), getKeyPattern());
+    }
+
+    public LayoutFormatterPreferences getLayoutFormatterPreferences(
+            JournalAbbreviationLoader journalAbbreviationLoader) {
+        Objects.requireNonNull(journalAbbreviationLoader);
+        return new LayoutFormatterPreferences(getNameFormatterPreferences(), getJournalAbbreviationPreferences(),
+                getFileLinkPreferences(), journalAbbreviationLoader);
+    }
+
+    public XMPPreferences getXMPPreferences() {
+        return new XMPPreferences(getBoolean(USE_XMP_PRIVACY_FILTER), getStringList(XMP_PRIVACY_FILTERS),
+                get(KEYWORD_SEPARATOR));
+    }
+
+    private NameFormatterPreferences getNameFormatterPreferences() {
+        return new NameFormatterPreferences(getStringList(NameFormatter.NAME_FORMATER_KEY),
+                getStringList(NameFormatter.NAME_FORMATTER_VALUE));
+    }
+
+    public FileLinkPreferences getFileLinkPreferences() {
+        return new FileLinkPreferences(Collections.singletonList(get(FieldName.FILE + FileLinkPreferences.DIR_SUFFIX)),
+                fileDirForDatabase);
+    }
+
+    public ProtectedTermsPreferences getProtectedTermsPreferences() {
+        return new ProtectedTermsPreferences(
+                getStringList(PROTECTED_TERMS_ENABLED_INTERNAL), getStringList(PROTECTED_TERMS_ENABLED_EXTERNAL),
+                getStringList(PROTECTED_TERMS_DISABLED_INTERNAL), getStringList(PROTECTED_TERMS_DISABLED_EXTERNAL));
+    }
+
+    public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
+        return new JournalAbbreviationPreferences(
+                getStringList(EXTERNAL_JOURNAL_LISTS), get(PERSONAL_JOURNAL_LIST), getBoolean(USE_IEEE_ABRV),
+                getDefaultEncoding());
+    }
+
+    public void setProtectedTermsPreferences(ProtectedTermsLoader loader) {
+        List<String> enabledExternalList = new ArrayList<>();
+        List<String> disabledExternalList = new ArrayList<>();
+        List<String> enabledInternalList = new ArrayList<>();
+        List<String> disabledInternalList = new ArrayList<>();
+
+        for (ProtectedTermsList list : loader.getProtectedTermsLists()) {
+            if (list.isInternalList()) {
+                if (list.isEnabled()) {
+                    enabledInternalList.add(list.getLocation());
+                } else {
+                    disabledInternalList.add(list.getLocation());
+                }
+            } else {
+                if (list.isEnabled()) {
+                    enabledExternalList.add(list.getLocation());
+                } else {
+                    disabledExternalList.add(list.getLocation());
+                }
+            }
+        }
+
+        putStringList(PROTECTED_TERMS_ENABLED_EXTERNAL, enabledExternalList);
+        putStringList(PROTECTED_TERMS_DISABLED_EXTERNAL, disabledExternalList);
+        putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, enabledInternalList);
+        putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, disabledInternalList);
+
     }
 
 }

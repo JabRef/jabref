@@ -79,11 +79,8 @@ import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
-import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
-import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
@@ -587,7 +584,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     public static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
         LatexFieldFormatter formatter = LatexFieldFormatter
-                .buildIgnoreHashes(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs));
+                .buildIgnoreHashes(Globals.prefs.getLatexFieldFormatterPreferences());
         new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter, type);
 
         return stringWriter.getBuffer().toString();
@@ -764,7 +761,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private boolean storeSource() {
         BibtexParser bibtexParser = new BibtexParser(new StringReader(source.getText()),
-                ImportFormatPreferences.fromPreferences(Globals.prefs));
+                Globals.prefs.getImportFormatPreferences());
 
         try {
             ParserResult parserResult = bibtexParser.parse();
@@ -814,7 +811,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
-                    new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs))
+                    new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences())
                             .format(newValue, fieldName);
 
                     compound.addEdit(new UndoableFieldChange(entry, fieldName, oldValue, newValue));
@@ -1173,7 +1170,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         // properly formatted. If that happens, the field
                         // is not stored and the textarea turns red.
                         if (toSet != null) {
-                            new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs))
+                            new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences())
                                     .format(toSet, fieldEditor.getFieldName());
                         }
 
@@ -1370,7 +1367,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
 
             BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
-                    BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
+                    Globals.prefs.getBibtexKeyPatternPreferences());
 
             // Store undo information:
             panel.getUndoManager().addEdit(

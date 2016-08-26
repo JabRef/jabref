@@ -48,7 +48,7 @@ public class OpenDatabaseTest {
 
     @Before
     public void setUp() {
-        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
+        importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
     }
 
     @Test

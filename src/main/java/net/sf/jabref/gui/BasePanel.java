@@ -96,7 +96,6 @@ import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
-import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.logic.exporter.FileSaveSession;
@@ -106,7 +105,6 @@ import net.sf.jabref.logic.exporter.SaveSession;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
-import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.UpdateField;
@@ -479,7 +477,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 for (BibEntry entry : entries) {
                     bes = entry;
                     BibtexKeyPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), bibDatabaseContext.getDatabase(),
-                            bes, BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
+                            bes, Globals.prefs.getBibtexKeyPatternPreferences());
                     ce.addEdit(new UndoableKeyChange(bibDatabaseContext.getDatabase(), bes, (String) oldvals.get(bes),
                             bes.getCiteKeyOptional().orElse(null)));
                 }
@@ -912,7 +910,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             Layout layout;
             try {
                 layout = new LayoutHelper(sr,
-                        LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader))
+                        Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader))
                                 .getLayoutFromText();
             } catch (IOException e) {
                 LOGGER.info("Could not get layout", e);
@@ -1939,7 +1937,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 Optional<String> oldKey = bes.getCiteKeyOptional();
                 if (!(oldKey.isPresent()) || oldKey.get().isEmpty()) {
                     BibtexKeyPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), bibDatabaseContext.getDatabase(),
-                            bes, BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
+                            bes, Globals.prefs.getBibtexKeyPatternPreferences());
                     ce.addEdit(new UndoableKeyChange(bibDatabaseContext.getDatabase(), bes, null,
                             bes.getCiteKeyOptional().get())); // Cite key is set here
                     any = true;

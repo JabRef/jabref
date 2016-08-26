@@ -60,7 +60,7 @@ public class BibtexDatabaseWriterTest {
         database = new BibDatabase();
         metaData = new MetaData();
         bibtexContext = new BibDatabaseContext(database, metaData, new Defaults(BibDatabaseMode.BIBTEX));
-        importFormatPreferences = ImportFormatPreferences.fromPreferences(prefs);
+        importFormatPreferences = prefs.getImportFormatPreferences();
     }
 
     @Test(expected = NullPointerException.class)

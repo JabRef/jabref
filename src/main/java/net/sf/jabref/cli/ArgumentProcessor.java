@@ -22,7 +22,6 @@ import net.sf.jabref.external.AutoSetLinks;
 import net.sf.jabref.gui.importer.fetcher.EntryFetcher;
 import net.sf.jabref.gui.importer.fetcher.EntryFetchers;
 import net.sf.jabref.logic.CustomEntryTypesManager;
-import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.exporter.BibDatabaseWriter;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
@@ -33,7 +32,6 @@ import net.sf.jabref.logic.exporter.IExportFormat;
 import net.sf.jabref.logic.exporter.SaveException;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.SaveSession;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportFormatReader;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.OutputPrinter;
@@ -242,7 +240,7 @@ public class ArgumentProcessor {
                 ParserResult pr = null;
                 if (bibExtension) {
                     pr = OpenDatabase.loadDatabaseOrAutoSave(aLeftOver, false,
-                            ImportFormatPreferences.fromPreferences(Globals.prefs));
+                            Globals.prefs.getImportFormatPreferences());
                 }
 
                 if (!bibExtension || (pr.isNullResult())) {
@@ -400,8 +398,8 @@ public class ArgumentProcessor {
             CustomEntryTypesManager.loadCustomEntryTypes(Globals.prefs);
             Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
                     Globals.journalAbbreviationLoader);
-            LayoutFormatterPreferences layoutPreferences = LayoutFormatterPreferences.fromPreferences(Globals.prefs,
-                    Globals.journalAbbreviationLoader);
+            LayoutFormatterPreferences layoutPreferences = Globals.prefs
+                    .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
             SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
             ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
         } catch (JabRefException ex) {
@@ -449,7 +447,7 @@ public class ArgumentProcessor {
                 for (BibEntry entry : database.getEntries()) {
                     // try to make a new label
                     BibtexKeyPatternUtil.makeLabel(metaData, database, entry,
-                            BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
+                            Globals.prefs.getBibtexKeyPatternPreferences());
                 }
             } else {
                 LOGGER.info(Localization.lang("No meta data present in BIB_file. Cannot regenerate BibTeX keys"));

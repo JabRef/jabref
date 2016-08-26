@@ -105,7 +105,7 @@ public class RenamePdfCleanupTest {
         entry.setField("title", "test title");
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                LayoutFormatterPreferences.fromPreferences(prefs, mock(JournalAbbreviationLoader.class)),
+                prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
                 prefs.getFileDirectoryPreferences());
         cleanup.cleanup(entry);
 

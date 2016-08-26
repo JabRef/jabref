@@ -17,7 +17,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
@@ -89,7 +88,7 @@ public class ISBNtoBibTeXFetcher implements EntryFetcher {
             }
 
             Optional<BibEntry> bibEntry = BibtexParser.singleFromString(bibtexString,
-                    ImportFormatPreferences.fromPreferences(Globals.prefs));
+                    Globals.prefs.getImportFormatPreferences());
             bibEntry.ifPresent(entry -> {
                 // Remove the added " Seiten" from the "pagetotal" field
                 entry.getFieldOptional(FieldName.PAGETOTAL)
