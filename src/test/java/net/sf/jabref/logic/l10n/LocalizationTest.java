@@ -64,4 +64,11 @@ public class LocalizationTest {
         assertEquals(knownKey, Localization.menuTitle(knownKey));
     }
 
+    @Test
+    public void testUnsetLanguageTranslation() {
+        String knownKey = "Groups";
+        assertEquals(knownKey, Localization.lang(knownKey));
+        assertEquals(knownKey, Localization.menuTitle(knownKey));
+    }
+
 }
