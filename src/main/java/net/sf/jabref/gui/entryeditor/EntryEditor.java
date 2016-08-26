@@ -1213,9 +1213,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     } catch (IllegalArgumentException ex) {
                         if(!SwingUtilities.isEventDispatchThread())
                         {
+                            fieldEditor.setInvalidBackgroundColor();
                             JOptionPane.showMessageDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
                                 Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
-                            fieldEditor.setInvalidBackgroundColor();
                             LOGGER.debug("Error setting field", ex);
                         }
                     }
