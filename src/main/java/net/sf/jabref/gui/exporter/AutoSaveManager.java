@@ -58,7 +58,7 @@ public class AutoSaveManager {
             // there could be changes done by the user while this method is running.
 
             for (BasePanel panel : frame.getBasePanelList()) {
-                if (panel.isModified() && (panel.getBibDatabaseContext().getDatabaseFile() != null)) {
+                if (panel.isModified() && (panel.getBibDatabaseContext().getDatabaseFile().isPresent())) {
                         AutoSaveManager.autoSave(panel);
                 }
             }
@@ -72,7 +72,7 @@ public class AutoSaveManager {
      * @return true if successful, false otherwise.
      */
     private static boolean autoSave(BasePanel panel) {
-        File databaseFile = panel.getBibDatabaseContext().getDatabaseFile();
+        File databaseFile = panel.getBibDatabaseContext().getDatabaseFile().orElse(null);
         File backupFile = AutoSaveUtil.getAutoSaveFile(databaseFile);
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
@@ -96,10 +96,10 @@ public class AutoSaveManager {
      * @return true if there was no autosave or if the autosave was successfully deleted, false otherwise.
      */
     public static boolean deleteAutoSaveFile(BasePanel panel) {
-        if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
+        if (!panel.getBibDatabaseContext().getDatabaseFile().isPresent()) {
             return true;
         }
-        File backupFile = AutoSaveUtil.getAutoSaveFile(panel.getBibDatabaseContext().getDatabaseFile());
+        File backupFile = AutoSaveUtil.getAutoSaveFile(panel.getBibDatabaseContext().getDatabaseFile().get());
         if (backupFile.exists()) {
             return backupFile.delete();
         } else {

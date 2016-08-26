@@ -377,12 +377,10 @@ class LayoutEntry {
             return encoding.displayName();
 
         case LayoutHelper.IS_FILENAME:
-            File f = databaseContext.getDatabaseFile();
-            return f == null ? "" : f.getName();
+            return databaseContext.getDatabaseFile().map(File::getName).orElse("");
 
         case LayoutHelper.IS_FILEPATH:
-            File f2 = databaseContext.getDatabaseFile();
-            return f2 == null ? "" : f2.getPath();
+            return databaseContext.getDatabaseFile().map(File::getPath).orElse("");
 
         default:
             break;

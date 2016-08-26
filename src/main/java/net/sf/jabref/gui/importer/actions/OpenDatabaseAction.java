@@ -126,8 +126,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             File file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
                 BasePanel basePanel = frame.getBasePanelAt(i);
-                if ((basePanel.getBibDatabaseContext().getDatabaseFile() != null)
-                        && basePanel.getBibDatabaseContext().getDatabaseFile().equals(file)) {
+                if ((basePanel.getBibDatabaseContext().getDatabaseFile().isPresent())
+                        && basePanel.getBibDatabaseContext().getDatabaseFile().get().equals(file)) {
                     iterator.remove();
                     removed++;
                     // See if we removed the final one. If so, we must perhaps
@@ -158,7 +158,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // already open. If so, we may have to raise the correct tab:
         else if (toRaise != null) {
             frame.output(Localization.lang("File '%0' is already open.",
-                    toRaise.getBibDatabaseContext().getDatabaseFile().getPath()));
+                    toRaise.getBibDatabaseContext().getDatabaseFile().get().getPath()));
             frame.getTabbedPane().setSelectedComponent(toRaise);
         }
 
