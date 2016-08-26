@@ -4,7 +4,6 @@ import java.util.List;
 
 import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * Converts string representation of groups to a parsed {@link GroupTreeNode}.

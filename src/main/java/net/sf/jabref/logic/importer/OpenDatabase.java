@@ -87,7 +87,7 @@ public class OpenDatabase {
         ParserResult result = new BibtexImporter(importFormatPreferences).importDatabase(fileToOpen.toPath(),
                 importFormatPreferences.getEncoding());
 
-        if (SpecialFieldsUtils.keywordSyncEnabled()) {
+        if (importFormatPreferences.isKeywordSyncEnabled()) {
             for (BibEntry entry : result.getDatabase().getEntries()) {
                 SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry);
             }
