@@ -16,13 +16,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Externally fetched information can be merged for entries with an ISBN
 - Externally fetched information can be merged for entries with an ArXiv eprint
 - Added EntryTypeFormatter to add camel casing to entry type in layouts, e.g., InProceedings
-- [#1225](https://github.com/JabRef/jabref/issues/1225): Hotkey-system is now consistent
+- [#1225](https://github.com/JabRef/jabref/issues/1225): Hotkeys are now consistent
 - Added print entry preview to the right click menu
 - [#462](https://github.com/JabRef/jabref/issues/462) Extend the OpenConsoleFeature by offering a selection between default terminal emulator and configurable command execution.
 - The field name in the layout files for entry type is changed from `bibtextype` to `entrytype`. Please update your existing files as support for `bibtextype` will be removed eventually.
 - [#1516](https://github.com/JabRef/jabref/issues/1516) Selected field names are written in uppercase in the entry editor
 - Table row height is adjusted on Windows which is useful for high resolution displays
-- For developers: Moved the bst package into logic. This requires the regeneration of antlr sources, execute: gradlew generateSource
 - [#1026](https://github.com/JabRef/jabref/issues/1026) JabRef does no longer delete user comments outside of BibTeX entries and strings
 - [#1249](https://github.com/JabRef/jabref/issues/1249) Date layout formatter added
 - Undo/redo are enabled/disabled and show the action in the tool tip
@@ -44,10 +43,11 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Improve focus of the maintable after a sidepane gets closed (Before it would focus the toolbar or it would focus the wrong entry)
 - File open dialogs now use default extensions as primary file filter
 - [#1841](https://github.com/JabRef/jabref/issues/1841) The "etal"-string in the Authors layout formatter can now be empty
+- For developers: Moved the bst package into logic. This requires the regeneration of antlr sources, execute: `gradlew generateSource`
 
 ### Fixed
 - Fixed [#1760](https://github.com/JabRef/jabref/issues/1760): Preview updated correctly when selecting a single entry after selecting multiple entries
-- Fixed [#1632](https://github.com/JabRef/jabref/issues/1632): User comments (@Comment) with or without brackets are now kept
+- Fixed [#1632](https://github.com/JabRef/jabref/issues/1632): User comments (`@Comment`) with or without brackets are now kept
 - When inserting a duplicate the right entry will be selected
 - Preview panel height is now saved immediately, thus is shown correctly if the panel height is changed, closed and opened again
 - Fixed [#1264](https://github.com/JabRef/jabref/issues/1264): S with caron does not render correctly
