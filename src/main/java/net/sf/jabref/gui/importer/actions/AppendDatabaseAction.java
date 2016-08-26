@@ -21,7 +21,6 @@ import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.ExplicitGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
-import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
@@ -137,9 +136,7 @@ public class AppendDatabaseAction implements BaseAction {
         }
 
         if (importGroups) {
-            GroupTreeNode newGroups = meta.getGroups();
-            if (newGroups != null) {
-
+            meta.getGroups().ifPresent(newGroups -> {
                 // ensure that there is always only one AllEntriesGroup
                 if (newGroups.getGroup() instanceof AllEntriesGroup) {
                     // create a dummy group
@@ -157,7 +154,7 @@ public class AppendDatabaseAction implements BaseAction {
                 // have been defined. therefore, no check for null is
                 // required here
                 frame.getGroupSelector().addGroups(newGroups, ce);
-            }
+            });
         }
 
         if (importSelectorWords) {

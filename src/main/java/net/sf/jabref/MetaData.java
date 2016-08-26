@@ -196,8 +196,8 @@ public class MetaData implements Iterable<String> {
         }
     }
 
-    public GroupTreeNode getGroups() {
-        return groupsRoot;
+    public Optional<GroupTreeNode> getGroups() {
+        return Optional.ofNullable(groupsRoot);
     }
 
     /**
@@ -380,17 +380,17 @@ public class MetaData implements Iterable<String> {
 
         // write groups if present. skip this if only the root node exists
         // (which is always the AllEntriesGroup).
-        if ((groupsRoot != null) && (groupsRoot.getNumberOfChildren() > 0)) {
+        getGroups().filter(groups -> groups.getNumberOfChildren() > 0).ifPresent(groups -> {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(OS.NEWLINE);
 
-            for (String groupNode : groupsRoot.getTreeAsString()) {
+            for (String groupNode : groups.getTreeAsString()) {
                 stringBuilder.append(StringUtil.quote(groupNode, ";", '\\'));
                 stringBuilder.append(";");
                 stringBuilder.append(OS.NEWLINE);
             }
             serializedMetaData.put(GROUPSTREE, stringBuilder.toString());
-        }
+        });
         return serializedMetaData;
     }
 

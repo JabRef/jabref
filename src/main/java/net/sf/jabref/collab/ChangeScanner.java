@@ -474,17 +474,18 @@ public class ChangeScanner implements Runnable {
      * be possible, but difficult to do properly, so I rather only report the change.
      */
     private void scanGroups(MetaData inTemp, MetaData onDisk) {
-        final GroupTreeNode groupsTmp = inTemp.getGroups();
-        final GroupTreeNode groupsDisk = onDisk.getGroups();
-        if ((groupsTmp == null) && (groupsDisk == null)) {
+        final Optional<GroupTreeNode> groupsTmp = inTemp.getGroups();
+        final Optional<GroupTreeNode> groupsDisk = onDisk.getGroups();
+        if (!groupsTmp.isPresent() && !groupsDisk.isPresent()) {
             return;
         }
-        if (((groupsTmp != null) && (groupsDisk == null)) || (groupsTmp == null)) {
-            changes.add(new GroupChange(groupsDisk, groupsTmp));
+        if ((groupsTmp.isPresent() && !groupsDisk.isPresent()) || !groupsTmp.isPresent()) {
+            changes.add(new GroupChange(groupsDisk.orElse(null), groupsTmp.orElse(null)));
             return;
         }
+        // Both present here
         if (!groupsTmp.equals(groupsDisk)) {
-            changes.add(new GroupChange(groupsDisk, groupsTmp));
+            changes.add(new GroupChange(groupsDisk.get(), groupsTmp.get()));
         }
     }
 

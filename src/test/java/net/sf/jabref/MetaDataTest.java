@@ -2,6 +2,7 @@ package net.sf.jabref;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -40,5 +41,10 @@ public class MetaDataTest {
         expectedSerialization.put("saveActions",
                 "enabled;" + OS.NEWLINE + "title[lower_case]" + OS.NEWLINE + ";");
         assertEquals(expectedSerialization, metaData.getAsStringMap());
+    }
+
+    @Test
+    public void emptyGroupsIfNotSet() {
+        assertEquals(Optional.empty(), metaData.getGroups());
     }
 }

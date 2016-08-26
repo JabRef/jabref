@@ -25,7 +25,6 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
-import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -234,15 +233,14 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     @Override
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
         panel.storeCurrentEdit();
-        GroupTreeNode groups = panel.getBibDatabaseContext().getMetaData().getGroups();
-        if (groups == null) {
-            groupAdd.setEnabled(false);
-            groupRemove.setEnabled(false);
-            groupMoveTo.setEnabled(false);
-        } else {
+        if (panel.getBibDatabaseContext().getMetaData().getGroups().isPresent()) {
             groupAdd.setEnabled(true);
             groupRemove.setEnabled(true);
             groupMoveTo.setEnabled(true);
+        } else {
+            groupAdd.setEnabled(false);
+            groupRemove.setEnabled(false);
+            groupMoveTo.setEnabled(false);
         }
     }
 
