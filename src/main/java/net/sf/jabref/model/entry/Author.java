@@ -258,8 +258,8 @@ public class Author {
      * @return abbreviated first name of the author (may consist of several
      * tokens)
      */
-    public String getFirstAbbr() {
-        return firstAbbr;
+    public Optional<String> getFirstAbbr() {
+        return Optional.ofNullable(firstAbbr);
     }
 
     /**
@@ -301,7 +301,7 @@ public class Author {
      */
     public String getLastOnly() {
         if (vonPart == null) {
-            return lastPart == null ? "" : lastPart;
+            return getLast().orElse("");
         } else {
             return lastPart == null ? vonPart : vonPart + ' ' + lastPart;
         }
@@ -318,17 +318,11 @@ public class Author {
      */
     public String getLastFirst(boolean abbr) {
         StringBuilder res = new StringBuilder(getLastOnly());
-        if (jrPart != null) {
-            res.append(", ").append(jrPart);
-        }
+        getJr().ifPresent(jr -> res.append(", ").append(jr));
         if (abbr) {
-            if (firstAbbr != null) {
-                res.append(", ").append(firstAbbr);
-            }
+            getFirstAbbr().ifPresent(firstA -> res.append(", ").append(firstA));
         } else {
-            if (firstPart != null) {
-                res.append(", ").append(firstPart);
-            }
+            getFirst().ifPresent(first -> res.append(", ").append(first));
         }
         return res.toString();
     }
@@ -345,13 +339,12 @@ public class Author {
     public String getFirstLast(boolean abbr) {
         StringBuilder res = new StringBuilder();
         if (abbr) {
-            res.append(firstAbbr == null ? "" : firstAbbr + ' ').append(getLastOnly());
+            getFirstAbbr().map(firstA -> firstA + ' ').ifPresent(res::append);
         } else {
-            res.append(firstPart == null ? "" : firstPart + ' ').append(getLastOnly());
+            getFirst().map(first -> first + ' ').ifPresent(res::append);
         }
-        if (jrPart != null) {
-            res.append(", ").append(jrPart);
-        }
+        res.append(getLastOnly());
+        getJr().ifPresent(jr -> res.append(", ").append(jr));
         return res.toString();
     }
 
@@ -376,17 +369,9 @@ public class Author {
      */
     public String getNameForAlphabetization() {
         StringBuilder res = new StringBuilder();
-        if (lastPart != null) {
-            res.append(lastPart);
-        }
-        if (jrPart != null) {
-            res.append(", ");
-            res.append(jrPart);
-        }
-        if (firstAbbr != null) {
-            res.append(", ");
-            res.append(firstAbbr);
-        }
+        getLast().ifPresent(res::append);
+        getJr().ifPresent(jr -> res.append(", ").append(jr));
+        getFirstAbbr().ifPresent(firstA -> res.append(", ").append(firstA));
         while ((res.length() > 0) && (res.charAt(0) == '{')) {
             res.deleteCharAt(0);
         }

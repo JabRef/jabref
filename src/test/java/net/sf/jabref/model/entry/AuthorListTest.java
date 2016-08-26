@@ -346,7 +346,7 @@ public class AuthorListTest {
 
         Author author = AuthorList.parse("John Smith and von Neumann, Jr, John").getAuthor(0);
         Assert.assertEquals(Optional.of("John"), author.getFirst());
-        Assert.assertEquals("J.", author.getFirstAbbr());
+        Assert.assertEquals(Optional.of("J."), author.getFirstAbbr());
         Assert.assertEquals("John Smith", author.getFirstLast(false));
         Assert.assertEquals("J. Smith", author.getFirstLast(true));
         Assert.assertEquals(Optional.empty(), author.getJr());
@@ -359,7 +359,7 @@ public class AuthorListTest {
 
         author = AuthorList.parse("Peter Black Brown").getAuthor(0);
         Assert.assertEquals(Optional.of("Peter Black"), author.getFirst());
-        Assert.assertEquals("P. B.", author.getFirstAbbr());
+        Assert.assertEquals(Optional.of("P. B."), author.getFirstAbbr());
         Assert.assertEquals("Peter Black Brown", author.getFirstLast(false));
         Assert.assertEquals("P. B. Brown", author.getFirstLast(true));
         Assert.assertEquals(Optional.empty(), author.getJr());
@@ -367,7 +367,7 @@ public class AuthorListTest {
 
         author = AuthorList.parse("John Smith and von Neumann, Jr, John").getAuthor(1);
         Assert.assertEquals(Optional.of("John"), author.getFirst());
-        Assert.assertEquals("J.", author.getFirstAbbr());
+        Assert.assertEquals(Optional.of("J."), author.getFirstAbbr());
         Assert.assertEquals("John von Neumann, Jr", author.getFirstLast(false));
         Assert.assertEquals("J. von Neumann, Jr", author.getFirstLast(true));
         Assert.assertEquals(Optional.of("Jr"), author.getJr());
@@ -602,7 +602,8 @@ public class AuthorListTest {
 
     @Test
     public void createCorrectInitials() {
-        Assert.assertEquals("J. G.", AuthorList.parse("Hornberg, Johann Gottfried").getAuthor(0).getFirstAbbr());
+        Assert.assertEquals(Optional.of("J. G."),
+                AuthorList.parse("Hornberg, Johann Gottfried").getAuthor(0).getFirstAbbr());
     }
 
     @Test

@@ -267,7 +267,7 @@ public class Authors extends AbstractParamLayoutFormatter {
         String firstNameResult = "";
         if (a.getFirst().isPresent()) {
             if (abbreviate) {
-                firstNameResult = a.getFirstAbbr();
+                firstNameResult = a.getFirstAbbr().orElse("");
 
                 if (firstInitialOnly && (firstNameResult.length() > 2)) {
                     firstNameResult = firstNameResult.substring(0, 2);

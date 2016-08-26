@@ -388,9 +388,8 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 } catch (NumberFormatException ex) {
                     throw new IOException("Cannot parse number of hits");
                 }
-            } else {
-                LOGGER.info("Unmatched! " + substring);
             }
+            LOGGER.info("Unmatched! " + substring);
         }
         throw new IOException("Cannot parse number of hits");
     }
