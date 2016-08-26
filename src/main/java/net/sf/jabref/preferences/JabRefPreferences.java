@@ -1377,12 +1377,13 @@ public class JabRefPreferences {
         }
     }
 
-    public FileDirectoryPreferences getFileDirectoryPreferences() {
-        return getFileDirectoryPreferences(FieldName.FILE);
-    }
 
-    public FileDirectoryPreferences getFileDirectoryPreferences(String fieldName) {
-        return new FileDirectoryPreferences(fieldName, getUser(), get(fieldName + FileLinkPreferences.DIR_SUFFIX),
+    public FileDirectoryPreferences getFileDirectoryPreferences() {
+        List<String> fields = Arrays.asList(FieldName.FILE, FieldName.PDF, FieldName.PS);
+        Map<String, String> fieldDirectories = new HashMap<>();
+        fields.stream()
+                .forEach(fieldName -> fieldDirectories.put(fieldName, get(fieldName + FileLinkPreferences.DIR_SUFFIX)));
+        return new FileDirectoryPreferences(getUser(), fieldDirectories,
                 getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
     }
 

@@ -230,7 +230,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
                 FileListEntry entry = tableModel.getEntry(row);
                 // null if file does not exist
-                Optional<File> file = FileUtil.expandFilename(databaseContext, entry.link);
+                Optional<File> file = FileUtil.expandFilename(databaseContext, entry.link,
+                        Globals.prefs.getFileDirectoryPreferences());
 
                 // transactional delete and unlink
                 try {

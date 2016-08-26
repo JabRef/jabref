@@ -125,8 +125,8 @@ public class WriteXMPAction extends AbstractWorker {
                     .ifPresent(
                             pdf -> FileUtil
                                     .expandFilename(pdf,
-                                            panel.getBibDatabaseContext().getFileDirectory(
-                                                    Globals.prefs.getFileDirectoryPreferences(FieldName.PDF)))
+                                            panel.getBibDatabaseContext().getFileDirectory(FieldName.PDF,
+                                                    Globals.prefs.getFileDirectoryPreferences()))
                             .ifPresent(files::add));
             // Then check the "file" field:
             List<String> dirs = panel.getBibDatabaseContext()

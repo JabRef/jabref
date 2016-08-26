@@ -10,6 +10,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
 import net.sf.jabref.model.database.DatabaseLocation;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.shared.DBMSSynchronizer;
 
 /**
@@ -117,23 +118,28 @@ public class BibDatabaseContext {
         return getMode() == BibDatabaseMode.BIBLATEX;
     }
 
-    /**
-     * Look up the directory set up for the given field type for this database.
-     * If no directory is set up, return that defined in global preferences.
-     * There can be up to three directory definitions for these files:
-     * the database's metadata can specify a general directory and/or a user-specific directory
-     * or the preferences can specify one.
-     * <p>
-     * The settings are prioritized in the following order and the first defined setting is used:
-     * 1. metadata user-specific directory
-     * 2. metadata general directory
-     * 3. preferences directory
-     * 4. BIB file directory
-     *
-     * @param fieldName The field type
-     * @return The default directory for this field type.
-     */
     public List<String> getFileDirectory(FileDirectoryPreferences preferences) {
+        return getFileDirectory(FieldName.FILE, preferences);
+    }
+
+    /**
+    * Look up the directory set up for the given field type for this database.
+    * If no directory is set up, return that defined in global preferences.
+    * There can be up to three directory definitions for these files:
+    * the database's metadata can specify a general directory and/or a user-specific directory
+    * or the preferences can specify one.
+    * <p>
+    * The settings are prioritized in the following order and the first defined setting is used:
+    * 1. metadata user-specific directory
+    * 2. metadata general directory
+    * 3. preferences directory
+    * 4. BIB file directory
+    *
+    * @param
+    * @param fieldName The field type
+    * @return The default directory for this field type.
+    */
+    public List<String> getFileDirectory(String fieldName, FileDirectoryPreferences preferences) {
         List<String> fileDirs = new ArrayList<>();
 
         // 1. metadata user-specific directory
@@ -149,7 +155,7 @@ public class BibDatabaseContext {
         }
 
         // 3. preferences directory
-        preferences.getFieldDirectory().ifPresent(fileDirs::add);
+        preferences.getFileDirectory(fieldName).ifPresent(fileDirs::add);
 
         // 4. BIB file directory
         if (getDatabaseFile() != null) {

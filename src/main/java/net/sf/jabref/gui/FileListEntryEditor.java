@@ -335,7 +335,8 @@ public class FileListEntryEditor {
 
     private final ActionListener browsePressed = e -> {
         String filePath = link.getText().trim();
-        Optional<File> file = FileUtil.expandFilename(this.databaseContext, filePath);
+        Optional<File> file = FileUtil.expandFilename(this.databaseContext, filePath,
+                Globals.prefs.getFileDirectoryPreferences());
         String workingDir;
         // no file set yet or found
         if (file.isPresent()) {

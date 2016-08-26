@@ -1,17 +1,20 @@
 package net.sf.jabref;
 
+import java.util.Map;
 import java.util.Optional;
+
+import net.sf.jabref.model.entry.FieldName;
 
 public class FileDirectoryPreferences {
     private final String user;
-    private final String fieldDirectory;
+    private final Map<String, String> fieldFileDirectories;
     private final boolean bibLocationAsPrimary;
-    private final String fieldName;
 
-    public FileDirectoryPreferences(String fieldName, String user, String fieldDirectory, boolean bibLocationAsPrimary) {
-        this.fieldName = fieldName;
+
+    public FileDirectoryPreferences(String user, Map<String, String> fieldFileDirectories,
+            boolean bibLocationAsPrimary) {
         this.user = user;
-        this.fieldDirectory = fieldDirectory;
+        this.fieldFileDirectories = fieldFileDirectories;
         this.bibLocationAsPrimary = bibLocationAsPrimary;
     }
 
@@ -19,15 +22,15 @@ public class FileDirectoryPreferences {
         return user;
     }
 
-    public Optional<String> getFieldDirectory() {
-        return Optional.ofNullable(fieldDirectory);
+    public Optional<String> getFileDirectory(String field) {
+        return Optional.ofNullable(fieldFileDirectories.get(field));
+    }
+
+    public Optional<String> getFileDirectory() {
+        return getFileDirectory(FieldName.FILE);
     }
 
     public boolean isBibLocationAsPrimary() {
         return bibLocationAsPrimary;
-    }
-
-    public String getFieldName() {
-        return fieldName;
     }
 }
