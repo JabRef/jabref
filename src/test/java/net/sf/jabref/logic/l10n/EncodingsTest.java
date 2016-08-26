@@ -2,7 +2,8 @@ package net.sf.jabref.logic.l10n;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class EncodingsTest {
     @Test
