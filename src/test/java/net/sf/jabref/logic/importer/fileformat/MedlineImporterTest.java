@@ -2,13 +2,12 @@ package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.sf.jabref.logic.util.FileExtensions;
 
@@ -35,7 +34,6 @@ import static org.junit.Assert.assertEquals;
 public class MedlineImporterTest {
 
     private MedlineImporter importer;
-    private static final String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/logic/importer/fileformat";
 
 
     /**
@@ -43,12 +41,10 @@ public class MedlineImporterTest {
      * @return A list of Names
      * @throws IOException
      */
-    public List<Path> getTestFiles() throws IOException {
-        List<Path> files = new ArrayList<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(FILEFORMAT_PATH))) {
-            stream.forEach(files::add);
+    public List<Path> getTestFiles() throws Exception {
+        try (Stream<Path> stream = Files.list(Paths.get(MedlineImporterTest.class.getResource("").toURI()))) {
+            return stream.filter(p -> !Files.isDirectory(p)).collect(Collectors.toList());
         }
-        return files;
     }
 
     @Before
@@ -77,7 +73,7 @@ public class MedlineImporterTest {
     }
 
     @Test
-    public void testIsRecognizedFormatReject() throws IOException {
+    public void testIsRecognizedFormatReject() throws Exception {
         List<Path> list = getTestFiles().stream().filter(n -> !n.getFileName().toString().startsWith("MedlineImporter"))
                 .collect(Collectors.toList());
 
