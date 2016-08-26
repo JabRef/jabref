@@ -2,8 +2,12 @@ package net.sf.jabref.external;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.JOptionPane;
 
@@ -27,8 +31,7 @@ public class FindFullTextAction extends AbstractWorker {
     private static final Log LOGGER = LogFactory.getLog(FindFullTextAction.class);
 
     private final BasePanel basePanel;
-    private BibEntry entry;
-    private Optional<URL> result;
+    private final Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
 
     public FindFullTextAction(BasePanel basePanel) {
         this.basePanel = basePanel;
@@ -41,52 +44,60 @@ public class FindFullTextAction extends AbstractWorker {
 
     @Override
     public void run() {
-        if (basePanel.getSelectedEntries().size() != 1) {
-            basePanel.output(Localization.lang("This operation requires exactly one item to be selected."));
-            result = Optional.empty();
-        } else {
-            entry = basePanel.getSelectedEntries().get(0);
+        for (BibEntry entry : basePanel.getSelectedEntries()) {
             FulltextFetchers fft = new FulltextFetchers();
-            result = fft.findFullTextPDF(entry);
+            downloads.put(fft.findFullTextPDF(entry), entry);
         }
     }
 
     @Override
     public void update() {
-        if (result.isPresent()) {
-            List<String> dirs = basePanel.getBibDatabaseContext()
-                    .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
-            if (dirs.isEmpty()) {
-                JOptionPane.showMessageDialog(basePanel.frame(),
-                        Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
-                                + " -> " + Localization.lang("External programs"),
-                        Localization.lang("Directory not found"), JOptionPane.ERROR_MESSAGE);
-                return;
+        List<Optional<URL>> remove = new ArrayList<>();
+        for (Entry<Optional<URL>, BibEntry> download : downloads.entrySet()) {
+            BibEntry entry = download.getValue();
+            Optional<URL> result = download.getKey();
+            if (result.isPresent()) {
+                List<String> dirs = basePanel.getBibDatabaseContext()
+                        .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+                if (dirs.isEmpty()) {
+                    JOptionPane.showMessageDialog(basePanel.frame(),
+                            Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
+                                    + " -> " + Localization.lang("External programs"),
+                            Localization.lang("Directory not found"), JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                // TODO: this needs its own thread as it blocks the UI!
+                DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(),
+                        basePanel.getBibDatabaseContext(), entry);
+                try {
+                    def.download(result.get(), file -> {
+                        FileListTableModel tm = new FileListTableModel();
+                        entry.getField(FieldName.FILE).ifPresent(tm::setContent);
+                        tm.addEntry(tm.getRowCount(), file);
+                        String newValue = tm.getStringRepresentation();
+                        UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
+                                entry.getField(FieldName.FILE).orElse(null), newValue);
+                        entry.setField(FieldName.FILE, newValue);
+                        basePanel.getUndoManager().addEdit(edit);
+                        basePanel.markBaseChanged();
+                    });
+                } catch (IOException e) {
+                    LOGGER.warn("Problem downloading file", e);
+                }
+                basePanel.output(Localization.lang("Finished downloading full text document for entry %0",
+                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+            } else {
+                String title = Localization.lang("Full text document download failed");
+                String message = Localization.lang("Full text document download failed for entry %0",
+                        entry.getCiteKeyOptional().orElse(Localization.lang("undefined")));
+
+                basePanel.output(message);
+                JOptionPane.showMessageDialog(basePanel.frame(), message, title, JOptionPane.ERROR_MESSAGE);
             }
-            String bibtexKey = entry.getCiteKey();
-            // TODO: this needs its own thread as it blocks the UI!
-            DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(), basePanel.getBibDatabaseContext(), bibtexKey);
-            try {
-                def.download(result.get(), file -> {
-                    FileListTableModel tm = new FileListTableModel();
-                    entry.getField(FieldName.FILE).ifPresent(tm::setContent);
-                    tm.addEntry(tm.getRowCount(), file);
-                    String newValue = tm.getStringRepresentation();
-                    UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
-                            entry.getField(FieldName.FILE).orElse(null), newValue);
-                    entry.setField(FieldName.FILE, newValue);
-                    basePanel.getUndoManager().addEdit(edit);
-                    basePanel.markBaseChanged();
-                });
-            } catch (IOException e) {
-                LOGGER.warn("Problem downloading file", e);
-            }
-            basePanel.output(Localization.lang("Finished downloading full text document"));
+            remove.add(result);
         }
-        else {
-            String message = Localization.lang("Full text document download failed");
-            basePanel.output(message);
-            JOptionPane.showMessageDialog(basePanel.frame(), message, message, JOptionPane.ERROR_MESSAGE);
+        for (Optional<URL> result : remove) {
+            downloads.remove(result);
         }
     }
 }
