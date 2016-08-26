@@ -619,7 +619,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
         pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
                 JabRefPreferences.SIZE_Y);
-        positionWindowOnScreen();
+        pw.displayWindowAtStoredLocation();
 
         tabbedPane.setBorder(null);
         tabbedPane.setForeground(GUIGlobals.INACTIVE_TABBED_COLOR);
@@ -662,12 +662,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
         }
 
-    }
-
-    private void positionWindowOnScreen() {
-        if (!prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-            pw.displayWindowAtStoredLocation();
-        }
     }
 
     public void refreshTitleAndTabs() {
@@ -759,7 +753,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         dispose();
 
-        //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, (getExtendedState()&MAXIMIZED_BOTH)>0);
         prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
 
         prefs.putBoolean(JabRefPreferences.TOOLBAR_VISIBLE, tlb.isVisible());

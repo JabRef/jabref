@@ -1,6 +1,7 @@
 package net.sf.jabref.gui.util;
 
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
@@ -61,6 +62,13 @@ public class WindowLocation {
     }
 
     public void storeCurrentWindowLocation() {
+        // maximizing is handled explicitely
+        if (window instanceof Frame) {
+            Frame frame = (Frame) window;
+            if (frame.getExtendedState() == Frame.MAXIMIZED_BOTH) {
+                return;
+            }
+        }
         Point location = window.getLocation();
         Dimension dimensions = window.getSize();
 
