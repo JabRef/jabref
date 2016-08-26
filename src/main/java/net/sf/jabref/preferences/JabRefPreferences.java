@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 
+import net.sf.jabref.FileDirectoryPreferences;
 import net.sf.jabref.JabRefException;
 import net.sf.jabref.JabRefMain;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
@@ -50,6 +51,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
@@ -1373,6 +1375,16 @@ public class JabRefPreferences {
         if (!history.isEmpty()) {
             putStringList(RECENT_FILES, history.getHistory());
         }
+    }
+
+
+    public FileDirectoryPreferences getFileDirectoryPreferences() {
+        List<String> fields = Arrays.asList(FieldName.FILE, FieldName.PDF, FieldName.PS);
+        Map<String, String> fieldDirectories = new HashMap<>();
+        fields.stream()
+                .forEach(fieldName -> fieldDirectories.put(fieldName, get(fieldName + FileLinkPreferences.DIR_SUFFIX)));
+        return new FileDirectoryPreferences(getUser(), fieldDirectories,
+                getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
     }
 
     public UpdateFieldPreferences getUpdateFieldPreferences() {

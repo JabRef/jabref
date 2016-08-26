@@ -149,7 +149,8 @@ public class CleanupAction extends AbstractWorker {
         BibDatabaseContext bibDatabaseContext = panel.getBibDatabaseContext();
         CleanupWorker cleaner = new CleanupWorker(bibDatabaseContext,
                 Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
-                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
+                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader),
+                Globals.prefs.getFileDirectoryPreferences());
         List<FieldChange> changes = cleaner.cleanup(preset, entry);
 
         unsuccessfulRenames = cleaner.getUnsuccessfulRenames();

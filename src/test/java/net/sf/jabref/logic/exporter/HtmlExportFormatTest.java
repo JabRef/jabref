@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.entry.BibEntry;
@@ -34,13 +33,13 @@ public class HtmlExportFormatTest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
+        JabRefPreferences prefs = JabRefPreferences.getInstance();
         JournalAbbreviationLoader journalAbbreviationLoader = new JournalAbbreviationLoader();
-        Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
+        Map<String, ExportFormat> customFormats = prefs.customExports.getCustomExportFormats(prefs,
                 journalAbbreviationLoader);
-        LayoutFormatterPreferences layoutPreferences = LayoutFormatterPreferences.fromPreferences(Globals.prefs,
+        LayoutFormatterPreferences layoutPreferences = LayoutFormatterPreferences.fromPreferences(prefs,
                 journalAbbreviationLoader);
-        SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+        SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(prefs);
         ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
 
         exportFormat = ExportFormats.getExportFormat("html");

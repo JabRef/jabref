@@ -8,6 +8,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.FileDirectoryPreferences;
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.FieldChange;
@@ -17,9 +18,12 @@ import net.sf.jabref.model.entry.ParsedFileField;
 public class MoveFilesCleanup implements CleanupJob {
 
     private final BibDatabaseContext databaseContext;
+    private final FileDirectoryPreferences fileDirectoryPreferences;
 
-    public MoveFilesCleanup(BibDatabaseContext databaseContext) {
+
+    public MoveFilesCleanup(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
+        this.fileDirectoryPreferences = Objects.requireNonNull(fileDirectoryPreferences);
     }
 
     @Override
@@ -28,7 +32,7 @@ public class MoveFilesCleanup implements CleanupJob {
             return Collections.emptyList();
         }
 
-        List<String> paths = databaseContext.getFileDirectory();
+        List<String> paths = databaseContext.getFileDirectory(fileDirectoryPreferences);
         String defaultFileDirectory = databaseContext.getMetaData().getDefaultFileDirectory().get();
         Optional<File> targetDirectory = FileUtil.expandFilename(defaultFileDirectory, paths);
         if(!targetDirectory.isPresent()) {
