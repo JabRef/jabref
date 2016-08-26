@@ -73,9 +73,8 @@ public class ImportFormatTest {
         // all classes implementing {@link ImportFormat}
         // sorted alphabetically
 
-        ImportFormatPreferences importFormatPreferences = ImportFormatPreferences
-                .fromPreferences(JabRefPreferences.getInstance());
-        XMPPreferences xmpPreferences = XMPPreferences.fromPreferences(JabRefPreferences.getInstance());
+        ImportFormatPreferences importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
+        XMPPreferences xmpPreferences = JabRefPreferences.getInstance().getXMPPreferences();
         // @formatter:off
         return Arrays.asList(
                 new Object[]{new BiblioscapeImporter()},

@@ -60,11 +60,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Created by Morten O. Alver 2007.02.22
- */
 public class FileListEditor extends JTable implements FieldEditor, DownloadExternalFile.DownloadCallback {
-
     private static final Log LOGGER = LogFactory.getLog(FileListEditor.class);
 
     private final FieldNameLabel label;
@@ -194,7 +190,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                         path = Paths.get(entry.link).toString();
                     } else {
                         // relative to file folder
-                        for (String folder : databaseContext.getFileDirectory()) {
+                        for (String folder : databaseContext
+                                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences())) {
                             Path file = Paths.get(folder, entry.link);
                             if (Files.exists(file)) {
                                 path = file.toString();
@@ -233,7 +230,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
                 FileListEntry entry = tableModel.getEntry(row);
                 // null if file does not exist
-                Optional<File> file = FileUtil.expandFilename(databaseContext, entry.link);
+                Optional<File> file = FileUtil.expandFilename(databaseContext, entry.link,
+                        Globals.prefs.getFileDirectoryPreferences());
 
                 // transactional delete and unlink
                 try {
@@ -357,7 +355,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     }
 
     private void addEntry() {
-        List<String> defaultDirectory = databaseContext.getFileDirectory();
+        List<String> defaultDirectory = databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         if (defaultDirectory.isEmpty() || (defaultDirectory.get(0) == null)) {
             addEntry("");
         } else {

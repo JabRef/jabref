@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -59,13 +59,14 @@ public class SilverPlatterImporterTest {
 
     @Test
     public final void testIsRecognizedFormat() throws Exception {
-        Assert.assertTrue(testImporter.isRecognizedFormat(txtFile, Charset.defaultCharset()));
+        Assert.assertTrue(testImporter.isRecognizedFormat(txtFile, StandardCharsets.UTF_8));
     }
 
     @Test
     public final void testImportEntries() throws Exception {
         try (InputStream bibIn = SilverPlatterImporterTest.class.getResourceAsStream(bibName)) {
-            List<BibEntry> entries = testImporter.importDatabase(txtFile, Charset.defaultCharset()).getDatabase().getEntries();
+            List<BibEntry> entries = testImporter.importDatabase(txtFile, StandardCharsets.UTF_8).getDatabase()
+                    .getEntries();
             BibEntryAssert.assertEquals(bibIn, entries);
         }
     }

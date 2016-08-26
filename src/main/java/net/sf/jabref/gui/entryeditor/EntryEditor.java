@@ -79,11 +79,8 @@ import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
-import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
-import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.l10n.Localization;
@@ -98,7 +95,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryConverter;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.event.FieldChangedEvent;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -487,44 +484,44 @@ public class EntryEditor extends JPanel implements EntryContainer {
     public Optional<JComponent> getExtra(final FieldEditor editor) {
         final String fieldName = editor.getFieldName();
 
-        final Set<FieldProperties> fieldExtras = InternalBibtexFields.getFieldExtras(fieldName);
+        final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
 
         // timestamp or a other field with datepicker command
         if (Globals.prefs.get(JabRefPreferences.TIME_STAMP_FIELD).equals(fieldName)
-                || fieldExtras.contains(FieldProperties.DATE)) {
+                || fieldExtras.contains(FieldProperty.DATE)) {
             // double click AND datefield => insert the current date (today)
             return FieldExtraComponents.getDateTimeExtraComponent(editor,
-                    fieldExtras.contains(FieldProperties.DATE), fieldExtras.contains(FieldProperties.ISO_DATE));
-        } else if (fieldExtras.contains(FieldProperties.EXTERNAL)) {
+                    fieldExtras.contains(FieldProperty.DATE), fieldExtras.contains(FieldProperty.ISO_DATE));
+        } else if (fieldExtras.contains(FieldProperty.EXTERNAL)) {
             return FieldExtraComponents.getExternalExtraComponent(panel, editor);
-        } else if (fieldExtras.contains(FieldProperties.JOURNAL_NAME)) {
+        } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {
             // Add controls for switching between abbreviated and full journal names.
             // If this field also has a FieldContentSelector, we need to combine these.
             return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors,
                     getStoreFieldAction());
         } else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectors(fieldName).isEmpty()) {
             return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors, getStoreFieldAction());
-        } else if (fieldExtras.contains(FieldProperties.DOI)) {
+        } else if (fieldExtras.contains(FieldProperty.DOI)) {
             return FieldExtraComponents.getDoiExtraComponent(panel, this, editor);
-        } else if (fieldExtras.contains(FieldProperties.EPRINT)) {
+        } else if (fieldExtras.contains(FieldProperty.EPRINT)) {
             return FieldExtraComponents.getEprintExtraComponent(panel, this, editor);
-        } else if (fieldExtras.contains(FieldProperties.ISBN)) {
+        } else if (fieldExtras.contains(FieldProperty.ISBN)) {
             return FieldExtraComponents.getIsbnExtraComponent(panel, this, editor);
-        } else if (fieldExtras.contains(FieldProperties.OWNER)) {
+        } else if (fieldExtras.contains(FieldProperty.OWNER)) {
             return FieldExtraComponents.getSetOwnerExtraComponent(editor, getStoreFieldAction());
-        } else if (fieldExtras.contains(FieldProperties.YES_NO)) {
+        } else if (fieldExtras.contains(FieldProperty.YES_NO)) {
             return FieldExtraComponents.getYesNoExtraComponent(editor, this);
-        } else if (fieldExtras.contains(FieldProperties.MONTH)) {
+        } else if (fieldExtras.contains(FieldProperty.MONTH)) {
             return FieldExtraComponents.getMonthExtraComponent(editor, this, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
-        } else if (fieldExtras.contains(FieldProperties.GENDER)) {
+        } else if (fieldExtras.contains(FieldProperty.GENDER)) {
             return FieldExtraComponents.getGenderExtraComponent(editor, this);
-        } else if (fieldExtras.contains(FieldProperties.EDITOR_TYPE)) {
+        } else if (fieldExtras.contains(FieldProperty.EDITOR_TYPE)) {
             return FieldExtraComponents.getEditorTypeExtraComponent(editor, this);
-        } else if (fieldExtras.contains(FieldProperties.PAGINATION)) {
+        } else if (fieldExtras.contains(FieldProperty.PAGINATION)) {
             return FieldExtraComponents.getPaginationExtraComponent(editor, this);
-        } else if (fieldExtras.contains(FieldProperties.TYPE)) {
+        } else if (fieldExtras.contains(FieldProperty.TYPE)) {
             return FieldExtraComponents.getTypeExtraComponent(editor, this, "patent".equalsIgnoreCase(entry.getType()));
-        } else if (fieldExtras.contains(FieldProperties.CROSSREF)) {
+        } else if (fieldExtras.contains(FieldProperty.CROSSREF)) {
             return FieldExtraComponents.getCrossrefExtraComponent(editor, frame.getCurrentBasePanel());
         }
         return Optional.empty();
@@ -587,7 +584,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     public static String getSourceString(BibEntry entry, BibDatabaseMode type) throws IOException {
         StringWriter stringWriter = new StringWriter(200);
         LatexFieldFormatter formatter = LatexFieldFormatter
-                .buildIgnoreHashes(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs));
+                .buildIgnoreHashes(Globals.prefs.getLatexFieldFormatterPreferences());
         new BibEntryWriter(formatter, false).writeWithoutPrependedNewlines(entry, stringWriter, type);
 
         return stringWriter.getBuffer().toString();
@@ -764,7 +761,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private boolean storeSource() {
         BibtexParser bibtexParser = new BibtexParser(new StringReader(source.getText()),
-                ImportFormatPreferences.fromPreferences(Globals.prefs));
+                Globals.prefs.getImportFormatPreferences());
 
         try {
             ParserResult parserResult = bibtexParser.parse();
@@ -814,7 +811,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
-                    new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs))
+                    new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences())
                             .format(newValue, fieldName);
 
                     compound.addEdit(new UndoableFieldChange(entry, fieldName, oldValue, newValue));
@@ -1173,7 +1170,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                         // properly formatted. If that happens, the field
                         // is not stored and the textarea turns red.
                         if (toSet != null) {
-                            new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs))
+                            new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences())
                                     .format(toSet, fieldEditor.getFieldName());
                         }
 
@@ -1372,7 +1369,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             }
 
             BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
-                    BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
+                    Globals.prefs.getBibtexKeyPatternPreferences());
 
             // Store undo information:
             panel.getUndoManager().addEdit(

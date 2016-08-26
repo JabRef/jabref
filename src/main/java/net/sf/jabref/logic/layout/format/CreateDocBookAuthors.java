@@ -29,21 +29,16 @@ public class CreateDocBookAuthors implements LayoutFormatter {
         for (int i = 0; i < al.getNumberOfAuthors(); i++) {
             sb.append('<').append(tagName).append('>');
             Author a = al.getAuthor(i);
-            if ((a.getFirst() != null) && !a.getFirst().isEmpty()) {
-                sb.append("<firstname>").append(CreateDocBookAuthors.XML_CHARS.format(a.getFirst()))
-                        .append("</firstname>");
-            }
-            if ((a.getVon() != null) && !a.getVon().isEmpty()) {
-                sb.append("<othername>").append(CreateDocBookAuthors.XML_CHARS.format(a.getVon()))
-                        .append("</othername>");
-            }
-            if ((a.getLast() != null) && !a.getLast().isEmpty()) {
-                sb.append("<surname>").append(CreateDocBookAuthors.XML_CHARS.format(a.getLast()));
-                if ((a.getJr() != null) && !a.getJr().isEmpty()) {
-                    sb.append(' ').append(CreateDocBookAuthors.XML_CHARS.format(a.getJr()));
-                }
+            a.getFirst().filter(first -> !first.isEmpty()).ifPresent(first -> sb.append("<firstname>")
+                    .append(CreateDocBookAuthors.XML_CHARS.format(first)).append("</firstname>"));
+            a.getVon().filter(von -> !von.isEmpty()).ifPresent(von -> sb.append("<othername>")
+                    .append(CreateDocBookAuthors.XML_CHARS.format(von)).append("</othername>"));
+            a.getLast().filter(last -> !last.isEmpty()).ifPresent(last -> {
+                sb.append("<surname>").append(CreateDocBookAuthors.XML_CHARS.format(last));
+                a.getJr().filter(jr -> !jr.isEmpty())
+                        .ifPresent(jr -> sb.append(' ').append(CreateDocBookAuthors.XML_CHARS.format(jr)));
                 sb.append("</surname>");
-            }
+            });
 
             if (i < (al.getNumberOfAuthors() - 1)) {
                 sb.append("</").append(tagName).append(">\n       ");

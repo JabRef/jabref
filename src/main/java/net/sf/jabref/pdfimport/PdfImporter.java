@@ -23,16 +23,13 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
-import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.PdfContentImporter;
 import net.sf.jabref.logic.importer.fileformat.PdfXmpImporter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
@@ -139,7 +136,7 @@ public class PdfImporter {
         for (String fileName : fileNames) {
             if (!neverShow && !doNotShowAgain) {
                 importDialog = new ImportDialog(dropRow >= 0, fileName);
-                if (!XMPUtil.hasMetadata(Paths.get(fileName), XMPPreferences.fromPreferences(Globals.prefs))) {
+                if (!XMPUtil.hasMetadata(Paths.get(fileName), Globals.prefs.getXMPPreferences())) {
                     importDialog.disableXMPChoice();
                 }
                 importDialog.setLocationRelativeTo(frame);
@@ -174,7 +171,7 @@ public class PdfImporter {
 
     private void doXMPImport(String fileName, List<BibEntry> res) {
         List<BibEntry> localRes = new ArrayList<>();
-        PdfXmpImporter importer = new PdfXmpImporter(XMPPreferences.fromPreferences(Globals.prefs));
+        PdfXmpImporter importer = new PdfXmpImporter(Globals.prefs.getXMPPreferences());
         Path filePath = Paths.get(fileName);
         ParserResult result = importer.importDatabase(filePath, Globals.prefs.getDefaultEncoding());
         if (result.hasWarnings()) {
@@ -199,7 +196,8 @@ public class PdfImporter {
         FileListTableModel tm = new FileListTableModel();
         File toLink = new File(fileName);
         // Get a list of file directories:
-        List<String> dirsS = panel.getBibDatabaseContext().getFileDirectory();
+        List<String> dirsS = panel.getBibDatabaseContext()
+                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
 
         tm.addEntry(0, new FileListEntry(toLink.getName(), FileUtil.shortenFileName(toLink, dirsS).getPath(),
                 ExternalFileTypes.getInstance().getExternalFileTypeByName("PDF")));
@@ -220,7 +218,7 @@ public class PdfImporter {
     private void doContentImport(String fileName, List<BibEntry> res) {
 
         PdfContentImporter contentImporter = new PdfContentImporter(
-                ImportFormatPreferences.fromPreferences(Globals.prefs));
+                Globals.prefs.getImportFormatPreferences());
         Path filePath = Paths.get(fileName);
         ParserResult result = contentImporter.importDatabase(filePath, Globals.prefs.getDefaultEncoding());
         if (result.hasWarnings()) {
@@ -240,7 +238,7 @@ public class PdfImporter {
         panel.getDatabase().insertEntry(entry);
         panel.markBaseChanged();
         BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
-                BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
+                Globals.prefs.getBibtexKeyPatternPreferences());
         DroppedFileHandler dfh = new DroppedFileHandler(frame, panel);
         dfh.linkPdfToEntry(fileName, entry);
         panel.highlightEntry(entry);

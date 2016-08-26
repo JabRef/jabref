@@ -31,7 +31,6 @@ import javax.xml.transform.TransformerException;
 import net.sf.jabref.cli.XMPUtilMain;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
-import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
@@ -149,7 +148,7 @@ public class XMPUtilTest {
 
     public static String bibtexEntry2BibtexString(BibEntry e, JabRefPreferences preferences) throws IOException {
         StringWriter sw = new StringWriter();
-        new BibEntryWriter(new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(preferences)),
+        new BibEntryWriter(new LatexFieldFormatter(preferences.getLatexFieldFormatterPreferences()),
                 false).write(e, sw, BibDatabaseMode.BIBTEX);
         return sw.getBuffer().toString();
     }
@@ -250,8 +249,8 @@ public class XMPUtilTest {
         // The code assumes privacy filters to be off
         prefs.putBoolean("useXmpPrivacyFilter", false);
 
-        importFormatPreferences = ImportFormatPreferences.fromPreferences(prefs);
-        xmpPreferences = XMPPreferences.fromPreferences(prefs);
+        importFormatPreferences = prefs.getImportFormatPreferences();
+        xmpPreferences = prefs.getXMPPreferences();
     }
 
     @After
@@ -325,9 +324,9 @@ public class XMPUtilTest {
             prefs.putBoolean("useXmpPrivacyFilter", true);
             prefs.putStringList(JabRefPreferences.XMP_PRIVACY_FILTERS, Arrays.asList("author", "title", "note"));
 
-            XMPUtil.writeXMP(pdfFile, e, null, XMPPreferences.fromPreferences(prefs));
+            XMPUtil.writeXMP(pdfFile, e, null, prefs.getXMPPreferences());
 
-            List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), XMPPreferences.fromPreferences(prefs));
+            List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), prefs.getXMPPreferences());
             Assert.assertEquals(1, l.size());
             BibEntry x = l.get(0);
 
@@ -343,9 +342,9 @@ public class XMPUtilTest {
 
         BibEntry e = t1BibtexEntry();
 
-        XMPUtil.writeXMP(pdfFile, e, null, XMPPreferences.fromPreferences(prefs));
+        XMPUtil.writeXMP(pdfFile, e, null, prefs.getXMPPreferences());
 
-        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), XMPPreferences.fromPreferences(prefs));
+        List<BibEntry> l = XMPUtil.readXMP(pdfFile.getAbsoluteFile(), prefs.getXMPPreferences());
         Assert.assertEquals(1, l.size());
         BibEntry x = l.get(0);
         Set<String> ts = x.getFieldNames();

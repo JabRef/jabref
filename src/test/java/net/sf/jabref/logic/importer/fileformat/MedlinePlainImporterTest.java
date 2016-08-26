@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -55,7 +55,7 @@ public class MedlinePlainImporterTest {
                 "IsiImporterTestInspec.isi", "IsiImporterTestWOS.isi", "IsiImporterTestMedline.isi");
         for (String str : list) {
             Path file = Paths.get(MedlinePlainImporter.class.getResource(str).toURI());
-            Assert.assertFalse(importer.isRecognizedFormat(file, Charset.defaultCharset()));
+            Assert.assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 
@@ -67,7 +67,7 @@ public class MedlinePlainImporterTest {
                 "MedlinePlainImporterTestInproceeding.txt");
         for (String str : list) {
             Path file = Paths.get(MedlinePlainImporter.class.getResource(str).toURI());
-            Assert.assertTrue(importer.isRecognizedFormat(file, Charset.defaultCharset()));
+            Assert.assertTrue(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 
@@ -81,7 +81,7 @@ public class MedlinePlainImporterTest {
         Path inputFile = Paths
                 .get(MedlinePlainImporter.class.getResource("MedlinePlainImporterTestMultipleEntries.txt").toURI());
 
-        List<BibEntry> entries = importer.importDatabase(inputFile, Charset.defaultCharset()).getDatabase()
+        List<BibEntry> entries = importer.importDatabase(inputFile, StandardCharsets.UTF_8).getDatabase()
                 .getEntries();
         assertEquals(7, entries.size());
 
@@ -148,7 +148,7 @@ public class MedlinePlainImporterTest {
             throws IOException, URISyntaxException {
         Path file = Paths.get(MedlinePlainImporter.class.getResource(medlineFile).toURI());
         try (InputStream nis = MedlinePlainImporter.class.getResourceAsStream(bibtexFile)) {
-            List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+            List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
             Assert.assertNotNull(entries);
             assertEquals(1, entries.size());
             BibEntryAssert.assertEquals(nis, entries.get(0));
@@ -188,7 +188,7 @@ public class MedlinePlainImporterTest {
     @Test
     public void testWithNbibFile() throws IOException, URISyntaxException {
         Path file = Paths.get(MedlinePlainImporter.class.getResource("NbibImporterTest.nbib").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         BibEntryAssert.assertEquals(MedlinePlainImporter.class, "NbibImporterTest.bib", entries);
     }
 

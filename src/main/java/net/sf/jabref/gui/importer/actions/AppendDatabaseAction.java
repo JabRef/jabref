@@ -21,8 +21,6 @@ import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.ExplicitGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
-import net.sf.jabref.logic.groups.GroupTreeNode;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.util.ParseException;
@@ -88,7 +86,7 @@ public class AppendDatabaseAction implements BaseAction {
                 Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
                 // Should this be done _after_ we know it was successfully opened?
                 ParserResult pr = OpenDatabase.loadDatabase(file,
-                        ImportFormatPreferences.fromPreferences(Globals.prefs));
+                        Globals.prefs.getImportFormatPreferences());
                 AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings,
                         importGroups, importSelectorWords);
                 panel.output(Localization.lang("Imported from database") + " '" + file.getPath() + "'");
@@ -137,9 +135,7 @@ public class AppendDatabaseAction implements BaseAction {
         }
 
         if (importGroups) {
-            GroupTreeNode newGroups = meta.getGroups();
-            if (newGroups != null) {
-
+            meta.getGroups().ifPresent(newGroups -> {
                 // ensure that there is always only one AllEntriesGroup
                 if (newGroups.getGroup() instanceof AllEntriesGroup) {
                     // create a dummy group
@@ -157,7 +153,7 @@ public class AppendDatabaseAction implements BaseAction {
                 // have been defined. therefore, no check for null is
                 // required here
                 frame.getGroupSelector().addGroups(newGroups, ce);
-            }
+            });
         }
 
         if (importSelectorWords) {

@@ -49,6 +49,7 @@ public class CleanupWorkerTest {
 
     @Before
     public void setUp() throws IOException {
+        // Needed for ExternalFileTypes
         if (Globals.prefs == null) {
             Globals.prefs = JabRefPreferences.getInstance();
         }
@@ -58,8 +59,9 @@ public class CleanupWorkerTest {
         MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
-        worker = new CleanupWorker(context, Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
-                mock(LayoutFormatterPreferences.class));
+        worker = new CleanupWorker(context,
+                JabRefPreferences.getInstance().get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
+                mock(LayoutFormatterPreferences.class), JabRefPreferences.getInstance().getFileDirectoryPreferences());
     }
 
     @Test(expected = NullPointerException.class)

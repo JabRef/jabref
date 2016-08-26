@@ -1,5 +1,6 @@
 package net.sf.jabref.logic.l10n;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -32,20 +33,21 @@ public class Languages {
         LANGUAGES.put("Simplified Chinese", "zh");
     }
 
-    public static Optional<String> convertToKnownLocale(String language) {
-        if(!LANGUAGES.values().contains(Objects.requireNonNull(language))) {
-            if(language.contains("_")) {
-                String lang = language.split("_")[0];
-                if(LANGUAGES.values().contains(lang)) {
-                    return Optional.of(lang);
-                } else {
-                    return Optional.empty();
-                }
-            } else {
+    public static Optional<Locale> convertToSupportedLocale(String language) {
+        Objects.requireNonNull(language);
+
+        if (!LANGUAGES.values().contains(language)) {
+            if (!language.contains("_")) {
                 return Optional.empty();
             }
-        } else {
-            return Optional.of(language);
+
+            String lang = language.split("_")[0];
+            if (!LANGUAGES.values().contains(lang)) {
+                return Optional.empty();
+            }
+            return Optional.of(new Locale(lang));
         }
+
+        return Optional.of(new Locale(language));
     }
 }

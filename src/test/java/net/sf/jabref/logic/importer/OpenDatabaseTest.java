@@ -48,7 +48,7 @@ public class OpenDatabaseTest {
 
     @Before
     public void setUp() {
-        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
+        importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
     }
 
     @Test
@@ -116,7 +116,7 @@ public class OpenDatabaseTest {
         Assert.assertEquals(StandardCharsets.US_ASCII, result.getMetaData().getEncoding().get());
 
         BibDatabase db = result.getDatabase();
-        Assert.assertEquals("testPreamble", db.getPreamble());
+        Assert.assertEquals(Optional.of("testPreamble"), db.getPreamble());
 
         Collection<BibEntry> entries = db.getEntries();
         Assert.assertEquals(1, entries.size());

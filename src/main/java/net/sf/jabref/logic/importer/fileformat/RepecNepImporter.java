@@ -369,7 +369,7 @@ public class RepecNepImporter extends ImportFormat {
                     be.setField(FieldName.MONTH, String.valueOf(cal.get(Calendar.MONTH) + 1));
                 }
                 if ((date != null) && recognizedDateFormats[i - 1].contains("dd")) {
-                    be.setField("day", String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
+                    be.setField(FieldName.DAY, String.valueOf(cal.get(Calendar.DAY_OF_MONTH)));
                 }
 
                 // parse URL field

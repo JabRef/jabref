@@ -31,7 +31,6 @@ import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.util.component.DiffHighlightingTextPane;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
-import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.DiffHighlighting;
@@ -442,7 +441,7 @@ public class MergeEntries {
         // Update the BibTeX source view
         StringWriter writer = new StringWriter();
         try {
-            new BibEntryWriter(new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)),
+            new BibEntryWriter(new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()),
                     false).write(mergedEntry, writer, databaseType);
         } catch (IOException ex) {
             LOGGER.error("Error in entry", ex);

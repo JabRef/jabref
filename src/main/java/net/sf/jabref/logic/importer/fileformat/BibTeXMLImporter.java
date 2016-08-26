@@ -208,12 +208,10 @@ public class BibTeXMLImporter extends ImportFormat {
                 putIfValueNotNull(fields, localName, value);
             } else if (elementValue instanceof BigInteger) {
                 BigInteger value = (BigInteger) elementValue;
-                if (value != null) {
-                    if (FieldName.NUMBER.equals(localName)) {
-                        fields.put(FieldName.NUMBER, String.valueOf(value));
-                    } else if (FieldName.CHAPTER.equals(localName)) {
-                        fields.put(FieldName.CHAPTER, String.valueOf(value));
-                    }
+                if (FieldName.NUMBER.equals(localName)) {
+                    fields.put(FieldName.NUMBER, String.valueOf(value));
+                } else if (FieldName.CHAPTER.equals(localName)) {
+                    fields.put(FieldName.CHAPTER, String.valueOf(value));
                 }
             } else if (elementValue instanceof XMLGregorianCalendar) {
                 XMLGregorianCalendar value = (XMLGregorianCalendar) elementValue;

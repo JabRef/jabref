@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.groups;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -64,8 +65,8 @@ public class GroupsUtil {
                 be.getFieldOptional(field).ifPresent(val -> {
                     if (!val.isEmpty()) {
                         AuthorList al = AuthorList.parse(val);
-                        res.addAll(al.getAuthors().stream().map(Author::getLast)
-                                .filter(lastName -> ((lastName != null) && !lastName.isEmpty()))
+                        res.addAll(al.getAuthors().stream().map(Author::getLast).filter(Optional::isPresent)
+                                .map(Optional::get).filter(lastName -> !lastName.isEmpty())
                                 .collect(Collectors.toList()));
                     }
                 });

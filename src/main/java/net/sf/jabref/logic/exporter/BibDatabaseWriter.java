@@ -165,7 +165,7 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
         }
 
         // Write preamble if there is one.
-        writePreamble(bibDatabaseContext.getDatabase().getPreamble());
+        writePreamble(bibDatabaseContext.getDatabase().getPreamble().orElse(""));
 
         // Write strings if there are any.
         writeStrings(bibDatabaseContext.getDatabase(), preferences.isReformatFile(),

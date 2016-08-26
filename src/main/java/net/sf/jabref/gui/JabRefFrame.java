@@ -206,6 +206,21 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction newBiblatexDatabaseAction = new NewDatabaseAction(this, BibDatabaseMode.BIBLATEX);
     private final AbstractAction openSharedDatabaseAction = new OpenSharedDatabaseAction(this);
     private final AbstractAction newSubDatabaseAction = new NewSubDatabaseAction(this);
+    private final AbstractAction jabrefWebPageAction = new OpenBrowserAction("https://jabref.org",
+            Localization.menuTitle("Website"), Localization.lang("Opens JabRef's website"),
+            IconTheme.getImage("about"), IconTheme.getImage("about"));
+    private final AbstractAction jabrefFacebookAction = new OpenBrowserAction("https://www.facebook.com/JabRef/",
+            "Facebook", Localization.lang("Opens JabRef's Facebook page"),
+            IconTheme.JabRefIcon.FACEBOOK.getSmallIcon(), IconTheme.JabRefIcon.FACEBOOK.getIcon());
+    private final AbstractAction jabrefBlogAction = new OpenBrowserAction("https://blog.jabref.org/",
+            Localization.menuTitle("Blog"), Localization.lang("Opens JabRef's blog"),
+            IconTheme.JabRefIcon.BLOG.getSmallIcon(), IconTheme.JabRefIcon.BLOG.getIcon());
+    private final AbstractAction developmentVersionAction = new OpenBrowserAction("https://builds.jabref.org/master/",
+            Localization.menuTitle("Development version"),
+            Localization.lang("Opens a link where the current development version can be downloaded"));
+    private final AbstractAction changeLogAction = new OpenBrowserAction(
+            "https://github.com/JabRef/jabref/blob/master/CHANGELOG.md", Localization.menuTitle("View change log"),
+            Localization.lang("See what has been changed in the JabRef versions"));
     private final AbstractAction forkMeOnGitHubAction = new OpenBrowserAction("https://github.com/JabRef/jabref",
             Localization.menuTitle("Fork me on GitHub"), Localization.lang("Opens JabRef's GitHub page"), IconTheme.JabRefIcon.GITHUB.getSmallIcon(), IconTheme.JabRefIcon.GITHUB.getIcon());
     private final AbstractAction donationAction = new OpenBrowserAction("https://github.com/JabRef/jabref/wiki/Donations",
@@ -677,12 +692,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         String changeFlag = panel.isModified() ? "*" : "";
 
         if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL) {
-            if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
-                setTitle(FRAME_TITLE + " - " + GUIGlobals.UNTITLED_TITLE + changeFlag + modeInfo);
-            } else {
-                String databaseFile = panel.getBibDatabaseContext().getDatabaseFile().getPath();
+            String databaseFile = panel.getBibDatabaseContext().getDatabaseFile().map(File::getPath)
+                    .orElse(GUIGlobals.UNTITLED_TITLE);
                 setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
-            }
         } else if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED) {
             setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBSynchronizer().getDBName() + " [shared]"
                     + modeInfo);
@@ -764,7 +776,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 prefs.remove(JabRefPreferences.LAST_EDITED);
             } else {
                 prefs.putStringList(JabRefPreferences.LAST_EDITED, filenames);
-                File focusedDatabase = getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile();
+                File focusedDatabase = getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null);
                 new LastFocusedTabPreferences(prefs).setLastFocusedTab(focusedDatabase);
             }
 
@@ -811,13 +823,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 if (getBasePanelAt(i).isModified()
                         && (getBasePanelAt(i).getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL)) {
                     tabbedPane.setSelectedIndex(i);
-                    String filename;
+                    String filename = getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile()
+                            .map(File::getAbsolutePath).orElse(GUIGlobals.UNTITLED_TITLE);
 
-                    if (getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile() == null) {
-                        filename = GUIGlobals.UNTITLED_TITLE;
-                    } else {
-                        filename = getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile().getAbsolutePath();
-                    }
                     int answer = showSaveDialog(filename);
 
                     if ((answer == JOptionPane.CANCEL_OPTION) ||
@@ -845,9 +853,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     }
                 }
 
-                if (getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile() != null) {
-                    filenames.add(getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile().getAbsolutePath());
-                }
+                getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile().map(File::getAbsolutePath)
+                        .ifPresent(filenames::add);
             }
         }
 
@@ -1351,10 +1358,18 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         helpMenu.addSeparator();
         helpMenu.add(errorConsole);
         helpMenu.addSeparator();
-        helpMenu.add(forkMeOnGitHubAction);
-        helpMenu.add(donationAction);
-        helpMenu.addSeparator();
         helpMenu.add(new SearchForUpdateAction());
+        JMenu webMenu = JabRefFrame.subMenu(Localization.menuTitle("JabRef resources"));
+        webMenu.add(jabrefWebPageAction);
+        webMenu.add(jabrefBlogAction);
+        webMenu.add(jabrefFacebookAction);
+        webMenu.addSeparator();
+        webMenu.add(forkMeOnGitHubAction);
+        webMenu.add(developmentVersionAction);
+        webMenu.add(changeLogAction);
+        webMenu.addSeparator();
+        webMenu.add(donationAction);
+        helpMenu.add(webMenu);
         helpMenu.add(about);
         mb.add(helpMenu);
 
@@ -1388,7 +1403,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
         } else {
             // only add tab if DB is not already open
-            Optional<BasePanel> panel = getBasePanelList().stream().filter(p -> p.getBibDatabaseContext().getDatabaseFile().equals(pr.getFile())).findFirst();
+            Optional<BasePanel> panel = getBasePanelList().stream()
+                    .filter(p -> p.getBibDatabaseContext().getDatabaseFile().equals(pr.getFile())).findFirst();
 
             if (panel.isPresent()) {
                 tabbedPane.setSelectedComponent(panel.get());
@@ -1565,8 +1581,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         if (tabCount > 0) {
             BasePanel current = getCurrentBasePanel();
-            boolean saved = current.getBibDatabaseContext().getDatabaseFile() != null;
+            boolean saved = current.getBibDatabaseContext().getDatabaseFile().isPresent();
             setEnabled(openAndSavedDatabasesOnlyActions, saved);
+
             boolean isShared = current.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED;
             setEnabled(sharedDatabaseOnlyActions, isShared);
             setEnabled(noSharedDatabaseActions, !isShared);
@@ -1602,10 +1619,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         for (BasePanel basePanel : getBasePanelList()) {
             try {
                 // db file exists
-                if (basePanel.getBibDatabaseContext().getDatabaseFile() == null) {
-                    dbPaths.add("");
+                if (basePanel.getBibDatabaseContext().getDatabaseFile().isPresent()) {
+                    dbPaths.add(basePanel.getBibDatabaseContext().getDatabaseFile().get().getCanonicalPath());
                 } else {
-                    dbPaths.add(basePanel.getBibDatabaseContext().getDatabaseFile().getCanonicalPath());
+                    dbPaths.add("");
                 }
             } catch (IOException ex) {
                 LOGGER.error("Invalid database file path: " + ex.getMessage());
@@ -1624,12 +1641,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         List<String> paths = getUniquePathParts();
         for (int i = 0; i < getBasePanelCount(); i++) {
             String uniqPath = paths.get(i);
-            File file = getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile();
+            Optional<File> file = getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile();
 
-            if (file == null) {
-                tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle());
-            } else {
-                if (!uniqPath.equals(file.getName())) {
+            if (file.isPresent()) {
+                if (!uniqPath.equals(file.get().getName())) {
                     // remove filename
                     uniqPath = uniqPath.substring(0, uniqPath.lastIndexOf(File.separator));
                     tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle() + " \u2014 " + uniqPath);
@@ -1637,8 +1652,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     // set original filename (again)
                     tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle());
                 }
+            } else {
+                tabbedPane.setTitleAt(i, getBasePanelAt(i).getTabTitle());
             }
-            tabbedPane.setToolTipTextAt(i, file == null ? null : file.getAbsolutePath());
+            tabbedPane.setToolTipTextAt(i, file.map(File::getAbsolutePath).orElse(null));
         }
     }
 
@@ -2137,11 +2154,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         boolean close = false;
         String filename;
 
-        if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
-            filename = GUIGlobals.UNTITLED_TITLE;
-        } else {
-            filename = panel.getBibDatabaseContext().getDatabaseFile().getAbsolutePath();
-        }
+        filename = panel.getBibDatabaseContext().getDatabaseFile().map(File::getAbsolutePath)
+                .orElse(GUIGlobals.UNTITLED_TITLE);
 
         int answer = showSaveDialog(filename);
         if (answer == JOptionPane.YES_OPTION) {
@@ -2321,12 +2335,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         private void updateTexts(UndoChangeEvent event) {
             SwingUtilities.invokeLater(() -> {
-                if (JabRefFrame.this != null) {
-                    undo.putValue(Action.SHORT_DESCRIPTION, event.getUndoDescription());
-                    undo.setEnabled(event.isCanUndo());
-                    redo.putValue(Action.SHORT_DESCRIPTION, event.getRedoDescription());
-                    redo.setEnabled(event.isCanRedo());
-                }
+                undo.putValue(Action.SHORT_DESCRIPTION, event.getUndoDescription());
+                undo.setEnabled(event.isCanUndo());
+                redo.putValue(Action.SHORT_DESCRIPTION, event.getRedoDescription());
+                redo.setEnabled(event.isCanRedo());
             });
         }
     }

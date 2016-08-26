@@ -80,7 +80,7 @@ public class ExportCustomizationDialog extends JDialog {
             if (ecd.okPressed()) {
                 List<String> newFormat = Arrays.asList(ecd.name(), ecd.layoutFile(), ecd.extension());
                 Globals.prefs.customExports.addFormat(newFormat,
-                        LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader),
+                        Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
                         SavePreferences.loadForExportFromPreferences(Globals.prefs));
                 Globals.prefs.customExports.store(Globals.prefs);
             }
@@ -115,7 +115,8 @@ public class ExportCustomizationDialog extends JDialog {
             for (int i = 0; i < rows.length; i++) {
                 entries.add(Globals.prefs.customExports.getSortedList().get(rows[i]));
             }
-            LayoutFormatterPreferences layoutPreferences = LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader);
+            LayoutFormatterPreferences layoutPreferences = Globals.prefs
+                    .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
             SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
             for (List<String> list : entries) {
                 Globals.prefs.customExports.remove(list, layoutPreferences, savePreferences);

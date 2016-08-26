@@ -6,7 +6,6 @@ import java.util.Set;
 import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 public class ImportFormatPreferences {
 
@@ -68,14 +67,5 @@ public class ImportFormatPreferences {
     public ImportFormatPreferences withEncoding(Charset newEncoding) {
         return new ImportFormatPreferences(customImportList, newEncoding, keywordSeparator, bibtexKeyPatternPreferences,
                 fieldContentParserPreferences, convertUnitsOnSearch, useCaseKeeperOnSearch);
-    }
-
-    static public ImportFormatPreferences fromPreferences(JabRefPreferences jabRefPreferences) {
-        return new ImportFormatPreferences(jabRefPreferences.customImports, jabRefPreferences.getDefaultEncoding(),
-                jabRefPreferences.get(JabRefPreferences.KEYWORD_SEPARATOR),
-                BibtexKeyPatternPreferences.fromPreferences(jabRefPreferences),
-                FieldContentParserPreferences.fromPreferences(jabRefPreferences),
-                jabRefPreferences.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH),
-                jabRefPreferences.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH));
     }
 }

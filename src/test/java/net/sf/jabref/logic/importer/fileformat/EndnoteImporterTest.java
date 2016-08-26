@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -23,14 +23,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-
 public class EndnoteImporterTest {
 
     private EndnoteImporter importer;
 
+
     @Before
     public void setUp() {
-        importer = new EndnoteImporter(ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
+        importer = new EndnoteImporter(JabRefPreferences.getInstance().getImportFormatPreferences());
     }
 
     @Test
@@ -52,8 +52,8 @@ public class EndnoteImporterTest {
 
     @Test
     public void testGetDescription() {
-        assertEquals("Importer for the Refer/Endnote format." +
-                " Modified to use article number for pages if pages are missing.", importer.getDescription());
+        assertEquals("Importer for the Refer/Endnote format."
+                + " Modified to use article number for pages if pages are missing.", importer.getDescription());
     }
 
     @Test
@@ -62,7 +62,7 @@ public class EndnoteImporterTest {
 
         for (String str : list) {
             Path file = Paths.get(EndnoteImporterTest.class.getResource(str).toURI());
-            assertTrue(importer.isRecognizedFormat(file, Charset.defaultCharset()));
+            assertTrue(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 
@@ -81,7 +81,7 @@ public class EndnoteImporterTest {
     @Test
     public void testImportEntries0() throws IOException, URISyntaxException {
         Path file = Paths.get(EndnoteImporterTest.class.getResource("Endnote.entries.enw").toURI());
-        List<BibEntry> bibEntries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
         assertEquals(5, bibEntries.size());
 
@@ -126,7 +126,8 @@ public class EndnoteImporterTest {
     @Test
     public void testImportEntries1() throws IOException {
         String s = "%O Artn\\\\s testO\n%A testA,\n%E testE0, testE1";
-        List<BibEntry> bibEntries = importer.importDatabase(new BufferedReader(new StringReader(s))).getDatabase().getEntries();
+        List<BibEntry> bibEntries = importer.importDatabase(new BufferedReader(new StringReader(s))).getDatabase()
+                .getEntries();
 
         assertEquals(1, bibEntries.size());
 
@@ -140,7 +141,7 @@ public class EndnoteImporterTest {
     @Test
     public void testImportEntriesBookExample() throws IOException, URISyntaxException {
         Path file = Paths.get(EndnoteImporterTest.class.getResource("Endnote.book.example.enw").toURI());
-        List<BibEntry> bibEntries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> bibEntries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
 
         assertEquals(1, bibEntries.size());
 
@@ -152,7 +153,8 @@ public class EndnoteImporterTest {
         assertEquals(Optional.of("Versionsverwaltung"), be.getFieldOptional("keywords"));
         assertEquals(Optional.of("XX, 327"), be.getFieldOptional("pages"));
         assertEquals(Optional.of("dpunkt.verlag"), be.getFieldOptional("publisher"));
-        assertEquals(Optional.of("Git : dezentrale Versionsverwaltung im Team : Grundlagen und Workflows"), be.getFieldOptional("title"));
+        assertEquals(Optional.of("Git : dezentrale Versionsverwaltung im Team : Grundlagen und Workflows"),
+                be.getFieldOptional("title"));
         assertEquals(Optional.of("http://d-nb.info/107601965X"), be.getFieldOptional("url"));
         assertEquals(Optional.of("2016"), be.getFieldOptional("year"));
     }

@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
@@ -23,8 +22,8 @@ public class ImportFormatReaderTestParameterless {
     public void setUp() {
         Globals.prefs = JabRefPreferences.getInstance(); // Needed for special fields
         reader = new ImportFormatReader();
-        reader.resetImportFormats(ImportFormatPreferences.fromPreferences(Globals.prefs),
-                XMPPreferences.fromPreferences(Globals.prefs));
+        reader.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
+                Globals.prefs.getXMPPreferences());
     }
 
     @Test

@@ -17,7 +17,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.ParserResult;
@@ -96,7 +95,7 @@ public class ADSFetcher implements EntryFetcher {
             ADSConnection.setRequestProperty("User-Agent", "JabRef");
             try (BufferedReader reader = new BufferedReader(
                     new InputStreamReader(ADSConnection.getInputStream(), Charset.forName("ISO-8859-1")))) {
-                ParserResult pr = BibtexParser.parse(reader, ImportFormatPreferences.fromPreferences(Globals.prefs));
+                ParserResult pr = BibtexParser.parse(reader, Globals.prefs.getImportFormatPreferences());
                 return pr.getDatabase();
             }
         } catch (FileNotFoundException e) {

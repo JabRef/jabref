@@ -34,12 +34,10 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
 import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
-import net.sf.jabref.logic.xmp.XMPPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
@@ -169,8 +167,8 @@ public class ImportCustomizationDialog extends JDialog {
                 customImporterTable.removeRowSelectionInterval(row, row);
                 Globals.prefs.customImports
                         .remove(((ImportTableModel) customImporterTable.getModel()).getImporter(row));
-                Globals.IMPORT_FORMAT_READER.resetImportFormats(ImportFormatPreferences.fromPreferences(Globals.prefs),
-                        XMPPreferences.fromPreferences(Globals.prefs));
+                Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
+                        Globals.prefs.getXMPPreferences());
                 customImporterTable.revalidate();
                 customImporterTable.repaint();
             }
@@ -260,8 +258,8 @@ public class ImportCustomizationDialog extends JDialog {
      */
     public void addOrReplaceImporter(CustomImporter importer) {
         Globals.prefs.customImports.replaceImporter(importer);
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(ImportFormatPreferences.fromPreferences(Globals.prefs),
-                XMPPreferences.fromPreferences(Globals.prefs));
+        Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
+                Globals.prefs.getXMPPreferences());
         ((ImportTableModel) customImporterTable.getModel()).fireTableDataChanged();
     }
 

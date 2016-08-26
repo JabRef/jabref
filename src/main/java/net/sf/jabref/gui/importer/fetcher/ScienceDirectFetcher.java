@@ -13,7 +13,6 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.fetcher.BibsonomyScraper;
@@ -87,7 +86,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
                 if (stopFetching) {
                     break;
                 }
-                BibsonomyScraper.getEntry(cit, ImportFormatPreferences.fromPreferences(Globals.prefs))
+                BibsonomyScraper.getEntry(cit, Globals.prefs.getImportFormatPreferences())
                         .ifPresent(dialog::addEntry);
                 dialog.setProgress(++i, citations.size());
             }

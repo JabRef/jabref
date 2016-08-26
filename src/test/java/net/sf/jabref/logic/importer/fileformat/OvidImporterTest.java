@@ -3,7 +3,7 @@ package net.sf.jabref.logic.importer.fileformat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -57,7 +57,7 @@ public class OvidImporterTest {
 
         for (String str : list) {
             Path file = Paths.get(OvidImporter.class.getResource(str).toURI());
-            Assert.assertTrue(importer.isRecognizedFormat(file, Charset.defaultCharset()));
+            Assert.assertTrue(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 
@@ -68,21 +68,21 @@ public class OvidImporterTest {
 
         for (String str : list) {
             Path file = Paths.get(OvidImporter.class.getResource(str).toURI());
-            Assert.assertFalse(importer.isRecognizedFormat(file, Charset.defaultCharset()));
+            Assert.assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 
     @Test
     public void testImportEmpty() throws IOException, URISyntaxException {
         Path file = Paths.get(OvidImporter.class.getResource("Empty.txt").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         Assert.assertEquals(Collections.emptyList(), entries);
     }
 
     @Test
     public void testImportEntries1() throws IOException, URISyntaxException {
         Path file = Paths.get(OvidImporter.class.getResource("OvidImporterTest1.txt").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         Assert.assertEquals(5, entries.size());
 
         BibEntry entry = entries.get(0);
@@ -135,7 +135,7 @@ public class OvidImporterTest {
     @Test
     public void testImportEntries2() throws IOException, URISyntaxException {
         Path file = Paths.get(OvidImporter.class.getResource("OvidImporterTest2.txt").toURI());
-        List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+        List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase().getEntries();
         Assert.assertEquals(Collections.emptyList(), entries);
     }
 
@@ -145,7 +145,8 @@ public class OvidImporterTest {
         for (int n = 3; n <= 7; n++) {
             Path file = Paths.get(OvidImporter.class.getResource("OvidImporterTest" + n + ".txt").toURI());
             try (InputStream nis = OvidImporter.class.getResourceAsStream("OvidImporterTestBib" + n + ".bib")) {
-                List<BibEntry> entries = importer.importDatabase(file, Charset.defaultCharset()).getDatabase().getEntries();
+                List<BibEntry> entries = importer.importDatabase(file, StandardCharsets.UTF_8).getDatabase()
+                        .getEntries();
                 Assert.assertNotNull(entries);
                 Assert.assertEquals(1, entries.size());
                 BibEntryAssert.assertEquals(nis, entries.get(0));

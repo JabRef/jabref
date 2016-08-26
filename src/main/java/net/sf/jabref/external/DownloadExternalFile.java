@@ -18,7 +18,6 @@ import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -147,7 +146,7 @@ public class DownloadExternalFile {
         }
 
         String suggestedName = getSuggestedFileName(suffix);
-        List<String> fDirectory = databaseContext.getFileDirectory();
+        List<String> fDirectory = databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         String directory;
         if (fDirectory.isEmpty()) {
             directory = null;
@@ -259,7 +258,7 @@ public class DownloadExternalFile {
         String plannedName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(),
                 frame.getCurrentBasePanel().getSelectedEntries().get(0),
                 Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
-                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
+                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader));
 
         if (!suffix.isEmpty()) {
             plannedName += "." + suffix;
