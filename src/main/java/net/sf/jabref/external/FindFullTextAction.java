@@ -44,6 +44,20 @@ public class FindFullTextAction extends AbstractWorker {
 
     @Override
     public void run() {
+        if (basePanel.getSelectedEntries().size() >= 10) {
+            String[] options = new String[]{Localization.lang("Look up full text documents"), Localization.lang("Cancel")};
+            int answer = JOptionPane.showOptionDialog(basePanel.frame(),
+                    Localization.lang(
+                            "You are about to look up full text documents for %0 entries.",
+                            String.valueOf(basePanel.getSelectedEntries().size())) + "\n"
+                            + Localization.lang("Do you still want to continue?"),
+                    Localization.lang("Look up full text documents"), JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+            if (answer != JOptionPane.OK_OPTION) {
+                basePanel.output(Localization.lang("Operation canceled."));
+                return;
+            }
+        }
         for (BibEntry entry : basePanel.getSelectedEntries()) {
             FulltextFetchers fft = new FulltextFetchers();
             downloads.put(fft.findFullTextPDF(entry), entry);
@@ -66,7 +80,6 @@ public class FindFullTextAction extends AbstractWorker {
                             Localization.lang("Directory not found"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
-                // TODO: this needs its own thread as it blocks the UI!
                 DownloadExternalFile def = new DownloadExternalFile(basePanel.frame(),
                         basePanel.getBibDatabaseContext(), entry);
                 try {
@@ -84,11 +97,11 @@ public class FindFullTextAction extends AbstractWorker {
                 } catch (IOException e) {
                     LOGGER.warn("Problem downloading file", e);
                 }
-                basePanel.output(Localization.lang("Finished downloading full text document for entry %0",
+                basePanel.output(Localization.lang("Finished downloading full text document for entry %0.",
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
             } else {
                 String title = Localization.lang("Full text document download failed");
-                String message = Localization.lang("Full text document download failed for entry %0",
+                String message = Localization.lang("Full text document download failed for entry %0.",
                         entry.getCiteKeyOptional().orElse(Localization.lang("undefined")));
 
                 basePanel.output(message);
