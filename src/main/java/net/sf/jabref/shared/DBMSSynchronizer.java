@@ -174,7 +174,7 @@ public class DBMSSynchronizer {
                             localEntry.getSharedBibEntryData()
                                     .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
                             for (String field : sharedEntry.get().getFieldNames()) {
-                                localEntry.setField(field, sharedEntry.get().getFieldOptional(field), EntryEventSource.SHARED);
+                                localEntry.setField(field, sharedEntry.get().getField(field), EntryEventSource.SHARED);
                             }
 
                             Set<String> redundantLocalEntryFields = localEntry.getFieldNames();

@@ -36,11 +36,11 @@ public class SpecialFieldsUtils {
         UpdateField.updateField(be, e.getFieldName(), value, nullFieldIfValueIsTheSame)
                 .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
         // we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
-        SpecialFieldsUtils.exportFieldToKeywords(e, be.getFieldOptional(e.getFieldName()).orElse(null), be, ce);
+        SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()).orElse(null), be, ce);
     }
 
     private static void exportFieldToKeywords(SpecialField e, BibEntry be, NamedCompound ce) {
-        SpecialFieldsUtils.exportFieldToKeywords(e, be.getFieldOptional(e.getFieldName()).orElse(null), be, ce);
+        SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()).orElse(null), be, ce);
     }
 
     private static void exportFieldToKeywords(SpecialField e, String newValue, BibEntry entry,

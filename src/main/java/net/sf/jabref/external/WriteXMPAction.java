@@ -120,7 +120,7 @@ public class WriteXMPAction extends AbstractWorker {
             List<File> files = new ArrayList<>();
 
             // First check the (legacy) "pdf" field:
-            entry.getFieldOptional(FieldName.PDF)
+            entry.getField(FieldName.PDF)
                     .ifPresent(
                             pdf -> FileUtil
                                     .expandFilename(pdf,
@@ -132,7 +132,7 @@ public class WriteXMPAction extends AbstractWorker {
                     .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
             if (entry.hasField(FieldName.FILE)) {
                 FileListTableModel tm = new FileListTableModel();
-                entry.getFieldOptional(FieldName.FILE).ifPresent(tm::setContent);
+                entry.getField(FieldName.FILE).ifPresent(tm::setContent);
                 for (int j = 0; j < tm.getRowCount(); j++) {
                     FileListEntry flEntry = tm.getEntry(j);
                     if ((flEntry.type.isPresent()) && "pdf".equalsIgnoreCase(flEntry.type.get().getName())) {

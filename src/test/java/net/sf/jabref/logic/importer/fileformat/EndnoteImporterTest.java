@@ -87,40 +87,40 @@ public class EndnoteImporterTest {
 
         BibEntry be0 = bibEntries.get(0);
         assertEquals("misc", be0.getType());
-        assertEquals(Optional.of("testA0 and testA1"), be0.getFieldOptional("author"));
-        assertEquals(Optional.of("testE0 and testE1"), be0.getFieldOptional("editor"));
-        assertEquals(Optional.of("testT"), be0.getFieldOptional("title"));
+        assertEquals(Optional.of("testA0 and testA1"), be0.getField("author"));
+        assertEquals(Optional.of("testE0 and testE1"), be0.getField("editor"));
+        assertEquals(Optional.of("testT"), be0.getField("title"));
 
         BibEntry be1 = bibEntries.get(1);
         assertEquals("misc", be1.getType());
-        assertEquals(Optional.of("testC"), be1.getFieldOptional("address"));
-        assertEquals(Optional.of("testB2"), be1.getFieldOptional("booktitle"));
-        assertEquals(Optional.of("test8"), be1.getFieldOptional("date"));
-        assertEquals(Optional.of("test7"), be1.getFieldOptional("edition"));
-        assertEquals(Optional.of("testJ"), be1.getFieldOptional("journal"));
-        assertEquals(Optional.of("testD"), be1.getFieldOptional("year"));
+        assertEquals(Optional.of("testC"), be1.getField("address"));
+        assertEquals(Optional.of("testB2"), be1.getField("booktitle"));
+        assertEquals(Optional.of("test8"), be1.getField("date"));
+        assertEquals(Optional.of("test7"), be1.getField("edition"));
+        assertEquals(Optional.of("testJ"), be1.getField("journal"));
+        assertEquals(Optional.of("testD"), be1.getField("year"));
 
         BibEntry be2 = bibEntries.get(2);
         assertEquals("article", be2.getType());
-        assertEquals(Optional.of("testB0"), be2.getFieldOptional("journal"));
+        assertEquals(Optional.of("testB0"), be2.getField("journal"));
 
         BibEntry be3 = bibEntries.get(3);
         assertEquals("book", be3.getType());
-        assertEquals(Optional.of("testI0"), be3.getFieldOptional("publisher"));
-        assertEquals(Optional.of("testB1"), be3.getFieldOptional("series"));
+        assertEquals(Optional.of("testI0"), be3.getField("publisher"));
+        assertEquals(Optional.of("testB1"), be3.getField("series"));
 
         BibEntry be4 = bibEntries.get(4);
         assertEquals("mastersthesis", be4.getType());
-        assertEquals(Optional.of("testX"), be4.getFieldOptional("abstract"));
-        assertEquals(Optional.of("testF"), be4.getFieldOptional("bibtexkey"));
-        assertEquals(Optional.of("testR"), be4.getFieldOptional("doi"));
-        assertEquals(Optional.of("testK"), be4.getFieldOptional("keywords"));
-        assertEquals(Optional.of("testO1"), be4.getFieldOptional("note"));
-        assertEquals(Optional.of("testN"), be4.getFieldOptional("number"));
-        assertEquals(Optional.of("testP"), be4.getFieldOptional("pages"));
-        assertEquals(Optional.of("testI1"), be4.getFieldOptional("school"));
-        assertEquals(Optional.of("testU"), be4.getFieldOptional("url"));
-        assertEquals(Optional.of("testV"), be4.getFieldOptional("volume"));
+        assertEquals(Optional.of("testX"), be4.getField("abstract"));
+        assertEquals(Optional.of("testF"), be4.getField("bibtexkey"));
+        assertEquals(Optional.of("testR"), be4.getField("doi"));
+        assertEquals(Optional.of("testK"), be4.getField("keywords"));
+        assertEquals(Optional.of("testO1"), be4.getField("note"));
+        assertEquals(Optional.of("testN"), be4.getField("number"));
+        assertEquals(Optional.of("testP"), be4.getField("pages"));
+        assertEquals(Optional.of("testI1"), be4.getField("school"));
+        assertEquals(Optional.of("testU"), be4.getField("url"));
+        assertEquals(Optional.of("testV"), be4.getField("volume"));
     }
 
     @Test
@@ -133,9 +133,9 @@ public class EndnoteImporterTest {
 
         BibEntry be = bibEntries.get(0);
         assertEquals("misc", be.getType());
-        assertEquals(Optional.of("testA"), be.getFieldOptional("author"));
-        assertEquals(Optional.of("testE0, testE1"), be.getFieldOptional("editor"));
-        assertEquals(Optional.of("testO"), be.getFieldOptional("pages"));
+        assertEquals(Optional.of("testA"), be.getField("author"));
+        assertEquals(Optional.of("testE0, testE1"), be.getField("editor"));
+        assertEquals(Optional.of("testO"), be.getField("pages"));
     }
 
     @Test
@@ -147,15 +147,15 @@ public class EndnoteImporterTest {
 
         BibEntry be = bibEntries.get(0);
         assertEquals("book", be.getType());
-        assertEquals(Optional.of("Heidelberg"), be.getFieldOptional("address"));
-        assertEquals(Optional.of("Preißel, René and Stachmann, Bjørn"), be.getFieldOptional("author"));
-        assertEquals(Optional.of("3., aktualisierte und erweiterte Auflage"), be.getFieldOptional("edition"));
-        assertEquals(Optional.of("Versionsverwaltung"), be.getFieldOptional("keywords"));
-        assertEquals(Optional.of("XX, 327"), be.getFieldOptional("pages"));
-        assertEquals(Optional.of("dpunkt.verlag"), be.getFieldOptional("publisher"));
+        assertEquals(Optional.of("Heidelberg"), be.getField("address"));
+        assertEquals(Optional.of("Preißel, René and Stachmann, Bjørn"), be.getField("author"));
+        assertEquals(Optional.of("3., aktualisierte und erweiterte Auflage"), be.getField("edition"));
+        assertEquals(Optional.of("Versionsverwaltung"), be.getField("keywords"));
+        assertEquals(Optional.of("XX, 327"), be.getField("pages"));
+        assertEquals(Optional.of("dpunkt.verlag"), be.getField("publisher"));
         assertEquals(Optional.of("Git : dezentrale Versionsverwaltung im Team : Grundlagen und Workflows"),
-                be.getFieldOptional("title"));
-        assertEquals(Optional.of("http://d-nb.info/107601965X"), be.getFieldOptional("url"));
-        assertEquals(Optional.of("2016"), be.getFieldOptional("year"));
+                be.getField("title"));
+        assertEquals(Optional.of("http://d-nb.info/107601965X"), be.getField("url"));
+        assertEquals(Optional.of("2016"), be.getField("year"));
     }
 }

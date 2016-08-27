@@ -123,7 +123,7 @@ public class KeywordGroup extends AbstractGroup {
             boolean modified = false;
             for (BibEntry entry : entriesToAdd) {
                 if (!contains(entry)) {
-                    String oldContent = entry.getFieldOptional(searchField).orElse(null);
+                    String oldContent = entry.getField(searchField).orElse(null);
                     String newContent = (oldContent == null ? "" : oldContent
                             + keywordSeparator)
                             + searchExpression;
@@ -152,12 +152,12 @@ public class KeywordGroup extends AbstractGroup {
             boolean modified = false;
             for (BibEntry entry : entriesToRemove) {
                 if (contains(entry)) {
-                    String oldContent = entry.getFieldOptional(searchField).orElse(null);
+                    String oldContent = entry.getField(searchField).orElse(null);
                     removeMatches(entry);
 
                     // Store change information.
                     changes.add(new FieldChange(entry, searchField, oldContent,
-                            entry.getFieldOptional(searchField).orElse(null)));
+                            entry.getField(searchField).orElse(null)));
                     modified = true;
                 }
             }
@@ -188,7 +188,7 @@ public class KeywordGroup extends AbstractGroup {
     @Override
     public boolean contains(BibEntry entry) {
         if (regExp) {
-            Optional<String> content = entry.getFieldOptional(searchField);
+            Optional<String> content = entry.getField(searchField);
             return content.map(value -> pattern.matcher(value).find()).orElse(false);
         }
 
@@ -253,7 +253,7 @@ public class KeywordGroup extends AbstractGroup {
      * possible if the search expression is not a regExp.
      */
     private void removeMatches(BibEntry entry) {
-        entry.getFieldOptional(searchField).ifPresent(content -> {
+        entry.getField(searchField).ifPresent(content -> {
             StringBuffer sbOrig = new StringBuffer(content);
             StringBuffer sbLower = new StringBuffer(content.toLowerCase());
             StringBuffer haystack = caseSensitive ? sbOrig : sbLower;

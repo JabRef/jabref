@@ -218,7 +218,7 @@ public class JSONEntryParser {
         }
 
         // Clean up abstract (often starting with Abstract)
-        entry.getFieldOptional(FieldName.ABSTRACT).ifPresent(abstractContents -> {
+        entry.getField(FieldName.ABSTRACT).ifPresent(abstractContents -> {
             if (abstractContents.startsWith("Abstract")) {
                 entry.setField(FieldName.ABSTRACT, abstractContents.substring(8));
             }

@@ -807,7 +807,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
             // Then set all fields that have been set by the user.
             for (Entry<String, String> field : newEntry.getFieldMap().entrySet()) {
                 String fieldName = field.getKey();
-                String oldValue = entry.getFieldOptional(fieldName).orElse(null);
+                String oldValue = entry.getField(fieldName).orElse(null);
                 String newValue = field.getValue();
                 if (!Objects.equals(oldValue, newValue)) {
                     // Test if the field is legally set.
@@ -1159,7 +1159,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     set = entry.hasField(fieldEditor.getFieldName());
                 } else {
                     set = !((entry.hasField(fieldEditor.getFieldName()))
-                            && toSet.equals(entry.getFieldOptional(fieldEditor.getFieldName()).orElse(null)));
+                            && toSet.equals(entry.getField(fieldEditor.getFieldName()).orElse(null)));
                 }
 
                 if (set) {
@@ -1174,7 +1174,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                                     .format(toSet, fieldEditor.getFieldName());
                         }
 
-                        String oldValue = entry.getFieldOptional(fieldEditor.getFieldName()).orElse(null);
+                        String oldValue = entry.getField(fieldEditor.getFieldName()).orElse(null);
 
                         if (toSet == null) {
                             entry.clearField(fieldEditor.getFieldName());

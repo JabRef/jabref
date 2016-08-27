@@ -76,7 +76,7 @@ class NameFieldAutoCompleter extends AbstractAutoCompleter {
             return;
         }
         for (String fieldName : fieldNames) {
-            entry.getFieldOptional(fieldName).ifPresent(fieldValue ->  {
+            entry.getField(fieldName).ifPresent(fieldValue ->  {
                 AuthorList authorList = AuthorList.parse(fieldValue);
                 for (Author author : authorList.getAuthors()) {
                     handleAuthor(author);

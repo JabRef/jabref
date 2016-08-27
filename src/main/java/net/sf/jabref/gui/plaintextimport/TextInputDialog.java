@@ -421,7 +421,7 @@ public class TextInputDialog extends JDialog {
                     markedTextStore.appendPosition(fieldName, selectionStart, selectionEnd);
 
                     // get old text from BibTeX tag
-                    Optional<String> old = entry.getFieldOptional(fieldName);
+                    Optional<String> old = entry.getField(fieldName);
 
                     // merge old and selected text
                     if (old.isPresent()) {

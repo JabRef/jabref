@@ -66,7 +66,7 @@ public class DatabaseFileLookup {
     private List<File> parseFileField(BibEntry entry) {
         Objects.requireNonNull(entry);
 
-        List<ParsedFileField> entries = FileField.parse(entry.getFieldOptional(FieldName.FILE).orElse(null));
+        List<ParsedFileField> entries = FileField.parse(entry.getField(FieldName.FILE).orElse(null));
 
         List<File> fileLinks = new ArrayList<>();
         for (ParsedFileField field : entries) {

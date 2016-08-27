@@ -152,7 +152,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             List<String> matchedFieldKeys = fieldsKeys.stream().filter(matchFieldKey()).collect(Collectors.toList());
 
             for (String field : matchedFieldKeys) {
-                Optional<String> fieldValue = entry.getFieldOptional(field);
+                Optional<String> fieldValue = entry.getField(field);
                 if (fieldValue.isPresent()) {
                     if (matchFieldValue(fieldValue.get())) {
                         return true;

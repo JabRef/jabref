@@ -130,7 +130,7 @@ public class SynchronizeFileField extends AbstractWorker {
             boolean removeAllBroken = false;
             mainLoop: for (BibEntry aSel : sel) {
                 panel.frame().setProgressBarValue(progress++);
-                final Optional<String> old = aSel.getFieldOptional(FieldName.FILE);
+                final Optional<String> old = aSel.getField(FieldName.FILE);
                 // Check if a extension is set:
                 if (old.isPresent() && !(old.get().isEmpty())) {
                     FileListTableModel tableModel = new FileListTableModel();

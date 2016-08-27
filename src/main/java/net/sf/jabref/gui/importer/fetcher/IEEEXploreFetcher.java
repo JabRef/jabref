@@ -255,7 +255,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up title
-        entry.getFieldOptional(FieldName.TITLE).ifPresent(title -> {
+        entry.getField(FieldName.TITLE).ifPresent(title -> {
             // USe the alt-text and replace image links
             title = title.replaceAll("[ ]?img src=[^ ]+ alt=\"([^\"]+)\">[ ]?", "\\$$1\\$");
             // Try to sort out most of the /spl / conversions
@@ -287,7 +287,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         });
 
         // clean up author
-        entry.getFieldOptional(FieldName.AUTHOR).ifPresent(author -> {
+        entry.getField(FieldName.AUTHOR).ifPresent(author -> {
             author = author.replaceAll("\\s+", " ");
 
             //reorder the "Jr." "Sr." etc to the correct ordering
@@ -306,7 +306,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         });
 
         // clean up month
-        entry.getFieldOptional(FieldName.MONTH).filter(month -> !month.isEmpty()).ifPresent(month -> {
+        entry.getField(FieldName.MONTH).filter(month -> !month.isEmpty()).ifPresent(month -> {
             month = month.replace(".", "");
             month = month.toLowerCase();
 
@@ -339,7 +339,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         });
 
         // clean up pages
-        entry.getFieldOptional(FieldName.PAGES).ifPresent(pages -> {
+        entry.getField(FieldName.PAGES).ifPresent(pages -> {
             String[] pageNumbers = pages.split("-");
             if (pageNumbers.length == 2) {
                 if (pageNumbers[0].equals(pageNumbers[1])) {// single page
@@ -360,7 +360,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             sourceField = FieldName.BOOKTITLE;
         }
         if (entry.hasField(sourceField)) {
-            String fullName = entry.getFieldOptional(sourceField).get();
+            String fullName = entry.getField(sourceField).get();
             if ("article".equals(type)) {
                 int ind = fullName.indexOf(": Accepted for future publication");
                 if (ind > 0) {
@@ -375,7 +375,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 if (parts.length == 3) {
                     fullName += parts[2];
                 }
-                entry.getFieldOptional(FieldName.NOTE).filter(note -> "Early Access".equals(note)).ifPresent(note -> {
+                entry.getField(FieldName.NOTE).filter(note -> "Early Access".equals(note)).ifPresent(note -> {
                     entry.setField(FieldName.YEAR, "to be published");
                     entry.clearField(FieldName.MONTH);
                     entry.clearField(FieldName.PAGES);
@@ -453,7 +453,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
                 fullName = fullName.trim();
 
                 fullName = fullName.replaceAll("^[tT]he ", "").replaceAll("^\\d{4} ", "").replaceAll("[,.]$", "");
-                Optional<String> year = entry.getFieldOptional(FieldName.YEAR);
+                Optional<String> year = entry.getField(FieldName.YEAR);
                 if (year.isPresent()) {
                     fullName = fullName.replaceAll(", " + year.get() + "\\.?", "");
                 }
@@ -467,7 +467,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
         }
 
         // clean up abstract
-        entry.getFieldOptional(FieldName.ABSTRACT).ifPresent(abstr -> {
+        entry.getField(FieldName.ABSTRACT).ifPresent(abstr -> {
             // Try to sort out most of the /spl / conversions
             // Deal with this specific nested type first
             abstr = abstr.replaceAll("/sub /spl infin//", "\\$_\\\\infty\\$");
@@ -486,11 +486,11 @@ public class IEEEXploreFetcher implements EntryFetcher {
         });
 
         // Clean up url
-        entry.getFieldOptional(FieldName.URL)
+        entry.getField(FieldName.URL)
                 .ifPresent(url -> entry.setField(FieldName.URL, "http://ieeexplore.ieee.org" + url.replace("tp=&", "")));
 
         // Replace ; as keyword separator
-        entry.getFieldOptional(FieldName.KEYWORDS).ifPresent(keys -> entry.setField(FieldName.KEYWORDS,
+        entry.getField(FieldName.KEYWORDS).ifPresent(keys -> entry.setField(FieldName.KEYWORDS,
                 keys.replace(";", Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR))));
         return entry;
     }

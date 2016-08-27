@@ -87,49 +87,49 @@ public class OvidImporterTest {
 
         BibEntry entry = entries.get(0);
         Assert.assertEquals("misc", entry.getType());
-        Assert.assertEquals(Optional.of("Mustermann and Musterfrau"), entry.getFieldOptional("author"));
-        Assert.assertEquals(Optional.of("Short abstract"), entry.getFieldOptional("abstract"));
-        Assert.assertEquals(Optional.of("Musterbuch"), entry.getFieldOptional("title"));
-        Assert.assertEquals(Optional.of("Einleitung"), entry.getFieldOptional("chaptertitle"));
+        Assert.assertEquals(Optional.of("Mustermann and Musterfrau"), entry.getField("author"));
+        Assert.assertEquals(Optional.of("Short abstract"), entry.getField("abstract"));
+        Assert.assertEquals(Optional.of("Musterbuch"), entry.getField("title"));
+        Assert.assertEquals(Optional.of("Einleitung"), entry.getField("chaptertitle"));
 
         entry = entries.get(1);
         Assert.assertEquals("inproceedings", entry.getType());
-        Assert.assertEquals(Optional.of("Max"), entry.getFieldOptional("editor"));
-        Assert.assertEquals(Optional.of("Max the Editor"), entry.getFieldOptional("title"));
-        Assert.assertEquals(Optional.of("Very Long Title"), entry.getFieldOptional("journal"));
-        Assert.assertEquals(Optional.of("28"), entry.getFieldOptional("volume"));
-        Assert.assertEquals(Optional.of("2"), entry.getFieldOptional("issue"));
-        Assert.assertEquals(Optional.of("2015"), entry.getFieldOptional("year"));
-        Assert.assertEquals(Optional.of("103--106"), entry.getFieldOptional("pages"));
+        Assert.assertEquals(Optional.of("Max"), entry.getField("editor"));
+        Assert.assertEquals(Optional.of("Max the Editor"), entry.getField("title"));
+        Assert.assertEquals(Optional.of("Very Long Title"), entry.getField("journal"));
+        Assert.assertEquals(Optional.of("28"), entry.getField("volume"));
+        Assert.assertEquals(Optional.of("2"), entry.getField("issue"));
+        Assert.assertEquals(Optional.of("2015"), entry.getField("year"));
+        Assert.assertEquals(Optional.of("103--106"), entry.getField("pages"));
 
         entry = entries.get(2);
         Assert.assertEquals("incollection", entry.getType());
-        Assert.assertEquals(Optional.of("Max"), entry.getFieldOptional("author"));
-        Assert.assertEquals(Optional.of("Test"), entry.getFieldOptional("title"));
-        Assert.assertEquals(Optional.of("Very Long Title"), entry.getFieldOptional("journal"));
-        Assert.assertEquals(Optional.of("28"), entry.getFieldOptional("volume"));
-        Assert.assertEquals(Optional.of("2"), entry.getFieldOptional("issue"));
-        Assert.assertEquals(Optional.of("April"), entry.getFieldOptional("month"));
-        Assert.assertEquals(Optional.of("2015"), entry.getFieldOptional("year"));
-        Assert.assertEquals(Optional.of("103--106"), entry.getFieldOptional("pages"));
+        Assert.assertEquals(Optional.of("Max"), entry.getField("author"));
+        Assert.assertEquals(Optional.of("Test"), entry.getField("title"));
+        Assert.assertEquals(Optional.of("Very Long Title"), entry.getField("journal"));
+        Assert.assertEquals(Optional.of("28"), entry.getField("volume"));
+        Assert.assertEquals(Optional.of("2"), entry.getField("issue"));
+        Assert.assertEquals(Optional.of("April"), entry.getField("month"));
+        Assert.assertEquals(Optional.of("2015"), entry.getField("year"));
+        Assert.assertEquals(Optional.of("103--106"), entry.getField("pages"));
 
         entry = entries.get(3);
         Assert.assertEquals("book", entry.getType());
-        Assert.assertEquals(Optional.of("Max"), entry.getFieldOptional("author"));
-        Assert.assertEquals(Optional.of("2015"), entry.getFieldOptional("year"));
-        Assert.assertEquals(Optional.of("Editor"), entry.getFieldOptional("editor"));
-        Assert.assertEquals(Optional.of("Very Long Title"), entry.getFieldOptional("booktitle"));
-        Assert.assertEquals(Optional.of("103--106"), entry.getFieldOptional("pages"));
-        Assert.assertEquals(Optional.of("Address"), entry.getFieldOptional("address"));
-        Assert.assertEquals(Optional.of("Publisher"), entry.getFieldOptional("publisher"));
+        Assert.assertEquals(Optional.of("Max"), entry.getField("author"));
+        Assert.assertEquals(Optional.of("2015"), entry.getField("year"));
+        Assert.assertEquals(Optional.of("Editor"), entry.getField("editor"));
+        Assert.assertEquals(Optional.of("Very Long Title"), entry.getField("booktitle"));
+        Assert.assertEquals(Optional.of("103--106"), entry.getField("pages"));
+        Assert.assertEquals(Optional.of("Address"), entry.getField("address"));
+        Assert.assertEquals(Optional.of("Publisher"), entry.getField("publisher"));
 
         entry = entries.get(4);
         Assert.assertEquals("article", entry.getType());
-        Assert.assertEquals(Optional.of("2014"), entry.getFieldOptional("year"));
-        Assert.assertEquals(Optional.of("58"), entry.getFieldOptional("pages"));
-        Assert.assertEquals(Optional.of("Test"), entry.getFieldOptional("address"));
-        Assert.assertEquals(Optional.empty(), entry.getFieldOptional("title"));
-        Assert.assertEquals(Optional.of("TestPublisher"), entry.getFieldOptional("publisher"));
+        Assert.assertEquals(Optional.of("2014"), entry.getField("year"));
+        Assert.assertEquals(Optional.of("58"), entry.getField("pages"));
+        Assert.assertEquals(Optional.of("Test"), entry.getField("address"));
+        Assert.assertEquals(Optional.empty(), entry.getField("title"));
+        Assert.assertEquals(Optional.of("TestPublisher"), entry.getField("publisher"));
     }
 
     @Test

@@ -68,7 +68,7 @@ public class EntryFromFileCreatorManagerTest {
             boolean file1Found = false;
             boolean file2Found = false;
             for (BibEntry entry : database.getEntries()) {
-                String filesInfo = entry.getFieldOptional("file").get();
+                String filesInfo = entry.getField("file").get();
                 if (filesInfo.contains(files.get(0).getName())) {
                     file1Found = true;
                 }

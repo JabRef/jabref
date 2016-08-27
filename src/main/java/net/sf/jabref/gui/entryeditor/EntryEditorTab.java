@@ -214,7 +214,7 @@ class EntryEditorTab {
         if (text.isEmpty()) {
             return getEntry().hasField(fieldEditor.getFieldName());
         } else {
-            return !Optional.of(text).equals(getEntry().getFieldOptional(fieldEditor.getFieldName()));
+            return !Optional.of(text).equals(getEntry().getField(fieldEditor.getFieldName()));
         }
     }
 
@@ -277,7 +277,7 @@ class EntryEditorTab {
         try {
             updating = true;
             for (FieldEditor editor : editors.values()) {
-                String toSet = entry.getFieldOptional(editor.getFieldName()).orElse("");
+                String toSet = entry.getField(editor.getFieldName()).orElse("");
                 if (!toSet.equals(editor.getText())) {
                     editor.setText(toSet);
                 }

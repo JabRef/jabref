@@ -215,7 +215,7 @@ public class JabRefDesktop {
             // User wants to change the type of this link.
             // First get a model of all file links for this entry:
             FileListTableModel tModel = new FileListTableModel();
-            Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
+            Optional<String> oldValue = entry.getField(FieldName.FILE);
             oldValue.ifPresent(tModel::setContent);
             FileListEntry flEntry = null;
             // Then find which one we are looking at:

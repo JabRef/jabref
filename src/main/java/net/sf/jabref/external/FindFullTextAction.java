@@ -69,11 +69,11 @@ public class FindFullTextAction extends AbstractWorker {
             try {
                 def.download(result.get(), file -> {
                     FileListTableModel tm = new FileListTableModel();
-                    entry.getFieldOptional(FieldName.FILE).ifPresent(tm::setContent);
+                    entry.getField(FieldName.FILE).ifPresent(tm::setContent);
                     tm.addEntry(tm.getRowCount(), file);
                     String newValue = tm.getStringRepresentation();
                     UndoableFieldChange edit = new UndoableFieldChange(entry, FieldName.FILE,
-                            entry.getFieldOptional(FieldName.FILE).orElse(null), newValue);
+                            entry.getField(FieldName.FILE).orElse(null), newValue);
                     entry.setField(FieldName.FILE, newValue);
                     basePanel.getUndoManager().addEdit(edit);
                     basePanel.markBaseChanged();

@@ -21,7 +21,7 @@ public class ISSNChecker implements Checker {
         }
 
         // Check that the ISSN is on the correct form
-        String issnString = entry.getFieldOptional(FieldName.ISSN).get().trim();
+        String issnString = entry.getField(FieldName.ISSN).get().trim();
 
         ISSN issn = new ISSN(issnString);
         if (!issn.isValidFormat()) {

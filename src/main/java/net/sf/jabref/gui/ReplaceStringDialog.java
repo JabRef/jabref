@@ -207,7 +207,7 @@ class ReplaceStringDialog extends JDialog {
         if (!be.hasField(fieldname)) {
             return 0;
         }
-        String txt = be.getFieldOptional(fieldname).get();
+        String txt = be.getField(fieldname).get();
         StringBuilder sb = new StringBuilder();
         int ind;
         int piv = 0;

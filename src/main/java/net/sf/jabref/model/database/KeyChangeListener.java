@@ -49,7 +49,7 @@ public class KeyChangeListener {
     private void updateEntryLinks(String newKey, String oldKey) {
         for (BibEntry entry : database.getEntries()) {
             for (String field : keyFields) {
-                entry.getFieldOptional(field).ifPresent(fieldContent -> {
+                entry.getField(field).ifPresent(fieldContent -> {
                     if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
                         replaceSingleKeyInField(newKey, oldKey, entry, field, fieldContent);
                     } else { // MULTIPLE_ENTRY_LINK

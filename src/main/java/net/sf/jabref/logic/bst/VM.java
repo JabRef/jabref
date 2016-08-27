@@ -298,7 +298,7 @@ public class VM implements Warn {
             if (context == null) {
                 throw new VMException("Must have an entry to cite$");
             }
-            stack.push(context.getBibtexEntry().getCiteKey());
+            stack.push(context.getBibtexEntry().getCiteKeyOptional().orElse(null));
         });
 
         /**
@@ -915,7 +915,7 @@ public class VM implements Warn {
         for (BstEntry e : entries) {
 
             for (Map.Entry<String, String> mEntry : e.getFields().entrySet()) {
-                String fieldValue = e.getBibtexEntry().getField(mEntry.getKey());
+                String fieldValue = e.getBibtexEntry().getField(mEntry.getKey()).orElse(null);
 
                 mEntry.setValue(fieldValue);
             }

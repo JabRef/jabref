@@ -911,7 +911,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 if (col == FILE_COL) {
                     if (entry.hasField(FieldName.FILE)) {
                         FileListTableModel tableModel = new FileListTableModel();
-                        entry.getFieldOptional(FieldName.FILE).ifPresent(tableModel::setContent);
+                        entry.getField(FieldName.FILE).ifPresent(tableModel::setContent);
                         if (tableModel.getRowCount() == 0) {
                             return;
                         }
@@ -966,7 +966,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             JPopupMenu menu = new JPopupMenu();
             int count = 0;
             FileListTableModel fileList = new FileListTableModel();
-            entry.getFieldOptional(FieldName.FILE).ifPresent(fileList::setContent);
+            entry.getField(FieldName.FILE).ifPresent(fileList::setContent);
             // If there are one or more links, open the first one:
             for (int i = 0; i < fileList.getRowCount(); i++) {
                 FileListEntry flEntry = fileList.getEntry(i);
@@ -995,7 +995,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             final int row = glTable.rowAtPoint(e.getPoint());
             BibEntry entry = sortedList.get(row);
 
-            entry.getFieldOptional(fieldName).ifPresent(link -> {
+            entry.getField(fieldName).ifPresent(link -> {
                 try {
                     JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), link, fieldName);
                 } catch (IOException ex) {
@@ -1133,7 +1133,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             }
             BibEntry entry = selectionModel.getSelected().get(0);
             String result = JOptionPane.showInputDialog(ImportInspectionDialog.this, Localization.lang("Enter URL"),
-                    entry.getFieldOptional(FieldName.URL).orElse(""));
+                    entry.getField(FieldName.URL).orElse(""));
             entries.getReadWriteLock().writeLock().lock();
             try {
                 if (result != null) {
@@ -1188,7 +1188,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         public void downloadComplete(FileListEntry file) {
             ImportInspectionDialog.this.toFront(); // Hack
             FileListTableModel localModel = new FileListTableModel();
-            entry.getFieldOptional(FieldName.FILE).ifPresent(localModel::setContent);
+            entry.getField(FieldName.FILE).ifPresent(localModel::setContent);
             localModel.addEntry(localModel.getRowCount(), file);
             entries.getReadWriteLock().writeLock().lock();
             try {
@@ -1224,7 +1224,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 }
             }
             final FileListTableModel localModel = new FileListTableModel();
-            entry.getFieldOptional(FieldName.FILE).ifPresent(localModel::setContent);
+            entry.getField(FieldName.FILE).ifPresent(localModel::setContent);
             // We have a static utility method for searching for all relevant
             // links:
             JDialog diag = new JDialog(ImportInspectionDialog.this, true);
@@ -1266,7 +1266,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             editor.setVisible(true, true);
             if (editor.okPressed()) {
                 FileListTableModel localModel = new FileListTableModel();
-                entry.getFieldOptional(FieldName.FILE).ifPresent(localModel::setContent);
+                entry.getField(FieldName.FILE).ifPresent(localModel::setContent);
                 localModel.addEntry(localModel.getRowCount(), flEntry);
                 entries.getReadWriteLock().writeLock().lock();
                 try {
@@ -1282,7 +1282,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         public void downloadComplete(FileListEntry file) {
             ImportInspectionDialog.this.toFront(); // Hack
             FileListTableModel localModel = new FileListTableModel();
-            entry.getFieldOptional(FieldName.FILE).ifPresent(localModel::setContent);
+            entry.getField(FieldName.FILE).ifPresent(localModel::setContent);
             localModel.addEntry(localModel.getRowCount(), file);
             entries.getReadWriteLock().writeLock().lock();
             try {
@@ -1429,7 +1429,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 case FILE_COL:
                     if (entry.hasField(FieldName.FILE)) {
                         FileListTableModel model = new FileListTableModel();
-                        entry.getFieldOptional(FieldName.FILE).ifPresent(model::setContent);
+                        entry.getField(FieldName.FILE).ifPresent(model::setContent);
                         fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
                         if ((model.getRowCount() > 0) && model.getEntry(0).type.isPresent()) {
                             fileLabel.setIcon(model.getEntry(0).type.get().getIcon());
@@ -1440,7 +1440,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     }
                 case URL_COL:
                     if (entry.hasField(FieldName.URL)) {
-                        urlLabel.setToolTipText(entry.getFieldOptional(FieldName.URL).orElse(""));
+                        urlLabel.setToolTipText(entry.getField(FieldName.URL).orElse(""));
                         return urlLabel;
                     } else {
                         return null;
@@ -1451,9 +1451,9 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             } else {
                 String field = INSPECTION_FIELDS.get(i - PAD);
                 if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES)) {
-                    return entry.getFieldOptional(field).map(AuthorList::fixAuthorNatbib).orElse("");
+                    return entry.getField(field).map(AuthorList::fixAuthorNatbib).orElse("");
                 } else {
-                    return entry.getFieldOptional(field).orElse(null);
+                    return entry.getField(field).orElse(null);
                 }
             }
         }

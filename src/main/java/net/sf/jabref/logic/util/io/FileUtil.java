@@ -357,7 +357,7 @@ public class FileUtil {
 
         List<File> result = new ArrayList<>();
         for (BibEntry entry : bes) {
-            entry.getFieldOptional(FieldName.FILE).ifPresent(fileField -> {
+            entry.getField(FieldName.FILE).ifPresent(fileField -> {
                 List<ParsedFileField> fileList = FileField.parse(fileField);
                 for (ParsedFileField file : fileList) {
                     expandFilename(file.getLink(), fileDirs).ifPresent(result::add);

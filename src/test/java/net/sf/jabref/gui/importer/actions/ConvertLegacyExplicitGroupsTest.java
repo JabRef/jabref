@@ -46,7 +46,7 @@ public class ConvertLegacyExplicitGroupsTest {
 
         action.performAction(basePanel, parserResult);
 
-        assertEquals(Optional.of("TestGroup"), entry.getFieldOptional("groups"));
+        assertEquals(Optional.of("TestGroup"), entry.getField("groups"));
     }
 
     @Test
@@ -68,7 +68,7 @@ public class ConvertLegacyExplicitGroupsTest {
 
         action.performAction(basePanel, parserResult);
 
-        assertEquals(Optional.of("TestGroup"), entry.getFieldOptional("groups"));
+        assertEquals(Optional.of("TestGroup"), entry.getField("groups"));
     }
 
     @Test
