@@ -273,7 +273,7 @@ public class DroppedFileHandler {
                             panel.getBibDatabaseContext().getFileDirectory(Globals.prefs.getFileDirectoryPreferences()))
                     .toString();
         } else {
-            if (renameCheckBox.isSelected()) {
+            if (renameCheckBox.isSelected() || (single == null)) {
                 destFilename = fileName;
             } else {
                 destFilename = single.getCiteKey() + "." + fileType.getExtension();

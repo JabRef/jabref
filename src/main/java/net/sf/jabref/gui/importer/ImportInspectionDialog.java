@@ -438,13 +438,10 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     }
 
     /**
-     * Generate key for the selected entry only.
+     * Generate key for an entry.
      */
-    private void generateKeySelectedEntry() {
-        if (selectionModel.getSelected().size() != 1) {
-            return;
-        }
-        BibEntry entry = selectionModel.getSelected().get(0);
+    private void generateKeyForEntry(BibEntry entry) {
+
         entries.getReadWriteLock().writeLock().lock();
         try {
             BibDatabase database;
@@ -1166,21 +1163,19 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 return;
             }
             entry = selectionModel.getSelected().get(0);
-            Optional<String> bibtexKey = entry.getCiteKeyOptional();
-            if (!bibtexKey.isPresent()) {
+            if (!entry.getCiteKeyOptional().isPresent()) {
                 int answer = JOptionPane.showConfirmDialog(frame,
                         Localization.lang("This entry has no BibTeX key. Generate key now?"),
                         Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (answer == JOptionPane.OK_OPTION) {
-                    generateKeySelectedEntry();
-                    bibtexKey = entry.getCiteKeyOptional();
+                    generateKeyForEntry(entry);
                 }
             }
-            DownloadExternalFile def = new DownloadExternalFile(frame, bibDatabaseContext, bibtexKey.get());
+            DownloadExternalFile def = new DownloadExternalFile(frame, bibDatabaseContext, entry);
             try {
                 def.download(this);
             } catch (IOException ex) {
-                LOGGER.warn("Could not downlod file", ex);
+                LOGGER.warn("Could not download file", ex);
             }
         }
 
@@ -1218,7 +1213,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         Localization.lang("This entry has no BibTeX key. Generate key now?"),
                         Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (answer == JOptionPane.OK_OPTION) {
-                    generateKeySelectedEntry();
+                    generateKeyForEntry(entry);
                 } else {
                     return; // Can't go on without the bibtex key.
                 }

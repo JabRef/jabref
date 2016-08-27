@@ -13,6 +13,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 - Added integrity check for fields with BibTeX keys, e.g., `crossref` and `related`, to check that the key exists
+- [#1496](https://github.com/JabRef/jabref/issues/1496) Keep track of which entry a downloaded file belongs to
+- Made it possible to download multiple entries in one action
 
 ### Fixed
 - Fixed NullPointerException when opening search result window for an untitled database 

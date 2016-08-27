@@ -140,7 +140,7 @@ public class MoveFileAction extends AbstractAction {
 
             }
 
-            if (!newFile.equals(file)) {
+            if ((newFile != null) && !newFile.equals(file)) {
                 try {
                     boolean success = file.renameTo(newFile);
                     if (!success) {

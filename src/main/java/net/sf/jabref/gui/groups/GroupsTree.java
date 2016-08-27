@@ -168,7 +168,7 @@ public class GroupsTree extends JTree implements DragSourceListener,
         } else if (dtde
                 .isDataFlavorSupported(TransferableEntrySelection.FLAVOR_INTERNAL)) {
             // check if node accepts explicit assignment
-            if (path == null) {
+            if (target == null) {
                 dtde.rejectDrag();
             } else {
                 // this would be the place to check if the dragging entries

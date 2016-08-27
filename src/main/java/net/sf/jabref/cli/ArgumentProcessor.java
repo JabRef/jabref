@@ -237,7 +237,7 @@ public class ArgumentProcessor {
                 // BIB files to open. Other files, and files that could not be opened
                 // as bib, we try to import instead.
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
-                ParserResult pr = null;
+                ParserResult pr = ParserResult.getNullResult();
                 if (bibExtension) {
                     pr = OpenDatabase.loadDatabaseOrAutoSave(aLeftOver, false,
                             Globals.prefs.getImportFormatPreferences());

@@ -87,12 +87,14 @@ public class EntryComparator implements Comparator<BibEntry> {
             }
         }
 
-        if ((f1 == null) && (f2 == null)) {
-            return next == null ? idCompare(e1, e2) : next.compare(e1, e2);
+        if (f2 == null) {
+            if (f1 == null) {
+                return next == null ? idCompare(e1, e2) : next.compare(e1, e2);
+            } else {
+                return -1;
+            }
         }
-        if ((f1 != null) && (f2 == null)) {
-            return -1;
-        }
+
         if (f1 == null) { // f2 != null here automatically
             return 1;
         }
