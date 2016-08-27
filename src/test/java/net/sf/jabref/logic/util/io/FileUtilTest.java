@@ -45,6 +45,50 @@ public class FileUtilTest {
     }
 
     @Test
+    public void testGetLinkedFileNameNoPattern() {
+        // bibkey
+        String fileNamePattern = "";
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("1234");
+        entry.setField("title", "mytitle");
+
+        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
+                mock(LayoutFormatterPreferences.class)));
+    }
+
+    @Test
+    public void testGetDefaultFileNameNoPatternNoBibTeXKey() {
+        // bibkey
+        String fileNamePattern = "";
+        BibEntry entry = new BibEntry();
+        entry.setField("title", "mytitle");
+
+        assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
+                mock(LayoutFormatterPreferences.class)));
+    }
+
+    @Test
+    public void testGetLinkedFileNameGetKeyIfEmptyField() {
+        // bibkey - title
+        String fileNamePattern = "\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
+        BibEntry entry = new BibEntry();
+        entry.setCiteKey("1234");
+
+        assertEquals("1234", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
+                JabRefPreferences.getInstance().getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class))));
+    }
+
+    @Test
+    public void testGetLinkedFileNameGetDefaultIfEmptyFieldNoKey() {
+        // bibkey - title
+        String fileNamePattern = "\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
+        BibEntry entry = new BibEntry();
+
+        assertEquals("default", FileUtil.createFileNameFromPattern(null, entry, fileNamePattern,
+                JabRefPreferences.getInstance().getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class))));
+    }
+
+    @Test
     public void testGetFileExtensionSimpleFile() {
         assertEquals("pdf", FileUtil.getFileExtension(new File("test.pdf")).get());
     }

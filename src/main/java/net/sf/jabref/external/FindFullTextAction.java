@@ -30,6 +30,8 @@ import org.apache.commons.logging.LogFactory;
 public class FindFullTextAction extends AbstractWorker {
     private static final Log LOGGER = LogFactory.getLog(FindFullTextAction.class);
 
+    private static final int warningLimit = 10; // The minimum number of selected entries to ask the user for confirmation
+
     private final BasePanel basePanel;
     private final Map<Optional<URL>, BibEntry> downloads = new ConcurrentHashMap<>();
 
@@ -44,7 +46,7 @@ public class FindFullTextAction extends AbstractWorker {
 
     @Override
     public void run() {
-        if (basePanel.getSelectedEntries().size() >= 10) {
+        if (basePanel.getSelectedEntries().size() >= warningLimit) {
             String[] options = new String[]{Localization.lang("Look up full text documents"), Localization.lang("Cancel")};
             int answer = JOptionPane.showOptionDialog(basePanel.frame(),
                     Localization.lang(

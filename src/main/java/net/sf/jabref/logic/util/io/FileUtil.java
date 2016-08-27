@@ -379,7 +379,8 @@ public class FileUtil {
      */
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry,
             String fileNamePattern, LayoutFormatterPreferences prefs) {
-        String targetName = entry.getCiteKeyOptional().orElse("default");
+        String targetName = null;
+
         StringReader sr = new StringReader(fileNamePattern);
         Layout layout = null;
         try {
@@ -389,6 +390,10 @@ public class FileUtil {
         }
         if (layout != null) {
             targetName = layout.doLayout(entry, database);
+        }
+
+        if ((targetName == null) || targetName.isEmpty()) {
+            targetName = entry.getCiteKeyOptional().orElse("default");
         }
         //Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);

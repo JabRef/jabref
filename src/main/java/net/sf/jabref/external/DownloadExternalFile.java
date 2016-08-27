@@ -205,7 +205,7 @@ public class DownloadExternalFile {
 
                 // If the local file is in or below the main file directory, change the
                 // path to relative:
-                if ((directory != null) && fileListEntry.link.startsWith(directory)
+                if ((dirPrefix != null) && fileListEntry.link.startsWith(directory)
                         && (fileListEntry.link.length() > dirPrefix.length())) {
                     fileListEntry = new FileListEntry(fileListEntry.description,
                             fileListEntry.link.substring(dirPrefix.length()), fileListEntry.type);
@@ -257,7 +257,6 @@ public class DownloadExternalFile {
         editor.getProgressBar().setValue(editor.getProgressBar().getMaximum());
     }
 
-    // FIXME: will break download if no bibtexkey is present!
     private String getSuggestedFileName(String suffix) {
         String plannedName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry,
                 Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
