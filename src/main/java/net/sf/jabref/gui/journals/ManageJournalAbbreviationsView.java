@@ -289,7 +289,15 @@ public class ManageJournalAbbreviationsView extends FXMLView {
 
     @FXML
     private void saveAbbreviations() {
-        viewModel.saveEverythingAndUpdateAutoCompleter();
+        Task<Void> task = new Task<Void>() {
+
+            @Override
+            protected Void call() {
+                viewModel.saveEverythingAndUpdateAutoCompleter();
+                return null;
+            }
+        };
+        new Thread(task).start();
         closeDialog();
     }
 
