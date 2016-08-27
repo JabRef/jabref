@@ -1015,6 +1015,7 @@ public class XMPUtilTest {
 
             if (metaRaw == null) {
                 Assert.fail();
+                return;
             }
 
             XMPMetadata meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));
@@ -1394,6 +1395,7 @@ public class XMPUtilTest {
 
                     if (metaRaw == null) {
                         Assert.fail();
+                        return; // To avoid warnings
                     }
 
                     XMPMetadata meta = new XMPMetadata(XMLUtil.parse(metaRaw.createInputStream()));

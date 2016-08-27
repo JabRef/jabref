@@ -46,7 +46,6 @@ public class FileUtilTest {
 
     @Test
     public void testGetLinkedFileNameNoPattern() {
-        // bibkey
         String fileNamePattern = "";
         BibEntry entry = new BibEntry();
         entry.setCiteKey("1234");
@@ -58,7 +57,6 @@ public class FileUtilTest {
 
     @Test
     public void testGetDefaultFileNameNoPatternNoBibTeXKey() {
-        // bibkey
         String fileNamePattern = "";
         BibEntry entry = new BibEntry();
         entry.setField("title", "mytitle");
