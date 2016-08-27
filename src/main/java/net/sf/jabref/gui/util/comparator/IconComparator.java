@@ -22,8 +22,8 @@ public class IconComparator implements Comparator<BibEntry> {
     public int compare(BibEntry e1, BibEntry e2) {
 
         for (String field : fields) {
-            Optional<String> val1 = e1.getFieldOptional(field);
-            Optional<String> val2 = e2.getFieldOptional(field);
+            Optional<String> val1 = e1.getField(field);
+            Optional<String> val2 = e2.getField(field);
             if (val1.isPresent()) {
                 if (val2.isPresent()) {
                     // val1 is not null AND val2 is not null

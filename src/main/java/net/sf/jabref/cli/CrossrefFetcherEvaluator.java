@@ -27,19 +27,20 @@ public class CrossrefFetcherEvaluator {
     public static void main(String[] args) throws IOException, InterruptedException {
         Globals.prefs = JabRefPreferences.getInstance();
         try (FileReader reader = new FileReader(args[0])) {
-            BibtexParser parser = new BibtexParser(new FileReader(args[0]), Globals.prefs.getImportFormatPreferences());
+            BibtexParser parser = new BibtexParser(reader, Globals.prefs.getImportFormatPreferences());
             ParserResult result = parser.parse();
             BibDatabase db = result.getDatabase();
 
-            int total = db.getEntryCount();
+            List<BibEntry> entries = db.getEntries();
 
             AtomicInteger dois = new AtomicInteger();
             AtomicInteger doiFound = new AtomicInteger();
             AtomicInteger doiNew = new AtomicInteger();
             AtomicInteger doiIdentical = new AtomicInteger();
 
-            List<BibEntry> entries = db.getEntries();
-            CountDownLatch countDownLatch = new CountDownLatch(entries.size());
+            int total = entries.size();
+
+            CountDownLatch countDownLatch = new CountDownLatch(total);
 
             ExecutorService executorService = Executors.newFixedThreadPool(5);
 
@@ -48,7 +49,7 @@ public class CrossrefFetcherEvaluator {
 
                     @Override
                     public void run() {
-                        Optional<DOI> origDOI = entry.getFieldOptional(FieldName.DOI).flatMap(DOI::build);
+                        Optional<DOI> origDOI = entry.getField(FieldName.DOI).flatMap(DOI::build);
                         if (origDOI.isPresent()) {
                             dois.incrementAndGet();
                             Optional<DOI> crossrefDOI = CrossRef.findDOI(entry);

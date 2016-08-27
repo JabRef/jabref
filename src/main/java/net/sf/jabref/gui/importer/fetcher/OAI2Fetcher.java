@@ -183,7 +183,7 @@ public class OAI2Fetcher implements EntryFetcher {
 
                 /* Correct line breaks and spacing */
                 for (String name : be.getFieldNames()) {
-                    be.getFieldOptional(name)
+                    be.getField(name)
                             .ifPresent(content -> be.setField(name, OAI2Handler.correctLineBreaks(content)));
                 }
 

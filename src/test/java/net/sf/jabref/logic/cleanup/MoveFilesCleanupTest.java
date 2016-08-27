@@ -59,7 +59,7 @@ public class MoveFilesCleanupTest {
         assertTrue(fileAfter.exists());
 
         assertEquals(Optional.of(FileField.getStringRepresentation(new ParsedFileField("", fileAfter.getName(), ""))),
-                entry.getFieldOptional("file"));
+                entry.getField("file"));
     }
 
     @Test
@@ -82,6 +82,6 @@ public class MoveFilesCleanupTest {
         assertEquals(
                 Optional.of(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("", "", ""),
                         new ParsedFileField("", fileAfter.getName(), ""), new ParsedFileField("", "", "")))),
-                entry.getFieldOptional("file"));
+                entry.getField("file"));
     }
 }

@@ -48,8 +48,8 @@ public class EntryComparator implements Comparator<BibEntry> {
             return 0;
         }
 
-        Object f1 = e1.getField(sortField);
-        Object f2 = e2.getField(sortField);
+        Object f1 = e1.getField(sortField).orElse(null);
+        Object f2 = e2.getField(sortField).orElse(null);
 
         if (binary) {
             // We just separate on set and unset fields:

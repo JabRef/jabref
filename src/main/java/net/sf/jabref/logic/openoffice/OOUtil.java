@@ -72,7 +72,7 @@ public class OOUtil {
                     WrappedTargetException, IllegalArgumentException {
 
         // Backup the value of the uniq field, just in case the entry already has it:
-        Optional<String> oldUniqVal = entry.getFieldOptional(UNIQUEFIER_FIELD);
+        Optional<String> oldUniqVal = entry.getField(UNIQUEFIER_FIELD);
 
 
         // Set the uniq field with the supplied uniquefier:

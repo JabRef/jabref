@@ -279,9 +279,9 @@ public class XMPUtilTest {
 
         Assert.assertNotNull(e);
         Assert.assertEquals(Optional.of("OezbekC06"), e.getCiteKeyOptional());
-        Assert.assertEquals(Optional.of("2003"), e.getFieldOptional("year"));
+        Assert.assertEquals(Optional.of("2003"), e.getField("year"));
         Assert.assertEquals(Optional.of("Beach sand convolution by surf-wave optimzation"),
-                e.getFieldOptional("title"));
+                e.getField("title"));
         Assert.assertEquals("misc", e.getType());
     }
 
@@ -304,8 +304,8 @@ public class XMPUtilTest {
 
         Assert.assertNotNull(e);
         Assert.assertEquals(Optional.of("OezbekC06"), e.getCiteKeyOptional());
-        Assert.assertEquals(Optional.of("2003"), e.getFieldOptional("year"));
-        Assert.assertEquals(Optional.of("�pt�mz�t��n"), e.getFieldOptional("title"));
+        Assert.assertEquals(Optional.of("2003"), e.getField("year"));
+        Assert.assertEquals(Optional.of("�pt�mz�t��n"), e.getField("title"));
         Assert.assertEquals("misc", e.getType());
     }
 
@@ -378,8 +378,8 @@ public class XMPUtilTest {
 
         Assert.assertNotNull(e);
         Assert.assertEquals(Optional.of("Clarkson06"), e.getCiteKeyOptional());
-        Assert.assertEquals("Kelly Clarkson and Ozzy Osbourne", e.getFieldOptional("author").get());
-        Assert.assertEquals("Huey Duck and Dewey Duck and Louie Duck", e.getFieldOptional("editor").get());
+        Assert.assertEquals("Kelly Clarkson and Ozzy Osbourne", e.getField("author").get());
+        Assert.assertEquals("Huey Duck and Dewey Duck and Louie Duck", e.getField("editor").get());
         Assert.assertEquals("misc", e.getType());
     }
 
@@ -499,9 +499,9 @@ public class XMPUtilTest {
         BibEntry e = l.get(0);
 
         Assert.assertNotNull(e);
-        Assert.assertEquals("Hallo World this is not an exercise .", e.getFieldOptional("title").get());
-        Assert.assertEquals("Hallo World this is not an exercise .", e.getFieldOptional("tabs").get());
-        Assert.assertEquals("\n\nAbstract preserve\n\t Whitespace\n\n", e.getFieldOptional("abstract").get());
+        Assert.assertEquals("Hallo World this is not an exercise .", e.getField("title").get());
+        Assert.assertEquals("Hallo World this is not an exercise .", e.getField("tabs").get());
+        Assert.assertEquals("\n\nAbstract preserve\n\t Whitespace\n\n", e.getField("abstract").get());
     }
 
     /**
@@ -767,12 +767,12 @@ public class XMPUtilTest {
 
             if ("author".equalsIgnoreCase(field) || "editor".equalsIgnoreCase(field)) {
 
-                AuthorList expectedAuthors = AuthorList.parse(expected.getFieldOptional(field).get());
-                AuthorList actualAuthors = AuthorList.parse(actual.getFieldOptional(field).get());
+                AuthorList expectedAuthors = AuthorList.parse(expected.getField(field).get());
+                AuthorList actualAuthors = AuthorList.parse(actual.getField(field).get());
                 Assert.assertEquals(expectedAuthors, actualAuthors);
             } else {
-                Assert.assertEquals("comparing " + field, expected.getFieldOptional(field),
-                        actual.getFieldOptional(field));
+                Assert.assertEquals("comparing " + field, expected.getField(field),
+                        actual.getField(field));
             }
         }
 
@@ -825,12 +825,12 @@ public class XMPUtilTest {
         }
 
         Assert.assertEquals(Optional.of("canh05"), a.getCiteKeyOptional());
-        Assert.assertEquals("K. Crowston and H. Annabi", a.getFieldOptional("author").get());
-        Assert.assertEquals("Title A", a.getFieldOptional("title").get());
+        Assert.assertEquals("K. Crowston and H. Annabi", a.getField("author").get());
+        Assert.assertEquals("Title A", a.getField("title").get());
         Assert.assertEquals("article", a.getType());
 
         Assert.assertEquals(Optional.of("foo"), b.getCiteKeyOptional());
-        Assert.assertEquals("Norton Bar", b.getFieldOptional("author").get());
+        Assert.assertEquals("Norton Bar", b.getField("author").get());
         Assert.assertEquals("inproceedings", b.getType());
     }
 
@@ -1334,7 +1334,7 @@ public class XMPUtilTest {
         BibEntry x = l.get(0);
 
         Assert.assertEquals(AuthorList.parse("Crowston, K. and Annabi, H. and Howison, J. and Masango, C."),
-                AuthorList.parse(x.getFieldOptional("author").get()));
+                AuthorList.parse(x.getField("author").get()));
     }
 
     @Test(expected = EncryptedPdfsNotSupportedException.class)
@@ -1377,7 +1377,7 @@ public class XMPUtilTest {
                 // Test whether we the main function can load the bibtex correctly
                 BibEntry b = XMPUtil.readXMP(pdfFile, xmpPreferences).get(0);
                 Assert.assertNotNull(b);
-                Assert.assertEquals(originalAuthors, AuthorList.parse(b.getFieldOptional("author").get()));
+                Assert.assertEquals(originalAuthors, AuthorList.parse(b.getField("author").get()));
 
                 // Next check from Document Information
                 try (PDDocument document = PDDocument.load(pdfFile.getAbsoluteFile())) {
@@ -1386,7 +1386,7 @@ public class XMPUtilTest {
                             AuthorList.parse(document.getDocumentInformation().getAuthor()));
 
                     b = XMPUtil.getBibtexEntryFromDocumentInformation(document.getDocumentInformation()).get();
-                    Assert.assertEquals(originalAuthors, AuthorList.parse(b.getFieldOptional("author").get()));
+                    Assert.assertEquals(originalAuthors, AuthorList.parse(b.getField("author").get()));
 
                     // Now check from Dublin Core
                     PDDocumentCatalog catalog = document.getDocumentCatalog();
@@ -1412,7 +1412,7 @@ public class XMPUtilTest {
 
                     b = XMPUtil.getBibtexEntryFromDublinCore(dcSchema, xmpPreferences).get();
                     Assert.assertNotNull(b);
-                    Assert.assertEquals(originalAuthors, AuthorList.parse(b.getFieldOptional("author").get()));
+                    Assert.assertEquals(originalAuthors, AuthorList.parse(b.getField("author").get()));
                 }
             } finally {
                 if (!pdfFile.delete()) {

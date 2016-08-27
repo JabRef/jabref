@@ -56,49 +56,49 @@ public class BibtexImporterTest {
                         Optional.of(
                                 "Aks{\\i}n, {\\\"O}zge and T{\\\"u}rkmen, Hayati and Artok, Levent and {\\c{C}}etinkaya, "
                                         + "Bekir and Ni, Chaoying and B{\\\"u}y{\\\"u}kg{\\\"u}ng{\\\"o}r, Orhan and {\\\"O}zkal, Erhan"),
-                        entry.getFieldOptional("author"));
-                assertEquals(Optional.of("aksin"), entry.getFieldOptional("bibtexkey"));
-                assertEquals(Optional.of("2006"), entry.getFieldOptional("date"));
+                        entry.getField("author"));
+                assertEquals(Optional.of("aksin"), entry.getField("bibtexkey"));
+                assertEquals(Optional.of("2006"), entry.getField("date"));
                 assertEquals(Optional.of("Effect of immobilization on catalytic characteristics"),
-                        entry.getFieldOptional("indextitle"));
-                assertEquals(Optional.of("#jomch#"), entry.getFieldOptional("journaltitle"));
-                assertEquals(Optional.of("13"), entry.getFieldOptional("number"));
-                assertEquals(Optional.of("3027-3036"), entry.getFieldOptional("pages"));
+                        entry.getField("indextitle"));
+                assertEquals(Optional.of("#jomch#"), entry.getField("journaltitle"));
+                assertEquals(Optional.of("13"), entry.getField("number"));
+                assertEquals(Optional.of("3027-3036"), entry.getField("pages"));
                 assertEquals(Optional
                         .of("Effect of immobilization on catalytic characteristics of saturated {Pd-N}-heterocyclic "
                                 + "carbenes in {Mizoroki-Heck} reactions"),
-                        entry.getFieldOptional("title"));
-                assertEquals(Optional.of("691"), entry.getFieldOptional("volume"));
+                        entry.getField("title"));
+                assertEquals(Optional.of("691"), entry.getField("volume"));
             } else if (entry.getCiteKeyOptional().get().equals("stdmodel")) {
                 assertEquals(Optional
                         .of("A \\texttt{set} with three members discussing the standard model of particle physics. "
                                 + "The \\texttt{crossref} field in the \\texttt{@set} entry and the \\texttt{entryset} field in "
                                 + "each set member entry is needed only when using BibTeX as the backend"),
-                        entry.getFieldOptional("annotation"));
-                assertEquals(Optional.of("stdmodel"), entry.getFieldOptional("bibtexkey"));
-                assertEquals(Optional.of("glashow,weinberg,salam"), entry.getFieldOptional("entryset"));
+                        entry.getField("annotation"));
+                assertEquals(Optional.of("stdmodel"), entry.getField("bibtexkey"));
+                assertEquals(Optional.of("glashow,weinberg,salam"), entry.getField("entryset"));
             } else if (entry.getCiteKeyOptional().get().equals("set")) {
                 assertEquals(Optional
                         .of("A \\texttt{set} with three members. The \\texttt{crossref} field in the \\texttt{@set} "
                                 + "entry and the \\texttt{entryset} field in each set member entry is needed only when using "
                                 + "BibTeX as the backend"),
-                        entry.getFieldOptional("annotation"));
-                assertEquals(Optional.of("set"), entry.getFieldOptional("bibtexkey"));
-                assertEquals(Optional.of("herrmann,aksin,yoon"), entry.getFieldOptional("entryset"));
+                        entry.getField("annotation"));
+                assertEquals(Optional.of("set"), entry.getField("bibtexkey"));
+                assertEquals(Optional.of("herrmann,aksin,yoon"), entry.getField("entryset"));
             } else if (entry.getCiteKeyOptional().get().equals("Preissel2016")) {
-                assertEquals(Optional.of("Heidelberg"), entry.getFieldOptional("address"));
-                assertEquals(Optional.of("Preißel, René"), entry.getFieldOptional("author"));
-                assertEquals(Optional.of("Preissel2016"), entry.getFieldOptional("bibtexkey"));
+                assertEquals(Optional.of("Heidelberg"), entry.getField("address"));
+                assertEquals(Optional.of("Preißel, René"), entry.getField("author"));
+                assertEquals(Optional.of("Preissel2016"), entry.getField("bibtexkey"));
                 assertEquals(Optional.of("3., aktualisierte und erweiterte Auflage"),
-                        entry.getFieldOptional("edition"));
-                assertEquals(Optional.of("978-3-86490-311-3"), entry.getFieldOptional("isbn"));
-                assertEquals(Optional.of("Versionsverwaltung"), entry.getFieldOptional("keywords"));
-                assertEquals(Optional.of("XX, 327 Seiten"), entry.getFieldOptional("pages"));
-                assertEquals(Optional.of("dpunkt.verlag"), entry.getFieldOptional("publisher"));
+                        entry.getField("edition"));
+                assertEquals(Optional.of("978-3-86490-311-3"), entry.getField("isbn"));
+                assertEquals(Optional.of("Versionsverwaltung"), entry.getField("keywords"));
+                assertEquals(Optional.of("XX, 327 Seiten"), entry.getField("pages"));
+                assertEquals(Optional.of("dpunkt.verlag"), entry.getField("publisher"));
                 assertEquals(Optional.of("Git: dezentrale Versionsverwaltung im Team : Grundlagen und Workflows"),
-                        entry.getFieldOptional("title"));
-                assertEquals(Optional.of("http://d-nb.info/107601965X"), entry.getFieldOptional("url"));
-                assertEquals(Optional.of("2016"), entry.getFieldOptional("year"));
+                        entry.getField("title"));
+                assertEquals(Optional.of("http://d-nb.info/107601965X"), entry.getField("url"));
+                assertEquals(Optional.of("2016"), entry.getField("year"));
             }
         }
     }

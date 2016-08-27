@@ -42,7 +42,7 @@ public class SpecialMainTableColumns {
         @Override
         public Object getColumnValue(BibEntry entry) {
 
-            return entry.getFieldOptional(SpecialFields.FIELDNAME_RANKING)
+            return entry.getField(SpecialFields.FIELDNAME_RANKING)
                     .flatMap(Rank.getInstance()::parse).map(rank -> rank.createLabel()).orElse(null);
         }
     };
@@ -54,7 +54,7 @@ public class SpecialMainTableColumns {
         @Override
         public Object getColumnValue(BibEntry entry) {
 
-            return entry.getFieldOptional(SpecialFields.FIELDNAME_PRIORITY)
+            return entry.getField(SpecialFields.FIELDNAME_PRIORITY)
                     .flatMap(Priority.getInstance()::parse).map(prio -> prio.createLabel()).orElse(null);
         }
     };
@@ -66,7 +66,7 @@ public class SpecialMainTableColumns {
         @Override
         public Object getColumnValue(BibEntry entry) {
 
-            return entry.getFieldOptional(SpecialFields.FIELDNAME_READ)
+            return entry.getField(SpecialFields.FIELDNAME_READ)
                     .flatMap(ReadStatus.getInstance()::parse).map(status -> status.createLabel()).orElse(null);
         }
     };
@@ -91,7 +91,7 @@ public class SpecialMainTableColumns {
         public Object getColumnValue(BibEntry entry) {
             // We use a FileListTableModel to parse the field content:
             FileListTableModel fileList = new FileListTableModel();
-            entry.getFieldOptional(FieldName.FILE).ifPresent(fileList::setContent);
+            entry.getField(FieldName.FILE).ifPresent(fileList::setContent);
             if (fileList.getRowCount() > 1) {
                 return new JLabel(IconTheme.JabRefIcon.FILE_MULTIPLE.getSmallIcon());
             } else if (fileList.getRowCount() == 1) {
@@ -170,7 +170,7 @@ public class SpecialMainTableColumns {
                 boolean iconFound = false;
                 JLabel iconLabel = null;
                 FileListTableModel fileList = new FileListTableModel();
-                entry.getFieldOptional(FieldName.FILE).ifPresent(fileList::setContent);
+                entry.getField(FieldName.FILE).ifPresent(fileList::setContent);
                 for (int i = 0; i < fileList.getRowCount(); i++) {
                     if ((fileList.getEntry(i).type.isPresent())
                             && externalFileTypeName.equalsIgnoreCase(fileList.getEntry(i).type.get().getName())) {

@@ -570,9 +570,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         popupMenu.addSeparator();
 
-        JMenuItem databaseProperties = new JMenuItem(Localization.lang("Database properties"));
-        databaseProperties.addActionListener(this.databaseProperties);
-        popupMenu.add(databaseProperties);
+        JMenuItem databasePropertiesMenu = new JMenuItem(Localization.lang("Database properties"));
+        databasePropertiesMenu.addActionListener(this.databaseProperties);
+        popupMenu.add(databasePropertiesMenu);
 
         JMenuItem bibtexKeyPatternBtn = new JMenuItem(Localization.lang("BibTeX key patterns"));
         bibtexKeyPatternBtn.addActionListener(bibtexKeyPattern);

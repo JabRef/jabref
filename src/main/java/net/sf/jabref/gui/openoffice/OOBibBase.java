@@ -469,7 +469,7 @@ class OOBibBase {
             // Rebuild the list of cited keys according to the sort order:
             cited.clear();
             for (BibEntry entry : entries.keySet()) {
-                cited.add(entry.getCiteKey());
+                cited.add(entry.getCiteKeyOptional().orElse(null));
             }
             names = Arrays.asList(xReferenceMarks.getElementNames());
         } else {
@@ -1368,7 +1368,7 @@ class OOBibBase {
                     // Insert a copy of the entry
                     resultDatabase.insertEntry(clonedEntry);
                     // Check if the cloned entry has a crossref field
-                    clonedEntry.getFieldOptional(FieldName.CROSSREF).ifPresent(crossref -> {
+                    clonedEntry.getField(FieldName.CROSSREF).ifPresent(crossref -> {
                         // If the crossref entry is not already in the database
                         if (!resultDatabase.getEntryByKey(crossref).isPresent()) {
                             // Add it if it is in the current database

@@ -95,7 +95,7 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(FieldName.PAGES);
+            Optional<String> value = entry.getField(FieldName.PAGES);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -113,7 +113,7 @@ public class IntegrityCheck {
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
             String field = FieldName.BOOKTITLE;
-            Optional<String> value = entry.getFieldOptional(field);
+            Optional<String> value = entry.getField(field);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -136,7 +136,7 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(field);
+            Optional<String> value = entry.getField(field);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -161,7 +161,7 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(FieldName.FILE);
+            Optional<String> value = entry.getField(FieldName.FILE);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -187,7 +187,7 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(FieldName.URL);
+            Optional<String> value = entry.getField(FieldName.URL);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -207,7 +207,7 @@ public class IntegrityCheck {
             List<IntegrityMessage> result = new ArrayList<>();
             for (String field : entry.getFieldNames()) {
                 if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES)) {
-                    Optional<String> value = entry.getFieldOptional(field);
+                    Optional<String> value = entry.getField(field);
                     if (!value.isPresent()) {
                         return Collections.emptyList();
                     }
@@ -234,7 +234,7 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(field);
+            Optional<String> value = entry.getField(field);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -269,7 +269,7 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(FieldName.TITLE);
+            Optional<String> value = entry.getField(FieldName.TITLE);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -312,7 +312,7 @@ public class IntegrityCheck {
          */
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(FieldName.YEAR);
+            Optional<String> value = entry.getField(FieldName.YEAR);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -353,7 +353,7 @@ public class IntegrityCheck {
          */
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(FieldName.PAGES);
+            Optional<String> value = entry.getField(FieldName.PAGES);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -390,7 +390,7 @@ public class IntegrityCheck {
          */
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(FieldName.PAGES);
+            Optional<String> value = entry.getField(FieldName.PAGES);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }

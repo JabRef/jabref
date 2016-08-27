@@ -87,33 +87,33 @@ public class MedlinePlainImporterTest {
 
         BibEntry testEntry = entries.get(0);
         assertEquals("article", testEntry.getType());
-        assertEquals(Optional.empty(), testEntry.getFieldOptional("month"));
-        assertEquals(Optional.of("Long, Vicky and Marland, Hilary"), testEntry.getFieldOptional("author"));
+        assertEquals(Optional.empty(), testEntry.getField("month"));
+        assertEquals(Optional.of("Long, Vicky and Marland, Hilary"), testEntry.getField("author"));
         assertEquals(
                 Optional.of(
                         "From danger and motherhood to health and beauty: health advice for the factory girl in early twentieth-century Britain."),
-                testEntry.getFieldOptional("title"));
+                testEntry.getField("title"));
 
         testEntry = entries.get(1);
         assertEquals("conference", testEntry.getType());
-        assertEquals(Optional.of("06"), testEntry.getFieldOptional("month"));
-        assertEquals(Optional.empty(), testEntry.getFieldOptional("author"));
-        assertEquals(Optional.empty(), testEntry.getFieldOptional("title"));
+        assertEquals(Optional.of("06"), testEntry.getField("month"));
+        assertEquals(Optional.empty(), testEntry.getField("author"));
+        assertEquals(Optional.empty(), testEntry.getField("title"));
 
         testEntry = entries.get(2);
         assertEquals("book", testEntry.getType());
         assertEquals(
                 Optional.of(
                         "This is a Testtitle: This title should be appended: This title should also be appended. Another append to the Title? LastTitle"),
-                testEntry.getFieldOptional("title"));
+                testEntry.getField("title"));
 
         testEntry = entries.get(3);
         assertEquals("techreport", testEntry.getType());
-        Assert.assertTrue(testEntry.getFieldOptional("doi").isPresent());
+        Assert.assertTrue(testEntry.getField("doi").isPresent());
 
         testEntry = entries.get(4);
         assertEquals("inproceedings", testEntry.getType());
-        assertEquals(Optional.of("Inproceedings book title"), testEntry.getFieldOptional("booktitle"));
+        assertEquals(Optional.of("Inproceedings book title"), testEntry.getField("booktitle"));
 
         BibEntry expectedEntry5 = new BibEntry();
         expectedEntry5.setType("proceedings");

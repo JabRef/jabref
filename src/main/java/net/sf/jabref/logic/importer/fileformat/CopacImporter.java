@@ -140,7 +140,7 @@ public class CopacImporter extends ImportFormat {
 
     private static void setOrAppend(BibEntry b, String field, String value, String separator) {
         if (b.hasField(field)) {
-            b.setField(field, b.getFieldOptional(field).get() + separator + value);
+            b.setField(field, b.getField(field).get() + separator + value);
         } else {
             b.setField(field, value);
         }

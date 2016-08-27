@@ -26,7 +26,7 @@ public class MSBibConverter {
 
         for (String field : entry.getFieldNames()) {
             // clean field
-            String unicodeField = removeLaTeX(entry.getFieldOptional(field).orElse(""));
+            String unicodeField = removeLaTeX(entry.getField(field).orElse(""));
 
             if (MSBibMapping.getMSBibField(field) != null) {
                 result.fields.put(MSBibMapping.getMSBibField(field), unicodeField);
@@ -34,43 +34,43 @@ public class MSBibConverter {
         }
 
         // Duplicate: also added as BookTitle
-        entry.getFieldOptional(FieldName.BOOKTITLE).ifPresent(booktitle -> result.conferenceName = booktitle);
-        entry.getFieldOptional(FieldName.PAGES).ifPresent(pages -> result.pages = new PageNumbers(pages));
-        entry.getFieldOptional(MSBIB_PREFIX + "accessed").ifPresent(accesed -> result.dateAccessed = accesed);
+        entry.getField(FieldName.BOOKTITLE).ifPresent(booktitle -> result.conferenceName = booktitle);
+        entry.getField(FieldName.PAGES).ifPresent(pages -> result.pages = new PageNumbers(pages));
+        entry.getField(MSBIB_PREFIX + "accessed").ifPresent(accesed -> result.dateAccessed = accesed);
 
         // TODO: currently this can never happen
         if ("SoundRecording".equals(msbibType)) {
-            result.albumTitle = entry.getFieldOptional(FieldName.TITLE).orElse(null);
+            result.albumTitle = entry.getField(FieldName.TITLE).orElse(null);
         }
 
         // TODO: currently this can never happen
         if ("Interview".equals(msbibType)) {
-            result.broadcastTitle = entry.getFieldOptional(FieldName.TITLE).orElse(null);
+            result.broadcastTitle = entry.getField(FieldName.TITLE).orElse(null);
         }
 
         if ("Patent".equalsIgnoreCase(entry.getType())) {
-            result.patentNumber = entry.getFieldOptional(FieldName.NUMBER).orElse(null);
+            result.patentNumber = entry.getField(FieldName.NUMBER).orElse(null);
         }
 
         result.journalName = entry.getFieldOrAlias(FieldName.JOURNAL).orElse(null);
         result.month = entry.getFieldOrAlias(FieldName.MONTH).orElse(null);
 
-        if (!entry.getFieldOptional(FieldName.YEAR).isPresent()) {
+        if (!entry.getField(FieldName.YEAR).isPresent()) {
             result.year = entry.getFieldOrAlias(FieldName.YEAR).orElse(null);
         }
 
-        if (!entry.getFieldOptional(FieldName.ISSUE).isPresent()) {
-            result.number = entry.getFieldOptional(FieldName.NUMBER).orElse(null);
+        if (!entry.getField(FieldName.ISSUE).isPresent()) {
+            result.number = entry.getField(FieldName.NUMBER).orElse(null);
         }
         // Value must be converted
         //Currently only english is supported
-        entry.getFieldOptional(FieldName.LANGUAGE)
+        entry.getField(FieldName.LANGUAGE)
                 .ifPresent(lang -> result.fields.put("LCID", String.valueOf(MSBibMapping.getLCID(lang))));
         StringBuilder sbNumber = new StringBuilder();
-        entry.getFieldOptional(FieldName.ISBN).ifPresent(isbn -> sbNumber.append(" ISBN: " + isbn));
-        entry.getFieldOptional(FieldName.ISSN).ifPresent(issn -> sbNumber.append(" ISSN: " + issn));
-        entry.getFieldOptional("lccn").ifPresent(lccn -> sbNumber.append("LCCN: " + lccn));
-        entry.getFieldOptional("mrnumber").ifPresent(mrnumber -> sbNumber.append(" MRN: " + mrnumber));
+        entry.getField(FieldName.ISBN).ifPresent(isbn -> sbNumber.append(" ISBN: " + isbn));
+        entry.getField(FieldName.ISSN).ifPresent(issn -> sbNumber.append(" ISSN: " + issn));
+        entry.getField("lccn").ifPresent(lccn -> sbNumber.append("LCCN: " + lccn));
+        entry.getField("mrnumber").ifPresent(mrnumber -> sbNumber.append(" MRN: " + mrnumber));
 
         result.standardNumber = sbNumber.toString();
         if (result.standardNumber.isEmpty()) {
@@ -79,8 +79,8 @@ public class MSBibConverter {
 
         result.address = entry.getFieldOrAlias(FieldName.ADDRESS).orElse(null);
 
-        if (entry.getFieldOptional(FieldName.TYPE).isPresent()) {
-            result.thesisType = entry.getFieldOptional(FieldName.TYPE).get();
+        if (entry.getField(FieldName.TYPE).isPresent()) {
+            result.thesisType = entry.getField(FieldName.TYPE).get();
 
         } else {
             if ("techreport".equalsIgnoreCase(entry.getType())) {
@@ -96,16 +96,16 @@ public class MSBibConverter {
 
         // TODO: currently this can never happen
         if (("InternetSite".equals(msbibType) || "DocumentFromInternetSite".equals(msbibType))) {
-            result.internetSiteTitle = entry.getFieldOptional(FieldName.TITLE).orElse(null);
+            result.internetSiteTitle = entry.getField(FieldName.TITLE).orElse(null);
         }
 
         // TODO: currently only Misc can happen
         if ("ElectronicSource".equals(msbibType) || "Art".equals(msbibType) || "Misc".equals(msbibType)) {
-            result.publicationTitle = entry.getFieldOptional(FieldName.TITLE).orElse(null);
+            result.publicationTitle = entry.getField(FieldName.TITLE).orElse(null);
         }
 
-        entry.getFieldOptional(FieldName.AUTHOR).ifPresent(authors -> result.authors = getAuthors(authors));
-        entry.getFieldOptional(FieldName.EDITOR).ifPresent(editors -> result.editors = getAuthors(editors));
+        entry.getField(FieldName.AUTHOR).ifPresent(authors -> result.authors = getAuthors(authors));
+        entry.getField(FieldName.EDITOR).ifPresent(editors -> result.editors = getAuthors(editors));
 
         return result;
     }

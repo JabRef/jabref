@@ -45,7 +45,7 @@ public class FetchAndMergeEntry {
 
     public FetchAndMergeEntry(BibEntry entry, BasePanel panel, List<String> fields) {
         for (String field : fields) {
-            Optional<String> fieldContent = entry.getFieldOptional(field);
+            Optional<String> fieldContent = entry.getField(field);
 
             // Get better looking name for status messages
             String type = FieldName.getDisplayName(field);

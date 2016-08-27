@@ -118,8 +118,8 @@ public class DuplicateCheck {
     }
 
     private static int compareSingleField(String field, BibEntry one, BibEntry two) {
-        Optional<String> optionalStringOne = one.getFieldOptional(field);
-        Optional<String> optionalStringTwo = two.getFieldOptional(field);
+        Optional<String> optionalStringOne = one.getField(field);
+        Optional<String> optionalStringTwo = two.getField(field);
         if (!optionalStringOne.isPresent()) {
             if (!optionalStringTwo.isPresent()) {
                 return EMPTY_IN_BOTH;
@@ -182,8 +182,8 @@ public class DuplicateCheck {
 
         int score = 0;
         for (String field : allFields) {
-            Optional<String> stringOne = one.getFieldOptional(field);
-            Optional<String> stringTwo = two.getFieldOptional(field);
+            Optional<String> stringOne = one.getField(field);
+            Optional<String> stringTwo = two.getField(field);
             if (stringOne.equals(stringTwo)) {
                 score++;
             }

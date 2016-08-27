@@ -520,7 +520,7 @@ public class BibDatabase {
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry: Do not do this for the bibtex key.
         if (!result.isPresent() && (database != null)) {
-            Optional<String> crossrefKey = entry.getFieldOptional(FieldName.CROSSREF);
+            Optional<String> crossrefKey = entry.getField(FieldName.CROSSREF);
             if (crossrefKey.isPresent() && !crossrefKey.get().isEmpty()) {
                 Optional<BibEntry> referred = database.getEntryByKey(crossrefKey.get());
                 if (referred.isPresent()) {

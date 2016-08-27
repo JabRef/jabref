@@ -388,7 +388,7 @@ public class DroppedFileHandler {
     private void doLink(BibEntry entry, ExternalFileType fileType, String filename,
                         boolean avoidDuplicate, NamedCompound edits) {
 
-        Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
+        Optional<String> oldValue = entry.getField(FieldName.FILE);
         FileListTableModel tm = new FileListTableModel();
         oldValue.ifPresent(tm::setContent);
 

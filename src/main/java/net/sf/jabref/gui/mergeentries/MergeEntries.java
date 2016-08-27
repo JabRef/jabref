@@ -213,8 +213,8 @@ public class MergeEntries {
         for (String field : allFields) {
             JLabel label = boldFontLabel(new SentenceCaseFormatter().format(field));
             mergePanel.add(label, CELL_CONSTRAINTS.xy(1, (2 * row) - 1, "left, top"));
-            Optional<String> leftString = leftEntry.getFieldOptional(field);
-            Optional<String> rightString = rightEntry.getFieldOptional(field);
+            Optional<String> leftString = leftEntry.getField(field);
+            Optional<String> rightString = rightEntry.getField(field);
             if (leftString.equals(rightString)) {
                 identicalFields.add(field);
             } else {
@@ -359,8 +359,8 @@ public class MergeEntries {
     private void updateTextPanes(Collection<String> fields) {
         int oldScrollPaneValue = scrollPane.getVerticalScrollBar().getValue();
         for (String field : fields) {
-            String leftString = leftEntry.getFieldOptional(field).orElse("");
-            String rightString = rightEntry.getFieldOptional(field).orElse("");
+            String leftString = leftEntry.getField(field).orElse("");
+            String rightString = rightEntry.getField(field).orElse("");
             switch (diffMode.getSelectedIndex()) {
             case 0: // Plain text
                 break;
@@ -427,9 +427,9 @@ public class MergeEntries {
         // Check the potentially different fields
         for (String field : differentFields) {
             if (radioButtons.get(field).get(0).isSelected()) {
-                mergedEntry.setField(field, leftEntry.getFieldOptional(field).get()); // Will only happen if field exists
+                mergedEntry.setField(field, leftEntry.getField(field).get()); // Will only happen if field exists
             } else if (radioButtons.get(field).get(2).isSelected()) {
-                mergedEntry.setField(field, rightEntry.getFieldOptional(field).get()); // Will only happen if field exists
+                mergedEntry.setField(field, rightEntry.getField(field).get()); // Will only happen if field exists
             } else {
                 mergedEntry.clearField(field);
             }

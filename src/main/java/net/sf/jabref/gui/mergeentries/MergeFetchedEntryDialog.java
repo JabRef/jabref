@@ -123,8 +123,8 @@ public class MergeFetchedEntryDialog extends JDialog {
 
             // fields
             for (String field : jointFields) {
-                Optional<String> originalString = originalEntry.getFieldOptional(field);
-                Optional<String> mergedString = mergedEntry.getFieldOptional(field);
+                Optional<String> originalString = originalEntry.getField(field);
+                Optional<String> mergedString = mergedEntry.getField(field);
                 if (!originalString.isPresent() || !originalString.equals(mergedString)) {
                     originalEntry.setField(field, mergedString.get()); // mergedString always present
                     ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString.orElse(null),
@@ -136,7 +136,7 @@ public class MergeFetchedEntryDialog extends JDialog {
             // Remove fields which are not in the merged entry, unless they are internal fields
             for (String field : originalFields) {
                 if (!jointFields.contains(field) && !InternalBibtexFields.isInternalField(field)) {
-                    Optional<String> originalString = originalEntry.getFieldOptional(field);
+                    Optional<String> originalString = originalEntry.getField(field);
                     originalEntry.clearField(field);
                     ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString.get(), null)); // originalString always present
                     edited = true;

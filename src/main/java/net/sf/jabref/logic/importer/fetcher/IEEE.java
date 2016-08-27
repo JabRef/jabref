@@ -38,7 +38,7 @@ public class IEEE implements FulltextFetcher {
 
         String stampString = "";
         // Try URL first -- will primarily work for entries from the old IEEE search
-        Optional<String> urlString = entry.getFieldOptional(FieldName.URL);
+        Optional<String> urlString = entry.getField(FieldName.URL);
         if (urlString.isPresent()) {
             // Is the URL a direct link to IEEE?
             Matcher matcher = STAMP_PATTERN.matcher(urlString.get());
@@ -50,7 +50,7 @@ public class IEEE implements FulltextFetcher {
 
         // If not, try DOI
         if (stampString.isEmpty()) {
-            Optional<DOI> doi = entry.getFieldOptional(FieldName.DOI).flatMap(DOI::build);
+            Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::build);
             if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI) && doi.get().getURI().isPresent()) {
                 // Download the HTML page from IEEE
                 String resolvedDOIPage = new URLDownload(doi.get().getURI().get().toURL())

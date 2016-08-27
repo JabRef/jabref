@@ -147,7 +147,7 @@ public class MainTableColumn {
                     || BibEntry.KEY_FIELD.equals(field)) {
                 return false;
             } else {
-                plainFieldContent = entry.getFieldOptional(field);
+                plainFieldContent = entry.getField(field);
                 resolvedFieldContent = BibDatabase.getResolvedField(field, entry, database.orElse(null));
             }
 

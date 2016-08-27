@@ -116,7 +116,7 @@ public class AutoSetLinks {
                 // Iterate over the entries:
                 for (Entry<BibEntry, List<File>> entryFilePair : result.entrySet()) {
                     FileListTableModel tableModel;
-                    Optional<String> oldVal = entryFilePair.getKey().getFieldOptional(FieldName.FILE);
+                    Optional<String> oldVal = entryFilePair.getKey().getField(FieldName.FILE);
                     if (singleTableModel == null) {
                         tableModel = new FileListTableModel();
                         oldVal.ifPresent(tableModel::setContent);

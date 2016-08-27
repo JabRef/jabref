@@ -172,7 +172,7 @@ public class BibEntry implements Cloneable {
         } else {
             newType = type;
         }
-        String oldType = getFieldOptional(TYPE_HEADER).orElse(null);
+        String oldType = getField(TYPE_HEADER).orElse(null);
 
         // We set the type before throwing the changeEvent, to enable
         // the change listener to access the new value if the change
@@ -207,17 +207,9 @@ public class BibEntry implements Cloneable {
     }
 
     /**
-     * Use {@link #getFieldOptional} instead
-     */
-    @Deprecated
-    public String getField(String name) {
-        return fields.get(toLowerCase(name));
-    }
-
-    /**
      * Returns the contents of the given field as an Optional.
      */
-    public Optional<String> getFieldOptional(String name) {
+    public Optional<String> getField(String name) {
         return Optional.ofNullable(fields.get(toLowerCase(name)));
     }
 
@@ -256,7 +248,7 @@ public class BibEntry implements Cloneable {
      * extract the year from the 'date' field (analogously for 'month').
      */
     public Optional<String> getFieldOrAlias(String name) {
-        Optional<String> fieldValue = getFieldOptional(toLowerCase(name));
+        Optional<String> fieldValue = getField(toLowerCase(name));
 
         if (fieldValue.isPresent() && !fieldValue.get().isEmpty()) {
             return fieldValue;
@@ -266,14 +258,14 @@ public class BibEntry implements Cloneable {
         String aliasForField = EntryConverter.FIELD_ALIASES.get(name);
 
         if (aliasForField != null) {
-            return getFieldOptional(aliasForField);
+            return getField(aliasForField);
         }
 
         // Finally, handle dates
         if (FieldName.DATE.equals(name)) {
-            Optional<String> year = getFieldOptional(FieldName.YEAR);
+            Optional<String> year = getField(FieldName.YEAR);
             if (year.isPresent()) {
-                MonthUtil.Month month = MonthUtil.getMonth(getFieldOptional(FieldName.MONTH).orElse(""));
+                MonthUtil.Month month = MonthUtil.getMonth(getField(FieldName.MONTH).orElse(""));
                 if (month.isValid()) {
                     return Optional.of(year.get() + '-' + month.twoDigitNumber);
                 } else {
@@ -282,7 +274,7 @@ public class BibEntry implements Cloneable {
             }
         }
         if (FieldName.YEAR.equals(name) || FieldName.MONTH.equals(name)) {
-            Optional<String> date = getFieldOptional(FieldName.DATE);
+            Optional<String> date = getField(FieldName.DATE);
             if (!date.isPresent()) {
                 return Optional.empty();
             }
@@ -366,7 +358,7 @@ public class BibEntry implements Cloneable {
             return clearField(fieldName);
         }
 
-        String oldValue = getFieldOptional(fieldName).orElse(null);
+        String oldValue = getField(fieldName).orElse(null);
         if (value.equals(oldValue)) {
             return Optional.empty();
         }
@@ -426,7 +418,7 @@ public class BibEntry implements Cloneable {
             throw new IllegalArgumentException("The field name '" + name + "' is reserved");
         }
 
-        Optional<String> oldValue = getFieldOptional(fieldName);
+        Optional<String> oldValue = getField(fieldName);
         if (!oldValue.isPresent()) {
             return Optional.empty();
         }
@@ -526,8 +518,8 @@ public class BibEntry implements Cloneable {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[] {getFieldOptional(FieldName.AUTHOR).orElse("N/A"),
-                getFieldOptional(FieldName.TITLE).orElse("N/A"), getFieldOptional(FieldName.YEAR).orElse("N/A")};
+        String[] s = new String[] {getField(FieldName.AUTHOR).orElse("N/A"),
+                getField(FieldName.TITLE).orElse("N/A"), getField(FieldName.YEAR).orElse("N/A")};
 
         String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
         if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
@@ -546,9 +538,9 @@ public class BibEntry implements Cloneable {
             return Optional.empty();
         }
 
-        Optional<String> year = getFieldOptional(FieldName.YEAR);
+        Optional<String> year = getField(FieldName.YEAR);
 
-        Optional<String> monthString = getFieldOptional(FieldName.MONTH);
+        Optional<String> monthString = getField(FieldName.MONTH);
         if (monthString.isPresent()) {
             MonthUtil.Month month = MonthUtil.getMonth(monthString.get());
             if (month.isValid()) {
@@ -581,7 +573,7 @@ public class BibEntry implements Cloneable {
 
     public Optional<FieldChange> putKeywords(Collection<String> keywords, String separator) {
         Objects.requireNonNull(keywords);
-        Optional<String> oldValue = this.getFieldOptional(FieldName.KEYWORDS);
+        Optional<String> oldValue = this.getField(FieldName.KEYWORDS);
 
         if (keywords.isEmpty()) {
             // Clear keyword field
