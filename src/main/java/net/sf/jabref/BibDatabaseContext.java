@@ -45,15 +45,16 @@ public class BibDatabaseContext {
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData, Defaults defaults) {
-        this(database, metaData, defaults, DatabaseLocation.LOCAL);
+        this(database, metaData, defaults, DatabaseLocation.LOCAL, null); // As it is set to local, the keywordSeparator is not used
     }
 
-    public BibDatabaseContext(BibDatabase database, MetaData metaData, Defaults defaults, DatabaseLocation location) {
+    public BibDatabaseContext(BibDatabase database, MetaData metaData, Defaults defaults, DatabaseLocation location,
+            String keywordSeparator) {
         this.defaults = Objects.requireNonNull(defaults);
         this.database = Objects.requireNonNull(database);
         this.metaData = Objects.requireNonNull(metaData);
 
-        updateDatabaseLocation(location);
+        updateDatabaseLocation(location, keywordSeparator);
     }
 
     public BibDatabaseContext(BibDatabase database, MetaData metaData) {
@@ -70,8 +71,8 @@ public class BibDatabaseContext {
         this(database, metaData, file, new Defaults());
     }
 
-    public BibDatabaseContext(Defaults defaults, DatabaseLocation location) {
-        this(new BibDatabase(), new MetaData(), defaults, location);
+    public BibDatabaseContext(Defaults defaults, DatabaseLocation location, String keywordSeparator) {
+        this(new BibDatabase(), new MetaData(), defaults, location, keywordSeparator);
     }
 
     public BibDatabaseMode getMode() {
@@ -201,7 +202,7 @@ public class BibDatabaseContext {
         return this.location;
     }
 
-    public void updateDatabaseLocation(DatabaseLocation newLocation) {
+    public void updateDatabaseLocation(DatabaseLocation newLocation, String keywordSeparator) {
 
         if ((this.location == DatabaseLocation.SHARED) && (newLocation == DatabaseLocation.LOCAL)) {
             this.database.unregisterListener(dbmsSynchronizer);
@@ -209,7 +210,7 @@ public class BibDatabaseContext {
         }
 
         if (newLocation == DatabaseLocation.SHARED) {
-            this.dbmsSynchronizer = new DBMSSynchronizer(this);
+            this.dbmsSynchronizer = new DBMSSynchronizer(this, keywordSeparator);
             this.database.registerListener(dbmsSynchronizer);
             this.metaData.registerListener(dbmsSynchronizer);
         }

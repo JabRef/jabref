@@ -17,10 +17,12 @@ public class SharedDatabaseUIManager {
 
     private final JabRefFrame jabRefFrame;
     private final DBMSSynchronizer dbmsSynchronizer;
+    private final String keywordSeparator;
 
-    public SharedDatabaseUIManager(JabRefFrame jabRefFrame) {
+    public SharedDatabaseUIManager(JabRefFrame jabRefFrame, String keywordSeparator) {
         this.jabRefFrame = jabRefFrame;
         this.dbmsSynchronizer = jabRefFrame.getCurrentBasePanel().getBibDatabaseContext().getDBSynchronizer();
+        this.keywordSeparator = keywordSeparator;
     }
 
     @Subscribe
@@ -41,7 +43,8 @@ public class SharedDatabaseUIManager {
             OpenSharedDatabaseDialog openSharedDatabaseDialog = new OpenSharedDatabaseDialog(jabRefFrame);
             openSharedDatabaseDialog.setVisible(true);
         } else if (answer == 1) {
-            connectionLostEvent.getBibDatabaseContext().updateDatabaseLocation(DatabaseLocation.LOCAL);
+            connectionLostEvent.getBibDatabaseContext().updateDatabaseLocation(DatabaseLocation.LOCAL,
+                    keywordSeparator);
             jabRefFrame.refreshTitleAndTabs();
             jabRefFrame.updateEnabledState();
             jabRefFrame.output(Localization.lang("Working offline."));
