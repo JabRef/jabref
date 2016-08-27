@@ -17,8 +17,6 @@ package net.sf.jabref.gui.journals;
 
 import java.io.File;
 
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
@@ -59,7 +57,6 @@ import com.airhacks.afterburner.views.FXMLView;
 public class ManageJournalAbbreviationsView extends FXMLView {
 
     private final ManageJournalAbbreviationsViewModel viewModel = new ManageJournalAbbreviationsViewModel();
-    private final BooleanProperty isEditableAndRemovable = new SimpleBooleanProperty(true);
 
     @FXML
     private TableView<AbbreviationViewModel> journalAbbreviationsTable;
@@ -132,7 +129,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
 
     private void setUpTable() {
         journalAbbreviationsTable.setOnKeyPressed(event -> {
-            if ((event.getCode() == KeyCode.DELETE) && isEditableAndRemovable.get()) {
+            if (event.getCode() == KeyCode.DELETE) {
                 viewModel.deleteAbbreviation();
             }
         });
@@ -149,7 +146,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
                 super.updateItem(isPseudoAbbreviation, isEmpty);
                 if (isPseudoAbbreviation != null) {
                     if (!isEmpty) {
-                        if (isEditableAndRemovable.get()) {
+                        if (viewModel.isAbbreviationEditableAndRemovableProperty().get()) {
                             if (isPseudoAbbreviation) {
                                 setGraphic(IconTheme.JabRefIcon.ADD.getGraphicNode());
                                 setOnMouseClicked(evt -> addAbbreviation());
@@ -170,7 +167,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
             protected void updateItem(Boolean isPseudoAbbreviation, boolean isEmpty) {
                 super.updateItem(isPseudoAbbreviation, isEmpty);
                 if (isPseudoAbbreviation != null) {
-                    if (!isEmpty && isEditableAndRemovable.get()) {
+                    if (!isEmpty && viewModel.isAbbreviationEditableAndRemovableProperty().get()) {
                         if (isPseudoAbbreviation) {
                             setGraphic(null);
                         } else {
@@ -191,10 +188,6 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         journalFilesBox.itemsProperty().bindBidirectional(viewModel.journalFilesProperty());
         viewModel.currentFileProperty().addListener((observable, oldvalue, newvalue) -> {
             journalFilesBox.getSelectionModel().select(newvalue);
-            if (newvalue != null) {
-                isEditableAndRemovable.set(!newvalue.isBuiltInListProperty().get());
-            }
-            removeJournalAbbreviationsButton.setDisable((newvalue == null) || !isEditableAndRemovable.get());
         });
         viewModel.currentAbbreviationProperty().addListener((observable, oldvalue, newvalue) -> {
             journalAbbreviationsTable.getSelectionModel().select(newvalue);
@@ -203,9 +196,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
                 .addListener((observable, oldvalue, newvalue) -> {
                     viewModel.currentAbbreviationProperty().set(newvalue);
                 });
-        isEditableAndRemovable.addListener((observable, oldvalue, newvalue) -> {
-            removeJournalAbbreviationsButton.setDisable(newvalue.booleanValue());
-        });
+        removeJournalAbbreviationsButton.disableProperty().bind(viewModel.isFileRemovableProperty().not());
     }
 
     public void showAndWait() {
@@ -317,8 +308,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
 
         @Override
         public void startEdit() {
-            if (!isEmpty() && isEditableAndRemovable.get()
-                    && !viewModel.currentAbbreviationProperty().get().isPseudoAbbreviation()) {
+            if (!isEmpty() && viewModel.isAbbreviationEditableAndRemovableProperty().get()) {
                 oldName = viewModel.currentAbbreviationProperty().get().getName();
                 super.startEdit();
                 createTextField();
@@ -418,8 +408,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
 
         @Override
         public void startEdit() {
-            if (!isEmpty() && isEditableAndRemovable.get()
-                    && !viewModel.currentAbbreviationProperty().get().isPseudoAbbreviation()) {
+            if (!isEmpty() && viewModel.isAbbreviationEditableAndRemovableProperty().get()) {
                 oldAbbreviation = viewModel.currentAbbreviationProperty().get().getAbbreviation();
                 super.startEdit();
                 createTextField();

@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
@@ -57,21 +58,30 @@ public class ManageJournalAbbreviationsViewModel {
     private final SimpleStringProperty abbreviationsAbbreviation = new SimpleStringProperty();
     private final SimpleObjectProperty<AbbreviationsFileViewModel> currentFile = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<AbbreviationViewModel> currentAbbreviation = new SimpleObjectProperty<>();
+    private final SimpleBooleanProperty isFileRemovable = new SimpleBooleanProperty();
+    private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty();
 
 
     public ManageJournalAbbreviationsViewModel() {
         abbreviationsCount.bind(abbreviations.sizeProperty());
+        currentAbbreviation.addListener((observable, oldvalue, newvalue) -> {
+            isAbbreviationEditableAndRemovable.set(((newvalue == null) || newvalue.isPseudoAbbreviation()
+                    || currentFile.get().isBuiltInListProperty().get()) ? false : true);
+            System.out.println("abbreviation editable " + isAbbreviationEditableAndRemovable);
+        });
         currentFile.addListener((observable, oldvalue, newvalue) -> {
             if (oldvalue != null) {
                 abbreviations.unbindBidirectional(oldvalue.abbreviationsProperty());
                 currentAbbreviation.set(null);
             }
             if (newvalue != null) {
+                isFileRemovable.set(newvalue.isBuiltInListProperty().get() ? false : true);
                 abbreviations.bindBidirectional(newvalue.abbreviationsProperty());
                 if (abbreviations.size() > 0) {
                     currentAbbreviation.set(abbreviations.get(abbreviations.size() - 1));
                 }
             } else {
+                isFileRemovable.set(false);
                 if (!journalFiles.isEmpty()) {
                     currentFile.set(journalFiles.get(0));
                 } else {
@@ -79,6 +89,7 @@ public class ManageJournalAbbreviationsViewModel {
                     abbreviations.clear();
                 }
             }
+            System.out.println("file editable? " + isFileRemovable.get());
         });
         journalFiles.addListener(new ListChangeListener<AbbreviationsFileViewModel>() {
 
@@ -178,9 +189,11 @@ public class ManageJournalAbbreviationsViewModel {
      * to {@code null}.
      */
     public void removeCurrentFile() {
-        journalFiles.remove(currentFile.get());
-        if (journalFiles.isEmpty()) {
-            currentFile.set(null);
+        if (isFileRemovable.get()) {
+            journalFiles.remove(currentFile.get());
+            if (journalFiles.isEmpty()) {
+                currentFile.set(null);
+            }
         }
     }
 
@@ -212,15 +225,17 @@ public class ManageJournalAbbreviationsViewModel {
      * @throws DuplicatedJournalAbbreviationException
      */
     public void editAbbreviation() throws EmptyFieldException, DuplicatedJournalAbbreviationException {
-        if (abbreviationsCount.get() != 0) {
-            Abbreviation abbreviation = new Abbreviation(abbreviationsName.get(), abbreviationsAbbreviation.get());
-            AbbreviationViewModel abbViewModel = new AbbreviationViewModel(abbreviation);
-            if (abbreviations.contains(abbViewModel)) {
-                if (!abbViewModel.equals(currentAbbreviation.get())) {
-                    throw new DuplicatedJournalAbbreviationException("Duplicated journal abbreviation");
+        if (isAbbreviationEditableAndRemovable.get()) {
+            if (abbreviationsCount.get() != 0) {
+                Abbreviation abbreviation = new Abbreviation(abbreviationsName.get(), abbreviationsAbbreviation.get());
+                AbbreviationViewModel abbViewModel = new AbbreviationViewModel(abbreviation);
+                if (abbreviations.contains(abbViewModel)) {
+                    if (!abbViewModel.equals(currentAbbreviation.get())) {
+                        throw new DuplicatedJournalAbbreviationException("Duplicated journal abbreviation");
+                    }
+                } else {
+                    setCurrentAbbreviationNameAndAbbreviationIfValid();
                 }
-            } else {
-                setCurrentAbbreviationNameAndAbbreviationIfValid();
             }
         }
     }
@@ -251,16 +266,18 @@ public class ManageJournalAbbreviationsViewModel {
      * if there are no abbreviations left.
      */
     public void deleteAbbreviation() {
-        if ((currentAbbreviation.get() != null) && !currentAbbreviation.get().isPseudoAbbreviation()) {
-            int index = abbreviations.indexOf(currentAbbreviation.get());
-            if (index > 1) {
-                currentAbbreviation.set(abbreviations.get(index - 1));
-            } else if ((index + 1) < abbreviationsCount.get()) {
-                currentAbbreviation.set(abbreviations.get(index + 1));
-            } else {
-                currentAbbreviation.set(null);
+        if (isAbbreviationEditableAndRemovable.get()) {
+            if ((currentAbbreviation.get() != null) && !currentAbbreviation.get().isPseudoAbbreviation()) {
+                int index = abbreviations.indexOf(currentAbbreviation.get());
+                if (index > 1) {
+                    currentAbbreviation.set(abbreviations.get(index - 1));
+                } else if ((index + 1) < abbreviationsCount.get()) {
+                    currentAbbreviation.set(abbreviations.get(index + 1));
+                } else {
+                    currentAbbreviation.set(null);
+                }
+                abbreviations.remove(index);
             }
-            abbreviations.remove(index);
         }
     }
 
@@ -344,6 +361,14 @@ public class ManageJournalAbbreviationsViewModel {
 
     public SimpleObjectProperty<AbbreviationViewModel> currentAbbreviationProperty() {
         return this.currentAbbreviation;
+    }
+
+    public SimpleBooleanProperty isAbbreviationEditableAndRemovableProperty() {
+        return this.isAbbreviationEditableAndRemovable;
+    }
+
+    public SimpleBooleanProperty isFileRemovableProperty() {
+        return this.isFileRemovable;
     }
 
 }
