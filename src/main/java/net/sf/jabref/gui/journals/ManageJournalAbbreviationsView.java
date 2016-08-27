@@ -146,14 +146,14 @@ public class ManageJournalAbbreviationsView extends FXMLView {
                 super.updateItem(isPseudoAbbreviation, isEmpty);
                 if (isPseudoAbbreviation != null) {
                     if (!isEmpty) {
-                        if (viewModel.isAbbreviationEditableAndRemovableProperty().get()) {
-                            if (isPseudoAbbreviation) {
-                                setGraphic(IconTheme.JabRefIcon.ADD.getGraphicNode());
-                                setOnMouseClicked(evt -> addAbbreviation());
-                            } else {
+                        if (!isPseudoAbbreviation) {
+                            if (viewModel.isAbbreviationEditableAndRemovableProperty().get()) {
                                 setGraphic(IconTheme.JabRefIcon.EDIT.getGraphicNode());
                                 setOnMouseClicked(evt -> editAbbreviation());
                             }
+                        } else {
+                            setGraphic(IconTheme.JabRefIcon.ADD.getGraphicNode());
+                            setOnMouseClicked(evt -> addAbbreviation());
                         }
                     }
                 } else {
@@ -167,12 +167,14 @@ public class ManageJournalAbbreviationsView extends FXMLView {
             protected void updateItem(Boolean isPseudoAbbreviation, boolean isEmpty) {
                 super.updateItem(isPseudoAbbreviation, isEmpty);
                 if (isPseudoAbbreviation != null) {
-                    if (!isEmpty && viewModel.isAbbreviationEditableAndRemovableProperty().get()) {
-                        if (isPseudoAbbreviation) {
-                            setGraphic(null);
+                    if (!isEmpty) {
+                        if (!isPseudoAbbreviation) {
+                            if (viewModel.isAbbreviationEditableAndRemovableProperty().get()) {
+                                setGraphic(IconTheme.JabRefIcon.DELETE_ENTRY.getGraphicNode());
+                                setOnMouseClicked(evt -> removeAbbreviation());
+                            }
                         } else {
-                            setGraphic(IconTheme.JabRefIcon.DELETE_ENTRY.getGraphicNode());
-                            setOnMouseClicked(evt -> removeAbbreviation());
+                            setGraphic(null);
                         }
                     }
                 } else {

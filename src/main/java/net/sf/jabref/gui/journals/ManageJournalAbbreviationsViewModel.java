@@ -67,7 +67,6 @@ public class ManageJournalAbbreviationsViewModel {
         currentAbbreviation.addListener((observable, oldvalue, newvalue) -> {
             isAbbreviationEditableAndRemovable.set(((newvalue == null) || newvalue.isPseudoAbbreviation()
                     || currentFile.get().isBuiltInListProperty().get()) ? false : true);
-            System.out.println("abbreviation editable " + isAbbreviationEditableAndRemovable);
         });
         currentFile.addListener((observable, oldvalue, newvalue) -> {
             if (oldvalue != null) {
@@ -89,7 +88,6 @@ public class ManageJournalAbbreviationsViewModel {
                     abbreviations.clear();
                 }
             }
-            System.out.println("file editable? " + isFileRemovable.get());
         });
         journalFiles.addListener(new ListChangeListener<AbbreviationsFileViewModel>() {
 
