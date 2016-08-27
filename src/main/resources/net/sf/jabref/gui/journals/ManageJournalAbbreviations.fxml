@@ -48,11 +48,11 @@
             <Pane HBox.hgrow="ALWAYS" />
             <Button fx:id="addNewJournalFileButton" mnemonicParsing="false" onAction="#addNewFile">
                <tooltip>
-                  <Tooltip autoHide="true" text="%Add existing file" />
+                  <Tooltip autoHide="true" text="%Create new list" />
                </tooltip></Button>
           <Button fx:id="addJournalFileButton" mnemonicParsing="false" onAction="#openFile">
                <tooltip>
-                  <Tooltip autoHide="true" text="%Create new list" />
+                  <Tooltip autoHide="true" text="%Add existing file" />
                </tooltip></Button>
             <Button fx:id="removeJournalAbbreviationsButton" mnemonicParsing="false" onAction="#removeList">
                <tooltip>
