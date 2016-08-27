@@ -18,15 +18,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.bibtex.FieldContentParser;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.Parser;
 import net.sf.jabref.logic.importer.ParserException;
 import net.sf.jabref.logic.importer.ParserResult;
-import net.sf.jabref.logic.importer.util.ParseException;
+import net.sf.jabref.logic.importer.util.MetaDataParser;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
@@ -37,6 +37,7 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.metadata.MetaData;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -209,7 +210,7 @@ public class BibtexParser implements Parser {
 
         // Instantiate meta data:
         try {
-            parserResult.setMetaData(MetaData.parse(meta, importFormatPreferences.getKeywordSeparator()));
+            parserResult.setMetaData(MetaDataParser.parse(meta, importFormatPreferences.getKeywordSeparator()));
         } catch (ParseException exception) {
             parserResult.addWarning(exception.getLocalizedMessage());
         }

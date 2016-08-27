@@ -15,16 +15,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.event.source.EntryEventSource;
+import net.sf.jabref.model.database.event.EntryAddedEvent;
+import net.sf.jabref.model.database.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.model.event.EntryAddedEvent;
-import net.sf.jabref.model.event.EntryChangedEvent;
-import net.sf.jabref.model.event.EntryRemovedEvent;
-import net.sf.jabref.model.event.FieldChangedEvent;
+import net.sf.jabref.model.entry.event.EntryChangedEvent;
+import net.sf.jabref.model.entry.event.EntryEventSource;
+import net.sf.jabref.model.entry.event.FieldChangedEvent;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;

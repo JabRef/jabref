@@ -4,8 +4,8 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.rules.GrammarBasedSearchRule;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.search.rules.GrammarBasedSearchRule;
 import net.sf.jabref.search.SearchBaseVisitor;
 import net.sf.jabref.search.SearchParser;
 

@@ -17,23 +17,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.logic.bibtex.comparator.CrossRefEntryComparator;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.logic.bibtex.comparator.IdComparator;
-import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.metadata.MetaData;
+import net.sf.jabref.model.metadata.SaveOrderConfig;
 
 public abstract class BibDatabaseWriter<E extends SaveSession> {
 
@@ -53,7 +53,7 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
     private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
         List<FieldChange> changes = new ArrayList<>();
 
-        Optional<FieldFormatterCleanups> saveActions = metaData.getSaveActions();
+        Optional<FieldFormatterCleanups> saveActions = FieldFormatterCleanups.fromMetaData(metaData);
         saveActions.ifPresent(actions -> {
             // save actions defined -> apply for every entry
             for (BibEntry entry : toChange) {
@@ -223,7 +223,7 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
     protected void writeMetaData(MetaData metaData) throws SaveException {
         Objects.requireNonNull(metaData);
 
-        Map<String, String> serializedMetaData = metaData.getAsStringMap();
+        Map<String, String> serializedMetaData = MetaDataSerializer.getSerializedStringMap(metaData);
 
         for(Map.Entry<String, String> metaItem : serializedMetaData.entrySet()) {
             writeMetaDataItem(metaItem);

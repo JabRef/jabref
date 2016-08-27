@@ -13,8 +13,8 @@ import javax.swing.JTree;
 import javax.swing.border.Border;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
-import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.groups.GroupTreeNode;
 
 /**
  * Renders a GroupTreeNode using its group's getName() method, rather that its toString() method.

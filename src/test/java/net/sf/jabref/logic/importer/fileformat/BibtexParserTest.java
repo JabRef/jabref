@@ -13,19 +13,13 @@ import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
-import net.sf.jabref.logic.groups.AllEntriesGroup;
-import net.sf.jabref.logic.groups.ExplicitGroup;
-import net.sf.jabref.logic.groups.GroupHierarchyType;
-import net.sf.jabref.logic.groups.GroupTreeNode;
-import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
-import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -34,6 +28,12 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.model.groups.AllEntriesGroup;
+import net.sf.jabref.model.groups.ExplicitGroup;
+import net.sf.jabref.model.groups.GroupHierarchyType;
+import net.sf.jabref.model.groups.GroupTreeNode;
+import net.sf.jabref.model.groups.KeywordGroup;
+import net.sf.jabref.model.metadata.SaveOrderConfig;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.BeforeClass;
@@ -1398,7 +1398,7 @@ public class BibtexParserTest {
                         + "@comment{jabref-meta: saveActions:enabled;title[lower_case]}")
                 );
 
-        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
+        FieldFormatterCleanups saveActions = FieldFormatterCleanups.fromMetaData(parserResult.getMetaData()).get();
 
         assertTrue(saveActions.isEnabled());
         assertEquals(Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())),
@@ -1411,7 +1411,7 @@ public class BibtexParserTest {
 
         ParserResult parserResult = parser.parse(
                 new StringReader("@comment{jabref-meta: saveActions:enabled;title[lower_case]}"));
-        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
+        FieldFormatterCleanups saveActions = FieldFormatterCleanups.fromMetaData(parserResult.getMetaData()).get();
 
         assertTrue(saveActions.isEnabled());
         assertEquals(Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())),
@@ -1484,7 +1484,7 @@ public class BibtexParserTest {
 
         GroupTreeNode root = result.getMetaData().getGroups().get();
 
-        assertEquals(new AllEntriesGroup(), root.getGroup());
+        assertEquals(new AllEntriesGroup(""), root.getGroup());
         assertEquals(3, root.getNumberOfChildren());
         assertEquals(
                 new KeywordGroup("Fréchet", "keywords", "FrechetSpace", false, true, GroupHierarchyType.INDEPENDENT,
