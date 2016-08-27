@@ -26,6 +26,7 @@ import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.journals.Abbreviation;
@@ -60,6 +61,39 @@ public class ManageJournalAbbreviationsViewModel {
 
     public ManageJournalAbbreviationsViewModel() {
         abbreviationsCount.bind(abbreviations.sizeProperty());
+        currentFile.addListener((observable, oldvalue, newvalue) -> {
+            if (oldvalue != null) {
+                abbreviations.unbindBidirectional(oldvalue.abbreviationsProperty());
+                currentAbbreviation.set(null);
+            }
+            if (newvalue != null) {
+                abbreviations.bindBidirectional(newvalue.abbreviationsProperty());
+                if (abbreviations.size() > 0) {
+                    currentAbbreviation.set(abbreviations.get(abbreviations.size() - 1));
+                }
+            } else {
+                if (!journalFiles.isEmpty()) {
+                    currentFile.set(journalFiles.get(0));
+                } else {
+                    currentAbbreviation.set(null);
+                    abbreviations.clear();
+                }
+            }
+        });
+        journalFiles.addListener(new ListChangeListener<AbbreviationsFileViewModel>() {
+
+            @Override
+            public void onChanged(ListChangeListener.Change<? extends AbbreviationsFileViewModel> c) {
+                if (c.next()) {
+                    if (!c.wasReplaced()) {
+                        if (c.wasAdded() && !c.getAddedSubList().get(0).isBuiltInListProperty().get()) {
+                            currentFile.set(c.getAddedSubList().get(0));
+                        }
+                    }
+                }
+            }
+
+        });
     }
 
     /**
@@ -72,7 +106,6 @@ public class ManageJournalAbbreviationsViewModel {
         builtInList.forEach(abbreviation -> builtInListViewModel.add(new AbbreviationViewModel(abbreviation)));
         AbbreviationsFileViewModel builtInFile = new AbbreviationsFileViewModel(builtInListViewModel,
                 "JabRef built in list");
-        journalFiles.add(builtInFile);
         List<Abbreviation> ieeeList;
         if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
             ieeeList = Globals.journalAbbreviationLoader.getOfficialIEEEAbbreviations();
@@ -82,7 +115,7 @@ public class ManageJournalAbbreviationsViewModel {
         List<AbbreviationViewModel> ieeeListViewModel = new ArrayList<>();
         ieeeList.forEach(abbreviation -> ieeeListViewModel.add(new AbbreviationViewModel(abbreviation)));
         AbbreviationsFileViewModel ieeeFile = new AbbreviationsFileViewModel(ieeeListViewModel, "IEEE built in list");
-        journalFiles.add(ieeeFile);
+        journalFiles.addAll(builtInFile, ieeeFile);
     }
 
     /**
@@ -125,7 +158,6 @@ public class ManageJournalAbbreviationsViewModel {
         if (journalFiles.contains(abbreviationsFile)) {
             throw new DuplicatedJournalFileException("Duplicated Journal File");
         }
-        journalFiles.add(abbreviationsFile);
         if (abbreviationsFile.exists()) {
             try {
                 abbreviationsFile.readAbbreviations();
@@ -133,30 +165,7 @@ public class ManageJournalAbbreviationsViewModel {
                 logger.debug(e.getLocalizedMessage());
             }
         }
-    }
-
-    /**
-     * This method changes the currentFile property and binds its abbreviations list
-     * to the abbreviations property of the view model.
-     *
-     * @param abbreviationsFile as new active file
-     */
-    public void changeActiveFile(AbbreviationsFileViewModel abbreviationsFile) {
-        // unbind previous current file
-        if (currentFile.get() != null) {
-            abbreviations.unbindBidirectional(currentFile.get().abbreviationsProperty());
-        }
-        currentFile.set(abbreviationsFile);
-        // set abbreviations property to abbreviations of current file
-        if (abbreviationsFile != null) {
-            abbreviationsProperty().bindBidirectional(abbreviationsFile.abbreviationsProperty());
-            if (!abbreviations.isEmpty()) {
-                currentAbbreviation.set(abbreviations.get(0));
-            }
-        } else {
-            currentAbbreviation.set(null);
-            abbreviations.clear();
-        }
+        journalFiles.add(abbreviationsFile);
     }
 
     /**
@@ -168,16 +177,11 @@ public class ManageJournalAbbreviationsViewModel {
      * there are no more files than the {@code activeFile} property will be set
      * to {@code null}.
      */
-    public void removeCurrentList() {
-        int index = journalFiles.indexOf(currentFile.get());
-        if (index > 0) {
-            changeActiveFile(journalFiles.get(index - 1));
-        } else if ((index + 1) < journalFiles.size()) {
-            changeActiveFile(journalFiles.get(index + 1));
-        } else {
-            changeActiveFile(null);
+    public void removeCurrentFile() {
+        journalFiles.remove(currentFile.get());
+        if (journalFiles.isEmpty()) {
+            currentFile.set(null);
         }
-        journalFiles.remove(index);
     }
 
     /**
@@ -297,21 +301,7 @@ public class ManageJournalAbbreviationsViewModel {
      */
     public void selectLastJournalFile() {
         if (journalFiles.size() > 0) {
-            changeActiveFile(journalFilesProperty().get(journalFilesProperty().size() - 1));
-        }
-    }
-
-    /**
-     * This will bind the given list property to the journal files list property of this class.
-     * If the size of the given list property is bigger than 0 it will call
-     * {@link #changeActiveFile(AbbreviationsFileViewModel)} on the first  item of the list.
-     *
-     * @param itemsProperty as list property of {@link AbbreviationsFileViewModel} objects
-     */
-    public void bindFileItems(SimpleListProperty<AbbreviationsFileViewModel> itemsProperty) {
-        journalFiles.bindBidirectional(itemsProperty);
-        if (!itemsProperty.isEmpty()) {
-            changeActiveFile(journalFilesProperty().get(0));
+            currentFile.set(journalFilesProperty().get(journalFilesProperty().size() - 1));
         }
     }
 

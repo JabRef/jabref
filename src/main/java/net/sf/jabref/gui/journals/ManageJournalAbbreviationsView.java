@@ -203,13 +203,9 @@ public class ManageJournalAbbreviationsView extends FXMLView {
                 .addListener((observable, oldvalue, newvalue) -> {
                     viewModel.currentAbbreviationProperty().set(newvalue);
                 });
-        journalFilesBox.getSelectionModel().selectedItemProperty().addListener((observabe, oldvalue, newvalue) -> {
-            viewModel.changeActiveFile(newvalue);
-        });
         isEditableAndRemovable.addListener((observable, oldvalue, newvalue) -> {
             removeJournalAbbreviationsButton.setDisable(newvalue.booleanValue());
         });
-
     }
 
     public void showAndWait() {
@@ -230,7 +226,6 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         if (file != null) {
             try {
                 viewModel.addNewFile(file.getAbsolutePath());
-                journalFilesBox.getSelectionModel().selectLast();
             } catch (DuplicatedJournalFileException e) {
                 showErrorDialog(e);
             }
@@ -245,7 +240,6 @@ public class ManageJournalAbbreviationsView extends FXMLView {
         if (file != null) {
             try {
                 viewModel.openFile(file.getAbsolutePath());
-                journalFilesBox.getSelectionModel().selectLast();
             } catch (DuplicatedJournalFileException e) {
                 showErrorDialog(e);
             }
@@ -254,12 +248,12 @@ public class ManageJournalAbbreviationsView extends FXMLView {
 
     @FXML
     private void removeList() {
-        viewModel.removeCurrentList();
+        viewModel.removeCurrentFile();
     }
 
     @FXML
     private void fileChanged() {
-        viewModel.changeActiveFile(journalFilesBox.getSelectionModel().getSelectedItem());
+        viewModel.currentFileProperty().set(journalFilesBox.getSelectionModel().getSelectedItem());
     }
 
     @FXML
