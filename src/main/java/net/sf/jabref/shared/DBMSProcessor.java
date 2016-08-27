@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class DBMSProcessor {
 
-    protected static final Log LOGGER = LogFactory.getLog(DBMSConnector.class);
+    protected static final Log LOGGER = LogFactory.getLog(DBMSProcessor.class);
 
     protected final Connection connection;
 
