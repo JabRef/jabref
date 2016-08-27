@@ -382,7 +382,11 @@ public class ManageJournalAbbreviationsView extends FXMLView {
                 @Override
                 public void handle(KeyEvent t) {
                     if (t.getCode() == KeyCode.ENTER) {
-                        journalAbbreviationsTable.requestFocus();
+                        if (isEditing()) {
+                            journalAbbreviationsTable.requestFocus();
+                        } else {
+                            startEdit();
+                        }
                     } else if (t.getCode() == KeyCode.ESCAPE) {
                         cancelEdit();
                     }

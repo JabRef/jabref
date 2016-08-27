@@ -224,16 +224,16 @@ public class ManageJournalAbbreviationsViewModel {
      */
     public void editAbbreviation() throws EmptyFieldException, DuplicatedJournalAbbreviationException {
         if (isAbbreviationEditableAndRemovable.get()) {
-            if (abbreviationsCount.get() != 0) {
-                Abbreviation abbreviation = new Abbreviation(abbreviationsName.get(), abbreviationsAbbreviation.get());
-                AbbreviationViewModel abbViewModel = new AbbreviationViewModel(abbreviation);
-                if (abbreviations.contains(abbViewModel)) {
-                    if (!abbViewModel.equals(currentAbbreviation.get())) {
-                        throw new DuplicatedJournalAbbreviationException("Duplicated journal abbreviation");
-                    }
+            Abbreviation abbreviation = new Abbreviation(abbreviationsName.get(), abbreviationsAbbreviation.get());
+            AbbreviationViewModel abbViewModel = new AbbreviationViewModel(abbreviation);
+            if (abbreviations.contains(abbViewModel)) {
+                if (!abbViewModel.equals(currentAbbreviation.get())) {
+                    throw new DuplicatedJournalAbbreviationException("Duplicated journal abbreviation");
                 } else {
                     setCurrentAbbreviationNameAndAbbreviationIfValid();
                 }
+            } else {
+                setCurrentAbbreviationNameAndAbbreviationIfValid();
             }
         }
     }
