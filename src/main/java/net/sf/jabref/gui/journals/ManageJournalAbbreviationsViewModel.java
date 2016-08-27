@@ -25,7 +25,6 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 
@@ -54,8 +53,6 @@ public class ManageJournalAbbreviationsViewModel {
     private final SimpleListProperty<AbbreviationViewModel> abbreviations = new SimpleListProperty<>(
             FXCollections.observableArrayList());
     private final SimpleIntegerProperty abbreviationsCount = new SimpleIntegerProperty();
-    private final SimpleStringProperty abbreviationsName = new SimpleStringProperty();
-    private final SimpleStringProperty abbreviationsAbbreviation = new SimpleStringProperty();
     private final SimpleObjectProperty<AbbreviationsFileViewModel> currentFile = new SimpleObjectProperty<>();
     private final SimpleObjectProperty<AbbreviationViewModel> currentAbbreviation = new SimpleObjectProperty<>();
     private final SimpleBooleanProperty isFileRemovable = new SimpleBooleanProperty();
@@ -196,16 +193,16 @@ public class ManageJournalAbbreviationsViewModel {
     }
 
     /**
-     * Method to add a new abbreviation to the abbreviations property.
-     * The name and the actual abbreviation will be taken from the abbreviationsName
-     * and abbreviationsAbbreviation properties. It also sets the currentAbbreviation
-     * property to the new abbreviation.
+     * Method to add a new abbreviation to the abbreviations list property.
+     * It also sets the currentAbbreviation property to the new abbreviation.
      *
+     * @param name of the abbreviation object
+     * @param abbreviation of the abbreviation object
      * @throws DuplicatedJournalAbbreviationException if the abbreviation already exists
      */
-    public void addAbbreviation() throws DuplicatedJournalAbbreviationException {
-        Abbreviation abbreviation = new Abbreviation(abbreviationsName.get(), abbreviationsAbbreviation.get());
-        AbbreviationViewModel abbreviationViewModel = new AbbreviationViewModel(abbreviation);
+    public void addAbbreviation(String name, String abbreviation) throws DuplicatedJournalAbbreviationException {
+        Abbreviation abbreviationObject = new Abbreviation(name, abbreviation);
+        AbbreviationViewModel abbreviationViewModel = new AbbreviationViewModel(abbreviationObject);
         if (abbreviations.contains(abbreviationViewModel)) {
             throw new DuplicatedJournalAbbreviationException("Duplicated journal abbreviation");
         } else {
@@ -216,24 +213,25 @@ public class ManageJournalAbbreviationsViewModel {
 
     /**
      * Method to change the currentAbbrevaition property to a new abbreviation.
-     * The name and the actual abbreviation will be taken from the abbreviationsName
-     * and abbreviationsAbbreviation properties.
      *
-     * @throws EmptyFieldException
-     * @throws DuplicatedJournalAbbreviationException
+     * @param name of the abbreviation object
+     * @param abbreviation of the abbreviation object
+     * @throws EmptyFieldException if either the name or the abbreviation is empty
+     * @throws DuplicatedJournalAbbreviationException if the abbreviation already exists
      */
-    public void editAbbreviation() throws EmptyFieldException, DuplicatedJournalAbbreviationException {
+    public void editAbbreviation(String name, String abbreviation)
+            throws EmptyFieldException, DuplicatedJournalAbbreviationException {
         if (isAbbreviationEditableAndRemovable.get()) {
-            Abbreviation abbreviation = new Abbreviation(abbreviationsName.get(), abbreviationsAbbreviation.get());
-            AbbreviationViewModel abbViewModel = new AbbreviationViewModel(abbreviation);
+            Abbreviation abbreviationbject = new Abbreviation(name, abbreviation);
+            AbbreviationViewModel abbViewModel = new AbbreviationViewModel(abbreviationbject);
             if (abbreviations.contains(abbViewModel)) {
                 if (!abbViewModel.equals(currentAbbreviation.get())) {
                     throw new DuplicatedJournalAbbreviationException("Duplicated journal abbreviation");
                 } else {
-                    setCurrentAbbreviationNameAndAbbreviationIfValid();
+                    setCurrentAbbreviationNameAndAbbreviationIfValid(name, abbreviation);
                 }
             } else {
-                setCurrentAbbreviationNameAndAbbreviationIfValid();
+                setCurrentAbbreviationNameAndAbbreviationIfValid(name, abbreviation);
             }
         }
     }
@@ -245,9 +243,8 @@ public class ManageJournalAbbreviationsViewModel {
      *
      * @throws EmptyFieldException if either the name or the abbreviation is empty
      */
-    private void setCurrentAbbreviationNameAndAbbreviationIfValid() throws EmptyFieldException {
-        String name = abbreviationsName.get();
-        String abbreviation = abbreviationsAbbreviation.get();
+    private void setCurrentAbbreviationNameAndAbbreviationIfValid(String name, String abbreviation)
+            throws EmptyFieldException {
         if (name.trim().isEmpty()) {
             throw new EmptyFieldException("Name can not be empty");
         } else if (abbreviation.trim().isEmpty()) {
@@ -339,14 +336,6 @@ public class ManageJournalAbbreviationsViewModel {
 
     public SimpleListProperty<AbbreviationViewModel> abbreviationsProperty() {
         return this.abbreviations;
-    }
-
-    public SimpleStringProperty abbreviationsNameProperty() {
-        return this.abbreviationsName;
-    }
-
-    public SimpleStringProperty abbreviationsAbbreviationProperty() {
-        return this.abbreviationsAbbreviation;
     }
 
     public SimpleIntegerProperty abbreviationsCountProperty() {

@@ -251,10 +251,8 @@ public class ManageJournalAbbreviationsView extends FXMLView {
 
     @FXML
     private void addAbbreviation() {
-        viewModel.abbreviationsNameProperty().set(Localization.lang("Name"));
-        viewModel.abbreviationsAbbreviationProperty().set(Localization.lang("Abbreviation"));
         try {
-            viewModel.addAbbreviation();
+            viewModel.addAbbreviation(Localization.lang("Name"), Localization.lang("Abbreviation"));
         } catch (DuplicatedJournalAbbreviationException e) {
             showErrorDialog(e);
         }
@@ -356,10 +354,8 @@ public class ManageJournalAbbreviationsView extends FXMLView {
             AbbreviationViewModel current = viewModel.currentAbbreviationProperty().get();
             super.commitEdit(name);
             current.setName(oldName);
-            viewModel.abbreviationsNameProperty().set(name);
-            viewModel.abbreviationsAbbreviationProperty().set(current.getAbbreviation());
             try {
-                viewModel.editAbbreviation();
+                viewModel.editAbbreviation(name, current.getAbbreviation());
             } catch (JabRefException e) {
                 showErrorDialog(e);
             }
@@ -460,10 +456,8 @@ public class ManageJournalAbbreviationsView extends FXMLView {
             AbbreviationViewModel current = viewModel.currentAbbreviationProperty().get();
             super.commitEdit(abbreviation);
             current.setAbbreviation(oldAbbreviation);
-            viewModel.abbreviationsNameProperty().set(current.getName());
-            viewModel.abbreviationsAbbreviationProperty().set(abbreviation);
             try {
-                viewModel.editAbbreviation();
+                viewModel.editAbbreviation(current.getName(), abbreviation);
             } catch (JabRefException e) {
                 showErrorDialog(e);
             }

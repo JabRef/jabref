@@ -175,7 +175,6 @@ public class ManageJournalAbbreviationsTest {
         viewModel.addNewFile(testFile1Entries);
         viewModel.removeCurrentFile();
 
-        System.out.println("abbreviations " + viewModel.abbreviationsProperty().toString());
         Assert.assertEquals(0, viewModel.journalFilesProperty().size());
         Assert.assertEquals(0, viewModel.abbreviationsProperty().size());
         Assert.assertNull(viewModel.currentFileProperty().get());
@@ -297,10 +296,8 @@ public class ManageJournalAbbreviationsTest {
     public void testAddDuplicatedAbbreviationResultsInException() throws JabRefException {
         viewModel.addNewFile(testFile3Entries);
         viewModel.selectLastJournalFile();
-        viewModel.abbreviationsNameProperty().set("YetAnotherEntry");
-        viewModel.abbreviationsAbbreviationProperty().set("YAE");
-        viewModel.addAbbreviation();
-        viewModel.addAbbreviation();
+        viewModel.addAbbreviation("YetAnotherEntry", "YAE");
+        viewModel.addAbbreviation("YetAnotherEntry", "YAE");
     }
 
     @Test
@@ -343,11 +340,9 @@ public class ManageJournalAbbreviationsTest {
 
         Assert.assertEquals(4, viewModel.abbreviationsProperty().size());
 
-        viewModel.abbreviationsNameProperty().set("YetAnotherEntry");
-        viewModel.abbreviationsAbbreviationProperty().set("YAE");
-        viewModel.editAbbreviation();
+        viewModel.editAbbreviation("YetAnotherEntry", "YAE");
         viewModel.currentAbbreviationProperty().set(viewModel.abbreviationsProperty().get(2));
-        viewModel.editAbbreviation();
+        viewModel.editAbbreviation("YetAnotherEntry", "YAE");
     }
 
     @Test(expected = EmptyFieldException.class)
@@ -359,9 +354,7 @@ public class ManageJournalAbbreviationsTest {
 
         Assert.assertEquals(4, viewModel.abbreviationsProperty().size());
 
-        viewModel.abbreviationsNameProperty().set("");
-        viewModel.abbreviationsAbbreviationProperty().set("YAE");
-        viewModel.editAbbreviation();
+        viewModel.editAbbreviation("", "YAE");
     }
 
     @Test(expected = EmptyFieldException.class)
@@ -373,9 +366,7 @@ public class ManageJournalAbbreviationsTest {
 
         Assert.assertEquals(4, viewModel.abbreviationsProperty().size());
 
-        viewModel.abbreviationsNameProperty().set("YetAnotherEntry");
-        viewModel.abbreviationsAbbreviationProperty().set("");
-        viewModel.editAbbreviation();
+        viewModel.editAbbreviation("YetAnotherEntry", "");
     }
 
     @Test
@@ -463,15 +454,11 @@ public class ManageJournalAbbreviationsTest {
     }
 
     private void addAbbrevaition(Abbreviation testAbbreviation) throws DuplicatedJournalAbbreviationException {
-        viewModel.abbreviationsNameProperty().set(testAbbreviation.getName());
-        viewModel.abbreviationsAbbreviationProperty().set(testAbbreviation.getAbbreviation());
-        viewModel.addAbbreviation();
+        viewModel.addAbbreviation(testAbbreviation.getName(), testAbbreviation.getAbbreviation());
     }
 
     private void editAbbreviation(Abbreviation testAbbreviation) throws JabRefException {
-        viewModel.abbreviationsNameProperty().set(testAbbreviation.getName());
-        viewModel.abbreviationsAbbreviationProperty().set(testAbbreviation.getAbbreviation());
-        viewModel.editAbbreviation();
+        viewModel.editAbbreviation(testAbbreviation.getName(), testAbbreviation.getAbbreviation());
     }
 
     private void addFourTestFileToViewModelAndPreferences() throws DuplicatedJournalFileException {
