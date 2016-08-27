@@ -3,7 +3,6 @@ package net.sf.jabref.gui.importer.actions;
 import java.util.Collections;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.ExplicitGroup;
@@ -29,8 +28,6 @@ public class ConvertLegacyExplicitGroupsTest {
 
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
-
         action = new ConvertLegacyExplicitGroups();
 
         entry = new BibEntry();
