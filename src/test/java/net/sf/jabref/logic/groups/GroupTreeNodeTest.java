@@ -41,13 +41,14 @@ public class GroupTreeNodeTest {
      *          B ExplicitNode, Refining (<-- this)
      */
     private GroupTreeNode getNodeInSimpleTree(GroupTreeNode root) throws ParseException {
-        root.addSubgroup(new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING, JabRefPreferences.getInstance()));
+        root.addSubgroup(new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING,
+                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)));
         GroupTreeNode parent = root
                 .addSubgroup(new ExplicitGroup("ExplicitParent", GroupHierarchyType.INDEPENDENT,
-                        JabRefPreferences.getInstance()));
+                        JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)));
         GroupTreeNode node = parent
                 .addSubgroup(new ExplicitGroup("ExplicitNode", GroupHierarchyType.REFINING,
-                        JabRefPreferences.getInstance()));
+                        JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)));
         return node;
     }
 
@@ -74,10 +75,11 @@ public class GroupTreeNodeTest {
      */
     private GroupTreeNode getNodeInComplexTree(GroupTreeNode root) throws ParseException {
         root.addSubgroup(getSearchGroup("SearchA"));
-        root.addSubgroup(new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING, JabRefPreferences.getInstance()));
+        root.addSubgroup(new ExplicitGroup("ExplicitA", GroupHierarchyType.INCLUDING,
+                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)));
         GroupTreeNode grandParent = root
                 .addSubgroup(new ExplicitGroup("ExplicitGrandParent", GroupHierarchyType.INDEPENDENT,
-                        JabRefPreferences.getInstance()));
+                        JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)));
         root.addSubgroup(getKeywordGroup("KeywordA"));
 
         grandParent.addSubgroup(getExplict("ExplicitB"));
@@ -96,7 +98,7 @@ public class GroupTreeNodeTest {
 
     private AbstractGroup getKeywordGroup(String name) throws ParseException {
         return new KeywordGroup(name, "searchField", "searchExpression", true, false, GroupHierarchyType.INDEPENDENT,
-                JabRefPreferences.getInstance());
+                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR));
     }
 
     private AbstractGroup getSearchGroup(String name) {
@@ -104,7 +106,8 @@ public class GroupTreeNodeTest {
     }
 
     private AbstractGroup getExplict(String name) throws ParseException {
-        return new ExplicitGroup(name, GroupHierarchyType.REFINING, JabRefPreferences.getInstance());
+        return new ExplicitGroup(name, GroupHierarchyType.REFINING,
+                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR));
     }
 
     /*
@@ -176,7 +179,8 @@ public class GroupTreeNodeTest {
     @Test
     public void getSearchRuleForIndependentGroupReturnsGroupAsMatcher() throws ParseException {
         GroupTreeNode node = GroupTreeNode
-                .fromGroup(new ExplicitGroup("node", GroupHierarchyType.INDEPENDENT, JabRefPreferences.getInstance()));
+                .fromGroup(new ExplicitGroup("node", GroupHierarchyType.INDEPENDENT,
+                        JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)));
         assertEquals(node.getGroup(), node.getSearchRule());
     }
 
@@ -184,9 +188,11 @@ public class GroupTreeNodeTest {
     public void getSearchRuleForRefiningGroupReturnsParentAndGroupAsMatcher() throws ParseException {
         GroupTreeNode parent = GroupTreeNode
                 .fromGroup(
-                        new ExplicitGroup("parent", GroupHierarchyType.INDEPENDENT, JabRefPreferences.getInstance()));
+                        new ExplicitGroup("parent", GroupHierarchyType.INDEPENDENT,
+                                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)));
         GroupTreeNode node = parent
-                .addSubgroup(new ExplicitGroup("node", GroupHierarchyType.REFINING, JabRefPreferences.getInstance()));
+                .addSubgroup(new ExplicitGroup("node", GroupHierarchyType.REFINING,
+                        JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)));
 
         AndMatcher matcher = new AndMatcher();
         matcher.addRule(node.getGroup());
@@ -197,10 +203,12 @@ public class GroupTreeNodeTest {
     @Test
     public void getSearchRuleForIncludingGroupReturnsGroupOrSubgroupAsMatcher() throws ParseException {
         GroupTreeNode node = GroupTreeNode
-                .fromGroup(new ExplicitGroup("node", GroupHierarchyType.INCLUDING, JabRefPreferences.getInstance()));
+                .fromGroup(new ExplicitGroup("node", GroupHierarchyType.INCLUDING,
+                        JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)));
         GroupTreeNode child = node
                 .addSubgroup(
-                        new ExplicitGroup("child", GroupHierarchyType.INDEPENDENT, JabRefPreferences.getInstance()));
+                        new ExplicitGroup("child", GroupHierarchyType.INDEPENDENT,
+                                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)));
 
         OrMatcher matcher = new OrMatcher();
         matcher.addRule(node.getGroup());
@@ -218,7 +226,7 @@ public class GroupTreeNodeTest {
         GroupTreeNode parent = getNodeInSimpleTree();
         GroupTreeNode node = parent.addSubgroup(
                 new KeywordGroup("node", "author", "author2", true, false, GroupHierarchyType.INDEPENDENT,
-                        JabRefPreferences.getInstance()));
+                        JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)));
         assertEquals(1, node.numberOfHits(entries));
     }
 
@@ -227,7 +235,7 @@ public class GroupTreeNodeTest {
         GroupTreeNode parent = getNodeInSimpleTree();
         GroupTreeNode node = parent.addSubgroup(
                 new KeywordGroup("node", "author", "author1", true, false, GroupHierarchyType.INDEPENDENT,
-                        JabRefPreferences.getInstance()));
+                        JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)));
         assertEquals(2, node.numberOfHits(entries));
     }
 
@@ -236,10 +244,10 @@ public class GroupTreeNodeTest {
         GroupTreeNode grandParent = getNodeInSimpleTree();
         GroupTreeNode parent = grandParent.addSubgroup(
                 new KeywordGroup("node", "author", "author2", true, false, GroupHierarchyType.INDEPENDENT,
-                        JabRefPreferences.getInstance()));
+                        JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)));
         GroupTreeNode node = parent.addSubgroup(
                 new KeywordGroup("node", "author", "author1", true, false, GroupHierarchyType.REFINING,
-                        JabRefPreferences.getInstance()));
+                        JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)));
         assertEquals(1, node.numberOfHits(entries));
     }
 
@@ -248,10 +256,10 @@ public class GroupTreeNodeTest {
         GroupTreeNode grandParent = getNodeInSimpleTree();
         GroupTreeNode parent = grandParent.addSubgroup(
                 new KeywordGroup("node", "author", "author2", true, false, GroupHierarchyType.INDEPENDENT,
-                        JabRefPreferences.getInstance()));
+                        JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)));
         GroupTreeNode node = parent.addSubgroup(
                 new KeywordGroup("node", "author", "author1", true, false, GroupHierarchyType.INDEPENDENT,
-                        JabRefPreferences.getInstance()));
+                        JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)));
         assertEquals(2, node.numberOfHits(entries));
     }
 
@@ -259,7 +267,7 @@ public class GroupTreeNodeTest {
     public void setGroupChangesUnderlyingGroup() throws Exception {
         GroupTreeNode node = getNodeInSimpleTree();
         AbstractGroup newGroup = new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT,
-                JabRefPreferences.getInstance());
+                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR));
 
         node.setGroup(newGroup, true, entries);
 
@@ -269,11 +277,11 @@ public class GroupTreeNodeTest {
     @Test
     public void setGroupAddsPreviousAssignmentsExplicitToExplicit() throws Exception {
         AbstractGroup oldGroup = new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT,
-                JabRefPreferences.getInstance());
+                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR));
         oldGroup.add(entry);
         GroupTreeNode node = GroupTreeNode.fromGroup(oldGroup);
         AbstractGroup newGroup = new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT,
-                JabRefPreferences.getInstance());
+                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR));
 
         node.setGroup(newGroup, true, entries);
 
@@ -283,11 +291,11 @@ public class GroupTreeNodeTest {
     @Test
     public void setGroupWithFalseDoesNotAddsPreviousAssignments() throws Exception {
         AbstractGroup oldGroup = new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT,
-                JabRefPreferences.getInstance());
+                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR));
         oldGroup.add(entry);
         GroupTreeNode node = GroupTreeNode.fromGroup(oldGroup);
         AbstractGroup newGroup = new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT,
-                JabRefPreferences.getInstance());
+                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR));
 
         node.setGroup(newGroup, false, entries);
 
@@ -297,11 +305,11 @@ public class GroupTreeNodeTest {
     @Test
     public void setGroupAddsOnlyPreviousAssignments() throws Exception {
         AbstractGroup oldGroup = new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT,
-                JabRefPreferences.getInstance());
+                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR));
         assertFalse(oldGroup.isMatch(entry));
         GroupTreeNode node = GroupTreeNode.fromGroup(oldGroup);
         AbstractGroup newGroup = new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT,
-                JabRefPreferences.getInstance());
+                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR));
 
         node.setGroup(newGroup, true, entries);
 
@@ -311,7 +319,7 @@ public class GroupTreeNodeTest {
     @Test
     public void setGroupExplicitToSearchDoesNotKeepPreviousAssignments() throws Exception {
         AbstractGroup oldGroup = new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT,
-                JabRefPreferences.getInstance());
+                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR));
         oldGroup.add(entry);
         GroupTreeNode node = GroupTreeNode.fromGroup(oldGroup);
         AbstractGroup newGroup = new SearchGroup("NewGroup", "test", false, false, GroupHierarchyType.INDEPENDENT);
@@ -324,11 +332,11 @@ public class GroupTreeNodeTest {
     @Test
     public void setGroupExplicitToExplicitIsRenameAndSoRemovesPreviousAssignment() throws Exception {
         AbstractGroup oldGroup = new ExplicitGroup("OldGroup", GroupHierarchyType.INDEPENDENT,
-                JabRefPreferences.getInstance());
+                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR));
         oldGroup.add(entry);
         GroupTreeNode node = GroupTreeNode.fromGroup(oldGroup);
         AbstractGroup newGroup = new ExplicitGroup("NewGroup", GroupHierarchyType.INDEPENDENT,
-                JabRefPreferences.getInstance());
+                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR));
 
         node.setGroup(newGroup, true, entries);
 

@@ -286,7 +286,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             return;
         }
 
-        if (SpecialFieldsUtils.keywordSyncEnabled() && !keywordsToAdd.isEmpty()) {
+        if (Globals.prefs.isKeywordSyncEnabled() && !keywordsToAdd.isEmpty()) {
             synchronizeSpecialFields(keywordsToAdd, keywordsToRemove);
         }
 
@@ -312,7 +312,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
                 ce.addEdit(new UndoableFieldChange(change.get()));
             }
 
-            if (SpecialFieldsUtils.keywordSyncEnabled()) {
+            if (Globals.prefs.isKeywordSyncEnabled()) {
                 SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, ce);
             }
         }

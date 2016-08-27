@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.event.MetaDataChangedEvent;
 import net.sf.jabref.event.source.EntryEventSource;
@@ -19,6 +20,7 @@ import net.sf.jabref.model.event.EntryAddedEvent;
 import net.sf.jabref.model.event.EntryEvent;
 import net.sf.jabref.model.event.EntryRemovedEvent;
 import net.sf.jabref.model.event.FieldChangedEvent;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.event.ConnectionLostEvent;
 import net.sf.jabref.shared.event.SharedEntryNotPresentEvent;
 import net.sf.jabref.shared.event.UpdateRefusedEvent;
@@ -246,7 +248,7 @@ public class DBMSSynchronizer {
         }
 
         try {
-            metaData.setData(dbmsProcessor.getSharedMetaData());
+            metaData.setData(dbmsProcessor.getSharedMetaData(), Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
         } catch (ParseException e) {
             LOGGER.error("Parse error", e);
         }

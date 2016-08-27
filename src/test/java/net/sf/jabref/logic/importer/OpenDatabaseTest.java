@@ -9,14 +9,12 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class OpenDatabaseTest {
@@ -38,12 +36,6 @@ public class OpenDatabaseTest {
                 .toFile();
         bibEncodingWithoutNewline = Paths
                 .get(OpenDatabaseTest.class.getResource("encodingWithoutNewline.bib").toURI()).toFile();
-    }
-
-    @BeforeClass
-    public static void setUpGlobalsPrefs() {
-        // otherwise FieldContentParser (called by BibtexParser) and SpecialFields crashes
-        Globals.prefs = JabRefPreferences.getInstance();
     }
 
     @Before

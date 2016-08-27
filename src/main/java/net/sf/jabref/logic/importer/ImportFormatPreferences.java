@@ -22,11 +22,13 @@ public class ImportFormatPreferences {
     private final boolean useCaseKeeperOnSearch;
     private final boolean convertUnitsOnSearch;
 
+    private final boolean keywordSyncEnabled;
+
 
     public ImportFormatPreferences(Set<CustomImporter> customImportList, Charset encoding,
             String keywordSeparator, BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
             FieldContentParserPreferences fieldContentParserPreferences, boolean convertUnitsOnSearch,
-            boolean useCaseKeeperOnSearch) {
+            boolean useCaseKeeperOnSearch, boolean keywordSyncEnabled) {
         this.customImportList = customImportList;
         this.encoding = encoding;
         this.keywordSeparator = keywordSeparator;
@@ -34,6 +36,7 @@ public class ImportFormatPreferences {
         this.fieldContentParserPreferences = fieldContentParserPreferences;
         this.convertUnitsOnSearch = convertUnitsOnSearch;
         this.useCaseKeeperOnSearch = useCaseKeeperOnSearch;
+        this.keywordSyncEnabled = keywordSyncEnabled;
     }
 
     public Set<CustomImporter> getCustomImportList() {
@@ -66,6 +69,10 @@ public class ImportFormatPreferences {
 
     public ImportFormatPreferences withEncoding(Charset newEncoding) {
         return new ImportFormatPreferences(customImportList, newEncoding, keywordSeparator, bibtexKeyPatternPreferences,
-                fieldContentParserPreferences, convertUnitsOnSearch, useCaseKeeperOnSearch);
+                fieldContentParserPreferences, convertUnitsOnSearch, useCaseKeeperOnSearch, keywordSyncEnabled);
+    }
+
+    public boolean isKeywordSyncEnabled() {
+        return keywordSyncEnabled;
     }
 }

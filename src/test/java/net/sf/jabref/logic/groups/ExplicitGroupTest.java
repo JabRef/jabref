@@ -16,14 +16,14 @@ public class ExplicitGroupTest {
     @Test
      public void testToStringSimple() throws ParseException {
         ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT,
-                JabRefPreferences.getInstance());
+                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR));
         assertEquals("ExplicitGroup:myExplicitGroup;0;", group.toString());
     }
 
     @Test
     public void toStringDoesNotWriteAssignedEntries() throws ParseException {
         ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INCLUDING,
-                JabRefPreferences.getInstance());
+                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR));
         group.add(makeBibtexEntry());
         assertEquals("ExplicitGroup:myExplicitGroup;2;", group.toString());
     }
