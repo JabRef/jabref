@@ -13,7 +13,6 @@ import net.sf.jabref.MetaData;
 import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.exception.OfflineLockException;
 import net.sf.jabref.shared.exception.SharedEntryNotPresentException;
@@ -48,8 +47,7 @@ public class DBMSSynchronizerTest {
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
 
 
-        dbmsSynchronizer = new DBMSSynchronizer(context,
-                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR));
+        dbmsSynchronizer = new DBMSSynchronizer(context, ", ");
         dbmsProcessor = DBMSProcessor.getProcessorInstance(connection, dbmsType);
 
         bibDatabase.registerListener(dbmsSynchronizer);
