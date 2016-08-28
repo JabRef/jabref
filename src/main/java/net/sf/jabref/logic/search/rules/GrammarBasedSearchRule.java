@@ -1,5 +1,6 @@
 package net.sf.jabref.logic.search.rules;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -10,6 +11,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.search.SearchBaseVisitor;
 import net.sf.jabref.search.SearchLexer;
 import net.sf.jabref.search.SearchParser;
@@ -146,10 +148,28 @@ public class GrammarBasedSearchRule implements SearchRule {
                 return matchFieldValue(entry.getType());
             }
 
+            // special case for searching a single keyword
+            if (fieldPattern.matcher("keyword").matches()) {
+                if (entry.hasField(FieldName.KEYWORDS)) {
+                    List<String> keywords = new ArrayList<>(entry.getKeywords());
+                    for (String keyword : keywords) {
+                        if (matchFieldValue(keyword)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+
             // specification of fieldsKeys to search is done in the search expression itself
             Set<String> fieldsKeys = entry.getFieldNames();
 
-            List<String> matchedFieldKeys = fieldsKeys.stream().filter(matchFieldKey()).collect(Collectors.toList());
+            List<String> matchedFieldKeys;
+            // special case for searching allfields=cat and title=dog
+            if (fieldPattern.matcher("allfields").matches()) {
+                matchedFieldKeys = new ArrayList<>(fieldsKeys);
+            } else { // Filter out the requested fields
+                matchedFieldKeys = fieldsKeys.stream().filter(matchFieldKey()).collect(Collectors.toList());
+            }
 
             for (String field : matchedFieldKeys) {
                 Optional<String> fieldValue = entry.getField(field);

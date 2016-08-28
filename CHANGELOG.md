@@ -15,6 +15,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Added integrity check for fields with BibTeX keys, e.g., `crossref` and `related`, to check that the key exists
 - [#1496](https://github.com/JabRef/jabref/issues/1496) Keep track of which entry a downloaded file belongs to
 - Made it possible to download multiple entries in one action
+- Added two new pseudo-fields for search: `keyword` to search for a specific keyword and `allfields` to search in all fields (useful in combination with search in specific fields)
 
 ### Fixed
 - Fixed NullPointerException when opening search result window for an untitled database 
