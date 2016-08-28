@@ -149,15 +149,14 @@ public class GrammarBasedSearchRule implements SearchRule {
             }
 
             // special case for searching a single keyword
-            if (fieldPattern.matcher("keyword").matches()) {
-                if (entry.hasField(FieldName.KEYWORDS)) {
-                    List<String> keywords = new ArrayList<>(entry.getKeywords());
-                    for (String keyword : keywords) {
-                        if (matchFieldValue(keyword)) {
-                            return true;
-                        }
+            if (entry.hasField(FieldName.KEYWORDS) && fieldPattern.matcher("keyword").matches()) {
+                List<String> keywords = new ArrayList<>(entry.getKeywords());
+                for (String keyword : keywords) {
+                    if (matchFieldValue(keyword)) {
+                        return true;
                     }
                 }
+                return false;
             }
 
             // specification of fieldsKeys to search is done in the search expression itself
