@@ -22,9 +22,7 @@ public class FieldEditorFocusListener implements FocusListener {
 
     @Override
     public void focusLost(FocusEvent event) {
-        if (event.getSource() instanceof FieldEditor) {
-            //Do nothing
-        } else {
+        if (!(event.getSource() instanceof FieldEditor)) {
             ((JComponent) event.getSource()).setBackground(GUIGlobals.validFieldBackgroundColor);
         }
     }
