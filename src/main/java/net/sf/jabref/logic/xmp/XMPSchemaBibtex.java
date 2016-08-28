@@ -286,16 +286,16 @@ public class XMPSchemaBibtex extends XMPSchema {
                 setTextProperty(field, value);
             }
         }
-        setTextProperty("entrytype", entry.getType());
+        setTextProperty(BibEntry.TYPE_HEADER, entry.getType());
     }
 
     public BibEntry getBibtexEntry() {
-        String type = getTextProperty("entrytype");
+        String type = getTextProperty(BibEntry.TYPE_HEADER);
         BibEntry e = new BibEntry(IdGenerator.next(), type);
 
         // Get Text Properties
         Map<String, String> text = XMPSchemaBibtex.getAllProperties(this, "bibtex");
-        text.remove("entrytype");
+        text.remove(BibEntry.TYPE_HEADER);
         e.setField(text);
         return e;
     }

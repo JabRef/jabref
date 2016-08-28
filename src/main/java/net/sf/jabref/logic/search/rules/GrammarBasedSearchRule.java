@@ -143,7 +143,7 @@ public class GrammarBasedSearchRule implements SearchRule {
 
         public boolean compare(BibEntry entry) {
             // special case for searching for entrytype=phdthesis
-            if (fieldPattern.matcher("entrytype").matches()) {
+            if (fieldPattern.matcher(BibEntry.TYPE_HEADER).matches()) {
                 return matchFieldValue(entry.getType());
             }
 
