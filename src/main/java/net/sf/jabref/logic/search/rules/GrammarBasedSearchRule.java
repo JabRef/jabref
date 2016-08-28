@@ -1,7 +1,5 @@
 package net.sf.jabref.logic.search.rules;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -148,22 +146,20 @@ public class GrammarBasedSearchRule implements SearchRule {
             }
 
             // special case for searching a single keyword
-            if (fieldPattern.matcher("keyword").matches()) {
+            if (fieldPattern.matcher("anykeyword").matches()) {
                 return entry.getKeywords().stream().anyMatch(this::matchFieldValue);
             }
 
             // specification of fieldsKeys to search is done in the search expression itself
             Set<String> fieldsKeys = entry.getFieldNames();
 
-            List<String> matchedFieldKeys;
             // special case for searching allfields=cat and title=dog
-            if (fieldPattern.matcher("allfields").matches()) {
-                matchedFieldKeys = new ArrayList<>(fieldsKeys);
-            } else { // Filter out the requested fields
-                matchedFieldKeys = fieldsKeys.stream().filter(matchFieldKey()).collect(Collectors.toList());
+            if (!fieldPattern.matcher("anyfield").matches()) {
+                // Filter out the requested fields
+                fieldsKeys = fieldsKeys.stream().filter(matchFieldKey()).collect(Collectors.toSet());
             }
 
-            for (String field : matchedFieldKeys) {
+            for (String field : fieldsKeys) {
                 Optional<String> fieldValue = entry.getField(field);
                 if (fieldValue.isPresent()) {
                     if (matchFieldValue(fieldValue.get())) {
@@ -173,7 +169,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             }
 
             // special case of asdf!=whatever and entry does not contain asdf
-            return matchedFieldKeys.isEmpty() && (operator == ComparisonOperator.DOES_NOT_CONTAIN);
+            return fieldsKeys.isEmpty() && (operator == ComparisonOperator.DOES_NOT_CONTAIN);
         }
 
         private Predicate<String> matchFieldKey() {

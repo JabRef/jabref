@@ -71,7 +71,7 @@ public class SearchQueryTest {
         BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
         e.setField("keywords", "banana, pineapple, orange");
 
-        SearchQuery searchQuery = new SearchQuery("keyword==apple", false, false);
+        SearchQuery searchQuery = new SearchQuery("anykeyword==apple", false, false);
         assertFalse(searchQuery.isMatch(e));
     }
 
@@ -80,7 +80,7 @@ public class SearchQueryTest {
         BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
         e.setField("keywords", "banana, pineapple, orange");
 
-        SearchQuery searchQuery = new SearchQuery("keyword==pineapple", false, false);
+        SearchQuery searchQuery = new SearchQuery("anykeyword==pineapple", false, false);
         assertTrue(searchQuery.isMatch(e));
     }
 
@@ -90,7 +90,7 @@ public class SearchQueryTest {
         e.setField("title", "Fruity features");
         e.setField("keywords", "banana, pineapple, orange");
 
-        SearchQuery searchQuery = new SearchQuery("allfields==\"fruity features\"", false, false);
+        SearchQuery searchQuery = new SearchQuery("anyfield==\"fruity features\"", false, false);
         assertTrue(searchQuery.isMatch(e));
     }
 
@@ -100,7 +100,7 @@ public class SearchQueryTest {
         e.setField("title", "Fruity features");
         e.setField("keywords", "banana, pineapple, orange");
 
-        SearchQuery searchQuery = new SearchQuery("allfields=fruit and keywords!=banana", false, false);
+        SearchQuery searchQuery = new SearchQuery("anyfield=fruit and keywords!=banana", false, false);
         assertFalse(searchQuery.isMatch(e));
     }
 
@@ -110,7 +110,7 @@ public class SearchQueryTest {
         e.setField("title", "Fruity features");
         e.setField("keywords", "banana, pineapple, orange");
 
-        SearchQuery searchQuery = new SearchQuery("allfields=fruit and keywords=apple", false, false);
+        SearchQuery searchQuery = new SearchQuery("anyfield=fruit and keywords=apple", false, false);
         assertTrue(searchQuery.isMatch(e));
     }
 }
