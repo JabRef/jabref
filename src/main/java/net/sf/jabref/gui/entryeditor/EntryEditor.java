@@ -1213,6 +1213,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                             JOptionPane.showMessageDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
                                 Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
                             LOGGER.debug("Error setting field", ex);
+                            requestFocus();
                         }
                     }
                 } else {
