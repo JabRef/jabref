@@ -21,6 +21,60 @@ public class DuplicateCheckTest {
     }
 
     @Test
+    public void noStrictDuplicateForDifferentTypes() {
+        BibEntry e1 = new BibEntry("1", "article");
+        BibEntry e2 = new BibEntry("2", "journal");
+        assertEquals(0, DuplicateCheck.compareEntriesStrictly(e1, e2), 0.01);
+    }
+
+    @Test
+    public void strictDuplicateForEqualFields() {
+        BibEntry e1 = new BibEntry();
+        e1.setField("key1", "value1");
+        e1.setField("key2", "value2");
+        BibEntry e2 = new BibEntry();
+        e2.setField("key1", "value1");
+        e2.setField("key2", "value2");
+        assertEquals(1, DuplicateCheck.compareEntriesStrictly(e1, e2), 0.01);
+    }
+
+    @Test
+    public void noStrictDuplicateForDifferentKeys() {
+        BibEntry e1 = new BibEntry();
+        e1.setField("key", "value1");
+        BibEntry e2 = new BibEntry();
+        e2.setField("key1", "value1");;
+        assertEquals(0, DuplicateCheck.compareEntriesStrictly(e1, e2), 0.01);
+    }
+
+    @Test
+    public void noStrictDuplicateForDifferentValues() {
+        BibEntry e1 = new BibEntry();
+        e1.setField("key1", "value");
+        BibEntry e2 = new BibEntry();
+        e2.setField("key1", "value1");
+        assertEquals(0, DuplicateCheck.compareEntriesStrictly(e1, e2), 0.01);
+    }
+
+    @Test
+    public void noStrictDuplicateIsCaseInsensitiveForKey() {
+        BibEntry e1 = new BibEntry();
+        e1.setField("KEY1", "value");
+        BibEntry e2 = new BibEntry();
+        e2.setField("key1", "value");
+        assertEquals(1, DuplicateCheck.compareEntriesStrictly(e1, e2), 0.01);
+    }
+
+    @Test
+    public void noStrictDuplicateIsCaseSensitiveForValue() {
+        BibEntry e1 = new BibEntry();
+        e1.setField("key1", "Value");
+        BibEntry e2 = new BibEntry();
+        e2.setField("key1", "value");
+        assertEquals(0, DuplicateCheck.compareEntriesStrictly(e1, e2), 0.01);
+    }
+
+    @Test
     public void testDuplicateDetection() {
         BibEntry one = new BibEntry(IdGenerator.next(), BibtexEntryTypes.ARTICLE.getName());
 
@@ -45,11 +99,9 @@ public class DuplicateCheckTest {
         one.setField("journal", "A");
         two.setField("journal", "A");
         assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
-        assertEquals(1.01, DuplicateCheck.compareEntriesStrictly(one, two), 0.01);
 
         two.setField("journal", "B");
         assertTrue(DuplicateCheck.isDuplicate(one, two, BibDatabaseMode.BIBTEX));
-        assertEquals(0.75, DuplicateCheck.compareEntriesStrictly(one, two), 0.01);
 
         two.setField("journal", "A");
         one.setField("number", "1");

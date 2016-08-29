@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -185,14 +186,12 @@ public class DuplicateCheck {
         for (String field : allFields) {
             Optional<String> stringOne = one.getField(field);
             Optional<String> stringTwo = two.getField(field);
-            if (stringOne.equals(stringTwo)) {
+            if (Objects.equals(stringOne, stringTwo)) {
                 score++;
             }
         }
         if (score == allFields.size()) {
-            return 1.01; // Just to make sure we can
-            // use score>1 without
-            // trouble.
+            return 1.0;
         }
         return (double) score / allFields.size();
     }
