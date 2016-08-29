@@ -28,6 +28,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1663](https://github.com/JabRef/jabref/issues/1663): Better multi-monitor support
 - Fixed [#1882](https://github.com/JabRef/jabref/issues/1882): Crash after saving illegal bibtexkey in entry editor
 - Fixed field `location` containing only city is not exported correctly to MS-Office 2007 xml format
+- Fixed [#1181](https://github.com/JabRef/jabref/issues/1181) and [#1504](https://github.com/JabRef/jabref/issues/1504): Improved "Normalize to BibTeX name format": Support separated names with commas and colons. Considered name affixes such as "Jr".
 
 ### Removed
 - The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field.
@@ -195,7 +196,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Manage content selectors now saves edited existing lists again and only marks database as changed when the content selectors are changed
 - When inserting a duplicate the right entry will be selected
 - Preview panel height is now saved immediately, thus is shown correctly if the panel height is changed, closed and opened again
-- Fixed [#1181](https://github.com/JabRef/jabref/issues/1181) and [#1504](https://github.com/JabRef/jabref/issues/1504): Improved "Normalize to BibTeX name format": Support separated names with commas and colons. Considered name affixes such as "Jr".
+
 
 ### Removed
 - [#1610](https://github.com/JabRef/jabref/issues/1610) Removed the possibility to auto show or hide the groups interface
