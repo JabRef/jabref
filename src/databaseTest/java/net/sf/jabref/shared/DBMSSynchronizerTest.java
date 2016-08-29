@@ -9,12 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.exception.OfflineLockException;
 import net.sf.jabref.shared.exception.SharedEntryNotPresentException;
@@ -43,15 +41,13 @@ public class DBMSSynchronizerTest {
     @Before
     public void setUp() throws ClassNotFoundException, SQLException, DatabaseNotSupportedException {
 
-        Globals.prefs = JabRefPreferences.getInstance();
-
         connection = TestConnector.getTestConnection(dbmsType);
 
         bibDatabase = new BibDatabase();
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
 
 
-        dbmsSynchronizer = new DBMSSynchronizer(context);
+        dbmsSynchronizer = new DBMSSynchronizer(context, ", ");
         dbmsProcessor = DBMSProcessor.getProcessorInstance(connection, dbmsType);
 
         bibDatabase.registerListener(dbmsSynchronizer);
