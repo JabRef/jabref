@@ -22,7 +22,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
@@ -44,8 +43,8 @@ public class IsbnFetcher implements IdBasedFetcher {
     private static final String URL_PATTERN = "http://www.ebook.de/de/tools/isbn2bibtex?";
     private ImportFormatPreferences prefs;
 
-    public IsbnFetcher(){
-        prefs = ImportFormatPreferences.fromPreferences(Globals.prefs);
+    public IsbnFetcher(ImportFormatPreferences prefs){
+        this.prefs = prefs;
     }
 
     @Override

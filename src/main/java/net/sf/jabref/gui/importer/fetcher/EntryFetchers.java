@@ -4,6 +4,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import net.sf.jabref.Globals;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
 import net.sf.jabref.logic.importer.fetcher.GvkFetcher;
 import net.sf.jabref.logic.importer.fetcher.IsbnFetcher;
@@ -29,7 +31,7 @@ public class EntryFetchers {
         entryFetchers.add(new DOAJFetcher());
         entryFetchers.add(new SpringerFetcher());
 
-        entryFetchers.add(new IdBasedEntryFetcher(new IsbnFetcher()));
+        entryFetchers.add(new IdBasedEntryFetcher(new IsbnFetcher(ImportFormatPreferences.fromPreferences(Globals.prefs))));
         entryFetchers.add(new SearchBasedEntryFetcher(new ArXiv()));
         entryFetchers.add(new SearchBasedEntryFetcher(new GvkFetcher()));
     }
