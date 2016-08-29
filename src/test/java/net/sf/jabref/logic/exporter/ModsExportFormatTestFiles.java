@@ -1,8 +1,6 @@
 package net.sf.jabref.logic.exporter;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -16,7 +14,6 @@ import java.util.stream.Stream;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fileformat.BibtexImporter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -35,13 +32,13 @@ import static org.junit.Assert.assertEquals;
 @RunWith(Parameterized.class)
 public class ModsExportFormatTestFiles {
 
-    public BibDatabaseContext databaseContext;
     public Charset charset;
-    public File tempFile;
-    public ModsExportFormat modsExportFormat;
-    public BibtexImporter testImporter;
+    private BibDatabaseContext databaseContext;
+    private File tempFile;
+    private ModsExportFormat modsExportFormat;
+    private BibtexImporter testImporter;
 
-    public static final String PATH_TO_FILE = "src/test/resources/net/sf/jabref/logic/exporter/";
+    private static final String PATH_TO_FILE = "src/test/resources/net/sf/jabref/logic/exporter/";
 
     @Parameter
     public String filename;
@@ -51,7 +48,7 @@ public class ModsExportFormatTestFiles {
 
 
     @Parameters(name = "{0}")
-    public static Collection<String> fileNames() throws IOException {
+    public static Collection<String> fileNames() throws Exception {
         try (Stream<Path> stream = Files.list(Paths.get(PATH_TO_FILE))) {
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
                     .filter(n -> n.startsWith("Mods")).collect(Collectors.toList());
@@ -65,11 +62,11 @@ public class ModsExportFormatTestFiles {
         charset = StandardCharsets.UTF_8;
         modsExportFormat = new ModsExportFormat();
         tempFile = testFolder.newFile();
-        testImporter = new BibtexImporter(ImportFormatPreferences.fromPreferences(Globals.prefs));
+        testImporter = new BibtexImporter(Globals.prefs.getImportFormatPreferences());
     }
 
     @Test
-    public final void testPerformExport() throws IOException, URISyntaxException, SaveException {
+    public final void testPerformExport() throws Exception {
         String xmlFileName = filename.replace(".bib", ".xml");
         Path importFile = Paths.get(ModsExportFormatTestFiles.class.getResource(filename).toURI());
         String tempFilename = tempFile.getCanonicalPath();
