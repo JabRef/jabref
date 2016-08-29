@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
@@ -119,8 +104,8 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        useDefaultPDFImportStyle.setSelected(prefs.getBoolean(JabRefPreferences.PREF_IMPORT_ALWAYSUSE));
-        int style = prefs.getInt(JabRefPreferences.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE);
+        useDefaultPDFImportStyle.setSelected(prefs.getBoolean(JabRefPreferences.IMPORT_ALWAYSUSE));
+        int style = prefs.getInt(JabRefPreferences.IMPORT_DEFAULT_PDF_IMPORT_STYLE);
         switch (style) {
         case ImportDialog.NOMETA:
             radioButtonNoMeta.setSelected(true);
@@ -139,12 +124,12 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
             radioButtonPDFcontent.setSelected(true);
             break;
         }
-        fileNamePattern.setText(prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN));
+        fileNamePattern.setText(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
     }
 
     @Override
     public void storeSettings() {
-        prefs.putBoolean(JabRefPreferences.PREF_IMPORT_ALWAYSUSE, useDefaultPDFImportStyle.isSelected());
+        prefs.putBoolean(JabRefPreferences.IMPORT_ALWAYSUSE, useDefaultPDFImportStyle.isSelected());
         int style = ImportSettingsTab.DEFAULT_STYLE;
         if (radioButtonNoMeta.isSelected()) {
             style = ImportDialog.NOMETA;
@@ -155,8 +140,8 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         } else if (radioButtononlyAttachPDF.isSelected()) {
             style = ImportDialog.ONLYATTACH;
         }
-        prefs.putInt(JabRefPreferences.PREF_IMPORT_DEFAULT_PDF_IMPORT_STYLE, style);
-        prefs.put(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN, fileNamePattern.getText());
+        prefs.putInt(JabRefPreferences.IMPORT_DEFAULT_PDF_IMPORT_STYLE, style);
+        prefs.put(JabRefPreferences.IMPORT_FILENAMEPATTERN, fileNamePattern.getText());
     }
 
     @Override

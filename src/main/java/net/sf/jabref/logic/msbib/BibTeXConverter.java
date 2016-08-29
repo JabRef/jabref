@@ -7,24 +7,30 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.importer.fileformat.ImportFormat;
+import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.mods.PersonName;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.MonthUtil;
+import net.sf.jabref.model.entry.MonthUtil.Month;
 
 public class BibTeXConverter {
+
     private static final String MSBIB_PREFIX = "msbib-";
+
 
     public static BibEntry convert(MSBibEntry entry) {
         BibEntry result;
         Map<String, String> fieldValues = new HashMap<>();
 
+        String bibTexEntryType = MSBibMapping.getBibLaTeXEntryType(entry.getType());
         if (entry.getCiteKey() == null) {
-            result = new BibEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID, MSBibMapping.getBibTeXEntryType(entry.getType()));
+            result = new BibEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID, bibTexEntryType);
+
         } else {
             // TODO: the cite key should not be the ID?!
             // id assumes an existing database so don't
-            result = new BibEntry(entry.getCiteKey(), MSBibMapping.getBibTeXEntryType(entry.getType()));
+            result = new BibEntry(entry.getCiteKey(), bibTexEntryType);
         }
 
         // add String fields
@@ -44,9 +50,9 @@ public class BibTeXConverter {
         }
 
         addAuthor(fieldValues, FieldName.AUTHOR, entry.authors);
-        addAuthor(fieldValues, MSBIB_PREFIX + "bookauthor", entry.bookAuthors);
+        addAuthor(fieldValues, MSBIB_PREFIX + FieldName.BOOKAUTHOR, entry.bookAuthors);
         addAuthor(fieldValues, FieldName.EDITOR, entry.editors);
-        addAuthor(fieldValues, MSBIB_PREFIX + "translator", entry.translators);
+        addAuthor(fieldValues, MSBIB_PREFIX + FieldName.TRANSLATOR, entry.translators);
         addAuthor(fieldValues, MSBIB_PREFIX + "producername", entry.producerNames);
         addAuthor(fieldValues, MSBIB_PREFIX + "composer", entry.composers);
         addAuthor(fieldValues, MSBIB_PREFIX + "conductor", entry.conductors);
@@ -77,6 +83,17 @@ public class BibTeXConverter {
             fieldValues.put(MSBIB_PREFIX + "accessed", entry.dateAccessed);
         }
 
+        if (entry.journalName != null) {
+            fieldValues.put(FieldName.JOURNALTITLE, entry.journalName);
+        }
+        if (entry.month != null) {
+            Month month = MonthUtil.getMonth(entry.month);
+            fieldValues.put(FieldName.MONTH, month.shortName);
+        }
+        if (entry.number != null) {
+            fieldValues.put(FieldName.NUMBER, entry.number);
+        }
+
         // set all fields
         result.setField(fieldValues);
 
@@ -92,7 +109,8 @@ public class BibTeXConverter {
         map.put(type, allAuthors);
     }
 
-    private static void parseSingleStandardNumber(String type, String bibtype, String standardNum, Map<String, String> map) {
+    private static void parseSingleStandardNumber(String type, String bibtype, String standardNum,
+            Map<String, String> map) {
         Pattern pattern = Pattern.compile(':' + type + ":(.[^:]+)");
         Matcher matcher = pattern.matcher(standardNum);
         if (matcher.matches()) {

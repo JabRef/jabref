@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.fieldeditors;
 
 import java.awt.BorderLayout;
@@ -65,6 +50,7 @@ import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
@@ -74,11 +60,7 @@ import com.jgoodies.forms.layout.FormLayout;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Created by Morten O. Alver 2007.02.22
- */
 public class FileListEditor extends JTable implements FieldEditor, DownloadExternalFile.DownloadCallback {
-
     private static final Log LOGGER = LogFactory.getLog(FileListEditor.class);
 
     private final FieldNameLabel label;
@@ -105,6 +87,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
         JScrollPane sPane = new JScrollPane(this);
         setTableHeader(null);
         addMouseListener(new TableClickListener());
+
+        GUIUtil.correctRowHeight(this);
 
         JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
         add.setToolTipText(Localization.lang("New file link (INSERT)"));
@@ -206,7 +190,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                         path = Paths.get(entry.link).toString();
                     } else {
                         // relative to file folder
-                        for (String folder : databaseContext.getFileDirectory()) {
+                        for (String folder : databaseContext
+                                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences())) {
                             Path file = Paths.get(folder, entry.link);
                             if (Files.exists(file)) {
                                 path = file.toString();
@@ -245,7 +230,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
 
                 FileListEntry entry = tableModel.getEntry(row);
                 // null if file does not exist
-                Optional<File> file = FileUtil.expandFilename(databaseContext, entry.link);
+                Optional<File> file = FileUtil.expandFilename(databaseContext, entry.link,
+                        Globals.prefs.getFileDirectoryPreferences());
 
                 // transactional delete and unlink
                 try {
@@ -369,7 +355,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     }
 
     private void addEntry() {
-        List<String> defaultDirectory = databaseContext.getFileDirectory();
+        List<String> defaultDirectory = databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         if (defaultDirectory.isEmpty() || (defaultDirectory.get(0) == null)) {
             addEntry("");
         } else {
@@ -461,8 +447,8 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
      * Run a file download operation.
      */
     private void downloadFile() {
-        String bibtexKey = entryEditor.getEntry().getCiteKey();
-        if (bibtexKey == null) {
+        Optional<String> bibtexKey = entryEditor.getEntry().getCiteKeyOptional();
+        if (!bibtexKey.isPresent()) {
             int answer = JOptionPane.showConfirmDialog(frame,
                     Localization.lang("This entry has no BibTeX key. Generate key now?"),
                     Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION,
@@ -470,11 +456,11 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
             if (answer == JOptionPane.OK_OPTION) {
                 ActionListener l = entryEditor.getGenerateKeyAction();
                 l.actionPerformed(null);
-                bibtexKey = entryEditor.getEntry().getCiteKey();
+                bibtexKey = entryEditor.getEntry().getCiteKeyOptional();
             }
         }
         DownloadExternalFile def = new DownloadExternalFile(frame,
-                frame.getCurrentBasePanel().getBibDatabaseContext(), bibtexKey);
+                frame.getCurrentBasePanel().getBibDatabaseContext(), entryEditor.getEntry());
         try {
             def.download(this);
         } catch (IOException ex) {

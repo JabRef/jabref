@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.external;
 
 import java.io.File;
@@ -36,6 +21,8 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,15 +44,16 @@ public class DownloadExternalFile {
 
     private final JabRefFrame frame;
     private final BibDatabaseContext databaseContext;
-    private final String bibtexKey;
+    private final BibEntry entry;
     private FileListEntryEditor editor;
     private boolean downloadFinished;
     private boolean dontShowDialog;
 
-    public DownloadExternalFile(JabRefFrame frame, BibDatabaseContext databaseContext, String bibtexKey) {
+
+    public DownloadExternalFile(JabRefFrame frame, BibDatabaseContext databaseContext, BibEntry entry) {
         this.frame = frame;
         this.databaseContext = databaseContext;
-        this.bibtexKey = bibtexKey;
+        this.entry = entry;
     }
 
     /**
@@ -160,7 +148,7 @@ public class DownloadExternalFile {
         }
 
         String suggestedName = getSuggestedFileName(suffix);
-        List<String> fDirectory = databaseContext.getFileDirectory();
+        List<String> fDirectory = databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         String directory;
         if (fDirectory.isEmpty()) {
             directory = null;
@@ -169,8 +157,8 @@ public class DownloadExternalFile {
         }
         final String suggestDir = directory == null ? System.getProperty("user.home") : directory;
         File file = new File(new File(suggestDir), suggestedName);
-        FileListEntry entry = new FileListEntry("", file.getCanonicalPath(), suggestedType);
-        editor = new FileListEntryEditor(frame, entry, true, false, databaseContext);
+        FileListEntry fileListEntry = new FileListEntry("", file.getCanonicalPath(), suggestedType);
+        editor = new FileListEntryEditor(frame, fileListEntry, true, false, databaseContext);
         editor.getProgressBar().setIndeterminate(true);
         editor.setOkEnabled(false);
         editor.setExternalConfirm(closeEntry -> {
@@ -195,7 +183,8 @@ public class DownloadExternalFile {
         }
         // Editor closed. Go on:
         if (editor.okPressed()) {
-            File toFile = directory == null ? new File(entry.link) : expandFilename(directory, entry.link);
+            File toFile = directory == null ? new File(fileListEntry.link) : expandFilename(directory,
+                    fileListEntry.link);
             String dirPrefix;
             if (directory == null) {
                 dirPrefix = null;
@@ -216,12 +205,13 @@ public class DownloadExternalFile {
 
                 // If the local file is in or below the main file directory, change the
                 // path to relative:
-                if ((directory != null) && entry.link.startsWith(directory) &&
-                        (entry.link.length() > dirPrefix.length())) {
-                    entry = new FileListEntry(entry.description, entry.link.substring(dirPrefix.length()), entry.type);
+                if ((dirPrefix != null) && fileListEntry.link.startsWith(directory)
+                        && (fileListEntry.link.length() > dirPrefix.length())) {
+                    fileListEntry = new FileListEntry(fileListEntry.description,
+                            fileListEntry.link.substring(dirPrefix.length()), fileListEntry.type);
                 }
 
-                callback.downloadComplete(entry);
+                callback.downloadComplete(fileListEntry);
             } catch (IOException ex) {
                 LOGGER.warn("Problem downloading file", ex);
             }
@@ -267,11 +257,10 @@ public class DownloadExternalFile {
         editor.getProgressBar().setValue(editor.getProgressBar().getMaximum());
     }
 
-    // FIXME: will break download if no bibtexkey is present!
     private String getSuggestedFileName(String suffix) {
-        String plannedName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(),
-                frame.getCurrentBasePanel().getSelectedEntries().get(0), Globals.journalAbbreviationLoader,
-                Globals.prefs);
+        String plannedName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry,
+                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
+                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader));
 
         if (!suffix.isEmpty()) {
             plannedName += "." + suffix;

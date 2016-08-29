@@ -12,3 +12,7 @@ Steps to reproduce:
 3. ...
 
 <!-- If applicable, excerpt of the bibliography file, screenshot, and excerpt of log (available in the error console) -->
+
+```
+Put the excerpt of the log file here
+```

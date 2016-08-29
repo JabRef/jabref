@@ -9,7 +9,6 @@ import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
-import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -17,7 +16,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -31,11 +29,6 @@ public class IntegrityCheckTest {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
-
-    @Before
-    public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
 
     @Test
     public void testUrlChecks() {
@@ -69,7 +62,7 @@ public class IntegrityCheckTest {
 
     @Test
     public void testAuthorNameChecks() {
-        for (String field : InternalBibtexFields.BIBLATEX_PERSON_NAME_FIELDS) {
+        for (String field : InternalBibtexFields.getPersonNameFields()) {
             assertCorrect(createContext(field, ""));
             assertCorrect(createContext(field, "Knuth"));
             assertCorrect(createContext(field, "   Knuth, Donald E. "));
@@ -213,6 +206,13 @@ public class IntegrityCheckTest {
         assertWrong(createContext("isbn", "978-0-306-40615-8"));
     }
 
+    @Test
+    public void testASCIIChecks() {
+        assertCorrect(createContext("title", "Only ascii characters!'@12"));
+        assertWrong(createContext("month", "Umlauts are nöt ällowed"));
+        assertWrong(createContext("author", "Some unicode ⊕"));
+    }
+
     private BibDatabaseContext createContext(String field, String value, String type) {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);
@@ -235,12 +235,15 @@ public class IntegrityCheckTest {
     }
 
     private void assertWrong(BibDatabaseContext context) {
-        List<IntegrityMessage> messages = new IntegrityCheck(context).checkBibtexDatabase();
+        List<IntegrityMessage> messages = new IntegrityCheck(context,
+                JabRefPreferences.getInstance().getFileDirectoryPreferences())
+                .checkBibtexDatabase();
         assertFalse(messages.toString(), messages.isEmpty());
     }
 
     private void assertCorrect(BibDatabaseContext context) {
-        List<IntegrityMessage> messages = new IntegrityCheck(context).checkBibtexDatabase();
+        List<IntegrityMessage> messages = new IntegrityCheck(context,
+                JabRefPreferences.getInstance().getFileDirectoryPreferences()).checkBibtexDatabase();
         assertEquals(Collections.emptyList(), messages);
     }
 

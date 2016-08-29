@@ -1,22 +1,8 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.model;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -27,7 +13,7 @@ import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
 import org.apache.commons.logging.Log;
@@ -85,13 +71,12 @@ public class DuplicateCheck {
         EntryType type = EntryTypes.getTypeOrDefault(one.getType(), bibDatabaseMode);
 
         // The check if they have the same required fields:
-        java.util.List<String> var = type.getRequiredFieldsFlat();
-        String[] fields = var.toArray(new String[var.size()]);
+        List<String> var = type.getRequiredFieldsFlat();
         double[] req;
-        if (fields == null) {
+        if (var == null) {
             req = new double[]{0., 0.};
         } else {
-            req = DuplicateCheck.compareFieldSet(fields, one, two);
+            req = DuplicateCheck.compareFieldSet(var, one, two);
         }
 
         if (Math.abs(req[0] - DuplicateCheck.duplicateThreshold) > DuplicateCheck.DOUBT_RANGE) {
@@ -99,17 +84,16 @@ public class DuplicateCheck {
             return req[0] >= DuplicateCheck.duplicateThreshold;
         }
         // Close to the threshold value, so we take a look at the optional fields, if any:
-        java.util.List<String> optionalFields = type.getOptionalFields();
-        fields = optionalFields.toArray(new String[optionalFields.size()]);
-        if (fields != null) {
-            double[] opt = DuplicateCheck.compareFieldSet(fields, one, two);
+        List<String> optionalFields = type.getOptionalFields();
+        if (optionalFields != null) {
+            double[] opt = DuplicateCheck.compareFieldSet(optionalFields, one, two);
             double totValue = ((DuplicateCheck.REQUIRED_WEIGHT * req[0] * req[1]) + (opt[0] * opt[1])) / ((req[1] * DuplicateCheck.REQUIRED_WEIGHT) + opt[1]);
             return totValue >= DuplicateCheck.duplicateThreshold;
         }
         return req[0] >= DuplicateCheck.duplicateThreshold;
     }
 
-    private static double[] compareFieldSet(String[] fields, BibEntry one, BibEntry two) {
+    private static double[] compareFieldSet(List<String> fields, BibEntry one, BibEntry two) {
         double res = 0;
         double totWeights = 0.;
         for (String field : fields) {
@@ -134,8 +118,8 @@ public class DuplicateCheck {
     }
 
     private static int compareSingleField(String field, BibEntry one, BibEntry two) {
-        Optional<String> optionalStringOne = one.getFieldOptional(field);
-        Optional<String> optionalStringTwo = two.getFieldOptional(field);
+        Optional<String> optionalStringOne = one.getField(field);
+        Optional<String> optionalStringTwo = two.getField(field);
         if (!optionalStringOne.isPresent()) {
             if (!optionalStringTwo.isPresent()) {
                 return EMPTY_IN_BOTH;
@@ -149,7 +133,7 @@ public class DuplicateCheck {
         String stringOne = optionalStringOne.get();
         String stringTwo = optionalStringTwo.get();
 
-        if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
+        if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES)) {
             // Specific for name fields.
             // Harmonise case:
             String authorOne = AuthorList.fixAuthorLastNameOnlyCommas(stringOne, false).replace(" and ", " ").toLowerCase();
@@ -198,8 +182,8 @@ public class DuplicateCheck {
 
         int score = 0;
         for (String field : allFields) {
-            Optional<String> stringOne = one.getFieldOptional(field);
-            Optional<String> stringTwo = two.getFieldOptional(field);
+            Optional<String> stringOne = one.getField(field);
+            Optional<String> stringTwo = two.getField(field);
             if (stringOne.equals(stringTwo)) {
                 score++;
             }

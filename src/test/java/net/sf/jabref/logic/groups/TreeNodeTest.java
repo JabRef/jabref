@@ -693,7 +693,7 @@ public class TreeNodeTest {
         }
     }
 
-    private class WrongTreeNodeImplementation extends TreeNode<TreeNodeMock> {
+    private static class WrongTreeNodeImplementation extends TreeNode<TreeNodeMock> {
         // This class is a wrong derived class of TreeNode<T>
         // since it does not extends TreeNode<WrongTreeNodeImplementation>
         // See test constructorChecksThatClassImplementsCorrectInterface

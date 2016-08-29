@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.external;
 
 import java.awt.BorderLayout;
@@ -145,14 +130,15 @@ public class SynchronizeFileField extends AbstractWorker {
             boolean removeAllBroken = false;
             mainLoop: for (BibEntry aSel : sel) {
                 panel.frame().setProgressBarValue(progress++);
-                final Optional<String> old = aSel.getFieldOptional(FieldName.FILE);
+                final Optional<String> old = aSel.getField(FieldName.FILE);
                 // Check if a extension is set:
                 if (old.isPresent() && !(old.get().isEmpty())) {
                     FileListTableModel tableModel = new FileListTableModel();
                     tableModel.setContentDontGuessTypes(old.get());
 
                     // We need to specify which directories to search in for Util.expandFilename:
-                    List<String> dirsS = panel.getBibDatabaseContext().getFileDirectory();
+                    List<String> dirsS = panel.getBibDatabaseContext()
+                            .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
                     List<File> dirs = new ArrayList<>();
                     for (String dirs1 : dirsS) {
                         dirs.add(new File(dirs1));
@@ -179,7 +165,8 @@ public class SynchronizeFileField extends AbstractWorker {
                             } else {
                                 answer = JOptionPane.showOptionDialog(panel.frame(),
                                         Localization.lang("<HTML>Could not find file '%0'<BR>linked from entry '%1'</HTML>",
-                                                flEntry.link, aSel.getCiteKey()),
+                                                flEntry.link,
+                                                aSel.getCiteKeyOptional().orElse(Localization.lang("undefined"))),
                                         Localization.lang("Broken link"),
                                         JOptionPane.YES_NO_CANCEL_OPTION,
                                         JOptionPane.QUESTION_MESSAGE, null, brokenLinkOptions, brokenLinkOptions[0]
@@ -379,7 +366,7 @@ public class SynchronizeFileField extends AbstractWorker {
                 canceled = true;
             }
 
-            List<String> dirs = databaseContext.getFileDirectory();
+            List<String> dirs = databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
             if (dirs.isEmpty()) {
                 autoSetNone.setSelected(true);
                 autoSetNone.setEnabled(false);

@@ -34,9 +34,8 @@ public class WarnAssignmentSideEffects {
                 if (FieldName.KEYWORDS.equals(field) || FieldName.GROUPS.equals(field)) {
                     continue; // this is not undesired
                 }
-                int len = InternalBibtexFields.numberOfPublicFields();
-                for (int i = 0; i < len; ++i) {
-                    if (field.equals(InternalBibtexFields.getFieldName(i))) {
+                for (String fieldName : InternalBibtexFields.getAllPublicFieldNames()) {
+                    if (field.equals(fieldName)) {
                         affectedFields.add(field);
                         break;
                     }

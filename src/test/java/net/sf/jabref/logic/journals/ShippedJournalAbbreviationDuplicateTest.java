@@ -22,7 +22,7 @@ public class ShippedJournalAbbreviationDuplicateTest {
         JournalAbbreviationRepository repoBuiltIn = new JournalAbbreviationRepository();
         repoBuiltIn.addEntries(JournalAbbreviationLoader.getBuiltInAbbreviations());
 
-        for (Abbreviation abbreviation : JournalAbbreviationLoader.getOfficialIEEEAbbreviations()) {
+        for (Abbreviation abbreviation : JournalAbbreviationLoader.getStandardIEEEAbbreviations()) {
             Assert.assertFalse("duplicate name " + abbreviation.toString(), repoBuiltIn.getAbbreviation(abbreviation.getName()).isPresent());
             Assert.assertFalse("duplicate iso " + abbreviation.toString(), repoBuiltIn.getAbbreviation(abbreviation.getIsoAbbreviation()).isPresent());
             Assert.assertFalse("duplicate medline " + abbreviation.toString(), repoBuiltIn.getAbbreviation(abbreviation.getMedlineAbbreviation()).isPresent());

@@ -3,8 +3,6 @@ package net.sf.jabref.logic.bibtex;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.preferences.JabRefPreferences;
-
 public class FieldContentParserPreferences {
 
     private final List<String> nonWrappableFields;
@@ -23,8 +21,4 @@ public class FieldContentParserPreferences {
         return nonWrappableFields;
     }
 
-    public static FieldContentParserPreferences fromPreferences(JabRefPreferences jabRefPreferences) {
-        return new FieldContentParserPreferences(
-                jabRefPreferences.getStringList(JabRefPreferences.NON_WRAPPABLE_FIELDS));
-    }
 }

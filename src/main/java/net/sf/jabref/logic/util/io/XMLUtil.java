@@ -118,10 +118,12 @@ public class XMLUtil {
             this.list = list;
         }
 
+        @Override
         public Node get(int index) {
             return list.item(index);
         }
 
+        @Override
         public int size() {
             return list.getLength();
         }

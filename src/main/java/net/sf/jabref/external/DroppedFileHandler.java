@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.external;
 
 import java.io.File;
@@ -42,12 +27,12 @@ import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -69,11 +54,6 @@ import org.apache.commons.logging.LogFactory;
 public class DroppedFileHandler {
 
     private static final Log LOGGER = LogFactory.getLog(DroppedFileHandler.class);
-
-    public static final String DFH_LEAVE = "DroppedFileHandler_LeaveFileInDir";
-    public static final String DFH_COPY = "DroppedFileHandler_CopyFile";
-    public static final String DFH_MOVE = "DroppedFileHandler_MoveFile";
-    public static final String DFH_RENAME = "DroppedFileHandler_RenameFile";
 
     private final JabRefFrame frame;
 
@@ -158,7 +138,10 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getFileDirectory()).toString();
+            destFilename = FileUtil
+                    .shortenFileName(new File(fileName),
+                            panel.getBibDatabaseContext().getFileDirectory(Globals.prefs.getFileDirectoryPreferences()))
+                    .toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
@@ -208,7 +191,10 @@ public class DroppedFileHandler {
         NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getFileDirectory()).toString();
+            destFilename = FileUtil
+                    .shortenFileName(new File(fileName),
+                            panel.getBibDatabaseContext().getFileDirectory(Globals.prefs.getFileDirectoryPreferences()))
+                    .toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
@@ -236,7 +222,7 @@ public class DroppedFileHandler {
 
         List<BibEntry> xmpEntriesInFile;
         try {
-            xmpEntriesInFile = XMPUtil.readXMP(fileName, XMPPreferences.fromPreferences(Globals.prefs));
+            xmpEntriesInFile = XMPUtil.readXMP(fileName, Globals.prefs.getXMPPreferences());
         } catch (IOException e) {
             LOGGER.warn("Problem reading XMP", e);
             return false;
@@ -282,9 +268,12 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getFileDirectory()).toString();
+            destFilename = FileUtil
+                    .shortenFileName(new File(fileName),
+                            panel.getBibDatabaseContext().getFileDirectory(Globals.prefs.getFileDirectoryPreferences()))
+                    .toString();
         } else {
-            if (renameCheckBox.isSelected()) {
+            if (renameCheckBox.isSelected() || (single == null)) {
                 destFilename = fileName;
             } else {
                 destFilename = single.getCiteKey() + "." + fileType.getExtension();
@@ -319,7 +308,7 @@ public class DroppedFileHandler {
             BibDatabase database) {
 
         String dialogTitle = Localization.lang("Link to file %0", linkFileName);
-        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
+        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {
@@ -353,15 +342,16 @@ public class DroppedFileHandler {
         renameCheckBox.setText(Localization.lang("Rename file to").concat(": "));
 
         // Determine which name to suggest:
-        String targetName = FileUtil.createFileNameFromPattern(database, entry, Globals.journalAbbreviationLoader,
-                Globals.prefs);
+        String targetName = FileUtil.createFileNameFromPattern(database, entry,
+                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
+                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader));
 
         renameToTextBox.setText(targetName.concat(".").concat(fileType.getExtension()));
 
-        linkInPlace.setSelected(frame.prefs().getBoolean(DroppedFileHandler.DFH_LEAVE));
-        copyRadioButton.setSelected(frame.prefs().getBoolean(DroppedFileHandler.DFH_COPY));
-        moveRadioButton.setSelected(frame.prefs().getBoolean(DroppedFileHandler.DFH_MOVE));
-        renameCheckBox.setSelected(frame.prefs().getBoolean(DroppedFileHandler.DFH_RENAME));
+        linkInPlace.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE));
+        copyRadioButton.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_COPY));
+        moveRadioButton.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_MOVE));
+        renameCheckBox.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_RENAME));
 
         linkInPlace.addChangeListener(cl);
         cl.stateChanged(new ChangeEvent(linkInPlace));
@@ -373,10 +363,10 @@ public class DroppedFileHandler {
                     JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (reply == JOptionPane.OK_OPTION) {
                 // store user's choice
-                frame.prefs().putBoolean(DroppedFileHandler.DFH_LEAVE, linkInPlace.isSelected());
-                frame.prefs().putBoolean(DroppedFileHandler.DFH_COPY, copyRadioButton.isSelected());
-                frame.prefs().putBoolean(DroppedFileHandler.DFH_MOVE, moveRadioButton.isSelected());
-                frame.prefs().putBoolean(DroppedFileHandler.DFH_RENAME, renameCheckBox.isSelected());
+                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE, linkInPlace.isSelected());
+                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_COPY, copyRadioButton.isSelected());
+                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_MOVE, moveRadioButton.isSelected());
+                frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_RENAME, renameCheckBox.isSelected());
                 return true;
             } else {
                 return false;
@@ -398,14 +388,15 @@ public class DroppedFileHandler {
     private void doLink(BibEntry entry, ExternalFileType fileType, String filename,
                         boolean avoidDuplicate, NamedCompound edits) {
 
-        Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
+        Optional<String> oldValue = entry.getField(FieldName.FILE);
         FileListTableModel tm = new FileListTableModel();
         oldValue.ifPresent(tm::setContent);
 
         // If avoidDuplicate==true, we should check if this file is already linked:
         if (avoidDuplicate) {
             // For comparison, find the absolute filename:
-            List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
+            List<String> dirs = panel.getBibDatabaseContext()
+                    .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
             String absFilename;
             if (new File(filename).isAbsolute() || dirs.isEmpty()) {
                 absFilename = filename;
@@ -465,7 +456,7 @@ public class DroppedFileHandler {
      */
     private boolean doMove(String fileName, String destFilename,
                            NamedCompound edits) {
-        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
+        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {
@@ -515,7 +506,7 @@ public class DroppedFileHandler {
      */
     private boolean doCopy(String fileName, String toFile, NamedCompound edits) {
 
-        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
+        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {

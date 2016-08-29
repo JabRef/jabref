@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.external;
 
 import java.awt.BorderLayout;
@@ -36,6 +21,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
@@ -46,7 +32,6 @@ import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -135,14 +120,19 @@ public class WriteXMPAction extends AbstractWorker {
             List<File> files = new ArrayList<>();
 
             // First check the (legacy) "pdf" field:
-            entry.getFieldOptional(FieldName.PDF).ifPresent(pdf ->
-                FileUtil.expandFilename(pdf, panel.getBibDatabaseContext().getFileDirectory("pdf"))
-                    .ifPresent(files::add));
+            entry.getField(FieldName.PDF)
+                    .ifPresent(
+                            pdf -> FileUtil
+                                    .expandFilename(pdf,
+                                            panel.getBibDatabaseContext().getFileDirectory(FieldName.PDF,
+                                                    Globals.prefs.getFileDirectoryPreferences()))
+                            .ifPresent(files::add));
             // Then check the "file" field:
-            List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
+            List<String> dirs = panel.getBibDatabaseContext()
+                    .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
             if (entry.hasField(FieldName.FILE)) {
                 FileListTableModel tm = new FileListTableModel();
-                entry.getFieldOptional(FieldName.FILE).ifPresent(tm::setContent);
+                entry.getField(FieldName.FILE).ifPresent(tm::setContent);
                 for (int j = 0; j < tm.getRowCount(); j++) {
                     FileListEntry flEntry = tm.getEntry(j);
                     if ((flEntry.type.isPresent()) && "pdf".equalsIgnoreCase(flEntry.type.get().getName())) {
@@ -151,44 +141,53 @@ public class WriteXMPAction extends AbstractWorker {
                 }
             }
 
-            optDiag.getProgressArea().append(entry.getCiteKey() + "\n");
+            SwingUtilities.invokeLater(() -> optDiag.getProgressArea()
+                    .append(entry.getCiteKeyOptional().orElse(Localization.lang("undefined")) + "\n"));
 
             if (files.isEmpty()) {
                 skipped++;
-                optDiag.getProgressArea().append("  " + Localization.lang("Skipped - No PDF linked") + ".\n");
+                SwingUtilities.invokeLater(() -> optDiag.getProgressArea()
+                        .append("  " + Localization.lang("Skipped - No PDF linked") + ".\n"));
             } else {
                 for (File file : files) {
                     if (file.exists()) {
                         try {
-                            XMPUtil.writeXMP(file, entry, database, XMPPreferences.fromPreferences(Globals.prefs));
-                            optDiag.getProgressArea().append("  " + Localization.lang("OK") + ".\n");
+                            XMPUtil.writeXMP(file, entry, database, Globals.prefs.getXMPPreferences());
+                            SwingUtilities.invokeLater(
+                                    () -> optDiag.getProgressArea().append("  " + Localization.lang("OK") + ".\n"));
                             entriesChanged++;
                         } catch (Exception e) {
-                            optDiag.getProgressArea().append(
-                                    "  " + Localization.lang("Error while writing") + " '" + file.getPath() + "':\n");
-                            optDiag.getProgressArea().append("    " + e.getLocalizedMessage() + "\n");
+                            SwingUtilities.invokeLater(() -> {
+                                optDiag.getProgressArea().append("  " + Localization.lang("Error while writing") + " '"
+                                        + file.getPath() + "':\n");
+                                optDiag.getProgressArea().append("    " + e.getLocalizedMessage() + "\n");
+                            });
                             errors++;
                         }
                     } else {
                         skipped++;
-                        optDiag.getProgressArea()
-                                .append("  " + Localization.lang("Skipped - PDF does not exist") + ":\n");
-                        optDiag.getProgressArea().append("    " + file.getPath() + "\n");
+                        SwingUtilities.invokeLater(() -> {
+                            optDiag.getProgressArea()
+                                    .append("  " + Localization.lang("Skipped - PDF does not exist") + ":\n");
+                            optDiag.getProgressArea().append("    " + file.getPath() + "\n");
+                        });
                     }
                 }
             }
 
             if (optDiag.isCanceled()) {
-                optDiag.getProgressArea().append("\n"
-                        + Localization.lang("Operation canceled.") +"\n");
+                SwingUtilities.invokeLater(
+                        () -> optDiag.getProgressArea().append("\n" + Localization.lang("Operation canceled.") + "\n"));
                 break;
             }
         }
-        optDiag.getProgressArea()
+        SwingUtilities.invokeLater(() -> {
+            optDiag.getProgressArea()
                 .append("\n"
                 + Localization.lang("Finished writing XMP for %0 file (%1 skipped, %2 errors).", String
                 .valueOf(entriesChanged), String.valueOf(skipped), String.valueOf(errors)));
-        optDiag.done();
+            optDiag.done();
+        });
     }
 
     @Override

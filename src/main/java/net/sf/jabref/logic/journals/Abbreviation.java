@@ -10,8 +10,8 @@ public class Abbreviation implements Comparable<Abbreviation> {
     private final String abbreviation;
 
     public Abbreviation(String name, String abbreviation) {
-        this.name = java.util.Objects.requireNonNull(name).trim();
-        this.abbreviation = java.util.Objects.requireNonNull(abbreviation).trim();
+        this.name = Objects.requireNonNull(name).trim();
+        this.abbreviation = Objects.requireNonNull(abbreviation).trim();
     }
 
     public String getName() {

@@ -86,7 +86,7 @@ public class FieldFormatterCleanups {
         return Objects.hash(actions, enabled);
     }
 
-    private static List<FieldFormatterCleanup> parse(String formatterString) {
+    public static List<FieldFormatterCleanup> parse(String formatterString) {
 
         if ((formatterString == null) || formatterString.isEmpty()) {
             // no save actions defined in the meta data

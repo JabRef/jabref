@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
@@ -23,15 +22,10 @@ public class URLDownloadTest {
 
     @Test
     public void testStringDownload() throws IOException {
-        Globals.prefs = JabRefPreferences.getInstance();
-        try {
-            URLDownload dl = new URLDownload(new URL("http://www.google.com"));
+        URLDownload dl = new URLDownload(new URL("http://www.google.com"));
 
-            Assert.assertTrue("google.com should contain google",
-                    dl.downloadToString(Globals.prefs.getDefaultEncoding()).contains("Google"));
-        } finally {
-            Globals.prefs = null;
-        }
+        Assert.assertTrue("google.com should contain google",
+                dl.downloadToString(JabRefPreferences.getInstance().getDefaultEncoding()).contains("Google"));
     }
 
     @Test

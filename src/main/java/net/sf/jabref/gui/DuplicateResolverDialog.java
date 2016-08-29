@@ -1,48 +1,33 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
+import net.sf.jabref.gui.help.HelpAction;
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.gui.mergeentries.MergeEntries;
 import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-// created by : ?
-//
-// modified : r.nagel 2.09.2004
-//            - insert close button
-
 public class DuplicateResolverDialog extends JDialog {
 
-    enum DuplicateResolverType {
+    public enum DuplicateResolverType {
         DUPLICATE_SEARCH,
         IMPORT_CHECK,
         INSPECTION,
         DUPLICATE_SEARCH_WITH_EXACT
     }
 
-    enum DuplicateResolverResult {
+    public enum DuplicateResolverResult {
         NOT_CHOSEN,
         KEEP_BOTH,
         KEEP_LEFT,
@@ -54,6 +39,7 @@ public class DuplicateResolverDialog extends JDialog {
 
     private final JButton cancel = new JButton(Localization.lang("Cancel"));
     private final JButton merge = new JButton(Localization.lang("Keep merged entry only"));
+    JButton helpButton = new HelpAction(Localization.lang("Help"), HelpFile.FIND_DUPLICATES).getHelpButton();
     private final JabRefFrame frame;
     private final JPanel options = new JPanel();
     private DuplicateResolverResult status = DuplicateResolverResult.NOT_CHOSEN;
@@ -116,6 +102,7 @@ public class DuplicateResolverDialog extends JDialog {
         options.add(merge);
         options.add(Box.createHorizontalStrut(5));
         options.add(cancel);
+        options.add(helpButton);
 
         first.addActionListener(e -> buttonPressed(DuplicateResolverResult.KEEP_LEFT));
         second.addActionListener(e -> buttonPressed(DuplicateResolverResult.KEEP_RIGHT));
@@ -124,7 +111,14 @@ public class DuplicateResolverDialog extends JDialog {
         if (removeExact != null) {
             removeExact.addActionListener(e -> buttonPressed(DuplicateResolverResult.AUTOREMOVE_EXACT));
         }
+
         cancel.addActionListener(e -> buttonPressed(DuplicateResolverResult.BREAK));
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                buttonPressed(DuplicateResolverResult.BREAK);
+            }
+        });
 
         getContentPane().add(me.getMergeEntryPanel());
         getContentPane().add(options, BorderLayout.SOUTH);
@@ -136,12 +130,11 @@ public class DuplicateResolverDialog extends JDialog {
         pw.setWindowPosition();
 
         both.requestFocus();
-
     }
 
 
-    private void buttonPressed(DuplicateResolverResult button) {
-        status = button;
+    private void buttonPressed(DuplicateResolverResult result) {
+        status = result;
         dispose();
     }
 
