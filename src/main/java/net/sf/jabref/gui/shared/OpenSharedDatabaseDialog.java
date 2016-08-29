@@ -35,6 +35,7 @@ import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.DatabaseLocation;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.DBMSConnectionProperties;
 import net.sf.jabref.shared.DBMSConnector;
 import net.sf.jabref.shared.DBMSType;
@@ -96,7 +97,9 @@ public class OpenSharedDatabaseDialog extends JDialog {
             bibDatabaseContext.getDBSynchronizer().openSharedDatabase(connectionProperties);
             frame.addTab(bibDatabaseContext, true);
             setGlobalPrefs();
-            bibDatabaseContext.getDBSynchronizer().registerListener(new SharedDatabaseUIManager(frame));
+            bibDatabaseContext.getDBSynchronizer()
+                    .registerListener(
+                            new SharedDatabaseUIManager(frame, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR)));
             frame.output(Localization.lang("Connection_to_%0_server_established.", connectionProperties.getType().toString()));
             dispose();
             return; // setLoadingConnectButtonText(false) should not be reached regularly.
@@ -126,7 +129,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
                     BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
 
                     bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode),
-                            DatabaseLocation.SHARED);
+                            DatabaseLocation.SHARED, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
 
                     connectionProperties = new DBMSConnectionProperties();
                     connectionProperties.setType((DBMSType) dbmsTypeDropDown.getSelectedItem());

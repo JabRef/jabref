@@ -24,11 +24,7 @@ import static org.mockito.Mockito.mock;
  * To test the Highlighting Feature, an instance of LayoutEntry will be instantiated via Layout and LayoutHelper.
  * With these instance the doLayout() Method is called several times for each test case.
  * To simulate a search, a BibEntry will be created, which will be used by LayoutEntry.
- * The definition of the search is set by
- * <p/>
- * LayoutEntry.setWordsToHighlight(words); and
- * Globals.prefs.putBoolean("caseSensitiveSearch", false);
- * <p/>
+ *
  * There are five test cases:
  * - The shown result text has no words which should be highlighted.
  * - There is one word which will be highlighted ignoring case sensitivity.

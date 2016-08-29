@@ -123,7 +123,7 @@ public class Benchmarks {
     @Benchmark
     public boolean keywordGroupContains() throws ParseException {
         KeywordGroup group = new KeywordGroup("testGroup", "keyword", "testkeyword", false, false,
-                GroupHierarchyType.INDEPENDENT, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+                GroupHierarchyType.INDEPENDENT, ", ");
         return group.containsAll(database.getEntries());
     }
 
