@@ -5,7 +5,6 @@ import java.io.StringReader;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -50,10 +49,6 @@ public class LayoutEntryTest {
      */
     @Before
     public void setUp() {
-        if (Globals.prefs == null) {
-            Globals.prefs = JabRefPreferences.getInstance();
-            Globals.prefs.putBoolean("highLightWords", Boolean.TRUE);
-        }
 
         // create Bibtext Entry
 
@@ -87,7 +82,7 @@ public class LayoutEntryTest {
     public String layout(String layoutFile, BibEntry entry, Optional<Pattern> highlightPattern) throws IOException {
         StringReader sr = new StringReader(layoutFile.replace("__NEWLINE__", "\n"));
         Layout layout = new LayoutHelper(sr,
-                LayoutFormatterPreferences.fromPreferences(Globals.prefs, mock(JournalAbbreviationLoader.class)))
+                JabRefPreferences.getInstance().getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)))
                         .getLayoutFromText();
 
         return layout.doLayout(entry, null, highlightPattern);

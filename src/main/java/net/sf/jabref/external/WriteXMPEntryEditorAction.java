@@ -19,7 +19,6 @@ import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -55,14 +54,16 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
         List<File> files = new ArrayList<>();
 
         // First check the (legacy) "pdf" field:
-        entry.getFieldOptional(FieldName.PDF).ifPresent(pdf -> FileUtil
-                .expandFilename(pdf, panel.getBibDatabaseContext().getFileDirectory("pdf")).ifPresent(files::add));
+        entry.getField(FieldName.PDF)
+                .ifPresent(pdf -> FileUtil.expandFilename(pdf, panel.getBibDatabaseContext()
+                        .getFileDirectory(FieldName.PDF, Globals.prefs.getFileDirectoryPreferences()))
+                .ifPresent(files::add));
 
         // Then check the "file" field:
-        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
+        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         if (entry.hasField(FieldName.FILE)) {
             FileListTableModel tm = new FileListTableModel();
-            entry.getFieldOptional(FieldName.FILE).ifPresent(tm::setContent);
+            entry.getField(FieldName.FILE).ifPresent(tm::setContent);
             for (int j = 0; j < tm.getRowCount(); j++) {
                 FileListEntry flEntry = tm.getEntry(j);
                 if ((flEntry.type.isPresent()) && "pdf".equalsIgnoreCase(flEntry.type.get().getName())) {
@@ -113,8 +114,7 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
 
                     } else {
                         try {
-                            XMPUtil.writeXMP(file, entry, panel.getDatabase(),
-                                    XMPPreferences.fromPreferences(Globals.prefs));
+                            XMPUtil.writeXMP(file, entry, panel.getDatabase(), Globals.prefs.getXMPPreferences());
                             if (files.size() == 1) {
                                 message = Localization.lang("Wrote XMP-metadata");
                             }

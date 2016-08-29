@@ -8,7 +8,6 @@ import java.util.stream.Collectors;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.importer.FetcherException;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
 import net.sf.jabref.logic.importer.fetcher.DOItoBibTeX;
 import net.sf.jabref.logic.importer.fetcher.IsbnFetcher;
@@ -51,7 +50,7 @@ public class FetchAndMergeEntry {
 
     public FetchAndMergeEntry(BibEntry entry, BasePanel panel, List<String> fields) {
         for (String field : fields) {
-            Optional<String> fieldContent = entry.getFieldOptional(field);
+            Optional<String> fieldContent = entry.getField(field);
 
             // Get better looking name for status messages
             String type = FieldName.getDisplayName(field);
@@ -61,7 +60,7 @@ public class FetchAndMergeEntry {
                 // Get entry based on field
                 if (FieldName.DOI.equals(field)) {
                     fetchedEntry = new DOItoBibTeX().getEntryFromDOI(fieldContent.get(),
-                            ImportFormatPreferences.fromPreferences(Globals.prefs));
+                            Globals.prefs.getImportFormatPreferences());
                 } else if (FieldName.ISBN.equals(field)) {
                     try {
                         fetchedEntry = new IsbnFetcher(ImportFormatPreferences.fromPreferences(Globals.prefs)).performSearchById(fieldContent.get());

@@ -21,6 +21,7 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.FileDirectoryPreferences;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
@@ -165,12 +166,13 @@ public class FileUtil {
      * @param databaseContext The database this file belongs to.
      * @param name     The filename, may also be a relative path to the file
      */
-    public static Optional<File> expandFilename(final BibDatabaseContext databaseContext, String name) {
+    public static Optional<File> expandFilename(final BibDatabaseContext databaseContext, String name,
+            FileDirectoryPreferences fileDirectoryPreferences) {
         Optional<String> extension = getFileExtension(name);
         // Find the default directory for this field type, if any:
-        List<String> directories = databaseContext.getFileDirectory(extension.orElse(null));
+        List<String> directories = databaseContext.getFileDirectory(extension.orElse(null), fileDirectoryPreferences);
         // Include the standard "file" directory:
-        List<String> fileDir = databaseContext.getFileDirectory();
+        List<String> fileDir = databaseContext.getFileDirectory(fileDirectoryPreferences);
         // Include the directory of the BIB file:
         List<String> al = new ArrayList<>();
         for (String dir : directories) {
@@ -355,7 +357,7 @@ public class FileUtil {
 
         List<File> result = new ArrayList<>();
         for (BibEntry entry : bes) {
-            entry.getFieldOptional(FieldName.FILE).ifPresent(fileField -> {
+            entry.getField(FieldName.FILE).ifPresent(fileField -> {
                 List<ParsedFileField> fileList = FileField.parse(fileField);
                 for (ParsedFileField file : fileList) {
                     expandFilename(file.getLink(), fileDirs).ifPresent(result::add);
@@ -377,7 +379,8 @@ public class FileUtil {
      */
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry,
             String fileNamePattern, LayoutFormatterPreferences prefs) {
-        String targetName = entry.getCiteKeyOptional().orElse("default");
+        String targetName = null;
+
         StringReader sr = new StringReader(fileNamePattern);
         Layout layout = null;
         try {
@@ -387,6 +390,10 @@ public class FileUtil {
         }
         if (layout != null) {
             targetName = layout.doLayout(entry, database);
+        }
+
+        if ((targetName == null) || targetName.isEmpty()) {
+            targetName = entry.getCiteKeyOptional().orElse("default");
         }
         //Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);

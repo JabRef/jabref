@@ -166,14 +166,14 @@ class OOCalcDatabase {
                 addTableCell(result, row, getField(e, FieldName.ORGANIZATION));
                 addTableCell(result, row, getField(e, FieldName.SCHOOL));
                 addTableCell(result, row, getField(e, FieldName.ANNOTE));
-                addTableCell(result, row, getField(e, "assignee"));
-                addTableCell(result, row, getField(e, "day"));
-                addTableCell(result, row, getField(e, "dayfiled"));
-                addTableCell(result, row, getField(e, "monthfiled"));
-                addTableCell(result, row, getField(e, "yearfiled"));
+                addTableCell(result, row, getField(e, FieldName.ASSIGNEE));
+                addTableCell(result, row, getField(e, FieldName.DAY));
+                addTableCell(result, row, getField(e, FieldName.DAYFILED));
+                addTableCell(result, row, getField(e, FieldName.MONTHFILED));
+                addTableCell(result, row, getField(e, FieldName.YEARFILED));
                 addTableCell(result, row, getField(e, FieldName.LANGUAGE));
-                addTableCell(result, row, getField(e, "nationality"));
-                addTableCell(result, row, getField(e, "revision"));
+                addTableCell(result, row, getField(e, FieldName.NATIONALITY));
+                addTableCell(result, row, getField(e, FieldName.REVISION));
                 addTableCell(result, row, "");
                 addTableCell(result, row, "");
                 addTableCell(result, row, "");
@@ -193,7 +193,7 @@ class OOCalcDatabase {
     }
 
     private static String getField(BibEntry e, String field) {
-        return e.getFieldOptional(field).orElse("");
+        return e.getField(field).orElse("");
     }
 
     private static void addTableCell(Document doc, Element parent, String content) {

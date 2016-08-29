@@ -90,8 +90,8 @@ public class DBMSSynchronizerTest {
 
         List<BibEntry> actualEntries = dbmsProcessor.getSharedEntries();
         Assert.assertEquals(1, actualEntries.size());
-        Assert.assertEquals(expectedEntry.getFieldOptional("author"), actualEntries.get(0).getFieldOptional("author"));
-        Assert.assertEquals("The nano processor1", actualEntries.get(0).getFieldOptional("title").get());
+        Assert.assertEquals(expectedEntry.getField("author"), actualEntries.get(0).getField("author"));
+        Assert.assertEquals("The nano processor1", actualEntries.get(0).getField("title").get());
 
     }
 
@@ -191,7 +191,7 @@ public class DBMSSynchronizerTest {
 
         dbmsSynchronizer.applyMetaData();
 
-        Assert.assertEquals("wirthlin, michael j1", bibEntry.getFieldOptional("author").get());
+        Assert.assertEquals("wirthlin, michael j1", bibEntry.getField("author").get());
 
     }
 

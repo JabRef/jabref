@@ -15,7 +15,6 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
-import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
@@ -67,7 +66,7 @@ public class SendAsEMailAction extends AbstractWorker {
 
         // write the entries using sw, which is used later to form the email content
         BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
-                new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)), true);
+                new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()), true);
 
         for (BibEntry entry : bes) {
             try {
@@ -83,8 +82,8 @@ public class SendAsEMailAction extends AbstractWorker {
         //   the unofficial "mailto:attachment" property
         boolean openFolders = JabRefPreferences.getInstance().getBoolean(JabRefPreferences.OPEN_FOLDERS_OF_ATTACHED_FILES);
 
-        List<File> fileList = FileUtil.getListOfLinkedFiles(bes,
-                frame.getCurrentBasePanel().getBibDatabaseContext().getFileDirectory());
+        List<File> fileList = FileUtil.getListOfLinkedFiles(bes, frame.getCurrentBasePanel().getBibDatabaseContext()
+                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences()));
         for (File f : fileList) {
             attachments.add(f.getPath());
             if (openFolders) {

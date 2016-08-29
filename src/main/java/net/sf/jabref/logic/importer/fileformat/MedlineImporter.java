@@ -178,7 +178,7 @@ public class MedlineImporter extends ImportFormat {
         Map<String, String> fields = new HashMap<>();
         if (currentArticle.getBookDocument() != null) {
             BookDocument bookDocument = currentArticle.getBookDocument();
-            fields.put("pmid", bookDocument.getPMID().getContent());
+            fields.put(FieldName.PMID, bookDocument.getPMID().getContent());
             if (bookDocument.getDateRevised() != null) {
                 DateRevised dateRevised = bookDocument.getDateRevised();
                 addDateRevised(fields, dateRevised);
@@ -335,7 +335,7 @@ public class MedlineImporter extends ImportFormat {
                         convertToDateFormat(dateCompleted.getYear(), dateCompleted.getMonth(), dateCompleted.getDay()));
             }
 
-            fields.put("pmid", medlineCitation.getPMID().getContent());
+            fields.put(FieldName.PMID, medlineCitation.getPMID().getContent());
             fields.put(FieldName.OWNER, medlineCitation.getOwner());
 
             addArticleInformation(fields, medlineCitation.getArticle().getContent());

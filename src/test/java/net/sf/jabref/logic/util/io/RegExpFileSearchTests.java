@@ -1,28 +1,22 @@
-package net.sf.jabref.external;
+package net.sf.jabref.logic.util.io;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.layout.format.NameFormatter;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -35,7 +29,6 @@ public class RegExpFileSearchTests {
 
     @Before
     public void setUp() throws IOException {
-        Globals.prefs = JabRefPreferences.getInstance();
 
         StringReader reader = new StringReader(
                 "@ARTICLE{HipKro03," + "\n" + "  author = {Eric von Hippel and Georg von Krogh}," + "\n"
@@ -46,7 +39,7 @@ public class RegExpFileSearchTests {
                         + "\n" + "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n"
                         + "  issn = {1526-5455}," + "\n" + "  publisher = {INFORMS}" + "\n" + "}");
 
-        BibtexParser parser = new BibtexParser(reader, ImportFormatPreferences.fromPreferences(Globals.prefs));
+        BibtexParser parser = new BibtexParser(reader, JabRefPreferences.getInstance().getImportFormatPreferences());
         ParserResult result = null;
 
         result = parser.parse();
@@ -72,7 +65,7 @@ public class RegExpFileSearchTests {
         List<File> dirs = Arrays.asList(new File(filesDirectory));
 
         //when
-        Map<BibEntry, java.util.List<File>> result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs,
+        Map<BibEntry, List<File>> result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs,
                 "**/[bibtexkey].*\\\\.[extension]");
 
         //then
@@ -102,33 +95,6 @@ public class RegExpFileSearchTests {
     }
 
     @Test
-    @Ignore
-    public void testUserFieldAndFormat() {
-
-        List<String> names = Globals.prefs.getStringList(NameFormatter.NAME_FORMATER_KEY);
-
-        List<String> formats = Globals.prefs.getStringList(NameFormatter.NAME_FORMATTER_VALUE);
-
-        try {
-
-            List<String> f = new LinkedList<>(formats);
-            List<String> n = new LinkedList<>(names);
-
-            n.add("testMe123454321");
-            f.add("*@*@test");
-
-            Globals.prefs.putStringList(NameFormatter.NAME_FORMATER_KEY, n);
-            Globals.prefs.putStringList(NameFormatter.NAME_FORMATTER_VALUE, f);
-
-            assertEquals("testtest", RegExpFileSearch.getFieldAndFormat("[author:testMe123454321]", entry, database));
-
-        } finally {
-            Globals.prefs.putStringList(NameFormatter.NAME_FORMATER_KEY, names);
-            Globals.prefs.putStringList(NameFormatter.NAME_FORMATTER_VALUE, formats);
-        }
-    }
-
-    @Test
     public void testExpandBrackets() {
 
         assertEquals("", RegExpFileSearch.expandBrackets("", entry, database));
@@ -147,11 +113,6 @@ public class RegExpFileSearchTests {
         assertEquals(
                 "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
                 RegExpFileSearch.expandBrackets("[author] have published [title] in [journal].", entry, database));
-    }
-
-    @After
-    public void tearDown(){
-        Globals.prefs = null;
     }
 
 }

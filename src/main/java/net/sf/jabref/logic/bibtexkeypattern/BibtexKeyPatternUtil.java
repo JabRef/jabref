@@ -551,7 +551,7 @@ public class BibtexKeyPatternUtil {
                  * form "pureauth..." which does not do this fallback
                  * substitution of editor.
                  */
-                String authString = entry.getFieldOptional(FieldName.AUTHOR)
+                String authString = entry.getField(FieldName.AUTHOR)
                         .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
 
                 if (val.startsWith("pure")) {
@@ -561,7 +561,7 @@ public class BibtexKeyPatternUtil {
                 }
 
                 if (authString.isEmpty()) {
-                    authString = entry.getFieldOptional(FieldName.EDITOR)
+                    authString = entry.getField(FieldName.EDITOR)
                             .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
                 }
 
@@ -631,39 +631,39 @@ public class BibtexKeyPatternUtil {
                 // Gather all markers starting with "ed" here, so we
                 // don't have to check all the time.
                 if ("edtr".equals(val)) {
-                    return firstAuthor(entry.getFieldOptional(FieldName.EDITOR).orElse(""));
+                    return firstAuthor(entry.getField(FieldName.EDITOR).orElse(""));
                 } else if ("edtrForeIni".equals(val)) {
-                    return firstAuthorForenameInitials(entry.getFieldOptional(FieldName.EDITOR).orElse(""));
+                    return firstAuthorForenameInitials(entry.getField(FieldName.EDITOR).orElse(""));
                 } else if ("editors".equals(val)) {
-                    return allAuthors(entry.getFieldOptional(FieldName.EDITOR).orElse(""));
+                    return allAuthors(entry.getField(FieldName.EDITOR).orElse(""));
                     // Last author's last name
                 } else if ("editorLast".equals(val)) {
-                    return lastAuthor(entry.getFieldOptional(FieldName.EDITOR).orElse(""));
+                    return lastAuthor(entry.getField(FieldName.EDITOR).orElse(""));
                 } else if ("editorLastForeIni".equals(val)) {
-                    return lastAuthorForenameInitials(entry.getFieldOptional(FieldName.EDITOR).orElse(""));
+                    return lastAuthorForenameInitials(entry.getField(FieldName.EDITOR).orElse(""));
                 } else if ("editorIni".equals(val)) {
-                    return oneAuthorPlusIni(entry.getFieldOptional(FieldName.EDITOR).orElse(""));
+                    return oneAuthorPlusIni(entry.getField(FieldName.EDITOR).orElse(""));
                 } else if (val.matches("edtrIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
-                    String s = authIniN(entry.getFieldOptional(FieldName.EDITOR).orElse(""), num);
+                    String s = authIniN(entry.getField(FieldName.EDITOR).orElse(""), num);
                     return s == null ? "" : s;
                 } else if (val.matches("edtr[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
-                    String s = authNofMth(entry.getFieldOptional(FieldName.EDITOR).orElse(""),
+                    String s = authNofMth(entry.getField(FieldName.EDITOR).orElse(""),
                             Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]) - 1);
                     return s == null ? "" : s;
                 } else if ("edtr.edtr.ea".equals(val)) {
-                    String s = authAuthEa(entry.getFieldOptional(FieldName.EDITOR).orElse(""));
+                    String s = authAuthEa(entry.getField(FieldName.EDITOR).orElse(""));
                     return s == null ? "" : s;
                 } else if ("edtrshort".equals(val)) {
-                    String s = authshort(entry.getFieldOptional(FieldName.EDITOR).orElse(""));
+                    String s = authshort(entry.getField(FieldName.EDITOR).orElse(""));
                     return s == null ? "" : s;
                 }
                 // authN. First N chars of the first author's last
                 // name.
                 else if (val.matches("edtr\\d+")) {
-                    String fa = firstAuthor(entry.getFieldOptional(FieldName.EDITOR).orElse(""));
+                    String fa = firstAuthor(entry.getField(FieldName.EDITOR).orElse(""));
                     if (fa == null) {
                         return "";
                     }
@@ -678,17 +678,17 @@ public class BibtexKeyPatternUtil {
                     return getField(entry, val);
                 }
             } else if ("firstpage".equals(val)) {
-                return firstPage(entry.getFieldOptional(FieldName.PAGES).orElse(""));
+                return firstPage(entry.getField(FieldName.PAGES).orElse(""));
             } else if ("lastpage".equals(val)) {
-                return lastPage(entry.getFieldOptional(FieldName.PAGES).orElse(""));
+                return lastPage(entry.getField(FieldName.PAGES).orElse(""));
             } else if ("shorttitle".equals(val)) {
-                return getTitleWords(3, entry.getFieldOptional(FieldName.TITLE).orElse(""));
+                return getTitleWords(3, entry.getField(FieldName.TITLE).orElse(""));
             } else if ("shorttitleINI".equals(val)) {
                 return keepLettersAndDigitsOnly(
-                        applyModifiers(getTitleWordsWithSpaces(3, entry.getFieldOptional(FieldName.TITLE).orElse("")),
+                        applyModifiers(getTitleWordsWithSpaces(3, entry.getField(FieldName.TITLE).orElse("")),
                                 new String[] {"abbr"}, 0));
             } else if ("veryshorttitle".equals(val)) {
-                return getTitleWords(1, entry.getFieldOptional(FieldName.TITLE).orElse(""));
+                return getTitleWords(1, entry.getField(FieldName.TITLE).orElse(""));
             } else if ("shortyear".equals(val)) {
                 String ss = entry.getFieldOrAlias(FieldName.YEAR).orElse("");
                 if (ss.isEmpty()) {
@@ -846,8 +846,7 @@ public class BibtexKeyPatternUtil {
         if (authorList.isEmpty()) {
             return "";
         }
-        String s = authorList.getAuthor(0).getLast();
-        return s == null ? "" : s;
+        return authorList.getAuthor(0).getLast().orElse("");
 
     }
 
@@ -867,8 +866,7 @@ public class BibtexKeyPatternUtil {
         if (authorList.isEmpty()) {
             return "";
         }
-        String s = authorList.getAuthor(0).getFirstAbbr();
-        return s == null ? "" : s.substring(0, 1);
+        return authorList.getAuthor(0).getFirstAbbr().map(s -> s.substring(0, 1)).orElse("");
     }
 
     /**
@@ -888,15 +886,10 @@ public class BibtexKeyPatternUtil {
         if (authorList.isEmpty()) {
             return "";
         }
-        String vonAuthor = authorList.getAuthor(0).getVon().replaceAll(" ", "");
+
         StringBuilder stringBuilder = new StringBuilder();
-        if (vonAuthor != null) {
-            stringBuilder.append(vonAuthor);
-        }
-        vonAuthor = authorList.getAuthor(0).getLast();
-        if (vonAuthor != null) {
-            stringBuilder.append(vonAuthor);
-        }
+        authorList.getAuthor(0).getVon().ifPresent(vonAuthor -> stringBuilder.append(vonAuthor.replaceAll(" ", "")));
+        authorList.getAuthor(0).getLast().ifPresent(stringBuilder::append);
         return stringBuilder.toString();
     }
 
@@ -932,8 +925,8 @@ public class BibtexKeyPatternUtil {
         if (authorList.isEmpty()) {
             return "";
         }
-        String s = authorList.getAuthor(authorList.getNumberOfAuthors() - 1).getFirstAbbr();
-        return s == null ? "" : s.substring(0, 1);
+        return authorList.getAuthor(authorList.getNumberOfAuthors() - 1).getFirstAbbr().map(s -> s.substring(0, 1))
+                .orElse("");
     }
 
     /**

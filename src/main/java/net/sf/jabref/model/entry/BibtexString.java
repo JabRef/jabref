@@ -107,6 +107,9 @@ public class BibtexString implements Cloneable {
         type = Type.get(name);
     }
 
+    /*
+     * Never returns null
+     */
     public String getContent() {
         return content == null ? "" : content;
     }

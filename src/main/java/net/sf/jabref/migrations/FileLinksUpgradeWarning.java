@@ -65,7 +65,8 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         offerChangeDatabase = linksFound(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
         // If the "file" directory is not set, offer to migrate pdf/ps dir:
         offerSetFileDir = !Globals.prefs.hasKey(FieldName.FILE + FileLinkPreferences.DIR_SUFFIX)
-                && (Globals.prefs.hasKey("pdfDirectory") || Globals.prefs.hasKey("psDirectory"));
+                && (Globals.prefs.hasKey(FieldName.PDF + FileLinkPreferences.DIR_SUFFIX)
+                        || Globals.prefs.hasKey(FieldName.PS + FileLinkPreferences.DIR_SUFFIX));
 
         // First check if this warning is disabled:
         return Globals.prefs.getBoolean(JabRefPreferences.SHOW_FILE_LINKS_UPGRADE_WARNING) && isThereSomethingToBeDone();
@@ -114,10 +115,10 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             formBuilder.add(changeDatabase).xy(1, row);
         }
         if (offerSetFileDir) {
-            if (Globals.prefs.hasKey("pdfDirectory")) {
-                fileDir.setText(Globals.prefs.get("pdfDirectory"));
+            if (Globals.prefs.hasKey(FieldName.PDF + FileLinkPreferences.DIR_SUFFIX)) {
+                fileDir.setText(Globals.prefs.get(FieldName.PDF + FileLinkPreferences.DIR_SUFFIX));
             } else {
-                fileDir.setText(Globals.prefs.get("psDirectory"));
+                fileDir.setText(Globals.prefs.get(FieldName.PS + FileLinkPreferences.DIR_SUFFIX));
             }
             JPanel builderPanel = new JPanel();
             builderPanel.add(setFileDir);

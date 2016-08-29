@@ -25,10 +25,8 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -140,7 +138,10 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getFileDirectory()).toString();
+            destFilename = FileUtil
+                    .shortenFileName(new File(fileName),
+                            panel.getBibDatabaseContext().getFileDirectory(Globals.prefs.getFileDirectoryPreferences()))
+                    .toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
@@ -190,7 +191,10 @@ public class DroppedFileHandler {
         NamedCompound edits = new NamedCompound(Localization.lang("Drop %0", fileType.getExtension()));
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getFileDirectory()).toString();
+            destFilename = FileUtil
+                    .shortenFileName(new File(fileName),
+                            panel.getBibDatabaseContext().getFileDirectory(Globals.prefs.getFileDirectoryPreferences()))
+                    .toString();
         } else {
             destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
             if (copyRadioButton.isSelected()) {
@@ -218,7 +222,7 @@ public class DroppedFileHandler {
 
         List<BibEntry> xmpEntriesInFile;
         try {
-            xmpEntriesInFile = XMPUtil.readXMP(fileName, XMPPreferences.fromPreferences(Globals.prefs));
+            xmpEntriesInFile = XMPUtil.readXMP(fileName, Globals.prefs.getXMPPreferences());
         } catch (IOException e) {
             LOGGER.warn("Problem reading XMP", e);
             return false;
@@ -264,9 +268,12 @@ public class DroppedFileHandler {
         String destFilename;
 
         if (linkInPlace.isSelected()) {
-            destFilename = FileUtil.shortenFileName(new File(fileName), panel.getBibDatabaseContext().getFileDirectory()).toString();
+            destFilename = FileUtil
+                    .shortenFileName(new File(fileName),
+                            panel.getBibDatabaseContext().getFileDirectory(Globals.prefs.getFileDirectoryPreferences()))
+                    .toString();
         } else {
-            if (renameCheckBox.isSelected()) {
+            if (renameCheckBox.isSelected() || (single == null)) {
                 destFilename = fileName;
             } else {
                 destFilename = single.getCiteKey() + "." + fileType.getExtension();
@@ -301,7 +308,7 @@ public class DroppedFileHandler {
             BibDatabase database) {
 
         String dialogTitle = Localization.lang("Link to file %0", linkFileName);
-        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
+        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {
@@ -337,7 +344,7 @@ public class DroppedFileHandler {
         // Determine which name to suggest:
         String targetName = FileUtil.createFileNameFromPattern(database, entry,
                 Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
-                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader));
+                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader));
 
         renameToTextBox.setText(targetName.concat(".").concat(fileType.getExtension()));
 
@@ -381,14 +388,15 @@ public class DroppedFileHandler {
     private void doLink(BibEntry entry, ExternalFileType fileType, String filename,
                         boolean avoidDuplicate, NamedCompound edits) {
 
-        Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
+        Optional<String> oldValue = entry.getField(FieldName.FILE);
         FileListTableModel tm = new FileListTableModel();
         oldValue.ifPresent(tm::setContent);
 
         // If avoidDuplicate==true, we should check if this file is already linked:
         if (avoidDuplicate) {
             // For comparison, find the absolute filename:
-            List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
+            List<String> dirs = panel.getBibDatabaseContext()
+                    .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
             String absFilename;
             if (new File(filename).isAbsolute() || dirs.isEmpty()) {
                 absFilename = filename;
@@ -448,7 +456,7 @@ public class DroppedFileHandler {
      */
     private boolean doMove(String fileName, String destFilename,
                            NamedCompound edits) {
-        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
+        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {
@@ -498,7 +506,7 @@ public class DroppedFileHandler {
      */
     private boolean doCopy(String fileName, String toFile, NamedCompound edits) {
 
-        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
+        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {

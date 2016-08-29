@@ -57,19 +57,19 @@ public class GVKParserTest {
             Assert.assertEquals(5, entries.size());
 
             BibEntry entry = entries.get(0);
-            Assert.assertEquals(Optional.empty(), entry.getFieldOptional("subtitle"));
+            Assert.assertEquals(Optional.empty(), entry.getField("subtitle"));
 
             entry = entries.get(1);
-            Assert.assertEquals(Optional.of("C"), entry.getFieldOptional("subtitle"));
+            Assert.assertEquals(Optional.of("C"), entry.getField("subtitle"));
 
             entry = entries.get(2);
-            Assert.assertEquals(Optional.of("Word"), entry.getFieldOptional("subtitle"));
+            Assert.assertEquals(Optional.of("Word"), entry.getField("subtitle"));
 
             entry = entries.get(3);
-            Assert.assertEquals(Optional.of("Word1 word2"), entry.getFieldOptional("subtitle"));
+            Assert.assertEquals(Optional.of("Word1 word2"), entry.getField("subtitle"));
 
             entry = entries.get(4);
-            Assert.assertEquals(Optional.of("Word1 word2"), entry.getFieldOptional("subtitle"));
+            Assert.assertEquals(Optional.of("Word1 word2"), entry.getField("subtitle"));
         }
     }
 }

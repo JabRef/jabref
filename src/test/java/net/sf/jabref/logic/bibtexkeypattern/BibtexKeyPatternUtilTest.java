@@ -43,7 +43,7 @@ public class BibtexKeyPatternUtilTest {
 
     @Before
     public void setUp() {
-        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
+        importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
         BibtexKeyPatternUtil.setDataBase(new BibDatabase());
     }
 
@@ -406,6 +406,14 @@ public class BibtexKeyPatternUtilTest {
                 .firstAuthorVonAndLast(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_1));
         assertEquals("vanderAalst", BibtexKeyPatternUtil
                 .firstAuthorVonAndLast(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_WITH_VAN_COUNT_2));
+    }
+
+    @Test
+    public void firstAuthorVonAndLastNoVonInName() {
+        assertEquals("Newton",
+                BibtexKeyPatternUtil.firstAuthorVonAndLast(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_1));
+        assertEquals("Newton",
+                BibtexKeyPatternUtil.firstAuthorVonAndLast(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2));
     }
 
     /**

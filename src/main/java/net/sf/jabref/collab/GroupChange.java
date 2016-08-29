@@ -27,9 +27,9 @@ class GroupChange extends Change {
 
     @Override
     public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
-        final GroupTreeNode root = panel.getBibDatabaseContext().getMetaData().getGroups();
+        final GroupTreeNode root = panel.getBibDatabaseContext().getMetaData().getGroups().orElse(null);
         final UndoableModifySubtree undo = new UndoableModifySubtree(
-                new GroupTreeNodeViewModel(panel.getBibDatabaseContext().getMetaData().getGroups()),
+                new GroupTreeNodeViewModel(panel.getBibDatabaseContext().getMetaData().getGroups().orElse(null)),
                 new GroupTreeNodeViewModel(root), Localization.lang("Modified groups"));
         root.removeAllChildren();
         if (changedGroups == null) {

@@ -43,7 +43,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -151,7 +150,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private JComboBox<BibtexEntryTypeWrapper> comboBoxEntryTypeSelection;
     private JProgressBar progressBarSearching;
     private JProgressBar progressBarImporting;
-    private JFileChooser fileChooser;
 
     private MouseListener treeMouseListener;
     private Action actionSelectAll;

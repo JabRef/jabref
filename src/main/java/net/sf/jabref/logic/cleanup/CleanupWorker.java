@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.FileDirectoryPreferences;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
@@ -16,14 +17,16 @@ public class CleanupWorker {
     private final BibDatabaseContext databaseContext;
     private final String fileNamePattern;
     private final LayoutFormatterPreferences prefs;
+    private final FileDirectoryPreferences fileDirectoryPreferences;
     private int unsuccessfulRenames;
 
 
-    public CleanupWorker(BibDatabaseContext databaseContext, String fileNamePattern,
-            LayoutFormatterPreferences prefs) {
+    public CleanupWorker(BibDatabaseContext databaseContext, String fileNamePattern, LayoutFormatterPreferences prefs,
+            FileDirectoryPreferences fileDirectoryPreferences) {
         this.databaseContext = databaseContext;
         this.fileNamePattern = fileNamePattern;
         this.prefs = prefs;
+        this.fileDirectoryPreferences = fileDirectoryPreferences;
     }
 
     public int getUnsuccessfulRenames() {
@@ -60,14 +63,14 @@ public class CleanupWorker {
             jobs.add(new FileLinksCleanup());
         }
         if (preset.isMovePDF()) {
-            jobs.add(new MoveFilesCleanup(databaseContext));
+            jobs.add(new MoveFilesCleanup(databaseContext, fileDirectoryPreferences));
         }
         if (preset.isMakePathsRelative()) {
-            jobs.add(new RelativePathsCleanup(databaseContext));
+            jobs.add(new RelativePathsCleanup(databaseContext, fileDirectoryPreferences));
         }
         if (preset.isRenamePDF()) {
             RenamePdfCleanup cleaner = new RenamePdfCleanup(preset.isRenamePdfOnlyRelativePaths(), databaseContext,
-                    fileNamePattern, prefs);
+                    fileNamePattern, prefs, fileDirectoryPreferences);
             jobs.add(cleaner);
             unsuccessfulRenames += cleaner.getUnsuccessfulRenames();
         }

@@ -52,7 +52,6 @@ import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.FindFullTextAction;
-import net.sf.jabref.external.RegExpFileSearch;
 import net.sf.jabref.external.SynchronizeFileField;
 import net.sf.jabref.external.WriteXMPAction;
 import net.sf.jabref.gui.actions.Actions;
@@ -96,7 +95,6 @@ import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
-import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.logic.exporter.FileSaveSession;
@@ -106,12 +104,12 @@ import net.sf.jabref.logic.exporter.SaveSession;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
-import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.io.RegExpFileSearch;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.DatabaseLocation;
@@ -226,25 +224,25 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         setupActions();
 
-        File file = bibDatabaseContext.getDatabaseFile();
+        Optional<File> file = bibDatabaseContext.getDatabaseFile();
 
         // ensure that at each addition of a new entry, the entry is added to the groups interface
         this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
 
-        if (file == null) {
+        if (file.isPresent()) {
             if (bibDatabaseContext.getDatabase().hasEntries()) {
-                // if the database is not empty and no file is assigned,
-                // the database came from an import and has to be treated somehow
-                // -> mark as changed
-                this.baseChanged = true;
+                // Register so we get notifications about outside changes to the file.
+                try {
+                    fileMonitorHandle = Globals.getFileUpdateMonitor().addUpdateListener(this, file.get());
+                } catch (IOException ex) {
+                    LOGGER.warn("Could not register FileUpdateMonitor", ex);
+                }
             }
         } else {
-            // Register so we get notifications about outside changes to the file.
-            try {
-                fileMonitorHandle = Globals.getFileUpdateMonitor().addUpdateListener(this, file);
-            } catch (IOException ex) {
-                LOGGER.warn("Could not register FileUpdateMonitor", ex);
-            }
+            // if the database is not empty and no file is assigned,
+            // the database came from an import and has to be treated somehow
+            // -> mark as changed
+            this.baseChanged = true;
         }
     }
 
@@ -258,7 +256,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         DatabaseLocation databaseLocation = this.bibDatabaseContext.getLocation();
 
         if (databaseLocation == DatabaseLocation.LOCAL) {
-            if (this.bibDatabaseContext.getDatabaseFile() == null) {
+            if (this.bibDatabaseContext.getDatabaseFile().isPresent()) {
+                // check if file is modified
+                String changeFlag = isModified() ? "*" : "";
+                title.append(this.bibDatabaseContext.getDatabaseFile().get().getName()).append(changeFlag);
+            } else {
                 title.append(GUIGlobals.UNTITLED_TITLE);
 
                 if (getDatabase().hasEntries()) {
@@ -268,10 +270,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     // This also happens internally at basepanel to ensure consistency line 224
                     title.append('*');
                 }
-            } else {
-                // check if file is modified
-                String changeFlag = isModified() ? "*" : "";
-                title.append(this.bibDatabaseContext.getDatabaseFile().getName()).append(changeFlag);
             }
         } else if (databaseLocation == DatabaseLocation.SHARED) {
             title.append(this.bibDatabaseContext.getDBSynchronizer().getDBName() + " [shared]");
@@ -479,7 +477,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 for (BibEntry entry : entries) {
                     bes = entry;
                     BibtexKeyPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), bibDatabaseContext.getDatabase(),
-                            bes, BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
+                            bes, Globals.prefs.getBibtexKeyPatternPreferences());
                     ce.addEdit(new UndoableKeyChange(bibDatabaseContext.getDatabase(), bes, (String) oldvals.get(bes),
                             bes.getCiteKeyOptional().orElse(null)));
                 }
@@ -538,7 +536,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         actions.put(Actions.OPEN_FOLDER, (BaseAction) () -> JabRefExecutorService.INSTANCE.execute(() -> {
             final List<File> files = FileUtil.getListOfLinkedFiles(mainTable.getSelectedEntries(),
-                    bibDatabaseContext.getFileDirectory());
+                    bibDatabaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences()));
             for (final File f : files) {
                 try {
                     JabRefDesktop.openFolderAndSelectFile(f.getAbsolutePath());
@@ -549,7 +547,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }));
 
         actions.put(Actions.OPEN_CONSOLE, (BaseAction) () -> JabRefDesktop
-                .openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile()));
+                .openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null)));
 
         actions.put(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, (BaseAction) () -> {
             DBMSSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBSynchronizer();
@@ -912,7 +910,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             Layout layout;
             try {
                 layout = new LayoutHelper(sr,
-                        LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader))
+                        Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader))
                                 .getLayoutFromText();
             } catch (IOException e) {
                 LOGGER.info("Could not get layout", e);
@@ -962,14 +960,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
                 return;
             }
-            FileListTableModel tableModel = new FileListTableModel();
-            entry.getFieldOptional(FieldName.FILE).ifPresent(tableModel::setContent);
-            if (tableModel.getRowCount() == 0) {
-                // content in bibtex field is not readable
+            FileListTableModel fileListTableModel = new FileListTableModel();
+            entry.getField(FieldName.FILE).ifPresent(fileListTableModel::setContent);
+            if (fileListTableModel.getRowCount() == 0) {
+                // content in BibTeX field is not readable
                 new SearchAndOpenFile(entry, BasePanel.this).searchAndOpen();
                 return;
             }
-            FileListEntry flEntry = tableModel.getEntry(0);
+            FileListEntry flEntry = fileListTableModel.getEntry(0);
             ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), entry, "", flEntry.link,
                     flEntry.type.get().getIcon(), bibDatabaseContext, flEntry.type);
             item.openLink();
@@ -1847,10 +1845,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         } else if (baseChanged && !nonUndoableChange) {
             baseChanged = false;
-            if (getBibDatabaseContext().getDatabaseFile() == null) {
-                frame.setTabTitle(this, GUIGlobals.UNTITLED_TITLE, null);
+            if (getBibDatabaseContext().getDatabaseFile().isPresent()) {
+                frame.setTabTitle(this, getTabTitle(),
+                        getBibDatabaseContext().getDatabaseFile().get().getAbsolutePath());
             } else {
-                frame.setTabTitle(this, getTabTitle(), getBibDatabaseContext().getDatabaseFile().getAbsolutePath());
+                frame.setTabTitle(this, GUIGlobals.UNTITLED_TITLE, null);
             }
         }
         frame.setWindowTitle();
@@ -1938,7 +1937,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 Optional<String> oldKey = bes.getCiteKeyOptional();
                 if (!(oldKey.isPresent()) || oldKey.get().isEmpty()) {
                     BibtexKeyPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), bibDatabaseContext.getDatabase(),
-                            bes, BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
+                            bes, Globals.prefs.getBibtexKeyPatternPreferences());
                     ce.addEdit(new UndoableKeyChange(bibDatabaseContext.getDatabase(), bes, null,
                             bes.getCiteKeyOptional().get())); // Cite key is set here
                     any = true;
@@ -2011,9 +2010,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             final List<BibEntry> bes = mainTable.getSelectedEntries();
             if (bes.size() == 1) {
                 String field = FieldName.DOI;
-                Optional<String> link = bes.get(0).getFieldOptional(FieldName.DOI);
+                Optional<String> link = bes.get(0).getField(FieldName.DOI);
                 if (bes.get(0).hasField(FieldName.URL)) {
-                    link = bes.get(0).getFieldOptional(FieldName.URL);
+                    link = bes.get(0).getField(FieldName.URL);
                     field = FieldName.URL;
                 }
                 if (link.isPresent()) {
@@ -2028,7 +2027,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     // Look for web links in the "file" field as a fallback:
                     FileListEntry entry = null;
                     FileListTableModel tm = new FileListTableModel();
-                    bes.get(0).getFieldOptional(FieldName.FILE).ifPresent(tm::setContent);
+                    bes.get(0).getField(FieldName.FILE).ifPresent(tm::setContent);
                     for (int i = 0; i < tm.getRowCount(); i++) {
                         FileListEntry flEntry = tm.getEntry(i);
                         if (FieldName.URL.equalsIgnoreCase(flEntry.type.get().getName())
@@ -2122,11 +2121,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         updatedExternally = true;
 
         final ChangeScanner scanner = new ChangeScanner(frame, BasePanel.this,
-                getBibDatabaseContext().getDatabaseFile());
+                getBibDatabaseContext().getDatabaseFile().orElse(null));
 
         // Test: running scan automatically in background
-        if ((getBibDatabaseContext().getDatabaseFile() != null)
-                && !FileBasedLock.waitForFileLock(getBibDatabaseContext().getDatabaseFile().toPath())) {
+        if ((getBibDatabaseContext().getDatabaseFile().isPresent())
+                && !FileBasedLock.waitForFileLock(getBibDatabaseContext().getDatabaseFile().get().toPath())) {
             // The file is locked even after the maximum wait. Do nothing.
             LOGGER.error("File updated externally, but change scan failed because the file is locked.");
             // Perturb the stored timestamp so successive checks are made:
@@ -2148,7 +2147,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 sidePaneManager.unregisterComponent(FileUpdatePanel.NAME);
             }
             FileUpdatePanel pan = new FileUpdatePanel(BasePanel.this, sidePaneManager,
-                    getBibDatabaseContext().getDatabaseFile(), scanner);
+                    getBibDatabaseContext().getDatabaseFile().orElse(null), scanner);
             sidePaneManager.register(FileUpdatePanel.NAME, pan);
             sidePaneManager.show(FileUpdatePanel.NAME);
         };
@@ -2162,7 +2161,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     @Override
     public void fileRemoved() {
-        LOGGER.info("File '" + getBibDatabaseContext().getDatabaseFile().getPath() + "' has been deleted.");
+        LOGGER.info("File '" + getBibDatabaseContext().getDatabaseFile().get().getPath() + "' has been deleted.");
     }
 
     /**
@@ -2358,12 +2357,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             final Set<ExternalFileType> types = ExternalFileTypes.getInstance().getExternalFileTypeSelection();
             final List<File> dirs = new ArrayList<>();
-            if (!basePanel.getBibDatabaseContext().getFileDirectory().isEmpty()) {
-                final List<String> mdDirs = basePanel.getBibDatabaseContext().getFileDirectory();
-                for (final String mdDir : mdDirs) {
-                    dirs.add(new File(mdDir));
-
-                }
+            final List<String> mdDirs = basePanel.getBibDatabaseContext()
+                    .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+            for (final String mdDir : mdDirs) {
+                dirs.add(new File(mdDir));
             }
             final List<String> extensions = new ArrayList<>();
             for (final ExternalFileType type : types) {

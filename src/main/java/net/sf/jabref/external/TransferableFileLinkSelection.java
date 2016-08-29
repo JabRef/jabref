@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -29,10 +30,11 @@ public class TransferableFileLinkSelection implements Transferable {
 
     public TransferableFileLinkSelection(BasePanel panel, List<BibEntry> selection) {
         FileListTableModel tm = new FileListTableModel();
-        selection.get(0).getFieldOptional(FieldName.FILE).ifPresent(tm::setContent);
+        selection.get(0).getField(FieldName.FILE).ifPresent(tm::setContent);
         if (tm.getRowCount() > 0) {
             // Find the default directory for this field type, if any:
-            List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
+            List<String> dirs = panel.getBibDatabaseContext()
+                    .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
             FileUtil.expandFilename(tm.getEntry(0).link, dirs).ifPresent(fileList::add);
         }
 

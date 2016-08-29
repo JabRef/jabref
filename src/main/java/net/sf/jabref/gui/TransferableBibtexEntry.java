@@ -12,7 +12,6 @@ import javax.swing.JOptionPane;
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
-import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
@@ -51,7 +50,7 @@ public class TransferableBibtexEntry implements Transferable {
             try {
                 StringWriter sw = new StringWriter();
                 BibEntryWriter bibtexEntryWriter = new BibEntryWriter(
-                        new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)), false);
+                        new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()), false);
                 for (BibEntry entry : data) {
                     bibtexEntryWriter.write(entry, sw, BibDatabaseMode.BIBTEX);
                 }

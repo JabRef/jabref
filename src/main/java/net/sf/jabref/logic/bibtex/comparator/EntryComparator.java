@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
 /**
@@ -13,8 +13,7 @@ import net.sf.jabref.model.entry.InternalBibtexFields;
  * structured as a node in a linked list of comparators, where each node can contain a link to a new comparator that
  * decides the ordering (by recursion) if this one can't find a difference. The next node, if any, is given at
  * construction time, and an arbitrary number of nodes can be included. If the entries are equal by this comparator, and
- * there is no next entry, the entries' unique IDs will decide the ordering. Consequently, this comparator can never
- * return 0 unless the entries are the same object.
+ * there is no next entry, the entries' unique IDs will decide the ordering.
  */
 public class EntryComparator implements Comparator<BibEntry> {
 
@@ -25,31 +24,33 @@ public class EntryComparator implements Comparator<BibEntry> {
     private final Comparator<BibEntry> next;
 
 
-    public EntryComparator(boolean binary, boolean desc, String field, Comparator<BibEntry> next) {
+    public EntryComparator(boolean binary, boolean descending, String field, Comparator<BibEntry> next) {
         this.binary = binary;
         this.sortField = field;
-        this.descending = desc;
+        this.descending = descending;
         this.next = next;
         this.numeric = InternalBibtexFields.isNumeric(sortField);
     }
 
-    public EntryComparator(boolean binary, boolean desc, String field) {
+    public EntryComparator(boolean binary, boolean descending, String field) {
         this.binary = binary;
         this.sortField = field;
-        this.descending = desc;
+        this.descending = descending;
         this.next = null;
         this.numeric = InternalBibtexFields.isNumeric(sortField);
     }
 
     @Override
     public int compare(BibEntry e1, BibEntry e2) {
-
+        // default equals
+        // TODO: with the new default equals this does not only return 0 for identical objects,
+        // but for all objects that have the same id and same fields
         if (Objects.equals(e1, e2)) {
             return 0;
         }
 
-        Object f1 = e1.getField(sortField);
-        Object f2 = e2.getField(sortField);
+        Object f1 = e1.getField(sortField).orElse(null);
+        Object f2 = e2.getField(sortField).orElse(null);
 
         if (binary) {
             // We just separate on set and unset fields:
@@ -62,7 +63,7 @@ public class EntryComparator implements Comparator<BibEntry> {
 
         // If the field is author or editor, we rearrange names so they are
         // sorted according to last name.
-        if (InternalBibtexFields.getFieldExtras(sortField).contains(FieldProperties.PERSON_NAMES)) {
+        if (InternalBibtexFields.getFieldProperties(sortField).contains(FieldProperty.PERSON_NAMES)) {
             if (f1 != null) {
                 f1 = AuthorList.fixAuthorForAlphabetization((String) f1).toLowerCase();
             }
@@ -87,12 +88,14 @@ public class EntryComparator implements Comparator<BibEntry> {
             }
         }
 
-        if ((f1 == null) && (f2 == null)) {
-            return next == null ? idCompare(e1, e2) : next.compare(e1, e2);
+        if (f2 == null) {
+            if (f1 == null) {
+                return next == null ? idCompare(e1, e2) : next.compare(e1, e2);
+            } else {
+                return -1;
+            }
         }
-        if ((f1 != null) && (f2 == null)) {
-            return -1;
-        }
+
         if (f1 == null) { // f2 != null here automatically
             return 1;
         }

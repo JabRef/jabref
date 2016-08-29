@@ -64,7 +64,8 @@ public class ExportAction {
             public void actionPerformed(ActionEvent e) {
                 Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
                         Globals.journalAbbreviationLoader);
-                LayoutFormatterPreferences layoutPreferences = LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader);
+                LayoutFormatterPreferences layoutPreferences = Globals.prefs
+                        .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
                 SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
                 ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
                 JFileChooser fc = ExportAction
@@ -105,7 +106,7 @@ public class ExportAction {
                     // so formatters can resolve linked files correctly.
                     // (This is an ugly hack!)
                     Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext()
-                            .getFileDirectory();
+                            .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
 
                     // Make sure we remember which filter was used, to set
                     // the default for next time:

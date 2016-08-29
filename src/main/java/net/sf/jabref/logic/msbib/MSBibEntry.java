@@ -24,6 +24,7 @@ import org.w3c.dom.NodeList;
  * @see <a href="http://www.ecma-international.org/publications/standards/Ecma-376.htm">ECMA Standard</a>
  */
 class MSBibEntry {
+
     // MSBib fields and values
     public Map<String, String> fields = new HashMap<>();
 
@@ -54,6 +55,14 @@ class MSBibEntry {
     public String publicationTitle;
     public String albumTitle;
     public String broadcastTitle;
+    public String year;
+    public String month;
+    public String day;
+    public String number;
+    public String patentNumber;
+    public String journalName;
+
+    private String bibtexEntryType;
 
     // reduced subset, supports only "CITY , STATE, COUNTRY"
     // \b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w+)\b
@@ -65,7 +74,9 @@ class MSBibEntry {
     // (\d{1,2})\s?[.,-/]\s?(\d{1,2})\s?[.,-/]\s?(\d{2,4})
     // 1-2 DIGITS SPACE SEPERATOR SPACE 1-2 DIGITS SPACE SEPERATOR SPACE 2-4 DIGITS
     // tested using http://www.javaregex.com/test.html
-    private static final Pattern DATE_PATTERN = Pattern.compile("(\\d{1,2})\\s*[.,-/]\\s*(\\d{1,2})\\s*[.,-/]\\s*(\\d{2,4})");
+    private static final Pattern DATE_PATTERN = Pattern
+            .compile("(\\d{1,2})\\s*[.,-/]\\s*(\\d{1,2})\\s*[.,-/]\\s*(\\d{2,4})");
+
 
     public MSBibEntry() {
 
@@ -99,6 +110,9 @@ class MSBibEntry {
                 String key = node.getLocalName();
                 String value = node.getTextContent();
 
+                if ("SourceType".equals(key)) {
+                    this.bibtexEntryType = value;
+                }
                 fields.put(key, value);
             }
         }
@@ -129,21 +143,30 @@ class MSBibEntry {
             address = null;
         }
 
+        if ("Patent".equalsIgnoreCase(bibtexEntryType)) {
+            number = getXmlElementTextContent("PatentNumber", entry);
+        }
+        journalName = getXmlElementTextContent("JournalName", entry);
+        month = getXmlElementTextContent("Month", entry);
         internetSiteTitle = getXmlElementTextContent("InternetSiteTitle", entry);
-        String month = getXmlElementTextContent("MonthAccessed", entry);
-        String day = getXmlElementTextContent("DayAccessed", entry);
-        String year = getXmlElementTextContent("YearAccessed", entry);
-        dateAccessed = "";
-        if (month != null) {
-            dateAccessed += month + ' ';
+
+        String monthAccessed = getXmlElementTextContent("MonthAccessed", entry);
+        String dayAccessed = getXmlElementTextContent("DayAccessed", entry);
+        String yearAccessed = getXmlElementTextContent("YearAccessed", entry);
+
+        StringBuilder sbDateAccesed = new StringBuilder();
+        if (monthAccessed != null) {
+            sbDateAccesed.append(monthAccessed);
+            sbDateAccesed.append(' ');
         }
-        if (day != null) {
-            dateAccessed += day + ", ";
+        if (dayAccessed != null) {
+            sbDateAccesed.append(dayAccessed);
+            sbDateAccesed.append(", ");
         }
-        if (year != null) {
-            dateAccessed += year;
+        if (yearAccessed != null) {
+            sbDateAccesed.append(yearAccessed);
         }
-        dateAccessed = dateAccessed.trim();
+        dateAccessed = sbDateAccesed.toString().trim();
         if (dateAccessed.isEmpty() || ",".equals(dateAccessed)) {
             dateAccessed = null;
         }
@@ -248,6 +271,12 @@ class MSBibEntry {
         if (pages != null) {
             addField(document, rootNode, "Pages", pages.toString("-"));
         }
+        addField(document, rootNode, "Year", year);
+        addField(document, rootNode, "Month", month);
+
+        addField(document, rootNode, "JournalName", journalName);
+        addField(document, rootNode, "PatentNumber", patentNumber);
+
         addField(document, rootNode, "StandardNumber", standardNumber);
         addField(document, rootNode, "ConferenceName", conferenceName);
 
@@ -286,7 +315,6 @@ class MSBibEntry {
             nameList.appendChild(person);
         }
         authorTop.appendChild(nameList);
-
         allAuthors.appendChild(authorTop);
     }
 

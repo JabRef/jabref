@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.event.EntryRemovedEvent;
 import net.sf.jabref.model.event.FieldChangedEvent;
@@ -25,8 +25,8 @@ public class KeyChangeListener {
         // Look for fields with FieldProperies.SINGLE_ENTRY_LINK or FieldProperties.MULTIPLE_ENTRY_LINK to speed up the search later
 
         for (String fieldName : InternalBibtexFields.getAllPublicFieldNames()) {
-            if (InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.SINGLE_ENTRY_LINK)
-                    || InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.MULTIPLE_ENTRY_LINK)) {
+            if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.SINGLE_ENTRY_LINK)
+                    || InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
                 keyFields.add(fieldName);
             }
         }
@@ -49,8 +49,8 @@ public class KeyChangeListener {
     private void updateEntryLinks(String newKey, String oldKey) {
         for (BibEntry entry : database.getEntries()) {
             for (String field : keyFields) {
-                entry.getFieldOptional(field).ifPresent(fieldContent -> {
-                    if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.SINGLE_ENTRY_LINK)) {
+                entry.getField(field).ifPresent(fieldContent -> {
+                    if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
                         replaceSingleKeyInField(newKey, oldKey, entry, field, fieldContent);
                     } else { // MULTIPLE_ENTRY_LINK
                         replaceKeyInMultiplesKeyField(newKey, oldKey, entry, field, fieldContent);

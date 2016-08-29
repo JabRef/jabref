@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.MetaData;
@@ -85,8 +86,8 @@ public class ParserResult {
         return entryTypes;
     }
 
-    public File getFile() {
-        return file;
+    public Optional<File> getFile() {
+        return Optional.ofNullable(file);
     }
 
     public void setFile(File f) {

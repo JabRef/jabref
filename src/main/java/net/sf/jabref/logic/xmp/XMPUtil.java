@@ -123,10 +123,6 @@ public class XMPUtil {
         return result;
     }
 
-    public static PDDocument loadWithAutomaticDecryption(Path filePath) throws IOException {
-        return loadWithAutomaticDecryption(new FileInputStream(filePath.toFile()));
-    }
-
     public static PDDocument loadWithAutomaticDecryption(InputStream inputStream) throws IOException {
         PDDocument doc = PDDocument.load(inputStream);
 

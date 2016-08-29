@@ -17,7 +17,6 @@ import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
@@ -82,10 +81,10 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
         }
 
         Optional<BibEntry> entry = BibtexParser.singleFromString(bibtexString,
-                ImportFormatPreferences.fromPreferences(Globals.prefs));
+                Globals.prefs.getImportFormatPreferences());
         if (entry.isPresent()) {
             // Optionally add curly brackets around key words to keep the case
-            entry.get().getFieldOptional(FieldName.TITLE).ifPresent(title -> {
+            entry.get().getField(FieldName.TITLE).ifPresent(title -> {
                 // Unit formatting
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
                     title = unitsToLatexFormatter.format(title);
@@ -98,7 +97,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
                 entry.get().setField(FieldName.TITLE, title);
             });
 
-            entry.get().getFieldOptional(FieldName.INSTITUTION).ifPresent(
+            entry.get().getField(FieldName.INSTITUTION).ifPresent(
                     institution -> entry.get().setField(FieldName.INSTITUTION,
                             new UnicodeToLatexFormatter().format(institution)));
             // Do not use the provided key

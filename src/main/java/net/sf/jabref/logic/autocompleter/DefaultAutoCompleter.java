@@ -41,7 +41,7 @@ class DefaultAutoCompleter extends AbstractAutoCompleter {
             return;
         }
 
-        entry.getFieldOptional(fieldName).ifPresent(fieldValue -> {
+        entry.getField(fieldName).ifPresent(fieldValue -> {
             StringTokenizer tok = new StringTokenizer(fieldValue, SEPARATING_CHARS);
             while (tok.hasMoreTokens()) {
                 addItemToIndex(tok.nextToken());

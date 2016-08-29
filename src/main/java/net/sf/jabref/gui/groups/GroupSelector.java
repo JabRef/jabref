@@ -1216,12 +1216,12 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             return;
         }
         MetaData metaData = panel.getBibDatabaseContext().getMetaData();
-        if (metaData.getGroups() == null) {
+        if (metaData.getGroups().isPresent()) {
+            setGroups(metaData.getGroups().get());
+        } else {
             GroupTreeNode newGroupsRoot = GroupTreeNode.fromGroup(new AllEntriesGroup());
             metaData.setGroups(newGroupsRoot);
             setGroups(newGroupsRoot);
-        } else {
-            setGroups(metaData.getGroups());
         }
 
         metaData.registerListener(this);
@@ -1266,6 +1266,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
     @Subscribe
     public void listen(GroupUpdatedEvent updateEvent) {
-        setGroups(updateEvent.getMetaData().getGroups());
+        setGroups(updateEvent.getMetaData().getGroups().orElse(null));
     }
 }

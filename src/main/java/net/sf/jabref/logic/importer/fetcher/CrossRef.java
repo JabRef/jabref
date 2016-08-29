@@ -38,7 +38,7 @@ public class CrossRef {
         Optional<DOI> doi = Optional.empty();
 
         // title is minimum requirement
-        Optional<String> title = entry.getFieldOptional(FieldName.TITLE);
+        Optional<String> title = entry.getField(FieldName.TITLE);
 
         if (!title.isPresent() || title.get().isEmpty()) {
             return doi;
@@ -68,14 +68,14 @@ public class CrossRef {
     private static String enhanceQuery(String query, BibEntry entry) {
         StringBuilder enhancedQuery = new StringBuilder(query);
         // author
-        entry.getFieldOptional(FieldName.AUTHOR).ifPresent(author -> {
+        entry.getField(FieldName.AUTHOR).ifPresent(author -> {
             if (!author.isEmpty()) {
                 enhancedQuery.append('+').append(author);
             }
         });
 
         // year
-        entry.getFieldOptional(FieldName.YEAR).ifPresent(year -> {
+        entry.getField(FieldName.YEAR).ifPresent(year -> {
             if (!year.isEmpty()) {
                 enhancedQuery.append('+').append(year);
             }
@@ -86,7 +86,7 @@ public class CrossRef {
 
     private static boolean checkValidity(BibEntry entry, JSONArray result) {
         // TODO: use latex-free version instead in the future
-        final String entryTitle = entry.getFieldOptional(FieldName.TITLE).map(CrossRef::removeLaTeX).orElse("");
+        final String entryTitle = entry.getField(FieldName.TITLE).map(CrossRef::removeLaTeX).orElse("");
 
         // currently only title-based
         // title: [ "How the Mind Hurts and Heals the Body." ]

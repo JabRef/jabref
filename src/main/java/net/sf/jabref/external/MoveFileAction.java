@@ -20,7 +20,6 @@ import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -69,7 +68,8 @@ public class MoveFileAction extends AbstractAction {
         }
 
         // Get an absolute path representation:
-        List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext().getFileDirectory();
+        List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext()
+                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {
@@ -99,8 +99,7 @@ public class MoveFileAction extends AbstractAction {
                     String suggName = FileUtil
                             .createFileNameFromPattern(eEditor.getDatabase(), eEditor.getEntry(),
                                     Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
-                                    LayoutFormatterPreferences.fromPreferences(Globals.prefs,
-                                            Globals.journalAbbreviationLoader))
+                                    Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader))
                             .concat(entry.type.isPresent() ? "." + entry.type.get().getExtension() : "");
                     CheckBoxMessage cbm = new CheckBoxMessage(Localization.lang("Move file to file directory?"),
                             Localization.lang("Rename to '%0'", suggName),
@@ -141,7 +140,7 @@ public class MoveFileAction extends AbstractAction {
 
             }
 
-            if (!newFile.equals(file)) {
+            if ((newFile != null) && !newFile.equals(file)) {
                 try {
                     boolean success = file.renameTo(newFile);
                     if (!success) {

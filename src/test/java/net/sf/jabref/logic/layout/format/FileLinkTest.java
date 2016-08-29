@@ -14,7 +14,7 @@ public class FileLinkTest {
     private FileLinkPreferences prefs;
     @Before
     public void setUp() throws Exception {
-        prefs = FileLinkPreferences.fromPreferences(JabRefPreferences.getInstance());
+        prefs = JabRefPreferences.getInstance().getFileLinkPreferences();
     }
 
     @Test

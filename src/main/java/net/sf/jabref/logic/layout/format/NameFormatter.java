@@ -77,10 +77,6 @@ public class NameFormatter implements LayoutFormatter {
 
     private String parameter = NameFormatter.DEFAULT_FORMAT;
 
-    public static final String NAME_FORMATER_KEY = "nameFormatterNames";
-
-    public static final String NAME_FORMATTER_VALUE = "nameFormatterFormats";
-
     private static String format(String toFormat, AuthorList al, String[] formats) {
 
         StringBuilder sb = new StringBuilder();

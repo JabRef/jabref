@@ -38,6 +38,6 @@ class EntireFieldAutoCompleter extends AbstractAutoCompleter {
             return;
         }
 
-        entry.getFieldOptional(fieldName).ifPresent(fieldValue -> addItemToIndex(fieldValue.trim()));
+        entry.getField(fieldName).ifPresent(fieldValue -> addItemToIndex(fieldValue.trim()));
     }
 }

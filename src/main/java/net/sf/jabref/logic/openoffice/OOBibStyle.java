@@ -743,12 +743,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
         if (al.getNumberOfAuthors() > number) {
             Author a = al.getAuthor(number);
-            if ((a.getVon() != null) && !a.getVon().isEmpty()) {
-                String von = a.getVon();
-                sb.append(von);
-                sb.append(' ');
-            }
-            sb.append(a.getLast());
+            a.getVon().filter(von -> !von.isEmpty()).ifPresent(von -> sb.append(von).append(' '));
+            sb.append(a.getLast().orElse(""));
         }
 
         return sb.toString();

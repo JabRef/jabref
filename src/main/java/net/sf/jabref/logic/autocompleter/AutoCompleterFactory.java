@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
 /**
@@ -26,11 +26,11 @@ public class AutoCompleterFactory {
     public AutoCompleter<String> getFor(String fieldName) {
         Objects.requireNonNull(fieldName);
 
-        if (InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.PERSON_NAMES)) {
+        if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.PERSON_NAMES)) {
             return new NameFieldAutoCompleter(fieldName, preferences);
-        } else if (InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.SINGLE_ENTRY_LINK)) {
+        } else if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
             return new BibtexKeyAutoCompleter(preferences);
-        } else if (InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.JOURNAL_NAME)
+        } else if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.JOURNAL_NAME)
                 || FieldName.PUBLISHER.equals(fieldName)) {
             return new JournalAutoCompleter(fieldName, preferences, abbreviationLoader);
         } else {

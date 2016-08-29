@@ -20,7 +20,6 @@ import javax.swing.JPanel;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.importer.FetcherPreviewDialog;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.ParserResult;
@@ -244,7 +243,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         try {
             String s = new URLDownload(link).downloadToString(StandardCharsets.UTF_8);
             BibtexParser bp = new BibtexParser(new StringReader(s),
-                    ImportFormatPreferences.fromPreferences(Globals.prefs));
+                    Globals.prefs.getImportFormatPreferences());
             ParserResult pr = bp.parse();
             if ((pr != null) && (pr.getDatabase() != null)) {
                 Collection<BibEntry> entries = pr.getDatabase().getEntries();
@@ -263,7 +262,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
                     // Clean up some remaining HTML code from Elsevier(?) papers
                     // Search for: Poincare algebra
                     // to see an example
-                    entry.getFieldOptional(FieldName.TITLE).ifPresent(title -> {
+                    entry.getField(FieldName.TITLE).ifPresent(title -> {
                         String newtitle = title.replaceAll("<.?i>([^<]*)</i>", "$1");
                         if (!newtitle.equals(title)) {
                             entry.setField(FieldName.TITLE, newtitle);

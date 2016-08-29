@@ -35,7 +35,8 @@ public class ConvertLegacyExplicitGroupsTest {
 
         entry = new BibEntry();
         entry.setCiteKey("Entry1");
-        group = new ExplicitGroup("TestGroup", GroupHierarchyType.INCLUDING, Globals.prefs);
+        group = new ExplicitGroup("TestGroup", GroupHierarchyType.INCLUDING,
+                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR));
         group.addLegacyEntryKey("Entry1");
     }
 
@@ -45,7 +46,7 @@ public class ConvertLegacyExplicitGroupsTest {
 
         action.performAction(basePanel, parserResult);
 
-        assertEquals(Optional.of("TestGroup"), entry.getFieldOptional("groups"));
+        assertEquals(Optional.of("TestGroup"), entry.getField("groups"));
     }
 
     @Test
@@ -60,13 +61,14 @@ public class ConvertLegacyExplicitGroupsTest {
     @Test
     public void performActionWritesGroupMembershipInEntryForComplexGroupTree() throws Exception {
         GroupTreeNode root = GroupTreeNode.fromGroup(new AllEntriesGroup());
-        root.addSubgroup(new ExplicitGroup("TestGroup2", GroupHierarchyType.INCLUDING, Globals.prefs));
+        root.addSubgroup(new ExplicitGroup("TestGroup2", GroupHierarchyType.INCLUDING,
+                JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)));
         root.addSubgroup(group);
         ParserResult parserResult = generateParserResult(entry, root);
 
         action.performAction(basePanel, parserResult);
 
-        assertEquals(Optional.of("TestGroup"), entry.getFieldOptional("groups"));
+        assertEquals(Optional.of("TestGroup"), entry.getField("groups"));
     }
 
     @Test

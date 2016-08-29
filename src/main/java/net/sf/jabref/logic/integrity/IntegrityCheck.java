@@ -14,11 +14,12 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.FileDirectoryPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.ParsedFileField;
@@ -28,9 +29,11 @@ import com.google.common.base.CharMatcher;
 public class IntegrityCheck {
 
     private final BibDatabaseContext bibDatabaseContext;
+    private final FileDirectoryPreferences fileDirectoryPreferences;
 
-    public IntegrityCheck(BibDatabaseContext bibDatabaseContext) {
+    public IntegrityCheck(BibDatabaseContext bibDatabaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
         this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
+        this.fileDirectoryPreferences = Objects.requireNonNull(fileDirectoryPreferences);
     }
 
     public List<IntegrityMessage> checkBibtexDatabase() {
@@ -64,7 +67,7 @@ public class IntegrityCheck {
         result.addAll(new BracketChecker(FieldName.TITLE).check(entry));
         result.addAll(new YearChecker().check(entry));
         result.addAll(new UrlChecker().check(entry));
-        result.addAll(new FileChecker(bibDatabaseContext).check(entry));
+        result.addAll(new FileChecker(bibDatabaseContext, fileDirectoryPreferences).check(entry));
         result.addAll(new TypeChecker().check(entry));
         for (String journalField : InternalBibtexFields.getJournalNameFields()) {
             result.addAll(new AbbreviationChecker(journalField).check(entry));
@@ -77,6 +80,7 @@ public class IntegrityCheck {
         result.addAll(new BooktitleChecker().check(entry));
         result.addAll(new ISSNChecker().check(entry));
         result.addAll(new ISBNChecker().check(entry));
+        result.addAll(new EntryLinkChecker(bibDatabaseContext.getDatabase()).check(entry));
 
         return result;
     }
@@ -91,7 +95,7 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(FieldName.PAGES);
+            Optional<String> value = entry.getField(FieldName.PAGES);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -109,7 +113,7 @@ public class IntegrityCheck {
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
             String field = FieldName.BOOKTITLE;
-            Optional<String> value = entry.getFieldOptional(field);
+            Optional<String> value = entry.getField(field);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -132,7 +136,7 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(field);
+            Optional<String> value = entry.getField(field);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -148,14 +152,16 @@ public class IntegrityCheck {
     private static class FileChecker implements Checker {
 
         private final BibDatabaseContext context;
+        private final FileDirectoryPreferences fileDirectoryPreferences;
 
-        private FileChecker(BibDatabaseContext context) {
+        private FileChecker(BibDatabaseContext context, FileDirectoryPreferences fileDirectoryPreferences) {
             this.context = context;
+            this.fileDirectoryPreferences = fileDirectoryPreferences;
         }
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(FieldName.FILE);
+            Optional<String> value = entry.getField(FieldName.FILE);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -165,7 +171,7 @@ public class IntegrityCheck {
                     .collect(Collectors.toList());
 
             for (ParsedFileField p : parsedFileFields) {
-                Optional<File> file = FileUtil.expandFilename(context, p.getLink());
+                Optional<File> file = FileUtil.expandFilename(context, p.getLink(), fileDirectoryPreferences);
                 if ((!file.isPresent()) || !file.get().exists()) {
                     return Collections.singletonList(
                             new IntegrityMessage(Localization.lang("link should refer to a correct file path"), entry,
@@ -181,7 +187,7 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(FieldName.URL);
+            Optional<String> value = entry.getField(FieldName.URL);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -200,8 +206,8 @@ public class IntegrityCheck {
         public List<IntegrityMessage> check(BibEntry entry) {
             List<IntegrityMessage> result = new ArrayList<>();
             for (String field : entry.getFieldNames()) {
-                if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
-                    Optional<String> value = entry.getFieldOptional(field);
+                if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES)) {
+                    Optional<String> value = entry.getField(field);
                     if (!value.isPresent()) {
                         return Collections.emptyList();
                     }
@@ -228,7 +234,7 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(field);
+            Optional<String> value = entry.getField(field);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -263,7 +269,7 @@ public class IntegrityCheck {
 
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(FieldName.TITLE);
+            Optional<String> value = entry.getField(FieldName.TITLE);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -306,7 +312,7 @@ public class IntegrityCheck {
          */
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(FieldName.YEAR);
+            Optional<String> value = entry.getField(FieldName.YEAR);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -347,7 +353,7 @@ public class IntegrityCheck {
          */
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(FieldName.PAGES);
+            Optional<String> value = entry.getField(FieldName.PAGES);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -384,7 +390,7 @@ public class IntegrityCheck {
          */
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
-            Optional<String> value = entry.getFieldOptional(FieldName.PAGES);
+            Optional<String> value = entry.getField(FieldName.PAGES);
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
@@ -413,7 +419,7 @@ public class IntegrityCheck {
 
 
             for (Map.Entry<String, String> field : fields.entrySet()) {
-                if (!InternalBibtexFields.getFieldExtras(field.getKey()).contains(FieldProperties.VERBATIM)) {
+                if (!InternalBibtexFields.getFieldProperties(field.getKey()).contains(FieldProperty.VERBATIM)) {
                     Matcher hashMatcher = UNESCAPED_HASH.matcher(field.getValue());
                     int hashCount = 0;
                     while (hashMatcher.find()) {

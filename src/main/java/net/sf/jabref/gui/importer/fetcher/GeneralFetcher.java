@@ -146,11 +146,8 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         gbl.setConstraints(helpBut, con);
         main.add(helpBut);
 
-        JPanel pan = new JPanel();
-        if (pan != null) {
-            gbl.setConstraints(optPanel, con);
-            main.add(optPanel);
-        }
+        gbl.setConstraints(optPanel, con);
+        main.add(optPanel);
 
         main.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
         add(main, BorderLayout.CENTER);

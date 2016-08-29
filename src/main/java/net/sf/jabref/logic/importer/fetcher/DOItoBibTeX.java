@@ -76,7 +76,7 @@ public class DOItoBibTeX {
 
     private static void formatTitleField(BibEntry entry, ImportFormatPreferences importFormatPreferences) {
         // Optionally add curly brackets around key words to keep the case
-        entry.getFieldOptional(FieldName.TITLE).ifPresent(title -> {
+        entry.getField(FieldName.TITLE).ifPresent(title -> {
             // Unit formatting
             if (importFormatPreferences.isConvertUnitsOnSearch()) {
                 title = unitsToLatexFormatter.format(title);

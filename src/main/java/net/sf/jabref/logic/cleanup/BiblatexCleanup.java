@@ -21,8 +21,8 @@ public class BiblatexCleanup implements CleanupJob {
         for (Map.Entry<String, String> alias : EntryConverter.FIELD_ALIASES_TEX_TO_LTX.entrySet()) {
             String oldFieldName = alias.getKey();
             String newFieldName = alias.getValue();
-            entry.getFieldOptional(oldFieldName).ifPresent(oldValue -> {
-                if (!oldValue.isEmpty() && (!entry.getFieldOptional(newFieldName).isPresent())) {
+            entry.getField(oldFieldName).ifPresent(oldValue -> {
+                if (!oldValue.isEmpty() && (!entry.getField(newFieldName).isPresent())) {
                     // There is content in the old field and no value in the new, so just copy
                     entry.setField(newFieldName, oldValue);
                     changes.add(new FieldChange(entry, newFieldName, null, oldValue));
@@ -34,11 +34,11 @@ public class BiblatexCleanup implements CleanupJob {
         }
 
         // Dates: create date out of year and month, save it and delete old fields
-        entry.getFieldOptional(FieldName.DATE).ifPresent(date -> {
+        entry.getField(FieldName.DATE).ifPresent(date -> {
             if (date.isEmpty()) {
                 entry.getFieldOrAlias(FieldName.DATE).ifPresent(newDate -> {
-                    Optional<String> oldYear = entry.getFieldOptional(FieldName.YEAR);
-                    Optional<String> oldMonth = entry.getFieldOptional(FieldName.MONTH);
+                    Optional<String> oldYear = entry.getField(FieldName.YEAR);
+                    Optional<String> oldMonth = entry.getField(FieldName.MONTH);
 
                     entry.setField(FieldName.DATE, newDate);
                     entry.clearField(FieldName.YEAR);
