@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.importer;
 
 import java.io.File;
@@ -26,7 +11,6 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.ImportDataTest;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
@@ -65,7 +49,7 @@ public class EntryFromFileCreatorManagerTest {
     public void testAddEntrysFromFiles() throws FileNotFoundException, IOException {
         try (FileInputStream stream = new FileInputStream(ImportDataTest.UNLINKED_FILES_TEST_BIB);
                 InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            ParserResult result = BibtexParser.parse(reader, ImportFormatPreferences.fromPreferences(Globals.prefs));
+            ParserResult result = BibtexParser.parse(reader, Globals.prefs.getImportFormatPreferences());
             BibDatabase database = result.getDatabase();
 
             List<File> files = new ArrayList<>();
@@ -84,7 +68,7 @@ public class EntryFromFileCreatorManagerTest {
             boolean file1Found = false;
             boolean file2Found = false;
             for (BibEntry entry : database.getEntries()) {
-                String filesInfo = entry.getFieldOptional("file").get();
+                String filesInfo = entry.getField("file").get();
                 if (filesInfo.contains(files.get(0).getName())) {
                     file1Found = true;
                 }

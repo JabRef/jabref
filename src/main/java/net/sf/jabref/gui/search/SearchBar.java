@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.search;
 
 import java.awt.Color;
@@ -22,6 +7,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -34,6 +20,7 @@ import javax.swing.JToolBar;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.WrapLayout;
@@ -120,8 +107,9 @@ public class SearchBar extends JPanel {
         openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
         openCurrentResultsInDialog.addActionListener(ae -> {
             SearchResultsDialog searchDialog = new SearchResultsDialog(basePanel.frame(),
-                    Localization.lang("Search results in database %0 for %1",
-                            basePanel.getBibDatabaseContext().getDatabaseFile().getName(),
+                    Localization.lang(
+                            "Search results in database %0 for %1", basePanel.getBibDatabaseContext().getDatabaseFile()
+                                    .map(File::getName).orElse(GUIGlobals.UNTITLED_TITLE),
                             this.getSearchQuery().localize()));
             List<BibEntry> entries = basePanel.getDatabase().getEntries().stream().filter(BibEntry::isSearchHit)
                     .collect(Collectors.toList());

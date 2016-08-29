@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.journals;
 
 import java.awt.BorderLayout;
@@ -62,7 +47,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
@@ -70,7 +54,6 @@ import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -191,7 +174,7 @@ class ManageJournalsPanel extends JPanel {
 
         viewBuiltin.addActionListener(e -> {
             JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbreviationLoader
-                    .getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs)).getAbbreviations()));
+                    .getRepository(Globals.prefs.getJournalAbbreviationPreferences()).getAbbreviations()));
             GUIUtil.correctRowHeight(table);
 
             JScrollPane pane = new JScrollPane(table);
@@ -364,7 +347,6 @@ class ManageJournalsPanel extends JPanel {
             }
         } else {
             filePath = Paths.get(personalFile.getText());
-
         }
 
         if (filePath != null) {
@@ -396,7 +378,7 @@ class ManageJournalsPanel extends JPanel {
         Globals.prefs.putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, extFiles);
 
         // Update journal abbreviation loader
-        Globals.journalAbbreviationLoader.update(JournalAbbreviationPreferences.fromPreferences(Globals.prefs));
+        Globals.journalAbbreviationLoader.update(Globals.prefs.getJournalAbbreviationPreferences());
     }
 
 
@@ -565,7 +547,10 @@ class ManageJournalsPanel extends JPanel {
 
         private void setupPanel() {
             tf.setEditable(false);
-            browse.addActionListener(BrowseAction.buildForFile(tf));
+            browse.addActionListener(e ->
+                    new FileDialog(frame).showDialogAndGetSelectedFile()
+                            .ifPresent(f -> tf.setText(f.toAbsolutePath().toString()))
+            );
             DownloadAction da = new DownloadAction(tf);
             download.addActionListener(da);
             FormBuilder builder = FormBuilder.create().layout(new FormLayout(

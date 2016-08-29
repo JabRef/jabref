@@ -9,22 +9,14 @@ import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.xml.sax.SAXException;
 
 public class GVKParserTest {
-
-    @Before
-    public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
 
     private void doTest(String xmlName, int expectedSize, List<String> resourceNames)
             throws ParserConfigurationException, SAXException, IOException {
@@ -65,19 +57,19 @@ public class GVKParserTest {
             Assert.assertEquals(5, entries.size());
 
             BibEntry entry = entries.get(0);
-            Assert.assertEquals(Optional.empty(), entry.getFieldOptional("subtitle"));
+            Assert.assertEquals(Optional.empty(), entry.getField("subtitle"));
 
             entry = entries.get(1);
-            Assert.assertEquals(Optional.of("C"), entry.getFieldOptional("subtitle"));
+            Assert.assertEquals(Optional.of("C"), entry.getField("subtitle"));
 
             entry = entries.get(2);
-            Assert.assertEquals(Optional.of("Word"), entry.getFieldOptional("subtitle"));
+            Assert.assertEquals(Optional.of("Word"), entry.getField("subtitle"));
 
             entry = entries.get(3);
-            Assert.assertEquals(Optional.of("Word1 word2"), entry.getFieldOptional("subtitle"));
+            Assert.assertEquals(Optional.of("Word1 word2"), entry.getField("subtitle"));
 
             entry = entries.get(4);
-            Assert.assertEquals(Optional.of("Word1 word2"), entry.getFieldOptional("subtitle"));
+            Assert.assertEquals(Optional.of("Word1 word2"), entry.getField("subtitle"));
         }
     }
 }

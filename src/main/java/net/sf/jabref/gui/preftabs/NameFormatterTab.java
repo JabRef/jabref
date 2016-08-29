@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
@@ -215,8 +200,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     @Override
     public void setValues() {
         tableRows.clear();
-        List<String> names = prefs.getStringList(NameFormatter.NAME_FORMATER_KEY);
-        List<String> formats = prefs.getStringList(NameFormatter.NAME_FORMATTER_VALUE);
+        List<String> names = prefs.getStringList(JabRefPreferences.NAME_FORMATER_KEY);
+        List<String> formats = prefs.getStringList(JabRefPreferences.NAME_FORMATTER_VALUE);
 
         for (int i = 0; i < names.size(); i++) {
             if (i < formats.size()) {
@@ -332,8 +317,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
             }
 
             // Finally, we store the new preferences.
-            prefs.putStringList(NameFormatter.NAME_FORMATER_KEY, names);
-            prefs.putStringList(NameFormatter.NAME_FORMATTER_VALUE, formats);
+            prefs.putStringList(JabRefPreferences.NAME_FORMATER_KEY, names);
+            prefs.putStringList(JabRefPreferences.NAME_FORMATTER_VALUE, formats);
         }
     }
 

@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License along
- with this program; if not, write to the Free Software Foundation, Inc.,
- 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.logic.util.io;
 
 import java.io.File;
@@ -24,6 +9,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.FileDirectoryPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -49,9 +35,10 @@ public class DatabaseFileLookup {
      *
      * @param database A {@link BibDatabase}.
      */
-    public DatabaseFileLookup(BibDatabaseContext databaseContext) {
+    public DatabaseFileLookup(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
         Objects.requireNonNull(databaseContext);
-        possibleFilePaths = Optional.ofNullable(databaseContext.getFileDirectory()).orElse(new ArrayList<>());
+        possibleFilePaths = Optional.ofNullable(databaseContext.getFileDirectory(fileDirectoryPreferences))
+                .orElse(new ArrayList<>());
 
         for (BibEntry entry : databaseContext.getDatabase().getEntries()) {
             fileCache.addAll(parseFileField(entry));
@@ -79,7 +66,7 @@ public class DatabaseFileLookup {
     private List<File> parseFileField(BibEntry entry) {
         Objects.requireNonNull(entry);
 
-        List<ParsedFileField> entries = FileField.parse(entry.getFieldOptional(FieldName.FILE).orElse(null));
+        List<ParsedFileField> entries = FileField.parse(entry.getField(FieldName.FILE).orElse(null));
 
         List<File> fileLinks = new ArrayList<>();
         for (ParsedFileField field : entries) {

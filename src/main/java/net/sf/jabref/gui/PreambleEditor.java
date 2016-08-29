@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui;
 
 import java.awt.BorderLayout;
@@ -47,10 +32,10 @@ import net.sf.jabref.preferences.JabRefPreferences;
 
 class PreambleEditor extends JDialog {
     // A reference to the entry this object works on.
-    private final BibDatabase base;
+    private final BibDatabase database;
     private final BasePanel panel;
 
-    private final FieldEditor ed;
+    private final FieldEditor editor;
 
     private final UndoAction undoAction = new UndoAction();
     private final StoreFieldAction storeFieldAction = new StoreFieldAction();
@@ -58,10 +43,10 @@ class PreambleEditor extends JDialog {
     // The action concerned with closing the window.
     private final CloseAction closeAction = new CloseAction();
 
-    public PreambleEditor(JabRefFrame baseFrame, BasePanel panel, BibDatabase base) {
+    public PreambleEditor(JabRefFrame baseFrame, BasePanel panel, BibDatabase database) {
         super(baseFrame);
         this.panel = panel;
-        this.base = base;
+        this.database = database;
 
         addWindowListener(new WindowAdapter() {
 
@@ -72,7 +57,7 @@ class PreambleEditor extends JDialog {
 
             @Override
             public void windowOpened(WindowEvent e) {
-                ed.requestFocus();
+                editor.requestFocus();
             }
         });
         setFocusTraversalPolicy(new LayoutFocusTraversalPolicy() {
@@ -91,19 +76,17 @@ class PreambleEditor extends JDialog {
         con.weighty = 1;
         con.insets = new Insets(10, 5, 10, 5);
 
-        String content = base.getPreamble();
+        editor = new TextArea(Localization.lang("Preamble"), database.getPreamble().orElse(""));
 
-        ed = new TextArea(Localization.lang("Preamble"), content == null ? "" : content);
+        setupJTextComponent((TextArea) editor);
 
-        setupJTextComponent((TextArea) ed);
-
-        gbl.setConstraints(ed.getLabel(), con);
-        pan.add(ed.getLabel());
+        gbl.setConstraints(editor.getLabel(), con);
+        pan.add(editor.getLabel());
 
         con.weightx = 1;
 
-        gbl.setConstraints(ed.getPane(), con);
-        pan.add(ed.getPane());
+        gbl.setConstraints(editor.getPane(), con);
+        pan.add(editor.getPane());
 
         Container conPane = getContentPane();
         conPane.add(pan, BorderLayout.CENTER);
@@ -130,7 +113,7 @@ class PreambleEditor extends JDialog {
     }
 
     public void updatePreamble() {
-        ed.setText(base.getPreamble());
+        editor.setText(database.getPreamble().orElse(""));
     }
 
 
@@ -160,32 +143,22 @@ class PreambleEditor extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            String toSet = null;
-            boolean set;
-            if (!ed.getText().isEmpty()) {
-                toSet = ed.getText();
-            }
+            String toSet = editor.getText();
+
             // We check if the field has changed, since we don't want to mark the
             // base as changed unless we have a real change.
-            if (toSet == null) {
-                set = base.getPreamble() != null;
-            } else {
-                set = !((base.getPreamble() != null)
-                        && toSet.equals(base.getPreamble()));
-            }
-
-            if (set) {
-                panel.getUndoManager().addEdit(new UndoablePreambleChange
-                        (base, panel, base.getPreamble(), toSet));
-                base.setPreamble(toSet);
+            if (!database.getPreamble().orElse("").equals(toSet)) {
+                panel.getUndoManager().addEdit(
+                        new UndoablePreambleChange(database, panel, database.getPreamble().orElse(null), toSet));
+                database.setPreamble(toSet);
                 if ((toSet == null) || toSet.isEmpty()) {
-                    ed.setLabelColor(GUIGlobals.NULL_FIELD_COLOR);
+                    editor.setLabelColor(GUIGlobals.NULL_FIELD_COLOR);
                 } else {
-                    ed.setLabelColor(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
+                    editor.setLabelColor(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
                 }
-                ed.setValidBackgroundColor();
-                if (ed.getTextComponent().hasFocus()) {
-                    ed.setActiveBackgroundColor();
+                editor.setValidBackgroundColor();
+                if (editor.getTextComponent().hasFocus()) {
+                    editor.setActiveBackgroundColor();
                 }
                 panel.markBaseChanged();
             }
@@ -241,7 +214,7 @@ class PreambleEditor extends JDialog {
 
 
     public FieldEditor getFieldEditor() {
-        return ed;
+        return editor;
     }
 
     public void storeCurrentEdit() {

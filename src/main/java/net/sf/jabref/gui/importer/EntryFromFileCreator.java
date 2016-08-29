@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.importer;
 
 import java.io.File;
@@ -21,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.external.ExternalFileTypes;
@@ -155,7 +141,8 @@ public abstract class EntryFromFileCreator implements FileFilter {
         Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance()
                 .getExternalFileTypeByExt(externalFileType.getFieldName());
 
-        List<String> possibleFilePaths = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getFileDirectory();
+        List<String> possibleFilePaths = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext()
+                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         File shortenedFileName = FileUtil.shortenFileName(file, possibleFilePaths);
         FileListEntry fileListEntry = new FileListEntry("", shortenedFileName.getPath(), fileType);
 
@@ -169,7 +156,7 @@ public abstract class EntryFromFileCreator implements FileFilter {
         if ((value == null) || value.isEmpty()) {
             return;
         }
-        Optional<String> oVal = entry.getFieldOptional(field);
+        Optional<String> oVal = entry.getField(field);
         if (oVal.isPresent()) {
             // TODO: find Jabref constant for delimter
             if (!oVal.get().contains(value)) {
@@ -190,7 +177,7 @@ public abstract class EntryFromFileCreator implements FileFilter {
 
     protected void addEntryDataToEntry(BibEntry entry, BibEntry e) {
         for (String field : e.getFieldNames()) {
-            e.getFieldOptional(field).ifPresent(fieldContent -> appendToField(entry, field, fieldContent));
+            e.getField(field).ifPresent(fieldContent -> appendToField(entry, field, fieldContent));
         }
     }
 

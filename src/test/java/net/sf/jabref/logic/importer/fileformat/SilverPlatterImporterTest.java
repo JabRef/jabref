@@ -1,18 +1,16 @@
 package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.InputStream;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,7 +36,6 @@ public class SilverPlatterImporterTest {
 
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
         testImporter = new SilverPlatterImporter();
         txtFile = Paths.get(SilverPlatterImporterTest.class.getResource(filename + ".txt").toURI());
         bibName = filename + ".bib";
@@ -62,13 +59,14 @@ public class SilverPlatterImporterTest {
 
     @Test
     public final void testIsRecognizedFormat() throws Exception {
-        Assert.assertTrue(testImporter.isRecognizedFormat(txtFile, Charset.defaultCharset()));
+        Assert.assertTrue(testImporter.isRecognizedFormat(txtFile, StandardCharsets.UTF_8));
     }
 
     @Test
     public final void testImportEntries() throws Exception {
         try (InputStream bibIn = SilverPlatterImporterTest.class.getResourceAsStream(bibName)) {
-            List<BibEntry> entries = testImporter.importDatabase(txtFile, Charset.defaultCharset()).getDatabase().getEntries();
+            List<BibEntry> entries = testImporter.importDatabase(txtFile, StandardCharsets.UTF_8).getDatabase()
+                    .getEntries();
             BibEntryAssert.assertEquals(bibIn, entries);
         }
     }

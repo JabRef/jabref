@@ -51,7 +51,7 @@ public class EntryUtil {
      * @return an List containing the keywords of the entry. An empty list if keywords are null or empty
      */
     public static Set<String> getSeparatedKeywords(BibEntry entry) {
-        return getSeparatedKeywords(entry.getFieldOptional(FieldName.KEYWORDS).orElse(null));
+        return getSeparatedKeywords(entry.getField(FieldName.KEYWORDS).orElse(null));
     }
 
     /**

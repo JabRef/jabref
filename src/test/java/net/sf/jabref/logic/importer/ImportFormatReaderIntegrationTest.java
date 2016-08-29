@@ -7,8 +7,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
@@ -37,10 +35,9 @@ public class ImportFormatReaderIntegrationTest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
         reader = new ImportFormatReader();
-        reader.resetImportFormats(ImportFormatPreferences.fromPreferences(Globals.prefs),
-                XMPPreferences.fromPreferences(JabRefPreferences.getInstance()));
+        reader.resetImportFormats(JabRefPreferences.getInstance().getImportFormatPreferences(),
+                JabRefPreferences.getInstance().getXMPPreferences());
     }
 
     @Test

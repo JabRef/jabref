@@ -12,7 +12,7 @@ import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
 public class MainTableColumn {
@@ -70,21 +70,6 @@ public class MainTableColumn {
         return joiner.toString();
     }
 
-    /**
-     * Checks whether the column should display names
-     * Relevant as name value format can be formatted.
-     *
-     * @return true if the bibtex fields contains author or editor
-     */
-    private boolean isNameColumn() {
-        for (String field : bibtexFields) {
-            if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public String getColumnName() {
         return columnName;
     }
@@ -105,18 +90,20 @@ public class MainTableColumn {
         if (bibtexFields.isEmpty()) {
             return null;
         }
+        boolean isNameColumn = false;
 
         Optional<String> content = Optional.empty();
         for (String field : bibtexFields) {
             content = BibDatabase.getResolvedField(field, entry, database.orElse(null));
             if (content.isPresent()) {
+                isNameColumn = InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES);
                 break;
             }
         }
 
         String result = content.orElse(null);
 
-        if (isNameColumn()) {
+        if (isNameColumn) {
             result = MainTableNameFormatter.formatName(result);
         }
 
@@ -160,7 +147,7 @@ public class MainTableColumn {
                     || BibEntry.KEY_FIELD.equals(field)) {
                 return false;
             } else {
-                plainFieldContent = entry.getFieldOptional(field);
+                plainFieldContent = entry.getField(field);
                 resolvedFieldContent = BibDatabase.getResolvedField(field, entry, database.orElse(null));
             }
 

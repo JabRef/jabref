@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
 package net.sf.jabref.gui.actions;
 
 import java.awt.BorderLayout;
@@ -301,7 +286,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             return;
         }
 
-        if (SpecialFieldsUtils.keywordSyncEnabled() && !keywordsToAdd.isEmpty()) {
+        if (Globals.prefs.isKeywordSyncEnabled() && !keywordsToAdd.isEmpty()) {
             synchronizeSpecialFields(keywordsToAdd, keywordsToRemove);
         }
 
@@ -327,7 +312,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
                 ce.addEdit(new UndoableFieldChange(change.get()));
             }
 
-            if (SpecialFieldsUtils.keywordSyncEnabled()) {
+            if (Globals.prefs.isKeywordSyncEnabled()) {
                 SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, ce);
             }
         }

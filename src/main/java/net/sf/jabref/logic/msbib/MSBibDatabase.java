@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.msbib;
 
 import java.io.BufferedReader;
@@ -45,12 +30,14 @@ import org.xml.sax.SAXException;
  * See http://www.ecma-international.org/publications/standards/Ecma-376.htm
  */
 public class MSBibDatabase {
+
     private static final Log LOGGER = LogFactory.getLog(MSBibDatabase.class);
 
     public static final String NAMESPACE = "http://schemas.openxmlformats.org/officeDocument/2006/bibliography";
     public static final String PREFIX = "b:";
 
     private Set<MSBibEntry> entries;
+
 
     public MSBibDatabase() {
         entries = new HashSet<>();
@@ -114,19 +101,18 @@ public class MSBibDatabase {
 
             Element rootNode = document.createElementNS(NAMESPACE, PREFIX + "Sources");
             rootNode.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", NAMESPACE);
-            rootNode.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:" + PREFIX.substring(0, PREFIX.length() - 1), NAMESPACE);
+            rootNode.setAttributeNS("http://www.w3.org/2000/xmlns/",
+                    "xmlns:" + PREFIX.substring(0, PREFIX.length() - 1), NAMESPACE);
             rootNode.setAttribute("SelectedStyle", "");
 
             for (MSBibEntry entry : entries) {
                 Node node = entry.getDOM(document);
                 rootNode.appendChild(node);
             }
-
             document.appendChild(rootNode);
         } catch (ParserConfigurationException e) {
             LOGGER.warn("Could not build XML document", e);
         }
-
         return document;
     }
 }

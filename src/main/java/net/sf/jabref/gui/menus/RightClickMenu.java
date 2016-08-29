@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.menus;
 
 import java.awt.event.ActionEvent;
@@ -40,7 +25,6 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
-import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -111,7 +95,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             add(markSpecific);
             add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entries"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon()));
         } else if (be != null) {
-            Optional<String> marked = be.getFieldOptional(FieldName.MARKED_INTERNAL);
+            Optional<String> marked = be.getField(FieldName.MARKED_INTERNAL);
             // We have to check for "" too as the marked field may be empty
             if ((!marked.isPresent()) || marked.get().isEmpty()) {
                 add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entry"), IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon()));
@@ -249,15 +233,14 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     @Override
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
         panel.storeCurrentEdit();
-        GroupTreeNode groups = panel.getBibDatabaseContext().getMetaData().getGroups();
-        if (groups == null) {
-            groupAdd.setEnabled(false);
-            groupRemove.setEnabled(false);
-            groupMoveTo.setEnabled(false);
-        } else {
+        if (panel.getBibDatabaseContext().getMetaData().getGroups().isPresent()) {
             groupAdd.setEnabled(true);
             groupRemove.setEnabled(true);
             groupMoveTo.setEnabled(true);
+        } else {
+            groupAdd.setEnabled(false);
+            groupRemove.setEnabled(false);
+            groupMoveTo.setEnabled(false);
         }
     }
 
@@ -288,7 +271,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         if (panel.getMainTable().getSelectedRowCount() == 1) {
             BibEntry entry = panel.getMainTable().getSelected().get(0);
             if(entry.hasField(FieldName.FILE)) {
-                JLabel label = FileListTableModel.getFirstLabel(entry.getFieldOptional(FieldName.FILE).get());
+                JLabel label = FileListTableModel.getFirstLabel(entry.getField(FieldName.FILE).get());
                 if (label != null) {
                     return label.getIcon();
                 }

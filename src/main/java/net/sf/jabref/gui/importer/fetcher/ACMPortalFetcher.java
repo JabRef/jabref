@@ -1,19 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef Contributors
-    Copyright (C) 2003-2011 Aaron Chen
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.importer.fetcher;
 
 import java.awt.Dimension;
@@ -47,7 +31,6 @@ import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
@@ -198,7 +181,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             if (selentry.getValue()) {
                 downloadEntryBibTeX(selentry.getKey(), fetchAbstract).ifPresent(entry ->  {
                     // Convert from HTML and optionally add curly brackets around key words to keep the case
-                    entry.getFieldOptional(FieldName.TITLE).ifPresent(title -> {
+                    entry.getField(FieldName.TITLE).ifPresent(title -> {
                         title = title.replace("\\&", "&").replace("\\#", "#");
                         title = convertHTMLChars(title);
 
@@ -214,7 +197,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                         entry.setField(FieldName.TITLE, title);
                     });
 
-                    entry.getFieldOptional(FieldName.ABSTRACT)
+                    entry.getField(FieldName.ABSTRACT)
                             .ifPresent(abstr -> entry.setField(FieldName.ABSTRACT, convertHTMLChars(abstr)));
                     inspector.addEntry(entry);
                 });
@@ -340,7 +323,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             Collection<BibEntry> items = null;
             try (BufferedReader in = new BufferedReader(
                     new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
-                items = BibtexParser.parse(in, ImportFormatPreferences.fromPreferences(Globals.prefs)).getDatabase()
+                items = BibtexParser.parse(in, Globals.prefs.getImportFormatPreferences()).getDatabase()
                         .getEntries();
             } catch (IOException e) {
                 LOGGER.info("Download of BibTeX information from ACM Portal failed.", e);
@@ -404,9 +387,8 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
                 } catch (NumberFormatException ex) {
                     throw new IOException("Cannot parse number of hits");
                 }
-            } else {
-                LOGGER.info("Unmatched! " + substring);
             }
+            LOGGER.info("Unmatched! " + substring);
         }
         throw new IOException("Cannot parse number of hits");
     }

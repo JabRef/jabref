@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.exporter;
 
 import java.io.File;
@@ -73,7 +58,7 @@ public class AutoSaveManager {
             // there could be changes done by the user while this method is running.
 
             for (BasePanel panel : frame.getBasePanelList()) {
-                if (panel.isModified() && (panel.getBibDatabaseContext().getDatabaseFile() != null)) {
+                if (panel.isModified() && (panel.getBibDatabaseContext().getDatabaseFile().isPresent())) {
                         AutoSaveManager.autoSave(panel);
                 }
             }
@@ -87,12 +72,13 @@ public class AutoSaveManager {
      * @return true if successful, false otherwise.
      */
     private static boolean autoSave(BasePanel panel) {
-        File databaseFile = panel.getBibDatabaseContext().getDatabaseFile();
+        File databaseFile = panel.getBibDatabaseContext().getDatabaseFile().orElse(null);
         File backupFile = AutoSaveUtil.getAutoSaveFile(databaseFile);
         try {
             SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs)
                     .withMakeBackup(false)
-                    .withEncoding(panel.getBibDatabaseContext().getMetaData().getEncoding());
+                    .withEncoding(panel.getBibDatabaseContext().getMetaData().getEncoding()
+                            .orElse(Globals.prefs.getDefaultEncoding()));
 
             BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
             SaveSession ss = databaseWriter.saveDatabase(panel.getBibDatabaseContext(), prefs);
@@ -110,10 +96,10 @@ public class AutoSaveManager {
      * @return true if there was no autosave or if the autosave was successfully deleted, false otherwise.
      */
     public static boolean deleteAutoSaveFile(BasePanel panel) {
-        if (panel.getBibDatabaseContext().getDatabaseFile() == null) {
+        if (!panel.getBibDatabaseContext().getDatabaseFile().isPresent()) {
             return true;
         }
-        File backupFile = AutoSaveUtil.getAutoSaveFile(panel.getBibDatabaseContext().getDatabaseFile());
+        File backupFile = AutoSaveUtil.getAutoSaveFile(panel.getBibDatabaseContext().getDatabaseFile().get());
         if (backupFile.exists()) {
             return backupFile.delete();
         } else {

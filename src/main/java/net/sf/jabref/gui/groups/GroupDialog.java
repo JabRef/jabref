@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.groups;
 
 import java.awt.BorderLayout;
@@ -280,14 +265,15 @@ class GroupDialog extends JDialog {
                 isOkPressed = true;
             try {
                 if (explicitRadioButton.isSelected()) {
-                    resultingGroup = new ExplicitGroup(nameField.getText().trim(), getContext(), Globals.prefs);
+                    resultingGroup = new ExplicitGroup(nameField.getText().trim(), getContext(),
+                            Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                 } else if (keywordsRadioButton.isSelected()) {
                     // regex is correct, otherwise OK would have been disabled
                     // therefore I don't catch anything here
-                    resultingGroup = new KeywordGroup(nameField.getText().trim(), keywordGroupSearchField.getText().trim(),
-                            keywordGroupSearchTerm.getText().trim(), keywordGroupCaseSensitive.isSelected(), keywordGroupRegExp
-                            .isSelected(),
-                            getContext(), Globals.prefs);
+                    resultingGroup = new KeywordGroup(nameField.getText().trim(),
+                            keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
+                            keywordGroupCaseSensitive.isSelected(), keywordGroupRegExp.isSelected(), getContext(),
+                            Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                 } else if (searchRadioButton.isSelected()) {
                     try {
                         // regex is correct, otherwise OK would have been

@@ -1,54 +1,3 @@
-/*
- Copyright (C) 2004 R. Nagel
- Copyright (C) 2015-2016 JabRef Contributors.
-
- All programs in this directory and
- subdirectories are published under the GNU General Public License as
- described below.
-
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or (at
- your option) any later version.
-
- This program is distributed in the hope that it will be useful, but
- WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
- USA
-
- Further information about the GNU GPL is available at:
- http://www.gnu.org/copyleft/gpl.ja.html
-
- */
-
-// created by : r.nagel 14.09.2004
-//
-// function : import from plain text => simple mark/copy/paste into bibtex entry
-//
-// todo     : - change colors and fonts
-//            - delete selected text
-//            - make textarea editable
-//            - create several bibtex entries in dialog
-//            - if the dialog works with an existing entry (right click menu item)
-//              the cancel option doesn't work well
-//
-// modified :
-//            28.07.2005
-//            - fix: insert button doesnt work
-//            - append a author with "and"
-//            04.11.2004
-//            - experimental: text-input-area with underlying infotext
-//            02.11.2004
-//            - integrity check, which reports errors and warnings for the fields
-//            22.10.2004
-//            - little help box
-//
-
 package net.sf.jabref.gui.plaintextimport;
 
 import java.awt.BorderLayout;
@@ -121,8 +70,6 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.util.component.OverlayPanel;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
-import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.FreeCiteImporter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -133,7 +80,7 @@ import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -141,6 +88,16 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * import from plain text => simple mark/copy/paste into bibtex entry
+ *
+ * TODO
+ *   - change colors and fonts
+ *   - delete selected text
+ *   - make textarea editable
+ *   - create several bibtex entries in dialog
+ *   - if the dialog works with an existing entry (right click menu item), the cancel option doesn't work well
+ */
 public class TextInputDialog extends JDialog {
 
     private static final Log LOGGER = LogFactory.getLog(TextInputDialog.class);
@@ -464,12 +421,12 @@ public class TextInputDialog extends JDialog {
                     markedTextStore.appendPosition(fieldName, selectionStart, selectionEnd);
 
                     // get old text from BibTeX tag
-                    Optional<String> old = entry.getFieldOptional(fieldName);
+                    Optional<String> old = entry.getField(fieldName);
 
                     // merge old and selected text
                     if (old.isPresent()) {
                         // insert a new name with an additional "and"
-                        if (InternalBibtexFields.getFieldExtras(fieldName).contains(FieldProperties.PERSON_NAMES)) {
+                        if (InternalBibtexFields.getFieldProperties(fieldName).contains(FieldProperty.PERSON_NAMES)) {
                             entry.setField(fieldName, old.get() + " and " + txt);
                         } else if (FieldName.KEYWORDS.equals(fieldName)) {
                             // Add keyword
@@ -497,7 +454,7 @@ public class TextInputDialog extends JDialog {
      * @return true if successful, false otherwise
      */
     private boolean parseWithFreeCiteAndAddEntries() {
-        FreeCiteImporter fimp = new FreeCiteImporter(ImportFormatPreferences.fromPreferences(Globals.prefs));
+        FreeCiteImporter fimp = new FreeCiteImporter(Globals.prefs.getImportFormatPreferences());
         String text = textPane.getText();
 
         // we have to remove line breaks (but keep empty lines)
@@ -534,7 +491,7 @@ public class TextInputDialog extends JDialog {
     private void updateSourceView() {
         StringWriter sw = new StringWriter(200);
         try {
-            new BibEntryWriter(new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)),
+            new BibEntryWriter(new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()),
                     false).write(entry, sw, frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
             sourcePreview.setText(sw.getBuffer().toString());
         } catch (IOException ex) {
@@ -594,8 +551,10 @@ public class TextInputDialog extends JDialog {
         @Override
         public void actionPerformed(ActionEvent e) {
             try {
-                Optional<Path> path = new FileDialog(frame).withExtension(FileExtensions.TXT)
-                        .showDialogAndGetSelectedFile();
+                FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.TXT);
+                dialog.setDefaultExtension(FileExtensions.TXT);
+                Optional<Path> path = dialog.showDialogAndGetSelectedFile();
+
                 if (path.isPresent()) {
                     File newFile = path.get().toFile();
                     document.remove(0, document.getLength());

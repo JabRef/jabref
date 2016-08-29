@@ -18,6 +18,7 @@ public class PostgreSQLProcessor extends DBMSProcessor {
 
     /**
      * Creates and sets up the needed tables and columns according to the database type.
+     *
      * @throws SQLException
      */
     @Override
@@ -34,9 +35,10 @@ public class PostgreSQLProcessor extends DBMSProcessor {
                 "\"NAME\" VARCHAR, " +
                 "\"VALUE\" TEXT)");
 
-        connection.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS \"METADATA\" ("
-                    + "\"KEY\" VARCHAR,"
-                    + "\"VALUE\" TEXT)");
+        connection.createStatement().executeUpdate(
+                "CREATE TABLE IF NOT EXISTS \"METADATA\" ("
+                + "\"KEY\" VARCHAR,"
+                + "\"VALUE\" TEXT)");
     }
 
     @Override

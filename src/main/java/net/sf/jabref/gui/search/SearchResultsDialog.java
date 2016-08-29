@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.search;
 
 import java.awt.BorderLayout;
@@ -68,7 +53,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -352,7 +337,7 @@ public class SearchResultsDialog {
                 case FILE_COL:
                     if (entry.hasField(FieldName.FILE)) {
                         FileListTableModel tableModel = new FileListTableModel();
-                        entry.getFieldOptional(FieldName.FILE).ifPresent(tableModel::setContent);
+                        entry.getField(FieldName.FILE).ifPresent(tableModel::setContent);
                         if (tableModel.getRowCount() == 0) {
                             return;
                         }
@@ -362,7 +347,7 @@ public class SearchResultsDialog {
                     }
                     break;
                 case URL_COL:
-                    entry.getFieldOptional(FieldName.URL).ifPresent(link -> { try {
+                    entry.getField(FieldName.URL).ifPresent(link -> { try {
                         JabRefDesktop.openExternalViewer(p.getBibDatabaseContext(), link, FieldName.URL);
                     } catch (IOException ex) {
                             LOGGER.warn("Could not open viewer", ex);
@@ -392,7 +377,7 @@ public class SearchResultsDialog {
             if (col == FILE_COL) {
                 // We use a FileListTableModel to parse the field content:
                 FileListTableModel fileList = new FileListTableModel();
-                entry.getFieldOptional(FieldName.FILE).ifPresent(fileList::setContent);
+                entry.getField(FieldName.FILE).ifPresent(fileList::setContent);
                 // If there are one or more links, open the first one:
                 for (int i = 0; i < fileList.getRowCount(); i++) {
                     FileListEntry flEntry = fileList.getEntry(i);
@@ -462,7 +447,7 @@ public class SearchResultsDialog {
                 case FILE_COL:
                     if (entry.hasField(FieldName.FILE)) {
                         FileListTableModel tmpModel = new FileListTableModel();
-                        entry.getFieldOptional(FieldName.FILE).ifPresent(tmpModel::setContent);
+                        entry.getField(FieldName.FILE).ifPresent(tmpModel::setContent);
                         fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
                         if (tmpModel.getRowCount() > 0) {
                             if (tmpModel.getEntry(0).type.isPresent()) {
@@ -477,7 +462,7 @@ public class SearchResultsDialog {
                     }
                 case URL_COL:
                     if (entry.hasField(FieldName.URL)) {
-                        urlLabel.setToolTipText(entry.getFieldOptional(FieldName.URL).get());
+                        urlLabel.setToolTipText(entry.getField(FieldName.URL).get());
                         return urlLabel;
                     } else {
                         return null;
@@ -488,14 +473,14 @@ public class SearchResultsDialog {
             }
             else {
                 String field = FIELDS[column - PAD];
-                if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
+                if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES)) {
                     // For name fields, tap into a MainTableFormat instance and use
                     // the same name formatting as is used in the entry table:
                     if (frame.getCurrentBasePanel() != null) {
-                        return MainTableNameFormatter.formatName(entry.getFieldOptional(field).orElse(null));
+                        return MainTableNameFormatter.formatName(entry.getField(field).orElse(null));
                     }
                 }
-                return entry.getFieldOptional(field).orElse(null);
+                return entry.getField(field).orElse(null);
             }
         }
 

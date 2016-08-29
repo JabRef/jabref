@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref;
 
 import java.io.File;
@@ -38,7 +23,6 @@ import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
 import net.sf.jabref.gui.importer.worker.AutosaveStartupPrompter;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.worker.VersionWorker;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
@@ -72,7 +56,7 @@ public class JabRefGUI {
 
         // passed file (we take the first one) should be focused
         if (!argsDatabases.isEmpty()) {
-            focusedFile = argsDatabases.get(0).getFile().getAbsolutePath();
+            focusedFile = argsDatabases.get(0).getFile().get().getAbsolutePath();
         } else {
             focusedFile = Globals.prefs.get(JabRefPreferences.LAST_FOCUSED);
         }
@@ -127,7 +111,7 @@ public class JabRefGUI {
                 ParserResult pr = parserResultIterator.next();
 
                 // Define focused tab
-                if ((focusedFile != null) && pr.getFile().getAbsolutePath().equals(focusedFile)) {
+                if (pr.getFile().get().getAbsolutePath().equals(focusedFile)) {
                     first = true;
                 }
 
@@ -145,7 +129,7 @@ public class JabRefGUI {
                     }
                 } else {
                     parserResultIterator.remove();
-                    postponed.add(pr.getFile());
+                    postponed.add(pr.getFile().get());
                 }
             }
         }
@@ -175,7 +159,8 @@ public class JabRefGUI {
         }
 
         for (ParserResult pr : failed) {
-            String message = "<html>" + Localization.lang("Error opening file '%0'.", pr.getFile().getName()) + "<p>"
+            String message = "<html>" + Localization.lang("Error opening file '%0'.", pr.getFile().get().getName())
+                    + "<p>"
                     + pr.getErrorMessage() + "</html>";
 
             JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(), message, Localization.lang("Error opening file"),
@@ -233,7 +218,7 @@ public class JabRefGUI {
             }
 
             ParserResult parsedDatabase = OpenDatabase.loadDatabaseOrAutoSave(fileName, false,
-                    ImportFormatPreferences.fromPreferences(Globals.prefs));
+                    Globals.prefs.getImportFormatPreferences());
 
             if (parsedDatabase.isNullResult()) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
@@ -245,7 +230,7 @@ public class JabRefGUI {
 
     private boolean isLoaded(File fileToOpen) {
         for (ParserResult pr : bibDatabases) {
-            if ((pr.getFile() != null) && pr.getFile().equals(fileToOpen)) {
+            if (pr.getFile().isPresent() && pr.getFile().get().equals(fileToOpen)) {
                 return true;
             }
         }

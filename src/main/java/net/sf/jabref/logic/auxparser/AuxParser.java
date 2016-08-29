@@ -149,7 +149,7 @@ public class AuxParser {
      * Resolves and adds CrossRef entries
      */
     private void resolveCrossReferences(BibEntry entry, AuxParserResult result) {
-        entry.getFieldOptional(FieldName.CROSSREF).ifPresent(crossref -> {
+        entry.getField(FieldName.CROSSREF).ifPresent(crossref -> {
             if (!result.getUniqueKeys().contains(crossref)) {
                 Optional<BibEntry> refEntry = masterDatabase.getEntryByKey(crossref);
 

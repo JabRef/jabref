@@ -19,6 +19,7 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.integrity.IntegrityCheck;
@@ -43,7 +44,8 @@ public class IntegrityCheckAction extends MnemonicAwareAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        IntegrityCheck check = new IntegrityCheck(frame.getCurrentBasePanel().getBibDatabaseContext());
+        IntegrityCheck check = new IntegrityCheck(frame.getCurrentBasePanel().getBibDatabaseContext(),
+                Globals.prefs.getFileDirectoryPreferences());
         List<IntegrityMessage> messages = check.checkBibtexDatabase();
 
         if (messages.isEmpty()) {

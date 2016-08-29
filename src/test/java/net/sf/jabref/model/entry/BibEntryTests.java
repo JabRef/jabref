@@ -41,7 +41,7 @@ public class BibEntryTests {
         // we have to use `getType("misc")` in the case of biblatex mode
         Assert.assertEquals("misc", entry.getType());
         Assert.assertNotNull(entry.getId());
-        Assert.assertFalse(entry.getFieldOptional("author").isPresent());
+        Assert.assertFalse(entry.getField("author").isPresent());
     }
 
     @Test
@@ -364,9 +364,9 @@ public class BibEntryTests {
         be.setCiteKey("Einstein1931");
         Assert.assertTrue(be.hasCiteKey());
         Assert.assertEquals(Optional.of("Einstein1931"), be.getCiteKeyOptional());
-        Assert.assertEquals(Optional.of("Albert Einstein"), be.getFieldOptional("author"));
+        Assert.assertEquals(Optional.of("Albert Einstein"), be.getField("author"));
         be.clearField("author");
-        Assert.assertEquals(Optional.empty(), be.getFieldOptional("author"));
+        Assert.assertEquals(Optional.empty(), be.getField("author"));
 
         String id = IdGenerator.next();
         be.setId(id);

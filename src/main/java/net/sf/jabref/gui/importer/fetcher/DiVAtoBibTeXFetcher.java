@@ -1,17 +1,3 @@
-/*  Copyright (C) 2012 JabRef contributors.
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 package net.sf.jabref.gui.importer.fetcher;
 
 import java.io.FileNotFoundException;
@@ -31,7 +17,6 @@ import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
@@ -95,11 +80,11 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
             return false;
         }
 
-        Optional<BibEntry> entry = BibtexParser.singleFromStringOptional(bibtexString,
-                ImportFormatPreferences.fromPreferences(Globals.prefs));
+        Optional<BibEntry> entry = BibtexParser.singleFromString(bibtexString,
+                Globals.prefs.getImportFormatPreferences());
         if (entry.isPresent()) {
             // Optionally add curly brackets around key words to keep the case
-            entry.get().getFieldOptional(FieldName.TITLE).ifPresent(title -> {
+            entry.get().getField(FieldName.TITLE).ifPresent(title -> {
                 // Unit formatting
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH)) {
                     title = unitsToLatexFormatter.format(title);
@@ -112,7 +97,7 @@ public class DiVAtoBibTeXFetcher implements EntryFetcher {
                 entry.get().setField(FieldName.TITLE, title);
             });
 
-            entry.get().getFieldOptional(FieldName.INSTITUTION).ifPresent(
+            entry.get().getField(FieldName.INSTITUTION).ifPresent(
                     institution -> entry.get().setField(FieldName.INSTITUTION,
                             new UnicodeToLatexFormatter().format(institution)));
             // Do not use the provided key

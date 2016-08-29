@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.external;
 
 import java.awt.event.ActionEvent;
@@ -83,7 +68,8 @@ public class MoveFileAction extends AbstractAction {
         }
 
         // Get an absolute path representation:
-        List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext().getFileDirectory();
+        List<String> dirs = frame.getCurrentBasePanel().getBibDatabaseContext()
+                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
             if (new File(dirs.get(i)).exists()) {
@@ -112,7 +98,8 @@ public class MoveFileAction extends AbstractAction {
                     // Determine which name to suggest:
                     String suggName = FileUtil
                             .createFileNameFromPattern(eEditor.getDatabase(), eEditor.getEntry(),
-                                    Globals.journalAbbreviationLoader, Globals.prefs)
+                                    Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
+                                    Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader))
                             .concat(entry.type.isPresent() ? "." + entry.type.get().getExtension() : "");
                     CheckBoxMessage cbm = new CheckBoxMessage(Localization.lang("Move file to file directory?"),
                             Localization.lang("Rename to '%0'", suggName),
@@ -153,7 +140,7 @@ public class MoveFileAction extends AbstractAction {
 
             }
 
-            if (!newFile.equals(file)) {
+            if ((newFile != null) && !newFile.equals(file)) {
                 try {
                     boolean success = file.renameTo(newFile);
                     if (!success) {

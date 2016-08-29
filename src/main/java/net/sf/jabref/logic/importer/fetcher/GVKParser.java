@@ -1,6 +1,3 @@
-/**
- * License: GPLv2, but Jan Frederik Maas agreed to change license upon request
- */
 package net.sf.jabref.logic.importer.fetcher;
 
 import java.io.IOException;

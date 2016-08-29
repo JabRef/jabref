@@ -20,7 +20,7 @@ public class ISBNChecker implements Checker {
         }
 
         // Check that the ISBN is on the correct form
-        ISBN isbn = new ISBN(entry.getFieldOptional(FieldName.ISBN).get());
+        ISBN isbn = new ISBN(entry.getField(FieldName.ISBN).get());
 
         if (!isbn.isValidFormat()) {
             return Collections.singletonList(

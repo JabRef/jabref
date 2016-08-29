@@ -54,15 +54,11 @@ public class DOItoBibTeX {
             bibtexString = cleanupEncoding(bibtexString);
 
             // BibTeX entry
-            BibEntry entry = BibtexParser.singleFromString(bibtexString, importFormatPreferences);
+            Optional<BibEntry> bibEntry = BibtexParser.singleFromString(bibtexString, importFormatPreferences);
 
-            if (entry == null) {
-                return Optional.empty();
-            }
-            // Optionally re-format BibTeX entry
-            formatTitleField(entry, importFormatPreferences);
+            bibEntry.ifPresent(entry -> formatTitleField(entry, importFormatPreferences));
 
-            return Optional.of(entry);
+            return bibEntry;
         } catch (MalformedURLException e) {
             LOGGER.warn("Bad DOI URL", e);
             return Optional.empty();
@@ -80,7 +76,7 @@ public class DOItoBibTeX {
 
     private static void formatTitleField(BibEntry entry, ImportFormatPreferences importFormatPreferences) {
         // Optionally add curly brackets around key words to keep the case
-        entry.getFieldOptional(FieldName.TITLE).ifPresent(title -> {
+        entry.getField(FieldName.TITLE).ifPresent(title -> {
             // Unit formatting
             if (importFormatPreferences.isConvertUnitsOnSearch()) {
                 title = unitsToLatexFormatter.format(title);

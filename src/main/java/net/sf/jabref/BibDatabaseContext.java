@@ -6,13 +6,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
 import net.sf.jabref.model.database.DatabaseLocation;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.DBMSSynchronizer;
 
 /**
@@ -98,10 +96,10 @@ public class BibDatabaseContext {
     /**
      * Get the file where this database was last saved to or loaded from, if any.
      *
-     * @return The relevant File, or null if none is defined.
+     * @return Optional of the relevant File, or Optional.empty() if none is defined.
      */
-    public File getDatabaseFile() {
-        return file;
+    public Optional<File> getDatabaseFile() {
+        return Optional.ofNullable(file);
     }
 
     public void setDatabaseFile(File file) {
@@ -120,27 +118,32 @@ public class BibDatabaseContext {
         return getMode() == BibDatabaseMode.BIBLATEX;
     }
 
+    public List<String> getFileDirectory(FileDirectoryPreferences preferences) {
+        return getFileDirectory(FieldName.FILE, preferences);
+    }
+
     /**
-     * Look up the directory set up for the given field type for this database.
-     * If no directory is set up, return that defined in global preferences.
-     * There can be up to three directory definitions for these files:
-     * the database's metadata can specify a general directory and/or a user-specific directory
-     * or the preferences can specify one.
-     * <p>
-     * The settings are prioritized in the following order and the first defined setting is used:
-     * 1. metadata user-specific directory
-     * 2. metadata general directory
-     * 3. preferences directory
-     * 4. BIB file directory
-     *
-     * @param fieldName The field type
-     * @return The default directory for this field type.
-     */
-    public List<String> getFileDirectory(String fieldName) {
+    * Look up the directory set up for the given field type for this database.
+    * If no directory is set up, return that defined in global preferences.
+    * There can be up to three directory definitions for these files:
+    * the database's metadata can specify a general directory and/or a user-specific directory
+    * or the preferences can specify one.
+    * <p>
+    * The settings are prioritized in the following order and the first defined setting is used:
+    * 1. metadata user-specific directory
+    * 2. metadata general directory
+    * 3. preferences directory
+    * 4. BIB file directory
+    *
+    * @param
+    * @param fieldName The field type
+    * @return The default directory for this field type.
+    */
+    public List<String> getFileDirectory(String fieldName, FileDirectoryPreferences preferences) {
         List<String> fileDirs = new ArrayList<>();
 
         // 1. metadata user-specific directory
-        Optional<String> userFileDirectory = metaData.getUserFileDirectory(Globals.prefs.getUser());
+        Optional<String> userFileDirectory = metaData.getUserFileDirectory(preferences.getUser());
         if(userFileDirectory.isPresent()) {
             fileDirs.add(getFileDirectoryPath(userFileDirectory.get()));
         }
@@ -152,21 +155,18 @@ public class BibDatabaseContext {
         }
 
         // 3. preferences directory
-        String dir = Globals.prefs.get(fieldName + FileLinkPreferences.DIR_SUFFIX); // FILE_DIR
-        if (dir != null) {
-            fileDirs.add(dir);
-        }
+        preferences.getFileDirectory(fieldName).ifPresent(fileDirs::add);
 
         // 4. BIB file directory
-        if (getDatabaseFile() != null) {
-            String parentDir = getDatabaseFile().getParent();
+        getDatabaseFile().ifPresent(databaseFile -> {
+            String parentDir = databaseFile.getParent();
             // Check if we should add it as primary file dir (first in the list) or not:
-            if (Globals.prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR)) {
+            if (preferences.isBibLocationAsPrimary()) {
                 fileDirs.add(0, parentDir);
             } else {
                 fileDirs.add(parentDir);
             }
-        }
+        });
 
         return fileDirs;
     }
@@ -175,13 +175,14 @@ public class BibDatabaseContext {
         String dir = directoryName;
         // If this directory is relative, we try to interpret it as relative to
         // the file path of this BIB file:
-        if (!new File(dir).isAbsolute() && (getDatabaseFile() != null)) {
+        Optional<File> databaseFile = getDatabaseFile();
+        if (!new File(dir).isAbsolute() && databaseFile.isPresent()) {
             String relDir;
             if (".".equals(dir)) {
                 // if dir is only "current" directory, just use its parent (== real current directory) as path
-                relDir = getDatabaseFile().getParent();
+                relDir = databaseFile.get().getParent();
             } else {
-                relDir = getDatabaseFile().getParent() + File.separator + dir;
+                relDir = databaseFile.get().getParent() + File.separator + dir;
             }
             // If this directory actually exists, it is very likely that the
             // user wants us to use it:
@@ -190,10 +191,6 @@ public class BibDatabaseContext {
             }
         }
         return dir;
-    }
-
-    public List<String> getFileDirectory() {
-        return getFileDirectory(FieldName.FILE);
     }
 
     public DBMSSynchronizer getDBSynchronizer() {

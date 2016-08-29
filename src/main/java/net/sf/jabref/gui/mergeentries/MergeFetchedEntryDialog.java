@@ -1,18 +1,3 @@
-/*  Copyright (C) 2012-2015 JabRef contributors.
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License along
- with this program; if not, write to the Free Software Foundation, Inc.,
- 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.mergeentries;
 
 import java.util.Optional;
@@ -138,8 +123,8 @@ public class MergeFetchedEntryDialog extends JDialog {
 
             // fields
             for (String field : jointFields) {
-                Optional<String> originalString = originalEntry.getFieldOptional(field);
-                Optional<String> mergedString = mergedEntry.getFieldOptional(field);
+                Optional<String> originalString = originalEntry.getField(field);
+                Optional<String> mergedString = mergedEntry.getField(field);
                 if (!originalString.isPresent() || !originalString.equals(mergedString)) {
                     originalEntry.setField(field, mergedString.get()); // mergedString always present
                     ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString.orElse(null),
@@ -151,7 +136,7 @@ public class MergeFetchedEntryDialog extends JDialog {
             // Remove fields which are not in the merged entry, unless they are internal fields
             for (String field : originalFields) {
                 if (!jointFields.contains(field) && !InternalBibtexFields.isInternalField(field)) {
-                    Optional<String> originalString = originalEntry.getFieldOptional(field);
+                    Optional<String> originalString = originalEntry.getField(field);
                     originalEntry.clearField(field);
                     ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString.get(), null)); // originalString always present
                     edited = true;

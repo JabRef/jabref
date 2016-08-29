@@ -1,16 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.cleanup;
 
 import java.io.File;
@@ -21,31 +8,34 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.FileDirectoryPreferences;
 import net.sf.jabref.logic.TypedBibEntry;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.ParsedFileField;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 public class RenamePdfCleanup implements CleanupJob {
 
     private final BibDatabaseContext databaseContext;
     private final boolean onlyRelativePaths;
-    private final JournalAbbreviationLoader repositoryLoader;
-    private final JabRefPreferences prefs;
+    private final String fileNamePattern;
+    private final LayoutFormatterPreferences prefs;
+    private final FileDirectoryPreferences fileDirectoryPreferences;
 
     private int unsuccessfulRenames;
 
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext,
-            JournalAbbreviationLoader repositoryLoader, JabRefPreferences prefs) {
+ String fileNamePattern,
+            LayoutFormatterPreferences prefs, FileDirectoryPreferences fileDirectoryPreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
-        this.repositoryLoader = Objects.requireNonNull(repositoryLoader);
+        this.fileNamePattern = Objects.requireNonNull(fileNamePattern);
         this.prefs = Objects.requireNonNull(prefs);
+        this.fileDirectoryPreferences = fileDirectoryPreferences;
     }
 
     @Override
@@ -63,9 +53,8 @@ public class RenamePdfCleanup implements CleanupJob {
                 continue;
             }
 
-            StringBuilder newFilename = new StringBuilder(
-                    FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, repositoryLoader, prefs)
-                            .trim());
+            StringBuilder newFilename = new StringBuilder(FileUtil
+                    .createFileNameFromPattern(databaseContext.getDatabase(), entry, fileNamePattern, prefs).trim());
 
             //Add extension to newFilename
             newFilename.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
@@ -73,7 +62,7 @@ public class RenamePdfCleanup implements CleanupJob {
             //get new Filename with path
             //Create new Path based on old Path and new filename
             Optional<File> expandedOldFile = FileUtil.expandFilename(realOldFilename,
-                    databaseContext.getFileDirectory());
+                    databaseContext.getFileDirectory(fileDirectoryPreferences));
             if ((!expandedOldFile.isPresent()) || (expandedOldFile.get().getParent() == null)) {
                 // something went wrong. Just skip this entry
                 newFileList.add(flEntry);
@@ -106,7 +95,8 @@ public class RenamePdfCleanup implements CleanupJob {
                 // we cannot use "newPath" to generate a FileListEntry as newPath is absolute, but we want to keep relative paths whenever possible
                 File parent = (new File(realOldFilename)).getParentFile();
                 String newFileEntryFileName;
-                if ((parent == null) || databaseContext.getFileDirectory().contains(parent.getAbsolutePath())) {
+                if ((parent == null) || databaseContext.getFileDirectory(fileDirectoryPreferences)
+                        .contains(parent.getAbsolutePath())) {
                     newFileEntryFileName = newFilename.toString();
                 } else {
                     newFileEntryFileName = parent.toString().concat(OS.FILE_SEPARATOR).concat(newFilename.toString());

@@ -81,15 +81,6 @@ public class FileDialog {
     }
 
     /**
-     * Show only directories instead of files and folders
-     * @return FileDialog
-     */
-    public FileDialog dirsOnly() {
-        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        return this;
-    }
-
-    /**
      * Add a single extension as file filter
      * @param singleExt The extension
      * @return FileDialog
@@ -156,6 +147,18 @@ public class FileDialog {
         return this;
     }
 
+    /**
+     * Shows an {@link JFileChooser#OPEN_DIALOG} and allows to select a single folder
+     * @return The path of the selected folder or {@link Optional#empty()} if dialog is aborted
+     */
+    public Optional<Path> showDialogAndGetSelectedDirectory() {
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setDialogTitle(Localization.lang("Select directory"));
+        fileChooser.setApproveButtonText(Localization.lang("Select"));
+        fileChooser.setApproveButtonToolTipText(Localization.lang("Select directory"));
+
+        return showDialogAndGetSelectedFile();
+    }
     /**
      * Shows an {@link JFileChooser#OPEN_DIALOG} and allows to select multiple files
      * @return List containing the paths of all files or an empty list if dialog is canceled

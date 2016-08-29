@@ -10,7 +10,6 @@ import net.sf.jabref.gui.protectedterms.NewProtectedTermsFileDialog;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsList;
-import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 
 public class ProtectedTermsMenu extends JMenu {
 
@@ -64,7 +63,7 @@ public class ProtectedTermsMenu extends JMenu {
             dialog.setVisible(true);
             if (dialog.isOKPressed()) {
                 // Update preferences with new list
-                ProtectedTermsPreferences.toPreferences(Globals.prefs, Globals.protectedTermsLoader);
+                Globals.prefs.setProtectedTermsPreferences(Globals.protectedTermsLoader);
             }
         });
         externalFiles.add(addToNewFileItem);

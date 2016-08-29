@@ -1,20 +1,3 @@
-/*  Copyright (C) 2005-2015 JabRef contributors.
- Copyright (C) 2005 Andreas Rudert, based on ExportCustomizationDialog by ??
-
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.importer;
 
 import java.awt.BorderLayout;
@@ -51,12 +34,10 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
 import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
-import net.sf.jabref.logic.xmp.XMPPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
@@ -66,22 +47,17 @@ import org.apache.commons.logging.LogFactory;
  * Dialog to manage custom importers.
  */
 public class ImportCustomizationDialog extends JDialog {
+    private static final Log LOGGER = LogFactory.getLog(ImportCustomizationDialog.class);
 
     // Column widths for import customization dialog table:
     private static final int COL_0_WIDTH = 200;
     private static final int COL_1_WIDTH = 80;
     private static final int COL_2_WIDTH = 200;
+
     private static final int COL_3_WIDTH = 200;
 
     private final JTable customImporterTable;
 
-    private static final Log LOGGER = LogFactory.getLog(ImportCustomizationDialog.class);
-
-
-    /**
-     *
-     * @param frame
-     */
     public ImportCustomizationDialog(final JabRefFrame frame) {
         super(frame, Localization.lang("Manage custom imports"), false);
 
@@ -106,8 +82,9 @@ public class ImportCustomizationDialog extends JDialog {
         addFromFolderButton.addActionListener(e -> {
             CustomImporter importer = new CustomImporter();
 
-            Optional<Path> selectedFile = new FileDialog(frame).withExtension(FileExtensions.CLASS)
-                    .showDialogAndGetSelectedFile();
+            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.CLASS);
+            dialog.setDefaultExtension(FileExtensions.CLASS);
+            Optional<Path> selectedFile = dialog.showDialogAndGetSelectedFile();
 
             if (selectedFile.isPresent() && (selectedFile.get().getParent() != null)) {
                 importer.setBasePath(selectedFile.get().getParent().toString());
@@ -136,8 +113,9 @@ public class ImportCustomizationDialog extends JDialog {
 
         JButton addFromJarButton = new JButton(Localization.lang("Add from JAR"));
         addFromJarButton.addActionListener(e -> {
-            Optional<Path> jarZipFile = new FileDialog(frame)
-                    .withExtensions(EnumSet.of(FileExtensions.ZIP, FileExtensions.JAR)).showDialogAndGetSelectedFile();
+            FileDialog dialog = new FileDialog(frame).withExtensions(EnumSet.of(FileExtensions.ZIP, FileExtensions.JAR));
+            dialog.setDefaultExtension(FileExtensions.JAR);
+            Optional<Path> jarZipFile = dialog.showDialogAndGetSelectedFile();
 
             if (jarZipFile.isPresent()) {
                 try (ZipFile zipFile = new ZipFile(jarZipFile.get().toFile(), ZipFile.OPEN_READ)) {
@@ -157,7 +135,6 @@ public class ImportCustomizationDialog extends JDialog {
                                     + Localization.lang("Have you chosen the correct package path?"));
                 }
             }
-
         });
         addFromJarButton
                 .setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a ZIP-archive.")
@@ -190,8 +167,8 @@ public class ImportCustomizationDialog extends JDialog {
                 customImporterTable.removeRowSelectionInterval(row, row);
                 Globals.prefs.customImports
                         .remove(((ImportTableModel) customImporterTable.getModel()).getImporter(row));
-                Globals.IMPORT_FORMAT_READER.resetImportFormats(ImportFormatPreferences.fromPreferences(Globals.prefs),
-                        XMPPreferences.fromPreferences(Globals.prefs));
+                Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
+                        Globals.prefs.getXMPPreferences());
                 customImporterTable.revalidate();
                 customImporterTable.repaint();
             }
@@ -281,8 +258,8 @@ public class ImportCustomizationDialog extends JDialog {
      */
     public void addOrReplaceImporter(CustomImporter importer) {
         Globals.prefs.customImports.replaceImporter(importer);
-        Globals.IMPORT_FORMAT_READER.resetImportFormats(ImportFormatPreferences.fromPreferences(Globals.prefs),
-                XMPPreferences.fromPreferences(Globals.prefs));
+        Globals.IMPORT_FORMAT_READER.resetImportFormats(Globals.prefs.getImportFormatPreferences(),
+                Globals.prefs.getXMPPreferences());
         ((ImportTableModel) customImporterTable.getModel()).fireTableDataChanged();
     }
 

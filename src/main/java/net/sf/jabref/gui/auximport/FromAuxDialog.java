@@ -1,43 +1,9 @@
-/*
- Copyright (C) 2004 R. Nagel
- Copyright (C) 2016 JabRef Contributors
-
-
- All programs in this directory and
- subdirectories are published under the GNU General Public License as
- described below.
-
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or (at
- your option) any later version.
-
- This program is distributed in the hope that it will be useful, but
- WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
- General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
- USA
-
- Further information about the GNU GPL is available at:
- http://www.gnu.org/copyleft/gpl.ja.html
-
- */
-
-// A wizard dialog for generating a new sub database from existing TeX AUX file
-//
-// created by : r.nagel 23.08.2004
-//
-// modified : 18.04.2006 r.nagel
-//            insert a "short info" section
-
 package net.sf.jabref.gui.auximport;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.nio.file.Path;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -57,8 +23,8 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.auxparser.AuxParser;
 import net.sf.jabref.logic.auxparser.AuxParserResult;
@@ -70,6 +36,9 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.DefaultFormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
 
+/**
+ * A wizard dialog for generating a new sub database from existing TeX AUX file
+ */
 public class FromAuxDialog extends JDialog {
 
     private final JPanel statusPanel = new JPanel();
@@ -185,15 +154,21 @@ public class FromAuxDialog extends JDialog {
 
         auxFileField = new JTextField("", 25);
         JButton browseAuxFileButton = new JButton(Localization.lang("Browse"));
-        browseAuxFileButton.addActionListener(BrowseAction.buildForFile(auxFileField, FileExtensions.AUX));
+
+        FileDialog dialog = new FileDialog(parentFrame).withExtension(FileExtensions.AUX);
+        dialog.setDefaultExtension(FileExtensions.AUX);
+        browseAuxFileButton.addActionListener(e -> {
+            Optional<Path> file = dialog.showDialogAndGetSelectedFile();
+            file.ifPresent(f -> auxFileField.setText(f.toAbsolutePath().toString()));
+        });
+
         notFoundList = new JList<>();
         JScrollPane listScrollPane = new JScrollPane(notFoundList);
         statusInfos = new JTextArea("", 5, 20);
         JScrollPane statusScrollPane = new JScrollPane(statusInfos);
         statusInfos.setEditable(false);
 
-        DefaultFormBuilder b = new DefaultFormBuilder(
-                new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, left:pref", ""), buttons);
+        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, left:pref", ""), buttons);
         b.appendSeparator(Localization.lang("Options"));
         b.append(Localization.lang("Reference database") + ":");
         b.append(dbChooser, 3);

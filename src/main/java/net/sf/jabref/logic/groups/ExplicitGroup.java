@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.logic.groups;
 
 import java.util.ArrayList;
@@ -26,7 +11,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -44,12 +28,13 @@ public class ExplicitGroup extends KeywordGroup {
 
     private static final Log LOGGER = LogFactory.getLog(ExplicitGroup.class);
 
-    public ExplicitGroup(String name, GroupHierarchyType context, JabRefPreferences jabRefPreferences)
+
+    public ExplicitGroup(String name, GroupHierarchyType context, String keywordSeparator)
             throws ParseException {
-        super(name, FieldName.GROUPS, name, true, false, context, jabRefPreferences);
+        super(name, FieldName.GROUPS, name, true, false, context, keywordSeparator);
     }
 
-    public static ExplicitGroup fromString(String s, JabRefPreferences jabRefPreferences) throws ParseException {
+    public static ExplicitGroup fromString(String s, String keywordSeparator) throws ParseException {
         if (!s.startsWith(ExplicitGroup.ID)) {
             throw new IllegalArgumentException("ExplicitGroup cannot be created from \"" + s + "\".");
         }
@@ -58,7 +43,7 @@ public class ExplicitGroup extends KeywordGroup {
 
         String name = tok.nextToken();
         int context = Integer.parseInt(tok.nextToken());
-        ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumber(context), jabRefPreferences);
+        ExplicitGroup newGroup = new ExplicitGroup(name, GroupHierarchyType.getByNumber(context), keywordSeparator);
         newGroup.addLegacyEntryKeys(tok);
         return newGroup;
     }
@@ -83,7 +68,7 @@ public class ExplicitGroup extends KeywordGroup {
     @Override
     public AbstractGroup deepCopy() {
         try {
-            ExplicitGroup copy = new ExplicitGroup(getName(), getContext(), jabRefPreferences);
+            ExplicitGroup copy = new ExplicitGroup(getName(), getContext(), keywordSeparator);
             copy.legacyEntryKeys.addAll(legacyEntryKeys);
             return copy;
         } catch (ParseException exception) {
