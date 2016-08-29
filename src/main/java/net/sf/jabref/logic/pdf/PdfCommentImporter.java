@@ -2,7 +2,6 @@ package net.sf.jabref.logic.pdf;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class PdfCommentImporter {
      * @param pathToPDF the URI specifying the document
      * @return a hasmap with the unique name as key and the notes content as value
      */
-    public HashMap<String, String> importNotes(final URI pathToPDF){
+    public HashMap<String, String> importNotes(final String pathToPDF){
 
         PDDocument pdf;
         HashMap<String, String> annotationsMap = new HashMap<>();
@@ -44,7 +43,7 @@ public class PdfCommentImporter {
         return annotationsMap;
     }
 
-    private PDDocument importPdfFile(final URI pathToPDF) throws IOException {
+    private PDDocument importPdfFile(final String pathToPDF) throws IOException {
         File file = new File(pathToPDF);
         return PDDocument.load(file);
     }
