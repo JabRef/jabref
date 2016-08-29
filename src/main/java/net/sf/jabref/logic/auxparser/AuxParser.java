@@ -154,7 +154,7 @@ public class AuxParser {
      */
     private void resolveCrossReferences(BibEntry entry, AuxParserResult result) {
         entry.getField(FieldName.CROSSREF).ifPresent(crossref -> {
-            if (!result.getUniqueKeys().contains(crossref)) {
+            if (!result.getGeneratedBibDatabase().getEntryByKey(crossref).isPresent()) {
                 Optional<BibEntry> refEntry = masterDatabase.getEntryByKey(crossref);
 
                 if (refEntry.isPresent()) {
