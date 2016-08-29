@@ -34,7 +34,6 @@ public class DoiFetcherTest {
         bibEntry.setField("url", "http://dx.doi.org/10.1002/9781118257517");
     }
 
-
     @Test
     public void testGetName() {
         assertEquals("DOI to BibTeX", fetcher.getName());
