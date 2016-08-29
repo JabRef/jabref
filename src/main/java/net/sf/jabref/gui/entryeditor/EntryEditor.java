@@ -370,9 +370,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private void addPdfTab() {
-        pdfPanel.setName(Localization.lang("PDF Comments"));
-        tabbed.addTab(Localization.lang("PDF Comments"), IconTheme.JabRefIcon.SOURCE.getSmallIcon(), pdfPanel,
-                Localization.lang("Show PDF Comments"));
+        pdfPanel.setName(Localization.lang("PDF comments"));
+        tabbed.addTab(Localization.lang("PDF comments"), IconTheme.JabRefIcon.PDF_FILE.getSmallIcon(), pdfPanel,
+                Localization.lang("Show PDF comments"));
         tabs.add(pdfPanel);
 
     }
