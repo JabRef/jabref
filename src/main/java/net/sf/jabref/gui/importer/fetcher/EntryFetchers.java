@@ -6,6 +6,7 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
+import net.sf.jabref.logic.importer.fetcher.DiVA;
 import net.sf.jabref.logic.importer.fetcher.GvkFetcher;
 import net.sf.jabref.logic.importer.fetcher.IsbnFetcher;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
@@ -18,7 +19,6 @@ public class EntryFetchers {
         entryFetchers.add(new ADSFetcher());
         entryFetchers.add(new CiteSeerXFetcher());
         entryFetchers.add(new DBLPFetcher());
-        entryFetchers.add(new DiVAtoBibTeXFetcher());
         entryFetchers.add(new DOItoBibTeXFetcher());
         entryFetchers.add(new IEEEXploreFetcher(abbreviationLoader));
         entryFetchers.add(new INSPIREFetcher());
@@ -30,7 +30,8 @@ public class EntryFetchers {
         entryFetchers.add(new DOAJFetcher());
         entryFetchers.add(new SpringerFetcher());
 
-        entryFetchers.add(new IdBasedEntryFetcher(new IsbnFetcher(Globals.prefs.getImportFormatPreferences ())));
+        entryFetchers.add(new IdBasedEntryFetcher(new DiVA(Globals.prefs.getImportFormatPreferences())));
+        entryFetchers.add(new IdBasedEntryFetcher(new IsbnFetcher(Globals.prefs.getImportFormatPreferences())));
         entryFetchers.add(new SearchBasedEntryFetcher(new ArXiv()));
         entryFetchers.add(new SearchBasedEntryFetcher(new GvkFetcher()));
     }
