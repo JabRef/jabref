@@ -90,7 +90,7 @@ public class IsbnFetcher implements IdBasedFetcher {
         }
 
         //Removes every non-digit character in the PAGETOTAL field.
-        Optional<String> pagetotal = entry.getFieldOptional(FieldName.PAGETOTAL);
+        Optional<String> pagetotal = entry.getField(FieldName.PAGETOTAL);
         pagetotal.ifPresent(pg -> {
             entry.setField(FieldName.PAGETOTAL, pg.replaceAll("[\\D]", ""));
         });

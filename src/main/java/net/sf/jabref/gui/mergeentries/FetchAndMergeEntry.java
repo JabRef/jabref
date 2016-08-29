@@ -63,7 +63,7 @@ public class FetchAndMergeEntry {
                             Globals.prefs.getImportFormatPreferences());
                 } else if (FieldName.ISBN.equals(field)) {
                     try {
-                        fetchedEntry = new IsbnFetcher(ImportFormatPreferences.fromPreferences(Globals.prefs)).performSearchById(fieldContent.get());
+                        fetchedEntry = new IsbnFetcher(Globals.prefs.getImportFormatPreferences ()).performSearchById(fieldContent.get());
                     } catch (FetcherException e) {
                         LOGGER.error("Info cannot be found", e);
                         panel.frame().setStatus(
