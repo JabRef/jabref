@@ -66,7 +66,7 @@ public class ErrorConsoleViewModel {
                     BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION);
             String issueTitle = "?title=" + URLEncoder.encode("Automatic Bug Report-" + dateFormat.format(date), "UTF-8");
             String issueBody = "&body=" + URLEncoder.encode(info, "UTF-8");
-            JabRefGUI.getMainFrame().output(Localization.lang("Report Issue on GitHub is successful"));
+            JabRefGUI.getMainFrame().output(Localization.lang("Issue on GitHub successfully reported."));
             FXDialogs.showInformationDialogAndWait("Report Issue successful",
                     "Your issue was reported in your browser." + "\n\n" +
                             "The log and exception information was copied to your clipboard." + "\n\n" +

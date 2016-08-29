@@ -36,8 +36,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.ObservableMessages;
 
 import com.airhacks.afterburner.views.FXMLView;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 public class ErrorConsoleView extends FXMLView {
 
@@ -53,7 +51,6 @@ public class ErrorConsoleView extends FXMLView {
     private ListView<ObservableMessageWithPriority> allMessage;
     @FXML
     private Label descriptionLabel;
-
 
     public ErrorConsoleView() {
         super();
@@ -77,10 +74,11 @@ public class ErrorConsoleView extends FXMLView {
         listViewStyle();
         allMessage.setItems(masterData);
 
+        //set console icon instead the error icon and insert a description
         Text graphic = new Text(IconTheme.JabRefIcon.CONSOLE.getCode());
         graphic.getStyleClass().add("icon");
-        String headerLabel = Localization.lang("We now give you an insight into the inner workings of JabRef's brain. ")
-                + Localization.lang("This might help to diagonalize the root of problems. ") + System.lineSeparator()
+        String headerLabel = Localization.lang("We now give you an insight into the inner workings of JabRef's brain.") + " "
+                + Localization.lang("This might help to diagonalize the root of problems.") + " " + System.lineSeparator()
                 + Localization.lang("Please use the button below to inform the developers about an issue.");
         descriptionLabel.setText(headerLabel);
         descriptionLabel.setGraphic(graphic);
@@ -105,11 +103,8 @@ public class ErrorConsoleView extends FXMLView {
     //style the list view with icon and message color
     private void listViewStyle() {
         // handler for listCell appearance (example for exception Cell)
-        Log log = LogFactory.getLog(ErrorConsoleView.class);
-        log.error("Error");
         allMessage.setCellFactory(
                 new Callback<ListView<ObservableMessageWithPriority>, ListCell<ObservableMessageWithPriority>>() {
-
                     @Override
                     public ListCell<ObservableMessageWithPriority> call(
                             ListView<ObservableMessageWithPriority> listView) {

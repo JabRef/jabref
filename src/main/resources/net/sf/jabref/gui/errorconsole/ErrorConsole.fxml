@@ -7,7 +7,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.BorderPane?>
-
 <DialogPane xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sf.jabref.gui.errorconsole.ErrorConsoleView">
     <content>
         <BorderPane>
@@ -24,7 +23,7 @@
                 </ButtonBar>
             </bottom>
             <center>
-                <ListView fx:id="allMessage" prefHeight="300.0" prefWidth="900.0" styleClass="list-content" BorderPane.alignment="CENTER" />
+                <ListView fx:id="allMessage" prefHeight="400.0" prefWidth="1100.0" styleClass="list-content" BorderPane.alignment="CENTER" />
             </center>
         </BorderPane>
     </content>
