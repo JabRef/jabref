@@ -6,15 +6,10 @@ import java.util.Base64;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  *   {@link Password} contains methods which are useful to encrypt and decrypt passwords using symetric algorithms.
  */
 public class Password {
-
-    private static final Log LOGGER = LogFactory.getLog(Password.class);
 
     private static final String ALGORITHM = "AES";
     private static final String STATIC_KEY = "ThisIsA128bitKey";
@@ -36,15 +31,10 @@ public class Password {
      *
      *  @return Encrypted phrase/password
      */
-    public String encrypt() {
-        try {
-            Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, ALGORITHM));
-            return Base64.getEncoder().encodeToString(cipher.doFinal(phrase.getBytes()));
-        } catch (GeneralSecurityException e) {
-            LOGGER.error("Encryption error", e);
-            return "";
-        }
+    public String encrypt() throws GeneralSecurityException {
+        Cipher cipher = Cipher.getInstance(ALGORITHM);
+        cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, ALGORITHM));
+        return Base64.getEncoder().encodeToString(cipher.doFinal(phrase.getBytes()));
     }
 
     /**
@@ -52,15 +42,10 @@ public class Password {
      *
      *  @return Decrypted phrase/password
      */
-    public String decrypt() {
-        try {
-            Cipher cipher = Cipher.getInstance(ALGORITHM);
-            cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, ALGORITHM));
-            return new String(cipher.doFinal(Base64.getDecoder().decode(phrase)));
-        } catch (GeneralSecurityException e) {
-            LOGGER.error("Decryption error", e);
-            return "";
-        }
+    public String decrypt() throws GeneralSecurityException {
+        Cipher cipher = Cipher.getInstance(ALGORITHM);
+        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, ALGORITHM));
+        return new String(cipher.doFinal(Base64.getDecoder().decode(phrase)));
     }
 
     /**

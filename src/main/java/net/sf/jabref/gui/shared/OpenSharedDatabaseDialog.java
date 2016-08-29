@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.Set;
@@ -44,7 +45,12 @@ import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
 import net.sf.jabref.shared.security.Password;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class OpenSharedDatabaseDialog extends JDialog {
+
+    private static final Log LOGGER = LogFactory.getLog(Password.class);
 
     private final JabRefFrame frame;
 
@@ -206,7 +212,11 @@ public class OpenSharedDatabaseDialog extends JDialog {
         }
 
         if (sharedDatabasePassword.isPresent() && sharedDatabaseUser.isPresent()) {
-            passwordField.setText(new Password(sharedDatabasePassword.get(), sharedDatabaseUser.get()).decrypt());
+            try {
+                passwordField.setText(new Password(sharedDatabasePassword.get(), sharedDatabaseUser.get()).decrypt());
+            } catch (GeneralSecurityException e) {
+                LOGGER.error("Could not read the password due to decryption problems.");
+            }
         }
 
         rememberPassword.setSelected(sharedDatabaseRememberPassword);
@@ -323,7 +333,11 @@ public class OpenSharedDatabaseDialog extends JDialog {
         prefs.setUser(userField.getText());
 
         if (rememberPassword.isSelected()) {
-            prefs.setPassword(new Password(new String(passwordField.getPassword()), userField.getText()).encrypt());
+            try {
+                prefs.setPassword(new Password(new String(passwordField.getPassword()), userField.getText()).encrypt());
+            } catch (GeneralSecurityException e) {
+                LOGGER.error("Could not store the password due to encryption problems.");
+            }
         } else {
             prefs.clearPassword(); // for the case that the password is already set
         }
