@@ -10,15 +10,15 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- *   {@link Password} contains methods which are useful to encrypt and decrypt phrases using symetric algorithms.
+ *   {@link Password} contains methods which are useful to encrypt and decrypt passwords using symetric algorithms.
  */
 public class Password {
 
     private static final Log LOGGER = LogFactory.getLog(Password.class);
 
     private static final String ALGORITHM = "AES";
-    private byte[] key;
-
+    private static final String STATIC_KEY = "ThisIsA128bitKey";
+    private final byte[] key;
     private final String phrase;
 
 
@@ -28,16 +28,7 @@ public class Password {
      */
     public Password(String phrase, String key) {
         this.phrase = phrase;
-        // normalize to maximum AES key length (16) if too long
-        this.key = key.substring(0, Math.min(16, key.length())).getBytes();
-
-        byte[] operand = "ThisIsA128bitKey".getBytes();
-
-        // increase key complexity using XOR
-        for (int i = 0; i < this.key.length; i++) {
-            operand[i] = (byte) (operand[i] ^ this.key[i]);
-        }
-        this.key = operand;
+        this.key = convertToAESKey(key);
     }
 
     /**
@@ -70,5 +61,23 @@ public class Password {
             LOGGER.error("Decryption error", e);
             return "";
         }
+    }
+
+    /**
+     * Converts the given String to the distinct 128 bit AES key.
+     * @param keyToConvert Key to convert
+     * @return normalized 128 bit AES key
+     */
+    private byte[] convertToAESKey(String keyToConvert) {
+        // normalize to maximum AES key length (16) if too long
+        byte[] convertedKey = keyToConvert.substring(0, Math.min(16, keyToConvert.length())).getBytes();
+
+        byte[] operand = STATIC_KEY.getBytes();
+
+        // increase key complexity using XOR
+        for (int i = 0; i < convertedKey.length; i++) {
+            operand[i] = (byte) (operand[i] ^ convertedKey[i]);
+        }
+        return operand;
     }
 }
