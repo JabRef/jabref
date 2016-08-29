@@ -153,6 +153,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private final JPanel srcPanel = new JPanel();
 
+    private final JPanel pdfPanel = new JPanel();
+
     private JTextArea source;
 
     private final JTabbedPane tabbed = new JTabbedPane();
@@ -305,6 +307,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
         addGeneralTabs();
         // source tab
         addSourceTab();
+
+        addPdfTab();
     }
 
     private void addGeneralTabs() {
@@ -363,6 +367,14 @@ public class EntryEditor extends JPanel implements EntryContainer {
         tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optionalPanel
                 .getPane(), Localization.lang("Show optional fields"));
         tabs.add(optionalPanel);
+    }
+
+    private void addPdfTab() {
+        pdfPanel.setName(Localization.lang("PDF Comments"));
+        tabbed.addTab(Localization.lang("PDF Comments"), IconTheme.JabRefIcon.SOURCE.getSmallIcon(), pdfPanel,
+                Localization.lang("Show PDF Comments"));
+        tabs.add(pdfPanel);
+
     }
 
     public String getDisplayedBibEntryType() {
