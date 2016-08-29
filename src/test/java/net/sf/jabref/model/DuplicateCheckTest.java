@@ -11,14 +11,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: Nov 9, 2007
- * Time: 7:04:25 PM
- * To change this template use File | Settings | File Templates.
- */
 public class DuplicateCheckTest {
+    @Test
+    public void noDuplicateForDifferentTypes() {
+        BibEntry e1 = new BibEntry("1", "article");
+        BibEntry e2 = new BibEntry("2", "journal");
+        assertFalse(DuplicateCheck.isDuplicate(e1, e2, BibDatabaseMode.BIBTEX));
+        assertFalse(DuplicateCheck.isDuplicate(e1, e2, BibDatabaseMode.BIBLATEX));
+    }
 
     @Test
     public void testDuplicateDetection() {
@@ -77,14 +77,31 @@ public class DuplicateCheckTest {
     }
 
     @Test
-    public void testWordCorrelation() {
-        String d1 = "Characterization of Calanus finmarchicus habitat in the North Sea";
-        String d2 = "Characterization of Calunus finmarchicus habitat in the North Sea";
-        String d3 = "Characterization of Calanus glacialissss habitat in the South Sea";
-
-        assertEquals(1.0, (DuplicateCheck.correlateByWords(d1, d2)), 0.01);
-        assertEquals(0.78, (DuplicateCheck.correlateByWords(d1, d3)), 0.01);
-        assertEquals(0.78, (DuplicateCheck.correlateByWords(d2, d3)), 0.01);
+    public void wordCorrelationIsOneForEmptyStrings() {
+        assertEquals(1.0, DuplicateCheck.correlateByWords("", ""), 0.01);
     }
 
+    @Test
+    public void wordCorrelationForSmallerFirstString() {
+        String d1 = "a test";
+        String d2 = "this a test";
+
+        assertEquals(0.0, DuplicateCheck.correlateByWords(d1, d2), 0.01);
+    }
+
+    @Test
+    public void wordCorrelationForBiggerFirstString() {
+        String d1 = "Characterization of me";
+        String d2 = "Characterization";
+
+        assertEquals(1.0, DuplicateCheck.correlateByWords(d1, d2), 0.01);
+    }
+
+    @Test
+    public void wordCorrelationForEqualStrings() {
+        String d1 = "Characterization";
+        String d2 = "Characterization";
+
+        assertEquals(1.0, DuplicateCheck.correlateByWords(d1, d2), 0.01);
+    }
 }
