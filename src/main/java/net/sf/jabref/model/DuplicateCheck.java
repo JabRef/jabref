@@ -24,6 +24,8 @@ import org.apache.commons.logging.LogFactory;
 
 /**
  * This class contains utility method for duplicate checking of entries.
+ *
+ * TODO: http://hpi.de/naumann/projects/data-quality-and-cleansing/dude-duplicate-detection.html
  */
 public class DuplicateCheck {
     private static final Log LOGGER = LogFactory.getLog(DuplicateCheck.class);
