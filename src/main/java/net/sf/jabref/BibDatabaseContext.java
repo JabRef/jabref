@@ -68,7 +68,7 @@ public class BibDatabaseContext {
     public BibDatabaseContext(Defaults defaults, DatabaseLocation location, String keywordSeparator) {
         this(new BibDatabase(), new MetaData(), defaults);
         if (location == DatabaseLocation.SHARED) {
-            setSharedDatabaseLocation(keywordSeparator);
+            convertToSharedDatabase(keywordSeparator);
         }
     }
 
@@ -199,7 +199,7 @@ public class BibDatabaseContext {
         return this.location;
     }
 
-    public void setSharedDatabaseLocation(String keywordSeparator) {
+    public void convertToSharedDatabase(String keywordSeparator) {
 
         this.dbmsSynchronizer = new DBMSSynchronizer(this, keywordSeparator);
         this.database.registerListener(dbmsSynchronizer);
@@ -208,13 +208,13 @@ public class BibDatabaseContext {
         this.location = DatabaseLocation.SHARED;
     }
 
-    public void setLocalDatabaseLocation() {
+    public void convertToLocalDatabase() {
 
         if ((this.location == DatabaseLocation.SHARED)) {
             this.database.unregisterListener(dbmsSynchronizer);
             this.metaData.unregisterListener(dbmsSynchronizer);
         }
 
-        this.location = DatabaseLocation.SHARED;
+        this.location = DatabaseLocation.LOCAL;
     }
 }

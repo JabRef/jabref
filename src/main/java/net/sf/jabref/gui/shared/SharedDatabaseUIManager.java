@@ -42,7 +42,7 @@ public class SharedDatabaseUIManager {
             OpenSharedDatabaseDialog openSharedDatabaseDialog = new OpenSharedDatabaseDialog(jabRefFrame);
             openSharedDatabaseDialog.setVisible(true);
         } else if (answer == 1) {
-            connectionLostEvent.getBibDatabaseContext().setLocalDatabaseLocation();
+            connectionLostEvent.getBibDatabaseContext().convertToLocalDatabase();
             jabRefFrame.refreshTitleAndTabs();
             jabRefFrame.updateEnabledState();
             jabRefFrame.output(Localization.lang("Working offline."));
