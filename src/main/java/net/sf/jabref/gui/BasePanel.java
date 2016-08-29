@@ -230,19 +230,19 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
 
         if (file.isPresent()) {
-            if (bibDatabaseContext.getDatabase().hasEntries()) {
-                // Register so we get notifications about outside changes to the file.
-                try {
-                    fileMonitorHandle = Globals.getFileUpdateMonitor().addUpdateListener(this, file.get());
-                } catch (IOException ex) {
-                    LOGGER.warn("Could not register FileUpdateMonitor", ex);
-                }
+            // Register so we get notifications about outside changes to the file.
+            try {
+                fileMonitorHandle = Globals.getFileUpdateMonitor().addUpdateListener(this, file.get());
+            } catch (IOException ex) {
+                LOGGER.warn("Could not register FileUpdateMonitor", ex);
             }
         } else {
-            // if the database is not empty and no file is assigned,
-            // the database came from an import and has to be treated somehow
-            // -> mark as changed
-            this.baseChanged = true;
+            if (bibDatabaseContext.getDatabase().hasEntries()) {
+                // if the database is not empty and no file is assigned,
+                // the database came from an import and has to be treated somehow
+                // -> mark as changed
+                this.baseChanged = true;
+            }
         }
     }
 
