@@ -4,7 +4,6 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.DatabaseLocation;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.shared.DBMSSynchronizer;
 import net.sf.jabref.shared.event.ConnectionLostEvent;
@@ -43,8 +42,7 @@ public class SharedDatabaseUIManager {
             OpenSharedDatabaseDialog openSharedDatabaseDialog = new OpenSharedDatabaseDialog(jabRefFrame);
             openSharedDatabaseDialog.setVisible(true);
         } else if (answer == 1) {
-            connectionLostEvent.getBibDatabaseContext().updateDatabaseLocation(DatabaseLocation.LOCAL,
-                    keywordSeparator);
+            connectionLostEvent.getBibDatabaseContext().setLocalDatabaseLocation();
             jabRefFrame.refreshTitleAndTabs();
             jabRefFrame.updateEnabledState();
             jabRefFrame.output(Localization.lang("Working offline."));
