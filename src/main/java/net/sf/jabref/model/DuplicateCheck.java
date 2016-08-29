@@ -106,6 +106,7 @@ public class DuplicateCheck {
             }
             totWeights += weight;
 
+            // TODO: EMPTY_IN_ONE, EMPTY_IN_TWO, NOT_EQUAL is not used
             CheckResult result = DuplicateCheck.compareSingleField(field, one, two);
             if (result == CheckResult.EQUAL) {
                 res += weight;
