@@ -15,20 +15,25 @@ import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class AuxParserTest {
-
     private ImportFormatPreferences importFormatPreferences;
-
 
     @Before
     public void setUp() {
         importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
+    }
+
+    @After
+    public void tearDown() {
+        importFormatPreferences = null;
     }
 
     @Test
@@ -112,5 +117,43 @@ public class AuxParserTest {
                     auxResult.getResolvedKeysCount() + auxResult.getUnresolvedKeysCount());
             assertEquals(0, auxResult.getCrossRefEntriesCount());
         }
+    }
+
+    @Test
+    public void testCrossRef() throws URISyntaxException, IOException {
+        InputStream originalStream = AuxParserTest.class.getResourceAsStream("origin.bib");
+        File auxFile = Paths.get(AuxParserTest.class.getResource("crossref.aux").toURI()).toFile();
+        try (InputStreamReader originalReader = new InputStreamReader(originalStream, StandardCharsets.UTF_8)) {
+            ParserResult result = BibtexParser.parse(originalReader, importFormatPreferences);
+
+            AuxParser auxParser = new AuxParser(auxFile.getAbsolutePath(), result.getDatabase());
+            AuxParserResult auxResult = auxParser.parse();
+
+            assertTrue(auxResult.getGeneratedBibDatabase().hasEntries());
+            assertEquals(1, auxResult.getUnresolvedKeysCount());
+            BibDatabase newDB = auxResult.getGeneratedBibDatabase();
+            assertEquals(2, newDB.getEntries().size());
+            assertEquals(1, auxResult.getResolvedKeysCount());
+            assertEquals(2, auxResult.getFoundKeysInAux());
+            assertEquals(auxResult.getFoundKeysInAux(),
+                    auxResult.getResolvedKeysCount() + auxResult.getUnresolvedKeysCount());
+            assertEquals(1, auxResult.getCrossRefEntriesCount());
+        }
+    }
+
+    @Test
+    public void testFileNotFound() throws URISyntaxException, IOException {
+        AuxParser auxParser = new AuxParser("unknownfile.bib", new BibDatabase());
+        AuxParserResult auxResult = auxParser.parse();
+
+        assertFalse(auxResult.getGeneratedBibDatabase().hasEntries());
+        assertEquals(0, auxResult.getUnresolvedKeysCount());
+        BibDatabase newDB = auxResult.getGeneratedBibDatabase();
+        assertEquals(0, newDB.getEntries().size());
+        assertEquals(0, auxResult.getResolvedKeysCount());
+        assertEquals(0, auxResult.getFoundKeysInAux());
+        assertEquals(auxResult.getFoundKeysInAux(),
+                auxResult.getResolvedKeysCount() + auxResult.getUnresolvedKeysCount());
+        assertEquals(0, auxResult.getCrossRefEntriesCount());
     }
 }
