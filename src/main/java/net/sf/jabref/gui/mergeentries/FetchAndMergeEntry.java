@@ -7,19 +7,24 @@ import java.util.stream.Collectors;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.importer.fetcher.ISBNtoBibTeXFetcher;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
 import net.sf.jabref.logic.importer.fetcher.DOItoBibTeX;
+import net.sf.jabref.logic.importer.fetcher.IsbnFetcher;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for fetching and merging information based on a specific field
  *
  */
 public class FetchAndMergeEntry {
+
+    private static final Log LOGGER = LogFactory.getLog(FetchAndMergeEntry.class);
 
     // A list of all field which are supported
     public static List<String> SUPPORTED_FIELDS = Arrays.asList(FieldName.DOI, FieldName.EPRINT, FieldName.ISBN);
@@ -57,13 +62,21 @@ public class FetchAndMergeEntry {
                     fetchedEntry = new DOItoBibTeX().getEntryFromDOI(fieldContent.get(),
                             Globals.prefs.getImportFormatPreferences());
                 } else if (FieldName.ISBN.equals(field)) {
-                    fetchedEntry = new ISBNtoBibTeXFetcher().getEntryFromISBN(fieldContent.get(), null);
+                    try {
+                        fetchedEntry = new IsbnFetcher(Globals.prefs.getImportFormatPreferences ()).performSearchById(fieldContent.get());
+                    } catch (FetcherException e) {
+                        LOGGER.error("Info cannot be found", e);
+                        panel.frame().setStatus(
+                                Localization.lang("Cannot get info based on given %0: %1", type, fieldContent.get()));
+                    }
+
                 } else if (FieldName.EPRINT.equals(field)) {
                     try {
                         fetchedEntry = new ArXiv().performSearchById(fieldContent.get());
                     } catch (FetcherException e) {
+                        LOGGER.error("Info cannot be found", e);
                         panel.frame().setStatus(
-                                Localization.lang("Cannot get info based on given %0:_%1", type, fieldContent.get()));
+                                Localization.lang("Cannot get info based on given %0: %1", type, fieldContent.get()));
                     }
                 }
 
@@ -73,7 +86,7 @@ public class FetchAndMergeEntry {
                     dialog.setVisible(true);
                 } else {
                     panel.frame()
-                            .setStatus(Localization.lang("Cannot get info based on given %0:_%1", type,
+                            .setStatus(Localization.lang("Cannot get info based on given %0: %1", type,
                                     fieldContent.get()));
                 }
             } else {
