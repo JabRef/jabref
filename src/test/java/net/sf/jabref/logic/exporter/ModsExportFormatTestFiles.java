@@ -38,8 +38,6 @@ public class ModsExportFormatTestFiles {
     private ModsExportFormat modsExportFormat;
     private BibtexImporter testImporter;
 
-    private static final String PATH_TO_FILE = "src/test/resources/net/sf/jabref/logic/exporter/";
-
     @Parameter
     public String filename;
 
@@ -49,7 +47,7 @@ public class ModsExportFormatTestFiles {
 
     @Parameters(name = "{0}")
     public static Collection<String> fileNames() throws Exception {
-        try (Stream<Path> stream = Files.list(Paths.get(PATH_TO_FILE))) {
+        try (Stream<Path> stream = Files.list(Paths.get(ModsExportFormatTestFiles.class.getResource("").toURI()))) {
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
                     .filter(n -> n.startsWith("Mods")).collect(Collectors.toList());
         }
@@ -75,7 +73,7 @@ public class ModsExportFormatTestFiles {
 
         modsExportFormat.performExport(databaseContext, tempFile.getPath(), charset, entries);
 
-        List<String> expected = Files.readAllLines(Paths.get(PATH_TO_FILE + xmlFileName));
+        List<String> expected = Files.readAllLines(Paths.get(ModsExportFormatTestFiles.class.getResource("").toURI() + xmlFileName));
         List<String> exported = Files.readAllLines(Paths.get(tempFilename));
         Collections.sort(expected);
         Collections.sort(exported);
