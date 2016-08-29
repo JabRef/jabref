@@ -9,7 +9,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
-import net.sf.jabref.logic.importer.fetcher.DOItoBibTeX;
+import net.sf.jabref.logic.importer.fetcher.DoiFetcher;
 import net.sf.jabref.logic.importer.fetcher.IsbnFetcher;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
@@ -59,7 +59,7 @@ public class FetchAndMergeEntry {
                 Optional<BibEntry> fetchedEntry = Optional.empty();
                 // Get entry based on field
                 if (FieldName.DOI.equals(field)) {
-                    fetchedEntry = new DOItoBibTeX().getEntryFromDOI(fieldContent.get(),
+                    fetchedEntry = DoiFetcher.getEntryFromDOI(fieldContent.get(), null,
                             Globals.prefs.getImportFormatPreferences());
                 } else if (FieldName.ISBN.equals(field)) {
                     try {

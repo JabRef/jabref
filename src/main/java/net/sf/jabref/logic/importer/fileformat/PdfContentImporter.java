@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
-import net.sf.jabref.logic.importer.fetcher.DOItoBibTeX;
+import net.sf.jabref.logic.importer.fetcher.DoiFetcher;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.FileExtensions;
@@ -207,7 +207,7 @@ public class PdfContentImporter extends ImportFormat {
             Optional<DOI> doi = DOI.findInText(firstPageContents);
             if (doi.isPresent()) {
                 ParserResult parserResult = new ParserResult(result);
-                Optional<BibEntry> entry = DOItoBibTeX.getEntryFromDOI(doi.get().getDOI(), parserResult,
+                Optional<BibEntry> entry = DoiFetcher.getEntryFromDOI(doi.get().getDOI(), parserResult,
                         importFormatPreferences);
                 entry.ifPresent(parserResult.getDatabase()::insertEntry);
                 return parserResult;
