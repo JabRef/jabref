@@ -370,6 +370,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
         tabs.add(optionalPanel);
     }
 
+    /**
+     * Add a tab for displaying comments from a PDF 
+     */
     private void addPdfTab() {
         pdfPanel.setName(Localization.lang("PDF comments"));
         tabbed.addTab(Localization.lang("PDF comments"), IconTheme.JabRefIcon.PDF_FILE.getSmallIcon(), pdfPanel,
