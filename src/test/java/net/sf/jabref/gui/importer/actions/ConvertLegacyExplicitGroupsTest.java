@@ -10,6 +10,7 @@ import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -31,6 +32,7 @@ public class ConvertLegacyExplicitGroupsTest {
         entry = new BibEntry();
         entry.setCiteKey("Entry1");
         group = new ExplicitGroup("TestGroup", GroupHierarchyType.INCLUDING, ", ");
+        group.addLegacyEntryKey("Entry1");
     }
 
     @Test

@@ -9,6 +9,7 @@ import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.search.matchers.AndMatcher;
 import net.sf.jabref.logic.search.matchers.OrMatcher;
 import net.sf.jabref.model.entry.BibEntry;
+
 import org.junit.Before;
 import org.junit.Test;
 
