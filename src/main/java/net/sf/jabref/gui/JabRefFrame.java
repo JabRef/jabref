@@ -74,6 +74,7 @@ import net.sf.jabref.gui.actions.OpenBrowserAction;
 import net.sf.jabref.gui.actions.OpenSharedDatabaseAction;
 import net.sf.jabref.gui.actions.SearchForUpdateAction;
 import net.sf.jabref.gui.actions.SortTabsAction;
+import net.sf.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
 import net.sf.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import net.sf.jabref.gui.exporter.AutoSaveManager;
 import net.sf.jabref.gui.exporter.ExportAction;

@@ -327,7 +327,7 @@ public class RegExpFileSearch {
             return fieldValue;
         }
 
-        String[] parts = afterColon.split(":");
+        List<String> parts = Arrays.asList(afterColon.split(":"));
         fieldValue = BibtexKeyPatternUtil.applyModifiers(fieldValue, parts, 0);
 
         return fieldValue;
