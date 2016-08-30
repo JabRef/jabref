@@ -12,7 +12,7 @@ import javax.swing.JPanel;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.gui.mergeentries.MergeEntries;
-import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
@@ -124,10 +124,10 @@ public class DuplicateResolverDialog extends JDialog {
         getContentPane().add(options, BorderLayout.SOUTH);
         pack();
 
-        PositionWindow pw = new PositionWindow(this, JabRefPreferences.DUPLICATES_POS_X,
+        WindowLocation pw = new WindowLocation(this, JabRefPreferences.DUPLICATES_POS_X,
                 JabRefPreferences.DUPLICATES_POS_Y, JabRefPreferences.DUPLICATES_SIZE_X,
                 JabRefPreferences.DUPLICATES_SIZE_Y);
-        pw.setWindowPosition();
+        pw.displayWindowAtStoredLocation();
 
         both.requestFocus();
     }
