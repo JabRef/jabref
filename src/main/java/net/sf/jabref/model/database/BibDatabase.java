@@ -37,7 +37,6 @@ import org.apache.commons.logging.LogFactory;
  * A bibliography database.
  */
 public class BibDatabase {
-
     private static final Log LOGGER = LogFactory.getLog(BibDatabase.class);
 
     /**

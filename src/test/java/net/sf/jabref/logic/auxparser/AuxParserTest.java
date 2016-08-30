@@ -52,7 +52,7 @@ public class AuxParserTest {
             assertEquals(2, newDB.getEntries().size());
             assertEquals(2, auxResult.getResolvedKeysCount());
             assertEquals(2, auxResult.getFoundKeysInAux());
-            assertEquals(auxResult.getFoundKeysInAux(),
+            assertEquals(auxResult.getFoundKeysInAux() + auxResult.getCrossRefEntriesCount(),
                     auxResult.getResolvedKeysCount() + auxResult.getUnresolvedKeysCount());
             assertEquals(0, auxResult.getCrossRefEntriesCount());
         }
@@ -75,7 +75,7 @@ public class AuxParserTest {
             assertEquals(2, newDB.getEntries().size());
             assertEquals(2, auxResult.getResolvedKeysCount());
             assertEquals(3, auxResult.getFoundKeysInAux());
-            assertEquals(auxResult.getFoundKeysInAux(),
+            assertEquals(auxResult.getFoundKeysInAux() + auxResult.getCrossRefEntriesCount(),
                     auxResult.getResolvedKeysCount() + auxResult.getUnresolvedKeysCount());
             assertEquals(0, auxResult.getCrossRefEntriesCount());
         }
@@ -113,7 +113,7 @@ public class AuxParserTest {
             assertEquals(2, newDB.getEntries().size());
             assertEquals(2, auxResult.getResolvedKeysCount());
             assertEquals(2, auxResult.getFoundKeysInAux());
-            assertEquals(auxResult.getFoundKeysInAux(),
+            assertEquals(auxResult.getFoundKeysInAux() + auxResult.getCrossRefEntriesCount(),
                     auxResult.getResolvedKeysCount() + auxResult.getUnresolvedKeysCount());
             assertEquals(0, auxResult.getCrossRefEntriesCount());
         }
@@ -130,12 +130,12 @@ public class AuxParserTest {
             AuxParserResult auxResult = auxParser.parse();
 
             assertTrue(auxResult.getGeneratedBibDatabase().hasEntries());
-            assertEquals(1, auxResult.getUnresolvedKeysCount());
+            assertEquals(2, auxResult.getUnresolvedKeysCount());
             BibDatabase newDB = auxResult.getGeneratedBibDatabase();
-            assertEquals(2, newDB.getEntries().size());
-            assertEquals(1, auxResult.getResolvedKeysCount());
-            assertEquals(2, auxResult.getFoundKeysInAux());
-            assertEquals(auxResult.getFoundKeysInAux(),
+            assertEquals(4, newDB.getEntries().size());
+            assertEquals(3, auxResult.getResolvedKeysCount());
+            assertEquals(4, auxResult.getFoundKeysInAux());
+            assertEquals(auxResult.getFoundKeysInAux() + auxResult.getCrossRefEntriesCount(),
                     auxResult.getResolvedKeysCount() + auxResult.getUnresolvedKeysCount());
             assertEquals(1, auxResult.getCrossRefEntriesCount());
         }
@@ -152,7 +152,7 @@ public class AuxParserTest {
         assertEquals(0, newDB.getEntries().size());
         assertEquals(0, auxResult.getResolvedKeysCount());
         assertEquals(0, auxResult.getFoundKeysInAux());
-        assertEquals(auxResult.getFoundKeysInAux(),
+        assertEquals(auxResult.getFoundKeysInAux() + auxResult.getCrossRefEntriesCount(),
                 auxResult.getResolvedKeysCount() + auxResult.getUnresolvedKeysCount());
         assertEquals(0, auxResult.getCrossRefEntriesCount());
     }
