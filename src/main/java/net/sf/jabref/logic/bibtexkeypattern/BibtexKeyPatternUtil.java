@@ -27,13 +27,12 @@ import org.apache.commons.logging.LogFactory;
  * This is the utility class of the LabelPattern package.
  */
 public class BibtexKeyPatternUtil {
+    private static final Log LOGGER = LogFactory.getLog(BibtexKeyPatternUtil.class);
 
     private static final String STARTING_CAPITAL_PATTERN = "[^A-Z]";
 
     // All single characters that we can use for extending a key to make it unique:
     private static final String CHARS = "abcdefghijklmnopqrstuvwxyz";
-
-    private static final Log LOGGER = LogFactory.getLog(BibtexKeyPatternUtil.class);
 
     private static final Pattern REGEX_PATTERN = Pattern.compile(".*\\(\\{([A-Z]+)\\}\\).*");
 
