@@ -21,7 +21,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - The user can jump from the searchbar to the maintable  with `ctrl+enter`
 - Implemented [#573 (comment)](https://github.com/JabRef/jabref/issues/573#issuecomment-232284156): Added shortcut: closing the search result window with `ctrl+w`
 - Added integrity check for fields with BibTeX keys, e.g., `crossref` and `related`, to check that the key exists
-- [#1496](https://github.com/JabRef/jabref/issues/1496) Keep track of which entry a downloaded file belongs to
 - Made it possible to download multiple entries in one action
 - [#1813](https://github.com/JabRef/jabref/issues/1813) Import/Export preferences dialog default directory set to working directory
 - [#1897](https://github.com/JabRef/jabref/issues/1897) Implemented integrity check for `year` field: Last four nonpunctuation characters should be numerals
@@ -35,6 +34,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Implemented integrity check for `note` and `howpublished` field: Should have the first letter capitalized (BibTeX)
 - <kbd>Pos1</kbd> / <kbd>HOME</kbd> now select the first/last entry in the main table and the search result frame.
 - <kbd>UP</kbd> / <kbd>Down</kbd> / <kbd>Tab</kbd> / <kbd>shift+Tab</kbd> in the search result frame have now the same functionality as in the main  table.
+- [#1496](https://github.com/JabRef/jabref/issues/1496) Keep track of which entry a downloaded file belongs to
+- [#1506](https://github.com/JabRef/jabref/issues/1506) It is possible to apply two new key modifier `title` for Title Case and `camel` for Camel Case (difference is that title case will leave prepositions etc in lower case) 
 
 ### Fixed
 - Fixed selecting an entry out of multiple duplicates
@@ -46,9 +47,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Entries in the SearchResultDialog are now converted to Unicode
 - Suggestions in the autocomplete (search) are now in Unicode
 - Fixed NullPointerException when opening search result window for an untitled database 
-- Fixed entry table traversal with Tab (no column traversal thus no double jump)
-- Fixed [#1757](https://github.com/JabRef/jabref/issues/1757): Crash after saving illegal argument in entry editor
 - Fixed [#1663](https://github.com/JabRef/jabref/issues/1663): Better multi-monitor support
+- Fixed [#1757](https://github.com/JabRef/jabref/issues/1757): Crash after saving illegal argument in entry editor
 - Fixed [#1882](https://github.com/JabRef/jabref/issues/1882): Crash after saving illegal bibtexkey in entry editor
 - Fixed field `location` containing only city is not exported correctly to MS-Office 2007 xml format
 - Fixed field `key` field is not exported to MS-Office 2008 xml format

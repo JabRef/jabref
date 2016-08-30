@@ -321,4 +321,39 @@ public class MakeLabelWithDatabaseTest {
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
         assertEquals(Optional.of("DoeSmiWon"), entry.getCiteKeyOptional());
     }
+
+    public void generateKeyTitleTitle() {
+        DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
+        bibtexKeyPattern.setDefaultValue("[title:title]");
+        metadata.setBibtexKeyPattern(bibtexKeyPattern);
+        BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
+        assertEquals(Optional.of("AnAwesomePaperonJabref"), entry.getCiteKeyOptional());
+    }
+
+    @Test
+    public void generateKeyTitleCamel() {
+        DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
+        bibtexKeyPattern.setDefaultValue("[title:camel]");
+        metadata.setBibtexKeyPattern(bibtexKeyPattern);
+        BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
+        assertEquals(Optional.of("AnAwesomePaperOnJabref"), entry.getCiteKeyOptional());
+    }
+
+    @Test
+    public void generateKeyTitleTitleAbbr() {
+        DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
+        bibtexKeyPattern.setDefaultValue("[title:title:abbr]");
+        metadata.setBibtexKeyPattern(bibtexKeyPattern);
+        BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
+        assertEquals(Optional.of("AAPoJ"), entry.getCiteKeyOptional());
+    }
+
+    @Test
+    public void generateKeyTitleCamelAbbr() {
+        DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
+        bibtexKeyPattern.setDefaultValue("[title:camel:abbr]");
+        metadata.setBibtexKeyPattern(bibtexKeyPattern);
+        BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
+        assertEquals(Optional.of("AAPOJ"), entry.getCiteKeyOptional());
+    }
 }
