@@ -25,7 +25,7 @@ import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.UndoablePreambleChange;
-import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -92,9 +92,9 @@ class PreambleEditor extends JDialog {
         conPane.add(pan, BorderLayout.CENTER);
         setTitle(Localization.lang("Edit preamble"));
 
-        PositionWindow pw = new PositionWindow(this, JabRefPreferences.PREAMBLE_POS_X, JabRefPreferences.PREAMBLE_POS_Y,
+        WindowLocation pw = new WindowLocation(this, JabRefPreferences.PREAMBLE_POS_X, JabRefPreferences.PREAMBLE_POS_Y,
                 JabRefPreferences.PREAMBLE_SIZE_X, JabRefPreferences.PREAMBLE_SIZE_Y);
-        pw.setWindowPosition();
+        pw.displayWindowAtStoredLocation();
     }
 
     private void setupJTextComponent(JTextComponent ta) {
