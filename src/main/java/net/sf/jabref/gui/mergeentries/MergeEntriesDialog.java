@@ -11,7 +11,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
-import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -113,10 +113,10 @@ public class MergeEntriesDialog extends JDialog {
         layout.insertColumn(1, ColumnSpec.decode(MARGIN));
 
 
-        PositionWindow pw = new PositionWindow(this, JabRefPreferences.MERGEENTRIES_POS_X,
+        WindowLocation pw = new WindowLocation(this, JabRefPreferences.MERGEENTRIES_POS_X,
                 JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
                 JabRefPreferences.MERGEENTRIES_SIZE_Y);
-        pw.setWindowPosition();
+        pw.displayWindowAtStoredLocation();
 
         // Show what we've got
         setVisible(true);

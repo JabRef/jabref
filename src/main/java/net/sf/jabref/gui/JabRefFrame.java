@@ -84,7 +84,6 @@ import net.sf.jabref.gui.exporter.SaveDatabaseAction;
 import net.sf.jabref.gui.groups.EntryTableTransferHandler;
 import net.sf.jabref.gui.groups.GroupSelector;
 import net.sf.jabref.gui.help.AboutAction;
-import net.sf.jabref.gui.help.AboutDialog;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.importer.ImportCustomizationDialog;
 import net.sf.jabref.gui.importer.ImportFormats;
@@ -104,7 +103,7 @@ import net.sf.jabref.gui.protectedterms.ProtectedTermsDialog;
 import net.sf.jabref.gui.push.PushToApplicationButton;
 import net.sf.jabref.gui.push.PushToApplications;
 import net.sf.jabref.gui.util.FocusRequester;
-import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.CustomEntryTypesManager;
 import net.sf.jabref.logic.help.HelpFile;
@@ -163,8 +162,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final Insets marg = new Insets(1, 0, 2, 0);
 
-    private PositionWindow pw;
-
     private final IntegrityCheckAction checkIntegrity = new IntegrityCheckAction(this);
 
     private final ToolBar tlb = new ToolBar();
@@ -181,9 +178,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final JProgressBar progressBar = new JProgressBar();
 
     private final FileHistoryMenu fileHistory = new FileHistoryMenu(prefs, this);
-
-    // The help window.
-    private final AboutDialog aboutDiag = new AboutDialog(this);
 
     // Here we instantiate menu/toolbar actions. Actions regarding
     // the currently open database are defined as a GeneralAction
@@ -230,7 +224,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Online help forum"), Localization.lang("Online help forum"), IconTheme.JabRefIcon.FORUM.getSmallIcon(), IconTheme.JabRefIcon.FORUM.getIcon());
     private final AbstractAction help = new HelpAction(Localization.menuTitle("Online help"), Localization.lang("Online help"),
             HelpFile.CONTENTS, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
-    private final AbstractAction about = new AboutAction(Localization.menuTitle("About JabRef"), aboutDiag,
+    private final AbstractAction about = new AboutAction(Localization.menuTitle("About JabRef"), this,
             Localization.lang("About JabRef"), IconTheme.getImage("about"));
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, Localization.menuTitle("Edit entry"),
             Localization.lang("Edit entry"), Globals.getKeyPrefs().getKey(KeyBinding.EDIT_ENTRY), IconTheme.JabRefIcon.EDIT_ENTRY.getIcon());
@@ -618,9 +612,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.setVisible(Globals.prefs.getBoolean(JabRefPreferences.TOOLBAR_VISIBLE));
 
         setBounds(GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds());
-        pw = new PositionWindow(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
+        WindowLocation pw = new WindowLocation(this, JabRefPreferences.POS_X, JabRefPreferences.POS_Y, JabRefPreferences.SIZE_X,
                 JabRefPreferences.SIZE_Y);
-        positionWindowOnScreen();
+        pw.displayWindowAtStoredLocation();
 
         tabbedPane.setBorder(null);
         tabbedPane.setForeground(GUIGlobals.INACTIVE_TABBED_COLOR);
@@ -663,12 +657,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
         }
 
-    }
-
-    private void positionWindowOnScreen() {
-        if (!prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-            pw.setWindowPosition();
-        }
     }
 
     public void refreshTitleAndTabs() {
@@ -760,7 +748,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         dispose();
 
-        //prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, (getExtendedState()&MAXIMIZED_BOTH)>0);
         prefs.putBoolean(JabRefPreferences.WINDOW_MAXIMISED, getExtendedState() == Frame.MAXIMIZED_BOTH);
 
         prefs.putBoolean(JabRefPreferences.TOOLBAR_VISIBLE, tlb.isVisible());
