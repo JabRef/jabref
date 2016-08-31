@@ -1,5 +1,6 @@
 package net.sf.jabref.logic.formatter.casechanger;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -16,6 +17,11 @@ public final class Title {
         this.words.addAll(new TitleParser().parse(title));
     }
 
+    public List<Word> getWordsReadOnly() {
+        return Collections.unmodifiableList(words);
+    }
+
+    @Deprecated
     public List<Word> getWords() {
         return words;
     }
