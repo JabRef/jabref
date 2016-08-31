@@ -1,6 +1,7 @@
 package net.sf.jabref.gui;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Frame;
@@ -1191,8 +1192,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         edit.add(unmark);
         edit.add(unmarkAll);
         edit.addSeparator();
-        if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SPECIALFIELDSENABLED)) {
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_RANKING)) {
+        if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
                 rankSubMenue = new JMenu();
                 RightClickMenu.populateSpecialFieldMenu(rankSubMenue, Rank.getInstance(), this);
                 edit.add(rankSubMenue);
@@ -1203,7 +1204,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY)) {
                 edit.add(toggleQualityAssured);
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_PRIORITY)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
                 rankSubMenue = new JMenu();
                 RightClickMenu.populateSpecialFieldMenu(rankSubMenue, Priority.getInstance(), this);
                 edit.add(rankSubMenue);
@@ -1211,7 +1212,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
                 edit.add(togglePrinted);
             }
-            if (Globals.prefs.getBoolean(JabRefPreferences.PREF_SHOWCOLUMN_READ)) {
+            if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
                 rankSubMenue = new JMenu();
                 RightClickMenu.populateSpecialFieldMenu(rankSubMenue, ReadStatus.getInstance(), this);
                 edit.add(rankSubMenue);
@@ -1493,6 +1494,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addSeparator();
         tlb.add(donationAction);
         tlb.add(forkMeOnGitHubAction);
+
+        createDisabledIconsForButtons(tlb);
     }
 
     /**
@@ -1548,6 +1551,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
             if (o instanceof Component) {
                 ((Component) o).setEnabled(enabled);
+                if (o instanceof JPanel) {
+                    JPanel root = (JPanel) o;
+                    for (int index = 0; index < root.getComponentCount(); index++) {
+                        root.getComponent(index).setEnabled(enabled);
+                    }
+                }
             }
         }
     }
@@ -1690,6 +1699,20 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 if (item.getIcon() instanceof IconTheme.FontBasedIcon) {
                     item.setDisabledIcon(((IconTheme.FontBasedIcon) item.getIcon()).createDisabledIcon());
                 }
+            }
+        }
+    }
+
+    public void createDisabledIconsForButtons(Container container) {
+        for (int index = 0; index < container.getComponentCount(); index++) {
+            Component component = container.getComponent(index);
+            if (component instanceof JButton) {
+                JButton item = (JButton) component;
+                if (item.getIcon() instanceof IconTheme.FontBasedIcon) {
+                    item.setDisabledIcon(((IconTheme.FontBasedIcon) item.getIcon()).createDisabledIcon());
+                }
+            } else if (component instanceof JPanel) {
+                createDisabledIconsForButtons((JPanel)component);
             }
         }
     }
