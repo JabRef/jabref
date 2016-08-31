@@ -1,6 +1,10 @@
 package net.sf.jabref.logic.cleanup;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,15 +13,21 @@ import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.FileDirectoryPreferences;
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
-import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.preferences.JabRefPreferences;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class RenamePdfCleanup implements CleanupJob {
+
+    private static final Log LOGGER = LogFactory.getLog(RenamePdfCleanup.class);
 
     private final BibDatabaseContext databaseContext;
     private final boolean onlyRelativePaths;
@@ -28,8 +38,7 @@ public class RenamePdfCleanup implements CleanupJob {
     private int unsuccessfulRenames;
 
 
-    public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext,
- String fileNamePattern,
+    public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
             LayoutFormatterPreferences prefs, FileDirectoryPreferences fileDirectoryPreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
@@ -53,23 +62,32 @@ public class RenamePdfCleanup implements CleanupJob {
                 continue;
             }
 
-            StringBuilder newFilename = new StringBuilder(FileUtil
+            StringBuilder targetFileName = new StringBuilder(FileUtil
                     .createFileNameFromPattern(databaseContext.getDatabase(), entry, fileNamePattern, prefs).trim());
 
+            String targetDirName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry,
+                    Globals.prefs.get(JabRefPreferences.IMPORT_FILEDIRPATTERN), prefs);
+
             //Add extension to newFilename
-            newFilename.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
+            targetFileName.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
 
             //get new Filename with path
             //Create new Path based on old Path and new filename
             Optional<File> expandedOldFile = FileUtil.expandFilename(realOldFilename,
                     databaseContext.getFileDirectory(fileDirectoryPreferences));
+
             if ((!expandedOldFile.isPresent()) || (expandedOldFile.get().getParent() == null)) {
                 // something went wrong. Just skip this entry
                 newFileList.add(flEntry);
                 continue;
             }
-            String newPath = expandedOldFile.get().getParent().concat(OS.FILE_SEPARATOR).concat(newFilename.toString());
 
+            String newPath = expandedOldFile.get().toPath().getParent().resolve(targetDirName)
+                    .resolve(targetFileName.toString()).toString();
+            System.out.println("New Path 2 " + newPath);
+            //            String newPath = expandedOldFile.get().getParent().concat(OS.FILE_SEPARATOR).concat(targetFileName.toString());
+
+            System.out.println("Original new Path " + newPath);
             String expandedOldFilePath = expandedOldFile.get().toString();
             boolean pathsDifferOnlyByCase = newPath.equalsIgnoreCase(expandedOldFilePath)
                     && !newPath.equals(expandedOldFilePath);
@@ -82,6 +100,12 @@ public class RenamePdfCleanup implements CleanupJob {
                 continue;
             }
 
+            try {
+                Files.createDirectories(Paths.get(newPath));
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                LOGGER.error("Could no create target necessary target directoires for renaming", e);
+            }
             //do rename
             boolean renameSuccessful = FileUtil.renameFile(expandedOldFilePath, newPath);
 
@@ -93,13 +117,17 @@ public class RenamePdfCleanup implements CleanupJob {
                 String type = flEntry.getFileType();
 
                 // we cannot use "newPath" to generate a FileListEntry as newPath is absolute, but we want to keep relative paths whenever possible
-                File parent = (new File(realOldFilename)).getParentFile();
+                // File parent = (new File(realOldFilename)).getParentFile();
+
+                Path parent = Paths.get(expandedOldFilePath).getParent();
+
                 String newFileEntryFileName;
-                if ((parent == null) || databaseContext.getFileDirectory(fileDirectoryPreferences)
-                        .contains(parent.getAbsolutePath())) {
-                    newFileEntryFileName = newFilename.toString();
+                if ((parent == null) || databaseContext.getFileDirectory(fileDirectoryPreferences).contains(parent)) {
+                    newFileEntryFileName = targetFileName.toString();
                 } else {
-                    newFileEntryFileName = parent.toString().concat(OS.FILE_SEPARATOR).concat(newFilename.toString());
+                    //TODO: Get relative path, must be one parent up
+                    newFileEntryFileName = parent.relativize(Paths.get(newPath)).toString();
+                    // parent.toString().concat(OS.FILE_SEPARATOR).concat(targetFileName.toString());
                 }
                 newFileList.add(new ParsedFileField(description, newFileEntryFileName, type));
             } else {
