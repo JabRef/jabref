@@ -662,15 +662,16 @@ public class BibtexKeyPatternUtil {
             } else if ("veryshorttitle".equals(val)) {
                 return getTitleWords(1, entry.getField(FieldName.TITLE).orElse(""));
             } else if ("shortyear".equals(val)) {
-                String ss = entry.getFieldOrAlias(FieldName.YEAR).orElse("");
-                if (ss.isEmpty()) {
-                    return ss;
-                } else if (ss.startsWith("in") || ss.startsWith("sub")) { // TODO: Year starting with in or sub? Why?
+                String yearString = entry.getFieldOrAlias(FieldName.YEAR).orElse("");
+                if (yearString.isEmpty()) {
+                    return yearString;
+                    // In press/in preparation/submitted
+                } else if (yearString.startsWith("in") || yearString.startsWith("sub")) {
                     return "IP";
-                } else if (ss.length() > 2) {
-                    return ss.substring(ss.length() - 2);
+                } else if (yearString.length() > 2) {
+                    return yearString.substring(yearString.length() - 2);
                 } else {
-                    return ss;
+                    return yearString;
                 }
             } else if (val.matches("keyword\\d+")) {
                 // according to LabelPattern.php, it returns keyword number n
