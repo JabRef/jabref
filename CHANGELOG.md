@@ -18,8 +18,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Fixed
 - Fixed NullPointerException when opening search result window for an untitled database 
-- Fixed #1757: Crash after saving illegal argument in entry editor
-- Fixed[#1663](https://github.com/JabRef/jabref/issues/1663): Better multi-monitor support
+- Fixed [#1757](https://github.com/JabRef/jabref/issues/1757): Crash after saving illegal argument in entry editor
+- Fixed [#1663](https://github.com/JabRef/jabref/issues/1663): Better multi-monitor support
+- Fixed [#1882](https://github.com/JabRef/jabref/issues/1882): Crash after saving illegal bibtexkey in entry editor
 
 ### Removed
 - The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field. 
