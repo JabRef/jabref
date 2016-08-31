@@ -1105,9 +1105,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 if ((cleaned == null) || cleaned.equals(newValue)) {
                     textField.setValidBackgroundColor();
                 } else {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Invalid BibTeX key"),
-                            Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
                     textField.setInvalidBackgroundColor();
+                    if (!SwingUtilities.isEventDispatchThread()) {
+                        JOptionPane.showMessageDialog(frame, Localization.lang("Invalid BibTeX key"),
+                                Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
+                        requestFocus();
+                    }
                     return;
                 }
 
