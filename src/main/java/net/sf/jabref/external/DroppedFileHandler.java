@@ -2,6 +2,9 @@ package net.sf.jabref.external;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +28,7 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.BibDatabase;
@@ -83,7 +86,7 @@ public class DroppedFileHandler {
         grp.add(moveRadioButton);
 
         FormLayout layout = new FormLayout("left:15dlu,pref,pref,pref", "bottom:14pt,pref,pref,pref,pref");
-        layout.setRowGroups(new int[][]{{1, 2, 3, 4, 5}});
+        layout.setRowGroups(new int[][] {{1, 2, 3, 4, 5}});
         FormBuilder builder = FormBuilder.create().layout(layout);
 
         builder.add(linkInPlace).xyw(1, 1, 4);
@@ -143,7 +146,7 @@ public class DroppedFileHandler {
                             panel.getBibDatabaseContext().getFileDirectory(Globals.prefs.getFileDirectoryPreferences()))
                     .toString();
         } else {
-            destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : new File(fileName).getName();
+            destFilename = renameCheckBox.isSelected() ? renameToTextBox.getText() : Paths.get(fileName).toString();
             if (copyRadioButton.isSelected()) {
                 success = doCopy(fileName, destFilename, edits);
             } else if (moveRadioButton.isSelected()) {
@@ -232,10 +235,8 @@ public class DroppedFileHandler {
             return false;
         }
 
-        JLabel confirmationMessage = new JLabel(
-                Localization.lang("The PDF contains one or several BibTeX-records.")
-                        + "\n"
-                        + Localization.lang("Do you want to import these as new entries into the current database?"));
+        JLabel confirmationMessage = new JLabel(Localization.lang("The PDF contains one or several BibTeX-records.")
+                + "\n" + Localization.lang("Do you want to import these as new entries into the current database?"));
 
         int reply = JOptionPane.showConfirmDialog(frame, confirmationMessage,
                 Localization.lang("XMP-metadata found in PDF: %0", fileName), JOptionPane.YES_NO_CANCEL_OPTION,
@@ -341,12 +342,23 @@ public class DroppedFileHandler {
         moveRadioButton.setText(Localization.lang("Move file to file directory"));
         renameCheckBox.setText(Localization.lang("Rename file to").concat(": "));
 
+        //TODO: here to check for
+
+        LayoutFormatterPreferences layoutPrefs = Globals.prefs
+                .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
+
         // Determine which name to suggest:
         String targetName = FileUtil.createFileNameFromPattern(database, entry,
-                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
-                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader));
+                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN), layoutPrefs);
 
-        renameToTextBox.setText(targetName.concat(".").concat(fileType.getExtension()));
+        String targetDirName = FileUtil.createFileNameFromPattern(database, entry,
+                Globals.prefs.get(JabRefPreferences.IMPORT_FILEDIRPATTERN), layoutPrefs);
+
+        System.out.println("TARGET Filename " + targetName); //fileNam pattern, e.g bibtexkey
+        System.out.println("TARGET FileDir " + targetDirName); //e.g. inBook
+
+        renameToTextBox
+                .setText(targetDirName.concat("/").concat(targetName.concat(".").concat(fileType.getExtension())));
 
         linkInPlace.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE));
         copyRadioButton.setSelected(frame.prefs().getBoolean(JabRefPreferences.DROPPEDFILEHANDLER_COPY));
@@ -357,10 +369,9 @@ public class DroppedFileHandler {
         cl.stateChanged(new ChangeEvent(linkInPlace));
 
         try {
-            Object[] messages = {Localization.lang("How would you like to link to '%0'?", linkFileName),
-                    optionsPanel};
-            int reply = JOptionPane.showConfirmDialog(frame, messages, dialogTitle,
-                    JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+            Object[] messages = {Localization.lang("How would you like to link to '%0'?", linkFileName), optionsPanel};
+            int reply = JOptionPane.showConfirmDialog(frame, messages, dialogTitle, JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE);
             if (reply == JOptionPane.OK_OPTION) {
                 // store user's choice
                 frame.prefs().putBoolean(JabRefPreferences.DROPPEDFILEHANDLER_LEAVE, linkInPlace.isSelected());
@@ -385,8 +396,8 @@ public class DroppedFileHandler {
      * @param edits    An NamedCompound action this action is to be added to. If none
      *                 is given, the edit is added to the panel's undoManager.
      */
-    private void doLink(BibEntry entry, ExternalFileType fileType, String filename,
-                        boolean avoidDuplicate, NamedCompound edits) {
+    private void doLink(BibEntry entry, ExternalFileType fileType, String filename, boolean avoidDuplicate,
+            NamedCompound edits) {
 
         Optional<String> oldValue = entry.getField(FieldName.FILE);
         FileListTableModel tm = new FileListTableModel();
@@ -454,8 +465,7 @@ public class DroppedFileHandler {
      * @param edits        TODO we should be able to undo this action
      * @return true if the operation succeeded.
      */
-    private boolean doMove(String fileName, String destFilename,
-                           NamedCompound edits) {
+    private boolean doMove(String fileName, String destFilename, NamedCompound edits) {
         List<String> dirs = panel.getBibDatabaseContext().getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         int found = -1;
         for (int i = 0; i < dirs.size(); i++) {
@@ -471,24 +481,24 @@ public class DroppedFileHandler {
             LOGGER.warn("Cannot determine destination directory or destination directory does not exist");
             return false;
         }
-        File toFile = new File(dirs.get(found) + OS.FILE_SEPARATOR + destFilename);
-        if (toFile.exists()) {
+        Path destFile = Paths.get(dirs.get(found)).resolve(destFilename);
+
+        if (Files.exists(destFile)) {
             int answer = JOptionPane.showConfirmDialog(frame,
-                    Localization.lang("'%0' exists. Overwrite file?", toFile.getAbsolutePath()),
-                    Localization.lang("Overwrite file?"),
-                    JOptionPane.YES_NO_OPTION);
+                    Localization.lang("'%0' exists. Overwrite file?", destFile.toString()),
+                    Localization.lang("Overwrite file?"), JOptionPane.YES_NO_OPTION);
             if (answer == JOptionPane.NO_OPTION) {
                 return false;
             }
         }
 
-        File fromFile = new File(fileName);
-        if (fromFile.renameTo(toFile)) {
+        Path fromFile = Paths.get(fileName);
+        if (FileUtil.renameFile(fromFile.toString(), destFile.toString())) {
             return true;
         } else {
             JOptionPane.showMessageDialog(frame,
-                    Localization.lang("Could not move file '%0'.", toFile.getAbsolutePath()) +
-                            Localization.lang("Please move the file manually and link in place."),
+                    Localization.lang("Could not move file '%0'.", destFile.toString())
+                            + Localization.lang("Please move the file manually and link in place."),
                     Localization.lang("Move file failed"), JOptionPane.ERROR_MESSAGE);
             return false;
         }
@@ -502,7 +512,7 @@ public class DroppedFileHandler {
      * @param fileName The name of the source file.
      * @param toFile   The destination filename. An existing path-component will be removed.
      * @param edits    TODO we should be able to undo this!
-     * @return
+     * @return true if the operation succeeded.
      */
     private boolean doCopy(String fileName, String toFile, NamedCompound edits) {
 
@@ -521,24 +531,25 @@ public class DroppedFileHandler {
             LOGGER.warn("Cannot determine destination directory or destination directory does not exist");
             return false;
         }
-        String destinationFileName = new File(toFile).getName();
 
-        File destFile = new File(dirs.get(found) + OS.FILE_SEPARATOR + destinationFileName);
-        if (destFile.equals(new File(fileName))) {
+        Path destFile = Paths.get(dirs.get(found)).resolve(toFile);
+        if (destFile.toString().equals(fileName)) {
             // File is already in the correct position. Don't override!
             return true;
         }
 
-        if (destFile.exists()) {
+        if (Files.exists(destFile)) {
             int answer = JOptionPane.showConfirmDialog(frame,
-                    Localization.lang("'%0' exists. Overwrite file?", destFile.getPath()),
+                    Localization.lang("'%0' exists. Overwrite file?", destFile.toString()),
                     Localization.lang("File exists"), JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (answer == JOptionPane.NO_OPTION) {
                 return false;
             }
         }
         try {
-            FileUtil.copyFile(new File(fileName), destFile, true);
+            //copy does not create directories, therefore we have to create them manually
+            Files.createDirectories(destFile);
+            FileUtil.copyFile(Paths.get(fileName), destFile, true);
         } catch (IOException e) {
             LOGGER.error("Problem copying file", e);
             return false;

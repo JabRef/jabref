@@ -40,6 +40,7 @@ import org.apache.commons.logging.LogFactory;
  * If the download is canceled, or failed, the user is informed. The callback is never called.
  */
 public class DownloadExternalFile {
+
     private static final Log LOGGER = LogFactory.getLog(DownloadExternalFile.class);
 
     private final JabRefFrame frame;
@@ -74,8 +75,8 @@ public class DownloadExternalFile {
         try {
             url = new URL(res);
         } catch (MalformedURLException ex1) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL"),
-                    Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL"), Localization.lang("Download file"),
+                    JOptionPane.ERROR_MESSAGE);
             return;
         }
 
@@ -103,9 +104,8 @@ public class DownloadExternalFile {
             // TODO: stop editor dialog if this results in an error:
             mimeType = udl.determineMimeType(); // Read MIME type
         } catch (IOException ex) {
-            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": "
-                    + ex.getMessage(), Localization.lang("Download file"),
-                    JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(frame, Localization.lang("Invalid URL") + ": " + ex.getMessage(),
+                    Localization.lang("Download file"), JOptionPane.ERROR_MESSAGE);
             LOGGER.info("Error while downloading " + "'" + res + "'", ex);
             return;
         }
@@ -197,7 +197,7 @@ public class DownloadExternalFile {
             }
 
             try {
-                boolean success = FileUtil.copyFile(tmp, toFile, true);
+                boolean success = FileUtil.copyFile(tmp.toPath(), toFile.toPath(), true);
                 if (!success) {
                     // OOps, the file exists!
                     LOGGER.error("File already exists! DownloadExternalFile.download()");
@@ -339,12 +339,14 @@ public class DownloadExternalFile {
 
     }
 
+
     /**
      * Callback interface that users of this class must implement in order to receive
      * notification when download is complete.
      */
     @FunctionalInterface
     public interface DownloadCallback {
+
         void downloadComplete(FileListEntry file);
     }
 }
