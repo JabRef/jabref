@@ -1476,7 +1476,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 specialFieldButtons.add(button);
             }
         }
-
         tlb.addSeparator();
 
         fetcherToggle = new JToggleButton(generalFetcher.getAction());
@@ -1545,14 +1544,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * @param enabled
      */
     private static void setEnabled(List<Object> list, boolean enabled) {
-        for (Object o : list) {
-            if (o instanceof Action) {
-                ((Action) o).setEnabled(enabled);
+        for (Object actionOrComponent : list) {
+            if (actionOrComponent instanceof Action) {
+                ((Action) actionOrComponent).setEnabled(enabled);
             }
-            if (o instanceof Component) {
-                ((Component) o).setEnabled(enabled);
-                if (o instanceof JPanel) {
-                    JPanel root = (JPanel) o;
+            if (actionOrComponent instanceof Component) {
+                ((Component) actionOrComponent).setEnabled(enabled);
+                if (actionOrComponent instanceof JPanel) {
+                    JPanel root = (JPanel) actionOrComponent;
                     for (int index = 0; index < root.getComponentCount(); index++) {
                         root.getComponent(index).setEnabled(enabled);
                     }
@@ -1707,9 +1706,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         for (int index = 0; index < container.getComponentCount(); index++) {
             Component component = container.getComponent(index);
             if (component instanceof JButton) {
-                JButton item = (JButton) component;
-                if (item.getIcon() instanceof IconTheme.FontBasedIcon) {
-                    item.setDisabledIcon(((IconTheme.FontBasedIcon) item.getIcon()).createDisabledIcon());
+                JButton button = (JButton) component;
+                if (button.getIcon() instanceof IconTheme.FontBasedIcon) {
+                    button.setDisabledIcon(((IconTheme.FontBasedIcon) button.getIcon()).createDisabledIcon());
                 }
             } else if (component instanceof JPanel) {
                 createDisabledIconsForButtons((JPanel)component);
