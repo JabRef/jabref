@@ -85,7 +85,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class JabRefPreferences {
-
     private static final Log LOGGER = LogFactory.getLog(JabRefPreferences.class);
 
     /**
@@ -1430,7 +1429,7 @@ public class JabRefPreferences {
     }
 
     public BibtexKeyPatternPreferences getBibtexKeyPatternPreferences() {
-        return new BibtexKeyPatternPreferences(get(DEFAULT_BIBTEX_KEY_PATTERN), get(KEY_PATTERN_REGEX),
+        return new BibtexKeyPatternPreferences(get(KEY_PATTERN_REGEX),
                 get(KEY_PATTERN_REPLACEMENT), getBoolean(KEY_GEN_ALWAYS_ADD_LETTER), getBoolean(KEY_GEN_FIRST_LETTER_A),
                 getBoolean(ENFORCE_LEGAL_BIBTEX_KEY), getKeyPattern());
     }

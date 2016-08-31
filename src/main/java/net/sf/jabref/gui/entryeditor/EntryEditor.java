@@ -116,7 +116,6 @@ import org.apache.commons.logging.LogFactory;
  * update themselves if the change is made from somewhere else.
  */
 public class EntryEditor extends JPanel implements EntryContainer {
-
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     // A reference to the entry this object works on.
@@ -1384,7 +1383,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
             setField(BibEntry.KEY_FIELD, bibtexKeyData);
             updateSource();
             panel.markBaseChanged();
-
         }
     }
 

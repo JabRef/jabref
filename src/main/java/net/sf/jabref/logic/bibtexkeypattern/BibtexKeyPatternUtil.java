@@ -2,6 +2,7 @@ package net.sf.jabref.logic.bibtexkeypattern;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -26,13 +27,12 @@ import org.apache.commons.logging.LogFactory;
  * This is the utility class of the LabelPattern package.
  */
 public class BibtexKeyPatternUtil {
+    private static final Log LOGGER = LogFactory.getLog(BibtexKeyPatternUtil.class);
 
     private static final String STARTING_CAPITAL_PATTERN = "[^A-Z]";
 
     // All single characters that we can use for extending a key to make it unique:
     private static final String CHARS = "abcdefghijklmnopqrstuvwxyz";
-
-    private static final Log LOGGER = LogFactory.getLog(BibtexKeyPatternUtil.class);
 
     private static final Pattern REGEX_PATTERN = Pattern.compile(".*\\(\\{([A-Z]+)\\}\\).*");
 
@@ -399,12 +399,11 @@ public class BibtexKeyPatternUtil {
                 } else if (field) {
                     // check whether there is a modifier on the end such as
                     // ":lower"
-                    String[] parts = parseFieldMarker(typeListEntry);
-
-                    String label = makeLabel(entry, parts[0]);
+                    List<String> parts = parseFieldMarker(typeListEntry);
+                    String label = makeLabel(entry, parts.get(0));
 
                     // apply modifier if present
-                    if (parts.length > 1) {
+                    if (parts.size() > 1) {
                         label = applyModifiers(label, parts, 1);
                     }
 
@@ -498,11 +497,11 @@ public class BibtexKeyPatternUtil {
      * @param offset The number of initial items in the modifiers array to skip.
      * @return The modified label.
      */
-    public static String applyModifiers(String label, String[] parts, int offset) {
+    public static String applyModifiers(String label, List<String> parts, int offset) {
         String resultingLabel = label;
-        if (parts.length > offset) {
-            for (int j = offset; j < parts.length; j++) {
-                String modifier = parts[j];
+        if (parts.size() > offset) {
+            for (int j = offset; j < parts.size(); j++) {
+                String modifier = parts.get(j);
 
                 if ("lower".equals(modifier)) {
                     resultingLabel = resultingLabel.toLowerCase(Locale.ENGLISH);
@@ -686,7 +685,7 @@ public class BibtexKeyPatternUtil {
             } else if ("shorttitleINI".equals(val)) {
                 return keepLettersAndDigitsOnly(
                         applyModifiers(getTitleWordsWithSpaces(3, entry.getField(FieldName.TITLE).orElse("")),
-                                new String[] {"abbr"}, 0));
+                                Collections.singletonList("abbr"), 0));
             } else if ("veryshorttitle".equals(val)) {
                 return getTitleWords(1, entry.getField(FieldName.TITLE).orElse(""));
             } else if ("shortyear".equals(val)) {
@@ -1284,37 +1283,38 @@ public class BibtexKeyPatternUtil {
      * @param arg The argument string.
      * @return An array of strings representing the parts of the marker
      */
-    private static String[] parseFieldMarker(String arg) {
+    private static List<String> parseFieldMarker(String arg) {
         List<String> parts = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean escaped = false;
         int inParenthesis = 0;
         for (int i = 0; i < arg.length(); i++) {
-            if ((arg.charAt(i) == ':') && !escaped && (inParenthesis == 0)) {
+            char currentChar = arg.charAt(i);
+            if ((currentChar == ':') && !escaped && (inParenthesis == 0)) {
                 parts.add(current.toString());
                 current = new StringBuilder();
-            } else if ((arg.charAt(i) == '(') && !escaped) {
+            } else if ((currentChar == '(') && !escaped) {
                 inParenthesis++;
-                current.append(arg.charAt(i));
-            } else if ((arg.charAt(i) == ')') && !escaped && (inParenthesis > 0)) {
+                current.append(currentChar);
+            } else if ((currentChar == ')') && !escaped && (inParenthesis > 0)) {
                 inParenthesis--;
-                current.append(arg.charAt(i));
-            } else if (arg.charAt(i) == '\\') {
+                current.append(currentChar);
+            } else if (currentChar == '\\') {
                 if (escaped) {
                     escaped = false;
-                    current.append(arg.charAt(i));
+                    current.append(currentChar);
                 } else {
                     escaped = true;
                 }
             } else if (escaped) {
-                current.append(arg.charAt(i));
+                current.append(currentChar);
                 escaped = false;
             } else {
-                current.append(arg.charAt(i));
+                current.append(currentChar);
             }
         }
         parts.add(current.toString());
-        return parts.toArray(new String[parts.size()]);
+        return parts;
     }
 
 
