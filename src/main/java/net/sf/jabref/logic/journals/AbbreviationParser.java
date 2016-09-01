@@ -106,7 +106,9 @@ public class AbbreviationParser {
             }
 
             Abbreviation abbreviation = new Abbreviation(fullName, abbrName);
-            this.abbreviations.add(abbreviation);
+            if (!abbreviations.contains(abbreviation)) {
+                this.abbreviations.add(abbreviation);
+            }
         }
     }
 

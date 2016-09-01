@@ -1,4 +1,4 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
+/*  Copyright (C) 2016 JabRef contributors.
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation; either version 2 of the License, or
@@ -12,27 +12,19 @@
     You should have received a copy of the GNU General Public License along
     with this program; if not, write to the Free Software Foundation, Inc.,
     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
-package net.sf.jabref.gui.journals;
+ */
+package net.sf.jabref.logic.journals;
 
-import java.awt.event.ActionEvent;
+import net.sf.jabref.JabRefException;
 
-import javax.swing.Action;
 
-import javafx.application.Platform;
+/**
+ * This exception will be thrown if the same journal abbreviation already exists in the same list.
+ */
+public class DuplicatedJournalAbbreviationException extends JabRefException {
 
-import net.sf.jabref.gui.actions.MnemonicAwareAction;
-import net.sf.jabref.logic.l10n.Localization;
-
-public class ManageJournalsAction extends MnemonicAwareAction {
-
-    public ManageJournalsAction() {
-        super();
-        putValue(Action.NAME, Localization.menuTitle("Manage journal abbreviations"));
+    public DuplicatedJournalAbbreviationException(String message) {
+        super(message);
     }
 
-    @Override
-    public void actionPerformed(ActionEvent actionEvent) {
-        Platform.runLater(() -> new ManageJournalAbbreviationsView().showAndWait());
-    }
 }
