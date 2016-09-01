@@ -306,9 +306,10 @@ public class IntegrityCheck {
     private static class YearChecker implements Checker {
 
         private static final Predicate<String> CONTAINS_FOUR_DIGIT = Pattern.compile("([^0-9]|^)[0-9]{4}([^0-9]|$)").asPredicate();
+        private static final Predicate<String> ENDS_WITH_ALPHA = Pattern.compile("[a-zA-Z]$").asPredicate();
 
         /**
-         * Checks, if the number String contains a four digit year
+         * Checks, if the number String contains a four digit year and ends with alpha
          */
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
@@ -319,6 +320,12 @@ public class IntegrityCheck {
 
             if (!CONTAINS_FOUR_DIGIT.test(value.get().trim())) {
                 return Collections.singletonList(new IntegrityMessage(Localization.lang("should contain a four digit number"), entry, FieldName.YEAR));
+            }
+
+            if (ENDS_WITH_ALPHA.test(value.get().replaceAll("[](){},.;!?<>%&§]", ""))) {
+                return Collections.singletonList(new IntegrityMessage(
+                        Localization.lang("last nonpunctuation character should not be an alphabetic character"), entry,
+                        FieldName.YEAR));
             }
 
             return Collections.emptyList();
