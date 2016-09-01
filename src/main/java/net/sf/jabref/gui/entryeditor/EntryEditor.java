@@ -153,11 +153,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private final JPanel srcPanel = new JPanel();
 
-    private final JPanel pdfPanel = new JPanel();
-
     private JTextArea source;
-
-    private JTextArea comment;
 
     private final JTabbedPane tabbed = new JTabbedPane();
 
@@ -218,7 +214,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         setupToolBar();
         setupFieldPanels();
         setupSourcePanel();
-        setupPdfPanel();
         add(tabbed, BorderLayout.CENTER);
         tabbed.addChangeListener(tabListener);
         if (Globals.prefs.getBoolean(JabRefPreferences.DEFAULT_SHOW_SOURCE)) {
@@ -377,7 +372,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
      */
     private void addPdfTab() {
         PdfCommentsTab pdfCommentsTab = new PdfCommentsTab(this, frame, panel);
-        tabbed.addTab(Localization.lang("PDF comments"), IconTheme.JabRefIcon.PDF_FILE.getSmallIcon(), pdfPanel,
+        tabbed.addTab(Localization.lang("PDF comments"), IconTheme.JabRefIcon.PDF_FILE.getSmallIcon(), pdfCommentsTab,
                 Localization.lang("Show PDF comments"));
         tabs.add(pdfCommentsTab);
 
@@ -562,19 +557,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         srcPanel.setLayout(new BorderLayout());
         srcPanel.add(scrollPane, BorderLayout.CENTER);
-    }
-
-    private void setupPdfPanel(){
-        comment = new JTextAreaWithHighlighting();
-
-        comment.setEditable(false);
-        comment.setLineWrap(true);
-        comment.setTabSize(1);
-        setupJTextComponent(comment);
-
-        pdfPanel.setLayout(new BorderLayout());
-        pdfPanel.add(comment);
-
     }
 
     public void updateSource() {
