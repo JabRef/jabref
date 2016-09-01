@@ -29,6 +29,8 @@ This page provides some development support in the form of howtos. See also [[Hi
     * [Working with authors](#working-with-authors)
   * [Benchmarks](#benchmarks)
   * [equals](#equals)
+  * [Files & Paths](#files-and-paths)
+
 
 ## Generic code how tos
 
@@ -396,3 +398,9 @@ Also, note:
  *   Always override `hashCode` when you override equals (`hashCode` also has very strict rules)
  *   Don’t try to be too clever
  *   Don’t substitute another type for `Object` in the equals declaration
+
+##Files and Paths
+Always try to use the methods from the nio-package. For interoperability, they provide methods to convert between file and path.
+https://docs.oracle.com/javase/tutorial/essential/io/path.html
+Mapping between old methods and new methods
+https://docs.oracle.com/javase/tutorial/essential/io/legacy.html#mapping
