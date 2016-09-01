@@ -1,11 +1,16 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.AuthorList;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Formatter normalizing a list of person names to the BibTeX format.
