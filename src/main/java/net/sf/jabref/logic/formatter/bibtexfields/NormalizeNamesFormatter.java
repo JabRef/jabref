@@ -1,9 +1,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -32,25 +30,15 @@ public class NormalizeNamesFormatter implements Formatter {
         Objects.requireNonNull(nameList);
         // Handle case names in order lastname, firstname and separated by ","
         // E.g., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.
-        if (!nameList.contains(" and ") && !nameList.contains("{") && !nameList.contains(";")) {
-            String[] arrayNameList = nameList.split(",");
+        if (!nameList.toUpperCase(Locale.ENGLISH).contains(" AND ") && !nameList.contains("{") && !nameList.contains(";")) {
+            List<String> arrayNameList = Arrays.asList(nameList.split(","));
+
             // Delete spaces for correct case identification
-            for (int i=0; i < arrayNameList.length; i++) {
-                arrayNameList[i] = arrayNameList[i].trim();
-            }
-            for (String namePart : arrayNameList) {
-                namePart = namePart.trim();
-            }
+            arrayNameList.replaceAll(String::trim);
+
             // Looking for space between pre- and lastname
-            boolean spaceInAllParts = false;
-            for (int i=0; i<arrayNameList.length; i++) {
-                if (arrayNameList[i].contains(" ") ) {
-                    spaceInAllParts = true;
-                } else {
-                    spaceInAllParts = false;
-                    break;
-                }
-            }
+            boolean spaceInAllParts = arrayNameList.stream().filter(name -> name.contains(" ")).collect(Collectors
+                    .toList()).size() == arrayNameList.size();
 
             // We hit the comma name separator case
             // Usually the getAsLastFirstNamesWithAnd method would separate them if pre- and lastname are separated with "and"
@@ -62,12 +50,12 @@ public class NormalizeNamesFormatter implements Formatter {
                 // arrayNameList needs to reduce by the count off avoiding terms
                 // valuePartsCount holds the count of name parts without the avoided terms
 
-                int valuePartsCount = arrayNameList.length;
+                int valuePartsCount = arrayNameList.size();
                 // Holds the index of each term which needs to be avoided
                 Collection<Integer> avoidIndex = new HashSet<>();
 
-                for (int i = 0; i < arrayNameList.length; i++) {
-                    if (avoidTermsInLowerCase.contains(arrayNameList[i].toLowerCase())) {
+                for (int i = 0; i < arrayNameList.size(); i++) {
+                    if (avoidTermsInLowerCase.contains(arrayNameList.get(i).toLowerCase())) {
                         avoidIndex.add(i);
                         valuePartsCount--;
                     }
@@ -78,14 +66,14 @@ public class NormalizeNamesFormatter implements Formatter {
                     StringBuilder stringBuilder = new StringBuilder();
                     // avoidedTimes needs to be increased b< the count of avoided terms for correct odd/even calculation
                     int avoidedTimes = 0;
-                    for (int i = 0; i < arrayNameList.length; i++) {
+                    for (int i = 0; i < arrayNameList.size(); i++) {
                         if (avoidIndex.contains(i)) {
                             // We hit a name affix
-                            stringBuilder.append(arrayNameList[i]);
+                            stringBuilder.append(arrayNameList.get(i));
                             stringBuilder.append(',');
                             avoidedTimes++;
                         } else {
-                            stringBuilder.append(arrayNameList[i]);
+                            stringBuilder.append(arrayNameList.get(i));
                             if (((i + avoidedTimes) % 2) == 0) {
                                 // Hit separation between last name and firstname --> comma has to be kept
                                 stringBuilder.append(',');
