@@ -6,6 +6,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.Optional;
@@ -50,7 +51,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class OpenSharedDatabaseDialog extends JDialog {
 
-    private static final Log LOGGER = LogFactory.getLog(Password.class);
+    protected static final Log LOGGER = LogFactory.getLog(OpenSharedDatabaseDialog.class);
 
     private final JabRefFrame frame;
 
@@ -213,9 +214,9 @@ public class OpenSharedDatabaseDialog extends JDialog {
 
         if (sharedDatabasePassword.isPresent() && sharedDatabaseUser.isPresent()) {
             try {
-                passwordField.setText(new Password(sharedDatabasePassword.get(), sharedDatabaseUser.get()).decrypt());
-            } catch (GeneralSecurityException e) {
-                LOGGER.error("Could not read the password due to decryption problems.");
+                passwordField.setText(new Password(sharedDatabasePassword.get().toCharArray(), sharedDatabaseUser.get()).decrypt());
+            } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+                LOGGER.error("Could not read the password due to decryption problems.", e);
             }
         }
 
@@ -334,9 +335,9 @@ public class OpenSharedDatabaseDialog extends JDialog {
 
         if (rememberPassword.isSelected()) {
             try {
-                prefs.setPassword(new Password(new String(passwordField.getPassword()), userField.getText()).encrypt());
-            } catch (GeneralSecurityException e) {
-                LOGGER.error("Could not store the password due to encryption problems.");
+                prefs.setPassword(new Password(passwordField.getPassword(), userField.getText()).encrypt());
+            } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+                LOGGER.error("Could not store the password due to encryption problems.", e);
             }
         } else {
             prefs.clearPassword(); // for the case that the password is already set

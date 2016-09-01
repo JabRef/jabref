@@ -1,9 +1,15 @@
 package net.sf.jabref.shared.security;
 
+import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.Base64;
 
 import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 /**
@@ -11,30 +17,31 @@ import javax.crypto.spec.SecretKeySpec;
  */
 public class Password {
 
-    private static final String ALGORITHM = "AES";
-    private static final String STATIC_KEY = "ThisIsA128bitKey";
-    private final byte[] key;
-    private final String phrase;
+    private final byte[] phrase;
+    private final Cipher cipher;
+    private final SecretKeySpec secretKey;
+    private final IvParameterSpec ivSpec;
 
 
     /**
      * @param phrase Phrase which should be encrypted or decrypted
-     * @param key Secret key which is used to improve symmetric encryption
+     * @param key Key which is used to improve symmetric encryption
      */
-    public Password(String phrase, String key) {
-        this.phrase = phrase;
-        this.key = convertToAESKey(key);
+    public Password(char[] phrase, String key) throws NoSuchAlgorithmException, NoSuchPaddingException {
+        this.phrase = new String(phrase).getBytes();
+        this.cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+        this.secretKey = new SecretKeySpec(get128BitHash(key.getBytes()), "AES");
+        this.ivSpec = new IvParameterSpec("ThisIsA128BitKey".getBytes());
     }
 
     /**
-     *  Encrypts the set phrase/password with strong symmetric encryption algorithms.
+     *  Encrypts the set phrase/password with a symmetric encryption algorithm.
      *
      *  @return Encrypted phrase/password
      */
-    public String encrypt() throws GeneralSecurityException {
-        Cipher cipher = Cipher.getInstance(ALGORITHM);
-        cipher.init(Cipher.ENCRYPT_MODE, new SecretKeySpec(key, ALGORITHM));
-        return Base64.getEncoder().encodeToString(cipher.doFinal(phrase.getBytes()));
+    public String encrypt() throws GeneralSecurityException, UnsupportedEncodingException {
+        cipher.init(Cipher.ENCRYPT_MODE, secretKey, ivSpec);
+        return new String(Base64.getEncoder().encode(cipher.doFinal(phrase)), "UTF-8");
     }
 
     /**
@@ -42,27 +49,17 @@ public class Password {
      *
      *  @return Decrypted phrase/password
      */
-    public String decrypt() throws GeneralSecurityException {
-        Cipher cipher = Cipher.getInstance(ALGORITHM);
-        cipher.init(Cipher.DECRYPT_MODE, new SecretKeySpec(key, ALGORITHM));
-        return new String(cipher.doFinal(Base64.getDecoder().decode(phrase)));
+    public String decrypt() throws GeneralSecurityException, UnsupportedEncodingException {
+        cipher.init(Cipher.DECRYPT_MODE, secretKey, ivSpec);
+        return new String(cipher.doFinal(Base64.getDecoder().decode(phrase)), "UTF-8");
     }
 
     /**
-     * Converts the given String to the distinct 128 bit AES key.
-     * @param keyToConvert Key to convert
-     * @return normalized 128 bit AES key
+     * Returns a 128 bit hash using SHA-256.
      */
-    private byte[] convertToAESKey(String keyToConvert) {
-        // normalize to maximum AES key length (16) if too long
-        byte[] convertedKey = keyToConvert.substring(0, Math.min(16, keyToConvert.length())).getBytes();
-
-        byte[] operand = STATIC_KEY.getBytes();
-
-        // increase key complexity using XOR
-        for (int i = 0; i < convertedKey.length; i++) {
-            operand[i] = (byte) (operand[i] ^ convertedKey[i]);
-        }
-        return operand;
+    private byte[] get128BitHash(byte[] byteArrayToHash) throws NoSuchAlgorithmException {
+        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+        messageDigest.update(byteArrayToHash);
+        return Arrays.copyOf(messageDigest.digest(), 16); // return 128 bit
     }
 }
