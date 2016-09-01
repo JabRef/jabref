@@ -1280,22 +1280,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-
-            int thisRow = panel.getMainTable().findEntry(entry);
-            int newRow;
-
-            if ((thisRow + 1) < panel.getDatabase().getEntryCount()) {
-                newRow = thisRow + 1;
-            } else if (thisRow > 0) {
-                newRow = 0;
-            } else {
-                return; // newRow is still -1, so we can assume the database has
-                // only one entry.
-            }
-
-            scrollTo(newRow);
-            panel.getMainTable().setRowSelectionInterval(newRow, newRow);
-
+            panel.selectNextEntry();
         }
     }
 
@@ -1308,22 +1293,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int thisRow = panel.getMainTable().findEntry(entry);
-            int newRow;
-
-            if ((thisRow - 1) >= 0) {
-                newRow = thisRow - 1;
-            } else if (thisRow != (panel.getDatabase().getEntryCount() - 1)) {
-                newRow = panel.getDatabase().getEntryCount() - 1;
-            } else {
-                return; // newRow is still -1, so we can assume the database has
-                // only one entry.
-
-            }
-
-            scrollTo(newRow);
-            panel.getMainTable().setRowSelectionInterval(newRow, newRow);
-
+            panel.selectPreviousEntry();
         }
     }
 
