@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -215,6 +217,22 @@ public class SearchResultFrame {
         SearchPreferences searchPreferences = new SearchPreferences(Globals.prefs);
         searchResultFrame.setSize(searchPreferences.getSeachDialogWidth(), searchPreferences.getSeachDialogHeight());
         searchResultFrame.setLocation(searchPreferences.getSearchDialogPosX(), searchPreferences.getSearchDialogPosY());
+
+        searchResultFrame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                new SearchPreferences(Globals.prefs)
+                        .setSearchDialogWidth(searchResultFrame.getSize().width)
+                        .setSearchDialogHeight(searchResultFrame.getSize().height);
+            }
+
+            @Override
+            public void componentMoved(ComponentEvent e) {
+                new SearchPreferences(Globals.prefs)
+                        .setSearchDialogPosX(searchResultFrame.getLocation().x)
+                        .setSearchDialogPosY(searchResultFrame.getLocation().y);
+            }
+        });
     }
 
     /**
@@ -327,11 +345,6 @@ public class SearchResultFrame {
     }
 
     public void dispose(){
-        new SearchPreferences(Globals.prefs)
-                .setSearchDialogWidth(searchResultFrame.getSize().width)
-                .setSearchDialogHeight(searchResultFrame.getSize().height)
-                .setSearchDialogPosX(searchResultFrame.getLocation().x)
-                .setSearchDialogPosY(searchResultFrame.getLocation().y);
         frame.getGlobalSearchBar().setSearchResultFrame(null);
         searchResultFrame.dispose();
         frame.getGlobalSearchBar().focus();

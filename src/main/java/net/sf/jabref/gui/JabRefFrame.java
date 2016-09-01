@@ -920,9 +920,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         //getContentPane().add(mb);
         setJMenuBar(mb);
         con.anchor = GridBagConstraints.NORTH;
-        //con.gridwidth = 1;//GridBagConstraints.REMAINDER;;
-        gbl.setConstraints(tlb, con);
-        getContentPane().add(tlb);
+
+        JPanel toolbarPanel = new JPanel(new WrapLayout(FlowLayout.LEFT));
+        toolbarPanel.add(tlb);
+        toolbarPanel.add(globalSearchBar);
+        gbl.setConstraints(toolbarPanel, con);
+        getContentPane().add(toolbarPanel);
 
         Component lim = Box.createGlue();
         gbl.setConstraints(lim, con);
