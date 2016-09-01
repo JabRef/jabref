@@ -56,11 +56,11 @@ public class WriteXMPEntryEditorAction extends AbstractAction {
         // First check the (legacy) "pdf" field:
         entry.getField(FieldName.PDF)
                 .ifPresent(pdf -> FileUtil.expandFilename(pdf, panel.getBibDatabaseContext()
-                        .getFileDirectory(FieldName.PDF, Globals.prefs.getFileDirectoryPreferences()))
+                        .getFileDirectories(FieldName.PDF, Globals.prefs.getFileDirectoryPreferences()))
                 .ifPresent(files::add));
 
         // Then check the "file" field:
-        List<String> dirs = panel.getBibDatabaseContext().getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+        List<String> dirs = panel.getBibDatabaseContext().getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
         if (entry.hasField(FieldName.FILE)) {
             FileListTableModel tm = new FileListTableModel();
             entry.getField(FieldName.FILE).ifPresent(tm::setContent);

@@ -148,7 +148,7 @@ public class DownloadExternalFile {
         }
 
         String suggestedName = getSuggestedFileName(suffix);
-        List<String> fDirectory = databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+        List<String> fDirectory = databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
         String directory;
         if (fDirectory.isEmpty()) {
             directory = null;

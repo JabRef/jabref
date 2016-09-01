@@ -124,12 +124,12 @@ public class WriteXMPAction extends AbstractWorker {
                     .ifPresent(
                             pdf -> FileUtil
                                     .expandFilename(pdf,
-                                            panel.getBibDatabaseContext().getFileDirectory(FieldName.PDF,
+                                            panel.getBibDatabaseContext().getFileDirectories(FieldName.PDF,
                                                     Globals.prefs.getFileDirectoryPreferences()))
                             .ifPresent(files::add));
             // Then check the "file" field:
             List<String> dirs = panel.getBibDatabaseContext()
-                    .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+                    .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
             if (entry.hasField(FieldName.FILE)) {
                 FileListTableModel tm = new FileListTableModel();
                 entry.getField(FieldName.FILE).ifPresent(tm::setContent);

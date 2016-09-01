@@ -191,7 +191,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
                     } else {
                         // relative to file folder
                         for (String folder : databaseContext
-                                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences())) {
+                                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences())) {
                             Path file = Paths.get(folder, entry.link);
                             if (Files.exists(file)) {
                                 path = file.toString();
@@ -355,7 +355,7 @@ public class FileListEditor extends JTable implements FieldEditor, DownloadExter
     }
 
     private void addEntry() {
-        List<String> defaultDirectory = databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+        List<String> defaultDirectory = databaseContext.getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
         if (defaultDirectory.isEmpty() || (defaultDirectory.get(0) == null)) {
             addEntry("");
         } else {

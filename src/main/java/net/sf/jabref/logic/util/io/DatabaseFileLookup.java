@@ -37,7 +37,7 @@ public class DatabaseFileLookup {
      */
     public DatabaseFileLookup(BibDatabaseContext databaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
         Objects.requireNonNull(databaseContext);
-        possibleFilePaths = Optional.ofNullable(databaseContext.getFileDirectory(fileDirectoryPreferences))
+        possibleFilePaths = Optional.ofNullable(databaseContext.getFileDirectories(fileDirectoryPreferences))
                 .orElse(new ArrayList<>());
 
         for (BibEntry entry : databaseContext.getDatabase().getEntries()) {

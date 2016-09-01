@@ -158,9 +158,9 @@ public class FileUtil {
             FileDirectoryPreferences fileDirectoryPreferences) {
         Optional<String> extension = getFileExtension(name);
         // Find the default directory for this field type, if any:
-        List<String> directories = databaseContext.getFileDirectory(extension.orElse(null), fileDirectoryPreferences);
+        List<String> directories = databaseContext.getFileDirectories(extension.orElse(null), fileDirectoryPreferences);
         // Include the standard "file" directory:
-        List<String> fileDir = databaseContext.getFileDirectory(fileDirectoryPreferences);
+        List<String> fileDir = databaseContext.getFileDirectories(fileDirectoryPreferences);
         // Include the directory of the BIB file:
         List<String> al = new ArrayList<>();
         for (String dir : directories) {

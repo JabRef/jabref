@@ -1,6 +1,9 @@
 package net.sf.jabref;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -116,12 +119,21 @@ public class BibDatabaseContext {
         return getMode() == BibDatabaseMode.BIBLATEX;
     }
 
-    public List<String> getFileDirectory(FileDirectoryPreferences preferences) {
-        return getFileDirectory(FieldName.FILE, preferences);
+    public List<String> getFileDirectories(FileDirectoryPreferences preferences) {
+        return getFileDirectories(FieldName.FILE, preferences);
     }
 
     /**
-    * Look up the directory set up for the given field type for this database.
+     * Returns the first existing file directory from  {@link #getFileDirectories(FileDirectoryPreferences)}
+     * @param preferences The FileDirectoryPreferences
+     * @return Optional of Path
+     */
+    public Optional<Path> getFirstExistingFileDir(FileDirectoryPreferences preferences) {
+        return getFileDirectories(preferences).stream().map(p -> Paths.get(p)).filter(Files::exists).findFirst();
+    }
+
+    /**
+    * Look up the directories set up for the given field type for this database.
     * If no directory is set up, return that defined in global preferences.
     * There can be up to three directory definitions for these files:
     * the database's metadata can specify a general directory and/or a user-specific directory
@@ -137,8 +149,8 @@ public class BibDatabaseContext {
     * @param fieldName The field type
     * @return The default directory for this field type.
     */
-    public List<String> getFileDirectory(String fieldName, FileDirectoryPreferences preferences) {
-        List<String> fileDirs = new ArrayList<>();
+    public List<String> getFileDirectories(String fieldName, FileDirectoryPreferences preferences) {
+        List<String> fileDirs = new ArrayList<>(4);
 
         // 1. metadata user-specific directory
         Optional<String> userFileDirectory = metaData.getUserFileDirectory(preferences.getUser());

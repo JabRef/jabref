@@ -197,7 +197,7 @@ public class PdfImporter {
         File toLink = new File(fileName);
         // Get a list of file directories:
         List<String> dirsS = panel.getBibDatabaseContext()
-                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
+                .getFileDirectories(Globals.prefs.getFileDirectoryPreferences());
 
         tm.addEntry(0, new FileListEntry(toLink.getName(), FileUtil.shortenFileName(toLink, dirsS).getPath(),
                 ExternalFileTypes.getInstance().getExternalFileTypeByName("PDF")));
