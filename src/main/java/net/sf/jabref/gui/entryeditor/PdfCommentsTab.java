@@ -21,15 +21,13 @@ public class PdfCommentsTab {
 
     private final JScrollPane scrollPane = new JScrollPane();
 
-    //TODO add final
+    private final EntryEditor parent;
 
-    private EntryEditor parent;
+    private final String tabTitle;
 
-    private String tabTitle;
+    private final JabRefFrame frame;
 
-    private JabRefFrame frame;
-
-    private BasePanel basePanel;
+    private final BasePanel basePanel;
 
     public PdfCommentsTab(EntryEditor parent, JabRefFrame frame, BasePanel basePanel) {
         this.parent = parent;
@@ -42,14 +40,16 @@ public class PdfCommentsTab {
     private void setUpPdfCommentsTab() {
         Optional<String> field = parent.getEntry().getField(FieldName.FILE);
         if (field.isPresent()) {
+            System.out.println("isPresent");
             DefaultListModel<String> listModel = new DefaultListModel<>();
             commentList.setModel(listModel);
             PdfCommentImporter commentImporter = new PdfCommentImporter();
             HashMap<String, String> importedNotes = commentImporter.importNotes(field.get());
             for (String note : importedNotes.values()) listModel.addElement(note);
-
+            commentList.setVisible(true);
+            System.out.println(listModel.get(1));
         }
-
+        panel.add(commentList);
     }
 
 }
