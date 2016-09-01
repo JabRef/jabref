@@ -15,13 +15,12 @@
 */
 package net.sf.jabref.logic.util.io;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -127,29 +126,20 @@ public class FileUtil {
     /**
      * Copies a file.
      *
-     * @param source         File Source file
-     * @param dest           File Destination file
+     * @param pathToSourceFile         File Source file
+     * @param pathToDestinationFile           File Destination file
      * @param deleteIfExists boolean Determines whether the copy goes on even if the file
      *                       exists.
      * @return boolean Whether the copy succeeded, or was stopped due to the
      * file already existing.
      * @throws IOException
      */
-    public static boolean copyFile(File source, File dest, boolean deleteIfExists) throws IOException {
+    public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean deleteIfExists) throws IOException {
         // Check if the file already exists.
-        if (dest.exists() && !deleteIfExists) {
+        if (Files.exists(pathToDestinationFile) && !deleteIfExists) {
             return false;
         }
-        try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(source));
-                BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dest))) {
-
-
-            int el;
-            while ((el = in.read()) >= 0) {
-                out.write(el);
-            }
-            out.flush();
-        }
+        Files.copy(pathToSourceFile,pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING);
         return true;
     }
 

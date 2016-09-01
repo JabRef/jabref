@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -194,7 +195,7 @@ public class FileUpdateMonitor implements Runnable {
 
             boolean res = false;
             try {
-                res = FileUtil.copyFile(file, tmpFile.toFile(), true);
+                res = FileUtil.copyFile(Paths.get(file.toURI()), tmpFile, true);
             } catch (IOException ex) {
                 LOGGER.info("Cannot copy to temporary file '" + tmpFile + '\'', ex);
             }

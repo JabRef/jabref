@@ -91,7 +91,7 @@ public class FileSaveSession extends SaveSession {
             Path fileName = file.getFileName();
             Path backupFile = file.resolveSibling(fileName + BACKUP_EXTENSION);
             try {
-                FileUtil.copyFile(file.toFile(), backupFile.toFile(), true);
+                FileUtil.copyFile(file, backupFile, true);
             } catch (IOException ex) {
                 LOGGER.error("Problem copying file", ex);
                 throw SaveException.BACKUP_CREATION;
@@ -111,7 +111,7 @@ public class FileSaveSession extends SaveSession {
                 }
             }
 
-            FileUtil.copyFile(temporaryFile.toFile(), file.toFile(), true);
+            FileUtil.copyFile(temporaryFile, file, true);
         } catch (IOException ex2) {
             // If something happens here, what can we do to correct the problem? The file is corrupted, but we still
             // have a clean copy in tmp. However, we just failed to copy tmp to file, so it's not likely that

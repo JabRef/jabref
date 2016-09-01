@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -208,7 +209,7 @@ public class DownloadExternalFile {
             }
 
             try {
-                boolean success = FileUtil.copyFile(tmp, toFile, true);
+                boolean success = FileUtil.copyFile(Paths.get(tmp.toURI()), Paths.get(toFile.toURI()), true);
                 if (!success) {
                     // OOps, the file exists!
                     LOGGER.error("File already exists! DownloadExternalFile.download()");

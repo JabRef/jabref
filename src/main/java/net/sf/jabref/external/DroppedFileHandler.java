@@ -17,6 +17,7 @@ package net.sf.jabref.external;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -547,7 +548,7 @@ public class DroppedFileHandler {
             }
         }
         try {
-            FileUtil.copyFile(new File(fileName), destFile, true);
+            FileUtil.copyFile(Paths.get(fileName), Paths.get(destFile.toURI()), true);
         } catch (IOException e) {
             LOGGER.error("Problem copying file", e);
             return false;
