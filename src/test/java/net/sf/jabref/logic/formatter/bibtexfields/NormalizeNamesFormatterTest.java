@@ -160,4 +160,11 @@ public class NormalizeNamesFormatterTest {
     public void testAvoidNameAffixes() {
         assertEquals("der Barbar, Canon and der Große, Alexander", formatter.format("Canon der Barbar, Alexander der Große"));
     }
+
+    @Test
+    public void testUpperCaseSensitiveList() {
+        assertEquals("der Barbar, Canon and der Große, Alexander", formatter.format("Canon der Barbar AND Alexander der Große"));
+        assertEquals("der Barbar, Canon and der Große, Alexander", formatter.format("Canon der Barbar aNd Alexander der Große"));
+        assertEquals("der Barbar, Canon and der Große, Alexander", formatter.format("Canon der Barbar AnD Alexander der Große"));
+    }
 }
