@@ -306,8 +306,9 @@ public class IntegrityCheck {
     private static class YearChecker implements Checker {
 
         private static final Predicate<String> CONTAINS_FOUR_DIGIT = Pattern.compile("([^0-9]|^)[0-9]{4}([^0-9]|$)").asPredicate();
-        private static final Predicate<String> ENDS_WITH_FOUR_DIGIT = Pattern.compile("[0-9][0-9][0-9][0-9]$")
+        private static final Predicate<String> ENDS_WITH_FOUR_DIGIT = Pattern.compile("[0-9]{4}$")
                 .asPredicate();
+        private static final String regex = "[](){},.;!?<>%&$]";
 
         /**
          * Checks, if the number String contains a four digit year and ends with it
@@ -323,7 +324,7 @@ public class IntegrityCheck {
                 return Collections.singletonList(new IntegrityMessage(Localization.lang("should contain a four digit number"), entry, FieldName.YEAR));
             }
 
-            if (!ENDS_WITH_FOUR_DIGIT.test(value.get().replaceAll("[](){},.;!?<>%&§]", ""))) {
+            if (!ENDS_WITH_FOUR_DIGIT.test(value.get().replaceAll(regex, ""))) {
                 return Collections.singletonList(new IntegrityMessage(
                         Localization.lang("last four nonpunctuation characters should be numerals"), entry,
                         FieldName.YEAR));
