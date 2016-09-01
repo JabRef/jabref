@@ -619,6 +619,7 @@ class LayoutEntry {
 
         int i = 0;
 
+
         while (i < c.length) {
 
             int start = i;
@@ -633,6 +634,7 @@ class LayoutEntry {
 
                     // Skip the brace
                     i++;
+                    int bracelevel = 0;
 
                     if (i < c.length) {
                         if (c[i] == '"') {
@@ -644,9 +646,14 @@ class LayoutEntry {
                             int startParam = i;
                             i++;
                             boolean escaped = false;
-                            while (((i + 1) < c.length) && !(!escaped && (c[i] == '"') && (c[i + 1] == ')'))) {
+                            while (((i + 1) < c.length)
+                                    && !(!escaped && (c[i] == '"') && (c[i + 1] == ')') && (bracelevel == 0))) {
                                 if (c[i] == '\\') {
                                     escaped = !escaped;
+                                } else if (c[i] == '(') {
+                                    bracelevel++;
+                                } else if (c[i] == ')') {
+                                    bracelevel--;
                                 } else {
                                     escaped = false;
                                 }
@@ -662,7 +669,12 @@ class LayoutEntry {
 
                             int startParam = i;
 
-                            while ((i < c.length) && (c[i] != ')')) {
+                            while ((i < c.length) && (!((c[i] == ')') && (bracelevel == 0)))) {
+                                if (c[i] == '(') {
+                                    bracelevel++;
+                                } else if (c[i] == ')') {
+                                    bracelevel--;
+                                }
                                 i++;
                             }
 
