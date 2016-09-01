@@ -1,5 +1,7 @@
 package net.sf.jabref.gui.entryeditor;
 
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -13,13 +15,12 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.pdf.PdfCommentImporter;
 import net.sf.jabref.model.entry.FieldName;
 
-public class PdfCommentsTab {
+public class PdfCommentsTab extends JPanel {
 
-    private final JPanel panel = new JPanel();
 
     private JList<String> commentList = new JList<>();
 
-    private final JScrollPane scrollPane = new JScrollPane();
+    private final JScrollPane scrollPane = new JScrollPane(commentList);
 
     private final EntryEditor parent;
 
@@ -46,10 +47,9 @@ public class PdfCommentsTab {
             PdfCommentImporter commentImporter = new PdfCommentImporter();
             HashMap<String, String> importedNotes = commentImporter.importNotes(field.get());
             for (String note : importedNotes.values()) listModel.addElement(note);
-            commentList.setVisible(true);
-            System.out.println(listModel.get(1));
         }
-        panel.add(commentList);
+        scrollPane.setPreferredSize(new Dimension(450,200));
+        this.add(scrollPane, BorderLayout.EAST);
     }
 
 }
