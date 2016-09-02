@@ -65,10 +65,11 @@ class MSBibEntry {
     private String bibtexEntryType;
 
     // reduced subset, supports only "CITY , STATE, COUNTRY"
-    // \b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w+)\b
-    // WORD SPACE , SPACE WORD SPACE , SPACE WORD
-    // tested using http://www.javaregex.com/test.html
-    private static final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w+)\\s?[,]?\\s?(\\w+)\\b");
+    // \b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w*)\b
+    // WORD SPACE , SPACE WORD SPACE (zero or more) , SPACE WORD (zero or word)
+    // tested using http://www.regexpal.com/
+    //Matches both single locations like Berlin or Stroudsburg, PA, USA
+    private static final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w*)\\s?[,]?\\s?(\\w*)\\b");
 
     // Allows 20.3-2007|||20/3-  2007 etc.
     // (\d{1,2})\s?[.,-/]\s?(\d{1,2})\s?[.,-/]\s?(\d{2,4})
@@ -128,6 +129,7 @@ class MSBibEntry {
         String city = getXmlElementTextContent("City", entry);
         String state = getXmlElementTextContent("StateProvince", entry);
         String country = getXmlElementTextContent("CountryRegion", entry);
+
         StringBuilder addressBuffer = new StringBuilder();
         if (city != null) {
             addressBuffer.append(city).append(", ");
