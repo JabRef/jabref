@@ -51,7 +51,7 @@ import org.apache.commons.logging.LogFactory;
 
 public class OpenSharedDatabaseDialog extends JDialog {
 
-    protected static final Log LOGGER = LogFactory.getLog(OpenSharedDatabaseDialog.class);
+    private static final Log LOGGER = LogFactory.getLog(OpenSharedDatabaseDialog.class);
 
     private final JabRefFrame frame;
 
