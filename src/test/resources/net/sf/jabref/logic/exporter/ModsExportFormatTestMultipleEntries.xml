@@ -31,7 +31,7 @@
 </originInfo>
 <identifier>ShruthiVinodhkumarSelvamani2016</identifier>
 <typeOfResource>text</typeOfResource>
-<genre authority="marc">article</genre>
+<genre authority="marc">inproceedings</genre>
 <relatedItem type="host" version="3.0">
 <originInfo>
 <issuance>continuing</issuance>
@@ -75,7 +75,7 @@
 <issuance>monographic</issuance>
 </originInfo>
 <typeOfResource>text</typeOfResource>
-<genre authority="marc">inproceedings</genre>
+<genre authority="marc">article</genre>
 <relatedItem type="host" version="3.0">
 <originInfo>
 <issuance>continuing</issuance>
