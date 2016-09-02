@@ -75,7 +75,7 @@ public class DoiFetcher implements IdBasedFetcher {
                 return Optional.empty();
             }
         } catch (IOException e) {
-            throw new FetcherException("Bad URL when fetching ISBN info", e);
+            throw new FetcherException("Bad URL when fetching DOI info", e);
         }
     }
 }
