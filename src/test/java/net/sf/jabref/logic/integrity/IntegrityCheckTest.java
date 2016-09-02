@@ -45,9 +45,19 @@ public class IntegrityCheckTest {
     public void testYearChecks() {
         assertCorrect(createContext("year", "2014"));
         assertCorrect(createContext("year", "1986"));
+        assertCorrect(createContext("year", "around 1986"));
+        assertCorrect(createContext("year", "(around 1986)"));
+        assertCorrect(createContext("year", "1986,"));
+        assertCorrect(createContext("year", "1986}%"));
+        assertCorrect(createContext("year", "1986(){},.;!?<>%&$"));
         assertWrong(createContext("year", "abc"));
         assertWrong(createContext("year", "86"));
         assertWrong(createContext("year", "204"));
+        assertWrong(createContext("year", "1986a"));
+        assertWrong(createContext("year", "(1986a)"));
+        assertWrong(createContext("year", "1986a,"));
+        assertWrong(createContext("year", "1986}a%"));
+        assertWrong(createContext("year", "1986a(){},.;!?<>%&$"));
     }
 
     @Test
