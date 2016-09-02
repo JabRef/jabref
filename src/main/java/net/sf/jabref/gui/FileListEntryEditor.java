@@ -58,7 +58,6 @@ import org.apache.commons.logging.LogFactory;
  * label that can be hidden when the download is complete.
  */
 public class FileListEntryEditor {
-
     private static final Log LOGGER = LogFactory.getLog(FileListEntryEditor.class);
 
     private JDialog diag;
@@ -296,7 +295,7 @@ public class FileListEntryEditor {
         String link = "";
         // See if we should trim the file link to be relative to the file directory:
         try {
-            List<String> dirs = databaseContext.getFileDirectory();
+            List<String> dirs = databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
             if (dirs.isEmpty()) {
                 link = this.link.getText().trim();
             } else {
@@ -334,10 +333,10 @@ public class FileListEntryEditor {
 
     }
 
-
     private final ActionListener browsePressed = e -> {
         String filePath = link.getText().trim();
-        Optional<File> file = FileUtil.expandFilename(this.databaseContext, filePath);
+        Optional<File> file = FileUtil.expandFilename(this.databaseContext, filePath,
+                Globals.prefs.getFileDirectoryPreferences());
         String workingDir;
         // no file set yet or found
         if (file.isPresent()) {
@@ -349,13 +348,12 @@ public class FileListEntryEditor {
         Optional<Path> path = new FileDialog(this.frame, workingDir).showDialogAndGetSelectedFile();
 
         path.ifPresent(selection -> {
-
             File newFile = selection.toFile();
             // Store the directory for next time:
             Globals.prefs.put(JabRefPreferences.FILE_WORKING_DIRECTORY, newFile.getPath());
 
             // If the file is below the file directory, make the path relative:
-            List<String> fileDirs = this.databaseContext.getFileDirectory();
+            List<String> fileDirs = this.databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
             newFile = FileUtil.shortenFileName(newFile, fileDirs);
 
             link.setText(newFile.getPath());

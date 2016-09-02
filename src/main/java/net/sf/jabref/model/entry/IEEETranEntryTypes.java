@@ -20,9 +20,8 @@ public class IEEETranEntryTypes {
     public static final EntryType ELECTRONIC = new BibtexEntryType() {
 
         {
-            addAllOptional(FieldName.AUTHOR, FieldName.MONTH, FieldName.YEAR, FieldName.TITLE, FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.ORGANIZATION, FieldName.ADDRESS,
-                    FieldName.NOTE, FieldName.URL);
-
+            addAllOptional(FieldName.AUTHOR, FieldName.MONTH, FieldName.YEAR, FieldName.TITLE, FieldName.LANGUAGE,
+                    FieldName.HOWPUBLISHED, FieldName.ORGANIZATION, FieldName.ADDRESS, FieldName.NOTE, FieldName.URL);
         }
 
         @Override
@@ -37,9 +36,10 @@ public class IEEETranEntryTypes {
     public static final EntryType IEEETRANBSTCTL = new BibtexEntryType() {
 
         {
-            addAllOptional("ctluse_article_number", "ctluse_paper", "ctluse_forced_etal", "ctluse_url",
-                    "ctlmax_names_forced_etal", "ctlnames_show_etal", "ctluse_alt_spacing", "ctlalt_stretch_factor",
-                    "ctldash_repeated_names", "ctlname_format_string", "ctlname_latex_cmd", "ctlname_url_prefix");
+            addAllOptional(FieldName.CTLUSE_ARTICLE_NUMBER, FieldName.CTLUSE_PAPER, FieldName.CTLUSE_FORCED_ETAL,
+                    FieldName.CTLUSE_URL, FieldName.CTLMAX_NAMES_FORCED_ETAL, FieldName.CTLNAMES_SHOW_ETAL,
+                    FieldName.CTLUSE_ALT_SPACING, FieldName.CTLALT_STRETCH_FACTOR, FieldName.CTLDASH_REPEATED_NAMES,
+                    FieldName.CTLNAME_FORMAT_STRING, FieldName.CTLNAME_LATEX_CMD, FieldName.CTLNAME_URL_PREFIX);
         }
 
         @Override
@@ -59,7 +59,8 @@ public class IEEETranEntryTypes {
 
         {
             addAllRequired(FieldName.TITLE, FieldName.YEAR);
-            addAllOptional(FieldName.EDITOR, FieldName.LANGUAGE, FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER, FieldName.ORGANIZATION, FieldName.MONTH, FieldName.NOTE, FieldName.URL);
+            addAllOptional(FieldName.EDITOR, FieldName.LANGUAGE, FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER,
+                    FieldName.ORGANIZATION, FieldName.MONTH, FieldName.NOTE, FieldName.URL);
         }
 
         @Override
@@ -77,9 +78,11 @@ public class IEEETranEntryTypes {
     public static final EntryType PATENT = new BibtexEntryType() {
 
         {
-            addAllRequired("nationality", FieldName.NUMBER, FieldName.orFields(FieldName.YEAR, FieldName.YEARFILED));
-            addAllOptional(FieldName.AUTHOR, FieldName.TITLE, FieldName.LANGUAGE, "assignee", FieldName.ADDRESS, FieldName.TYPE, FieldName.NUMBER, "day", "dayfiled",
-                    FieldName.MONTH, "monthfiled", FieldName.NOTE, FieldName.URL);
+            addAllRequired(FieldName.NATIONALITY, FieldName.NUMBER,
+                    FieldName.orFields(FieldName.YEAR, FieldName.YEARFILED));
+            addAllOptional(FieldName.AUTHOR, FieldName.TITLE, FieldName.LANGUAGE, FieldName.ASSIGNEE, FieldName.ADDRESS,
+                    FieldName.TYPE, FieldName.NUMBER, FieldName.DAY, FieldName.DAYFILED, FieldName.MONTH,
+                    FieldName.MONTHFILED, FieldName.NOTE, FieldName.URL);
         }
 
         @Override
@@ -98,8 +101,9 @@ public class IEEETranEntryTypes {
 
         {
             addAllRequired(FieldName.TITLE, FieldName.orFields(FieldName.ORGANIZATION, FieldName.INSTITUTION));
-            addAllOptional(FieldName.AUTHOR, FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.TYPE, FieldName.NUMBER, "revision", FieldName.ADDRESS, FieldName.MONTH,
-                    FieldName.YEAR, FieldName.NOTE, FieldName.URL);
+            addAllOptional(FieldName.AUTHOR, FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.TYPE,
+                    FieldName.NUMBER, FieldName.REVISION, FieldName.ADDRESS, FieldName.MONTH, FieldName.YEAR,
+                    FieldName.NOTE, FieldName.URL);
         }
 
         @Override

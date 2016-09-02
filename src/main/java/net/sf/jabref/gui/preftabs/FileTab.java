@@ -17,8 +17,8 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
@@ -138,8 +138,14 @@ class FileTab extends JPanel implements PrefsTab {
         lab = new JLabel(Localization.lang("Main file directory") + ':');
         builder.append(lab);
         builder.append(fileDir);
-        BrowseAction browse = BrowseAction.buildForDir(this.frame, fileDir);
-        builder.append(new JButton(browse));
+
+        JButton browse = new JButton(Localization.lang("Browse"));
+        browse.addActionListener(e ->
+                new FileDialog(this.frame).showDialogAndGetSelectedDirectory()
+                        .ifPresent(f -> fileDir.setText(f.toAbsolutePath().toString()))
+        );
+        builder.append(browse);
+
         builder.nextLine();
         builder.append(bibLocAsPrimaryDir, 3);
         builder.nextLine();
@@ -259,10 +265,8 @@ class FileTab extends JPanel implements PrefsTab {
         prefs.putInt(JabRefPreferences.AUTO_SAVE_INTERVAL, (Integer) autoSaveInterval.getValue());
         doNotResolveStringsFor.setText(prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
 
-        boolean updateSpecialFields = false;
         if (!nonWrappableFields.getText().trim().equals(prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS))) {
             prefs.put(JabRefPreferences.NON_WRAPPABLE_FIELDS, nonWrappableFields.getText());
-            updateSpecialFields = true;
         }
 
         // See if we should start or stop the auto save manager:

@@ -130,8 +130,6 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
                     }
                 }
             } else {
-                String argument;
-
                 if (!incommand) {
                     sb.append(c);
                 } else if (Character.isWhitespace(c) || (c == '{') || (c == '}')) {
@@ -142,37 +140,33 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
                     String command = currentCommand.toString();
 
                     if (c == '{') {
-                        String part = StringUtil.getPart(field, i, true);
-                        i += part.length();
-                        argument = part;
-                        if (argument != null) {
-                            // handle common case of general latex command
-                            String result = LatexToUnicodeFormatter.CHARS.get(command + argument);
+                        String argument = StringUtil.getPart(field, i, true);
+                        i += argument.length();
+                        // handle common case of general latex command
+                        String result = LatexToUnicodeFormatter.CHARS.get(command + argument);
 
-                            // If found, then use translated version. If not, then keep
-                            // the
-                            // text of the parameter intact.
-                            if (result == null) {
-                                // Use combining accents if argument is single character or empty
-                                if (argument.length() <= 1) {
-                                    String accent = LatexToUnicodeFormatter.ACCENTS.get(command);
-                                    if (accent == null) {
-                                        if (argument.length() == 0) {
-                                            // Empty argument, may be used as separator as in \LaTeX{}, so keep the command
-                                            sb.append(command);
-                                        } else {
-                                            sb.append(argument);
-                                        }
+                        // If found, then use translated version. If not, then keep
+                        // the
+                        // text of the parameter intact.
+                        if (result == null) {
+                            // Use combining accents if argument is single character or empty
+                            if (argument.length() <= 1) {
+                                String accent = LatexToUnicodeFormatter.ACCENTS.get(command);
+                                if (accent == null) {
+                                    if (argument.isEmpty()) {
+                                        // Empty argument, may be used as separator as in \LaTeX{}, so keep the command
+                                        sb.append(command);
                                     } else {
-                                        sb.append(argument).append(accent);
+                                        sb.append(argument);
                                     }
                                 } else {
-                                    sb.append(argument);
+                                    sb.append(argument).append(accent);
                                 }
                             } else {
-                                sb.append(result);
+                                sb.append(argument);
                             }
-
+                        } else {
+                            sb.append(result);
                         }
                     } else if (c == '}') {
                         // This end brace terminates a command. This can be the case in
@@ -197,21 +191,17 @@ public class LatexToUnicodeFormatter implements LayoutFormatter, Formatter {
                         }
                         sb.append(' ');
                     }
-                }/* else if (c == '}') {
-                    System.out.printf("com term by }: '%s'\n", currentCommand.toString());
-
-                    argument = "";
-                 }*/else {
-                     /*
-                      * TODO: this point is reached, apparently, if a command is
-                      * terminated in a strange way, such as with "$\omega$".
-                      * Also, the command "\&" causes us to get here. The former
-                      * issue is maybe a little difficult to address, since it
-                      * involves the LaTeX math mode. We don't have a complete
-                      * LaTeX parser, so maybe it's better to ignore these
-                      * commands?
-                      */
-                 }
+                } else {
+                    /*
+                     * TODO: this point is reached, apparently, if a command is
+                     * terminated in a strange way, such as with "$\omega$".
+                     * Also, the command "\&" causes us to get here. The former
+                     * issue is maybe a little difficult to address, since it
+                     * involves the LaTeX math mode. We don't have a complete
+                     * LaTeX parser, so maybe it's better to ignore these
+                     * commands?
+                     */
+                }
 
                 incommand = false;
                 escaped = false;

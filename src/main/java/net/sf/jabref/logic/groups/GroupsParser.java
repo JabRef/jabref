@@ -4,14 +4,13 @@ import java.util.List;
 
 import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * Converts string representation of groups to a parsed {@link GroupTreeNode}.
  */
 class GroupsParser {
 
-    public static GroupTreeNode importGroups(List<String> orderedData, JabRefPreferences jabRefPreferences)
+    public static GroupTreeNode importGroups(List<String> orderedData, String keywordSeparator)
             throws ParseException {
         GroupTreeNode cursor = null;
         GroupTreeNode root = null;
@@ -27,7 +26,7 @@ class GroupsParser {
                 throw new ParseException(Localization.lang("Expected \"%0\" to contain whitespace", string));
             }
             int level = Integer.parseInt(string.substring(0, spaceIndex));
-            AbstractGroup group = AbstractGroup.fromString(string.substring(spaceIndex + 1), jabRefPreferences);
+            AbstractGroup group = AbstractGroup.fromString(string.substring(spaceIndex + 1), keywordSeparator);
             GroupTreeNode newNode = GroupTreeNode.fromGroup(group);
             if (cursor == null) {
                 // create new root

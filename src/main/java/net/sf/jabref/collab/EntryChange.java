@@ -51,19 +51,21 @@ class EntryChange extends Change {
         allFields.addAll(diskEntry.getFieldNames());
 
         for (String field : allFields) {
-            String mem = memEntry.getField(field);
-            String tmp = tmpEntry.getField(field);
-            String disk = diskEntry.getField(field);
+            Optional<String> mem = memEntry.getField(field);
+            Optional<String> tmp = tmpEntry.getField(field);
+            Optional<String> disk = diskEntry.getField(field);
 
-            if ((tmp != null) && (disk != null)) {
+            if ((tmp.isPresent()) && (disk.isPresent())) {
                 if (!tmp.equals(disk)) {
                     // Modified externally.
-                    add(new FieldChange(field, memEntry, tmpEntry, mem, tmp, disk));
+                    add(new FieldChange(field, memEntry, tmpEntry, mem.orElse(null), tmp.get(), disk.get()));
                 }
-            } else if (((tmp == null) && (disk != null) && !disk.isEmpty()) || ((disk == null) && (tmp != null) && !tmp.isEmpty()
-                    && (mem != null) && !mem.isEmpty())) {
+            } else if (((!tmp.isPresent()) && (disk.isPresent()) && !disk.get().isEmpty())
+                    || ((!disk.isPresent()) && (tmp.isPresent()) && !tmp.get().isEmpty()
+                            && (mem.isPresent()) && !mem.get().isEmpty())) {
                 // Added externally.
-                add(new FieldChange(field, memEntry, tmpEntry, mem, tmp, disk));
+                add(new FieldChange(field, memEntry, tmpEntry, mem.orElse(null), tmp.orElse(null),
+                        disk.orElse(null)));
             }
         }
     }

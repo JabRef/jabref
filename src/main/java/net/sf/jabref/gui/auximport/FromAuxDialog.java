@@ -2,6 +2,8 @@ package net.sf.jabref.gui.auximport;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.nio.file.Path;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -21,8 +23,8 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.auxparser.AuxParser;
 import net.sf.jabref.logic.auxparser.AuxParserResult;
@@ -152,15 +154,21 @@ public class FromAuxDialog extends JDialog {
 
         auxFileField = new JTextField("", 25);
         JButton browseAuxFileButton = new JButton(Localization.lang("Browse"));
-        browseAuxFileButton.addActionListener(BrowseAction.buildForFile(auxFileField, FileExtensions.AUX));
+
+        FileDialog dialog = new FileDialog(parentFrame).withExtension(FileExtensions.AUX);
+        dialog.setDefaultExtension(FileExtensions.AUX);
+        browseAuxFileButton.addActionListener(e -> {
+            Optional<Path> file = dialog.showDialogAndGetSelectedFile();
+            file.ifPresent(f -> auxFileField.setText(f.toAbsolutePath().toString()));
+        });
+
         notFoundList = new JList<>();
         JScrollPane listScrollPane = new JScrollPane(notFoundList);
         statusInfos = new JTextArea("", 5, 20);
         JScrollPane statusScrollPane = new JScrollPane(statusInfos);
         statusInfos.setEditable(false);
 
-        DefaultFormBuilder b = new DefaultFormBuilder(
-                new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, left:pref", ""), buttons);
+        DefaultFormBuilder b = new DefaultFormBuilder(new FormLayout("left:pref, 4dlu, fill:pref:grow, 4dlu, left:pref", ""), buttons);
         b.appendSeparator(Localization.lang("Options"));
         b.append(Localization.lang("Reference database") + ":");
         b.append(dbChooser, 3);

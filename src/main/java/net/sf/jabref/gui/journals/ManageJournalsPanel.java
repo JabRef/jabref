@@ -47,7 +47,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
@@ -55,7 +54,6 @@ import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -176,7 +174,7 @@ class ManageJournalsPanel extends JPanel {
 
         viewBuiltin.addActionListener(e -> {
             JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbreviationLoader
-                    .getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs)).getAbbreviations()));
+                    .getRepository(Globals.prefs.getJournalAbbreviationPreferences()).getAbbreviations()));
             GUIUtil.correctRowHeight(table);
 
             JScrollPane pane = new JScrollPane(table);
@@ -380,7 +378,7 @@ class ManageJournalsPanel extends JPanel {
         Globals.prefs.putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, extFiles);
 
         // Update journal abbreviation loader
-        Globals.journalAbbreviationLoader.update(JournalAbbreviationPreferences.fromPreferences(Globals.prefs));
+        Globals.journalAbbreviationLoader.update(Globals.prefs.getJournalAbbreviationPreferences());
     }
 
 
@@ -549,7 +547,10 @@ class ManageJournalsPanel extends JPanel {
 
         private void setupPanel() {
             tf.setEditable(false);
-            browse.addActionListener(BrowseAction.buildForFile(tf));
+            browse.addActionListener(e ->
+                    new FileDialog(frame).showDialogAndGetSelectedFile()
+                            .ifPresent(f -> tf.setText(f.toAbsolutePath().toString()))
+            );
             DownloadAction da = new DownloadAction(tf);
             download.addActionListener(da);
             FormBuilder builder = FormBuilder.create().layout(new FormLayout(

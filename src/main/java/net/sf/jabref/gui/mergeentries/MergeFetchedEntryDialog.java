@@ -12,7 +12,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableChangeType;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.InternalBibtexFields;
@@ -87,10 +87,10 @@ public class MergeFetchedEntryDialog extends JDialog {
         layout.insertRow(1, RowSpec.decode(MARGIN));
         layout.insertColumn(1, ColumnSpec.decode(MARGIN));
 
-        PositionWindow pw = new PositionWindow(this, JabRefPreferences.MERGEENTRIES_POS_X,
+        WindowLocation pw = new WindowLocation(this, JabRefPreferences.MERGEENTRIES_POS_X,
                 JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
                 JabRefPreferences.MERGEENTRIES_SIZE_Y);
-        pw.setWindowPosition();
+        pw.displayWindowAtStoredLocation();
 
     }
 
@@ -123,8 +123,8 @@ public class MergeFetchedEntryDialog extends JDialog {
 
             // fields
             for (String field : jointFields) {
-                Optional<String> originalString = originalEntry.getFieldOptional(field);
-                Optional<String> mergedString = mergedEntry.getFieldOptional(field);
+                Optional<String> originalString = originalEntry.getField(field);
+                Optional<String> mergedString = mergedEntry.getField(field);
                 if (!originalString.isPresent() || !originalString.equals(mergedString)) {
                     originalEntry.setField(field, mergedString.get()); // mergedString always present
                     ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString.orElse(null),
@@ -136,7 +136,7 @@ public class MergeFetchedEntryDialog extends JDialog {
             // Remove fields which are not in the merged entry, unless they are internal fields
             for (String field : originalFields) {
                 if (!jointFields.contains(field) && !InternalBibtexFields.isInternalField(field)) {
-                    Optional<String> originalString = originalEntry.getFieldOptional(field);
+                    Optional<String> originalString = originalEntry.getField(field);
                     originalEntry.clearField(field);
                     ce.addEdit(new UndoableFieldChange(originalEntry, field, originalString.get(), null)); // originalString always present
                     edited = true;

@@ -28,6 +28,7 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.FieldName;
 
@@ -36,8 +37,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class MetaData implements Iterable<String> {
-
     private static final Log LOGGER = LogFactory.getLog(MetaData.class);
+
     public static final String META_FLAG = "jabref-meta: ";
     private static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
 
@@ -65,12 +66,13 @@ public class MetaData implements Iterable<String> {
      * must simply make sure the appropriate changes are reflected in the Vector
      * it has been passed.
      */
-    private MetaData(Map<String, String> inData) throws ParseException {
+    private MetaData(Map<String, String> inData, String keywordSeparator) throws ParseException {
         Objects.requireNonNull(inData);
-        setData(inData);
+        setData(inData, keywordSeparator);
     }
-    private MetaData(Map<String, String> inData, Charset encoding) throws ParseException {
-        this(inData);
+
+    private MetaData(Map<String, String> inData, Charset encoding, String keywordSeparator) throws ParseException {
+        this(inData, keywordSeparator);
         this.encoding = Objects.requireNonNull(encoding);
     }
 
@@ -85,15 +87,16 @@ public class MetaData implements Iterable<String> {
         this.encoding = encoding;
     }
 
-    public static MetaData parse(Map<String, String> data) throws ParseException {
-        return new MetaData(data);
+    public static MetaData parse(Map<String, String> data, String keywordSeparator) throws ParseException {
+        return new MetaData(data, keywordSeparator);
     }
 
-    public static MetaData parse(Map<String, String> data, Charset encoding) throws ParseException {
-        return new MetaData(data, encoding);
+    public static MetaData parse(Map<String, String> data, Charset encoding, String keywordSeparator)
+            throws ParseException {
+        return new MetaData(data, encoding, keywordSeparator);
     }
 
-    public void setData(Map<String, String> inData) throws ParseException {
+    public void setData(Map<String, String> inData, String keywordSeparator) throws ParseException {
         clearMetaData();
         for (Map.Entry<String, String> entry : inData.entrySet()) {
             StringReader data = new StringReader(entry.getValue());
@@ -108,7 +111,7 @@ public class MetaData implements Iterable<String> {
                 LOGGER.error("Weird error while parsing meta data.", ex);
             }
             if (GROUPSTREE.equals(entry.getKey())) {
-                putGroups(orderedData);
+                putGroups(orderedData, keywordSeparator);
                 // the keys "groupsversion" and "groups" were used in JabRef versions around 1.3, we will not support them anymore
                 eventBus.post(new GroupUpdatedEvent(this));
             } else if (SAVE_ACTIONS.equals(entry.getKey())) {
@@ -185,9 +188,9 @@ public class MetaData implements Iterable<String> {
      *
      * @param orderedData The vector of metadata strings
      */
-    private void putGroups(List<String> orderedData) throws ParseException {
+    private void putGroups(List<String> orderedData, String keywordSeparator) throws ParseException {
         try {
-            groupsRoot = GroupTreeNode.parse(orderedData, Globals.prefs);
+            groupsRoot = GroupTreeNode.parse(orderedData, keywordSeparator);
             eventBus.post(new GroupUpdatedEvent(this));
         } catch (ParseException e) {
             throw new ParseException(Localization.lang(
@@ -195,8 +198,8 @@ public class MetaData implements Iterable<String> {
         }
     }
 
-    public GroupTreeNode getGroups() {
-        return groupsRoot;
+    public Optional<GroupTreeNode> getGroups() {
+        return Optional.ofNullable(groupsRoot);
     }
 
     /**
@@ -236,12 +239,12 @@ public class MetaData implements Iterable<String> {
     /**
      * @return the stored label patterns
      */
-    public AbstractBibtexKeyPattern getBibtexKeyPattern() {
+    public AbstractBibtexKeyPattern getBibtexKeyPattern(GlobalBibtexKeyPattern globalPattern) {
         if (bibtexKeyPattern != null) {
             return bibtexKeyPattern;
         }
 
-        bibtexKeyPattern = new DatabaseBibtexKeyPattern(Globals.prefs);
+        bibtexKeyPattern = new DatabaseBibtexKeyPattern(globalPattern);
 
         // read the data from the metadata and store it into the bibtexKeyPattern
         for (String key : this) {
@@ -379,17 +382,17 @@ public class MetaData implements Iterable<String> {
 
         // write groups if present. skip this if only the root node exists
         // (which is always the AllEntriesGroup).
-        if ((groupsRoot != null) && (groupsRoot.getNumberOfChildren() > 0)) {
+        getGroups().filter(groups -> groups.getNumberOfChildren() > 0).ifPresent(groups -> {
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append(OS.NEWLINE);
 
-            for (String groupNode : groupsRoot.getTreeAsString()) {
+            for (String groupNode : groups.getTreeAsString()) {
                 stringBuilder.append(StringUtil.quote(groupNode, ";", '\\'));
                 stringBuilder.append(";");
                 stringBuilder.append(OS.NEWLINE);
             }
             serializedMetaData.put(GROUPSTREE, stringBuilder.toString());
-        }
+        });
         return serializedMetaData;
     }
 

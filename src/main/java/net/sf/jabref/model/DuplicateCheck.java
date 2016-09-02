@@ -13,7 +13,7 @@ import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
 import org.apache.commons.logging.Log;
@@ -118,8 +118,8 @@ public class DuplicateCheck {
     }
 
     private static int compareSingleField(String field, BibEntry one, BibEntry two) {
-        Optional<String> optionalStringOne = one.getFieldOptional(field);
-        Optional<String> optionalStringTwo = two.getFieldOptional(field);
+        Optional<String> optionalStringOne = one.getField(field);
+        Optional<String> optionalStringTwo = two.getField(field);
         if (!optionalStringOne.isPresent()) {
             if (!optionalStringTwo.isPresent()) {
                 return EMPTY_IN_BOTH;
@@ -133,7 +133,7 @@ public class DuplicateCheck {
         String stringOne = optionalStringOne.get();
         String stringTwo = optionalStringTwo.get();
 
-        if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
+        if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES)) {
             // Specific for name fields.
             // Harmonise case:
             String authorOne = AuthorList.fixAuthorLastNameOnlyCommas(stringOne, false).replace(" and ", " ").toLowerCase();
@@ -182,8 +182,8 @@ public class DuplicateCheck {
 
         int score = 0;
         for (String field : allFields) {
-            Optional<String> stringOne = one.getFieldOptional(field);
-            Optional<String> stringTwo = two.getFieldOptional(field);
+            Optional<String> stringOne = one.getField(field);
+            Optional<String> stringTwo = two.getField(field);
             if (stringOne.equals(stringTwo)) {
                 score++;
             }

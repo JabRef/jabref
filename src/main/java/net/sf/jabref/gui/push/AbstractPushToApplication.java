@@ -10,7 +10,7 @@ import javax.swing.JTextField;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.actions.BrowseAction;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -150,9 +150,11 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         }
         builder.add(label.toString()).xy(1, 1);
         builder.add(path).xy(3, 1);
-        BrowseAction action = BrowseAction.buildForFile(path);
         JButton browse = new JButton(Localization.lang("Browse"));
-        browse.addActionListener(action);
+        browse.addActionListener(e ->
+                new FileDialog(null).showDialogAndGetSelectedFile()
+                        .ifPresent(f -> path.setText(f.toAbsolutePath().toString()))
+        );
         builder.add(browse).xy(5, 1);
         settings = builder.build();
     }

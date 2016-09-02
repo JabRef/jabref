@@ -28,9 +28,9 @@ public class BibEntryWriterTest {
 
     @Before
     public void setUpWriter() {
-        importFormatPreferences = ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance());
-        writer = new BibEntryWriter(new LatexFieldFormatter(
-                LatexFieldFormatterPreferences.fromPreferences(JabRefPreferences.getInstance())), true);
+        importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
+        writer = new BibEntryWriter(
+                new LatexFieldFormatter(JabRefPreferences.getInstance().getLatexFieldFormatterPreferences()), true);
     }
 
     @Test
@@ -295,7 +295,7 @@ public class BibEntryWriterTest {
         // modify month field
         Set<String> fields = entry.getFieldNames();
         assertTrue(fields.contains("month"));
-        assertEquals("#mar#", entry.getFieldOptional("month").get());
+        assertEquals("#mar#", entry.getField("month").get());
 
         //write out bibtex string
         StringWriter stringWriter = new StringWriter();

@@ -292,4 +292,16 @@ public class BibDatabaseTest {
         database.addString(string);
         assertEquals(database.resolveForStrings("AAA#AAA#AAA#"), "AAAaaaAAA#");
     }
+
+    @Test
+    public void preambleIsEmptyIfNotSet() {
+        assertEquals(Optional.empty(), database.getPreamble());
+    }
+
+    @Test
+    public void setPreambleWorks() {
+        database.setPreamble("Oh yeah!");
+        assertEquals(Optional.of("Oh yeah!"), database.getPreamble());
+    }
+
 }

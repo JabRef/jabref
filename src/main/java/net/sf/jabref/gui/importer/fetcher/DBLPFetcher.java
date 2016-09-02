@@ -10,7 +10,6 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
@@ -32,7 +31,7 @@ public class DBLPFetcher implements EntryFetcher {
 
     private volatile boolean shouldContinue;
     private String query;
-    private final DBLPHelper helper = new DBLPHelper(ImportFormatPreferences.fromPreferences(Globals.prefs));
+    private final DBLPHelper helper = new DBLPHelper(Globals.prefs.getImportFormatPreferences());
 
 
     @Override
@@ -106,7 +105,7 @@ public class DBLPFetcher implements EntryFetcher {
                                 .downloadToString(Globals.prefs.getDefaultEncoding());
 
                         Collection<BibEntry> bibtexEntries = BibtexParser.fromString(bibtexPage,
-                                ImportFormatPreferences.fromPreferences(Globals.prefs));
+                                Globals.prefs.getImportFormatPreferences());
 
                         for (BibEntry be : bibtexEntries) {
 

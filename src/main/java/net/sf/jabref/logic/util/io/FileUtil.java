@@ -21,7 +21,7 @@ import java.util.Vector;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.FileDirectoryPreferences;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
@@ -31,7 +31,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -167,12 +166,13 @@ public class FileUtil {
      * @param databaseContext The database this file belongs to.
      * @param name     The filename, may also be a relative path to the file
      */
-    public static Optional<File> expandFilename(final BibDatabaseContext databaseContext, String name) {
+    public static Optional<File> expandFilename(final BibDatabaseContext databaseContext, String name,
+            FileDirectoryPreferences fileDirectoryPreferences) {
         Optional<String> extension = getFileExtension(name);
         // Find the default directory for this field type, if any:
-        List<String> directories = databaseContext.getFileDirectory(extension.orElse(null));
+        List<String> directories = databaseContext.getFileDirectory(extension.orElse(null), fileDirectoryPreferences);
         // Include the standard "file" directory:
-        List<String> fileDir = databaseContext.getFileDirectory();
+        List<String> fileDir = databaseContext.getFileDirectory(fileDirectoryPreferences);
         // Include the directory of the BIB file:
         List<String> al = new ArrayList<>();
         for (String dir : directories) {
@@ -357,7 +357,7 @@ public class FileUtil {
 
         List<File> result = new ArrayList<>();
         for (BibEntry entry : bes) {
-            entry.getFieldOptional(FieldName.FILE).ifPresent(fileField -> {
+            entry.getField(FieldName.FILE).ifPresent(fileField -> {
                 List<ParsedFileField> fileList = FileField.parse(fileField);
                 for (ParsedFileField file : fileList) {
                     expandFilename(file.getLink(), fileDirs).ifPresent(result::add);
@@ -371,24 +371,29 @@ public class FileUtil {
     /**
      * Determines filename provided by an entry in a database
      *
-     * @param database the database, where the entry is located
-     * @param entry    the entry to which the file should be linked to
-     * @param repositoryLoader
+     * @param database        the database, where the entry is located
+     * @param entry           the entry to which the file should be linked to
+     * @param fileNamePattern the filename pattern
+     * @param prefs           the layout preferences
      * @return a suggested fileName
      */
     public static String createFileNameFromPattern(BibDatabase database, BibEntry entry,
-            JournalAbbreviationLoader repositoryLoader, JabRefPreferences prefs) {
-        String targetName = entry.getCiteKeyOptional().orElse("default");
-        StringReader sr = new StringReader(prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN));
+            String fileNamePattern, LayoutFormatterPreferences prefs) {
+        String targetName = null;
+
+        StringReader sr = new StringReader(fileNamePattern);
         Layout layout = null;
         try {
-            layout = new LayoutHelper(sr, LayoutFormatterPreferences.fromPreferences(prefs, repositoryLoader))
-                    .getLayoutFromText();
+            layout = new LayoutHelper(sr, prefs).getLayoutFromText();
         } catch (IOException e) {
             LOGGER.info("Wrong format " + e.getMessage(), e);
         }
         if (layout != null) {
             targetName = layout.doLayout(entry, database);
+        }
+
+        if ((targetName == null) || targetName.isEmpty()) {
+            targetName = entry.getCiteKeyOptional().orElse("default");
         }
         //Removes illegal characters from filename
         targetName = FileNameCleaner.cleanFileName(targetName);

@@ -52,8 +52,7 @@ public class SavePreferences {
         DatabaseSaveType saveType = DatabaseSaveType.ALL;
         Boolean takeMetadataSaveOrderInAccount = false;
         Boolean reformatFile = preferences.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT);
-        LatexFieldFormatterPreferences latexFieldFormatterPreferences = LatexFieldFormatterPreferences
-                .fromPreferences(preferences);
+        LatexFieldFormatterPreferences latexFieldFormatterPreferences = preferences.getLatexFieldFormatterPreferences();
         return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
                 takeMetadataSaveOrderInAccount, reformatFile, latexFieldFormatterPreferences);
     }
@@ -66,8 +65,7 @@ public class SavePreferences {
         DatabaseSaveType saveType = DatabaseSaveType.ALL;
         Boolean takeMetadataSaveOrderInAccount = true;
         Boolean reformatFile = preferences.getBoolean(JabRefPreferences.REFORMAT_FILE_ON_SAVE_AND_EXPORT);
-        LatexFieldFormatterPreferences latexFieldFormatterPreferences = LatexFieldFormatterPreferences
-                .fromPreferences(preferences);
+        LatexFieldFormatterPreferences latexFieldFormatterPreferences = preferences.getLatexFieldFormatterPreferences();
         return new SavePreferences(saveInOriginalOrder, saveOrder, encoding, makeBackup, saveType,
                 takeMetadataSaveOrderInAccount, reformatFile, latexFieldFormatterPreferences);
     }

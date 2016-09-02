@@ -49,7 +49,7 @@ public class FulltextFetchers {
     public Optional<URL> findFullTextPDF(BibEntry entry) {
         // for accuracy, fetch DOI first but do not modify entry
         BibEntry clonedEntry = (BibEntry) entry.clone();
-        Optional<String> doi = clonedEntry.getFieldOptional(FieldName.DOI);
+        Optional<String> doi = clonedEntry.getField(FieldName.DOI);
 
         if (!doi.isPresent() || !DOI.build(doi.get()).isPresent()) {
             CrossRef.findDOI(clonedEntry).ifPresent(e -> clonedEntry.setField(FieldName.DOI, e.getDOI()));

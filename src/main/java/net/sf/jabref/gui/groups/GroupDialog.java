@@ -265,14 +265,15 @@ class GroupDialog extends JDialog {
                 isOkPressed = true;
             try {
                 if (explicitRadioButton.isSelected()) {
-                    resultingGroup = new ExplicitGroup(nameField.getText().trim(), getContext(), Globals.prefs);
+                    resultingGroup = new ExplicitGroup(nameField.getText().trim(), getContext(),
+                            Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                 } else if (keywordsRadioButton.isSelected()) {
                     // regex is correct, otherwise OK would have been disabled
                     // therefore I don't catch anything here
-                    resultingGroup = new KeywordGroup(nameField.getText().trim(), keywordGroupSearchField.getText().trim(),
-                            keywordGroupSearchTerm.getText().trim(), keywordGroupCaseSensitive.isSelected(), keywordGroupRegExp
-                            .isSelected(),
-                            getContext(), Globals.prefs);
+                    resultingGroup = new KeywordGroup(nameField.getText().trim(),
+                            keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
+                            keywordGroupCaseSensitive.isSelected(), keywordGroupRegExp.isSelected(), getContext(),
+                            Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                 } else if (searchRadioButton.isSelected()) {
                     try {
                         // regex is correct, otherwise OK would have been

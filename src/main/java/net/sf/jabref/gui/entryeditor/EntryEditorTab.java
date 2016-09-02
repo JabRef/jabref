@@ -36,7 +36,7 @@ import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -135,7 +135,7 @@ class EntryEditorTab {
             FieldEditor fieldEditor;
             int defaultHeight;
             int wHeight = (int) (50.0 * InternalBibtexFields.getFieldWeight(field));
-            if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.FILE_EDITOR)) {
+            if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.FILE_EDITOR)) {
                 fieldEditor = new FileListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent);
 
                 fileListEditor = (FileListEditor) fieldEditor;
@@ -214,7 +214,7 @@ class EntryEditorTab {
         if (text.isEmpty()) {
             return getEntry().hasField(fieldEditor.getFieldName());
         } else {
-            return !Optional.of(text).equals(getEntry().getFieldOptional(fieldEditor.getFieldName()));
+            return !Optional.of(text).equals(getEntry().getField(fieldEditor.getFieldName()));
         }
     }
 
@@ -277,7 +277,7 @@ class EntryEditorTab {
         try {
             updating = true;
             for (FieldEditor editor : editors.values()) {
-                String toSet = entry.getFieldOptional(editor.getFieldName()).orElse("");
+                String toSet = entry.getField(editor.getFieldName()).orElse("");
                 if (!toSet.equals(editor.getText())) {
                     editor.setText(toSet);
                 }

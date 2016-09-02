@@ -48,7 +48,7 @@ public class FieldFormatterCleanupsTest {
 
         actions.applySaveActions(entry);
 
-        assertEquals(Optional.of("Educational session 1"), entry.getFieldOptional("title"));
+        assertEquals(Optional.of("Educational session 1"), entry.getField("title"));
     }
 
     @Test
@@ -60,7 +60,7 @@ public class FieldFormatterCleanupsTest {
 
         actions.applySaveActions(entry);
 
-        assertEquals(Optional.of("Educational session 1"), entry.getFieldOptional("title"));
+        assertEquals(Optional.of("Educational session 1"), entry.getField("title"));
     }
 
     @Test
@@ -73,7 +73,7 @@ public class FieldFormatterCleanupsTest {
 
         actions.applySaveActions(entry);
 
-        assertEquals(Optional.of("educational session 1"), entry.getFieldOptional("title"));
+        assertEquals(Optional.of("educational session 1"), entry.getField("title"));
     }
 
     @Test
@@ -86,7 +86,7 @@ public class FieldFormatterCleanupsTest {
 
         actions.applySaveActions(entry);
 
-        assertEquals(Optional.of("educational session 1"), entry.getFieldOptional("title"));
+        assertEquals(Optional.of("educational session 1"), entry.getField("title"));
     }
 
     @Test
@@ -101,7 +101,7 @@ public class FieldFormatterCleanupsTest {
 
         actions.applySaveActions(entry);
 
-        assertEquals(Optional.of("educational session 1"), entry.getFieldOptional("title"));
+        assertEquals(Optional.of("educational session 1"), entry.getField("title"));
     }
 
     @Test
@@ -116,8 +116,8 @@ public class FieldFormatterCleanupsTest {
 
         actions.applySaveActions(entry);
 
-        assertEquals(Optional.of("educational session 1"), entry.getFieldOptional("title"));
-        assertEquals(Optional.of("1--7"), entry.getFieldOptional("pages"));
+        assertEquals(Optional.of("educational session 1"), entry.getField("title"));
+        assertEquals(Optional.of("1--7"), entry.getField("pages"));
     }
 
     @Test
@@ -134,8 +134,8 @@ public class FieldFormatterCleanupsTest {
 
         actions.applySaveActions(entry);
 
-        assertEquals(Optional.of("educational session 1"), entry.getFieldOptional("title"));
-        assertEquals(Optional.of("1--7"), entry.getFieldOptional("pages"));
+        assertEquals(Optional.of("educational session 1"), entry.getField("title"));
+        assertEquals(Optional.of("1--7"), entry.getField("pages"));
     }
 
     @Test
@@ -143,6 +143,6 @@ public class FieldFormatterCleanupsTest {
         FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "mont[clear]");
         actions.applySaveActions(entry);
 
-        assertEquals(Optional.empty(), entry.getFieldOptional("mont"));
+        assertEquals(Optional.empty(), entry.getField("mont"));
     }
 }

@@ -24,8 +24,8 @@ import javax.swing.JTextField;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.SaveOrderConfigDisplay;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.cleanup.FieldFormatterCleanupsPanel;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -34,6 +34,7 @@ import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.DatabaseLocation;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -79,12 +80,29 @@ public class DatabasePropertiesDialog extends JDialog {
         this.metaData = panel.getBibDatabaseContext().getMetaData();
     }
 
+    public void updateEnableStatus() {
+        DatabaseLocation location = panel.getBibDatabaseContext().getLocation();
+        boolean isShared = (location == DatabaseLocation.SHARED);
+        encoding.setEnabled(!isShared); // the encoding of shared database is always UTF-8
+        saveInOriginalOrder.setEnabled(!isShared);
+        saveInSpecifiedOrder.setEnabled(!isShared);
+        saveOrderPanel.setEnabled(!isShared);
+        protect.setEnabled(!isShared);
+    }
+
     private void init(JFrame parent) {
 
         JButton browseFile = new JButton(Localization.lang("Browse"));
         JButton browseFileIndv = new JButton(Localization.lang("Browse"));
-        browseFile.addActionListener(BrowseAction.buildForDir(parent, fileDir));
-        browseFileIndv.addActionListener(BrowseAction.buildForDir(parent, fileDirIndv));
+
+        browseFile.addActionListener(e ->
+                new FileDialog(parent).showDialogAndGetSelectedDirectory()
+                        .ifPresent(f -> fileDir.setText(f.toAbsolutePath().toString()))
+        );
+        browseFileIndv.addActionListener(e ->
+                new FileDialog(parent).showDialogAndGetSelectedDirectory()
+                        .ifPresent(f -> fileDirIndv.setText(f.toAbsolutePath().toString()))
+        );
 
         setupSortOrderConfiguration();
         FormLayout form = new FormLayout("left:pref, 4dlu, pref:grow, 4dlu, pref:grow, 4dlu, pref",
@@ -175,7 +193,8 @@ public class DatabasePropertiesDialog extends JDialog {
     }
 
     private void setValues() {
-        encoding.setSelectedItem(panel.getBibDatabaseContext().getMetaData().getEncoding());
+        Optional<Charset> charset = panel.getBibDatabaseContext().getMetaData().getEncoding();
+        encoding.setSelectedItem(charset.orElse(Globals.prefs.getDefaultEncoding()));
 
         Optional<SaveOrderConfig> storedSaveOrderConfig = metaData.getSaveOrderConfig();
         boolean selected;

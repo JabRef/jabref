@@ -13,7 +13,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.importer.ParserResultWarningDialog;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
@@ -62,7 +61,7 @@ public class AutosaveStartupPrompter implements Runnable {
             ParserResult pr;
             do {
                 pr = OpenDatabase.loadDatabaseOrAutoSave(fileToLoad.getPath(), true,
-                        ImportFormatPreferences.fromPreferences(Globals.prefs));
+                        Globals.prefs.getImportFormatPreferences());
                 if (pr.isInvalid()) {
                     loaded.add(pr);
                     BibDatabaseContext databaseContext = pr.getDatabaseContext();

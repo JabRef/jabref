@@ -153,7 +153,7 @@ public class PreferencesDialog extends JDialog {
         // Import and export actions:
         exportPreferences.setToolTipText(Localization.lang("Export preferences to file"));
         exportPreferences.addActionListener(e -> {
-            FileDialog dialog = new FileDialog(frame, System.getProperty("user.home")).withExtension(FileExtensions.XML);
+            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.XML);
             dialog.setDefaultExtension(FileExtensions.XML);
             Optional<Path> path = dialog.saveNewFile();
 
@@ -170,7 +170,7 @@ public class PreferencesDialog extends JDialog {
 
         importPreferences.setToolTipText(Localization.lang("Import preferences from file"));
         importPreferences.addActionListener(e -> {
-            FileDialog dialog = new FileDialog(frame, System.getProperty("user.home")).withExtension(FileExtensions.XML);
+            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.XML);
             dialog.setDefaultExtension(FileExtensions.XML);
             Optional<Path> fileName = dialog.showDialogAndGetSelectedFile();
 
@@ -219,8 +219,8 @@ public class PreferencesDialog extends JDialog {
         setValues();
         Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
                 Globals.journalAbbreviationLoader);
-        LayoutFormatterPreferences layoutPreferences = LayoutFormatterPreferences.fromPreferences(Globals.prefs,
-                Globals.journalAbbreviationLoader);
+        LayoutFormatterPreferences layoutPreferences = Globals.prefs
+                .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
         SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
         ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
 

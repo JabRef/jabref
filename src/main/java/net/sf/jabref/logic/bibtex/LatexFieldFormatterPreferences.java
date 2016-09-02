@@ -3,8 +3,6 @@ package net.sf.jabref.logic.bibtex;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.preferences.JabRefPreferences;
-
 public class LatexFieldFormatterPreferences {
 
     private final boolean resolveStringsAllFields;
@@ -23,12 +21,6 @@ public class LatexFieldFormatterPreferences {
     public LatexFieldFormatterPreferences() {
         // This constructor is only to allow an empty constructor in SavePreferences
         this(true, Collections.emptyList(), new FieldContentParserPreferences());
-    }
-
-    public static LatexFieldFormatterPreferences fromPreferences(JabRefPreferences prefs) {
-        return new LatexFieldFormatterPreferences(prefs.getBoolean(JabRefPreferences.RESOLVE_STRINGS_ALL_FIELDS),
-                prefs.getStringList(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR),
-                FieldContentParserPreferences.fromPreferences(prefs));
     }
 
     public boolean isResolveStringsAllFields() {

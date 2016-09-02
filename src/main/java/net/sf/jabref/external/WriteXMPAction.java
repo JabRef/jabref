@@ -32,7 +32,6 @@ import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -121,14 +120,19 @@ public class WriteXMPAction extends AbstractWorker {
             List<File> files = new ArrayList<>();
 
             // First check the (legacy) "pdf" field:
-            entry.getFieldOptional(FieldName.PDF).ifPresent(pdf ->
-                FileUtil.expandFilename(pdf, panel.getBibDatabaseContext().getFileDirectory("pdf"))
-                    .ifPresent(files::add));
+            entry.getField(FieldName.PDF)
+                    .ifPresent(
+                            pdf -> FileUtil
+                                    .expandFilename(pdf,
+                                            panel.getBibDatabaseContext().getFileDirectory(FieldName.PDF,
+                                                    Globals.prefs.getFileDirectoryPreferences()))
+                            .ifPresent(files::add));
             // Then check the "file" field:
-            List<String> dirs = panel.getBibDatabaseContext().getFileDirectory();
+            List<String> dirs = panel.getBibDatabaseContext()
+                    .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
             if (entry.hasField(FieldName.FILE)) {
                 FileListTableModel tm = new FileListTableModel();
-                entry.getFieldOptional(FieldName.FILE).ifPresent(tm::setContent);
+                entry.getField(FieldName.FILE).ifPresent(tm::setContent);
                 for (int j = 0; j < tm.getRowCount(); j++) {
                     FileListEntry flEntry = tm.getEntry(j);
                     if ((flEntry.type.isPresent()) && "pdf".equalsIgnoreCase(flEntry.type.get().getName())) {
@@ -137,7 +141,8 @@ public class WriteXMPAction extends AbstractWorker {
                 }
             }
 
-            SwingUtilities.invokeLater(() -> optDiag.getProgressArea().append(entry.getCiteKey() + "\n"));
+            SwingUtilities.invokeLater(() -> optDiag.getProgressArea()
+                    .append(entry.getCiteKeyOptional().orElse(Localization.lang("undefined")) + "\n"));
 
             if (files.isEmpty()) {
                 skipped++;
@@ -147,7 +152,7 @@ public class WriteXMPAction extends AbstractWorker {
                 for (File file : files) {
                     if (file.exists()) {
                         try {
-                            XMPUtil.writeXMP(file, entry, database, XMPPreferences.fromPreferences(Globals.prefs));
+                            XMPUtil.writeXMP(file, entry, database, Globals.prefs.getXMPPreferences());
                             SwingUtilities.invokeLater(
                                     () -> optDiag.getProgressArea().append("  " + Localization.lang("OK") + ".\n"));
                             entriesChanged++;

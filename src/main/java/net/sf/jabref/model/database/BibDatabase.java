@@ -37,7 +37,6 @@ import org.apache.commons.logging.LogFactory;
  * A bibliography database.
  */
 public class BibDatabase {
-
     private static final Log LOGGER = LogFactory.getLog(BibDatabase.class);
 
     /**
@@ -123,7 +122,7 @@ public class BibDatabase {
      */
     public synchronized Optional<BibEntry> getEntryByKey(String key) {
         for (BibEntry entry : entries) {
-            if (key.equals(entry.getCiteKey())) {
+            if (key.equals(entry.getCiteKeyOptional().orElse(null))) {
                 return Optional.of(entry);
             }
         }
@@ -138,7 +137,16 @@ public class BibDatabase {
      * @return list of entries that contains the given key
      */
     public synchronized List<BibEntry> getEntriesByKey(String key) {
-        return entries.stream().filter(entry -> key.equals(entry.getCiteKey())).collect(Collectors.toList());
+        List<BibEntry> result = new ArrayList<>();
+
+        for (BibEntry entry : entries) {
+            entry.getCiteKeyOptional().ifPresent(entryKey -> {
+                if (key.equals(entryKey)) {
+                    result.add(entry);
+                }
+            });
+        }
+        return result;
     }
 
     /**
@@ -234,8 +242,8 @@ public class BibDatabase {
     /**
      * Returns the database's preamble.
      */
-    public synchronized String getPreamble() {
-        return preamble;
+    public synchronized Optional<String> getPreamble() {
+        return Optional.ofNullable(preamble);
     }
 
     /**
@@ -303,7 +311,7 @@ public class BibDatabase {
      * @param database another BibDatabase
      */
     public void copyPreamble(BibDatabase database) {
-        setPreamble(database.getPreamble());
+        setPreamble(database.getPreamble().orElse(""));
     }
 
     /**
@@ -520,7 +528,7 @@ public class BibDatabase {
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry: Do not do this for the bibtex key.
         if (!result.isPresent() && (database != null)) {
-            Optional<String> crossrefKey = entry.getFieldOptional(FieldName.CROSSREF);
+            Optional<String> crossrefKey = entry.getField(FieldName.CROSSREF);
             if (crossrefKey.isPresent() && !crossrefKey.get().isEmpty()) {
                 Optional<BibEntry> referred = database.getEntryByKey(crossrefKey.get());
                 if (referred.isPresent()) {

@@ -48,7 +48,7 @@ public class UpdateField {
         String writtenValue = null;
         String oldValue = null;
         if (be.hasField(field)) {
-            oldValue = be.getFieldOptional(field).get();
+            oldValue = be.getField(field).get();
             if ((newValue == null) || (oldValue.equals(newValue) && nullFieldIfValueIsTheSame)) {
                 // If the new field value is null or the old and the new value are the same and flag is set
                 // Clear the field

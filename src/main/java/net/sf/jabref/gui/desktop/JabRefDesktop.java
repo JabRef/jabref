@@ -61,7 +61,7 @@ public class JabRefDesktop {
         String fieldName = initialFieldName;
         if (FieldName.PS.equals(fieldName) || FieldName.PDF.equals(fieldName)) {
             // Find the default directory for this field type:
-            List<String> dir = databaseContext.getFileDirectory(fieldName);
+            List<String> dir = databaseContext.getFileDirectory(fieldName, Globals.prefs.getFileDirectoryPreferences());
 
             Optional<File> file = FileUtil.expandFilename(link, dir);
 
@@ -144,7 +144,8 @@ public class JabRefDesktop {
         File file = new File(link);
 
         if (!httpLink) {
-            Optional<File> tmp = FileUtil.expandFilename(databaseContext, link);
+            Optional<File> tmp = FileUtil.expandFilename(databaseContext, link,
+                    Globals.prefs.getFileDirectoryPreferences());
             if (tmp.isPresent()) {
                 file = tmp.get();
             }
@@ -214,7 +215,7 @@ public class JabRefDesktop {
             // User wants to change the type of this link.
             // First get a model of all file links for this entry:
             FileListTableModel tModel = new FileListTableModel();
-            Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
+            Optional<String> oldValue = entry.getField(FieldName.FILE);
             oldValue.ifPresent(tModel::setContent);
             FileListEntry flEntry = null;
             // Then find which one we are looking at:

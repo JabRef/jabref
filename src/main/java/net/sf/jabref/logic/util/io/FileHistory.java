@@ -2,27 +2,25 @@ package net.sf.jabref.logic.util.io;
 
 import java.util.LinkedList;
 import java.util.List;
-
-import net.sf.jabref.preferences.JabRefPreferences;
+import java.util.Objects;
 
 public class FileHistory {
 
-    private final JabRefPreferences prefs;
-    private final List<String> history = new LinkedList<>();
+    private final LinkedList<String> history;
 
     private static final int HISTORY_SIZE = 8;
 
 
-    public FileHistory(JabRefPreferences prefs) {
-        this.prefs = prefs;
-        List<String> old = prefs.getStringList(JabRefPreferences.RECENT_FILES);
-        if (old != null) {
-            history.addAll(old);
-        }
+    public FileHistory(List<String> fileList) {
+        history = new LinkedList<>(Objects.requireNonNull(fileList));
     }
 
     public int size() {
         return history.size();
+    }
+
+    public boolean isEmpty() {
+        return history.isEmpty();
     }
 
     /**
@@ -32,10 +30,10 @@ public class FileHistory {
      */
 
     public void newFile(String filename) {
-        history.remove(filename);
-        ((LinkedList<String>) history).addFirst(filename);
-        while (history.size() > HISTORY_SIZE) {
-            ((LinkedList<String>) history).removeLast();
+        removeItem(filename);
+        history.addFirst(filename);
+        while (size() > HISTORY_SIZE) {
+            history.removeLast();
         }
     }
 
@@ -47,10 +45,7 @@ public class FileHistory {
         history.remove(filename);
     }
 
-    public void storeHistory() {
-        if (!history.isEmpty()) {
-            prefs.putStringList(JabRefPreferences.RECENT_FILES, history);
-        }
+    public List<String> getHistory() {
+        return history;
     }
-
 }

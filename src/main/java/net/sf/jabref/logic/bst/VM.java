@@ -64,7 +64,7 @@ public class VM implements Warn {
 
     private StringBuilder bbl;
 
-    private String preamble;
+    private String preamble = "";
 
     private static final Pattern ADD_PERIOD_PATTERN = Pattern.compile("([^\\.\\?\\!\\}\\s])(\\}|\\s)*$");
 
@@ -298,7 +298,7 @@ public class VM implements Warn {
             if (context == null) {
                 throw new VMException("Must have an entry to cite$");
             }
-            stack.push(context.getBibtexEntry().getCiteKey());
+            stack.push(context.getBibtexEntry().getCiteKeyOptional().orElse(null));
         });
 
         /**
@@ -471,11 +471,7 @@ public class VM implements Warn {
          * @PREAMBLE strings read from the database files.
          */
         buildInFunctions.put("preamble$", context -> {
-            if (preamble == null) {
-                stack.push("");
-            } else {
-                stack.push(preamble);
-            }
+            stack.push(preamble);
         });
 
         /**
@@ -836,7 +832,7 @@ public class VM implements Warn {
 
 
     public String run(BibDatabase db) {
-        preamble = db.getPreamble();
+        preamble = db.getPreamble().orElse("");
         return run(db.getEntries());
     }
 
@@ -919,7 +915,7 @@ public class VM implements Warn {
         for (BstEntry e : entries) {
 
             for (Map.Entry<String, String> mEntry : e.getFields().entrySet()) {
-                String fieldValue = e.getBibtexEntry().getField(mEntry.getKey());
+                String fieldValue = e.getBibtexEntry().getField(mEntry.getKey()).orElse(null);
 
                 mEntry.setValue(fieldValue);
             }

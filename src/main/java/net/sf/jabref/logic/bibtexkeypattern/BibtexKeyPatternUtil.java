@@ -2,7 +2,9 @@ package net.sf.jabref.logic.bibtexkeypattern;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -25,13 +27,12 @@ import org.apache.commons.logging.LogFactory;
  * This is the utility class of the LabelPattern package.
  */
 public class BibtexKeyPatternUtil {
+    private static final Log LOGGER = LogFactory.getLog(BibtexKeyPatternUtil.class);
 
     private static final String STARTING_CAPITAL_PATTERN = "[^A-Z]";
 
     // All single characters that we can use for extending a key to make it unique:
     private static final String CHARS = "abcdefghijklmnopqrstuvwxyz";
-
-    private static final Log LOGGER = LogFactory.getLog(BibtexKeyPatternUtil.class);
 
     private static final Pattern REGEX_PATTERN = Pattern.compile(".*\\(\\{([A-Z]+)\\}\\).*");
 
@@ -258,7 +259,7 @@ public class BibtexKeyPatternUtil {
             // Cleanup: remove unnecessary words.
             for (String k : parts[index].replaceAll("\\{[A-Z]+\\}", "").split("[ \\-_]")) {
                 if ((!(k.isEmpty()) // remove empty
-                        && !ignore.contains(k.toLowerCase()) // remove ignored words
+                        && !ignore.contains(k.toLowerCase(Locale.ENGLISH)) // remove ignored words
                         && (k.charAt(k.length() - 1) != '.')
                         && (String.valueOf(k.charAt(0))).matches("[A-Z]"))
                         || ((k.length() >= 3) && "uni".equalsIgnoreCase(k.substring(0, 2)))) {
@@ -377,14 +378,12 @@ public class BibtexKeyPatternUtil {
         database = dBase;
         String key;
         StringBuilder stringBuilder = new StringBuilder();
-        boolean forceUpper = false;
-        boolean forceLower = false;
-
         try {
             // get the type of entry
             String entryType = entry.getType();
             // Get the arrayList corresponding to the type
-            List<String> typeList = new ArrayList<>(metaData.getBibtexKeyPattern().getValue(entryType));
+            List<String> typeList = new ArrayList<>(
+                    metaData.getBibtexKeyPattern(bibtexKeyPatternPreferences.getKeyPattern()).getValue(entryType));
             if (!typeList.isEmpty()) {
                 typeList.remove(0);
             }
@@ -397,12 +396,11 @@ public class BibtexKeyPatternUtil {
                 } else if (field) {
                     // check whether there is a modifier on the end such as
                     // ":lower"
-                    String[] parts = parseFieldMarker(typeListEntry);
-
-                    String label = makeLabel(entry, parts[0]);
+                    List<String> parts = parseFieldMarker(typeListEntry);
+                    String label = makeLabel(entry, parts.get(0));
 
                     // apply modifier if present
-                    if (parts.length > 1) {
+                    if (parts.size() > 1) {
                         label = applyModifiers(label, parts, 1);
                     }
 
@@ -426,14 +424,7 @@ public class BibtexKeyPatternUtil {
             key = key.replaceAll(regex, replacement);
         }
 
-        if (forceUpper) {
-            key = key.toUpperCase();
-        }
-        if (forceLower) {
-            key = key.toLowerCase();
-        }
-
-        String oldKey = entry.getCiteKey();
+        String oldKey = entry.getCiteKeyOptional().orElse(null);
         int occurrences = database.getNumberOfKeyOccurrences(key);
 
         if (Objects.equals(oldKey, key)) {
@@ -446,11 +437,11 @@ public class BibtexKeyPatternUtil {
         if (!alwaysAddLetter && (occurrences == 0)) {
             // No dupes found, so we can just go ahead.
             if (!key.equals(oldKey)) {
-                if (!database.containsEntryWithId(entry.getId())) {
+                if (database.containsEntryWithId(entry.getId())) {
+                    database.setCiteKeyForEntry(entry, key);
+                } else {
                     // entry does not (yet) exist in the database, just update the entry
                     entry.setCiteKey(key);
-                } else {
-                    database.setCiteKeyForEntry(entry, key);
                 }
             }
 
@@ -479,11 +470,11 @@ public class BibtexKeyPatternUtil {
             }
 
             if (!moddedKey.equals(oldKey)) {
-                if (!database.containsEntryWithId(entry.getId())) {
+                if (database.containsEntryWithId(entry.getId())) {
+                    database.setCiteKeyForEntry(entry, moddedKey);
+                } else {
                     // entry does not (yet) exist in the database, just update the entry
                     entry.setCiteKey(moddedKey);
-                } else {
-                    database.setCiteKeyForEntry(entry, moddedKey);
                 }
             }
         }
@@ -496,16 +487,16 @@ public class BibtexKeyPatternUtil {
      * @param offset The number of initial items in the modifiers array to skip.
      * @return The modified label.
      */
-    public static String applyModifiers(String label, String[] parts, int offset) {
+    public static String applyModifiers(String label, List<String> parts, int offset) {
         String resultingLabel = label;
-        if (parts.length > offset) {
-            for (int j = offset; j < parts.length; j++) {
-                String modifier = parts[j];
+        if (parts.size() > offset) {
+            for (int j = offset; j < parts.size(); j++) {
+                String modifier = parts.get(j);
 
                 if ("lower".equals(modifier)) {
-                    resultingLabel = resultingLabel.toLowerCase();
+                    resultingLabel = resultingLabel.toLowerCase(Locale.ENGLISH);
                 } else if ("upper".equals(modifier)) {
-                    resultingLabel = resultingLabel.toUpperCase();
+                    resultingLabel = resultingLabel.toUpperCase(Locale.ENGLISH);
                 } else if ("abbr".equals(modifier)) {
                     // Abbreviate - that is,
                     StringBuilder abbreviateSB = new StringBuilder();
@@ -549,10 +540,8 @@ public class BibtexKeyPatternUtil {
                  * form "pureauth..." which does not do this fallback
                  * substitution of editor.
                  */
-                String authString = entry.getField(FieldName.AUTHOR);
-                if (authString != null) {
-                    authString = normalize(database.resolveForStrings(authString));
-                }
+                String authString = entry.getField(FieldName.AUTHOR)
+                        .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
 
                 if (val.startsWith("pure")) {
                     // remove the "pure" prefix so the remaining
@@ -560,13 +549,9 @@ public class BibtexKeyPatternUtil {
                     val = val.substring(4);
                 }
 
-                if ((authString == null) || authString.isEmpty()) {
-                    authString = entry.getField(FieldName.EDITOR);
-                    if (authString == null) {
-                        authString = "";
-                    } else {
-                        authString = normalize(database.resolveForStrings(authString));
-                    }
+                if (authString.isEmpty()) {
+                    authString = entry.getField(FieldName.EDITOR)
+                            .map(authorString -> normalize(database.resolveForStrings(authorString))).orElse("");
                 }
 
                 // Gather all author-related checks, so we don't
@@ -591,86 +576,69 @@ public class BibtexKeyPatternUtil {
                     return oneAuthorPlusIni(authString);
                 } else if (val.matches("authIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
-                    String s = authIniN(authString, num);
-                    return s == null ? "" : s;
+                    return authIniN(authString, num);
                 } else if ("auth.auth.ea".equals(val)) {
-                    String s = authAuthEa(authString);
-                    return s == null ? "" : s;
+                    return authAuthEa(authString);
                 } else if ("auth.etal".equals(val)) {
-                    String s = authEtal(authString, ".", ".etal");
-                    return s == null ? "" : s;
+                    return authEtal(authString, ".", ".etal");
                 } else if ("authEtAl".equals(val)) {
-                    String s = authEtal(authString, "", "EtAl");
-                    return s == null ? "" : s;
+                    return authEtal(authString, "", "EtAl");
                 } else if ("authshort".equals(val)) {
-                    String s = authshort(authString);
-                    return s == null ? "" : s;
+                    return authshort(authString);
                 } else if (val.matches("auth[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
-                    String s = authNofMth(authString, Integer.parseInt(nums[0]),
+                    return authNofMth(authString, Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]));
-                    return s == null ? "" : s;
                 } else if (val.matches("auth\\d+")) {
                     // authN. First N chars of the first author's last
                     // name.
 
                     String fa = firstAuthor(authString);
-                    if (fa == null) {
-                        return "";
-                    }
                     int num = Integer.parseInt(val.substring(4));
                     if (num > fa.length()) {
                         num = fa.length();
                     }
                     return fa.substring(0, num);
                 } else if (val.matches("authors\\d+")) {
-                    String s = nAuthors(authString, Integer.parseInt(val.substring(7)));
-                    return s == null ? "" : s;
+                    return nAuthors(authString, Integer.parseInt(val.substring(7)));
                 } else {
                     // This "auth" business was a dead end, so just
                     // use it literally:
-                    return getField(entry, val);
+                    return entry.getFieldOrAlias(val).orElse("");
                 }
             } else if (val.startsWith("ed")) {
                 // Gather all markers starting with "ed" here, so we
                 // don't have to check all the time.
                 if ("edtr".equals(val)) {
-                    return firstAuthor(entry.getField(FieldName.EDITOR));
+                    return firstAuthor(entry.getField(FieldName.EDITOR).orElse(""));
                 } else if ("edtrForeIni".equals(val)) {
-                    return firstAuthorForenameInitials(entry.getField(FieldName.EDITOR));
+                    return firstAuthorForenameInitials(entry.getField(FieldName.EDITOR).orElse(""));
                 } else if ("editors".equals(val)) {
-                    return allAuthors(entry.getField(FieldName.EDITOR));
+                    return allAuthors(entry.getField(FieldName.EDITOR).orElse(""));
                     // Last author's last name
                 } else if ("editorLast".equals(val)) {
-                    return lastAuthor(entry.getField(FieldName.EDITOR));
+                    return lastAuthor(entry.getField(FieldName.EDITOR).orElse(""));
                 } else if ("editorLastForeIni".equals(val)) {
-                    return lastAuthorForenameInitials(entry.getField(FieldName.EDITOR));
+                    return lastAuthorForenameInitials(entry.getField(FieldName.EDITOR).orElse(""));
                 } else if ("editorIni".equals(val)) {
-                    return oneAuthorPlusIni(entry.getField(FieldName.EDITOR));
+                    return oneAuthorPlusIni(entry.getField(FieldName.EDITOR).orElse(""));
                 } else if (val.matches("edtrIni[\\d]+")) {
                     int num = Integer.parseInt(val.substring(7));
-                    String s = authIniN(entry.getField(FieldName.EDITOR), num);
-                    return s == null ? "" : s;
+                    return authIniN(entry.getField(FieldName.EDITOR).orElse(""), num);
                 } else if (val.matches("edtr[\\d]+_[\\d]+")) {
                     String[] nums = val.substring(4).split("_");
-                    String s = authNofMth(entry.getField(FieldName.EDITOR),
+                    return authNofMth(entry.getField(FieldName.EDITOR).orElse(""),
                             Integer.parseInt(nums[0]),
                             Integer.parseInt(nums[1]) - 1);
-                    return s == null ? "" : s;
                 } else if ("edtr.edtr.ea".equals(val)) {
-                    String s = authAuthEa(entry.getField(FieldName.EDITOR));
-                    return s == null ? "" : s;
+                    return authAuthEa(entry.getField(FieldName.EDITOR).orElse(""));
                 } else if ("edtrshort".equals(val)) {
-                    String s = authshort(entry.getField(FieldName.EDITOR));
-                    return s == null ? "" : s;
+                    return authshort(entry.getField(FieldName.EDITOR).orElse(""));
                 }
                 // authN. First N chars of the first author's last
                 // name.
                 else if (val.matches("edtr\\d+")) {
-                    String fa = firstAuthor(entry.getField(FieldName.EDITOR));
-                    if (fa == null) {
-                        return "";
-                    }
+                    String fa = firstAuthor(entry.getField(FieldName.EDITOR).orElse(""));
                     int num = Integer.parseInt(val.substring(4));
                     if (num > fa.length()) {
                         num = fa.length();
@@ -679,28 +647,31 @@ public class BibtexKeyPatternUtil {
                 } else {
                     // This "ed" business was a dead end, so just
                     // use it literally:
-                    return getField(entry, val);
+                    return entry.getFieldOrAlias(val).orElse("");
                 }
             } else if ("firstpage".equals(val)) {
-                return firstPage(entry.getField(FieldName.PAGES));
+                return firstPage(entry.getField(FieldName.PAGES).orElse(""));
             } else if ("lastpage".equals(val)) {
-                return lastPage(entry.getField(FieldName.PAGES));
+                return lastPage(entry.getField(FieldName.PAGES).orElse(""));
             } else if ("shorttitle".equals(val)) {
-                return getTitleWords(3, entry.getField(FieldName.TITLE));
+                return getTitleWords(3, entry.getField(FieldName.TITLE).orElse(""));
             } else if ("shorttitleINI".equals(val)) {
-                return keepLettersAndDigitsOnly(applyModifiers(getTitleWordsWithSpaces(3, entry.getField(FieldName.TITLE)), new String[] {"abbr"}, 0));
+                return keepLettersAndDigitsOnly(
+                        applyModifiers(getTitleWordsWithSpaces(3, entry.getField(FieldName.TITLE).orElse("")),
+                                Collections.singletonList("abbr"), 0));
             } else if ("veryshorttitle".equals(val)) {
-                return getTitleWords(1, entry.getField(FieldName.TITLE));
+                return getTitleWords(1, entry.getField(FieldName.TITLE).orElse(""));
             } else if ("shortyear".equals(val)) {
-                String ss = entry.getFieldOrAlias(FieldName.YEAR).orElse("");
-                if (ss.isEmpty()) {
-                    return ss;
-                } else if (ss.startsWith("in") || ss.startsWith("sub")) {
+                String yearString = entry.getFieldOrAlias(FieldName.YEAR).orElse("");
+                if (yearString.isEmpty()) {
+                    return yearString;
+                    // In press/in preparation/submitted
+                } else if (yearString.startsWith("in") || yearString.startsWith("sub")) {
                     return "IP";
-                } else if (ss.length() > 2) {
-                    return ss.substring(ss.length() - 2);
+                } else if (yearString.length() > 2) {
+                    return yearString.substring(yearString.length() - 2);
                 } else {
-                    return ss;
+                    return yearString;
                 }
             } else if (val.matches("keyword\\d+")) {
                 // according to LabelPattern.php, it returns keyword number n
@@ -737,24 +708,13 @@ public class BibtexKeyPatternUtil {
                 return sb.toString();
             } else {
                 // we haven't seen any special demands
-                return getField(entry, val);
+                return entry.getFieldOrAlias(val).orElse("");
             }
         } catch (NullPointerException ex) {
             LOGGER.debug("Problem making label", ex);
             return "";
         }
 
-    }
-
-    /**
-     * Look up a field of a BibEntry, returning its String value, or an
-     * empty string if it isn't set.
-     * @param entry The entry.
-     * @param field The field to look up.
-     * @return The field value.
-     */
-    private static String getField(BibEntry entry, String field) {
-        return entry.getFieldOrAlias(field).orElse("");
     }
 
     /**
@@ -848,8 +808,7 @@ public class BibtexKeyPatternUtil {
         if (authorList.isEmpty()) {
             return "";
         }
-        String s = authorList.getAuthor(0).getLast();
-        return s == null ? "" : s;
+        return authorList.getAuthor(0).getLast().orElse("");
 
     }
 
@@ -869,8 +828,7 @@ public class BibtexKeyPatternUtil {
         if (authorList.isEmpty()) {
             return "";
         }
-        String s = authorList.getAuthor(0).getFirstAbbr();
-        return s == null ? "" : s.substring(0, 1);
+        return authorList.getAuthor(0).getFirstAbbr().map(s -> s.substring(0, 1)).orElse("");
     }
 
     /**
@@ -890,15 +848,10 @@ public class BibtexKeyPatternUtil {
         if (authorList.isEmpty()) {
             return "";
         }
-        String vonAuthor = authorList.getAuthor(0).getVon().replaceAll(" ", "");
+
         StringBuilder stringBuilder = new StringBuilder();
-        if (vonAuthor != null) {
-            stringBuilder.append(vonAuthor);
-        }
-        vonAuthor = authorList.getAuthor(0).getLast();
-        if (vonAuthor != null) {
-            stringBuilder.append(vonAuthor);
-        }
+        authorList.getAuthor(0).getVon().ifPresent(vonAuthor -> stringBuilder.append(vonAuthor.replaceAll(" ", "")));
+        authorList.getAuthor(0).getLast().ifPresent(stringBuilder::append);
         return stringBuilder.toString();
     }
 
@@ -934,8 +887,8 @@ public class BibtexKeyPatternUtil {
         if (authorList.isEmpty()) {
             return "";
         }
-        String s = authorList.getAuthor(authorList.getNumberOfAuthors() - 1).getFirstAbbr();
-        return s == null ? "" : s.substring(0, 1);
+        return authorList.getAuthor(authorList.getNumberOfAuthors() - 1).getFirstAbbr().map(s -> s.substring(0, 1))
+                .orElse("");
     }
 
     /**
@@ -1293,37 +1246,38 @@ public class BibtexKeyPatternUtil {
      * @param arg The argument string.
      * @return An array of strings representing the parts of the marker
      */
-    private static String[] parseFieldMarker(String arg) {
+    private static List<String> parseFieldMarker(String arg) {
         List<String> parts = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean escaped = false;
         int inParenthesis = 0;
         for (int i = 0; i < arg.length(); i++) {
-            if ((arg.charAt(i) == ':') && !escaped && (inParenthesis == 0)) {
+            char currentChar = arg.charAt(i);
+            if ((currentChar == ':') && !escaped && (inParenthesis == 0)) {
                 parts.add(current.toString());
                 current = new StringBuilder();
-            } else if ((arg.charAt(i) == '(') && !escaped) {
+            } else if ((currentChar == '(') && !escaped) {
                 inParenthesis++;
-                current.append(arg.charAt(i));
-            } else if ((arg.charAt(i) == ')') && !escaped && (inParenthesis > 0)) {
+                current.append(currentChar);
+            } else if ((currentChar == ')') && !escaped && (inParenthesis > 0)) {
                 inParenthesis--;
-                current.append(arg.charAt(i));
-            } else if (arg.charAt(i) == '\\') {
+                current.append(currentChar);
+            } else if (currentChar == '\\') {
                 if (escaped) {
                     escaped = false;
-                    current.append(arg.charAt(i));
+                    current.append(currentChar);
                 } else {
                     escaped = true;
                 }
             } else if (escaped) {
-                current.append(arg.charAt(i));
+                current.append(currentChar);
                 escaped = false;
             } else {
-                current.append(arg.charAt(i));
+                current.append(currentChar);
             }
         }
         parts.add(current.toString());
-        return parts.toArray(new String[parts.size()]);
+        return parts;
     }
 
 

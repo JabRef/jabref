@@ -36,7 +36,7 @@ public class SpringerLink implements FulltextFetcher {
         Optional<URL> pdfLink = Optional.empty();
 
         // Try unique DOI first
-        Optional<DOI> doi = entry.getFieldOptional(FieldName.DOI).flatMap(DOI::build);
+        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::build);
 
         if(doi.isPresent()) {
             // Available in catalog?

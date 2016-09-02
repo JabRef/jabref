@@ -21,12 +21,11 @@ import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.ExplicitGroup;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
-import net.sf.jabref.logic.groups.GroupTreeNode;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
@@ -38,21 +37,13 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Created by IntelliJ IDEA.
- * User: alver
- * Date: May 18, 2006
- * Time: 9:49:02 PM
- * To change this template use File | Settings | File Templates.
- */
 public class AppendDatabaseAction implements BaseAction {
+    private static final Log LOGGER = LogFactory.getLog(AppendDatabaseAction.class);
 
     private final JabRefFrame frame;
     private final BasePanel panel;
+
     private final List<File> filesToOpen = new ArrayList<>();
-
-    private static final Log LOGGER = LogFactory.getLog(AppendDatabaseAction.class);
-
 
     public AppendDatabaseAction(JabRefFrame frame, BasePanel panel) {
         this.frame = frame;
@@ -67,8 +58,9 @@ public class AppendDatabaseAction implements BaseAction {
         md.setLocationRelativeTo(panel);
         md.setVisible(true);
         if (md.isOkPressed()) {
-
-            List<String> chosen = new FileDialog(frame).updateWorkingDirPref().showDialogAndGetMultipleFiles();
+            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.BIBTEX_DB);
+            dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
+            List<String> chosen = dialog.showDialogAndGetMultipleFiles();
             if (chosen.isEmpty()) {
                 return;
             }
@@ -91,10 +83,10 @@ public class AppendDatabaseAction implements BaseAction {
         }
         for (File file : filesToOpen) {
             try {
-                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getPath());
+                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
                 // Should this be done _after_ we know it was successfully opened?
                 ParserResult pr = OpenDatabase.loadDatabase(file,
-                        ImportFormatPreferences.fromPreferences(Globals.prefs));
+                        Globals.prefs.getImportFormatPreferences());
                 AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings,
                         importGroups, importSelectorWords);
                 panel.output(Localization.lang("Imported from database") + " '" + file.getPath() + "'");
@@ -143,15 +135,13 @@ public class AppendDatabaseAction implements BaseAction {
         }
 
         if (importGroups) {
-            GroupTreeNode newGroups = meta.getGroups();
-            if (newGroups != null) {
-
+            meta.getGroups().ifPresent(newGroups -> {
                 // ensure that there is always only one AllEntriesGroup
                 if (newGroups.getGroup() instanceof AllEntriesGroup) {
                     // create a dummy group
                     try {
                         ExplicitGroup group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT,
-                                Globals.prefs);
+                                Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                         newGroups.setGroup(group);
                         group.add(appendedEntries);
                     } catch (ParseException e) {
@@ -163,7 +153,7 @@ public class AppendDatabaseAction implements BaseAction {
                 // have been defined. therefore, no check for null is
                 // required here
                 frame.getGroupSelector().addGroups(newGroups, ce);
-            }
+            });
         }
 
         if (importSelectorWords) {

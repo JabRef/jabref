@@ -6,11 +6,10 @@ import java.util.Collection;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
-import net.sf.jabref.Globals;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.DatabaseLocation;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -36,18 +35,16 @@ public class SynchronizationTestSimulator {
 
 
     @Before
-    public void setUp() throws ClassNotFoundException, SQLException {
+    public void setUp() throws ClassNotFoundException, SQLException, DatabaseNotSupportedException {
         // Get only one connection for each parameter
         if (TestConnector.currentConnectionType != dbmsType) {
             connection = TestConnector.getTestConnection(dbmsType);
         }
 
-        Globals.prefs = JabRefPreferences.getInstance();
-
-        clientContextA = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED);
+        clientContextA = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ", ");
         clientContextA.getDBSynchronizer().openSharedDatabase(connection, dbmsType, "A");
 
-        clientContextB = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED);
+        clientContextB = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ", ");
         clientContextB.getDBSynchronizer().openSharedDatabase(connection, dbmsType, "B");
         eventListenerB = new SynchronizationTestEventListener();
         clientContextB.getDBSynchronizer().registerListener(eventListenerB);

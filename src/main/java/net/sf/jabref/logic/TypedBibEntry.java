@@ -69,7 +69,7 @@ public class TypedBibEntry {
      */
     public List<ParsedFileField> getFiles() {
         //Extract the path
-        Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
+        Optional<String> oldValue = entry.getField(FieldName.FILE);
         if (!oldValue.isPresent()) {
             return new ArrayList<>();
         }
@@ -79,7 +79,7 @@ public class TypedBibEntry {
 
     public Optional<FieldChange> setFiles(List<ParsedFileField> files) {
 
-        Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
+        Optional<String> oldValue = entry.getField(FieldName.FILE);
         String newValue = FileField.getStringRepresentation(files);
 
         if(oldValue.isPresent() && oldValue.get().equals(newValue)) {

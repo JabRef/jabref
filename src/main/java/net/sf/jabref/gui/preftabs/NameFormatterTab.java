@@ -200,8 +200,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
     @Override
     public void setValues() {
         tableRows.clear();
-        List<String> names = prefs.getStringList(NameFormatter.NAME_FORMATER_KEY);
-        List<String> formats = prefs.getStringList(NameFormatter.NAME_FORMATTER_VALUE);
+        List<String> names = prefs.getStringList(JabRefPreferences.NAME_FORMATER_KEY);
+        List<String> formats = prefs.getStringList(JabRefPreferences.NAME_FORMATTER_VALUE);
 
         for (int i = 0; i < names.size(); i++) {
             if (i < formats.size()) {
@@ -317,8 +317,8 @@ public class NameFormatterTab extends JPanel implements PrefsTab {
             }
 
             // Finally, we store the new preferences.
-            prefs.putStringList(NameFormatter.NAME_FORMATER_KEY, names);
-            prefs.putStringList(NameFormatter.NAME_FORMATTER_VALUE, formats);
+            prefs.putStringList(JabRefPreferences.NAME_FORMATER_KEY, names);
+            prefs.putStringList(JabRefPreferences.NAME_FORMATTER_VALUE, formats);
         }
     }
 

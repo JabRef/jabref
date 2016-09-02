@@ -6,7 +6,6 @@ import java.util.Set;
 import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 public class ImportFormatPreferences {
 
@@ -23,11 +22,13 @@ public class ImportFormatPreferences {
     private final boolean useCaseKeeperOnSearch;
     private final boolean convertUnitsOnSearch;
 
+    private final boolean keywordSyncEnabled;
+
 
     public ImportFormatPreferences(Set<CustomImporter> customImportList, Charset encoding,
             String keywordSeparator, BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
             FieldContentParserPreferences fieldContentParserPreferences, boolean convertUnitsOnSearch,
-            boolean useCaseKeeperOnSearch) {
+            boolean useCaseKeeperOnSearch, boolean keywordSyncEnabled) {
         this.customImportList = customImportList;
         this.encoding = encoding;
         this.keywordSeparator = keywordSeparator;
@@ -35,6 +36,7 @@ public class ImportFormatPreferences {
         this.fieldContentParserPreferences = fieldContentParserPreferences;
         this.convertUnitsOnSearch = convertUnitsOnSearch;
         this.useCaseKeeperOnSearch = useCaseKeeperOnSearch;
+        this.keywordSyncEnabled = keywordSyncEnabled;
     }
 
     public Set<CustomImporter> getCustomImportList() {
@@ -67,15 +69,10 @@ public class ImportFormatPreferences {
 
     public ImportFormatPreferences withEncoding(Charset newEncoding) {
         return new ImportFormatPreferences(customImportList, newEncoding, keywordSeparator, bibtexKeyPatternPreferences,
-                fieldContentParserPreferences, convertUnitsOnSearch, useCaseKeeperOnSearch);
+                fieldContentParserPreferences, convertUnitsOnSearch, useCaseKeeperOnSearch, keywordSyncEnabled);
     }
 
-    static public ImportFormatPreferences fromPreferences(JabRefPreferences jabRefPreferences) {
-        return new ImportFormatPreferences(jabRefPreferences.customImports, jabRefPreferences.getDefaultEncoding(),
-                jabRefPreferences.get(JabRefPreferences.KEYWORD_SEPARATOR),
-                BibtexKeyPatternPreferences.fromPreferences(jabRefPreferences),
-                FieldContentParserPreferences.fromPreferences(jabRefPreferences),
-                jabRefPreferences.getBoolean(JabRefPreferences.USE_UNIT_FORMATTER_ON_SEARCH),
-                jabRefPreferences.getBoolean(JabRefPreferences.USE_CASE_KEEPER_ON_SEARCH));
+    public boolean isKeywordSyncEnabled() {
+        return keywordSyncEnabled;
     }
 }

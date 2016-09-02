@@ -17,7 +17,7 @@ public class FileLinksCleanup implements CleanupJob {
 
     @Override
     public List<FieldChange> cleanup(BibEntry entry) {
-        Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
+        Optional<String> oldValue = entry.getField(FieldName.FILE);
         if (!oldValue.isPresent()) {
             return Collections.emptyList();
         }

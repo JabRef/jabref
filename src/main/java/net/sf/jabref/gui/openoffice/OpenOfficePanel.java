@@ -35,11 +35,11 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.SidePaneComponent;
 import net.sf.jabref.gui.SidePaneManager;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -49,7 +49,6 @@ import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.openoffice.OOBibStyle;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
@@ -133,7 +132,7 @@ public class OpenOfficePanel extends AbstractWorker {
         update.setPreferredSize(new Dimension(24, 24));
         preferences = new OpenOfficePreferences(Globals.prefs);
         loader = new StyleLoader(preferences,
-                LayoutFormatterPreferences.fromPreferences(Globals.prefs, Globals.journalAbbreviationLoader),
+                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
                 Globals.prefs.getDefaultEncoding());
     }
 
@@ -537,17 +536,26 @@ public class OpenOfficePanel extends AbstractWorker {
         final JTextField ooPath = new JTextField(30);
         JButton browseOOPath = new JButton(Localization.lang("Browse"));
         ooPath.setText(preferences.getOOPath());
-        browseOOPath.addActionListener(BrowseAction.buildForDir(ooPath));
+        browseOOPath.addActionListener(e ->
+                new FileDialog(frame).showDialogAndGetSelectedDirectory()
+                        .ifPresent(f -> ooPath.setText(f.toAbsolutePath().toString()))
+        );
 
         final JTextField ooExec = new JTextField(30);
         JButton browseOOExec = new JButton(Localization.lang("Browse"));
         ooExec.setText(preferences.getExecutablePath());
-        browseOOExec.addActionListener(BrowseAction.buildForFile(ooExec));
+        browseOOExec.addActionListener(e ->
+                new FileDialog(frame).showDialogAndGetSelectedFile()
+                        .ifPresent(f -> ooExec.setText(f.toAbsolutePath().toString()))
+        );
 
         final JTextField ooJars = new JTextField(30);
-        JButton browseOOJars = new JButton(Localization.lang("Browse"));
-        browseOOJars.addActionListener(BrowseAction.buildForDir(ooJars));
         ooJars.setText(preferences.getJarsPath());
+        JButton browseOOJars = new JButton(Localization.lang("Browse"));
+        browseOOJars.addActionListener(e ->
+                new FileDialog(frame).showDialogAndGetSelectedFile()
+                        .ifPresent(f -> ooJars.setText(f.toAbsolutePath().toString()))
+        );
 
         FormBuilder builder = FormBuilder.create()
                 .layout(
@@ -670,7 +678,7 @@ public class OpenOfficePanel extends AbstractWorker {
         // Check if there are empty keys
         boolean emptyKeys = false;
         for (BibEntry entry : entries) {
-            if (entry.getCiteKey() == null) {
+            if (!entry.getCiteKeyOptional().isPresent()) {
                 // Found one, no need to look further for now
                 emptyKeys = true;
                 break;
@@ -691,16 +699,17 @@ public class OpenOfficePanel extends AbstractWorker {
         BasePanel panel = frame.getCurrentBasePanel();
         if ((answer == JOptionPane.OK_OPTION) && (panel != null)) {
             // Generate keys
-            BibtexKeyPatternPreferences prefs = BibtexKeyPatternPreferences.fromPreferences(Globals.prefs);
+            BibtexKeyPatternPreferences prefs = Globals.prefs.getBibtexKeyPatternPreferences();
             NamedCompound undoCompound = new NamedCompound(Localization.lang("Cite"));
             for (BibEntry entry : entries) {
-                if (entry.getCiteKey() == null) {
+                if (!entry.getCiteKeyOptional().isPresent()) {
                     // Generate key
                     BibtexKeyPatternUtil
                             .makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
                             prefs);
                     // Add undo change
-                    undoCompound.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, null, entry.getCiteKey()));
+                    undoCompound.addEdit(
+                            new UndoableKeyChange(panel.getDatabase(), entry, null, entry.getCiteKeyOptional().get()));
                 }
             }
             undoCompound.end();

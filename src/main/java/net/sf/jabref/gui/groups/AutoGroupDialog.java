@@ -36,6 +36,7 @@ import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -82,7 +83,8 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 try {
                     GroupTreeNode autoGroupsRoot = GroupTreeNode.fromGroup(
                             new ExplicitGroup(Localization.lang("Automatically created groups"),
-                                    GroupHierarchyType.INCLUDING, Globals.prefs));
+                                    GroupHierarchyType.INCLUDING,
+                                    Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR)));
                     Set<String> hs;
                     String fieldText = field.getText();
                     if (keywords.isSelected()) {
@@ -110,7 +112,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
 
                     for (String keyword : hs) {
                         KeywordGroup group = new KeywordGroup(formatter.format(keyword), fieldText, keyword, false, false,
-                                GroupHierarchyType.INDEPENDENT, Globals.prefs);
+                                GroupHierarchyType.INDEPENDENT, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                         autoGroupsRoot.addChild(GroupTreeNode.fromGroup(group));
                     }
 

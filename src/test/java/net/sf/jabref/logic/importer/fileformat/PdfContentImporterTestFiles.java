@@ -9,13 +9,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -28,11 +25,6 @@ public class PdfContentImporterTestFiles {
     @Parameter
     public String fileName;
 
-
-    @Before
-    public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
 
     @Parameters(name = "{index}: {0}")
     public static Collection<Object[]> fileNames() {
@@ -52,7 +44,7 @@ public class PdfContentImporterTestFiles {
         String pdfFileName = fileName + ".pdf";
         String bibFileName = fileName + ".bib";
         PdfContentImporter importer = new PdfContentImporter(
-                ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
+                JabRefPreferences.getInstance().getImportFormatPreferences());
         Path pdfFile = Paths.get(PdfContentImporter.class.getResource(pdfFileName).toURI());
         List<BibEntry> result = importer.importDatabase(pdfFile, StandardCharsets.UTF_8).getDatabase().getEntries();
         BibEntryAssert.assertEquals(PdfContentImporterTest.class, bibFileName, result);

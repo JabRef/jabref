@@ -8,10 +8,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bst.VM.BstEntry;
 import net.sf.jabref.logic.bst.VM.StackFunction;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.entry.BibEntry;
@@ -19,15 +17,9 @@ import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.antlr.runtime.RecognitionException;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
 public class TestVM {
-
-    @Before
-    public void setPreferences() {
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
 
 
     @Test
@@ -649,7 +641,7 @@ public class TestVM {
 
     private static BibEntry bibtexString2BibtexEntry(String s) throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader(s),
-                ImportFormatPreferences.fromPreferences(Globals.prefs));
+                JabRefPreferences.getInstance().getImportFormatPreferences());
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
         return c.iterator().next();

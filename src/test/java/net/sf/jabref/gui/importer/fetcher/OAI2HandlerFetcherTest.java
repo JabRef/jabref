@@ -56,22 +56,22 @@ public class OAI2HandlerFetcherTest {
     public void testParse() throws Throwable {
         try {
             saxParser.parse(this.getClass().getResourceAsStream("oai2.xml"), handler);
-            Assert.assertEquals(Optional.of("hep-ph/0408155"), be.getFieldOptional("eprint"));
+            Assert.assertEquals(Optional.of("hep-ph/0408155"), be.getField("eprint"));
             Assert.assertEquals(Optional.of("G. F. Giudice and A. Riotto and A. Zaffaroni and J. López-Peña"),
-                    be.getFieldOptional("author"));
-            Assert.assertEquals(Optional.of("Nucl.Phys. B"), be.getFieldOptional("journal"));
-            Assert.assertEquals(Optional.of("710"), be.getFieldOptional("volume"));
-            Assert.assertEquals(Optional.of("2005"), be.getFieldOptional("year"));
-            Assert.assertEquals(Optional.of("511-525"), be.getFieldOptional("pages"));
+                    be.getField("author"));
+            Assert.assertEquals(Optional.of("Nucl.Phys. B"), be.getField("journal"));
+            Assert.assertEquals(Optional.of("710"), be.getField("volume"));
+            Assert.assertEquals(Optional.of("2005"), be.getField("year"));
+            Assert.assertEquals(Optional.of("511-525"), be.getField("pages"));
 
             // Citekey is only generated if the user says so in the import
             // inspection dialog.
             Assert.assertEquals(Optional.empty(), be.getCiteKeyOptional());
 
-            Assert.assertEquals(Optional.of("Heavy Particles from Inflation"), be.getFieldOptional("title"));
-            Assert.assertTrue(be.getFieldOptional("abstract").isPresent());
-            Assert.assertEquals(Optional.of("23 pages"), be.getFieldOptional("comments"));
-            Assert.assertEquals(Optional.of("CERN-PH-TH/2004-151"), be.getFieldOptional("reportno"));
+            Assert.assertEquals(Optional.of("Heavy Particles from Inflation"), be.getField("title"));
+            Assert.assertTrue(be.getField("abstract").isPresent());
+            Assert.assertEquals(Optional.of("23 pages"), be.getField("comments"));
+            Assert.assertEquals(Optional.of("CERN-PH-TH/2004-151"), be.getField("reportno"));
         } catch (SAXException e) {
             throw e.getException();
         }
@@ -81,7 +81,7 @@ public class OAI2HandlerFetcherTest {
     public void testOai22xml() throws SAXException, IOException {
 
         saxParser.parse(this.getClass().getResourceAsStream("oai22.xml"), handler);
-        Assert.assertEquals(Optional.of("2005"), be.getFieldOptional("year"));
+        Assert.assertEquals(Optional.of("2005"), be.getField("year"));
 
     }
 
@@ -89,7 +89,7 @@ public class OAI2HandlerFetcherTest {
     public void testOai23xml() throws SAXException, IOException {
 
         saxParser.parse(this.getClass().getResourceAsStream("oai23.xml"), handler);
-        Assert.assertEquals(Optional.of("Javier López Peña and Gabriel Navarro"), be.getFieldOptional("author"));
+        Assert.assertEquals(Optional.of("Javier López Peña and Gabriel Navarro"), be.getField("author"));
 
     }
 
@@ -126,11 +126,11 @@ public class OAI2HandlerFetcherTest {
             be = fetcher.importOai2Entry("math.RA/0612188");
             Assert.assertNotNull(be);
 
-            Assert.assertEquals(Optional.of("math/0612188"), be.getFieldOptional("eprint"));
+            Assert.assertEquals(Optional.of("math/0612188"), be.getField("eprint"));
             Assert.assertEquals(Optional.of("On the classification and properties of noncommutative duplicates"),
-                    be.getFieldOptional("title"));
-            Assert.assertEquals(Optional.of("Javier López Peña and Gabriel Navarro"), be.getFieldOptional("author"));
-            Assert.assertEquals(Optional.of("2007"), be.getFieldOptional("year"));
+                    be.getField("title"));
+            Assert.assertEquals(Optional.of("Javier López Peña and Gabriel Navarro"), be.getField("author"));
+            Assert.assertEquals(Optional.of("2007"), be.getField("year"));
 
             Thread.sleep(20000);
         }
@@ -140,11 +140,11 @@ public class OAI2HandlerFetcherTest {
             be = fetcher.importOai2Entry("astro-ph/0702080");
             Assert.assertNotNull(be);
 
-            Assert.assertEquals(Optional.of("astro-ph/0702080"), be.getFieldOptional("eprint"));
+            Assert.assertEquals(Optional.of("astro-ph/0702080"), be.getField("eprint"));
             Assert.assertEquals(
                     Optional.of(
                             "Magnetized Hypermassive Neutron Star Collapse: a candidate central engine for short-hard GRBs"),
-                    be.getFieldOptional("title"));
+                    be.getField("title"));
 
             Thread.sleep(20000);
         }
@@ -154,7 +154,7 @@ public class OAI2HandlerFetcherTest {
             be = fetcher.importOai2Entry("math.QA/0601001");
             Assert.assertNotNull(be);
 
-            Assert.assertEquals(Optional.of("math/0601001"), be.getFieldOptional("eprint"));
+            Assert.assertEquals(Optional.of("math/0601001"), be.getField("eprint"));
             Thread.sleep(20000);
         }
 
@@ -163,7 +163,7 @@ public class OAI2HandlerFetcherTest {
             be = fetcher.importOai2Entry("hep-ph/0408155");
             Assert.assertNotNull(be);
 
-            Assert.assertEquals(Optional.of("hep-ph/0408155"), be.getFieldOptional("eprint"));
+            Assert.assertEquals(Optional.of("hep-ph/0408155"), be.getField("eprint"));
             Thread.sleep(20000);
         }
 
@@ -171,8 +171,8 @@ public class OAI2HandlerFetcherTest {
         be = fetcher.importOai2Entry("0709.3040");
         Assert.assertNotNull(be);
 
-        Assert.assertEquals(Optional.of("2007"), be.getFieldOptional("year"));
-        Assert.assertEquals(Optional.of("#sep#"), be.getFieldOptional("month"));
+        Assert.assertEquals(Optional.of("2007"), be.getField("year"));
+        Assert.assertEquals(Optional.of("#sep#"), be.getField("month"));
 
     }
 }

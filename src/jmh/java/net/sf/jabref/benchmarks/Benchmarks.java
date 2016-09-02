@@ -17,7 +17,6 @@ import net.sf.jabref.logic.exporter.StringSaveSession;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.groups.GroupHierarchyType;
 import net.sf.jabref.logic.groups.KeywordGroup;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.importer.util.ParseException;
@@ -76,7 +75,7 @@ public class Benchmarks {
     public ParserResult parse() throws IOException {
         StringReader bibtexStringReader = new StringReader(bibtexString);
         BibtexParser parser = new BibtexParser(bibtexStringReader,
-                ImportFormatPreferences.fromPreferences(Globals.prefs));
+                Globals.prefs.getImportFormatPreferences());
         return parser.parse();
     }
 
@@ -124,7 +123,7 @@ public class Benchmarks {
     @Benchmark
     public boolean keywordGroupContains() throws ParseException {
         KeywordGroup group = new KeywordGroup("testGroup", "keyword", "testkeyword", false, false,
-                GroupHierarchyType.INDEPENDENT, Globals.prefs);
+                GroupHierarchyType.INDEPENDENT, ", ");
         return group.containsAll(database.getEntries());
     }
 

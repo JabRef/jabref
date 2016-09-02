@@ -1,5 +1,6 @@
 package net.sf.jabref.specialfields;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
@@ -20,7 +21,7 @@ public class SpecialFieldDatabaseChangeListener {
 
     @Subscribe
     public void listen(EntryAddedEvent event) {
-        if (SpecialFieldsUtils.keywordSyncEnabled()) {
+        if (Globals.prefs.isKeywordSyncEnabled()) {
             final BibEntry entry = event.getBibEntry();
             // NamedCompount code similar to SpecialFieldUpdateListener
             NamedCompound nc = new NamedCompound(Localization.lang("Synchronized special fields based on keywords"));

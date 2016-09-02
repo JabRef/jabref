@@ -80,7 +80,6 @@ import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
-import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.groups.AllEntriesGroup;
 import net.sf.jabref.logic.groups.EntriesGroupChange;
@@ -97,7 +96,7 @@ import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -241,7 +240,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         popup.add(deleteListener);
         popup.addSeparator();
         if (!newDatabase && (bibDatabaseContext != null)) {
-            GroupTreeNode node = bibDatabaseContext.getMetaData().getGroups();
+            GroupTreeNode node = bibDatabaseContext.getMetaData().getGroups().get();
             JMenu groupsAdd = new JMenu(Localization.lang("Add to group"));
             groupsAdd.setEnabled(false); // Will get enabled if there are groups that can be added to.
             insertNodes(groupsAdd, node);
@@ -439,13 +438,10 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     }
 
     /**
-     * Generate key for the selected entry only.
+     * Generate key for an entry.
      */
-    private void generateKeySelectedEntry() {
-        if (selectionModel.getSelected().size() != 1) {
-            return;
-        }
-        BibEntry entry = selectionModel.getSelected().get(0);
+    private void generateKeyForEntry(BibEntry entry) {
+
         entries.getReadWriteLock().writeLock().lock();
         try {
             BibDatabase database;
@@ -466,7 +462,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             // Generate a unique key:
             BibtexKeyPatternUtil.makeLabel(localMetaData, database, entry,
-                    BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
+                    Globals.prefs.getBibtexKeyPatternPreferences());
             // Remove the entry from the database again, since we only added it in
             // order to
             // make sure the key was unique:
@@ -508,7 +504,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 database.insertEntry(entry);
 
                 BibtexKeyPatternUtil.makeLabel(localMetaData, database, entry,
-                        BibtexKeyPatternPreferences.fromPreferences(Globals.prefs));
+                        Globals.prefs.getBibtexKeyPatternPreferences());
                 // Add the generated key to our list:   -- TODO: Why??
                 keys.add(entry.getCiteKeyOptional());
             }
@@ -912,7 +908,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 if (col == FILE_COL) {
                     if (entry.hasField(FieldName.FILE)) {
                         FileListTableModel tableModel = new FileListTableModel();
-                        entry.getFieldOptional(FieldName.FILE).ifPresent(tableModel::setContent);
+                        entry.getField(FieldName.FILE).ifPresent(tableModel::setContent);
                         if (tableModel.getRowCount() == 0) {
                             return;
                         }
@@ -967,7 +963,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             JPopupMenu menu = new JPopupMenu();
             int count = 0;
             FileListTableModel fileList = new FileListTableModel();
-            entry.getFieldOptional(FieldName.FILE).ifPresent(fileList::setContent);
+            entry.getField(FieldName.FILE).ifPresent(fileList::setContent);
             // If there are one or more links, open the first one:
             for (int i = 0; i < fileList.getRowCount(); i++) {
                 FileListEntry flEntry = fileList.getEntry(i);
@@ -996,7 +992,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             final int row = glTable.rowAtPoint(e.getPoint());
             BibEntry entry = sortedList.get(row);
 
-            entry.getFieldOptional(fieldName).ifPresent(link -> {
+            entry.getField(fieldName).ifPresent(link -> {
                 try {
                     JabRefDesktop.openExternalViewer(panel.getBibDatabaseContext(), link, fieldName);
                 } catch (IOException ex) {
@@ -1134,7 +1130,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             }
             BibEntry entry = selectionModel.getSelected().get(0);
             String result = JOptionPane.showInputDialog(ImportInspectionDialog.this, Localization.lang("Enter URL"),
-                    entry.getFieldOptional(FieldName.URL).orElse(""));
+                    entry.getField(FieldName.URL).orElse(""));
             entries.getReadWriteLock().writeLock().lock();
             try {
                 if (result != null) {
@@ -1167,21 +1163,19 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 return;
             }
             entry = selectionModel.getSelected().get(0);
-            Optional<String> bibtexKey = entry.getCiteKeyOptional();
-            if (!bibtexKey.isPresent()) {
+            if (!entry.getCiteKeyOptional().isPresent()) {
                 int answer = JOptionPane.showConfirmDialog(frame,
                         Localization.lang("This entry has no BibTeX key. Generate key now?"),
                         Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (answer == JOptionPane.OK_OPTION) {
-                    generateKeySelectedEntry();
-                    bibtexKey = entry.getCiteKeyOptional();
+                    generateKeyForEntry(entry);
                 }
             }
-            DownloadExternalFile def = new DownloadExternalFile(frame, bibDatabaseContext, bibtexKey.get());
+            DownloadExternalFile def = new DownloadExternalFile(frame, bibDatabaseContext, entry);
             try {
                 def.download(this);
             } catch (IOException ex) {
-                LOGGER.warn("Could not downlod file", ex);
+                LOGGER.warn("Could not download file", ex);
             }
         }
 
@@ -1189,7 +1183,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         public void downloadComplete(FileListEntry file) {
             ImportInspectionDialog.this.toFront(); // Hack
             FileListTableModel localModel = new FileListTableModel();
-            entry.getFieldOptional(FieldName.FILE).ifPresent(localModel::setContent);
+            entry.getField(FieldName.FILE).ifPresent(localModel::setContent);
             localModel.addEntry(localModel.getRowCount(), file);
             entries.getReadWriteLock().writeLock().lock();
             try {
@@ -1219,13 +1213,13 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         Localization.lang("This entry has no BibTeX key. Generate key now?"),
                         Localization.lang("Download file"), JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
                 if (answer == JOptionPane.OK_OPTION) {
-                    generateKeySelectedEntry();
+                    generateKeyForEntry(entry);
                 } else {
                     return; // Can't go on without the bibtex key.
                 }
             }
             final FileListTableModel localModel = new FileListTableModel();
-            entry.getFieldOptional(FieldName.FILE).ifPresent(localModel::setContent);
+            entry.getField(FieldName.FILE).ifPresent(localModel::setContent);
             // We have a static utility method for searching for all relevant
             // links:
             JDialog diag = new JDialog(ImportInspectionDialog.this, true);
@@ -1267,7 +1261,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             editor.setVisible(true, true);
             if (editor.okPressed()) {
                 FileListTableModel localModel = new FileListTableModel();
-                entry.getFieldOptional(FieldName.FILE).ifPresent(localModel::setContent);
+                entry.getField(FieldName.FILE).ifPresent(localModel::setContent);
                 localModel.addEntry(localModel.getRowCount(), flEntry);
                 entries.getReadWriteLock().writeLock().lock();
                 try {
@@ -1283,7 +1277,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         public void downloadComplete(FileListEntry file) {
             ImportInspectionDialog.this.toFront(); // Hack
             FileListTableModel localModel = new FileListTableModel();
-            entry.getFieldOptional(FieldName.FILE).ifPresent(localModel::setContent);
+            entry.getField(FieldName.FILE).ifPresent(localModel::setContent);
             localModel.addEntry(localModel.getRowCount(), file);
             entries.getReadWriteLock().writeLock().lock();
             try {
@@ -1430,7 +1424,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 case FILE_COL:
                     if (entry.hasField(FieldName.FILE)) {
                         FileListTableModel model = new FileListTableModel();
-                        entry.getFieldOptional(FieldName.FILE).ifPresent(model::setContent);
+                        entry.getField(FieldName.FILE).ifPresent(model::setContent);
                         fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
                         if ((model.getRowCount() > 0) && model.getEntry(0).type.isPresent()) {
                             fileLabel.setIcon(model.getEntry(0).type.get().getIcon());
@@ -1441,7 +1435,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     }
                 case URL_COL:
                     if (entry.hasField(FieldName.URL)) {
-                        urlLabel.setToolTipText(entry.getFieldOptional(FieldName.URL).orElse(""));
+                        urlLabel.setToolTipText(entry.getField(FieldName.URL).orElse(""));
                         return urlLabel;
                     } else {
                         return null;
@@ -1451,10 +1445,10 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 }
             } else {
                 String field = INSPECTION_FIELDS.get(i - PAD);
-                if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
-                    return entry.getFieldOptional(field).map(AuthorList::fixAuthorNatbib).orElse("");
+                if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES)) {
+                    return entry.getField(field).map(AuthorList::fixAuthorNatbib).orElse("");
                 } else {
-                    return entry.getFieldOptional(field).orElse(null);
+                    return entry.getField(field).orElse(null);
                 }
             }
         }

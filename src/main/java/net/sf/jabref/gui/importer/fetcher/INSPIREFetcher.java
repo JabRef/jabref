@@ -15,7 +15,6 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.ParserResult;
@@ -111,7 +110,7 @@ public class INSPIREFetcher implements EntryFetcher {
             try (INSPIREBibtexFilterReader reader = new INSPIREBibtexFilterReader(
                     new InputStreamReader(inputStream, Charset.forName("UTF-8")))) {
 
-                ParserResult pr = BibtexParser.parse(reader, ImportFormatPreferences.fromPreferences(Globals.prefs));
+                ParserResult pr = BibtexParser.parse(reader, Globals.prefs.getImportFormatPreferences());
 
                 return pr.getDatabase();
             }

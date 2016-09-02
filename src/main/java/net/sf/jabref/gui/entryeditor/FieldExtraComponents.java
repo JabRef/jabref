@@ -1,9 +1,6 @@
 package net.sf.jabref.gui.entryeditor;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.dnd.DnDConstants;
-import java.awt.dnd.DropTarget;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -30,7 +27,6 @@ import net.sf.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.journals.JournalAbbreviationRepository;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLUtil;
@@ -40,7 +36,7 @@ import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -82,7 +78,7 @@ public class FieldExtraComponents {
         button.addActionListener(actionEvent -> {
             String text = editor.getText();
             JournalAbbreviationRepository abbreviationRepository = Globals.journalAbbreviationLoader
-                    .getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs));
+                    .getRepository(Globals.prefs.getJournalAbbreviationPreferences());
             if (abbreviationRepository.isKnownName(text)) {
                 String s = abbreviationRepository.getNextAbbreviation(text).orElse(text);
 
@@ -398,21 +394,6 @@ public class FieldExtraComponents {
     }
 
     /**
-     * Set up a drop target for URLs for fields with EXTRA_URL
-     *
-     * @param fieldEditor
-     * @param storeFieldAction
-     * @return
-     */
-    public static Optional<JComponent> getURLExtraComponent(FieldEditor fieldEditor,
-            StoreFieldAction storeFieldAction) {
-        ((JComponent) fieldEditor).setDropTarget(new DropTarget((Component) fieldEditor, DnDConstants.ACTION_NONE,
-                new SimpleUrlDragDrop(fieldEditor, storeFieldAction)));
-
-        return Optional.empty();
-    }
-
-    /**
      * Return a button opening a content selector for fields where one exists
      *
      * @param frame
@@ -426,8 +407,8 @@ public class FieldExtraComponents {
             Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
         FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor,
                 storeFieldAction, false,
-                InternalBibtexFields.getFieldExtras(editor.getFieldName())
-                        .contains(FieldProperties.PERSON_NAMES) ? " and " : ", ");
+                InternalBibtexFields.getFieldProperties(editor.getFieldName())
+                        .contains(FieldProperty.PERSON_NAMES) ? " and " : ", ");
         contentSelectors.add(ws);
         return Optional.of(ws);
     }

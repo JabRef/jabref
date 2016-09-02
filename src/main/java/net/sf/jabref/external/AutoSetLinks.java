@@ -28,6 +28,7 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.logic.util.io.RegExpFileSearch;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -92,7 +93,7 @@ public class AutoSetLinks {
             public void run() {
                 // determine directories to search in
                 List<File> dirs = new ArrayList<>();
-                List<String> dirsS = databaseContext.getFileDirectory();
+                List<String> dirsS = databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
                 dirs.addAll(dirsS.stream().map(File::new).collect(Collectors.toList()));
 
                 // determine extensions
@@ -115,7 +116,7 @@ public class AutoSetLinks {
                 // Iterate over the entries:
                 for (Entry<BibEntry, List<File>> entryFilePair : result.entrySet()) {
                     FileListTableModel tableModel;
-                    Optional<String> oldVal = entryFilePair.getKey().getFieldOptional(FieldName.FILE);
+                    Optional<String> oldVal = entryFilePair.getKey().getField(FieldName.FILE);
                     if (singleTableModel == null) {
                         tableModel = new FileListTableModel();
                         oldVal.ifPresent(tableModel::setContent);
