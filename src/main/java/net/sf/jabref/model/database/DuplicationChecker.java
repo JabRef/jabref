@@ -16,7 +16,6 @@ class DuplicationChecker {
     // use a map instead of a set since i need to know how many of each key is in there
     private final Map<String, Integer> allKeys = new HashMap<>();
 
-
     /**
      * Usage:
      * <br>
