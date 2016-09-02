@@ -310,9 +310,13 @@ public class IntegrityCheck {
                 .asPredicate();
         private static final String PUNCTUATION_MARKS = "[(){},.;!?<>%&$]";
 
+
         /**
          * Checks, if the number String contains a four digit year and ends with it.
-         * Official bibtex spec: http://ftp.fernuni-hagen.de/ftp-dir/pub/mirrors/www.ctan.org/biblio/bibtex/base/btxdoc.pdf
+         * Official bibtex spec:
+         * Generally it should consist of four numerals, such as 1984, although the standard styles
+         * can handle any year whose last four nonpunctuation characters are numerals, such as ‘(about 1984)’.
+         * Source: http://ftp.fernuni-hagen.de/ftp-dir/pub/mirrors/www.ctan.org/biblio/bibtex/base/btxdoc.pdf
          */
         @Override
         public List<IntegrityMessage> check(BibEntry entry) {
