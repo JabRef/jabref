@@ -2,7 +2,6 @@ package net.sf.jabref.model.database;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,6 +16,7 @@ class DuplicationChecker {
     // use a map instead of a set since i need to know how many of each key is in there
     private final Map<String, Integer> allKeys = new HashMap<>();
 
+
     /**
      * Usage:
      * <br>
@@ -27,23 +27,18 @@ class DuplicationChecker {
      *
      * @return true, if there is a duplicate key, else false
      */
-    public boolean checkForDuplicateKeyAndAdd(Optional<String> oldKey, Optional<String> newKey) {
+    public boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey) {
 
-        boolean duplicate;
-        if (!oldKey.isPresent() && newKey.isPresent()) {// this is a new entry so don't bother removing oldKey
-            duplicate = addKeyToSet(newKey.get());
+        boolean duplicate = false;
+        if (oldKey == null) { // No old key
+            duplicate = addKeyToSet(newKey);
         } else {
             if (oldKey.equals(newKey)) {// were OK because the user did not change keys
                 duplicate = false;
             } else {
-                // user changed the key
-                if (oldKey.isPresent()) {
-                    removeKeyFromSet(oldKey.get());
-                }
-                if (newKey.isPresent()) {
-                    duplicate = addKeyToSet(newKey.get());
-                } else {
-                    duplicate = false;
+                removeKeyFromSet(oldKey); // Get rid of old key
+                if (newKey != null) { // Add new key if any
+                    duplicate = addKeyToSet(newKey);
                 }
             }
         }

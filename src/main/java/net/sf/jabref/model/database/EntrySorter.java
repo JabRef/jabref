@@ -11,7 +11,6 @@ public class EntrySorter {
 
     private final List<BibEntry> entries;
 
-
     public EntrySorter(List<BibEntry> entries, Comparator<BibEntry> comparator) {
         this.entries = new ArrayList<>(entries);
         Collections.sort(this.entries, comparator);

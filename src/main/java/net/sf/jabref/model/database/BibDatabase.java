@@ -174,7 +174,7 @@ public class BibDatabase {
         entry.registerListener(this);
 
         eventBus.post(new EntryAddedEvent(entry, eventSource));
-        return duplicationChecker.checkForDuplicateKeyAndAdd(Optional.empty(), entry.getCiteKeyOptional());
+        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
     }
 
     /**
@@ -215,13 +215,13 @@ public class BibDatabase {
      * @return true, if the entry contains the key, false if not
      */
     public synchronized boolean setCiteKeyForEntry(BibEntry entry, String key) {
-        Optional<String> oldKey = entry.getCiteKeyOptional();
+        String oldKey = entry.getCiteKey();
         if (key == null) {
             entry.clearField(BibEntry.KEY_FIELD);
         } else {
             entry.setCiteKey(key);
         }
-        return duplicationChecker.checkForDuplicateKeyAndAdd(oldKey, Optional.ofNullable(key));
+        return duplicationChecker.checkForDuplicateKeyAndAdd(oldKey, key);
     }
 
     /**
