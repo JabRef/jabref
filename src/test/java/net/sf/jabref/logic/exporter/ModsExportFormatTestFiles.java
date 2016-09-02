@@ -40,6 +40,7 @@ public class ModsExportFormatTestFiles {
 
     @Parameter
     public String filename;
+    public Path resourceDir;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -57,6 +58,7 @@ public class ModsExportFormatTestFiles {
     public void setUp() throws Exception {
         Globals.prefs = JabRefPreferences.getInstance();
         databaseContext = new BibDatabaseContext();
+        resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("").toURI());
         charset = StandardCharsets.UTF_8;
         modsExportFormat = new ModsExportFormat();
         tempFile = testFolder.newFile();
@@ -66,14 +68,14 @@ public class ModsExportFormatTestFiles {
     @Test
     public final void testPerformExport() throws Exception {
         String xmlFileName = filename.replace(".bib", ".xml");
-        Path importFile = Paths.get(ModsExportFormatTestFiles.class.getResource(filename).toURI());
+        Path importFile = resourceDir.resolve(filename);
         String tempFilename = tempFile.getCanonicalPath();
-        List<BibEntry> entries = testImporter.importDatabase(importFile, Charset.defaultCharset()).getDatabase()
+        List<BibEntry> entries = testImporter.importDatabase(importFile, charset).getDatabase()
                 .getEntries();
 
         modsExportFormat.performExport(databaseContext, tempFile.getPath(), charset, entries);
 
-        List<String> expected = Files.readAllLines(Paths.get(ModsExportFormatTestFiles.class.getResource("").toURI() + xmlFileName));
+        List<String> expected = Files.readAllLines(resourceDir.resolve(xmlFileName));
         List<String> exported = Files.readAllLines(Paths.get(tempFilename));
         Collections.sort(expected);
         Collections.sort(exported);

@@ -37,7 +37,7 @@ public class ModsExportFormatTest {
     public final void testPerformExportTrowsSaveException() throws Exception {
         String filename = "ModsExportFormatTestAllFields.bib";
         Path importFile = Paths.get(ModsExportFormatTestFiles.class.getResource(filename).toURI());
-        List<BibEntry> entries = testImporter.importDatabase(importFile, Charset.defaultCharset()).getDatabase()
+        List<BibEntry> entries = testImporter.importDatabase(importFile, charset).getDatabase()
                 .getEntries();
 
         modsExportFormat.performExport(databaseContext, "", charset, entries);
