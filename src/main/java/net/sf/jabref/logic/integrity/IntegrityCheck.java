@@ -363,15 +363,17 @@ public class IntegrityCheck {
             if (!value.isPresent()) {
                 return Collections.emptyList();
             }
-            //BibTeX
-            if (!FIRST_LETTER_CAPITALIZED.test(value.get().trim()) && (!bibDatabaseContext.isBiblatexMode())) {
-                return Collections.singletonList(new IntegrityMessage(
-                        Localization.lang("should have the first letter capitalized"), entry, FieldName.EDITION));
-            }
+
             //BibLaTeX
             if (!ONLY_NUMERALS_OR_LITERALS.test(value.get().trim()) && (bibDatabaseContext.isBiblatexMode())) {
                 return Collections.singletonList(new IntegrityMessage(
                         Localization.lang("should contain an integer or a literal"), entry, FieldName.EDITION));
+            }
+
+            //BibTeX
+            if (!FIRST_LETTER_CAPITALIZED.test(value.get().trim()) && (!bibDatabaseContext.isBiblatexMode())) {
+                return Collections.singletonList(new IntegrityMessage(
+                        Localization.lang("should have the first letter capitalized"), entry, FieldName.EDITION));
             }
 
             return Collections.emptyList();
