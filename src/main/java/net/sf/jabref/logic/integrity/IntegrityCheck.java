@@ -28,7 +28,7 @@ import com.google.common.base.CharMatcher;
 
 public class IntegrityCheck {
 
-    private static BibDatabaseContext bibDatabaseContext;
+    private final BibDatabaseContext bibDatabaseContext;
     private final FileDirectoryPreferences fileDirectoryPreferences;
 
     public IntegrityCheck(BibDatabaseContext bibDatabaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
@@ -66,7 +66,7 @@ public class IntegrityCheck {
 
         result.addAll(new BracketChecker(FieldName.TITLE).check(entry));
         result.addAll(new YearChecker().check(entry));
-        result.addAll(new EditionChecker().check(entry));
+        result.addAll(new EditionChecker(bibDatabaseContext).check(entry));
         result.addAll(new UrlChecker().check(entry));
         result.addAll(new FileChecker(bibDatabaseContext, fileDirectoryPreferences).check(entry));
         result.addAll(new TypeChecker().check(entry));
@@ -346,6 +346,12 @@ public class IntegrityCheck {
         private static final Predicate<String> ONLY_NUMERALS_OR_LITERALS = Pattern.compile("^([0-9]+|[^0-9]+)$")
                 .asPredicate();
 
+        private final BibDatabaseContext bibDatabaseContext2;
+
+
+        public EditionChecker(BibDatabaseContext bibDatabaseContext) {
+            this.bibDatabaseContext2 = Objects.requireNonNull(bibDatabaseContext);
+        }
 
         /**
          * Checks, if the first letter is capitalized (BibTeX mode)
@@ -365,13 +371,13 @@ public class IntegrityCheck {
             }
 
             //BibLaTeX
-            if (!ONLY_NUMERALS_OR_LITERALS.test(value.get().trim()) && (bibDatabaseContext.isBiblatexMode())) {
+            if (!ONLY_NUMERALS_OR_LITERALS.test(value.get().trim()) && (bibDatabaseContext2.isBiblatexMode())) {
                 return Collections.singletonList(new IntegrityMessage(
                         Localization.lang("should contain an integer or a literal"), entry, FieldName.EDITION));
             }
 
             //BibTeX
-            if (!FIRST_LETTER_CAPITALIZED.test(value.get().trim()) && (!bibDatabaseContext.isBiblatexMode())) {
+            if (!FIRST_LETTER_CAPITALIZED.test(value.get().trim()) && (!bibDatabaseContext2.isBiblatexMode())) {
                 return Collections.singletonList(new IntegrityMessage(
                         Localization.lang("should have the first letter capitalized"), entry, FieldName.EDITION));
             }
