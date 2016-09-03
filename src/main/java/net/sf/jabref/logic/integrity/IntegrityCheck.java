@@ -28,7 +28,7 @@ import com.google.common.base.CharMatcher;
 
 public class IntegrityCheck {
 
-    private final BibDatabaseContext bibDatabaseContext;
+    private static BibDatabaseContext bibDatabaseContext;
     private final FileDirectoryPreferences fileDirectoryPreferences;
 
     public IntegrityCheck(BibDatabaseContext bibDatabaseContext, FileDirectoryPreferences fileDirectoryPreferences) {
@@ -66,6 +66,7 @@ public class IntegrityCheck {
 
         result.addAll(new BracketChecker(FieldName.TITLE).check(entry));
         result.addAll(new YearChecker().check(entry));
+        result.addAll(new EditionChecker().check(entry));
         result.addAll(new UrlChecker().check(entry));
         result.addAll(new FileChecker(bibDatabaseContext, fileDirectoryPreferences).check(entry));
         result.addAll(new TypeChecker().check(entry));
@@ -333,6 +334,44 @@ public class IntegrityCheck {
                 return Collections.singletonList(new IntegrityMessage(
                         Localization.lang("last four nonpunctuation characters should be numerals"), entry,
                         FieldName.YEAR));
+            }
+
+            return Collections.emptyList();
+        }
+    }
+
+    private static class EditionChecker implements Checker {
+
+        private static final Predicate<String> FIRST_LETTER_CAPITALIZED = Pattern.compile("^[A-Z]").asPredicate();
+        private static final Predicate<String> ONLY_NUMERALS_OR_LITERALS = Pattern.compile("^([0-9]+|[^0-9]+)$")
+                .asPredicate();
+
+
+        /**
+         * Checks, if the first letter is capitalized (BibTeX mode)
+         * Checks, if field contains only an integer (BibLaTeX mode)
+         * Official bibtex spec:
+         * The edition of a book-for example, “Second”.
+         * This should be an ordinal, and should have the first letter capitalized.
+         * BibLaTex:
+         * The edition of a printed publication. This must be an integer, not an ordinal.
+         * It is also possible to give the edition as a literal string, for example "Third, revised and expanded edition".
+         */
+        @Override
+        public List<IntegrityMessage> check(BibEntry entry) {
+            Optional<String> value = entry.getField(FieldName.EDITION);
+            if (!value.isPresent()) {
+                return Collections.emptyList();
+            }
+            //BibTeX
+            if (!FIRST_LETTER_CAPITALIZED.test(value.get().trim()) && (!bibDatabaseContext.isBiblatexMode())) {
+                return Collections.singletonList(new IntegrityMessage(
+                        Localization.lang("should have the first letter capitalized"), entry, FieldName.EDITION));
+            }
+            //BibLaTeX
+            if (!ONLY_NUMERALS_OR_LITERALS.test(value.get().trim()) && (bibDatabaseContext.isBiblatexMode())) {
+                return Collections.singletonList(new IntegrityMessage(
+                        Localization.lang("should contain an integer or a literal"), entry, FieldName.EDITION));
             }
 
             return Collections.emptyList();
