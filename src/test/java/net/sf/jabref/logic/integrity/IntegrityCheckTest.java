@@ -61,6 +61,20 @@ public class IntegrityCheckTest {
     }
 
     @Test
+    public void testEditionChecks() {
+        assertCorrect(withMode(createContext("edition", "Second"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("edition", "Third"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("edition", "second"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("edition", "2"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("edition", "2nd"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("edition", "2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("edition", "10"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(
+                withMode(createContext("edition", "Third, revised and expanded edition"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("edition", "2nd"), BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
     public void testBracketChecks() {
         assertCorrect(createContext("title", "x"));
         assertCorrect(createContext("title", "{x}"));
