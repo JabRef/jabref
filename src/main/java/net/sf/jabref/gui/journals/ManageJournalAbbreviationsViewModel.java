@@ -58,7 +58,6 @@ public class ManageJournalAbbreviationsViewModel {
     private final SimpleBooleanProperty isFileRemovable = new SimpleBooleanProperty();
     private final SimpleBooleanProperty isAbbreviationEditableAndRemovable = new SimpleBooleanProperty();
 
-
     public ManageJournalAbbreviationsViewModel() {
         abbreviationsCount.bind(abbreviations.sizeProperty());
         currentAbbreviation.addListener((observable, oldvalue, newvalue) -> {
@@ -100,6 +99,10 @@ public class ManageJournalAbbreviationsViewModel {
             }
 
         });
+    }
+
+    public boolean isAbbreviationEditableAndRemovable() {
+        return isAbbreviationEditableAndRemovable.get();
     }
 
     /**
