@@ -47,13 +47,10 @@ public class GlobalSearchBar extends JPanel {
 
     private final JabRefFrame frame;
 
-    private final JToolBar toolBar = new OSXCompatibleToolbar();
     private final JLabel searchIcon = new JLabel(IconTheme.JabRefIcon.SEARCH.getSmallIcon());
     private final JTextFieldWithUnfocusedText searchField = new JTextFieldWithUnfocusedText(Localization.lang("Search") + "...");
-    private final JButton clearSearchButton = new JButton(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
     private JButton openCurrentResultsInDialog = new JButton(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon());
 
-    private final JToggleButton globalSearch;
     private final JToggleButton caseSensitive;
     private final JToggleButton regularExp;
     private final JButton searchModeButton = new JButton();
@@ -81,7 +78,7 @@ public class GlobalSearchBar extends JPanel {
         currentResults.setFont(currentResults.getFont().deriveFont(Font.BOLD));
         searchField.setColumns(30);
 
-        globalSearch = new JToggleButton(IconTheme.JabRefIcon.GLOBAL_SEARCH_OFF.getSmallIcon(), searchPreferences.isGlobalSearch());
+        JToggleButton globalSearch = new JToggleButton(IconTheme.JabRefIcon.GLOBAL_SEARCH_OFF.getSmallIcon(), searchPreferences.isGlobalSearch());
         globalSearch.setSelectedIcon(IconTheme.JabRefIcon.GLOBAL_SEARCH_ON.getSmallIcon());
         globalSearch.setToolTipText(Localization.lang("Search globally"));
         globalSearch.addActionListener(e -> {
@@ -93,10 +90,9 @@ public class GlobalSearchBar extends JPanel {
         openCurrentResultsInDialog.setDisabledIcon(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon().createDisabledIcon());
         openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
         openCurrentResultsInDialog.addActionListener(event -> {
-            if (globalSearch.isSelected()){
+            if (globalSearch.isSelected()) {
                 performGlobalSearch();
-            }
-            else {
+            } else {
                 openLocalFindingsInExternalPanel();
             }
         });
@@ -121,6 +117,7 @@ public class GlobalSearchBar extends JPanel {
         updateSearchModeButtonText();
         searchModeButton.addActionListener(event -> toggleSearchModeAndSearch());
 
+        JButton clearSearchButton = new JButton(IconTheme.JabRefIcon.CLOSE.getSmallIcon());
         clearSearchButton.setToolTipText(Localization.lang("Clear"));
         clearSearchButton.addActionListener(event -> endSearch());
 
@@ -140,6 +137,7 @@ public class GlobalSearchBar extends JPanel {
         autoCompleteSupport.install();
 
         setLayout(new WrapLayout(FlowLayout.RIGHT));
+        JToolBar toolBar = new OSXCompatibleToolbar();
         toolBar.setFloatable(false);
         if (OS.OS_X) {
             searchField.putClientProperty("JTextField.variant", "search");
@@ -182,7 +180,7 @@ public class GlobalSearchBar extends JPanel {
         globalSearchWorker.execute();
     }
 
-    private void openLocalFindingsInExternalPanel(){
+    private void openLocalFindingsInExternalPanel() {
         BasePanel currentBasePanel = frame.getCurrentBasePanel();
         if (currentBasePanel == null || validateSearchResultFrame(false)) {
             return;
@@ -206,7 +204,7 @@ public class GlobalSearchBar extends JPanel {
         searchDialog.setVisible(true);
     }
 
-    private boolean validateSearchResultFrame(boolean globalSearch){
+    private boolean validateSearchResultFrame(boolean globalSearch) {
         if (searchResultFrame != null) {
             if (searchResultFrame.isGlobalSearch() == globalSearch && isStillValidQuery(searchResultFrame.getSearchQuery())) {
                 searchResultFrame.focus();
@@ -317,7 +315,7 @@ public class GlobalSearchBar extends JPanel {
         return searchQueryHighlightObservable;
     }
 
-    boolean isStillValidQuery(SearchQuery query) {
+    public boolean isStillValidQuery(SearchQuery query) {
         return query.getQuery().equals(this.searchField.getText())
                 && (query.isRegularExpression() == regularExp.isSelected())
                 && (query.isCaseSensitive() == caseSensitive.isSelected());
@@ -354,7 +352,7 @@ public class GlobalSearchBar extends JPanel {
         this.searchResultFrame = searchResultFrame;
     }
 
-    public void setSearchTerm(String searchTerm){
+    public void setSearchTerm(String searchTerm) {
         searchField.setText(searchTerm);
         // to hinder the autocomplete window to popup
         autoCompleteSupport.setVisible(false);
