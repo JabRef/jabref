@@ -66,8 +66,9 @@ public class PdfCommentsTab extends JPanel {
             DefaultListModel<String> listModel = new DefaultListModel<>();
             commentList.setModel(listModel);
             PdfCommentImporter commentImporter = new PdfCommentImporter();
-            HashMap<String, String> importedNotes = commentImporter.importNotes(field.get());
-            for (String note : importedNotes.values()) listModel.addElement(note);
+            String pdfPath = field.get().replaceFirst(".*?:", System.getProperty("file.separator")).replaceAll(":PDF", "");
+            HashMap<String, String> importedNotes = commentImporter.importNotes(pdfPath);
+            importedNotes.values().stream().forEach((note) -> listModel.addElement(note));
 
             //TODO add context information for importedNotes
         }
