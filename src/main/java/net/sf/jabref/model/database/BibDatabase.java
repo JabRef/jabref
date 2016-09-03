@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.model.EntryTypes;
@@ -21,7 +22,6 @@ import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.model.event.EntryAddedEvent;
 import net.sf.jabref.model.event.EntryChangedEvent;
@@ -58,7 +58,6 @@ public class BibDatabase {
      * contains all entry.getID() of the current database
      */
     private final Set<String> internalIDs = new HashSet<>();
-
 
     private final EventBus eventBus = new EventBus();
 
@@ -100,22 +99,22 @@ public class BibDatabase {
         return Collections.unmodifiableList(entries);
     }
 
+    /**
+     * Returns a set of Strings, that contains all field names that are visible. This means that the fields
+     * are not internal fields. Internal fields are fields, that are starting with "_".
+     *
+     * @return set of fieldnames, that are visible
+     */
     public Set<String> getAllVisibleFields() {
         Set<String> allFields = new TreeSet<>();
         for (BibEntry e : getEntries()) {
             allFields.addAll(e.getFieldNames());
         }
-        Set<String> toberemoved = new TreeSet<>();
-        for (String field : allFields) {
-            if (InternalBibtexFields.isInternalField(field)) {
-                toberemoved.add(field);
-            }
-        }
+        return allFields.stream().filter(field -> !isInternalField(field)).collect(Collectors.toSet());
+    }
 
-        for (String field : toberemoved) {
-            allFields.remove(field);
-        }
-        return allFields;
+    public static boolean isInternalField(String field) {
+        return field.startsWith("__");
     }
 
     /**
@@ -130,6 +129,13 @@ public class BibDatabase {
         return Optional.empty();
     }
 
+    /**
+     * Collects entries having the specified BibTeX key and returns these entries as list.
+     * The order of the entries is the order they appear in the database.
+     *
+     * @param key
+     * @return list of entries that contains the given key
+     */
     public synchronized List<BibEntry> getEntriesByKey(String key) {
         List<BibEntry> result = new ArrayList<>();
 
@@ -163,8 +169,7 @@ public class BibDatabase {
      * @param eventSource Source the event is sent from
      * @return false if the insert was done without a duplicate warning
      */
-    public synchronized boolean insertEntry(BibEntry entry, EntryEventSource eventSource)
-            throws KeyCollisionException {
+    public synchronized boolean insertEntry(BibEntry entry, EntryEventSource eventSource) throws KeyCollisionException {
         Objects.requireNonNull(entry);
 
         String id = entry.getId();
@@ -177,7 +182,7 @@ public class BibDatabase {
         entry.registerListener(this);
 
         eventBus.post(new EntryAddedEvent(entry, eventSource));
-        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKeyOptional().orElse(null));
+        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
     }
 
     /**
@@ -192,13 +197,14 @@ public class BibDatabase {
     /**
      * Removes the given entry.
      * The Entry is removed based on the id {@link BibEntry#id}
+     *
      * @param toBeDeleted Entry to delete
      * @param eventSource Source the event is sent from
      */
     public synchronized void removeEntry(BibEntry toBeDeleted, EntryEventSource eventSource) {
         Objects.requireNonNull(toBeDeleted);
 
-        boolean anyRemoved =  entries.removeIf(entry -> entry.getId().equals(toBeDeleted.getId()));
+        boolean anyRemoved = entries.removeIf(entry -> entry.getId().equals(toBeDeleted.getId()));
         if (anyRemoved) {
             internalIDs.remove(toBeDeleted.getId());
             toBeDeleted.getCiteKeyOptional().ifPresent(duplicationChecker::removeKeyFromSet);
@@ -210,8 +216,14 @@ public class BibDatabase {
         return duplicationChecker.getNumberOfKeyOccurrences(key);
     }
 
+    /**
+     * Sets the given key to the given entry.
+     * If the key is null, the entry field will be cleared.
+     *
+     * @return true, if the entry contains the key, false if not
+     */
     public synchronized boolean setCiteKeyForEntry(BibEntry entry, String key) {
-        String oldKey = entry.getCiteKeyOptional().orElse(null);
+        String oldKey = entry.getCiteKey();
         if (key == null) {
             entry.clearField(BibEntry.KEY_FIELD);
         } else {
@@ -237,8 +249,7 @@ public class BibDatabase {
     /**
      * Inserts a Bibtex String.
      */
-    public synchronized void addString(BibtexString string)
-            throws KeyCollisionException {
+    public synchronized void addString(BibtexString string) throws KeyCollisionException {
         if (hasStringLabel(string.getName())) {
             throw new KeyCollisionException("A string with that label already exists");
         }
@@ -478,8 +489,6 @@ public class BibDatabase {
         return res;
     }
 
-
-
     /**
      * Returns the text stored in the given field of the given bibtex entry
      * which belongs to the given database.
@@ -511,9 +520,9 @@ public class BibDatabase {
             return entry.getCiteKeyOptional();
         }
 
-        // TODO: Changed this to also consider alias fields, which is the expected
+        // Changed this to also consider alias fields, which is the expected
         // behavior for the preview layout and for the check whatever all fields are present.
-        // But there might be unwanted side-effects?!
+        // TODO: But there might be unwanted side-effects?!
         Optional<String> result = entry.getFieldOrAlias(field);
 
         // If this field is not set, and the entry has a crossref, try to look up the
