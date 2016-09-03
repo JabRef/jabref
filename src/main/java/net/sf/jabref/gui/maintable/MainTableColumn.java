@@ -94,7 +94,7 @@ public class MainTableColumn {
 
         Optional<String> content = Optional.empty();
         for (String field : bibtexFields) {
-            content = BibDatabase.getResolvedField(field, entry, database.orElse(null));
+            content = entry.getResolvedField(field, database.orElse(null));
             if (content.isPresent()) {
                 isNameColumn = InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES);
                 break;
@@ -148,7 +148,7 @@ public class MainTableColumn {
                 return false;
             } else {
                 plainFieldContent = entry.getField(field);
-                resolvedFieldContent = BibDatabase.getResolvedField(field, entry, database.orElse(null));
+                resolvedFieldContent = entry.getResolvedField(field, database.orElse(null));
             }
 
             if (resolvedFieldContent.isPresent()) {

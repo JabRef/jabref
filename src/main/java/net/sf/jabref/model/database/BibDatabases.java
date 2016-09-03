@@ -21,7 +21,7 @@ public class BibDatabases {
 
         for (BibEntry entry : bibentries) {
             entry.setId(IdGenerator.next());
-            database.insertEntry(entry);
+            database.insertEntryWithDuplicationCheck(entry);
         }
 
         return database;

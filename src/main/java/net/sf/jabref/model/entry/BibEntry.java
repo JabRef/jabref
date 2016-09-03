@@ -22,8 +22,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.event.source.EntryEventSource;
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.event.FieldChangedEvent;
 
 import com.google.common.base.Strings;
@@ -35,10 +37,15 @@ public class BibEntry implements Cloneable {
 
     private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
 
+    // All these fields should be private or protected
+    @Deprecated // use get/setType
     public static final String TYPE_HEADER = "entrytype";
+    @Deprecated
     public static final String OBSOLETE_TYPE_HEADER = "bibtextype";
+    @Deprecated // use dedicated methods like get/set/clearCiteKey
     public static final String KEY_FIELD = "bibtexkey";
     protected static final String ID_FIELD = "id";
+    @Deprecated // use constructor without type
     public static final String DEFAULT_TYPE = "misc";
 
     private static final Pattern REMOVE_TRAILING_WHITESPACE = Pattern.compile("\\s+$");
@@ -104,6 +111,58 @@ public class BibEntry implements Cloneable {
     }
 
     /**
+     * Returns the text stored in the given field of the given bibtex entry
+     * which belongs to the given database.
+     * <p>
+     * If a database is given, this function will try to resolve any string
+     * references in the field-value.
+     * Also, if a database is given, this function will try to find values for
+     * unset fields in the entry linked by the "crossref" field, if any.
+     *
+     * @param field    The field to return the value of.
+     * @param database maybenull
+     *                 The database of the bibtex entry.
+     * @return The resolved field value or null if not found.
+     */
+    public Optional<String> getResolvedField(String field, BibDatabase database) {
+        Objects.requireNonNull(this, "entry cannot be null");
+
+        if (TYPE_HEADER.equals(field) || OBSOLETE_TYPE_HEADER.equals(field)) {
+            Optional<EntryType> entryType = EntryTypes.getType(getType(), BibDatabaseMode.BIBLATEX);
+            if (entryType.isPresent()) {
+                return Optional.of(entryType.get().getName());
+            } else {
+                return Optional.of(EntryUtil.capitalizeFirst(getType()));
+            }
+        }
+
+        if (KEY_FIELD.equals(field)) {
+            return getCiteKeyOptional();
+        }
+
+        // Changed this to also consider alias fields, which is the expected
+        // behavior for the preview layout and for the check whatever all fields are present.
+        // TODO: But there might be unwanted side-effects?!
+        Optional<String> result = getFieldOrAlias(field);
+
+        // If this field is not set, and the entry has a crossref, try to look up the
+        // field in the referred entry: Do not do this for the bibtex key.
+        if (!result.isPresent() && (database != null)) {
+            Optional<String> crossrefKey = getField(FieldName.CROSSREF);
+            if (crossrefKey.isPresent() && !crossrefKey.get().isEmpty()) {
+                Optional<BibEntry> referred = database.getEntryByKey(crossrefKey.get());
+                if (referred.isPresent()) {
+                    // Ok, we found the referred entry. Get the field value from that
+                    // entry. If it is unset there, too, stop looking:
+                    result = referred.get().getFieldOrAlias(field);
+                }
+            }
+        }
+
+        return result.map(resultText -> BibDatabase.getText(resultText, database));
+    }
+
+    /**
      * Sets this entry's ID, provided the database containing it
      * doesn't veto the change.
      *
@@ -131,7 +190,7 @@ public class BibEntry implements Cloneable {
      *
      * Note: This is <emph>not</emph> the internal Id of this entry. The internal Id is always present, whereas the BibTeX key might not be present.
      *
-     * @param newCiteKey The cite key to set. Must not be null, may be empty to remove it.
+     * @param newCiteKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
      */
     public void setCiteKey(String newCiteKey) {
         setField(KEY_FIELD, newCiteKey);
@@ -454,7 +513,7 @@ public class BibEntry implements Cloneable {
                     return false;
                 }
             } else {
-                if (!BibDatabase.getResolvedField(fieldName, this, database).isPresent()) {
+                if (!this.getResolvedField(fieldName, database).isPresent()) {
                     return false;
                 }
             }
@@ -466,7 +525,7 @@ public class BibEntry implements Cloneable {
         for (String field : fieldsToCheck) {
             String fieldName = toLowerCase(field);
 
-            Optional<String> value = BibDatabase.getResolvedField(fieldName, this, database);
+            Optional<String> value = this.getResolvedField(fieldName, database);
             if ((value.isPresent()) && !value.get().isEmpty()) {
                 return true;
             }
@@ -688,5 +747,9 @@ public class BibEntry implements Cloneable {
                 return words;
             }
         }
+    }
+
+    public Optional<FieldChange> clearCiteKey() {
+        return clearField(KEY_FIELD);
     }
 }

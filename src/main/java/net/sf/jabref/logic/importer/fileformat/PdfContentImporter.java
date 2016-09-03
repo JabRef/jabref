@@ -209,7 +209,7 @@ public class PdfContentImporter extends ImportFormat {
                 ParserResult parserResult = new ParserResult(result);
                 Optional<BibEntry> entry = DOItoBibTeX.getEntryFromDOI(doi.get().getDOI(), parserResult,
                         importFormatPreferences);
-                entry.ifPresent(parserResult.getDatabase()::insertEntry);
+                entry.ifPresent(parserResult.getDatabase()::insertEntryWithDuplicationCheck);
                 return parserResult;
             }
 

@@ -173,6 +173,6 @@ public class AuxParser {
     private void insertEntry(BibEntry entry, AuxParserResult result) {
         BibEntry clonedEntry = (BibEntry) entry.clone();
         clonedEntry.setId(IdGenerator.next());
-        result.getGeneratedBibDatabase().insertEntry(clonedEntry);
+        result.getGeneratedBibDatabase().insertEntryWithDuplicationCheck(clonedEntry);
     }
 }
