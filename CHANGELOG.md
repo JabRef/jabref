@@ -19,6 +19,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#1897](https://github.com/JabRef/jabref/issues/1897) Implemented integrity check for `year` field: Last four nonpunctuation characters should be numerals
 
 ### Fixed
+- Fixed selecting an entry out of multiple duplicates
 - Fixed NullPointerException when opening search result window for an untitled database 
 - Fixed entry table traversal with Tab (no column traversal thus no double jump)
 - Fixed [#1757](https://github.com/JabRef/jabref/issues/1757): Crash after saving illegal argument in entry editor

@@ -838,8 +838,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 selectionListener.editSignalled(firstBE);
             }
 
-            // If we inserted a duplicate we want to select the duplicate (thus we have to search from the back)
-            highlightLastEntry(firstBE);
+            highlightEntry(firstBE);
         }
     }
 
@@ -1045,10 +1044,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         } catch (SaveException ex) {
             if (ex.specificEntry()) {
                 // Error occurred during processing of the entry. Highlight it:
-                final int row = mainTable.findEntry(ex.getEntry());
-                final int topShow = Math.max(0, row - 3);
-                mainTable.setRowSelectionInterval(row, row);
-                mainTable.scrollTo(topShow);
+                highlightEntry(ex.getEntry());
                 showEntry(ex.getEntry());
             } else {
                 LOGGER.warn("Could not save", ex);
@@ -1154,14 +1150,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     mode = BasePanelMode.WILL_SHOW_EDITOR;
                 }
 
-                int row = mainTable.findEntry(be);
-                if (row >= 0) {
-                    highlightEntry(be); // Selects the entry. The selection listener will open the editor.
-                } else {
-                    // The entry is not visible in the table, perhaps due to a filtering search
-                    // or group selection. Show the entry editor anyway:
-                    showEntry(be);
-                }
+                highlightEntry(be);
 
                 markBaseChanged(); // The database just changed.
                 new FocusRequester(getEntryEditor(be));
@@ -1476,11 +1465,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // otherwise set the bottom component to null.
         if (mode == BasePanelMode.SHOWING_PREVIEW) {
             mode = BasePanelMode.SHOWING_NOTHING;
-            int row = mainTable.findEntry(currentPreview.getEntry());
-            if (row >= 0) {
-                mainTable.setRowSelectionInterval(row, row);
-            }
-
+            highlightEntry(currentPreview.getEntry());
         } else if (mode == BasePanelMode.SHOWING_EDITOR) {
             mode = BasePanelMode.SHOWING_NOTHING;
         } else {
@@ -1720,21 +1705,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     /**
-     * This method selects the given entry (searches from the back), and scrolls it into view in the table.
-     * If an entryEditor is shown, it is given focus afterwards.
-     */
-    public void highlightLastEntry(final BibEntry bibEntry) {
-        highlightEntry(mainTable.findLastEntry(bibEntry));
-    }
-
-    /**
      * This method selects the entry on the given position, and scrolls it into view in the table.
      * If an entryEditor is shown, it is given focus afterwards.
      */
     public void highlightEntry(int pos) {
-        if (pos >= 0) {
-            mainTable.clearSelection();
-            mainTable.addRowSelectionInterval(pos, pos);
+        if (pos >= 0 && pos < mainTable.getRowCount()) {
+            mainTable.setRowSelectionInterval(pos, pos);
             mainTable.ensureVisible(pos);
         }
     }

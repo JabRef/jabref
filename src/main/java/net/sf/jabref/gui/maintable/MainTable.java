@@ -499,11 +499,14 @@ public class MainTable extends JTable {
     }
 
     public int findEntry(BibEntry entry) {
-        return model.getTableRows().indexOf(entry);
-    }
-
-    public int findLastEntry(BibEntry entry) {
-        return model.getTableRows().lastIndexOf(entry);
+        EventList<BibEntry> tableRows = model.getTableRows();
+        for (int i = 0; i < tableRows.size(); i++) {
+            BibEntry bibEntry = tableRows.get(i);
+            if (entry.getId().equals(bibEntry.getId())) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     /**
