@@ -759,11 +759,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private boolean storeSource() {
-        BibtexParser bibtexParser = new BibtexParser(new StringReader(source.getText()),
-                Globals.prefs.getImportFormatPreferences());
-
+        BibtexParser bibtexParser = new BibtexParser(Globals.prefs.getImportFormatPreferences());
         try {
-            ParserResult parserResult = bibtexParser.parse();
+            ParserResult parserResult = bibtexParser.parse(new StringReader(source.getText()));
             BibDatabase database = parserResult.getDatabase();
 
             if (database.getEntryCount() > 1) {

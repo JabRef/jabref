@@ -91,9 +91,8 @@ public class ClipBoardManager implements ClipboardOwner {
                     entry.ifPresent(result::add);
                 } else {
                     // parse bibtex string
-                    BibtexParser bp = new BibtexParser(new StringReader(data),
-                            Globals.prefs.getImportFormatPreferences());
-                    BibDatabase db = bp.parse().getDatabase();
+                    BibtexParser bp = new BibtexParser(Globals.prefs.getImportFormatPreferences());
+                    BibDatabase db = bp.parse(new StringReader(data)).getDatabase();
                     LOGGER.info("Parsed " + db.getEntryCount() + " entries from clipboard text");
                     if (db.hasEntries()) {
                         result = db.getEntries();

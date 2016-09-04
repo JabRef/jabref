@@ -17,6 +17,7 @@
 
 package net.sf.jabref.logic.importer;
 
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -53,8 +54,8 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
             return Collections.emptyList();
         }
 
-        try (InputStream is = getQueryURL(query).openStream()) {
-            return getParser().parseEntries(is);
+        try (InputStream stream = new BufferedInputStream(getQueryURL(query).openStream())) {
+            return getParser().parseEntries(stream);
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {

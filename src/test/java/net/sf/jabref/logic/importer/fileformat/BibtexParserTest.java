@@ -60,8 +60,8 @@ public class BibtexParserTest {
 
     @SuppressWarnings("unused")
     @Test(expected = NullPointerException.class)
-    public void initalizationWithNullThrowsNullPointerException() {
-        new BibtexParser(null, importFormatPreferences);
+    public void parseWithNullThrowsNullPointerException() throws Exception {
+        new BibtexParser(importFormatPreferences).parse(null);
     }
 
     @Test
@@ -124,15 +124,6 @@ public class BibtexParserTest {
     public void singleFromStringReturnsNullIfNoEntryRecognized() {
         Optional<BibEntry> parsed = BibtexParser.singleFromString("@@article@@{{{{{{}", importFormatPreferences);
         assertEquals(Optional.empty(), parsed);
-    }
-
-    @Test
-    public void parseTwoTimesReturnsSameResult() throws IOException {
-        BibtexParser parser = new BibtexParser(new StringReader("@article{test,author={Ed von Test}}"),
-                importFormatPreferences);
-        ParserResult result = parser.parse();
-
-        assertEquals(result, parser.parse());
     }
 
     @Test
@@ -1394,7 +1385,9 @@ public class BibtexParserTest {
 
     @Test
     public void parseRecognizesSaveActionsAfterEntry() throws IOException {
-        BibtexParser parser = new BibtexParser(
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+
+        ParserResult parserResult = parser.parse(
                 new StringReader("@InProceedings{6055279,\n" + "  Title                    = {Educational session 1},\n"
                         + "  Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\n"
                         + "  Year                     = {2011},\n" + "  Month                    = {Sept},\n"
@@ -1402,10 +1395,8 @@ public class BibtexParserTest {
                         + "  Abstract                 = {Start of the above-titled section of the conference proceedings record.},\n"
                         + "  DOI                      = {10.1109/CICC.2011.6055279},\n"
                         + "  ISSN                     = {0886-5930}\n" + "}\n" + "\n"
-                        + "@comment{jabref-meta: saveActions:enabled;title[lower_case]}"),
-                importFormatPreferences);
-
-        ParserResult parserResult = parser.parse();
+                        + "@comment{jabref-meta: saveActions:enabled;title[lower_case]}")
+                );
 
         FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
 
@@ -1416,11 +1407,10 @@ public class BibtexParserTest {
 
     @Test
     public void integrationTestSaveActions() throws IOException {
-        BibtexParser parser = new BibtexParser(
-                new StringReader("@comment{jabref-meta: saveActions:enabled;title[lower_case]}"),
-                importFormatPreferences);
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
 
-        ParserResult parserResult = parser.parse();
+        ParserResult parserResult = parser.parse(
+                new StringReader("@comment{jabref-meta: saveActions:enabled;title[lower_case]}"));
         FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
 
         assertTrue(saveActions.isEnabled());
