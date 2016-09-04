@@ -500,10 +500,10 @@ public class MainTable extends JTable {
 
     public int findEntry(BibEntry entry) {
         EventList<BibEntry> tableRows = model.getTableRows();
-        for (int i = 0; i < tableRows.size(); i++) {
-            BibEntry bibEntry = tableRows.get(i);
+        for (int row = 0; row < tableRows.size(); row++) {
+            BibEntry bibEntry = tableRows.get(row);
             if (entry.getId().equals(bibEntry.getId())) {
-                return i;
+                return row;
             }
         }
         return -1;
