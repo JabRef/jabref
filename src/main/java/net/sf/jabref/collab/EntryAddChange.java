@@ -31,8 +31,8 @@ class EntryAddChange extends Change {
     @Override
     public boolean makeChange(BasePanel panel, BibDatabase secondary, NamedCompound undoEdit) {
         diskEntry.setId(IdGenerator.next());
-        panel.getDatabase().insertEntry(diskEntry);
-        secondary.insertEntry(diskEntry);
+        panel.getDatabase().insertEntryWithDuplicationCheck(diskEntry);
+        secondary.insertEntryWithDuplicationCheck(diskEntry);
         undoEdit.addEdit(new UndoableInsertEntry(panel.getDatabase(), diskEntry, panel));
         return true;
     }
