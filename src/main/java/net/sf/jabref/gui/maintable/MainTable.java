@@ -502,7 +502,7 @@ public class MainTable extends JTable {
         EventList<BibEntry> tableRows = model.getTableRows();
         for (int row = 0; row < tableRows.size(); row++) {
             BibEntry bibEntry = tableRows.get(row);
-            if (entry == bibEntry) {
+            if (entry == bibEntry) { // NOPMD (equals doesn't recognise duplicates)
                 return row;
             }
         }
