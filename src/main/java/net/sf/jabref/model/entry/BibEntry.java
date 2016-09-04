@@ -124,7 +124,7 @@ public class BibEntry implements Cloneable {
      *                 The database of the bibtex entry.
      * @return The resolved field value or null if not found.
      */
-    public Optional<String> getResolvedField(String field, BibDatabase database) {
+    public Optional<String> getResolvedFieldOrAlias(String field, BibDatabase database) {
         Objects.requireNonNull(this, "entry cannot be null");
 
         if (TYPE_HEADER.equals(field) || OBSOLETE_TYPE_HEADER.equals(field)) {
@@ -139,10 +139,7 @@ public class BibEntry implements Cloneable {
         if (KEY_FIELD.equals(field)) {
             return getCiteKeyOptional();
         }
-
-        // Changed this to also consider alias fields, which is the expected
-        // behavior for the preview layout and for the check whatever all fields are present.
-        // TODO: But there might be unwanted side-effects?!
+        
         Optional<String> result = getFieldOrAlias(field);
 
         // If this field is not set, and the entry has a crossref, try to look up the
@@ -513,7 +510,7 @@ public class BibEntry implements Cloneable {
                     return false;
                 }
             } else {
-                if (!this.getResolvedField(fieldName, database).isPresent()) {
+                if (!this.getResolvedFieldOrAlias(fieldName, database).isPresent()) {
                     return false;
                 }
             }
@@ -525,7 +522,7 @@ public class BibEntry implements Cloneable {
         for (String field : fieldsToCheck) {
             String fieldName = toLowerCase(field);
 
-            Optional<String> value = this.getResolvedField(fieldName, database);
+            Optional<String> value = this.getResolvedFieldOrAlias(fieldName, database);
             if ((value.isPresent()) && !value.get().isEmpty()) {
                 return true;
             }
