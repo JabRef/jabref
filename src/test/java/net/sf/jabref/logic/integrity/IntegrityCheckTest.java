@@ -242,7 +242,7 @@ public class IntegrityCheckTest {
         entry.setField(field, value);
         entry.setType(type);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntry(entry);
+        bibDatabase.insertEntryWithDuplicationCheck(entry);
         return new BibDatabaseContext(bibDatabase, new Defaults());
     }
 
@@ -250,7 +250,7 @@ public class IntegrityCheckTest {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntry(entry);
+        bibDatabase.insertEntryWithDuplicationCheck(entry);
         return new BibDatabaseContext(bibDatabase, metaData, new Defaults());
     }
 

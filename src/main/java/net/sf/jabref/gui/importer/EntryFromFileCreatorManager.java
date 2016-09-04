@@ -147,7 +147,7 @@ public final class EntryFromFileCreatorManager {
                 if (!database.containsEntryWithId(entry.get().getId())) {
                     // Work around SIDE EFFECT of creator.createEntry. The EntryFromPDFCreator also creates the entry in the table
                     // Therefore, we only insert the entry if it is not already present
-                    if (database.insertEntry(entry.get())) {
+                    if (database.insertEntryWithDuplicationCheck(entry.get())) {
                         importGUIMessages.add("Problem importing " + f.getPath() + ": Insert into BibDatabase failed.");
                     } else {
                         count++;

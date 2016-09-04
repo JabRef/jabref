@@ -111,7 +111,7 @@ public class BibtexDatabaseWriterTest {
     public void writeEntry() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setType(BibtexEntryTypes.ARTICLE);
-        database.insertEntry(entry);
+        database.insertEntryWithDuplicationCheck(entry);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry), new SavePreferences());
 
@@ -126,7 +126,7 @@ public class BibtexDatabaseWriterTest {
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
         BibEntry entry = new BibEntry();
         entry.setType(BibtexEntryTypes.ARTICLE);
-        database.insertEntry(entry);
+        database.insertEntryWithDuplicationCheck(entry);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry), preferences);
 
@@ -247,7 +247,7 @@ public class BibtexDatabaseWriterTest {
             EntryTypes.addOrModifyCustomEntryType(new CustomEntryType("customizedType", "required", "optional"));
             BibEntry entry = new BibEntry();
             entry.setType("customizedType");
-            database.insertEntry(entry);
+            database.insertEntryWithDuplicationCheck(entry);
 
             StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry), new SavePreferences());
 
@@ -348,7 +348,7 @@ public class BibtexDatabaseWriterTest {
         entry.setField("author", "Mr. author");
         entry.setParsedSerialization("presaved serialization");
         entry.setChanged(false);
-        database.insertEntry(entry);
+        database.insertEntryWithDuplicationCheck(entry);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry), new SavePreferences());
 
@@ -363,7 +363,7 @@ public class BibtexDatabaseWriterTest {
         entry.setField("author", "Mr. author");
         entry.setParsedSerialization("wrong serialization");
         entry.setChanged(false);
-        database.insertEntry(entry);
+        database.insertEntryWithDuplicationCheck(entry);
 
         SavePreferences preferences = new SavePreferences().withReformatFile(true);
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry), preferences);
@@ -522,9 +522,9 @@ public class BibtexDatabaseWriterTest {
         thirdEntry.setField("author", "B");
         thirdEntry.setField("year", "2000");
 
-        database.insertEntry(secondEntry);
-        database.insertEntry(thirdEntry);
-        database.insertEntry(firstEntry);
+        database.insertEntryWithDuplicationCheck(secondEntry);
+        database.insertEntryWithDuplicationCheck(thirdEntry);
+        database.insertEntryWithDuplicationCheck(firstEntry);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, database.getEntries(), new SavePreferences());
 
@@ -566,9 +566,9 @@ public class BibtexDatabaseWriterTest {
         thirdEntry.setField("author", "A");
         thirdEntry.setField("year", "2000");
 
-        database.insertEntry(firstEntry);
-        database.insertEntry(secondEntry);
-        database.insertEntry(thirdEntry);
+        database.insertEntryWithDuplicationCheck(firstEntry);
+        database.insertEntryWithDuplicationCheck(secondEntry);
+        database.insertEntryWithDuplicationCheck(thirdEntry);
 
         SavePreferences preferences = new SavePreferences().withSaveInOriginalOrder(false);
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, database.getEntries(), preferences);
