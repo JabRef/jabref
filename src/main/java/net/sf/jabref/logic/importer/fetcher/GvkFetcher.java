@@ -1,30 +1,24 @@
 package net.sf.jabref.logic.importer.fetcher;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
-import net.sf.jabref.logic.importer.SearchBasedFetcher;
-import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.logic.importer.Parser;
+import net.sf.jabref.logic.importer.SearchBasedParserFetcher;
+import net.sf.jabref.logic.importer.fileformat.GvkParser;
 
 import org.apache.http.client.utils.URIBuilder;
-import org.jsoup.helper.StringUtil;
-import org.xml.sax.SAXException;
 
-public class GvkFetcher implements SearchBasedFetcher {
+public class GvkFetcher implements SearchBasedParserFetcher {
 
     private static final String URL_PATTERN = "http://sru.gbv.de/gvk?";
 
@@ -74,7 +68,8 @@ public class GvkFetcher implements SearchBasedFetcher {
         }
     }
 
-    protected URL getQueryURL(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+    @Override
+    public URL getQueryURL(String query) throws URISyntaxException, MalformedURLException, FetcherException {
         String gvkQuery = getSearchQueryString(query);
         URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);
         uriBuilder.addParameter("version", "1.1");
@@ -86,21 +81,9 @@ public class GvkFetcher implements SearchBasedFetcher {
         return uriBuilder.build().toURL();
     }
 
-
     @Override
-    public List<BibEntry> performSearch(String query) throws FetcherException {
-        if (StringUtil.isBlank(query)) {
-            return Collections.emptyList();
-        }
-
-        try (InputStream is = getQueryURL(query).openStream()) {
-            return (new GVKParser()).parseEntries(is);
-        } catch (URISyntaxException e) {
-            throw new FetcherException("URI malformed error", e);
-        } catch (IOException e) {
-            throw new FetcherException("An I/O exception occurred", e);
-        } catch (SAXException | ParserConfigurationException e) {
-            throw new FetcherException("An internal parser error occurred", e);
-        }
+    public Parser getParser() {
+        return new GvkParser();
     }
+
 }

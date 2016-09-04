@@ -1,4 +1,21 @@
-package net.sf.jabref.logic.importer.fetcher;
+/*
+ * Copyright (C) 2003-2016 JabRef contributors.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+ */
+
+package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +26,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sf.jabref.logic.importer.Parser;
+import net.sf.jabref.logic.importer.ParserException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -22,17 +41,21 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-class GVKParser {
-    private static final Log LOGGER = LogFactory.getLog(GVKParser.class);
+public class GvkParser implements Parser {
+    private static final Log LOGGER = LogFactory.getLog(GvkParser.class);
 
-    List<BibEntry> parseEntries(InputStream is)
-            throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document content = dbuild.parse(is);
-        return this.parseEntries(content);
+    @Override
+    public List<BibEntry> parseEntries(InputStream inputStream) throws ParserException {
+        try {
+            DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document content = dbuild.parse(inputStream);
+            return this.parseEntries(content);
+        } catch (ParserConfigurationException|SAXException|IOException exception) {
+            throw new ParserException(exception);
+        }
     }
 
-    List<BibEntry> parseEntries(Document content) {
+    private List<BibEntry> parseEntries(Document content) {
         List<BibEntry> result = new LinkedList<>();
 
         // used for creating test cases
