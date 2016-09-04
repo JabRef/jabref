@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.model.event.EntryAddedEvent;
@@ -535,5 +536,9 @@ public class BibDatabase {
     @Subscribe
     private void relayEntryChangeEvent(FieldChangedEvent event) {
         eventBus.post(event);
+    }
+
+    public Optional<BibEntry> getReferencedEntry(BibEntry entry) {
+        return entry.getField(FieldName.CROSSREF).flatMap(this::getEntryByKey);
     }
 }

@@ -139,21 +139,14 @@ public class BibEntry implements Cloneable {
         if (KEY_FIELD.equals(field)) {
             return getCiteKeyOptional();
         }
-        
+
         Optional<String> result = getFieldOrAlias(field);
 
         // If this field is not set, and the entry has a crossref, try to look up the
         // field in the referred entry: Do not do this for the bibtex key.
         if (!result.isPresent() && (database != null)) {
-            Optional<String> crossrefKey = getField(FieldName.CROSSREF);
-            if (crossrefKey.isPresent() && !crossrefKey.get().isEmpty()) {
-                Optional<BibEntry> referred = database.getEntryByKey(crossrefKey.get());
-                if (referred.isPresent()) {
-                    // Ok, we found the referred entry. Get the field value from that
-                    // entry. If it is unset there, too, stop looking:
-                    result = referred.get().getFieldOrAlias(field);
-                }
-            }
+            Optional<BibEntry> referred = database.getReferencedEntry(this);
+            result = referred.flatMap(entry -> entry.getFieldOrAlias(field));
         }
 
         return result.map(resultText -> BibDatabase.getText(resultText, database));
