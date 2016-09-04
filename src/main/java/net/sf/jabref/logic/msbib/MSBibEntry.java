@@ -64,25 +64,32 @@ class MSBibEntry {
 
     private String bibtexEntryType;
 
-    // reduced subset, supports only "CITY , STATE, COUNTRY"
-    // \b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w*)\b
-    // WORD SPACE , SPACE WORD SPACE (zero or more) , SPACE WORD (zero or word)
-    // tested using http://www.regexpal.com/
-    //Matches both single locations like Berlin or Stroudsburg, PA, USA
-    private static final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w*)\\s?[,]?\\s?(\\w*)\\b");
+    /**
+     * reduced subset, supports only "CITY , STATE, COUNTRY" <br>
+     *  <b>\b(\w+)\s?[,]?\s?(\w+)\s?[,]?\s?(\w*)\b</b> <br>
+     *  WORD SPACE , SPACE WORD SPACE (Can be zero or more) , SPACE WORD (Can be zero or more) <br>
+     *  Matches both single locations (only city) like Berlin and full locations like Stroudsburg, PA, USA <br>
+     *  tested using http://www.regexpal.com/
+     */
+    private final Pattern ADDRESS_PATTERN = Pattern.compile("\\b(\\w+)\\s?[,]?\\s?(\\w*)\\s?[,]?\\s?(\\w*)\\b");
 
-    // Allows 20.3-2007|||20/3-  2007 etc.
-    // (\d{1,2})\s?[.,-/]\s?(\d{1,2})\s?[.,-/]\s?(\d{2,4})
-    // 1-2 DIGITS SPACE SEPERATOR SPACE 1-2 DIGITS SPACE SEPERATOR SPACE 2-4 DIGITS
-    // tested using http://www.javaregex.com/test.html
+    /**
+     * Allows 20.3-2007|||20/3-  2007 etc.
+     * <b>(\d{1,2})\s?[.,-/]\s?(\d{1,2})\s?[.,-/]\s?(\d{2,4})</b>
+     * 1-2 DIGITS SPACE SEPERATOR SPACE 1-2 DIGITS SPACE SEPERATOR SPACE 2-4 DIGITS
+     */
     private static final Pattern DATE_PATTERN = Pattern
             .compile("(\\d{1,2})\\s*[.,-/]\\s*(\\d{1,2})\\s*[.,-/]\\s*(\\d{2,4})");
 
 
     public MSBibEntry() {
-
+        //empty
     }
 
+    /**
+     * Createa new {@link MsBibEntry} to import from an xml element
+     * @param entry
+     */
     public MSBibEntry(Element entry) {
         populateFromXml(entry);
     }
@@ -132,12 +139,14 @@ class MSBibEntry {
 
         StringBuilder addressBuffer = new StringBuilder();
         if (city != null) {
-            addressBuffer.append(city).append(", ");
+            addressBuffer.append(city);
         }
-        if (state != null) {
-            addressBuffer.append(state).append(' ');
+        if (((state != null) && !state.isEmpty()) && ((city != null) && !city.isEmpty())) {
+            addressBuffer.append(",").append(' ');
+            addressBuffer.append(state);
         }
-        if (country != null) {
+        if ((country != null) && !country.isEmpty()) {
+            addressBuffer.append(",").append(' ');
             addressBuffer.append(country);
         }
         address = addressBuffer.toString().trim();
@@ -233,7 +242,12 @@ class MSBibEntry {
         return result;
     }
 
-    public Element getDOM(Document document) {
+    /**
+     * Gets the dom representation for one entry, used for export
+     * @param document XmlDocument
+     * @return XmlElement represenation of one entry
+     */
+    public Element getEntryDom(Document document) {
         Element rootNode = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + "Source");
 
         for (Map.Entry<String, String> entry : fields.entrySet()) {
@@ -320,18 +334,18 @@ class MSBibEntry {
         allAuthors.appendChild(authorTop);
     }
 
-    private void addAddress(Document document, Element parent, String address) {
-        if (address == null) {
+    private void addAddress(Document document, Element parent, String addressToSplit) {
+        if (addressToSplit == null) {
             return;
         }
 
-        Matcher matcher = ADDRESS_PATTERN.matcher(address);
+        Matcher matcher = ADDRESS_PATTERN.matcher(addressToSplit);
         if (matcher.matches() && (matcher.groupCount() >= 3)) {
             addField(document, parent, "City", matcher.group(1));
             addField(document, parent, "StateProvince", matcher.group(2));
             addField(document, parent, "CountryRegion", matcher.group(3));
         } else {
-            addField(document, parent, "City", address);
+            addField(document, parent, "City", addressToSplit);
         }
     }
 }

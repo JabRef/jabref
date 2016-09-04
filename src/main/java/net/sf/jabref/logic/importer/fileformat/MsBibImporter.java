@@ -46,7 +46,7 @@ public class MsBibImporter extends ImportFormat {
         Objects.requireNonNull(reader);
 
         MSBibDatabase dbase = new MSBibDatabase();
-        return new ParserResult(dbase.importEntries(reader));
+        return new ParserResult(dbase.importEntriesFromXml(reader));
     }
 
     @Override

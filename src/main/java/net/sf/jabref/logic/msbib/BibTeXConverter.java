@@ -19,6 +19,11 @@ public class BibTeXConverter {
     private static final String MSBIB_PREFIX = "msbib-";
 
 
+    /**
+     * Converts an {@link MSBibEntry} to a {@link BibEntry} for import
+     * @param entry The MsBibEntry to convert
+     * @return The bib entry
+     */
     public static BibEntry convert(MSBibEntry entry) {
         BibEntry result;
         Map<String, String> fieldValues = new HashMap<>();
@@ -72,7 +77,7 @@ public class BibTeXConverter {
         parseStandardNumber(entry.standardNumber, fieldValues);
 
         if (entry.address != null) {
-            fieldValues.put(FieldName.ADDRESS, entry.address);
+            fieldValues.put(FieldName.LOCATION, entry.address);
         }
         // TODO: ConferenceName is saved as booktitle when converting from MSBIB to BibTeX
         if (entry.conferenceName != null) {
