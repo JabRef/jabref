@@ -17,6 +17,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Made it possible to download multiple entries in one action
 - [#1813](https://github.com/JabRef/jabref/issues/1813) Import/Export preferences dialog default directory set to working directory
 - [#1897](https://github.com/JabRef/jabref/issues/1897) Implemented integrity check for `year` field: Last four nonpunctuation characters should be numerals
+- Address in MS-Office 2007 xml format is now imported as `location`
+
 
 ### Fixed
 - Fixed NullPointerException when opening search result window for an untitled database 
@@ -24,6 +26,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1757](https://github.com/JabRef/jabref/issues/1757): Crash after saving illegal argument in entry editor
 - Fixed [#1663](https://github.com/JabRef/jabref/issues/1663): Better multi-monitor support
 - Fixed [#1882](https://github.com/JabRef/jabref/issues/1882): Crash after saving illegal bibtexkey in entry editor
+- Fixed field `location` containing only city is not exported correctly to MS-Office 2007 xml format
 
 ### Removed
 - The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field. 
