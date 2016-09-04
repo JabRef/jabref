@@ -346,11 +346,10 @@ public class IntegrityCheck {
         private static final Predicate<String> ONLY_NUMERALS_OR_LITERALS = Pattern.compile("^([0-9]+|[^0-9]+)$")
                 .asPredicate();
 
-        private final BibDatabaseContext bibDatabaseContext2;
-
+        private final BibDatabaseContext bibDatabaseContextEdition;
 
         public EditionChecker(BibDatabaseContext bibDatabaseContext) {
-            this.bibDatabaseContext2 = Objects.requireNonNull(bibDatabaseContext);
+            this.bibDatabaseContextEdition = Objects.requireNonNull(bibDatabaseContext);
         }
 
         /**
@@ -371,13 +370,13 @@ public class IntegrityCheck {
             }
 
             //BibLaTeX
-            if (!ONLY_NUMERALS_OR_LITERALS.test(value.get().trim()) && (bibDatabaseContext2.isBiblatexMode())) {
+            if (!ONLY_NUMERALS_OR_LITERALS.test(value.get().trim()) && (bibDatabaseContextEdition.isBiblatexMode())) {
                 return Collections.singletonList(new IntegrityMessage(
                         Localization.lang("should contain an integer or a literal"), entry, FieldName.EDITION));
             }
 
             //BibTeX
-            if (!FIRST_LETTER_CAPITALIZED.test(value.get().trim()) && (!bibDatabaseContext2.isBiblatexMode())) {
+            if (!FIRST_LETTER_CAPITALIZED.test(value.get().trim()) && (!bibDatabaseContextEdition.isBiblatexMode())) {
                 return Collections.singletonList(new IntegrityMessage(
                         Localization.lang("should have the first letter capitalized"), entry, FieldName.EDITION));
             }
