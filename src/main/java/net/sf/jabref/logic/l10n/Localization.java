@@ -15,11 +15,12 @@ public class Localization {
 
     public static final String RESOURCE_PREFIX = "l10n/JabRef";
     public static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
+    public static final String BIBTEX = "BibTeX";
 
     private static ResourceBundle messages;
     private static ResourceBundle menuTitles;
     
-    public static ResourceBundle getMessages() {
+    public static LocalizationBundle getMessages() {
         return new LocalizationBundle(messages);
     }
 

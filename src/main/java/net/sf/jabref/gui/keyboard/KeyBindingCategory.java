@@ -13,7 +13,7 @@ public enum KeyBindingCategory {
     VIEW(
             Localization.menuTitle("View")),
     BIBTEX(
-            Localization.menuTitle("BibTeX")),
+            Localization.BIBTEX),
     QUALITY(
             Localization.menuTitle("Quality")),
     TOOLS(
