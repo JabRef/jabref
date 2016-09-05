@@ -17,9 +17,9 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     private String name;
     private String extension;
     private String openWith;
-    private String iconName;
+    private final String iconName;
     private String mimeType;
-    private Icon icon;
+    private final Icon icon;
     private final JLabel label = new JLabel();
 
     public ExternalFileType(String name, String extension, String mimeType,
@@ -31,8 +31,8 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         this.mimeType = mimeType;
         this.openWith = openWith;
 
-        setIconName(iconName);
-        setIcon(icon);
+        this.iconName = iconName;
+        this.icon = icon;
     }
 
     /**
@@ -144,15 +144,6 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     }
 
     /**
-     * Set the string associated with this file type's icon.
-     *
-     * @param name The icon name to use.
-     */
-    public void setIconName(String name) {
-        this.iconName = name;
-    }
-
-    /**
      * Obtain a JLabel instance set with this file type's icon. The same JLabel
      * is returned from each call of this method.
      *
@@ -162,22 +153,8 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         return label;
     }
 
-    /**
-     * Get the string associated with this file type's icon.
-     *
-     * @return The icon name.
-     */
-    public String getIconName() {
-        return iconName;
-    }
-
     public Icon getIcon() {
         return icon;
-    }
-
-    public void setIcon(Icon icon) {
-        this.icon = icon;
-        label.setIcon(this.icon);
     }
 
     @Override
