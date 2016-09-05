@@ -27,14 +27,14 @@ public class EditionChecker implements Checker {
     }
 
     /**
+     * Checks, if field contains only an integer or a literal (BibLaTeX mode)
      * Checks, if the first letter is capitalized (BibTeX mode)
-     * Checks, if field contains only an integer (BibLaTeX mode)
-     * Official bibtex spec:
-     * The edition of a book-for example, “Second”.
-     * This should be an ordinal, and should have the first letter capitalized.
      * BibLaTex:
      * The edition of a printed publication. This must be an integer, not an ordinal.
      * It is also possible to give the edition as a literal string, for example "Third, revised and expanded edition".
+     * Official bibtex spec:
+     * The edition of a book-for example, "Second".
+     * This should be an ordinal, and should have the first letter capitalized.
      */
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
