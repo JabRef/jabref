@@ -69,8 +69,6 @@ public class PdfCommentsTab extends JPanel {
             String pdfPath = field.get().replaceFirst(".*?:", System.getProperty("file.separator")).replaceAll(":PDF", "");
             HashMap<String, String> importedNotes = commentImporter.importNotes(pdfPath);
             importedNotes.values().stream().forEach((note) -> listModel.addElement(note));
-
-            //TODO add context information for importedNotes
         }
 
         commentScrollPane.setPreferredSize(new Dimension(450,200));
