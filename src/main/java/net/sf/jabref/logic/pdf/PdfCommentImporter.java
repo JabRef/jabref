@@ -44,7 +44,6 @@ public class PdfCommentImporter {
             try {
                 for (PDAnnotation annotation : page.getAnnotations()) {
                     annotationsMap.put(annotation.getAnnotationName(), annotation.getContents());
-                    annotation.get
                 }
             } catch (IOException e1) {
                 e1.printStackTrace();
