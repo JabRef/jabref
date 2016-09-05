@@ -6,6 +6,7 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
+import net.sf.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import net.sf.jabref.logic.importer.fetcher.DiVA;
 import net.sf.jabref.logic.importer.fetcher.GvkFetcher;
 import net.sf.jabref.logic.importer.fetcher.IsbnFetcher;
@@ -34,6 +35,8 @@ public class EntryFetchers {
         entryFetchers.add(new IdBasedEntryFetcher(new IsbnFetcher(Globals.prefs.getImportFormatPreferences())));
         entryFetchers.add(new SearchBasedEntryFetcher(new ArXiv()));
         entryFetchers.add(new SearchBasedEntryFetcher(new GvkFetcher()));
+        entryFetchers.add(
+                new SearchBasedEntryFetcher(new AstrophysicsDataSystem(Globals.prefs.getImportFormatPreferences())));
     }
 
     public List<EntryFetcher> getEntryFetchers() {
