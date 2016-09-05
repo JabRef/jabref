@@ -21,20 +21,20 @@ import org.apache.commons.logging.LogFactory;
 
 public class DoiFetcher implements IdBasedFetcher {
 
-    private ImportFormatPreferences prefs;
+    private ImportFormatPreferences preferences;
 
     private static final Log LOGGER = LogFactory.getLog(DoiFetcher.class);
 
     public DoiFetcher(ImportFormatPreferences preferences) {
-        this.prefs = preferences;
+        this.preferences = preferences;
     }
 
-    public static Optional<BibEntry> getEntryFromDOI(String doiStr, ParserResult parserResult, ImportFormatPreferences importFormatPreferences){
+    public static Optional<BibEntry> getEntryFromDOI(String doi, ParserResult parserResult, ImportFormatPreferences preferences){
         try {
-            return new DoiFetcher(importFormatPreferences).performSearchById(doiStr);
+            return new DoiFetcher(preferences).performSearchById(doi);
         } catch (FetcherException e) {
             LOGGER.warn("Invalid DOI", e);
-            parserResult.addWarning(Localization.lang("Invalid DOI: '%0'.", doiStr));
+            parserResult.addWarning(Localization.lang("Invalid DOI: '%0'.", doi));
         }
         return Optional.empty();
     }
@@ -69,7 +69,7 @@ public class DoiFetcher implements IdBasedFetcher {
                 String bibtexString = download.downloadToString(StandardCharsets.UTF_8);
 
                 // BibTeX entry
-                return BibtexParser.singleFromString(cleanupEncoding(bibtexString), prefs);
+                return BibtexParser.singleFromString(cleanupEncoding(bibtexString), preferences);
             } else {
                 LOGGER.warn(Localization.lang("Invalid DOI: '%0'.", identifier));
                 return Optional.empty();

@@ -12,6 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class DoiFetcherTest {
 
@@ -58,18 +59,24 @@ public class DoiFetcherTest {
 
     @Test(expected = FetcherException.class)
     public void testPerformSearchFetcherException() throws FetcherException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1002/9781118257517F");
-        assertEquals(Optional.empty(), fetchedEntry);
+        fetcher.performSearchById("10.1002/9781118257517F");
+        fail();
     }
 
     @Test(expected = NullPointerException.class)
-    public void testGetEntryFromDOILongNullPointerException() throws FetcherException {
-        assertEquals(Optional.empty(), DoiFetcher.getEntryFromDOI("10.1002/9781118257517F", null, Globals.prefs.getImportFormatPreferences()));
+    public void testGetEntryFromDOILongNullPointerException() {
+        DoiFetcher.getEntryFromDOI("10.1002/9781118257517F", null, Globals.prefs.getImportFormatPreferences());
+        fail();
     }
 
     @Test
-    public void testGetEntryFromDOILong() throws FetcherException {
+    public void testGetEntryFromDOILong() {
         assertEquals(Optional.of(bibEntry), DoiFetcher.getEntryFromDOI("10.1002/9781118257517", new ParserResult(), Globals.prefs.getImportFormatPreferences()));
+    }
+
+    @Test
+    public void testGetEntryFromDOIEmpty() {
+        assertEquals(Optional.empty(), DoiFetcher.getEntryFromDOI("", new ParserResult(), Globals.prefs.getImportFormatPreferences()));
     }
 
 }
