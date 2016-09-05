@@ -215,7 +215,10 @@ public class DownloadExternalFile {
 
                 callback.downloadComplete(fileListEntry);
             } catch (IOException ex) {
-                LOGGER.warn("Problem downloading file", ex);
+                String content = String.format("%s %n %s", Localization.lang("Error message:"),
+                        ex.getLocalizedMessage());
+                JOptionPane.showMessageDialog(this.frame, content,
+                        Localization.lang("Error while writing"), JOptionPane.ERROR_MESSAGE);
             }
 
             if (!tmp.delete()) {
