@@ -292,7 +292,12 @@ class EntryEditorTab {
         if (!editors.containsKey(field)) {
             return false;
         }
+
         FieldEditor fieldEditor = editors.get(field);
+        if (fieldEditor.getText().equals(content)){
+            return true;
+        }
+
         // trying to preserve current edit position (fixes SF bug #1285)
         if(fieldEditor.getTextComponent() instanceof JTextComponent) {
             int initialCaretPosition = ((JTextComponent) fieldEditor).getCaretPosition();
