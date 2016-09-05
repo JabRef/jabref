@@ -180,7 +180,7 @@ public class LocalizationParser {
                 .collect(Collectors.toList());
     }
 
-    private static class JavaLocalizationEntryParser {
+    static class JavaLocalizationEntryParser {
 
         private static final String INFINITE_WHITESPACE = "\\s*";
         private static final String DOT = "\\.";
