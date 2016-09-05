@@ -10,6 +10,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Collection;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -38,15 +39,6 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IEEETranEntryTypes;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.embed.swing.JFXPanel;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
-import javafx.scene.layout.AnchorPane;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jdesktop.swingx.VerticalLayout;
@@ -93,7 +85,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         // modal dialog
         super(frame, true);
 
-        this.frame=frame;
+        this.frame = frame;
 
         bibDatabaseContext = frame.getCurrentBasePanel().getBibDatabaseContext();
         biblatexMode = bibDatabaseContext.isBiblatexMode();
@@ -126,7 +118,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
             panel.add(createEntryGroupPanel("BibTeX", BibtexEntryTypes.ALL));
             panel.add(createEntryGroupPanel("IEEETran", IEEETranEntryTypes.ALL));
 
-            if(!CustomEntryTypesManager.ALL.isEmpty()) {
+            if (!CustomEntryTypesManager.ALL.isEmpty()) {
                 panel.add(createEntryGroupPanel(Localization.lang("Custom"), CustomEntryTypesManager.ALL));
             }
 
@@ -199,20 +191,33 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
                 searchID = idTextField.getText();
                 if (!searchID.isEmpty()) {
                     fetcher = EntryFetchers.getIdFetchers().get(comboBox.getSelectedIndex());
-                        try {
-                            bibEntry = fetcher.performSearchById(searchID);
-                            dispose();
-                            if (bibEntry.isPresent()) {
-                                frame.getCurrentBasePanel().insertEntry(bibEntry.get());
-                            } else {
-                                JOptionPane.showMessageDialog(null, Localization.lang("No_entry_with_id_'%0'_for_fetcher_'%1'_was_found.", searchID,fetcher.getName()), Localization.lang("No_files_found."), JOptionPane.WARNING_MESSAGE);
-                            }
-                        } catch (FetcherException e) {
-                            LOGGER.error(Localization.lang("Error_fetching_from_'%0'.",fetcher.getName()), e);
-                            JOptionPane.showMessageDialog(null,Localization.lang("Error_fetching_from_'%0'.",fetcher.getName()), Localization.lang("Error_ while_fetching."), JOptionPane.ERROR_MESSAGE);
-                        }
+                    try {
+                        bibEntry = fetcher.performSearchById(searchID);
+                        dispose();
+                    } catch (FetcherException e) {
+                        LOGGER.error(Localization.lang("Error_fetching_from_'%0'.", fetcher.getName()), e);
+                        JOptionPane.showMessageDialog(null, Localization.lang("Error_fetching_from_'%0'.", fetcher.getName()), Localization.lang("Error_ while_fetching."), JOptionPane.ERROR_MESSAGE);
+                    }
                 }
                 return bibEntry;
+            }
+
+            @Override
+            protected void done() {
+                if (isCancelled()) {
+                    return;
+                }
+
+                try {
+                    Optional<BibEntry> result = get();
+                    if (result.isPresent()) {
+                        frame.getCurrentBasePanel().insertEntry(result.get());
+                    } else {
+                        JOptionPane.showMessageDialog(null, Localization.lang("No_entry_with_id_'%0'_for_fetcher_'%1'_was_found.", searchID, fetcher.getName()), Localization.lang("No_files_found."), JOptionPane.WARNING_MESSAGE);
+                    }
+                } catch (ExecutionException | InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         };
 
@@ -247,58 +252,11 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
         bb.addButton(searchButton);
 
-        jPanel.add(buttons,constraints);
+        jPanel.add(buttons, constraints);
         jPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), groupTitle));
 
 
         return jPanel;
-    }
-
-    private JFXPanel createIdFetcherFX(String groupTitle) {
-        JFXPanel jfxPanel = new JFXPanel();
-        Label fetcherLabel = new Label("Fetcher"), idLabel = new Label("ID");
-        Button searchButton = new Button(Localization.lang("Search"));
-        TextField idTextField = new TextField();
-        ChoiceBox<IdBasedFetcher> choiceBox = new ChoiceBox(FXCollections.observableArrayList(EntryFetchers.getIdFetchers()));
-
-        Platform.runLater(() -> {
-            AnchorPane root = new AnchorPane();
-
-            AnchorPane.setTopAnchor(fetcherLabel, 10.0);
-            AnchorPane.setTopAnchor(choiceBox, 10.0);
-            AnchorPane.setTopAnchor(idLabel, 50.0);
-            AnchorPane.setTopAnchor(idTextField, 50.0);
-            AnchorPane.setTopAnchor(searchButton, 100.0);
-
-            AnchorPane.setLeftAnchor(fetcherLabel, 10.0);
-            AnchorPane.setLeftAnchor(idLabel, 10.0);
-
-            AnchorPane.setLeftAnchor(searchButton, 80.0);
-            AnchorPane.setLeftAnchor(choiceBox, 80.0);
-            AnchorPane.setLeftAnchor(idTextField, 80.0);
-
-            AnchorPane.setRightAnchor(choiceBox, 30.0);
-            AnchorPane.setRightAnchor(idTextField, 30.0);
-            AnchorPane.setRightAnchor(searchButton, 80.0);
-
-            root.getChildren().add(choiceBox);
-            root.getChildren().add(fetcherLabel);
-            root.getChildren().add(idLabel);
-            root.getChildren().add(idTextField);
-            root.getChildren().add(searchButton);
-
-            searchButton.setOnAction(action -> {
-                System.out.println(idTextField.getText());
-                IdBasedFetcher fetcher = choiceBox.getValue();
-
-            });
-
-            jfxPanel.setScene(new Scene(root,getWidth(),getHeight()/2));
-        });
-
-        jfxPanel.setBorder(BorderFactory.createEtchedBorder());
-
-        return jfxPanel;
     }
 
     @Override
