@@ -271,7 +271,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 }
             }
         } else if (databaseLocation == DatabaseLocation.SHARED) {
-            title.append(this.bibDatabaseContext.getDBSynchronizer().getDBName() + " [shared]");
+            title.append(
+                    this.bibDatabaseContext.getDBSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]");
         }
 
         return title.toString();
@@ -458,7 +459,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                 }
 
-                Map<BibEntry, Object> oldvals = new HashMap<>();
+                Map<BibEntry, String> oldvals = new HashMap<>();
                 // Iterate again, removing already set keys. This is skipped if overwriting
                 // is disabled, since all entries with keys set will have been removed.
                 if (!Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
@@ -477,7 +478,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     bes = entry;
                     BibtexKeyPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), bibDatabaseContext.getDatabase(),
                             bes, Globals.prefs.getBibtexKeyPatternPreferences());
-                    ce.addEdit(new UndoableKeyChange(bibDatabaseContext.getDatabase(), bes, (String) oldvals.get(bes),
+                    ce.addEdit(new UndoableKeyChange(bibDatabaseContext.getDatabase(), bes, oldvals.get(bes),
                             bes.getCiteKeyOptional().orElse(null)));
                 }
                 ce.end();
@@ -1740,7 +1741,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     public void selectPreviousEntry() {
-        highlightEntry((mainTable.getSelectedRow() - 1 + mainTable.getRowCount()) % mainTable.getRowCount());
+        highlightEntry(((mainTable.getSelectedRow() - 1) + mainTable.getRowCount()) % mainTable.getRowCount());
     }
 
     public void selectNextEntry() {
