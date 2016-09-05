@@ -678,15 +678,15 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         String mode = panel.getBibDatabaseContext().getMode().getFormattedName();
         String modeInfo = String.format(" (%s)", Localization.lang("%0 mode", mode));
-        String changeFlag = panel.isModified() ? "*" : "";
 
         if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL) {
+            String changeFlag = panel.isModified() ? "*" : "";
             String databaseFile = panel.getBibDatabaseContext().getDatabaseFile().map(File::getPath)
                     .orElse(GUIGlobals.UNTITLED_TITLE);
                 setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
         } else if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED) {
-            setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBSynchronizer().getDBName() + " [shared]"
-                    + modeInfo);
+            setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBSynchronizer().getDBName() + " ["
+                    + Localization.lang("shared") + "]" + modeInfo);
         }
     }
 
