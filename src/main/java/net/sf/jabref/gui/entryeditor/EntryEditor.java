@@ -116,7 +116,6 @@ import org.apache.commons.logging.LogFactory;
  * update themselves if the change is made from somewhere else.
  */
 public class EntryEditor extends JPanel implements EntryContainer {
-
     private static final Log LOGGER = LogFactory.getLog(EntryEditor.class);
 
     // A reference to the entry this object works on.
@@ -1119,9 +1118,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 if ((cleaned == null) || cleaned.equals(newValue)) {
                     textField.setValidBackgroundColor();
                 } else {
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Invalid BibTeX key"),
-                            Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
                     textField.setInvalidBackgroundColor();
+                    if (!SwingUtilities.isEventDispatchThread()) {
+                        JOptionPane.showMessageDialog(frame, Localization.lang("Invalid BibTeX key"),
+                                Localization.lang("Error setting field"), JOptionPane.ERROR_MESSAGE);
+                        requestFocus();
+                    }
                     return;
                 }
 
@@ -1291,22 +1293,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-
-            int thisRow = panel.getMainTable().findEntry(entry);
-            int newRow;
-
-            if ((thisRow + 1) < panel.getDatabase().getEntryCount()) {
-                newRow = thisRow + 1;
-            } else if (thisRow > 0) {
-                newRow = 0;
-            } else {
-                return; // newRow is still -1, so we can assume the database has
-                // only one entry.
-            }
-
-            scrollTo(newRow);
-            panel.getMainTable().setRowSelectionInterval(newRow, newRow);
-
+            panel.selectNextEntry();
         }
     }
 
@@ -1319,22 +1306,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int thisRow = panel.getMainTable().findEntry(entry);
-            int newRow;
-
-            if ((thisRow - 1) >= 0) {
-                newRow = thisRow - 1;
-            } else if (thisRow != (panel.getDatabase().getEntryCount() - 1)) {
-                newRow = panel.getDatabase().getEntryCount() - 1;
-            } else {
-                return; // newRow is still -1, so we can assume the database has
-                // only one entry.
-
-            }
-
-            scrollTo(newRow);
-            panel.getMainTable().setRowSelectionInterval(newRow, newRow);
-
+            panel.selectPreviousEntry();
         }
     }
 
@@ -1394,7 +1366,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
             setField(BibEntry.KEY_FIELD, bibtexKeyData);
             updateSource();
             panel.markBaseChanged();
-
         }
     }
 

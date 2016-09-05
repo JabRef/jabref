@@ -1366,13 +1366,13 @@ class OOBibBase {
                     BibEntry clonedEntry = (BibEntry) entry.get().clone();
                     clonedEntry.setId(IdGenerator.next());
                     // Insert a copy of the entry
-                    resultDatabase.insertEntry(clonedEntry);
+                    resultDatabase.insertEntryWithDuplicationCheck(clonedEntry);
                     // Check if the cloned entry has a crossref field
                     clonedEntry.getField(FieldName.CROSSREF).ifPresent(crossref -> {
                         // If the crossref entry is not already in the database
                         if (!resultDatabase.getEntryByKey(crossref).isPresent()) {
                             // Add it if it is in the current database
-                            loopDatabase.getEntryByKey(crossref).ifPresent(resultDatabase::insertEntry);
+                            loopDatabase.getEntryByKey(crossref).ifPresent(resultDatabase::insertEntryWithDuplicationCheck);
                         }
                     });
 

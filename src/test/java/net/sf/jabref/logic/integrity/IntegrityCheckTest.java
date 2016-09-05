@@ -45,9 +45,19 @@ public class IntegrityCheckTest {
     public void testYearChecks() {
         assertCorrect(createContext("year", "2014"));
         assertCorrect(createContext("year", "1986"));
+        assertCorrect(createContext("year", "around 1986"));
+        assertCorrect(createContext("year", "(around 1986)"));
+        assertCorrect(createContext("year", "1986,"));
+        assertCorrect(createContext("year", "1986}%"));
+        assertCorrect(createContext("year", "1986(){},.;!?<>%&$"));
         assertWrong(createContext("year", "abc"));
         assertWrong(createContext("year", "86"));
         assertWrong(createContext("year", "204"));
+        assertWrong(createContext("year", "1986a"));
+        assertWrong(createContext("year", "(1986a)"));
+        assertWrong(createContext("year", "1986a,"));
+        assertWrong(createContext("year", "1986}a%"));
+        assertWrong(createContext("year", "1986a(){},.;!?<>%&$"));
     }
 
     @Test
@@ -218,7 +228,7 @@ public class IntegrityCheckTest {
         entry.setField(field, value);
         entry.setType(type);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntry(entry);
+        bibDatabase.insertEntryWithDuplicationCheck(entry);
         return new BibDatabaseContext(bibDatabase, new Defaults());
     }
 
@@ -226,7 +236,7 @@ public class IntegrityCheckTest {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntry(entry);
+        bibDatabase.insertEntryWithDuplicationCheck(entry);
         return new BibDatabaseContext(bibDatabase, metaData, new Defaults());
     }
 

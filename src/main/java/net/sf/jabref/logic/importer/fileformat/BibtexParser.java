@@ -220,7 +220,7 @@ public class BibtexParser {
             // store complete parsed serialization (comments, type definition + type contents)
             entry.setParsedSerialization(commentsAndEntryTypeDefinition + dumpTextReadSoFarToString());
 
-            boolean duplicateKey = database.insertEntry(entry);
+            boolean duplicateKey = database.insertEntryWithDuplicationCheck(entry);
             if (duplicateKey) {
                 parserResult.addDuplicateKey(entry.getCiteKey());
             } else if (!entry.getCiteKeyOptional().isPresent() || entry.getCiteKeyOptional().get().isEmpty()) {

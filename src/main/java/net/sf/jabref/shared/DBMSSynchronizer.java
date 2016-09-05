@@ -8,7 +8,6 @@ import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.event.MetaDataChangedEvent;
 import net.sf.jabref.event.source.EntryEventSource;
@@ -20,7 +19,6 @@ import net.sf.jabref.model.event.EntryAddedEvent;
 import net.sf.jabref.model.event.EntryEvent;
 import net.sf.jabref.model.event.EntryRemovedEvent;
 import net.sf.jabref.model.event.FieldChangedEvent;
-import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.event.ConnectionLostEvent;
 import net.sf.jabref.shared.event.SharedEntryNotPresentEvent;
 import net.sf.jabref.shared.event.UpdateRefusedEvent;
@@ -49,13 +47,15 @@ public class DBMSSynchronizer {
     private final BibDatabase bibDatabase;
     private final EventBus eventBus;
     private Connection currentConnection;
+    private final String keywordSeparator;
 
 
-    public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext) {
+    public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, String keywordSeparator) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.bibDatabase = bibDatabaseContext.getDatabase();
         this.metaData = bibDatabaseContext.getMetaData();
         this.eventBus = new EventBus();
+        this.keywordSeparator = keywordSeparator;
     }
 
     /**
@@ -248,7 +248,7 @@ public class DBMSSynchronizer {
         }
 
         try {
-            metaData.setData(dbmsProcessor.getSharedMetaData(), Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+            metaData.setData(dbmsProcessor.getSharedMetaData(), keywordSeparator);
         } catch (ParseException e) {
             LOGGER.error("Parse error", e);
         }

@@ -145,18 +145,11 @@ public class JabRefGUI {
             Globals.startAutoSaveManager(JabRefGUI.getMainFrame());
         }
 
-        // If we are set to remember the window location, we also remember the maximised
-        // state. This needs to be set after the window has been made visible, so we
-        // do it here:
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
             JabRefGUI.getMainFrame().setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
 
         JabRefGUI.getMainFrame().setVisible(true);
-
-        if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-            JabRefGUI.getMainFrame().setExtendedState(JFrame.MAXIMIZED_BOTH);
-        }
 
         for (ParserResult pr : failed) {
             String message = "<html>" + Localization.lang("Error opening file '%0'.", pr.getFile().get().getName())

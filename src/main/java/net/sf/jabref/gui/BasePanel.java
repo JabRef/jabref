@@ -141,7 +141,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListener {
-
     private static final Log LOGGER = LogFactory.getLog(BasePanel.class);
 
     // Divider size for BaseFrame split pane. 0 means non-resizable.
@@ -230,19 +229,19 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.bibDatabaseContext.getDatabase().registerListener(new GroupTreeListener());
 
         if (file.isPresent()) {
-            if (bibDatabaseContext.getDatabase().hasEntries()) {
-                // Register so we get notifications about outside changes to the file.
-                try {
-                    fileMonitorHandle = Globals.getFileUpdateMonitor().addUpdateListener(this, file.get());
-                } catch (IOException ex) {
-                    LOGGER.warn("Could not register FileUpdateMonitor", ex);
-                }
+            // Register so we get notifications about outside changes to the file.
+            try {
+                fileMonitorHandle = Globals.getFileUpdateMonitor().addUpdateListener(this, file.get());
+            } catch (IOException ex) {
+                LOGGER.warn("Could not register FileUpdateMonitor", ex);
             }
         } else {
-            // if the database is not empty and no file is assigned,
-            // the database came from an import and has to be treated somehow
-            // -> mark as changed
-            this.baseChanged = true;
+            if (bibDatabaseContext.getDatabase().hasEntries()) {
+                // if the database is not empty and no file is assigned,
+                // the database came from an import and has to be treated somehow
+                // -> mark as changed
+                this.baseChanged = true;
+            }
         }
     }
 
@@ -467,7 +466,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         bes = entry;
                         // Store the old value:
                         oldvals.put(bes, bes.getCiteKeyOptional().orElse(null));
-                        bibDatabaseContext.getDatabase().setCiteKeyForEntry(bes, null);
+                        bes.clearCiteKey();
                     }
                 }
 
@@ -825,7 +824,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // independently of the copied
                 // ones.
                 be.setId(IdGenerator.next());
-                bibDatabaseContext.getDatabase().insertEntry(be);
+                bibDatabaseContext.getDatabase().insertEntryWithDuplicationCheck(be);
 
                 ce.addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), be, BasePanel.this));
 
@@ -1137,7 +1136,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             String id = IdGenerator.next();
             final BibEntry be = new BibEntry(id, actualType.getName());
             try {
-                bibDatabaseContext.getDatabase().insertEntry(be);
+                bibDatabaseContext.getDatabase().insertEntryWithDuplicationCheck(be);
                 // Set owner/timestamp if options are enabled:
                 List<BibEntry> list = new ArrayList<>();
                 list.add(be);
@@ -1291,7 +1290,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void insertEntry(final BibEntry bibEntry) {
         if (bibEntry != null) {
             try {
-                bibDatabaseContext.getDatabase().insertEntry(bibEntry);
+                bibDatabaseContext.getDatabase().insertEntryWithDuplicationCheck(bibEntry);
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)) {
                     // Set owner field to default value
                     UpdateField.setAutomaticFields(bibEntry, true, true, Globals.prefs.getUpdateFieldPreferences());
@@ -1738,6 +1737,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             mainTable.addRowSelectionInterval(pos, pos);
             mainTable.ensureVisible(pos);
         }
+    }
+
+    public void selectPreviousEntry() {
+        highlightEntry((mainTable.getSelectedRow() - 1 + mainTable.getRowCount()) % mainTable.getRowCount());
+    }
+
+    public void selectNextEntry() {
+        highlightEntry((mainTable.getSelectedRow() + 1) % mainTable.getRowCount());
     }
 
     /**
