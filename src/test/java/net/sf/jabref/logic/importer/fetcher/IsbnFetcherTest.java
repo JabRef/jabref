@@ -20,7 +20,7 @@ public class IsbnFetcherTest {
 
     @Before
     public void setUp() {
-        fetcher = new IsbnFetcher(Globals.prefs.getImportFormatPreferences ());
+        fetcher = new IsbnFetcher(Globals.prefs.getImportFormatPreferences());
 
         bibEntry = new BibEntry();
         bibEntry.setType(BibLatexEntryTypes.BOOK);
