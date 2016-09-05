@@ -21,6 +21,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#1912](https://github.com/JabRef/jabref/issues/1912) Implemented integrity check for `edition` field: Should have the first letter capitalized (BibTeX), Should contain an integer or a literal (BibLaTeX)
 
 ### Fixed
+- Fixed selecting an entry out of multiple duplicates
 - Fixed NullPointerException when opening search result window for an untitled database 
 - Fixed entry table traversal with Tab (no column traversal thus no double jump)
 - Fixed [#1757](https://github.com/JabRef/jabref/issues/1757): Crash after saving illegal argument in entry editor
