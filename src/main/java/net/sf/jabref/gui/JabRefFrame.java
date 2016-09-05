@@ -656,7 +656,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 globalSearchBar.performSearch();
             } else {
                 SearchQuery currentSearchQuery = currentBasePanel.getCurrentSearchQuery();
-                if (currentSearchQuery != null) {
+                if (currentSearchQuery != null && !currentSearchQuery.getQuery().trim().isEmpty()) {
                     globalSearchBar.setSearchTerm(currentSearchQuery.getQuery());
                 } else {
                     globalSearchBar.setSearchTerm("");

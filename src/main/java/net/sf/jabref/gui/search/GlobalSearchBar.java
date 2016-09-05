@@ -356,6 +356,7 @@ public class GlobalSearchBar extends JPanel {
         searchField.setText(searchTerm);
         // to hinder the autocomplete window to popup
         autoCompleteSupport.setVisible(false);
+        frame.getCurrentBasePanel().requestFocusInWindow();
     }
 
 }
