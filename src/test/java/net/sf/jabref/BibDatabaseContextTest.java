@@ -31,7 +31,7 @@ public class BibDatabaseContextTest {
     public void testTypeBasedOnInferredModeBibTeX() {
         BibDatabase db = new BibDatabase();
         BibEntry e1 = new BibEntry("1");
-        db.insertEntry(e1);
+        db.insertEntryWithDuplicationCheck(e1);
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(db);
         assertEquals(BibDatabaseMode.BIBTEX, bibDatabaseContext.getMode());
@@ -41,7 +41,7 @@ public class BibDatabaseContextTest {
     public void testTypeBasedOnInferredModeBiblatex() {
         BibDatabase db = new BibDatabase();
         BibEntry e1 = new BibEntry("1", "electronic");
-        db.insertEntry(e1);
+        db.insertEntryWithDuplicationCheck(e1);
 
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(db);
         assertEquals(BibDatabaseMode.BIBLATEX, bibDatabaseContext.getMode());

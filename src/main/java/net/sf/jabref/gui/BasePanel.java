@@ -466,7 +466,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         bes = entry;
                         // Store the old value:
                         oldvals.put(bes, bes.getCiteKeyOptional().orElse(null));
-                        bibDatabaseContext.getDatabase().setCiteKeyForEntry(bes, null);
+                        bes.clearCiteKey();
                     }
                 }
 
@@ -824,7 +824,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // independently of the copied
                 // ones.
                 be.setId(IdGenerator.next());
-                bibDatabaseContext.getDatabase().insertEntry(be);
+                bibDatabaseContext.getDatabase().insertEntryWithDuplicationCheck(be);
 
                 ce.addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), be, BasePanel.this));
 
@@ -1136,7 +1136,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             String id = IdGenerator.next();
             final BibEntry be = new BibEntry(id, actualType.getName());
             try {
-                bibDatabaseContext.getDatabase().insertEntry(be);
+                bibDatabaseContext.getDatabase().insertEntryWithDuplicationCheck(be);
                 // Set owner/timestamp if options are enabled:
                 List<BibEntry> list = new ArrayList<>();
                 list.add(be);
@@ -1290,7 +1290,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void insertEntry(final BibEntry bibEntry) {
         if (bibEntry != null) {
             try {
-                bibDatabaseContext.getDatabase().insertEntry(bibEntry);
+                bibDatabaseContext.getDatabase().insertEntryWithDuplicationCheck(bibEntry);
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)) {
                     // Set owner field to default value
                     UpdateField.setAutomaticFields(bibEntry, true, true, Globals.prefs.getUpdateFieldPreferences());
