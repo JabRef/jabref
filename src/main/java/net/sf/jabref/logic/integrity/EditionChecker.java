@@ -44,13 +44,13 @@ public class EditionChecker implements Checker {
         }
 
         //BibLaTeX
-        if (!ONLY_NUMERALS_OR_LITERALS.test(value.get().trim()) && (bibDatabaseContextEdition.isBiblatexMode())) {
+        if (bibDatabaseContextEdition.isBiblatexMode() && !ONLY_NUMERALS_OR_LITERALS.test(value.get().trim())) {
             return Collections.singletonList(new IntegrityMessage(
                     Localization.lang("should contain an integer or a literal"), entry, FieldName.EDITION));
         }
 
         //BibTeX
-        if (!FIRST_LETTER_CAPITALIZED.test(value.get().trim()) && (!bibDatabaseContextEdition.isBiblatexMode())) {
+        if (!bibDatabaseContextEdition.isBiblatexMode() && !FIRST_LETTER_CAPITALIZED.test(value.get().trim())) {
             return Collections.singletonList(new IntegrityMessage(
                     Localization.lang("should have the first letter capitalized"), entry, FieldName.EDITION));
         }
