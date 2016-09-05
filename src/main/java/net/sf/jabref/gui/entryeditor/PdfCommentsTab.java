@@ -2,6 +2,8 @@ package net.sf.jabref.gui.entryeditor;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 
@@ -15,6 +17,7 @@ import javax.swing.JTextArea;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.pdf.PdfCommentImporter;
+import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
 public class PdfCommentsTab extends JPanel {
@@ -43,6 +46,8 @@ public class PdfCommentsTab extends JPanel {
 
     private JScrollPane siteScrollPane = new JScrollPane(siteArea);
 
+    DefaultListModel<String> listModel;
+
     private final EntryEditor parent;
 
     private final String tabTitle;
@@ -57,24 +62,37 @@ public class PdfCommentsTab extends JPanel {
         this.basePanel = basePanel;
         this.tabTitle = "PDF comments";
         this.setUpInformationPanel();
-        this.setUpPdfCommentsTab();
+        listModel  = new DefaultListModel<>();
+        try {
+            this.setUpPdfCommentsTab();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
-    private void setUpPdfCommentsTab() {
+    private void setUpPdfCommentsTab() throws IOException {
         Optional<String> field = parent.getEntry().getField(FieldName.FILE);
         if (field.isPresent()) {
-            DefaultListModel<String> listModel = new DefaultListModel<>();
+
             commentList.setModel(listModel);
             PdfCommentImporter commentImporter = new PdfCommentImporter();
-            String pdfPath = field.get().replaceFirst(".*?:", System.getProperty("file.separator")).replaceAll(":PDF", "");
-            HashMap<String, String> importedNotes = commentImporter.importNotes(pdfPath);
-            importedNotes.values().stream().forEach((note) -> listModel.addElement(note));
+            ArrayList<BibEntry> entries = new ArrayList<>();
+            entries.add(parent.getEntry());
+            commentImporter.importPdfFile(entries, basePanel.getBibDatabaseContext());
+
+            HashMap<String, String> importedNotes = commentImporter.importNotes(commentImporter.importPdfFile(entries,
+                    basePanel.getBibDatabaseContext()).get(0));
+            updateShownComments(importedNotes);
         }
 
         commentScrollPane.setPreferredSize(new Dimension(450,200));
 
         this.add(commentScrollPane, BorderLayout.EAST);
         this.add(informationPanel,BorderLayout.WEST);
+    }
+
+    private void updateShownComments(HashMap<String, String> importedNotes){
+        importedNotes.values().stream().forEach((note) -> listModel.addElement(note));
     }
 
 

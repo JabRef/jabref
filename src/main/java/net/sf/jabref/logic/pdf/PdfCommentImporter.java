@@ -44,6 +44,7 @@ public class PdfCommentImporter {
             try {
                 for (PDAnnotation annotation : page.getAnnotations()) {
                     annotationsMap.put(annotation.getAnnotationName(), annotation.getContents());
+                    annotation.get
                 }
             } catch (IOException e1) {
                 e1.printStackTrace();
@@ -52,7 +53,7 @@ public class PdfCommentImporter {
         return annotationsMap;
     }
 
-    private List<PDDocument> importPdfFile(final List<BibEntry> entryList, final BibDatabaseContext bibDatabaseContext) throws IOException {
+    public List<PDDocument> importPdfFile(final List<BibEntry> entryList, final BibDatabaseContext bibDatabaseContext) throws IOException {
 
         final List<File> files = FileUtil.getListOfLinkedFiles(entryList,
                 bibDatabaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences()));
