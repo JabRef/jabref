@@ -43,6 +43,7 @@ import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import net.sf.jabref.logic.cleanup.CleanupPreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.exporter.CustomExportList;
@@ -1496,4 +1497,8 @@ public class JabRefPreferences {
 
     }
 
+    public CleanupPreferences getCleanupPreferences(JournalAbbreviationLoader journalAbbreviationLoader) {
+        return new CleanupPreferences(get(IMPORT_FILENAMEPATTERN),
+                getLayoutFormatterPreferences(journalAbbreviationLoader), getFileDirectoryPreferences());
+    }
 }

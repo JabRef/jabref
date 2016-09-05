@@ -21,12 +21,11 @@ public class CleanupWorker {
     private int unsuccessfulRenames;
 
 
-    public CleanupWorker(BibDatabaseContext databaseContext, String fileNamePattern, LayoutFormatterPreferences prefs,
-            FileDirectoryPreferences fileDirectoryPreferences) {
+    public CleanupWorker(BibDatabaseContext databaseContext, CleanupPreferences cleanupPreferences) {
         this.databaseContext = databaseContext;
-        this.fileNamePattern = fileNamePattern;
-        this.prefs = prefs;
-        this.fileDirectoryPreferences = fileDirectoryPreferences;
+        this.fileNamePattern = cleanupPreferences.getFileNamePattern();
+        this.prefs = cleanupPreferences.getLayoutFormatterPreferences();
+        this.fileDirectoryPreferences = cleanupPreferences.getFileDirectoryPreferences();
     }
 
     public int getUnsuccessfulRenames() {

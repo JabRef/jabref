@@ -60,8 +60,9 @@ public class CleanupWorkerTest {
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
         worker = new CleanupWorker(context,
-                JabRefPreferences.getInstance().get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
-                mock(LayoutFormatterPreferences.class), JabRefPreferences.getInstance().getFileDirectoryPreferences());
+                new CleanupPreferences(JabRefPreferences.getInstance().get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
+                        mock(LayoutFormatterPreferences.class),
+                        JabRefPreferences.getInstance().getFileDirectoryPreferences()));
     }
 
     @Test(expected = NullPointerException.class)
