@@ -182,6 +182,18 @@ public class MainTable extends JTable {
                 panel.selectPreviousEntry();
             }
         });
+        am.put("selectNextRow", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panel.selectNextEntry();
+            }
+        });
+        am.put("selectPreviousRow", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panel.selectPreviousEntry();
+            }
+        });
     }
 
     public void addSelectionListener(ListEventListener<BibEntry> listener) {
