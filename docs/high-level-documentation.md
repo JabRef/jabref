@@ -1,6 +1,7 @@
 # High Level Documentation
 
-Describes relevant information about the code structure of JabRef in a very precise and succinct way. 
+Describes relevant information about the code structure of JabRef in a very precise and succinct way.
+Closer-to-code documentation is available at [Code HowTos](../Code HowTos).
 
 We are currently transitioning from a spaghetti to a more structured architecture with the `model` in the center, and the `logic` as an intermediate layer towards the `gui` which is the outer shell. There are additional utility packages for `preferences` and the `cli`. The dependencies are only directed towards the center. We have JUnit tests to detect violations of the most crucial dependencies (between `logic`, `model`, and `gui`), and the build will fail automatically in these cases.
 
