@@ -3,7 +3,11 @@ package net.sf.jabref.model.pdf;
 
 import java.util.Optional;
 
-public class pdfComment {
+import org.apache.pdfbox.cos.COSDictionary;
+import org.apache.pdfbox.cos.COSName;
+import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+
+public class PdfComment {
 
     private String commentId;
     private String author;
@@ -12,12 +16,21 @@ public class pdfComment {
     private String content;
     private Optional<String> text;
 
-    public pdfComment(String commentId, String author, String date, int page, String content, Optional<String> text) {
+    public PdfComment(String commentId, String author, String date, int page, String content, Optional<String> text) {
         this.author = author;
         this.date = date;
         this.page = page;
         this.content = content;
         this.text = text;
+    }
+    public PdfComment(PDAnnotation annotation, int page){
+        COSDictionary dict = annotation.getDictionary();
+        this.author = dict.getString(COSName.T);
+        this.commentId = annotation.getAnnotationName();
+        this.date = annotation.getModifiedDate();
+        this.page = page;
+        this.content = annotation.getContents();
+
     }
 
     public String getCommentId() {

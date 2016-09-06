@@ -13,7 +13,6 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTextField;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
@@ -21,6 +20,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.pdf.PdfCommentImporter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.pdf.PdfComment;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
 
@@ -82,17 +82,18 @@ public class PdfCommentsTab extends JPanel {
             List<PDDocument> documents = commentImporter.importPdfFile(entries,
                     basePanel.getBibDatabaseContext());
             if (documents.isEmpty()) {
+                listModel.clear();
                 listModel.addElement(Localization.lang("Attached_file_has_no_valid_path"));
             } else {
-                HashMap<String, String> importedNotes = commentImporter.importNotes(documents.get(0));
+                HashMap<String, PdfComment> importedNotes = commentImporter.importNotes(documents.get(0));
                 updateShownComments(importedNotes);
             }
         }
     }
 
-    private void updateShownComments(HashMap<String, String> importedNotes){
+    private void updateShownComments(HashMap<String, PdfComment> importedNotes){
         listModel.clear();
-        importedNotes.values().stream().forEach((note) -> listModel.addElement(note));
+        importedNotes.values().stream().forEach((note) -> listModel.addElement(note.getContent()));
     }
 
     private void setUpInformationPanel(){

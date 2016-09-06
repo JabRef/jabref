@@ -10,6 +10,7 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.pdf.PdfComment;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,20 +35,25 @@ public class PdfCommentImporter {
      * @param document a PDDocument to get the annotations from
      * @return a hashmap with the unique name as key and the notes content as value
      */
-    public HashMap<String, String> importNotes(final PDDocument document) {
+    public HashMap<String, PdfComment> importNotes(final PDDocument document) {
 
-        HashMap<String, String> annotationsMap = new HashMap<>();
+        HashMap<String, PdfComment> annotationsMap = new HashMap<>();
 
         pdfPages = document.getDocumentCatalog().getAllPages();
         for (int i = 0; i < pdfPages.size(); i++) {
             page = (PDPage) pdfPages.get(i);
             try {
                 for (PDAnnotation annotation : page.getAnnotations()) {
-                    annotationsMap.put(annotation.getAnnotationName(), annotation.getContents());
+                    annotationsMap.put(annotation.getAnnotationName(), new PdfComment(annotation, i));
                 }
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
+        }
+        try {
+            document.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return annotationsMap;
     }
