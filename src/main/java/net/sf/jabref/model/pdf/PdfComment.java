@@ -33,6 +33,11 @@ public class PdfComment {
 
     }
 
+    @Override
+    public String toString() {
+        return content;
+    }
+
     public String getCommentId() {
         return commentId;
     }

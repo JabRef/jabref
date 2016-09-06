@@ -13,6 +13,8 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
@@ -27,7 +29,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 public class PdfCommentsTab extends JPanel {
 
     private final JPanel informationPanel = new JPanel();
-    private final JList<String> commentList = new JList<>();
+    private final JList<PdfComment> commentList = new JList<>();
     private final JScrollPane commentScrollPane = new JScrollPane();
     private final JLabel authorLabel = new JLabel(Localization.lang("Author"), JLabel.CENTER);
     private final JTextArea authorArea = new JTextArea("author", 2, 25);
@@ -41,12 +43,14 @@ public class PdfCommentsTab extends JPanel {
     private final JLabel commentTxtLabel = new JLabel(Localization.lang("Content"),JLabel.CENTER);
     private final JTextArea commentTxtArea = new JTextArea("comment content", 10, 25);
     private final JScrollPane commentTxtScrollPane = new JScrollPane();
-    DefaultListModel<String> listModel;
+    DefaultListModel<PdfComment> listModel;
 
     private final EntryEditor parent;
     private final String tabTitle;
     private final JabRefFrame frame;
     private final BasePanel basePanel;
+
+    HashMap<String, PdfComment> importedNotes = new HashMap<>();
 
     public PdfCommentsTab(EntryEditor parent, JabRefFrame frame, BasePanel basePanel) {
         this.parent = parent;
@@ -75,6 +79,7 @@ public class PdfCommentsTab extends JPanel {
         Optional<String> field = parent.getEntry().getField(FieldName.FILE);
         if (field.isPresent()) {
             commentList.setModel(listModel);
+            commentList.addListSelectionListener(new CommentListSelectionListener());
             PdfCommentImporter commentImporter = new PdfCommentImporter();
             ArrayList<BibEntry> entries = new ArrayList<>();
             entries.add(parent.getEntry());
@@ -83,9 +88,9 @@ public class PdfCommentsTab extends JPanel {
                     basePanel.getBibDatabaseContext());
             if (documents.isEmpty()) {
                 listModel.clear();
-                listModel.addElement(Localization.lang("Attached_file_has_no_valid_path"));
+//                listModel.addElement(Localization.lang("Attached_file_has_no_valid_path"));
             } else {
-                HashMap<String, PdfComment> importedNotes = commentImporter.importNotes(documents.get(0));
+                importedNotes = commentImporter.importNotes(documents.get(0));
                 updateShownComments(importedNotes);
             }
         }
@@ -93,7 +98,14 @@ public class PdfCommentsTab extends JPanel {
 
     private void updateShownComments(HashMap<String, PdfComment> importedNotes){
         listModel.clear();
-        importedNotes.values().stream().forEach((note) -> listModel.addElement(note.getContent()));
+        importedNotes.forEach((k, v) -> listModel.addElement(v));
+    }
+
+    private void updateTextFields(PdfComment comment) {
+        authorArea.setText(comment.getAuthor());
+        dateArea.setText(comment.getDate());
+        pageArea.setText(String.valueOf(comment.getPage()));
+        commentTxtArea.setText(comment.getContent());
     }
 
     private void setUpInformationPanel(){
@@ -127,5 +139,11 @@ public class PdfCommentsTab extends JPanel {
         commentTxtScrollPane.setViewportView(commentTxtArea);
         commentTxtArea.setEditable(false);
 
+    }
+    private class CommentListSelectionListener implements ListSelectionListener {
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+            updateTextFields(listModel.get(commentList.getSelectedIndex()));
+        }
     }
 }
