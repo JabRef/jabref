@@ -28,25 +28,25 @@ public class PdfCommentsTab extends JPanel {
 
     private final JScrollPane commentScrollPane = new JScrollPane();
 
-    private final JLabel authorLabel = new JLabel(Localization.lang("author"), JLabel.CENTER);
+    private final JLabel authorLabel = new JLabel(Localization.lang("Author"), JLabel.CENTER);
 
     private final JTextArea authorArea = new JTextArea("author", 2, 25);
 
     private final JScrollPane authorScrollPane = new JScrollPane();
 
-    private final JLabel dateLabel = new JLabel(Localization.lang("date"), JLabel.CENTER);
+    private final JLabel dateLabel = new JLabel(Localization.lang("Date"), JLabel.CENTER);
 
     private final JTextArea dateArea = new JTextArea("date", 2, 25);
 
     private final JScrollPane dateScrollPane = new JScrollPane();
 
-    private final JLabel pageLabel = new JLabel(Localization.lang("page"), JLabel.CENTER);
+    private final JLabel pageLabel = new JLabel(Localization.lang("Page"), JLabel.CENTER);
 
     private final JTextArea pageArea = new JTextArea("page", 2, 25);
 
     private final JScrollPane pageScrollPane = new JScrollPane();
 
-    private final JLabel commentTxtLabel = new JLabel(Localization.lang("content"),JLabel.CENTER);
+    private final JLabel commentTxtLabel = new JLabel(Localization.lang("Content"),JLabel.CENTER);
 
     private final JTextArea commentTxtArea = new JTextArea("comment content", 10, 25);
 
@@ -66,7 +66,7 @@ public class PdfCommentsTab extends JPanel {
         this.parent = parent;
         this.frame = frame;
         this.basePanel = basePanel;
-        this.tabTitle = "PDF comments";
+        this.tabTitle = Localization.lang("PDF comments");
         this.setUpInformationPanel();
         listModel  = new DefaultListModel<>();
         try {
