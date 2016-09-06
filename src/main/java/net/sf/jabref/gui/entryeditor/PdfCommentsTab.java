@@ -29,27 +29,30 @@ public class PdfCommentsTab extends JPanel {
     private final JPanel informationPanel = new JPanel();
     private final JList<String> commentList = new JList<>();
     private final JScrollPane commentScrollPane = new JScrollPane();
-    private final JLabel authorLabel = new JLabel("author", JLabel.CENTER);
+    private final JLabel authorLabel = new JLabel(Localization.lang("Author"), JLabel.CENTER);
     private final JTextArea authorArea = new JTextArea("author", 2, 25);
     private final JScrollPane authorScrollPane = new JScrollPane();
-    private final JLabel dateLabel = new JLabel("date", JLabel.CENTER);
+    private final JLabel dateLabel = new JLabel(Localization.lang("Date"), JLabel.CENTER);
     private final JTextArea dateArea = new JTextArea("date", 2, 25);
     private final JScrollPane dateScrollPane = new JScrollPane();
-    private final JLabel pageLabel = new JLabel("page", JLabel.CENTER);
+    private final JLabel pageLabel = new JLabel(Localization.lang("Page"), JLabel.CENTER);
     private final JTextArea pageArea = new JTextArea("page", 2, 25);
+    private final JScrollPane pageScrollPane = new JScrollPane();
+    private final JLabel commentTxtLabel = new JLabel(Localization.lang("Content"),JLabel.CENTER);
+    private final JTextArea commentTxtArea = new JTextArea("comment content", 10, 25);
+    private final JScrollPane commentTxtScrollPane = new JScrollPane();
     DefaultListModel<String> listModel;
 
     private final EntryEditor parent;
     private final String tabTitle;
     private final JabRefFrame frame;
     private final BasePanel basePanel;
-    private JTextField txtCommentContent;
 
     public PdfCommentsTab(EntryEditor parent, JabRefFrame frame, BasePanel basePanel) {
         this.parent = parent;
         this.frame = frame;
         this.basePanel = basePanel;
-        this.tabTitle = "PDF comments";
+        this.tabTitle = Localization.lang("PDF comments");
         this.setUpInformationPanel();
         listModel  = new DefaultListModel<>();
         this.setUpPdfCommentsTab();
@@ -94,36 +97,34 @@ public class PdfCommentsTab extends JPanel {
 
     private void setUpInformationPanel(){
         informationPanel.setLayout(null);
-        authorLabel.setBounds(15, 25, 46, 20);
 
+        authorLabel.setBounds(15, 25, 46, 20);
         informationPanel.add(authorLabel);
         authorScrollPane.setBounds(76, 25, 547, 42);
         informationPanel.add(authorScrollPane);
         authorScrollPane.setViewportView(authorArea);
         authorArea.setEditable(false);
+
         dateLabel.setBounds(15, 80, 30, 20);
         informationPanel.add(dateLabel);
         dateScrollPane.setBounds(76, 83, 547, 42);
         informationPanel.add(dateScrollPane);
         dateScrollPane.setViewportView(dateArea);
         dateArea.setEditable(false);
+        
         pageLabel.setBounds(15, 128, 34, 20);
         informationPanel.add(pageLabel);
-
-        JScrollPane pageScrollPane = new JScrollPane();
         pageScrollPane.setBounds(76, 141, 547, 42);
         informationPanel.add(pageScrollPane);
         pageScrollPane.setViewportView(pageArea);
         pageArea.setEditable(false);
 
-        txtCommentContent = new JTextField();
-        txtCommentContent.setText("comment content");
-        txtCommentContent.setBounds(76, 200, 547, 173);
-        informationPanel.add(txtCommentContent);
-        txtCommentContent.setColumns(10);
+        commentTxtLabel.setBounds(15, 200, 69, 20);
+        informationPanel.add(commentTxtLabel);
+        commentTxtScrollPane.setBounds(76, 200, 547, 173);
+        informationPanel.add(commentTxtScrollPane);
+        commentTxtScrollPane.setViewportView(commentTxtArea);
+        commentTxtArea.setEditable(false);
 
-        JLabel lblContent = new JLabel("content");
-        lblContent.setBounds(15, 200, 69, 20);
-        informationPanel.add(lblContent);
     }
 }
