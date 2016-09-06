@@ -35,7 +35,28 @@ public class AdsFetcherTest {
         bibEntry.setField("doi", "10.12942/lrr-2012-10");
         bibEntry.setField("eprint", "1112.3960");
         bibEntry.setField("keywords", "astronomical observations, Newtonian limit, equations of motion, extragalactic astronomy, cosmology, theories of gravity, fundamental physics, astrophysics");
-        bibEntry.setField("abstract", "A wealth of astronomical data indicate the presence of mass discrepancies in the Universe. The motions observed in a variety of classes of extragalactic systems exceed what can be explained by the mass visible in stars and gas. Either (i) there is a vast amount of unseen mass in some novel form - dark matter - or (ii) the data indicate a breakdown of our understanding of dynamics on the relevant scales, or (iii) both. Here, we first review a few outstanding challenges for the dark matter interpretation of mass discrepancies in galaxies, purely based on observations and independently of any alternative theoretical framework. We then show that many of these puzzling observations are predicted by one single relation - Milgrom's law - involving an acceleration constant a_0 (or a characteristic surface density Σ_† = a_0/G) on the order of the square-root of the cosmological constant in natural units. This relation can at present most easily be interpreted as the effect of a single universal force law resulting from a modification of Newtonian dynamics (MOND) on galactic scales. We exhaustively review the current observational successes and problems of this alternative paradigm at all astrophysical scales, and summarize the various theoretical attempts (TeVeS, GEA, BIMOND, and others) made to effectively embed this modification of Newtonian dynamics within a relativistic theory of gravity.");
+        bibEntry.setField("abstract", "{A wealth of astronomical data indicate the presence of mass\n" +
+                "discrepancies in the Universe. The motions observed in a variety of\n" +
+                "classes of extragalactic systems exceed what can be explained by the\n" +
+                "mass visible in stars and gas. Either (i) there is a vast amount of\n" +
+                "unseen mass in some novel form - dark matter - or (ii) the data indicate\n" +
+                "a breakdown of our understanding of dynamics on the relevant scales, or\n" +
+                "(iii) both. Here, we first review a few outstanding challenges for the\n" +
+                "dark matter interpretation of mass discrepancies in galaxies, purely\n" +
+                "based on observations and independently of any alternative theoretical\n" +
+                "framework. We then show that many of these puzzling observations are\n" +
+                "predicted by one single relation - Milgrom's law - involving an\n" +
+                "acceleration constant a\\_0 (or a characteristic surface density\n" +
+                "{$\\Sigma$}\\_{\\dagger} = a\\_0/G) on the order of the square-root of the\n" +
+                "cosmological constant in natural units. This relation can at present\n" +
+                "most easily be interpreted as the effect of a single universal force law\n" +
+                "resulting from a modification of Newtonian dynamics (MOND) on galactic\n" +
+                "scales. We exhaustively review the current observational successes and\n" +
+                "problems of this alternative paradigm at all astrophysical scales, and\n" +
+                "summarize the various theoretical attempts (TeVeS, GEA, BIMOND, and\n" +
+                "others) made to effectively embed this modification of Newtonian\n" +
+                "dynamics within a relativistic theory of gravity.\n" +
+                "}");
     }
 
 
