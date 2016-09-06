@@ -41,10 +41,10 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 import net.sf.jabref.JabRefException;
-import net.sf.jabref.gui.util.ValueTableCellFactory;
 import net.sf.jabref.gui.FXAlert;
 import net.sf.jabref.gui.FXDialogs;
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.util.ValueTableCellFactory;
 import net.sf.jabref.logic.journals.DuplicatedJournalAbbreviationException;
 import net.sf.jabref.logic.journals.DuplicatedJournalFileException;
 import net.sf.jabref.logic.l10n.Localization;

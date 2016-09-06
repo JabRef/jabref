@@ -19,8 +19,6 @@ package net.sf.jabref.gui.util;
 
 import javafx.event.EventHandler;
 import javafx.scene.Node;
-import javafx.scene.control.TableCell;
-import javafx.scene.control.TableColumn;
 import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.input.MouseEvent;
