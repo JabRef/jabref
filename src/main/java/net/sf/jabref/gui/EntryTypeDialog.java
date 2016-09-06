@@ -206,6 +206,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
             @Override
             protected void done() {
                 if (isCancelled()) {
+                    JOptionPane.showMessageDialog(null, "Fetching was canceled", "Canceled fetching", JOptionPane.INFORMATION_MESSAGE);
                     return;
                 }
 
