@@ -98,7 +98,6 @@ import net.sf.jabref.gui.journals.ManageJournalsAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.keyboard.KeyBindingRepository;
 import net.sf.jabref.gui.keyboard.KeyBindingsDialog;
-import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.menus.ChangeEntryTypeMenu;
 import net.sf.jabref.gui.menus.FileHistoryMenu;
 import net.sf.jabref.gui.menus.RightClickMenu;
@@ -314,7 +313,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction normalSearch = new GeneralAction(Actions.SEARCH, Localization.menuTitle("Search"),
             Localization.lang("Search"), Globals.getKeyPrefs().getKey(KeyBinding.SEARCH), IconTheme.JabRefIcon.SEARCH.getIcon());
     private final AbstractAction globalSearch = new GeneralAction(Actions.GLOBAL_SEARCH,
-            Localization.menuTitle("Global search"),
+            Localization.menuTitle("Global Search"),
             Localization.lang("Search globally"),
             Globals.getKeyPrefs().getKey(KeyBinding.GLOBAL_SEARCH),
             IconTheme.JabRefIcon.SEARCH.getIcon());
@@ -651,17 +650,15 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 return;
             }
 
-            // need to perform the search on the changed tab
             if (new SearchPreferences(Globals.prefs).isGlobalSearch()) {
                 globalSearchBar.performSearch();
             } else {
+                String content = "";
                 SearchQuery currentSearchQuery = currentBasePanel.getCurrentSearchQuery();
                 if (currentSearchQuery != null && !currentSearchQuery.getQuery().trim().isEmpty()) {
-                    globalSearchBar.setSearchTerm(currentSearchQuery.getQuery());
-                } else {
-                    globalSearchBar.setSearchTerm("");
-                    currentBasePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
+                    content = currentSearchQuery.getQuery();
                 }
+                globalSearchBar.setSearchTerm(content, true);
             }
 
             groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));

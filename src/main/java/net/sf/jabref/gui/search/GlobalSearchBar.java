@@ -28,6 +28,7 @@ import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
+import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.component.JTextFieldWithUnfocusedText;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.help.HelpFile;
@@ -65,6 +66,7 @@ public class GlobalSearchBar extends JPanel {
     private SearchResultFrame searchResultFrame;
 
     private SearchDisplayMode searchDisplayMode;
+    private boolean switchedDatabase;
 
 
     public GlobalSearchBar(JabRefFrame frame) {
@@ -235,7 +237,8 @@ public class GlobalSearchBar extends JPanel {
         BasePanel currentBasePanel = frame.getCurrentBasePanel();
         if (currentBasePanel != null) {
             clearSearch(currentBasePanel);
-            currentBasePanel.getMainTable().requestFocus();
+            Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
+            new FocusRequester(currentBasePanel.getMainTable());
         }
     }
 
@@ -263,6 +266,10 @@ public class GlobalSearchBar extends JPanel {
             currentBasePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
         }
 
+        if (switchedDatabase){
+            switchedDatabase = false;
+            return;
+        }
         focus();
     }
 
@@ -352,11 +359,15 @@ public class GlobalSearchBar extends JPanel {
         this.searchResultFrame = searchResultFrame;
     }
 
-    public void setSearchTerm(String searchTerm) {
+    public void setSearchTerm(String searchTerm, boolean switchedDatabase) {
+        if (searchTerm.equals(searchField.getText())){
+            return;
+        }
+
+        this.switchedDatabase = switchedDatabase;
         searchField.setText(searchTerm);
         // to hinder the autocomplete window to popup
         autoCompleteSupport.setVisible(false);
-        frame.getCurrentBasePanel().requestFocusInWindow();
     }
 
 }
