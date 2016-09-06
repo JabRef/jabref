@@ -33,13 +33,13 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Fixed
 - Fixed selecting an entry out of multiple duplicates
-- Fixed [#617](https://github.com/JabRef/jabref/issues/617): `Enter` in global search opens the selected entry & `Enter` in search dialog window opens the selected entry  
+- Fixed [#617](https://github.com/JabRef/jabref/issues/617): `Enter` in global search opens the selected entry & `Enter` in search dialog window opens the selected entry
 - Entries in the SearchResultPanel will be shown correctly (Latex to Unicode)
-- Suggestions in the autocomplete will be shown correctly (Latex to Unicode) 
+- Suggestions in the autocomplete will be shown correctly (Latex to Unicode)
 - Fixed: When searching the first match will be selected if the current selection is no match
 - Selecting an entry in the search result Window will now select the correct entry in the bib file
 - Entries in the SearchResultDialog are now converted to Unicode
-- Suggestions in the autocomplete (search) are now in Unicode       
+- Suggestions in the autocomplete (search) are now in Unicode
 - Fixed NullPointerException when opening search result window for an untitled database 
 - Fixed entry table traversal with Tab (no column traversal thus no double jump)
 - Fixed [#1757](https://github.com/JabRef/jabref/issues/1757): Crash after saving illegal argument in entry editor
