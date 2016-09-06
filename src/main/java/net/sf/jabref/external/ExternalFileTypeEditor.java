@@ -125,8 +125,7 @@ public class ExternalFileTypeEditor extends JDialog {
 
         add.addActionListener(e -> {
             // Generate a new file type:
-            ExternalFileType type = new ExternalFileType("", "", "", "", "new",
-                    IconTheme.JabRefIcon.FILE.getSmallIcon());
+            ExternalFileType type = new ExternalFileType("", "", "", "", IconTheme.JabRefIcon.FILE.getCode());
             // Show the file type editor:
             getEditor(type).setVisible(true);
             if (entryEditor.okPressed()) {
@@ -310,7 +309,7 @@ public class ExternalFileTypeEditor extends JDialog {
             ExternalFileType type = fileTypes.get(rowIndex);
             switch (columnIndex) {
             case 0:
-                return type.getIcon();
+                return ExternalFileTypeIcon.getIcon(type);
             case 1:
                 return type.getName();
             case 2:

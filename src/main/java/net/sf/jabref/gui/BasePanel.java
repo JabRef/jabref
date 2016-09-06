@@ -50,6 +50,7 @@ import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.external.AttachFileAction;
 import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypeIcon;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.FindFullTextAction;
 import net.sf.jabref.external.SynchronizeFileField;
@@ -968,7 +969,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
             FileListEntry flEntry = fileListTableModel.getEntry(0);
             ExternalFileMenuItem item = new ExternalFileMenuItem(frame(), entry, "", flEntry.link,
-                    flEntry.type.get().getIcon(), bibDatabaseContext, flEntry.type);
+                    ExternalFileTypeIcon.getIcon(flEntry.type.get()), bibDatabaseContext, flEntry.type);
             item.openLink();
         });
     }
@@ -1710,7 +1711,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * If an entryEditor is shown, it is given focus afterwards.
      */
     public void highlightEntry(int pos) {
-        if (pos >= 0 && pos < mainTable.getRowCount()) {
+        if ((pos >= 0) && (pos < mainTable.getRowCount())) {
             mainTable.setRowSelectionInterval(pos, pos);
             mainTable.ensureVisible(pos);
         }

@@ -7,6 +7,7 @@ import java.util.Optional;
 import javax.swing.JLabel;
 
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypeIcon;
 import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
@@ -97,7 +98,7 @@ public class SpecialMainTableColumns {
             } else if (fileList.getRowCount() == 1) {
                 Optional<ExternalFileType> type = fileList.getEntry(0).type;
                 if (type.isPresent()) {
-                    return type.get().getIconLabel();
+                    return ExternalFileTypeIcon.getIconLabel(type.get());
                 } else {
                     return new JLabel(IconTheme.JabRefIcon.FILE.getSmallIcon());
                 }
@@ -178,7 +179,7 @@ public class SpecialMainTableColumns {
                             // already found another file of the desired type - show FILE_MULTIPLE Icon
                             return new JLabel(IconTheme.JabRefIcon.FILE_MULTIPLE.getSmallIcon());
                         } else {
-                            iconLabel = fileList.getEntry(i).type.get().getIconLabel();
+                            iconLabel = ExternalFileTypeIcon.getIconLabel(fileList.getEntry(i).type.get());
                             iconFound = true;
                         }
                     }

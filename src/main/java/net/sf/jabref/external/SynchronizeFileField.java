@@ -216,7 +216,7 @@ public class SynchronizeFileField extends AbstractWorker {
                             } else if (answer == JOptionPane.YES_OPTION) {
                                 // User wants to define the new file type. Show the dialog:
                                 ExternalFileType newType = new ExternalFileType(flEntry.type.get().getName(), "", "",
-                                        "", "new", IconTheme.JabRefIcon.FILE.getSmallIcon());
+                                        "", IconTheme.JabRefIcon.FILE.getCode());
                                 ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(panel.frame(), newType);
                                 editor.setVisible(true);
                                 if (editor.okPressed()) {

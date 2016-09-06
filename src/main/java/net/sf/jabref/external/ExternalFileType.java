@@ -2,11 +2,6 @@ package net.sf.jabref.external;
 
 import java.util.Objects;
 
-import javax.swing.Icon;
-import javax.swing.JLabel;
-
-import net.sf.jabref.gui.IconTheme;
-
 /**
  * This class defines a type of external files that can be linked to from JabRef.
  * The class contains enough information to provide an icon, a standard extension
@@ -17,22 +12,16 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     private String name;
     private String extension;
     private String openWith;
-    private final String iconName;
     private String mimeType;
-    private final Icon icon;
-    private final JLabel label = new JLabel();
+    private String materialDesignIconCodePoint;
 
-    public ExternalFileType(String name, String extension, String mimeType,
-                            String openWith, String iconName, Icon icon) {
-        label.setText(null);
+    public ExternalFileType(String name, String extension, String mimeType, String openWith,
+            String materialDesignIconCodePoint) {
         this.name = name;
-        label.setToolTipText(this.name);
         this.extension = extension;
         this.mimeType = mimeType;
         this.openWith = openWith;
-
-        this.iconName = iconName;
-        this.icon = icon;
+        this.materialDesignIconCodePoint = materialDesignIconCodePoint;
     }
 
     /**
@@ -51,33 +40,29 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         String extension = val[1];
         String openWith;
         String mimeType;
-        String iconName;
-        Icon icon;
+        String materialDesignIconCodePoint;
 
         if (val.length == 4) {
             // Up to version 2.4b the mime type is not included:
             mimeType = "";
             openWith = val[2];
-            iconName = val[3];
+            materialDesignIconCodePoint = "";
         } else {
             // When mime type is included, the array length should be 5:
             mimeType = val[2];
             openWith = val[3];
-            iconName = val[4];
+            materialDesignIconCodePoint = val[4]; // TODO: Try to distinguish between pre 3.7-format where this is not a code point, but the name of the icon
         }
 
-        // set icon to default first
-        icon = IconTheme.JabRefIcon.FILE.getSmallIcon();
-
         // check whether there is another icon defined for this file type
-        for(ExternalFileType fileType : ExternalFileTypes.getDefaultExternalFileTypes()) {
-            if(fileType.getName().equals(name)) {
-                icon = fileType.icon;
+        for (ExternalFileType fileType : ExternalFileTypes.getDefaultExternalFileTypes()) {
+            if (fileType.getName().equals(name)) {
+                materialDesignIconCodePoint = fileType.getMaterialDesignIconCodePoint();
                 break;
             }
         }
 
-        return new ExternalFileType(name, extension, mimeType, openWith, iconName, icon);
+        return new ExternalFileType(name, extension, mimeType, openWith, materialDesignIconCodePoint);
     }
 
     /**
@@ -88,16 +73,15 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
      * @return A String[] containing all information about this file type.
      */
     public String[] getStringArrayRepresentation() {
-        return new String[]{name, extension, mimeType, openWith, iconName};
+        return new String[] {name, extension, mimeType, openWith, materialDesignIconCodePoint};
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-        label.setToolTipText(this.name);
+    public void setName(String newName) {
+        this.name = newName;
     }
 
     public String getExtension() {
@@ -143,20 +127,6 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
         this.openWith = openWith;
     }
 
-    /**
-     * Obtain a JLabel instance set with this file type's icon. The same JLabel
-     * is returned from each call of this method.
-     *
-     * @return the label.
-     */
-    public JLabel getIconLabel() {
-        return label;
-    }
-
-    public Icon getIcon() {
-        return icon;
-    }
-
     @Override
     public String toString() {
         return getName();
@@ -168,12 +138,12 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
     }
 
     public ExternalFileType copy() {
-        return new ExternalFileType(name, extension, mimeType, openWith, iconName, icon);
+        return new ExternalFileType(name, extension, mimeType, openWith, materialDesignIconCodePoint);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, extension, mimeType, openWith, iconName);
+        return Objects.hash(name, extension, mimeType, openWith, materialDesignIconCodePoint);
     }
 
     /**
@@ -191,9 +161,18 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
 
         if (object instanceof ExternalFileType) {
             ExternalFileType other = (ExternalFileType) object;
-            return Objects.equals(name, other.name) && Objects.equals(extension, other.extension) &&
-                    Objects.equals(mimeType, other.mimeType) && Objects.equals(openWith, other.openWith) && Objects.equals(iconName,  other.iconName);
+            return Objects.equals(name, other.name) && Objects.equals(extension, other.extension)
+                    && Objects.equals(mimeType, other.mimeType) && Objects.equals(openWith, other.openWith)
+                    && Objects.equals(materialDesignIconCodePoint, other.materialDesignIconCodePoint);
         }
         return false;
+    }
+
+    public String getMaterialDesignIconCodePoint() {
+        return materialDesignIconCodePoint;
+    }
+
+    public void setMaterialDesignIconCodePoint(String materialDesignIconCodePoint) {
+        this.materialDesignIconCodePoint = materialDesignIconCodePoint;
     }
 }

@@ -11,6 +11,7 @@ import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.external.ExternalFileType;
+import net.sf.jabref.external.ExternalFileTypeIcon;
 import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -158,7 +159,7 @@ public class FileListTableModel extends AbstractTableModel {
         if ((entry == null) || (!entry.type.isPresent())) {
             return null;
         }
-        return entry.type.get().getIconLabel();
+        return ExternalFileTypeIcon.getIconLabel(entry.type.get());
     }
 
     private FileListEntry decodeEntry(ParsedFileField entry, boolean deduceUnknownType) {
