@@ -129,7 +129,7 @@ tasks.eclipse.doFirst {
         org.eclipse.jdt.core.formatter.align_type_members_on_columns=false
         org.eclipse.jdt.core.formatter.alignment_for_arguments_in_allocation_expression=16
         org.eclipse.jdt.core.formatter.alignment_for_arguments_in_annotation=0
-        org.eclipse.jdt.core.formatter.alignment_for_arguments_in_enum_constant=1
+        org.eclipse.jdt.core.formatter.alignment_for_arguments_in_enum_constant=0
         org.eclipse.jdt.core.formatter.alignment_for_arguments_in_explicit_constructor_call=16
         org.eclipse.jdt.core.formatter.alignment_for_arguments_in_method_invocation=16
         org.eclipse.jdt.core.formatter.alignment_for_arguments_in_qualified_allocation_expression=16
@@ -137,7 +137,7 @@ tasks.eclipse.doFirst {
         org.eclipse.jdt.core.formatter.alignment_for_binary_expression=16
         org.eclipse.jdt.core.formatter.alignment_for_compact_if=16
         org.eclipse.jdt.core.formatter.alignment_for_conditional_expression=0
-        org.eclipse.jdt.core.formatter.alignment_for_enum_constants=81
+        org.eclipse.jdt.core.formatter.alignment_for_enum_constants=48
         org.eclipse.jdt.core.formatter.alignment_for_expressions_in_array_initializer=16
         org.eclipse.jdt.core.formatter.alignment_for_method_declaration=0
         org.eclipse.jdt.core.formatter.alignment_for_multiple_fields=16
@@ -146,7 +146,7 @@ tasks.eclipse.doFirst {
         org.eclipse.jdt.core.formatter.alignment_for_resources_in_try=88
         org.eclipse.jdt.core.formatter.alignment_for_selector_in_method_invocation=16
         org.eclipse.jdt.core.formatter.alignment_for_superclass_in_type_declaration=16
-        org.eclipse.jdt.core.formatter.alignment_for_superinterfaces_in_enum_declaration=17
+        org.eclipse.jdt.core.formatter.alignment_for_superinterfaces_in_enum_declaration=0
         org.eclipse.jdt.core.formatter.alignment_for_superinterfaces_in_type_declaration=16
         org.eclipse.jdt.core.formatter.alignment_for_throws_clause_in_constructor_declaration=16
         org.eclipse.jdt.core.formatter.alignment_for_throws_clause_in_method_declaration=16

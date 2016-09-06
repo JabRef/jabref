@@ -1,18 +1,3 @@
-/*  Copyright (C) 2015 JabRef contributors.
- This program is free software; you can redistribute it and/or modify
- it under the terms of the GNU General Public License as published by
- the Free Software Foundation; either version 2 of the License, or
- (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License along
- with this program; if not, write to the Free Software Foundation, Inc.,
- 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.mergeentries;
 
 import java.awt.Font;
@@ -46,7 +31,6 @@ import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.util.component.DiffHighlightingTextPane;
 import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
-import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.DiffHighlighting;
@@ -229,8 +213,8 @@ public class MergeEntries {
         for (String field : allFields) {
             JLabel label = boldFontLabel(new SentenceCaseFormatter().format(field));
             mergePanel.add(label, CELL_CONSTRAINTS.xy(1, (2 * row) - 1, "left, top"));
-            Optional<String> leftString = leftEntry.getFieldOptional(field);
-            Optional<String> rightString = rightEntry.getFieldOptional(field);
+            Optional<String> leftString = leftEntry.getField(field);
+            Optional<String> rightString = rightEntry.getField(field);
             if (leftString.equals(rightString)) {
                 identicalFields.add(field);
             } else {
@@ -375,8 +359,8 @@ public class MergeEntries {
     private void updateTextPanes(Collection<String> fields) {
         int oldScrollPaneValue = scrollPane.getVerticalScrollBar().getValue();
         for (String field : fields) {
-            String leftString = leftEntry.getFieldOptional(field).orElse("");
-            String rightString = rightEntry.getFieldOptional(field).orElse("");
+            String leftString = leftEntry.getField(field).orElse("");
+            String rightString = rightEntry.getField(field).orElse("");
             switch (diffMode.getSelectedIndex()) {
             case 0: // Plain text
                 break;
@@ -443,9 +427,9 @@ public class MergeEntries {
         // Check the potentially different fields
         for (String field : differentFields) {
             if (radioButtons.get(field).get(0).isSelected()) {
-                mergedEntry.setField(field, leftEntry.getFieldOptional(field).get()); // Will only happen if field exists
+                mergedEntry.setField(field, leftEntry.getField(field).get()); // Will only happen if field exists
             } else if (radioButtons.get(field).get(2).isSelected()) {
-                mergedEntry.setField(field, rightEntry.getFieldOptional(field).get()); // Will only happen if field exists
+                mergedEntry.setField(field, rightEntry.getField(field).get()); // Will only happen if field exists
             } else {
                 mergedEntry.clearField(field);
             }
@@ -457,7 +441,7 @@ public class MergeEntries {
         // Update the BibTeX source view
         StringWriter writer = new StringWriter();
         try {
-            new BibEntryWriter(new LatexFieldFormatter(LatexFieldFormatterPreferences.fromPreferences(Globals.prefs)),
+            new BibEntryWriter(new LatexFieldFormatter(Globals.prefs.getLatexFieldFormatterPreferences()),
                     false).write(mergedEntry, writer, databaseType);
         } catch (IOException ex) {
             LOGGER.error("Error in entry", ex);

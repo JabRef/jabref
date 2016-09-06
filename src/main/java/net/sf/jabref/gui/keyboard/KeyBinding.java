@@ -62,6 +62,7 @@ public enum KeyBinding {
     NEW_PHDTHESIS("New phdthesis", Localization.lang("New phdthesis"), "ctrl shift T", KeyBindingCategory.BIBTEX),
     NEW_PROCEEDINGS("New proceedings", Localization.lang("New proceedings"), "ctrl shift P", KeyBindingCategory.BIBTEX),
     NEW_UNPUBLISHED("New unpublished", Localization.lang("New unpublished"), "ctrl shift U", KeyBindingCategory.BIBTEX),
+    NEW_TECHREPORT("New technical report", Localization.lang("New technical report"), "ctrl shift R", KeyBindingCategory.BIBTEX),
     NEXT_TAB(
             "Next tab", Localization.lang("Next tab"), "ctrl PAGE_DOWN", KeyBindingCategory.VIEW),
     OPEN_CONSOLE("Open terminal here", Localization.lang("Open terminal here"), "ctrl shift J", KeyBindingCategory.TOOLS),
@@ -70,6 +71,7 @@ public enum KeyBinding {
     OPEN_FOLDER("Open folder", Localization.lang("Open folder"), "ctrl shift O", KeyBindingCategory.TOOLS),
     OPEN_URL_OR_DOI("Open URL or DOI", Localization.lang("Open URL or DOI"), "F3", KeyBindingCategory.TOOLS),
     PASTE("Paste", Localization.lang("Paste"), "ctrl V", KeyBindingCategory.EDIT),
+    PULL_CHANGES_FROM_SHARED_DATABASE("Pull changes from shared database", Localization.lang("Pull changes from shared database"), "ctrl shift R", KeyBindingCategory.FILE),
     PREAMBLE_EDITOR_STORE_CHANGES("Preamble editor, store changes", Localization.lang("Preamble editor, store changes"), "alt S", KeyBindingCategory.FILE),
     PREVIOUS_TAB(
             "Previous tab", Localization.lang("Previous tab"), "ctrl PAGE_UP", KeyBindingCategory.VIEW),
@@ -99,7 +101,8 @@ public enum KeyBinding {
     UNDO("Undo", Localization.lang("Undo"), "ctrl Z", KeyBindingCategory.EDIT),
     UNMARK_ENTRIES("Unmark entries", Localization.lang("Unmark entries"), "ctrl shift M", KeyBindingCategory.EDIT),
     WEB_SEARCH("Web search", Localization.lang("Web search"), "F5", KeyBindingCategory.SEARCH),
-    WRITE_XMP("Write XMP", Localization.lang("Write XMP"), "ctrl F7", KeyBindingCategory.TOOLS),;
+    WRITE_XMP("Write XMP", Localization.lang("Write XMP"), "ctrl F7", KeyBindingCategory.TOOLS),
+    OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION("Open OpenOffice/LibreOffice connection", Localization.lang("Open OpenOffice/LibreOffice connection"), "alt 0", KeyBindingCategory.TOOLS);
 
     private final String key;
     private final String localization;

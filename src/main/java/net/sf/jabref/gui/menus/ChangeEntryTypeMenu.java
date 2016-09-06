@@ -32,6 +32,7 @@ public class ChangeEntryTypeMenu {
         entryShortCuts.put(BibtexEntryTypes.INBOOK.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_INBOOK));
         entryShortCuts.put(BibtexEntryTypes.PROCEEDINGS.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_PROCEEDINGS));
         entryShortCuts.put(BibtexEntryTypes.UNPUBLISHED.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_UNPUBLISHED));
+        entryShortCuts.put(BibtexEntryTypes.TECHREPORT.getName(), Globals.getKeyPrefs().getKey(KeyBinding.NEW_TECHREPORT));
     }
 
     public JMenu getChangeEntryTypeMenu(BasePanel panel) {

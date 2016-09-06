@@ -192,7 +192,7 @@
             <entry key="exportSecDescending" value="false"/>
             <entry key="exportTerDescending" value="false"/>
           </map>
-          <node name="labelPattern">
+          <node name="bibtexKeyPattern">
             <map/>
           </node>
         </node>

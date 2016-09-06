@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.bibtex;
 
 import java.util.ArrayList;
@@ -43,6 +28,9 @@ public class LatexFieldFormatter {
 
     private final FieldContentParser parser;
 
+    private static final char FIELD_START = '{';
+    private static final char FIELD_END = '}';
+
 
     public LatexFieldFormatter(LatexFieldFormatterPreferences prefs) {
         this(true, prefs);
@@ -71,7 +59,7 @@ public class LatexFieldFormatter {
             throws IllegalArgumentException {
 
         if (content == null) {
-            return prefs.getValueDelimiterStartOfValue() + String.valueOf(prefs.getValueDelimiterEndOfValue());
+            return FIELD_START + String.valueOf(FIELD_END);
         }
 
         String result = content;
@@ -182,18 +170,18 @@ public class LatexFieldFormatter {
         checkBraces(content);
 
         stringBuilder = new StringBuilder(
-                String.valueOf(prefs.getValueDelimiterStartOfValue()));
+                String.valueOf(FIELD_START));
 
         stringBuilder.append(parser.format(content, fieldName));
 
-        stringBuilder.append(prefs.getValueDelimiterEndOfValue());
+        stringBuilder.append(FIELD_END);
 
         return stringBuilder.toString();
     }
 
     private void writeText(String text, int startPos, int endPos) {
 
-        stringBuilder.append(prefs.getValueDelimiterStartOfValue());
+        stringBuilder.append(FIELD_START);
         boolean escape = false;
         boolean inCommandName = false;
         boolean inCommand = false;
@@ -252,7 +240,7 @@ public class LatexFieldFormatter {
             }
             escape = c == '\\';
         }
-        stringBuilder.append(prefs.getValueDelimiterEndOfValue());
+        stringBuilder.append(FIELD_END);
     }
 
     private void writeStringLabel(String text, int startPos, int endPos,
@@ -266,7 +254,6 @@ public class LatexFieldFormatter {
     }
 
     private static void checkBraces(String text) throws IllegalArgumentException {
-
         List<Integer> left = new ArrayList<>(5);
         List<Integer> right = new ArrayList<>(5);
         int current = -1;

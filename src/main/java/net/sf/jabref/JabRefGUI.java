@@ -1,21 +1,5 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref;
 
-import java.awt.Font;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,18 +18,19 @@ import javax.swing.plaf.FontUIResource;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.ParserResultWarningDialog;
+import net.sf.jabref.gui.importer.ParserResultWarningDialog;
+import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
+import net.sf.jabref.gui.importer.worker.AutosaveStartupPrompter;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.worker.VersionWorker;
-import net.sf.jabref.importer.AutosaveStartupPrompter;
-import net.sf.jabref.importer.OpenDatabaseAction;
-import net.sf.jabref.importer.ParserResult;
+import net.sf.jabref.logic.importer.OpenDatabase;
+import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.Version;
-import net.sf.jabref.logic.util.VersionPreferences;
 import net.sf.jabref.migrations.PreferencesMigrations;
 import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.preferences.VersionPreferences;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;
@@ -71,7 +56,7 @@ public class JabRefGUI {
 
         // passed file (we take the first one) should be focused
         if (!argsDatabases.isEmpty()) {
-            focusedFile = argsDatabases.get(0).getFile().getAbsolutePath();
+            focusedFile = argsDatabases.get(0).getFile().get().getAbsolutePath();
         } else {
             focusedFile = Globals.prefs.get(JabRefPreferences.LAST_FOCUSED);
         }
@@ -88,9 +73,9 @@ public class JabRefGUI {
 
     private void openWindow() {
         // Perform checks and changes for users with a preference set from an older JabRef version.
-        PreferencesMigrations.replaceAbstractField();
         PreferencesMigrations.upgradeSortOrder();
         PreferencesMigrations.upgradeFaultyEncodingStrings();
+        PreferencesMigrations.upgradeLabelPatternToBibtexKeyPattern();
 
         // This property is set to make the Mac OSX Java VM move the menu bar to the top of the screen
         if (OS.OS_X) {
@@ -115,8 +100,6 @@ public class JabRefGUI {
         }
 
         GUIGlobals.init();
-        GUIGlobals.currentFont = new Font(Globals.prefs.get(JabRefPreferences.FONT_FAMILY),
-                Globals.prefs.getInt(JabRefPreferences.FONT_STYLE), Globals.prefs.getInt(JabRefPreferences.FONT_SIZE));
 
         LOGGER.debug("Initializing frame");
         JabRefGUI.mainFrame = new JabRefFrame();
@@ -128,7 +111,7 @@ public class JabRefGUI {
                 ParserResult pr = parserResultIterator.next();
 
                 // Define focused tab
-                if (focusedFile != null && pr.getFile().getAbsolutePath().equals(focusedFile)) {
+                if (pr.getFile().get().getAbsolutePath().equals(focusedFile)) {
                     first = true;
                 }
 
@@ -146,7 +129,7 @@ public class JabRefGUI {
                     }
                 } else {
                     parserResultIterator.remove();
-                    postponed.add(pr.getFile());
+                    postponed.add(pr.getFile().get());
                 }
             }
         }
@@ -162,32 +145,25 @@ public class JabRefGUI {
             Globals.startAutoSaveManager(JabRefGUI.getMainFrame());
         }
 
-        // If we are set to remember the window location, we also remember the maximised
-        // state. This needs to be set after the window has been made visible, so we
-        // do it here:
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
             JabRefGUI.getMainFrame().setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
 
         JabRefGUI.getMainFrame().setVisible(true);
 
-        if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-            JabRefGUI.getMainFrame().setExtendedState(JFrame.MAXIMIZED_BOTH);
-        }
-
         for (ParserResult pr : failed) {
-            String message = "<html>" + Localization.lang("Error opening file '%0'.", pr.getFile().getName()) + "<p>"
+            String message = "<html>" + Localization.lang("Error opening file '%0'.", pr.getFile().get().getName())
+                    + "<p>"
                     + pr.getErrorMessage() + "</html>";
 
             JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(), message, Localization.lang("Error opening file"),
                     JOptionPane.ERROR_MESSAGE);
         }
 
-        if (Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
-            int i = 0;
-            for (ParserResult pr : bibDatabases) {
-                ParserResultWarningDialog.showParserResultWarningDialog(pr, JabRefGUI.getMainFrame(), i++);
-            }
+        // Display warnings, if any
+        int tabNumber = 0;
+        for (ParserResult pr : bibDatabases) {
+            ParserResultWarningDialog.showParserResultWarningDialog(pr, JabRefGUI.getMainFrame(), tabNumber++);
         }
 
         // After adding the databases, go through each and see if
@@ -234,7 +210,8 @@ public class JabRefGUI {
                 continue;
             }
 
-            ParserResult parsedDatabase = OpenDatabaseAction.loadDatabaseOrAutoSave(fileName, false);
+            ParserResult parsedDatabase = OpenDatabase.loadDatabaseOrAutoSave(fileName, false,
+                    Globals.prefs.getImportFormatPreferences());
 
             if (parsedDatabase.isNullResult()) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
@@ -246,7 +223,7 @@ public class JabRefGUI {
 
     private boolean isLoaded(File fileToOpen) {
         for (ParserResult pr : bibDatabases) {
-            if (pr.getFile() != null && pr.getFile().equals(fileToOpen)) {
+            if (pr.getFile().isPresent() && pr.getFile().get().equals(fileToOpen)) {
                 return true;
             }
         }

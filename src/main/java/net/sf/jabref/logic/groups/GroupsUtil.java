@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.groups;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.TreeSet;
@@ -18,7 +19,7 @@ public class GroupsUtil {
         Set<String> res = new TreeSet<>();
 
         for (BibEntry be : db.getEntries()) {
-            be.getFieldOptional(field).ifPresent(fieldValue -> {
+            be.getField(field).ifPresent(fieldValue -> {
                 StringTokenizer tok = new StringTokenizer(fieldValue.trim(), deliminator);
                 while (tok.hasMoreTokens()) {
                     res.add(EntryUtil.capitalizeFirst(tok.nextToken().trim()));
@@ -40,7 +41,7 @@ public class GroupsUtil {
     public static Set<String> findAllWordsInField(BibDatabase db, String field, String remove) {
         Set<String> res = new TreeSet<>();
         for (BibEntry be : db.getEntries()) {
-            be.getFieldOptional(field).ifPresent(o -> {
+            be.getField(field).ifPresent(o -> {
                 StringTokenizer tok = new StringTokenizer(o, remove, false);
                 while (tok.hasMoreTokens()) {
                     res.add(EntryUtil.capitalizeFirst(tok.nextToken().trim()));
@@ -61,11 +62,11 @@ public class GroupsUtil {
         Set<String> res = new TreeSet<>();
         for (BibEntry be : db.getEntries()) {
             for (String field : fields) {
-                be.getFieldOptional(field).ifPresent(val -> {
+                be.getField(field).ifPresent(val -> {
                     if (!val.isEmpty()) {
                         AuthorList al = AuthorList.parse(val);
-                        res.addAll(al.getAuthors().stream().map(Author::getLast)
-                                .filter(lastName -> ((lastName != null) && !lastName.isEmpty()))
+                        res.addAll(al.getAuthors().stream().map(Author::getLast).filter(Optional::isPresent)
+                                .map(Optional::get).filter(lastName -> !lastName.isEmpty())
                                 .collect(Collectors.toList()));
                     }
                 });

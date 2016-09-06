@@ -1,19 +1,3 @@
-/*  Copyright (C) 2015 JabRef contributors.
-    Copyright (C) 2015 Oscar Gustafsson.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.push;
 
 import java.io.IOException;
@@ -26,7 +10,7 @@ import javax.swing.JTextField;
 import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.actions.BrowseAction;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -120,6 +104,7 @@ public abstract class AbstractPushToApplication implements PushToApplication {
      * @param keyString String containing the Bibtex keys to be pushed to the application
      * @return String array with the command to call and its arguments
      */
+    @SuppressWarnings("unused")
     protected String[] getCommandLine(String keyString) {
         return new String[0];
     }
@@ -165,9 +150,11 @@ public abstract class AbstractPushToApplication implements PushToApplication {
         }
         builder.add(label.toString()).xy(1, 1);
         builder.add(path).xy(3, 1);
-        BrowseAction action = BrowseAction.buildForFile(path);
         JButton browse = new JButton(Localization.lang("Browse"));
-        browse.addActionListener(action);
+        browse.addActionListener(e ->
+                new FileDialog(null).showDialogAndGetSelectedFile()
+                        .ifPresent(f -> path.setText(f.toAbsolutePath().toString()))
+        );
         builder.add(browse).xy(5, 1);
         settings = builder.build();
     }

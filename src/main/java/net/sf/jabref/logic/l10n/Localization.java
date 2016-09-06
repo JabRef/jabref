@@ -13,8 +13,8 @@ import org.apache.commons.logging.LogFactory;
 public class Localization {
     private static final Log LOGGER = LogFactory.getLog(Localization.class);
 
-    public static final String RESOURCE_PREFIX = "l10n/JabRef";
-    public static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
+    protected static final String RESOURCE_PREFIX = "l10n/JabRef";
+    protected static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
 
     private static ResourceBundle messages;
     private static ResourceBundle menuTitles;
@@ -24,39 +24,29 @@ public class Localization {
     }
 
     public static void setLanguage(String language) {
-        Optional<String> knownLanguage = Languages.convertToKnownLocale(language);
+        Optional<Locale> knownLanguage = Languages.convertToSupportedLocale(language);
         if(!knownLanguage.isPresent()) {
             LOGGER.warn("Language " + language + " is not supported by JabRef (Default:" + Locale.getDefault()+ ")");
             setLanguage("en");
             return;
         }
 
-        String[] languageParts = knownLanguage.get().split("_");
-        Locale locale;
-        if (languageParts.length == 1) {
-            locale = new Locale(languageParts[0]);
-        } else if (languageParts.length == 2) {
-            locale = new Locale(languageParts[0], languageParts[1]);
-        } else {
-            locale = Locale.ENGLISH;
-        }
-
+        Locale locale = knownLanguage.get();
         Locale.setDefault(locale);
         javax.swing.JComponent.setDefaultLocale(locale);
 
         try {
             createResourceBundles(locale);
-        } catch (MissingResourceException e) {
-            // SHOULD NOT HAPPEN AS WE HAVE SCRIPTS TO COVER FOR THIS
-            LOGGER.warn("Could not find bundles for language " + locale + ", switching to full english language", e);
+        } catch (MissingResourceException ex) {
+            // should not happen as we have scripts to enforce this
+            LOGGER.warn("Could not find bundles for language " + locale + ", switching to full english language", ex);
             setLanguage("en");
         }
     }
 
     private static void createResourceBundles(Locale locale) {
         messages = ResourceBundle.getBundle(RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
-        menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale,
-                new EncodingControl(StandardCharsets.UTF_8));
+        menuTitles = ResourceBundle.getBundle(MENU_RESOURCE_PREFIX, locale, new EncodingControl(StandardCharsets.UTF_8));
     }
 
     /**
