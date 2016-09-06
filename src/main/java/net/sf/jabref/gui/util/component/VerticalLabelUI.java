@@ -10,6 +10,7 @@ import java.awt.Rectangle;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
+import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicLabelUI;
 
 /**
@@ -32,6 +33,7 @@ public class VerticalLabelUI extends BasicLabelUI {
     private Rectangle verticalViewR = new Rectangle();
     private Rectangle verticalIconR = new Rectangle();
     private Rectangle verticalTextR = new Rectangle();
+
 
     /**
      * Constructs a <code>VerticalLabelUI</code> with the desired rotation.
@@ -61,8 +63,7 @@ public class VerticalLabelUI extends BasicLabelUI {
      * @see ComponentUI#getBaselineResizeBehavior(javax.swing.JComponent)
      */
     @Override
-    public Component.BaselineResizeBehavior getBaselineResizeBehavior(
-            JComponent c) {
+    public Component.BaselineResizeBehavior getBaselineResizeBehavior(JComponent c) {
         super.getBaselineResizeBehavior(c);
         return Component.BaselineResizeBehavior.OTHER;
     }
@@ -74,17 +75,15 @@ public class VerticalLabelUI extends BasicLabelUI {
      * Icon, int, int, int, int, Rectangle, Rectangle, Rectangle, int)}
      */
     @Override
-    protected String layoutCL(JLabel label, FontMetrics fontMetrics,
-            String text, Icon icon, Rectangle viewR, Rectangle iconR,
-            Rectangle textR) {
+    protected String layoutCL(JLabel label, FontMetrics fontMetrics, String text, Icon icon, Rectangle viewR,
+            Rectangle iconR, Rectangle textR) {
 
         String result = text;
         verticalViewR = transposeRectangle(viewR, verticalViewR);
         verticalIconR = transposeRectangle(iconR, verticalIconR);
         verticalTextR = transposeRectangle(textR, verticalTextR);
 
-        result = super.layoutCL(label, fontMetrics, result, icon,
-                verticalViewR, verticalIconR, verticalTextR);
+        result = super.layoutCL(label, fontMetrics, result, icon, verticalViewR, verticalIconR, verticalTextR);
 
         copyRectangle(verticalViewR, viewR);
         copyRectangle(verticalIconR, iconR);
