@@ -18,7 +18,6 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.pdf.PdfCommentImporter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import javax.swing.JTextField;
 
 public class PdfCommentsTab extends JPanel {
 
@@ -44,6 +43,14 @@ public class PdfCommentsTab extends JPanel {
 
     private final JTextArea pageArea = new JTextArea("page", 2, 25);
 
+    private final JScrollPane pageScrollPane = new JScrollPane();
+
+    private final JLabel commentTxtLabel = new JLabel("content",JLabel.CENTER);
+
+    private final JTextArea commentTxtArea = new JTextArea("comment content", 10, 25);
+
+    private final JScrollPane commentTxtScrollPane = new JScrollPane();
+
     DefaultListModel<String> listModel;
 
     private final EntryEditor parent;
@@ -53,7 +60,6 @@ public class PdfCommentsTab extends JPanel {
     private final JabRefFrame frame;
 
     private final BasePanel basePanel;
-    private JTextField txtCommentContent;
 
     public PdfCommentsTab(EntryEditor parent, JabRefFrame frame, BasePanel basePanel) {
         this.parent = parent;
@@ -102,36 +108,34 @@ public class PdfCommentsTab extends JPanel {
 
     private void setUpInformationPanel(){
         informationPanel.setLayout(null);
-        authorLabel.setBounds(15, 25, 46, 20);
 
+        authorLabel.setBounds(15, 25, 46, 20);
         informationPanel.add(authorLabel);
         authorScrollPane.setBounds(76, 25, 547, 42);
         informationPanel.add(authorScrollPane);
         authorScrollPane.setViewportView(authorArea);
         authorArea.setEditable(false);
+
         dateLabel.setBounds(15, 80, 30, 20);
         informationPanel.add(dateLabel);
         dateScrollPane.setBounds(76, 83, 547, 42);
         informationPanel.add(dateScrollPane);
         dateScrollPane.setViewportView(dateArea);
         dateArea.setEditable(false);
+        
         pageLabel.setBounds(15, 128, 34, 20);
         informationPanel.add(pageLabel);
-
-        JScrollPane pageScrollPane = new JScrollPane();
         pageScrollPane.setBounds(76, 141, 547, 42);
         informationPanel.add(pageScrollPane);
         pageScrollPane.setViewportView(pageArea);
         pageArea.setEditable(false);
 
-        txtCommentContent = new JTextField();
-        txtCommentContent.setText("comment content");
-        txtCommentContent.setBounds(76, 200, 547, 173);
-        informationPanel.add(txtCommentContent);
-        txtCommentContent.setColumns(10);
+        commentTxtLabel.setBounds(15, 200, 69, 20);
+        informationPanel.add(commentTxtLabel);
+        commentTxtScrollPane.setBounds(76, 200, 547, 173);
+        informationPanel.add(commentTxtScrollPane);
+        commentTxtScrollPane.setViewportView(commentTxtArea);
+        commentTxtArea.setEditable(false);
 
-        JLabel lblContent = new JLabel("content");
-        lblContent.setBounds(15, 200, 69, 20);
-        informationPanel.add(lblContent);
     }
 }
