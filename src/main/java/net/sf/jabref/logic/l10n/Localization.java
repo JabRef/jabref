@@ -19,7 +19,7 @@ public class Localization {
     private static ResourceBundle messages;
     private static ResourceBundle menuTitles;
     
-    public static ResourceBundle getMessages() {
+    public static LocalizationBundle getMessages() {
         return new LocalizationBundle(messages);
     }
 
