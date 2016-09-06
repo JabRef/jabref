@@ -69,6 +69,7 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.external.ExternalFileTypeIcon;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.importer.EntryFromFileCreator;
 import net.sf.jabref.gui.importer.EntryFromFileCreatorManager;
@@ -1006,7 +1007,7 @@ public class FindUnlinkedFilesDialog extends JDialog {
                 if (value instanceof EntryFromFileCreator) {
                     EntryFromFileCreator creator = (EntryFromFileCreator) value;
                     if (creator.getExternalFileType() != null) {
-                        label.setIcon(creator.getExternalFileType().getIcon());
+                        label.setIcon(ExternalFileTypeIcon.getIcon(creator.getExternalFileType()));
                     }
                 }
                 return label;

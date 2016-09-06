@@ -33,6 +33,7 @@ import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.external.ExternalFileMenuItem;
+import net.sf.jabref.external.ExternalFileTypeIcon;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.FileListTableModel;
@@ -386,7 +387,7 @@ public class SearchResultsDialog {
                         description = flEntry.link;
                     }
                     menu.add(new ExternalFileMenuItem(p.frame(), entry, description, flEntry.link,
-                            flEntry.type.get().getIcon(), p.getBibDatabaseContext(), flEntry.type));
+                            ExternalFileTypeIcon.getIcon(flEntry.type.get()), p.getBibDatabaseContext(), flEntry.type));
                     count++;
                 }
 
@@ -451,7 +452,7 @@ public class SearchResultsDialog {
                         fileLabel.setToolTipText(tmpModel.getToolTipHTMLRepresentation());
                         if (tmpModel.getRowCount() > 0) {
                             if (tmpModel.getEntry(0).type.isPresent()) {
-                                fileLabel.setIcon(tmpModel.getEntry(0).type.get().getIcon());
+                                fileLabel.setIcon(ExternalFileTypeIcon.getIcon(tmpModel.getEntry(0).type.get()));
                             } else {
                                 fileLabel.setIcon(IconTheme.JabRefIcon.FILE.getSmallIcon());
                             }

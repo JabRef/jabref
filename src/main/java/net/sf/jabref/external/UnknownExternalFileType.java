@@ -10,7 +10,7 @@ import net.sf.jabref.gui.IconTheme;
 public class UnknownExternalFileType extends ExternalFileType {
 
     public UnknownExternalFileType(String name) {
-        super(name, "", "", "", "unknown", IconTheme.JabRefIcon.FILE.getSmallIcon());
+        super(name, "", "", "", IconTheme.JabRefIcon.FILE.getCode());
     }
 
 }

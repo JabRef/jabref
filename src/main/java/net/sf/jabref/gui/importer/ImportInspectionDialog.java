@@ -56,6 +56,7 @@ import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.external.DownloadExternalFile;
 import net.sf.jabref.external.ExternalFileMenuItem;
+import net.sf.jabref.external.ExternalFileTypeIcon;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.DuplicateResolverDialog;
 import net.sf.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
@@ -972,7 +973,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                     description = flEntry.link;
                 }
                 menu.add(new ExternalFileMenuItem(panel.frame(), entry, description, flEntry.link,
-                        flEntry.type.get().getIcon(), panel.getBibDatabaseContext(), flEntry.type));
+                        ExternalFileTypeIcon.getIcon(flEntry.type.get()), panel.getBibDatabaseContext(), flEntry.type));
                 count++;
             }
             if (count == 0) {
@@ -1427,7 +1428,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                         entry.getField(FieldName.FILE).ifPresent(model::setContent);
                         fileLabel.setToolTipText(model.getToolTipHTMLRepresentation());
                         if ((model.getRowCount() > 0) && model.getEntry(0).type.isPresent()) {
-                            fileLabel.setIcon(model.getEntry(0).type.get().getIcon());
+                            fileLabel.setIcon(ExternalFileTypeIcon.getIcon(model.getEntry(0).type.get()));
                         }
                         return fileLabel;
                     } else {

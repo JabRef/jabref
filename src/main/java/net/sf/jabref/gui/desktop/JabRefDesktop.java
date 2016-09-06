@@ -193,8 +193,8 @@ public class JabRefDesktop {
             return false;
         } else if (answer == JOptionPane.YES_OPTION) {
             // User wants to define the new file type. Show the dialog:
-            ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "", "new",
-                    IconTheme.JabRefIcon.FILE.getSmallIcon());
+            ExternalFileType newType = new ExternalFileType(fileType.getName(), "", "", "",
+                    IconTheme.JabRefIcon.FILE.getCode());
             ExternalFileTypeEntryEditor editor = new ExternalFileTypeEntryEditor(frame, newType);
             editor.setVisible(true);
             if (editor.okPressed()) {
