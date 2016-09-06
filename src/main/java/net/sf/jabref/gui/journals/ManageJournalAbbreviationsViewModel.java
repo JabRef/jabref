@@ -34,6 +34,7 @@ import net.sf.jabref.logic.journals.DuplicatedJournalAbbreviationException;
 import net.sf.jabref.logic.journals.DuplicatedJournalFileException;
 import net.sf.jabref.logic.journals.EmptyFieldException;
 import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -114,7 +115,7 @@ public class ManageJournalAbbreviationsViewModel {
         List<AbbreviationViewModel> builtInListViewModel = new ArrayList<>();
         builtInList.forEach(abbreviation -> builtInListViewModel.add(new AbbreviationViewModel(abbreviation)));
         AbbreviationsFileViewModel builtInFile = new AbbreviationsFileViewModel(builtInListViewModel,
-                "JabRef built in list");
+                Localization.lang("JabRef built in list"));
         List<Abbreviation> ieeeList;
         if (Globals.prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)) {
             ieeeList = Globals.journalAbbreviationLoader.getOfficialIEEEAbbreviations();
@@ -123,7 +124,8 @@ public class ManageJournalAbbreviationsViewModel {
         }
         List<AbbreviationViewModel> ieeeListViewModel = new ArrayList<>();
         ieeeList.forEach(abbreviation -> ieeeListViewModel.add(new AbbreviationViewModel(abbreviation)));
-        AbbreviationsFileViewModel ieeeFile = new AbbreviationsFileViewModel(ieeeListViewModel, "IEEE built in list");
+        AbbreviationsFileViewModel ieeeFile = new AbbreviationsFileViewModel(ieeeListViewModel,
+                Localization.lang("IEEE built in list"));
         journalFiles.addAll(builtInFile, ieeeFile);
     }
 

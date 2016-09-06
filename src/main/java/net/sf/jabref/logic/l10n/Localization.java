@@ -13,8 +13,9 @@ import org.apache.commons.logging.LogFactory;
 public class Localization {
     private static final Log LOGGER = LogFactory.getLog(Localization.class);
 
-    protected static final String RESOURCE_PREFIX = "l10n/JabRef";
-    protected static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
+    public static final String RESOURCE_PREFIX = "l10n/JabRef";
+    public static final String MENU_RESOURCE_PREFIX = "l10n/Menu";
+    public static final String BIBTEX = "BibTeX";
 
     private static ResourceBundle messages;
     private static ResourceBundle menuTitles;
