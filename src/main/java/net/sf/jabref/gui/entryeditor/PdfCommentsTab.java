@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
@@ -96,9 +97,14 @@ public class PdfCommentsTab extends JPanel {
         }
     }
 
+    /**
+     * Updates the list model to show the given notes exclusive those with no content
+     * @param importedNotes value is the comments name and the value is a pdfComment object to add to the list model
+     */
     private void updateShownComments(HashMap<String, PdfComment> importedNotes){
         listModel.clear();
-        importedNotes.forEach((k, v) -> listModel.addElement(v));
+        importedNotes.values().stream().filter(comment -> !(null == comment.getContent())).collect(Collectors.toList())
+                .forEach((comment) -> listModel.addElement(comment));
     }
 
     private void updateTextFields(PdfComment comment) {
