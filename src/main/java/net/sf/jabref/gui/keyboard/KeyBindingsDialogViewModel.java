@@ -25,16 +25,14 @@ import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeTableCell;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.control.TreeTableView;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
-import javafx.util.Callback;
 
 import net.sf.jabref.gui.FXDialogs;
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.gui.util.ViewModelTreeTableCellFactory;
 import net.sf.jabref.logic.l10n.Localization;
 
 public class KeyBindingsDialogViewModel {
@@ -101,32 +99,12 @@ public class KeyBindingsDialogViewModel {
     private void bindColumnValues() {
         actionColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().nameProperty());
         shortcutColumn.setCellValueFactory(cellData -> cellData.getValue().getValue().shownBindingProperty());
-        resetColumn.setCellFactory(
-                new Callback<TreeTableColumn<KeyBindingViewModel, String>, TreeTableCell<KeyBindingViewModel, String>>() {
-
-                    @Override
-                    public TreeTableCell<KeyBindingViewModel, String> call(
-                            TreeTableColumn<KeyBindingViewModel, String> p) {
-                        return new TreeTableCell<KeyBindingViewModel, String>() {
-
-                            @Override
-                            public void updateItem(String item, boolean empty) {
-                                super.updateItem(item, empty);
-                                KeyBindingViewModel viewModel = getTreeTableRow().getItem();
-                                if ((viewModel != null) && !viewModel.isCategory()) {
-                                    Text graphic = new Text(IconTheme.JabRefIcon.CLEANUP_ENTRIES.getCode());
-                                    graphic.getStyleClass().add("icon");
-                                    setGraphic(graphic);
-                                    setOnMouseClicked(evt -> {
-                                        getTreeTableRow().getItem().resetToDefault(keyBindingRepository);
-                                    });
-
-                                }
-                                keyBindingsTable.refresh();
-                            }
-                        };
-                    }
-                });
+        resetColumn.setCellFactory(new ViewModelTreeTableCellFactory<KeyBindingViewModel, String>().
+                withGraphic(
+                    viewModel -> viewModel.isCategory() ? null : IconTheme.JabRefIcon.CLEANUP_ENTRIES.getGraphicNode()).
+                withOnMouseClickedEvent(
+                    viewModel -> viewModel.isCategory() ? null : evt -> viewModel.resetToDefault(keyBindingRepository))
+        );
     }
 
     private void registerKeyEvents() {
