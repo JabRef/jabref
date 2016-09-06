@@ -88,7 +88,7 @@ public class PdfCommentsTab extends JPanel {
                     basePanel.getBibDatabaseContext());
             if (documents.isEmpty()) {
                 listModel.clear();
-//                listModel.addElement(Localization.lang("Attached_file_has_no_valid_path"));
+                listModel.addElement(new PdfComment("", "", "", 0, Localization.lang("Attached_file_has_no_valid_path"), ""));
             } else {
                 importedNotes = commentImporter.importNotes(documents.get(0));
                 updateShownComments(importedNotes);

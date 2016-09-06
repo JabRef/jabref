@@ -1,8 +1,6 @@
 package net.sf.jabref.model.pdf;
 
 
-import java.util.Optional;
-
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
@@ -14,14 +12,15 @@ public class PdfComment {
     private String date;
     private int page;
     private String content;
-    private Optional<String> text;
+    private String text;
 
-    public PdfComment(String commentId, String author, String date, int page, String content, Optional<String> text) {
+    public PdfComment(String commentId, String author, String date, int page, String content, String text) {
         this.author = author;
         this.date = date;
         this.page = page;
         this.content = content;
         this.text = text;
+        this.commentId = commentId;
     }
     public PdfComment(PDAnnotation annotation, int page){
         COSDictionary dict = annotation.getDictionary();
@@ -78,11 +77,11 @@ public class PdfComment {
         this.content = content;
     }
 
-    public Optional<String> getText() {
+    public String getText() {
         return text;
     }
 
-    public void setText(Optional<String> text) {
+    public void setText(String text) {
         this.text = text;
     }
 }
