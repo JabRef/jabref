@@ -122,7 +122,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
                 panel.add(createEntryGroupPanel(Localization.lang("Custom"), CustomEntryTypesManager.ALL));
             }
 
-            panel.add(createIdFetcher("ID based generator"));
+            panel.add(createIdFetcher("ID-based entry generator"));
         }
 
         return panel;
@@ -175,7 +175,8 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
     }
 
     private JPanel createIdFetcher(String groupTitle) {
-        JButton searchButton = new JButton(Localization.lang("Search"));
+        JButton generateButton = new JButton(Localization.lang("Generate"));
+        JButton cancelButton = new JButton(Localization.lang("Cancel"));
         JTextField idTextField = new JTextField("");
         JComboBox<String> comboBox = new JComboBox<>();
         getIdFetchers().forEach(n -> comboBox.addItem(n.getName()));
@@ -195,8 +196,8 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
                         bibEntry = fetcher.performSearchById(searchID);
                         dispose();
                     } catch (FetcherException e) {
-                        LOGGER.error(Localization.lang("Error_fetching_from_'%0'.", fetcher.getName()), e);
-                        JOptionPane.showMessageDialog(null, Localization.lang("Error_fetching_from_'%0'.", fetcher.getName()), Localization.lang("Error_ while_fetching."), JOptionPane.ERROR_MESSAGE);
+                        LOGGER.error("Error fetching from " + fetcher.getName(), e);
+                        JOptionPane.showMessageDialog(null, Localization.lang("Error_while_fetching_from_%0", fetcher.getName()), Localization.lang("Error_while_fetching"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
                 return bibEntry;
@@ -221,7 +222,8 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
             }
         };
 
-        searchButton.addActionListener(n -> fetcherWorker.execute());
+        generateButton.addActionListener(n -> fetcherWorker.execute());
+        cancelButton.addActionListener(n -> fetcherWorker.cancel(true));
 
         JPanel jPanel = new JPanel();
 
@@ -250,7 +252,8 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         constraints.gridy = 2;
         JPanel buttons = new JPanel();
         ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
-        bb.addButton(searchButton);
+        bb.addButton(generateButton);
+        bb.addButton(cancelButton);
 
         jPanel.add(buttons, constraints);
         jPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), groupTitle));
