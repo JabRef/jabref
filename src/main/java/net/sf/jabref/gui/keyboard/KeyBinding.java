@@ -6,6 +6,7 @@ public enum KeyBinding {
 
     ABBREVIATE(
             "Abbreviate", Localization.lang("Abbreviate journal names"), "ctrl alt A"),
+    ACCEPT("Accept", Localization.lang("Accept"), "ctrl ENTER"),
     AUTOGENERATE_BIBTEX_KEYS("Autogenerate BibTeX keys", Localization.lang("Autogenerate BibTeX keys"), "ctrl G"),
     AUTOMATICALLY_LINK_FILES(
             "Automatically link files", Localization.lang("Automatically set file links"), "F7"),

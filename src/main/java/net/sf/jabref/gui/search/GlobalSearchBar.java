@@ -138,6 +138,18 @@ public class GlobalSearchBar extends JPanel {
 
         autoCompleteSupport.install();
 
+        String acceptSearch = "acceptSearch";
+        searchField.getInputMap().put(Globals.getKeyPrefs().getKey(KeyBinding.ACCEPT), acceptSearch);
+        searchField.getActionMap().put(acceptSearch, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                autoCompleteSupport.setVisible(false);
+                BasePanel currentBasePanel = frame.getCurrentBasePanel();
+                Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
+                new FocusRequester(currentBasePanel.getMainTable());
+            }
+        });
+
         setLayout(new WrapLayout(FlowLayout.RIGHT));
         JToolBar toolBar = new OSXCompatibleToolbar();
         toolBar.setFloatable(false);

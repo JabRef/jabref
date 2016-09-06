@@ -17,6 +17,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - The search result Window will now show which entry belongs to which bib file
 - The search result Window will now remember its location
 - The search result Window won't stay on top anymore if the main Window is focused and will be present in the taskbar
+- The User can jump from the searchbar to the maintabel with `ctrl + enter`
 - Implemented [#573 (comment)](https://github.com/JabRef/jabref/issues/573#issuecomment-232284156): Added shortcut: closing the search result window with `ctrl+w`
 - Added integrity check for fields with BibTeX keys, e.g., `crossref` and `related`, to check that the key exists
 - [#1496](https://github.com/JabRef/jabref/issues/1496) Keep track of which entry a downloaded file belongs to
