@@ -1,4 +1,4 @@
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.filelist;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,10 +10,10 @@ import javax.swing.SwingUtilities;
 import javax.swing.event.TableModelEvent;
 import javax.swing.table.AbstractTableModel;
 
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.ExternalFileTypeIcon;
-import net.sf.jabref.external.ExternalFileTypes;
-import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypeIcon;
+import net.sf.jabref.logic.externalfiletype.ExternalFileType;
+import net.sf.jabref.logic.externalfiletype.ExternalFileTypes;
+import net.sf.jabref.logic.externalfiletype.UnknownExternalFileType;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;

@@ -1,9 +1,10 @@
-package net.sf.jabref.external;
+package net.sf.jabref.gui.externalfiletype;
 
 import javax.swing.Icon;
 import javax.swing.JLabel;
 
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.logic.externalfiletype.ExternalFileType;
 
 public class ExternalFileTypeIcon {
 

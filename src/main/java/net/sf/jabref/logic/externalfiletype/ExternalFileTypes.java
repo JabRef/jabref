@@ -1,4 +1,4 @@
-package net.sf.jabref.external;
+package net.sf.jabref.logic.externalfiletype;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -7,7 +7,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.FileField;
@@ -23,7 +22,7 @@ public final class ExternalFileTypes {
     private final Set<ExternalFileType> externalFileTypes = new TreeSet<>();
 
     private final ExternalFileType HTML_FALLBACK_TYPE = new ExternalFileType("URL", "html", "text/html", "",
-            IconTheme.JabRefIcon.WWW.getCode());
+            FileTypeIconMapping.WWW);
 
     // The only instance of this class:
     private static ExternalFileTypes singleton;
@@ -42,52 +41,45 @@ public final class ExternalFileTypes {
 
     public static List<ExternalFileType> getDefaultExternalFileTypes() {
         List<ExternalFileType> list = new ArrayList<>();
-        list.add(new ExternalFileType("PDF", "pdf", "application/pdf", "evince",
-                IconTheme.JabRefIcon.PDF_FILE.getCode()));
-        list.add(new ExternalFileType("PostScript", "ps", "application/postscript", "evince",
-                IconTheme.JabRefIcon.FILE.getCode()));
-        list.add(new ExternalFileType("Word", "doc", "application/msword", "oowriter",
-                IconTheme.JabRefIcon.FILE_WORD.getCode()));
+        list.add(new ExternalFileType("PDF", "pdf", "application/pdf", "evince", FileTypeIconMapping.PDF_FILE));
+        list.add(
+                new ExternalFileType("PostScript", "ps", "application/postscript", "evince", FileTypeIconMapping.FILE));
+        list.add(new ExternalFileType("Word", "doc", "application/msword", "oowriter", FileTypeIconMapping.FILE_WORD));
         list.add(new ExternalFileType("Word 2007+", "docx",
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "oowriter",
-                IconTheme.JabRefIcon.FILE_WORD.getCode()));
+                FileTypeIconMapping.FILE_WORD));
         list.add(new ExternalFileType(Localization.lang("OpenDocument text"), "odt",
                 "application/vnd.oasis.opendocument.text", "oowriter", ""));
-        list.add(new ExternalFileType("Excel", "xls", "application/excel", "oocalc",
-                IconTheme.JabRefIcon.FILE_EXCEL.getCode()));
+        list.add(new ExternalFileType("Excel", "xls", "application/excel", "oocalc", FileTypeIconMapping.FILE_EXCEL));
         list.add(new ExternalFileType("Excel 2007+", "xlsx",
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "oocalc",
-                IconTheme.JabRefIcon.FILE_EXCEL.getCode()));
+                FileTypeIconMapping.FILE_EXCEL));
         list.add(new ExternalFileType(Localization.lang("OpenDocument spreadsheet"), "ods",
                 "application/vnd.oasis.opendocument.spreadsheet", "oocalc", ""));
         list.add(new ExternalFileType("PowerPoint", "ppt", "application/vnd.ms-powerpoint", "ooimpress",
-                IconTheme.JabRefIcon.FILE_POWERPOINT.getCode()));
+                FileTypeIconMapping.FILE_POWERPOINT));
         list.add(new ExternalFileType("PowerPoint 2007+", "pptx",
                 "application/vnd.openxmlformats-officedocument.presentationml.presentation", "ooimpress",
-                IconTheme.JabRefIcon.FILE_POWERPOINT.getCode()));
+                FileTypeIconMapping.FILE_POWERPOINT));
         list.add(new ExternalFileType(Localization.lang("OpenDocument presentation"), "odp",
                 "application/vnd.oasis.opendocument.presentation", "ooimpress", ""));
         list.add(new ExternalFileType("Rich Text Format", "rtf", "application/rtf", "oowriter",
-                IconTheme.JabRefIcon.FILE_TEXT.getCode()));
+                FileTypeIconMapping.FILE_TEXT));
         list.add(new ExternalFileType(Localization.lang("%0 image", "PNG"), "png", "image/png", "gimp",
-                IconTheme.JabRefIcon.PICTURE.getCode()));
+                FileTypeIconMapping.PICTURE));
         list.add(new ExternalFileType(Localization.lang("%0 image", "GIF"), "gif", "image/gif", "gimp",
-                IconTheme.JabRefIcon.PICTURE.getCode()));
+                FileTypeIconMapping.PICTURE));
         list.add(new ExternalFileType(Localization.lang("%0 image", "JPG"), "jpg", "image/jpeg", "gimp",
-                IconTheme.JabRefIcon.PICTURE.getCode()));
-        list.add(new ExternalFileType("Djvu", "djvu", "image/vnd.djvu", "evince", IconTheme.JabRefIcon.FILE.getCode()));
-        list.add(new ExternalFileType("Text", "txt", "text/plain", "emacs", IconTheme.JabRefIcon.FILE_TEXT.getCode()));
-        list.add(new ExternalFileType("LaTeX", "tex", "application/x-latex", "emacs",
-                IconTheme.JabRefIcon.FILE_TEXT.getCode()));
-        list.add(
-                new ExternalFileType("CHM", "chm", "application/mshelp", "gnochm", IconTheme.JabRefIcon.WWW.getCode()));
+                FileTypeIconMapping.PICTURE));
+        list.add(new ExternalFileType("Djvu", "djvu", "image/vnd.djvu", "evince", FileTypeIconMapping.FILE));
+        list.add(new ExternalFileType("Text", "txt", "text/plain", "emacs", FileTypeIconMapping.FILE_TEXT));
+        list.add(new ExternalFileType("LaTeX", "tex", "application/x-latex", "emacs", FileTypeIconMapping.FILE_TEXT));
+        list.add(new ExternalFileType("CHM", "chm", "application/mshelp", "gnochm", FileTypeIconMapping.WWW));
         list.add(new ExternalFileType(Localization.lang("%0 image", "TIFF"), "tiff", "image/tiff", "gimp",
-                IconTheme.JabRefIcon.PICTURE.getCode()));
-        list.add(new ExternalFileType("URL", "html", "text/html", "firefox", IconTheme.JabRefIcon.WWW.getCode()));
-        list.add(
-                new ExternalFileType("MHT", "mht", "multipart/related", "firefox", IconTheme.JabRefIcon.WWW.getCode()));
-        list.add(new ExternalFileType("ePUB", "epub", "application/epub+zip", "firefox",
-                IconTheme.JabRefIcon.WWW.getCode()));
+                FileTypeIconMapping.PICTURE));
+        list.add(new ExternalFileType("URL", "html", "text/html", "firefox", FileTypeIconMapping.WWW));
+        list.add(new ExternalFileType("MHT", "mht", "multipart/related", "firefox", FileTypeIconMapping.WWW));
+        list.add(new ExternalFileType("ePUB", "epub", "application/epub+zip", "firefox", FileTypeIconMapping.WWW));
 
         // On all OSes there is a generic application available to handle file opening,
         // so we don't need the default application settings anymore:

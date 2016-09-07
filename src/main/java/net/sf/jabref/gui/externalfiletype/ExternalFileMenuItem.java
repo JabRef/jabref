@@ -1,4 +1,4 @@
-package net.sf.jabref.external;
+package net.sf.jabref.gui.externalfiletype;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,6 +13,9 @@ import javax.swing.JOptionPane;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.logic.externalfiletype.ExternalFileType;
+import net.sf.jabref.logic.externalfiletype.ExternalFileTypes;
+import net.sf.jabref.logic.externalfiletype.UnknownExternalFileType;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 

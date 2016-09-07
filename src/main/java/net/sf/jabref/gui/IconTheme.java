@@ -21,6 +21,8 @@ import java.util.Objects;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 
+import net.sf.jabref.logic.externalfiletype.FileTypeIconMapping;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -69,8 +71,8 @@ public class IconTheme {
         FOLDER("\uf24b"), /*css: folder */
         REMOVE("\uf375"), /*css: minus-box */
         REMOVE_NOBOX("\uf374") /*css: minus */,
-        FILE("\uf214"), /* css: file*/
-        PDF_FILE("\uf225"), /* css: file-pdf*/
+        FILE(FileTypeIconMapping.FILE), /* css: file*/
+        PDF_FILE(FileTypeIconMapping.PDF_FILE), /* css: file-pdf*/
         DOI("\uF072") /*css: barcode-scan*/,
         DUPLICATE("\uf191") /*css: content-duplicate */,
         EDIT("\uf3eb") /*css: pencil */,
@@ -108,7 +110,7 @@ public class IconTheme {
         RANK3("\uF4CE\uF4CE\uF4CE\uF4D2\uF4D2"),
         RANK4("\uF4CE\uF4CE\uF4CE\uF4CE\uF4D2"),
         RANK5("\uF4CE\uF4CE\uF4CE\uF4CE\uF4CE"),
-        WWW("\uf59f") /*css: web*/,
+        WWW(FileTypeIconMapping.WWW) /*css: web*/,
         GROUP_INCLUDING("\uf233") /*css: filter-outline*/,
         GROUP_REFINING("\uf232") /*css: filter*/,
         AUTO_GROUP("\uf068"), /*css: auto-fix*/
@@ -121,7 +123,7 @@ public class IconTheme {
         OPEN("\uf24b") /*css: folder */,
         ADD_ROW("\uf490") /* css: server-plus*/,
         REMOVE_ROW("\uf48c") /*css: server-minus */,
-        PICTURE("\uf21f") /*css: file-image */,
+        PICTURE(FileTypeIconMapping.PICTURE) /*css: file-image */,
         READ_STATUS_READ("\uf208", new Color(111, 204, 117)), /*css: eye */
         READ_STATUS_SKIMMED("\uF208", Color.ORANGE), /*css: eye */
         READ_STATUS("\uF208"),/*css: eye */
@@ -142,10 +144,10 @@ public class IconTheme {
         TOGGLE_ENTRY_PREVIEW("\uf332"), /*css: library-books */
         TOGGLE_GROUPS("\uf572"), /*css: view-list */
         WRITE_XMP("\uf2fa"), /* css: import */
-        FILE_WORD("\uf22c"), /*css: file-word */
-        FILE_EXCEL("\uf21b"), /*css: file-excel */
-        FILE_POWERPOINT("\uf227"), /*css: file-powerpoint */
-        FILE_TEXT("\uf219"), /*css: file-document */
+        FILE_WORD(FileTypeIconMapping.FILE_WORD), /*css: file-word */
+        FILE_EXCEL(FileTypeIconMapping.FILE_EXCEL), /*css: file-excel */
+        FILE_POWERPOINT(FileTypeIconMapping.FILE_POWERPOINT), /*css: file-powerpoint */
+        FILE_TEXT(FileTypeIconMapping.FILE_TEXT), /*css: file-document */
         FILE_MULTIPLE("\uf222"), /*css: file-multiple */
         KEY_BINDINGS("\uf30c"), /*css: keyboard */
         FIND_DUPLICATES("\uf16b"), /*css: code-equal */

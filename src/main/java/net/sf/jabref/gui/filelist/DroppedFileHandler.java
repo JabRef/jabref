@@ -1,4 +1,4 @@
-package net.sf.jabref.external;
+package net.sf.jabref.gui.filelist;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,13 +17,13 @@ import javax.swing.event.ChangeListener;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
+import net.sf.jabref.logic.externalfiletype.ExternalFileType;
+import net.sf.jabref.logic.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;

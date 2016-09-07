@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.external.ExternalFileTypes;
+import net.sf.jabref.logic.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;

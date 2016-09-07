@@ -1,4 +1,4 @@
-package net.sf.jabref.external;
+package net.sf.jabref.logic.externalfiletype;
 
 import java.util.Objects;
 
@@ -46,7 +46,7 @@ public class ExternalFileType implements Comparable<ExternalFileType> {
             // Up to version 2.4b the mime type is not included:
             mimeType = "";
             openWith = val[2];
-            materialDesignIconCodePoint = "";
+            materialDesignIconCodePoint = FileTypeIconMapping.FILE;
         } else {
             // When mime type is included, the array length should be 5:
             mimeType = val[2];

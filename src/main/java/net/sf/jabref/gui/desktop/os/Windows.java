@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.ExternalFileTypes;
+import net.sf.jabref.logic.externalfiletype.ExternalFileType;
+import net.sf.jabref.logic.externalfiletype.ExternalFileTypes;
 
 public class Windows implements NativeDesktop {
     private static String DEFAULT_EXECUTABLE_EXTENSION = ".exe";

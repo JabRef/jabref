@@ -1,6 +1,4 @@
-package net.sf.jabref.external;
-
-import net.sf.jabref.gui.IconTheme;
+package net.sf.jabref.logic.externalfiletype;
 
 /**
  * This subclass of ExternalFileType is used to mark types that are unknown.
@@ -10,7 +8,7 @@ import net.sf.jabref.gui.IconTheme;
 public class UnknownExternalFileType extends ExternalFileType {
 
     public UnknownExternalFileType(String name) {
-        super(name, "", "", "", IconTheme.JabRefIcon.FILE.getCode());
+        super(name, "", "", "", FileTypeIconMapping.FILE);
     }
 
 }

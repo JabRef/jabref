@@ -1,4 +1,4 @@
-package net.sf.jabref.external;
+package net.sf.jabref.gui.externalfiletype;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -21,6 +21,7 @@ import javax.swing.event.DocumentListener;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.logic.externalfiletype.ExternalFileType;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.preferences.JabRefPreferences;

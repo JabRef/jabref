@@ -7,8 +7,8 @@ import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.ExternalFileTypes;
+import net.sf.jabref.logic.externalfiletype.ExternalFileType;
+import net.sf.jabref.logic.externalfiletype.ExternalFileTypes;
 
 public class Linux implements NativeDesktop {
     @Override

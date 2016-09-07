@@ -1,5 +1,7 @@
 package net.sf.jabref.external;
 
+import net.sf.jabref.logic.externalfiletype.ExternalFileType;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertNotNull;
