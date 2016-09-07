@@ -48,8 +48,13 @@ public class MSBibConverter {
             result.broadcastTitle = entry.getField(FieldName.TITLE).orElse(null);
         }
 
+        if (!entry.getField(FieldName.ISSUE).isPresent()) {
+            result.number = entry.getField(FieldName.NUMBER).orElse(null);
+        }
+
         if ("Patent".equalsIgnoreCase(entry.getType())) {
             result.patentNumber = entry.getField(FieldName.NUMBER).orElse(null);
+            result.number = null;
         }
 
         result.journalName = entry.getFieldOrAlias(FieldName.JOURNAL).orElse(null);
@@ -59,9 +64,7 @@ public class MSBibConverter {
             result.year = entry.getFieldOrAlias(FieldName.YEAR).orElse(null);
         }
 
-        if (!entry.getField(FieldName.ISSUE).isPresent()) {
-            result.number = entry.getField(FieldName.NUMBER).orElse(null);
-        }
+
         // Value must be converted
         //Currently only english is supported
         entry.getField(FieldName.LANGUAGE)

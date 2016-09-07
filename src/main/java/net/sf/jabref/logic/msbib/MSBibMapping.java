@@ -32,6 +32,8 @@ public class MSBibMapping {
         biblatexToMsBib.put(FieldName.EDITION, "Edition");
         biblatexToMsBib.put(FieldName.PUBLISHER, "Publisher");
         biblatexToMsBib.put(FieldName.BOOKTITLE, "BookTitle");
+        biblatexToMsBib.put("shorttitle", "ShortTitle");
+
         //biblatexToMsBib.put(FieldName.BOOKTITLE, "ConferenceName");
         //biblatexToMsBib.put(FieldName.PAGES, "Pages");
         biblatexToMsBib.put(FieldName.CHAPTER, "ChapterNumber");
@@ -42,6 +44,7 @@ public class MSBibMapping {
         biblatexToMsBib.put(FieldName.DOI, "DOI");
         biblatexToMsBib.put(FieldName.URL, "URL");
         // BibTeX/Biblatex only fields
+
         biblatexToMsBib.put(FieldName.SERIES, BIBTEX_PREFIX + "Series");
         biblatexToMsBib.put(FieldName.ABSTRACT, BIBTEX_PREFIX + "Abstract");
         biblatexToMsBib.put(FieldName.KEYWORDS, BIBTEX_PREFIX + "KeyWords");
@@ -54,7 +57,8 @@ public class MSBibMapping {
         biblatexToMsBib.put("size", BIBTEX_PREFIX + "Size");
         biblatexToMsBib.put("intype", BIBTEX_PREFIX + "InType");
         biblatexToMsBib.put("paper", BIBTEX_PREFIX + "Paper");
-        biblatexToMsBib.put("shorttitle", "ShortTitle");
+        biblatexToMsBib.put(FieldName.KEY, BIBTEX_PREFIX + "Key");
+
         // MSBib only fields
         biblatexToMsBib.put(MSBIB_PREFIX + "numberofvolume", "NumberVolumes");
         biblatexToMsBib.put(MSBIB_PREFIX + "periodical", "PeriodicalTitle");
