@@ -22,6 +22,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - `number` field is now exported as `number` field in MS-Office 2007 xml format, if no `issue` field is present and the entry type is not `patent`
 - `note` field is now exported as `comments` field in MS-Office 2007 xml format
 - `comments` field in MS-Office 2007 xml format is now imported as `note` field
+- [#463](https://github.com/JabRef/jabref/issues/463): Disable menu-item and toolbar-buttons while no database is open
 
 ### Fixed
 - Fixed selecting an entry out of multiple duplicates
