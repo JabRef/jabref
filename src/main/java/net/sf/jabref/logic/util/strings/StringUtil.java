@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.logic.util.strings;
 
 import java.util.ArrayList;
@@ -501,26 +486,26 @@ public class StringUtil {
      * From http://stackoverflow.com/questions/1030479/most-efficient-way-of-converting-string-to-integer-in-java
      *
      * @param str the String holding an Integer value
-     * @return the int value of str or null if not possible
+     * @return the int value of str or Optional.empty() if not possible
      */
-    public static Integer intValueOfWithNull(String str) {
+    public static Optional<Integer> intValueOfOptional(String str) {
         int idx = 0;
         int end;
         boolean sign = false;
         char ch;
 
         if ((str == null) || ((end = str.length()) == 0) || ((((ch = str.charAt(0)) < '0') || (ch > '9')) && (!(sign = ch == '-') || (++idx == end) || ((ch = str.charAt(idx)) < '0') || (ch > '9')))) {
-            return null;
+            return Optional.empty();
         }
 
         int ival = 0;
         for (;; ival *= 10) {
             ival += '0' - ch;
             if (++idx == end) {
-                return sign ? ival : -ival;
+                return Optional.of(sign ? ival : -ival);
             }
             if (((ch = str.charAt(idx)) < '0') || (ch > '9')) {
-                return null;
+                return Optional.empty();
             }
         }
     }

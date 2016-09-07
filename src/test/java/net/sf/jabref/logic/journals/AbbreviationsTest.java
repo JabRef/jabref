@@ -1,7 +1,5 @@
 package net.sf.jabref.logic.journals;
 
-import net.sf.jabref.preferences.JabRefPreferences;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,8 +12,9 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class AbbreviationsTest {
 
-    @Mock JabRefPreferences prefs;
-    JournalAbbreviationLoader abbreviations;
+    @Mock
+    private JournalAbbreviationPreferences prefs;
+    private JournalAbbreviationLoader abbreviations;
 
     @Before
     public void setUp() throws Exception {
@@ -24,40 +23,40 @@ public class AbbreviationsTest {
 
     @Test
     public void getNextAbbreviationAbbreviatesIEEEJournalTitle() {
-        when(prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)).thenReturn(true);
+        when(prefs.isUseIEEEAbbreviations()).thenReturn(true);
 
         assertEquals("#IEEE_J_PROC#",
-                abbreviations.getRepository(JournalAbbreviationPreferences.fromPreferences(prefs))
+                abbreviations.getRepository(prefs)
                         .getNextAbbreviation("Proceedings of the IEEE").get());
     }
 
     @Test
     public void getNextAbbreviationExpandsIEEEAbbreviation() {
-        when(prefs.getBoolean(JabRefPreferences.USE_IEEE_ABRV)).thenReturn(true);
+        when(prefs.isUseIEEEAbbreviations()).thenReturn(true);
 
         assertEquals("Proceedings of the IEEE",
-                abbreviations.getRepository(JournalAbbreviationPreferences.fromPreferences(prefs))
+                abbreviations.getRepository(prefs)
                         .getNextAbbreviation("#IEEE_J_PROC#").get());
     }
 
     @Test
     public void getNextAbbreviationAbbreviatesJournalTitle() {
         assertEquals("Proc. IEEE",
-                abbreviations.getRepository(JournalAbbreviationPreferences.fromPreferences(prefs))
+                abbreviations.getRepository(prefs)
                         .getNextAbbreviation("Proceedings of the IEEE").get());
     }
 
     @Test
     public void getNextAbbreviationRemovesPoint() {
         assertEquals("Proc IEEE",
-                abbreviations.getRepository(JournalAbbreviationPreferences.fromPreferences(prefs))
+                abbreviations.getRepository(prefs)
                         .getNextAbbreviation("Proc. IEEE").get());
     }
 
     @Test
     public void getNextAbbreviationExpandsAbbreviation() {
         assertEquals("Proceedings of the IEEE",
-                abbreviations.getRepository(JournalAbbreviationPreferences.fromPreferences(prefs))
+                abbreviations.getRepository(prefs)
                         .getNextAbbreviation("Proc IEEE").get());
     }
 

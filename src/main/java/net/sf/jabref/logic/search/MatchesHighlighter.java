@@ -24,13 +24,14 @@ public class MatchesHighlighter {
      */
     public static String highlightWordsWithHTML(String text, Optional<Pattern> highlightPattern) {
         Objects.requireNonNull(highlightPattern);
-        Objects.requireNonNull(text);
+        String searchText = Objects.requireNonNull(text);
 
-        if (text.isEmpty() || !highlightPattern.isPresent()) {
-            return text;
+
+        if (searchText.isEmpty() || !highlightPattern.isPresent()) {
+            return searchText;
         }
 
-        Matcher matcher = highlightPattern.get().matcher(text);
+        Matcher matcher = highlightPattern.get().matcher(searchText);
 
         StringBuffer sb = new StringBuffer();
         boolean foundSomething = false;
@@ -45,10 +46,10 @@ public class MatchesHighlighter {
 
         if (foundSomething) {
             matcher.appendTail(sb);
-            text = sb.toString();
+            searchText = sb.toString();
         }
 
-        return text;
+        return searchText;
     }
 
 }

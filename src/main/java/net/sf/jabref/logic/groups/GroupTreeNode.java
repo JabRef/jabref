@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.groups;
 
 import java.util.ArrayList;
@@ -21,13 +6,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.importer.fileformat.ParseException;
+import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.logic.search.matchers.MatcherSet;
 import net.sf.jabref.logic.search.matchers.MatcherSets;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 /**
  * A node in the groups tree that holds exactly one AbstractGroup.
@@ -249,9 +233,9 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         return GroupTreeNode.fromGroup(group);
     }
 
-    public static GroupTreeNode parse(List<String> orderedData, JabRefPreferences jabRefPreferences)
+    public static GroupTreeNode parse(List<String> orderedData, String keywordSeparator)
             throws ParseException {
-        return GroupsParser.importGroups(orderedData, jabRefPreferences);
+        return GroupsParser.importGroups(orderedData, keywordSeparator);
     }
 
     /**

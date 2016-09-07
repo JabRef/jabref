@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.bst;
 
 import java.io.File;
@@ -79,7 +64,7 @@ public class VM implements Warn {
 
     private StringBuilder bbl;
 
-    private String preamble;
+    private String preamble = "";
 
     private static final Pattern ADD_PERIOD_PATTERN = Pattern.compile("([^\\.\\?\\!\\}\\s])(\\}|\\s)*$");
 
@@ -313,7 +298,7 @@ public class VM implements Warn {
             if (context == null) {
                 throw new VMException("Must have an entry to cite$");
             }
-            stack.push(context.getBibtexEntry().getCiteKey());
+            stack.push(context.getBibtexEntry().getCiteKeyOptional().orElse(null));
         });
 
         /**
@@ -486,11 +471,7 @@ public class VM implements Warn {
          * @PREAMBLE strings read from the database files.
          */
         buildInFunctions.put("preamble$", context -> {
-            if (preamble == null) {
-                stack.push("");
-            } else {
-                stack.push(preamble);
-            }
+            stack.push(preamble);
         });
 
         /**
@@ -851,7 +832,7 @@ public class VM implements Warn {
 
 
     public String run(BibDatabase db) {
-        preamble = db.getPreamble();
+        preamble = db.getPreamble().orElse("");
         return run(db.getEntries());
     }
 
@@ -934,7 +915,7 @@ public class VM implements Warn {
         for (BstEntry e : entries) {
 
             for (Map.Entry<String, String> mEntry : e.getFields().entrySet()) {
-                String fieldValue = e.getBibtexEntry().getField(mEntry.getKey());
+                String fieldValue = e.getBibtexEntry().getField(mEntry.getKey()).orElse(null);
 
                 mEntry.setValue(fieldValue);
             }

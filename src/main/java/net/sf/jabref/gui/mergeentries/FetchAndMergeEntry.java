@@ -5,20 +5,26 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.importer.fetcher.DOItoBibTeXFetcher;
-import net.sf.jabref.importer.fetcher.ISBNtoBibTeXFetcher;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
+import net.sf.jabref.logic.importer.fetcher.DOItoBibTeX;
+import net.sf.jabref.logic.importer.fetcher.IsbnFetcher;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Class for fetching and merging information based on a specific field
  *
  */
 public class FetchAndMergeEntry {
+
+    private static final Log LOGGER = LogFactory.getLog(FetchAndMergeEntry.class);
 
     // A list of all field which are supported
     public static List<String> SUPPORTED_FIELDS = Arrays.asList(FieldName.DOI, FieldName.EPRINT, FieldName.ISBN);
@@ -44,7 +50,7 @@ public class FetchAndMergeEntry {
 
     public FetchAndMergeEntry(BibEntry entry, BasePanel panel, List<String> fields) {
         for (String field : fields) {
-            Optional<String> fieldContent = entry.getFieldOptional(field);
+            Optional<String> fieldContent = entry.getField(field);
 
             // Get better looking name for status messages
             String type = FieldName.getDisplayName(field);
@@ -53,15 +59,24 @@ public class FetchAndMergeEntry {
                 Optional<BibEntry> fetchedEntry = Optional.empty();
                 // Get entry based on field
                 if (FieldName.DOI.equals(field)) {
-                    fetchedEntry = new DOItoBibTeXFetcher().getEntryFromDOI(fieldContent.get());
+                    fetchedEntry = new DOItoBibTeX().getEntryFromDOI(fieldContent.get(),
+                            Globals.prefs.getImportFormatPreferences());
                 } else if (FieldName.ISBN.equals(field)) {
-                    fetchedEntry = new ISBNtoBibTeXFetcher().getEntryFromISBN(fieldContent.get(), null);
+                    try {
+                        fetchedEntry = new IsbnFetcher(Globals.prefs.getImportFormatPreferences ()).performSearchById(fieldContent.get());
+                    } catch (FetcherException e) {
+                        LOGGER.error("Info cannot be found", e);
+                        panel.frame().setStatus(
+                                Localization.lang("Cannot get info based on given %0: %1", type, fieldContent.get()));
+                    }
+
                 } else if (FieldName.EPRINT.equals(field)) {
                     try {
                         fetchedEntry = new ArXiv().performSearchById(fieldContent.get());
                     } catch (FetcherException e) {
+                        LOGGER.error("Info cannot be found", e);
                         panel.frame().setStatus(
-                                Localization.lang("Cannot get info based on given %0:_%1", type, fieldContent.get()));
+                                Localization.lang("Cannot get info based on given %0: %1", type, fieldContent.get()));
                     }
                 }
 
@@ -71,7 +86,7 @@ public class FetchAndMergeEntry {
                     dialog.setVisible(true);
                 } else {
                     panel.frame()
-                            .setStatus(Localization.lang("Cannot get info based on given %0:_%1", type,
+                            .setStatus(Localization.lang("Cannot get info based on given %0: %1", type,
                                     fieldContent.get()));
                 }
             } else {

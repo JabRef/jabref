@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class TypedBibEntryTest {
+
     @Test
     public void hasAllRequiredFieldsFail() {
         BibEntry e = new BibEntry("id", BibtexEntryTypes.ARTICLE.getName());

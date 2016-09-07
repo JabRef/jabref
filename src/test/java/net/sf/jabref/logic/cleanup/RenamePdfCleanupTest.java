@@ -7,9 +7,9 @@ import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
-import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
@@ -23,7 +23,6 @@ import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class RenamePdfCleanupTest {
 
@@ -31,11 +30,11 @@ public class RenamePdfCleanupTest {
     public TemporaryFolder testFolder = new TemporaryFolder();
     private BibDatabaseContext context;
     private BibEntry entry;
+    private JabRefPreferences prefs;
 
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = mock(JabRefPreferences.class);
-
+        prefs = JabRefPreferences.getInstance();
         MetaData metaData = new MetaData();
         context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
         context.setDatabaseFile(testFolder.newFile("test.bib"));
@@ -49,67 +48,68 @@ public class RenamePdfCleanupTest {
      */
     @Test
     public void cleanupRenamePdfRenamesFileEvenIfOnlyDifferenceIsCase() throws IOException {
-        when(Globals.prefs.get("importFileNamePattern")).thenReturn("\\bibtexkey");
+        String fileNamePattern = "\\bibtexkey";
         File tempFile = testFolder.newFile("toot.tmp");
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationLoader.class),
-                Globals.prefs);
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
+                mock(LayoutFormatterPreferences.class), prefs.getFileDirectoryPreferences());
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot.tmp", "");
-        assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getFieldOptional("file"));
+        assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
     @Test
     public void cleanupRenamePdfRenamesWithMultipleFiles() throws IOException {
-        when(Globals.prefs.get("importFileNamePattern")).thenReturn("\\bibtexkey - \\title");
+        String fileNamePattern = "\\bibtexkey - \\title";
         File tempFile = testFolder.newFile("Toot.tmp");
 
         entry.setField("title", "test title");
         entry.setField("file", FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""),
                 new ParsedFileField("", tempFile.getAbsolutePath(), ""), new ParsedFileField("","",""))));
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationLoader.class),
-                Globals.prefs);
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
+                mock(LayoutFormatterPreferences.class), prefs.getFileDirectoryPreferences());
         cleanup.cleanup(entry);
 
         assertEquals(
                 Optional.of(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("", "", ""),
                         new ParsedFileField("", "Toot - test title.tmp", ""), new ParsedFileField("", "", "")))),
-                entry.getFieldOptional("file"));
+                entry.getField("file"));
     }
 
     @Test
     public void cleanupRenamePdfRenamesFileStartingWithBibtexKey() throws IOException {
-        when(Globals.prefs.get("importFileNamePattern")).thenReturn("\\bibtexkey - \\title");
+        String fileNamePattern = "\\bibtexkey - \\title";
         File tempFile = testFolder.newFile("Toot.tmp");
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationLoader.class),
-                Globals.prefs);
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
+                mock(LayoutFormatterPreferences.class), prefs.getFileDirectoryPreferences());
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot - test title.tmp", "");
-        assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getFieldOptional("file"));
+        assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
     @Test
     public void cleanupRenamePdfRenamesFileInSameFolder() throws IOException {
-        when(Globals.prefs.get(JabRefPreferences.PREF_IMPORT_FILENAMEPATTERN)).thenReturn("\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}");
+        String fileNamePattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
         testFolder.newFile("Toot.pdf");
         ParsedFileField fileField = new ParsedFileField("", "Toot.pdf", "PDF");
         entry.setField("file", FileField.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, mock(JournalAbbreviationLoader.class),
-                Globals.prefs);
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
+                prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
+                prefs.getFileDirectoryPreferences());
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot - test title.pdf", "PDF");
-        assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getFieldOptional("file"));
+        assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 }

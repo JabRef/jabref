@@ -19,7 +19,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.model.FieldChange;
@@ -49,18 +49,9 @@ public class CleanupWorkerTest {
 
     @Before
     public void setUp() throws IOException {
+        // Needed for ExternalFileTypes
         if (Globals.prefs == null) {
             Globals.prefs = JabRefPreferences.getInstance();
-        }
-        if (Globals.journalAbbreviationLoader == null) {
-            Globals.journalAbbreviationLoader = mock(JournalAbbreviationLoader.class);
-        }
-
-        if (Globals.protectedTermsLoader == null) {
-            Globals.protectedTermsLoader = new ProtectedTermsLoader(
-                    new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
-                            Collections.emptyList(), Collections.emptyList()));
-            ProtectTermsFormatter.setProtectedTermsLoader(Globals.protectedTermsLoader);
         }
 
         pdfFolder = bibFolder.newFolder();
@@ -68,11 +59,11 @@ public class CleanupWorkerTest {
         MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
-        worker = new CleanupWorker(context, mock(JournalAbbreviationLoader.class), Globals.prefs);
+        worker = new CleanupWorker(context,
+                JabRefPreferences.getInstance().get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
+                mock(LayoutFormatterPreferences.class), JabRefPreferences.getInstance().getFileDirectoryPreferences());
     }
 
-
-    @SuppressWarnings("unused")
     @Test(expected = NullPointerException.class)
     public void cleanupWithNullPresetThrowsException() {
         worker.cleanup(null, new BibEntry());
@@ -114,8 +105,8 @@ public class CleanupWorkerTest {
         entry.setField("pdf", "aPdfFile");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.empty(), entry.getFieldOptional("pdf"));
-        Assert.assertEquals(Optional.of("aPdfFile:aPdfFile:PDF"), entry.getFieldOptional("file"));
+        Assert.assertEquals(Optional.empty(), entry.getField("pdf"));
+        Assert.assertEquals(Optional.of("aPdfFile:aPdfFile:PDF"), entry.getField("file"));
     }
 
     @Test
@@ -125,8 +116,8 @@ public class CleanupWorkerTest {
         entry.setField("ps", "aPsFile");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.empty(), entry.getFieldOptional("pdf"));
-        Assert.assertEquals(Optional.of("aPsFile:aPsFile:PostScript"), entry.getFieldOptional("file"));
+        Assert.assertEquals(Optional.empty(), entry.getField("pdf"));
+        Assert.assertEquals(Optional.of("aPsFile:aPsFile:PostScript"), entry.getField("file"));
     }
 
     @Test
@@ -136,7 +127,7 @@ public class CleanupWorkerTest {
         entry.setField("doi", "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("10.1016/0001-8708(80)90035-3"), entry.getFieldOptional("doi"));
+        Assert.assertEquals(Optional.of("10.1016/0001-8708(80)90035-3"), entry.getField("doi"));
     }
 
     @Test
@@ -159,8 +150,8 @@ public class CleanupWorkerTest {
         entry.setField("url", "http://dx.doi.org/10.1016/0001-8708(80)90035-3");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("10.1016/0001-8708(80)90035-3"), entry.getFieldOptional("doi"));
-        Assert.assertEquals(Optional.empty(), entry.getFieldOptional("url"));
+        Assert.assertEquals(Optional.of("10.1016/0001-8708(80)90035-3"), entry.getField("doi"));
+        Assert.assertEquals(Optional.empty(), entry.getField("url"));
     }
 
     @Test
@@ -184,7 +175,7 @@ public class CleanupWorkerTest {
         entry.setField("month", "01");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("#jan#"), entry.getFieldOptional("month"));
+        Assert.assertEquals(Optional.of("#jan#"), entry.getField("month"));
     }
 
     @Test
@@ -195,7 +186,7 @@ public class CleanupWorkerTest {
         entry.setField("pages", "1-2");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("1--2"), entry.getFieldOptional("pages"));
+        Assert.assertEquals(Optional.of("1--2"), entry.getField("pages"));
     }
 
     @Test
@@ -206,7 +197,7 @@ public class CleanupWorkerTest {
         entry.setField("date", "01/1999");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("1999-01"), entry.getFieldOptional("date"));
+        Assert.assertEquals(Optional.of("1999-01"), entry.getField("date"));
     }
 
     @Test
@@ -216,7 +207,7 @@ public class CleanupWorkerTest {
         entry.setField("file", "link::");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of(":link:"), entry.getFieldOptional("file"));
+        Assert.assertEquals(Optional.of(":link:"), entry.getField("file"));
     }
 
     @Test
@@ -233,7 +224,7 @@ public class CleanupWorkerTest {
         worker.cleanup(preset, entry);
         ParsedFileField newFileField = new ParsedFileField("", tempFile.getName(), "");
         Assert.assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)),
-                entry.getFieldOptional("file"));
+                entry.getField("file"));
     }
 
     @Test
@@ -248,7 +239,7 @@ public class CleanupWorkerTest {
         worker.cleanup(preset, entry);
         ParsedFileField newFileField = new ParsedFileField("", tempFile.getName(), "");
         Assert.assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)),
-                entry.getFieldOptional("file"));
+                entry.getField("file"));
     }
 
     @Test
@@ -264,7 +255,7 @@ public class CleanupWorkerTest {
         worker.cleanup(preset, entry);
         ParsedFileField newFileField = new ParsedFileField("", "Toot.tmp", "");
         Assert.assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)),
-                entry.getFieldOptional("file"));
+                entry.getField("file"));
     }
 
     @Test
@@ -275,7 +266,7 @@ public class CleanupWorkerTest {
         entry.setField("title", "&Epsilon;");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("{{$\\Epsilon$}}"), entry.getFieldOptional("title"));
+        Assert.assertEquals(Optional.of("{{$\\Epsilon$}}"), entry.getField("title"));
     }
 
     @Test
@@ -286,19 +277,22 @@ public class CleanupWorkerTest {
         entry.setField("title", "1 A");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("1~{A}"), entry.getFieldOptional("title"));
+        Assert.assertEquals(Optional.of("1~{A}"), entry.getField("title"));
     }
 
     @Test
     public void cleanupCasesAddsBracketAroundAluminiumGalliumArsenid() {
+        ProtectedTermsLoader protectedTermsLoader = new ProtectedTermsLoader(
+                new ProtectedTermsPreferences(ProtectedTermsLoader.getInternalLists(), Collections.emptyList(),
+                        Collections.emptyList(), Collections.emptyList()));
+        Assert.assertNotEquals(Collections.emptyList(), protectedTermsLoader.getProtectedTerms());
         CleanupPreset preset = new CleanupPreset(new FieldFormatterCleanups(true,
-                Collections.singletonList(
-                        new FieldFormatterCleanup("title", new ProtectTermsFormatter()))));
+                Collections.singletonList(new FieldFormatterCleanup("title", new ProtectTermsFormatter(protectedTermsLoader)))));
         BibEntry entry = new BibEntry();
         entry.setField("title", "AlGaAs");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("{AlGaAs}"), entry.getFieldOptional("title"));
+        Assert.assertEquals(Optional.of("{AlGaAs}"), entry.getField("title"));
     }
 
     @Test
@@ -309,7 +303,7 @@ public class CleanupWorkerTest {
         entry.setField("title", "$\\alpha$$\\beta$");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("$\\alpha\\beta$"), entry.getFieldOptional("title"));
+        Assert.assertEquals(Optional.of("$\\alpha\\beta$"), entry.getField("title"));
     }
 
     @Test
@@ -319,8 +313,8 @@ public class CleanupWorkerTest {
         entry.setField("journal", "test");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.empty(), entry.getFieldOptional("journal"));
-        Assert.assertEquals(Optional.of("test"), entry.getFieldOptional("journaltitle"));
+        Assert.assertEquals(Optional.empty(), entry.getField("journal"));
+        Assert.assertEquals(Optional.of("test"), entry.getField("journaltitle"));
     }
 
     @Test
@@ -331,6 +325,6 @@ public class CleanupWorkerTest {
         entry.setField("month", "01");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("01"), entry.getFieldOptional("month"));
+        Assert.assertEquals(Optional.of("01"), entry.getField("month"));
     }
 }

@@ -1,13 +1,10 @@
 package net.sf.jabref.model;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -22,11 +19,6 @@ import static org.junit.Assert.assertTrue;
  * To change this template use File | Settings | File Templates.
  */
 public class DuplicateCheckTest {
-
-    @Before
-    public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
 
     @Test
     public void testDuplicateDetection() {

@@ -7,25 +7,35 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import javafx.fxml.FXMLLoader;
+
+import com.sun.javafx.application.PlatformImpl;
+
 public class LocalizationParser {
 
-    public static List<LocalizationEntry> find(LocalizationBundle type) throws IOException {
-        List<LocalizationEntry> entries = findLocalizationEntriesInJavaFiles(type);
+    public static SortedSet<LocalizationEntry> find(LocalizationBundle type) throws IOException {
+        Set<LocalizationEntry> entries = findLocalizationEntriesInFiles(type);
 
-        List<String> keysInJavaFiles = entries.stream()
+        Set<String> keysInJavaFiles = entries.stream()
                 .map(LocalizationEntry::getKey)
                 .distinct()
                 .sorted()
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
 
-        List<String> englishKeys;
+        Set<String> englishKeys;
         if (type == LocalizationBundle.LANG) {
             englishKeys = getKeysInPropertiesFile("/l10n/JabRef_en.properties");
         } else {
@@ -34,35 +44,54 @@ public class LocalizationParser {
         List<String> missingKeys = new LinkedList<>(keysInJavaFiles);
         missingKeys.removeAll(englishKeys);
 
-        return entries.stream().filter(e -> missingKeys.contains(e.getKey())).collect(Collectors.toList());
+        return entries.stream().filter(e -> missingKeys.contains(e.getKey())).collect(
+                Collectors.toCollection(TreeSet::new));
     }
 
-    public static List<String> findObsolete(LocalizationBundle type) throws IOException {
-        List<LocalizationEntry> entries = findLocalizationEntriesInJavaFiles(type);
+    public static SortedSet<String> findObsolete(LocalizationBundle type) throws IOException {
+        Set<LocalizationEntry> entries = findLocalizationEntriesInFiles(type);
 
-        List<String> keysInJavaFiles = entries.stream().map(LocalizationEntry::getKey).distinct().sorted()
-                .collect(Collectors.toList());
+        Set<String> keysInFiles = entries.stream().map(LocalizationEntry::getKey).collect(Collectors.toSet());
 
-        List<String> englishKeys;
+        Set<String> englishKeys;
         if (type == LocalizationBundle.LANG) {
             englishKeys = getKeysInPropertiesFile("/l10n/JabRef_en.properties");
         } else {
             englishKeys = getKeysInPropertiesFile("/l10n/Menu_en.properties");
         }
-        englishKeys.removeAll(keysInJavaFiles);
+        englishKeys.removeAll(keysInFiles);
 
-        return englishKeys;
+        return englishKeys.stream().collect(Collectors.toCollection(TreeSet::new));
     }
 
-    private static List<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundle type)
+    private static Set<LocalizationEntry> findLocalizationEntriesInFiles(LocalizationBundle type) throws IOException {
+        if (type == LocalizationBundle.MENU) {
+            return findLocalizationEntriesInJavaFiles(type);
+        } else {
+            Set<LocalizationEntry> entriesInFiles = new HashSet<>();
+            entriesInFiles.addAll(findLocalizationEntriesInJavaFiles(type));
+            entriesInFiles.addAll(findLocalizationEntriesInFxmlFiles(type));
+            return entriesInFiles;
+        }
+    }
+
+    private static Set<LocalizationEntry> findLocalizationEntriesInJavaFiles(LocalizationBundle type)
             throws IOException {
         return Files.walk(Paths.get("src/main"))
                 .filter(LocalizationParser::isJavaFile)
-                .flatMap(p -> getLanguageKeysInJavaFile(p, type).stream())
-                .collect(Collectors.toList());
+                .flatMap(path -> getLanguageKeysInJavaFile(path, type).stream())
+                .collect(Collectors.toSet());
     }
 
-    public static List<String> getKeysInPropertiesFile(String path) {
+    private static Set<LocalizationEntry> findLocalizationEntriesInFxmlFiles(LocalizationBundle type)
+            throws IOException {
+        return Files.walk(Paths.get("src/main"))
+                .filter(LocalizationParser::isFxmlFile)
+                .flatMap(path -> getLanguageKeysInFxmlFile(path, type).stream())
+                .collect(Collectors.toSet());
+    }
+
+    public static SortedSet<String> getKeysInPropertiesFile(String path) {
         Properties properties = getProperties(path);
 
         return properties.keySet().stream()
@@ -70,7 +99,7 @@ public class LocalizationParser {
                 .map(Object::toString)
                 .map(String::trim)
                 .map(e -> new LocalizationKey(e).getPropertiesKey())
-                .collect(Collectors.toList());
+                .collect(Collectors.toCollection(TreeSet::new));
     }
 
     public static Properties getProperties(String path) {
@@ -88,7 +117,11 @@ public class LocalizationParser {
         return path.toString().endsWith(".java");
     }
 
-    public static List<LocalizationEntry> getLanguageKeysInJavaFile(Path path, LocalizationBundle type) {
+    private static boolean isFxmlFile(Path path) {
+        return path.toString().endsWith(".fxml");
+    }
+
+    private static List<LocalizationEntry> getLanguageKeysInJavaFile(Path path, LocalizationBundle type) {
         List<LocalizationEntry> result = new LinkedList<>();
 
         try {
@@ -108,7 +141,46 @@ public class LocalizationParser {
         return result;
     }
 
-    public static class JavaLocalizationEntryParser {
+    private static List<LocalizationEntry> getLanguageKeysInFxmlFile(Path path, LocalizationBundle type) {
+        // Load the fxml file and register all used language resources
+
+        List<String> result = new LinkedList<>();
+
+        // Record which keys are requested; we pretend that we have all keys
+        ResourceBundle registerUsageResourceBundle = new ResourceBundle() {
+
+            @Override
+            protected Object handleGetObject(String key) {
+                result.add(key);
+                return "test";
+            }
+
+            @Override
+            public Enumeration<String> getKeys() {
+                return null;
+            }
+
+            @Override
+            public boolean containsKey(String key) {
+                return true;
+            }
+        };
+
+        try {
+            PlatformImpl.startup(() -> {});
+            FXMLLoader loader = new FXMLLoader(path.toUri().toURL(), registerUsageResourceBundle);
+            //loader.setBuilderFactory();
+            loader.load();
+        } catch (IOException ignore) {
+            ignore.printStackTrace();
+        }
+
+        return result.stream()
+                .map(key -> new LocalizationEntry(path, new LocalizationKey(key).getPropertiesKey(), type))
+                .collect(Collectors.toList());
+    }
+
+    static class JavaLocalizationEntryParser {
 
         private static final String INFINITE_WHITESPACE = "\\s*";
         private static final String DOT = "\\.";

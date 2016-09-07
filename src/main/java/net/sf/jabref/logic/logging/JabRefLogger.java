@@ -9,7 +9,6 @@ import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 
 public class JabRefLogger {
-
     private static final Log LOGGER = LogFactory.getLog(JabRefLogger.class);
 
     public static void setDebug() {

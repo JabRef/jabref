@@ -9,7 +9,6 @@ import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
-import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -17,7 +16,6 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -31,11 +29,6 @@ public class IntegrityCheckTest {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
-
-    @Before
-    public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
 
     @Test
     public void testUrlChecks() {
@@ -52,9 +45,33 @@ public class IntegrityCheckTest {
     public void testYearChecks() {
         assertCorrect(createContext("year", "2014"));
         assertCorrect(createContext("year", "1986"));
+        assertCorrect(createContext("year", "around 1986"));
+        assertCorrect(createContext("year", "(around 1986)"));
+        assertCorrect(createContext("year", "1986,"));
+        assertCorrect(createContext("year", "1986}%"));
+        assertCorrect(createContext("year", "1986(){},.;!?<>%&$"));
         assertWrong(createContext("year", "abc"));
         assertWrong(createContext("year", "86"));
         assertWrong(createContext("year", "204"));
+        assertWrong(createContext("year", "1986a"));
+        assertWrong(createContext("year", "(1986a)"));
+        assertWrong(createContext("year", "1986a,"));
+        assertWrong(createContext("year", "1986}a%"));
+        assertWrong(createContext("year", "1986a(){},.;!?<>%&$"));
+    }
+
+    @Test
+    public void testEditionChecks() {
+        assertCorrect(withMode(createContext("edition", "Second"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("edition", "Third"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("edition", "second"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("edition", "2"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("edition", "2nd"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("edition", "2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("edition", "10"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(
+                withMode(createContext("edition", "Third, revised and expanded edition"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("edition", "2nd"), BibDatabaseMode.BIBLATEX));
     }
 
     @Test
@@ -69,7 +86,7 @@ public class IntegrityCheckTest {
 
     @Test
     public void testAuthorNameChecks() {
-        for (String field : InternalBibtexFields.BIBLATEX_PERSON_NAME_FIELDS) {
+        for (String field : InternalBibtexFields.getPersonNameFields()) {
             assertCorrect(createContext(field, ""));
             assertCorrect(createContext(field, "Knuth"));
             assertCorrect(createContext(field, "   Knuth, Donald E. "));
@@ -213,12 +230,19 @@ public class IntegrityCheckTest {
         assertWrong(createContext("isbn", "978-0-306-40615-8"));
     }
 
+    @Test
+    public void testASCIIChecks() {
+        assertCorrect(createContext("title", "Only ascii characters!'@12"));
+        assertWrong(createContext("month", "Umlauts are nöt ällowed"));
+        assertWrong(createContext("author", "Some unicode ⊕"));
+    }
+
     private BibDatabaseContext createContext(String field, String value, String type) {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);
         entry.setType(type);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntry(entry);
+        bibDatabase.insertEntryWithDuplicationCheck(entry);
         return new BibDatabaseContext(bibDatabase, new Defaults());
     }
 
@@ -226,7 +250,7 @@ public class IntegrityCheckTest {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntry(entry);
+        bibDatabase.insertEntryWithDuplicationCheck(entry);
         return new BibDatabaseContext(bibDatabase, metaData, new Defaults());
     }
 
@@ -235,12 +259,15 @@ public class IntegrityCheckTest {
     }
 
     private void assertWrong(BibDatabaseContext context) {
-        List<IntegrityMessage> messages = new IntegrityCheck(context).checkBibtexDatabase();
+        List<IntegrityMessage> messages = new IntegrityCheck(context,
+                JabRefPreferences.getInstance().getFileDirectoryPreferences())
+                .checkBibtexDatabase();
         assertFalse(messages.toString(), messages.isEmpty());
     }
 
     private void assertCorrect(BibDatabaseContext context) {
-        List<IntegrityMessage> messages = new IntegrityCheck(context).checkBibtexDatabase();
+        List<IntegrityMessage> messages = new IntegrityCheck(context,
+                JabRefPreferences.getInstance().getFileDirectoryPreferences()).checkBibtexDatabase();
         assertEquals(Collections.emptyList(), messages);
     }
 

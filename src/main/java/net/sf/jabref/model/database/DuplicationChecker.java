@@ -7,7 +7,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- * Determines which bibtex cite keys are duplicates in a single {@link BibDatabase}
+ * Determines which bibtex cite keys are duplicates in a single {@link BibDatabase}.
  */
 class DuplicationChecker {
 
@@ -16,33 +16,29 @@ class DuplicationChecker {
     // use a map instead of a set since i need to know how many of each key is in there
     private final Map<String, Integer> allKeys = new HashMap<>();
 
-    //##########################################
-    //  usage:
-    //  isDuplicate=checkForDuplicateKeyAndAdd( null, b.getKey() , issueDuplicateWarning);
-    //############################################
-    // if the newkey already exists and is not the same as oldkey it will give a warning
-    // else it will add the newkey to the to set and remove the oldkey
+    /**
+     * Usage:
+     * <br>
+     * isDuplicate=checkForDuplicateKeyAndAdd( null, b.getKey() , issueDuplicateWarning);
+     *
+     * If the newkey already exists and is not the same as oldkey it will give a warning
+     * else it will add the newkey to the to set and remove the oldkey
+     *
+     * @return true, if there is a duplicate key, else false
+     */
     public boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey) {
-        // LOGGER.debug(" checkForDuplicateKeyAndAdd [oldKey = " + oldKey + "] [newKey = " + newKey + "]");
 
-        boolean duplicate;
-        if (oldKey == null) {// this is a new entry so don't bother removing oldKey
+        boolean duplicate = false;
+        if (oldKey == null) { // No old key
             duplicate = addKeyToSet(newKey);
         } else {
             if (oldKey.equals(newKey)) {// were OK because the user did not change keys
                 duplicate = false;
-            } else {// user changed the key
-
-                // removed the oldkey
-                // But what if more than two have the same key?
-                // this means that user can add another key and would not get a warning!
-                // consider this: i add a key xxx, then i add another key xxx . I get a warning. I delete the key xxx. JBM
-                // removes this key from the allKey. then I add another key xxx. I don't get a warning!
-                // i need a way to count the number of keys of each type
-                // hashmap=>int (increment each time)
-
-                removeKeyFromSet(oldKey);
-                duplicate = addKeyToSet(newKey);
+            } else {
+                removeKeyFromSet(oldKey); // Get rid of old key
+                if (newKey != null) { // Add new key if any
+                    duplicate = addKeyToSet(newKey);
+                }
             }
         }
         if (duplicate) {
@@ -64,10 +60,21 @@ class DuplicationChecker {
 
     }
 
-    //========================================================
-    // keep track of all the keys to warn if there are duplicates
-    //========================================================
-    public boolean addKeyToSet(String key) {
+    /**
+     * Helper function for counting the number of the key usages.
+     * Adds the given key to the internal keyset together with the count of it.
+     * The counter is increased if the key already exists, otherwise set to 1.
+     * <br>
+     * Special case: If a null or empty key is passed, it is not counted and thus not added.
+     *
+     * Reasoning:
+     * Consider this: I add a key xxx, then I add another key xxx. I get a warning. I delete the key xxx.
+     * Consider JabRef simply removing this key from a set of allKeys.
+     * Then I add another key xxx. I don't get a warning!
+     * Thus, I need a way to count the number of keys of each type.
+     * Solution: hashmap=>int (increment each time at add and decrement each time at remove)
+     */
+    protected boolean addKeyToSet(String key) {
         if ((key == null) || key.isEmpty()) {
             return false;//don't put empty key
         }
@@ -75,27 +82,30 @@ class DuplicationChecker {
         if (allKeys.containsKey(key)) {
             // warning
             exists = true;
-            allKeys.put(key, allKeys.get(key) + 1);// incrementInteger( allKeys.get(key)));
+            allKeys.put(key, allKeys.get(key) + 1);
         } else {
             allKeys.put(key, 1);
         }
         return exists;
     }
 
-    //========================================================
-    // reduce the number of keys by 1. if this number goes to zero then remove from the set
-    // note: there is a good reason why we should not use a hashset but use hashmap instead
-    //========================================================
-    public void removeKeyFromSet(String key) {
+    /**
+     * Helper function for counting the number of the key usages.
+     * Removes the given key from the internal keyset together with the count of it, if the key is set to 1.
+     * If it is not set to 1, the counter will be decreased.
+     * <br>
+     * Special case: If a null or empty key is passed, it is not counted and thus not removed.
+     */
+    protected void removeKeyFromSet(String key) {
         if ((key == null) || key.isEmpty()) {
             return;
         }
         if (allKeys.containsKey(key)) {
-            Integer tI = allKeys.get(key); // if(allKeys.get(key) instanceof Integer)
+            Integer tI = allKeys.get(key);
             if (tI == 1) {
                 allKeys.remove(key);
             } else {
-                allKeys.put(key, tI - 1);//decrementInteger( tI ));
+                allKeys.put(key, tI - 1);
             }
         }
     }

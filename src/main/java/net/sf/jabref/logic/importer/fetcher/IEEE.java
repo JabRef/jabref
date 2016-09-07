@@ -1,20 +1,3 @@
-/*
- * Copyright (C) 2003-2016 JabRef contributors.
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-
 package net.sf.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
@@ -55,7 +38,7 @@ public class IEEE implements FulltextFetcher {
 
         String stampString = "";
         // Try URL first -- will primarily work for entries from the old IEEE search
-        Optional<String> urlString = entry.getFieldOptional(FieldName.URL);
+        Optional<String> urlString = entry.getField(FieldName.URL);
         if (urlString.isPresent()) {
             // Is the URL a direct link to IEEE?
             Matcher matcher = STAMP_PATTERN.matcher(urlString.get());
@@ -67,7 +50,7 @@ public class IEEE implements FulltextFetcher {
 
         // If not, try DOI
         if (stampString.isEmpty()) {
-            Optional<DOI> doi = entry.getFieldOptional(FieldName.DOI).flatMap(DOI::build);
+            Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::build);
             if (doi.isPresent() && doi.get().getDOI().startsWith(IEEE_DOI) && doi.get().getURI().isPresent()) {
                 // Download the HTML page from IEEE
                 String resolvedDOIPage = new URLDownload(doi.get().getURI().get().toURL())

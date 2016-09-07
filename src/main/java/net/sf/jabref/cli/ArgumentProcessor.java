@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
@@ -16,27 +17,27 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefException;
-import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.external.AutoSetLinks;
-import net.sf.jabref.importer.ImportFormatReader;
-import net.sf.jabref.importer.ImportInspectionCommandLine;
-import net.sf.jabref.importer.OpenDatabaseAction;
-import net.sf.jabref.importer.ParserResult;
-import net.sf.jabref.importer.fetcher.EntryFetcher;
-import net.sf.jabref.importer.fetcher.EntryFetchers;
+import net.sf.jabref.gui.importer.fetcher.EntryFetcher;
+import net.sf.jabref.gui.importer.fetcher.EntryFetchers;
 import net.sf.jabref.logic.CustomEntryTypesManager;
+import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.exporter.BibDatabaseWriter;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
+import net.sf.jabref.logic.exporter.ExportFormat;
 import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.exporter.FileSaveSession;
 import net.sf.jabref.logic.exporter.IExportFormat;
 import net.sf.jabref.logic.exporter.SaveException;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.SaveSession;
+import net.sf.jabref.logic.importer.ImportFormatReader;
+import net.sf.jabref.logic.importer.OpenDatabase;
+import net.sf.jabref.logic.importer.OutputPrinter;
+import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.labelpattern.LabelPatternPreferences;
-import net.sf.jabref.logic.labelpattern.LabelPatternUtil;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.logging.JabRefLogger;
 import net.sf.jabref.logic.search.DatabaseSearcher;
 import net.sf.jabref.logic.search.SearchQuery;
@@ -46,6 +47,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -197,7 +199,9 @@ public class ArgumentProcessor {
                 // We have an ExportFormat instance:
                 try {
                     System.out.println(Localization.lang("Exporting") + ": " + data[1]);
-                    format.performExport(databaseContext, data[1], databaseContext.getMetaData().getEncoding(), matches);
+                    format.performExport(databaseContext, data[1],
+                            databaseContext.getMetaData().getEncoding().orElse(Globals.prefs.getDefaultEncoding()),
+                            matches);
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[1] + "': "
                             + ex.getMessage());
@@ -234,9 +238,10 @@ public class ArgumentProcessor {
                 // BIB files to open. Other files, and files that could not be opened
                 // as bib, we try to import instead.
                 boolean bibExtension = aLeftOver.toLowerCase(Locale.ENGLISH).endsWith("bib");
-                ParserResult pr = null;
+                ParserResult pr = ParserResult.getNullResult();
                 if (bibExtension) {
-                    pr = OpenDatabaseAction.loadDatabaseOrAutoSave(aLeftOver, false);
+                    pr = OpenDatabase.loadDatabaseOrAutoSave(aLeftOver, false,
+                            Globals.prefs.getImportFormatPreferences());
                 }
 
                 if (!bibExtension || (pr.isNullResult())) {
@@ -360,13 +365,14 @@ public class ArgumentProcessor {
             // Set the global variable for this database's file directory before exporting,
             // so formatters can resolve linked files correctly.
             // (This is an ugly hack!)
-            File theFile = pr.getFile();
+            File theFile = pr.getFile().get();
             if (!theFile.isAbsolute()) {
                 theFile = theFile.getAbsoluteFile();
             }
             BibDatabaseContext databaseContext = pr.getDatabaseContext();
             databaseContext.setDatabaseFile(theFile);
-            Globals.prefs.fileDirForDatabase = databaseContext.getFileDirectory();
+            Globals.prefs.fileDirForDatabase = databaseContext
+                    .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
             System.out.println(Localization.lang("Exporting") + ": " + data[0]);
             IExportFormat format = ExportFormats.getExportFormat(data[1]);
             if (format == null) {
@@ -375,7 +381,9 @@ public class ArgumentProcessor {
                 // We have an ExportFormat instance:
                 try {
                     format.performExport(pr.getDatabaseContext(), data[0],
-                            pr.getDatabaseContext().getMetaData().getEncoding(), null);
+                            pr.getDatabaseContext().getMetaData().getEncoding()
+                                    .orElse(Globals.prefs.getDefaultEncoding()),
+                            null);
                 } catch (Exception ex) {
                     System.err.println(Localization.lang("Could not export file") + " '" + data[0] + "': "
                             + ex.getMessage());
@@ -389,7 +397,12 @@ public class ArgumentProcessor {
         try {
             Globals.prefs.importPreferences(cli.getPreferencesImport());
             CustomEntryTypesManager.loadCustomEntryTypes(Globals.prefs);
-            ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
+            Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
+                    Globals.journalAbbreviationLoader);
+            LayoutFormatterPreferences layoutPreferences = Globals.prefs
+                    .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
+            SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+            ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
         } catch (JabRefException ex) {
             LOGGER.error("Cannot import preferences", ex);
         }
@@ -400,6 +413,7 @@ public class ArgumentProcessor {
             try {
                 System.out.println(Localization.lang("Setting all preferences to default values."));
                 Globals.prefs.clear();
+                new SharedDatabasePreferences().clear();
             } catch (BackingStoreException e) {
                 System.err.println(Localization.lang("Unable to clear preferences."));
                 LOGGER.error("Unable to clear preferences", e);
@@ -434,8 +448,8 @@ public class ArgumentProcessor {
                 LOGGER.info(Localization.lang("Regenerating BibTeX keys according to metadata"));
                 for (BibEntry entry : database.getEntries()) {
                     // try to make a new label
-                    LabelPatternUtil.makeLabel(metaData, database, entry,
-                            LabelPatternPreferences.fromPreferences(Globals.prefs));
+                    BibtexKeyPatternUtil.makeLabel(metaData, database, entry,
+                            Globals.prefs.getBibtexKeyPatternPreferences());
                 }
             } else {
                 LOGGER.info(Localization.lang("No meta data present in BIB_file. Cannot regenerate BibTeX keys"));
@@ -516,6 +530,8 @@ public class ArgumentProcessor {
 
     private static Optional<ParserResult> importFile(String argument) {
         String[] data = argument.split(",");
+        OutputPrinter printer = new SystemOutputPrinter();
+
         try {
             if ((data.length > 1) && !"*".equals(data[1])) {
                 System.out.println(Localization.lang("Importing") + ": " + data[0]);
@@ -529,7 +545,7 @@ public class ArgumentProcessor {
                     ParserResult result = Globals.IMPORT_FORMAT_READER.importFromFile(data[1], file);
 
                     if(result.hasWarnings()) {
-                        JabRefGUI.getMainFrame().showMessage(result.getErrorMessage());
+                        printer.showMessage(result.getErrorMessage());
                     }
 
                     return Optional.of(result);
