@@ -43,8 +43,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.jdesktop.swingx.VerticalLayout;
 
-import static net.sf.jabref.gui.importer.fetcher.EntryFetchers.getIdFetchers;
-
 /**
  * Dialog that prompts the user to choose a type for an entry.
  * Returns null if canceled.
@@ -122,7 +120,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
                 panel.add(createEntryGroupPanel(Localization.lang("Custom"), CustomEntryTypesManager.ALL));
             }
 
-            panel.add(createIdFetcher("ID-based entry generator"));
+            panel.add(createIdFetcherPanel());
         }
 
         return panel;
@@ -174,39 +172,39 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         return panel;
     }
 
-    private JPanel createIdFetcher(String groupTitle) {
+    private JPanel createIdFetcherPanel() {
         JButton generateButton = new JButton(Localization.lang("Generate"));
         JButton cancelButton = new JButton(Localization.lang("Cancel"));
         JTextField idTextField = new JTextField("");
         JComboBox<String> comboBox = new JComboBox<>();
-        getIdFetchers().forEach(n -> comboBox.addItem(n.getName()));
+        EntryFetchers.getIdFetchers().forEach(fetcher -> comboBox.addItem(fetcher.getName()));
         JLabel fetcherLabel = new JLabel("ID type"), idLabel = new JLabel("ID");
 
         SwingWorker<Optional<BibEntry>, Void> fetcherWorker = new SwingWorker<Optional<BibEntry>, Void>() {
             Optional<BibEntry> bibEntry = Optional.empty();
-            IdBasedFetcher fetcher;
-            String searchID;
+            IdBasedFetcher fetcher = null;
+            String searchID = "";
 
             @Override
             protected Optional<BibEntry> doInBackground() throws Exception {
-                searchID = idTextField.getText();
+                searchID = idTextField.getText().trim();
+                fetcher = EntryFetchers.getIdFetchers().get(comboBox.getSelectedIndex());
                 if (!searchID.isEmpty()) {
-                    fetcher = EntryFetchers.getIdFetchers().get(comboBox.getSelectedIndex());
                     try {
                         bibEntry = fetcher.performSearchById(searchID);
-                        dispose();
                     } catch (FetcherException e) {
                         LOGGER.error("Error fetching from " + fetcher.getName(), e);
-                        JOptionPane.showMessageDialog(null, Localization.lang("Error_while_fetching_from_%0", fetcher.getName()), Localization.lang("Error_while_fetching"), JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, Localization.lang("Error while fetching from %0", fetcher.getName()), Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
+                dispose();
                 return bibEntry;
             }
 
             @Override
             protected void done() {
                 if (isCancelled()) {
-                    JOptionPane.showMessageDialog(null, "Fetching was canceled", "Canceled fetching", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, Localization.lang("%0 import canceled", fetcher.getName()),Localization.lang("Import canceled by user"), JOptionPane.INFORMATION_MESSAGE);
                     return;
                 }
 
@@ -215,16 +213,16 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
                     if (result.isPresent()) {
                         frame.getCurrentBasePanel().insertEntry(result.get());
                     } else {
-                        JOptionPane.showMessageDialog(null, Localization.lang("No_entry_with_id_'%0'_for_fetcher_'%1'_was_found.", searchID, fetcher.getName()), Localization.lang("No_files_found."), JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(null, Localization.lang("No entry with id '%0' for fetcher '%1' was found.", searchID, fetcher.getName()), Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
                     }
                 } catch (ExecutionException | InterruptedException e) {
-                    e.printStackTrace();
+                    LOGGER.error("No entry with id '" + searchID + " for fetcher '" + fetcher.getName() + "' was found.");
                 }
             }
         };
 
-        generateButton.addActionListener(n -> fetcherWorker.execute());
-        cancelButton.addActionListener(n -> fetcherWorker.cancel(true));
+        generateButton.addActionListener(action -> fetcherWorker.execute());
+        cancelButton.addActionListener(action -> fetcherWorker.cancel(true));
 
         JPanel jPanel = new JPanel();
 
@@ -257,7 +255,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         bb.addButton(cancelButton);
 
         jPanel.add(buttons, constraints);
-        jPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), groupTitle));
+        jPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("ID-based_entry_generator")));
 
 
         return jPanel;
