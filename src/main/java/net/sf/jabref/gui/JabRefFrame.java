@@ -285,7 +285,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.menuTitle("Unmark entries"), Localization.lang("Unmark entries"),
             Globals.getKeyPrefs().getKey(KeyBinding.UNMARK_ENTRIES), IconTheme.JabRefIcon.UNMARK_ENTRIES.getIcon());
     private final AbstractAction unmarkAll = new GeneralAction(Actions.UNMARK_ALL, Localization.menuTitle("Unmark all"));
-    private JMenu rankSubMenue;
+    private JMenu rankSubMenu;
     private final AbstractAction toggleRelevance = new GeneralAction(
             Relevance.getInstance().getValues().get(0).getActionName(),
             Relevance.getInstance().getValues().get(0).getMenuString(),
@@ -383,7 +383,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Will write XMP-metadata to the PDFs linked from selected entries."),
             Globals.getKeyPrefs().getKey(KeyBinding.WRITE_XMP));
 
-    private JMenuItem optMenueItem;
+    private JMenuItem optMenuItem;
 
     private final AbstractAction openFolder = new GeneralAction(Actions.OPEN_FOLDER,
             Localization.menuTitle("Open folder"), Localization.lang("Open folder"),
@@ -1194,9 +1194,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         edit.addSeparator();
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
-                rankSubMenue = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(rankSubMenue, Rank.getInstance(), this);
-                edit.add(rankSubMenue);
+                rankSubMenu = new JMenu();
+                RightClickMenu.populateSpecialFieldMenu(rankSubMenu, Rank.getInstance(), this);
+                edit.add(rankSubMenu);
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
                 edit.add(toggleRelevance);
@@ -1205,17 +1205,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 edit.add(toggleQualityAssured);
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
-                rankSubMenue = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(rankSubMenue, Priority.getInstance(), this);
-                edit.add(rankSubMenue);
+                rankSubMenu = new JMenu();
+                RightClickMenu.populateSpecialFieldMenu(rankSubMenu, Priority.getInstance(), this);
+                edit.add(rankSubMenu);
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
                 edit.add(togglePrinted);
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
-                rankSubMenue = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(rankSubMenue, ReadStatus.getInstance(), this);
-                edit.add(rankSubMenue);
+                rankSubMenu = new JMenu();
+                RightClickMenu.populateSpecialFieldMenu(rankSubMenu, ReadStatus.getInstance(), this);
+                edit.add(rankSubMenu);
             }
             edit.addSeparator();
         }
@@ -1318,8 +1318,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tools.add(writeXmpAction);
         OpenOfficePanel otp = OpenOfficePanel.getInstance();
         otp.init(this, sidePaneManager);
-        optMenueItem = otp.getMenuItem();
-        tools.add(optMenueItem);
+        optMenuItem = otp.getMenuItem();
+        tools.add(optMenuItem);
         tools.add(pushExternalButton.getMenuAction());
         tools.addSeparator();
         tools.add(openFolder);
@@ -1511,9 +1511,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         openDatabaseOnlyActions.clear();
         openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save,
                 saveAs, saveSelectedAs, saveSelectedAsPlain, editModeAction, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
-                unmarkAll, rankSubMenue, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings,
+                unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings,
                 toggleGroups, makeKeyAction, normalSearch, generalFetcher.getAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
-                sendAsEmail, downloadFullText, writeXmpAction,optMenueItem, findUnlinkedFiles, addToGroup, removeFromGroup,
+                sendAsEmail, downloadFullText, writeXmpAction, optMenuItem, findUnlinkedFiles, addToGroup, removeFromGroup,
                 moveToGroup, autoLinkFile, resolveDuplicateKeys, openUrl, openFolder, openFile, togglePreview,
                 dupliCheck, autoSetFile, newEntryAction, newSpec, customizeAction, plainTextImport, getMassSetField(), getManageKeywords(),
                 pushExternalButton.getMenuAction(), closeDatabaseAction, getSwitchPreviewAction(), checkIntegrity,
@@ -1711,7 +1711,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     button.setDisabledIcon(((IconTheme.FontBasedIcon) button.getIcon()).createDisabledIcon());
                 }
             } else if (component instanceof JPanel) {
-                createDisabledIconsForButtons((JPanel)component);
+                createDisabledIconsForButtons((JPanel) component);
             }
         }
     }
