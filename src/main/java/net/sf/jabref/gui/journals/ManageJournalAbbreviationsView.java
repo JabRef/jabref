@@ -72,8 +72,6 @@ public class ManageJournalAbbreviationsView extends FXMLView {
     @FXML
     private Button cancelButton;
     @FXML
-    private Button saveButton;
-    @FXML
     private ComboBox<AbbreviationsFileViewModel> journalFilesBox;
     @FXML
     private Button addJournalFileButton;
@@ -89,8 +87,7 @@ public class ManageJournalAbbreviationsView extends FXMLView {
 
     public ManageJournalAbbreviationsView() {
         super();
-        // TODO: Uncomment this line; for some reason the LocalizationTests fail then. Fix this.
-        //bundle = Localization.getMessages();
+        bundle = Localization.getMessages();
     }
 
     @FXML
