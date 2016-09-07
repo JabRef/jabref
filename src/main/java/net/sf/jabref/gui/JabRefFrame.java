@@ -1,6 +1,7 @@
 package net.sf.jabref.gui;
 
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Font;
 import java.awt.Frame;
@@ -279,10 +280,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     private final AbstractAction mark = new GeneralAction(Actions.MARK_ENTRIES, Localization.menuTitle("Mark entries"),
             Localization.lang("Mark entries"), Globals.getKeyPrefs().getKey(KeyBinding.MARK_ENTRIES), IconTheme.JabRefIcon.MARK_ENTRIES.getIcon());
+    private final JMenu markSpecific = JabRefFrame.subMenu(Localization.menuTitle("Mark specific color"));
     private final AbstractAction unmark = new GeneralAction(Actions.UNMARK_ENTRIES,
             Localization.menuTitle("Unmark entries"), Localization.lang("Unmark entries"),
             Globals.getKeyPrefs().getKey(KeyBinding.UNMARK_ENTRIES), IconTheme.JabRefIcon.UNMARK_ENTRIES.getIcon());
     private final AbstractAction unmarkAll = new GeneralAction(Actions.UNMARK_ALL, Localization.menuTitle("Unmark all"));
+    private JMenu rankSubMenu;
     private final AbstractAction toggleRelevance = new GeneralAction(
             Relevance.getInstance().getValues().get(0).getActionName(),
             Relevance.getInstance().getValues().get(0).getMenuString(),
@@ -380,6 +383,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Will write XMP-metadata to the PDFs linked from selected entries."),
             Globals.getKeyPrefs().getKey(KeyBinding.WRITE_XMP));
 
+    private JMenuItem optMenuItem;
+
     private final AbstractAction openFolder = new GeneralAction(Actions.OPEN_FOLDER,
             Localization.menuTitle("Open folder"), Localization.lang("Open folder"),
             Globals.getKeyPrefs().getKey(KeyBinding.OPEN_FOLDER));
@@ -472,6 +477,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     // The action for adding a new entry of unspecified type.
     private final NewEntryAction newEntryAction = new NewEntryAction(this, Globals.getKeyPrefs().getKey(KeyBinding.NEW_ENTRY));
+    private JMenu newSpec;
     private final List<NewEntryAction> newSpecificEntryAction = getNewEntryActions();
 
     // The action for closing the current database and leaving the window open.
@@ -1128,7 +1134,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         JMenu view = JabRefFrame.subMenu(Localization.menuTitle("View"));
         JMenu tools = JabRefFrame.subMenu(Localization.menuTitle("Tools"));
         JMenu options = JabRefFrame.subMenu(Localization.menuTitle("Options"));
-        JMenu newSpec = JabRefFrame.subMenu(Localization.menuTitle("New entry by type..."));
+        newSpec = JabRefFrame.subMenu(Localization.menuTitle("New entry by type..."));
         JMenu helpMenu = JabRefFrame.subMenu(Localization.menuTitle("Help"));
 
         file.add(newBibtexDatabaseAction);
@@ -1179,7 +1185,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         edit.addSeparator();
         edit.add(mark);
-        JMenu markSpecific = JabRefFrame.subMenu(Localization.menuTitle("Mark specific color"));
         for (int i = 0; i < EntryMarker.MAX_MARKING_LEVEL; i++) {
             markSpecific.add(new MarkEntriesAction(this, i).getMenuItem());
         }
@@ -1188,11 +1193,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         edit.add(unmarkAll);
         edit.addSeparator();
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
-            JMenu m;
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
-                m = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(m, Rank.getInstance(), this);
-                edit.add(m);
+                rankSubMenu = new JMenu();
+                RightClickMenu.populateSpecialFieldMenu(rankSubMenu, Rank.getInstance(), this);
+                edit.add(rankSubMenu);
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
                 edit.add(toggleRelevance);
@@ -1201,17 +1205,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 edit.add(toggleQualityAssured);
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
-                m = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(m, Priority.getInstance(), this);
-                edit.add(m);
+                rankSubMenu = new JMenu();
+                RightClickMenu.populateSpecialFieldMenu(rankSubMenu, Priority.getInstance(), this);
+                edit.add(rankSubMenu);
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
                 edit.add(togglePrinted);
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
-                m = new JMenu();
-                RightClickMenu.populateSpecialFieldMenu(m, ReadStatus.getInstance(), this);
-                edit.add(m);
+                rankSubMenu = new JMenu();
+                RightClickMenu.populateSpecialFieldMenu(rankSubMenu, ReadStatus.getInstance(), this);
+                edit.add(rankSubMenu);
             }
             edit.addSeparator();
         }
@@ -1314,7 +1318,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tools.add(writeXmpAction);
         OpenOfficePanel otp = OpenOfficePanel.getInstance();
         otp.init(this, sidePaneManager);
-        tools.add(otp.getMenuItem());
+        optMenuItem = otp.getMenuItem();
+        tools.add(optMenuItem);
         tools.add(pushExternalButton.getMenuAction());
         tools.addSeparator();
         tools.add(openFolder);
@@ -1488,6 +1493,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addSeparator();
         tlb.add(donationAction);
         tlb.add(forkMeOnGitHubAction);
+
+        createDisabledIconsForButtons(tlb);
     }
 
     /**
@@ -1503,15 +1510,15 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private void initActions() {
         openDatabaseOnlyActions.clear();
         openDatabaseOnlyActions.addAll(Arrays.asList(manageSelectors, mergeDatabaseAction, newSubDatabaseAction, save,
-                saveAs, saveSelectedAs, saveSelectedAsPlain, undo, redo, cut, deleteEntry, copy, paste, mark, unmark,
-                unmarkAll, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings,
-                toggleGroups, makeKeyAction, normalSearch, mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
-                sendAsEmail, downloadFullText, writeXmpAction, findUnlinkedFiles, addToGroup, removeFromGroup,
+                saveAs, saveSelectedAs, saveSelectedAsPlain, editModeAction, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
+                unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, editPreamble, editStrings,
+                toggleGroups, makeKeyAction, normalSearch, generalFetcher.getAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
+                sendAsEmail, downloadFullText, writeXmpAction, optMenuItem, findUnlinkedFiles, addToGroup, removeFromGroup,
                 moveToGroup, autoLinkFile, resolveDuplicateKeys, openUrl, openFolder, openFile, togglePreview,
-                dupliCheck, autoSetFile, newEntryAction, plainTextImport, getMassSetField(), getManageKeywords(),
+                dupliCheck, autoSetFile, newEntryAction, newSpec, customizeAction, plainTextImport, getMassSetField(), getManageKeywords(),
                 pushExternalButton.getMenuAction(), closeDatabaseAction, getSwitchPreviewAction(), checkIntegrity,
                 toggleHighlightAny, toggleHighlightAll, toggleHighlightDisable, databaseProperties, abbreviateIso, abbreviateMedline,
-                unabbreviate, exportAll, exportSelected, importCurrent, saveAll, focusTable,
+                unabbreviate, exportAll, exportSelected, importCurrent, saveAll, focusTable, increaseFontSize, decreseFontSize,
                 toggleRelevance, toggleQualityAssured, togglePrinted, pushExternalButton.getComponent()));
 
         openDatabaseOnlyActions.addAll(newSpecificEntryAction);
@@ -1537,12 +1544,18 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
      * @param enabled
      */
     private static void setEnabled(List<Object> list, boolean enabled) {
-        for (Object o : list) {
-            if (o instanceof Action) {
-                ((Action) o).setEnabled(enabled);
+        for (Object actionOrComponent : list) {
+            if (actionOrComponent instanceof Action) {
+                ((Action) actionOrComponent).setEnabled(enabled);
             }
-            if (o instanceof Component) {
-                ((Component) o).setEnabled(enabled);
+            if (actionOrComponent instanceof Component) {
+                ((Component) actionOrComponent).setEnabled(enabled);
+                if (actionOrComponent instanceof JPanel) {
+                    JPanel root = (JPanel) actionOrComponent;
+                    for (int index = 0; index < root.getComponentCount(); index++) {
+                        root.getComponent(index).setEnabled(enabled);
+                    }
+                }
             }
         }
     }
@@ -1685,6 +1698,20 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 if (item.getIcon() instanceof IconTheme.FontBasedIcon) {
                     item.setDisabledIcon(((IconTheme.FontBasedIcon) item.getIcon()).createDisabledIcon());
                 }
+            }
+        }
+    }
+
+    public void createDisabledIconsForButtons(Container container) {
+        for (int index = 0; index < container.getComponentCount(); index++) {
+            Component component = container.getComponent(index);
+            if (component instanceof JButton) {
+                JButton button = (JButton) component;
+                if (button.getIcon() instanceof IconTheme.FontBasedIcon) {
+                    button.setDisabledIcon(((IconTheme.FontBasedIcon) button.getIcon()).createDisabledIcon());
+                }
+            } else if (component instanceof JPanel) {
+                createDisabledIconsForButtons((JPanel) component);
             }
         }
     }
