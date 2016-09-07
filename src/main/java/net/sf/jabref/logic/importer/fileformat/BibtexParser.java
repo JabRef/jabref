@@ -95,12 +95,12 @@ public class BibtexParser implements Parser {
      * @param bibtexString
      * @return Returns returns an empty collection if no entries where found or if an error occurred.
      */
+    @Deprecated // use parseEntries
     public static List<BibEntry> fromString(String bibtexString, ImportFormatPreferences importFormatPreferences) {
-        StringReader reader = new StringReader(bibtexString);
         BibtexParser parser = new BibtexParser(importFormatPreferences);
 
         try {
-            return parser.parse(reader).getDatabase().getEntries();
+            return parser.parseEntries(bibtexString);
         } catch (Exception e) {
             LOGGER.warn("BibtexParser.fromString(String): " + e.getMessage(), e);
             return Collections.emptyList();
@@ -127,11 +127,19 @@ public class BibtexParser implements Parser {
     @Override
     public List<BibEntry> parseEntries(InputStream inputStream) throws ParserException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+        return parseEntries(reader);
+    }
+
+    public List<BibEntry> parseEntries(Reader reader) throws ParserException {
         try {
             return parse(reader).getDatabase().getEntries();
         } catch (IOException e) {
             throw new ParserException(e);
         }
+    }
+
+    public List<BibEntry> parseEntries(String bibtexString) throws ParserException {
+        return parseEntries(new StringReader(bibtexString));
     }
 
     /**

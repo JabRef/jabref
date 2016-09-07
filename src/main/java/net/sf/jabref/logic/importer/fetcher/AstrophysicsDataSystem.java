@@ -75,7 +75,7 @@ public class AstrophysicsDataSystem implements SearchBasedParserFetcher, EntryBa
         uriBuilder.addParameter("db_key", "PRE");
 
         // Add title search
-        entry.getField(FieldName.TITLE).ifPresent(title -> {
+        entry.getFieldOrAlias(FieldName.TITLE).ifPresent(title -> {
             uriBuilder.addParameter("ttl_logic", "OR");
             uriBuilder.addParameter("title", title);
             uriBuilder.addParameter("ttl_syn", "YES"); // Synonym replacement
@@ -84,7 +84,7 @@ public class AstrophysicsDataSystem implements SearchBasedParserFetcher, EntryBa
         });
 
         // Add author search
-        entry.getField(FieldName.AUTHOR).ifPresent(author -> {
+        entry.getFieldOrAlias(FieldName.AUTHOR).ifPresent(author -> {
             uriBuilder.addParameter("aut_logic", "OR");
             uriBuilder.addParameter("author", author);
             uriBuilder.addParameter("aut_syn", "YES"); // Synonym replacement
