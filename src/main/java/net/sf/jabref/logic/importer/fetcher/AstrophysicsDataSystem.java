@@ -26,6 +26,9 @@ import org.apache.http.client.utils.URIBuilder;
  *
  * Search query-based: http://adsabs.harvard.edu/basic_search.html
  * Entry -based: http://adsabs.harvard.edu/abstract_service.html
+ *
+ * There is also a new API (https://github.com/adsabs/adsabs-dev-api) but it returns JSON
+ * (or at least needs multiple calls to get BibTeX, status: September 2016)
  */
 public class AstrophysicsDataSystem implements SearchBasedParserFetcher, EntryBasedParserFetcher {
 
