@@ -30,6 +30,7 @@ import org.junit.Test;
 
 import static net.sf.jabref.logic.util.OS.NEWLINE;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -37,6 +38,7 @@ import static org.mockito.Mockito.when;
 public class AstrophysicsDataSystemTest {
 
     AstrophysicsDataSystem fetcher;
+    BibEntry diezSliceTheoremEntry;
 
     @Before
     public void setUp() throws Exception {
@@ -44,11 +46,8 @@ public class AstrophysicsDataSystemTest {
         when(importFormatPreferences.getFieldContentParserPreferences()).thenReturn(
                 mock(FieldContentParserPreferences.class));
         fetcher = new AstrophysicsDataSystem(importFormatPreferences);
-    }
 
-    @Test
-    public void performSearchFindsEntry() throws Exception {
-        BibEntry diezSliceTheoremEntry = new BibEntry();
+        diezSliceTheoremEntry = new BibEntry();
         diezSliceTheoremEntry.setType(BibtexEntryTypes.ARTICLE);
         diezSliceTheoremEntry.setCiteKey("2014arXiv1405.2249D");
         diezSliceTheoremEntry.setField("author", "Diez, T.");
@@ -76,8 +75,22 @@ public class AstrophysicsDataSystemTest {
                         + "setting. The examples of the Klein-Gordon field and general Yang-Mills" + NEWLINE
                         + "theory illustrate that the presented approach conveniently handles the" + NEWLINE
                         + "occurring symmetries." + NEWLINE);
+    }
 
+    @Test
+    public void searchByQueryFindsEntry() throws Exception {
         List<BibEntry> fetchedEntries = fetcher.performSearch("Diez slice theorem");
         assertEquals(Collections.singletonList(diezSliceTheoremEntry), fetchedEntries);
+    }
+
+    @Test
+    public void searchByEntryFindsEntry() throws Exception {
+        BibEntry searchEntry = new BibEntry();
+        searchEntry.setField("title", "slice theorem");
+        searchEntry.setField("author", "Diez");
+
+        List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
+        assertFalse(fetchedEntries.isEmpty());
+        assertEquals(diezSliceTheoremEntry, fetchedEntries.get(0));
     }
 }

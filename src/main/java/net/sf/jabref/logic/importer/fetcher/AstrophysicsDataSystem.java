@@ -1,20 +1,3 @@
-/*
- * Copyright (C) 2003-2016 JabRef contributors.
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-
 package net.sf.jabref.logic.importer.fetcher;
 
 import java.net.MalformedURLException;
@@ -25,9 +8,9 @@ import java.util.Objects;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
-import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import net.sf.jabref.logic.help.HelpFile;
+import net.sf.jabref.logic.importer.EntryBasedParserFetcher;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.Parser;
@@ -42,10 +25,12 @@ import org.apache.http.client.utils.URIBuilder;
  * Fetches data from the SAO/NASA Astrophysics Data System (http://www.adsabs.harvard.edu/)
  *
  * Search query-based: http://adsabs.harvard.edu/basic_search.html
+ * Entry -based: http://adsabs.harvard.edu/abstract_service.html
  */
-public class AstrophysicsDataSystem implements SearchBasedParserFetcher {
+public class AstrophysicsDataSystem implements SearchBasedParserFetcher, EntryBasedParserFetcher {
 
-    private static String API_URL = "http://adsabs.harvard.edu/cgi-bin/nph-basic_connect";
+    private static String API_QUERY_URL = "http://adsabs.harvard.edu/cgi-bin/nph-basic_connect";
+    private static String API_ENTRY_URL = "http://adsabs.harvard.edu/cgi-bin/nph-abs_connect";
     private final ImportFormatPreferences preferences;
 
     public AstrophysicsDataSystem(ImportFormatPreferences preferences) {
@@ -62,13 +47,48 @@ public class AstrophysicsDataSystem implements SearchBasedParserFetcher {
         return null;
     }
 
-    @Override
-    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
-        URIBuilder uriBuilder = new URIBuilder(API_URL);
-        uriBuilder.addParameter("qsearch", query);
+    private URIBuilder getBaseUrl(String apiUrl) throws URISyntaxException {
+        URIBuilder uriBuilder = new URIBuilder(apiUrl);
         uriBuilder.addParameter("data_type", "BIBTEXPLUS");
         uriBuilder.addParameter("start_nr", String.valueOf(1));
         uriBuilder.addParameter("nr_to_return", String.valueOf(200));
+        return uriBuilder;
+    }
+
+    @Override
+    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+        URIBuilder uriBuilder = getBaseUrl(API_QUERY_URL);
+        uriBuilder.addParameter("qsearch", query);
+        return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException {
+        URIBuilder uriBuilder = getBaseUrl(API_ENTRY_URL);
+
+        // Search astronomy + physics + arXiv db
+        uriBuilder.addParameter("db_key", "AST");
+        uriBuilder.addParameter("db_key", "PHY");
+        uriBuilder.addParameter("db_key", "PRE");
+
+        // Add title search
+        entry.getField(FieldName.TITLE).ifPresent(title -> {
+            uriBuilder.addParameter("ttl_logic", "OR");
+            uriBuilder.addParameter("title", title);
+            uriBuilder.addParameter("ttl_syn", "YES"); // Synonym replacement
+            uriBuilder.addParameter("ttl_wt", "0.3"); // Weight
+            uriBuilder.addParameter("ttl_wgt", "YES"); // Consider Weight
+        });
+
+        // Add author search
+        entry.getField(FieldName.AUTHOR).ifPresent(author -> {
+            uriBuilder.addParameter("aut_logic", "OR");
+            uriBuilder.addParameter("author", author);
+            uriBuilder.addParameter("aut_syn", "YES"); // Synonym replacement
+            uriBuilder.addParameter("aut_wt", "1.0"); // Weight
+            uriBuilder.addParameter("aut_wgt", "YES"); // Consider weight
+        });
+
         return uriBuilder.build().toURL();
     }
 
