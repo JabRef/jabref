@@ -37,7 +37,7 @@ import net.sf.jabref.logic.logging.Cache;
 public class ErrorConsoleAction extends AbstractAction {
 
     public ErrorConsoleAction(StreamEavesdropper streamEavesdropper, Cache cache) {
-        super(Localization.menuTitle("Show developer information"));
+        super(Localization.menuTitle("View event log"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Display all error messages"));
     }
 

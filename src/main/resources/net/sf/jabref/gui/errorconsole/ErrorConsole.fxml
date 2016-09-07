@@ -7,7 +7,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.layout.BorderPane?>
-<DialogPane xmlns="http://javafx.com/javafx/8.0.65" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sf.jabref.gui.errorconsole.ErrorConsoleView">
+<DialogPane prefHeight="500.0" prefWidth="1080.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.sf.jabref.gui.errorconsole.ErrorConsoleView">
     <content>
         <BorderPane>
             <bottom>
@@ -23,11 +23,11 @@
                 </ButtonBar>
             </bottom>
             <center>
-                <ListView fx:id="allMessage" prefHeight="400.0" prefWidth="1100.0" styleClass="list-content" BorderPane.alignment="CENTER" />
+                <ListView fx:id="allMessage" styleClass="list-content" BorderPane.alignment="CENTER" />
             </center>
         </BorderPane>
     </content>
    <header>
-      <Label fx:id="descriptionLabel" styleClass="info-section" />
+      <Label fx:id="descriptionLabel" styleClass="info-section" text="%We now give you insight into the inner workings of JabRef's brain. These information might be helpful to diagnose the root cause of a problem. Please feel free to inform the developers about an issue." wrapText="true" />
    </header>
 </DialogPane>

@@ -16,11 +16,11 @@
 package net.sf.jabref.logic.error;
 
 /**
- * This enum will be define for three different priority of message
+ * This enum will be define for three different type of message
  * <ul>
- *     <li>LOW is for log entry
- *     <li>MEDIUM is for output entry
- *     <li>HIGH is for exception entry
+ * <li>log
+ * <li>output
+ * <li>exception
  * </ul>
  */
 public enum MessagePriority {

@@ -30,10 +30,10 @@ import javafx.util.Callback;
 
 import net.sf.jabref.gui.FXAlert;
 import net.sf.jabref.gui.IconTheme;
+import net.sf.jabref.logic.error.LogMessageWithPriority;
 import net.sf.jabref.logic.error.MessagePriority;
-import net.sf.jabref.logic.error.ObservableMessageWithPriority;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.logging.ObservableMessages;
+import net.sf.jabref.logic.logging.LogMessage;
 
 import com.airhacks.afterburner.views.FXMLView;
 
@@ -48,7 +48,7 @@ public class ErrorConsoleView extends FXMLView {
     @FXML
     private Button createIssueButton;
     @FXML
-    private ListView<ObservableMessageWithPriority> allMessage;
+    private ListView<LogMessageWithPriority> allMessage;
     @FXML
     private Label descriptionLabel;
 
@@ -58,7 +58,7 @@ public class ErrorConsoleView extends FXMLView {
     }
 
     public void show() {
-        FXAlert errorConsole = new FXAlert(AlertType.ERROR, Localization.lang("Developer information"), false);
+        FXAlert errorConsole = new FXAlert(AlertType.ERROR, Localization.lang("Event log"), false);
         DialogPane pane = (DialogPane) this.getView();
         errorConsole.setDialogPane(pane);
         errorConsole.setResizable(true);
@@ -70,18 +70,10 @@ public class ErrorConsoleView extends FXMLView {
         ButtonBar.setButtonData(copyLogButton, ButtonBar.ButtonData.LEFT);
         ButtonBar.setButtonData(createIssueButton, ButtonBar.ButtonData.LEFT);
 
-        ObservableList<ObservableMessageWithPriority> masterData = ObservableMessages.INSTANCE.messagesPropety();
+        ObservableList<LogMessageWithPriority> masterData = LogMessage.getInstance().messagesProperty();
         listViewStyle();
         allMessage.setItems(masterData);
-
-        //set console icon instead the error icon and insert a description
-        Text graphic = new Text(IconTheme.JabRefIcon.CONSOLE.getCode());
-        graphic.getStyleClass().add("icon");
-        String headerLabel = Localization.lang("We now give you an insight into the inner workings of JabRef's brain.") + " "
-                + Localization.lang("This might help to diagonalize the root of problems.") + " " + System.lineSeparator()
-                + Localization.lang("Please use the button below to inform the developers about an issue.");
-        descriptionLabel.setText(headerLabel);
-        descriptionLabel.setGraphic(graphic);
+        descriptionLabel.setGraphic(IconTheme.JabRefIcon.CONSOLE.getGraphicNode());
     }
 
     @FXML
@@ -100,33 +92,42 @@ public class ErrorConsoleView extends FXMLView {
         stage.close();
     }
 
-    //style the list view with icon and message color
+    /**
+     * Style the list view with icon and message color
+     */
     private void listViewStyle() {
-        // handler for listCell appearance (example for exception Cell)
+        // Handler for listCell appearance (example for exception Cell)
         allMessage.setCellFactory(
-                new Callback<ListView<ObservableMessageWithPriority>, ListCell<ObservableMessageWithPriority>>() {
+                new Callback<ListView<LogMessageWithPriority>, ListCell<LogMessageWithPriority>>() {
                     @Override
-                    public ListCell<ObservableMessageWithPriority> call(
-                            ListView<ObservableMessageWithPriority> listView) {
-                        return new ListCell<ObservableMessageWithPriority>() {
+                    public ListCell<LogMessageWithPriority> call(
+                            ListView<LogMessageWithPriority> listView) {
+                        return new ListCell<LogMessageWithPriority>() {
 
                             @Override
-                            public void updateItem(ObservableMessageWithPriority omp, boolean empty) {
-                                super.updateItem(omp, empty);
-                                if (omp != null) {
-                                    setText(omp.getMessage());
-                                    getStyleClass().clear();
+                            public void updateItem(LogMessageWithPriority logMessageWithPriority, boolean empty) {
+                                super.updateItem(logMessageWithPriority, empty);
+                                if (logMessageWithPriority != null) {
+                                    setText(logMessageWithPriority.getMessage());
                                     Text graphic = new Text();
                                     graphic.getStyleClass().add("icon");
-                                    if (omp.getPriority() == MessagePriority.HIGH) {
-                                        getStyleClass().add("exception");
-                                        graphic.setText(IconTheme.JabRefIcon.INTEGRITY_FAIL.getCode());
-                                    } else if (omp.getPriority() == MessagePriority.MEDIUM) {
-                                        getStyleClass().add("output");
-                                        graphic.setText(IconTheme.JabRefIcon.INTEGRITY_WARN.getCode());
-                                    } else {
-                                        getStyleClass().add("log");
-                                        graphic.setText(IconTheme.JabRefIcon.INTEGRITY_INFO.getCode());
+
+                                    MessagePriority prio = logMessageWithPriority.getPriority();
+                                    switch (prio) {
+                                        case HIGH:
+                                            getStyleClass().add("exception");
+                                            graphic.setText(IconTheme.JabRefIcon.INTEGRITY_FAIL.getCode());
+                                            break;
+                                        case MEDIUM:
+                                            getStyleClass().add("output");
+                                            graphic.setText(IconTheme.JabRefIcon.INTEGRITY_WARN.getCode());
+                                            break;
+                                        case LOW:
+                                            getStyleClass().add("log");
+                                            graphic.setText(IconTheme.JabRefIcon.INTEGRITY_INFO.getCode());
+                                            break;
+                                        default:
+                                            break;
                                     }
                                     setGraphic(graphic);
                                 } else {

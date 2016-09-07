@@ -18,7 +18,7 @@ package net.sf.jabref.logic.error;
 
 import java.io.PrintStream;
 
-import net.sf.jabref.logic.logging.ObservableMessages;
+import net.sf.jabref.logic.logging.LogMessage;
 
 /**
  * All writes to this print stream are copied to two print streams
@@ -43,8 +43,8 @@ public class TeeStream extends PrintStream {
             outStream.write(buf, off, len);
             String s = new String(buf, off, len);
             if (!s.equals(System.lineSeparator())) {
-                ObservableMessageWithPriority messageWithPriority = new ObservableMessageWithPriority(s.replaceAll(System.lineSeparator(), ""), priority);
-                ObservableMessages.INSTANCE.add(messageWithPriority);
+                LogMessageWithPriority messageWithPriority = new LogMessageWithPriority(s.replaceAll(System.lineSeparator(), ""), priority);
+                LogMessage.getInstance().add(messageWithPriority);
             }
         } catch (Exception ignored) {
             // Ignored

@@ -11,7 +11,7 @@
 }
 
 .list-cell {
- -fx-background-color: white;
+    -fx-background-color: white;
  }
  
  .icon {
@@ -29,7 +29,7 @@
 }
 
 .log {
--fx-text-fill: blue;
+    -fx-text-fill: blue;
 }
 
 .log .icon {
@@ -37,7 +37,7 @@
 }
 
 .output {
--fx-text-fill: black;
+    -fx-text-fill: black;
 }
 
 .output .icon {

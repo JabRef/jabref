@@ -77,8 +77,18 @@ public class FXAlert extends Alert {
         setDialogIcon(image);
     }
 
+    public FXAlert(AlertType type, String title, Image image) {
+        this(type, title, true);
+        setDialogIcon(image);
+    }
+
     public FXAlert(AlertType type, String title, boolean isModal) {
         this(type, isModal);
+        setTitle(title);
+    }
+
+    public FXAlert(AlertType type, String title) {
+        this(type);
         setTitle(title);
     }
 
@@ -105,6 +115,10 @@ public class FXAlert extends Alert {
                 fxDialogWindow.close();
             }
         });
+    }
+
+    public FXAlert(AlertType type) {
+        this(type, true);
     }
 
     public void setDialogStyle(String pathToStyleSheet) {

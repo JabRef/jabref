@@ -17,7 +17,7 @@ public class KeyBindingsDialogView extends FXMLView {
     }
 
     public void show(KeyBindingPreferences keyBindingPreferences) {
-        FXAlert keyBindingsDialog = new FXAlert(AlertType.INFORMATION, Localization.lang("Key bindings"),true);
+        FXAlert keyBindingsDialog = new FXAlert(AlertType.INFORMATION, Localization.lang("Key bindings"));
         keyBindingsDialog.setDialogPane((DialogPane) this.getView());
         KeyBindingsDialogViewModel controller = (KeyBindingsDialogViewModel) fxmlLoader.getController();
         controller.setKeyBindingPreferences(keyBindingPreferences);
