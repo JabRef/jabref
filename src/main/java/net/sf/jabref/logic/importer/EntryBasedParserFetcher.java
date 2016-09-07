@@ -32,18 +32,18 @@ import net.sf.jabref.model.entry.BibEntry;
 import org.jsoup.helper.StringUtil;
 
 /**
- * Provides a convenient interface for search-based fetcher, which follow the usual three-step procedure:
- * 1. Open a URL based on the search query
+ * Provides a convenient interface for entry-based fetcher, which follow the usual three-step procedure:
+ * 1. Open a URL based on the entry
  * 2. Parse the response to get a list of {@link BibEntry}
  * 3. Post-process fetched entries
  */
-public interface SearchBasedParserFetcher extends SearchBasedFetcher {
+public interface EntryBasedParserFetcher extends EntryBasedFetcher {
 
     /**
-     * Constructs a URL based on the query.
-     * @param query the search query
+     * Constructs a URL based on the {@link BibEntry}.
+     * @param entry the entry to look information for
      */
-    URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException;
+    URL getURLForEntry(BibEntry entry) throws URISyntaxException, MalformedURLException, FetcherException;
 
     /**
      * Returns the parser used to convert the response to a list of {@link BibEntry}.
@@ -68,12 +68,8 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
     }
 
     @Override
-    default List<BibEntry> performSearch(String query) throws FetcherException {
-        if (StringUtil.isBlank(query)) {
-            return Collections.emptyList();
-        }
-
-        try (InputStream stream = new BufferedInputStream(getURLForQuery(query).openStream())) {
+    default List<BibEntry> performSearch(BibEntry entry) throws FetcherException {
+        try (InputStream stream = new BufferedInputStream(getURLForEntry(entry).openStream())) {
             List<BibEntry> fetchedEntries = getParser().parseEntries(stream);
 
             // Post-cleanup

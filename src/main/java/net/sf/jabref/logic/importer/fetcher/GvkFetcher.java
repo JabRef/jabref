@@ -69,7 +69,7 @@ public class GvkFetcher implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getQueryURL(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
         String gvkQuery = getSearchQueryString(query);
         URIBuilder uriBuilder = new URIBuilder(URL_PATTERN);
         uriBuilder.addParameter("version", "1.1");

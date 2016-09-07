@@ -63,7 +63,7 @@ public class AstrophysicsDataSystem implements SearchBasedParserFetcher {
     }
 
     @Override
-    public URL getQueryURL(String query) throws URISyntaxException, MalformedURLException, FetcherException {
+    public URL getURLForQuery(String query) throws URISyntaxException, MalformedURLException, FetcherException {
         URIBuilder uriBuilder = new URIBuilder(API_URL);
         uriBuilder.addParameter("qsearch", query);
         uriBuilder.addParameter("data_type", "BIBTEXPLUS");
