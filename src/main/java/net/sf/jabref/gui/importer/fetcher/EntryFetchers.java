@@ -10,6 +10,7 @@ import net.sf.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import net.sf.jabref.logic.importer.fetcher.DiVA;
 import net.sf.jabref.logic.importer.fetcher.GvkFetcher;
 import net.sf.jabref.logic.importer.fetcher.IsbnFetcher;
+import net.sf.jabref.logic.importer.fetcher.MathSciNet;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 
 public class EntryFetchers {
@@ -37,6 +38,7 @@ public class EntryFetchers {
         entryFetchers.add(new SearchBasedEntryFetcher(new GvkFetcher()));
         entryFetchers.add(
                 new SearchBasedEntryFetcher(new AstrophysicsDataSystem(Globals.prefs.getImportFormatPreferences())));
+        entryFetchers.add(new SearchBasedEntryFetcher(new MathSciNet(Globals.prefs.getImportFormatPreferences())));
     }
 
     public List<EntryFetcher> getEntryFetchers() {

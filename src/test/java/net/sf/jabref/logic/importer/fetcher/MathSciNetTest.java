@@ -17,7 +17,6 @@
 
 package net.sf.jabref.logic.importer.fetcher;
 
-import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
@@ -28,16 +27,14 @@ import net.sf.jabref.model.entry.BibtexEntryTypes;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.sun.tools.doclint.Entity.and;
-import static net.sf.jabref.logic.util.OS.NEWLINE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class MathSciNetLookupTest {
+public class MathSciNetTest {
 
-    MathSciNetLookup fetcher;
+    MathSciNet fetcher;
     BibEntry ratiuEntry;
 
     @Before
@@ -45,7 +42,7 @@ public class MathSciNetLookupTest {
         ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
         when(importFormatPreferences.getFieldContentParserPreferences()).thenReturn(
                 mock(FieldContentParserPreferences.class));
-        fetcher = new MathSciNetLookup(importFormatPreferences);
+        fetcher = new MathSciNet(importFormatPreferences);
 
         ratiuEntry = new BibEntry();
         ratiuEntry.setType(BibtexEntryTypes.ARTICLE);
@@ -71,6 +68,13 @@ public class MathSciNetLookupTest {
         searchEntry.setField("journal", "fluid");
 
         List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
+        assertFalse(fetchedEntries.isEmpty());
+        assertEquals(ratiuEntry, fetchedEntries.get(0));
+    }
+
+    @Test
+    public void searchByQueryFindsEntry() throws Exception {
+        List<BibEntry> fetchedEntries = fetcher.performSearch("Two-Dimensional Ericksen Leslie System");
         assertFalse(fetchedEntries.isEmpty());
         assertEquals(ratiuEntry, fetchedEntries.get(0));
     }
