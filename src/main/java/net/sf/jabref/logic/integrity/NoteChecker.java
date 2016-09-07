@@ -25,7 +25,7 @@ public class NoteChecker implements Checker {
     }
 
     /**
-     * BibLaTeX package documentation p.222:
+     * BibLaTeX package documentation (Section 4.9.1):
      * The BibLaTeX package will automatically capitalize the first word when required at the beginning of a sentence.
      * Official BibTeX specification:
      * note: Any additional information that can help the reader. The first word should be capitalized.

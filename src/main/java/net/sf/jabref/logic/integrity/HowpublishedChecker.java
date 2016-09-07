@@ -25,7 +25,7 @@ public class HowpublishedChecker implements Checker {
     }
 
     /**
-     * BibLaTeX package documentation p.222:
+     * BibLaTeX package documentation (Section 4.9.1):
      * The BibLaTeX package will automatically capitalize the first word when required at the beginning of a sentence.
      * Official BibTeX specification:
      * howpublished: How something strange has been published. The first word should be capitalized.
