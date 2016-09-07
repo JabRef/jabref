@@ -64,7 +64,6 @@ public class MSBibConverter {
             result.year = entry.getFieldOrAlias(FieldName.YEAR).orElse(null);
         }
 
-
         // Value must be converted
         //Currently only english is supported
         entry.getField(FieldName.LANGUAGE)

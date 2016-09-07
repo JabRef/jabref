@@ -33,6 +33,7 @@ public class MSBibMapping {
         biblatexToMsBib.put(FieldName.PUBLISHER, "Publisher");
         biblatexToMsBib.put(FieldName.BOOKTITLE, "BookTitle");
         biblatexToMsBib.put("shorttitle", "ShortTitle");
+        biblatexToMsBib.put(FieldName.NOTE, "Comments");
 
         //biblatexToMsBib.put(FieldName.BOOKTITLE, "ConferenceName");
         //biblatexToMsBib.put(FieldName.PAGES, "Pages");

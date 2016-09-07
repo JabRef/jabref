@@ -20,6 +20,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Address in MS-Office 2007 xml format is now imported as `location`
 - [#1912](https://github.com/JabRef/jabref/issues/1912) Implemented integrity check for `edition` field: Should have the first letter capitalized (BibTeX), Should contain an integer or a literal (BibLaTeX)
 - `number` field is now exported as `number` field in MS-Office 2007 xml format, if no `issue` field is present and the entry type is not `patent`
+- `note` field is now exported as `comments` field in MS-Office 2007 xml format
+- `comments` field in MS-Office 2007 xml format is now imported as `note` field
 
 ### Fixed
 - Fixed selecting an entry out of multiple duplicates
