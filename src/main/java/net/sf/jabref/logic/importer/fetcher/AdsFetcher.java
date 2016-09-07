@@ -10,6 +10,7 @@ import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
@@ -55,7 +56,7 @@ public class AdsFetcher implements IdBasedFetcher {
 
             String bibtexString = Unirest.get(url.toString()).asString().getBody();
 
-            if(bibtexString.contains("@")) {
+            if (bibtexString.contains("@")) {
                 bibtexString = bibtexString.substring(bibtexString.indexOf('@'));
                 result = BibtexParser.singleFromString(bibtexString, preferences);
             }
@@ -70,12 +71,35 @@ public class AdsFetcher implements IdBasedFetcher {
         return result;
     }
 
-    private Optional<BibEntry> postProcess(BibEntry entry){
-        //TODO: Remove useless brackets
-        String titleString = entry.getField(FieldName.TITLE).get();
-        String abstractString = entry.getField(FieldName.ABSTRACT).get();
-        String authorString = entry.getField(FieldName.AUTHOR).get();
+    /**
+     * Remove all useless curly brackets in the given entry.
+     * The original fetcher fetches a bibtex file containing "{ and }" at the end of an abstract or title. This causes a {{ and }} in JabRef.
+     * @param entry Fetched entry with useless curly brackets
+     * @return cleaned entry
+     */
+    private Optional<BibEntry> postProcess(BibEntry entry) {
+        Optional<String> optTitleString = entry.getField(FieldName.TITLE);
+        if (optTitleString.isPresent()) {
+            String titleString = optTitleString.get();
+            titleString = StringUtil.shaveString(titleString);
+            entry.setField(FieldName.TITLE, titleString.trim());
+        }
 
+        Optional<String> optAuthorString = entry.getField(FieldName.AUTHOR);
+        if (optAuthorString.isPresent()) {
+            String authorString = optAuthorString.get();
+            authorString = authorString.replace('{', ' ');
+            authorString = authorString.replace('}', ' ');
+            authorString = authorString.replace("  ", " ");
+            entry.setField(FieldName.AUTHOR, authorString.trim());
+        }
+
+        Optional<String> optAbstractStirng = entry.getField(FieldName.ABSTRACT);
+        if (optAbstractStirng.isPresent()) {
+            String abstractString = optAbstractStirng.get();
+            abstractString = StringUtil.shaveString(abstractString);
+            entry.setField(FieldName.ABSTRACT, abstractString.trim());
+        }
         return Optional.of(entry);
     }
 
