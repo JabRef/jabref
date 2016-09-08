@@ -12,8 +12,6 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.MouseAdapter;
 import java.awt.event.WindowAdapter;
@@ -645,8 +643,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tabbedPane.addChangeListener(e -> {
             markActiveBasePanel();
 
-            BasePanel bp = getCurrentBasePanel();
-            if (bp == null) {
+            BasePanel currentBasePanel = getCurrentBasePanel();
+            if (currentBasePanel == null) {
                 return;
             }
 
@@ -664,15 +662,15 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
             previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
             fetcherToggle.setSelected(sidePaneManager.isComponentVisible(generalFetcher.getTitle()));
-            Globals.getFocusListener().setFocused(bp.getMainTable());
+            Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
             setWindowTitle();
             editModeAction.initName();
             // Update search autocompleter with information for the correct database:
-            bp.updateSearchManager();
+            currentBasePanel.updateSearchManager();
             // Set correct enabled state for Back and Forward actions:
-            bp.setBackAndForwardEnabledState();
-            bp.getUndoManager().postUndoRedoEvent();
-            new FocusRequester(bp.getMainTable());
+            currentBasePanel.setBackAndForwardEnabledState();
+            currentBasePanel.getUndoManager().postUndoRedoEvent();
+            new FocusRequester(currentBasePanel.getMainTable());
         });
 
         //Note: The registration of Apple event is at the end of initialization, because
@@ -1505,7 +1503,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tlb.addSeparator();
 
         fetcherToggle = new JToggleButton(generalFetcher.getAction());
-        tlb.addJToogleButton(fetcherToggle);
+        tlb.addJToggleButton(fetcherToggle);
 
         previewToggle = new JToggleButton(togglePreview);
         tlb.addJToggleButton(previewToggle);
@@ -2306,7 +2304,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             add(b);
         }
 
-        public void addJToogleButton(JToggleButton button) {
+        public void addJToggleButton(JToggleButton button) {
             button.setText(null);
             if (!OS.OS_X) {
                 button.setMargin(marg);
