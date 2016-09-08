@@ -28,9 +28,9 @@ import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.FXDialogs;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.logic.error.LogMessageWithPriority;
+import net.sf.jabref.logic.error.LogMessage;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.logging.LogMessage;
+import net.sf.jabref.logic.logging.LogMessages;
 import net.sf.jabref.logic.util.BuildInfo;
 
 import org.apache.commons.logging.Log;
@@ -42,18 +42,29 @@ public class ErrorConsoleViewModel {
     private static final Log LOGGER = LogFactory.getLog(ErrorConsoleViewModel.class);
     private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     private final Date date = new Date();
+    private ObservableList<LogMessage> allMessagesData = LogMessages.getInstance().messagesProperty();
+
+    public ObservableList<LogMessage> getAllMessagesData(){
+        return this.allMessagesData;
+    }
+
+    /**
+     * Handler for get of log messages in listview
+     * @return all messages as String
+     */
+    private String getLogMessagesAsString (){
+        StringBuilder logMessagesContent = new StringBuilder();
+        for (LogMessage message : getAllMessagesData()) {
+            logMessagesContent.append(message.getMessage() + System.lineSeparator());
+        }
+        return logMessagesContent.toString();
+    }
 
     /**
      * Handler for copy of Log Entry in clipboard by click of Copy Log Button
      */
     public void copyLog() {
-        ObservableList<LogMessageWithPriority> masterData = LogMessage.getInstance().messagesProperty();
-        StringBuilder logContentCopy = new StringBuilder();
-
-        for (LogMessageWithPriority message : masterData) {
-            logContentCopy.append(message.getMessage() + System.lineSeparator());
-        }
-        new ClipBoardManager().setClipboardContents(logContentCopy.toString());
+        new ClipBoardManager().setClipboardContents(getLogMessagesAsString());
         JabRefGUI.getMainFrame().output(Localization.lang("Log copied to clipboard."));
     }
 
@@ -66,21 +77,15 @@ public class ErrorConsoleViewModel {
             String issueBody = String.format("JabRef %s%n%s %s %s %nJava %s\n\n", Globals.BUILD_INFO.getVersion(), BuildInfo.OS,
                     BuildInfo.OS_VERSION, BuildInfo.OS_ARCH, BuildInfo.JAVA_VERSION);
             JabRefGUI.getMainFrame().output(Localization.lang("Issue on GitHub successfully reported."));
-            FXDialogs.showInformationDialogAndWait("Issue report successful",
-                    "Your issue was reported in your browser." + "\n\n" +
-                            "The log and exception information was copied to your clipboard." + "\n\n" +
-                            "Please paste this information (with Ctrl+V) in the issue description.");
+            FXDialogs.showInformationDialogAndWait(Localization.lang("Issue report successful"),
+                    Localization.lang("Your issue was reported in your browser.") + "\n\n" +
+                            Localization.lang("The log and exception information was copied to your clipboard.") + "\n\n" +
+                            Localization.lang("Please paste this information (with Ctrl+V) in the issue description."));
             URIBuilder uriBuilder = new URIBuilder().setScheme("https").setHost("github.com").setPath("/JabRef/jabref/issues/new")
                     .setParameter("title", issueTitle).setParameter("body", issueBody);
             JabRefDesktop.openBrowser(uriBuilder.build().toString());
-            // Get contents of listview
-            ObservableList<LogMessageWithPriority> masterData = LogMessage.getInstance().messagesProperty();
-            String listViewContent = "";
-            for (LogMessageWithPriority message : masterData) {
-                listViewContent += message.getMessage() + System.lineSeparator();
-            }
             // Format the contents of listview in Issue Description
-            String issueDetails = ("<details>\n" + "<summary>" + "Detail information:" + "</summary>\n```\n" + listViewContent + "\n```\n</details>");
+            String issueDetails = ("<details>\n" + "<summary>" + "Detail information:" + "</summary>\n```\n" + getLogMessagesAsString() + "\n```\n</details>");
             new ClipBoardManager().setClipboardContents(issueDetails);
         } catch (IOException e) {
             LOGGER.error(e);

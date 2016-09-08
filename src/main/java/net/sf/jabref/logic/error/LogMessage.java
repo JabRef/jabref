@@ -19,30 +19,30 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 
 /**
- * This class will be get the message and handle it with a priority, which will be define in {@link MessagePriority}
+ * This class will be get the message and handle it with a typ, which will be define in {@link MessageType}
  * <ul>
- * <li>MessagePriority.LOW is define for log entries
- * <li>MessagePriority.MEDIUM is define for output entries
- * <li>MessagePriority.HIGH is define for exception entries
+ * <li>MessageType.LOG is define for log entries
+ * <li>MessageType.OUTPUT is define for output entries
+ * <li>MessageType.EXCEPTION is define for exception entries
  * </ul>
  */
-public class LogMessageWithPriority {
+public class LogMessage {
 
     private String message;
-    private MessagePriority priority;
+    private MessageType priority;
     private BooleanProperty isFiltered = new SimpleBooleanProperty();
 
-    public LogMessageWithPriority(String message, MessagePriority priority) {
+    public LogMessage(String message, MessageType priority) {
         this.message = message;
         this.priority = priority;
-        isFiltered.set(priority != MessagePriority.LOW);
+        isFiltered.set(priority != MessageType.LOG);
     }
 
-    public MessagePriority getPriority() {
+    public MessageType getPriority() {
         return priority;
     }
 
-    public void setPriority(MessagePriority priority) {
+    public void setPriority(MessageType priority) {
         this.priority = priority;
     }
 
@@ -52,10 +52,6 @@ public class LogMessageWithPriority {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public void setIsFiltered(boolean isFiltered) {
-        this.isFiltered.set(isFiltered);
     }
 
     public BooleanProperty isFilteredProperty() {

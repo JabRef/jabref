@@ -3,8 +3,8 @@ package net.sf.jabref.logic.logging;
 import java.util.LinkedList;
 import java.util.Queue;
 
-import net.sf.jabref.logic.error.LogMessageWithPriority;
-import net.sf.jabref.logic.error.MessagePriority;
+import net.sf.jabref.logic.error.LogMessage;
+import net.sf.jabref.logic.error.MessageType;
 
 /**
  * Enables caching of messages
@@ -31,8 +31,8 @@ public class Cache {
 
     public synchronized void add(String message) {
         queue.add(message);
-        LogMessageWithPriority messageWithPriority = new LogMessageWithPriority(message.replaceAll(System.lineSeparator(), ""), MessagePriority.LOW);
-        LogMessage.getInstance().add(messageWithPriority);
+        LogMessage messageWithPriority = new LogMessage(message.replaceAll(System.lineSeparator(), ""), MessageType.LOG);
+        LogMessages.getInstance().add(messageWithPriority);
 
         if (isCapacityExceeded()) {
             // if we reached capacity, we switch to the "real" caching method and remove old lines

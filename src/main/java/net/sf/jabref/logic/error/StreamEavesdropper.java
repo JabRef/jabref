@@ -31,12 +31,12 @@ public class StreamEavesdropper {
 
     public TeeStream getOutStream() {
         PrintStream consoleOut = new PrintStream(outByteStream);
-        return new TeeStream(consoleOut, systemOut, MessagePriority.MEDIUM);
+        return new TeeStream(consoleOut, systemOut, MessageType.OUTPUT);
     }
 
     public TeeStream getErrStream() {
         PrintStream consoleErr = new PrintStream(errByteStream);
-        return new TeeStream(consoleErr, systemErr, MessagePriority.HIGH);
+        return new TeeStream(consoleErr, systemErr, MessageType.EXCEPTION);
     }
 
     public String getOutput() {

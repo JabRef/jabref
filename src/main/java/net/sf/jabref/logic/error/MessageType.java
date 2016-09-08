@@ -23,6 +23,6 @@ package net.sf.jabref.logic.error;
  * <li>exception
  * </ul>
  */
-public enum MessagePriority {
-    LOW, MEDIUM, HIGH;
+public enum MessageType {
+    LOG, OUTPUT, EXCEPTION;
 }

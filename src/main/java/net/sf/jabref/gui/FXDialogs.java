@@ -119,7 +119,7 @@ public abstract class FXDialogs {
      */
     public static Optional<ButtonType> showCustomDialogAndWait(String title, DialogPane contentPane,
             ButtonType... buttonTypes) {
-        FXAlert alert = new FXAlert(AlertType.NONE, title, true);
+        FXAlert alert = new FXAlert(AlertType.NONE, title);
         alert.setDialogPane(contentPane);
         alert.getButtonTypes().setAll(buttonTypes);
         return alert.showAndWait();

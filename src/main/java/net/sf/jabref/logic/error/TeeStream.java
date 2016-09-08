@@ -2,7 +2,7 @@ package net.sf.jabref.logic.error;
 
 import java.io.PrintStream;
 
-import net.sf.jabref.logic.logging.LogMessage;
+import net.sf.jabref.logic.logging.LogMessages;
 
 /**
  * All writes to this print stream are copied to two print streams
@@ -12,9 +12,9 @@ import net.sf.jabref.logic.logging.LogMessage;
 public class TeeStream extends PrintStream {
 
     private final PrintStream outStream;
-    private final MessagePriority priority;
+    private final MessageType priority;
 
-    public TeeStream(PrintStream out1, PrintStream out2, MessagePriority priority) {
+    public TeeStream(PrintStream out1, PrintStream out2, MessageType priority) {
         super(out1);
         this.outStream = out2;
         this.priority = priority;
@@ -27,8 +27,8 @@ public class TeeStream extends PrintStream {
             outStream.write(buf, off, len);
             String s = new String(buf, off, len);
             if (!s.equals(System.lineSeparator())) {
-                LogMessageWithPriority messageWithPriority = new LogMessageWithPriority(s.replaceAll(System.lineSeparator(), ""), priority);
-                LogMessage.getInstance().add(messageWithPriority);
+                LogMessage messageWithPriority = new LogMessage(s.replaceAll(System.lineSeparator(), ""), priority);
+                LogMessages.getInstance().add(messageWithPriority);
             }
         } catch (Exception ignored) {
             // Ignored
