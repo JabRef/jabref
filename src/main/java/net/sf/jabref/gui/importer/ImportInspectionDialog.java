@@ -63,8 +63,9 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.gui.externalfiles.AutoSetLinks;
 import net.sf.jabref.gui.externalfiles.DownloadExternalFile;
-import net.sf.jabref.gui.externalfiles.ExternalFileMenuItem;
+import net.sf.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import net.sf.jabref.gui.filelist.FileListEntry;
 import net.sf.jabref.gui.filelist.FileListEntryEditor;
 import net.sf.jabref.gui.filelist.FileListTableModel;
@@ -250,7 +251,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         // Add "Attach file" menu choices to right click menu:
         popup.add(new LinkLocalFile());
         popup.add(new DownloadFile());
-        popup.add(new AutoSetLinks());
+        popup.add(new InternalAutoSetLinks());
         popup.add(new AttachUrl());
         getContentPane().add(centerPan, BorderLayout.CENTER);
 
@@ -1195,9 +1196,9 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         }
     }
 
-    private class AutoSetLinks extends JMenuItem implements ActionListener {
+    private class InternalAutoSetLinks extends JMenuItem implements ActionListener {
 
-        public AutoSetLinks() {
+        public InternalAutoSetLinks() {
             super(Localization.lang("Automatically set file links"));
             addActionListener(this);
         }
@@ -1223,8 +1224,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // We have a static utility method for searching for all relevant
             // links:
             JDialog diag = new JDialog(ImportInspectionDialog.this, true);
-            JabRefExecutorService.INSTANCE.execute(
-                    net.sf.jabref.gui.externalfiles.AutoSetLinks.autoSetLinks(entry, localModel, bibDatabaseContext, e -> {
+            JabRefExecutorService.INSTANCE
+                    .execute(AutoSetLinks.autoSetLinks(entry, localModel, bibDatabaseContext, e -> {
                         if (e.getID() > 0) {
 
                             entries.getReadWriteLock().writeLock().lock();
@@ -1235,7 +1236,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                             }
                             glTable.repaint();
                         }
-                    }, diag));
+                    } , diag));
 
         }
     }

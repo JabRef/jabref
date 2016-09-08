@@ -23,8 +23,7 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
 
     public UpgradePdfPsToFileCleanup() {
         fields.put(FieldName.PDF, "PDF");
-        fields.put(FieldName.PS, "PS");
-
+        fields.put(FieldName.PS, "PostScript");
     }
 
     @Override

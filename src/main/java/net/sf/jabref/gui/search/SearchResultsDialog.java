@@ -39,7 +39,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.TransferableBibtexEntry;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.gui.externalfiles.ExternalFileMenuItem;
+import net.sf.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import net.sf.jabref.gui.filelist.FileListEntry;
 import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.keyboard.KeyBinding;

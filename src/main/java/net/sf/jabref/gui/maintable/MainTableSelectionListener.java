@@ -27,7 +27,7 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
-import net.sf.jabref.gui.externalfiles.ExternalFileMenuItem;
+import net.sf.jabref.gui.externalfiletype.ExternalFileMenuItem;
 import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.filelist.FileListEntry;
 import net.sf.jabref.gui.filelist.FileListTableModel;
