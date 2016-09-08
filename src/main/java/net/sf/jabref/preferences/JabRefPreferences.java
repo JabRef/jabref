@@ -286,6 +286,9 @@ public class JabRefPreferences {
     public static final String CONSOLE_COMMAND = "consoleCommand";
     public static final String USE_DEFAULT_CONSOLE_APPLICATION = "useDefaultConsoleApplication";
 
+    public static final String ADOBE_ACROBAT_COMMAND = "adobeAcrobatCommand";
+    public static final String SUMATRA_COMMAND = "sumatraCommand";
+
     // Currently, it is not possible to specify defaults for specific entry types
     // When this should be made possible, the code to inspect is net.sf.jabref.gui.preftabs.BibtexKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getBibtexKeyPattern(); etc
     public static final String DEFAULT_BIBTEX_KEY_PATTERN = "defaultBibtexKeyPattern";
@@ -867,8 +870,12 @@ public class JabRefPreferences {
         defaults.put(USE_DEFAULT_CONSOLE_APPLICATION, Boolean.TRUE);
         if (OS.WINDOWS) {
             defaults.put(CONSOLE_COMMAND, "C:\\Program Files\\ConEmu\\ConEmu64.exe /single /dir \"%DIR\"");
+            defaults.put(ADOBE_ACROBAT_COMMAND, "C:\\Program Files (x86)\\Adobe\\Acrobat Reader DC\\Reader");
+            defaults.put(SUMATRA_COMMAND, "C:\\Program Files\\SumatraPDF");
         } else {
             defaults.put(CONSOLE_COMMAND, "");
+            defaults.put(ADOBE_ACROBAT_COMMAND, "");
+            defaults.put(SUMATRA_COMMAND, "");
         }
 
         //versioncheck defaults
