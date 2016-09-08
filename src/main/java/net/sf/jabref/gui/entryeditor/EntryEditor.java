@@ -375,7 +375,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         tabbed.addTab(Localization.lang("PDF comments"), IconTheme.JabRefIcon.PDF_FILE.getSmallIcon(), pdfCommentsTab,
                 Localization.lang("Show PDF comments"));
         tabs.add(pdfCommentsTab);
-
     }
 
     public String getDisplayedBibEntryType() {
@@ -1040,9 +1039,18 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     ((EntryEditorTab) activeTab).updateAll();
                     activateVisible();
                 }
+                if (activeTab instanceof PdfCommentsTab) {
+                    try {
+                        ((PdfCommentsTab) activeTab).addComments();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
             });
         }
     }
+
+
 
     class DeleteAction extends AbstractAction {
         public DeleteAction() {
