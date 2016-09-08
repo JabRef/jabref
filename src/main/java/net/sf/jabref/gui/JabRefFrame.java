@@ -2358,6 +2358,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         return pushApplications;
     }
 
+    public GlobalSearchBar getGlobalSearchBar() {
+        return globalSearchBar;
+    }
+
 
     private class UndoRedoEventManager {
 
