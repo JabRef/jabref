@@ -12,6 +12,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Added support for over 1000 (self updating) 1.0.1 Citation Styles
+- You can set and cycle different preview Styles (including CitationStyles)
 - Added integrity check for fields with BibTeX keys, e.g., `crossref` and `related`, to check that the key exists
 - [#1496](https://github.com/JabRef/jabref/issues/1496) Keep track of which entry a downloaded file belongs to
 - Made it possible to download multiple entries in one action
@@ -35,6 +37,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed field `key` field is not exported to MS-Office 2008 xml format
 
 ### Removed
+- Removed 2nd Preview Style
 - The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field. 
 - Automatic migration for the `evastar_pdf` field is removed.
 

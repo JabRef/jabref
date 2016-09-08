@@ -112,10 +112,7 @@ public class SearchResultsDialog {
     private void init(String title) {
         diag = new JDialog(frame, title, false);
 
-        int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
-        String layoutFile = activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs
-                .get(JabRefPreferences.PREVIEW_1);
-        preview = new PreviewPanel(null, null, layoutFile);
+        preview = new PreviewPanel(null, null);
 
         sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, FieldName.AUTHOR));
         model = (DefaultEventTableModel<BibEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,
@@ -283,6 +280,12 @@ public class SearchResultsDialog {
     private void addEntry(BibEntry entry, BasePanel panel) {
         entries.add(entry);
         entryHome.put(entry, panel);
+
+        if (preview.getEntry() == null || preview.getBasePanel() == null){
+            preview.setEntry(entry);
+            preview.setBasePanel(panel);
+            preview.setDatabaseContext(panel.getBibDatabaseContext());
+        }
     }
 
     /**
@@ -414,6 +417,8 @@ public class SearchResultsDialog {
                 preview.setDatabaseContext(p.getBibDatabaseContext());
                 // Update the preview's entry:
                 preview.setEntry(entry);
+                preview.setBasePanel(entryHome.get(entry));
+                preview.setDatabaseContext(entryHome.get(entry).getBibDatabaseContext());
                 contentPane.setDividerLocation(0.5f);
                 SwingUtilities.invokeLater(() -> preview.scrollRectToVisible(toRect));
             }
