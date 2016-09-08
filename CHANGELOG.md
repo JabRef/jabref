@@ -19,6 +19,10 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#1897](https://github.com/JabRef/jabref/issues/1897) Implemented integrity check for `year` field: Last four nonpunctuation characters should be numerals
 - Address in MS-Office 2007 xml format is now imported as `location`
 - [#1912](https://github.com/JabRef/jabref/issues/1912) Implemented integrity check for `edition` field: Should have the first letter capitalized (BibTeX), Should contain an integer or a literal (BibLaTeX)
+- `number` field is now exported as `number` field in MS-Office 2007 xml format, if no `issue` field is present and the entry type is not `patent`
+- `note` field is now exported as `comments` field in MS-Office 2007 xml format
+- `comments` field in MS-Office 2007 xml format is now imported as `note` field
+- [#463](https://github.com/JabRef/jabref/issues/463): Disable menu-item and toolbar-buttons while no database is open
 
 ### Fixed
 - Fixed selecting an entry out of multiple duplicates
@@ -28,10 +32,11 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1663](https://github.com/JabRef/jabref/issues/1663): Better multi-monitor support
 - Fixed [#1882](https://github.com/JabRef/jabref/issues/1882): Crash after saving illegal bibtexkey in entry editor
 - Fixed field `location` containing only city is not exported correctly to MS-Office 2007 xml format
+- Fixed field `key` field is not exported to MS-Office 2008 xml format
 - Fixed [#1181](https://github.com/JabRef/jabref/issues/1181) and [#1504](https://github.com/JabRef/jabref/issues/1504): Improved "Normalize to BibTeX name format": Support separated names with commas and colons. Considered name affixes such as "Jr".
 
 ### Removed
-- The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field.
+- The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field. 
 
 
 
@@ -196,7 +201,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Manage content selectors now saves edited existing lists again and only marks database as changed when the content selectors are changed
 - When inserting a duplicate the right entry will be selected
 - Preview panel height is now saved immediately, thus is shown correctly if the panel height is changed, closed and opened again
-
 
 ### Removed
 - [#1610](https://github.com/JabRef/jabref/issues/1610) Removed the possibility to auto show or hide the groups interface
