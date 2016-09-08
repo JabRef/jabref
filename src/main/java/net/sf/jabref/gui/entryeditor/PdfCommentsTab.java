@@ -26,6 +26,8 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.pdf.PdfComment;
 
 import org.apache.pdfbox.pdmodel.PDDocument;
+import javax.swing.JButton;
+import java.awt.SystemColor;
 
 public class PdfCommentsTab extends JPanel {
 
@@ -72,7 +74,7 @@ public class PdfCommentsTab extends JPanel {
 
         this.add(commentScrollPane);
         commentScrollPane.setViewportView(commentList);
-        informationPanel.setBounds(583, 16, 650, 389);
+        informationPanel.setBounds(491, 16, 742, 389);
         this.add(informationPanel);
     }
 
@@ -117,33 +119,54 @@ public class PdfCommentsTab extends JPanel {
     private void setUpInformationPanel(){
         informationPanel.setLayout(null);
 
-        authorLabel.setBounds(15, 25, 46, 20);
+        authorLabel.setBounds(0, 44, 61, 20);
         informationPanel.add(authorLabel);
-        authorScrollPane.setBounds(76, 25, 547, 42);
+        authorScrollPane.setBounds(116, 43, 547, 20);
         informationPanel.add(authorScrollPane);
+        authorArea.setBackground(SystemColor.control);
         authorScrollPane.setViewportView(authorArea);
         authorArea.setEditable(false);
 
-        dateLabel.setBounds(15, 80, 30, 20);
+        dateLabel.setBounds(0, 70, 61, 20);
         informationPanel.add(dateLabel);
-        dateScrollPane.setBounds(76, 83, 547, 42);
+        dateScrollPane.setBounds(116, 69, 547, 20);
         informationPanel.add(dateScrollPane);
+        dateArea.setBackground(SystemColor.control);
         dateScrollPane.setViewportView(dateArea);
         dateArea.setEditable(false);
-        
-        pageLabel.setBounds(15, 128, 34, 20);
+
+        pageLabel.setBounds(10, 95, 34, 20);
         informationPanel.add(pageLabel);
-        pageScrollPane.setBounds(76, 141, 547, 42);
+        pageScrollPane.setBounds(116, 94, 547, 20);
         informationPanel.add(pageScrollPane);
+        pageArea.setBackground(SystemColor.control);
         pageScrollPane.setViewportView(pageArea);
         pageArea.setEditable(false);
 
-        commentTxtLabel.setBounds(15, 200, 69, 20);
+        commentTxtLabel.setBounds(0, 138, 69, 20);
         informationPanel.add(commentTxtLabel);
-        commentTxtScrollPane.setBounds(76, 200, 547, 173);
+        commentTxtScrollPane.setBounds(116, 143, 547, 173);
         informationPanel.add(commentTxtScrollPane);
         commentTxtScrollPane.setViewportView(commentTxtArea);
         commentTxtArea.setEditable(false);
+
+        JScrollPane pdfNamePane = new JScrollPane();
+        pdfNamePane.setBounds(116, 16, 506, 20);
+        informationPanel.add(pdfNamePane);
+
+        JTextArea pdfNameArea = new JTextArea();
+        pdfNameArea.setBackground(SystemColor.control);
+        pdfNameArea.setEditable(false);
+        pdfNamePane.setViewportView(pdfNameArea);
+        pdfNameArea.setText("pdfName");
+
+        JLabel lblPdfName = new JLabel("PDF Name");
+        lblPdfName.setBounds(0, 17, 81, 20);
+        informationPanel.add(lblPdfName);
+
+        JButton btnOpenPdf = new JButton("Open PDF");
+        btnOpenPdf.setBounds(624, 16, 118, 21);
+        informationPanel.add(btnOpenPdf);
 
     }
     private class CommentListSelectionListener implements ListSelectionListener {
