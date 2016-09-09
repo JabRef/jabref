@@ -23,7 +23,7 @@ public enum KeyBindingCategory {
 
 
     private KeyBindingCategory(String name) {
-        this.name = name;
+        this.name = name.replace("&", "");
     }
 
     public String getName() {
