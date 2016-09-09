@@ -141,30 +141,13 @@ public class ModsImporter extends ImportFormat {
                 putIfValueNotNull(fields, FieldName.LANGUAGE, language.getLangValue());
             } else if (groupElement instanceof LocationDefinition) {
                 LocationDefinition location = (LocationDefinition) groupElement;
-                List<String> locations = new ArrayList<>();
-                List<PhysicalLocationDefinition> physicalLocations = location.getPhysicalLocation();
-                for (PhysicalLocationDefinition physicalLocation : physicalLocations) {
-                    locations.add(physicalLocation.getValue());
-                }
-                putIfListIsNotEmpty(fields, locations, FieldName.LOCATION, ", ");
-
-                List<UrlDefinition> urlDefinitions = location.getUrl();
-                List<String> urls = new ArrayList<>();
-                for (UrlDefinition url : urlDefinitions) {
-                    urls.add(url.getValue());
-                }
-                putIfListIsNotEmpty(fields, urls, FieldName.URL, ", ");
+                parseLocationAndUrl(fields, location);
             } else if (groupElement instanceof NameDefinition) {
                 NameDefinition name = (NameDefinition) groupElement;
                 handleAuthorsInNamePart(name, authors, fields);
             } else if (groupElement instanceof OriginInfoDefinition) {
                 OriginInfoDefinition originInfo = (OriginInfoDefinition) groupElement;
-                List<JAXBElement<?>> placeOrPublisherOrDateIssued = originInfo.getPlaceOrPublisherOrDateIssued();
-                for (JAXBElement<?> jaxbElement : placeOrPublisherOrDateIssued) {
-                    Object value = jaxbElement.getValue();
-                    String elementName = jaxbElement.getName().getLocalPart();
-                    putPlaceOrPublisherOrDate(fields, elementName, value);
-                }
+                parseOriginInfo(fields, originInfo);
             } else if (groupElement instanceof RecordInfoDefinition) {
                 RecordInfoDefinition recordInfo = (RecordInfoDefinition) groupElement;
                 parseRecordInfo(fields, recordInfo);
@@ -183,20 +166,7 @@ public class ModsImporter extends ImportFormat {
                     String elementName = jaxbElement.getName().getLocalPart();
                     if (value instanceof HierarchicalGeographicDefinition) {
                         HierarchicalGeographicDefinition hierarchichalGeographic = (HierarchicalGeographicDefinition) value;
-                        List<JAXBElement<? extends StringPlusLanguage>> areaOrContinentOrCountry = hierarchichalGeographic
-                                .getExtraTerrestrialAreaOrContinentOrCountry();
-
-                        for (JAXBElement<? extends StringPlusLanguage> element : areaOrContinentOrCountry) {
-                            String localName = element.getName().getLocalPart();
-                            if ("city".equals(localName)) {
-                                StringPlusLanguage city = element.getValue();
-                                putIfValueNotNull(fields, "city", city.getValue());
-                            } else if ("country".equals(localName)) {
-                                StringPlusLanguage country = element.getValue();
-                                putIfValueNotNull(fields, "country", country.getValue());
-                            }
-                        }
-
+                        parseGeographicInformation(fields, hierarchichalGeographic);
                     } else if ((value instanceof StringPlusLanguagePlusAuthority) && "topic".equals(elementName)) {
                         StringPlusLanguagePlusAuthority topic = (StringPlusLanguagePlusAuthority) value;
                         if (topic.getValue() != null) {
@@ -227,6 +197,47 @@ public class ModsImporter extends ImportFormat {
 
     }
 
+    private void parseGeographicInformation(Map<String, String> fields,
+            HierarchicalGeographicDefinition hierarchichalGeographic) {
+        List<JAXBElement<? extends StringPlusLanguage>> areaOrContinentOrCountry = hierarchichalGeographic
+                .getExtraTerrestrialAreaOrContinentOrCountry();
+        for (JAXBElement<? extends StringPlusLanguage> element : areaOrContinentOrCountry) {
+            String localName = element.getName().getLocalPart();
+            if ("city".equals(localName)) {
+                StringPlusLanguage city = element.getValue();
+                putIfValueNotNull(fields, "city", city.getValue());
+            } else if ("country".equals(localName)) {
+                StringPlusLanguage country = element.getValue();
+                putIfValueNotNull(fields, "country", country.getValue());
+            }
+        }
+    }
+
+    private void parseLocationAndUrl(Map<String, String> fields, LocationDefinition location) {
+        List<String> locations = new ArrayList<>();
+        List<PhysicalLocationDefinition> physicalLocations = location.getPhysicalLocation();
+        for (PhysicalLocationDefinition physicalLocation : physicalLocations) {
+            locations.add(physicalLocation.getValue());
+        }
+        putIfListIsNotEmpty(fields, locations, FieldName.LOCATION, ", ");
+
+        List<UrlDefinition> urlDefinitions = location.getUrl();
+        List<String> urls = new ArrayList<>();
+        for (UrlDefinition url : urlDefinitions) {
+            urls.add(url.getValue());
+        }
+        putIfListIsNotEmpty(fields, urls, FieldName.URL, ", ");
+    }
+
+    private void parseOriginInfo(Map<String, String> fields, OriginInfoDefinition originInfo) {
+        List<JAXBElement<?>> placeOrPublisherOrDateIssued = originInfo.getPlaceOrPublisherOrDateIssued();
+        for (JAXBElement<?> jaxbElement : placeOrPublisherOrDateIssued) {
+            Object value = jaxbElement.getValue();
+            String elementName = jaxbElement.getName().getLocalPart();
+            putPlaceOrPublisherOrDate(fields, elementName, value);
+        }
+    }
+
     private void parseRecordInfo(Map<String, String> fields, RecordInfoDefinition recordInfo) {
         List<JAXBElement<?>> recordContent = recordInfo.getRecordContentSourceOrRecordCreationDateOrRecordChangeDate();
         for (JAXBElement<?> jaxbElement : recordContent) {
@@ -239,7 +250,7 @@ public class ModsImporter extends ImportFormat {
                 List<String> languages = new ArrayList<>();
                 List<LanguageTermDefinition> languageTerms = language.getLanguageTerm();
                 for (LanguageTermDefinition languageTerm : languageTerms) {
-                        languages.add(languageTerm.getValue());
+                    languages.add(languageTerm.getValue());
                 }
                 putIfListIsNotEmpty(fields, languages, FieldName.LANGUAGE, ", ");
             }
@@ -281,13 +292,11 @@ public class ModsImporter extends ImportFormat {
             } else if (extentDefinition.getStart() != null) {
                 putIfValueNotNull(fields, FieldName.PAGES, extentDefinition.getStart().getValue());
                 if (extentDefinition.getEnd() != null) {
-                    if (extentDefinition.getEnd().getValue() != null) {
-                        String endPage = extentDefinition.getEnd().getValue();
-                        //if end appears, then there has to be a start page appeard, so get it and put it together with
-                        //the end page
-                        String startPage = fields.get(FieldName.PAGES);
-                        fields.put(FieldName.PAGES, startPage + "-" + endPage);
-                    }
+                    String endPage = extentDefinition.getEnd().getValue();
+                    //if end appears, then there has to be a start page appeard, so get it and put it together with
+                    //the end page
+                    String startPage = fields.get(FieldName.PAGES);
+                    fields.put(FieldName.PAGES, startPage + "-" + endPage);
                 }
             }
         }
@@ -311,10 +320,8 @@ public class ModsImporter extends ImportFormat {
             DateDefinition date = (DateDefinition) value;
             switch (elementName) {
             case "dateIssued":
-                if ("yes".equals(date.getKeyDate())) {
-                    if (date.getValue() != null) {
-                        fields.put(FieldName.YEAR, date.getValue().substring(0, 4));
-                    }
+                if ("yes".equals(date.getKeyDate()) && (date.getValue() != null)) {
+                    fields.put(FieldName.YEAR, date.getValue().substring(0, 4));
                 }
                 putIfValueNotNull(fields, "issued", date.getValue());
                 break;
@@ -330,6 +337,8 @@ public class ModsImporter extends ImportFormat {
                 break;
             case "dateModified":
                 putIfValueNotNull(fields, "modified", date.getValue());
+                break;
+            default:
                 break;
             }
         } else if ((value instanceof StringPlusLanguagePlusSupplied) && "publisher".equals(elementName)) {

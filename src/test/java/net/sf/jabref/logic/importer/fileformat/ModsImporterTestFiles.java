@@ -29,7 +29,7 @@ public class ModsImporterTestFiles {
     public String fileName;
     public Path resourceDir;
 
-    ModsImporter testImporter;
+    private ModsImporter testImporter;
 
 
     @Before
