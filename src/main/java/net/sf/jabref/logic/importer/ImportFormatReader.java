@@ -21,6 +21,7 @@ import net.sf.jabref.logic.importer.fileformat.InspecImporter;
 import net.sf.jabref.logic.importer.fileformat.IsiImporter;
 import net.sf.jabref.logic.importer.fileformat.MedlineImporter;
 import net.sf.jabref.logic.importer.fileformat.MedlinePlainImporter;
+import net.sf.jabref.logic.importer.fileformat.ModsImporter;
 import net.sf.jabref.logic.importer.fileformat.MsBibImporter;
 import net.sf.jabref.logic.importer.fileformat.OvidImporter;
 import net.sf.jabref.logic.importer.fileformat.PdfContentImporter;
@@ -65,6 +66,7 @@ public class ImportFormatReader {
         formats.add(new IsiImporter());
         formats.add(new MedlineImporter());
         formats.add(new MedlinePlainImporter());
+        formats.add(new ModsImporter());
         formats.add(new MsBibImporter());
         formats.add(new OvidImporter());
         formats.add(new PdfContentImporter(importFormatPreferences));

@@ -23,6 +23,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - `note` field is now exported as `comments` field in MS-Office 2007 xml format
 - `comments` field in MS-Office 2007 xml format is now imported as `note` field
 - [#463](https://github.com/JabRef/jabref/issues/463): Disable menu-item and toolbar-buttons while no database is open
+- importer for MODS format added
 
 ### Fixed
 - Fixed selecting an entry out of multiple duplicates
