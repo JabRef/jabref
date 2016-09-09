@@ -47,7 +47,7 @@ install4j {
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.14.1'
+    gradleVersion = '3.0'
 }
 
 
@@ -62,8 +62,8 @@ configurations {
     databaseTestCompile.extendsFrom testCompile
     databaseTestRuntime.extendsFrom testRuntime
 
-	integrationTestCompile.extendsFrom testCompile
-	integrationTestRuntime.extendsFrom testRuntime
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
 }
 
 dependencies {
@@ -136,7 +136,7 @@ sourceSets {
             runtimeClasspath += main.output + test.output
         }
     }
-	integrationTest {
+    integrationTest {
         java {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
@@ -152,6 +152,8 @@ processResources {
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "))
+
+                filteringCharset = 'UTF-8'
     }
 
     filesMatching("resource/**/meta.xml") {
