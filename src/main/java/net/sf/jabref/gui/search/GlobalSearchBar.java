@@ -23,7 +23,6 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
-import net.sf.jabref.gui.WrapLayout;
 import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -150,7 +149,7 @@ public class GlobalSearchBar extends JPanel {
             }
         });
 
-        setLayout(new WrapLayout(FlowLayout.RIGHT));
+        setLayout(new FlowLayout(FlowLayout.RIGHT));
         JToolBar toolBar = new OSXCompatibleToolbar();
         toolBar.setFloatable(false);
         if (OS.OS_X) {
