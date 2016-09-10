@@ -19,12 +19,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 
 public class SpecialFieldsUtils {
 
-
-    /****************************************************/
-    /** generic treatment                              **/
-    /** no special treatment any more, thanks to enums **/
-    /****************************************************/
-
     /**
      * @param e - Field to be handled
      * @param value - may be null to state that field should be emptied
@@ -54,7 +48,7 @@ public class SpecialFieldsUtils {
         int foundPos = -1;
 
         // cleanup keywords
-        for (Object value : specialFieldsKeywords) {
+        for (String value : specialFieldsKeywords) {
             int pos = keywordList.indexOf(value);
             if (pos >= 0) {
                 foundPos = pos;
@@ -141,19 +135,20 @@ public class SpecialFieldsUtils {
      * @return an instance of that field. The returned object is a singleton. null is returned if fieldName does not indicate a special field
      */
     public static Optional<SpecialField> getSpecialFieldInstanceFromFieldName(String fieldName) {
-        if (fieldName.equals(SpecialFields.FIELDNAME_PRIORITY)) {
+        switch (fieldName) {
+        case SpecialFields.FIELDNAME_PRIORITY:
             return Optional.of(Priority.getInstance());
-        } else if (fieldName.equals(SpecialFields.FIELDNAME_QUALITY)) {
+        case SpecialFields.FIELDNAME_QUALITY:
             return Optional.of(Quality.getInstance());
-        } else if (fieldName.equals(SpecialFields.FIELDNAME_RANKING)) {
+        case SpecialFields.FIELDNAME_RANKING:
             return Optional.of(Rank.getInstance());
-        } else if (fieldName.equals(SpecialFields.FIELDNAME_RELEVANCE)) {
+        case SpecialFields.FIELDNAME_RELEVANCE:
             return Optional.of(Relevance.getInstance());
-        } else if (fieldName.equals(SpecialFields.FIELDNAME_READ)) {
+        case SpecialFields.FIELDNAME_READ:
             return Optional.of(ReadStatus.getInstance());
-        } else if (fieldName.equals(SpecialFields.FIELDNAME_PRINTED)) {
+        case SpecialFields.FIELDNAME_PRINTED:
             return Optional.of(Printed.getInstance());
-        } else {
+        default:
             return Optional.empty();
         }
     }
