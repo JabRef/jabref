@@ -64,8 +64,8 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
     }
 
     private void setupLogic(){
-        chosen.getSelectionModel().addListSelectionListener(e -> {
-            boolean selectionEmpty = ((ListSelectionModel) e.getSource()).isSelectionEmpty();
+        chosen.getSelectionModel().addListSelectionListener(event -> {
+            boolean selectionEmpty = ((ListSelectionModel) event.getSource()).isSelectionEmpty();
             btnLeft.setEnabled(!selectionEmpty);
             btnDown.setEnabled(!selectionEmpty);
             btnUp.setEnabled(!selectionEmpty);
@@ -74,21 +74,21 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         available.getSelectionModel()
                 .addListSelectionListener(e -> btnRight.setEnabled(!((ListSelectionModel) e.getSource()).isSelectionEmpty()));
 
-        btnRight.addActionListener(e -> {
+        btnRight.addActionListener(event -> {
             for (Object object : available.getSelectedValuesList()) {
                 availableModel.removeElement(object);
                 chosenModel.addElement(object);
             }
         });
 
-        btnLeft.addActionListener(e -> {
+        btnLeft.addActionListener(event -> {
             for (Object object : chosen.getSelectedValuesList()) {
                 availableModel.addElement(object);
                 chosenModel.removeElement(object);
             }
         });
 
-        btnUp.addActionListener(e -> {
+        btnUp.addActionListener(event -> {
             List<Integer> newSelectedIndices = new ArrayList<>();
             for (int oldIndex : chosen.getSelectedIndices()) {
                 boolean alreadyTaken = newSelectedIndices.contains(oldIndex - 1);
@@ -99,7 +99,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
             chosen.setSelectedIndices(ArrayUtils.toPrimitive(newSelectedIndices.toArray(new Integer[newSelectedIndices.size()])));
         });
 
-        btnDown.addActionListener(e -> {
+        btnDown.addActionListener(event -> {
             List<Integer> newSelectedIndices = new ArrayList<>();
             int[] selectedIndices = chosen.getSelectedIndices();
             for (int i = selectedIndices.length - 1; i >= 0; i--) {
@@ -113,21 +113,21 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         });
 
 
-        btnDefault.addActionListener(e ->
+        btnDefault.addActionListener(event ->
                 layout.setText(new PreviewPreferences(Globals.prefs)
                         .getPreviewStyleDefault().replace("__NEWLINE__", "\n")));
 
-        btnTest.addActionListener(e -> {
+        btnTest.addActionListener(event -> {
             try {
                 PreviewPanel testPane = new PreviewPanel(null, TestEntry.getTestEntry(), null)
                         .setFixedLayout(layout.getText());
                 testPane.setPreferredSize(new Dimension(800, 350));
                 JOptionPane.showMessageDialog(PreviewPrefsTab.this, new JScrollPane(testPane), Localization.lang("Preview"), JOptionPane.PLAIN_MESSAGE);
-            } catch (StringIndexOutOfBoundsException ex) {
-                LOGGER.warn("Parsing error.", ex);
+            } catch (StringIndexOutOfBoundsException exception) {
+                LOGGER.warn("Parsing error.", exception);
                 JOptionPane.showMessageDialog(null,
                         Localization.lang("Parsing error") + ": " + Localization.lang("illegal backslash expression")
-                                + ".\n" + ex.getMessage(),
+                                + ".\n" + exception.getMessage(),
                         Localization.lang("Parsing error"), JOptionPane.ERROR_MESSAGE);
             }
         });
@@ -213,7 +213,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                     get().stream()
                             .filter(style -> !previewPreferences.getPreviewCycle().contains(style.getFilepath()))
                             .sorted((style0, style1) -> style0.getTitle().compareTo(style1.getTitle()))
-                            .forEach(style -> availableModel.addElement(style));
+                            .forEach(availableModel::addElement);
 
                     btnRight.setEnabled(!availableModel.isEmpty());
                 } catch (InterruptedException | ExecutionException e) {
@@ -258,7 +258,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public String getTabName() {
-        return Localization.lang("Entry preview") + " & " + Localization.lang("Citation Style");
+        return Localization.lang("Entry preview");
     }
 
 }

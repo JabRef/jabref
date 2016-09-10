@@ -637,27 +637,27 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         tabbedPane.addChangeListener(e -> {
             markActiveBasePanel();
 
-            BasePanel bp = getCurrentBasePanel();
-            if (bp == null) {
+            BasePanel basePanel = getCurrentBasePanel();
+            if (basePanel == null) {
                 return;
             }
 
-            if (bp.getPreviewPanel() != null) {
-                bp.getPreviewPanel().updateLayout();
+            if (basePanel.getPreviewPanel() != null) {
+                basePanel.getPreviewPanel().updateLayout();
             }
 
             groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
             previewToggle.setSelected(new PreviewPreferences(Globals.prefs).isPreviewEnabled());
             fetcherToggle.setSelected(sidePaneManager.isComponentVisible(generalFetcher.getTitle()));
-            Globals.getFocusListener().setFocused(bp.getMainTable());
+            Globals.getFocusListener().setFocused(basePanel.getMainTable());
             setWindowTitle();
             editModeAction.initName();
             // Update search autocompleter with information for the correct database:
-            bp.updateSearchManager();
+            basePanel.updateSearchManager();
             // Set correct enabled state for Back and Forward actions:
-            bp.setBackAndForwardEnabledState();
-            bp.getUndoManager().postUndoRedoEvent();
-            new FocusRequester(bp.getMainTable());
+            basePanel.setBackAndForwardEnabledState();
+            basePanel.getUndoManager().postUndoRedoEvent();
+            new FocusRequester(basePanel.getMainTable());
         });
 
         //Note: The registration of Apple event is at the end of initialization, because
