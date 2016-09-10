@@ -9,6 +9,7 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -33,6 +34,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 
+/**
+ * Representation of a CitationStyle
+ * Stores its name, the filepath and the style itself
+ */
 public class CitationStyle {
 
     public static final String DEFAULT = "/ieee.csl";
@@ -49,6 +54,9 @@ public class CitationStyle {
         this.source = Objects.requireNonNull(source);
     }
 
+    /**
+     * Creates an CitationStyle instance out of the style string
+     */
     private static CitationStyle createCitationStyleFromSource(final String source, final String filename) {
         try {
             DocumentBuilder db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
@@ -68,7 +76,15 @@ public class CitationStyle {
         return null;
     }
 
+    /**
+     * Loads the CitationStyle from the given file
+     */
     public static CitationStyle createCitationStyleFromFile(final String styleFile) {
+        if (!isCitationStyleFile(styleFile)) {
+            LOGGER.error("Can only load style files: "+ styleFile);
+            return null;
+        }
+
         try {
             String text;
             String internalFile = (styleFile.startsWith("/") ? "" : "/") + styleFile;
@@ -94,6 +110,8 @@ public class CitationStyle {
 
     /**
      * THIS ONLY WORKS WHEN JabRef IS STARTED AS AN APPLICATION (JAR)
+     *
+     * Reads all available CitationStyle in the Jar
      */
     public static List<CitationStyle> discoverCitationStyles() {
         try {
@@ -120,13 +138,11 @@ public class CitationStyle {
         return Collections.emptyList();
     }
 
+    /**
+     * Checks if the given style file is a CitationStyle
+     */
     public static boolean isCitationStyleFile(String styleFile){
-        for (String s : FileExtensions.CITATION_STYLE.getExtensions()) {
-            if (styleFile.endsWith(s)){
-                return true;
-            }
-        }
-        return false;
+        return Arrays.stream(FileExtensions.CITATION_STYLE.getExtensions()).anyMatch(styleFile::endsWith);
     }
 
     public String getTitle() {

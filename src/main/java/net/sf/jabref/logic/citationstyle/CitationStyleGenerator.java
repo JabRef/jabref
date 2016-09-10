@@ -20,15 +20,26 @@ import org.jbibtex.ParseException;
 import org.jbibtex.TokenMgrError;
 
 
+/**
+ * WARNING: The generation of a citation may take some time, better call it in outside the main Thread
+ */
 public class CitationStyleGenerator {
 
     private static final Log LOGGER = LogFactory.getLog(CitationStyleGenerator.class);
 
 
+    /**
+     * Generates a Citation based on the given entry and style
+     * WARNING: this may take some time, better call it in outside the main Thread
+     */
     public static String generateCitation(BibEntry entry, String style) {
         return generateCitation(entry, style, CitationStyleOutputFormat.HTML);
     }
 
+    /**
+     * Generates a Citation based on the given entry, style, and output format
+     * WARNING: this may take some time, better call it in outside the main Thread
+     */
     public static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat) {
         try {
             String parsedEntry = new UnicodeToLatexFormatter().format(entry.toString());

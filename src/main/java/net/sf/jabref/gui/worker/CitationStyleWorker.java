@@ -18,6 +18,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
+/**
+ * Generates a citation and updates the linked preview panel
+ */
 public class CitationStyleWorker extends SwingWorker<String, Void> {
 
     private static final Log LOGGER = LogFactory.getLog(CitationStyleWorker.class);

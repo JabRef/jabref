@@ -11,6 +11,9 @@ import net.sf.jabref.model.event.EntryRemovedEvent;
 import com.google.common.eventbus.Subscribe;
 
 
+/**
+ * Caches the generated Citations for quicker access
+ */
 public class CitationStyleCache {
 
     private CitationStyle citationStyle;
@@ -26,6 +29,9 @@ public class CitationStyleCache {
         bibDatabaseContext.getDatabase().registerListener(new BibDatabaseEntryListener());
     }
 
+    /**
+     * returns the citation for the given BibEntry and the set CitationStyle
+     */
     public String getCitationFor(BibEntry entry) {
         Map<BibEntry, String> cache = citationStylesCache.get(citationStyle.getSource());
         if (cache == null){
