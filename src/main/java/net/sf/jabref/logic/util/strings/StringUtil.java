@@ -655,6 +655,10 @@ public class StringUtil {
         return StringUtils.isNotBlank(string);
     }
 
+    public static boolean isBlank(String string) {
+        return StringUtils.isBlank(string);
+    }
+
     /**
      * Return string enclosed in HTML bold tags
      */
@@ -673,4 +677,7 @@ public class StringUtil {
         return "<b>" + input + "</b>";
     }
 
+    public static String stripAccents(String searchQuery) {
+        return StringUtils.stripAccents(searchQuery);
+    }
 }

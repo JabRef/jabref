@@ -6,10 +6,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
@@ -18,6 +18,8 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.Keyword;
+import net.sf.jabref.model.entry.KeywordList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -676,13 +678,13 @@ public class BibtexKeyPatternUtil {
             } else if (val.matches("keyword\\d+")) {
                 // according to LabelPattern.php, it returns keyword number n
                 int num = Integer.parseInt(val.substring(7));
-                Set<String> separatedKeywords = entry.getKeywords();
+                KeywordList separatedKeywords = entry.getKeywords(Globals.prefs.getKeywordDelimiter());
                 if (separatedKeywords.size() < num) {
                     // not enough keywords
                     return "";
                 } else {
                     // num counts from 1 to n, but index in arrayList count from 0 to n-1
-                    return new ArrayList<>(separatedKeywords).get(num-1);
+                    return separatedKeywords.get(num-1).toString();
                 }
             } else if (val.matches("keywords\\d*")) {
                 // return all keywords, not separated
@@ -692,13 +694,12 @@ public class BibtexKeyPatternUtil {
                 } else {
                     num = Integer.MAX_VALUE;
                 }
-                Set<String> separatedKeywords = entry.getKeywords();
+                KeywordList separatedKeywords = entry.getKeywords(Globals.prefs.getKeywordDelimiter());
                 StringBuilder sb = new StringBuilder();
                 int i = 0;
-                for (String keyword : separatedKeywords) {
+                for (Keyword keyword : separatedKeywords) {
                     // remove all spaces
-                    keyword = keyword.replaceAll("\\s+", "");
-                    sb.append(keyword);
+                    sb.append(keyword.toString().replaceAll("\\s+", ""));
 
                     i++;
                     if (i >= num) {

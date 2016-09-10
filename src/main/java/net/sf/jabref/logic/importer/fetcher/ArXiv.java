@@ -16,6 +16,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
@@ -32,7 +33,6 @@ import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.ParsedFileField;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.utils.URIBuilder;
@@ -149,11 +149,11 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         try {
             URIBuilder uriBuilder = new URIBuilder(API_URL);
             // The arXiv API has problems with accents, so we remove them (i.e. Fréchet -> Frechet)
-            if (StringUtils.isNotBlank(searchQuery)) {
-                uriBuilder.addParameter("search_query", StringUtils.stripAccents(searchQuery));
+            if (StringUtil.isNotBlank(searchQuery)) {
+                uriBuilder.addParameter("search_query", StringUtil.stripAccents(searchQuery));
             }
             if (!ids.isEmpty()) {
-                uriBuilder.addParameter("id_list", StringUtils.join(ids, ','));
+                uriBuilder.addParameter("id_list", String.join(",", ids));
             }
             uriBuilder.addParameter("start", String.valueOf(start));
             uriBuilder.addParameter("max_results", String.valueOf(maxResults));
@@ -331,8 +331,8 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             BibEntry bibEntry = new BibEntry();
             bibEntry.setType(BibtexEntryTypes.ARTICLE);
             bibEntry.setField(FieldName.EPRINTTYPE, "arXiv");
-            bibEntry.setField(FieldName.AUTHOR, StringUtils.join(authorNames, " and "));
-            bibEntry.addKeywords(categories, ", "); // TODO: Should use separator value from preferences
+            bibEntry.setField(FieldName.AUTHOR, String.join(" and ", authorNames));
+            bibEntry.addKeywords(categories, Globals.prefs.getKeywordDelimiter());
             getId().ifPresent(id -> bibEntry.setField(FieldName.EPRINT, id));
             title.ifPresent(titleContent -> bibEntry.setField(FieldName.TITLE, titleContent));
             doi.ifPresent(doiContent -> bibEntry.setField(FieldName.DOI, doiContent));

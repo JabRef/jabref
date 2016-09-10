@@ -6,11 +6,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.util.Enumeration;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -37,10 +34,12 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.model.entry.Keyword;
+import net.sf.jabref.model.entry.KeywordList;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
 import net.sf.jabref.specialfields.Quality;
@@ -64,14 +63,14 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
     private JDialog diag;
 
 
-    private DefaultListModel<String> keywordListModel;
+    private DefaultListModel<Keyword> keywordListModel;
 
     private JRadioButton intersectKeywords;
     private JRadioButton mergeKeywords;
 
     private boolean canceled;
 
-    private final Set<String> sortedKeywordsOfAllEntriesBeforeUpdateByUser = new TreeSet<>();
+    private final KeywordList sortedKeywordsOfAllEntriesBeforeUpdateByUser = new KeywordList();
 
 
     public ManageKeywordsAction(JabRefFrame frame) {
@@ -87,7 +86,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         JTextField keyword = new JTextField();
 
         keywordListModel = new DefaultListModel<>();
-        JList<String> keywordList = new JList<>(keywordListModel);
+        JList<Keyword> keywordList = new JList<>(keywordListModel);
         keywordList.setVisibleRowCount(8);
         JScrollPane kPane = new JScrollPane(keywordList);
 
@@ -149,9 +148,9 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         final ActionListener removeActionListenter = arg0 -> {
             // keywordList.getSelectedIndices(); does not work, therefore we operate on the values
-            List<String> values = keywordList.getSelectedValuesList();
+            List<Keyword> values = keywordList.getSelectedValuesList();
 
-            for (String val : values) {
+            for (Keyword val : values) {
                 keywordListModel.removeElement(val);
             }
         };
@@ -213,29 +212,33 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         diag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
     }
 
-    private void addButtonActionListener(JTextField keyword) {
-        String text = keyword.getText().trim();
-        if (!text.isEmpty()) {
-            if (keywordListModel.isEmpty()) {
-                keywordListModel.addElement(text);
-            } else {
-                int idx = 0;
-                String element = keywordListModel.getElementAt(idx);
-                while ((idx < keywordListModel.size()) && (element.compareTo(text) < 0)) {
-                    idx++;
-                }
-                if (idx == keywordListModel.size()) {
-                    // list is empty or word is greater than last word in list
-                    keywordListModel.addElement(text);
-                } else if (element.compareTo(text) == 0) {
-                    // nothing to do, word already in table
-                } else {
-                    keywordListModel.add(idx, text);
-                }
-            }
-            keyword.setText(null);
-            keyword.requestFocusInWindow();
+    private void addButtonActionListener(JTextField keywordTextField) {
+        if (StringUtil.isBlank(keywordTextField.getText())) {
+            return; // nothing to add
         }
+
+
+        Keyword newKeyword = new Keyword(keywordTextField.getText().trim());
+        if (keywordListModel.isEmpty()) {
+            keywordListModel.addElement(newKeyword);
+        } else {
+            int idx = 0;
+            Keyword element = keywordListModel.getElementAt(idx);
+            while ((idx < keywordListModel.size()) && (element.compareTo(newKeyword) < 0)) {
+                idx++;
+            }
+            if (idx == keywordListModel.size()) {
+                // list is empty or word is greater than last word in list
+                keywordListModel.addElement(newKeyword);
+            } else if (element.compareTo(newKeyword) == 0) {
+                // nothing to do, word already in table
+            } else {
+                keywordListModel.add(idx, newKeyword);
+            }
+        }
+        keywordTextField.setText(null);
+            keywordTextField.requestFocusInWindow();
+
     }
 
     @Override
@@ -263,19 +266,19 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             return;
         }
 
-        Set<String> keywordsToAdd = new HashSet<>();
-        Set<String> userSelectedKeywords = new HashSet<>();
+        KeywordList keywordsToAdd = new KeywordList();
+        KeywordList userSelectedKeywords = new KeywordList();
         // build keywordsToAdd and userSelectedKeywords in parallel
-        for (Enumeration<String> keywords = keywordListModel.elements(); keywords.hasMoreElements();) {
-            String keyword = keywords.nextElement();
+        for (Enumeration<Keyword> keywords = keywordListModel.elements(); keywords.hasMoreElements();) {
+            Keyword keyword = keywords.nextElement();
             userSelectedKeywords.add(keyword);
             if (!sortedKeywordsOfAllEntriesBeforeUpdateByUser.contains(keyword)) {
                 keywordsToAdd.add(keyword);
             }
         }
 
-        Set<String> keywordsToRemove = new HashSet<>();
-        for (String kword : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
+        KeywordList keywordsToRemove = new KeywordList();
+        for (Keyword kword : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
             if (!userSelectedKeywords.contains(kword)) {
                 keywordsToRemove.add(kword);
             }
@@ -295,19 +298,18 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         bp.markBaseChanged();
     }
 
-    private NamedCompound updateKeywords(List<BibEntry> entries, Set<String> keywordsToAdd,
-            Set<String> keywordsToRemove) {
+    private NamedCompound updateKeywords(List<BibEntry> entries, KeywordList keywordsToAdd,
+            KeywordList keywordsToRemove) {
         NamedCompound ce = new NamedCompound(Localization.lang("Update keywords"));
         for (BibEntry entry : entries) {
-            Set<String> keywords = entry.getKeywords();
+            KeywordList keywords = entry.getKeywords(Globals.prefs.getKeywordDelimiter());
 
             // update keywords
             keywords.removeAll(keywordsToRemove);
             keywords.addAll(keywordsToAdd);
 
             // put keywords back
-            Optional<FieldChange> change = entry.putKeywords(keywords,
-                    Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+            Optional<FieldChange> change = entry.putKeywords(keywords, Globals.prefs.getKeywordDelimiter());
             if (change.isPresent()) {
                 ce.addEdit(new UndoableFieldChange(change.get()));
             }
@@ -320,13 +322,13 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         return ce;
     }
 
-    private void synchronizeSpecialFields(Set<String> keywordsToAdd, Set<String> keywordsToRemove) {
+    private void synchronizeSpecialFields(KeywordList keywordsToAdd, KeywordList keywordsToRemove) {
         // we need to check whether a special field is added
         // for each field:
         //   check if something is added
         //   if yes, add all keywords of that special fields to the keywords to be removed
 
-        Set<String> clone;
+        KeywordList clone;
 
         // Priority
         clone = createClone(keywordsToAdd);
@@ -371,8 +373,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         }
     }
 
-    private static Set<String> createClone(Set<String> keywordsToAdd) {
-        return new HashSet<>(keywordsToAdd);
+    private static KeywordList createClone(KeywordList keywordsToAdd) {
+        return new KeywordList(keywordsToAdd);
     }
 
     private void fillKeyWordList() {
@@ -385,7 +387,7 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
         if (mergeKeywords.isSelected()) {
             for (BibEntry entry : entries) {
-                Set<String> separatedKeywords = entry.getKeywords();
+                KeywordList separatedKeywords = entry.getKeywords(Globals.prefs.getKeywordDelimiter());
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
             }
         } else {
@@ -393,18 +395,18 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
 
             // all keywords from first entry have to be added
             BibEntry firstEntry = entries.get(0);
-            Set<String> separatedKeywords = firstEntry.getKeywords();
+            KeywordList separatedKeywords = firstEntry.getKeywords(Globals.prefs.getKeywordDelimiter());
             sortedKeywordsOfAllEntriesBeforeUpdateByUser.addAll(separatedKeywords);
 
             // for the remaining entries, intersection has to be used
             // this approach ensures that one empty keyword list leads to an empty set of common keywords
             for (int i = 1; i < entries.size(); i++) {
                 BibEntry entry = entries.get(i);
-                separatedKeywords = entry.getKeywords();
+                separatedKeywords = entry.getKeywords(Globals.prefs.getKeywordDelimiter());
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.retainAll(separatedKeywords);
             }
         }
-        for (String s : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
+        for (Keyword s : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
             keywordListModel.addElement(s);
         }
     }

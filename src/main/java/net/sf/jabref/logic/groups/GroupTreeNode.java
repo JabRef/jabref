@@ -10,6 +10,7 @@ import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.search.SearchMatcher;
 import net.sf.jabref.logic.search.matchers.MatcherSet;
 import net.sf.jabref.logic.search.matchers.MatcherSets;
+import net.sf.jabref.model.TreeNode;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 

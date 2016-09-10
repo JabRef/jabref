@@ -187,7 +187,7 @@ public class BibtexParser {
 
         // Instantiate meta data:
         try {
-            parserResult.setMetaData(MetaData.parse(meta, importFormatPreferences.getKeywordSeparator()));
+            parserResult.setMetaData(MetaData.parse(meta, importFormatPreferences.getKeywordSeparator().toString()));
         } catch (ParseException exception) {
             parserResult.addWarning(exception.getLocalizedMessage());
         }

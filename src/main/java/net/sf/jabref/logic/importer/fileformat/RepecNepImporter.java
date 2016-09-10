@@ -342,7 +342,7 @@ public class RepecNepImporter extends ImportFormat {
             if ("Keywords".equals(keyword)) {
                 String content = readMultipleLines(in);
                 String[] keywords = content.split("[,;]");
-                be.addKeywords(new LinkedHashSet<>(Arrays.asList(keywords)),
+                be.addKeywords(Arrays.asList(keywords),
                         importFormatPreferences.getKeywordSeparator());
                 // parse JEL field
             } else if ("JEL".equals(keyword)) {

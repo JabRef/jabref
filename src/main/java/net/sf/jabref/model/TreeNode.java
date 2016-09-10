@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.groups;
+package net.sf.jabref.model;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -11,7 +11,9 @@ import java.util.function.Consumer;
 /**
  * Represents a node in a tree.
  * <p>
- * Usually, tree nodes have a value property which allows access to the value stored in the node.
+ * In usual implementations, nodes function as wrappers around a data object. Thus normally they have a value property
+ * which allows access to the value stored in the node.
+ *
  * In contrast to this approach, the TreeNode<T> class is designed to be used as a base class which provides the
  * tree traversing functionality via inheritance.
  * <p>
@@ -26,8 +28,8 @@ import java.util.function.Consumer;
  *
  * @param <T> the type of the class
  */
-// We use some explicit casts of the form "(T) this". The constructor ensures that this cast is valid.
-@SuppressWarnings("unchecked") public abstract class TreeNode<T extends TreeNode<T>> {
+@SuppressWarnings("unchecked") // We use some explicit casts of the form "(T) this". The constructor ensures that this cast is valid.
+public abstract class TreeNode<T extends TreeNode<T>> {
 
     /**
      * This node's parent, or null if this node has no parent
@@ -454,6 +456,7 @@ import java.util.function.Consumer;
      * @param index the position where the node should be added
      * @return the child node
      * @throws IndexOutOfBoundsException if the index is out of range
+     * @throws UnsupportedOperationException if the given node has already a parent
      */
     public T addChild(T child, int index) {
         Objects.requireNonNull(child);
@@ -504,9 +507,8 @@ import java.util.function.Consumer;
         }
 
         int j = getNumberOfChildren() - 1;
-        int lastModified;
         while (j > 0) {
-            lastModified = j + 1;
+            int lastModified = j + 1;
             j = -1;
             for (int i = 1; i < lastModified; ++i) {
                 T child1 = getChildAt(i - 1).get();
@@ -544,10 +546,7 @@ import java.util.function.Consumer;
         }
 
         // Remove from previous parent
-        Optional<T> oldParent = getParent();
-        if (oldParent.isPresent()) {
-            oldParent.get().removeChild((T) this);
-        }
+        getParent().ifPresent(oldParent -> oldParent.removeChild((T) this));
 
         // Add as child
         target.addChild((T) this, targetIndex);

@@ -1,10 +1,12 @@
-package net.sf.jabref.logic.groups;
+package net.sf.jabref.model;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+
+import net.sf.jabref.model.TreeNode;
 
 import org.junit.Test;
 
