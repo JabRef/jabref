@@ -29,6 +29,7 @@ import net.sf.jabref.preferences.PreviewPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.factories.Paddings;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -74,33 +75,41 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 .addListSelectionListener(e -> btnRight.setEnabled(!((ListSelectionModel) e.getSource()).isSelectionEmpty()));
 
         btnRight.addActionListener(e -> {
-            for (Object s : available.getSelectedValuesList()) {
-                availableModel.removeElement(s);
-                chosenModel.addElement(s);
+            for (Object object : available.getSelectedValuesList()) {
+                availableModel.removeElement(object);
+                chosenModel.addElement(object);
             }
         });
 
         btnLeft.addActionListener(e -> {
-            for (Object s : chosen.getSelectedValuesList()) {
-                availableModel.addElement(s);
-                chosenModel.removeElement(s);
+            for (Object object : chosen.getSelectedValuesList()) {
+                availableModel.addElement(object);
+                chosenModel.removeElement(object);
             }
         });
 
         btnUp.addActionListener(e -> {
-            for (int i : chosen.getSelectedIndices()) {
-                if (i > 0) {
-                    chosenModel.add(i - 1, chosenModel.remove(i));
-                }
+            List<Integer> newSelectedIndices = new ArrayList<>();
+            for (int oldIndex : chosen.getSelectedIndices()) {
+                boolean alreadyTaken = newSelectedIndices.contains(oldIndex - 1);
+                int newIndex = (oldIndex > 0 && !alreadyTaken) ? oldIndex - 1 : oldIndex;
+                chosenModel.add(newIndex, chosenModel.remove(oldIndex));
+                newSelectedIndices.add(newIndex);
             }
+            chosen.setSelectedIndices(ArrayUtils.toPrimitive(newSelectedIndices.toArray(new Integer[newSelectedIndices.size()])));
         });
 
         btnDown.addActionListener(e -> {
-            for (int i : chosen.getSelectedIndices()) {
-                if (i < chosenModel.size() - 1) {
-                    chosenModel.add(i + 1, chosenModel.remove(i));
-                }
+            List<Integer> newSelectedIndices = new ArrayList<>();
+            int[] selectedIndices = chosen.getSelectedIndices();
+            for (int i = selectedIndices.length - 1; i >= 0; i--) {
+                int oldIndex = selectedIndices[i];
+                boolean alreadyTaken = newSelectedIndices.contains(oldIndex + 1);
+                int newIndex = (oldIndex < chosenModel.getSize() - 1 && !alreadyTaken) ? oldIndex + 1 : oldIndex;
+                chosenModel.add(newIndex, chosenModel.remove(oldIndex));
+                newSelectedIndices.add(newIndex);
             }
+            chosen.setSelectedIndices(ArrayUtils.toPrimitive(newSelectedIndices.toArray(new Integer[newSelectedIndices.size()])));
         });
 
 
@@ -163,11 +172,10 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         chosenModel.clear();
         boolean isPreviewChosen = false;
         for (String style : previewPreferences.getPreviewCycle()) {
-            if (CitationStyle.isCitationStyleFile(style)){
+            if (CitationStyle.isCitationStyleFile(style)) {
                 chosenModel.addElement(CitationStyle.createCitationStyleFromFile(style));
-            }
-            else {
-                if (isPreviewChosen){
+            } else {
+                if (isPreviewChosen) {
                     LOGGER.error("Preview is already in the list, something went wrong");
                     continue;
                 }
