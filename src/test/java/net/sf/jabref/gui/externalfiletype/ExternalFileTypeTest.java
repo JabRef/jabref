@@ -1,4 +1,4 @@
-package net.sf.jabref.external;
+package net.sf.jabref.gui.externalfiletype;
 
 import org.junit.Test;
 

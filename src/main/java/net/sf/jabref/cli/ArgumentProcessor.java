@@ -18,7 +18,7 @@ import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefException;
 import net.sf.jabref.MetaData;
-import net.sf.jabref.external.AutoSetLinks;
+import net.sf.jabref.gui.externalfiles.AutoSetLinks;
 import net.sf.jabref.gui.importer.fetcher.EntryFetcher;
 import net.sf.jabref.gui.importer.fetcher.EntryFetchers;
 import net.sf.jabref.logic.CustomEntryTypesManager;
