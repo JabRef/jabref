@@ -8,6 +8,7 @@ import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 
 /**
+ * <b>use SearchBasedFetcher instead</b> <br>
  * Implement this interface to add another activeFetcher (something that grabs records
  * from the Web for JabRef). Have a look at the existing implemenations
  * OAI2Fetcher, IEEEXploreFetcher, MedlineFetcher, JStorFetcher and
@@ -18,8 +19,11 @@ import net.sf.jabref.logic.importer.OutputPrinter;
  *
  * A Fetcher should not execute any GUI Operations, because it might be run in
  * headless mode, but rather use the OutputPrinter for talking to the user.
+ *
+ *
+ *
  */
-@Deprecated // use SearchBasedFetcher instead
+@Deprecated
 public interface EntryFetcher extends ImportInspectionDialog.CallBack {
 
     /**

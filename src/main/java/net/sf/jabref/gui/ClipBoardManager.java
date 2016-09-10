@@ -66,6 +66,7 @@ public class ClipBoardManager implements ClipboardOwner {
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     public List<BibEntry> extractBibEntriesFromClipboard() {
         // Get clipboard contents, and see if TransferableBibtexEntry is among the content flavors offered
         Transferable content = CLIPBOARD.getContents(null);

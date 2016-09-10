@@ -38,14 +38,25 @@ public class BibEntry implements Cloneable {
     private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
 
     // All these fields should be private or protected
-    @Deprecated // use get/setType
+    /**
+     * use get/setType
+     */
+    @Deprecated
     public static final String TYPE_HEADER = "entrytype";
     @Deprecated
     public static final String OBSOLETE_TYPE_HEADER = "bibtextype";
-    @Deprecated // use dedicated methods like get/set/clearCiteKey
+
+    /**
+     *  use dedicated methods like get/set/clearCiteKey
+     */
+    @Deprecated
     public static final String KEY_FIELD = "bibtexkey";
     protected static final String ID_FIELD = "id";
-    @Deprecated // use constructor without type
+
+    /**
+     * use constructor without type
+     */
+    @Deprecated
     public static final String DEFAULT_TYPE = "misc";
 
     private static final Pattern REMOVE_TRAILING_WHITESPACE = Pattern.compile("\\s+$");
@@ -567,8 +578,8 @@ public class BibEntry implements Cloneable {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[] {getField(FieldName.AUTHOR).orElse("N/A"),
-                getField(FieldName.TITLE).orElse("N/A"), getField(FieldName.YEAR).orElse("N/A")};
+        String[] s = new String[] {getField(FieldName.AUTHOR).orElse("N/A"), getField(FieldName.TITLE).orElse("N/A"),
+                getField(FieldName.YEAR).orElse("N/A")};
 
         String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
         if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
