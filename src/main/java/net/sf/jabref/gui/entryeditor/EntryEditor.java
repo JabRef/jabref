@@ -50,7 +50,6 @@ import javax.swing.event.ChangeListener;
 import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.external.WriteXMPEntryEditorAction;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryContainer;
 import net.sf.jabref.gui.FieldContentSelector;
@@ -59,6 +58,7 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.actions.Actions;
+import net.sf.jabref.gui.externalfiles.WriteXMPEntryEditorAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditorFocusListener;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
