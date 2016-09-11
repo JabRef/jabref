@@ -533,6 +533,8 @@ public class OpenOfficePanel extends AbstractWorker {
 
         dialogOkPressed = false;
         final JDialog cDiag = new JDialog(frame, Localization.lang("Set connection parameters"), true);
+
+        // Path fields
         final JTextField ooPath = new JTextField(30);
         JButton browseOOPath = new JButton(Localization.lang("Browse"));
         ooPath.setText(preferences.getOOPath());
@@ -575,9 +577,9 @@ public class OpenOfficePanel extends AbstractWorker {
             builder.add(browseOOJars).xy(5, 3);
         }
         builder.padding("5dlu, 5dlu, 5dlu, 5dlu");
-        ButtonBarBuilder bb = new ButtonBarBuilder();
-        JButton ok = new JButton(Localization.lang("OK"));
-        JButton cancel = new JButton(Localization.lang("Cancel"));
+
+        cDiag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
+
         ActionListener tfListener = e -> {
             preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
             cDiag.dispose();
@@ -586,22 +588,28 @@ public class OpenOfficePanel extends AbstractWorker {
         ooPath.addActionListener(tfListener);
         ooExec.addActionListener(tfListener);
         ooJars.addActionListener(tfListener);
+
+        // Buttons
+        JButton ok = new JButton(Localization.lang("OK"));
+        JButton cancel = new JButton(Localization.lang("Cancel"));
+
         ok.addActionListener(e -> {
             preferences.updateConnectionParams(ooPath.getText(), ooExec.getText(), ooJars.getText());
             dialogOkPressed = true;
             cDiag.dispose();
         });
-
         cancel.addActionListener(e -> cDiag.dispose());
 
+        ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
         bb.addRelatedGap();
         bb.addButton(ok);
         bb.addButton(cancel);
         bb.addGlue();
         bb.padding("5dlu, 5dlu, 5dlu, 5dlu");
-        cDiag.getContentPane().add(builder.getPanel(), BorderLayout.CENTER);
         cDiag.getContentPane().add(bb.getPanel(), BorderLayout.SOUTH);
+
+        // Finish and show dialog
         cDiag.pack();
         cDiag.setLocationRelativeTo(frame);
         cDiag.setVisible(true);
@@ -620,15 +628,15 @@ public class OpenOfficePanel extends AbstractWorker {
         Boolean inParenthesis = inParenthesisIn;
         String pageInfo = null;
         if (addPageInfo) {
-            AdvancedCiteDialog acd = new AdvancedCiteDialog(frame);
-            acd.showDialog();
-            if (acd.canceled()) {
+            AdvancedCiteDialog citeDialog = new AdvancedCiteDialog(frame);
+            citeDialog.showDialog();
+            if (citeDialog.canceled()) {
                 return;
             }
-            if (!acd.getPageInfo().isEmpty()) {
-                pageInfo = acd.getPageInfo();
+            if (!citeDialog.getPageInfo().isEmpty()) {
+                pageInfo = citeDialog.getPageInfo();
             }
-            inParenthesis = acd.isInParenthesisCite();
+            inParenthesis = citeDialog.isInParenthesisCite();
 
         }
 

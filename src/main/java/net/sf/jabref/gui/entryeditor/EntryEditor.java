@@ -57,7 +57,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.web.WebView;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.external.WriteXMPEntryEditorAction;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryContainer;
 import net.sf.jabref.gui.FieldContentSelector;
@@ -66,6 +65,7 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.actions.Actions;
+import net.sf.jabref.gui.externalfiles.WriteXMPEntryEditorAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditorFocusListener;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
@@ -576,7 +576,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private void setupSourcePanel() {
         source = new JTextAreaWithHighlighting();
-        panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener((SearchQueryHighlightListener) source);
+        panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener((SearchQueryHighlightListener) source);
 
         source.setEditable(true);
         source.setLineWrap(true);

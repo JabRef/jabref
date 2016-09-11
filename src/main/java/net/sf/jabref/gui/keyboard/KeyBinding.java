@@ -4,27 +4,21 @@ import net.sf.jabref.logic.l10n.Localization;
 
 public enum KeyBinding {
 
-    ABBREVIATE(
-            "Abbreviate", Localization.lang("Abbreviate journal names"), "ctrl alt A", KeyBindingCategory.TOOLS),
-    AUTOGENERATE_BIBTEX_KEYS(
-            "Autogenerate BibTeX keys", Localization
-                    .lang("Autogenerate BibTeX keys"), "ctrl G", KeyBindingCategory.QUALITY),
-    AUTOMATICALLY_LINK_FILES(
-            "Automatically link files", Localization.lang("Automatically set file links"), "F7", KeyBindingCategory.QUALITY),
+    ABBREVIATE("Abbreviate", Localization.lang("Abbreviate journal names"), "ctrl alt A", KeyBindingCategory.TOOLS),
+    AUTOGENERATE_BIBTEX_KEYS("Autogenerate BibTeX keys", Localization.lang("Autogenerate BibTeX keys"), "ctrl G", KeyBindingCategory.QUALITY),
+    ACCEPT("Accept", Localization.lang("Accept"), "ctrl ENTER", KeyBindingCategory.EDIT),
+    AUTOMATICALLY_LINK_FILES("Automatically link files", Localization.lang("Automatically set file links"), "F7", KeyBindingCategory.QUALITY),
     BACK("Back", Localization.lang("Back"), "alt LEFT", KeyBindingCategory.VIEW),
-    CLEANUP(
-            "Cleanup", Localization.lang("Cleanup entries"), "F8", KeyBindingCategory.QUALITY),
+    CLEANUP("Cleanup", Localization.lang("Cleanup entries"), "F8", KeyBindingCategory.QUALITY),
     CLEAR_SEARCH("Clear search", Localization.lang("Clear search"), "ESCAPE", KeyBindingCategory.SEARCH),
     CLOSE_DATABASE("Close database", Localization.lang("Close database"), "ctrl W", KeyBindingCategory.FILE),
     CLOSE_DIALOG("Close dialog", Localization.lang("Close dialog"), "ESCAPE", KeyBindingCategory.FILE),
-    CLOSE_ENTRY_EDITOR(
-            "Close entry editor", Localization.lang("Close entry editor"), "ESCAPE", KeyBindingCategory.VIEW),
+    CLOSE_ENTRY_EDITOR("Close entry editor", Localization.lang("Close entry editor"), "ESCAPE", KeyBindingCategory.VIEW),
     COPY("Copy", Localization.lang("Copy"), "ctrl C", KeyBindingCategory.EDIT),
     COPY_CITE_BIBTEX_KEY("Copy \\cite{BibTeX key}", Localization.lang("Copy \\cite{BibTeX key}"), "ctrl K", KeyBindingCategory.EDIT),
     COPY_BIBTEX_KEY("Copy BibTeX key", Localization.lang("Copy BibTeX key"), "ctrl shift K", KeyBindingCategory.EDIT),
     COPY_BIBTEX_KEY_AND_TITLE("Copy BibTeX key and title", Localization.lang("Copy BibTeX key and title"), "ctrl shift alt K", KeyBindingCategory.EDIT),
-    COPY_PREVIEW(
-            "Copy preview", Localization.lang("Copy preview"), "ctrl shift C", KeyBindingCategory.VIEW),
+    COPY_PREVIEW("Copy preview", Localization.lang("Copy preview"), "ctrl shift C", KeyBindingCategory.VIEW),
     CUT("Cut", Localization.lang("Cut"), "ctrl X", KeyBindingCategory.EDIT),
     DECREASE_TABLE_FONT_SIZE("Decrease table font size", Localization.lang("Decrease table font size"), "ctrl MINUS", KeyBindingCategory.VIEW),
     DELETE_ENTRY("Delete entry", Localization.lang("Delete entry"), "DELETE", KeyBindingCategory.BIBTEX),
@@ -39,16 +33,14 @@ public enum KeyBinding {
     ENTRY_EDITOR_STORE_FIELD("Entry editor, store field", Localization.lang("Entry editor, store field"), "alt S", KeyBindingCategory.TOOLS),
     FILE_LIST_EDITOR_MOVE_ENTRY_DOWN("File list editor, move entry down", Localization.lang("File list editor, move entry down"), "ctrl DOWN", KeyBindingCategory.VIEW),
     FILE_LIST_EDITOR_MOVE_ENTRY_UP("File list editor, move entry up", Localization.lang("File list editor, move entry up"), "ctrl UP", KeyBindingCategory.VIEW),
-    FIND_UNLINKED_FILES(
-            "Find unlinked files", Localization.lang("Find unlinked files"), "shift F7", KeyBindingCategory.QUALITY),
+    FIND_UNLINKED_FILES("Find unlinked files", Localization.lang("Find unlinked files"), "shift F7", KeyBindingCategory.QUALITY),
     FOCUS_ENTRY_TABLE("Focus entry table", Localization.lang("Focus entry table"), "alt 1", KeyBindingCategory.VIEW),
     FORWARD("Forward", Localization.lang("Forward"), "alt RIGHT", KeyBindingCategory.VIEW),
+    GLOBAL_SEARCH("Search globally", Localization.lang("Search globally"), "ctrl shift F", KeyBindingCategory.SEARCH),
     HELP("Help", Localization.lang("Help"), "F1", KeyBindingCategory.FILE),
     IMPORT_INTO_CURRENT_DATABASE("Import into current database", Localization.lang("Import into current database"), "ctrl I", KeyBindingCategory.FILE),
     IMPORT_INTO_NEW_DATABASE("Import into new database", Localization.lang("Import into new database"), "ctrl alt I", KeyBindingCategory.FILE),
-    INCREASE_TABLE_FONT_SIZE(
-            "Increase table font size", Localization
-                    .lang("Increase table font size"), "ctrl PLUS", KeyBindingCategory.VIEW),
+    INCREASE_TABLE_FONT_SIZE("Increase table font size", Localization.lang("Increase table font size"), "ctrl PLUS", KeyBindingCategory.VIEW),
     MARK_ENTRIES("Mark entries", Localization.lang("Mark entries"), "ctrl M", KeyBindingCategory.EDIT),
     NEW_ARTICLE("New article", Localization.lang("New article"), "ctrl shift A", KeyBindingCategory.BIBTEX),
     NEW_BOOK("New book", Localization.lang("New book"), "ctrl shift B", KeyBindingCategory.BIBTEX),
@@ -60,8 +52,7 @@ public enum KeyBinding {
     NEW_PROCEEDINGS("New proceedings", Localization.lang("New proceedings"), "ctrl shift P", KeyBindingCategory.BIBTEX),
     NEW_UNPUBLISHED("New unpublished", Localization.lang("New unpublished"), "ctrl shift U", KeyBindingCategory.BIBTEX),
     NEW_TECHREPORT("New technical report", Localization.lang("New technical report"), "ctrl shift R", KeyBindingCategory.BIBTEX),
-    NEXT_TAB(
-            "Next tab", Localization.lang("Next tab"), "ctrl PAGE_DOWN", KeyBindingCategory.VIEW),
+    NEXT_TAB("Next tab", Localization.lang("Next tab"), "ctrl PAGE_DOWN", KeyBindingCategory.VIEW),
     OPEN_CONSOLE("Open terminal here", Localization.lang("Open terminal here"), "ctrl shift L", KeyBindingCategory.TOOLS),
     OPEN_DATABASE("Open database", Localization.lang("Open database"), "ctrl O", KeyBindingCategory.FILE),
     OPEN_FILE("Open file", Localization.lang("Open file"), "F4", KeyBindingCategory.TOOLS),
@@ -70,28 +61,23 @@ public enum KeyBinding {
     PASTE("Paste", Localization.lang("Paste"), "ctrl V", KeyBindingCategory.EDIT),
     PULL_CHANGES_FROM_SHARED_DATABASE("Pull changes from shared database", Localization.lang("Pull changes from shared database"), "ctrl shift R", KeyBindingCategory.FILE),
     PREAMBLE_EDITOR_STORE_CHANGES("Preamble editor, store changes", Localization.lang("Preamble editor, store changes"), "alt S", KeyBindingCategory.FILE),
-    PREVIOUS_TAB(
-            "Previous tab", Localization.lang("Previous tab"), "ctrl PAGE_UP", KeyBindingCategory.VIEW),
+    PREVIOUS_TAB("Previous tab", Localization.lang("Previous tab"), "ctrl PAGE_UP", KeyBindingCategory.VIEW),
     PUSH_TO_APPLICATION("Push to application", Localization.lang("Push to application"), "ctrl L", KeyBindingCategory.TOOLS),
     QUIT_JABREF("Quit JabRef", Localization.lang("Quit JabRef"), "ctrl Q", KeyBindingCategory.FILE),
     REDO("Redo", Localization.lang("Redo"), "ctrl Y", KeyBindingCategory.EDIT),
-    REFRESH_OO(
-            "Refresh OO", Localization.lang("Refresh OpenOffice/LibreOffice"), "ctrl alt O", KeyBindingCategory.TOOLS),
+    REFRESH_OO("Refresh OO", Localization.lang("Refresh OpenOffice/LibreOffice"), "ctrl alt O", KeyBindingCategory.TOOLS),
     REPLACE_STRING("Replace string", Localization.lang("Replace string"), "ctrl R", KeyBindingCategory.SEARCH),
     RESOLVE_DUPLICATE_BIBTEX_KEYS("Resolve duplicate BibTeX keys", Localization.lang("Resolve duplicate BibTeX keys"), "ctrl shift D", KeyBindingCategory.BIBTEX),
     SAVE_ALL("Save all", Localization.lang("Save all"), "ctrl alt S", KeyBindingCategory.FILE),
     SAVE_DATABASE("Save database", Localization.lang("Save database"), "ctrl S", KeyBindingCategory.FILE),
-    SAVE_DATABASE_AS(
-            "Save database as ...", Localization.lang("Save database as..."), "ctrl shift S", KeyBindingCategory.FILE),
+    SAVE_DATABASE_AS("Save database as ...", Localization.lang("Save database as..."), "ctrl shift S", KeyBindingCategory.FILE),
     SEARCH("Search", Localization.lang("Search"), "ctrl F", KeyBindingCategory.SEARCH),
     SELECT_ALL("Select all", Localization.lang("Select all"), "ctrl A", KeyBindingCategory.EDIT),
     STRING_DIALOG_ADD_STRING("String dialog, add string", Localization.lang("String dialog, add string"), "ctrl N", KeyBindingCategory.FILE),
     STRING_DIALOG_REMOVE_STRING("String dialog, remove string", Localization.lang("String dialog, remove string"), "shift DELETE", KeyBindingCategory.FILE),
-    SWITCH_PREVIEW_LAYOUT(
-            "Switch preview layout", Localization.lang("Switch preview layout"), "F9", KeyBindingCategory.VIEW),
-    SYNCHRONIZE_FILES("Synchronize files", Localization.lang("Synchronize files"), "shift F7", KeyBindingCategory.QUALITY),
-    TOGGLE_ENTRY_PREVIEW(
-            "Toggle entry preview", Localization.lang("Toggle entry preview"), "alt 2", KeyBindingCategory.VIEW),
+    SWITCH_PREVIEW_LAYOUT("Switch preview layout", Localization.lang("Switch preview layout"), "F9", KeyBindingCategory.VIEW),
+    SYNCHRONIZE_FILES("Synchronize files", Localization.lang("Synchronize files"), "ctrl shift F7", KeyBindingCategory.QUALITY),
+    TOGGLE_ENTRY_PREVIEW("Toggle entry preview", Localization.lang("Toggle entry preview"), "alt 2", KeyBindingCategory.VIEW),
     TOGGLE_GROUPS_INTERFACE("Toggle groups interface", Localization.lang("Toggle groups interface"), "alt 3", KeyBindingCategory.VIEW),
     UNABBREVIATE("Unabbreviate", Localization.lang("Unabbreviate"), "ctrl alt shift A", KeyBindingCategory.TOOLS),
     UNDO("Undo", Localization.lang("Undo"), "ctrl Z", KeyBindingCategory.EDIT),
