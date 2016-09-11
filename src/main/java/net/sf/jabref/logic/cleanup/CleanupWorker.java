@@ -1,7 +1,6 @@
 package net.sf.jabref.logic.cleanup;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -10,7 +9,6 @@ import net.sf.jabref.FileDirectoryPreferences;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
 
 public class CleanupWorker {
 
@@ -51,7 +49,7 @@ public class CleanupWorker {
         List<CleanupJob> jobs = new ArrayList<>();
 
         if (preset.isCleanUpUpgradeExternalLinks()) {
-            jobs.add(new UpgradePdfPsToFileCleanup(Arrays.asList(FieldName.PDF, FieldName.PS)));
+            jobs.add(new UpgradePdfPsToFileCleanup());
         }
         if (preset.isCleanUpDOI()) {
             jobs.add(new DoiCleanup());
