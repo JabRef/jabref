@@ -1,4 +1,4 @@
-package net.sf.jabref.external;
+package net.sf.jabref.gui.externalfiles;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -14,10 +14,10 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.FileDialog;
-import net.sf.jabref.gui.FileListEntry;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
+import net.sf.jabref.gui.filelist.FileListEntry;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;

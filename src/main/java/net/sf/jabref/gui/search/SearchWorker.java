@@ -1,6 +1,5 @@
 package net.sf.jabref.gui.search;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -8,6 +7,7 @@ import java.util.stream.Collectors;
 
 import javax.swing.SwingWorker;
 
+import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.logic.search.SearchQuery;
@@ -16,6 +16,7 @@ import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 
 /**
  * Not reusable. Always create a new instance for each search!
@@ -28,22 +29,21 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
     private final BibDatabase database;
 
     private final SearchQuery searchQuery;
-    private final SearchMode mode;
+    private final SearchDisplayMode searchDisplayMode;
 
-    SearchWorker(BasePanel basePanel, SearchQuery searchQuery, SearchMode mode) {
+    public SearchWorker(BasePanel basePanel, SearchQuery searchQuery, SearchDisplayMode searchDisplayMode) {
         this.basePanel = Objects.requireNonNull(basePanel);
         this.database = Objects.requireNonNull(basePanel.getDatabase());
         this.searchQuery = Objects.requireNonNull(searchQuery);
-        this.mode = Objects.requireNonNull(mode);
-        LOGGER.debug("Search (" + this.mode.getDisplayName() + "): " + this.searchQuery);
+        this.searchDisplayMode = Objects.requireNonNull(searchDisplayMode);
+        LOGGER.debug("Search (" + this.searchDisplayMode.getDisplayName() + "): " + this.searchQuery);
     }
 
     @Override
     protected List<BibEntry> doInBackground() throws Exception {
-        // Search the current database
-        List<BibEntry> matchedEntries = new LinkedList<>();
-        matchedEntries.addAll(database.getEntries().stream().filter(searchQuery::isMatch).collect(Collectors.toList()));
-        return matchedEntries;
+        return database.getEntries().stream()
+                .filter(searchQuery::isMatch)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -60,9 +60,10 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
     }
 
     private void updateUIWithSearchResult(List<BibEntry> matchedEntries) {
+        GlobalSearchBar globalSearchBar = JabRefGUI.getMainFrame().getGlobalSearchBar();
 
         // check if still the current query
-        if (!basePanel.getSearchBar().isStillValidQuery(searchQuery)) {
+        if (!globalSearchBar.isStillValidQuery(searchQuery)) {
             // do not update - another search was already issued
             return;
         }
@@ -71,33 +72,40 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
         for (BibEntry entry : basePanel.getDatabase().getEntries()) {
             entry.setSearchHit(false);
         }
-
+        // and mark
         for (BibEntry entry : matchedEntries) {
             entry.setSearchHit(true);
         }
 
         basePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
-
         // Show the result in the chosen way:
-        switch (mode) {
-        case FLOAT:
-            basePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FLOAT);
-            break;
-        case FILTER:
-            basePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FILTER);
-            break;
-        default:
-            break;
+        switch (searchDisplayMode) {
+            case FLOAT:
+                basePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FLOAT);
+                break;
+            case FILTER:
+                basePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.FILTER);
+                break;
+            default:
+                LOGGER.error("Following searchDisplayMode was not defined: " + searchDisplayMode);
+                break;
         }
 
-        // select first match (i.e., row) if there is any
-        int hits = matchedEntries.size();
-        if ((hits > 0) && (basePanel.getMainTable().getRowCount() > 0)) {
-            basePanel.getMainTable().setSelected(0);
+        // only selects the first match if the selected entries are no hits or no entry is selected
+        List<BibEntry> selectedEntries = basePanel.getSelectedEntries();
+        boolean isHitSelected = selectedEntries.stream().anyMatch(BibEntry::isSearchHit);
+        if (!isHitSelected && !matchedEntries.isEmpty()) {
+            for (int i = 0; i < basePanel.getMainTable().getRowCount(); i++) {
+                BibEntry entry = basePanel.getMainTable().getEntryAt(i);
+                if (entry.isSearchHit()) {
+                    basePanel.getMainTable().setSelected(i);
+                    break;
+                }
+            }
         }
 
-        basePanel.getSearchBar().updateResults(hits, searchQuery.getDescription(), searchQuery.isGrammarBasedSearch());
-        basePanel.getSearchBar().getSearchQueryHighlightObservable().fireSearchlistenerEvent(searchQuery);
+        globalSearchBar.updateResults(matchedEntries.size(), searchQuery.getDescription(), searchQuery.isGrammarBasedSearch());
+        globalSearchBar.getSearchQueryHighlightObservable().fireSearchlistenerEvent(searchQuery);
     }
 
 }

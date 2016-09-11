@@ -3,6 +3,9 @@ package net.sf.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ItemListener;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -10,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
@@ -281,7 +285,14 @@ class FileTab extends JPanel implements PrefsTab {
 
     @Override
     public boolean validateSettings() {
-        return true;
+        Path path = Paths.get(fileDir.getText());
+        boolean valid = Files.exists(path) && Files.isDirectory(path);
+        if (!valid) {
+            String content = String.format("%s -> %s %n %n %s: %n %s", Localization.lang("File"),
+                    Localization.lang("Main file directory"), Localization.lang("Directory not found"), path);
+            JOptionPane.showMessageDialog(this.frame, content, Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+        }
+        return valid;
     }
 
     @Override
