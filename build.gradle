@@ -48,6 +48,7 @@ install4j {
     installDir = file(project.ext.install4jDir)
 }
 
+
 repositories {
     jcenter()
 }
@@ -151,9 +152,9 @@ processResources {
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "))
-
                 filteringCharset = 'UTF-8'
     }
+    filteringCharset = 'UTF-8'
 
     filesMatching("resource/**/meta.xml") {
         expand version: project.version
