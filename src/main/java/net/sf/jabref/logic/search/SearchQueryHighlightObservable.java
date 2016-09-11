@@ -20,19 +20,17 @@ public class SearchQueryHighlightObservable {
      * Adds a SearchQueryHighlightListener to the search bar. The added listener is immediately informed about the current search.
      * Subscribers will be notified about searches.
      *
-     * @param l SearchQueryHighlightListener to be added
+     * @param newListener SearchQueryHighlightListener to be added
      */
-    public void addSearchListener(SearchQueryHighlightListener l) {
-        Objects.requireNonNull(l);
+    public SearchQueryHighlightObservable addSearchListener(SearchQueryHighlightListener newListener) {
+        Objects.requireNonNull(newListener);
 
-        if (listeners.contains(l)) {
-            return;
-        } else {
-            listeners.add(l);
+        if (!listeners.contains(newListener)) {
+            listeners.add(newListener);
+            newListener.highlightPattern(pattern);
         }
 
-        // fire event for the new subscriber
-        l.highlightPattern(pattern);
+        return this;
     }
 
     public int getListenerCount() {

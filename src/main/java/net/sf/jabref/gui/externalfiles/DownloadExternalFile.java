@@ -1,4 +1,4 @@
-package net.sf.jabref.external;
+package net.sf.jabref.gui.externalfiles;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,9 +13,11 @@ import javax.swing.SwingUtilities;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListEntryEditor;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
+import net.sf.jabref.gui.filelist.FileListEntry;
+import net.sf.jabref.gui.filelist.FileListEntryEditor;
 import net.sf.jabref.gui.net.MonitoredURLDownload;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
@@ -213,7 +215,10 @@ public class DownloadExternalFile {
 
                 callback.downloadComplete(fileListEntry);
             } catch (IOException ex) {
-                LOGGER.warn("Problem downloading file", ex);
+                String content = String.format("%s %n %s", Localization.lang("Error message:"),
+                        ex.getLocalizedMessage());
+                JOptionPane.showMessageDialog(this.frame, content,
+                        Localization.lang("Error while writing"), JOptionPane.ERROR_MESSAGE);
             }
 
             if (!tmp.delete()) {
