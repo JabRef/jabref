@@ -85,6 +85,5 @@ public class MSBibExportFormatTestFiles {
 
         assertThat(test, CompareMatcher.isSimilarTo(control)
                 .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
-
     }
 }
