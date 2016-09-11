@@ -50,8 +50,8 @@ import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.logic.bibtex.comparator.EntryComparator;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
@@ -434,7 +434,7 @@ public class SearchResultsDialog {
         @Override
         public String getColumnName(int column) {
             if (column >= PAD) {
-                return EntryUtil.capitalizeFirst(FIELDS[column - PAD]);
+                return StringUtil.capitalizeFirst(FIELDS[column - PAD]);
             } else {
                 return "";
             }

@@ -2,7 +2,7 @@ package net.sf.jabref.cli;
 
 import net.sf.jabref.logic.auxparser.AuxParser;
 import net.sf.jabref.logic.auxparser.AuxParserResult;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 
 public class AuxCommandLine {

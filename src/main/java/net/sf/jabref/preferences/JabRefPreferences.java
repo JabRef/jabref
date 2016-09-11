@@ -70,14 +70,13 @@ import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.UpdateFieldPreferences;
 import net.sf.jabref.logic.util.io.FileHistory;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CustomEntryType;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.SpecialFields;
 
@@ -1268,12 +1267,12 @@ public class JabRefPreferences {
         List<String> opt = getStringList(CUSTOM_TYPE_OPT + nr);
         List<String> priOpt = getStringList(CUSTOM_TYPE_PRIOPT + nr);
         if (priOpt.isEmpty()) {
-            return Optional.of(new CustomEntryType(EntryUtil.capitalizeFirst(name), req, opt));
+            return Optional.of(new CustomEntryType(StringUtil.capitalizeFirst(name), req, opt));
         }
         List<String> secondary = new ArrayList<>(opt);
         secondary.removeAll(priOpt);
 
-        return Optional.of(new CustomEntryType(EntryUtil.capitalizeFirst(name), req, priOpt, secondary));
+        return Optional.of(new CustomEntryType(StringUtil.capitalizeFirst(name), req, priOpt, secondary));
 
     }
 

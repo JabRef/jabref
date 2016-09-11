@@ -64,7 +64,7 @@ import net.sf.jabref.logic.importer.fileformat.medline.Section;
 import net.sf.jabref.logic.importer.fileformat.medline.Sections;
 import net.sf.jabref.logic.importer.fileformat.medline.Text;
 import net.sf.jabref.logic.util.FileExtensions;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;

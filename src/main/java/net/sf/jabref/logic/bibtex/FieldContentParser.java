@@ -4,7 +4,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.entry.FieldName;
 
 /**
@@ -40,7 +41,7 @@ public class FieldContentParser {
 
         if (multiLineFields.contains(bibtexField)) {
             // Unify line breaks
-            return StringUtil.unifyLineBreaksToConfiguredLineBreaks(fieldContent);
+            return StringUtil.unifyLineBreaks(fieldContent, OS.NEWLINE);
         }
 
         return WHITESPACE.matcher(fieldContent).replaceAll(" ");

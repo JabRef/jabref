@@ -25,12 +25,12 @@ import java.util.TreeSet;
 import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.logic.TypedBibEntry;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.MonthUtil;
 
@@ -989,7 +989,7 @@ public class XMPUtil {
                 di.setCustomMetadataValue("bibtex/" + fieldName, fieldContent);
             }
         }
-        di.setCustomMetadataValue("bibtex/entrytype", EntryUtil.capitalizeFirst(resolvedEntry.getType()));
+        di.setCustomMetadataValue("bibtex/entrytype", StringUtil.capitalizeFirst(resolvedEntry.getType()));
     }
 
     /**

@@ -6,13 +6,13 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
@@ -58,7 +58,7 @@ public class TypedBibEntry {
         if (entryType.isPresent()) {
             return entryType.get().getName();
         } else {
-            return EntryUtil.capitalizeFirst(entry.getType());
+            return StringUtil.capitalizeFirst(entry.getType());
         }
     }
 

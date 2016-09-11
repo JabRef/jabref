@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.util.strings;
+package net.sf.jabref.model.strings;
 
 import java.util.Optional;
 
@@ -27,13 +27,13 @@ public class StringUtilTest {
     @Test
     public void testUnifyLineBreaks() {
         // Mac < v9
-        String result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r");
+        String result = StringUtil.unifyLineBreaks("\r", OS.NEWLINE);
         assertEquals(OS.NEWLINE, result);
         // Windows
-        result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r\n");
+        result = StringUtil.unifyLineBreaks("\r\n", OS.NEWLINE);
         assertEquals(OS.NEWLINE, result);
         // Unix
-        result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\n");
+        result = StringUtil.unifyLineBreaks("\n", OS.NEWLINE);
         assertEquals(OS.NEWLINE, result);
     }
 
@@ -123,18 +123,18 @@ public class StringUtilTest {
     @Test
     public void testWrap() {
         assertEquals("aaaaa" + OS.NEWLINE + "\tbbbbb" + OS.NEWLINE + "\tccccc",
-                StringUtil.wrap("aaaaa bbbbb ccccc", 5));
-        assertEquals("aaaaa bbbbb" + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 8));
-        assertEquals("aaaaa bbbbb" + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 11));
-        assertEquals("aaaaa bbbbb ccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 12));
+                StringUtil.wrap("aaaaa bbbbb ccccc", 5, OS.NEWLINE));
+        assertEquals("aaaaa bbbbb" + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 8, OS.NEWLINE));
+        assertEquals("aaaaa bbbbb" + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 11, OS.NEWLINE));
+        assertEquals("aaaaa bbbbb ccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 12, OS.NEWLINE));
         assertEquals("aaaaa" + OS.NEWLINE + "\t" + OS.NEWLINE + "\tbbbbb" + OS.NEWLINE + "\t"
-                + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\nbbbbb\nccccc", 12));
+                + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\nbbbbb\nccccc", 12, OS.NEWLINE));
         assertEquals(
                 "aaaaa" + OS.NEWLINE + "\t" + OS.NEWLINE + "\t" + OS.NEWLINE + "\tbbbbb"
                         + OS.NEWLINE + "\t" + OS.NEWLINE + "\tccccc",
-                StringUtil.wrap("aaaaa\n\nbbbbb\nccccc", 12));
+                StringUtil.wrap("aaaaa\n\nbbbbb\nccccc", 12, OS.NEWLINE));
         assertEquals("aaaaa" + OS.NEWLINE + "\t" + OS.NEWLINE + "\tbbbbb" + OS.NEWLINE + "\t"
-                + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\r\nbbbbb\r\nccccc", 12));
+                + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\r\nbbbbb\r\nccccc", 12, OS.NEWLINE));
     }
 
     @Test
@@ -343,5 +343,13 @@ public class StringUtilTest {
     @Test
     public void testBoldHTMLReturnsAlternativeTextIfNull() {
         assertEquals("<b>BB</b>", StringUtil.boldHTML(null, "BB"));
+    }
+
+    @Test
+    public void testCapitalizeFirst() {
+        assertEquals("", StringUtil.capitalizeFirst(""));
+        assertEquals("Hello world", StringUtil.capitalizeFirst("Hello World"));
+        assertEquals("A", StringUtil.capitalizeFirst("a"));
+        assertEquals("Aa", StringUtil.capitalizeFirst("AA"));
     }
 }

@@ -7,11 +7,11 @@ import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryUtil;
 
 public class GroupsUtil {
 
@@ -22,7 +22,7 @@ public class GroupsUtil {
             be.getField(field).ifPresent(fieldValue -> {
                 StringTokenizer tok = new StringTokenizer(fieldValue.trim(), deliminator);
                 while (tok.hasMoreTokens()) {
-                    res.add(EntryUtil.capitalizeFirst(tok.nextToken().trim()));
+                    res.add(StringUtil.capitalizeFirst(tok.nextToken().trim()));
                 }
             });
         }
@@ -44,7 +44,7 @@ public class GroupsUtil {
             be.getField(field).ifPresent(o -> {
                 StringTokenizer tok = new StringTokenizer(o, remove, false);
                 while (tok.hasMoreTokens()) {
-                    res.add(EntryUtil.capitalizeFirst(tok.nextToken().trim()));
+                    res.add(StringUtil.capitalizeFirst(tok.nextToken().trim()));
                 }
             });
         }

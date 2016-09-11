@@ -16,7 +16,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -101,7 +101,7 @@ public class FieldFormatterCleanups {
         // first remove all newlines for easier parsing
         String remainingString = formatterString;
 
-        remainingString = StringUtil.unifyLineBreaksToConfiguredLineBreaks(remainingString).replaceAll(OS.NEWLINE, "");
+        remainingString = StringUtil.unifyLineBreaks(remainingString, OS.NEWLINE).replaceAll(OS.NEWLINE, "");
         try {
             while (startIndex < formatterString.length()) {
                 // read the field name

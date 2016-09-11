@@ -10,10 +10,9 @@ import java.util.regex.PatternSyntaxException;
 import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -51,7 +50,7 @@ public class KeywordGroup extends AbstractGroup {
             compilePattern();
         }
         this.keywordSeparator = keywordSeparator;
-        this.searchWords = EntryUtil.getStringAsWords(searchExpression);
+        this.searchWords = StringUtil.getStringAsWords(searchExpression);
     }
 
     private void compilePattern() throws ParseException {

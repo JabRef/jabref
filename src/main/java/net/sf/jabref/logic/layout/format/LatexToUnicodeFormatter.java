@@ -7,7 +7,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * This formatter converts LaTeX character sequences their equivalent unicode characters,

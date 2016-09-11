@@ -34,12 +34,12 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -260,7 +260,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
 
             if (defaulted.contains(stringListEntry.getKey())) {
                 // This type should be reverted to its default setup.
-                String nm = EntryUtil.capitalizeFirst(stringListEntry.getKey());
+                String nm = StringUtil.capitalizeFirst(stringListEntry.getKey());
                 EntryTypes.removeType(nm, bibDatabaseMode);
 
                 updateTypesForEntries(nm);
@@ -285,8 +285,8 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
 
             if (changesMade) {
                 CustomEntryType typ = biblatexMode ?
-                        new CustomEntryType(EntryUtil.capitalizeFirst(stringListEntry.getKey()), reqStr, optStr, opt2Str) :
-                        new CustomEntryType(EntryUtil.capitalizeFirst(stringListEntry.getKey()), reqStr, optStr);
+                        new CustomEntryType(StringUtil.capitalizeFirst(stringListEntry.getKey()), reqStr, optStr, opt2Str) :
+                        new CustomEntryType(StringUtil.capitalizeFirst(stringListEntry.getKey()), reqStr, optStr);
 
                 EntryTypes.addOrModifyCustomEntryType(typ);
                 updateTypesForEntries(typ.getName());
@@ -320,14 +320,14 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
                                         + "type will be declared "
                                         + "typeless. Continue?"),
                                 Localization.lang("Delete custom format") +
-                                        " '" + EntryUtil.capitalizeFirst(name) + '\'', JOptionPane.YES_NO_OPTION,
+                                        " '" + StringUtil.capitalizeFirst(name) + '\'', JOptionPane.YES_NO_OPTION,
                                 JOptionPane.WARNING_MESSAGE);
                 if (reply != JOptionPane.YES_OPTION) {
                     return;
                 }
             }
             EntryTypes.removeType(name, bibDatabaseMode);
-            updateTypesForEntries(EntryUtil.capitalizeFirst(name));
+            updateTypesForEntries(StringUtil.capitalizeFirst(name));
             changed.remove(name);
             reqLists.remove(name);
             optLists.remove(name);

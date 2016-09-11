@@ -22,6 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.event.source.EntryEventSource;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
@@ -140,7 +141,7 @@ public class BibEntry implements Cloneable {
             if (entryType.isPresent()) {
                 return Optional.of(entryType.get().getName());
             } else {
-                return Optional.of(EntryUtil.capitalizeFirst(getType()));
+                return Optional.of(StringUtil.capitalizeFirst(getType()));
             }
         }
 
@@ -751,7 +752,7 @@ public class BibEntry implements Cloneable {
             if (fieldValue == null) {
                 return Collections.emptySet();
             } else {
-                HashSet<String> words = new HashSet<>(EntryUtil.getStringAsWords(fieldValue));
+                HashSet<String> words = new HashSet<>(StringUtil.getStringAsWords(fieldValue));
                 fieldsAsWords.put(fieldName, words);
                 return words;
             }

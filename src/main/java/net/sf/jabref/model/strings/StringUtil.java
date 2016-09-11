@@ -1,14 +1,13 @@
-package net.sf.jabref.logic.util.strings;
+package net.sf.jabref.model.strings;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import net.sf.jabref.logic.util.OS;
 
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.StringUtils;
@@ -153,33 +152,34 @@ public class StringUtil {
      *
      * @param in
      * @param wrapAmount
+     * @param newline
      * @return the wrapped String.
      */
-    public static String wrap(String in, int wrapAmount) {
+    public static String wrap(String in, int wrapAmount, String newline) {
 
         String[] lines = in.split("\n");
         StringBuilder result = new StringBuilder();
         // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
-        addWrappedLine(result, CharMatcher.WHITESPACE.trimTrailingFrom(lines[0]), wrapAmount); // See
+        addWrappedLine(result, CharMatcher.WHITESPACE.trimTrailingFrom(lines[0]), wrapAmount, newline); // See
         for (int i = 1; i < lines.length; i++) {
 
             if (lines[i].trim().isEmpty()) {
-                result.append(OS.NEWLINE);
+                result.append(newline);
                 result.append('\t');
             } else {
-                result.append(OS.NEWLINE);
+                result.append(newline);
                 result.append('\t');
-                result.append(OS.NEWLINE);
+                result.append(newline);
                 result.append('\t');
                 // remove all whitespace at the end of the string, this especially includes \r created when the field content has \r\n as line separator
                 String line = CharMatcher.WHITESPACE.trimTrailingFrom(lines[i]);
-                addWrappedLine(result, line, wrapAmount);
+                addWrappedLine(result, line, wrapAmount, newline);
             }
         }
         return result.toString();
     }
 
-    private static void addWrappedLine(StringBuilder result, String line, int wrapAmount) {
+    private static void addWrappedLine(StringBuilder result, String line, int wrapAmount, String newline) {
         // Set our pointer to the beginning of the new line in the StringBuffer:
         int length = result.length();
         // Add the line, unmodified:
@@ -192,8 +192,8 @@ public class StringUtil {
             }
 
             result.deleteCharAt(current);
-            result.insert(current, OS.NEWLINE + "\t");
-            length = current + OS.NEWLINE.length();
+            result.insert(current, newline + "\t");
+            length = current + newline.length();
 
         }
     }
@@ -398,8 +398,8 @@ public class StringUtil {
      *
      * @return a String with only OS.NEWLINE as line breaks
      */
-    public static String unifyLineBreaksToConfiguredLineBreaks(String s) {
-        return LINE_BREAKS.matcher(s).replaceAll(OS.NEWLINE);
+    public static String unifyLineBreaks(String s, String newline) {
+        return LINE_BREAKS.matcher(s).replaceAll(newline);
     }
 
     /**
@@ -679,5 +679,30 @@ public class StringUtil {
 
     public static String stripAccents(String searchQuery) {
         return StringUtils.stripAccents(searchQuery);
+    }
+
+    /**
+     * Make first character of String uppercase, and the
+     * rest lowercase.
+     */
+    public static String capitalizeFirst(String toCapitalize) {
+        if (toCapitalize.length() > 1) {
+            return toCapitalize.substring(0, 1).toUpperCase()
+                    + toCapitalize.substring(1, toCapitalize.length()).toLowerCase();
+        } else {
+            return toCapitalize.toUpperCase();
+        }
+
+    }
+
+    /**
+     * Returns a list of words contained in the given text.
+     * Whitespace, comma and semicolon are considered as separator between words.
+     *
+     * @param text the input
+     * @return a list of words
+     */
+    public static List<String> getStringAsWords(String text) {
+        return Arrays.asList(text.split("[\\s,;]+"));
     }
 }

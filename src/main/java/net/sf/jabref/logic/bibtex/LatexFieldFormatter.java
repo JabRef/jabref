@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
 /**
@@ -250,7 +250,7 @@ public class LatexFieldFormatter {
     }
 
     private void putIn(String s) {
-        stringBuilder.append(StringUtil.wrap(s, prefs.getLineLength()));
+        stringBuilder.append(StringUtil.wrap(s, prefs.getLineLength(), OS.NEWLINE));
     }
 
     private static void checkBraces(String text) throws IllegalArgumentException {

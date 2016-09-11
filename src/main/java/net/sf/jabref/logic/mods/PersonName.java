@@ -2,7 +2,7 @@ package net.sf.jabref.logic.mods;
 
 import java.util.List;
 
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 
 /**
