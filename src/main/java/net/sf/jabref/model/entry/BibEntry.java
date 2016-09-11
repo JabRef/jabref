@@ -39,7 +39,7 @@ public class BibEntry implements Cloneable {
 
     // All these fields should be private or protected
     /**
-     * use get/setType
+     * @deprecated use get/setType
      */
     @Deprecated
     public static final String TYPE_HEADER = "entrytype";
@@ -47,14 +47,14 @@ public class BibEntry implements Cloneable {
     public static final String OBSOLETE_TYPE_HEADER = "bibtextype";
 
     /**
-     *  use dedicated methods like get/set/clearCiteKey
+     * @deprecated use dedicated methods like get/set/clearCiteKey
      */
     @Deprecated
     public static final String KEY_FIELD = "bibtexkey";
     protected static final String ID_FIELD = "id";
 
     /**
-     * use constructor without type
+     * @deprecated use constructor without type
      */
     @Deprecated
     public static final String DEFAULT_TYPE = "misc";
@@ -160,7 +160,7 @@ public class BibEntry implements Cloneable {
             result = referred.flatMap(entry -> entry.getFieldOrAlias(field));
         }
 
-        return result.map(resultText -> BibDatabase.getText(resultText, database));
+        return result.map(database::resolveForStrings);
     }
 
     /**
