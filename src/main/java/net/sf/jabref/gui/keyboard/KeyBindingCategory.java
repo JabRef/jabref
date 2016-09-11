@@ -5,25 +5,25 @@ import net.sf.jabref.logic.l10n.Localization;
 public enum KeyBindingCategory {
 
     FILE(
-            Localization.menuTitle("File")),
+            Localization.lang("File")),
     EDIT(
-            Localization.menuTitle("Edit")),
+            Localization.lang("Edit")),
     SEARCH(
-            Localization.menuTitle("Search")),
+            Localization.lang("Search")),
     VIEW(
-            Localization.menuTitle("View")),
+            Localization.lang("View")),
     BIBTEX(
             Localization.BIBTEX),
     QUALITY(
-            Localization.menuTitle("Quality")),
+            Localization.lang("Quality")),
     TOOLS(
-            Localization.menuTitle("Tools"));
+            Localization.lang("Tools"));
 
     private final String name;
 
 
     private KeyBindingCategory(String name) {
-        this.name = name.replace("&", "");
+        this.name = name;
     }
 
     public String getName() {
