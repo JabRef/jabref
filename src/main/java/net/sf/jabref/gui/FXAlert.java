@@ -84,6 +84,10 @@ public class FXAlert extends Alert {
 
     public FXAlert(AlertType type) {
         super(type);
+
+        Image image = new Image(IconTheme.getIconUrl("jabrefIcon48").toString());
+        setDialogIcon(image);
+
         Stage fxDialogWindow = getDialogWindow();
 
         fxDialogWindow.setOnShown(evt -> {
