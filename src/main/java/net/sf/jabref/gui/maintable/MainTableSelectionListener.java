@@ -85,8 +85,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 new PreviewPanel(panel.getBibDatabaseContext(), null, panel,
                         Globals.prefs.get(JabRefPreferences.PREVIEW_1))};
 
-        panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[0]);
-        panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[1]);
+        panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable()
+                .addSearchListener(previewPanel[0])
+                .addSearchListener(previewPanel[1]);
 
         this.preview = previewPanel[activePreview];
     }
