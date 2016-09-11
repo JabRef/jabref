@@ -14,7 +14,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Vector;
 
 import net.sf.jabref.event.GroupUpdatedEvent;
 import net.sf.jabref.event.MetaDataChangedEvent;
@@ -25,12 +24,12 @@ import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.EventBus;
 import org.apache.commons.logging.Log;
@@ -66,12 +65,12 @@ public class MetaData implements Iterable<String> {
      * must simply make sure the appropriate changes are reflected in the Vector
      * it has been passed.
      */
-    private MetaData(Map<String, String> inData, String keywordSeparator) throws ParseException {
+    private MetaData(Map<String, String> inData, Character keywordSeparator) throws ParseException {
         Objects.requireNonNull(inData);
         setData(inData, keywordSeparator);
     }
 
-    private MetaData(Map<String, String> inData, Charset encoding, String keywordSeparator) throws ParseException {
+    private MetaData(Map<String, String> inData, Charset encoding, Character keywordSeparator) throws ParseException {
         this(inData, keywordSeparator);
         this.encoding = Objects.requireNonNull(encoding);
     }
@@ -87,16 +86,16 @@ public class MetaData implements Iterable<String> {
         this.encoding = encoding;
     }
 
-    public static MetaData parse(Map<String, String> data, String keywordSeparator) throws ParseException {
+    public static MetaData parse(Map<String, String> data, Character keywordSeparator) throws ParseException {
         return new MetaData(data, keywordSeparator);
     }
 
-    public static MetaData parse(Map<String, String> data, Charset encoding, String keywordSeparator)
+    public static MetaData parse(Map<String, String> data, Charset encoding, Character keywordSeparator)
             throws ParseException {
         return new MetaData(data, encoding, keywordSeparator);
     }
 
-    public void setData(Map<String, String> inData, String keywordSeparator) throws ParseException {
+    public void setData(Map<String, String> inData, Character keywordSeparator) throws ParseException {
         clearMetaData();
         for (Map.Entry<String, String> entry : inData.entrySet()) {
             StringReader data = new StringReader(entry.getValue());
@@ -128,17 +127,6 @@ public class MetaData implements Iterable<String> {
             return Optional.of(SaveOrderConfig.parse(storedSaveOrderConfig));
         }
         return Optional.empty();
-    }
-
-    /**
-     * Add default metadata for new database:
-     */
-    public void initializeNewDatabase() {
-        metaData.put(SELECTOR_META_PREFIX + FieldName.KEYWORDS, new Vector<>());
-        metaData.put(SELECTOR_META_PREFIX + FieldName.AUTHOR, new Vector<>());
-        metaData.put(SELECTOR_META_PREFIX + FieldName.JOURNAL, new Vector<>());
-        metaData.put(SELECTOR_META_PREFIX + FieldName.PUBLISHER, new Vector<>());
-        metaData.put(SELECTOR_META_PREFIX + FieldName.REVIEW, new Vector<>());
     }
 
     /**
@@ -188,7 +176,7 @@ public class MetaData implements Iterable<String> {
      *
      * @param orderedData The vector of metadata strings
      */
-    private void putGroups(List<String> orderedData, String keywordSeparator) throws ParseException {
+    private void putGroups(List<String> orderedData, Character keywordSeparator) throws ParseException {
         try {
             groupsRoot = GroupTreeNode.parse(orderedData, keywordSeparator);
             eventBus.post(new GroupUpdatedEvent(this));
@@ -281,10 +269,10 @@ public class MetaData implements Iterable<String> {
         // set new value if it is not a default value
         Set<String> allKeys = bibtexKeyPattern.getAllKeys();
         for (String key : allKeys) {
-            String metaDataKey = PREFIX_KEYPATTERN + key;
             if (!bibtexKeyPattern.isDefaultValue(key)) {
                 List<String> data = new ArrayList<>();
                 data.add(bibtexKeyPattern.getValue(key).get(0));
+                String metaDataKey = PREFIX_KEYPATTERN + key;
                 this.putData(metaDataKey, data);
             }
         }

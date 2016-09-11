@@ -47,7 +47,7 @@ public abstract class AbstractGroup implements SearchMatcher {
      * @throws ParseException If an error occurred and a group could not be created,
      *                        e.g. due to a malformed regular expression.
      */
-    public static AbstractGroup fromString(String s, String keywordSeparator) throws ParseException {
+    public static AbstractGroup fromString(String s, Character keywordSeparator) throws ParseException {
         if (s.startsWith(KeywordGroup.ID)) {
             return KeywordGroup.fromString(s, keywordSeparator);
         }

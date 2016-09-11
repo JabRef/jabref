@@ -9,8 +9,8 @@ import java.util.TreeSet;
 import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
-import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,12 +29,12 @@ public class ExplicitGroup extends KeywordGroup {
     private static final Log LOGGER = LogFactory.getLog(ExplicitGroup.class);
 
 
-    public ExplicitGroup(String name, GroupHierarchyType context, String keywordSeparator)
+    public ExplicitGroup(String name, GroupHierarchyType context, Character keywordSeparator)
             throws ParseException {
         super(name, FieldName.GROUPS, name, true, false, context, keywordSeparator);
     }
 
-    public static ExplicitGroup fromString(String s, String keywordSeparator) throws ParseException {
+    public static ExplicitGroup fromString(String s, Character keywordSeparator) throws ParseException {
         if (!s.startsWith(ExplicitGroup.ID)) {
             throw new IllegalArgumentException("ExplicitGroup cannot be created from \"" + s + "\".");
         }

@@ -7,11 +7,11 @@ import java.util.StringTokenizer;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.strings.StringUtil;
 
 public class GroupsUtil {
 

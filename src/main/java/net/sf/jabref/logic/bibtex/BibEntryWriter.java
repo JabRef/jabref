@@ -11,12 +11,12 @@ import java.util.function.Predicate;
 
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.strings.StringUtil;
 
 
 public class BibEntryWriter {

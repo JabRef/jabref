@@ -137,7 +137,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
                     BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
 
                     bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode),
-                            DatabaseLocation.SHARED, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+                            DatabaseLocation.SHARED, Globals.prefs.getKeywordDelimiter());
 
                     connectionProperties = new DBMSConnectionProperties();
                     connectionProperties.setType((DBMSType) dbmsTypeDropDown.getSelectedItem());
@@ -326,8 +326,8 @@ public class OpenSharedDatabaseDialog extends JDialog {
     /**
      * Saves the data from this dialog persistently to facilitate the usage.
      */
-    public void setPreferences() {
-        prefs.setType(((DBMSType) dbmsTypeDropDown.getSelectedItem()).toString());
+    private void setPreferences() {
+        prefs.setType(dbmsTypeDropDown.getSelectedItem().toString());
         prefs.setHost(hostField.getText());
         prefs.setPort(portField.getText());
         prefs.setName(databaseField.getText());

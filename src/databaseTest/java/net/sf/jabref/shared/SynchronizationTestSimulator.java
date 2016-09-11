@@ -41,10 +41,10 @@ public class SynchronizationTestSimulator {
             connection = TestConnector.getTestConnection(dbmsType);
         }
 
-        clientContextA = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ", ");
+        clientContextA = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ',');
         clientContextA.getDBSynchronizer().openSharedDatabase(connection, dbmsType, "A");
 
-        clientContextB = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ", ");
+        clientContextB = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ',');
         clientContextB.getDBSynchronizer().openSharedDatabase(connection, dbmsType, "B");
         eventListenerB = new SynchronizationTestEventListener();
         clientContextB.getDBSynchronizer().registerListener(eventListenerB);

@@ -10,9 +10,9 @@ import java.util.regex.PatternSyntaxException;
 import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
-import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,7 +30,7 @@ public class KeywordGroup extends AbstractGroup {
     private final boolean regExp;
     private Pattern pattern;
     private final List<String> searchWords;
-    protected final String keywordSeparator;
+    protected final Character keywordSeparator;
 
     private static final Log LOGGER = LogFactory.getLog(KeywordGroup.class);
 
@@ -40,7 +40,7 @@ public class KeywordGroup extends AbstractGroup {
      */
     public KeywordGroup(String name, String searchField,
                         String searchExpression, boolean caseSensitive, boolean regExp,
-            GroupHierarchyType context, String keywordSeparator) throws ParseException {
+            GroupHierarchyType context, Character keywordSeparator) throws ParseException {
         super(name, context);
         this.searchField = searchField;
         this.searchExpression = searchExpression;
@@ -68,7 +68,7 @@ public class KeywordGroup extends AbstractGroup {
      * @param s The String representation obtained from
      *          KeywordGroup.toString()
      */
-    public static AbstractGroup fromString(String s, String keywordSeparator) throws ParseException {
+    public static AbstractGroup fromString(String s, Character keywordSeparator) throws ParseException {
         if (!s.startsWith(KeywordGroup.ID)) {
             throw new IllegalArgumentException("KeywordGroup cannot be created from \"" + s + "\".");
         }
@@ -266,14 +266,14 @@ public class KeywordGroup extends AbstractGroup {
                 // reduce spaces at i to 1
                 j = i;
                 k = i;
-                while (((j - 1) >= 0) && (keywordSeparator.indexOf(haystack.charAt(j - 1)) >= 0)) {
+                while (((j - 1) >= 0) && (keywordSeparator.toString().indexOf(haystack.charAt(j - 1)) >= 0)) {
                     --j;
                 }
-                while ((k < haystack.length()) && (keywordSeparator.indexOf(haystack.charAt(k)) >= 0)) {
+                while ((k < haystack.length()) && (keywordSeparator.toString().indexOf(haystack.charAt(k)) >= 0)) {
                     ++k;
                 }
-                sbOrig.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? keywordSeparator : "");
-                sbLower.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? keywordSeparator : "");
+                sbOrig.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? keywordSeparator.toString() : "");
+                sbLower.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? keywordSeparator.toString() : "");
             }
 
             String result = sbOrig.toString().trim();

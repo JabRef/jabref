@@ -26,12 +26,12 @@ import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.importer.util.OAI2Handler;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.io.XMLUtil;
-import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

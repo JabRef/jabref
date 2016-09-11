@@ -34,13 +34,13 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.strings.StringUtil;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 

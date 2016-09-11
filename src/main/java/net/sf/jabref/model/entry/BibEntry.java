@@ -22,12 +22,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.event.source.EntryEventSource;
-import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.event.FieldChangedEvent;
+import net.sf.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;

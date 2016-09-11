@@ -10,7 +10,7 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 class GroupsParser {
 
-    public static GroupTreeNode importGroups(List<String> orderedData, String keywordSeparator)
+    public static GroupTreeNode importGroups(List<String> orderedData, Character keywordSeparator)
             throws ParseException {
         GroupTreeNode cursor = null;
         GroupTreeNode root = null;

@@ -70,7 +70,6 @@ import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.UpdateFieldPreferences;
 import net.sf.jabref.logic.util.io.FileHistory;
-import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -79,6 +78,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.SpecialFields;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -1,9 +1,9 @@
 package net.sf.jabref.gui.undo;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * This class represents a change in any field value. The relevant

@@ -16,10 +16,10 @@ import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.strings.StringUtil;
 
 public class FieldFormatterCleanups {
 

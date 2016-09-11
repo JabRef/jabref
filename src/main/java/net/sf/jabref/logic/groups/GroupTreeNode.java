@@ -234,7 +234,7 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         return GroupTreeNode.fromGroup(group);
     }
 
-    public static GroupTreeNode parse(List<String> orderedData, String keywordSeparator)
+    public static GroupTreeNode parse(List<String> orderedData, Character keywordSeparator)
             throws ParseException {
         return GroupsParser.importGroups(orderedData, keywordSeparator);
     }
