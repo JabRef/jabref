@@ -107,6 +107,7 @@ dependencies {
     compile 'com.google.guava:guava:19.0'
     
     compile 'com.airhacks:afterburner.fx:1.6.3'
+    compile 'de.codecentric.centerdevice:javafxsvg:1.2.1'
 
     compile 'commons-logging:commons-logging:1.2'
 
