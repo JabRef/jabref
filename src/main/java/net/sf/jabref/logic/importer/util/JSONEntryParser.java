@@ -1,12 +1,10 @@
 package net.sf.jabref.logic.importer.util;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.KeywordList;
 import net.sf.jabref.model.entry.MonthUtil;
 
 import org.apache.commons.logging.Log;
