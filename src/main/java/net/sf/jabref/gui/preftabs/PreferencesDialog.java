@@ -36,6 +36,7 @@ import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.JabRefPreferencesFilter;
+import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
@@ -153,7 +154,7 @@ public class PreferencesDialog extends JDialog {
         // Import and export actions:
         exportPreferences.setToolTipText(Localization.lang("Export preferences to file"));
         exportPreferences.addActionListener(e -> {
-            FileDialog dialog = new FileDialog(frame, System.getProperty("user.home")).withExtension(FileExtensions.XML);
+            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.XML);
             dialog.setDefaultExtension(FileExtensions.XML);
             Optional<Path> path = dialog.saveNewFile();
 
@@ -170,7 +171,7 @@ public class PreferencesDialog extends JDialog {
 
         importPreferences.setToolTipText(Localization.lang("Import preferences from file"));
         importPreferences.addActionListener(e -> {
-            FileDialog dialog = new FileDialog(frame, System.getProperty("user.home")).withExtension(FileExtensions.XML);
+            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.XML);
             dialog.setDefaultExtension(FileExtensions.XML);
             Optional<Path> fileName = dialog.showDialogAndGetSelectedFile();
 
@@ -197,6 +198,7 @@ public class PreferencesDialog extends JDialog {
                     Localization.lang("Reset preferences"), JOptionPane.OK_CANCEL_OPTION) == JOptionPane.OK_OPTION) {
                 try {
                     prefs.clear();
+                    new SharedDatabasePreferences().clear();
                     JOptionPane.showMessageDialog(PreferencesDialog.this,
                             Localization.lang("You must restart JabRef for this to come into effect."),
                             Localization.lang("Reset preferences"), JOptionPane.WARNING_MESSAGE);

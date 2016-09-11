@@ -1498,11 +1498,11 @@ public class BibtexParserTest {
         assertEquals(3, root.getNumberOfChildren());
         assertEquals(
                 new KeywordGroup("Fréchet", "keywords", "FrechetSpace", false, true, GroupHierarchyType.INDEPENDENT,
-                        JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)),
+                        ", "),
                 root.getChildren().get(0).getGroup());
         assertEquals(
                 new KeywordGroup("Invariant theory", "keywords", "GIT", false, false, GroupHierarchyType.INDEPENDENT,
-                        JabRefPreferences.getInstance().get(JabRefPreferences.KEYWORD_SEPARATOR)),
+                        ", "),
                 root.getChildren().get(1).getGroup());
         assertEquals(Arrays.asList("Key1", "Key2"),
                 ((ExplicitGroup) root.getChildren().get(2).getGroup()).getLegacyEntryKeys());

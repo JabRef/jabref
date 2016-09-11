@@ -39,7 +39,7 @@ import net.sf.jabref.gui.undo.UndoableInsertString;
 import net.sf.jabref.gui.undo.UndoableRemoveString;
 import net.sf.jabref.gui.undo.UndoableStringChange;
 import net.sf.jabref.gui.util.GUIUtil;
-import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.comparator.BibtexStringComparator;
 import net.sf.jabref.logic.help.HelpFile;
@@ -145,11 +145,10 @@ class StringDialog extends JDialog {
 
         setTitle(STRINGS_TITLE + ": "
                 + panel.getBibDatabaseContext().getDatabaseFile().map(File::getName).orElse(GUIGlobals.UNTITLED_TITLE));
-        PositionWindow pw = new PositionWindow(this, JabRefPreferences.STRINGS_POS_X, JabRefPreferences.STRINGS_POS_Y,
+        WindowLocation pw = new WindowLocation(this, JabRefPreferences.STRINGS_POS_X, JabRefPreferences.STRINGS_POS_Y,
                 JabRefPreferences.STRINGS_SIZE_X, JabRefPreferences.STRINGS_SIZE_Y);
-        pw.setWindowPosition();
+        pw.displayWindowAtStoredLocation();
     }
-
 
     class StringTable extends JTable {
 

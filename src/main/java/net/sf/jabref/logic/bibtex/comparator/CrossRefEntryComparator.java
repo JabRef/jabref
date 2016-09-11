@@ -15,17 +15,14 @@ public class CrossRefEntryComparator implements Comparator<BibEntry> {
 
     @Override
     public int compare(BibEntry e1, BibEntry e2) {
+        boolean crEntry1 = e1.hasField(FieldName.CROSSREF);
+        boolean crEntry2 = e2.hasField(FieldName.CROSSREF);
 
-        Boolean b1 = e1.hasField(FieldName.CROSSREF);
-        Boolean b2 = e2.hasField(FieldName.CROSSREF);
+        if ((crEntry1 && crEntry2) || (!crEntry1 && !crEntry2)) {
+            return 0;
+        }
 
-        if ((!b1) && (!b2)) {
-            return 0; // secComparator.compare(e1, e2);
-        }
-        if (b1 && b2) {
-            return 0; // secComparator.compare(e1, e2);
-        }
-        if (!b1) {
+        if (!crEntry1) {
             return 1;
         } else {
             return -1;

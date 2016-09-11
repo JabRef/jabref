@@ -9,7 +9,6 @@ import net.sf.jabref.model.entry.BibEntry;
 
 public class EntrySorter {
 
-    // guarded by itself
     private final List<BibEntry> entries;
 
     public EntrySorter(List<BibEntry> entries, Comparator<BibEntry> comparator) {

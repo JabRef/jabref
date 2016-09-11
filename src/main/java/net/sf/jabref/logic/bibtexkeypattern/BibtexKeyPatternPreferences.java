@@ -4,7 +4,6 @@ import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 
 public class BibtexKeyPatternPreferences {
 
-    private final String defaultBibtexKeyPattern;
     private final String keyPatternRegex;
     private final String keyPatternReplacement;
     private final boolean alwaysAddLetter;
@@ -12,10 +11,10 @@ public class BibtexKeyPatternPreferences {
     private final boolean enforceLegalKey;
     private final GlobalBibtexKeyPattern keyPattern;
 
-    public BibtexKeyPatternPreferences(String defaultBibtexKeyPattern, String keyPatternRegex, String keyPatternReplacement,
+
+    public BibtexKeyPatternPreferences(String keyPatternRegex, String keyPatternReplacement,
             boolean alwaysAddLetter, boolean firstLetterA, boolean enforceLegalKey,
             GlobalBibtexKeyPattern keyPattern) {
-        this.defaultBibtexKeyPattern = defaultBibtexKeyPattern;
         this.keyPatternRegex = keyPatternRegex;
         this.keyPatternReplacement = keyPatternReplacement;
         this.alwaysAddLetter = alwaysAddLetter;
@@ -43,8 +42,6 @@ public class BibtexKeyPatternPreferences {
     public boolean isEnforceLegalKey() {
         return enforceLegalKey;
     }
-
-    public String getDefaultBibtexKeyPattern() { return defaultBibtexKeyPattern;}
 
     public GlobalBibtexKeyPattern getKeyPattern() {
         return keyPattern;
