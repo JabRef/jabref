@@ -15,10 +15,10 @@ import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 
-import net.sf.jabref.external.DroppedFileHandler;
-import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.EntryContainer;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.externalfiles.DroppedFileHandler;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.gui.groups.EntryTableTransferHandler;
 import net.sf.jabref.logic.util.io.FileUtil;
 

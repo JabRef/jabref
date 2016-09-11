@@ -23,12 +23,12 @@ import javax.swing.JTable;
 import javax.swing.TransferHandler;
 
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.external.DroppedFileHandler;
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.ExternalFileTypes;
-import net.sf.jabref.external.TransferableFileLinkSelection;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.externalfiles.DroppedFileHandler;
+import net.sf.jabref.gui.externalfiles.TransferableFileLinkSelection;
+import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 import net.sf.jabref.gui.importer.ImportMenuItem;
 import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
 import net.sf.jabref.gui.maintable.MainTable;
