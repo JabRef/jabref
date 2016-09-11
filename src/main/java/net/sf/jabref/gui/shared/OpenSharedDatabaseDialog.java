@@ -38,7 +38,6 @@ import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.DatabaseLocation;
-import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.DBMSConnectionProperties;
 import net.sf.jabref.shared.DBMSConnector;
 import net.sf.jabref.shared.DBMSType;
@@ -107,7 +106,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
             setPreferences();
             bibDatabaseContext.getDBSynchronizer()
                     .registerListener(
-                            new SharedDatabaseUIManager(frame, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR)));
+                            new SharedDatabaseUIManager(frame));
             frame.output(Localization.lang("Connection_to_%0_server_established.", connectionProperties.getType().toString()));
             dispose();
             return; // setLoadingConnectButtonText(false) should not be reached regularly.

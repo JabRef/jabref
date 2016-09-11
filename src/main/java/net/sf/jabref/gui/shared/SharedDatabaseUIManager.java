@@ -16,12 +16,10 @@ public class SharedDatabaseUIManager {
 
     private final JabRefFrame jabRefFrame;
     private final DBMSSynchronizer dbmsSynchronizer;
-    private final String keywordSeparator;
 
-    public SharedDatabaseUIManager(JabRefFrame jabRefFrame, String keywordSeparator) {
+    public SharedDatabaseUIManager(JabRefFrame jabRefFrame) {
         this.jabRefFrame = jabRefFrame;
         this.dbmsSynchronizer = jabRefFrame.getCurrentBasePanel().getBibDatabaseContext().getDBSynchronizer();
-        this.keywordSeparator = keywordSeparator;
     }
 
     @Subscribe
