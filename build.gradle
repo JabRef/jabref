@@ -1,5 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
 
+// to update the gradle wrapper, execute ./gradlew wrapper --gradle-version 3.0
+
 buildscript {
     repositories {
         maven {
@@ -45,11 +47,6 @@ mainClassName = "net.sf.jabref.JabRefMain"
 install4j {
     installDir = file(project.ext.install4jDir)
 }
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.0'
-}
-
 
 repositories {
     jcenter()
