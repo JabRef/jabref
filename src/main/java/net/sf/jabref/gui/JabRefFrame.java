@@ -1,5 +1,6 @@
 package net.sf.jabref.gui;
 
+import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
@@ -29,7 +30,6 @@ import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.Box;
 import javax.swing.ButtonGroup;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -173,9 +173,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final GlobalSearchBar globalSearchBar = new GlobalSearchBar(this);
 
     private final JMenuBar mb = new JMenuBar();
-
-    private final GridBagLayout gbl = new GridBagLayout();
-    private final GridBagConstraints con = new GridBagConstraints();
 
     private final JLabel statusLine = new JLabel("", SwingConstants.LEFT);
     private final JLabel statusLabel = new JLabel(
@@ -901,62 +898,27 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         pushExternalButton = new PushToApplicationButton(this, pushApplications.getApplications());
         fillMenu();
         createToolBar();
-        getContentPane().setLayout(gbl);
-        splitPane.setDividerSize(2);
-        splitPane.setBorder(null);
-        //getContentPane().setBackground(GUIGlobals.lightGray);
-        con.fill = GridBagConstraints.HORIZONTAL;
-        con.anchor = GridBagConstraints.WEST;
-        con.weightx = 1;
-        con.weighty = 0;
-        con.gridwidth = GridBagConstraints.REMAINDER;
-
-        //gbl.setConstraints(mb, con);
-        //getContentPane().add(mb);
         setJMenuBar(mb);
-        con.anchor = GridBagConstraints.NORTH;
+        getContentPane().setLayout(new BorderLayout());
 
         JPanel toolbarPanel = new JPanel(new WrapLayout(FlowLayout.LEFT));
         toolbarPanel.add(tlb);
         toolbarPanel.add(globalSearchBar);
-        gbl.setConstraints(toolbarPanel, con);
-        getContentPane().add(toolbarPanel);
+        getContentPane().add(toolbarPanel, BorderLayout.PAGE_START);
 
-        Component lim = Box.createGlue();
-        gbl.setConstraints(lim, con);
-        //getContentPane().add(lim);
-        /*
-          JPanel empt = new JPanel();
-          empt.setBackground(GUIGlobals.lightGray);
-          gbl.setConstraints(empt, con);
-               getContentPane().add(empt);
-
-          con.insets = new Insets(1,0,1,1);
-          con.anchor = GridBagConstraints.EAST;
-          con.weightx = 0;
-          gbl.setConstraints(searchManager, con);
-          getContentPane().add(searchManager);*/
-        con.gridwidth = GridBagConstraints.REMAINDER;
-        con.weightx = 1;
-        con.weighty = 0;
-        con.fill = GridBagConstraints.BOTH;
-        con.anchor = GridBagConstraints.WEST;
-        con.insets = new Insets(0, 0, 0, 0);
-        lim = Box.createGlue();
-        gbl.setConstraints(lim, con);
-        getContentPane().add(lim);
-        //tabbedPane.setVisible(false);
-        //tabbedPane.setForeground(GUIGlobals.lightGray);
-        con.weighty = 1;
-        gbl.setConstraints(splitPane, con);
-        getContentPane().add(splitPane);
-
-        UIManager.put("TabbedPane.contentBorderInsets", new Insets(0, 0, 0, 0));
-
+        splitPane.setDividerSize(2);
+        splitPane.setBorder(null);
         splitPane.setRightComponent(tabbedPane);
         splitPane.setLeftComponent(sidePaneManager.getPanel());
+        getContentPane().add(splitPane, BorderLayout.CENTER);
+
+        UIManager.put("TabbedPane.contentBorderInsets", new Insets(0, 0, 0, 0));
         sidePaneManager.updateView();
 
+        GridBagLayout gbl = new GridBagLayout();
+        GridBagConstraints con = new GridBagConstraints();
+        con.fill = GridBagConstraints.BOTH;
+        con.anchor = GridBagConstraints.WEST;
         JPanel status = new JPanel();
         status.setLayout(gbl);
         con.weighty = 0;
@@ -975,12 +937,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         con.insets = new Insets(2, 4, 2, 2);
         gbl.setConstraints(progressBar, con);
         status.add(progressBar);
-        con.weightx = 1;
-        con.gridwidth = GridBagConstraints.REMAINDER;
         statusLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR.darker());
-        con.insets = new Insets(0, 0, 0, 0);
-        gbl.setConstraints(status, con);
-        getContentPane().add(status);
+        getContentPane().add(status, BorderLayout.PAGE_END);
 
         // Drag and drop for tabbedPane:
         TransferHandler xfer = new EntryTableTransferHandler(null, this, null);
