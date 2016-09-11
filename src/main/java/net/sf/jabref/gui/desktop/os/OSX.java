@@ -5,8 +5,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Optional;
 
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.ExternalFileTypes;
+import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
 
 public class OSX implements NativeDesktop {
 
