@@ -24,7 +24,7 @@
 							<children>
 								<VBox alignment="CENTER_LEFT" spacing="1.0" styleClass="about-top" HBox.hgrow="NEVER">
 									<children>
-                                        <Label alignment="CENTER" contentDisplay="CENTER" onMouseClicked="#copyVersionToClipboard" styleClass="about-heading" text="${controller.heading}" textFill="#2c3e50">
+                                        <Label alignment="CENTER" contentDisplay="CENTER" onMouseClicked="#copyVersionToClipboard" styleClass="about-heading" text="${controller.heading}" textFill="#2c3e50" wrapText="true">
                                             <cursor>
                                                 <Cursor fx:constant="HAND" />
                                             </cursor>
@@ -32,16 +32,23 @@
 	                                           <Tooltip text="%Copy Version" />
 	                                        </tooltip>
                                         </Label>
-                                        <Hyperlink onAction="#openChangeLog" text="%What's new in this version" />
+                              <Label styleClass="dev-heading" fx:id="devVersionLabel" />
+                                        <Hyperlink styleClass="top-padding" onAction="#openChangeLog" text="%What's new in this version?" />
                                         <Label styleClass="filler" />
-                                        <Hyperlink onAction="#openLicense" text="${controller.license}" />
-                                        <Hyperlink onAction="#openExternalLibrariesWebsite" text="%Used Libraries" />
+										<HBox alignment="CENTER_LEFT">
+											<children>
+												<Label styleClass="space-after" text="${controller.license}" wrapText="true" />
+												<Hyperlink onAction="#openLicense" text="%MIT" />
+											</children>
+										</HBox>
+                                        <Hyperlink onAction="#openExternalLibrariesWebsite" text="%Used libraries" />
 										<HBox alignment="CENTER_LEFT">
 											<children>
 												<Label styleClass="space-after" text="%Want to help?" wrapText="true" />
 												<Hyperlink onAction="#openDonation" text="%Make a donation" />
 												<Label styleClass="space" text="%or" wrapText="true" />
 												<Hyperlink onAction="#openGithub" text="%get involved" />
+												<Label text="." />
 											</children>
 										</HBox>
 									</children>

@@ -110,7 +110,11 @@ public class Version {
      */
     public String getChangelogUrl() {
         String version = this.getMajor() + "." + this.getMinor() + (this.getPatch() != 0 ? "." + this.getPatch() : "");
-        return "https://github.com/JabRef/jabref/blob/v" + version + "/CHANGELOG.md";
+        String url = "https://github.com/JabRef/jabref/blob/v" + version + "/CHANGELOG.md";
+        if (isDevelopmentVersion) {
+            url = "https://github.com/JabRef/jabref/blob/master/CHANGELOG.md#unreleased";
+        }
+        return url;
     }
 
     @Override
