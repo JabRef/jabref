@@ -1,19 +1,27 @@
 .about-heading {
-	-fx-background-color: linear-gradient(#F0EEF7, #D8D4EC);
-	-fx-background-radius: 20px;
-	-fx-background-insets: 10px;
-	-fx-border-style: solid;
-	-fx-border-radius: 20px;
-	-fx-border-insets: 10px;
-	-fx-padding: 5px;
+    -fx-font-size: 30;
+    -fx-padding: 0 0 5 0;
 }
 
 .about-heading:pressed {
 	-fx-text-fill: #1E90FF;
 }
 
-.general-info {
-	-fx-padding: 5px;
+.sub-heading {
+    -fx-font-size: 18;
+    -fx-padding: 5px;
+}
+
+.about-top {
+    -fx-padding: 0 5 15 5;
+}
+
+.space {
+    -fx-padding: 0 5 0 5;
+}
+
+.space-after {
+    -fx-padding: 0 5 0 0;
 }
 
 .info-sections {
@@ -21,10 +29,17 @@
 }
 
 .custom-buttons {
-	-fx-padding: 5px;
+	-fx-padding: 10 0 0 0;
 }
 
 .dialog-pane *.button-bar {
 	-fx-max-height: 0;
 	-fx-pref-height: 0;
+}
+
+.hyperlink {
+    -fx-padding: 0;
+    -fx-underline: false;
+    -fx-border-style: null;
+    -fx-border-color: null;
 }
