@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fetcher.DoiFetcher;
@@ -26,6 +27,8 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
 
 import com.google.common.base.Strings;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.util.PDFTextStripper;
 
@@ -207,8 +210,7 @@ public class PdfContentImporter extends ImportFormat {
             Optional<DOI> doi = DOI.findInText(firstPageContents);
             if (doi.isPresent()) {
                 ParserResult parserResult = new ParserResult(result);
-                Optional<BibEntry> entry = DoiFetcher.getEntryFromDOI(doi.get().getDOI(), parserResult,
-                        importFormatPreferences);
+                Optional<BibEntry> entry = new DoiFetcher(importFormatPreferences).performSearchById(doi.get().getDOI());
                 entry.ifPresent(parserResult.getDatabase()::insertEntry);
                 return parserResult;
             }
@@ -479,6 +481,8 @@ public class PdfContentImporter extends ImportFormat {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
         } catch(IOException exception) {
             return ParserResult.fromErrorMessage(exception.getLocalizedMessage());
+        } catch (FetcherException e) {
+            return ParserResult.fromErrorMessage("Error while fetching");
         }
 
         return new ParserResult(result);

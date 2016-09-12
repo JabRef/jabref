@@ -4,9 +4,9 @@ import java.util.Optional;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.FetcherException;
-import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -51,32 +51,15 @@ public class DoiFetcherTest {
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
-    @Test
-    public void testPerformSearchEmpty() throws FetcherException {
+    @Test(expected = FetcherException.class)
+    public void testPerformSearchEmptyDOI() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("");
         assertEquals(Optional.empty(), fetchedEntry);
     }
 
     @Test(expected = FetcherException.class)
-    public void testPerformSearchFetcherException() throws FetcherException {
+    public void testPerformSearchInvalidDOI() throws FetcherException {
         fetcher.performSearchById("10.1002/9781118257517F");
         fail();
     }
-
-    @Test(expected = NullPointerException.class)
-    public void testGetEntryFromDOILongNullPointerException() {
-        DoiFetcher.getEntryFromDOI("10.1002/9781118257517F", null, Globals.prefs.getImportFormatPreferences());
-        fail();
-    }
-
-    @Test
-    public void testGetEntryFromDOILong() {
-        assertEquals(Optional.of(bibEntry), DoiFetcher.getEntryFromDOI("10.1002/9781118257517", new ParserResult(), Globals.prefs.getImportFormatPreferences()));
-    }
-
-    @Test
-    public void testGetEntryFromDOIEmpty() {
-        assertEquals(Optional.empty(), DoiFetcher.getEntryFromDOI("", new ParserResult(), Globals.prefs.getImportFormatPreferences()));
-    }
-
 }
