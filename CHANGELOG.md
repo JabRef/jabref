@@ -51,6 +51,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1882](https://github.com/JabRef/jabref/issues/1882): Crash after saving illegal bibtexkey in entry editor
 - Fixed field `location` containing only city is not exported correctly to MS-Office 2007 xml format
 - Fixed field `key` field is not exported to MS-Office 2008 xml format
+- Fixed [#1181](https://github.com/JabRef/jabref/issues/1181) and [#1504](https://github.com/JabRef/jabref/issues/1504): Improved "Normalize to BibTeX name format": Support separated names with commas and colons. Considered name affixes such as "Jr".
 - Fixed download files failed silently when an invalid directory is selected
 - Fixed [#1949](https://github.com/JabRef/jabref/issues/1949): Error message directs to the wrong preference tab
 - Fixed InvalidBackgroundColor flickering with Ctrl-s and File > Save database
