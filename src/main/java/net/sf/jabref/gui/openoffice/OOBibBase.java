@@ -248,11 +248,11 @@ class OOBibBase {
         } catch (Exception e) {
             throw new CreationException(e.getMessage());
         }
-        XDesktop xDesktop = UnoRuntime.queryInterface(XDesktop.class, desktop);
+        XDesktop resultDesktop = UnoRuntime.queryInterface(XDesktop.class, desktop);
 
         UnoRuntime.queryInterface(XComponentLoader.class, desktop);
 
-        return xDesktop;
+        return resultDesktop;
     }
 
     private List<XTextDocument> getTextDocuments() throws NoSuchElementException, WrappedTargetException {
@@ -339,7 +339,7 @@ class OOBibBase {
             }
 
             String keyString = String.join(",",
-                    entries.stream().map(BibEntry::getCiteKey).collect(Collectors.toList()));
+                    entries.stream().map(entry -> entry.getCiteKeyOptional().orElse("")).collect(Collectors.toList()));
             // Insert bookmark:
             String bName = getUniqueReferenceMarkName(keyString,
                     withText ? inParenthesis ? OOBibBase.AUTHORYEAR_PAR : OOBibBase.AUTHORYEAR_INTEXT : OOBibBase.INVISIBLE_CIT);
@@ -525,8 +525,8 @@ class OOBibBase {
                     StringBuilder sb = new StringBuilder();
                     normCitMarkers[i] = new String[keys.length];
                     for (int j = 0; j < keys.length; j++) {
-                        normCitMarkers[i][j] = cEntries[j].getCiteKey();
-                        sb.append(cEntries[j].getCiteKey());
+                        normCitMarkers[i][j] = cEntries[j].getCiteKeyOptional().orElse(null);
+                        sb.append(cEntries[j].getCiteKeyOptional().orElse(""));
                         if (j < (keys.length - 1)) {
                             sb.append(',');
                         }
@@ -583,7 +583,7 @@ class OOBibBase {
                         }
                         // Update key list to match the new sorting:
                         for (int j = 0; j < cEntries.length; j++) {
-                            bibtexKeys[i][j] = cEntries[j].getCiteKey();
+                            bibtexKeys[i][j] = cEntries[j].getCiteKeyOptional().orElse(null);
                         }
                     }
 
@@ -1013,7 +1013,7 @@ class OOBibBase {
             Layout layout = style.getReferenceFormat(entry.getKey().getType());
             layout.setPostFormatter(POSTFORMATTER);
             OOUtil.insertFullReferenceAtCurrentLocation(text, cursor, layout, parFormat, entry.getKey(),
-                    entry.getValue(), uniquefiers.get(entry.getKey().getCiteKey()));
+                    entry.getValue(), uniquefiers.get(entry.getKey().getCiteKeyOptional().orElse(null)));
         }
 
     }
@@ -1266,8 +1266,8 @@ class OOBibBase {
                     }
                 }
                 Collections.sort(entries, new FieldComparator(FieldName.YEAR));
-                String keyString = String.join(",",
-                        entries.stream().map(BibEntry::getCiteKey).collect(Collectors.toList()));
+                String keyString = String.join(",", entries.stream().map(entry -> entry.getCiteKeyOptional().orElse(""))
+                        .collect(Collectors.toList()));
                 // Insert bookmark:
                 String bName = getUniqueReferenceMarkName(keyString, OOBibBase.AUTHORYEAR_PAR);
                 insertReferenceMark(bName, "tmp", mxDocCursor, true, style);
@@ -1366,13 +1366,13 @@ class OOBibBase {
                     BibEntry clonedEntry = (BibEntry) entry.get().clone();
                     clonedEntry.setId(IdGenerator.next());
                     // Insert a copy of the entry
-                    resultDatabase.insertEntryWithDuplicationCheck(clonedEntry);
+                    resultDatabase.insertEntry(clonedEntry);
                     // Check if the cloned entry has a crossref field
                     clonedEntry.getField(FieldName.CROSSREF).ifPresent(crossref -> {
                         // If the crossref entry is not already in the database
                         if (!resultDatabase.getEntryByKey(crossref).isPresent()) {
                             // Add it if it is in the current database
-                            loopDatabase.getEntryByKey(crossref).ifPresent(resultDatabase::insertEntryWithDuplicationCheck);
+                            loopDatabase.getEntryByKey(crossref).ifPresent(resultDatabase::insertEntry);
                         }
                     });
 

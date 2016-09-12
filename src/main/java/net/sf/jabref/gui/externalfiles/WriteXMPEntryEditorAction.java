@@ -1,4 +1,4 @@
-package net.sf.jabref.external;
+package net.sf.jabref.gui.externalfiles;
 
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -12,10 +12,10 @@ import javax.xml.transform.TransformerException;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.filelist.FileListEntry;
+import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;

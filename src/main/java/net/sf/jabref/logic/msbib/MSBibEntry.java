@@ -293,6 +293,8 @@ class MSBibEntry {
         addField(document, rootNode, "JournalName", journalName);
         addField(document, rootNode, "PatentNumber", patentNumber);
 
+        addField(document, rootNode, "Number", number);
+
         addField(document, rootNode, "StandardNumber", standardNumber);
         addField(document, rootNode, "ConferenceName", conferenceName);
 

@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
+
 /**
  * Delivers possible completions for a given string.
  *
@@ -102,6 +104,8 @@ public abstract class AbstractAutoCompleter implements AutoCompleter<String> {
         if (word.length() < getLengthOfShortestWordToAdd()) {
             return;
         }
+
+        word = new LatexToUnicodeFormatter().format(word);
 
         indexCaseSensitive.add(word);
 

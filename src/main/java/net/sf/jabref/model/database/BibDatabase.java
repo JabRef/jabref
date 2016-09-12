@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
  * A bibliography database.
  */
 public class BibDatabase {
+
     private static final Log LOGGER = LogFactory.getLog(BibDatabase.class);
 
     /**
@@ -108,7 +109,8 @@ public class BibDatabase {
         for (BibEntry e : getEntries()) {
             allFields.addAll(e.getFieldNames());
         }
-        return allFields.stream().filter(field -> !InternalBibtexFields.isInternalField(field)).collect(Collectors.toSet());
+        return allFields.stream().filter(field -> !InternalBibtexFields.isInternalField(field))
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -438,7 +440,9 @@ public class BibDatabase {
         }
     }
 
+
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
+
 
     private String resolveContent(String result, Set<String> usedIds) {
         String res = result;
@@ -489,13 +493,14 @@ public class BibDatabase {
     }
 
     /**
+     * @deprecated use  {@link BibDatabase#resolveForStrings(String)}
      * Returns a text with references resolved according to an optionally given database.
      *
      * @param toResolve maybenull The text to resolve.
      * @param database  maybenull The database to use for resolving the text.
      * @return The resolved text or the original text if either the text or the database are null
      */
-    @Deprecated // use BibDatabase.resolveForStrings
+    @Deprecated
     public static String getText(String toResolve, BibDatabase database) {
         if ((toResolve != null) && (database != null)) {
             return database.resolveForStrings(toResolve);

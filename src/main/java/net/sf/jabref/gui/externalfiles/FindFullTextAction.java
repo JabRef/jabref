@@ -1,4 +1,4 @@
-package net.sf.jabref.external;
+package net.sf.jabref.gui.externalfiles;
 
 import java.io.IOException;
 import java.net.URL;
@@ -13,7 +13,7 @@ import javax.swing.JOptionPane;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.importer.FulltextFetchers;
@@ -78,7 +78,7 @@ public class FindFullTextAction extends AbstractWorker {
                 if (dirs.isEmpty()) {
                     JOptionPane.showMessageDialog(basePanel.frame(),
                             Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
-                                    + " -> " + Localization.lang("External programs"),
+                                    + " -> " + Localization.lang("File"),
                             Localization.lang("Directory not found"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }
