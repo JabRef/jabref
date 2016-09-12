@@ -46,3 +46,12 @@ task generateMissingTranslationKeys(type: JavaExec) {
     args "-t"
     args "-u"
 }
+
+task sortKeysInTranslationFiles(type: JavaExec) {
+    description "Sorts the the keys in all localization Files according to the key order in the english files"
+    group = 'Localization'
+    main 'org.python.util.jython'
+    classpath project.configurations.jython.asPath
+    args file("scripts/syncLang.py")
+    args "-s"
+}
