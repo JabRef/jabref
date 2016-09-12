@@ -36,6 +36,7 @@ import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
 import net.sf.jabref.specialfields.SpecialField;
+import net.sf.jabref.specialfields.SpecialFieldIcon;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 
 import org.apache.commons.logging.Log;
@@ -221,7 +222,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
      */
     public static void populateSpecialFieldMenu(JMenu menu, SpecialField field, JabRefFrame frame) {
         menu.setText(field.getMenuString());
-        menu.setIcon(((IconTheme.FontBasedIcon) field.getRepresentingIcon()).createSmallIcon());
+        menu.setIcon(((IconTheme.FontBasedIcon) SpecialFieldIcon.getRepresentingIcon(field)).createSmallIcon());
         for (SpecialFieldValue val : field.getValues()) {
             menu.add(val.getMenuAction(frame));
         }

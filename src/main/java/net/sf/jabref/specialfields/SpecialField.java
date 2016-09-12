@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.swing.Icon;
-
 import net.sf.jabref.logic.l10n.Localization;
 
 import org.apache.commons.logging.Log;
@@ -50,8 +48,6 @@ public abstract class SpecialField {
     public abstract String getFieldName();
 
     public abstract String getLocalizedFieldName();
-
-    public abstract Icon getRepresentingIcon();
 
     public String getMenuString() {
         return getLocalizedFieldName();

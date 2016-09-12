@@ -13,9 +13,6 @@ public class Priority extends SpecialField {
 
     private static Priority INSTANCE;
 
-    private final Icon icon = IconTheme.JabRefIcon.PRIORITY.getSmallIcon();
-
-
     private Priority() {
         List<SpecialFieldValue> values = new ArrayList<>();
         values.add(new SpecialFieldValue(this, null, "clearPriority", Localization.lang("Clear priority"), null,
@@ -50,8 +47,4 @@ public class Priority extends SpecialField {
         return Localization.lang("Priority");
     }
 
-    @Override
-    public Icon getRepresentingIcon() {
-        return this.icon;
-    }
 }

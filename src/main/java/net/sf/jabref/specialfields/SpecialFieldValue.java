@@ -79,7 +79,7 @@ public class SpecialFieldValue {
     }
 
     public Icon getIcon() {
-        return this.icon;
+        return icon;
     }
 
     public String getToolTipText() {
@@ -102,6 +102,10 @@ public class SpecialFieldValue {
             this.menuAction = new SpecialFieldMenuAction(this, frame);
         }
         return this.menuAction;
+    }
+
+    public SpecialField getField() {
+        return field;
     }
 
 }
