@@ -77,6 +77,7 @@ import net.sf.jabref.gui.importer.UnlinkedPDFFileFilter;
 import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;

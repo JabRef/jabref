@@ -306,6 +306,11 @@ public class BibtexKeyPatternUtilTest {
         BibtexKeyPatternUtil.authIniN(null, 3);
     }
 
+    @Test
+    public void testAuthIniNEmptyReturnsEmpty() {
+        assertEquals("", BibtexKeyPatternUtil.authIniN("", 1));
+    }
+
     /**
      * Tests  [auth.auth.ea]
      */
@@ -316,6 +321,11 @@ public class BibtexKeyPatternUtilTest {
                 BibtexKeyPatternUtil.authAuthEa(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_2));
         assertEquals("Newton.Maxwell.ea",
                 BibtexKeyPatternUtil.authAuthEa(AUTHOR_STRING_FIRSTNAME_FULL_LASTNAME_FULL_COUNT_3));
+    }
+
+    @Test
+    public void testAuthEaEmptyReturnsEmpty() {
+        assertEquals("", BibtexKeyPatternUtil.authAuthEa(""));
     }
 
     /**
@@ -352,6 +362,11 @@ public class BibtexKeyPatternUtilTest {
         assertEquals("NME", BibtexKeyPatternUtil.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3));
         assertEquals("NM", BibtexKeyPatternUtil.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_2));
         assertEquals("Newton", BibtexKeyPatternUtil.authshort(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_1));
+    }
+
+    @Test
+    public void testAuthShortEmptyReturnsEmpty() {
+        assertEquals("", BibtexKeyPatternUtil.authshort(""));
     }
 
     /**
@@ -519,6 +534,11 @@ public class BibtexKeyPatternUtilTest {
                 BibtexKeyPatternUtil.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_3, 1));
         assertEquals("NewtonEtAl",
                 BibtexKeyPatternUtil.nAuthors(AUTHOR_STRING_FIRSTNAME_INITIAL_LASTNAME_FULL_COUNT_4, 1));
+    }
+
+    @Test
+    public void testNAuthors1EmptyReturnEmpty() {
+        assertEquals("", BibtexKeyPatternUtil.nAuthors("", 1));
     }
 
     /**

@@ -7,6 +7,7 @@ import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.io.DatabaseFileLookup;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * {@link FileFilter} implementation, that allows only files which are not

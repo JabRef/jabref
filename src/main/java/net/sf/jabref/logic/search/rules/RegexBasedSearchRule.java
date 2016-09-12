@@ -1,10 +1,11 @@
 package net.sf.jabref.logic.search.rules;
 
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
+import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -12,7 +13,7 @@ import net.sf.jabref.model.entry.BibEntry;
  */
 public class RegexBasedSearchRule implements SearchRule {
 
-    private static final RemoveLatexCommands REMOVE_LATEX_COMMANDS = new RemoveLatexCommands();
+    private static final LatexToUnicodeFormatter LATEX_TO_UNICODE_FORMATTER = new LatexToUnicodeFormatter();
 
     private final boolean caseSensitive;
 
@@ -50,10 +51,10 @@ public class RegexBasedSearchRule implements SearchRule {
         }
 
         for (String field : bibEntry.getFieldNames()) {
-            if (bibEntry.hasField(field)) {
-                String fieldContent = RegexBasedSearchRule.REMOVE_LATEX_COMMANDS
-                        .format(bibEntry.getField(field).get());
-                String fieldContentNoBrackets = RegexBasedSearchRule.REMOVE_LATEX_COMMANDS.format(fieldContent);
+            Optional<String> fieldOptional = bibEntry.getField(field);
+            if (fieldOptional.isPresent()) {
+                String fieldContent = RegexBasedSearchRule.LATEX_TO_UNICODE_FORMATTER.format(fieldOptional.get());
+                String fieldContentNoBrackets = RegexBasedSearchRule.LATEX_TO_UNICODE_FORMATTER.format(fieldContent);
                 Matcher m = pattern.matcher(fieldContentNoBrackets);
                 if (m.find()) {
                     return true;

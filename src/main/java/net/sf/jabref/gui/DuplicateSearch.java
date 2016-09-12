@@ -124,7 +124,7 @@ public class DuplicateSearch implements Runnable {
                 // and adding merged entries:
                 if (!toAdd.isEmpty()) {
                     for (BibEntry entry : toAdd) {
-                        panel.getDatabase().insertEntry(entry);
+                        panel.getDatabase().insertEntryWithDuplicationCheck(entry);
                         ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
                     }
                     panel.markBaseChanged();

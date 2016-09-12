@@ -316,7 +316,7 @@ public class RegExpFileSearch {
         }
 
         // If no field value was found, try to interpret it as a key generator field marker:
-        String fieldValue = BibDatabase.getResolvedField(beforeColon, entry, database)
+        String fieldValue = entry.getResolvedFieldOrAlias(beforeColon, database)
                 .orElse(BibtexKeyPatternUtil.makeLabel(entry, beforeColon));
 
         if (fieldValue == null) {
@@ -327,7 +327,7 @@ public class RegExpFileSearch {
             return fieldValue;
         }
 
-        String[] parts = afterColon.split(":");
+        List<String> parts = Arrays.asList(afterColon.split(":"));
         fieldValue = BibtexKeyPatternUtil.applyModifiers(fieldValue, parts, 0);
 
         return fieldValue;

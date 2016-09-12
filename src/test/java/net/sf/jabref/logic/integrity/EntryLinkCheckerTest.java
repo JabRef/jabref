@@ -26,7 +26,7 @@ public class EntryLinkCheckerTest {
         database = new BibDatabase();
         checker = new EntryLinkChecker(database);
         entry = new BibEntry();
-        database.insertEntry(entry);
+        database.insertEntryWithDuplicationCheck(entry);
     }
 
     @SuppressWarnings("unused")
@@ -61,7 +61,7 @@ public class EntryLinkCheckerTest {
 
         BibEntry entry2 = new BibEntry();
         entry2.setCiteKey("banana");
-        database.insertEntry(entry2);
+        database.insertEntryWithDuplicationCheck(entry2);
 
         List<IntegrityMessage> message = checker.check(entry);
         assertEquals(Collections.emptyList(), message);
@@ -73,11 +73,11 @@ public class EntryLinkCheckerTest {
 
         BibEntry entry2 = new BibEntry();
         entry2.setCiteKey("banana");
-        database.insertEntry(entry2);
+        database.insertEntryWithDuplicationCheck(entry2);
 
         BibEntry entry3 = new BibEntry();
         entry3.setCiteKey("pineapple");
-        database.insertEntry(entry3);
+        database.insertEntryWithDuplicationCheck(entry3);
 
         List<IntegrityMessage> message = checker.check(entry);
         assertEquals(Collections.emptyList(), message);
@@ -87,15 +87,15 @@ public class EntryLinkCheckerTest {
     public void testCheckNonExistingRelated() {
         BibEntry entry1 = new BibEntry();
         entry1.setField("related", "banana,pineapple,strawberry");
-        database.insertEntry(entry1);
+        database.insertEntryWithDuplicationCheck(entry1);
 
         BibEntry entry2 = new BibEntry();
         entry2.setCiteKey("banana");
-        database.insertEntry(entry2);
+        database.insertEntryWithDuplicationCheck(entry2);
 
         BibEntry entry3 = new BibEntry();
         entry3.setCiteKey("pineapple");
-        database.insertEntry(entry3);
+        database.insertEntryWithDuplicationCheck(entry3);
 
         List<IntegrityMessage> message = checker.check(entry1);
         assertFalse(message.toString(), message.isEmpty());

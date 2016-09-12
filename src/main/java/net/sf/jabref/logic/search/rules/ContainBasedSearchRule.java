@@ -3,7 +3,7 @@ package net.sf.jabref.logic.search.rules;
 import java.util.Iterator;
 import java.util.List;
 
-import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
+import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -11,7 +11,7 @@ import net.sf.jabref.model.entry.BibEntry;
  */
 public class ContainBasedSearchRule implements SearchRule {
 
-    private static final RemoveLatexCommands REMOVE_LATEX_COMMANDS = new RemoveLatexCommands();
+    private static final LatexToUnicodeFormatter LATEX_TO_UNICODE_FORMATTER = new LatexToUnicodeFormatter();
 
     private final boolean caseSensitive;
 
@@ -39,7 +39,7 @@ public class ContainBasedSearchRule implements SearchRule {
         List<String> unmatchedWords = new SentenceAnalyzer(searchString).getWords();
 
         for (String fieldContent : bibEntry.getFieldValues()) {
-            String formattedFieldContent = ContainBasedSearchRule.REMOVE_LATEX_COMMANDS.format(fieldContent);
+            String formattedFieldContent = ContainBasedSearchRule.LATEX_TO_UNICODE_FORMATTER.format(fieldContent);
             if (!caseSensitive) {
                 formattedFieldContent = formattedFieldContent.toLowerCase();
             }
