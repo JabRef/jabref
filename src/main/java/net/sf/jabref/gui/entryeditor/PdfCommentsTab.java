@@ -82,7 +82,7 @@ public class PdfCommentsTab extends JPanel {
     public void addComments() throws IOException {
         Optional<String> field = parent.getEntry().getField(FieldName.FILE);
         if (field.isPresent()) {
-            if(!commentList.getModel().equals(listModel)){
+            if (!commentList.getModel().equals(listModel)) {
                 commentList.setModel(listModel);
                 commentList.addListSelectionListener(new CommentListSelectionListener());
             }
@@ -173,11 +173,12 @@ public class PdfCommentsTab extends JPanel {
         informationPanel.add(btnOpenPdf);
 
     }
+
     private class CommentListSelectionListener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent e) {
             int index;
-            if(commentList.getSelectedIndex() >= 0){
+            if (commentList.getSelectedIndex() >= 0) {
                 index = commentList.getSelectedIndex();
                 updateTextFields(listModel.get(index));
                 commentListSelectedIndex = index;

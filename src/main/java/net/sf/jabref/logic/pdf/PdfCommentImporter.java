@@ -1,5 +1,6 @@
 package net.sf.jabref.logic.pdf;
 
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -14,15 +15,21 @@ import net.sf.jabref.model.pdf.PdfComment;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.pdfbox.cos.COSArray;
+import org.apache.pdfbox.cos.COSFloat;
+import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationHighlight;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
+import org.apache.pdfbox.util.PDFTextStripperByArea;
 
 public class PdfCommentImporter {
 
+    private final int APPREVIATED_ANNOTATIONANE_LENGTH = 20;
     private List pdfPages;
     private PDPage page;
-
     private Log logger = LogFactory.getLog(PdfCommentImporter.class);
 
     public PdfCommentImporter() {
@@ -44,7 +51,50 @@ public class PdfCommentImporter {
             page = (PDPage) pdfPages.get(i);
             try {
                 for (PDAnnotation annotation : page.getAnnotations()) {
-                    annotationsMap.put(annotation.getAnnotationName(), new PdfComment(annotation, i));
+                    if (annotation.getSubtype().equals(FDFAnnotationHighlight.SUBTYPE)) {
+                        PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();
+
+                        COSArray quadsArray = (COSArray) annotation.getDictionary().getDictionaryObject(COSName.getPDFName("QuadPoints"));
+                        String highlightedText = null;
+                        for (int j = 1, k = 0; j <= (quadsArray.size() / 8); j++) {
+
+                            COSFloat upperLeftX = (COSFloat) quadsArray.get(0 + k);
+                            COSFloat upperLeftY = (COSFloat) quadsArray.get(1 + k);
+                            COSFloat upperRightX = (COSFloat) quadsArray.get(2 + k);
+                            COSFloat upperRightY = (COSFloat) quadsArray.get(3 + k);
+                            COSFloat lowerLeftX = (COSFloat) quadsArray.get(4 + k);
+                            COSFloat lowerLeftY = (COSFloat) quadsArray.get(5 + k);
+
+                            k += 8;
+
+                            float ulx = upperLeftX.floatValue() - 1;
+                            float uly = upperLeftY.floatValue();
+                            float width = upperRightX.floatValue() - lowerLeftX.floatValue();
+                            float height = upperRightY.floatValue() - lowerLeftY.floatValue();
+
+                            PDRectangle pageSize = page.getMediaBox();
+                            uly = pageSize.getHeight() - uly;
+
+                            Rectangle2D.Float rectangle = new Rectangle2D.Float(ulx, uly, width, height);
+                            stripperByArea.addRegion("highlightedRegion", rectangle);
+                            stripperByArea.extractRegions(page);
+                            String highlightedTextInLine = stripperByArea.getTextForRegion("highlightedRegion");
+
+                            if (j > 1) {
+                                highlightedText = highlightedText.concat(highlightedTextInLine);
+                            } else {
+                                highlightedText = highlightedTextInLine;
+                            }
+                        }
+                        annotation.setContents(highlightedText);
+                        int appreviatedContentLengthForName = APPREVIATED_ANNOTATIONANE_LENGTH;
+                        if(highlightedText.length() < appreviatedContentLengthForName){
+                            appreviatedContentLengthForName = highlightedText.length();
+                        }
+                        annotationsMap.put(highlightedText.subSequence(0, appreviatedContentLengthForName).toString() + "...", new PdfComment(annotation, i));
+                    } else {
+                        annotationsMap.put(annotation.getAnnotationName(), new PdfComment(annotation, i));
+                    }
                 }
             } catch (IOException e1) {
                 e1.printStackTrace();
