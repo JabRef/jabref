@@ -214,7 +214,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
                         JOptionPane.showMessageDialog(null, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID), Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
                     }
                 } catch (ExecutionException | InterruptedException e) {
-                    LOGGER.error(String.format("No entry with id '%0' for fetcher '%1' was found.", searchID, fetcher.getName()), e);
+                    LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchID, fetcher.getName()), e);
                 }
             }
         };
