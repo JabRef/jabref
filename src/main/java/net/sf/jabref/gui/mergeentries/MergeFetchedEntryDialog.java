@@ -164,5 +164,4 @@ public class MergeFetchedEntryDialog extends JDialog {
             dispose();
         }
     }
-
 }
