@@ -1,4 +1,4 @@
-package net.sf.jabref.external;
+package net.sf.jabref.gui.externalfiletype;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -317,9 +317,6 @@ public final class ExternalFileTypes {
         }
 
         // Finally, build the list of types based on the modified defaults list:
-        for (ExternalFileType type : types) {
-            externalFileTypes.add(type);
-        }
+        externalFileTypes.addAll(types);
     }
-
 }

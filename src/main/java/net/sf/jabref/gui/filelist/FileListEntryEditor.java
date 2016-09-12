@@ -1,4 +1,4 @@
-package net.sf.jabref.gui;
+package net.sf.jabref.gui.filelist;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -32,11 +32,12 @@ import javax.swing.event.DocumentListener;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.external.ConfirmCloseFileListEntryEditor;
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.ExternalFileTypes;
-import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.gui.FileDialog;
+import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
+import net.sf.jabref.gui.externalfiletype.UnknownExternalFileType;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -290,14 +291,14 @@ public class FileListEntryEditor {
         }
     }
 
-    private void storeSettings(FileListEntry entry) {
+    private void storeSettings(FileListEntry listEntry) {
         String descriptionText = this.description.getText().trim();
-        String link = "";
+        String fileLink = "";
         // See if we should trim the file link to be relative to the file directory:
         try {
             List<String> dirs = databaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
             if (dirs.isEmpty()) {
-                link = this.link.getText().trim();
+                fileLink = this.link.getText().trim();
             } else {
                 boolean found = false;
                 for (String dir : dirs) {
@@ -306,26 +307,26 @@ public class FileListEntryEditor {
                     if (fl.isAbsolute()) {
                         String flPath = fl.getCanonicalPath();
                         if ((flPath.length() > canPath.length()) && (flPath.startsWith(canPath))) {
-                            link = fl.getCanonicalPath().substring(canPath.length() + 1);
+                            fileLink = fl.getCanonicalPath().substring(canPath.length() + 1);
                             found = true;
                             break;
                         }
                     }
                 }
                 if (!found) {
-                    link = this.link.getText().trim();
+                    fileLink = this.link.getText().trim();
                 }
             }
         } catch (IOException ex) {
             // Don't think this should happen, but set the file link directly as a fallback:
-            link = this.link.getText().trim();
+            fileLink = this.link.getText().trim();
         }
 
         ExternalFileType type = (ExternalFileType) types.getSelectedItem();
 
-        entry.description = descriptionText;
-        entry.type = Optional.ofNullable(type);
-        entry.link = link;
+        listEntry.description = descriptionText;
+        listEntry.type = Optional.ofNullable(type);
+        listEntry.link = fileLink;
     }
 
     public boolean okPressed() {

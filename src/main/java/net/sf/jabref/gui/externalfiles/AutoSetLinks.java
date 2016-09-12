@@ -1,4 +1,4 @@
-package net.sf.jabref.external;
+package net.sf.jabref.gui.externalfiles;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
@@ -22,8 +22,11 @@ import javax.swing.SwingUtilities;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
+import net.sf.jabref.gui.externalfiletype.UnknownExternalFileType;
+import net.sf.jabref.gui.filelist.FileListEntry;
+import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;
