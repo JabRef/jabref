@@ -30,6 +30,7 @@ This page provides some development support in the form of howtos. See also [[Hi
   * [Benchmarks](#benchmarks)
   * [equals](#equals)
   * [Files & Paths](#files-and-paths)
+  * [JavaFX](#javafx)
 
 
 ## Generic code how tos
@@ -404,3 +405,18 @@ Always try to use the methods from the nio-package. For interoperability, they p
 https://docs.oracle.com/javase/tutorial/essential/io/path.html
 Mapping between old methods and new methods
 https://docs.oracle.com/javase/tutorial/essential/io/legacy.html#mapping
+
+##JavaFX
+
+The following expressions can be used in FXML attributes, according to the [official documentation](https://docs.oracle.com/javase/8/javafx/api/javafx/fxml/doc-files/introduction_to_fxml.html#attributes)
+
+Type | Expression | Value point to | Remark
+--- | --- | --- | ---
+Location | `@image.png` | path relative to the current FXML file | -
+Resource | `%textToBeTranslated` | key in ResourceBundle | -
+Attribute variable | `$idOfControl` or `$variable` | named control or variable in controller (may be path in the namespace) | resolved only once at load time
+Expression binding | `${expression}` | expression, for example `textField.text` | changes to source are propagated
+Bidirectional expression binding | `#{expression}` | expression | changes are propagated in both directions (not yet implemented in JavaFX)
+Event handler | `#nameOfEventHandler` | name of the event handler method in the controller | -
+
+
