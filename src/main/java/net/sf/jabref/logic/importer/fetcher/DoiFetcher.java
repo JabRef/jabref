@@ -51,9 +51,10 @@ public class DoiFetcher implements IdBasedFetcher {
                 String bibtexString = download.downloadToString(StandardCharsets.UTF_8);
 
                 // BibTeX entry
-                return BibtexParser.singleFromString(cleanupEncoding(bibtexString), preferences);
+                Optional<BibEntry> result = BibtexParser.singleFromString(cleanupEncoding(bibtexString), preferences);
+                return result;
             } else {
-                throw new FetcherException("Invalid DOI: " + identifier);
+                throw new FetcherException(String.format("Invalid DOI: %s", identifier));
             }
         } catch (IOException e) {
             throw new FetcherException("Bad URL when fetching DOI info", e);
