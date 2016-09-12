@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
@@ -49,11 +48,6 @@ public class CleanupWorkerTest {
 
     @Before
     public void setUp() throws IOException {
-        // Needed for ExternalFileTypes
-        if (Globals.prefs == null) {
-            Globals.prefs = JabRefPreferences.getInstance();
-        }
-
         pdfFolder = bibFolder.newFolder();
 
         MetaData metaData = new MetaData();
