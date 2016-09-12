@@ -65,7 +65,11 @@ public class GlobalSearchBar extends JPanel {
     private SearchResultFrame searchResultFrame;
 
     private SearchDisplayMode searchDisplayMode;
-    private boolean switchedDatabase;
+
+    /**
+     * if this flag is set the searchbar won't be selected after the next search
+     */
+    private boolean dontSelectSearchBar;
 
 
     public GlobalSearchBar(JabRefFrame frame) {
@@ -277,8 +281,8 @@ public class GlobalSearchBar extends JPanel {
             currentBasePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
         }
 
-        if (switchedDatabase){
-            switchedDatabase = false;
+        if (dontSelectSearchBar){
+            dontSelectSearchBar = false;
             return;
         }
         focus();
@@ -370,15 +374,19 @@ public class GlobalSearchBar extends JPanel {
         this.searchResultFrame = searchResultFrame;
     }
 
-    public void setSearchTerm(String searchTerm, boolean switchedDatabase) {
+    public void setSearchTerm(String searchTerm, boolean dontSelectSearchBar) {
         if (searchTerm.equals(searchField.getText())){
             return;
         }
 
-        this.switchedDatabase = switchedDatabase;
+        setDontSelectSearchBar(dontSelectSearchBar);
         searchField.setText(searchTerm);
         // to hinder the autocomplete window to popup
         autoCompleteSupport.setVisible(false);
+    }
+
+    public void setDontSelectSearchBar(boolean dontSelectSearchBar) {
+        this.dontSelectSearchBar = dontSelectSearchBar;
     }
 
 }
