@@ -16,7 +16,7 @@ import net.sf.jabref.model.entry.FieldName;
 public class EditionChecker implements Checker {
 
     private static final Predicate<String> FIRST_LETTER_CAPITALIZED = Pattern.compile("^[A-Z]").asPredicate();
-    private static final Predicate<String> ONLY_NUMERALS_OR_LITERALS = Pattern.compile("^([0-9]+|[^0-9]+)$")
+    private static final Predicate<String> ONLY_NUMERALS_OR_LITERALS = Pattern.compile("^([0-9]+|[^0-9].+)$")
             .asPredicate();
 
     private final BibDatabaseContext bibDatabaseContextEdition;
@@ -29,10 +29,10 @@ public class EditionChecker implements Checker {
     /**
      * Checks, if field contains only an integer or a literal (BibLaTeX mode)
      * Checks, if the first letter is capitalized (BibTeX mode)
-     * BibLaTex:
+     * BibLaTeX package documentation:
      * The edition of a printed publication. This must be an integer, not an ordinal.
      * It is also possible to give the edition as a literal string, for example "Third, revised and expanded edition".
-     * Official bibtex spec:
+     * Official BibTeX specification:
      * The edition of a book-for example, "Second".
      * This should be an ordinal, and should have the first letter capitalized.
      */
