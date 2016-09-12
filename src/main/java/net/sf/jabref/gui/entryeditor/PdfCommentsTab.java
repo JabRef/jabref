@@ -1,7 +1,8 @@
 package net.sf.jabref.gui.entryeditor;
 
 import java.awt.Dimension;
-import java.awt.SystemColor;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +21,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.pdf.PdfCommentImporter;
@@ -34,18 +36,21 @@ public class PdfCommentsTab extends JPanel {
     private final JPanel informationPanel = new JPanel();
     private final JList<PdfComment> commentList = new JList<>();
     private final JScrollPane commentScrollPane = new JScrollPane();
+    private final JLabel commentLabel = new JLabel(Localization.lang("Comments and marked text"), JLabel.LEFT);
     private final JLabel authorLabel = new JLabel(Localization.lang("Author"), JLabel.CENTER);
-    private final JTextArea authorArea = new JTextArea("author", 2, 25);
+    private final JTextArea authorArea = new JTextArea("author");
     private final JScrollPane authorScrollPane = new JScrollPane();
     private final JLabel dateLabel = new JLabel(Localization.lang("Date"), JLabel.CENTER);
-    private final JTextArea dateArea = new JTextArea("date", 2, 25);
+    private final JTextArea dateArea = new JTextArea("date");
     private final JScrollPane dateScrollPane = new JScrollPane();
     private final JLabel pageLabel = new JLabel(Localization.lang("Page"), JLabel.CENTER);
-    private final JTextArea pageArea = new JTextArea("page", 2, 25);
+    private final JTextArea pageArea = new JTextArea("page");
     private final JScrollPane pageScrollPane = new JScrollPane();
     private final JLabel commentTxtLabel = new JLabel(Localization.lang("Content"),JLabel.CENTER);
-    private final JTextArea commentTxtArea = new JTextArea("comment content", 10, 25);
+    private final JTextArea commentTxtArea = new JTextArea("comment content");
     private final JScrollPane commentTxtScrollPane = new JScrollPane();
+    private final JButton copyToClipboardButton = new JButton();
+    private final JButton openPdfButton = new JButton();
     DefaultListModel<PdfComment> listModel;
 
     private final EntryEditor parent;
@@ -67,16 +72,24 @@ public class PdfCommentsTab extends JPanel {
     }
 
     private void setUpPdfCommentsTab() {
+        setLayout(new GridBagLayout());
+        GridBagConstraints tabConstraints = new GridBagConstraints();
 
-        setLayout(null);
-        commentScrollPane.setBounds(26, 16, 450, 389);
+        tabConstraints.gridx = 0;
+        tabConstraints.gridy = 0;
+        tabConstraints.ipady = 10;
+        tabConstraints.ipadx = 200;
 
-        commentScrollPane.setPreferredSize(new Dimension(450,200));
+        commentScrollPane.setMinimumSize(new Dimension(200,150));
 
-        this.add(commentScrollPane);
+        this.add(commentLabel,tabConstraints);
+
+        tabConstraints.gridy = 1;
+        this.add(commentScrollPane, tabConstraints);
         commentScrollPane.setViewportView(commentList);
-        informationPanel.setBounds(491, 16, 742, 389);
-        this.add(informationPanel);
+
+        tabConstraints.gridx = 1;
+        this.add(informationPanel, tabConstraints);
     }
 
     public void addComments() throws IOException {
@@ -121,56 +134,100 @@ public class PdfCommentsTab extends JPanel {
     }
 
     private void setUpInformationPanel(){
-        informationPanel.setLayout(null);
+        JPanel pdfCommentPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints pdfLayoutConstrains = new GridBagConstraints();
 
-        authorLabel.setBounds(0, 44, 61, 20);
-        informationPanel.add(authorLabel);
-        authorScrollPane.setBounds(116, 43, 547, 20);
-        informationPanel.add(authorScrollPane);
-        authorArea.setBackground(SystemColor.control);
+        pdfLayoutConstrains.fill = GridBagConstraints.HORIZONTAL;
+
+        pdfLayoutConstrains.gridx = 0;
+        pdfLayoutConstrains.gridy = 0;
+        pdfLayoutConstrains.ipadx = 10;
+        pdfLayoutConstrains.ipady = 10;
+        pdfCommentPanel.add(authorLabel, pdfLayoutConstrains);
+
+        pdfLayoutConstrains.gridx = 1;
         authorScrollPane.setViewportView(authorArea);
-        authorArea.setEditable(false);
+        pdfCommentPanel.add(authorScrollPane, pdfLayoutConstrains);
 
-        dateLabel.setBounds(0, 70, 61, 20);
-        informationPanel.add(dateLabel);
-        dateScrollPane.setBounds(116, 69, 547, 20);
-        informationPanel.add(dateScrollPane);
-        dateArea.setBackground(SystemColor.control);
+        pdfLayoutConstrains.gridy = 1;
+        pdfLayoutConstrains.gridx = 0;
+        pdfCommentPanel.add(dateLabel, pdfLayoutConstrains);
+
+        pdfLayoutConstrains.gridx = 1;
         dateScrollPane.setViewportView(dateArea);
-        dateArea.setEditable(false);
+        pdfCommentPanel.add(dateScrollPane, pdfLayoutConstrains);
 
-        pageLabel.setBounds(10, 95, 34, 20);
-        informationPanel.add(pageLabel);
-        pageScrollPane.setBounds(116, 94, 547, 20);
-        informationPanel.add(pageScrollPane);
-        pageArea.setBackground(SystemColor.control);
+        pdfLayoutConstrains.gridy = 2;
+        pdfLayoutConstrains.gridx = 0;
+        pdfCommentPanel.add(pageLabel, pdfLayoutConstrains);
+
+        pdfLayoutConstrains.gridx = 1;
         pageScrollPane.setViewportView(pageArea);
-        pageArea.setEditable(false);
+        pdfCommentPanel.add(pageScrollPane, pdfLayoutConstrains);
 
-        commentTxtLabel.setBounds(0, 138, 69, 20);
-        informationPanel.add(commentTxtLabel);
-        commentTxtScrollPane.setBounds(116, 143, 547, 173);
-        informationPanel.add(commentTxtScrollPane);
+        pdfLayoutConstrains.gridy = 3;
+        pdfLayoutConstrains.gridx = 0;
+        pdfCommentPanel.add(commentTxtLabel,pdfLayoutConstrains);
+
+        pdfLayoutConstrains.gridx = 1;
         commentTxtScrollPane.setViewportView(commentTxtArea);
+        pdfCommentPanel.add(commentTxtScrollPane, pdfLayoutConstrains);
+
+        pdfLayoutConstrains.gridy = 4;
+        pdfCommentPanel.add(setUpButtons(),pdfLayoutConstrains);
+
+        informationPanel.add(pdfCommentPanel);
+
+//        informationPanel.setLayout(null);
+//
+//        authorLabel.setBounds(0, 44, 61, 20);
+//        informationPanel.add(authorLabel);
+//        authorScrollPane.setBounds(116, 43, 547, 20);
+//        informationPanel.add(authorScrollPane);
+//        authorArea.setBackground(SystemColor.control);
+//        authorScrollPane.setViewportView(authorArea);
+        authorArea.setEditable(false);
+//
+//        dateLabel.setBounds(0, 70, 61, 20);
+//        informationPanel.add(dateLabel);
+//        dateScrollPane.setBounds(116, 69, 547, 20);
+//        informationPanel.add(dateScrollPane);
+//        dateArea.setBackground(SystemColor.control);
+//        dateScrollPane.setViewportView(dateArea);
+        dateArea.setEditable(false);
+//
+//        pageLabel.setBounds(10, 95, 34, 20);
+//        informationPanel.add(pageLabel);
+//        pageScrollPane.setBounds(116, 94, 547, 20);
+//        informationPanel.add(pageScrollPane);
+//        pageArea.setBackground(SystemColor.control);
+//        pageScrollPane.setViewportView(pageArea);
+        pageArea.setEditable(false);
+//
+//        commentTxtLabel.setBounds(0, 138, 69, 20);
+//        informationPanel.add(commentTxtLabel);
+//        commentTxtScrollPane.setBounds(116, 143, 547, 173);
+//        informationPanel.add(commentTxtScrollPane);
+//        commentTxtScrollPane.setViewportView(commentTxtArea);
         commentTxtArea.setEditable(false);
-
-        JScrollPane pdfNamePane = new JScrollPane();
-        pdfNamePane.setBounds(116, 16, 506, 20);
-        informationPanel.add(pdfNamePane);
-
-        JTextArea pdfNameArea = new JTextArea();
-        pdfNameArea.setBackground(SystemColor.control);
-        pdfNameArea.setEditable(false);
-        pdfNamePane.setViewportView(pdfNameArea);
-        pdfNameArea.setText("pdfName");
-
-        JLabel lblPdfName = new JLabel("PDF Name");
-        lblPdfName.setBounds(0, 17, 81, 20);
-        informationPanel.add(lblPdfName);
-
-        JButton btnOpenPdf = new JButton("Open PDF");
-        btnOpenPdf.setBounds(624, 16, 118, 21);
-        informationPanel.add(btnOpenPdf);
+//
+//        JScrollPane pdfNamePane = new JScrollPane();
+//        pdfNamePane.setBounds(116, 16, 506, 20);
+//        informationPanel.add(pdfNamePane);
+//
+//        JTextArea pdfNameArea = new JTextArea();
+//        pdfNameArea.setBackground(SystemColor.control);
+//        pdfNameArea.setEditable(false);
+//        pdfNamePane.setViewportView(pdfNameArea);
+//        pdfNameArea.setText("pdfName");
+//
+//        JLabel lblPdfName = new JLabel("PDF Name");
+//        lblPdfName.setBounds(0, 17, 81, 20);
+//        informationPanel.add(lblPdfName);
+//
+//        JButton btnOpenPdf = new JButton("Open PDF");
+//        btnOpenPdf.setBounds(624, 16, 118, 21);
+//        informationPanel.add(btnOpenPdf);
 
     }
 
@@ -185,5 +242,34 @@ public class PdfCommentsTab extends JPanel {
             }
             commentList.setSelectedIndex(commentListSelectedIndex);
         }
+    }
+
+    private JPanel setUpButtons(){
+        JPanel buttonPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints buttonConstraints = new GridBagConstraints();
+
+        buttonConstraints.gridx = 0;
+        buttonConstraints.gridy = 0;
+        buttonConstraints.gridy = 10;
+        buttonConstraints.gridx = 10;
+        openPdfButton.setText(Localization.lang("Open PDF"));
+        openPdfButton.addActionListener(e -> openPdf());
+        copyToClipboardButton.setText(Localization.lang("Copy to clipboard"));
+        copyToClipboardButton.addActionListener(e -> copytoClipboard());
+
+        buttonPanel.add(copyToClipboardButton, buttonConstraints);
+
+        buttonConstraints.gridx = 1;
+        buttonPanel.add(openPdfButton, buttonConstraints);
+
+        return buttonPanel;
+    }
+
+    private void copytoClipboard(){
+        new ClipBoardManager().setClipboardContents(commentTxtArea.getText());
+    }
+
+    private void openPdf() {
+
     }
 }
