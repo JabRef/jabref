@@ -32,6 +32,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - `comments` field in MS-Office 2007 xml format is now imported as `note` field
 - [#463](https://github.com/JabRef/jabref/issues/463): Disable menu-item and toolbar-buttons while no database is open
 - Implemented integrity check for `note` and `howpublished` field: Should have the first letter capitalized (BibTeX)
+- <kbd>Pos1</kbd> / <kbd>HOME</kbd> now select the first/last entry in the main table and the search result frame.
+- <kbd>UP</kbd> / <kbd>Down</kbd> / <kbd>Tab</kbd> / <kbd>shift+Tab</kbd> in the search result frame have now the same functionality as in the main  table.
 
 ### Fixed
 - Fixed selecting an entry out of multiple duplicates

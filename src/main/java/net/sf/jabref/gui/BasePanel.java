@@ -1743,6 +1743,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         highlightEntry((mainTable.getSelectedRow() + 1) % mainTable.getRowCount());
     }
 
+
+    public void selectFirstEntry() {
+        highlightEntry(0);
+    }
+
+    public void selectLastEntry() {
+        highlightEntry(mainTable.getRowCount() - 1);
+    }
+
     /**
      * This method is called from an EntryEditor when it should be closed. We relay to the selection listener, which
      * takes care of the rest.
