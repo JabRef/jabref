@@ -52,6 +52,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
     private static final Log LOGGER = LogFactory.getLog(EntryTypeDialog.class);
 
     private EntryType type;
+    private SwingWorker<Optional<BibEntry>, Void> fetcherWorker;
     private JabRefFrame frame;
     private static final int COLUMN = 3;
     private final boolean biblatexMode;
@@ -174,19 +175,21 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
     private JPanel createIdFetcherPanel() {
         JButton generateButton = new JButton(Localization.lang("Generate"));
-        JButton cancelButton = new JButton(Localization.lang("Cancel"));
         JTextField idTextField = new JTextField("");
         JComboBox<String> comboBox = new JComboBox<>();
         EntryFetchers.getIdFetchers().forEach(fetcher -> comboBox.addItem(fetcher.getName()));
-        JLabel fetcherLabel = new JLabel("ID type"), idLabel = new JLabel("ID");
+        JLabel fetcherLabel = new JLabel(Localization.lang("ID type"));
+        JLabel idLabel = new JLabel(Localization.lang("ID"));
 
-        SwingWorker<Optional<BibEntry>, Void> fetcherWorker = new SwingWorker<Optional<BibEntry>, Void>() {
+        fetcherWorker = new SwingWorker<Optional<BibEntry>, Void>() {
             Optional<BibEntry> bibEntry = Optional.empty();
             IdBasedFetcher fetcher = null;
             String searchID = "";
 
             @Override
             protected Optional<BibEntry> doInBackground() throws Exception {
+                generateButton.setEnabled(false);
+                generateButton.setText(Localization.lang("Searching..."));
                 searchID = idTextField.getText().trim();
                 fetcher = EntryFetchers.getIdFetchers().get(comboBox.getSelectedIndex());
                 if (!searchID.isEmpty()) {
@@ -203,26 +206,20 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
             @Override
             protected void done() {
-                if (isCancelled()) {
-                    JOptionPane.showMessageDialog(null, Localization.lang("%0 import canceled", fetcher.getName()),Localization.lang("Import canceled by user"), JOptionPane.INFORMATION_MESSAGE);
-                    return;
-                }
-
                 try {
                     Optional<BibEntry> result = get();
                     if (result.isPresent()) {
                         frame.getCurrentBasePanel().insertEntry(result.get());
                     } else {
-                        JOptionPane.showMessageDialog(null, Localization.lang("No entry with id '%0' for fetcher '%1' was found.", searchID, fetcher.getName()), Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
+                        JOptionPane.showMessageDialog(null, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID), Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
                     }
                 } catch (ExecutionException | InterruptedException e) {
-                    LOGGER.error("No entry with id '" + searchID + " for fetcher '" + fetcher.getName() + "' was found.");
+                    LOGGER.error(String.format("No entry with id '%0' for fetcher '%1' was found.", searchID, fetcher.getName()), e);
                 }
             }
         };
 
         generateButton.addActionListener(action -> fetcherWorker.execute());
-        cancelButton.addActionListener(action -> fetcherWorker.cancel(true));
 
         JPanel jPanel = new JPanel();
 
@@ -252,11 +249,9 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         JPanel buttons = new JPanel();
         ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
         bb.addButton(generateButton);
-        bb.addButton(cancelButton);
 
         jPanel.add(buttons, constraints);
         jPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("ID-based_entry_generator")));
-
 
         return jPanel;
     }
@@ -281,6 +276,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            fetcherWorker.cancel(true);
             dispose();
         }
     }
