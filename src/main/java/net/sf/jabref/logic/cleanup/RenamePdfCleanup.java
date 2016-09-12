@@ -1,6 +1,8 @@
 package net.sf.jabref.logic.cleanup;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -83,7 +85,12 @@ public class RenamePdfCleanup implements CleanupJob {
             }
 
             //do rename
-            boolean renameSuccessful = FileUtil.renameFile(expandedOldFilePath, newPath);
+            boolean renameSuccessful = false;
+            try {
+                renameSuccessful = FileUtil.renameFile(Paths.get(expandedOldFilePath), Paths.get(newPath));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
             if (renameSuccessful) {
                 changed = true;

@@ -110,37 +110,38 @@ public class FileUtil {
     /**
      * Copies a file.
      *
-     * @param pathToSourceFile         File Source file
-     * @param pathToDestinationFile           File Destination file
-     * @param deleteIfExists boolean Determines whether the copy goes on even if the file
-     *                       exists.
-     * @return boolean Whether the copy succeeded, or was stopped due to the
-     * file already existing.
+     * @param pathToSourceFile File Source file
+     * @param pathToDestinationFile File Destination file
+     * @param deleteIfExists boolean Determines whether the copy goes on even if the file exists.
+     * @return boolean Whether the copy succeeded, or was stopped due to the file already existing.
      * @throws IOException
      */
     public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean deleteIfExists) throws IOException {
         // Check if the file already exists.
+        if (!Files.exists(pathToSourceFile)) {
+            return false;
+        }
         if (Files.exists(pathToDestinationFile) && !deleteIfExists) {
             return false;
         }
-        Files.copy(pathToSourceFile,pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(pathToSourceFile, pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING);
         return true;
     }
 
     /**
-     * @param fileName
-     * @param destFilename
+     * @param fromFile
+     * @param toFile
      * @return
      */
-    public static boolean renameFile(String fileName, String destFilename) {
-        // File (or directory) with old name
-        File fromFile = new File(fileName);
+    public static boolean renameFile(Path fromFile, Path toFile) throws IOException {
+        Objects.requireNonNull(fromFile);
+        Objects.requireNonNull(toFile);
+        if (!Files.exists(fromFile) || !Files.exists(toFile)) {
+            return false;
+        }
+        Files.move(fromFile, toFile, StandardCopyOption.REPLACE_EXISTING);
+        return true;
 
-        // File (or directory) with new name
-        File toFile = new File(destFilename);
-
-        // Rename file (or directory)
-        return fromFile.renameTo(toFile);
     }
 
     /**

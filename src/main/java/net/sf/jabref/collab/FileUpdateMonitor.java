@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,7 +60,7 @@ public class FileUpdateMonitor implements Runnable {
         }
         numberOfUpdateListener++;
         String key = String.valueOf(numberOfUpdateListener);
-        entries.put(key, new Entry(ul, file));
+        entries.put(key, new Entry(ul, file.toPath()));
         return key;
     }
 
@@ -107,7 +106,11 @@ public class FileUpdateMonitor implements Runnable {
     public void updateTimeStamp(String key) {
         Entry entry = entries.get(key);
         if (entry != null) {
-            entry.updateTimeStamp();
+            try {
+                entry.updateTimeStamp();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -133,17 +136,17 @@ public class FileUpdateMonitor implements Runnable {
     static class Entry {
 
         private final FileUpdateListener listener;
-        private final File file;
+        private final Path file;
         private final Path tmpFile;
         private long timeStamp;
         private long fileSize;
 
 
-        public Entry(FileUpdateListener ul, File f) {
+        public Entry(FileUpdateListener ul, Path f) throws IOException {
             listener = ul;
             file = f;
-            timeStamp = file.lastModified();
-            fileSize = file.length();
+            timeStamp = Files.getLastModifiedTime(file).toMillis();
+            fileSize = Files.size(file);
             tmpFile = FileUpdateMonitor.getTempFile();
             if (tmpFile != null) {
                 tmpFile.toFile().deleteOnExit();
@@ -157,20 +160,20 @@ public class FileUpdateMonitor implements Runnable {
          * @return boolean true if the file has changed.
          */
         public boolean hasBeenUpdated() throws IOException {
-            long modified = file.lastModified();
+            long modified = Files.getLastModifiedTime(file).toMillis();
             if (modified == 0L) {
                 throw new IOException("File deleted");
             }
-            long fileSizeNow = file.length();
+            long fileSizeNow = Files.size(file);
             return (timeStamp != modified) || (fileSize != fileSizeNow);
         }
 
-        public void updateTimeStamp() {
-            timeStamp = file.lastModified();
+        public void updateTimeStamp() throws IOException {
+            timeStamp = Files.getLastModifiedTime(file).toMillis();
             if (timeStamp == 0L) {
                 notifyFileRemoved();
             }
-            fileSize = file.length();
+            fileSize = Files.size(file);
 
             copy();
         }
@@ -179,7 +182,7 @@ public class FileUpdateMonitor implements Runnable {
 
             boolean res = false;
             try {
-                res = FileUtil.copyFile(Paths.get(file.toURI()), tmpFile, true);
+                res = FileUtil.copyFile(file, tmpFile, true);
             } catch (IOException ex) {
                 LOGGER.info("Cannot copy to temporary file '" + tmpFile + '\'', ex);
             }
@@ -189,10 +192,10 @@ public class FileUpdateMonitor implements Runnable {
         /**
          * Call the listener method to signal that the file has changed.
          */
-        public void notifyListener() {
+        public void notifyListener() throws IOException {
             // Update time stamp.
-            timeStamp = file.lastModified();
-            fileSize = file.length();
+            timeStamp = Files.getLastModifiedTime(file).toMillis();
+            fileSize = Files.size(file);
             listener.fileUpdated();
         }
 

@@ -1,6 +1,8 @@
 package net.sf.jabref.logic.util.io;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -10,13 +12,27 @@ import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 public class FileUtilTest {
+    @Rule
+    public TemporaryFolder temporaryFolder = new TemporaryFolder();
+
+    private final Path emptyTestPath = Paths.get("noExistPath");;
+    private Path emptyTestFilePath;
+
+    @Before
+    public void setUpViewModel() throws IOException {
+        emptyTestFilePath = createTemporaryTestFile("emptyTestFile01.txt");
+    }
 
     @Test
     public void testGetLinkedFileNameDefault() {
@@ -151,4 +167,66 @@ public class FileUtilTest {
         assertEquals(uniqPath, result);
     }
 
+    @Test
+    public void testCopyFileFromEmptySourcePathToEmptyDestinationPathWithOverrideExistFile() throws Exception{
+        assertFalse(FileUtil.copyFile(emptyTestPath, emptyTestPath, true));
+    }
+
+    @Test
+    public void testCopyFileFromEmptySourcePathToEmptyDestinationPathWithoutOverrideExistFile() throws Exception{
+        assertFalse(FileUtil.copyFile(emptyTestPath, emptyTestPath, false));
+    }
+
+    @Test
+    public void testCopyFileFromEmptySourcePathToExistDestinationPathWithOverrideExistFile() throws Exception{
+        assertFalse(FileUtil.copyFile(emptyTestPath, emptyTestFilePath, true));
+    }
+
+    @Test
+    public void testCopyFileFromEmptySourcePathToExistDestinationPathWithoutOverrideExistFile() throws Exception{
+        assertFalse(FileUtil.copyFile(emptyTestPath, emptyTestFilePath, false));
+    }
+
+    @Test
+    public void testCopyFileFromExistSourcePathToExistDestinationPathWithOverrideExistFile() throws Exception{
+
+        assertTrue(FileUtil.copyFile(emptyTestFilePath, emptyTestFilePath, true));
+    }
+
+    @Test
+    public void testCopyFileFromExistSourcePathToExistDestinationPathWithoutOverrideExistFile() throws Exception{
+        assertFalse(FileUtil.copyFile(emptyTestFilePath, emptyTestFilePath, false));
+    }
+
+    @Test (expected = NullPointerException.class)
+    public void testRenameFiletoNull() throws Exception {
+        FileUtil.renameFile(null, null);
+        FileUtil.renameFile(emptyTestFilePath,null);
+        FileUtil.renameFile(null, emptyTestFilePath);
+    }
+
+    @Test
+    public void testRenameFileWithFromFileNotExistAndToFileNotExist() throws Exception{
+        assertFalse(FileUtil.renameFile(emptyTestPath, emptyTestPath));
+    }
+
+    @Test
+    public void testRenameFileWithFromFileNotExistAndToFileExist() throws Exception{
+        assertFalse(FileUtil.renameFile(emptyTestPath, emptyTestFilePath));
+    }
+
+    @Test
+    public void testRenameFileWithFromFileExistAndToFileNotExist() throws Exception{
+        assertFalse(FileUtil.renameFile(emptyTestFilePath, emptyTestPath));
+    }
+
+    @Test
+    public void testRenameFileWithFromFileExistAndToFileExist() throws Exception{
+        assertTrue(FileUtil.renameFile(emptyTestFilePath, emptyTestFilePath));
+    }
+
+    private Path createTemporaryTestFile(String name) throws IOException {
+        File testFile = temporaryFolder.newFile(name);
+        return testFile.toPath();
+    }
 }
