@@ -1,6 +1,7 @@
 package net.sf.jabref.gui.specialfields;
 
 import javax.swing.Icon;
+
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.specialfields.SpecialField;
 import net.sf.jabref.specialfields.Printed;
