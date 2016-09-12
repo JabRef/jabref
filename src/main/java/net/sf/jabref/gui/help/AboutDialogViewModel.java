@@ -28,7 +28,7 @@ public class AboutDialogViewModel {
     private final String LIBRARIES = "https://github.com/JabRef/jabref/blob/master/external-libraries.txt";
     private final String GITHUB = "https://github.com/JabRef/jabref";
     private final String CHANGELOG = "https://github.com/JabRef/jabref/blob/master/CHANGELOG.md";
-    private final String LICENSE = "https://opensource.org/licenses/mit-license.php";
+    private final String LICENSE = "https://github.com/JabRef/jabref/blob/master/LICENSE.md";
     private final Log logger = LogFactory.getLog(AboutDialogViewModel.class);
     private final ReadOnlyStringWrapper license = new ReadOnlyStringWrapper();
     private final ReadOnlyStringWrapper heading = new ReadOnlyStringWrapper();
