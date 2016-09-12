@@ -122,6 +122,7 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.event.EntryAddedEvent;
 import net.sf.jabref.model.event.EntryChangedEvent;
+import net.sf.jabref.model.event.EntryRemovedEvent;
 import net.sf.jabref.preferences.HighlightMatchingGroupPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.DBMSSynchronizer;
@@ -1280,6 +1281,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         @Subscribe
         public void listen(EntryChangedEvent entryChangedEvent) {
+            frame.getGlobalSearchBar().setDontSelectSearchBar(true);
+            frame.getGlobalSearchBar().performSearch();
+        }
+
+        @Subscribe
+        public void listen(EntryRemovedEvent removedEntryEvent) {
             frame.getGlobalSearchBar().performSearch();
         }
     }
