@@ -156,7 +156,7 @@ public class ChangeScanner implements Runnable {
 
                 Defaults defaults = new Defaults(BibDatabaseMode
                         .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-                BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
+                BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(FileSaveSession::new);
                 SaveSession ss = databaseWriter.saveDatabase(new BibDatabaseContext(databaseInTemp, metadataInTemp, defaults), prefs);
                 ss.commit(Globals.getFileUpdateMonitor().getTempFile(panel.fileMonitorHandle()));
             } catch (SaveException ex) {

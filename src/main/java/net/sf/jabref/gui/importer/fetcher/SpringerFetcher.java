@@ -1,6 +1,6 @@
 package net.sf.jabref.gui.importer.fetcher;
 
-    import java.io.UnsupportedEncodingException;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import javax.swing.JOptionPane;
