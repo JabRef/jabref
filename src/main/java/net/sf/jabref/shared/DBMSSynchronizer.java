@@ -47,13 +47,15 @@ public class DBMSSynchronizer {
     private final BibDatabase bibDatabase;
     private final EventBus eventBus;
     private Connection currentConnection;
+    private final String keywordSeparator;
 
 
-    public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext) {
+    public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, String keywordSeparator) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.bibDatabase = bibDatabaseContext.getDatabase();
         this.metaData = bibDatabaseContext.getMetaData();
         this.eventBus = new EventBus();
+        this.keywordSeparator = keywordSeparator;
     }
 
     /**
@@ -172,7 +174,7 @@ public class DBMSSynchronizer {
                             localEntry.getSharedBibEntryData()
                                     .setVersion(sharedEntry.get().getSharedBibEntryData().getVersion());
                             for (String field : sharedEntry.get().getFieldNames()) {
-                                localEntry.setField(field, sharedEntry.get().getFieldOptional(field), EntryEventSource.SHARED);
+                                localEntry.setField(field, sharedEntry.get().getField(field), EntryEventSource.SHARED);
                             }
 
                             Set<String> redundantLocalEntryFields = localEntry.getFieldNames();
@@ -246,7 +248,7 @@ public class DBMSSynchronizer {
         }
 
         try {
-            metaData.setData(dbmsProcessor.getSharedMetaData());
+            metaData.setData(dbmsProcessor.getSharedMetaData(), keywordSeparator);
         } catch (ParseException e) {
             LOGGER.error("Parse error", e);
         }

@@ -86,6 +86,6 @@ public class AutoCompletePreferences {
     }
 
     public JournalAbbreviationPreferences getJournalAbbreviationPreferences() {
-        return JournalAbbreviationPreferences.fromPreferences(preferences);
+        return preferences.getJournalAbbreviationPreferences();
     }
 }

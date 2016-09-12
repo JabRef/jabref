@@ -7,7 +7,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -43,7 +42,6 @@ import javax.swing.JTextField;
 import javax.swing.table.AbstractTableModel;
 
 import net.sf.jabref.Globals;
-
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
@@ -54,7 +52,6 @@ import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.journals.Abbreviation;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
-import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -175,7 +172,7 @@ class ManageJournalsPanel extends JPanel {
 
         viewBuiltin.addActionListener(e -> {
             JTable table = new JTable(JournalAbbreviationsUtil.getTableModel(Globals.journalAbbreviationLoader
-                    .getRepository(JournalAbbreviationPreferences.fromPreferences(Globals.prefs)).getAbbreviations()));
+                    .getRepository(Globals.prefs.getJournalAbbreviationPreferences()).getAbbreviations()));
             GUIUtil.correctRowHeight(table);
 
             JScrollPane pane = new JScrollPane(table);
@@ -379,7 +376,7 @@ class ManageJournalsPanel extends JPanel {
         Globals.prefs.putStringList(JabRefPreferences.EXTERNAL_JOURNAL_LISTS, extFiles);
 
         // Update journal abbreviation loader
-        Globals.journalAbbreviationLoader.update(JournalAbbreviationPreferences.fromPreferences(Globals.prefs));
+        Globals.journalAbbreviationLoader.update(Globals.prefs.getJournalAbbreviationPreferences());
     }
 
 

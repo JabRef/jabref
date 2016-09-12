@@ -62,7 +62,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         Objects.requireNonNull(entry);
 
         // 1. Eprint
-        Optional<String> identifier = entry.getFieldOptional(FieldName.EPRINT);
+        Optional<String> identifier = entry.getField(FieldName.EPRINT);
         if (StringUtil.isNotBlank(identifier)) {
             try {
                 // Get pdf of entry with the specified id
@@ -77,7 +77,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
         }
 
         // 2. DOI
-        Optional<DOI> doi = entry.getFieldOptional(FieldName.DOI).flatMap(DOI::build);
+        Optional<DOI> doi = entry.getField(FieldName.DOI).flatMap(DOI::build);
         if (doi.isPresent()) {
             String doiString = doi.get().getDOI();
             // Search for an entry in the ArXiv which is linked to the doi

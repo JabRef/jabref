@@ -20,17 +20,17 @@ import javax.swing.Timer;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.external.ExternalFileMenuItem;
-import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.BasePanelMode;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.externalfiletype.ExternalFileMenuItem;
+import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import net.sf.jabref.gui.filelist.FileListEntry;
+import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.menus.RightClickMenu;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
@@ -85,8 +85,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 new PreviewPanel(panel.getBibDatabaseContext(), null, panel,
                         Globals.prefs.get(JabRefPreferences.PREVIEW_1))};
 
-        panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[0]);
-        panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[1]);
+        panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable()
+                .addSearchListener(previewPanel[0])
+                .addSearchListener(previewPanel[1]);
 
         this.preview = previewPanel[activePreview];
     }
@@ -270,7 +271,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 for (String fieldName : fieldNames) {
                     // Check if field is present, if not skip this field
                     if (entry.hasField(fieldName)) {
-                        String link = entry.getFieldOptional(fieldName).get();
+                        String link = entry.getField(fieldName).get();
 
                         // See if this is a simple file link field, or if it is a file-list
                         // field that can specify a list of links:
@@ -315,7 +316,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 }
             });
         } else if (modelColumn.getBibtexFields().contains(FieldName.CROSSREF)) { // Clicking on crossref column
-            tableRows.get(row).getFieldOptional(FieldName.CROSSREF)
+            tableRows.get(row).getField(FieldName.CROSSREF)
                     .ifPresent(crossref -> panel.getDatabase().getEntryByKey(crossref).ifPresent(entry -> panel.highlightEntry(entry)));
         }
     }
@@ -381,7 +382,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 if (FieldName.FILE.equals(field)) {
                     // We use a FileListTableModel to parse the field content:
                     FileListTableModel fileList = new FileListTableModel();
-                    entry.getFieldOptional(field).ifPresent(fileList::setContent);
+                    entry.getField(field).ifPresent(fileList::setContent);
                     for (int i = 0; i < fileList.getRowCount(); i++) {
                         FileListEntry flEntry = fileList.getEntry(i);
                         if (column.isFileFilter()
@@ -402,7 +403,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                         // full pop should be shown as left click already shows short popup
                         showDefaultPopup = true;
                     } else {
-                        Optional<String> content = entry.getFieldOptional(field);
+                        Optional<String> content = entry.getField(field);
                         if (content.isPresent()) {
                             Icon icon;
                             JLabel iconLabel = GUIGlobals.getTableIcon(field);

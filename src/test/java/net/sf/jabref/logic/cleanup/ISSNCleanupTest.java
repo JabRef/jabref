@@ -3,6 +3,7 @@ package net.sf.jabref.logic.cleanup;
 import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.FileDirectoryPreferences;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 
@@ -19,7 +20,8 @@ public class ISSNCleanupTest {
 
     @Before
     public void setUp() {
-        worker = new CleanupWorker(mock(BibDatabaseContext.class), "", mock(LayoutFormatterPreferences.class));
+        worker = new CleanupWorker(mock(BibDatabaseContext.class), "", mock(LayoutFormatterPreferences.class),
+                mock(FileDirectoryPreferences.class));
     }
 
     @Test
@@ -29,7 +31,7 @@ public class ISSNCleanupTest {
         entry.setField("issn", "0123-4567");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("0123-4567"), entry.getFieldOptional("issn"));
+        Assert.assertEquals(Optional.of("0123-4567"), entry.getField("issn"));
     }
 
     @Test
@@ -39,7 +41,7 @@ public class ISSNCleanupTest {
         entry.setField("issn", "01234567");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("0123-4567"), entry.getFieldOptional("issn"));
+        Assert.assertEquals(Optional.of("0123-4567"), entry.getField("issn"));
     }
 
     @Test
@@ -49,7 +51,7 @@ public class ISSNCleanupTest {
         entry.setField("issn", "Banana");
 
         worker.cleanup(preset, entry);
-        Assert.assertEquals(Optional.of("Banana"), entry.getFieldOptional("issn"));
+        Assert.assertEquals(Optional.of("Banana"), entry.getField("issn"));
     }
 
 }

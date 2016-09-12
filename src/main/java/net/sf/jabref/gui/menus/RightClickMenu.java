@@ -19,13 +19,12 @@ import javax.swing.event.PopupMenuListener;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryMarker;
-import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.Actions;
+import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
-import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -96,7 +95,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             add(markSpecific);
             add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entries"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon()));
         } else if (be != null) {
-            Optional<String> marked = be.getFieldOptional(FieldName.MARKED_INTERNAL);
+            Optional<String> marked = be.getField(FieldName.MARKED_INTERNAL);
             // We have to check for "" too as the marked field may be empty
             if ((!marked.isPresent()) || marked.get().isEmpty()) {
                 add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entry"), IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon()));
@@ -234,15 +233,14 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     @Override
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
         panel.storeCurrentEdit();
-        GroupTreeNode groups = panel.getBibDatabaseContext().getMetaData().getGroups();
-        if (groups == null) {
-            groupAdd.setEnabled(false);
-            groupRemove.setEnabled(false);
-            groupMoveTo.setEnabled(false);
-        } else {
+        if (panel.getBibDatabaseContext().getMetaData().getGroups().isPresent()) {
             groupAdd.setEnabled(true);
             groupRemove.setEnabled(true);
             groupMoveTo.setEnabled(true);
+        } else {
+            groupAdd.setEnabled(false);
+            groupRemove.setEnabled(false);
+            groupMoveTo.setEnabled(false);
         }
     }
 
@@ -273,7 +271,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         if (panel.getMainTable().getSelectedRowCount() == 1) {
             BibEntry entry = panel.getMainTable().getSelected().get(0);
             if(entry.hasField(FieldName.FILE)) {
-                JLabel label = FileListTableModel.getFirstLabel(entry.getFieldOptional(FieldName.FILE).get());
+                JLabel label = FileListTableModel.getFirstLabel(entry.getField(FieldName.FILE).get());
                 if (label != null) {
                     return label.getIcon();
                 }

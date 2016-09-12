@@ -39,10 +39,9 @@ public class BibtexSingleField {
     private int length = DEFAULT_FIELD_LENGTH;
     private double weight = DEFAULT_FIELD_WEIGHT;
 
-    // the extras data
-    // fieldExtras contains mappings to tell the EntryEditor to add a specific
-    // function to this field, for instance a "browse" button for the "pdf" field.
-    private Set<FieldProperties> extras = EnumSet.noneOf(FieldProperties.class);
+    // properties contains a set of FieldProperty to e.g. tell the EntryEditor to add a specific
+    // function to this field, to format names, or to control the integrity checks.
+    private Set<FieldProperty> properties = EnumSet.noneOf(FieldProperty.class);
 
     // a comma separated list of alternative bibtex-fieldnames, e.g.
     // "LCCN" is the same like "lib-congress"
@@ -119,14 +118,14 @@ public class BibtexSingleField {
         return flags.contains(Flag.WRITEABLE);
     }
 
-    public void setExtras(Set<FieldProperties> pExtras) {
-        extras = pExtras;
+    public void setExtras(Set<FieldProperty> pExtras) {
+        properties = pExtras;
     }
 
     // fieldExtras contains mappings to tell the EntryEditor to add a specific
     // function to this field, for instance a "browse" button for the "pdf" field.
-    public Set<FieldProperties> getExtras() {
-        return extras;
+    public Set<FieldProperty> getFieldProperties() {
+        return properties;
     }
 
     public void setWeight(double value) {
@@ -157,15 +156,15 @@ public class BibtexSingleField {
      */
     public BibtexSingleField setNumeric(boolean numeric) {
         if (numeric) {
-            extras.add(FieldProperties.NUMERIC);
+            properties.add(FieldProperty.NUMERIC);
         } else {
-            extras.remove(FieldProperties.NUMERIC);
+            properties.remove(FieldProperty.NUMERIC);
         }
         return this;
     }
 
     public boolean isNumeric() {
-        return extras.contains(FieldProperties.NUMERIC);
+        return properties.contains(FieldProperty.NUMERIC);
     }
 
     public void setName(String fieldName) {

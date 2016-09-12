@@ -13,7 +13,6 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.importer.fileformat.ImportFormat;
@@ -64,7 +63,7 @@ public class BibEntryAssert {
         ParserResult result;
         try (Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
             BibtexParser parser = new BibtexParser(reader,
-                    ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
+                    JabRefPreferences.getInstance().getImportFormatPreferences());
             result = parser.parse();
         }
         Assert.assertNotNull(result);

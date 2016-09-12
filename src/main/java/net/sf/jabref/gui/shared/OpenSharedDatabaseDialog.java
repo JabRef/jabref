@@ -6,6 +6,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.Optional;
 import java.util.Set;
@@ -15,6 +17,7 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -35,12 +38,20 @@ import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.DatabaseLocation;
+import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.DBMSConnectionProperties;
 import net.sf.jabref.shared.DBMSConnector;
 import net.sf.jabref.shared.DBMSType;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
+import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
+import net.sf.jabref.shared.security.Password;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 public class OpenSharedDatabaseDialog extends JDialog {
+
+    private static final Log LOGGER = LogFactory.getLog(OpenSharedDatabaseDialog.class);
 
     private final JabRefFrame frame;
 
@@ -67,11 +78,9 @@ public class OpenSharedDatabaseDialog extends JDialog {
     private final JButton cancelButton = new JButton(Localization.lang("Cancel"));
     private final JButton helpButton = new HelpAction(HelpFile.SQL_DATABASE).getHelpButton();
 
-    private static final String SHARED_DATABASE_TYPE = "sharedDatabaseType";
-    private static final String SHARED_DATABASE_HOST = "sharedDatabaseHost";
-    private static final String SHARED_DATABASE_PORT = "sharedDatabasePort";
-    private static final String SHARED_DATABASE_NAME = "sharedDatabaseName";
-    private static final String SHARED_DATABASE_USER = "sharedDatabaseUser";
+    private final JCheckBox rememberPassword = new JCheckBox(Localization.lang("Remember password?"));
+
+    private final SharedDatabasePreferences prefs = new SharedDatabasePreferences();
 
     private DBMSConnectionProperties connectionProperties;
     private BibDatabaseContext bibDatabaseContext;
@@ -83,20 +92,25 @@ public class OpenSharedDatabaseDialog extends JDialog {
         super(frame, Localization.lang("Open shared database"));
         this.frame = frame;
         initLayout();
-        applyGlobalPrefs();
+        applyPreferences();
         setupActions();
         pack();
         setLocationRelativeTo(frame);
     }
 
     public void openSharedDatabase() {
+        setLoadingConnectButtonText(true);
+
         try {
             bibDatabaseContext.getDBSynchronizer().openSharedDatabase(connectionProperties);
             frame.addTab(bibDatabaseContext, true);
-            setGlobalPrefs();
-            bibDatabaseContext.getDBSynchronizer().registerListener(new SharedDatabaseUIManager(frame));
-            frame.output(Localization.lang("Connection_to_%0_server_stablished.", connectionProperties.getType().toString()));
+            setPreferences();
+            bibDatabaseContext.getDBSynchronizer()
+                    .registerListener(
+                            new SharedDatabaseUIManager(frame, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR)));
+            frame.output(Localization.lang("Connection_to_%0_server_established.", connectionProperties.getType().toString()));
             dispose();
+            return; // setLoadingConnectButtonText(false) should not be reached regularly.
         } catch (ClassNotFoundException exception) {
             JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this, exception.getMessage(),
                     Localization.lang("Driver error"), JOptionPane.ERROR_MESSAGE);
@@ -106,6 +120,8 @@ public class OpenSharedDatabaseDialog extends JDialog {
         } catch (DatabaseNotSupportedException exception) {
             new MigrationHelpDialog(this).setVisible(true);
         }
+
+        setLoadingConnectButtonText(false);
     }
 
     /**
@@ -121,7 +137,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
                     BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
 
                     bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode),
-                            DatabaseLocation.SHARED);
+                            DatabaseLocation.SHARED, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
 
                     connectionProperties = new DBMSConnectionProperties();
                     connectionProperties.setType((DBMSType) dbmsTypeDropDown.getSelectedItem());
@@ -132,7 +148,6 @@ public class OpenSharedDatabaseDialog extends JDialog {
                     connectionProperties.setPassword(new String(passwordField.getPassword())); //JPasswordField.getPassword() does not return a String, but a char array.
 
                     openSharedDatabase();
-
                 } catch (JabRefException exception) {
                     JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this, exception.getMessage(),
                             Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
@@ -163,12 +178,14 @@ public class OpenSharedDatabaseDialog extends JDialog {
     /**
      * Fetches possibly saved data and configures the control elements respectively.
      */
-    private void applyGlobalPrefs() {
-        Optional<String> sharedDatabaseType = Globals.prefs.getAsOptional(SHARED_DATABASE_TYPE);
-        Optional<String> sharedDatabaseHost = Globals.prefs.getAsOptional(SHARED_DATABASE_HOST);
-        Optional<String> sharedDatabasePort = Globals.prefs.getAsOptional(SHARED_DATABASE_PORT);
-        Optional<String> sharedDatabaseName = Globals.prefs.getAsOptional(SHARED_DATABASE_NAME);
-        Optional<String> sharedDatabaseUser = Globals.prefs.getAsOptional(SHARED_DATABASE_USER);
+    private void applyPreferences() {
+        Optional<String> sharedDatabaseType = prefs.getType();
+        Optional<String> sharedDatabaseHost = prefs.getHost();
+        Optional<String> sharedDatabasePort = prefs.getPort();
+        Optional<String> sharedDatabaseName = prefs.getName();
+        Optional<String> sharedDatabaseUser = prefs.getUser();
+        Optional<String> sharedDatabasePassword = prefs.getPassword();
+        boolean sharedDatabaseRememberPassword = prefs.getRememberPassword();
 
         if (sharedDatabaseType.isPresent()) {
             Optional<DBMSType> dbmsType = DBMSType.fromString(sharedDatabaseType.get());
@@ -194,6 +211,16 @@ public class OpenSharedDatabaseDialog extends JDialog {
         if (sharedDatabaseUser.isPresent()) {
             userField.setText(sharedDatabaseUser.get());
         }
+
+        if (sharedDatabasePassword.isPresent() && sharedDatabaseUser.isPresent()) {
+            try {
+                passwordField.setText(new Password(sharedDatabasePassword.get().toCharArray(), sharedDatabaseUser.get()).decrypt());
+            } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+                LOGGER.error("Could not read the password due to decryption problems.", e);
+            }
+        }
+
+        rememberPassword.setSelected(sharedDatabaseRememberPassword);
     }
 
     /**
@@ -258,6 +285,9 @@ public class OpenSharedDatabaseDialog extends JDialog {
         gridBagConstraints.gridy = 4;
         connectionPanel.add(passwordField, gridBagConstraints);
 
+        gridBagConstraints.gridy = 5;
+        connectionPanel.add(rememberPassword, gridBagConstraints);
+
         // 3. column
         gridBagConstraints.gridx = 2;
         gridBagConstraints.gridy = 1;
@@ -267,7 +297,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
 
         // help button
         gridBagConstraints.gridx = 0;
-        gridBagConstraints.gridy = 5;
+        gridBagConstraints.gridy = 6;
         gridBagConstraints.insets = new Insets(10, 10, 0, 0);
         JPanel helpPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         helpPanel.add(helpButton);
@@ -275,6 +305,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
 
         // control buttons
         gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridwidth = 2;
         buttonPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         buttonPanel.add(connectButton);
         buttonPanel.add(cancelButton);
@@ -284,6 +315,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
         getContentPane().setLayout(gridBagLayout);
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
+        gridBagConstraints.gridwidth = 1;
         gridBagConstraints.insets = new Insets(5, 5, 5, 5);
         gridBagLayout.setConstraints(connectionPanel, gridBagConstraints);
         getContentPane().add(connectionPanel);
@@ -294,12 +326,24 @@ public class OpenSharedDatabaseDialog extends JDialog {
     /**
      * Saves the data from this dialog persistently to facilitate the usage.
      */
-    public void setGlobalPrefs() {
-        Globals.prefs.put(SHARED_DATABASE_TYPE, ((DBMSType) dbmsTypeDropDown.getSelectedItem()).toString());
-        Globals.prefs.put(SHARED_DATABASE_HOST, hostField.getText());
-        Globals.prefs.put(SHARED_DATABASE_PORT, portField.getText());
-        Globals.prefs.put(SHARED_DATABASE_NAME, databaseField.getText());
-        Globals.prefs.put(SHARED_DATABASE_USER, userField.getText());
+    public void setPreferences() {
+        prefs.setType(((DBMSType) dbmsTypeDropDown.getSelectedItem()).toString());
+        prefs.setHost(hostField.getText());
+        prefs.setPort(portField.getText());
+        prefs.setName(databaseField.getText());
+        prefs.setUser(userField.getText());
+
+        if (rememberPassword.isSelected()) {
+            try {
+                prefs.setPassword(new Password(passwordField.getPassword(), userField.getText()).encrypt());
+            } catch (GeneralSecurityException | UnsupportedEncodingException e) {
+                LOGGER.error("Could not store the password due to encryption problems.", e);
+            }
+        } else {
+            prefs.clearPassword(); // for the case that the password is already set
+        }
+
+        prefs.setRememberPassword(rememberPassword.isSelected());
     }
 
     private boolean isEmptyField(JTextField field) {
@@ -326,6 +370,18 @@ public class OpenSharedDatabaseDialog extends JDialog {
         if (isEmptyField(userField)) {
             userField.requestFocus();
             throw new JabRefException(Localization.lang("Required_field_\"%0\"_is_empty.", Localization.lang("User")));
+        }
+    }
+
+    /**
+     * Sets the connectButton according to the current connection state.
+     */
+    private void setLoadingConnectButtonText(boolean isLoading) {
+        connectButton.setEnabled(!isLoading);
+        if (isLoading) {
+            connectButton.setText(Localization.lang("Connecting..."));
+        } else {
+            connectButton.setText(Localization.lang("Connect"));
         }
     }
 

@@ -1,10 +1,6 @@
 package net.sf.jabref.logic.layout.format;
 
-import java.util.Collections;
 import java.util.List;
-
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 public class FileLinkPreferences {
 
@@ -16,11 +12,6 @@ public class FileLinkPreferences {
     public FileLinkPreferences(List<String> generatedDirForDatabase, List<String> fileDirForDatabase) {
         this.generatedDirForDatabase = generatedDirForDatabase;
         this.fileDirForDatabase = fileDirForDatabase;
-    }
-
-    public static FileLinkPreferences fromPreferences(JabRefPreferences prefs) {
-        return new FileLinkPreferences(Collections.singletonList(prefs.get(FieldName.FILE + FileLinkPreferences.DIR_SUFFIX)),
-                prefs.fileDirForDatabase);
     }
 
     public List<String> getGeneratedDirForDatabase() {

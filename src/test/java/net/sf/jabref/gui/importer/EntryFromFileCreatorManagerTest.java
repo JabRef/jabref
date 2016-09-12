@@ -11,7 +11,6 @@ import java.util.List;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.ImportDataTest;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
@@ -50,7 +49,7 @@ public class EntryFromFileCreatorManagerTest {
     public void testAddEntrysFromFiles() throws FileNotFoundException, IOException {
         try (FileInputStream stream = new FileInputStream(ImportDataTest.UNLINKED_FILES_TEST_BIB);
                 InputStreamReader reader = new InputStreamReader(stream, StandardCharsets.UTF_8)) {
-            ParserResult result = BibtexParser.parse(reader, ImportFormatPreferences.fromPreferences(Globals.prefs));
+            ParserResult result = BibtexParser.parse(reader, Globals.prefs.getImportFormatPreferences());
             BibDatabase database = result.getDatabase();
 
             List<File> files = new ArrayList<>();
@@ -69,7 +68,7 @@ public class EntryFromFileCreatorManagerTest {
             boolean file1Found = false;
             boolean file2Found = false;
             for (BibEntry entry : database.getEntries()) {
-                String filesInfo = entry.getFieldOptional("file").get();
+                String filesInfo = entry.getField("file").get();
                 if (filesInfo.contains(files.get(0).getName())) {
                     file1Found = true;
                 }

@@ -6,11 +6,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.StringTokenizer;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.ExternalFileTypes;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
+import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
+import net.sf.jabref.gui.filelist.FileListEntry;
+import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -140,7 +141,8 @@ public abstract class EntryFromFileCreator implements FileFilter {
         Optional<ExternalFileType> fileType = ExternalFileTypes.getInstance()
                 .getExternalFileTypeByExt(externalFileType.getFieldName());
 
-        List<String> possibleFilePaths = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext().getFileDirectory();
+        List<String> possibleFilePaths = JabRefGUI.getMainFrame().getCurrentBasePanel().getBibDatabaseContext()
+                .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
         File shortenedFileName = FileUtil.shortenFileName(file, possibleFilePaths);
         FileListEntry fileListEntry = new FileListEntry("", shortenedFileName.getPath(), fileType);
 
@@ -154,7 +156,7 @@ public abstract class EntryFromFileCreator implements FileFilter {
         if ((value == null) || value.isEmpty()) {
             return;
         }
-        Optional<String> oVal = entry.getFieldOptional(field);
+        Optional<String> oVal = entry.getField(field);
         if (oVal.isPresent()) {
             // TODO: find Jabref constant for delimter
             if (!oVal.get().contains(value)) {
@@ -175,7 +177,7 @@ public abstract class EntryFromFileCreator implements FileFilter {
 
     protected void addEntryDataToEntry(BibEntry entry, BibEntry e) {
         for (String field : e.getFieldNames()) {
-            e.getFieldOptional(field).ifPresent(fieldContent -> appendToField(entry, field, fieldContent));
+            e.getField(field).ifPresent(fieldContent -> appendToField(entry, field, fieldContent));
         }
     }
 

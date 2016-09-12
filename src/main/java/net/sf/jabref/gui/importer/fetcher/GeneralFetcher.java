@@ -76,7 +76,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         HelpAction help = new HelpAction(activeFetcher.getHelpPage());
         JButton helpBut = help.getHelpButton();
         helpBut.setEnabled(activeFetcher.getHelpPage() != null);
-        
+
         fetcherChoice.addActionListener(actionEvent -> {
             activeFetcher = fetcherArray[fetcherChoice.getSelectedIndex()];
             Globals.prefs.putInt(JabRefPreferences.SELECTED_FETCHER_INDEX, fetcherChoice.getSelectedIndex());
@@ -146,11 +146,8 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         gbl.setConstraints(helpBut, con);
         main.add(helpBut);
 
-        JPanel pan = new JPanel();
-        if (pan != null) {
-            gbl.setConstraints(optPanel, con);
-            main.add(optPanel);
-        }
+        gbl.setConstraints(optPanel, con);
+        main.add(optPanel);
 
         main.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
         add(main, BorderLayout.CENTER);

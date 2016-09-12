@@ -4,8 +4,10 @@ import java.io.File;
 import java.io.FileFilter;
 
 import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.util.io.DatabaseFileLookup;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * {@link FileFilter} implementation, that allows only files which are not
@@ -28,7 +30,7 @@ public class UnlinkedPDFFileFilter implements FileFilter {
 
     public UnlinkedPDFFileFilter(FileFilter fileFilter, BibDatabaseContext databaseContext) {
         this.fileFilter = fileFilter;
-        this.lookup = new DatabaseFileLookup(databaseContext);
+        this.lookup = new DatabaseFileLookup(databaseContext, Globals.prefs.getFileDirectoryPreferences());
     }
 
     @Override

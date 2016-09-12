@@ -9,12 +9,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.xml.transform.TransformerException;
+
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
@@ -279,8 +281,8 @@ public class XMPSchemaBibtex extends XMPSchema {
         }
 
         for (String field : fields) {
-            String value = BibDatabase.getResolvedField(field, entry, database).orElse("");
-            if (InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES)) {
+            String value = entry.getResolvedFieldOrAlias(field, database).orElse("");
+            if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES)) {
                 setPersonList(field, value);
             } else {
                 setTextProperty(field, value);

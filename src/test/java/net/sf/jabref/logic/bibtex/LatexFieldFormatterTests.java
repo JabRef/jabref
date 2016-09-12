@@ -14,8 +14,7 @@ public class LatexFieldFormatterTests {
 
     @Before
     public void setUp() {
-        this.formatter = new LatexFieldFormatter(
-                LatexFieldFormatterPreferences.fromPreferences(JabRefPreferences.getInstance()));
+        this.formatter = new LatexFieldFormatter(JabRefPreferences.getInstance().getLatexFieldFormatterPreferences());
     }
 
     @Test

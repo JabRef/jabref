@@ -13,14 +13,7 @@ import javax.swing.JOptionPane;
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.ExternalFileTypeEntryEditor;
-import net.sf.jabref.external.ExternalFileTypes;
-import net.sf.jabref.external.UnknownExternalFileType;
 import net.sf.jabref.gui.ClipBoardManager;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListEntryEditor;
-import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.desktop.os.DefaultDesktop;
@@ -28,6 +21,13 @@ import net.sf.jabref.gui.desktop.os.Linux;
 import net.sf.jabref.gui.desktop.os.NativeDesktop;
 import net.sf.jabref.gui.desktop.os.OSX;
 import net.sf.jabref.gui.desktop.os.Windows;
+import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypeEntryEditor;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
+import net.sf.jabref.gui.externalfiletype.UnknownExternalFileType;
+import net.sf.jabref.gui.filelist.FileListEntry;
+import net.sf.jabref.gui.filelist.FileListEntryEditor;
+import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.DOI;
@@ -61,7 +61,7 @@ public class JabRefDesktop {
         String fieldName = initialFieldName;
         if (FieldName.PS.equals(fieldName) || FieldName.PDF.equals(fieldName)) {
             // Find the default directory for this field type:
-            List<String> dir = databaseContext.getFileDirectory(fieldName);
+            List<String> dir = databaseContext.getFileDirectory(fieldName, Globals.prefs.getFileDirectoryPreferences());
 
             Optional<File> file = FileUtil.expandFilename(link, dir);
 
@@ -144,7 +144,8 @@ public class JabRefDesktop {
         File file = new File(link);
 
         if (!httpLink) {
-            Optional<File> tmp = FileUtil.expandFilename(databaseContext, link);
+            Optional<File> tmp = FileUtil.expandFilename(databaseContext, link,
+                    Globals.prefs.getFileDirectoryPreferences());
             if (tmp.isPresent()) {
                 file = tmp.get();
             }
@@ -214,7 +215,7 @@ public class JabRefDesktop {
             // User wants to change the type of this link.
             // First get a model of all file links for this entry:
             FileListTableModel tModel = new FileListTableModel();
-            Optional<String> oldValue = entry.getFieldOptional(FieldName.FILE);
+            Optional<String> oldValue = entry.getField(FieldName.FILE);
             oldValue.ifPresent(tModel::setContent);
             FileListEntry flEntry = null;
             // Then find which one we are looking at:

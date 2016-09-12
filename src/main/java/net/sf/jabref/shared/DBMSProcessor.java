@@ -27,7 +27,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public abstract class DBMSProcessor {
 
-    protected static final Log LOGGER = LogFactory.getLog(DBMSConnector.class);
+    protected static final Log LOGGER = LogFactory.getLog(DBMSProcessor.class);
 
     protected final Connection connection;
 
@@ -187,7 +187,7 @@ public abstract class DBMSProcessor {
                         // columnIndex starts with 1
                         preparedFieldStatement.setInt(1, bibEntry.getSharedBibEntryData().getSharedID());
                         preparedFieldStatement.setString(2, fieldName);
-                        preparedFieldStatement.setString(3, bibEntry.getFieldOptional(fieldName).get());
+                        preparedFieldStatement.setString(3, bibEntry.getField(fieldName).get());
                         preparedFieldStatement.executeUpdate();
                     }
                 }
@@ -288,7 +288,7 @@ public abstract class DBMSProcessor {
     private void insertOrUpdateFields(BibEntry localBibEntry) throws SQLException {
         for (String fieldName : localBibEntry.getFieldNames()) {
             // avoiding to use deprecated BibEntry.getField() method. null values are accepted by PreparedStatement!
-            Optional<String> valueOptional = localBibEntry.getFieldOptional(fieldName);
+            Optional<String> valueOptional = localBibEntry.getField(fieldName);
             String value = null;
             if (valueOptional.isPresent()) {
                 value = valueOptional.get();

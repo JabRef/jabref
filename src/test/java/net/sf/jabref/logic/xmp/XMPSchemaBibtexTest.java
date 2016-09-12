@@ -43,7 +43,7 @@ public class XMPSchemaBibtexTest {
         Assert.assertEquals(e.getFieldNames().size(), x.getFieldNames().size());
 
         for (String name : e.getFieldNames()) {
-            Assert.assertEquals(e.getFieldOptional(name), x.getFieldOptional(name));
+            Assert.assertEquals(e.getField(name), x.getField(name));
         }
     }
 

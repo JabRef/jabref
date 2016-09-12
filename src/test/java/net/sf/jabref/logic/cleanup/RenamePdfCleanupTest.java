@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Defaults;
-import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
@@ -31,11 +30,11 @@ public class RenamePdfCleanupTest {
     public TemporaryFolder testFolder = new TemporaryFolder();
     private BibDatabaseContext context;
     private BibEntry entry;
+    private JabRefPreferences prefs;
 
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = mock(JabRefPreferences.class);
-
+        prefs = JabRefPreferences.getInstance();
         MetaData metaData = new MetaData();
         context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
         context.setDatabaseFile(testFolder.newFile("test.bib"));
@@ -55,11 +54,11 @@ public class RenamePdfCleanupTest {
         entry.setField("file", FileField.getStringRepresentation(fileField));
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                mock(LayoutFormatterPreferences.class));
+                mock(LayoutFormatterPreferences.class), prefs.getFileDirectoryPreferences());
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot.tmp", "");
-        assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getFieldOptional("file"));
+        assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
     @Test
@@ -72,13 +71,13 @@ public class RenamePdfCleanupTest {
                 new ParsedFileField("", tempFile.getAbsolutePath(), ""), new ParsedFileField("","",""))));
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                mock(LayoutFormatterPreferences.class));
+                mock(LayoutFormatterPreferences.class), prefs.getFileDirectoryPreferences());
         cleanup.cleanup(entry);
 
         assertEquals(
                 Optional.of(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("", "", ""),
                         new ParsedFileField("", "Toot - test title.tmp", ""), new ParsedFileField("", "", "")))),
-                entry.getFieldOptional("file"));
+                entry.getField("file"));
     }
 
     @Test
@@ -90,11 +89,11 @@ public class RenamePdfCleanupTest {
         entry.setField("title", "test title");
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                mock(LayoutFormatterPreferences.class));
+                mock(LayoutFormatterPreferences.class), prefs.getFileDirectoryPreferences());
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot - test title.tmp", "");
-        assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getFieldOptional("file"));
+        assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 
     @Test
@@ -106,10 +105,11 @@ public class RenamePdfCleanupTest {
         entry.setField("title", "test title");
 
         RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
-                LayoutFormatterPreferences.fromPreferences(Globals.prefs, mock(JournalAbbreviationLoader.class)));
+                prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
+                prefs.getFileDirectoryPreferences());
         cleanup.cleanup(entry);
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot - test title.pdf", "PDF");
-        assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getFieldOptional("file"));
+        assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
     }
 }

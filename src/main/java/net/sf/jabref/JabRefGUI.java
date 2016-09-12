@@ -23,7 +23,6 @@ import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
 import net.sf.jabref.gui.importer.worker.AutosaveStartupPrompter;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.worker.VersionWorker;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
@@ -57,7 +56,7 @@ public class JabRefGUI {
 
         // passed file (we take the first one) should be focused
         if (!argsDatabases.isEmpty()) {
-            focusedFile = argsDatabases.get(0).getFile().getAbsolutePath();
+            focusedFile = argsDatabases.get(0).getFile().get().getAbsolutePath();
         } else {
             focusedFile = Globals.prefs.get(JabRefPreferences.LAST_FOCUSED);
         }
@@ -112,7 +111,7 @@ public class JabRefGUI {
                 ParserResult pr = parserResultIterator.next();
 
                 // Define focused tab
-                if ((focusedFile != null) && pr.getFile().getAbsolutePath().equals(focusedFile)) {
+                if (pr.getFile().get().getAbsolutePath().equals(focusedFile)) {
                     first = true;
                 }
 
@@ -130,7 +129,7 @@ public class JabRefGUI {
                     }
                 } else {
                     parserResultIterator.remove();
-                    postponed.add(pr.getFile());
+                    postponed.add(pr.getFile().get());
                 }
             }
         }
@@ -146,21 +145,15 @@ public class JabRefGUI {
             Globals.startAutoSaveManager(JabRefGUI.getMainFrame());
         }
 
-        // If we are set to remember the window location, we also remember the maximised
-        // state. This needs to be set after the window has been made visible, so we
-        // do it here:
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
             JabRefGUI.getMainFrame().setExtendedState(JFrame.MAXIMIZED_BOTH);
         }
 
         JabRefGUI.getMainFrame().setVisible(true);
 
-        if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-            JabRefGUI.getMainFrame().setExtendedState(JFrame.MAXIMIZED_BOTH);
-        }
-
         for (ParserResult pr : failed) {
-            String message = "<html>" + Localization.lang("Error opening file '%0'.", pr.getFile().getName()) + "<p>"
+            String message = "<html>" + Localization.lang("Error opening file '%0'.", pr.getFile().get().getName())
+                    + "<p>"
                     + pr.getErrorMessage() + "</html>";
 
             JOptionPane.showMessageDialog(JabRefGUI.getMainFrame(), message, Localization.lang("Error opening file"),
@@ -218,7 +211,7 @@ public class JabRefGUI {
             }
 
             ParserResult parsedDatabase = OpenDatabase.loadDatabaseOrAutoSave(fileName, false,
-                    ImportFormatPreferences.fromPreferences(Globals.prefs));
+                    Globals.prefs.getImportFormatPreferences());
 
             if (parsedDatabase.isNullResult()) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + dbFile.getPath() + "'");
@@ -230,7 +223,7 @@ public class JabRefGUI {
 
     private boolean isLoaded(File fileToOpen) {
         for (ParserResult pr : bibDatabases) {
-            if ((pr.getFile() != null) && pr.getFile().equals(fileToOpen)) {
+            if (pr.getFile().isPresent() && pr.getFile().get().equals(fileToOpen)) {
                 return true;
             }
         }

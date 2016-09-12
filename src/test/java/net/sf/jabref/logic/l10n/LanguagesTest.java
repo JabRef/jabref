@@ -1,5 +1,6 @@
 package net.sf.jabref.logic.l10n;
 
+import java.util.Locale;
 import java.util.Optional;
 
 import org.junit.Test;
@@ -7,17 +8,33 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class LanguagesTest {
+    @Test
+    public void convertKnownLanguageOnly() {
+        assertEquals(Optional.of(new Locale("en")), Languages.convertToSupportedLocale("en"));
+    }
 
     @Test
-    public void testConvertToKnownLocale() {
-        assertEquals(Optional.of("en"), Languages.convertToKnownLocale("en"));
-        assertEquals(Optional.of("en"), Languages.convertToKnownLocale("en_US"));
-        assertEquals(Optional.of("de"), Languages.convertToKnownLocale("de_DE"));
-        assertEquals(Optional.empty(), Languages.convertToKnownLocale("WHATEVER"));
+    public void convertUnknownLanguage() {
+        assertEquals(Optional.empty(), Languages.convertToSupportedLocale("This is not a locale"));
+    }
+
+    @Test
+    public void convertKnownLanguageAndCountryOnly() {
+        assertEquals(Optional.of(new Locale("en")), Languages.convertToSupportedLocale("en_US"));
+    }
+
+    @Test
+    public void convertKnownLanguageAndUnknownCountry() {
+        assertEquals(Optional.of(new Locale("en")), Languages.convertToSupportedLocale("en_GB_unknownvariant"));
+    }
+
+    @Test
+    public void convertUnknownKnownLanguageAndUnknownCountry() {
+        assertEquals(Optional.empty(), Languages.convertToSupportedLocale("language_country_variant"));
     }
 
     @Test(expected = NullPointerException.class)
-    public void testConvertToKnownLocaleNull() {
-        Languages.convertToKnownLocale(null);
+    public void convertToKnownLocaleNull() {
+        Languages.convertToSupportedLocale(null);
     }
 }

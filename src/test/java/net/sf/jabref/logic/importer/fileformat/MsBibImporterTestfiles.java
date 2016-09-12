@@ -2,12 +2,14 @@ package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.model.entry.BibEntry;
@@ -25,35 +27,39 @@ public class MsBibImporterTestfiles {
 
     @Parameter
     public String fileName;
+    public Path resourceDir;
 
-    private Path xmlFile;
 
     @Before
-    public void setUp() throws URISyntaxException {
-        xmlFile = Paths.get(MsBibImporter.class.getResource(fileName + ".xml").toURI());
+    public void setUp() throws Exception {
+        resourceDir = Paths.get(MsBibImporterTestfiles.class.getResource("").toURI());
     }
 
-    @Parameters(name = "{index}: {0}")
-    public static Collection<Object[]> fileNames() {
-        Object[][] data = new Object[][] {{"MsBibImporterTest1"}, {"MsBibImporterTest2"}, {"MsBibImporterTest3"},
-                {"MsBibImporterTest4"}, {"MsBibImporterTest5"}, {"MsBibImporterTest6"}, {"MsBibLCID"}};
-        return Arrays.asList(data);
+    @Parameters(name = "{0}")
+    public static Collection<String> fileNames() throws IOException, URISyntaxException {
+        try (Stream<Path> stream = Files.list(Paths.get(MsBibImporterTestfiles.class.getResource("").toURI()))) {
+            return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".xml"))
+                    .filter(n -> n.startsWith("MsBib")).collect(Collectors.toList());
+        }
     }
-
 
     @Test
     public final void testIsRecognizedFormat() throws Exception {
         MsBibImporter testImporter = new MsBibImporter();
-        Assert.assertTrue(testImporter.isRecognizedFormat(xmlFile, Charset.defaultCharset()));
+        Path xmlFile = resourceDir.resolve(fileName);
+
+        Assert.assertTrue(testImporter.isRecognizedFormat(xmlFile, StandardCharsets.UTF_8));
     }
 
-
     @Test
-    public void testImportEntries() throws IOException {
+    public void testImportEntries() throws Exception {
 
-        String bibFileName = fileName + ".bib";
+        String bibFileName = fileName.replace(".xml", ".bib");
         MsBibImporter testImporter = new MsBibImporter();
-        List<BibEntry> result = testImporter.importDatabase(xmlFile, Charset.defaultCharset()).getDatabase().getEntries();
+
+        Path xmlFile = resourceDir.resolve(fileName);
+
+        List<BibEntry> result = testImporter.importDatabase(xmlFile, StandardCharsets.UTF_8).getDatabase().getEntries();
         BibEntryAssert.assertEquals(MsBibImporterTest.class, bibFileName, result);
     }
 

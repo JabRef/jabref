@@ -43,7 +43,6 @@ import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -78,6 +77,7 @@ import net.sf.jabref.gui.importer.UnlinkedPDFFileFilter;
 import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -151,7 +151,6 @@ public class FindUnlinkedFilesDialog extends JDialog {
     private JComboBox<BibtexEntryTypeWrapper> comboBoxEntryTypeSelection;
     private JProgressBar progressBarSearching;
     private JProgressBar progressBarImporting;
-    private JFileChooser fileChooser;
 
     private MouseListener treeMouseListener;
     private Action actionSelectAll;

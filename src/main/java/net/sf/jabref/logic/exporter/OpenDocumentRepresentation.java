@@ -148,13 +148,13 @@ class OpenDocumentRepresentation {
                 addTableCell(result, row, getField(e, BibEntry.KEY_FIELD));
                 addTableCell(result, row, new GetOpenOfficeType().format(e.getType()));
                 addTableCell(result, row, getField(e, FieldName.ADDRESS));
-                addTableCell(result, row, getField(e, "assignee"));
+                addTableCell(result, row, getField(e, FieldName.ASSIGNEE));
                 addTableCell(result, row, getField(e, FieldName.ANNOTE));
                 addTableCell(result, row, getField(e, FieldName.AUTHOR));//new AuthorLastFirst().format(getField(e, FieldName.AUTHOR_FIELD)));
                 addTableCell(result, row, getField(e, FieldName.BOOKTITLE));
                 addTableCell(result, row, getField(e, FieldName.CHAPTER));
-                addTableCell(result, row, getField(e, "day"));
-                addTableCell(result, row, getField(e, "dayfiled"));
+                addTableCell(result, row, getField(e, FieldName.DAY));
+                addTableCell(result, row, getField(e, FieldName.DAYFILED));
                 addTableCell(result, row, getField(e, FieldName.EDITION));
                 addTableCell(result, row, getField(e, FieldName.EDITOR));//new AuthorLastFirst().format(getField(e, FieldName.EDITOR_FIELD)));
                 addTableCell(result, row, getField(e, FieldName.HOWPUBLISHED));
@@ -162,21 +162,21 @@ class OpenDocumentRepresentation {
                 addTableCell(result, row, getField(e, FieldName.JOURNAL));
                 addTableCell(result, row, getField(e, FieldName.LANGUAGE));
                 addTableCell(result, row, getField(e, FieldName.MONTH));
-                addTableCell(result, row, getField(e, "monthfiled"));
-                addTableCell(result, row, getField(e, "nationality"));
+                addTableCell(result, row, getField(e, FieldName.MONTHFILED));
+                addTableCell(result, row, getField(e, FieldName.NATIONALITY));
                 addTableCell(result, row, getField(e, FieldName.NOTE));
                 addTableCell(result, row, getField(e, FieldName.NUMBER));
                 addTableCell(result, row, getField(e, FieldName.ORGANIZATION));
                 addTableCell(result, row, getField(e, FieldName.PAGES));
                 addTableCell(result, row, getField(e, FieldName.PUBLISHER));
-                addTableCell(result, row, getField(e, "revision"));
+                addTableCell(result, row, getField(e, FieldName.REVISION));
                 addTableCell(result, row, getField(e, FieldName.SCHOOL));
                 addTableCell(result, row, getField(e, FieldName.SERIES));
                 addTableCell(result, row, new RemoveWhitespace().format(new RemoveBrackets().format(getField(e, FieldName.TITLE))));
                 addTableCell(result, row, getField(e, "reporttype"));
                 addTableCell(result, row, getField(e, FieldName.VOLUME));
                 addTableCell(result, row, getField(e, FieldName.YEAR));
-                addTableCell(result, row, getField(e, "yearfiled"));
+                addTableCell(result, row, getField(e, FieldName.YEARFILED));
                 addTableCell(result, row, getField(e, FieldName.URL));
                 addTableCell(result, row, "");
                 addTableCell(result, row, "");
@@ -199,7 +199,7 @@ class OpenDocumentRepresentation {
     }
 
     private String getField(BibEntry e, String field) {
-        return BibDatabase.getResolvedField(field, e, database).orElse("");
+        return e.getResolvedFieldOrAlias(field, database).orElse("");
     }
 
     private void addTableCell(Document doc, Element parent, String content) {

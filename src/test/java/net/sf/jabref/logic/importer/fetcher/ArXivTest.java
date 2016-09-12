@@ -134,7 +134,7 @@ public class ArXivTest {
     public void searchEntryByIdWith5Digits() throws Exception {
         assertEquals(Optional.of(
                 "An Optimal Convergence Theorem for Mean Curvature Flow of Arbitrary Codimension in Hyperbolic Spaces"),
-                finder.performSearchById("1503.06747").flatMap(entry -> entry.getFieldOptional("title")));
+                finder.performSearchById("1503.06747").flatMap(entry -> entry.getField("title")));
     }
 
     @Test

@@ -717,7 +717,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
         String authorField = getStringCitProperty(AUTHOR_FIELD);
         String[] fields = field.split(FieldName.FIELD_SEPARATOR);
         for (String s : fields) {
-            Optional<String> content = BibDatabase.getResolvedField(s, entry, database);
+            Optional<String> content = entry.getResolvedFieldOrAlias(s, database);
 
             if ((content.isPresent()) && !content.get().trim().isEmpty()) {
                 if (field.equals(authorField) && StringUtil.isInCurlyBrackets(content.get())) {
@@ -743,12 +743,8 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
 
         if (al.getNumberOfAuthors() > number) {
             Author a = al.getAuthor(number);
-            if ((a.getVon() != null) && !a.getVon().isEmpty()) {
-                String von = a.getVon();
-                sb.append(von);
-                sb.append(' ');
-            }
-            sb.append(a.getLast());
+            a.getVon().filter(von -> !von.isEmpty()).ifPresent(von -> sb.append(von).append(' '));
+            sb.append(a.getLast().orElse(""));
         }
 
         return sb.toString();

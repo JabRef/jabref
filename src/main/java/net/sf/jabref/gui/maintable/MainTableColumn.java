@@ -12,7 +12,7 @@ import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperties;
+import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 
 public class MainTableColumn {
@@ -94,9 +94,9 @@ public class MainTableColumn {
 
         Optional<String> content = Optional.empty();
         for (String field : bibtexFields) {
-            content = BibDatabase.getResolvedField(field, entry, database.orElse(null));
+            content = entry.getResolvedFieldOrAlias(field, database.orElse(null));
             if (content.isPresent()) {
-                isNameColumn = InternalBibtexFields.getFieldExtras(field).contains(FieldProperties.PERSON_NAMES);
+                isNameColumn = InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES);
                 break;
             }
         }
@@ -127,7 +127,7 @@ public class MainTableColumn {
      * The reasons for being different are (combinations may also happen):
      * - The entry has a crossref where the field content is obtained from
      * - The field has a string in it (which getColumnValue() resolves)
-     * - There are some alias fields. For example, if the entry has a date field but no year field, getResolvedField()
+     * - There are some alias fields. For example, if the entry has a date field but no year field, getResolvedFieldOrAlias()
      *   will return the year value from the date field when queried for year
      *
      *
@@ -147,8 +147,8 @@ public class MainTableColumn {
                     || BibEntry.KEY_FIELD.equals(field)) {
                 return false;
             } else {
-                plainFieldContent = entry.getFieldOptional(field);
-                resolvedFieldContent = BibDatabase.getResolvedField(field, entry, database.orElse(null));
+                plainFieldContent = entry.getField(field);
+                resolvedFieldContent = entry.getResolvedFieldOrAlias(field, database.orElse(null));
             }
 
             if (resolvedFieldContent.isPresent()) {

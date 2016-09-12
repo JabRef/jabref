@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.Charset;
@@ -199,7 +200,8 @@ public class PdfContentImporter extends ImportFormat {
     @Override
     public ParserResult importDatabase(Path filePath, Charset defaultEncoding) {
         final ArrayList<BibEntry> result = new ArrayList<>(1);
-        try (PDDocument document = XMPUtil.loadWithAutomaticDecryption(filePath)) {
+        try (FileInputStream fileStream = new FileInputStream(filePath.toFile());
+                PDDocument document = XMPUtil.loadWithAutomaticDecryption(fileStream)) {
             String firstPageContents = getFirstPageContents(document);
 
             Optional<DOI> doi = DOI.findInText(firstPageContents);
@@ -207,7 +209,7 @@ public class PdfContentImporter extends ImportFormat {
                 ParserResult parserResult = new ParserResult(result);
                 Optional<BibEntry> entry = DOItoBibTeX.getEntryFromDOI(doi.get().getDOI(), parserResult,
                         importFormatPreferences);
-                entry.ifPresent(parserResult.getDatabase()::insertEntry);
+                entry.ifPresent(parserResult.getDatabase()::insertEntryWithDuplicationCheck);
                 return parserResult;
             }
 

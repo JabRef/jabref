@@ -2,14 +2,12 @@ package net.sf.jabref.logic.layout;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.logic.layout.format.NameFormatterPreferences;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 public class LayoutFormatterPreferences {
 
@@ -26,16 +24,6 @@ public class LayoutFormatterPreferences {
         this.journalAbbreviationPreferences = journalAbbreviationPreferences;
         this.fileLinkPreferences = fileLinkPreferences;
         this.journalAbbreviationLoader = journalAbbreviationLoader;
-    }
-
-    public static LayoutFormatterPreferences fromPreferences(JabRefPreferences jabRefPreferences,
-            JournalAbbreviationLoader journalAbbreviationLoader) {
-        Objects.requireNonNull(jabRefPreferences);
-        Objects.requireNonNull(journalAbbreviationLoader);
-        return new LayoutFormatterPreferences(NameFormatterPreferences.fromPreferences(jabRefPreferences),
-                JournalAbbreviationPreferences.fromPreferences(jabRefPreferences),
-                FileLinkPreferences.fromPreferences(jabRefPreferences),
-                journalAbbreviationLoader);
     }
 
     public NameFormatterPreferences getNameFormatterPreferences() {

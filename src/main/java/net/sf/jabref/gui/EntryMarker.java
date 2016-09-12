@@ -29,7 +29,7 @@ public class EntryMarker {
         int prevMarkLevel;
         String newValue = null;
         if (be.hasField(FieldName.MARKED_INTERNAL)) {
-            String markerString = be.getFieldOptional(FieldName.MARKED_INTERNAL).get();
+            String markerString = be.getField(FieldName.MARKED_INTERNAL).get();
             int index = markerString.indexOf(Globals.prefs.getWrappedUsername());
             if (index >= 0) {
                 // Already marked 1 for this user.
@@ -57,7 +57,7 @@ public class EntryMarker {
         }
 
         ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED_INTERNAL,
-                be.getFieldOptional(FieldName.MARKED_INTERNAL).orElse(null), newValue));
+                be.getField(FieldName.MARKED_INTERNAL).orElse(null), newValue));
         be.setField(FieldName.MARKED_INTERNAL, newValue);
     }
 
@@ -66,7 +66,7 @@ public class EntryMarker {
      */
     public static void unmarkEntry(BibEntry be, boolean onlyMaxLevel, BibDatabase database, NamedCompound ce) {
         if (be.hasField(FieldName.MARKED_INTERNAL)) {
-            String markerString = be.getFieldOptional(FieldName.MARKED_INTERNAL).get();
+            String markerString = be.getField(FieldName.MARKED_INTERNAL).get();
             if ("0".equals(markerString)) {
                 if (!onlyMaxLevel) {
                     unmarkOldStyle(be, database, ce);
@@ -121,7 +121,7 @@ public class EntryMarker {
             }
             String newVal = sb.length() > 0 ? sb.toString() : null;*/
             ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED_INTERNAL,
-                    be.getFieldOptional(FieldName.MARKED_INTERNAL).get(), newValue));
+                    be.getField(FieldName.MARKED_INTERNAL).get(), newValue));
             if (newValue == null) {
                 be.clearField(FieldName.MARKED_INTERNAL);
             } else {
@@ -144,7 +144,7 @@ public class EntryMarker {
     private static void unmarkOldStyle(BibEntry be, BibDatabase database, NamedCompound ce) {
         Set<Object> owners = new TreeSet<>();
         for (BibEntry entry : database.getEntries()) {
-            entry.getFieldOptional(FieldName.OWNER).ifPresent(owners::add);
+            entry.getField(FieldName.OWNER).ifPresent(owners::add);
         }
         owners.remove(Globals.prefs.get(JabRefPreferences.DEFAULT_OWNER));
         StringBuilder sb = new StringBuilder();
@@ -156,11 +156,11 @@ public class EntryMarker {
         String newVal = sb.toString();
         if (newVal.isEmpty()) {
             ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED_INTERNAL,
-                    be.getFieldOptional(FieldName.MARKED_INTERNAL).orElse(null), null));
+                    be.getField(FieldName.MARKED_INTERNAL).orElse(null), null));
             be.clearField(FieldName.MARKED_INTERNAL);
         } else {
             ce.addEdit(new UndoableFieldChange(be, FieldName.MARKED_INTERNAL,
-                    be.getFieldOptional(FieldName.MARKED_INTERNAL).orElse(null), newVal));
+                    be.getField(FieldName.MARKED_INTERNAL).orElse(null), newVal));
             be.setField(FieldName.MARKED_INTERNAL, newVal);
         }
     }
@@ -169,7 +169,7 @@ public class EntryMarker {
         if (!be.hasField(FieldName.MARKED_INTERNAL)) {
             return 0;
         }
-        String s = be.getFieldOptional(FieldName.MARKED_INTERNAL).get();
+        String s = be.getField(FieldName.MARKED_INTERNAL).get();
         if ("0".equals(s)) {
             return 1;
         }

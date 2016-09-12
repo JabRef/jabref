@@ -6,6 +6,7 @@ import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -56,8 +57,8 @@ public class GroupAddRemoveDialog implements BaseAction {
 
     @Override
     public void action() throws Throwable {
-        GroupTreeNode groups = panel.getBibDatabaseContext().getMetaData().getGroups();
-        if (groups == null) {
+        Optional<GroupTreeNode> groups = panel.getBibDatabaseContext().getMetaData().getGroups();
+        if (!groups.isPresent()) {
             return;
         }
 
@@ -69,7 +70,7 @@ public class GroupAddRemoveDialog implements BaseAction {
                 true);
         JButton ok = new JButton(Localization.lang("OK"));
         JButton cancel = new JButton(Localization.lang("Cancel"));
-        tree = new JTree(new GroupTreeNodeViewModel(groups));
+        tree = new JTree(new GroupTreeNodeViewModel(groups.get()));
         tree.setCellRenderer(new AddRemoveGroupTreeCellRenderer());
         tree.setVisibleRowCount(22);
 
