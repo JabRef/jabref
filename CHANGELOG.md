@@ -42,7 +42,6 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Entries in the SearchResultDialog are now converted to Unicode
 - Suggestions in the autocomplete (search) are now in Unicode
 - Fixed NullPointerException when opening search result window for an untitled database 
-- Fixed #1757: Crash after saving illegal argument in entry editor
 - Fixed entry table traversal with Tab (no column traversal thus no double jump)
 - Fixed [#1757](https://github.com/JabRef/jabref/issues/1757): Crash after saving illegal argument in entry editor
 - Fixed [#1663](https://github.com/JabRef/jabref/issues/1663): Better multi-monitor support
