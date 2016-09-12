@@ -30,6 +30,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - `note` field is now exported as `comments` field in MS-Office 2007 xml format
 - `comments` field in MS-Office 2007 xml format is now imported as `note` field
 - [#463](https://github.com/JabRef/jabref/issues/463): Disable menu-item and toolbar-buttons while no database is open
+- Implemented integrity check for `note` and `howpublished` field: Should have the first letter capitalized (BibTeX)
 
 ### Fixed
 - Fixed selecting an entry out of multiple duplicates
@@ -49,6 +50,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed field `key` field is not exported to MS-Office 2008 xml format
 - Fixed download files failed silently when an invalid directory is selected
 - Fixed [#1949](https://github.com/JabRef/jabref/issues/1949): Error message directs to the wrong preference tab
+- Fixed InvalidBackgroundColor flickering with Ctrl-s and File > Save database
 
 ### Removed
 - The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field. 

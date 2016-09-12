@@ -294,7 +294,8 @@ public class ArgumentProcessor {
                 try {
                     System.out.println(Localization.lang("Saving") + ": " + subName);
                     SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
-                    BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
+                    BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
+                            FileSaveSession::new);
                     Defaults defaults = new Defaults(BibDatabaseMode
                             .fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
                     SaveSession session = databaseWriter.saveDatabase(new BibDatabaseContext(newBase, defaults),
@@ -338,7 +339,8 @@ public class ArgumentProcessor {
                         SavePreferences prefs = SavePreferences.loadForSaveFromPreferences(Globals.prefs);
                         Defaults defaults = new Defaults(BibDatabaseMode.fromPreference(
                                 Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-                        BibDatabaseWriter databaseWriter = new BibtexDatabaseWriter(FileSaveSession::new);
+                        BibDatabaseWriter<SaveSession> databaseWriter = new BibtexDatabaseWriter<>(
+                                FileSaveSession::new);
                         SaveSession session = databaseWriter.saveDatabase(
                                 new BibDatabaseContext(pr.getDatabase(), pr.getMetaData(), defaults), prefs);
 
