@@ -17,8 +17,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.external.ExternalFileTypeEditor;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypeEditor;
 import net.sf.jabref.gui.push.PushToApplication;
 import net.sf.jabref.gui.push.PushToApplicationButton;
 import net.sf.jabref.logic.l10n.Localization;

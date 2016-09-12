@@ -13,7 +13,7 @@ import net.sf.jabref.logic.protectedterms.ProtectedTermsList;
 
 public class ProtectedTermsMenu extends JMenu {
 
-    private static final ProtectTermsFormatter formatter = new ProtectTermsFormatter();
+    private static final ProtectTermsFormatter formatter = new ProtectTermsFormatter(Globals.protectedTermsLoader);
     private final JMenu externalFiles;
     private final JTextComponent opener;
 

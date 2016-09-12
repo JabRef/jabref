@@ -12,24 +12,49 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Implemented [#825](https://github.com/JabRef/jabref/issues/825): Search Bar across all bib files instead each having its own
+- Implemented [#573](https://github.com/JabRef/jabref/issues/573): Add key shortcut for global search (`ctrl+shift+f`, if the searchfield is empty it will be focused instead)
+- The search result Window will now show which entry belongs to which bib file
+- The search result Window will now remember its location
+- The search result Window won't stay on top anymore if the main Window is focused and will be present in the taskbar
+- The user can jump from the searchbar to the maintable  with `ctrl+enter`
+- Implemented [#573 (comment)](https://github.com/JabRef/jabref/issues/573#issuecomment-232284156): Added shortcut: closing the search result window with `ctrl+w`
 - Added integrity check for fields with BibTeX keys, e.g., `crossref` and `related`, to check that the key exists
 - [#1496](https://github.com/JabRef/jabref/issues/1496) Keep track of which entry a downloaded file belongs to
 - Made it possible to download multiple entries in one action
 - [#1813](https://github.com/JabRef/jabref/issues/1813) Import/Export preferences dialog default directory set to working directory
 - [#1897](https://github.com/JabRef/jabref/issues/1897) Implemented integrity check for `year` field: Last four nonpunctuation characters should be numerals
 - Address in MS-Office 2007 xml format is now imported as `location`
-
+- [#1912](https://github.com/JabRef/jabref/issues/1912) Implemented integrity check for `edition` field: Should have the first letter capitalized (BibTeX), Should contain an integer or a literal (BibLaTeX)
+- `number` field is now exported as `number` field in MS-Office 2007 xml format, if no `issue` field is present and the entry type is not `patent`
+- `note` field is now exported as `comments` field in MS-Office 2007 xml format
+- `comments` field in MS-Office 2007 xml format is now imported as `note` field
+- [#463](https://github.com/JabRef/jabref/issues/463): Disable menu-item and toolbar-buttons while no database is open
+- Implemented integrity check for `note` and `howpublished` field: Should have the first letter capitalized (BibTeX)
 
 ### Fixed
+- Fixed selecting an entry out of multiple duplicates
+- Fixed [#617](https://github.com/JabRef/jabref/issues/617): `Enter` in global search opens the selected entry & `Enter` in search dialog window opens the selected entry
+- Entries in the SearchResultPanel will be shown correctly (Latex to Unicode)
+- Suggestions in the autocomplete will be shown correctly (Latex to Unicode)
+- Fixed: When searching the first match will be selected if the current selection is no match
+- Selecting an entry in the search result Window will now select the correct entry in the bib file
+- Entries in the SearchResultDialog are now converted to Unicode
+- Suggestions in the autocomplete (search) are now in Unicode
 - Fixed NullPointerException when opening search result window for an untitled database 
 - Fixed entry table traversal with Tab (no column traversal thus no double jump)
 - Fixed [#1757](https://github.com/JabRef/jabref/issues/1757): Crash after saving illegal argument in entry editor
 - Fixed [#1663](https://github.com/JabRef/jabref/issues/1663): Better multi-monitor support
 - Fixed [#1882](https://github.com/JabRef/jabref/issues/1882): Crash after saving illegal bibtexkey in entry editor
 - Fixed field `location` containing only city is not exported correctly to MS-Office 2007 xml format
+- Fixed field `key` field is not exported to MS-Office 2008 xml format
+- Fixed download files failed silently when an invalid directory is selected
+- Fixed [#1949](https://github.com/JabRef/jabref/issues/1949): Error message directs to the wrong preference tab
+- Fixed InvalidBackgroundColor flickering with Ctrl-s and File > Save database
 
 ### Removed
 - The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field. 
+- Automatic migration for the `evastar_pdf` field is removed.
 
 
 

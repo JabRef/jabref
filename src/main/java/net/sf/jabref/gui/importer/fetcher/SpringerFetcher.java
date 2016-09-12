@@ -1,26 +1,26 @@
 package net.sf.jabref.gui.importer.fetcher;
 
-    import java.io.UnsupportedEncodingException;
-    import java.net.URLEncoder;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
-    import javax.swing.JOptionPane;
-    import javax.swing.JPanel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.util.JSONEntryParser;
 import net.sf.jabref.logic.l10n.Localization;
-    import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibEntry;
 
-    import com.mashape.unirest.http.HttpResponse;
-    import com.mashape.unirest.http.JsonNode;
-    import com.mashape.unirest.http.Unirest;
-    import com.mashape.unirest.http.exceptions.UnirestException;
-    import org.apache.commons.logging.Log;
-    import org.apache.commons.logging.LogFactory;
-    import org.json.JSONArray;
-    import org.json.JSONObject;
+import com.mashape.unirest.http.HttpResponse;
+import com.mashape.unirest.http.JsonNode;
+import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 public class SpringerFetcher implements EntryFetcher {
 
