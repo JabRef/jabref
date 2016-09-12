@@ -28,38 +28,40 @@ public class SpecialFieldsUtils {
     /****************************************************/
 
     /**
-     * @param e - Field to be handled
+     * @param field - Field to be handled
      * @param value - may be null to state that field should be emptied
-     * @param be - BibTeXEntry to be handled
+     * @param entry - BibTeXEntry to be handled
      * @param changeList - Filled with undo info (if necessary)
      * @param nullFieldIfValueIsTheSame - true: field is nulled if value is the same than the current value in be
+     * @param keywordSeparator - Separator for keywords
+     * @param keywordSyncEnabled - true: the special field value is stored in the keywords
      */
-    public static void updateField(SpecialField e, String value, BibEntry be, List<FieldChange> changeList,
+    public static void updateField(SpecialField field, String value, BibEntry entry, List<FieldChange> changeList,
             boolean nullFieldIfValueIsTheSame, String keywordSeparator, boolean keywordSyncEnabled) {
-        UpdateField.updateField(be, e.getFieldName(), value, nullFieldIfValueIsTheSame)
-                .ifPresent(fieldChange -> changeList.add(fieldChange));
+        UpdateField.updateField(entry, field.getFieldName(), value, nullFieldIfValueIsTheSame)
+                .ifPresent(changeList::add);
         if (keywordSyncEnabled) {
             // we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
-            SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()).orElse(null), be, changeList,
+            SpecialFieldsUtils.exportFieldToKeywords(field, entry.getField(field.getFieldName()).orElse(null), entry, changeList,
                     keywordSeparator);
         }
     }
 
-    private static void exportFieldToKeywords(SpecialField e, BibEntry be, List<FieldChange> changeList,
+    private static void exportFieldToKeywords(SpecialField field, BibEntry entry, List<FieldChange> changeList,
             String keywordSeparator) {
-        SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()).orElse(null), be, changeList,
+        SpecialFieldsUtils.exportFieldToKeywords(field, entry.getField(field.getFieldName()).orElse(null), entry, changeList,
                 keywordSeparator);
     }
 
-    private static void exportFieldToKeywords(SpecialField e, String newValue, BibEntry entry,
+    private static void exportFieldToKeywords(SpecialField field, String newValue, BibEntry entry,
             List<FieldChange> changeList, String keywordSeparator) {
         List<String> keywordList = new ArrayList<>(entry.getKeywords());
-        List<String> specialFieldsKeywords = e.getKeyWords();
+        List<String> specialFieldsKeywords = field.getKeyWords();
 
         int foundPos = -1;
 
         // cleanup keywords
-        for (Object value : specialFieldsKeywords) {
+        for (String value : specialFieldsKeywords) {
             int pos = keywordList.indexOf(value);
             if (pos >= 0) {
                 foundPos = pos;
@@ -82,8 +84,8 @@ public class SpecialFieldsUtils {
         }
     }
 
-    public static void syncKeywordsFromSpecialFields(BibEntry be, String keywordSeparator) {
-        syncKeywordsFromSpecialFields(be, null, keywordSeparator);
+    public static void syncKeywordsFromSpecialFields(BibEntry entry, String keywordSeparator) {
+        syncKeywordsFromSpecialFields(entry, null, keywordSeparator);
     }
 
     /**
@@ -91,18 +93,18 @@ public class SpecialFieldsUtils {
      *
      * @param changeList indicates the undo named compound. May be null
      */
-    public static void syncKeywordsFromSpecialFields(BibEntry be, List<FieldChange> changeList, String keywordSeparator) {
-        SpecialFieldsUtils.exportFieldToKeywords(Priority.getInstance(), be, changeList, keywordSeparator);
-        SpecialFieldsUtils.exportFieldToKeywords(Rank.getInstance(), be, changeList, keywordSeparator);
-        SpecialFieldsUtils.exportFieldToKeywords(Relevance.getInstance(), be, changeList, keywordSeparator);
-        SpecialFieldsUtils.exportFieldToKeywords(Quality.getInstance(), be, changeList, keywordSeparator);
-        SpecialFieldsUtils.exportFieldToKeywords(ReadStatus.getInstance(), be, changeList, keywordSeparator);
-        SpecialFieldsUtils.exportFieldToKeywords(Printed.getInstance(), be, changeList, keywordSeparator);
+    public static void syncKeywordsFromSpecialFields(BibEntry entry, List<FieldChange> changeList, String keywordSeparator) {
+        SpecialFieldsUtils.exportFieldToKeywords(Priority.getInstance(), entry, changeList, keywordSeparator);
+        SpecialFieldsUtils.exportFieldToKeywords(Rank.getInstance(), entry, changeList, keywordSeparator);
+        SpecialFieldsUtils.exportFieldToKeywords(Relevance.getInstance(), entry, changeList, keywordSeparator);
+        SpecialFieldsUtils.exportFieldToKeywords(Quality.getInstance(), entry, changeList, keywordSeparator);
+        SpecialFieldsUtils.exportFieldToKeywords(ReadStatus.getInstance(), entry, changeList, keywordSeparator);
+        SpecialFieldsUtils.exportFieldToKeywords(Printed.getInstance(), entry, changeList, keywordSeparator);
     }
 
-    private static void importKeywordsForField(Set<String> keywordList, SpecialField c, BibEntry be,
+    private static void importKeywordsForField(Set<String> keywordList, SpecialField field, BibEntry entry,
             List<FieldChange> changeList) {
-        List<String> values = c.getKeyWords();
+        List<String> values = field.getKeyWords();
         String newValue = null;
         for (String val : values) {
             if (keywordList.contains(val)) {
@@ -110,32 +112,32 @@ public class SpecialFieldsUtils {
                 break;
             }
         }
-        Optional<FieldChange> change = UpdateField.updateNonDisplayableField(be, c.getFieldName(), newValue);
+        Optional<FieldChange> change = UpdateField.updateNonDisplayableField(entry, field.getFieldName(), newValue);
         if (changeList != null) {
             change.ifPresent(changeList::add);
         }
     }
 
-    public static void syncSpecialFieldsFromKeywords(BibEntry be) {
-        syncSpecialFieldsFromKeywords(be, null);
+    public static void syncSpecialFieldsFromKeywords(BibEntry entry) {
+        syncSpecialFieldsFromKeywords(entry, null);
     }
 
     /**
     * updates field values according to keywords
     *
-    * @param ce indicates the undo named compound. May be null
+    * @param changeList indicates the list of field changes. May be null
     */
-    public static void syncSpecialFieldsFromKeywords(BibEntry be, List<FieldChange> ce) {
-        if (!be.hasField(FieldName.KEYWORDS)) {
+    public static void syncSpecialFieldsFromKeywords(BibEntry entry, List<FieldChange> changeList) {
+        if (!entry.hasField(FieldName.KEYWORDS)) {
             return;
         }
-        Set<String> keywordList = EntryUtil.getSeparatedKeywords(be);
-        SpecialFieldsUtils.importKeywordsForField(keywordList, Priority.getInstance(), be, ce);
-        SpecialFieldsUtils.importKeywordsForField(keywordList, Rank.getInstance(), be, ce);
-        SpecialFieldsUtils.importKeywordsForField(keywordList, Quality.getInstance(), be, ce);
-        SpecialFieldsUtils.importKeywordsForField(keywordList, Relevance.getInstance(), be, ce);
-        SpecialFieldsUtils.importKeywordsForField(keywordList, ReadStatus.getInstance(), be, ce);
-        SpecialFieldsUtils.importKeywordsForField(keywordList, Printed.getInstance(), be, ce);
+        Set<String> keywordList = EntryUtil.getSeparatedKeywords(entry);
+        SpecialFieldsUtils.importKeywordsForField(keywordList, Priority.getInstance(), entry, changeList);
+        SpecialFieldsUtils.importKeywordsForField(keywordList, Rank.getInstance(), entry, changeList);
+        SpecialFieldsUtils.importKeywordsForField(keywordList, Quality.getInstance(), entry, changeList);
+        SpecialFieldsUtils.importKeywordsForField(keywordList, Relevance.getInstance(), entry, changeList);
+        SpecialFieldsUtils.importKeywordsForField(keywordList, ReadStatus.getInstance(), entry, changeList);
+        SpecialFieldsUtils.importKeywordsForField(keywordList, Printed.getInstance(), entry, changeList);
     }
 
     /**
