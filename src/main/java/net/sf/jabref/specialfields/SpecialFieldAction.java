@@ -1,11 +1,16 @@
 package net.sf.jabref.specialfields;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.NamedCompound;
+import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,17 +51,20 @@ public class SpecialFieldAction implements BaseAction {
                 return;
             }
             NamedCompound ce = new NamedCompound(undoText);
+            List<FieldChange> changes = new ArrayList<>();
             for (BibEntry be : bes) {
                 // if (value==null) and then call nullField has been omitted as updatefield also handles value==null
-                SpecialFieldsUtils.updateField(specialField, value, be, ce, nullFieldIfValueIsTheSame);
+                SpecialFieldsUtils.updateField(specialField, value, be, changes, nullFieldIfValueIsTheSame,
+                        Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR), Globals.prefs.isKeywordSyncEnabled());
             }
+            changes.forEach(change -> ce.addEdit(new UndoableFieldChange(change)));
             ce.end();
             if (ce.hasEdits()) {
                 frame.getCurrentBasePanel().getUndoManager().addEdit(ce);
                 frame.getCurrentBasePanel().markBaseChanged();
                 frame.getCurrentBasePanel().updateEntryEditorIfShowing();
                 String outText;
-                if (nullFieldIfValueIsTheSame || value==null) {
+                if (nullFieldIfValueIsTheSame || (value==null)) {
                     outText = specialField.getTextDone(Integer.toString(bes.size()));
                 } else {
                     outText = specialField.getTextDone(value, Integer.toString(bes.size()));

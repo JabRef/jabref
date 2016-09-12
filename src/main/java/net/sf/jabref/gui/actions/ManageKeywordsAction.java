@@ -5,6 +5,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -313,7 +314,9 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
             }
 
             if (Globals.prefs.isKeywordSyncEnabled()) {
-                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, ce);
+                List<FieldChange> changes = new ArrayList<>();
+                SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, changes);
+                changes.forEach(thisChange -> ce.addEdit(new UndoableFieldChange(thisChange)));
             }
         }
         ce.end();

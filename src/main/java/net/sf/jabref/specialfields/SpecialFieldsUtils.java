@@ -5,16 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.SpecialFields;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 
 public class SpecialFieldsUtils {
@@ -29,25 +25,28 @@ public class SpecialFieldsUtils {
      * @param e - Field to be handled
      * @param value - may be null to state that field should be emptied
      * @param be - BibTeXEntry to be handled
-     * @param ce - Filled with undo info (if necessary)
+     * @param changeList - Filled with undo info (if necessary)
      * @param nullFieldIfValueIsTheSame - true: field is nulled if value is the same than the current value in be
      */
-    public static void updateField(SpecialField e, String value, BibEntry be, NamedCompound ce, boolean nullFieldIfValueIsTheSame) {
+    public static void updateField(SpecialField e, String value, BibEntry be, List<FieldChange> changeList,
+            boolean nullFieldIfValueIsTheSame, String keywordSeparator, boolean keywordSyncEnabled) {
         UpdateField.updateField(be, e.getFieldName(), value, nullFieldIfValueIsTheSame)
-                .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
-        // we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
-        SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()).orElse(null), be, ce);
+                .ifPresent(fieldChange -> changeList.add(fieldChange));
+        if (keywordSyncEnabled) {
+            // we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
+            SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()).orElse(null), be, changeList,
+                    keywordSeparator);
+        }
     }
 
-    private static void exportFieldToKeywords(SpecialField e, BibEntry be, NamedCompound ce) {
-        SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()).orElse(null), be, ce);
+    private static void exportFieldToKeywords(SpecialField e, BibEntry be, List<FieldChange> changeList,
+            String keywordSeparator) {
+        SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()).orElse(null), be, changeList,
+                keywordSeparator);
     }
 
     private static void exportFieldToKeywords(SpecialField e, String newValue, BibEntry entry,
-            NamedCompound ce) {
-        if (!Globals.prefs.isKeywordSyncEnabled()) {
-            return;
-        }
+            List<FieldChange> changeList, String keywordSeparator) {
         List<String> keywordList = new ArrayList<>(entry.getKeywords());
         List<String> specialFieldsKeywords = e.getKeyWords();
 
@@ -71,33 +70,32 @@ public class SpecialFieldsUtils {
         }
 
 
-        Optional<FieldChange> change = entry.putKeywords(keywordList,
-                Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
-        if (ce != null){
-            change.ifPresent(changeValue -> ce.addEdit(new UndoableFieldChange(changeValue)));
+        Optional<FieldChange> change = entry.putKeywords(keywordList, keywordSeparator);
+        if (changeList != null){
+            change.ifPresent(changeList::add);
         }
     }
 
-    public static void syncKeywordsFromSpecialFields(BibEntry be) {
-        syncKeywordsFromSpecialFields(be, null);
+    public static void syncKeywordsFromSpecialFields(BibEntry be, String keywordSeparator) {
+        syncKeywordsFromSpecialFields(be, null, keywordSeparator);
     }
 
     /**
      * Update keywords according to values of special fields
      *
-     * @param nc indicates the undo named compound. May be null
+     * @param changeList indicates the undo named compound. May be null
      */
-    public static void syncKeywordsFromSpecialFields(BibEntry be, NamedCompound nc) {
-        SpecialFieldsUtils.exportFieldToKeywords(Priority.getInstance(), be, nc);
-        SpecialFieldsUtils.exportFieldToKeywords(Rank.getInstance(), be, nc);
-        SpecialFieldsUtils.exportFieldToKeywords(Relevance.getInstance(), be, nc);
-        SpecialFieldsUtils.exportFieldToKeywords(Quality.getInstance(), be, nc);
-        SpecialFieldsUtils.exportFieldToKeywords(ReadStatus.getInstance(), be, nc);
-        SpecialFieldsUtils.exportFieldToKeywords(Printed.getInstance(), be, nc);
+    public static void syncKeywordsFromSpecialFields(BibEntry be, List<FieldChange> changeList, String keywordSeparator) {
+        SpecialFieldsUtils.exportFieldToKeywords(Priority.getInstance(), be, changeList, keywordSeparator);
+        SpecialFieldsUtils.exportFieldToKeywords(Rank.getInstance(), be, changeList, keywordSeparator);
+        SpecialFieldsUtils.exportFieldToKeywords(Relevance.getInstance(), be, changeList, keywordSeparator);
+        SpecialFieldsUtils.exportFieldToKeywords(Quality.getInstance(), be, changeList, keywordSeparator);
+        SpecialFieldsUtils.exportFieldToKeywords(ReadStatus.getInstance(), be, changeList, keywordSeparator);
+        SpecialFieldsUtils.exportFieldToKeywords(Printed.getInstance(), be, changeList, keywordSeparator);
     }
 
     private static void importKeywordsForField(Set<String> keywordList, SpecialField c, BibEntry be,
-            NamedCompound nc) {
+            List<FieldChange> changeList) {
         List<String> values = c.getKeyWords();
         String newValue = null;
         for (String val : values) {
@@ -106,12 +104,10 @@ public class SpecialFieldsUtils {
                 break;
             }
         }
-        UpdateField.updateNonDisplayableField(be, c.getFieldName(), newValue)
-                .ifPresent(fieldChange -> {
-                    if (nc != null) {
-                        nc.addEdit(new UndoableFieldChange(fieldChange));
-                    }
-                });
+        Optional<FieldChange> change = UpdateField.updateNonDisplayableField(be, c.getFieldName(), newValue);
+        if (changeList != null) {
+            change.ifPresent(changeList::add);
+        }
     }
 
     public static void syncSpecialFieldsFromKeywords(BibEntry be) {
@@ -123,7 +119,7 @@ public class SpecialFieldsUtils {
     *
     * @param ce indicates the undo named compound. May be null
     */
-    public static void syncSpecialFieldsFromKeywords(BibEntry be, NamedCompound ce) {
+    public static void syncSpecialFieldsFromKeywords(BibEntry be, List<FieldChange> ce) {
         if (!be.hasField(FieldName.KEYWORDS)) {
             return;
         }
