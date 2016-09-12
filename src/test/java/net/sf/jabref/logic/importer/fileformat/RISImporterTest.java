@@ -2,12 +2,11 @@ package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.logic.util.FileExtensions;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,7 +19,6 @@ public class RISImporterTest {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
         importer = new RisImporter();
     }
 
@@ -36,7 +34,7 @@ public class RISImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        Assert.assertEquals(".ris", importer.getExtensions().get(0));
+        Assert.assertEquals(FileExtensions.RIS, importer.getExtensions());
     }
 
     @Test
@@ -47,7 +45,7 @@ public class RISImporterTest {
     @Test
     public void testIfNotRecognizedFormat() throws IOException, URISyntaxException {
         Path file = Paths.get(RISImporterTest.class.getResource("RisImporterCorrupted.ris").toURI());
-        Assert.assertFalse(importer.isRecognizedFormat(file, Charset.defaultCharset()));
+        Assert.assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
     }
 
 }

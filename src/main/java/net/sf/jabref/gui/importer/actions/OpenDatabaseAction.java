@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.importer.actions;
 
 import java.awt.event.ActionEvent;
@@ -24,6 +9,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.swing.Action;
 import javax.swing.JOptionPane;
@@ -35,17 +21,16 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FileExtensions;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.NewFileDialogs;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.importer.ParserResultWarningDialog;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.io.AutoSaveUtil;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -60,7 +45,6 @@ import org.apache.commons.logging.LogFactory;
 // The action concerned with opening an existing database.
 
 public class OpenDatabaseAction extends MnemonicAwareAction {
-
     public static final Log LOGGER = LogFactory.getLog(OpenDatabaseAction.class);
 
     private final boolean showDialog;
@@ -81,7 +65,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         POST_OPEN_ACTIONS.add(new HandleDuplicateWarnings());
     }
 
-
     public OpenDatabaseAction(JabRefFrame frame, boolean showDialog) {
         super(IconTheme.JabRefIcon.OPEN.getIcon());
         this.frame = frame;
@@ -96,15 +79,10 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         List<File> filesToOpen = new ArrayList<>();
 
         if (showDialog) {
-
-            List<String> chosenStrings = new NewFileDialogs(frame).withExtension(FileExtensions.BIBTEX_DB)
-                    .showDlgAndGetMultipleFiles();
-
-            for (String chosen : chosenStrings) {
-
-                filesToOpen.add(new File(chosen));
-
-            }
+            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.BIBTEX_DB);
+            dialog.setDefaultExtension(FileExtensions.BIBTEX_DB);
+            List<String> chosenStrings = dialog.showDialogAndGetMultipleFiles();
+            filesToOpen.addAll(chosenStrings.stream().map(File::new).collect(Collectors.toList()));
         } else {
             LOGGER.info(Action.NAME + " " + e.getActionCommand());
             filesToOpen.add(new File(StringUtil.getCorrectFileName(e.getActionCommand(), "bib")));
@@ -112,7 +90,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
         openFiles(filesToOpen, true);
     }
-
 
     /**
      * Opens the given file. If null or 404, nothing happens
@@ -148,8 +125,8 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             File file = iterator.next();
             for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
                 BasePanel basePanel = frame.getBasePanelAt(i);
-                if ((basePanel.getBibDatabaseContext().getDatabaseFile() != null)
-                        && basePanel.getBibDatabaseContext().getDatabaseFile().equals(file)) {
+                if ((basePanel.getBibDatabaseContext().getDatabaseFile().isPresent())
+                        && basePanel.getBibDatabaseContext().getDatabaseFile().get().equals(file)) {
                     iterator.remove();
                     removed++;
                     // See if we removed the final one. If so, we must perhaps
@@ -180,7 +157,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         // already open. If so, we may have to raise the correct tab:
         else if (toRaise != null) {
             frame.output(Localization.lang("File '%0' is already open.",
-                    toRaise.getBibDatabaseContext().getDatabaseFile().getPath()));
+                    toRaise.getBibDatabaseContext().getDatabaseFile().get().getPath()));
             frame.getTabbedPane().setSelectedComponent(toRaise);
         }
 
@@ -224,7 +201,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             boolean done = false;
             while (!done) {
                 String fileName = file.getPath();
-                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getPath());
+                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
                 // Should this be done _after_ we know it was successfully opened?
 
                 if (FileBasedLock.hasLockFile(file.toPath())) {
@@ -242,7 +219,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                         } else {
                             return;
                         }
-                    } else if (!FileBasedLock.waitForFileLock(file.toPath(), 10)) {
+                    } else if (!FileBasedLock.waitForFileLock(file.toPath())) {
                         JOptionPane.showMessageDialog(null,
                                 Localization.lang("Error opening file") + " '" + fileName + "'. "
                                         + Localization.lang("File is locked by another JabRef instance."),
@@ -256,7 +233,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                 String errorMessage = null;
                 try {
                     result = OpenDatabase.loadDatabase(fileToLoad,
-                            ImportFormatPreferences.fromPreferences(Globals.prefs));
+                            Globals.prefs.getImportFormatPreferences());
                 } catch (IOException ex) {
                     LOGGER.error("Error loading database " + fileToLoad, ex);
                     result = ParserResult.getNullResult();

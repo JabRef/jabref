@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.bibtexkeypattern;
 
 import java.awt.BorderLayout;
@@ -53,18 +38,18 @@ class ResolveDuplicateLabelDialog {
     private boolean okPressed;
     private boolean cancelPressed;
 
-    private static final String LAYOUT = "<font face=\"arial\"><b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>\\end{bibtexkey}</b><br>\n" +
-            "\\begin{author} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\author}<BR>\\end{author}\n" +
-            "\\begin{editor} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\editor} <i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}\n" +
-            "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>\n" +
-            "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}\n" +
-            "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}\n" +
-            "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}\n" +
-            "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}\n" +
-            "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}\n" +
-            "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}\n" +
-            "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}\n" +
-            "<p></p></font>";
+    private static final String LAYOUT = "<font face=\"arial\"><b><i>\\entrytype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>\\end{bibtexkey}</b><br>\n"
+            + "\\begin{author} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\author}<BR>\\end{author}\n"
+            + "\\begin{editor} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\editor} <i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}\n"
+            + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>\n"
+            + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}\n"
+            + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}\n"
+            + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}\n"
+            + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}\n"
+            + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}\n"
+            + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}\n"
+            + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}\n"
+            + "<p></p></font>";
 
 
     public ResolveDuplicateLabelDialog(BasePanel panel, String key, List<BibEntry> entries) {

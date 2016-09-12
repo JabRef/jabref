@@ -2,16 +2,14 @@ package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.logic.util.FileExtensions;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -36,25 +34,21 @@ import static org.junit.Assert.assertEquals;
 public class MedlineImporterTest {
 
     private MedlineImporter importer;
-    private static final String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/logic/importer/fileformat";
 
-    
+
     /**
      * Generates a List of all files in the package "/src/test/resources/net/sf/jabref/logic/importer/fileformat"
      * @return A list of Names
      * @throws IOException
      */
-    public List<Path> getTestFiles() throws IOException {
-        List<Path> files = new ArrayList<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(FILEFORMAT_PATH))) {
-            stream.forEach(files::add);
+    public List<Path> getTestFiles() throws Exception {
+        try (Stream<Path> stream = Files.list(Paths.get(MedlineImporterTest.class.getResource("").toURI()))) {
+            return stream.filter(p -> !Files.isDirectory(p)).collect(Collectors.toList());
         }
-        return files;
     }
 
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
         this.importer = new MedlineImporter();
     }
 
@@ -70,12 +64,7 @@ public class MedlineImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        List<String> extensions = new ArrayList<>();
-        extensions.add(".nbib");
-        extensions.add(".xml");
-
-        assertEquals(extensions.get(0), importer.getExtensions().get(0));
-        assertEquals(extensions.get(1), importer.getExtensions().get(1));
+        assertEquals(FileExtensions.MEDLINE, importer.getExtensions());
     }
 
     @Test
@@ -84,8 +73,8 @@ public class MedlineImporterTest {
     }
 
     @Test
-    public void testIsRecognizedFormatReject() throws IOException {
-       List<Path> list = getTestFiles().stream().filter(n -> !n.getFileName().toString().startsWith("MedlineImporter"))
+    public void testIsRecognizedFormatReject() throws Exception {
+        List<Path> list = getTestFiles().stream().filter(n -> !n.getFileName().toString().startsWith("MedlineImporter"))
                 .collect(Collectors.toList());
 
         for (Path file : list) {

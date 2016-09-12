@@ -9,14 +9,12 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class OpenDatabaseTest {
@@ -40,41 +38,35 @@ public class OpenDatabaseTest {
                 .get(OpenDatabaseTest.class.getResource("encodingWithoutNewline.bib").toURI()).toFile();
     }
 
-    @BeforeClass
-    public static void setUpGlobalsPrefs() {
-        // otherwise FieldContentParser (called by BibtexParser) crashes
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
-
     @Before
     public void setUp() {
-        importFormatPreferences = ImportFormatPreferences.fromPreferences(Globals.prefs);
+        importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();
     }
 
     @Test
     public void useFallbackEncodingIfNoHeader() throws IOException {
         ParserResult result = OpenDatabase.loadDatabase(bibNoHeader, importFormatPreferences);
-        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding());
+        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding().get());
     }
 
     @Test
     public void useFallbackEncodingIfUnknownHeader() throws IOException {
         ParserResult result = OpenDatabase.loadDatabase(bibWrongHeader, importFormatPreferences);
-        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding());
+        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding().get());
     }
 
     @Test
     public void useSpecifiedEncoding() throws IOException {
         ParserResult result = OpenDatabase.loadDatabase(bibHeader,
                 importFormatPreferences.withEncoding(StandardCharsets.US_ASCII));
-        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding());
+        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding().get());
     }
 
     @Test
     public void useSpecifiedEncodingWithSignature() throws IOException {
         ParserResult result = OpenDatabase.loadDatabase(bibHeaderAndSignature,
                 importFormatPreferences.withEncoding(StandardCharsets.US_ASCII));
-        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding());
+        Assert.assertEquals(defaultEncoding, result.getMetaData().getEncoding().get());
     }
 
     @Test
@@ -84,7 +76,7 @@ public class OpenDatabaseTest {
 
         // Entry
         Assert.assertEquals(1, db.getEntryCount());
-        Assert.assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getFieldOptional("year"));
+        Assert.assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getField("year"));
     }
 
     @Test
@@ -94,7 +86,7 @@ public class OpenDatabaseTest {
 
         // Entry
         Assert.assertEquals(1, db.getEntryCount());
-        Assert.assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getFieldOptional("year"));
+        Assert.assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getField("year"));
     }
 
     @Test
@@ -104,7 +96,7 @@ public class OpenDatabaseTest {
 
         // Entry
         Assert.assertEquals(1, db.getEntryCount());
-        Assert.assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getFieldOptional("year"));
+        Assert.assertEquals(Optional.of("2014"), db.getEntryByKey("1").get().getField("year"));
     }
 
     /**
@@ -113,10 +105,10 @@ public class OpenDatabaseTest {
     @Test
     public void correctlyParseEncodingWithoutNewline() throws IOException {
         ParserResult result = OpenDatabase.loadDatabase(bibEncodingWithoutNewline, importFormatPreferences);
-        Assert.assertEquals(StandardCharsets.US_ASCII, result.getMetaData().getEncoding());
+        Assert.assertEquals(StandardCharsets.US_ASCII, result.getMetaData().getEncoding().get());
 
         BibDatabase db = result.getDatabase();
-        Assert.assertEquals("testPreamble", db.getPreamble());
+        Assert.assertEquals(Optional.of("testPreamble"), db.getPreamble());
 
         Collection<BibEntry> entries = db.getEntries();
         Assert.assertEquals(1, entries.size());

@@ -8,7 +8,7 @@ We also have [code howtos](https://github.com/JabRef/jabref/wiki/Code-Howtos) an
 For newcomers, [FLOSS Coach](http://www.flosscoach.com/) might be helpful.
 It contains steps to get started with JabRef development.
 
-In case you have any questions, you can use our [developers mailinglist](https://lists.sourceforge.net/lists/listinfo/jabref-devel).
+In case you have any question, do not hesitate to write one of our [JabRef developers](https://github.com/orgs/JabRef/teams/developers) an email.
 
 
 ## Formal requirements for a pull request
@@ -101,4 +101,4 @@ You can add the prefix `[WIP]` to indicate that the pull request is not yet comp
 
 [commit guidelines section of Pro Git]: http://git-scm.com/book/en/Distributed-Git-Contributing-to-a-Project#Commit-Guidelines
 [good commit message]: http://tbaggery.com/2008/04/19/a-note-about-git-commit-messages.html
-[help documentation]: https://help.github.com/articles/using-pull-requests/
+[help documentation]: https://help.github.com/articles/about-pull-requests/

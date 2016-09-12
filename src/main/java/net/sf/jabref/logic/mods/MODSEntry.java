@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.mods;
 
 import java.io.StringWriter;
@@ -99,48 +84,48 @@ class MODSEntry {
     private void populateFromBibtex(BibEntry bibtex) {
         if (bibtex.hasField(FieldName.TITLE)) {
             if (CHARFORMAT) {
-                title = chars.format(bibtex.getFieldOptional(FieldName.TITLE).get());
+                title = chars.format(bibtex.getField(FieldName.TITLE).get());
             } else {
-                title = bibtex.getFieldOptional(FieldName.TITLE).get();
+                title = bibtex.getField(FieldName.TITLE).get();
             }
         }
 
         if (bibtex.hasField(FieldName.PUBLISHER)) {
             if (CHARFORMAT) {
-                publisher = chars.format(bibtex.getFieldOptional(FieldName.PUBLISHER).get());
+                publisher = chars.format(bibtex.getField(FieldName.PUBLISHER).get());
             } else {
-                publisher = bibtex.getFieldOptional(FieldName.PUBLISHER).get();
+                publisher = bibtex.getField(FieldName.PUBLISHER).get();
             }
         }
 
         if (bibtex.hasField(BibEntry.KEY_FIELD)) {
-            id = bibtex.getCiteKey();
+            id = bibtex.getCiteKeyOptional().get();
         }
         if (bibtex.hasField("place")) { // TODO: "place" is the MODS version, in BibTeX: "address", BibLaTeX: "location"?
             if (CHARFORMAT) {
-                place = chars.format(bibtex.getField("place"));
+                place = chars.format(bibtex.getField("place").get());
             } else {
-                place = bibtex.getField("place");
+                place = bibtex.getField("place").get();
             }
         }
 
         date = getDate(bibtex);
         genre = getMODSgenre(bibtex);
         if (bibtex.hasField(FieldName.AUTHOR)) {
-            authors = getAuthors(bibtex.getFieldOptional(FieldName.AUTHOR).get());
+            authors = getAuthors(bibtex.getField(FieldName.AUTHOR).get());
         }
         if ("article".equals(bibtex.getType()) || "inproceedings".equals(bibtex.getType())) {
             host = new MODSEntry();
             host.entryType = "relatedItem";
-            host.title = bibtex.getField(FieldName.BOOKTITLE);
-            host.publisher = bibtex.getField(FieldName.PUBLISHER);
-            host.number = bibtex.getField(FieldName.NUMBER);
+            host.title = bibtex.getField(FieldName.BOOKTITLE).orElse(null);
+            host.publisher = bibtex.getField(FieldName.PUBLISHER).orElse(null);
+            host.number = bibtex.getField(FieldName.NUMBER).orElse(null);
             if (bibtex.hasField(FieldName.VOLUME)) {
-                host.volume = bibtex.getFieldOptional(FieldName.VOLUME).get();
+                host.volume = bibtex.getField(FieldName.VOLUME).get();
             }
             host.issuance = "continuing";
             if (bibtex.hasField(FieldName.PAGES)) {
-                host.pages = new PageNumbers(bibtex.getFieldOptional(FieldName.PAGES).get());
+                host.pages = new PageNumbers(bibtex.getField(FieldName.PAGES).get());
             }
         }
 
@@ -155,11 +140,11 @@ class MODSEntry {
         }
     }
 
-    private List<PersonName> getAuthors(String authors) {
+    private List<PersonName> getAuthors(String authorString) {
         List<PersonName> result = new LinkedList<>();
 
-        if (authors.contains(" and ")) {
-            String[] names = authors.split(" and ");
+        if (authorString.contains(" and ")) {
+            String[] names = authorString.split(" and ");
             for (String name : names) {
                 if (CHARFORMAT) {
                     result.add(new PersonName(chars.format(name)));
@@ -169,9 +154,9 @@ class MODSEntry {
             }
         } else {
             if (CHARFORMAT) {
-                result.add(new PersonName(chars.format(authors)));
+                result.add(new PersonName(chars.format(authorString)));
             } else {
-                result.add(new PersonName(authors));
+                result.add(new PersonName(authorString));
             }
         }
         return result;
@@ -180,8 +165,8 @@ class MODSEntry {
     /* construct a MODS date object */
     private static String getDate(BibEntry bibtex) {
         StringBuilder result = new StringBuilder();
-        bibtex.getFieldOptional(FieldName.YEAR).ifPresent(result::append);
-        bibtex.getFieldOptional(FieldName.MONTH).ifPresent(result.append('-')::append);
+        bibtex.getField(FieldName.YEAR).ifPresent(result::append);
+        bibtex.getField(FieldName.MONTH).ifPresent(result.append('-')::append);
         return result.toString();
     }
 
@@ -250,18 +235,18 @@ class MODSEntry {
             Element originInfo = d.createElement("originInfo");
             mods.appendChild(originInfo);
             if (this.publisher != null) {
-                Element publisher = d.createElement(FieldName.PUBLISHER);
-                publisher.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(this.publisher)));
-                originInfo.appendChild(publisher);
+                Element publisherElement = d.createElement(FieldName.PUBLISHER);
+                publisherElement.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(this.publisher)));
+                originInfo.appendChild(publisherElement);
             }
             if (date != null) {
                 Element dateIssued = d.createElement("dateIssued");
                 dateIssued.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(date)));
                 originInfo.appendChild(dateIssued);
             }
-            Element issuance = d.createElement("issuance");
-            issuance.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(this.issuance)));
-            originInfo.appendChild(issuance);
+            Element issuanceElement = d.createElement("issuance");
+            issuanceElement.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(this.issuance)));
+            originInfo.appendChild(issuanceElement);
 
             if (id != null) {
                 Element idref = d.createElement("identifier");

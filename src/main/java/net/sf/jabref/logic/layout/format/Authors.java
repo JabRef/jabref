@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.logic.layout.format;
 
 import java.util.ArrayList;
@@ -213,7 +198,7 @@ public class Authors extends AbstractParamLayoutFormatter {
             } else if (comp(key, "LastSep") && !value.isEmpty()) {
                 lastSeparator = value;
             }
-        } else if ("etal".equalsIgnoreCase(key.trim()) && !value.isEmpty()) {
+        } else if ("etal".equalsIgnoreCase(key.trim())) {
             etAlString = value;
         } else if (Authors.NUMBER_PATTERN.matcher(key.trim()).matches()) {
             // Just a number:
@@ -273,52 +258,51 @@ public class Authors extends AbstractParamLayoutFormatter {
     }
 
     private void addSingleName(StringBuilder sb, Author a, boolean firstFirst) {
-        String firstNamePart = a.getFirst();
-        String lastNamePart = a.getLast();
-        String von = a.getVon();
-        if ((von != null) && !von.isEmpty()) {
-            lastNamePart = von + ' ' + lastNamePart;
-        }
-        String jr = a.getJr();
-        if ((jr != null) && !jr.isEmpty()) {
-            String jrSeparator = " ";
-            lastNamePart = lastNamePart + jrSeparator + jr;
-        }
+        StringBuilder lastNameSB = new StringBuilder();
+        a.getVon().filter(von -> !von.isEmpty()).ifPresent(von -> lastNameSB.append(von).append(' '));
+        a.getLast().ifPresent(lastNameSB::append);
+        String jrSeparator = " ";
+        a.getJr().filter(jr -> !jr.isEmpty()).ifPresent(jr -> lastNameSB.append(jrSeparator).append(jr));
 
-        if (abbreviate && (firstNamePart != null)) {
-            firstNamePart = a.getFirstAbbr();
+        String firstNameResult = "";
+        if (a.getFirst().isPresent()) {
+            if (abbreviate) {
+                firstNameResult = a.getFirstAbbr().orElse("");
 
-            if (firstInitialOnly && (firstNamePart.length() > 2)) {
-                firstNamePart = firstNamePart.substring(0, 2);
-            } else if (middleInitial) {
-                String abbr = firstNamePart;
-                firstNamePart = a.getFirst();
-                int index = firstNamePart.indexOf(' ');
-                //System.out.println(firstNamePart);
-                //System.out.println(index);
-                if (index >= 0) {
-                    firstNamePart = firstNamePart.substring(0, index + 1);
-                    if (abbr.length() > 3) {
-                        firstNamePart = firstNamePart + abbr.substring(3);
+                if (firstInitialOnly && (firstNameResult.length() > 2)) {
+                    firstNameResult = firstNameResult.substring(0, 2);
+                } else if (middleInitial) {
+                    String abbr = firstNameResult;
+                    firstNameResult = a.getFirst().get();
+                    int index = firstNameResult.indexOf(' ');
+                    //System.out.println(firstNamePart);
+                    //System.out.println(index);
+                    if (index >= 0) {
+                        firstNameResult = firstNameResult.substring(0, index + 1);
+                        if (abbr.length() > 3) {
+                            firstNameResult = firstNameResult + abbr.substring(3);
+                        }
                     }
                 }
-            }
-            if (!abbrDots) {
-                firstNamePart = firstNamePart.replace(".", "");
-            }
-            if (!abbrSpaces) {
-                firstNamePart = firstNamePart.replace(" ", "");
+                if (!abbrDots) {
+                    firstNameResult = firstNameResult.replace(".", "");
+                }
+                if (!abbrSpaces) {
+                    firstNameResult = firstNameResult.replace(" ", "");
+                }
+            } else {
+                firstNameResult = a.getFirst().get();
             }
         }
 
-        if (lastNameOnly || (firstNamePart == null)) {
-            sb.append(lastNamePart);
+        if (lastNameOnly || (firstNameResult.isEmpty())) {
+            sb.append(lastNameSB);
         } else if (firstFirst) {
             String firstFirstSeparator = " ";
-            sb.append(firstNamePart).append(firstFirstSeparator);
-            sb.append(lastNamePart);
+            sb.append(firstNameResult).append(firstFirstSeparator);
+            sb.append(lastNameSB);
         } else {
-            sb.append(lastNamePart).append(lastFirstSeparator).append(firstNamePart);
+            sb.append(lastNameSB).append(lastFirstSeparator).append(firstNameResult);
         }
 
     }

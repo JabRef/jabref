@@ -5,8 +5,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
@@ -21,10 +19,9 @@ public class ImportFormatReaderTestParameterless {
 
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
         reader = new ImportFormatReader();
-        reader.resetImportFormats(ImportFormatPreferences.fromPreferences(Globals.prefs),
-                XMPPreferences.fromPreferences(Globals.prefs));
+        reader.resetImportFormats(JabRefPreferences.getInstance().getImportFormatPreferences(),
+                JabRefPreferences.getInstance().getXMPPreferences());
     }
 
     @Test

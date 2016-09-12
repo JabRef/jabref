@@ -1,44 +1,30 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
-
 package net.sf.jabref.logic.cleanup;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.FileDirectoryPreferences;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 public class CleanupWorker {
 
     private final BibDatabaseContext databaseContext;
-    private final JournalAbbreviationLoader repositoryLoader;
-    private final JabRefPreferences prefs;
+    private final String fileNamePattern;
+    private final LayoutFormatterPreferences prefs;
+    private final FileDirectoryPreferences fileDirectoryPreferences;
     private int unsuccessfulRenames;
 
 
-    public CleanupWorker(BibDatabaseContext databaseContext, JournalAbbreviationLoader repositoryLoader,
-            JabRefPreferences prefs) {
+    public CleanupWorker(BibDatabaseContext databaseContext, String fileNamePattern, LayoutFormatterPreferences prefs,
+            FileDirectoryPreferences fileDirectoryPreferences) {
         this.databaseContext = databaseContext;
-        this.repositoryLoader = repositoryLoader;
+        this.fileNamePattern = fileNamePattern;
         this.prefs = prefs;
+        this.fileDirectoryPreferences = fileDirectoryPreferences;
     }
 
     public int getUnsuccessfulRenames() {
@@ -63,7 +49,7 @@ public class CleanupWorker {
         List<CleanupJob> jobs = new ArrayList<>();
 
         if (preset.isCleanUpUpgradeExternalLinks()) {
-            jobs.add(new UpgradePdfPsToFileCleanup(Arrays.asList(FieldName.PDF, FieldName.PS)));
+            jobs.add(new UpgradePdfPsToFileCleanup());
         }
         if (preset.isCleanUpDOI()) {
             jobs.add(new DoiCleanup());
@@ -75,14 +61,14 @@ public class CleanupWorker {
             jobs.add(new FileLinksCleanup());
         }
         if (preset.isMovePDF()) {
-            jobs.add(new MoveFilesCleanup(databaseContext));
+            jobs.add(new MoveFilesCleanup(databaseContext, fileDirectoryPreferences));
         }
         if (preset.isMakePathsRelative()) {
-            jobs.add(new RelativePathsCleanup(databaseContext));
+            jobs.add(new RelativePathsCleanup(databaseContext, fileDirectoryPreferences));
         }
         if (preset.isRenamePDF()) {
             RenamePdfCleanup cleaner = new RenamePdfCleanup(preset.isRenamePdfOnlyRelativePaths(), databaseContext,
-                    repositoryLoader, prefs);
+                    fileNamePattern, prefs, fileDirectoryPreferences);
             jobs.add(cleaner);
             unsuccessfulRenames += cleaner.getUnsuccessfulRenames();
         }

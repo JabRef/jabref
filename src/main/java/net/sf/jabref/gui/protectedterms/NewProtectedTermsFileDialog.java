@@ -2,6 +2,8 @@ package net.sf.jabref.gui.protectedterms;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
+import java.nio.file.Path;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -10,17 +12,16 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFrame;
 import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
-
-import net.sf.jabref.gui.FileExtensions;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
+import net.sf.jabref.logic.util.FileExtensions;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -33,6 +34,7 @@ public class NewProtectedTermsFileDialog extends JDialog {
     private final JCheckBox enabled = new JCheckBox(Localization.lang("Enabled"));
     private boolean addOKPressed;
     private final ProtectedTermsLoader loader;
+    private JFrame parent;
 
     public NewProtectedTermsFileDialog(JDialog parent, ProtectedTermsLoader loader) {
         super(parent, Localization.lang("New protected terms file"), true);
@@ -43,6 +45,7 @@ public class NewProtectedTermsFileDialog extends JDialog {
 
     public NewProtectedTermsFileDialog(JabRefFrame mainFrame, ProtectedTermsLoader loader) {
         super(mainFrame, Localization.lang("New protected terms file"), true);
+        parent = mainFrame;
         this.loader = loader;
         setupDialog();
         setLocationRelativeTo(mainFrame);
@@ -50,7 +53,12 @@ public class NewProtectedTermsFileDialog extends JDialog {
 
     private void setupDialog() {
         JButton browse = new JButton(Localization.lang("Browse"));
-        browse.addActionListener(BrowseAction.buildForFile(newFile, FileExtensions.TERMS));
+        FileDialog dialog = new FileDialog(parent).withExtension(FileExtensions.TERMS);
+        dialog.setDefaultExtension(FileExtensions.TERMS);
+        browse.addActionListener(e -> {
+            Optional<Path> file = dialog.showDialogAndGetSelectedFile();
+            file.ifPresent(f -> newFile.setText(f.toAbsolutePath().toString()));
+        });
 
         // Build content panel
         FormBuilder builder = FormBuilder.create();

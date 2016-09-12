@@ -11,14 +11,16 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class FileBasedLock {
+    private static final Log LOGGER = LogFactory.getLog(FileBasedLock.class);
+
+    private static final String LOCKFILE_SUFFIX = ".lock";
+    // default retry count for aquiring file lock
+    private static final int AQUIRE_LOCK_RETRY = 10;
 
     /**
      * The age in ms of a lockfile before JabRef will offer to "steal" the locked file.
      */
     public static final long LOCKFILE_CRITICAL_AGE = 60000;
-    private static final String LOCKFILE_SUFFIX = ".lock";
-    private static final Log LOGGER = LogFactory.getLog(FileBasedLock.class);
-
 
     /**
      * This method checks whether there is a lock file for the given file. If
@@ -29,7 +31,7 @@ public class FileBasedLock {
      * @param maxWaitCount The maximum number of times to wait.
      * @return true if the lock file is gone, false if it is still there.
      */
-    public static boolean waitForFileLock(Path file, int maxWaitCount) {
+    private static boolean waitForFileLock(Path file, int maxWaitCount) {
         // Check if the file is locked by another JabRef user:
         int lockCheckCount = 0;
         while (hasLockFile(file)) {
@@ -44,6 +46,10 @@ public class FileBasedLock {
             }
         }
         return true;
+    }
+
+    public static boolean waitForFileLock(Path file) {
+        return waitForFileLock(file, AQUIRE_LOCK_RETRY);
     }
 
     /**

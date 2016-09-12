@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.importer.worker;
 
 import java.io.File;
@@ -28,7 +13,6 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.importer.ParserResultWarningDialog;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
@@ -77,7 +61,7 @@ public class AutosaveStartupPrompter implements Runnable {
             ParserResult pr;
             do {
                 pr = OpenDatabase.loadDatabaseOrAutoSave(fileToLoad.getPath(), true,
-                        ImportFormatPreferences.fromPreferences(Globals.prefs));
+                        Globals.prefs.getImportFormatPreferences());
                 if (pr.isInvalid()) {
                     loaded.add(pr);
                     BibDatabaseContext databaseContext = pr.getDatabaseContext();
@@ -108,7 +92,7 @@ public class AutosaveStartupPrompter implements Runnable {
                 }
             } while (!done);
 
-            if (!pr.isInvalid() && Globals.prefs.getBoolean(JabRefPreferences.DISPLAY_KEY_WARNING_DIALOG_AT_STARTUP)) {
+            if (!pr.isInvalid()) {
                 ParserResultWarningDialog.showParserResultWarningDialog(pr, frame);
             }
         }

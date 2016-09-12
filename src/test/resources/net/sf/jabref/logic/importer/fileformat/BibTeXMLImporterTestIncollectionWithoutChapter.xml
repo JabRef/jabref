@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<bibtex:file xmlns:bibtex="http://bibtexml.sf.net/">
+<bibtex:entry id="Mustermann2016">
+  <bibtex:incollection>
+    <bibtex:author>Max Mustermann</bibtex:author>
+    <bibtex:editor>Maxima Musterfrau</bibtex:editor>
+    <bibtex:title>Java InCollection</bibtex:title>
+    <bibtex:booktitle>Java Testing</bibtex:booktitle>
+    <bibtex:publisher>Java Publisher</bibtex:publisher>
+    <bibtex:volume>1</bibtex:volume>
+    <bibtex:month>February</bibtex:month>
+    <bibtex:pages>18-26</bibtex:pages>
+    <bibtex:number>1</bibtex:number>
+    <bibtex:keywords>java</bibtex:keywords>
+  </bibtex:incollection>
+</bibtex:entry>
+</bibtex:file>

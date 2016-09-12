@@ -4,17 +4,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -29,7 +28,6 @@ public class InspecImportTest {
 
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
         this.importer = new InspecImporter();
     }
 
@@ -38,7 +36,7 @@ public class InspecImportTest {
         List<String> testList = Arrays.asList("InspecImportTest.txt", "InspecImportTest2.txt");
         for (String str : testList) {
             Path file = Paths.get(InspecImportTest.class.getResource(str).toURI());
-            assertTrue(importer.isRecognizedFormat(file, Charset.defaultCharset()));
+            assertTrue(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 
@@ -49,7 +47,7 @@ public class InspecImportTest {
                 "IsiImporterTestMedline.isi", "RisImporterTest1.ris", "InspecImportTestFalse.txt");
         for (String str : testList) {
             Path file = Paths.get(InspecImportTest.class.getResource(str).toURI());
-            assertFalse(importer.isRecognizedFormat(file, Charset.defaultCharset()));
+            assertFalse(importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 
@@ -117,7 +115,7 @@ public class InspecImportTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(".txt", importer.getExtensions().get(0));
+        assertEquals(FileExtensions.INSPEC, importer.getExtensions());
     }
 
     @Test

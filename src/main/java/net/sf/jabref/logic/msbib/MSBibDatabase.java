@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.msbib;
 
 import java.io.BufferedReader;
@@ -41,10 +26,11 @@ import org.xml.sax.SAXException;
 
 /**
  * Microsoft Word bibliography.
- *
+ * The class is uesed both for import and export
  * See http://www.ecma-international.org/publications/standards/Ecma-376.htm
  */
 public class MSBibDatabase {
+
     private static final Log LOGGER = LogFactory.getLog(MSBibDatabase.class);
 
     public static final String NAMESPACE = "http://schemas.openxmlformats.org/officeDocument/2006/bibliography";
@@ -52,20 +38,34 @@ public class MSBibDatabase {
 
     private Set<MSBibEntry> entries;
 
+
+    /**
+     * Creates a {@link MSBibDatabase} for <b>import</b>
+     */
     public MSBibDatabase() {
         entries = new HashSet<>();
     }
 
     // TODO: why an additonal entry list? entries are included inside database!
+    /**
+     * Creates a new {@link MSBibDatabase} for <b>export</b>
+     * @param database The bib database
+     * @param entries List of {@link BibEntry}
+     */
     public MSBibDatabase(BibDatabase database, List<BibEntry> entries) {
         if (entries == null) {
-            addEntries(database.getEntries());
+            addEntriesForExport(database.getEntries());
         } else {
-            addEntries(entries);
+            addEntriesForExport(entries);
         }
     }
 
-    public List<BibEntry> importEntries(BufferedReader reader) {
+    /**
+     * Imports entries from an office xml file
+     * @param reader
+     * @return List of {@link BibEntry}
+     */
+    public List<BibEntry> importEntriesFromXml(BufferedReader reader) {
         entries = new HashSet<>();
         Document inputDocument;
         try {
@@ -96,7 +96,7 @@ public class MSBibDatabase {
         return bibitems;
     }
 
-    private void addEntries(List<BibEntry> entriesToAdd) {
+    private void addEntriesForExport(List<BibEntry> entriesToAdd) {
         entries = new HashSet<>();
         for (BibEntry entry : entriesToAdd) {
             MSBibEntry newMods = MSBibConverter.convert(entry);
@@ -104,7 +104,11 @@ public class MSBibDatabase {
         }
     }
 
-    public Document getDOM() {
+    /**
+     * Gets the assembled dom for export
+     * @return XML Document
+     */
+    public Document getDomForExport() {
         Document document = null;
         try {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -114,19 +118,18 @@ public class MSBibDatabase {
 
             Element rootNode = document.createElementNS(NAMESPACE, PREFIX + "Sources");
             rootNode.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", NAMESPACE);
-            rootNode.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns:" + PREFIX.substring(0, PREFIX.length() - 1), NAMESPACE);
+            rootNode.setAttributeNS("http://www.w3.org/2000/xmlns/",
+                    "xmlns:" + PREFIX.substring(0, PREFIX.length() - 1), NAMESPACE);
             rootNode.setAttribute("SelectedStyle", "");
 
             for (MSBibEntry entry : entries) {
-                Node node = entry.getDOM(document);
+                Node node = entry.getEntryDom(document);
                 rootNode.appendChild(node);
             }
-
             document.appendChild(rootNode);
         } catch (ParserConfigurationException e) {
             LOGGER.warn("Could not build XML document", e);
         }
-
         return document;
     }
 }

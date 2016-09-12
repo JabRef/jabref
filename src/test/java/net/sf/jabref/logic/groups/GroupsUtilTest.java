@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
@@ -29,7 +28,7 @@ public class GroupsUtilTest {
                 StandardCharsets.UTF_8)) {
 
             ParserResult result = BibtexParser.parse(fr,
-                    ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
+                    JabRefPreferences.getInstance().getImportFormatPreferences());
 
             BibDatabase db = result.getDatabase();
 

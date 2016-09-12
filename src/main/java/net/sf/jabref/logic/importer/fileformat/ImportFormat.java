@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
@@ -23,10 +8,10 @@ import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
-import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.util.FileExtensions;
 
 /**
  * Role of an importer for JabRef.
@@ -117,13 +102,12 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
      */
     public abstract String getFormatName();
 
+
     /**
-     * Returns the file extensions that this importer can read.
-     * The extension should contain the leading dot, so for example ".bib"
-     *
-     * @return list of supported file extensions (not null but may be empty). The list should never be null. Instead return an empty list.
+     * Returns the file extensions that this importer can read
+     * @return {@link FileExtensions} correspoding to the importer
      */
-    public abstract List<String> getExtensions();
+    public abstract FileExtensions getExtensions();
 
     /**
      * Returns a one-word ID which identifies this import format.

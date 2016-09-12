@@ -18,6 +18,7 @@ public class MySQLProcessor extends DBMSProcessor {
 
     /**
      * Creates and sets up the needed tables and columns according to the database type.
+     *
      * @throws SQLException
      */
     @Override
@@ -35,9 +36,10 @@ public class MySQLProcessor extends DBMSProcessor {
                 "`VALUE` TEXT DEFAULT NULL, " +
                 "FOREIGN KEY (`ENTRY_SHARED_ID`) REFERENCES `ENTRY`(`SHARED_ID`) ON DELETE CASCADE)");
 
-        connection.createStatement().executeUpdate("CREATE TABLE IF NOT EXISTS `METADATA` (" +
-                    "`KEY` varchar(255) NOT NULL," +
-                    "`VALUE` text NOT NULL)");
+        connection.createStatement().executeUpdate(
+                "CREATE TABLE IF NOT EXISTS `METADATA` (" +
+                "`KEY` varchar(255) NOT NULL," +
+                "`VALUE` text NOT NULL)");
     }
 
     @Override

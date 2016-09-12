@@ -1,5 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
 
+// to update the gradle wrapper, execute ./gradlew wrapper --gradle-version 3.0
+
 buildscript {
     repositories {
         maven {
@@ -32,11 +34,11 @@ apply plugin: 'checkstyle'
 
 apply from: 'eclipse.gradle'
 apply from: 'localization.gradle'
-apply from: 'medline.gradle'
+apply from: 'xjc.gradle'
 
 group = "net.sf.jabref"
-version = "3.6dev"
-project.ext.threeDotVersion = "3.5.0.1"
+version = "3.7dev"
+project.ext.threeDotVersion = "3.6.0.1"
 project.ext.install4jDir = hasProperty("install4jDir") ? getProperty("install4jDir") : (OperatingSystem.current().isWindows() ? 'C:/Program Files/install4j6' : 'install4j6')
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -44,10 +46,6 @@ mainClassName = "net.sf.jabref.JabRefMain"
 
 install4j {
     installDir = file(project.ext.install4jDir)
-}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.14.1'
 }
 
 
@@ -62,8 +60,8 @@ configurations {
     databaseTestCompile.extendsFrom testCompile
     databaseTestRuntime.extendsFrom testRuntime
 
-	integrationTestCompile.extendsFrom testCompile
-	integrationTestRuntime.extendsFrom testRuntime
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
 }
 
 dependencies {
@@ -79,7 +77,7 @@ dependencies {
     compile 'org.apache.pdfbox:jempbox:1.8.12'
 
     // required for reading write-protected PDFs - see https://github.com/JabRef/jabref/pull/942#issuecomment-209252635
-    compile 'org.bouncycastle:bcprov-jdk15on:1.54'
+    compile 'org.bouncycastle:bcprov-jdk15on:1.55'
 
     compile 'commons-cli:commons-cli:1.3.1'
 
@@ -112,15 +110,17 @@ dependencies {
 
     compile 'org.jsoup:jsoup:1.9.2'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
-    compile 'info.debatty:java-string-similarity:0.14'
+    compile 'info.debatty:java-string-similarity:0.17'
 
     compile 'org.apache.logging.log4j:log4j-jcl:2.6.2'
     compile 'org.apache.logging.log4j:log4j-api:2.6.2'
     compile 'org.apache.logging.log4j:log4j-core:2.6.2'
+    compile 'org.xmlunit:xmlunit-core:2.2.1'
+    compile 'org.xmlunit:xmlunit-matchers:2.2.1'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile 'com.github.tomakehurst:wiremock:2.1.9'
+    testCompile 'com.github.tomakehurst:wiremock:2.1.11'
     testCompile 'org.assertj:assertj-swing-junit:3.4.0'
 }
 
@@ -136,7 +136,7 @@ sourceSets {
             runtimeClasspath += main.output + test.output
         }
     }
-	integrationTest {
+    integrationTest {
         java {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
@@ -152,7 +152,9 @@ processResources {
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "))
+                filteringCharset = 'UTF-8'
     }
+    filteringCharset = 'UTF-8'
 
     filesMatching("resource/**/meta.xml") {
         expand version: project.version

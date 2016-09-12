@@ -1,8 +1,6 @@
 package net.sf.jabref.logic.importer.fileformat;
 
-import java.util.Arrays;
-
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
@@ -14,9 +12,10 @@ public class FreeCiteImporterTest {
 
     private FreeCiteImporter importer;
 
+
     @Before
     public void setUp() {
-        importer = new FreeCiteImporter(ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
+        importer = new FreeCiteImporter(JabRefPreferences.getInstance().getImportFormatPreferences());
     }
 
     @Test
@@ -26,11 +25,12 @@ public class FreeCiteImporterTest {
 
     @Test
     public void testsGetExtensions() {
-        assertEquals(Arrays.asList(".txt",".xml"), importer.getExtensions());
+        assertEquals(FileExtensions.FREECITE, importer.getExtensions());
     }
 
     @Test
     public void testGetDescription() {
-        assertEquals("This importer parses text format citations using the online API of FreeCite.", importer.getDescription());
+        assertEquals("This importer parses text format citations using the online API of FreeCite.",
+                importer.getDescription());
     }
 }
