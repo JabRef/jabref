@@ -11,6 +11,7 @@ import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
@@ -29,7 +30,7 @@ public class DoiFetcher implements IdBasedFetcher {
 
     @Override
     public String getName() {
-        return "DOI to BibTeX";
+        return "DOI";
     }
 
     @Override
@@ -54,7 +55,7 @@ public class DoiFetcher implements IdBasedFetcher {
                 Optional<BibEntry> result = BibtexParser.singleFromString(cleanupEncoding(bibtexString), preferences);
                 return result;
             } else {
-                throw new FetcherException(String.format("Invalid DOI: %s", identifier));
+                throw new FetcherException(Localization.lang("Invalid_DOI:_'%0'.", identifier));
             }
         } catch (IOException e) {
             throw new FetcherException("Bad URL when fetching DOI info", e);

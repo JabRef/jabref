@@ -480,7 +480,7 @@ public class PdfContentImporter extends ImportFormat {
         } catch(IOException exception) {
             return ParserResult.fromErrorMessage(exception.getLocalizedMessage());
         } catch (FetcherException e) {
-            return ParserResult.fromErrorMessage("Error while fetching");
+            return ParserResult.fromErrorMessage("Bad URL when fetching DOI info");
         }
 
         return new ParserResult(result);

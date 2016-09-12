@@ -48,7 +48,7 @@ public class DoiFetcherTest {
 
     @Test
     public void testGetName() {
-        assertEquals("DOI to BibTeX", fetcher.getName());
+        assertEquals("DOI", fetcher.getName());
     }
 
     @Test
