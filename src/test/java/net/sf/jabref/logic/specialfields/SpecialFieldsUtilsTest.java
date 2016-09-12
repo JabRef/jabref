@@ -1,4 +1,4 @@
-package net.sf.jabref.specialfields;
+package net.sf.jabref.logic.specialfields;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.specialfields.Rank;
 
 import org.junit.Test;
 

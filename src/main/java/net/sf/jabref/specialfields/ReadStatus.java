@@ -7,6 +7,7 @@ import javax.swing.Icon;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.specialfields.SpecialField;
 import net.sf.jabref.model.entry.SpecialFields;
 
 public class ReadStatus extends SpecialField {

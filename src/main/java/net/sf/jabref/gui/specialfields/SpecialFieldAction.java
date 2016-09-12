@@ -1,4 +1,4 @@
-package net.sf.jabref.specialfields;
+package net.sf.jabref.gui.specialfields;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,6 +8,8 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
+import net.sf.jabref.logic.specialfields.SpecialField;
+import net.sf.jabref.logic.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;

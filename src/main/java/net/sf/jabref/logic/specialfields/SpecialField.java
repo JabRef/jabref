@@ -1,4 +1,4 @@
-package net.sf.jabref.specialfields;
+package net.sf.jabref.logic.specialfields;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.specialfields.SpecialFieldValue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -1,9 +1,10 @@
-package net.sf.jabref.specialfields;
+package net.sf.jabref.gui.specialfields;
 
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.logic.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.event.FieldChangedEvent;

@@ -1,6 +1,7 @@
 package net.sf.jabref.specialfields;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.event.EntryAddedEvent;
 

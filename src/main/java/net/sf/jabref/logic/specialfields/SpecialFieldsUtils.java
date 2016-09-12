@@ -1,4 +1,4 @@
-package net.sf.jabref.specialfields;
+package net.sf.jabref.logic.specialfields;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,12 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.SpecialFields;
+import net.sf.jabref.specialfields.Printed;
+import net.sf.jabref.specialfields.Priority;
+import net.sf.jabref.specialfields.Quality;
+import net.sf.jabref.specialfields.Rank;
+import net.sf.jabref.specialfields.ReadStatus;
+import net.sf.jabref.specialfields.Relevance;
 
 
 public class SpecialFieldsUtils {
