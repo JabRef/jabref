@@ -49,6 +49,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed field `location` containing only city is not exported correctly to MS-Office 2007 xml format
 - Fixed field `key` field is not exported to MS-Office 2008 xml format
 - Fixed download files failed silently when an invalid directory is selected
+- Fixed InvalidBackgroundColor flickering with Ctrl-s and File > Save database
 
 ### Removed
 - The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field. 
