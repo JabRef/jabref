@@ -52,6 +52,7 @@ public class PdfCommentsTab extends JPanel {
     private final String tabTitle;
     private final JabRefFrame frame;
     private final BasePanel basePanel;
+    private int commentListSelectedIndex;
 
     HashMap<String, PdfComment> importedNotes = new HashMap<>();
 
@@ -81,8 +82,10 @@ public class PdfCommentsTab extends JPanel {
     public void addComments() throws IOException {
         Optional<String> field = parent.getEntry().getField(FieldName.FILE);
         if (field.isPresent()) {
-            commentList.setModel(listModel);
-            commentList.addListSelectionListener(new CommentListSelectionListener());
+            if(!commentList.getModel().equals(listModel)){
+                commentList.setModel(listModel);
+                commentList.addListSelectionListener(new CommentListSelectionListener());
+            }
             PdfCommentImporter commentImporter = new PdfCommentImporter();
             ArrayList<BibEntry> entries = new ArrayList<>();
             entries.add(parent.getEntry());
@@ -95,6 +98,7 @@ public class PdfCommentsTab extends JPanel {
             } else {
                 importedNotes = commentImporter.importNotes(documents.get(0));
                 updateShownComments(importedNotes);
+                commentList.setSelectedIndex(commentListSelectedIndex);
             }
         }
     }
@@ -213,7 +217,13 @@ public class PdfCommentsTab extends JPanel {
     private class CommentListSelectionListener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent e) {
-            updateTextFields(listModel.get(commentList.getSelectedIndex()));
+            int index;
+            if(commentList.getSelectedIndex() >= 0){
+                index = commentList.getSelectedIndex();
+                updateTextFields(listModel.get(index));
+                commentListSelectedIndex = index;
+            }
+            commentList.setSelectedIndex(commentListSelectedIndex);
         }
     }
 }
