@@ -13,6 +13,7 @@ public class PdfComment {
     private int page;
     private String content;
     private String text;
+    private final static int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
 
     public PdfComment(String commentId, String author, String date, int page, String content, String text) {
         this.author = author;
@@ -32,9 +33,23 @@ public class PdfComment {
 
     }
 
+    /**
+     * Abbreviate annotation names when they are longer than {@code ABBREVIATED_ANNOTATION_NAME_LENGTH} chars
+     * @param annotationName
+     * @return the abbreviated name
+     */
+    private String abbreviateAnnotationName(final String annotationName ){
+
+            int abbreviatedContentLengthForName = ABBREVIATED_ANNOTATION_NAME_LENGTH;
+            if (annotationName.length() > abbreviatedContentLengthForName) {
+                return annotationName.subSequence(0, abbreviatedContentLengthForName).toString() + "...";
+            }
+        return annotationName;
+    }
+
     @Override
     public String toString() {
-        return content;
+        return abbreviateAnnotationName(content);
     }
 
     public String getCommentId() {

@@ -255,7 +255,7 @@ public class PdfCommentsTab extends JPanel {
         openPdfButton.setText(Localization.lang("Open PDF"));
         openPdfButton.addActionListener(e -> openPdf());
         copyToClipboardButton.setText(Localization.lang("Copy to clipboard"));
-        copyToClipboardButton.addActionListener(e -> copytoClipboard());
+        copyToClipboardButton.addActionListener(e -> copyToClipboard());
 
         buttonPanel.add(copyToClipboardButton, buttonConstraints);
 
@@ -265,7 +265,7 @@ public class PdfCommentsTab extends JPanel {
         return buttonPanel;
     }
 
-    private void copytoClipboard(){
+    private void copyToClipboard(){
         new ClipBoardManager().setClipboardContents(commentTxtArea.getText());
     }
 

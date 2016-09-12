@@ -13,8 +13,6 @@ import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.pdf.PdfComment;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSFloat;
 import org.apache.pdfbox.cos.COSName;
@@ -27,10 +25,8 @@ import org.apache.pdfbox.util.PDFTextStripperByArea;
 
 public class PdfCommentImporter {
 
-    private final int APPREVIATED_ANNOTATIONANE_LENGTH = 20;
     private List pdfPages;
     private PDPage page;
-    private Log logger = LogFactory.getLog(PdfCommentImporter.class);
 
     public PdfCommentImporter() {
 
@@ -87,14 +83,8 @@ public class PdfCommentImporter {
                             }
                         }
                         annotation.setContents(highlightedText);
-                        int appreviatedContentLengthForName = APPREVIATED_ANNOTATIONANE_LENGTH;
-                        if(highlightedText.length() < appreviatedContentLengthForName){
-                            appreviatedContentLengthForName = highlightedText.length();
-                        }
-                        annotationsMap.put(highlightedText.subSequence(0, appreviatedContentLengthForName).toString() + "...", new PdfComment(annotation, i));
-                    } else {
-                        annotationsMap.put(annotation.getAnnotationName(), new PdfComment(annotation, i));
                     }
+                    annotationsMap.put( annotation.getAnnotationName(), new PdfComment(annotation, i));
                 }
             } catch (IOException e1) {
                 e1.printStackTrace();
