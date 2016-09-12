@@ -92,6 +92,9 @@ class ExternalTab extends JPanel implements PrefsTab {
         executeConsole.addActionListener(e -> updateExecuteConsoleButtonAndFieldEnabledState());
         browseButton.addActionListener(e -> showConsoleChooser());
 
+        browseAdobeAcrobatReader.addActionListener(e -> showAdobeChooser());
+        browseSumatraReader.addActionListener(e -> showSumatraChooser());
+
         layoutConstraints.fill = GridBagConstraints.HORIZONTAL;
 
         pdfLayoutConstrains.fill = GridBagConstraints.HORIZONTAL;
@@ -250,6 +253,22 @@ class ExternalTab extends JPanel implements PrefsTab {
         int answer = consoleChooser.showOpenDialog(ExternalTab.this);
         if (answer == JFileChooser.APPROVE_OPTION) {
             consoleCommand.setText(consoleChooser.getSelectedFile().getAbsolutePath());
+        }
+    }
+
+    private void showAdobeChooser(){
+        JFileChooser adobeChooser = new JFileChooser();
+        int answer = adobeChooser.showOpenDialog(ExternalTab.this);
+        if (answer == JFileChooser.APPROVE_OPTION) {
+            adobeAcrobatReaderPath.setText(adobeChooser.getSelectedFile().getAbsolutePath());
+        }
+    }
+
+    private void showSumatraChooser() {
+        JFileChooser adobeChooser = new JFileChooser();
+        int answer = adobeChooser.showOpenDialog(ExternalTab.this);
+        if (answer == JFileChooser.APPROVE_OPTION) {
+            sumatraReaderPath.setText(adobeChooser.getSelectedFile().getAbsolutePath());
         }
     }
 }
