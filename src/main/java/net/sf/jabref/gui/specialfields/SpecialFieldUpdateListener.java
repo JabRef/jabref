@@ -1,11 +1,14 @@
-package net.sf.jabref.specialfields;
+package net.sf.jabref.gui.specialfields;
 
 import javax.swing.SwingUtilities;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.logic.specialfields.SpecialFieldsUtils;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.event.FieldChangedEvent;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
 
@@ -32,8 +35,9 @@ public class SpecialFieldUpdateListener {
                 SwingUtilities
                         .invokeLater(() -> JabRefGUI.getMainFrame().getCurrentBasePanel().updateEntryEditorIfShowing());
             } else {
-                if (SpecialFieldsUtils.isSpecialField(fieldName)) {
-                    SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry);
+                if (SpecialFieldsUtils.isSpecialField(fieldName) && Globals.prefs.isKeywordSyncEnabled()) {
+                    SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry,
+                            Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
                     SwingUtilities.invokeLater(
                             () -> JabRefGUI.getMainFrame().getCurrentBasePanel().updateEntryEditorIfShowing());
                 }

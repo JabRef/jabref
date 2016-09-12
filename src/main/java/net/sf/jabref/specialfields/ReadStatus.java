@@ -7,6 +7,7 @@ import javax.swing.Icon;
 
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.specialfields.SpecialField;
 import net.sf.jabref.model.entry.SpecialFields;
 
 public class ReadStatus extends SpecialField {
@@ -48,10 +49,5 @@ public class ReadStatus extends SpecialField {
     @Override
     public String getLocalizedFieldName() {
         return Localization.lang("Read status");
-    }
-
-    @Override
-    public Icon getRepresentingIcon() {
-        return this.icon;
     }
 }

@@ -3,10 +3,9 @@ package net.sf.jabref.specialfields;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Icon;
-
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.specialfields.SpecialField;
 import net.sf.jabref.model.entry.SpecialFields;
 
 public class Rank extends SpecialField {
@@ -32,11 +31,6 @@ public class Rank extends SpecialField {
             Rank.INSTANCE = new Rank();
         }
         return Rank.INSTANCE;
-    }
-
-    @Override
-    public Icon getRepresentingIcon() {
-        return IconTheme.JabRefIcon.RANKING.getIcon();
     }
 
     @Override

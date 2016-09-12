@@ -1,4 +1,4 @@
-package net.sf.jabref.specialfields;
+package net.sf.jabref.logic.specialfields;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,9 +6,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.swing.Icon;
-
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.specialfields.SpecialFieldValue;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,8 +49,6 @@ public abstract class SpecialField {
     public abstract String getFieldName();
 
     public abstract String getLocalizedFieldName();
-
-    public abstract Icon getRepresentingIcon();
 
     public String getMenuString() {
         return getLocalizedFieldName();

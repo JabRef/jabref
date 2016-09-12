@@ -3,10 +3,9 @@ package net.sf.jabref.specialfields;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.Icon;
-
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.specialfields.SpecialField;
 import net.sf.jabref.model.entry.SpecialFields;
 
 public class Quality extends SpecialField {
@@ -38,11 +37,6 @@ public class Quality extends SpecialField {
             Quality.INSTANCE = new Quality();
         }
         return Quality.INSTANCE;
-    }
-
-    @Override
-    public Icon getRepresentingIcon() {
-        return IconTheme.JabRefIcon.QUALITY.getSmallIcon();
     }
 
     @Override

@@ -24,8 +24,10 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
+import net.sf.jabref.gui.specialfields.SpecialFieldIcon;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.specialfields.SpecialField;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -35,7 +37,6 @@ import net.sf.jabref.specialfields.Quality;
 import net.sf.jabref.specialfields.Rank;
 import net.sf.jabref.specialfields.ReadStatus;
 import net.sf.jabref.specialfields.Relevance;
-import net.sf.jabref.specialfields.SpecialField;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 
 import org.apache.commons.logging.Log;
@@ -221,7 +222,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
      */
     public static void populateSpecialFieldMenu(JMenu menu, SpecialField field, JabRefFrame frame) {
         menu.setText(field.getMenuString());
-        menu.setIcon(((IconTheme.FontBasedIcon) field.getRepresentingIcon()).createSmallIcon());
+        menu.setIcon(((IconTheme.FontBasedIcon) SpecialFieldIcon.getRepresentingIcon(field)).createSmallIcon());
         for (SpecialFieldValue val : field.getValues()) {
             menu.add(val.getMenuAction(frame));
         }
