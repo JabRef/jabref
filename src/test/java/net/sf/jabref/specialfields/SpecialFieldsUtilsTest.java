@@ -4,12 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -18,11 +15,6 @@ import static org.junit.Assert.assertTrue;
 
 
 public class SpecialFieldsUtilsTest {
-
-    @Before
-    public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
-    }
 
     @Test
     public void testSyncKeywordsFromSpecialFieldsBibEntry() {
@@ -33,12 +25,12 @@ public class SpecialFieldsUtilsTest {
     }
 
     @Test
-    public void testSyncKeywordsFromSpecialFieldsBibEntryNamedCompoundHasEdits() {
+    public void testSyncKeywordsFromSpecialFieldsBibEntryChangeListHasEdits() {
         BibEntry entry = new BibEntry();
-        List<FieldChange> nc = new ArrayList<>();
+        List<FieldChange> changeList = new ArrayList<>();
         entry.setField("ranking", "rank2");
-        SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, nc, ", ");
-        assertFalse(nc.isEmpty());
+        SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, changeList, ", ");
+        assertFalse(changeList.isEmpty());
     }
 
     @Test
@@ -51,20 +43,20 @@ public class SpecialFieldsUtilsTest {
     }
 
     @Test
-    public void testSyncKeywordsFromSpecialFieldsBibEntryNamedCompoundCorrectContent() {
+    public void testSyncKeywordsFromSpecialFieldsBibEntryChangeListCorrectContent() {
         BibEntry entry = new BibEntry();
-        List<FieldChange> nc = new ArrayList<>();
+        List<FieldChange> changeList = new ArrayList<>();
         entry.setField("ranking", "rank2");
-        SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, nc, ", ");
+        SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, changeList, ", ");
         assertEquals(Optional.of("rank2"), entry.getField("keywords"));
     }
 
     @Test
-    public void testSyncKeywordsFromSpecialFieldsBibEntryNamedCompoundNoEdits() {
+    public void testSyncKeywordsFromSpecialFieldsBibEntryChangeListNoEdits() {
         BibEntry entry = new BibEntry();
-        List<FieldChange> nc = new ArrayList<>();
-        SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, nc, ", ");
-        assertTrue(nc.isEmpty());
+        List<FieldChange> changeList = new ArrayList<>();
+        SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, changeList, ", ");
+        assertTrue(changeList.isEmpty());
     }
 
     @Test
@@ -76,29 +68,29 @@ public class SpecialFieldsUtilsTest {
     }
 
     @Test
-    public void testSyncSpecialFieldsFromKeywordsBibEntryNamedCompoundHasEdits() {
+    public void testSyncSpecialFieldsFromKeywordsBibEntryChangeListHasEdits() {
         BibEntry entry = new BibEntry();
-        List<FieldChange> nc = new ArrayList<>();
+        List<FieldChange> changeList = new ArrayList<>();
         entry.setField("keywords", "rank2");
-        SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, nc);
-        assertFalse(nc.isEmpty());
+        SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, changeList);
+        assertFalse(changeList.isEmpty());
     }
 
     @Test
-    public void testSyncSpecialFieldsFromKeywordsBibEntryNamedCompoundCorrectContent() {
+    public void testSyncSpecialFieldsFromKeywordsBibEntryChangeListCorrectContent() {
         BibEntry entry = new BibEntry();
-        List<FieldChange> nc = new ArrayList<>();
+        List<FieldChange> changeList = new ArrayList<>();
         entry.setField("keywords", "rank2");
-        SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, nc);
+        SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, changeList);
         assertEquals(Optional.of("rank2"), entry.getField("ranking"));
     }
 
     @Test
-    public void testSyncSpecialFieldsFromKeywordsBibEntryNamedCompoundNoEdit() {
+    public void testSyncSpecialFieldsFromKeywordsBibEntryChangeListNoEdit() {
         BibEntry entry = new BibEntry();
-        List<FieldChange> nc = new ArrayList<>();
-        SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, nc);
-        assertTrue(nc.isEmpty());
+        List<FieldChange> changeList = new ArrayList<>();
+        SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, changeList);
+        assertTrue(changeList.isEmpty());
     }
 
     @Test
