@@ -1,36 +1,19 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.model.bibtexkeypattern;
 
 import java.util.List;
 
-import net.sf.jabref.preferences.JabRefPreferences;
-
 public class DatabaseBibtexKeyPattern extends AbstractBibtexKeyPattern {
 
-    private final JabRefPreferences prefs;
+    private final GlobalBibtexKeyPattern globalBibtexKeyPattern;
 
 
-    public DatabaseBibtexKeyPattern(JabRefPreferences prefs) {
-        this.prefs = prefs;
+    public DatabaseBibtexKeyPattern(GlobalBibtexKeyPattern globalBibtexKeyPattern) {
+        this.globalBibtexKeyPattern = globalBibtexKeyPattern;
     }
 
     @Override
     public List<String> getLastLevelBibtexKeyPattern(String key) {
-        return prefs.getKeyPattern().getValue(key);
+        return globalBibtexKeyPattern.getValue(key);
     }
 
 }

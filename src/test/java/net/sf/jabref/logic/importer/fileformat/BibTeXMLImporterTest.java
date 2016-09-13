@@ -1,20 +1,15 @@
 package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.DirectoryStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import net.sf.jabref.Globals;
-import net.sf.jabref.logic.importer.util.BibTeXMLHandler;
 import net.sf.jabref.logic.util.FileExtensions;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +22,6 @@ import static org.junit.Assert.assertFalse;
 @RunWith(MockitoJUnitRunner.class)
 public class BibTeXMLImporterTest {
 
-    private static final String FILEFORMAT_PATH = "src/test/resources/net/sf/jabref/logic/importer/fileformat";
     private BibTeXMLImporter importer;
 
 
@@ -37,25 +31,16 @@ public class BibTeXMLImporterTest {
      * @return A list of Names
      * @throws IOException
      */
-    public List<Path> getTestFiles() throws IOException {
-        List<Path> files = new ArrayList<>();
-        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(FILEFORMAT_PATH))) {
-            stream.forEach(files::add);
+    public List<Path> getTestFiles() throws Exception {
+        try (Stream<Path> stream = Files.list(Paths.get(BibTeXMLImporterTest.class.getResource("").toURI()))) {
+            return stream.filter(p -> !Files.isDirectory(p)).collect(Collectors.toList());
         }
-        return files;
 
     }
 
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
         importer = new BibTeXMLImporter();
-    }
-
-    @Test
-    public void testGetItemsEmpty() {
-        BibTeXMLHandler handler = new BibTeXMLHandler();
-        assertEquals(Collections.emptyList(), handler.getItems());
     }
 
     @Test
@@ -79,13 +64,13 @@ public class BibTeXMLImporterTest {
     }
 
     @Test
-    public void testIsRecognizedFormatReject() throws IOException {
+    public void testIsRecognizedFormatReject() throws Exception {
         List<Path> list = getTestFiles().stream()
                 .filter(n -> !n.getFileName().toString().startsWith("BibTeXMLImporterTest"))
                 .collect(Collectors.toList());
 
         for (Path file : list) {
-            assertFalse(file.toString(), importer.isRecognizedFormat(file, Charset.defaultCharset()));
+            assertFalse(file.toString(), importer.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 }

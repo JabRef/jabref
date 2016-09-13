@@ -1,18 +1,3 @@
-/*  Copyright (C) 2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
 package net.sf.jabref.gui.protectedterms;
 
 import java.awt.BorderLayout;
@@ -22,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -50,28 +36,26 @@ import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
-import net.sf.jabref.external.ExternalFileType;
-import net.sf.jabref.external.ExternalFileTypes;
-import net.sf.jabref.external.UnknownExternalFileType;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
+import net.sf.jabref.gui.externalfiletype.UnknownExternalFileType;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.gui.util.GUIUtil;
+import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsList;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
-import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.logic.util.FileExtensions;
-import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -166,7 +150,7 @@ public class ProtectedTermsDialog {
             @Override
             public void actionPerformed(ActionEvent event) {
                 // Restore from preferences
-                loader.update(ProtectedTermsPreferences.fromPreferences(Globals.prefs));
+                loader.update(Globals.prefs.getProtectedTermsPreferences());
                 diag.dispose();
             }
         };
@@ -189,9 +173,9 @@ public class ProtectedTermsDialog {
 
         diag.pack();
 
-        PositionWindow pw = new PositionWindow(diag, JabRefPreferences.TERMS_POS_X, JabRefPreferences.TERMS_POS_Y,
+        WindowLocation pw = new WindowLocation(diag, JabRefPreferences.TERMS_POS_X, JabRefPreferences.TERMS_POS_Y,
                 JabRefPreferences.TERMS_SIZE_X, JabRefPreferences.TERMS_SIZE_Y);
-        pw.setWindowPosition();
+        pw.displayWindowAtStoredLocation();
     }
 
     private void setupTable() {
@@ -203,9 +187,7 @@ public class ProtectedTermsDialog {
         cm.getColumn(0).setMaxWidth((cm.getColumn(0).getPreferredWidth() * 11) / 10);
         cm.getColumn(1).setPreferredWidth(100);
         cm.getColumn(2).setPreferredWidth(100);
-        if (OS.WINDOWS) { // On Windows the table font scales with the menu font
-            table.setRowHeight(Globals.prefs.getInt(JabRefPreferences.MENU_FONT_SIZE) + 2);
-        }
+        GUIUtil.correctRowHeight(table);
 
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.addMouseListener(new MouseAdapter() {
@@ -452,7 +434,12 @@ public class ProtectedTermsDialog {
             super(diag, Localization.lang("Add protected terms file"), true);
 
             JButton browse = new JButton(Localization.lang("Browse"));
-            browse.addActionListener(BrowseAction.buildForFile(newFile, FileExtensions.TERMS));
+            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.TERMS);
+            dialog.setDefaultExtension(FileExtensions.TERMS);
+            browse.addActionListener(e -> {
+                Optional<Path> file = dialog.showDialogAndGetSelectedFile();
+                file.ifPresent(f -> newFile.setText(f.toAbsolutePath().toString()));
+            });
 
             // Build content panel
             FormBuilder builder = FormBuilder.create();
@@ -507,6 +494,6 @@ public class ProtectedTermsDialog {
 
 
     private void storePreferences() {
-        ProtectedTermsPreferences.toPreferences(Globals.prefs, loader);
+        Globals.prefs.setProtectedTermsPreferences(loader);
     }
 }

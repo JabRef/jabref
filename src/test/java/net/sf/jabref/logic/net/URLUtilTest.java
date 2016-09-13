@@ -13,6 +13,8 @@ public class URLUtilTest {
         Assert.assertEquals("this is no url!", URLUtil.cleanGoogleSearchURL("this is no url!"));
         // no Google search URL
         Assert.assertEquals("http://dl.acm.org/citation.cfm?id=321811", URLUtil.cleanGoogleSearchURL("http://dl.acm.org/citation.cfm?id=321811"));
+        // malformed Google URL
+        Assert.assertEquals("https://www.google.de/url♥", URLUtil.cleanGoogleSearchURL("https://www.google.de/url♥"));
         // no queries
         Assert.assertEquals("https://www.google.de/url", URLUtil.cleanGoogleSearchURL("https://www.google.de/url"));
         Assert.assertEquals("https://www.google.de/url?", URLUtil.cleanGoogleSearchURL("https://www.google.de/url?"));

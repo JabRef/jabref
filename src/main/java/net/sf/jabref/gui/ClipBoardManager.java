@@ -1,24 +1,3 @@
-/*  Copyright (C) 2003-2011 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
-// created by : r.nagel 14.09.2004
-//
-// function : handle all clipboard action
-//
-// modified :
-
 package net.sf.jabref.gui;
 
 import java.awt.Toolkit;
@@ -35,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.fetcher.DOItoBibTeX;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.util.DOI;
@@ -88,15 +66,19 @@ public class ClipBoardManager implements ClipboardOwner {
         return result;
     }
 
+
     public List<BibEntry> extractBibEntriesFromClipboard() {
         // Get clipboard contents, and see if TransferableBibtexEntry is among the content flavors offered
         Transferable content = CLIPBOARD.getContents(null);
-
         List<BibEntry> result = new ArrayList<>();
+
+
         if (content.isDataFlavorSupported(TransferableBibtexEntry.entryFlavor)) {
             // We have determined that the clipboard data is a set of entries.
-            try {
-                result = (List<BibEntry>) content.getTransferData(TransferableBibtexEntry.entryFlavor);
+            try  {
+                @SuppressWarnings("unchecked")
+                List<BibEntry> contents = (List<BibEntry>) content.getTransferData(TransferableBibtexEntry.entryFlavor);
+                result = contents;
             } catch (UnsupportedFlavorException | ClassCastException ex) {
                 LOGGER.warn("Could not paste this type", ex);
             } catch (IOException ex) {
@@ -109,12 +91,12 @@ public class ClipBoardManager implements ClipboardOwner {
                 if (DOI.build(data).isPresent()) {
                     LOGGER.info("Found DOI in clipboard");
                     Optional<BibEntry> entry = DOItoBibTeX.getEntryFromDOI(new DOI(data).getDOI(),
-                            ImportFormatPreferences.fromPreferences(Globals.prefs));
+                            Globals.prefs.getImportFormatPreferences());
                     entry.ifPresent(result::add);
                 } else {
                     // parse bibtex string
                     BibtexParser bp = new BibtexParser(new StringReader(data),
-                            ImportFormatPreferences.fromPreferences(Globals.prefs));
+                            Globals.prefs.getImportFormatPreferences());
                     BibDatabase db = bp.parse().getDatabase();
                     LOGGER.info("Parsed " + db.getEntryCount() + " entries from clipboard text");
                     if (db.hasEntries()) {

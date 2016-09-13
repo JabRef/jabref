@@ -6,7 +6,6 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
 import net.sf.jabref.MetaData;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
@@ -34,14 +33,12 @@ public class MoveFilesCleanupTest {
 
     @Before
     public void setUp() throws IOException {
-        Globals.prefs = JabRefPreferences.getInstance();
-
         pdfFolder = bibFolder.newFolder();
         MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
         databaseContext = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
 
-        cleanup = new MoveFilesCleanup(databaseContext);
+        cleanup = new MoveFilesCleanup(databaseContext, JabRefPreferences.getInstance().getFileDirectoryPreferences());
     }
 
     @Test
@@ -62,7 +59,7 @@ public class MoveFilesCleanupTest {
         assertTrue(fileAfter.exists());
 
         assertEquals(Optional.of(FileField.getStringRepresentation(new ParsedFileField("", fileAfter.getName(), ""))),
-                entry.getFieldOptional("file"));
+                entry.getField("file"));
     }
 
     @Test
@@ -85,6 +82,6 @@ public class MoveFilesCleanupTest {
         assertEquals(
                 Optional.of(FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("", "", ""),
                         new ParsedFileField("", fileAfter.getName(), ""), new ParsedFileField("", "", "")))),
-                entry.getFieldOptional("file"));
+                entry.getField("file"));
     }
 }

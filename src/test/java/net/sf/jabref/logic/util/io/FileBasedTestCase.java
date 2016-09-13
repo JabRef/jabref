@@ -12,21 +12,25 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.jabref.BibtexTestData;
-import net.sf.jabref.Globals;
+import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+@RunWith(MockitoJUnitRunner.class)
 public class FileBasedTestCase {
 
     private BibEntry entry;
@@ -35,12 +39,14 @@ public class FileBasedTestCase {
     @Rule
     public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
+    @Mock
+    private ImportFormatPreferences prefs;
 
     @Before
     public void setUp() throws IOException {
-        Globals.prefs = mock(JabRefPreferences.class);
+        when(prefs.getFieldContentParserPreferences()).thenReturn(new FieldContentParserPreferences());
 
-        BibDatabase database = BibtexTestData.getBibtexDatabase();
+        BibDatabase database = BibtexTestData.getBibtexDatabase(prefs);
         entry = database.getEntries().iterator().next();
 
         rootDir = temporaryFolder.getRoot().toPath();

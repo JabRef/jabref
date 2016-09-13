@@ -1,23 +1,11 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.preftabs;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ItemListener;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -25,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
@@ -32,8 +21,8 @@ import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.actions.BrowseAction;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
@@ -153,8 +142,14 @@ class FileTab extends JPanel implements PrefsTab {
         lab = new JLabel(Localization.lang("Main file directory") + ':');
         builder.append(lab);
         builder.append(fileDir);
-        BrowseAction browse = BrowseAction.buildForDir(this.frame, fileDir);
-        builder.append(new JButton(browse));
+
+        JButton browse = new JButton(Localization.lang("Browse"));
+        browse.addActionListener(e ->
+                new FileDialog(this.frame).showDialogAndGetSelectedDirectory()
+                        .ifPresent(f -> fileDir.setText(f.toAbsolutePath().toString()))
+        );
+        builder.append(browse);
+
         builder.nextLine();
         builder.append(bibLocAsPrimaryDir, 3);
         builder.nextLine();
@@ -274,10 +269,8 @@ class FileTab extends JPanel implements PrefsTab {
         prefs.putInt(JabRefPreferences.AUTO_SAVE_INTERVAL, (Integer) autoSaveInterval.getValue());
         doNotResolveStringsFor.setText(prefs.get(JabRefPreferences.DO_NOT_RESOLVE_STRINGS_FOR));
 
-        boolean updateSpecialFields = false;
         if (!nonWrappableFields.getText().trim().equals(prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS))) {
             prefs.put(JabRefPreferences.NON_WRAPPABLE_FIELDS, nonWrappableFields.getText());
-            updateSpecialFields = true;
         }
 
         // See if we should start or stop the auto save manager:
@@ -292,7 +285,14 @@ class FileTab extends JPanel implements PrefsTab {
 
     @Override
     public boolean validateSettings() {
-        return true;
+        Path path = Paths.get(fileDir.getText());
+        boolean valid = Files.exists(path) && Files.isDirectory(path);
+        if (!valid) {
+            String content = String.format("%s -> %s %n %n %s: %n %s", Localization.lang("File"),
+                    Localization.lang("Main file directory"), Localization.lang("Directory not found"), path);
+            JOptionPane.showMessageDialog(this.frame, content, Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+        }
+        return valid;
     }
 
     @Override

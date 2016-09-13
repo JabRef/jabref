@@ -27,7 +27,7 @@ public class SpecialFieldsUtilsTest {
         BibEntry entry = new BibEntry();
         entry.setField("ranking", "rank2");
         SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry);
-        assertEquals(Optional.of("rank2"), entry.getFieldOptional("keywords"));
+        assertEquals(Optional.of("rank2"), entry.getField("keywords"));
     }
 
     @Test
@@ -45,7 +45,7 @@ public class SpecialFieldsUtilsTest {
         entry.setField("ranking", "rank2");
         entry.setField("keywords", "rank3");
         SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry);
-        assertEquals(Optional.of("rank2"), entry.getFieldOptional("keywords"));
+        assertEquals(Optional.of("rank2"), entry.getField("keywords"));
     }
 
     @Test
@@ -54,7 +54,7 @@ public class SpecialFieldsUtilsTest {
         NamedCompound nc = new NamedCompound("Test");
         entry.setField("ranking", "rank2");
         SpecialFieldsUtils.syncKeywordsFromSpecialFields(entry, nc);
-        assertEquals(Optional.of("rank2"), entry.getFieldOptional("keywords"));
+        assertEquals(Optional.of("rank2"), entry.getField("keywords"));
     }
 
     @Test
@@ -70,7 +70,7 @@ public class SpecialFieldsUtilsTest {
         BibEntry entry = new BibEntry();
         entry.setField("keywords", "rank2");
         SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry);
-        assertEquals(Optional.of("rank2"), entry.getFieldOptional("ranking"));
+        assertEquals(Optional.of("rank2"), entry.getField("ranking"));
     }
 
     @Test
@@ -88,7 +88,7 @@ public class SpecialFieldsUtilsTest {
         NamedCompound nc = new NamedCompound("Test");
         entry.setField("keywords", "rank2");
         SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry, nc);
-        assertEquals(Optional.of("rank2"), entry.getFieldOptional("ranking"));
+        assertEquals(Optional.of("rank2"), entry.getField("ranking"));
     }
 
     @Test

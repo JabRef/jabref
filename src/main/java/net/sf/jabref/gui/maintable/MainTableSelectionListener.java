@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.maintable;
 
 import java.awt.event.FocusEvent;
@@ -35,17 +20,17 @@ import javax.swing.Timer;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.external.ExternalFileMenuItem;
-import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.BasePanelMode;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.externalfiletype.ExternalFileMenuItem;
+import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import net.sf.jabref.gui.filelist.FileListEntry;
+import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.menus.RightClickMenu;
 import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
@@ -100,8 +85,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 new PreviewPanel(panel.getBibDatabaseContext(), null, panel,
                         Globals.prefs.get(JabRefPreferences.PREVIEW_1))};
 
-        panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[0]);
-        panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[1]);
+        panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable()
+                .addSearchListener(previewPanel[0])
+                .addSearchListener(previewPanel[1]);
 
         this.preview = previewPanel[activePreview];
     }
@@ -120,24 +106,19 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         if (!enabled) {
             return;
         }
+
         EventList<BibEntry> selected = e.getSourceList();
-        BibEntry newSelected = null;
-        while (e.next()) {
-            if (e.getType() == ListEvent.INSERT) {
-                if (newSelected == null) {
-                    if (e.getIndex() < selected.size()) {
-                        newSelected = selected.get(e.getIndex());
-                    }
-                } else {
-                    return; // More than one new selected. Do nothing.
-                }
-            }
+        if (selected.isEmpty()){
+            return;
+        }
+
+        final BibEntry newSelected = selected.get(0);
+        if (Objects.nonNull(panel.getCurrentEditor()) && (newSelected == panel.getCurrentEditor().getEntry())) {
+            // is already selected
+            return;
         }
 
         if (newSelected != null) {
-
-            // Ok, we have a single new entry that has been selected. Now decide what to do with it:
-            final BibEntry toShow = newSelected;
             final BasePanelMode mode = panel.getMode(); // What is the panel already showing?
             if ((mode == BasePanelMode.WILL_SHOW_EDITOR) || (mode == BasePanelMode.SHOWING_EDITOR)) {
                 // An entry is currently being edited.
@@ -147,7 +128,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                     visName = oldEditor.getVisiblePanelName();
                 }
                 // Get an old or new editor for the entry to edit:
-                EntryEditor newEditor = panel.getEntryEditor(toShow);
+                EntryEditor newEditor = panel.getEntryEditor(newSelected);
 
                 if (oldEditor != null) {
                     oldEditor.setMovingToDifferentEntry();
@@ -165,7 +146,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             } else {
                 // Either nothing or a preview was shown. Update the preview.
                 if (previewActive) {
-                    updatePreview(toShow, false);
+                    updatePreview(newSelected, false);
                 }
             }
         }
@@ -295,7 +276,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 for (String fieldName : fieldNames) {
                     // Check if field is present, if not skip this field
                     if (entry.hasField(fieldName)) {
-                        String link = entry.getFieldOptional(fieldName).get();
+                        String link = entry.getField(fieldName).get();
 
                         // See if this is a simple file link field, or if it is a file-list
                         // field that can specify a list of links:
@@ -340,7 +321,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 }
             });
         } else if (modelColumn.getBibtexFields().contains(FieldName.CROSSREF)) { // Clicking on crossref column
-            tableRows.get(row).getFieldOptional(FieldName.CROSSREF)
+            tableRows.get(row).getField(FieldName.CROSSREF)
                     .ifPresent(crossref -> panel.getDatabase().getEntryByKey(crossref).ifPresent(entry -> panel.highlightEntry(entry)));
         }
     }
@@ -406,7 +387,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                 if (FieldName.FILE.equals(field)) {
                     // We use a FileListTableModel to parse the field content:
                     FileListTableModel fileList = new FileListTableModel();
-                    entry.getFieldOptional(field).ifPresent(fileList::setContent);
+                    entry.getField(field).ifPresent(fileList::setContent);
                     for (int i = 0; i < fileList.getRowCount(); i++) {
                         FileListEntry flEntry = fileList.getEntry(i);
                         if (column.isFileFilter()
@@ -427,7 +408,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                         // full pop should be shown as left click already shows short popup
                         showDefaultPopup = true;
                     } else {
-                        Optional<String> content = entry.getFieldOptional(field);
+                        Optional<String> content = entry.getField(field);
                         if (content.isPresent()) {
                             Icon icon;
                             JLabel iconLabel = GUIGlobals.getTableIcon(field);

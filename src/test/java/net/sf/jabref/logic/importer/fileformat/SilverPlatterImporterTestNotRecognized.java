@@ -1,14 +1,11 @@
 package net.sf.jabref.logic.importer.fileformat;
 
 import java.net.URL;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-
-import net.sf.jabref.Globals;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -23,7 +20,6 @@ public class SilverPlatterImporterTestNotRecognized {
 
     @Before
     public void setUp() throws Exception {
-        Globals.prefs = JabRefPreferences.getInstance();
         testImporter = new SilverPlatterImporter();
     }
 
@@ -35,7 +31,7 @@ public class SilverPlatterImporterTestNotRecognized {
             URL resource = SilverPlatterImporter.class.getResource(s);
             assertNotNull("resource " + s + " must be available", resource);
             Path file = Paths.get(resource.toURI());
-            Assert.assertFalse(testImporter.isRecognizedFormat(file, Charset.defaultCharset()));
+            Assert.assertFalse(testImporter.isRecognizedFormat(file, StandardCharsets.UTF_8));
         }
     }
 

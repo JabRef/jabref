@@ -40,7 +40,7 @@ public class DBMSProcessorTest {
             connection = TestConnector.getTestConnection(dbmsType);
         }
         dbmsProcessor = DBMSProcessor.getProcessorInstance(connection, dbmsType);
-        dbmsProcessor.setUpSharedDatabase();
+        dbmsProcessor.setupSharedDatabase();
     }
 
     @Parameters(name = "Test with {0} database system")
@@ -58,7 +58,7 @@ public class DBMSProcessorTest {
     @Test
     public void testSetUpSharedDatabase() throws SQLException {
         clear();
-        dbmsProcessor.setUpSharedDatabase();
+        dbmsProcessor.setupSharedDatabase();
         Assert.assertTrue(dbmsProcessor.checkBaseIntegrity());
     }
 

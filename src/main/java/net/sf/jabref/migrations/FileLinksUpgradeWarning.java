@@ -1,21 +1,5 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.migrations;
 
-import java.util.Arrays;
 import java.util.List;
 
 import javax.swing.JButton;
@@ -27,7 +11,7 @@ import javax.swing.JTextField;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.actions.BrowseAction;
+import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.entryeditor.EntryEditorTabList;
 import net.sf.jabref.gui.importer.actions.PostOpenAction;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -56,7 +40,7 @@ import com.jgoodies.forms.layout.FormLayout;
  */
 public class FileLinksUpgradeWarning implements PostOpenAction {
 
-    private static final String[] FIELDS_TO_LOOK_FOR = new String[] {FieldName.PDF, FieldName.PS, "evastar_pdf"};
+    private static final String[] FIELDS_TO_LOOK_FOR = new String[] {FieldName.PDF, FieldName.PS};
 
     private boolean offerChangeSettings;
 
@@ -80,7 +64,8 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
         offerChangeDatabase = linksFound(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
         // If the "file" directory is not set, offer to migrate pdf/ps dir:
         offerSetFileDir = !Globals.prefs.hasKey(FieldName.FILE + FileLinkPreferences.DIR_SUFFIX)
-                && (Globals.prefs.hasKey("pdfDirectory") || Globals.prefs.hasKey("psDirectory"));
+                && (Globals.prefs.hasKey(FieldName.PDF + FileLinkPreferences.DIR_SUFFIX)
+                        || Globals.prefs.hasKey(FieldName.PS + FileLinkPreferences.DIR_SUFFIX));
 
         // First check if this warning is disabled:
         return Globals.prefs.getBoolean(JabRefPreferences.SHOW_FILE_LINKS_UPGRADE_WARNING) && isThereSomethingToBeDone();
@@ -129,16 +114,19 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
             formBuilder.add(changeDatabase).xy(1, row);
         }
         if (offerSetFileDir) {
-            if (Globals.prefs.hasKey("pdfDirectory")) {
-                fileDir.setText(Globals.prefs.get("pdfDirectory"));
+            if (Globals.prefs.hasKey(FieldName.PDF + FileLinkPreferences.DIR_SUFFIX)) {
+                fileDir.setText(Globals.prefs.get(FieldName.PDF + FileLinkPreferences.DIR_SUFFIX));
             } else {
-                fileDir.setText(Globals.prefs.get("psDirectory"));
+                fileDir.setText(Globals.prefs.get(FieldName.PS + FileLinkPreferences.DIR_SUFFIX));
             }
             JPanel builderPanel = new JPanel();
             builderPanel.add(setFileDir);
             builderPanel.add(fileDir);
             JButton browse = new JButton(Localization.lang("Browse"));
-            browse.addActionListener(BrowseAction.buildForDir(fileDir));
+            browse.addActionListener(e ->
+                    new FileDialog(null).showDialogAndGetSelectedFile()
+                            .ifPresent(f -> fileDir.setText(f.toAbsolutePath().toString()))
+            );
             builderPanel.add(browse);
             formBuilder.appendRows("2dlu, p");
             row += 2;
@@ -195,7 +183,7 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
 
         if (upgradeDatabase) {
             // Update file links links in the database:
-            NamedCompound ce = upgradePdfPsToFile(pr.getDatabase(), FileLinksUpgradeWarning.FIELDS_TO_LOOK_FOR);
+            NamedCompound ce = upgradePdfPsToFile(pr.getDatabase());
             panel.getUndoManager().addEdit(ce);
             panel.markBaseChanged();
         }
@@ -248,10 +236,10 @@ public class FileLinksUpgradeWarning implements PostOpenAction {
      * @param fields   The fields to find links in.
      * @return A CompoundEdit specifying the undo operation for the whole operation.
      */
-    private static NamedCompound upgradePdfPsToFile(BibDatabase database, String[] fields) {
+    private static NamedCompound upgradePdfPsToFile(BibDatabase database) {
         NamedCompound ce = new NamedCompound(Localization.lang("Move external links to 'file' field"));
 
-        UpgradePdfPsToFileCleanup cleanupJob = new UpgradePdfPsToFileCleanup(Arrays.asList(fields));
+        UpgradePdfPsToFileCleanup cleanupJob = new UpgradePdfPsToFileCleanup();
         for (BibEntry entry : database.getEntries()) {
             List<FieldChange> changes = cleanupJob.cleanup(entry);
 

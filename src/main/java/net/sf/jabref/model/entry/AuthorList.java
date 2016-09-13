@@ -1,22 +1,11 @@
-/*  Copyright (C) 2003-2016 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.model.entry;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.WeakHashMap;
 import java.util.stream.Collectors;
@@ -145,6 +134,9 @@ public class AuthorList {
 
     private static final WeakHashMap<String, AuthorList> AUTHOR_CACHE = new WeakHashMap<>();
 
+    // Avoid partition where these values are contained
+    private final static Collection<String> avoidTermsInLowerCase = Arrays.asList("jr", "sr", "jnr", "snr", "von", "zu", "van", "der");
+
     /**
      * Creates a new list of authors.
      * <p>
@@ -171,6 +163,46 @@ public class AuthorList {
      */
     public static AuthorList parse(String authors) {
         Objects.requireNonNull(authors);
+
+        // Handle case names in order lastname, firstname and separated by ","
+        // E.g., Ali Babar, M., Dingsøyr, T., Lago, P., van der Vliet, H.
+        if (!authors.toUpperCase(Locale.ENGLISH).contains(" AND ") && !authors.contains("{") && !authors.contains(";")) {
+            List<String> arrayNameList = Arrays.asList(authors.split(","));
+
+            // Delete spaces for correct case identification
+            arrayNameList.replaceAll(String::trim);
+
+            // Looking for space between pre- and lastname
+            boolean spaceInAllParts = arrayNameList.stream().filter(name -> name.contains(" ")).collect(Collectors
+                    .toList()).size() == arrayNameList.size();
+
+            // We hit the comma name separator case
+            // Usually the getAsLastFirstNamesWithAnd method would separate them if pre- and lastname are separated with "and"
+            // If not, we check if spaces separate pre- and lastname
+            if (spaceInAllParts) {
+                authors = authors.replaceAll(",", " and");
+            } else {
+                // Looking for name affixes to avoid
+                // arrayNameList needs to reduce by the count off avoiding terms
+                // valuePartsCount holds the count of name parts without the avoided terms
+
+                int valuePartsCount = arrayNameList.size();
+                // Holds the index of each term which needs to be avoided
+                Collection<Integer> avoidIndex = new HashSet<>();
+
+                for (int i = 0; i < arrayNameList.size(); i++) {
+                    if (avoidTermsInLowerCase.contains(arrayNameList.get(i).toLowerCase())) {
+                        avoidIndex.add(i);
+                        valuePartsCount--;
+                    }
+                }
+
+                if ((valuePartsCount % 2) == 0) {
+                    // We hit the described special case with name affix like Jr
+                    authors = buildWithAffix(avoidIndex, arrayNameList).toString();
+                }
+            }
+        }
 
         AuthorList authorList = AUTHOR_CACHE.get(authors);
         if (authorList == null) {
@@ -590,6 +622,36 @@ public class AuthorList {
         authorsAlph = getAuthors().stream().map(Author::getNameForAlphabetization)
                 .collect(Collectors.joining(" and "));
         return authorsAlph;
+    }
+
+    /**
+     * Builds a new array of strings with stringbuilder.
+     * Regarding to the name affixes.
+     * @return New string with correct seperation
+     */
+    private static StringBuilder buildWithAffix(Collection<Integer> indexArray, List nameList) {
+        StringBuilder stringBuilder = new StringBuilder();
+        // avoidedTimes needs to be increased by the count of avoided terms for correct odd/even calculation
+        int avoidedTimes = 0;
+        for (int i = 0; i < nameList.size(); i++) {
+            if (indexArray.contains(i)) {
+                // We hit a name affix
+                stringBuilder.append(nameList.get(i));
+                stringBuilder.append(',');
+                avoidedTimes++;
+            } else {
+                stringBuilder.append(nameList.get(i));
+                if (((i + avoidedTimes) % 2) == 0) {
+                    // Hit separation between last name and firstname --> comma has to be kept
+                    stringBuilder.append(',');
+                } else {
+                    // Hit separation between full names (e.g., Ali Babar, M. and Dingsøyr, T.) --> semicolon has to be used
+                    // Will be treated correctly by AuthorList.parse(authors);
+                    stringBuilder.append(';');
+                }
+            }
+        }
+        return stringBuilder;
     }
 
 }

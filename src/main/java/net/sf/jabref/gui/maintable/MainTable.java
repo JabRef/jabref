@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.gui.maintable;
 
 import java.awt.Color;
@@ -20,17 +5,17 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
+import javax.swing.AbstractAction;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
+import javax.swing.InputMap;
 import javax.swing.JLabel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -49,6 +34,7 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.groups.EntryTableTransferHandler;
 import net.sf.jabref.gui.groups.GroupMatcher;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.renderer.CompleteRenderer;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.renderer.IncompleteRenderer;
@@ -92,6 +78,7 @@ public class MainTable extends JTable {
     private final BasePanel panel;
 
     private final boolean tableColorCodes;
+    private final boolean tableResolvedColorCodes;
     private final DefaultEventSelectionModel<BibEntry> localSelectionModel;
     private final TableComparatorChooser<BibEntry> comparatorChooser;
     private final JScrollPane pane;
@@ -103,12 +90,14 @@ public class MainTable extends JTable {
     // Enum used to define how a cell should be rendered.
     private enum CellRendererMode {
         REQUIRED,
+        RESOLVED,
         OPTIONAL,
         OTHER
     }
     private static GeneralRenderer defRenderer;
     private static GeneralRenderer reqRenderer;
     private static GeneralRenderer optRenderer;
+    private static GeneralRenderer resolvedRenderer;
     private static GeneralRenderer grayedOutRenderer;
     private static GeneralRenderer veryGrayedOutRenderer;
 
@@ -143,6 +132,7 @@ public class MainTable extends JTable {
                 .eventTableModelWithThreadProxyList(model.getTableRows(), tableFormat));
 
         tableColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_COLOR_CODES_ON);
+        tableResolvedColorCodes = Globals.prefs.getBoolean(JabRefPreferences.TABLE_RESOLVED_COLOR_CODES_ON);
         localSelectionModel = (DefaultEventSelectionModel<BibEntry>) GlazedListsSwing
                 .eventSelectionModelWithThreadProxyList(model.getTableRows());
         setSelectionModel(localSelectionModel);
@@ -180,7 +170,51 @@ public class MainTable extends JTable {
         model.updateMarkingState(Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
         setWidths();
 
-        addKeyListener(new TableKeyListener());
+        //Override 'selectNextColumnCell' and 'selectPreviousColumnCell' to move rows instead of cells on TAB
+        ActionMap actionMap = getActionMap();
+        InputMap inputMap = getInputMap();
+        actionMap.put("selectNextColumnCell", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panel.selectNextEntry();
+            }
+        });
+        actionMap.put("selectPreviousColumnCell", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panel.selectPreviousEntry();
+            }
+        });
+        actionMap.put("selectNextRow", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panel.selectNextEntry();
+            }
+        });
+        actionMap.put("selectPreviousRow", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panel.selectPreviousEntry();
+            }
+        });
+
+        String selectFirst = "selectFirst";
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SELECT_FIRST_ENTRY), selectFirst);
+        actionMap.put(selectFirst, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                panel.selectFirstEntry();
+            }
+        });
+
+        String selectLast = "selectLast";
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SELECT_LAST_ENTRY), selectLast);
+        actionMap.put(selectLast, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                panel.selectLastEntry();
+            }
+        });
     }
 
     public void addSelectionListener(ListEventListener<BibEntry> listener) {
@@ -220,8 +254,6 @@ public class MainTable extends JTable {
 
         int score = -3;
         DefaultTableCellRenderer renderer = MainTable.defRenderer;
-
-        CellRendererMode status = getCellStatus(row, column);
 
         if ((model.getSearchState() != MainTableDataModel.DisplayOption.FLOAT)
                 || matches(row, SearchMatcher.INSTANCE)) {
@@ -268,11 +300,14 @@ public class MainTable extends JTable {
                 renderer = MainTable.incRenderer;
             }
             renderer.setHorizontalAlignment(JLabel.CENTER);
-        } else if (tableColorCodes) {
+        } else if (tableColorCodes || tableResolvedColorCodes) {
+            CellRendererMode status = getCellStatus(row, column, tableResolvedColorCodes);
             if (status == CellRendererMode.REQUIRED) {
                 renderer = MainTable.reqRenderer;
             } else if (status == CellRendererMode.OPTIONAL) {
                 renderer = MainTable.optRenderer;
+            } else if (status == CellRendererMode.RESOLVED) {
+                renderer = MainTable.resolvedRenderer;
             }
         }
 
@@ -454,11 +489,14 @@ public class MainTable extends JTable {
 
     }
 
-    private CellRendererMode getCellStatus(int row, int col) {
+    private CellRendererMode getCellStatus(int row, int col, boolean checkResolved) {
         try {
             BibEntry be = getEntryAt(row);
+            if (checkResolved && tableFormat.getTableColumn(col).isResolved(be)) {
+                return CellRendererMode.RESOLVED;
+            }
             Optional<EntryType> type = EntryTypes.getType(be.getType(), panel.getBibDatabaseContext().getMode());
-            if(type.isPresent()) {
+            if (type.isPresent()) {
                 String columnName = getColumnName(col).toLowerCase();
                 if (columnName.equals(BibEntry.KEY_FIELD) || type.get().getRequiredFieldsFlat().contains(columnName)) {
                     return CellRendererMode.REQUIRED;
@@ -494,7 +532,14 @@ public class MainTable extends JTable {
     }
 
     public int findEntry(BibEntry entry) {
-        return model.getTableRows().indexOf(entry);
+        EventList<BibEntry> tableRows = model.getTableRows();
+        for (int row = 0; row < tableRows.size(); row++) {
+            BibEntry bibEntry = tableRows.get(row);
+            if (entry == bibEntry) { // NOPMD (equals doesn't recognise duplicates)
+                return row;
+            }
+        }
+        return -1;
     }
 
     /**
@@ -558,7 +603,7 @@ public class MainTable extends JTable {
     public void ensureVisible(int row) {
         JScrollBar vert = pane.getVerticalScrollBar();
         int y = row * getRowHeight();
-        if ((y < vert.getValue()) || ((y > (vert.getValue() + vert.getVisibleAmount()))
+        if ((y < vert.getValue()) || ((y >= (vert.getValue() + vert.getVisibleAmount()))
                 && (model.getSearchState() != MainTableDataModel.DisplayOption.FLOAT))) {
             scrollToCenter(row, 1);
         }
@@ -615,6 +660,9 @@ public class MainTable extends JTable {
                 (new JTable(), "", true, false, 0, 0).getBackground();
         MainTable.reqRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_REQ_FIELD_BACKGROUND), Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
         MainTable.optRenderer = new GeneralRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_OPT_FIELD_BACKGROUND), Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
+        MainTable.resolvedRenderer = new GeneralRenderer(
+                Globals.prefs.getColor(JabRefPreferences.TABLE_RESOLVED_FIELD_BACKGROUND),
+                Globals.prefs.getColor(JabRefPreferences.TABLE_TEXT));
         MainTable.incRenderer = new IncompleteRenderer();
         MainTable.compRenderer = new CompleteRenderer(Globals.prefs.getColor(JabRefPreferences.TABLE_BACKGROUND));
         MainTable.grayedOutNumberRenderer = new CompleteRenderer(Globals.prefs.getColor(JabRefPreferences.GRAYED_OUT_BACKGROUND));
@@ -645,28 +693,6 @@ public class MainTable extends JTable {
     private TableComparatorChooser<BibEntry> createTableComparatorChooser(JTable table, SortedList<BibEntry> list,
                                                                              Object sortingStrategy) {
         return TableComparatorChooser.install(table, list, sortingStrategy);
-    }
-
-    /**
-     * KeyEvent handling of Tab
-     */
-    private class TableKeyListener extends KeyAdapter {
-
-        private final Set<Integer> pressed = new HashSet<>();
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-            pressed.add(e.getExtendedKeyCode());
-            if (pressed.contains(KeyEvent.VK_TAB)) {
-                int change = pressed.contains(KeyEvent.VK_SHIFT) ? -1 : 1;
-                setSelected((getSelectedRow() + change + getRowCount()) % getRowCount());
-            }
-        }
-
-        @Override
-        public void keyReleased(KeyEvent e) {
-            pressed.remove(e.getExtendedKeyCode());
-        }
     }
 
     /**

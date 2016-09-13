@@ -17,9 +17,12 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.worker.AbstractWorker;
+import net.sf.jabref.logic.exporter.ExportFormat;
 import net.sf.jabref.logic.exporter.ExportFormats;
 import net.sf.jabref.logic.exporter.IExportFormat;
+import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -59,7 +62,12 @@ public class ExportAction {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
+                Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
+                        Globals.journalAbbreviationLoader);
+                LayoutFormatterPreferences layoutPreferences = Globals.prefs
+                        .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
+                SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
+                ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
                 JFileChooser fc = ExportAction
                         .createExportFileChooser(Globals.prefs.get(JabRefPreferences.EXPORT_WORKING_DIRECTORY));
                 fc.showSaveDialog(frame);
@@ -98,7 +106,7 @@ public class ExportAction {
                     // so formatters can resolve linked files correctly.
                     // (This is an ugly hack!)
                     Globals.prefs.fileDirForDatabase = frame.getCurrentBasePanel().getBibDatabaseContext()
-                            .getFileDirectory();
+                            .getFileDirectory(Globals.prefs.getFileDirectoryPreferences());
 
                     // Make sure we remember which filter was used, to set
                     // the default for next time:
@@ -117,7 +125,8 @@ public class ExportAction {
                             try {
                                 format.performExport(frame.getCurrentBasePanel().getBibDatabaseContext(),
                                         finFile.getPath(),
-                                        frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getEncoding(),
+                                        frame.getCurrentBasePanel().getBibDatabaseContext().getMetaData().getEncoding()
+                                                .orElse(Globals.prefs.getDefaultEncoding()),
                                         finEntries);
                             } catch (Exception ex) {
                                 LOGGER.warn("Problem exporting", ex);

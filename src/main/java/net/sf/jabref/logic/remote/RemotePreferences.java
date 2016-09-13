@@ -1,36 +1,33 @@
 package net.sf.jabref.logic.remote;
 
-import net.sf.jabref.preferences.JabRefPreferences;
-
 /**
  * Place for handling the preferences for the remote communication
  */
 public class RemotePreferences {
 
-    public static final String REMOTE_SERVER_PORT = "remoteServerPort";
-    public static final String USE_REMOTE_SERVER = "useRemoteServer";
-
-    private final JabRefPreferences preferences;
+    private int port;
+    private boolean useRemoteServer;
 
 
-    public RemotePreferences(JabRefPreferences preferences) {
-        this.preferences = preferences;
+    public RemotePreferences(int port, boolean useRemoteServer) {
+        this.port = port;
+        this.useRemoteServer = useRemoteServer;
     }
 
     public int getPort() {
-        return preferences.getInt(REMOTE_SERVER_PORT);
+        return port;
     }
 
     public void setPort(int port) {
-        preferences.putInt(REMOTE_SERVER_PORT, port);
+        this.port = port;
     }
 
     public boolean useRemoteServer() {
-        return preferences.getBoolean(USE_REMOTE_SERVER);
+        return useRemoteServer;
     }
 
     public void setUseRemoteServer(boolean useRemoteServer) {
-        preferences.putBoolean(USE_REMOTE_SERVER, useRemoteServer);
+        this.useRemoteServer = useRemoteServer;
     }
 
     public boolean isDifferentPort(int otherPort) {

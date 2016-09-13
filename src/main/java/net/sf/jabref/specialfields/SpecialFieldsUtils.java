@@ -1,18 +1,3 @@
-/*  Copyright (C) 2012-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.specialfields;
 
 import java.util.ArrayList;
@@ -51,16 +36,16 @@ public class SpecialFieldsUtils {
         UpdateField.updateField(be, e.getFieldName(), value, nullFieldIfValueIsTheSame)
                 .ifPresent(fieldChange -> ce.addEdit(new UndoableFieldChange(fieldChange)));
         // we cannot use "value" here as updateField has side effects: "nullFieldIfValueIsTheSame" nulls the field if value is the same
-        SpecialFieldsUtils.exportFieldToKeywords(e, be.getFieldOptional(e.getFieldName()).orElse(null), be, ce);
+        SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()).orElse(null), be, ce);
     }
 
     private static void exportFieldToKeywords(SpecialField e, BibEntry be, NamedCompound ce) {
-        SpecialFieldsUtils.exportFieldToKeywords(e, be.getFieldOptional(e.getFieldName()).orElse(null), be, ce);
+        SpecialFieldsUtils.exportFieldToKeywords(e, be.getField(e.getFieldName()).orElse(null), be, ce);
     }
 
     private static void exportFieldToKeywords(SpecialField e, String newValue, BibEntry entry,
             NamedCompound ce) {
-        if (!SpecialFieldsUtils.keywordSyncEnabled()) {
+        if (!Globals.prefs.isKeywordSyncEnabled()) {
             return;
         }
         List<String> keywordList = new ArrayList<>(entry.getKeywords());
@@ -180,10 +165,4 @@ public class SpecialFieldsUtils {
     public static boolean isSpecialField(String fieldName) {
         return SpecialFieldsUtils.getSpecialFieldInstanceFromFieldName(fieldName).isPresent();
     }
-
-    public static boolean keywordSyncEnabled() {
-        return Globals.prefs.getBoolean(JabRefPreferences.PREF_SPECIALFIELDSENABLED) &&
-                Globals.prefs.getBoolean(JabRefPreferences.PREF_AUTOSYNCSPECIALFIELDSTOKEYWORDS);
-    }
-
 }

@@ -14,9 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 public class OpenDatabase {
-
     public static final Log LOGGER = LogFactory.getLog(OpenDatabase.class);
-
 
     /**
      * Load database (bib-file) or, if there exists, a newer autosave version, unless the flag is set to ignore the autosave
@@ -25,22 +23,20 @@ public class OpenDatabase {
      * @param ignoreAutosave true if autosave version of the file should be ignored
      * @return ParserResult which never is null
      */
-
     public static ParserResult loadDatabaseOrAutoSave(String name, boolean ignoreAutosave,
             ImportFormatPreferences importFormatPreferences) {
-        // String in OpenDatabaseAction.java
-        LOGGER.info("Opening: " + name);
         File file = new File(name);
+        LOGGER.info("Opening: " + name);
+
         if (!file.exists()) {
             ParserResult pr = new ParserResult(null, null, null);
             pr.setFile(file);
             pr.setInvalid(true);
             LOGGER.error(Localization.lang("Error") + ": " + Localization.lang("File not found"));
             return pr;
-
         }
-        try {
 
+        try {
             if (!ignoreAutosave) {
                 boolean autoSaveFound = AutoSaveUtil.newerAutoSaveExists(file);
                 if (autoSaveFound) {
@@ -53,7 +49,7 @@ public class OpenDatabase {
                 }
             }
 
-            if (!FileBasedLock.waitForFileLock(file.toPath(), 10)) {
+            if (!FileBasedLock.waitForFileLock(file.toPath())) {
                 LOGGER.error(Localization.lang("Error opening file") + " '" + name + "'. "
                         + "File is locked by another JabRef instance.");
                 return ParserResult.getNullResult();
@@ -72,10 +68,9 @@ public class OpenDatabase {
             pr.setFile(file);
             pr.setInvalid(true);
             pr.setErrorMessage(ex.getMessage());
-            LOGGER.info("Problem opening .bib-file", ex);
+            LOGGER.error("Problem opening .bib-file", ex);
             return pr;
         }
-
     }
 
     /**
@@ -83,11 +78,10 @@ public class OpenDatabase {
      */
     public static ParserResult loadDatabase(File fileToOpen, ImportFormatPreferences importFormatPreferences)
             throws IOException {
-        // Open and parse file
         ParserResult result = new BibtexImporter(importFormatPreferences).importDatabase(fileToOpen.toPath(),
                 importFormatPreferences.getEncoding());
 
-        if (SpecialFieldsUtils.keywordSyncEnabled()) {
+        if (importFormatPreferences.isKeywordSyncEnabled()) {
             for (BibEntry entry : result.getDatabase().getEntries()) {
                 SpecialFieldsUtils.syncSpecialFieldsFromKeywords(entry);
             }
@@ -96,5 +90,4 @@ public class OpenDatabase {
 
         return result;
     }
-
 }

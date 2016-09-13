@@ -2,8 +2,6 @@ package net.sf.jabref.logic.xmp;
 
 import java.util.List;
 
-import net.sf.jabref.preferences.JabRefPreferences;
-
 public class XMPPreferences {
 
     private final boolean useXMPPrivacyFilter;
@@ -15,12 +13,6 @@ public class XMPPreferences {
         this.useXMPPrivacyFilter = useXMPPrivacyFilter;
         this.xmpPrivacyFilter = xmpPrivacyFilter;
         this.keywordSeparator = keywordSeparator;
-    }
-
-    public static XMPPreferences fromPreferences(JabRefPreferences jabrefPreferences) {
-        return new XMPPreferences(jabrefPreferences.getBoolean(JabRefPreferences.USE_XMP_PRIVACY_FILTER),
-                jabrefPreferences.getStringList(JabRefPreferences.XMP_PRIVACY_FILTERS),
-                jabrefPreferences.get(JabRefPreferences.KEYWORD_SEPARATOR));
     }
 
     public boolean isUseXMPPrivacyFilter() {

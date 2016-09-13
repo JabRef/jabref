@@ -1,5 +1,7 @@
 package net.sf.jabref.model.entry;
 
+import java.util.Optional;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -343,38 +345,60 @@ public class AuthorListTest {
     public void testGetAuthor() {
 
         Author author = AuthorList.parse("John Smith and von Neumann, Jr, John").getAuthor(0);
-        Assert.assertEquals("John", author.getFirst());
-        Assert.assertEquals("J.", author.getFirstAbbr());
+        Assert.assertEquals(Optional.of("John"), author.getFirst());
+        Assert.assertEquals(Optional.of("J."), author.getFirstAbbr());
         Assert.assertEquals("John Smith", author.getFirstLast(false));
         Assert.assertEquals("J. Smith", author.getFirstLast(true));
-        Assert.assertEquals(null, author.getJr());
-        Assert.assertEquals("Smith", author.getLast());
+        Assert.assertEquals(Optional.empty(), author.getJr());
+        Assert.assertEquals(Optional.of("Smith"), author.getLast());
         Assert.assertEquals("Smith, John", author.getLastFirst(false));
         Assert.assertEquals("Smith, J.", author.getLastFirst(true));
         Assert.assertEquals("Smith", author.getLastOnly());
         Assert.assertEquals("Smith, J.", author.getNameForAlphabetization());
-        Assert.assertEquals(null, author.getVon());
+        Assert.assertEquals(Optional.empty(), author.getVon());
 
         author = AuthorList.parse("Peter Black Brown").getAuthor(0);
-        Assert.assertEquals("Peter Black", author.getFirst());
-        Assert.assertEquals("P. B.", author.getFirstAbbr());
+        Assert.assertEquals(Optional.of("Peter Black"), author.getFirst());
+        Assert.assertEquals(Optional.of("P. B."), author.getFirstAbbr());
         Assert.assertEquals("Peter Black Brown", author.getFirstLast(false));
         Assert.assertEquals("P. B. Brown", author.getFirstLast(true));
-        Assert.assertEquals(null, author.getJr());
-        Assert.assertEquals(null, author.getVon());
+        Assert.assertEquals(Optional.empty(), author.getJr());
+        Assert.assertEquals(Optional.empty(), author.getVon());
 
         author = AuthorList.parse("John Smith and von Neumann, Jr, John").getAuthor(1);
-        Assert.assertEquals("John", author.getFirst());
-        Assert.assertEquals("J.", author.getFirstAbbr());
+        Assert.assertEquals(Optional.of("John"), author.getFirst());
+        Assert.assertEquals(Optional.of("J."), author.getFirstAbbr());
         Assert.assertEquals("John von Neumann, Jr", author.getFirstLast(false));
         Assert.assertEquals("J. von Neumann, Jr", author.getFirstLast(true));
-        Assert.assertEquals("Jr", author.getJr());
-        Assert.assertEquals("Neumann", author.getLast());
+        Assert.assertEquals(Optional.of("Jr"), author.getJr());
+        Assert.assertEquals(Optional.of("Neumann"), author.getLast());
         Assert.assertEquals("von Neumann, Jr, John", author.getLastFirst(false));
         Assert.assertEquals("von Neumann, Jr, J.", author.getLastFirst(true));
         Assert.assertEquals("von Neumann", author.getLastOnly());
         Assert.assertEquals("Neumann, Jr, J.", author.getNameForAlphabetization());
-        Assert.assertEquals("von", author.getVon());
+        Assert.assertEquals(Optional.of("von"), author.getVon());
+
+    }
+
+    @Test
+    public void testCompanyAuthor() {
+        Author author = AuthorList.parse("{JabRef Developers}").getAuthor(0);
+        Author expected = new Author(null, null, null, "JabRef Developers", null);
+        Assert.assertEquals(expected, author);
+    }
+
+    @Test
+    public void testCompanyAuthorWithLowerCaseWord() {
+        Author author = AuthorList.parse("{JabRef Developers on Fire}").getAuthor(0);
+        Author expected = new Author(null, null, null, "JabRef Developers on Fire", null);
+        Assert.assertEquals(expected, author);
+    }
+
+    @Test
+    public void testAbbreviationWithRelax() {
+        Author author = AuthorList.parse("{\\relax Ch}ristoph Cholera").getAuthor(0);
+        Author expected = new Author("{\\relax Ch}ristoph", "{\\relax Ch}.", null, "Cholera", null);
+        Assert.assertEquals(expected, author);
     }
 
     @Test
@@ -501,6 +525,15 @@ public class AuthorListTest {
     }
 
     @Test
+    public void testGetAuthorsLastFirstAndsCaching() {
+        // getAsLastFirstNamesWithAnd caches its results, therefore we call the method twice using the same arguments
+        Assert.assertEquals("Smith, John", AuthorList.parse("John Smith").getAsLastFirstNamesWithAnd(false));
+        Assert.assertEquals("Smith, John", AuthorList.parse("John Smith").getAsLastFirstNamesWithAnd(false));
+        Assert.assertEquals("Smith, J.", AuthorList.parse("John Smith").getAsLastFirstNamesWithAnd(true));
+        Assert.assertEquals("Smith, J.", AuthorList.parse("John Smith").getAsLastFirstNamesWithAnd(true));
+    }
+
+    @Test
     public void testGetAuthorsFirstFirst() {
 
         AuthorList al;
@@ -578,7 +611,8 @@ public class AuthorListTest {
 
     @Test
     public void createCorrectInitials() {
-        Assert.assertEquals("J. G.", AuthorList.parse("Hornberg, Johann Gottfried").getAuthor(0).getFirstAbbr());
+        Assert.assertEquals(Optional.of("J. G."),
+                AuthorList.parse("Hornberg, Johann Gottfried").getAuthor(0).getFirstAbbr());
     }
 
     @Test
@@ -611,4 +645,5 @@ public class AuthorListTest {
         Author expected = new Author("H{e}lene", "H.", null, "Fiaux", null);
         Assert.assertEquals(new AuthorList(expected), AuthorList.parse("H{e}lene Fiaux"));
     }
+
 }

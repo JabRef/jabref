@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <bibtex:file xmlns:bibtex="http://bibtexml.sf.net/">
-<bibtex:entry bibtex:id="Mustermann2016">
+<bibtex:entry id="Mustermann2016">
   <bibtex:article>
     <bibtex:author>Max Mustermann</bibtex:author>
     <bibtex:title>Java tricks</bibtex:title>

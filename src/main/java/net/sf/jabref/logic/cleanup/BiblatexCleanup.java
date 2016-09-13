@@ -1,17 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
-
 package net.sf.jabref.logic.cleanup;
 
 import java.util.ArrayList;
@@ -35,8 +21,8 @@ public class BiblatexCleanup implements CleanupJob {
         for (Map.Entry<String, String> alias : EntryConverter.FIELD_ALIASES_TEX_TO_LTX.entrySet()) {
             String oldFieldName = alias.getKey();
             String newFieldName = alias.getValue();
-            entry.getFieldOptional(oldFieldName).ifPresent(oldValue -> {
-                if (!oldValue.isEmpty() && (!entry.getFieldOptional(newFieldName).isPresent())) {
+            entry.getField(oldFieldName).ifPresent(oldValue -> {
+                if (!oldValue.isEmpty() && (!entry.getField(newFieldName).isPresent())) {
                     // There is content in the old field and no value in the new, so just copy
                     entry.setField(newFieldName, oldValue);
                     changes.add(new FieldChange(entry, newFieldName, null, oldValue));
@@ -48,11 +34,11 @@ public class BiblatexCleanup implements CleanupJob {
         }
 
         // Dates: create date out of year and month, save it and delete old fields
-        entry.getFieldOptional(FieldName.DATE).ifPresent(date -> {
+        entry.getField(FieldName.DATE).ifPresent(date -> {
             if (date.isEmpty()) {
                 entry.getFieldOrAlias(FieldName.DATE).ifPresent(newDate -> {
-                    Optional<String> oldYear = entry.getFieldOptional(FieldName.YEAR);
-                    Optional<String> oldMonth = entry.getFieldOptional(FieldName.MONTH);
+                    Optional<String> oldYear = entry.getField(FieldName.YEAR);
+                    Optional<String> oldMonth = entry.getField(FieldName.MONTH);
 
                     entry.setField(FieldName.DATE, newDate);
                     entry.clearField(FieldName.YEAR);

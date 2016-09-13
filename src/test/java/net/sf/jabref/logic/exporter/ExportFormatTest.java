@@ -7,10 +7,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
+import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -44,7 +45,6 @@ public class ExportFormatTest {
 
     @Before
     public void setUp() {
-        Globals.journalAbbreviationLoader = new JournalAbbreviationLoader();
         databaseContext = new BibDatabaseContext();
         charset = Charsets.UTF_8;
         entries = Collections.emptyList();
@@ -75,8 +75,16 @@ public class ExportFormatTest {
     @Parameterized.Parameters(name = "{index}: {1}")
     public static Collection<Object[]> exportFormats() {
         Collection<Object[]> result = new ArrayList<>();
-        Globals.prefs = JabRefPreferences.getInstance();
-        ExportFormats.initAllExports(Globals.prefs.customExports.getCustomExportFormats(Globals.prefs));
+        JabRefPreferences prefs = JabRefPreferences.getInstance();
+        JournalAbbreviationLoader journalAbbreviationLoader = new JournalAbbreviationLoader();
+
+        Map<String, ExportFormat> customFormats = prefs.customExports.getCustomExportFormats(prefs,
+                journalAbbreviationLoader);
+        LayoutFormatterPreferences layoutPreferences = prefs
+                .getLayoutFormatterPreferences(journalAbbreviationLoader);
+        SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(prefs);
+        ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
+
         for (IExportFormat format : ExportFormats.getExportFormats().values()) {
             result.add(new Object[] {format, format.getDisplayName()});
         }

@@ -1,18 +1,3 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
 package net.sf.jabref.model.entry;
 
 import java.util.Arrays;
@@ -36,9 +21,9 @@ public class BibLatexEntryTypes {
         {
             addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.JOURNALTITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.TRANSLATOR, "annotator", "commentator", FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.EDITOR, "editora",
-                    "editorb", "editorc", FieldName.JOURNALSUBTITLE, "issuetitle", "issuesubtitle", FieldName.LANGUAGE, FieldName.ORIGLANGUAGE,
+                    "editorb", "editorc", FieldName.JOURNALSUBTITLE, FieldName.ISSUETITLE, FieldName.ISSUESUBTITLE, FieldName.LANGUAGE, FieldName.ORIGLANGUAGE,
                     FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER, FieldName.EID, FieldName.ISSUE, FieldName.MONTH, FieldName.PAGES, FieldName.VERSION, FieldName.NOTE, FieldName.ISSN,
-                    "addendum", FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
         }
 
@@ -68,7 +53,7 @@ public class BibLatexEntryTypes {
                     "introduction", "foreword", "afterword", FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE, FieldName.MAINSUBTITLE,
                     FieldName.MAINTITLEADDON, FieldName.LANGUAGE, FieldName.ORIGLANGUAGE, FieldName.VOLUME, FieldName.PART, FieldName.EDITION, FieldName.VOLUMES, FieldName.SERIES,
                     FieldName.NUMBER, FieldName.NOTE, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL,
-                    "addendum", FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
         }
 
@@ -94,7 +79,7 @@ public class BibLatexEntryTypes {
             addAllOptional(FieldName.EDITOR, "editora", "editorb", "editorc", FieldName.TRANSLATOR, "annotator", "commentator",
                     "introduction", "foreword", "afterword", FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.ORIGLANGUAGE,
                     FieldName.EDITION, FieldName.VOLUMES, FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.PAGETOTAL,
-                    "addendum", FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
         }
 
@@ -124,7 +109,7 @@ public class BibLatexEntryTypes {
                     "commentator", "introduction", "foreword", "afterword", FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE,
                     FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON, FieldName.BOOKSUBTITLE, FieldName.BOOKTITLEADDON, FieldName.LANGUAGE, FieldName.ORIGLANGUAGE,
                     FieldName.VOLUME, FieldName.PART, FieldName.EDITION, FieldName.VOLUMES, FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN,
-                    FieldName.CHAPTER, FieldName.PAGES, "addendum", FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS,
+                    FieldName.CHAPTER, FieldName.PAGES, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS,
                     FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
         }
@@ -198,7 +183,7 @@ public class BibLatexEntryTypes {
         {
             addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.TYPE, FieldName.NOTE, FieldName.LOCATION, FieldName.CHAPTER,
-                    FieldName.PAGES, FieldName.PAGETOTAL, "addendum", FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
+                    FieldName.PAGES, FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
                     FieldName.URL, FieldName.URLDATE);
         }
@@ -227,7 +212,7 @@ public class BibLatexEntryTypes {
             addAllOptional("editora", "editorb", "editorc", FieldName.TRANSLATOR, "annotator", "commentator", "introduction",
                     "foreword", "afterword", FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE, FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON,
                     FieldName.LANGUAGE, FieldName.ORIGLANGUAGE, FieldName.VOLUME, FieldName.PART, FieldName.EDITION, FieldName.VOLUMES, FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE,
-                    FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, "addendum", FieldName.PUBSTATE, FieldName.DOI,
+                    FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI,
                     FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
 
@@ -253,7 +238,7 @@ public class BibLatexEntryTypes {
             addAllRequired(FieldName.EDITOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional("editora", "editorb", "editorc", FieldName.TRANSLATOR, "annotator", "commentator", "introduction",
                     "foreword", "afterword", FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.ORIGLANGUAGE, FieldName.EDITION, FieldName.VOLUMES, FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE,
-                    FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.PAGETOTAL, "addendum", FieldName.PUBSTATE, FieldName.DOI,
+                    FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI,
                     FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
 
@@ -283,7 +268,7 @@ public class BibLatexEntryTypes {
                     "foreword", "afterword", FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE, FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON,
                     FieldName.BOOKSUBTITLE, FieldName.BOOKTITLEADDON, FieldName.LANGUAGE, FieldName.ORIGLANGUAGE, FieldName.VOLUME, FieldName.PART, FieldName.EDITION,
                     FieldName.VOLUMES, FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES,
-                    "addendum", FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
         }
 
@@ -334,7 +319,7 @@ public class BibLatexEntryTypes {
             addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.EDITION, FieldName.TYPE, FieldName.SERIES, FieldName.NUMBER, FieldName.VERSION,
                     FieldName.NOTE, FieldName.ORGANIZATION, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL,
-                    "addendum", FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
         }
 
@@ -359,7 +344,7 @@ public class BibLatexEntryTypes {
         {
             addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.TYPE, FieldName.VERSION, FieldName.NOTE,
-                    FieldName.ORGANIZATION, FieldName.LOCATION, FieldName.MONTH, "addendum", FieldName.PUBSTATE, FieldName.DOI,
+                    FieldName.ORGANIZATION, FieldName.LOCATION, FieldName.MONTH, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI,
                     FieldName.EPRINT, FieldName.EPRINTCLASS,
                     FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
@@ -383,7 +368,7 @@ public class BibLatexEntryTypes {
 
         {
             addAllRequired(FieldName.orFields(FieldName.AUTHOR, FieldName.EDITOR), FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE), FieldName.URL);
-            addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.VERSION, FieldName.NOTE, FieldName.ORGANIZATION, FieldName.MONTH, "addendum", FieldName.PUBSTATE, FieldName.URLDATE);
+            addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.VERSION, FieldName.NOTE, FieldName.ORGANIZATION, FieldName.MONTH, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.URLDATE);
         }
 
         @Override
@@ -399,15 +384,15 @@ public class BibLatexEntryTypes {
 
     public static final BibLatexEntryType PATENT = new BibLatexEntryType() {
 
-        private final List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList("holder",
+        private final List<String> primaryOptionalFields = Collections.unmodifiableList(Arrays.asList(FieldName.HOLDER,
                 FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
                 FieldName.URLDATE));
 
 
         {
             addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.NUMBER, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
-            addAllOptional("holder", FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.TYPE, FieldName.VERSION, FieldName.LOCATION, FieldName.NOTE, FieldName.MONTH,
-                    "addendum", FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+            addAllOptional(FieldName.HOLDER, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.TYPE, FieldName.VERSION, FieldName.LOCATION, FieldName.NOTE, FieldName.MONTH,
+                    FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
         }
 
@@ -425,14 +410,14 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType PERIODICAL = new BibLatexEntryType() {
 
         private final List<String> primaryOptionalFields = Collections
-                .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, "issuetitle", "issuesubtitle", FieldName.ISSN, FieldName.DOI,
+                .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, FieldName.ISSUETITLE, FieldName.ISSUESUBTITLE, FieldName.ISSN, FieldName.DOI,
                                 FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE));
 
 
         {
             addAllRequired(FieldName.EDITOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
-            addAllOptional("editora", "editorb", "editorc", FieldName.SUBTITLE, "issuetitle", "issuesubtitle", FieldName.LANGUAGE,
-                    FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER, FieldName.ISSUE, FieldName.MONTH, FieldName.NOTE, FieldName.ISSN, "addendum", FieldName.PUBSTATE,
+            addAllOptional("editora", "editorb", "editorc", FieldName.SUBTITLE, FieldName.ISSUETITLE, FieldName.ISSUESUBTITLE, FieldName.LANGUAGE,
+                    FieldName.SERIES, FieldName.VOLUME, FieldName.NUMBER, FieldName.ISSUE, FieldName.MONTH, FieldName.NOTE, FieldName.ISSN, FieldName.ADDENDUM, FieldName.PUBSTATE,
                     FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
 
@@ -475,16 +460,16 @@ public class BibLatexEntryTypes {
 
         private final List<String> primaryOptionalFields = Collections
                 .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE, FieldName.MAINSUBTITLE,
-                        FieldName.MAINTITLEADDON, "eventtitle", FieldName.VOLUME, FieldName.PUBLISHER, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL,
+                        FieldName.MAINTITLEADDON, FieldName.EVENTTITLE, FieldName.VOLUME, FieldName.PUBLISHER, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL,
                         FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE));
 
 
         {
             addAllRequired(FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
-            addAllOptional(FieldName.EDITOR, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE, FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON, "eventtitle",
+            addAllOptional(FieldName.EDITOR, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE, FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON, FieldName.EVENTTITLE,
                     "eventtitleaddon", "eventdate", "venue", FieldName.LANGUAGE, FieldName.VOLUME, FieldName.PART, FieldName.VOLUMES, FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE,
                     FieldName.ORGANIZATION, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.MONTH, FieldName.YEAR, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL,
-                    "addendum", FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
         }
 
@@ -503,16 +488,16 @@ public class BibLatexEntryTypes {
 
         private final List<String> primaryOptionalFields = Collections
                 .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE, FieldName.MAINSUBTITLE,
-                        FieldName.MAINTITLEADDON, "eventtitle", FieldName.VOLUME, FieldName.PUBLISHER, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL,
+                        FieldName.MAINTITLEADDON, FieldName.EVENTTITLE, FieldName.VOLUME, FieldName.PUBLISHER, FieldName.ISBN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL,
                         FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE));
 
 
         {
             addAllRequired(FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
-            addAllOptional(FieldName.EDITOR, FieldName.SUBTITLE, FieldName.TITLEADDON, "eventtitle",
+            addAllOptional(FieldName.EDITOR, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.EVENTTITLE,
                     "eventtitleaddon", "eventdate", "venue", FieldName.LANGUAGE, FieldName.VOLUMES, FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE,
                     FieldName.ORGANIZATION, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN, FieldName.PAGETOTAL,
-                    "addendum", FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
+                    FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
         }
 
@@ -531,7 +516,7 @@ public class BibLatexEntryTypes {
 
         private final List<String> primaryOptionalFields = Collections
                 .unmodifiableList(Arrays.asList(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE, FieldName.MAINSUBTITLE,
-                        FieldName.MAINTITLEADDON, FieldName.BOOKSUBTITLE, FieldName.BOOKTITLEADDON, "eventtitle", FieldName.VOLUME, FieldName.PUBLISHER, FieldName.ISBN,
+                        FieldName.MAINTITLEADDON, FieldName.BOOKSUBTITLE, FieldName.BOOKTITLEADDON, FieldName.EVENTTITLE, FieldName.VOLUME, FieldName.PUBLISHER, FieldName.ISBN,
                         FieldName.CHAPTER, FieldName.PAGES, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE,
                         FieldName.URL, FieldName.URLDATE));
 
@@ -539,9 +524,9 @@ public class BibLatexEntryTypes {
         {
             addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.BOOKTITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.EDITOR, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.MAINTITLE, FieldName.MAINSUBTITLE, FieldName.MAINTITLEADDON, FieldName.BOOKSUBTITLE,
-                    FieldName.BOOKTITLEADDON, "eventtitle", "eventtitleaddon", "eventdate", "venue", FieldName.LANGUAGE, FieldName.VOLUME, FieldName.PART, FieldName.VOLUMES,
+                    FieldName.BOOKTITLEADDON, FieldName.EVENTTITLE, "eventtitleaddon", "eventdate", "venue", FieldName.LANGUAGE, FieldName.VOLUME, FieldName.PART, FieldName.VOLUMES,
                     FieldName.SERIES, FieldName.NUMBER, FieldName.NOTE, FieldName.ORGANIZATION, FieldName.PUBLISHER, FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN,
-                    FieldName.CHAPTER, FieldName.PAGES, "addendum", FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS,
+                    FieldName.CHAPTER, FieldName.PAGES, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT, FieldName.EPRINTCLASS,
                     FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
         }
@@ -640,7 +625,7 @@ public class BibLatexEntryTypes {
         {
             addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.TYPE, FieldName.INSTITUTION, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.NUMBER, FieldName.VERSION, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH,
-                    FieldName.ISRN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, "addendum", FieldName.PUBSTATE, FieldName.DOI,
+                    FieldName.ISRN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI,
                     FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
@@ -677,7 +662,7 @@ public class BibLatexEntryTypes {
         {
             addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.TYPE, FieldName.INSTITUTION, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN, FieldName.CHAPTER,
-                    FieldName.PAGES, FieldName.PAGETOTAL, "addendum", FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
+                    FieldName.PAGES, FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
         }
@@ -702,7 +687,7 @@ public class BibLatexEntryTypes {
         {
             addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.HOWPUBLISHED, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH,
-                    "addendum", FieldName.PUBSTATE, FieldName.URL, FieldName.URLDATE);
+                    FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.URL, FieldName.URLDATE);
         }
 
         @Override
@@ -778,7 +763,7 @@ public class BibLatexEntryTypes {
             // Treated as alias of "THESIS", except FieldName.TYPE field is optional
             addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.TYPE, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN, FieldName.CHAPTER,
-                    FieldName.PAGES, FieldName.PAGETOTAL, "addendum", FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
+                    FieldName.PAGES, FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
         }
@@ -806,7 +791,7 @@ public class BibLatexEntryTypes {
             // Treated as alias of "THESIS", except FieldName.TYPE field is optional
             addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.TYPE, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH, FieldName.ISBN, FieldName.CHAPTER,
-                    FieldName.PAGES, FieldName.PAGETOTAL, "addendum", FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
+                    FieldName.PAGES, FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI, FieldName.EPRINT,
                     FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL,
                     FieldName.URLDATE);
         }
@@ -834,7 +819,7 @@ public class BibLatexEntryTypes {
             // Treated as alias of "REPORT", except FieldName.TYPE field is optional
             addAllRequired(FieldName.AUTHOR, FieldName.TITLE, FieldName.INSTITUTION, FieldName.orFields(FieldName.YEAR, FieldName.DATE));
             addAllOptional(FieldName.TYPE, FieldName.SUBTITLE, FieldName.TITLEADDON, FieldName.LANGUAGE, FieldName.NUMBER, FieldName.VERSION, FieldName.NOTE, FieldName.LOCATION, FieldName.MONTH,
-                    FieldName.ISRN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, "addendum", FieldName.PUBSTATE, FieldName.DOI,
+                    FieldName.ISRN, FieldName.CHAPTER, FieldName.PAGES, FieldName.PAGETOTAL, FieldName.ADDENDUM, FieldName.PUBSTATE, FieldName.DOI,
                     FieldName.EPRINT, FieldName.EPRINTCLASS, FieldName.EPRINTTYPE, FieldName.URL, FieldName.URLDATE);
         }
 
@@ -880,9 +865,10 @@ public class BibLatexEntryTypes {
     public static final BibLatexEntryType IEEETRANBSTCTL = new BibLatexEntryType() {
 
         {
-            addAllOptional("ctluse_article_number", "ctluse_paper", "ctluse_forced_etal", "ctluse_url",
-                    "ctlmax_names_forced_etal", "ctlnames_show_etal", "ctluse_alt_spacing", "ctlalt_stretch_factor",
-                    "ctldash_repeated_names", "ctlname_format_string", "ctlname_latex_cmd", "ctlname_url_prefix");
+            addAllOptional(FieldName.CTLUSE_ARTICLE_NUMBER, FieldName.CTLUSE_PAPER, FieldName.CTLUSE_FORCED_ETAL,
+                    FieldName.CTLUSE_URL, FieldName.CTLMAX_NAMES_FORCED_ETAL, FieldName.CTLNAMES_SHOW_ETAL,
+                    FieldName.CTLUSE_ALT_SPACING, FieldName.CTLALT_STRETCH_FACTOR, FieldName.CTLDASH_REPEATED_NAMES,
+                    FieldName.CTLNAME_FORMAT_STRING, FieldName.CTLNAME_LATEX_CMD, FieldName.CTLNAME_URL_PREFIX);
         }
 
         @Override

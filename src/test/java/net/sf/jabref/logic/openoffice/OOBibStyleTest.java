@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.Set;
 
 import net.sf.jabref.JabRefMain;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.importer.fileformat.ImportFormat;
@@ -42,8 +41,8 @@ public class OOBibStyleTest {
 
     @Before
     public void setUp() {
-        layoutFormatterPreferences = LayoutFormatterPreferences.fromPreferences(JabRefPreferences.getInstance(),
-                mock(JournalAbbreviationLoader.class));
+        layoutFormatterPreferences = JabRefPreferences.getInstance()
+                .getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class));
     }
 
     @Test
@@ -144,7 +143,7 @@ public class OOBibStyleTest {
     public void testGetCitationMarker() throws IOException {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, StandardCharsets.UTF_8),
-                ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
+                JabRefPreferences.getInstance().getImportFormatPreferences());
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
         Map<BibEntry, BibDatabase> entryDBMap = new HashMap<>();
@@ -166,7 +165,7 @@ public class OOBibStyleTest {
     public void testLayout() throws IOException {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, StandardCharsets.UTF_8),
-                ImportFormatPreferences.fromPreferences(JabRefPreferences.getInstance()));
+                JabRefPreferences.getInstance().getImportFormatPreferences());
         OOBibStyle style = new OOBibStyle(StyleLoader.DEFAULT_NUMERICAL_STYLE_PATH,
                 layoutFormatterPreferences);
         BibDatabase db = result.getDatabase();
@@ -199,7 +198,7 @@ public class OOBibStyleTest {
         entry.setField("author", "{JabRef Development Team}");
         entry.setField("title", "JabRef Manual");
         entry.setField("year", "2016");
-        database.insertEntry(entry);
+        database.insertEntryWithDuplicationCheck(entry);
         assertEquals("<b>JabRef Development Team</b> (<b>2016</b>). <i>JabRef Manual</i>,  .",
                 l.doLayout(entry, database));
     }
@@ -218,7 +217,7 @@ public class OOBibStyleTest {
         entry.setField("author", "Alpha von Beta");
         entry.setField("title", "JabRef Manual");
         entry.setField("year", "2016");
-        database.insertEntry(entry);
+        database.insertEntryWithDuplicationCheck(entry);
         assertEquals("<b>von Beta, A.</b> (<b>2016</b>). <i>JabRef Manual</i>,  .",
                 l.doLayout(entry, database));
     }
@@ -237,7 +236,7 @@ public class OOBibStyleTest {
         entry.setField("author", "{JabRef Development Team}");
         entry.setField("title", "JabRef Manual");
         entry.setField("year", "2016");
-        database.insertEntry(entry);
+        database.insertEntryWithDuplicationCheck(entry);
         entries.add(entry);
         entryDBMap.put(entry, database);
         assertEquals("[JabRef Development Team, 2016]", style.getCitationMarker(entries, entryDBMap, true, null, null));
@@ -257,7 +256,7 @@ public class OOBibStyleTest {
         entry.setField("author", "Alpha von Beta");
         entry.setField("title", "JabRef Manual");
         entry.setField("year", "2016");
-        database.insertEntry(entry);
+        database.insertEntryWithDuplicationCheck(entry);
         entries.add(entry);
         entryDBMap.put(entry, database);
         assertEquals("[von Beta, 2016]", style.getCitationMarker(entries, entryDBMap, true, null, null));
@@ -275,7 +274,7 @@ public class OOBibStyleTest {
         BibEntry entry = new BibEntry();
         entry.setType("article");
         entry.setField("year", "2016");
-        database.insertEntry(entry);
+        database.insertEntryWithDuplicationCheck(entry);
         entries.add(entry);
         entryDBMap.put(entry, database);
         assertEquals("[, 2016]", style.getCitationMarker(entries, entryDBMap, true, null, null));
@@ -293,7 +292,7 @@ public class OOBibStyleTest {
         BibEntry entry = new BibEntry();
         entry.setType("article");
         entry.setField("author", "Alpha von Beta");
-        database.insertEntry(entry);
+        database.insertEntryWithDuplicationCheck(entry);
         entries.add(entry);
         entryDBMap.put(entry, database);
         assertEquals("[von Beta, ]", style.getCitationMarker(entries, entryDBMap, true, null, null));
@@ -310,7 +309,7 @@ public class OOBibStyleTest {
 
         BibEntry entry = new BibEntry();
         entry.setType("article");
-        database.insertEntry(entry);
+        database.insertEntryWithDuplicationCheck(entry);
         entries.add(entry);
         entryDBMap.put(entry, database);
         assertEquals("[, ]", style.getCitationMarker(entries, entryDBMap, true, null, null));
@@ -330,18 +329,18 @@ public class OOBibStyleTest {
         entry1.setField("title", "Paper 1");
         entry1.setField("year", "2000");
         entries.add(entry1);
-        database.insertEntry(entry1);
+        database.insertEntryWithDuplicationCheck(entry1);
         BibEntry entry3 = new BibEntry();
         entry3.setField("author", "Alpha Beta");
         entry3.setField("title", "Paper 2");
         entry3.setField("year", "2000");
         entries.add(entry3);
-        database.insertEntry(entry3);
+        database.insertEntryWithDuplicationCheck(entry3);
         BibEntry entry2 = new BibEntry();
         entry2.setField("author", "Gamma Epsilon");
         entry2.setField("year", "2001");
         entries.add(entry2);
-        database.insertEntry(entry2);
+        database.insertEntryWithDuplicationCheck(entry2);
         for (BibEntry entry : database.getEntries()) {
             entryDBMap.put(entry, database);
         }
@@ -366,18 +365,18 @@ public class OOBibStyleTest {
         entry1.setField("title", "Paper 1");
         entry1.setField("year", "2000");
         entries.add(entry1);
-        database.insertEntry(entry1);
+        database.insertEntryWithDuplicationCheck(entry1);
         BibEntry entry3 = new BibEntry();
         entry3.setField("author", "Alpha Beta");
         entry3.setField("title", "Paper 2");
         entry3.setField("year", "2000");
         entries.add(entry3);
-        database.insertEntry(entry3);
+        database.insertEntryWithDuplicationCheck(entry3);
         BibEntry entry2 = new BibEntry();
         entry2.setField("author", "Gamma Epsilon");
         entry2.setField("year", "2001");
         entries.add(entry2);
-        database.insertEntry(entry2);
+        database.insertEntryWithDuplicationCheck(entry2);
         for (BibEntry entry : database.getEntries()) {
             entryDBMap.put(entry, database);
         }
@@ -402,19 +401,19 @@ public class OOBibStyleTest {
         entry1.setField("title", "Paper 1");
         entry1.setField("year", "2000");
         entries.add(entry1);
-        database.insertEntry(entry1);
+        database.insertEntryWithDuplicationCheck(entry1);
         BibEntry entry2 = new BibEntry();
         entry2.setField("author", "Alpha Beta");
         entry2.setField("title", "Paper 2");
         entry2.setField("year", "2000");
         entries.add(entry2);
-        database.insertEntry(entry2);
+        database.insertEntryWithDuplicationCheck(entry2);
         BibEntry entry3 = new BibEntry();
         entry3.setField("author", "Alpha Beta");
         entry3.setField("title", "Paper 3");
         entry3.setField("year", "2000");
         entries.add(entry3);
-        database.insertEntry(entry3);
+        database.insertEntryWithDuplicationCheck(entry3);
         for (BibEntry entry : database.getEntries()) {
             entryDBMap.put(entry, database);
         }
@@ -437,19 +436,19 @@ public class OOBibStyleTest {
         entry1.setField("title", "Paper 1");
         entry1.setField("year", "2000");
         entries.add(entry1);
-        database.insertEntry(entry1);
+        database.insertEntryWithDuplicationCheck(entry1);
         BibEntry entry2 = new BibEntry();
         entry2.setField("author", "Alpha Beta");
         entry2.setField("title", "Paper 2");
         entry2.setField("year", "2000");
         entries.add(entry2);
-        database.insertEntry(entry2);
+        database.insertEntryWithDuplicationCheck(entry2);
         BibEntry entry3 = new BibEntry();
         entry3.setField("author", "Alpha Beta");
         entry3.setField("title", "Paper 3");
         entry3.setField("year", "2000");
         entries.add(entry3);
-        database.insertEntry(entry3);
+        database.insertEntryWithDuplicationCheck(entry3);
         for (BibEntry entry : database.getEntries()) {
             entryDBMap.put(entry, database);
         }
@@ -512,7 +511,7 @@ public class OOBibStyleTest {
         entry.setField("author", "Alpha von Beta and Gamma Epsilon and Ypsilon Tau");
         entry.setField("title", "JabRef Manual");
         entry.setField("year", "2016");
-        database.insertEntry(entry);
+        database.insertEntryWithDuplicationCheck(entry);
         entries.add(entry);
         entryDBMap.put(entry, database);
         assertEquals("von Beta, Epsilon, and Tau, 2016",

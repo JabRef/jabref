@@ -22,6 +22,7 @@ public class ArchitectureTests {
     public static final String PACKAGE_NET_SF_JABREF_GUI = "net.sf.jabref.gui";
     public static final String PACKAGE_NET_SF_JABREF_LOGIC = "net.sf.jabref.logic";
     public static final String PACKAGE_NET_SF_JABREF_MODEL = "net.sf.jabref.model";
+    public static final String CLASS_NET_SF_JABREF_GLOBALS = "net.sf.jabref.Globals";
 
     private final String firstPackage;
     private final String secondPackage;
@@ -38,11 +39,13 @@ public class ArchitectureTests {
                         {PACKAGE_NET_SF_JABREF_LOGIC, PACKAGE_JAVA_AWT},
                         {PACKAGE_NET_SF_JABREF_LOGIC, PACKAGE_JAVAX_SWING},
                         {PACKAGE_NET_SF_JABREF_LOGIC, PACKAGE_NET_SF_JABREF_GUI},
+                        {PACKAGE_NET_SF_JABREF_LOGIC, CLASS_NET_SF_JABREF_GLOBALS},
 
                         {PACKAGE_NET_SF_JABREF_MODEL, PACKAGE_JAVA_AWT},
                         {PACKAGE_NET_SF_JABREF_MODEL, PACKAGE_JAVAX_SWING},
                         {PACKAGE_NET_SF_JABREF_MODEL, PACKAGE_NET_SF_JABREF_GUI},
-                        {PACKAGE_NET_SF_JABREF_MODEL, PACKAGE_NET_SF_JABREF_LOGIC}
+                        {PACKAGE_NET_SF_JABREF_MODEL, PACKAGE_NET_SF_JABREF_LOGIC},
+                        {PACKAGE_NET_SF_JABREF_MODEL, CLASS_NET_SF_JABREF_GLOBALS}
                 }
         );
     }

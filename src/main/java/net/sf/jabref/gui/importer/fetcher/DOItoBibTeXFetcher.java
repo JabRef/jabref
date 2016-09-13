@@ -6,7 +6,6 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.ParserResult;
@@ -25,7 +24,7 @@ public class DOItoBibTeXFetcher implements EntryFetcher {
     public boolean processQuery(String query, ImportInspector inspector, OutputPrinter status) {
         ParserResult parserResult = new ParserResult();
         Optional<BibEntry> entry = DOItoBibTeX.getEntryFromDOI(query, parserResult,
-                ImportFormatPreferences.fromPreferences(Globals.prefs));
+                Globals.prefs.getImportFormatPreferences());
         if (parserResult.hasWarnings()) {
             status.showMessage(parserResult.getErrorMessage());
         }

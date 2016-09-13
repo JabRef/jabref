@@ -1,25 +1,11 @@
-/*  Copyright (C) 2003-2015 JabRef contributors.
-    This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-    You should have received a copy of the GNU General Public License along
-    with this program; if not, write to the Free Software Foundation, Inc.,
-    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
-*/
-
 package net.sf.jabref.logic.cleanup;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 
-import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -27,14 +13,17 @@ import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
 
 /**
- * Collects file links from the given set of fields, and add them to the list contained in the file field.
+ * Collects file links from the ps and pdf fields, and add them to the list contained in the file field.
  */
 public class UpgradePdfPsToFileCleanup implements CleanupJob {
 
-    private final List<String> fields;
+    // Field name and file type name (from ExternalFileTypes)
+    private final Map<String, String> fields = new HashMap<>();
 
-    public UpgradePdfPsToFileCleanup(List<String> fields) {
-        this.fields = Objects.requireNonNull(fields);
+
+    public UpgradePdfPsToFileCleanup() {
+        fields.put(FieldName.PDF, "PDF");
+        fields.put(FieldName.PS, "PostScript");
     }
 
     @Override
@@ -42,22 +31,21 @@ public class UpgradePdfPsToFileCleanup implements CleanupJob {
         List<FieldChange> changes = new ArrayList<>();
 
         // If there are already links in the file field, keep those on top:
-        String oldFileContent = entry.getFieldOptional(FieldName.FILE).orElse(null);
+        String oldFileContent = entry.getField(FieldName.FILE).orElse(null);
 
         List<ParsedFileField> fileList = new ArrayList<>(FileField.parse(oldFileContent));
         int oldItemCount = fileList.size();
-        for (String field : fields) {
-            entry.getFieldOptional(field).ifPresent(o -> {
+        for (Map.Entry<String, String> field : fields.entrySet()) {
+            entry.getField(field.getKey()).ifPresent(o -> {
                 if (o.trim().isEmpty()) {
                     return;
                 }
                 File f = new File(o);
-                ParsedFileField flEntry = new ParsedFileField(f.getName(), o,
-                        ExternalFileTypes.getInstance().getExternalFileTypeNameByExt(field));
+                ParsedFileField flEntry = new ParsedFileField(f.getName(), o, field.getValue());
                 fileList.add(flEntry);
 
-                entry.clearField(field);
-                changes.add(new FieldChange(entry, field, o, null));
+                entry.clearField(field.getKey());
+                changes.add(new FieldChange(entry, field.getKey(), o, null));
             });
         }
 
