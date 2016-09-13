@@ -17,9 +17,7 @@ public class HTMLCharacterChecker implements Checker {
     private static final Pattern HTML_CHARACTER_PATTERN = Pattern.compile("&[#\\p{Alnum}]+;");
 
     /**
-     * Checks, if there are any HTML encoded characters in the fields.
-     *
-     * This check excludes the `url` field as it allows HTML encoded characters.
+     * Checks, if there are any HTML encoded characters in nonverbatim fields.
      */
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
