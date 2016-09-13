@@ -9,7 +9,8 @@ import java.util.regex.Pattern;
 import net.sf.jabref.logic.integrity.IntegrityCheck.Checker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.FieldProperty;
+import net.sf.jabref.model.entry.InternalBibtexFields;
 
 public class HTMLCharacterChecker implements Checker {
     // Detect any HTML encoded character,
@@ -24,8 +25,8 @@ public class HTMLCharacterChecker implements Checker {
     public List<IntegrityMessage> check(BibEntry entry) {
         List<IntegrityMessage> results = new ArrayList<>();
         for (Map.Entry<String, String> field : entry.getFieldMap().entrySet()) {
-            // skip verbatim URL field
-            if (field.getKey().equals(FieldName.URL)) {
+            // skip verbatim fields
+            if (InternalBibtexFields.getFieldProperties(field.getKey()).contains(FieldProperty.VERBATIM)) {
                 continue;
             }
 
