@@ -66,6 +66,7 @@ public interface SearchBasedParserFetcher extends SearchBasedFetcher {
         } catch (URISyntaxException e) {
             throw new FetcherException("Search URI is malformed", e);
         } catch (IOException e) {
+            // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource
             throw new FetcherException("An I/O exception occurred", e);
         } catch (ParserException e) {
             throw new FetcherException("An internal parser error occurred", e);

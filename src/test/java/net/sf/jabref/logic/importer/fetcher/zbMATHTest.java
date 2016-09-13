@@ -7,7 +7,9 @@ import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.support.DevEnvironment;
 
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -44,6 +46,9 @@ public class zbMATHTest {
 
     @Test
     public void searchByQueryFindsEntry() throws Exception {
+        // CI has no subscription to zbMath and thus gets 401 response
+        Assume.assumeFalse(DevEnvironment.isCIServer());
+
         List<BibEntry> fetchedEntries = fetcher.performSearch("an:0507.57010");
         assertEquals(Collections.singletonList(donaldsonEntry), fetchedEntries);
     }
