@@ -225,6 +225,7 @@ public class IntegrityCheckTest {
         assertCorrect(createContext("title", "Not a single {HTML} character"));
         assertCorrect(createContext("month", "#jan#"));
         assertCorrect(createContext("author", "A. Einstein and I. Newton"));
+        assertCorrect(createContext("url", "http://www.thinkmind.org/index.php?view=article&amp;articleid=cloud_computing_2013_1_20_20130"));
         assertWrong(createContext("author", "Lenhard, J&ouml;rg"));
         assertWrong(createContext("author", "Lenhard, J&#227;rg"));
         assertWrong(createContext("journal", "&Auml;rling Str&ouml;m for &#8211; &#x2031;"));
