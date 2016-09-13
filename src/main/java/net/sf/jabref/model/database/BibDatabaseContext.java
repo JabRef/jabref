@@ -190,8 +190,12 @@ public class BibDatabaseContext {
         return dir;
     }
 
-    public DBMSSynchronizer getDBSynchronizer() {
+    public DBMSSynchronizer getDBMSSynchronizer() {
         return this.dbmsSynchronizer;
+    }
+
+    public void unsetDBMSSynchronizer() {
+        this.dbmsSynchronizer = null;
     }
 
     public DatabaseLocation getLocation() {

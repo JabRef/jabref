@@ -13,6 +13,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.event.EntryEventSource;
@@ -29,14 +30,16 @@ public abstract class DBMSProcessor {
 
     protected static final Log LOGGER = LogFactory.getLog(DBMSProcessor.class);
 
+    protected static final String PROCESSOR_ID = UUID.randomUUID().toString();
+
     protected final Connection connection;
 
-    /**
-     * @param connection Working SQL connection
-     * @param dbmsType Instance of {@link DBMSType}
-     */
-    public DBMSProcessor(Connection connection) {
-        this.connection = connection;
+    protected DBMSConnectionProperties connectionProperties;
+
+
+    protected DBMSProcessor(DBMSConnection dbmsConnection) {
+        this.connection = dbmsConnection.getConnection();
+        this.connectionProperties = dbmsConnection.getProperties();
     }
 
     /**
@@ -126,8 +129,50 @@ public abstract class DBMSProcessor {
      * @param bibEntry {@link BibEntry} to be inserted
      */
     public void insertEntry(BibEntry bibEntry) {
+        if (checkForBibEntryExistence(bibEntry)) {
+            return;
+        }
+        insertIntoEntryTable(bibEntry);
+        insertIntoFieldTable(bibEntry);
+    }
 
+    /**
+     * Inserts the given bibEntry into ENTRY table.
+     *
+     * @param bibEntry {@link BibEntry} to be inserted
+     */
+    protected void insertIntoEntryTable(BibEntry bibEntry) {
+        // Inserting into ENTRY table
+        StringBuilder insertIntoEntryQuery = new StringBuilder()
+                .append("INSERT INTO ")
+                .append(escape("ENTRY"))
+                .append("(")
+                .append(escape("TYPE"))
+                .append(") VALUES(?)");
 
+        // This is the only method to get generated keys which is accepted by MySQL, PostgreSQL and Oracle.
+        try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
+                new String[] {"SHARED_ID"})) {
+
+            preparedEntryStatement.setString(1, bibEntry.getType());
+            preparedEntryStatement.executeUpdate();
+
+            try (ResultSet generatedKeys = preparedEntryStatement.getGeneratedKeys()) {
+                if (generatedKeys.next()) {
+                    bibEntry.getSharedBibEntryData().setSharedID(generatedKeys.getInt(1)); // set generated ID locally
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.error("SQL Error: ", e);
+        }
+    }
+
+    /**
+     * Checks whether the given bibEntry already exists on shared database.
+     * @param bibEntry {@link BibEntry} to be checked
+     * @return <code>true</code> if existent, else <code>false</code>
+     */
+    private boolean checkForBibEntryExistence(BibEntry bibEntry) {
         try {
             // Check if already exists
             int sharedID = bibEntry.getSharedBibEntryData().getSharedID();
@@ -143,53 +188,43 @@ public abstract class DBMSProcessor {
                     preparedSelectStatement.setInt(1, sharedID);
                     try (ResultSet resultSet = preparedSelectStatement.executeQuery()) {
                         if (resultSet.next()) {
-                            return;
+                            return true;
                         }
                     }
                 }
             }
+        } catch (SQLException e) {
+            LOGGER.error("SQL Error: ", e);
+        }
+        return false;
+    }
 
-            // Inserting into ENTRY table
-            StringBuilder insertIntoEntryQuery = new StringBuilder()
-                .append("INSERT INTO ")
-                .append(escape("ENTRY"))
-                .append("(")
-                .append(escape("TYPE"))
-                .append(") VALUES(?)");
+    /**
+     * Inserts the given bibEntry into FIELD table.
+     *
+     * @param bibEntry {@link BibEntry} to be inserted
+     */
+    private void insertIntoFieldTable(BibEntry bibEntry) {
+        try {
+            // Inserting into FIELD table
+            for (String fieldName : bibEntry.getFieldNames()) {
+                StringBuilder insertFieldQuery = new StringBuilder()
+                    .append("INSERT INTO ")
+                    .append(escape("FIELD"))
+                    .append("(")
+                    .append(escape("ENTRY_SHARED_ID"))
+                    .append(", ")
+                    .append(escape("NAME"))
+                    .append(", ")
+                    .append(escape("VALUE"))
+                    .append(") VALUES(?, ?, ?)");
 
-            // This is the only method to get generated keys which is accepted by MySQL, PostgreSQL and Oracle.
-            try (PreparedStatement preparedEntryStatement = connection.prepareStatement(insertIntoEntryQuery.toString(),
-                    new String[] {"SHARED_ID"})) {
-
-                preparedEntryStatement.setString(1, bibEntry.getType());
-                preparedEntryStatement.executeUpdate();
-
-                try (ResultSet generatedKeys = preparedEntryStatement.getGeneratedKeys()) {
-                    if (generatedKeys.next()) {
-                        bibEntry.getSharedBibEntryData().setSharedID(generatedKeys.getInt(1)); // set generated ID locally
-                    }
-                }
-
-                // Inserting into FIELD table
-                for (String fieldName : bibEntry.getFieldNames()) {
-                    StringBuilder insertFieldQuery = new StringBuilder()
-                        .append("INSERT INTO ")
-                        .append(escape("FIELD"))
-                        .append("(")
-                        .append(escape("ENTRY_SHARED_ID"))
-                        .append(", ")
-                        .append(escape("NAME"))
-                        .append(", ")
-                        .append(escape("VALUE"))
-                        .append(") VALUES(?, ?, ?)");
-
-                    try (PreparedStatement preparedFieldStatement = connection.prepareStatement(insertFieldQuery.toString())) {
-                        // columnIndex starts with 1
-                        preparedFieldStatement.setInt(1, bibEntry.getSharedBibEntryData().getSharedID());
-                        preparedFieldStatement.setString(2, fieldName);
-                        preparedFieldStatement.setString(3, bibEntry.getField(fieldName).get());
-                        preparedFieldStatement.executeUpdate();
-                    }
+                try (PreparedStatement preparedFieldStatement = connection.prepareStatement(insertFieldQuery.toString())) {
+                    // columnIndex starts with 1
+                    preparedFieldStatement.setInt(1, bibEntry.getSharedBibEntryData().getSharedID());
+                    preparedFieldStatement.setString(2, fieldName);
+                    preparedFieldStatement.setString(3, bibEntry.getField(fieldName).get());
+                    preparedFieldStatement.executeUpdate();
                 }
             }
         } catch (SQLException e) {
@@ -517,7 +552,8 @@ public abstract class DBMSProcessor {
     /**
      *  Returns a new instance of the abstract type {@link DBMSProcessor}
      */
-    public static DBMSProcessor getProcessorInstance(Connection connection, DBMSType type) {
+    public static DBMSProcessor getProcessorInstance(DBMSConnection connection) {
+        DBMSType type = connection.getProperties().getType();
         if (type == DBMSType.MYSQL) {
             return new MySQLProcessor(connection);
         } else if (type == DBMSType.POSTGRESQL) {
@@ -527,5 +563,22 @@ public abstract class DBMSProcessor {
         }
         return null; // can never happen except new types were added without updating this method.
     }
+
+    /**
+     * Listens for notifications from DBMS.
+     *
+     * @param dbmsSynchronizer {@link DBMSSynchronizer} which handles the notification.
+     */
+    public abstract void startNotificationListener(DBMSSynchronizer dbmsSynchronizer);
+
+    /**
+     * Terminates the notification listener.
+     */
+    public abstract void stopNotificationListener();
+
+    /**
+     * Notifies all clients ({@link DBMSSynchronizer}) which are connected to the same DBMS.
+     */
+    public abstract void notifyClients();
 
 }

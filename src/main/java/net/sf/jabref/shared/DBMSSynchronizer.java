@@ -39,7 +39,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DBMSSynchronizer {
 
-    private static final Log LOGGER = LogFactory.getLog(DBMSConnector.class);
+    private static final Log LOGGER = LogFactory.getLog(DBMSSynchronizer.class);
 
     private DBMSProcessor dbmsProcessor;
     private DBMSType dbmsType;
@@ -120,6 +120,14 @@ public class DBMSSynchronizer {
             synchronizeSharedMetaData(event.getMetaData());
             synchronizeLocalDatabase();
             applyMetaData();
+            dbmsProcessor.notifyClients();
+        }
+    }
+
+    @Subscribe
+    public void listen(EntryEvent event) {
+        if (isEventSourceAccepted(event)) {
+            dbmsProcessor.notifyClients();
         }
     }
 
@@ -145,6 +153,7 @@ public class DBMSSynchronizer {
 
         synchronizeLocalMetaData();
         synchronizeLocalDatabase();
+        dbmsProcessor.startNotificationListener(this);
     }
 
     /**
@@ -216,6 +225,7 @@ public class DBMSSynchronizer {
                 }
             }
             if (!match) {
+                eventBus.post(new SharedEntryNotPresentEvent(localEntry));
                 bibDatabase.removeEntry(localEntry, EntryEventSource.SHARED); // Should not reach the listeners above.
                 i--; // due to index shift on localEntries
             }
@@ -235,7 +245,7 @@ public class DBMSSynchronizer {
         } catch (OfflineLockException exception) {
             eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
         } catch (SharedEntryNotPresentException exception) {
-            eventBus.post(new SharedEntryNotPresentEvent(exception.getNonPresentBibEntry()));
+            // do nothing
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
         }
@@ -286,7 +296,7 @@ public class DBMSSynchronizer {
                 } catch (OfflineLockException exception) {
                     eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
                 } catch (SharedEntryNotPresentException exception) {
-                    eventBus.post(new SharedEntryNotPresentEvent(exception.getNonPresentBibEntry()));
+                    // do nothing
                 } catch (SQLException e) {
                     LOGGER.error("SQL Error: ", e);
                 }
@@ -337,16 +347,25 @@ public class DBMSSynchronizer {
         return ((eventSource == EntryEventSource.LOCAL) || (eventSource == EntryEventSource.UNDO));
     }
 
-    public void openSharedDatabase(Connection connection, DBMSType type, String name) throws DatabaseNotSupportedException, SQLException {
-        this.dbmsType = type;
-        this.dbName = name;
-        this.currentConnection = connection;
-        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(connection, type);
+    public void openSharedDatabase(DBMSConnection connection) throws DatabaseNotSupportedException, SQLException {
+        this.dbmsType = connection.getProperties().getType();
+        this.dbName = connection.getProperties().getDatabase();
+        this.currentConnection = connection.getConnection();
+        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(connection);
         initializeDatabases();
     }
 
-    public void openSharedDatabase(DBMSConnectionProperties properties) throws ClassNotFoundException, SQLException, DatabaseNotSupportedException {
-        openSharedDatabase(DBMSConnector.getNewConnection(properties), properties.getType(), properties.getDatabase());
+    public void openSharedDatabase(DBMSConnectionProperties properties) throws SQLException, DatabaseNotSupportedException {
+        openSharedDatabase(new DBMSConnection(properties));
+    }
+
+    public void closeSharedDatabase() {
+        try {
+            dbmsProcessor.stopNotificationListener();
+            currentConnection.close();
+        } catch (SQLException e) {
+            LOGGER.error("SQL Error:", e);
+        }
     }
 
     private boolean isPresentLocalBibEntry(BibEntry bibEntry) {
