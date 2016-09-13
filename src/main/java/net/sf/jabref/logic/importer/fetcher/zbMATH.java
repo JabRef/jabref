@@ -47,11 +47,6 @@ public class zbMATH implements SearchBasedParserFetcher {
         return "zbMATH";
     }
 
-    @Override
-    public HelpFile getHelpPage() {
-        return null;
-    }
-
     /**
      * TODO: Implement EntryBasedParserFetcher
      * We use the zbMATH Citation matcher (https://www.zbmath.org/citationmatching/)

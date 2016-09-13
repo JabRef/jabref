@@ -31,12 +31,12 @@ public class GvkParserTest {
 
     @Test
     public void emptyResult() throws Exception {
-        doTest("gvk_empty_result_becaue_of_bad_query.xml", 0, Collections.emptyList());
+        doTest("gvk_empty_result_because_of_bad_query.xml", 0, Collections.emptyList());
     }
 
     @Test
     public void resultFor797485368() throws Exception {
-        doTest("gvk_result_for_797485368.xml", 1, Arrays.asList("gvk_result_for_797485368.bib"));
+        doTest("gvk_result_for_797485368.xml", 1, Collections.singletonList("gvk_result_for_797485368.bib"));
     }
 
     @Test

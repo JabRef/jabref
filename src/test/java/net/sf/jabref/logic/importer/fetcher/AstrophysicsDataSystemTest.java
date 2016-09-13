@@ -43,8 +43,8 @@ public class AstrophysicsDataSystemTest {
         diezSliceTheoremEntry.setField("primaryclass", "math-ph");
         diezSliceTheoremEntry.setField("abstract",
                 "A general slice theorem for the action of a Fr$\\backslash$'echet Lie group on a" + NEWLINE
-                        + "Fr$\\backslash$'echet manifolds is established. The Nash-Moser theorem provides the"
-                        + NEWLINE + "fundamental tool to generalize the result of Palais to this" + NEWLINE
+                        + "Fr$\\backslash$'echet manifolds is established. The Nash-Moser theorem provides the" + NEWLINE
+                        + "fundamental tool to generalize the result of Palais to this" + NEWLINE
                         + "infinite-dimensional setting. The presented slice theorem is illustrated" + NEWLINE
                         + "by its application to gauge theories: the action of the gauge" + NEWLINE
                         + "transformation group admits smooth slices at every point and thus the" + NEWLINE

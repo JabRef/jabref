@@ -83,8 +83,8 @@ public class BibtexParser implements Parser {
      *
      * @param in the Reader to read from
      * @throws IOException
+     * @deprecated inline this method
      */
-    @Deprecated // inline this method
     public static ParserResult parse(Reader in, ImportFormatPreferences importFormatPreferences) throws IOException {
         return new BibtexParser(importFormatPreferences).parse(in);
     }
@@ -94,8 +94,9 @@ public class BibtexParser implements Parser {
      *
      * @param bibtexString
      * @return Returns returns an empty collection if no entries where found or if an error occurred.
+     * @deprecated use parseEntries
      */
-    @Deprecated // use parseEntries
+    @Deprecated
     public static List<BibEntry> fromString(String bibtexString, ImportFormatPreferences importFormatPreferences) {
         BibtexParser parser = new BibtexParser(importFormatPreferences);
 

@@ -44,11 +44,6 @@ public class MathSciNet implements SearchBasedParserFetcher, EntryBasedParserFet
         return "MathSciNet";
     }
 
-    @Override
-    public HelpFile getHelpPage() {
-        return null;
-    }
-
     /**
      * We use MR Lookup (http://www.ams.org/mrlookup) instead of the usual search since this tool is also available
      * without subscription and, moreover, is optimized for finding a publication based on partial information.

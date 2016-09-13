@@ -45,11 +45,6 @@ public class AstrophysicsDataSystem implements SearchBasedParserFetcher, EntryBa
         return "SAO/NASA Astrophysics Data System";
     }
 
-    @Override
-    public HelpFile getHelpPage() {
-        return null;
-    }
-
     private URIBuilder getBaseUrl(String apiUrl) throws URISyntaxException {
         URIBuilder uriBuilder = new URIBuilder(apiUrl);
         uriBuilder.addParameter("data_type", "BIBTEXPLUS");
@@ -105,6 +100,8 @@ public class AstrophysicsDataSystem implements SearchBasedParserFetcher, EntryBa
         new FieldFormatterCleanup(FieldName.ABSTRACT, new RemoveBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(FieldName.TITLE, new RemoveBracesFormatter()).cleanup(entry);
         new FieldFormatterCleanup(FieldName.AUTHOR, new NormalizeNamesFormatter()).cleanup(entry);
+
+        // Remove url to ADS page
         new FieldFormatterCleanup("adsnote", new ClearFormatter()).cleanup(entry);
         new FieldFormatterCleanup("adsurl", new ClearFormatter()).cleanup(entry);
     }

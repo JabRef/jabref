@@ -16,8 +16,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class zbMATHTest {
-    zbMATH fetcher;
-    BibEntry donaldsonEntry;
+    private zbMATH fetcher;
+    private BibEntry donaldsonEntry;
 
     @Before
     public void setUp() throws Exception {
