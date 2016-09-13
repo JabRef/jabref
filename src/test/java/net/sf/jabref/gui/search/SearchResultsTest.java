@@ -19,7 +19,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.testutils.TestUtils;
 
-public class SeachResultsTest extends AssertJSwingJUnitTestCase {
+public class SearchResultsTest extends AssertJSwingJUnitTestCase {
 
     private FrameFixture frameFixture;
 

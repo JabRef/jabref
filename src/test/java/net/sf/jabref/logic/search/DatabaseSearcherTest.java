@@ -5,10 +5,13 @@ import java.util.List;
 
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
 
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class DatabaseSearcherTest {
 
@@ -66,7 +69,7 @@ public class DatabaseSearcherTest {
 
         DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
-        assertTrue(databaseSearcher.getDatabasefromMatches().getEntries().isEmpty());
+        assertTrue(databaseSearcher.getMatches().isEmpty());
     }
 
     @Test
@@ -76,7 +79,7 @@ public class DatabaseSearcherTest {
 
         DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
-        assertTrue(databaseSearcher.getDatabasefromMatches().getEntries().isEmpty());
+        assertTrue(databaseSearcher.getMatches().isEmpty());
     }
 
     @Test
@@ -90,7 +93,7 @@ public class DatabaseSearcherTest {
         SearchQuery query = new SearchQuery("tonho", true, true);
         DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
-        assertFalse(databaseSearcher.getDatabasefromMatches().getEntries().isEmpty());
+        assertFalse(databaseSearcher.getMatches().isEmpty());
     }
 
     @Test
@@ -107,7 +110,7 @@ public class DatabaseSearcherTest {
         SearchQuery query = new SearchQuery("tonho", true, true);
         DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
-        assertFalse(databaseSearcher.getDatabasefromMatches().getEntries().isEmpty());
+        assertFalse(databaseSearcher.getMatches().isEmpty());
     }
 
     @Test
@@ -121,7 +124,7 @@ public class DatabaseSearcherTest {
         SearchQuery query = new SearchQuery("asdf", true, true);
         DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
-        assertTrue(databaseSearcher.getDatabasefromMatches().getEntries().isEmpty());
+        assertTrue(databaseSearcher.getMatches().isEmpty());
     }
 
     @Test
@@ -133,6 +136,6 @@ public class DatabaseSearcherTest {
         SearchQuery query = new SearchQuery("tonho", true, true);
         DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
-        assertTrue(databaseSearcher.getDatabasefromMatches().getEntries().isEmpty());
+        assertTrue(databaseSearcher.getMatches().isEmpty());
     }
 }
