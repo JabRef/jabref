@@ -5,6 +5,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.swing.JFrame;
 
+import net.sf.jabref.gui.BasePanel;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.testutils.TestUtils;
+
 import org.assertj.swing.core.ComponentFinder;
 import org.assertj.swing.edt.FailOnThreadViolationRepaintManager;
 import org.assertj.swing.finder.WindowFinder;
@@ -14,10 +18,6 @@ import org.assertj.swing.junit.testcase.AssertJSwingJUnitTestCase;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.testutils.TestUtils;
 
 public class SearchResultsTest extends AssertJSwingJUnitTestCase {
 
