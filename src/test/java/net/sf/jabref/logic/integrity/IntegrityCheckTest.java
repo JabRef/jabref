@@ -61,6 +61,39 @@ public class IntegrityCheckTest {
     }
 
     @Test
+    public void testEditionChecks() {
+        assertCorrect(withMode(createContext("edition", "Second"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("edition", "Third"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("edition", "second"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("edition", "2"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("edition", "2nd"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("edition", "2"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("edition", "10"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(
+                withMode(createContext("edition", "Third, revised and expanded edition"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("edition", "Edition 2000"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("edition", "2nd"), BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
+    public void testNoteChecks() {
+        assertCorrect(withMode(createContext("note", "Lorem ipsum"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("note", "Lorem ipsum? 10"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("note", "lorem ipsum"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("note", "Lorem ipsum"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("note", "lorem ipsum"), BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
+    public void testHowpublishedChecks() {
+        assertCorrect(withMode(createContext("howpublished", "Lorem ipsum"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("howpublished", "Lorem ipsum? 10"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("howpublished", "lorem ipsum"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("howpublished", "Lorem ipsum"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("howpublished", "lorem ipsum"), BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
     public void testBracketChecks() {
         assertCorrect(createContext("title", "x"));
         assertCorrect(createContext("title", "{x}"));
@@ -228,7 +261,7 @@ public class IntegrityCheckTest {
         entry.setField(field, value);
         entry.setType(type);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntry(entry);
+        bibDatabase.insertEntryWithDuplicationCheck(entry);
         return new BibDatabaseContext(bibDatabase, new Defaults());
     }
 
@@ -236,7 +269,7 @@ public class IntegrityCheckTest {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntry(entry);
+        bibDatabase.insertEntryWithDuplicationCheck(entry);
         return new BibDatabaseContext(bibDatabase, metaData, new Defaults());
     }
 

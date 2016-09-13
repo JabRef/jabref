@@ -1,5 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
 
+// to update the gradle wrapper, execute ./gradlew wrapper --gradle-version 3.0
+
 buildscript {
     repositories {
         maven {
@@ -46,10 +48,6 @@ install4j {
     installDir = file(project.ext.install4jDir)
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.14.1'
-}
-
 
 repositories {
     jcenter()
@@ -62,8 +60,8 @@ configurations {
     databaseTestCompile.extendsFrom testCompile
     databaseTestRuntime.extendsFrom testRuntime
 
-	integrationTestCompile.extendsFrom testCompile
-	integrationTestRuntime.extendsFrom testRuntime
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
 }
 
 dependencies {
@@ -112,11 +110,13 @@ dependencies {
 
     compile 'org.jsoup:jsoup:1.9.2'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
-    compile 'info.debatty:java-string-similarity:0.16'
+    compile 'info.debatty:java-string-similarity:0.17'
 
     compile 'org.apache.logging.log4j:log4j-jcl:2.6.2'
     compile 'org.apache.logging.log4j:log4j-api:2.6.2'
     compile 'org.apache.logging.log4j:log4j-core:2.6.2'
+    compile 'org.xmlunit:xmlunit-core:2.2.1'
+    compile 'org.xmlunit:xmlunit-matchers:2.2.1'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
@@ -136,7 +136,7 @@ sourceSets {
             runtimeClasspath += main.output + test.output
         }
     }
-	integrationTest {
+    integrationTest {
         java {
             compileClasspath += main.output + test.output
             runtimeClasspath += main.output + test.output
@@ -152,7 +152,9 @@ processResources {
                 "year": String.valueOf(Calendar.getInstance().get(Calendar.YEAR)),
                 "authors": new File('AUTHORS').readLines().findAll { !it.startsWith("#") }.join(", "),
                 "developers": new File('DEVELOPERS').readLines().findAll { !it.startsWith("#") }.join(", "))
+                filteringCharset = 'UTF-8'
     }
+    filteringCharset = 'UTF-8'
 
     filesMatching("resource/**/meta.xml") {
         expand version: project.version

@@ -12,15 +12,15 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.external.DroppedFileHandler;
-import net.sf.jabref.external.ExternalFileTypes;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.BasePanelMode;
 import net.sf.jabref.gui.EntryTypeDialog;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.externalfiles.DroppedFileHandler;
+import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
+import net.sf.jabref.gui.filelist.FileListEntry;
+import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
@@ -191,7 +191,7 @@ public class PdfImporter {
         entry = localRes.get(0);
 
         // insert entry to database and link file
-        panel.getDatabase().insertEntry(entry);
+        panel.getDatabase().insertEntryWithDuplicationCheck(entry);
         panel.markBaseChanged();
         FileListTableModel tm = new FileListTableModel();
         File toLink = new File(fileName);
@@ -235,7 +235,7 @@ public class PdfImporter {
         BibEntry entry = result.getDatabase().getEntries().get(0);
 
         // insert entry to database and link file
-        panel.getDatabase().insertEntry(entry);
+        panel.getDatabase().insertEntryWithDuplicationCheck(entry);
         panel.markBaseChanged();
         BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
                 Globals.prefs.getBibtexKeyPatternPreferences());
@@ -262,7 +262,7 @@ public class PdfImporter {
             String id = IdGenerator.next();
             final BibEntry bibEntry = new BibEntry(id, type.getName());
             try {
-                panel.getDatabase().insertEntry(bibEntry);
+                panel.getDatabase().insertEntryWithDuplicationCheck(bibEntry);
 
                 // Set owner/timestamp if options are enabled:
                 List<BibEntry> list = new ArrayList<>();

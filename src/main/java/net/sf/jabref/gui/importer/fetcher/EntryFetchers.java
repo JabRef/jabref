@@ -1,10 +1,12 @@
 package net.sf.jabref.gui.importer.fetcher;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.importer.IdBasedFetcher;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
 import net.sf.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import net.sf.jabref.logic.importer.fetcher.DiVA;
@@ -33,8 +35,6 @@ public class EntryFetchers {
         entryFetchers.add(new DOAJFetcher());
         entryFetchers.add(new SpringerFetcher());
 
-        entryFetchers.add(new IdBasedEntryFetcher(new DiVA(Globals.prefs.getImportFormatPreferences())));
-        entryFetchers.add(new IdBasedEntryFetcher(new IsbnFetcher(Globals.prefs.getImportFormatPreferences())));
         entryFetchers.add(new SearchBasedEntryFetcher(new ArXiv()));
         entryFetchers.add(new SearchBasedEntryFetcher(new GvkFetcher()));
         entryFetchers.add(
@@ -45,5 +45,13 @@ public class EntryFetchers {
 
     public List<EntryFetcher> getEntryFetchers() {
         return Collections.unmodifiableList(this.entryFetchers);
+    }
+
+    public static ArrayList<IdBasedFetcher> getIdFetchers() {
+        ArrayList<IdBasedFetcher> list = new ArrayList<>();
+        list.add(new IsbnFetcher(Globals.prefs.getImportFormatPreferences()));
+        list.add(new DiVA(Globals.prefs.getImportFormatPreferences()));
+        list.sort((fetcher1, fetcher2) -> fetcher1.getName().compareTo(fetcher2.getName()));
+        return list;
     }
 }
