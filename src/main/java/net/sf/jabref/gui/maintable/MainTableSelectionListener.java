@@ -82,7 +82,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         } else {
             preview = new PreviewPanel(panel.getBibDatabaseContext(), null, panel);
         }
-        panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview);
+        panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview);
     }
 
     public void setEnabled(boolean enabled) {
@@ -101,6 +101,11 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         }
 
         final BibEntry newSelected = selected.get(0);
+        if (Objects.nonNull(panel.getCurrentEditor()) && (newSelected == panel.getCurrentEditor().getEntry())) {
+            // is already selected
+            return;
+        }
+
         if (newSelected != null) {
             final BasePanelMode mode = panel.getMode(); // What is the panel already showing?
             if ((mode == BasePanelMode.WILL_SHOW_EDITOR) || (mode == BasePanelMode.SHOWING_EDITOR)) {

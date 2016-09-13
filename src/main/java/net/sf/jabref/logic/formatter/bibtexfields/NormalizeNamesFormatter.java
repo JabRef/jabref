@@ -1,5 +1,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
+import java.util.Objects;
+
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.AuthorList;
@@ -20,8 +22,9 @@ public class NormalizeNamesFormatter implements Formatter {
     }
 
     @Override
-    public String format(String value) {
-        AuthorList authorList = AuthorList.parse(value);
+    public String format(String nameList) {
+        Objects.requireNonNull(nameList);
+        AuthorList authorList = AuthorList.parse(nameList);
         return authorList.getAsLastFirstNamesWithAnd(false);
     }
 
