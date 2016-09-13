@@ -62,6 +62,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.logic.layout.format.NameFormatterPreferences;
+import net.sf.jabref.logic.net.ProxyPreferences;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsList;
@@ -1448,6 +1449,25 @@ public class JabRefPreferences {
     public FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(Collections.singletonList(get(FieldName.FILE + FileLinkPreferences.DIR_SUFFIX)),
                 fileDirForDatabase);
+    }
+
+    public void storeProxyPreferences(ProxyPreferences proxyPreferences) {
+        putBoolean(PROXY_USE, proxyPreferences.isUseProxy());
+        put(PROXY_HOSTNAME, proxyPreferences.getHostname());
+        put(PROXY_PORT, proxyPreferences.getPort());
+        putBoolean(PROXY_USE_AUTHENTICATION, proxyPreferences.isUseAuthentication());
+        put(PROXY_USERNAME, proxyPreferences.getUsername());
+        put(PROXY_PASSWORD, proxyPreferences.getPassword());
+    }
+
+    public ProxyPreferences getProxyPreferences() {
+        Boolean useProxy = getBoolean(PROXY_USE);
+        String hostname = get(PROXY_HOSTNAME);
+        String port = get(PROXY_PORT);
+        Boolean useAuthentication = getBoolean(PROXY_USE_AUTHENTICATION);
+        String username = get(PROXY_USERNAME);
+        String password = get(PROXY_PASSWORD);
+        return new ProxyPreferences(useProxy, hostname, port, useAuthentication, username, password);
     }
 
     public ProtectedTermsPreferences getProtectedTermsPreferences() {
