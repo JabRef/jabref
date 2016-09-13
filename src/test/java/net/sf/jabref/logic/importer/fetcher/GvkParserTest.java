@@ -16,14 +16,14 @@ import org.junit.Test;
 public class GvkParserTest {
 
     private void doTest(String xmlName, int expectedSize, List<String> resourceNames) throws Exception {
-        try (InputStream is = GvkParser.class.getResourceAsStream(xmlName)) {
+        try (InputStream is = GvkParserTest.class.getResourceAsStream(xmlName)) {
             GvkParser parser = new GvkParser();
             List<BibEntry> entries = parser.parseEntries(is);
             Assert.assertNotNull(entries);
             Assert.assertEquals(expectedSize, entries.size());
             int i = 0;
             for (String resourceName : resourceNames) {
-                BibEntryAssert.assertEquals(GvkParser.class, resourceName, entries.get(i));
+                BibEntryAssert.assertEquals(GvkParserTest.class, resourceName, entries.get(i));
                 i++;
             }
         }
@@ -46,7 +46,7 @@ public class GvkParserTest {
 
     @Test
     public void subTitleTest() throws Exception {
-        try (InputStream is = GvkParser.class.getResourceAsStream("gvk_artificial_subtitle_test.xml")) {
+        try (InputStream is = GvkParserTest.class.getResourceAsStream("gvk_artificial_subtitle_test.xml")) {
             GvkParser parser = new GvkParser();
             List<BibEntry> entries = parser.parseEntries(is);
             Assert.assertNotNull(entries);
