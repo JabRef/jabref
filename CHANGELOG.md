@@ -19,8 +19,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - The search result Window won't stay on top anymore if the main Window is focused and will be present in the taskbar
 - The user can jump from the searchbar to the maintable  with `ctrl+enter`
 - Implemented [#573 (comment)](https://github.com/JabRef/jabref/issues/573#issuecomment-232284156): Added shortcut: closing the search result window with `ctrl+w`
-- Added support for over 1000 (self updating) 1.0.1 Citation Styles
-- You can set and cycle different preview Styles (including CitationStyles)
+- Added support for over 1000 1.0.1 CitationStyles
+- You can set and cycle different preview styles (including CitationStyles)
 - Added integrity check for fields with BibTeX keys, e.g., `crossref` and `related`, to check that the key exists
 - [#1496](https://github.com/JabRef/jabref/issues/1496) Keep track of which entry a downloaded file belongs to
 - Made it possible to download multiple entries in one action
@@ -61,7 +61,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1958](https://github.com/JabRef/jabref/issues/1958): Verbatim fields are no longer checked for HTML encoded characters by integrity checks
 
 ### Removed
-- Removed 2nd Preview Style
+- Removed 2nd preview style
 - The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field. 
 - Automatic migration for the `evastar_pdf` field is removed.
 
