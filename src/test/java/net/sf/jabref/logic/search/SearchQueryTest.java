@@ -66,4 +66,30 @@ public class SearchQueryTest {
         assertTrue(searchQuery.isMatch(e));
     }
 
+
+    @Test
+    public void testIsMatch() {
+        BibEntry entry = new BibEntry();
+        entry.setType(BibtexEntryTypes.ARTICLE);
+        entry.setField("author", "asdf");
+
+        assertFalse(new SearchQuery("qwer", true, true).isMatch(entry));
+        assertTrue(new SearchQuery("asdf", true, true).isMatch(entry));
+        assertTrue(new SearchQuery("author=asdf", true, true).isMatch(entry));
+    }
+
+    @Test
+    public void testIsValidQuery() {
+        assertFalse(new SearchQuery("asdf[", true, true).isValidQuery());
+        assertTrue(new SearchQuery("asdf[", true, false).isValidQuery());
+        assertTrue(new SearchQuery("asdf", true, false).isValidQuery());
+        assertTrue(new SearchQuery("asdf", true, true).isValidQuery());
+        assertTrue(new SearchQuery("123", true, true).isValidQuery());
+        assertTrue(new SearchQuery("123", true, true).isValidQuery());
+        assertTrue(new SearchQuery("author=asdf", true, false).isValidQuery());
+        assertTrue(new SearchQuery("author=asdf", true, true).isValidQuery());
+        assertTrue(new SearchQuery("author=123", true, false).isValidQuery());
+        assertTrue(new SearchQuery("author=123", true, true).isValidQuery());
+    }
+
 }
