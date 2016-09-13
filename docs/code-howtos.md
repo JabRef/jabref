@@ -416,7 +416,7 @@ Location | `@image.png` | path relative to the current FXML file | -
 Resource | `%textToBeTranslated` | key in ResourceBundle | -
 Attribute variable | `$idOfControl` or `$variable` | named control or variable in controller (may be path in the namespace) | resolved only once at load time
 Expression binding | `${expression}` | expression, for example `textField.text` | changes to source are propagated
-Bidirectional expression binding | `#{expression}` | expression | changes are propagated in both directions (not yet implemented in JavaFX)
+Bidirectional expression binding | `#{expression}` | expression | changes are propagated in both directions (not yet implemented in JavaFX, see [feature request](https://bugs.openjdk.java.net/browse/JDK-8090665))
 Event handler | `#nameOfEventHandler` | name of the event handler method in the controller | -
 
 
