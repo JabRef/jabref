@@ -44,12 +44,13 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Selecting an entry in the search result Window will now select the correct entry in the bib file
 - Entries in the SearchResultDialog are now converted to Unicode
 - Suggestions in the autocomplete (search) are now in Unicode
-- Fixed NullPointerException when opening search result window for an untitled database 
+- Fixed NullPointerException when opening search result window for an untitled database
 - Fixed entry table traversal with Tab (no column traversal thus no double jump)
 - Fixed [#1757](https://github.com/JabRef/jabref/issues/1757): Crash after saving illegal argument in entry editor
 - Fixed [#1663](https://github.com/JabRef/jabref/issues/1663): Better multi-monitor support
 - Fixed [#1882](https://github.com/JabRef/jabref/issues/1882): Crash after saving illegal bibtexkey in entry editor
 - Fixed field `location` containing only city is not exported correctly to MS-Office 2007 xml format
+- Fixed [#1235](https://github.com/JabRef/jabref/issues/1235): Modified Key bindings do not work correctly
 - Fixed field `key` field is not exported to MS-Office 2008 xml format
 - Fixed [#1181](https://github.com/JabRef/jabref/issues/1181) and [#1504](https://github.com/JabRef/jabref/issues/1504): Improved "Normalize to BibTeX name format": Support separated names with commas and colons. Considered name affixes such as "Jr".
 - Fixed download files failed silently when an invalid directory is selected

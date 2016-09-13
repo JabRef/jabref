@@ -2,6 +2,9 @@ package net.sf.jabref.gui.keyboard;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
 /**
  * respond to grabKey and display the key binding
@@ -9,6 +12,9 @@ import java.awt.event.KeyEvent;
 public class KeyBindingsListener extends KeyAdapter {
 
     private final KeyBindingTable table;
+    private boolean isDeleteKey;
+    private boolean isFunctionKey;
+    private boolean isEscapeKey;
 
     public KeyBindingsListener(KeyBindingTable table) {
         this.table = table;
@@ -16,51 +22,87 @@ public class KeyBindingsListener extends KeyAdapter {
 
     @Override
     public void keyPressed(KeyEvent evt) {
-        // first check if anything is selected if not the return
+        // first check if anything is selected if not then return
         final int selRow = table.getSelectedRow();
         boolean isAnyRowSelected = selRow >= 0;
         if (!isAnyRowSelected) {
             return;
         }
 
-        final String modifier = KeyEvent.getKeyModifiersText(evt.getModifiers());
+        final String modifier = getModifierText(evt);
 
         // VALIDATE code and modifier
         // all key bindings must have a modifier: ctrl alt etc
         if ("".equals(modifier)) {
             int kc = evt.getKeyCode();
-            boolean isFunctionKey = (kc >= KeyEvent.VK_F1) && (kc <= KeyEvent.VK_F12);
-            boolean isEscapeKey = kc == KeyEvent.VK_ESCAPE;
-            boolean isDeleteKey = kc == KeyEvent.VK_DELETE;
+            isFunctionKey = (kc >= KeyEvent.VK_F1) && (kc <= KeyEvent.VK_F12);
+            isEscapeKey = kc == KeyEvent.VK_ESCAPE;
+            isDeleteKey = kc == KeyEvent.VK_DELETE;
             if (!(isFunctionKey || isEscapeKey || isDeleteKey)) {
                 return; // need a modifier except for function, escape and delete keys
             }
         }
 
-        final String code = KeyEvent.getKeyText(evt.getKeyCode());
-        // second key cannot be a modifiers
-        if ("Tab".equals(code)
-                || "Backspace".equals(code)
-                || "Enter".equals(code)
-                || "Space".equals(code)
-                || "Ctrl".equals(code)
-                || "Shift".equals(code)
-                || "Alt".equals(code)) {
+        int code = evt.getKeyCode();
+        String newKey;
+        //skip the event triggered only by a modifier
+        if (code == KeyEvent.VK_ALT ||
+                code == KeyEvent.VK_TAB ||
+                code == KeyEvent.VK_BACK_SPACE ||
+                code == KeyEvent.VK_ENTER ||
+                code == KeyEvent.VK_SPACE ||
+                code == KeyEvent.VK_CONTROL ||
+                code == KeyEvent.VK_SHIFT ||
+                code == KeyEvent.VK_META) {
             return;
         }
-
-        // COMPUTE new key binding
-        String newKey;
         if ("".equals(modifier)) {
-            newKey = code;
+            if (isFunctionKey) {
+                newKey = KeyEvent.getKeyText(code);
+            } else if (isEscapeKey) {
+                newKey = "ESCAPE";
+            } else if (isDeleteKey) {
+                newKey = "DELETE";
+            } else {
+                return;
+            }
         } else {
-            newKey = modifier.toLowerCase().replace("+", " ") + " " + code;
+            newKey = modifier.toLowerCase(Locale.ENGLISH) + " " + KeyEvent.getKeyText(code);
         }
-
-        // SHOW new key binding
+        //SHOW new key binding
         //find which key is selected and set its value
         table.setValueAt(newKey, selRow, 1);
         table.revalidate();
         table.repaint();
+    }
+
+    /**
+     * Checks if the event has pressed modifiers and adds their English key text to an ArrayList
+     * from which a String is build
+     *
+     * @param evt the KeyEvent that was triggered to set the KeyBindings
+     * @return a String containing the modifier keys text
+     */
+    private String getModifierText(KeyEvent evt) {
+        ArrayList<String> modifiersList = new ArrayList<>();
+
+        if (evt.isControlDown()) {
+            modifiersList.add("ctrl");
+        }
+        if (evt.isAltDown()) {
+            modifiersList.add("alt");
+        }
+        if (evt.isShiftDown()) {
+            modifiersList.add("shift");
+        }
+        if (evt.isAltGraphDown()) {
+            modifiersList.add("alt gr");
+        }
+        if (evt.isMetaDown()) {
+            modifiersList.add("meta");
+        }
+        //Now build the String with all the modifier texts
+        String modifiersAsString = modifiersList.stream().collect(Collectors.joining(" "));
+        return modifiersAsString;
     }
 }
