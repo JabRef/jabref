@@ -62,11 +62,13 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.logic.layout.format.NameFormatterPreferences;
+import net.sf.jabref.logic.net.ProxyPreferences;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsList;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
+import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.UpdateFieldPreferences;
 import net.sf.jabref.logic.util.io.FileHistory;
@@ -1449,6 +1451,25 @@ public class JabRefPreferences {
                 fileDirForDatabase);
     }
 
+    public void storeProxyPreferences(ProxyPreferences proxyPreferences) {
+        putBoolean(PROXY_USE, proxyPreferences.isUseProxy());
+        put(PROXY_HOSTNAME, proxyPreferences.getHostname());
+        put(PROXY_PORT, proxyPreferences.getPort());
+        putBoolean(PROXY_USE_AUTHENTICATION, proxyPreferences.isUseAuthentication());
+        put(PROXY_USERNAME, proxyPreferences.getUsername());
+        put(PROXY_PASSWORD, proxyPreferences.getPassword());
+    }
+
+    public ProxyPreferences getProxyPreferences() {
+        Boolean useProxy = getBoolean(PROXY_USE);
+        String hostname = get(PROXY_HOSTNAME);
+        String port = get(PROXY_PORT);
+        Boolean useAuthentication = getBoolean(PROXY_USE_AUTHENTICATION);
+        String username = get(PROXY_USERNAME);
+        String password = get(PROXY_PASSWORD);
+        return new ProxyPreferences(useProxy, hostname, port, useAuthentication, username, password);
+    }
+
     public ProtectedTermsPreferences getProtectedTermsPreferences() {
         return new ProtectedTermsPreferences(
                 getStringList(PROTECTED_TERMS_ENABLED_INTERNAL), getStringList(PROTECTED_TERMS_ENABLED_EXTERNAL),
@@ -1488,6 +1509,15 @@ public class JabRefPreferences {
         putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, enabledInternalList);
         putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, disabledInternalList);
 
+    }
+
+    public RemotePreferences getRemotePreferences() {
+        return new RemotePreferences(getInt(REMOTE_SERVER_PORT), getBoolean(USE_REMOTE_SERVER));
+    }
+
+    public void setRemotePreferences(RemotePreferences remotePreferences) {
+        putInt(REMOTE_SERVER_PORT, remotePreferences.getPort());
+        putBoolean(USE_REMOTE_SERVER, remotePreferences.useRemoteServer());
     }
 
 }

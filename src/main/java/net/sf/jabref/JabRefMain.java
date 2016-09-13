@@ -41,7 +41,7 @@ public class JabRefMain {
     private static void start(String[] args) {
         JabRefPreferences preferences = JabRefPreferences.getInstance();
 
-        ProxyPreferences proxyPreferences = ProxyPreferences.loadFromPreferences(preferences);
+        ProxyPreferences proxyPreferences = preferences.getProxyPreferences();
         ProxyRegisterer.register(proxyPreferences);
         if (proxyPreferences.isUseProxy() && proxyPreferences.isUseAuthentication()) {
             Authenticator.setDefault(new ProxyAuthenticator());
@@ -79,7 +79,7 @@ public class JabRefMain {
         ProtectTermsFormatter.setProtectedTermsLoader(Globals.protectedTermsLoader);
 
         // Check for running JabRef
-        RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);
+        RemotePreferences remotePreferences = Globals.prefs.getRemotePreferences();
         if (remotePreferences.useRemoteServer()) {
             Globals.REMOTE_LISTENER.open(new JabRefMessageHandler(), remotePreferences.getPort());
 

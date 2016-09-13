@@ -36,7 +36,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
 
     public AdvancedTab(JabRefPreferences prefs) {
         preferences = prefs;
-        remotePreferences = new RemotePreferences(preferences);
+        remotePreferences = prefs.getRemotePreferences();
 
         useRemoteServer = new JCheckBox(Localization.lang("Listen for remote operation on port") + ':');
         useIEEEAbrv = new JCheckBox(Localization.lang("Use IEEE LaTeX abbreviations"));
@@ -132,6 +132,7 @@ class AdvancedTab extends JPanel implements PrefsTab {
         } else {
             Globals.REMOTE_LISTENER.stop();
         }
+        preferences.setRemotePreferences(remotePreferences);
     }
 
     private Optional<Integer> getPortAsInt() {
