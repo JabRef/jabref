@@ -6,13 +6,10 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Collections;
 import java.util.List;
 
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.model.entry.BibEntry;
-
-import org.jsoup.helper.StringUtil;
 
 /**
  * Provides a convenient interface for entry-based fetcher, which follow the usual three-step procedure:

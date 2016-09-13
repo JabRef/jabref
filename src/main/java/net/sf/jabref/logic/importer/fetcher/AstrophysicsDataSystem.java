@@ -9,7 +9,6 @@ import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
-import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.EntryBasedParserFetcher;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
