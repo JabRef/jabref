@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.importer.fetcher;
+package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,6 +9,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sf.jabref.logic.importer.Parser;
+import net.sf.jabref.logic.importer.ParserException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -22,17 +24,21 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-class GVKParser {
-    private static final Log LOGGER = LogFactory.getLog(GVKParser.class);
+public class GvkParser implements Parser {
+    private static final Log LOGGER = LogFactory.getLog(GvkParser.class);
 
-    List<BibEntry> parseEntries(InputStream is)
-            throws ParserConfigurationException, SAXException, IOException {
-        DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        Document content = dbuild.parse(is);
-        return this.parseEntries(content);
+    @Override
+    public List<BibEntry> parseEntries(InputStream inputStream) throws ParserException {
+        try {
+            DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document content = dbuild.parse(inputStream);
+            return this.parseEntries(content);
+        } catch (ParserConfigurationException|SAXException|IOException exception) {
+            throw new ParserException(exception);
+        }
     }
 
-    List<BibEntry> parseEntries(Document content) {
+    private List<BibEntry> parseEntries(Document content) {
         List<BibEntry> result = new LinkedList<>();
 
         // used for creating test cases

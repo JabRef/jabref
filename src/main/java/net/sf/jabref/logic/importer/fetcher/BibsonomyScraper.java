@@ -1,13 +1,11 @@
 package net.sf.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
-import java.io.StringReader;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
-import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
@@ -39,14 +37,7 @@ public class BibsonomyScraper {
 
             URL url = new URL(BibsonomyScraper.BIBSONOMY_SCRAPER + cleanURL + BibsonomyScraper.BIBSONOMY_SCRAPER_POST);
             String bibtex = new URLDownload(url).downloadToString(StandardCharsets.UTF_8);
-            BibtexParser bp = new BibtexParser(new StringReader(bibtex), importFormatPreferences);
-            ParserResult pr = bp.parse();
-            if ((pr != null) && pr.getDatabase().hasEntries()) {
-                return Optional.of(pr.getDatabase().getEntries().iterator().next());
-            } else {
-                return Optional.empty();
-            }
-
+            return BibtexParser.singleFromString(bibtex, importFormatPreferences);
         } catch (IOException ex) {
             LOGGER.warn("Could not download entry", ex);
             return Optional.empty();

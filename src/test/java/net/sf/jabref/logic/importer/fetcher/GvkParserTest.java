@@ -1,33 +1,29 @@
 package net.sf.jabref.logic.importer.fetcher;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import net.sf.jabref.logic.bibtex.BibEntryAssert;
+import net.sf.jabref.logic.importer.fileformat.GvkParser;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
-public class GVKParserTest {
+public class GvkParserTest {
 
-    private void doTest(String xmlName, int expectedSize, List<String> resourceNames)
-            throws ParserConfigurationException, SAXException, IOException {
-        try (InputStream is = GVKParser.class.getResourceAsStream(xmlName)) {
-            GVKParser parser = new GVKParser();
+    private void doTest(String xmlName, int expectedSize, List<String> resourceNames) throws Exception {
+        try (InputStream is = GvkParserTest.class.getResourceAsStream(xmlName)) {
+            GvkParser parser = new GvkParser();
             List<BibEntry> entries = parser.parseEntries(is);
             Assert.assertNotNull(entries);
             Assert.assertEquals(expectedSize, entries.size());
             int i = 0;
             for (String resourceName : resourceNames) {
-                BibEntryAssert.assertEquals(GVKParser.class, resourceName, entries.get(i));
+                BibEntryAssert.assertEquals(GvkParserTest.class, resourceName, entries.get(i));
                 i++;
             }
         }
@@ -35,12 +31,12 @@ public class GVKParserTest {
 
     @Test
     public void emptyResult() throws Exception {
-        doTest("gvk_empty_result_becaue_of_bad_query.xml", 0, Collections.emptyList());
+        doTest("gvk_empty_result_because_of_bad_query.xml", 0, Collections.emptyList());
     }
 
     @Test
     public void resultFor797485368() throws Exception {
-        doTest("gvk_result_for_797485368.xml", 1, Arrays.asList("gvk_result_for_797485368.bib"));
+        doTest("gvk_result_for_797485368.xml", 1, Collections.singletonList("gvk_result_for_797485368.bib"));
     }
 
     @Test
@@ -49,9 +45,9 @@ public class GVKParserTest {
     }
 
     @Test
-    public void subTitleTest() throws IOException, ParserConfigurationException, SAXException {
-        try (InputStream is = GVKParser.class.getResourceAsStream("gvk_artificial_subtitle_test.xml")) {
-            GVKParser parser = new GVKParser();
+    public void subTitleTest() throws Exception {
+        try (InputStream is = GvkParserTest.class.getResourceAsStream("gvk_artificial_subtitle_test.xml")) {
+            GvkParser parser = new GvkParser();
             List<BibEntry> entries = parser.parseEntries(is);
             Assert.assertNotNull(entries);
             Assert.assertEquals(5, entries.size());

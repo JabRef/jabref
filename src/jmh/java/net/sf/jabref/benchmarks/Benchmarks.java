@@ -73,10 +73,8 @@ public class Benchmarks {
 
     @Benchmark
     public ParserResult parse() throws IOException {
-        StringReader bibtexStringReader = new StringReader(bibtexString);
-        BibtexParser parser = new BibtexParser(bibtexStringReader,
-                Globals.prefs.getImportFormatPreferences());
-        return parser.parse();
+        BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences());
+        return parser.parse(new StringReader(bibtexString));
     }
 
     @Benchmark

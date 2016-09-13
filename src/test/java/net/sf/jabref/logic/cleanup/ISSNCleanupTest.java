@@ -20,8 +20,9 @@ public class ISSNCleanupTest {
 
     @Before
     public void setUp() {
-        worker = new CleanupWorker(mock(BibDatabaseContext.class), "", mock(LayoutFormatterPreferences.class),
-                mock(FileDirectoryPreferences.class));
+        worker = new CleanupWorker(mock(BibDatabaseContext.class),
+                new CleanupPreferences("", mock(LayoutFormatterPreferences.class),
+                        mock(FileDirectoryPreferences.class)));
     }
 
     @Test
