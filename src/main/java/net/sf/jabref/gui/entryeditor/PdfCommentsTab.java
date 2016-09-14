@@ -1,8 +1,8 @@
 package net.sf.jabref.gui.entryeditor;
 
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.SystemColor;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -82,7 +82,6 @@ public class PdfCommentsTab extends JPanel {
         tabConstraints.ipadx = 200;
 
 
-        commentScrollPane.setMinimumSize(new Dimension(200,150));
 
         this.add(commentLabel,tabConstraints);
         tabConstraints.weightx = 1;
@@ -141,6 +140,8 @@ public class PdfCommentsTab extends JPanel {
         JPanel pdfCommentPanel = new JPanel(new GridBagLayout());
         GridBagConstraints pdfLayoutConstrains = new GridBagConstraints();
 
+        pdfLayoutConstrains.insets = new Insets(5, 5, 5, 5);
+
         pdfLayoutConstrains.weightx = 1;
         pdfLayoutConstrains.weighty = 1;
         pdfLayoutConstrains.fill = GridBagConstraints.BOTH;
@@ -149,10 +150,12 @@ public class PdfCommentsTab extends JPanel {
         pdfLayoutConstrains.gridy = 0;
         pdfLayoutConstrains.ipadx = 10;
         pdfLayoutConstrains.ipady = 10;
+
         pdfCommentPanel.add(authorLabel, pdfLayoutConstrains);
 
         pdfLayoutConstrains.gridx = 1;
         authorScrollPane.setViewportView(authorArea);
+        authorScrollPane.setBorder(null);
         pdfCommentPanel.add(authorScrollPane, pdfLayoutConstrains);
 
         pdfLayoutConstrains.gridy = 1;
@@ -161,6 +164,7 @@ public class PdfCommentsTab extends JPanel {
 
         pdfLayoutConstrains.gridx = 1;
         dateScrollPane.setViewportView(dateArea);
+        dateScrollPane.setBorder(null);
         pdfCommentPanel.add(dateScrollPane, pdfLayoutConstrains);
 
         pdfLayoutConstrains.gridy = 2;
@@ -169,6 +173,7 @@ public class PdfCommentsTab extends JPanel {
 
         pdfLayoutConstrains.gridx = 1;
         pageScrollPane.setViewportView(pageArea);
+        pageScrollPane.setBorder(null);
         pdfCommentPanel.add(pageScrollPane, pdfLayoutConstrains);
 
         pdfLayoutConstrains.gridy = 3;
@@ -179,8 +184,9 @@ public class PdfCommentsTab extends JPanel {
         commentTxtScrollPane.setViewportView(commentTxtArea);
         pdfCommentPanel.add(commentTxtScrollPane, pdfLayoutConstrains);
 
+        pdfLayoutConstrains.weighty = 0;
         pdfLayoutConstrains.gridy = 4;
-        pdfCommentPanel.add(setUpButtons(),pdfLayoutConstrains);
+        pdfCommentPanel.add(setUpButtons(), pdfLayoutConstrains);
 
         informationPanel.add(pdfCommentPanel);
 
@@ -199,7 +205,7 @@ public class PdfCommentsTab extends JPanel {
 //        dateScrollPane.setBounds(116, 69, 547, 20);
 //        informationPanel.add(dateScrollPane);
         dateArea.setBackground(SystemColor.control);
-        dateArea.setBorder(null);
+        //        dateArea.setBorder(null);
 //        dateScrollPane.setViewportView(dateArea);
         dateArea.setEditable(false);
 //
@@ -208,7 +214,7 @@ public class PdfCommentsTab extends JPanel {
 //        pageScrollPane.setBounds(116, 94, 547, 20);
 //        informationPanel.add(pageScrollPane);
         pageArea.setBackground(SystemColor.control);
-        pageArea.setBorder(null);
+        //        pageArea.setBorder(null);
 //        pageScrollPane.setViewportView(pageArea);
         pageArea.setEditable(false);
 //
@@ -217,8 +223,9 @@ public class PdfCommentsTab extends JPanel {
 //        commentTxtScrollPane.setBounds(116, 143, 547, 173);
 //        informationPanel.add(commentTxtScrollPane);
         //        commentTxtScrollPane.setViewportView(commentTxtArea);
+        //        commentTxtArea.setBorder(null);
         commentTxtArea.setEditable(false);
-        commentTxtArea.setBorder(null);
+
 //
 //        JScrollPane pdfNamePane = new JScrollPane();
 //        pdfNamePane.setBounds(116, 16, 506, 20);
