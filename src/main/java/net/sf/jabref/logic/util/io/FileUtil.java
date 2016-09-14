@@ -110,28 +110,27 @@ public class FileUtil {
     /**
      * Copies a file.
      *
-     * @param pathToSourceFile File Source file
-     * @param pathToDestinationFile File Destination file
-     * @param deleteIfExists boolean Determines whether the copy goes on even if the file exists.
+     * @param pathToSourceFile Path Source file
+     * @param pathToDestinationFile Path Destination file
+     * @param replaceExisting boolean Determines whether the copy goes on even if the file exists.
      * @return boolean Whether the copy succeeded, or was stopped due to the file already existing.
      * @throws IOException
      */
-    public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean deleteIfExists) throws IOException {
+    public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean replaceExisting) throws IOException {
         // Check if the file already exists.
         if (!Files.exists(pathToSourceFile)) {
             return false;
         }
-        if (Files.exists(pathToDestinationFile) && !deleteIfExists) {
+        if (Files.exists(pathToDestinationFile) && !replaceExisting) {
             return false;
         }
-        Files.copy(pathToSourceFile, pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING);
-        return true;
+        return Files.copy(pathToSourceFile, pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING) != null;
     }
 
     /**
-     * @param fromFile
-     * @param toFile
-     * @return
+     * @param fromFile Path Source file
+     * @param toFile Path Rename file or Path directory
+     * @return boolean Whether the rename succeeded, or was stopped, if the file on this path not exist or is null.
      */
     public static boolean renameFile(Path fromFile, Path toFile) throws IOException {
         Objects.requireNonNull(fromFile);
@@ -139,8 +138,7 @@ public class FileUtil {
         if (!Files.exists(fromFile) || !Files.exists(toFile)) {
             return false;
         }
-        Files.move(fromFile, toFile, StandardCopyOption.REPLACE_EXISTING);
-        return true;
+        return Files.move(fromFile, fromFile.resolveSibling(toFile), StandardCopyOption.REPLACE_EXISTING) != null;
 
     }
 

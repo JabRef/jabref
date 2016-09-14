@@ -19,6 +19,9 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.ParsedFileField;
 import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 public class RenamePdfCleanup implements CleanupJob {
 
     private final BibDatabaseContext databaseContext;
@@ -26,6 +29,7 @@ public class RenamePdfCleanup implements CleanupJob {
     private final String fileNamePattern;
     private final LayoutFormatterPreferences prefs;
     private final FileDirectoryPreferences fileDirectoryPreferences;
+    private static final Log LOGGER = LogFactory.getLog(RenamePdfCleanup.class);
 
     private int unsuccessfulRenames;
 
@@ -89,7 +93,7 @@ public class RenamePdfCleanup implements CleanupJob {
             try {
                 renameSuccessful = FileUtil.renameFile(Paths.get(expandedOldFilePath), Paths.get(newPath));
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Problem renaming file", e);
             }
 
             if (renameSuccessful) {
