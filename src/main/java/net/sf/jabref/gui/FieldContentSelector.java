@@ -13,9 +13,9 @@ import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.KeyStroke;
 
-import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.metadata.MetaData;
 
 import com.jgoodies.forms.layout.Sizes;
 import com.jgoodies.looks.Options;

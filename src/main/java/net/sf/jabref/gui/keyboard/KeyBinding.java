@@ -78,6 +78,8 @@ public enum KeyBinding {
             "Save database as ...", Localization.lang("Save database as..."), "ctrl shift S"),
     SEARCH("Search", Localization.lang("Search"), "ctrl F"),
     SELECT_ALL("Select all", Localization.lang("Select all"), "ctrl A"),
+    SELECT_FIRST_ENTRY("Select first entry", Localization.lang("Select first entry"), "HOME"),
+    SELECT_LAST_ENTRY("Select last entry", Localization.lang("Select last entry"), "END"),
     STRING_DIALOG_ADD_STRING("String dialog, add string", Localization.lang("String dialog, add string"), "ctrl N"),
     STRING_DIALOG_REMOVE_STRING("String dialog, remove string", Localization.lang("String dialog, remove string"), "shift DELETE"),
     SWITCH_PREVIEW_LAYOUT("Switch preview layout", Localization.lang("Switch preview layout"), "F9"),

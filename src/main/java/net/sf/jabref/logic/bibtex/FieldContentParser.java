@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.bibtex;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -21,6 +22,8 @@ public class FieldContentParser {
 
 
     public FieldContentParser(FieldContentParserPreferences prefs) {
+        Objects.requireNonNull(prefs);
+
         multiLineFields = new HashSet<>();
         // the following two are also coded in net.sf.jabref.logic.bibtex.LatexFieldFormatter.format(String, String)
         multiLineFields.add(FieldName.ABSTRACT);

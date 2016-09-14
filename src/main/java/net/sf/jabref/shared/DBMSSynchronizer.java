@@ -7,18 +7,20 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.event.MetaDataChangedEvent;
-import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.logic.exporter.BibDatabaseWriter;
-import net.sf.jabref.logic.importer.util.ParseException;
+import net.sf.jabref.logic.exporter.MetaDataSerializer;
+import net.sf.jabref.logic.importer.util.MetaDataParser;
+import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
+import net.sf.jabref.model.database.event.EntryAddedEvent;
+import net.sf.jabref.model.database.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.event.EntryAddedEvent;
-import net.sf.jabref.model.event.EntryEvent;
-import net.sf.jabref.model.event.EntryRemovedEvent;
-import net.sf.jabref.model.event.FieldChangedEvent;
+import net.sf.jabref.model.entry.event.EntryEvent;
+import net.sf.jabref.model.entry.event.EntryEventSource;
+import net.sf.jabref.model.entry.event.FieldChangedEvent;
+import net.sf.jabref.model.metadata.MetaData;
+import net.sf.jabref.model.metadata.event.MetaDataChangedEvent;
 import net.sf.jabref.shared.event.ConnectionLostEvent;
 import net.sf.jabref.shared.event.SharedEntryNotPresentEvent;
 import net.sf.jabref.shared.event.UpdateRefusedEvent;
@@ -248,7 +250,8 @@ public class DBMSSynchronizer {
         }
 
         try {
-            metaData.setData(dbmsProcessor.getSharedMetaData(), keywordSeparator);
+            metaData.setParsedData(MetaDataParser.getParsedData(dbmsProcessor.getSharedMetaData(), keywordSeparator,
+                    metaData));
         } catch (ParseException e) {
             LOGGER.error("Parse error", e);
         }
@@ -262,7 +265,7 @@ public class DBMSSynchronizer {
             return;
         }
         try {
-            dbmsProcessor.setSharedMetaData(data.getAsStringMap());
+            dbmsProcessor.setSharedMetaData(MetaDataSerializer.getSerializedStringMap(data));
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
         }

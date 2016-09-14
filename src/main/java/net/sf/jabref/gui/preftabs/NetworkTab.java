@@ -96,7 +96,7 @@ public class NetworkTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        ProxyPreferences proxyPreferences = ProxyPreferences.loadFromPreferences(preferences);
+        ProxyPreferences proxyPreferences = preferences.getProxyPreferences();
         useProxyCheckBox.setSelected(proxyPreferences.isUseProxy());
         hostnameTextField.setText(proxyPreferences.getHostname());
         portTextField.setText(proxyPreferences.getPort());
@@ -121,7 +121,7 @@ public class NetworkTab extends JPanel implements PrefsTab {
         if (!proxyPreferences.equals(oldProxyPreferences)) {
             ProxyRegisterer.register(proxyPreferences);
         }
-        proxyPreferences.storeInPreferences(preferences);
+        preferences.storeProxyPreferences(proxyPreferences);
     }
 
     @Override

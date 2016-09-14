@@ -40,13 +40,11 @@ import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
-import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.actions.CleanupAction;
@@ -114,14 +112,17 @@ import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.io.RegExpFileSearch;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.DatabaseLocation;
 import net.sf.jabref.model.database.KeyCollisionException;
+import net.sf.jabref.model.database.event.EntryAddedEvent;
+import net.sf.jabref.model.database.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.event.EntryAddedEvent;
-import net.sf.jabref.model.event.EntryChangedEvent;
+import net.sf.jabref.model.entry.event.EntryChangedEvent;
+import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.preferences.HighlightMatchingGroupPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.DBMSSynchronizer;
@@ -1280,6 +1281,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         @Subscribe
         public void listen(EntryChangedEvent entryChangedEvent) {
+            frame.getGlobalSearchBar().setDontSelectSearchBar(true);
+            frame.getGlobalSearchBar().performSearch();
+        }
+
+        @Subscribe
+        public void listen(EntryRemovedEvent removedEntryEvent) {
             frame.getGlobalSearchBar().performSearch();
         }
     }
@@ -1722,7 +1729,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * If an entryEditor is shown, it is given focus afterwards.
      */
     public void highlightEntry(int pos) {
-        if (pos >= 0 && pos < mainTable.getRowCount()) {
+        if ((pos >= 0) && (pos < mainTable.getRowCount())) {
             mainTable.setRowSelectionInterval(pos, pos);
             mainTable.ensureVisible(pos);
         }
@@ -1734,6 +1741,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public void selectNextEntry() {
         highlightEntry((mainTable.getSelectedRow() + 1) % mainTable.getRowCount());
+    }
+
+
+    public void selectFirstEntry() {
+        highlightEntry(0);
+    }
+
+    public void selectLastEntry() {
+        highlightEntry(mainTable.getRowCount() - 1);
     }
 
     /**

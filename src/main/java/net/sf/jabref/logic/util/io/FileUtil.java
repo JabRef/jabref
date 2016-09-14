@@ -19,17 +19,17 @@ import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.FileDirectoryPreferences;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
