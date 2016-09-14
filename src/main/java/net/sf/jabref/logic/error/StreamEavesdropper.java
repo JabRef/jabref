@@ -38,20 +38,20 @@ public class StreamEavesdropper {
             @Override
             public void write(byte[] buf, int off, int len) {
                 super.write(buf, off, len);
-                String s = new String(buf, off, len);
-                addToLog(s, MessageType.OUTPUT);
+                String message = new String(buf, off, len);
+                addToLog(message, MessageType.OUTPUT);
             }
         };
         return new TeeStream(consoleOut, systemOut);
     }
 
     public TeeStream getErrStream() {
-        PrintStream consoleErr = new PrintStream(errByteStream){
+        PrintStream consoleErr = new PrintStream(errByteStream) {
             @Override
             public void write(byte[] buf, int off, int len) {
                 super.write(buf, off, len);
-                String s = new String(buf, off, len);
-                addToLog(s, MessageType.EXCEPTION
+                String message = new String(buf, off, len);
+                addToLog(message, MessageType.EXCEPTION
                 );
             }
         };
