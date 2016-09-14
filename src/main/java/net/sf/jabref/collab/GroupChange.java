@@ -7,10 +7,10 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
 import net.sf.jabref.gui.groups.UndoableModifySubtree;
 import net.sf.jabref.gui.undo.NamedCompound;
-import net.sf.jabref.logic.groups.AllEntriesGroup;
-import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.groups.AllEntriesGroup;
+import net.sf.jabref.model.groups.GroupTreeNode;
 
 class GroupChange extends Change {
 
@@ -34,7 +34,7 @@ class GroupChange extends Change {
         root.removeAllChildren();
         if (changedGroups == null) {
             // I think setting root to null is not possible
-            root.setGroup(new AllEntriesGroup());
+            root.setGroup(new AllEntriesGroup(Localization.lang("All entries")));
         } else {
             // change root group, even though it'll be AllEntries anyway
             root.setGroup(changedGroups.getGroup());

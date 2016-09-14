@@ -6,9 +6,6 @@ public class FileLinkPreferences {
 
     private final List<String> generatedDirForDatabase;
     private final List<String> fileDirForDatabase;
-    public static final String DIR_SUFFIX = "Directory";
-
-
     public FileLinkPreferences(List<String> generatedDirForDatabase, List<String> fileDirForDatabase) {
         this.generatedDirForDatabase = generatedDirForDatabase;
         this.fileDirForDatabase = fileDirForDatabase;
