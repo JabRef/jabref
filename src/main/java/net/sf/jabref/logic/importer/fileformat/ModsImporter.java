@@ -84,10 +84,10 @@ public class ModsImporter extends ImportFormat {
             context = JAXBContext.newInstance("net.sf.jabref.logic.importer.fileformat.mods");
             Unmarshaller unmarshaller = context.createUnmarshaller();
 
-            //The mods schema has no @XmlRootElement, so we create the unmarshalledObject as JAXBElement
-            //Then we can get from the JAXBElement the ModsDefinition or the ModsColletionDefinition object
+            //The unmarshalled object is a jaxbElement.
             JAXBElement<?> unmarshalledObject = (JAXBElement<?>) unmarshaller.unmarshal(input);
 
+            //To get the root element we have to invoke getValue on the unmarshalled object
             if (unmarshalledObject.getValue() instanceof ModsCollectionDefinition) {
                 ModsCollectionDefinition collection = (ModsCollectionDefinition) unmarshalledObject.getValue();
                 List<ModsDefinition> mods = collection.getMods();
@@ -169,9 +169,7 @@ public class ModsImporter extends ImportFormat {
                         parseGeographicInformation(fields, hierarchichalGeographic);
                     } else if ((value instanceof StringPlusLanguagePlusAuthority) && "topic".equals(elementName)) {
                         StringPlusLanguagePlusAuthority topic = (StringPlusLanguagePlusAuthority) value;
-                        if (topic.getValue() != null) {
-                            keywords.add(topic.getValue());
-                        }
+                        keywords.add(topic.getValue());
                     }
                 }
             } else if (groupElement instanceof IdentifierDefinition) {
@@ -185,13 +183,22 @@ public class ModsImporter extends ImportFormat {
                 }
             } else if (groupElement instanceof TitleInfoDefinition) {
                 TitleInfoDefinition titleInfo = (TitleInfoDefinition) groupElement;
-                putIfValueNotNull(fields, FieldName.TITLE, titleInfo.getTitle());
+                List<Object> titleOrSubTitleOrPartNumber = titleInfo.getTitleOrSubTitleOrPartNumber();
+                for (Object object : titleOrSubTitleOrPartNumber) {
+                    if (object instanceof JAXBElement) {
+                        JAXBElement<StringPlusLanguage> element = (JAXBElement<StringPlusLanguage>) object;
+                        if ("title".equals(element.getName().getLocalPart())) {
+                            StringPlusLanguage title = element.getValue();
+                            fields.put(FieldName.TITLE, title.getValue());
+                        }
+                    }
+                }
             }
         }
 
-        //the element subject can appear more than one time, that's why the keywords has to be put here
-        //same goes for authors and notes
+        //The element subject can appear more than one time, that's why the keywords has to be put here
         putIfListIsNotEmpty(fields, keywords, FieldName.KEYWORDS, KEYWORD_SEPARATOR);
+        //same goes for authors and notes
         putIfListIsNotEmpty(fields, authors, FieldName.AUTHOR, " and ");
         putIfListIsNotEmpty(fields, notes, FieldName.NOTE, ", ");
 
@@ -280,7 +287,16 @@ public class ModsImporter extends ImportFormat {
                 }
             } else if (groupElement instanceof TitleInfoDefinition) {
                 TitleInfoDefinition titleInfo = (TitleInfoDefinition) groupElement;
-                putIfValueNotNull(fields, FieldName.JOURNAL, titleInfo.getTitle());
+                List<Object> titleOrSubTitleOrPartNumber = titleInfo.getTitleOrSubTitleOrPartNumber();
+                for (Object object : titleOrSubTitleOrPartNumber) {
+                    if (object instanceof JAXBElement) {
+                        JAXBElement<StringPlusLanguage> element = (JAXBElement<StringPlusLanguage>) object;
+                        if ("title".equals(element.getName().getLocalPart())) {
+                            StringPlusLanguage journal = element.getValue();
+                            fields.put(FieldName.JOURNAL, journal.getValue());
+                        }
+                    }
+                }
             }
         }
     }
@@ -372,7 +388,6 @@ public class ModsImporter extends ImportFormat {
                 if ("given".equals(type) && (namePart.getValue() != null)) {
                     foreName.add(namePart.getValue());
                 } else if ("family".equals(type) && (namePart.getValue() != null)) {
-                    //There should only be one family name for one author
                     familyName = namePart.getValue();
                 }
             } else if ((value instanceof StringPlusLanguage) && "affiliation".equals(elementName)) {
