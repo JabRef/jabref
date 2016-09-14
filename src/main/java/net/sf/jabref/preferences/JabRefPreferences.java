@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 
-import net.sf.jabref.FileDirectoryPreferences;
 import net.sf.jabref.JabRefException;
 import net.sf.jabref.JabRefMain;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
@@ -43,6 +42,7 @@ import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import net.sf.jabref.logic.cleanup.CleanupPreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.exporter.CustomExportList;
@@ -72,7 +72,6 @@ import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.UpdateFieldPreferences;
 import net.sf.jabref.logic.util.io.FileHistory;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -82,6 +81,9 @@ import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.SpecialFields;
+import net.sf.jabref.model.metadata.FileDirectoryPreferences;
+import net.sf.jabref.model.metadata.SaveOrderConfig;
+import net.sf.jabref.model.util.ModelStringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -941,7 +943,7 @@ public class JabRefPreferences {
     }
 
     private static String convertListToString(List<String> value) {
-        return value.stream().map(val -> StringUtil.quote(val, ";", '\\')).collect(Collectors.joining(";"));
+        return value.stream().map(val -> ModelStringUtil.quote(val, ";", '\\')).collect(Collectors.joining(";"));
     }
 
     /**
@@ -1346,7 +1348,7 @@ public class JabRefPreferences {
         List<String> fields = Arrays.asList(FieldName.FILE, FieldName.PDF, FieldName.PS);
         Map<String, String> fieldDirectories = new HashMap<>();
         fields.stream()
-                .forEach(fieldName -> fieldDirectories.put(fieldName, get(fieldName + FileLinkPreferences.DIR_SUFFIX)));
+                .forEach(fieldName -> fieldDirectories.put(fieldName, get(fieldName + FileDirectoryPreferences.DIR_SUFFIX)));
         return new FileDirectoryPreferences(getUser(), fieldDirectories,
                 getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
     }
@@ -1401,7 +1403,7 @@ public class JabRefPreferences {
     }
 
     public FileLinkPreferences getFileLinkPreferences() {
-        return new FileLinkPreferences(Collections.singletonList(get(FieldName.FILE + FileLinkPreferences.DIR_SUFFIX)),
+        return new FileLinkPreferences(Collections.singletonList(get(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX)),
                 fileDirForDatabase);
     }
 
@@ -1465,6 +1467,11 @@ public class JabRefPreferences {
 
     }
 
+    public CleanupPreferences getCleanupPreferences(JournalAbbreviationLoader journalAbbreviationLoader) {
+        return new CleanupPreferences(get(IMPORT_FILENAMEPATTERN),
+                getLayoutFormatterPreferences(journalAbbreviationLoader), getFileDirectoryPreferences());
+    }
+
     public RemotePreferences getRemotePreferences() {
         return new RemotePreferences(getInt(REMOTE_SERVER_PORT), getBoolean(USE_REMOTE_SERVER));
     }
@@ -1472,6 +1479,40 @@ public class JabRefPreferences {
     public void setRemotePreferences(RemotePreferences remotePreferences) {
         putInt(REMOTE_SERVER_PORT, remotePreferences.getPort());
         putBoolean(USE_REMOTE_SERVER, remotePreferences.useRemoteServer());
+    }
+
+    public void storeExportSaveOrder(SaveOrderConfig config) {
+        putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, config.sortCriteria[0].descending);
+        putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, config.sortCriteria[1].descending);
+        putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, config.sortCriteria[2].descending);
+
+        put(EXPORT_PRIMARY_SORT_FIELD, config.sortCriteria[0].field);
+        put(EXPORT_SECONDARY_SORT_FIELD, config.sortCriteria[1].field);
+        put(EXPORT_TERTIARY_SORT_FIELD, config.sortCriteria[2].field);
+    }
+
+    public SaveOrderConfig loadTableSaveOrder() {
+        SaveOrderConfig config = new SaveOrderConfig();
+        config.sortCriteria[0].field = get(TABLE_PRIMARY_SORT_FIELD);
+        config.sortCriteria[0].descending = getBoolean(TABLE_PRIMARY_SORT_DESCENDING);
+        config.sortCriteria[1].field = get(TABLE_SECONDARY_SORT_FIELD);
+        config.sortCriteria[1].descending = getBoolean(TABLE_SECONDARY_SORT_DESCENDING);
+        config.sortCriteria[2].field = get(TABLE_TERTIARY_SORT_FIELD);
+        config.sortCriteria[2].descending = getBoolean(TABLE_TERTIARY_SORT_DESCENDING);
+
+        return config;
+    }
+
+    public SaveOrderConfig loadExportSaveOrder() {
+        SaveOrderConfig config = new SaveOrderConfig();
+        config.sortCriteria[0].field = get(EXPORT_PRIMARY_SORT_FIELD);
+        config.sortCriteria[0].descending = getBoolean(EXPORT_PRIMARY_SORT_DESCENDING);
+        config.sortCriteria[1].field = get(EXPORT_SECONDARY_SORT_FIELD);
+        config.sortCriteria[1].descending = getBoolean(EXPORT_SECONDARY_SORT_DESCENDING);
+        config.sortCriteria[2].field = get(EXPORT_TERTIARY_SORT_FIELD);
+        config.sortCriteria[2].descending = getBoolean(EXPORT_TERTIARY_SORT_DESCENDING);
+
+        return config;
     }
 
 }

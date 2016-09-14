@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.shared.exception.OfflineLockException;
 import net.sf.jabref.shared.exception.SharedEntryNotPresentException;
 

@@ -3,10 +3,10 @@ package net.sf.jabref.logic.citationstyle;
 import java.util.HashMap;
 import java.util.Map;
 
-import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.model.database.BibDatabaseContext;
+import net.sf.jabref.model.database.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.event.EntryChangedEvent;
-import net.sf.jabref.model.event.EntryRemovedEvent;
+import net.sf.jabref.model.entry.event.EntryChangedEvent;
 
 import com.google.common.eventbus.Subscribe;
 

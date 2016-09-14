@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.search;
 
-import net.sf.jabref.logic.search.rules.GrammarBasedSearchRule;
 import net.sf.jabref.logic.search.rules.describer.GrammarBasedSearchRuleDescriber;
+import net.sf.jabref.model.search.rules.GrammarBasedSearchRule;
 
 import org.junit.Test;
 
