@@ -1,9 +1,7 @@
 package net.sf.jabref.logic.citationstyle;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
+import java.util.Map;
 
 import net.sf.jabref.logic.formatter.bibtexfields.UnicodeToLatexFormatter;
 import net.sf.jabref.logic.l10n.Localization;
@@ -11,12 +9,13 @@ import net.sf.jabref.model.entry.BibEntry;
 
 import de.undercouch.citeproc.CSL;
 import de.undercouch.citeproc.bibtex.BibTeXConverter;
-import de.undercouch.citeproc.bibtex.BibTeXItemDataProvider;
+import de.undercouch.citeproc.csl.CSLItemData;
 import de.undercouch.citeproc.output.Bibliography;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.jbibtex.BibTeXDatabase;
-import org.jbibtex.ParseException;
+import org.jbibtex.BibTeXEntry;
+import org.jbibtex.DigitStringValue;
+import org.jbibtex.Key;
 import org.jbibtex.TokenMgrError;
 
 
@@ -26,6 +25,7 @@ import org.jbibtex.TokenMgrError;
 public class CitationStyleGenerator {
 
     private static final Log LOGGER = LogFactory.getLog(CitationStyleGenerator.class);
+    private static final UnicodeToLatexFormatter UNICODE_TO_LATEX_FORMATTER = new UnicodeToLatexFormatter();
 
 
     /**
@@ -42,21 +42,17 @@ public class CitationStyleGenerator {
      */
     public static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat) {
         try {
-            String parsedEntry = new UnicodeToLatexFormatter().format(entry.toString());
-            InputStream stream = new ByteArrayInputStream(parsedEntry.getBytes(StandardCharsets.UTF_8));
+            BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(entry.getType()), new Key(entry.getCiteKey()));
+            for (Map.Entry<String, String> field : entry.getFieldMap().entrySet()) {
+                String value = UNICODE_TO_LATEX_FORMATTER.format(field.getValue());
+                bibTeXEntry.addField(new Key(field.getKey()), new DigitStringValue(value));
+            }
 
-            BibTeXDatabase db = new BibTeXConverter().loadDatabase(stream);
-            BibTeXItemDataProvider provider = new BibTeXItemDataProvider();
-            provider.addDatabase(db);
-
-            CSL citeproc = new CSL(provider, style);
-            citeproc.setOutputFormat(outputFormat.format);
-            provider.registerCitationItems(citeproc);
-
-            Bibliography bibliography = citeproc.makeBibliography();
+            CSLItemData cslItemData = new BibTeXConverter().toItemData(bibTeXEntry);
+            Bibliography bibliography = CSL.makeAdhocBibliography(style, cslItemData);
             return bibliography.getEntries()[0];
 
-        } catch (IOException | ParseException e) {
+        } catch (IOException  e) {
             LOGGER.error("Could not generate BibEntry Citation", e);
         } catch (TokenMgrError e) {
             LOGGER.error("Bad character inside BibEntry", e);
@@ -68,7 +64,7 @@ public class CitationStyleGenerator {
                     .toString();
         }
 
-        return null;
+        return "";
     }
 
 }
