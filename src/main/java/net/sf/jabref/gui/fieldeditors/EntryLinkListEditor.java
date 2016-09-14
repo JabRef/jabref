@@ -5,9 +5,6 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.FontMetrics;
 import java.awt.Insets;
-import java.awt.datatransfer.DataFlavor;
-import java.awt.datatransfer.Transferable;
-import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -16,6 +13,7 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.AbstractAction;
 import javax.swing.JButton;
@@ -28,23 +26,20 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.TransferHandler;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
-import net.sf.jabref.gui.groups.TransferableEntrySelection;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryLinkList;
 import net.sf.jabref.model.entry.ParsedEntryLink;
@@ -71,6 +66,8 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
     private final JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
     private final JButton remove = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getSmallIcon());
     private AutoCompleteListener autoCompleteListener;
+
+    private static final String layoutFormat = "\\begin{author}\\format[Authors(2,1),LatexToUnicode]{\\author}\\end{author}\\begin{title}, \"\\format[LatexToUnicode]{\\title}\"\\end{title}\\begin{year}, \\year\\end{year}";
 
     public EntryLinkListEditor(JabRefFrame frame, BibDatabaseContext databaseContext, String fieldName, String content,
             EntryEditor entryEditor, boolean singleEntry) {
@@ -336,7 +333,13 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
             if ((e.getButton() == MouseEvent.BUTTON1) && (e.getClickCount() == 2)) {
                 int row = rowAtPoint(e.getPoint());
                 if (row >= 0) {
-                    ParsedEntryLink entry = tableModel.getEntry(row);
+                    Optional<BibEntry>  entry = tableModel.getEntry(row).getLinkedEntry();
+                    if (entry.isPresent()) {
+                        // Select entry in main table
+                        frame.getCurrentBasePanel().highlightEntry(entry.get());
+                    } else {
+                        // Focus BibTeX key field
+                    }
                 }
             } else if (e.isPopupTrigger()) {
                 processPopupTrigger(e);
@@ -378,8 +381,7 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
 
     @Override
     public void setAutoCompleteListener(AutoCompleteListener listener) {
-        this.autoCompleteListener = listener;
-        setDefaultRenderer(String.class, new BibtexKeyRenderer());
+        // Do nothing
     }
 
     @Override
@@ -488,11 +490,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
             }
         }
 
-        public void setEntry(int index, ParsedEntryLink entry) {
-            internalList.set(index, entry);
-            fireTableRowsUpdated(index, index);
-        }
-
         public void removeEntry(int index) {
             internalList.remove(index);
             if (SwingUtilities.isEventDispatchThread()) {
@@ -542,78 +539,7 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
                 }
             }
         }
-
-        public void addEntry(ParsedEntryLink entry) {
-            synchronized (internalList) {
-                internalList.add(entry);
-                if (SwingUtilities.isEventDispatchThread()) {
-                    fireTableDataChanged();
-                } else {
-                    SwingUtilities.invokeLater(() -> fireTableDataChanged());
-                }
-            }
-        }
-
-
     }
-
-    private class BibtexKeyRenderer extends DefaultTableCellRenderer {
-
-        public BibtexKeyRenderer() {
-            super();
-            addKeyListener(autoCompleteListener);
-        }
-
-        @Override
-        public void setValue(Object value) {
-            super.setText((String) value);
-        }
-    }
-
-    private class EntryLinkTransferHandler extends TransferHandler {
-
-        private final DataFlavor supportedFlavor = TransferableEntrySelection.FLAVOR_INTERNAL;
-
-        @Override
-        public boolean canImport(TransferSupport support) {
-            if (!support.isDrop()) {
-                return false;
-            }
-
-            if (!support.isDataFlavorSupported(supportedFlavor)) {
-                return false;
-            }
-            return true;
-        }
-
-        @Override
-        public boolean importData(TransferSupport support) {
-            if (!canImport(support)) {
-                return false;
-            }
-
-            Transferable transferable = support.getTransferable();
-            try {
-                TransferableEntrySelection entrySelection = (TransferableEntrySelection) transferable
-                        .getTransferData(supportedFlavor);
-                for (BibEntry entry : entrySelection.getSelection()) {
-                    tableModel.addEntry(new ParsedEntryLink(entry));
-                }
-            } catch (IOException | UnsupportedFlavorException e) {
-                LOGGER.warn("Problem dropping on entry link field", e);
-                return false;
-            }
-            entryEditor.updateField(this);
-            adjustColumnWidth();
-
-            return true;
-        }
-
-    }
-
-
-    private static final String layoutFormat = "\\begin{author}\\format[Authors(2,1),LatexToUnicode]{\\author}\\end{author}\\begin{title}, \"\\format[LatexToUnicode]{\\title}\"\\end{title}\\begin{year}, \\year\\end{year}";
-
 
     private static String formatEntry(BibEntry entry, BibDatabase database) {
         StringReader sr = new StringReader(layoutFormat);
