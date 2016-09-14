@@ -7,11 +7,11 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.logic.groups.AbstractGroup;
-import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.groups.AbstractGroup;
+import net.sf.jabref.model.groups.KeywordGroup;
 
 public class WarnAssignmentSideEffects {
 

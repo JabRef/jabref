@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Vector;
 
 import net.sf.jabref.gui.undo.AbstractUndoableJabRefEdit;
-import net.sf.jabref.logic.groups.GroupTreeNode;
+import net.sf.jabref.model.groups.GroupTreeNode;
 
 public class UndoableModifySubtree extends AbstractUndoableJabRefEdit {
 
