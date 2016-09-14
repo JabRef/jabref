@@ -66,15 +66,19 @@ public class ClipBoardManager implements ClipboardOwner {
         return result;
     }
 
+
     public List<BibEntry> extractBibEntriesFromClipboard() {
         // Get clipboard contents, and see if TransferableBibtexEntry is among the content flavors offered
         Transferable content = CLIPBOARD.getContents(null);
-
         List<BibEntry> result = new ArrayList<>();
+
+
         if (content.isDataFlavorSupported(TransferableBibtexEntry.entryFlavor)) {
             // We have determined that the clipboard data is a set of entries.
-            try {
-                result = (List<BibEntry>) content.getTransferData(TransferableBibtexEntry.entryFlavor);
+            try  {
+                @SuppressWarnings("unchecked")
+                List<BibEntry> contents = (List<BibEntry>) content.getTransferData(TransferableBibtexEntry.entryFlavor);
+                result = contents;
             } catch (UnsupportedFlavorException | ClassCastException ex) {
                 LOGGER.warn("Could not paste this type", ex);
             } catch (IOException ex) {
@@ -91,9 +95,8 @@ public class ClipBoardManager implements ClipboardOwner {
                     entry.ifPresent(result::add);
                 } else {
                     // parse bibtex string
-                    BibtexParser bp = new BibtexParser(new StringReader(data),
-                            Globals.prefs.getImportFormatPreferences());
-                    BibDatabase db = bp.parse().getDatabase();
+                    BibtexParser bp = new BibtexParser(Globals.prefs.getImportFormatPreferences());
+                    BibDatabase db = bp.parse(new StringReader(data)).getDatabase();
                     LOGGER.info("Parsed " + db.getEntryCount() + " entries from clipboard text");
                     if (db.hasEntries()) {
                         result = db.getEntries();

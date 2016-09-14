@@ -8,9 +8,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
@@ -24,9 +21,11 @@ import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
@@ -49,19 +48,15 @@ public class CleanupWorkerTest {
 
     @Before
     public void setUp() throws IOException {
-        // Needed for ExternalFileTypes
-        if (Globals.prefs == null) {
-            Globals.prefs = JabRefPreferences.getInstance();
-        }
-
         pdfFolder = bibFolder.newFolder();
 
         MetaData metaData = new MetaData();
         metaData.setDefaultFileDirectory(pdfFolder.getAbsolutePath());
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
         worker = new CleanupWorker(context,
-                JabRefPreferences.getInstance().get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
-                mock(LayoutFormatterPreferences.class), JabRefPreferences.getInstance().getFileDirectoryPreferences());
+                new CleanupPreferences(JabRefPreferences.getInstance().get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
+                        mock(LayoutFormatterPreferences.class),
+                        JabRefPreferences.getInstance().getFileDirectoryPreferences()));
     }
 
     @Test(expected = NullPointerException.class)

@@ -6,6 +6,7 @@ public enum KeyBinding {
 
     ABBREVIATE(
             "Abbreviate", Localization.lang("Abbreviate journal names"), "ctrl alt A"),
+    ACCEPT("Accept", Localization.lang("Accept"), "ctrl ENTER"),
     AUTOGENERATE_BIBTEX_KEYS("Autogenerate BibTeX keys", Localization.lang("Autogenerate BibTeX keys"), "ctrl G"),
     AUTOMATICALLY_LINK_FILES(
             "Automatically link files", Localization.lang("Automatically set file links"), "F7"),
@@ -38,6 +39,7 @@ public enum KeyBinding {
     FIND_UNLINKED_FILES("Find unlinked files", Localization.lang("Find unlinked files"), "shift F7"),
     FOCUS_ENTRY_TABLE("Focus entry table", Localization.lang("Focus entry table"), "alt 1"),
     FORWARD("Forward", Localization.lang("Forward"), "alt RIGHT"),
+    GLOBAL_SEARCH("Search globally", Localization.lang("Search globally"), "ctrl shift F"),
     HELP("Help", Localization.lang("Help"), "F1"),
     IMPORT_INTO_CURRENT_DATABASE("Import into current database", Localization.lang("Import into current database"), "ctrl I"),
     IMPORT_INTO_NEW_DATABASE("Import into new database", Localization.lang("Import into new database"), "ctrl alt I"),
@@ -76,6 +78,8 @@ public enum KeyBinding {
             "Save database as ...", Localization.lang("Save database as..."), "ctrl shift S"),
     SEARCH("Search", Localization.lang("Search"), "ctrl F"),
     SELECT_ALL("Select all", Localization.lang("Select all"), "ctrl A"),
+    SELECT_FIRST_ENTRY("Select first entry", Localization.lang("Select first entry"), "HOME"),
+    SELECT_LAST_ENTRY("Select last entry", Localization.lang("Select last entry"), "END"),
     STRING_DIALOG_ADD_STRING("String dialog, add string", Localization.lang("String dialog, add string"), "ctrl N"),
     STRING_DIALOG_REMOVE_STRING("String dialog, remove string", Localization.lang("String dialog, remove string"), "shift DELETE"),
     SWITCH_PREVIEW_LAYOUT("Switch preview layout", Localization.lang("Switch preview layout"), "F9"),

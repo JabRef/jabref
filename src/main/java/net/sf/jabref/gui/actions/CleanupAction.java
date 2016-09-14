@@ -5,7 +5,6 @@ import java.util.Objects;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
@@ -145,11 +144,8 @@ public class CleanupAction extends AbstractWorker {
      */
     private void doCleanup(CleanupPreset preset, BibEntry entry, NamedCompound ce) {
         // Create and run cleaner
-        BibDatabaseContext bibDatabaseContext = panel.getBibDatabaseContext();
-        CleanupWorker cleaner = new CleanupWorker(bibDatabaseContext,
-                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
-                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
-                Globals.prefs.getFileDirectoryPreferences());
+        CleanupWorker cleaner = new CleanupWorker(panel.getBibDatabaseContext(), preferences.getCleanupPreferences(
+                Globals.journalAbbreviationLoader));
         List<FieldChange> changes = cleaner.cleanup(preset, entry);
 
         unsuccessfulRenames = cleaner.getUnsuccessfulRenames();
@@ -163,4 +159,5 @@ public class CleanupAction extends AbstractWorker {
             ce.addEdit(new UndoableFieldChange(change));
         }
     }
+
 }

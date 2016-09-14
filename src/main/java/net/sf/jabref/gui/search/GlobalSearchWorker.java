@@ -1,51 +1,69 @@
 package net.sf.jabref.gui.search;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
+
+import javax.swing.SwingWorker;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
-import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.model.entry.BibEntry;
 
-class GlobalSearchWorker extends AbstractWorker {
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+
+class GlobalSearchWorker extends SwingWorker<Map<BasePanel, List<BibEntry>>, Void> {
+
+    private static final Log LOGGER = LogFactory.getLog(GlobalSearchWorker.class);
 
     private final JabRefFrame frame;
     private final SearchQuery searchQuery;
-    private final SearchResultsDialog dialog;
+    private final SearchResultFrame dialog;
 
     public GlobalSearchWorker(JabRefFrame frame, SearchQuery query) {
         this.frame = Objects.requireNonNull(frame);
         this.searchQuery = Objects.requireNonNull(query);
 
-        dialog = new SearchResultsDialog(frame,
+        dialog = new SearchResultFrame(frame,
                 Localization.lang("Search results in all databases for %0",
-                        this.searchQuery.localize()));
+                        this.searchQuery.localize()),
+                searchQuery, true);
+        frame.getGlobalSearchBar().setSearchResultFrame(dialog);
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.jabref.Worker#run()
-     */
     @Override
-    public void run() {
-        // Search all databases
-        for (int i = 0; i < frame.getTabbedPane().getTabCount(); i++) {
-            BasePanel basePanel = frame.getBasePanelAt(i);
-            List<BibEntry> matches = basePanel.getDatabase().getEntries().stream().filter(searchQuery::isMatch).collect(Collectors.toList());
-            dialog.addEntries(matches, basePanel);
+    protected Map<BasePanel, List<BibEntry>> doInBackground() throws Exception {
+        Map<BasePanel, List<BibEntry>> matches = new HashMap<>();
+        for (BasePanel basePanel : frame.getBasePanelList()) {
+            matches.put(basePanel, basePanel.getDatabase().getEntries().stream()
+                    .filter(searchQuery::isMatch)
+                    .collect(Collectors.toList()));
         }
+        return matches;
     }
 
-    /* (non-Javadoc)
-     * @see net.sf.jabref.AbstractWorker#update()
-     */
     @Override
-    public void update() {
-        dialog.selectFirstEntry();
-        dialog.setVisible(true);
+    protected void done() {
+        if (isCancelled()) {
+            return;
+        }
+
+        try {
+            for (Map.Entry<BasePanel, List<BibEntry>> match : get().entrySet()) {
+                dialog.addEntries(match.getValue(), match.getKey());
+            }
+            dialog.selectFirstEntry();
+            dialog.setVisible(true);
+        } catch (InterruptedException | ExecutionException e) {
+            LOGGER.error("something went wrong during the search", e);
+        }
     }
 
 }

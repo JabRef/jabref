@@ -15,16 +15,16 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.event.source.EntryEventSource;
+import net.sf.jabref.model.database.event.EntryAddedEvent;
+import net.sf.jabref.model.database.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
-import net.sf.jabref.model.event.EntryAddedEvent;
-import net.sf.jabref.model.event.EntryChangedEvent;
-import net.sf.jabref.model.event.EntryRemovedEvent;
-import net.sf.jabref.model.event.FieldChangedEvent;
+import net.sf.jabref.model.entry.event.EntryChangedEvent;
+import net.sf.jabref.model.entry.event.EntryEventSource;
+import net.sf.jabref.model.entry.event.FieldChangedEvent;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
  * A bibliography database.
  */
 public class BibDatabase {
+
     private static final Log LOGGER = LogFactory.getLog(BibDatabase.class);
 
     /**
@@ -108,7 +109,8 @@ public class BibDatabase {
         for (BibEntry e : getEntries()) {
             allFields.addAll(e.getFieldNames());
         }
-        return allFields.stream().filter(field -> !InternalBibtexFields.isInternalField(field)).collect(Collectors.toSet());
+        return allFields.stream().filter(field -> !InternalBibtexFields.isInternalField(field))
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -438,7 +440,9 @@ public class BibDatabase {
         }
     }
 
+
     private static final Pattern RESOLVE_CONTENT_PATTERN = Pattern.compile(".*#[^#]+#.*");
+
 
     private String resolveContent(String result, Set<String> usedIds) {
         String res = result;
@@ -489,13 +493,14 @@ public class BibDatabase {
     }
 
     /**
+     * @deprecated use  {@link BibDatabase#resolveForStrings(String)}
      * Returns a text with references resolved according to an optionally given database.
      *
      * @param toResolve maybenull The text to resolve.
      * @param database  maybenull The database to use for resolving the text.
      * @return The resolved text or the original text if either the text or the database are null
      */
-    @Deprecated // use BibDatabase.resolveForStrings
+    @Deprecated
     public static String getText(String toResolve, BibDatabase database) {
         if ((toResolve != null) && (database != null)) {
             return database.resolveForStrings(toResolve);

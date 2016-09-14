@@ -44,8 +44,6 @@ import javax.swing.undo.AbstractUndoableEdit;
 import javax.swing.undo.CompoundEdit;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.event.GroupUpdatedEvent;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
@@ -55,18 +53,20 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
-import net.sf.jabref.logic.groups.AbstractGroup;
-import net.sf.jabref.logic.groups.AllEntriesGroup;
-import net.sf.jabref.logic.groups.EntriesGroupChange;
-import net.sf.jabref.logic.groups.GroupTreeNode;
-import net.sf.jabref.logic.groups.MoveGroupChange;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.SearchMatcher;
-import net.sf.jabref.logic.search.matchers.MatcherSet;
-import net.sf.jabref.logic.search.matchers.MatcherSets;
-import net.sf.jabref.logic.search.matchers.NotMatcher;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.groups.AbstractGroup;
+import net.sf.jabref.model.groups.AllEntriesGroup;
+import net.sf.jabref.model.groups.EntriesGroupChange;
+import net.sf.jabref.model.groups.GroupTreeNode;
+import net.sf.jabref.model.groups.MoveGroupChange;
+import net.sf.jabref.model.groups.event.GroupUpdatedEvent;
+import net.sf.jabref.model.metadata.MetaData;
+import net.sf.jabref.model.search.SearchMatcher;
+import net.sf.jabref.model.search.matchers.MatcherSet;
+import net.sf.jabref.model.search.matchers.MatcherSets;
+import net.sf.jabref.model.search.matchers.NotMatcher;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.eventbus.Subscribe;
@@ -343,7 +343,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK));
 
 
-        setGroups(GroupTreeNode.fromGroup(new AllEntriesGroup()));
+        setGroups(GroupTreeNode.fromGroup(new AllEntriesGroup(Localization.lang("All entries"))));
     }
 
     private void definePopup() {
@@ -1219,7 +1219,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         if (metaData.getGroups().isPresent()) {
             setGroups(metaData.getGroups().get());
         } else {
-            GroupTreeNode newGroupsRoot = GroupTreeNode.fromGroup(new AllEntriesGroup());
+            GroupTreeNode newGroupsRoot = GroupTreeNode
+                    .fromGroup(new AllEntriesGroup(Localization.lang("All entries")));
             metaData.setGroups(newGroupsRoot);
             setGroups(newGroupsRoot);
         }

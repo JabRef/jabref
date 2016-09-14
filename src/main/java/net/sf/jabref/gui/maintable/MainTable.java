@@ -15,6 +15,7 @@ import java.util.Optional;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
+import javax.swing.InputMap;
 import javax.swing.JLabel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -33,6 +34,7 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.groups.EntryTableTransferHandler;
 import net.sf.jabref.gui.groups.GroupMatcher;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.renderer.CompleteRenderer;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.renderer.IncompleteRenderer;
@@ -169,17 +171,48 @@ public class MainTable extends JTable {
         setWidths();
 
         //Override 'selectNextColumnCell' and 'selectPreviousColumnCell' to move rows instead of cells on TAB
-        ActionMap am = getActionMap();
-        am.put("selectNextColumnCell", new AbstractAction() {
+        ActionMap actionMap = getActionMap();
+        InputMap inputMap = getInputMap();
+        actionMap.put("selectNextColumnCell", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 panel.selectNextEntry();
             }
         });
-        am.put("selectPreviousColumnCell", new AbstractAction() {
+        actionMap.put("selectPreviousColumnCell", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 panel.selectPreviousEntry();
+            }
+        });
+        actionMap.put("selectNextRow", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panel.selectNextEntry();
+            }
+        });
+        actionMap.put("selectPreviousRow", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                panel.selectPreviousEntry();
+            }
+        });
+
+        String selectFirst = "selectFirst";
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SELECT_FIRST_ENTRY), selectFirst);
+        actionMap.put(selectFirst, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                panel.selectFirstEntry();
+            }
+        });
+
+        String selectLast = "selectLast";
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SELECT_LAST_ENTRY), selectLast);
+        actionMap.put(selectLast, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                panel.selectLastEntry();
             }
         });
     }

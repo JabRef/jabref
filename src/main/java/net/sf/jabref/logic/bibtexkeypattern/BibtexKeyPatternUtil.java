@@ -10,14 +10,14 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.formatter.casechanger.Word;
-import net.sf.jabref.logic.layout.format.RemoveLatexCommands;
+import net.sf.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.metadata.MetaData;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -742,7 +742,7 @@ public class BibtexKeyPatternUtil {
     }
 
     private static String getTitleWordsWithSpaces(int number, String title) {
-        String ss = new RemoveLatexCommands().format(title);
+        String ss = new RemoveLatexCommandsFormatter().format(title);
         StringBuilder stringBuilder = new StringBuilder();
         StringBuilder current;
         int piv = 0;
