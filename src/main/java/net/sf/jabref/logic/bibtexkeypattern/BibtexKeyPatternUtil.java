@@ -10,12 +10,11 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-<<<<<<< ff7c9b2b1c5f3e814e80b88f7d8c662d5d33b04d
-=======
-import net.sf.jabref.MetaData;
-import net.sf.jabref.logic.formatter.casechanger.Title;
+import net.sf.jabref.logic.formatter.casechanger.CapitalizeFormatter;
+import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import net.sf.jabref.logic.formatter.casechanger.SentenceCaseFormatter;
 import net.sf.jabref.logic.formatter.casechanger.TitleCaseFormatter;
->>>>>>> Implemented title and camel key modifiers
+import net.sf.jabref.logic.formatter.casechanger.UpperCaseFormatter;
 import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -45,6 +44,12 @@ public class BibtexKeyPatternUtil {
     private static final int CHARS_OF_FIRST = 5;
 
     private static BibDatabase database;
+
+    private static LowerCaseFormatter lowerCaseFormatter = new LowerCaseFormatter();
+    private static TitleCaseFormatter titleCaseFormatter = new TitleCaseFormatter();
+    private static UpperCaseFormatter upperCaseFormatter = new UpperCaseFormatter();
+    private static SentenceCaseFormatter sentenceCaseFormatter = new SentenceCaseFormatter();
+    private static CapitalizeFormatter capitalizeFormatter = new CapitalizeFormatter();
 
     /**
      * Required for LabelPatternUtilTest
@@ -499,10 +504,10 @@ public class BibtexKeyPatternUtil {
             for (int j = offset; j < parts.size(); j++) {
                 String modifier = parts.get(j);
 
-                if ("lower".equals(modifier)) {
-                    resultingLabel = resultingLabel.toLowerCase(Locale.ENGLISH);
-                } else if ("upper".equals(modifier)) {
-                    resultingLabel = resultingLabel.toUpperCase(Locale.ENGLISH);
+                if ("lower".equals(modifier) || lowerCaseFormatter.getKey().equals(modifier)) {
+                    resultingLabel = lowerCaseFormatter.format(resultingLabel);
+                } else if ("upper".equals(modifier) || upperCaseFormatter.getKey().equals(modifier)) {
+                    resultingLabel = upperCaseFormatter.format(resultingLabel);
                 } else if ("abbr".equals(modifier)) {
                     // Abbreviate - that is,
                     StringBuilder abbreviateSB = new StringBuilder();
@@ -515,13 +520,12 @@ public class BibtexKeyPatternUtil {
                     }
                     resultingLabel = abbreviateSB.toString();
 
-                } else if ("camel".equals(modifier)) {
-                    // CamelCasingOfEveryWord
-                    Title title = new Title(resultingLabel);
-                    title.getWords().stream().forEach(Word::toUpperFirst);
-                    resultingLabel = title.toString();
-                } else if ("title".equals(modifier)) {
-                    resultingLabel = new TitleCaseFormatter().format(resultingLabel);
+                } else if (capitalizeFormatter.getKey().equals(modifier)) {
+                    resultingLabel = capitalizeFormatter.format(resultingLabel);
+                } else if (titleCaseFormatter.getKey().equals(modifier)) {
+                    resultingLabel = titleCaseFormatter.format(resultingLabel);
+                } else if (sentenceCaseFormatter.getKey().equals(modifier)) {
+                    resultingLabel = sentenceCaseFormatter.format(resultingLabel);
                 } else if (!modifier.isEmpty() && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
                     // Alternate text modifier in parentheses. Should be inserted if
                     // the label is empty:

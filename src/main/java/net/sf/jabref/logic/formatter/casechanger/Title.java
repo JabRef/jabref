@@ -17,13 +17,8 @@ public final class Title {
         this.words.addAll(new TitleParser().parse(title));
     }
 
-    public List<Word> getWordsReadOnly() {
-        return Collections.unmodifiableList(words);
-    }
-
-    @Deprecated
     public List<Word> getWords() {
-        return words;
+        return Collections.unmodifiableList(words);
     }
 
     public Optional<Word> getFirstWord() {

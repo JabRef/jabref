@@ -31,7 +31,7 @@ public class MakeLabelWithDatabaseTest {
         entry.setField("author", "John Doe");
         entry.setField("year", "2016");
         entry.setField("title", "An awesome paper on JabRef");
-        database.insertEntryWithDuplicationCheck(entry);
+        database.insertEntry(entry);
         pattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern.split("[auth][year]"));
         preferences = new BibtexKeyPatternPreferences("", "", false, true, true, pattern);
     }
@@ -97,7 +97,7 @@ public class MakeLabelWithDatabaseTest {
         entry2.setField("author", "John Doe");
         entry2.setField("year", "2016");
         entry2.setCiteKey(entry.getCiteKeyOptional().get());
-        database.insertEntryWithDuplicationCheck(entry2);
+        database.insertEntry(entry2);
         BibEntry entry3 = new BibEntry();
         entry3.setField("author", "John Doe");
         entry3.setField("year", "2016");
@@ -322,38 +322,56 @@ public class MakeLabelWithDatabaseTest {
         assertEquals(Optional.of("DoeSmiWon"), entry.getCiteKeyOptional());
     }
 
-    public void generateKeyTitleTitle() {
+    public void generateKeyTitleTitleCase() {
         DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
-        bibtexKeyPattern.setDefaultValue("[title:title]");
+        bibtexKeyPattern.setDefaultValue("[title:title_case]");
         metadata.setBibtexKeyPattern(bibtexKeyPattern);
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
         assertEquals(Optional.of("AnAwesomePaperonJabref"), entry.getCiteKeyOptional());
     }
 
     @Test
-    public void generateKeyTitleCamel() {
+    public void generateKeyTitleCapitalize() {
         DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
-        bibtexKeyPattern.setDefaultValue("[title:camel]");
+        bibtexKeyPattern.setDefaultValue("[title:capitalize]");
         metadata.setBibtexKeyPattern(bibtexKeyPattern);
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
         assertEquals(Optional.of("AnAwesomePaperOnJabref"), entry.getCiteKeyOptional());
     }
 
     @Test
-    public void generateKeyTitleTitleAbbr() {
+    public void generateKeyTitleSentenceCase() {
         DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
-        bibtexKeyPattern.setDefaultValue("[title:title:abbr]");
+        bibtexKeyPattern.setDefaultValue("[title:sentence_case]");
+        metadata.setBibtexKeyPattern(bibtexKeyPattern);
+        BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
+        assertEquals(Optional.of("Anawesomepaperonjabref"), entry.getCiteKeyOptional());
+    }
+
+    @Test
+    public void generateKeyTitleTitleCaseAbbr() {
+        DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
+        bibtexKeyPattern.setDefaultValue("[title:title_case:abbr]");
         metadata.setBibtexKeyPattern(bibtexKeyPattern);
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
         assertEquals(Optional.of("AAPoJ"), entry.getCiteKeyOptional());
     }
 
     @Test
-    public void generateKeyTitleCamelAbbr() {
+    public void generateKeyTitleCapitalizeAbbr() {
         DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
-        bibtexKeyPattern.setDefaultValue("[title:camel:abbr]");
+        bibtexKeyPattern.setDefaultValue("[title:capitalize:abbr]");
         metadata.setBibtexKeyPattern(bibtexKeyPattern);
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
         assertEquals(Optional.of("AAPOJ"), entry.getCiteKeyOptional());
+    }
+
+    @Test
+    public void generateKeyTitleSentenceCaseAbbr() {
+        DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
+        bibtexKeyPattern.setDefaultValue("[title:sentence_case:abbr]");
+        metadata.setBibtexKeyPattern(bibtexKeyPattern);
+        BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
+        assertEquals(Optional.of("Aapoj"), entry.getCiteKeyOptional());
     }
 }

@@ -35,7 +35,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - <kbd>Pos1</kbd> / <kbd>HOME</kbd> now select the first/last entry in the main table and the search result frame.
 - <kbd>UP</kbd> / <kbd>Down</kbd> / <kbd>Tab</kbd> / <kbd>shift+Tab</kbd> in the search result frame have now the same functionality as in the main  table.
 - [#1496](https://github.com/JabRef/jabref/issues/1496) Keep track of which entry a downloaded file belongs to
-- [#1506](https://github.com/JabRef/jabref/issues/1506) It is possible to apply two new key modifier `title` for Title Case and `camel` for Camel Case (difference is that title case will leave prepositions etc in lower case) 
+- [#1506](https://github.com/JabRef/jabref/issues/1506) It is possible to apply two new key modifier `title_case` for Title Case, `capitalize` for Capitalized first character of each word (difference is that title case will leave prepositions etc in lower case), and `sentence_case` for normal sentence case (first word capitalized). In addition `lower_case` and `upper_case` can be used instead of `lower` and `upper`. 
 
 ### Fixed
 - Fixed selecting an entry out of multiple duplicates
