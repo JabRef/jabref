@@ -87,8 +87,11 @@ public class GlobalSearchBar extends JPanel {
         globalSearch.setToolTipText(Localization.lang("Search globally"));
         globalSearch.addActionListener(e -> {
             searchPreferences.setGlobalSearch(globalSearch.isSelected());
-            String localization = globalSearch.isSelected() ? "Search in all open databases" : "Show search results in a window";
-            openCurrentResultsInDialog.setToolTipText(Localization.lang(localization));
+            if (globalSearch.isSelected()) {
+                openCurrentResultsInDialog.setToolTipText(Localization.lang("Search in all open databases"));
+            } else {
+                openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
+            }
         });
 
         openCurrentResultsInDialog.setDisabledIcon(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon().createDisabledIcon());
