@@ -83,8 +83,7 @@ public class GlobalSearchBar extends JPanel {
         currentResults.setFont(currentResults.getFont().deriveFont(Font.BOLD));
         searchField.setColumns(30);
 
-        JToggleButton globalSearch = new JToggleButton(IconTheme.JabRefIcon.GLOBAL_SEARCH_OFF.getSmallIcon(), searchPreferences.isGlobalSearch());
-        globalSearch.setSelectedIcon(IconTheme.JabRefIcon.GLOBAL_SEARCH_ON.getSmallIcon());
+        JToggleButton globalSearch = new JToggleButton(IconTheme.JabRefIcon.GLOBAL_SEARCH.getSmallIcon(), searchPreferences.isGlobalSearch());
         globalSearch.setToolTipText(Localization.lang("Search globally"));
         globalSearch.addActionListener(e -> {
             searchPreferences.setGlobalSearch(globalSearch.isSelected());

@@ -157,8 +157,7 @@ public class IconTheme {
         FORUM("\uf28c"), /* css: forum */
         FACEBOOK("\uf20c"), /* css: facebook */
         BLOG("\uf46b"), /* css: rss */
-        GLOBAL_SEARCH_ON("\uF1E7"), /* css: earth */
-        GLOBAL_SEARCH_OFF("\uF1E8"), /* css: earth-off */
+        GLOBAL_SEARCH("\uF1E7"), /* css: earth */
         // STILL MISSING:
         GROUP_REGULAR("\uF4E6", Color.RED);
 
