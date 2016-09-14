@@ -65,7 +65,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
     private final boolean singleEntry;
     private final JButton add = new JButton(IconTheme.JabRefIcon.ADD_NOBOX.getSmallIcon());
     private final JButton remove = new JButton(IconTheme.JabRefIcon.REMOVE_NOBOX.getSmallIcon());
-    private AutoCompleteListener autoCompleteListener;
 
     private static final String layoutFormat = "\\begin{author}\\format[Authors(2,1),LatexToUnicode]{\\author}\\end{author}\\begin{title}, \"\\format[LatexToUnicode]{\\title}\"\\end{title}\\begin{year}, \\year\\end{year}";
 
@@ -116,11 +115,6 @@ public class EntryLinkListEditor extends JTable implements FieldEditor {
         panel.setLayout(new BorderLayout());
         panel.add(sPane, BorderLayout.CENTER);
         panel.add(builder.getPanel(), BorderLayout.EAST);
-
-        // TransferHandler transferHandler = new EntryLinkTransferHandler();
-
-        // setTransferHandler(transferHandler);
-        // panel.setTransferHandler(transferHandler);
 
         // Add an input/action pair for deleting entries:
         getInputMap().put(KeyStroke.getKeyStroke("DELETE"), "delete");
