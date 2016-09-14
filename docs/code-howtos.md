@@ -353,6 +353,16 @@ public void getTypeReturnsBibLatexArticleInBibLatexMode() {
 
 Global variables are OK here. Global variables are NOT OK everywhere else, especially model and logic.
 
+### Find out issues with the EDT
+
+If someone wants to find out more, add the following first in `main` or `start` in `JabRefMain`:
+``` Java
+RepaintManager.setCurrentManager(new CheckingRepaintManager());
+```
+then it is just to work with JabRef until an exception happens.
+
+Source: <https://github.com/JabRef/jabref/pull/1725>
+
 ## UI for Preferences
 
   * `JabRefFrame.preferences()` shows the preferences 
