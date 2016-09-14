@@ -98,7 +98,7 @@ public class DatabaseSearcherTest {
         SearchQuery query = new SearchQuery("tonho", true, true);
         DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
-        assertEquals(Collections.emptyList(), databaseSearcher.getMatches());
+        assertEquals(Collections.singletonList(entry), databaseSearcher.getMatches());
     }
 
     @Test
