@@ -79,17 +79,52 @@ public class SearchQueryTest {
     }
 
     @Test
-    public void testIsValidQuery() {
-        assertFalse(new SearchQuery("asdf[", true, true).isValid());
-        assertTrue(new SearchQuery("asdf[", true, false).isValid());
+    public void testIsValidQueryNotAsRegEx() {
         assertTrue(new SearchQuery("asdf", true, false).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryContainsBracketNotAsRegEx() {
+        assertTrue(new SearchQuery("asdf[", true, false).isValid());
+    }
+
+    @Test
+    public void testIsNotValidQueryContainsBracketNotAsRegEx() {
+        assertFalse(new SearchQuery("asdf[", true, true).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryAsRegEx() {
         assertTrue(new SearchQuery("asdf", true, true).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryWithNumbersAsRegEx() {
         assertTrue(new SearchQuery("123", true, true).isValid());
-        assertTrue(new SearchQuery("123", true, true).isValid());
-        assertTrue(new SearchQuery("author=asdf", true, false).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryContainsBracketAsRegEx() {
+        assertFalse(new SearchQuery("asdf[", true, true).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryWithEqualSignAsRegEx() {
         assertTrue(new SearchQuery("author=asdf", true, true).isValid());
-        assertTrue(new SearchQuery("author=123", true, false).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryWithNumbersAndEqualSignAsRegEx() {
         assertTrue(new SearchQuery("author=123", true, true).isValid());
     }
 
+    @Test
+    public void testIsValidQueryWithEqualSignNotAsRegEx() {
+        assertTrue(new SearchQuery("author=asdf", true, false).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryWithNumbersAndEqualSignNotAsRegEx() {
+        assertTrue(new SearchQuery("author=123", true, false).isValid());
+    }
 }
