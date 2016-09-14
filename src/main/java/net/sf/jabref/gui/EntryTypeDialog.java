@@ -24,7 +24,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.importer.fetcher.EntryFetchers;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -33,6 +32,7 @@ import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
@@ -53,7 +53,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
     private EntryType type;
     private SwingWorker<Optional<BibEntry>, Void> fetcherWorker;
-    private JabRefFrame frame;
+    private final JabRefFrame frame;
     private static final int COLUMN = 3;
     private final boolean biblatexMode;
 

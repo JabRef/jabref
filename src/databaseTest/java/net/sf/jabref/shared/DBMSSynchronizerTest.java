@@ -8,11 +8,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.event.source.EntryEventSource;
+import net.sf.jabref.logic.exporter.MetaDataSerializer;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.event.EntryEventSource;
+import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.exception.OfflineLockException;
 import net.sf.jabref.shared.exception.SharedEntryNotPresentException;
@@ -120,7 +121,7 @@ public class DBMSSynchronizerTest {
         dbmsSynchronizer.setMetaData(testMetaData);
         testMetaData.putData("databaseType", Arrays.asList("bibtex"));
 
-        Map<String, String> expectedMap = testMetaData.getAsStringMap();
+        Map<String, String> expectedMap = MetaDataSerializer.getSerializedStringMap(testMetaData);
         Map<String, String> actualMap = dbmsProcessor.getSharedMetaData();
 
         Assert.assertEquals(expectedMap, actualMap);

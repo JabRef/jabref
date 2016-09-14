@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.logic.groups.ExplicitGroup;
-import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.groups.ExplicitGroup;
+import net.sf.jabref.model.groups.GroupTreeNode;
 
 /**
  * Converts legacy explicit groups, where the group contained a list of assigned entries, to the new format,

@@ -20,5 +20,7 @@ public interface WebFetcher {
      *
      * @return the {@link HelpFile} enum constant for the help page
      */
-    HelpFile getHelpPage();
+    default HelpFile getHelpPage() {
+        return null; // no help page by default
+    }
 }

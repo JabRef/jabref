@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.gui.undo.AbstractUndoableJabRefEdit;
-import net.sf.jabref.logic.groups.GroupTreeNode;
-import net.sf.jabref.logic.groups.MoveGroupChange;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.groups.GroupTreeNode;
+import net.sf.jabref.model.groups.MoveGroupChange;
 
 /**
  * @author jzieren
