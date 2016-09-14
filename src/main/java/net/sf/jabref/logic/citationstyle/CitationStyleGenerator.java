@@ -26,6 +26,7 @@ public class CitationStyleGenerator {
 
     private static final Log LOGGER = LogFactory.getLog(CitationStyleGenerator.class);
     private static final UnicodeToLatexFormatter UNICODE_TO_LATEX_FORMATTER = new UnicodeToLatexFormatter();
+    private static final BibTeXConverter BIBTEX_CONVERTER = new BibTeXConverter();
 
 
     /**
@@ -48,7 +49,7 @@ public class CitationStyleGenerator {
                 bibTeXEntry.addField(new Key(field.getKey()), new DigitStringValue(value));
             }
 
-            CSLItemData cslItemData = new BibTeXConverter().toItemData(bibTeXEntry);
+            CSLItemData cslItemData = BIBTEX_CONVERTER.toItemData(bibTeXEntry);
             Bibliography bibliography = CSL.makeAdhocBibliography(style, cslItemData);
             return bibliography.getEntries()[0];
 
