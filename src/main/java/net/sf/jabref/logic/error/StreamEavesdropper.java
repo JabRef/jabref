@@ -3,6 +3,10 @@ package net.sf.jabref.logic.error;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+import javafx.application.Platform;
+
+import net.sf.jabref.logic.logging.LogMessages;
+
 /**
  * Allows to eavesdrop on an out and an err stream.
  * <p/>
@@ -30,13 +34,35 @@ public class StreamEavesdropper {
     }
 
     public TeeStream getOutStream() {
-        PrintStream consoleOut = new PrintStream(outByteStream);
-        return new TeeStream(consoleOut, systemOut, MessageType.OUTPUT);
+        PrintStream consoleOut = new PrintStream(outByteStream) {
+            @Override
+            public void write(byte[] buf, int off, int len) {
+                super.write(buf, off, len);
+                String s = new String(buf, off, len);
+                addToLog(s, MessageType.OUTPUT);
+            }
+        };
+        return new TeeStream(consoleOut, systemOut);
     }
 
     public TeeStream getErrStream() {
-        PrintStream consoleErr = new PrintStream(errByteStream);
-        return new TeeStream(consoleErr, systemErr, MessageType.EXCEPTION);
+        PrintStream consoleErr = new PrintStream(errByteStream){
+            @Override
+            public void write(byte[] buf, int off, int len) {
+                super.write(buf, off, len);
+                String s = new String(buf, off, len);
+                addToLog(s, MessageType.EXCEPTION
+                );
+            }
+        };
+        return new TeeStream(consoleErr, systemErr);
+    }
+
+    private void addToLog(String s, MessageType priority) {
+        if (!s.equals(System.lineSeparator())) {
+            LogMessage messageWithPriority = new LogMessage(s.replaceAll(System.lineSeparator(), ""), priority);
+            Platform.runLater(() -> LogMessages.getInstance().add(messageWithPriority));
+        }
     }
 
     public String getOutput() {
