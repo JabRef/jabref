@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<modsCollection xmlns:link="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:ns4="http://www.w3.org/2001/XMLSchema-instance" ns4:schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd">
+    <mods:mods>
+        <mods:genre>article</mods:genre>
+        <mods:note>a note</mods:note>
+        <mods:note>and another note</mods:note>
+        <mods:subject>
+            <topic>keyword</topic>
+        </mods:subject>
+        <mods:subject>
+            <topic>electrophoresis</topic>
+        </mods:subject>
+        <mods:subject>
+            <topic>neoplasia</topic>
+        </mods:subject>
+        <mods:subject>
+            <topic>spectrometry</topic>
+        </mods:subject>
+        <mods:subject>
+            <topic>translation</topic>
+        </mods:subject>
+        <mods:language>
+            <mods:languageTerm>en</mods:languageTerm>
+        </mods:language>
+        <mods:name>
+            <affiliation>an affiliation</affiliation>
+        </mods:name>
+        <mods:name type="personal">
+            <namePart type="family">Don't</namePart>
+            <namePart type="given"></namePart>
+            <namePart type="given">know</namePart>
+            <namePart type="family">Realy</namePart>
+            <namePart type="given"></namePart>
+            <namePart type="given">don't</namePart>
+            <namePart type="given">know</namePart>
+        </mods:name>
+        <mods:abstract>abstract</mods:abstract>
+        <mods:identifier type="pmid">123456789</mods:identifier>
+        <mods:identifier type="uri">an uri</mods:identifier>
+        <mods:abstract ns4:type="mods:urlDefinition">someWebSite</mods:abstract>
+        <mods:location>
+            <mods:physicalLocation>somewhere</mods:physicalLocation>
+        </mods:location>
+        <mods:identifier type="doi">someDoi</mods:identifier>
+        <mods:relatedItem type="host">
+            <mods:titleInfo>
+                <title>Some jorunalt</title>
+            </mods:titleInfo>
+            <mods:part>
+                <mods:extent>
+                    <mods:start>68</mods:start>
+                    <mods:end/>
+                </mods:extent>
+                <mods:detail type="issue">
+                    <number>10</number>
+                </mods:detail>
+                <mods:detail type="volume">
+                    <number>5</number>
+                </mods:detail>
+            </mods:part>
+        </mods:relatedItem>
+        <mods:originInfo>
+            <dateIssued keyDate="yes">2000</dateIssued>
+            <edition>2</edition>
+            <dateCaptured keyDate="yes">2000-10-10</dateCaptured>
+            <dateModified keyDate="yes">2000-10-10</dateModified>
+            <place>
+                <mods:placeTerm type="text">India</mods:placeTerm>
+            </place>
+            <dateCreated keyDate="yes">2000-10-10</dateCreated>
+            <issuance>monographic</issuance>
+            <publisher>Verlag verlag</publisher>
+        </mods:originInfo>
+        <mods:typeOfResource>text</mods:typeOfResource>
+    </mods:mods>
+</modsCollection>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<modsCollection xmlns:link="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:ns4="http://www.w3.org/2001/XMLSchema-instance" ns4:schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd">
+    <mods:mods>
+        <mods:genre>article</mods:genre>
+        <mods:subject>
+            <topic>Biomarkers</topic>
+        </mods:subject>
+        <mods:subject>
+            <topic>electrophoresis</topic>
+        </mods:subject>
+        <mods:subject>
+            <topic>neoplasia</topic>
+        </mods:subject>
+        <mods:subject>
+            <topic>spectrometry</topic>
+        </mods:subject>
+        <mods:subject>
+            <topic>translation</topic>
+        </mods:subject>
+        <mods:name type="personal">
+            <namePart type="family">Shruthi</namePart>
+            <namePart type="given"></namePart>
+            <namePart type="given">Basavaradhya</namePart>
+            <namePart type="given">Sahukar</namePart>
+            <namePart type="family">Vinodhkumar</namePart>
+            <namePart type="given"></namePart>
+            <namePart type="given">Palani</namePart>
+            <namePart type="family">Selvamani</namePart>
+        </mods:name>
+        <mods:relatedItem type="host">
+            <mods:titleInfo>
+                <title>Advanced biomedical research</title>
+            </mods:titleInfo>
+            <mods:part>
+                <mods:detail type="volume">
+                    <number>5</number>
+                </mods:detail>
+                <mods:extent>
+                    <mods:total>67</mods:total>
+                </mods:extent>
+            </mods:part>
+        </mods:relatedItem>
+        <mods:originInfo>
+            <place>
+                <mods:placeTerm type="text">India</mods:placeTerm>
+            </place>
+            <dateIssued keyDate="yes">2016</dateIssued>
+        </mods:originInfo>
+        <mods:typeOfResource>text</mods:typeOfResource>
+    </mods:mods>
+    <mods:mods ID="ShruthiVinodhkumarSelvamani2016">
+        <mods:identifier type="citekey">ShruthiVinodhkumarSelvamani2016</mods:identifier>
+        <mods:genre>inproceedings</mods:genre>
+        <mods:name type="personal">
+            <namePart type="family">Shruthi</namePart>
+            <namePart type="given"></namePart>
+            <namePart type="given">Basavaradhya</namePart>
+            <namePart type="given">Sahukar</namePart>
+            <namePart type="family">Vinodhkumar</namePart>
+            <namePart type="given"></namePart>
+            <namePart type="given">Palani</namePart>
+            <namePart type="family">Selvamani</namePart>
+        </mods:name>
+        <mods:relatedItem type="host">
+            <mods:titleInfo>
+                <title>Advanced biomedical research</title>
+            </mods:titleInfo>
+            <mods:part/>
+        </mods:relatedItem>
+        <mods:originInfo>
+            <dateIssued keyDate="yes">2016</dateIssued>
+        </mods:originInfo>
+        <mods:typeOfResource>text</mods:typeOfResource>
+    </mods:mods>
+</modsCollection>
