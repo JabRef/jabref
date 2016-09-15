@@ -2,10 +2,10 @@ package net.sf.jabref.logic.importer.fetcher;
 
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +20,7 @@ public class DoiFetcherTest {
 
     @Before
     public void setUp() {
-        fetcher = new DoiFetcher(Globals.prefs.getImportFormatPreferences());
+        fetcher = new DoiFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
 
         bibEntryBurd2011 = new BibEntry();
         bibEntryBurd2011.setType(BibLatexEntryTypes.BOOK);
