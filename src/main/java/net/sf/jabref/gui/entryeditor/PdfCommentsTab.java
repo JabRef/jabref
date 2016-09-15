@@ -5,10 +5,10 @@ import java.awt.GridBagLayout;
 import java.awt.SystemColor;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
@@ -28,6 +28,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.pdf.PdfCommentImporter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.pdf.PdfComment;
 
 import com.jgoodies.forms.builder.FormBuilder;
@@ -120,8 +121,11 @@ public class PdfCommentsTab extends JPanel {
      */
     private void updateShownComments(HashMap<String, PdfComment> importedNotes){
         listModel.clear();
-        importedNotes.values().stream().filter(comment -> !(null == comment.getContent())).collect(Collectors.toList())
-                .forEach((comment) -> listModel.addElement(comment));
+        Comparator<PdfComment> byPage = (comment1, comment2) -> Integer.compare(comment1.getPage(), comment2.getPage());
+        importedNotes.values().stream()
+                .filter(comment -> !(null == comment.getContent()))
+                .sorted(byPage)
+                .forEach(listModel::addElement);
     }
 
     private void updateTextFields(PdfComment comment) {
@@ -129,6 +133,7 @@ public class PdfCommentsTab extends JPanel {
         dateArea.setText(comment.getDate());
         pageArea.setText(String.valueOf(comment.getPage()));
         commentTxtArea.setText(comment.getContent());
+        filenameArea.setText(FileField.parse(parent.getEntry().getField(FieldName.FILE).get()).get(0).getLink());
     }
 
     private void setUpInformationPanel(){
