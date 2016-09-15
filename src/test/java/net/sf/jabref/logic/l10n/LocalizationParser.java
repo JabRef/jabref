@@ -22,8 +22,6 @@ import java.util.stream.Collectors;
 
 import javafx.fxml.FXMLLoader;
 
-import com.sun.javafx.application.PlatformImpl;
-
 public class LocalizationParser {
 
     public static SortedSet<LocalizationEntry> find(LocalizationBundle type) throws IOException {
@@ -146,30 +144,30 @@ public class LocalizationParser {
 
         List<String> result = new LinkedList<>();
 
-        // Record which keys are requested; we pretend that we have all keys
-        ResourceBundle registerUsageResourceBundle = new ResourceBundle() {
-
-            @Override
-            protected Object handleGetObject(String key) {
-                result.add(key);
-                return "test";
-            }
-
-            @Override
-            public Enumeration<String> getKeys() {
-                return null;
-            }
-
-            @Override
-            public boolean containsKey(String key) {
-                return true;
-            }
-        };
-
         try {
-            PlatformImpl.startup(() -> {});
+            LocalizationJavaFXToolkit.installToolkit();
+
+            // Record which keys are requested; we pretend that we have all keys
+            ResourceBundle registerUsageResourceBundle = new ResourceBundle() {
+
+                @Override
+                protected Object handleGetObject(String key) {
+                    result.add(key);
+                    return "test";
+                }
+
+                @Override
+                public Enumeration<String> getKeys() {
+                    return null;
+                }
+
+                @Override
+                public boolean containsKey(String key) {
+                    return true;
+                }
+            };
             FXMLLoader loader = new FXMLLoader(path.toUri().toURL(), registerUsageResourceBundle);
-            //loader.setBuilderFactory();
+            FXMLLoader.setDefaultClassLoader(Thread.currentThread().getContextClassLoader());
             loader.load();
         } catch (IOException ignore) {
             ignore.printStackTrace();
