@@ -12,9 +12,6 @@ import java.util.stream.Collectors;
 public class KeyBindingsListener extends KeyAdapter {
 
     private final KeyBindingTable table;
-    private boolean isDeleteKey;
-    private boolean isFunctionKey;
-    private boolean isEscapeKey;
 
     public KeyBindingsListener(KeyBindingTable table) {
         this.table = table;
@@ -22,6 +19,11 @@ public class KeyBindingsListener extends KeyAdapter {
 
     @Override
     public void keyPressed(KeyEvent evt) {
+
+        boolean isFunctionKey = false;
+        boolean isEscapeKey = false;
+        boolean isDeleteKey = false;
+
         // first check if anything is selected if not then return
         final int selRow = table.getSelectedRow();
         boolean isAnyRowSelected = selRow >= 0;
@@ -39,13 +41,15 @@ public class KeyBindingsListener extends KeyAdapter {
             isEscapeKey = kc == KeyEvent.VK_ESCAPE;
             isDeleteKey = kc == KeyEvent.VK_DELETE;
             if (!(isFunctionKey || isEscapeKey || isDeleteKey)) {
-                return; // need a modifier except for function, escape and delete keys
+                // need a modifier except for function, escape and delete keys
+                return;
             }
         }
 
         int code = evt.getKeyCode();
         String newKey;
-        //skip the event triggered only by a modifier
+        //skip the event triggered only by a modifier, tab, backspace or enter because these normally have preset
+        // functionality if they alone are pressed
         if (code == KeyEvent.VK_ALT ||
                 code == KeyEvent.VK_TAB ||
                 code == KeyEvent.VK_BACK_SPACE ||
@@ -77,8 +81,7 @@ public class KeyBindingsListener extends KeyAdapter {
     }
 
     /**
-     * Checks if the event has pressed modifiers and adds their English key text to an ArrayList
-     * from which a String is build
+     * Collects th English translations of all modifiers and returns them separated by a space
      *
      * @param evt the KeyEvent that was triggered to set the KeyBindings
      * @return a String containing the modifier keys text
