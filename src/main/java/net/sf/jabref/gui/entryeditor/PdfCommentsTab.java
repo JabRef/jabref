@@ -38,7 +38,7 @@ public class PdfCommentsTab extends JPanel {
 
     private final JList<PdfComment> commentList = new JList<>();
     private final JScrollPane commentScrollPane = new JScrollPane();
-    private final JLabel commentLabel = new JLabel(Localization.lang("Comments and highlighted text"), JLabel.LEFT);
+    private final JLabel commentLabel = new JLabel(Localization.lang("Comments"), JLabel.LEFT);
     private final JLabel fileNameLabel = new JLabel(Localization.lang("Filename"),JLabel.CENTER);
     private final JTextArea filenameArea = new JTextArea("filename");
     private final JScrollPane fileNameScrollPane = new JScrollPane();
@@ -90,6 +90,7 @@ public class PdfCommentsTab extends JPanel {
         this.add(commentListPanel);
     }
 
+
     public void addComments() throws IOException {
         Optional<String> field = parent.getEntry().getField(FieldName.FILE);
         if (field.isPresent()) {
@@ -134,17 +135,17 @@ public class PdfCommentsTab extends JPanel {
     private void setUpInformationPanel(){
         JPanel informationPanel  = FormBuilder.create()
                 .columns("pref, $lcgap, pref:grow")
-                .rows("pref, $lg, pref, $lg, pref, $lg, pref, $lg, pref, $lg, pref, $lg, pref")
+                .rows("pref, $lg, pref, $lg, pref, $lg, pref, $lg, fill:pref:grow, $lg, pref")
                 .padding(Paddings.DIALOG)
-                .add(fileNameLabel).xy(1,1)
+                .add(fileNameLabel).xy(1,1, "left, top")
                 .add(fileNameScrollPane).xy(3,1)
-                .add(authorLabel).xy(1,3)
+                .add(authorLabel).xy(1,3, "left, top")
                 .add(authorScrollPane).xy(3,3)
-                .add(dateLabel).xy(1,5)
+                .add(dateLabel).xy(1,5, "left, top")
                 .add(dateScrollPane).xy(3,5)
-                .add(pageLabel).xy(1,7)
+                .add(pageLabel).xy(1,7, "left, top")
                 .add(pageScrollPane).xy(3,7)
-                .add(commentTxtLabel).xy(1,9)
+                .add(commentTxtLabel).xy(1,9, "left, top")
                 .add(commentTxtScrollPane).xy(3,9)
                 .add(this.setUpButtons()).xy(3,11)
                 .build();
