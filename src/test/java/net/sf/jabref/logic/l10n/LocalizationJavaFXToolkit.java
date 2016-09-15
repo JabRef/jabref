@@ -43,7 +43,6 @@ import javafx.stage.StageStyle;
 import javafx.stage.Window;
 
 import com.sun.glass.ui.CommonDialogs;
-import com.sun.glass.ui.Screen;
 import com.sun.javafx.application.PlatformImpl;
 import com.sun.javafx.embed.HostInterface;
 import com.sun.javafx.geom.BaseBounds;
