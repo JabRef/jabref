@@ -196,8 +196,10 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
                     try {
                         bibEntry = fetcher.performSearchById(searchID);
                     } catch (FetcherException e) {
-                        LOGGER.error("Error fetching from " + fetcher.getName(), e);
-                        JOptionPane.showMessageDialog(null, Localization.lang("Error while fetching from %0", fetcher.getName()), Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                        LOGGER.error(e.getMessage(), e);
+                        JOptionPane.showMessageDialog(null,
+                                Localization.lang("Error while fetching from %0", fetcher.getName()) + "\n" + e.getMessage(),
+                                Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
                 dispose();

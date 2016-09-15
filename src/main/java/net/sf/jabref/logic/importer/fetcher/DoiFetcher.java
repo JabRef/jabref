@@ -58,7 +58,7 @@ public class DoiFetcher implements IdBasedFetcher {
                 throw new FetcherException(Localization.lang("Invalid_DOI:_'%0'.", identifier));
             }
         } catch (IOException e) {
-            throw new FetcherException("Bad URL when fetching DOI info", e);
+            throw new FetcherException(Localization.lang("Invalid URL"), e);
         }
     }
 }
