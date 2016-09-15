@@ -1,9 +1,9 @@
 package net.sf.jabref.logic.search.rules.describer;
 
-import net.sf.jabref.logic.search.rules.ContainBasedSearchRule;
-import net.sf.jabref.logic.search.rules.GrammarBasedSearchRule;
-import net.sf.jabref.logic.search.rules.RegexBasedSearchRule;
-import net.sf.jabref.logic.search.rules.SearchRule;
+import net.sf.jabref.model.search.rules.ContainBasedSearchRule;
+import net.sf.jabref.model.search.rules.GrammarBasedSearchRule;
+import net.sf.jabref.model.search.rules.RegexBasedSearchRule;
+import net.sf.jabref.model.search.rules.SearchRule;
 
 public class SearchDescribers {
 

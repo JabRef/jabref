@@ -97,7 +97,7 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.model.event.FieldChangedEvent;
+import net.sf.jabref.model.entry.event.FieldChangedEvent;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 
@@ -759,11 +759,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private boolean storeSource() {
-        BibtexParser bibtexParser = new BibtexParser(new StringReader(source.getText()),
-                Globals.prefs.getImportFormatPreferences());
-
+        BibtexParser bibtexParser = new BibtexParser(Globals.prefs.getImportFormatPreferences());
         try {
-            ParserResult parserResult = bibtexParser.parse();
+            ParserResult parserResult = bibtexParser.parse(new StringReader(source.getText()));
             BibDatabase database = parserResult.getDatabase();
 
             if (database.getEntryCount() > 1) {

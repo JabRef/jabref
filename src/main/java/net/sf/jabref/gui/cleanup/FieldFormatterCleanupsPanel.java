@@ -25,13 +25,13 @@ import javax.swing.UIManager;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.metadata.MetaData;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.layout.FormLayout;
@@ -59,7 +59,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
     public void setValues(MetaData metaData) {
         Objects.requireNonNull(metaData);
-        Optional<FieldFormatterCleanups> saveActions = metaData.getSaveActions();
+        Optional<FieldFormatterCleanups> saveActions = FieldFormatterCleanups.fromMetaData(metaData);
         setValues(saveActions.orElse(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS));
     }
 
@@ -247,7 +247,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
             return;
         }
 
-        metaData.setSaveActions(formatterCleanups);
+        metaData.setSaveActions(formatterCleanups.getAsStringList());
     }
 
     public FieldFormatterCleanups getFormatterCleanups() {

@@ -2,20 +2,15 @@ package net.sf.jabref.logic.util.io;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.jabref.logic.importer.ParserResult;
-import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
-import net.sf.jabref.preferences.JabRefPreferences;
 
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,25 +25,23 @@ public class RegExpFileSearchTests {
     @Before
     public void setUp() throws IOException {
 
-        StringReader reader = new StringReader(
-                "@ARTICLE{HipKro03," + "\n" + "  author = {Eric von Hippel and Georg von Krogh}," + "\n"
-                        + "  title = {Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science},"
-                        + "\n" + "  journal = {Organization Science}," + "\n" + "  year = {2003}," + "\n"
-                        + "  volume = {14}," + "\n" + "  pages = {209--223}," + "\n" + "  number = {2}," + "\n"
-                        + "  address = {Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA},"
-                        + "\n" + "  doi = {http://dx.doi.org/10.1287/orsc.14.2.209.14992}," + "\n"
-                        + "  issn = {1526-5455}," + "\n" + "  publisher = {INFORMS}" + "\n" + "}");
+        entry = new BibEntry();
+        entry.setType(BibtexEntryTypes.ARTICLE);
+        entry.setCiteKey("HipKro03");
+        entry.setField("author", "Eric von Hippel and Georg von Krogh");
+        entry.setField("title", "Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science");
+        entry.setField("journal", "Organization Science");
+        entry.setField("year", "2003");
+        entry.setField("volume", "14");
+        entry.setField("pages", "209--223");
+        entry.setField("number", "2");
+        entry.setField("address", "Institute for Operations Research and the Management Sciences (INFORMS), Linthicum, Maryland, USA");
+        entry.setField("doi", "http://dx.doi.org/10.1287/orsc.14.2.209.14992");
+        entry.setField("issn", "1526-5455");
+        entry.setField("publisher", "INFORMS");
 
-        BibtexParser parser = new BibtexParser(reader, JabRefPreferences.getInstance().getImportFormatPreferences());
-        ParserResult result = null;
-
-        result = parser.parse();
-
-        database = result.getDatabase();
-        entry = database.getEntryByKey("HipKro03").get();
-
-        Assert.assertNotNull(database);
-        Assert.assertNotNull(entry);
+        database = new BibDatabase();
+        database.insertEntry(entry);
     }
 
     @Test

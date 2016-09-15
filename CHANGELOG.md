@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Added fetcher for [MathSciNet](http://www.ams.org/mathscinet), [zbMATH](https://www.zbmath.org/) and [Astrophysics Data System](http://www.adsabs.harvard.edu/)
 - Implemented [#825](https://github.com/JabRef/jabref/issues/825): Search Bar across all bib files instead each having its own
 - Implemented [#573](https://github.com/JabRef/jabref/issues/573): Add key shortcut for global search (`ctrl+shift+f`, if the searchfield is empty it will be focused instead)
 - The search result Window will now show which entry belongs to which bib file
@@ -57,6 +58,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1949](https://github.com/JabRef/jabref/issues/1949): Error message directs to the wrong preference tab
 - Fixed InvalidBackgroundColor flickering with Ctrl-s and File > Save database
 - Fixed loop when pulling changes (shared database) when current selected field has changed
+- Fixed [#1958](https://github.com/JabRef/jabref/issues/1958): Verbatim fields are no longer checked for HTML encoded characters by integrity checks
 
 ### Removed
 - The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field. 

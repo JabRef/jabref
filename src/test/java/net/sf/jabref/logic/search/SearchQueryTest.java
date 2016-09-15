@@ -66,4 +66,65 @@ public class SearchQueryTest {
         assertTrue(searchQuery.isMatch(e));
     }
 
+
+    @Test
+    public void testIsMatch() {
+        BibEntry entry = new BibEntry();
+        entry.setType(BibtexEntryTypes.ARTICLE);
+        entry.setField("author", "asdf");
+
+        assertFalse(new SearchQuery("qwer", true, true).isMatch(entry));
+        assertTrue(new SearchQuery("asdf", true, true).isMatch(entry));
+        assertTrue(new SearchQuery("author=asdf", true, true).isMatch(entry));
+    }
+
+    @Test
+    public void testIsValidQueryNotAsRegEx() {
+        assertTrue(new SearchQuery("asdf", true, false).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryContainsBracketNotAsRegEx() {
+        assertTrue(new SearchQuery("asdf[", true, false).isValid());
+    }
+
+    @Test
+    public void testIsNotValidQueryContainsBracketNotAsRegEx() {
+        assertFalse(new SearchQuery("asdf[", true, true).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryAsRegEx() {
+        assertTrue(new SearchQuery("asdf", true, true).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryWithNumbersAsRegEx() {
+        assertTrue(new SearchQuery("123", true, true).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryContainsBracketAsRegEx() {
+        assertFalse(new SearchQuery("asdf[", true, true).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryWithEqualSignAsRegEx() {
+        assertTrue(new SearchQuery("author=asdf", true, true).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryWithNumbersAndEqualSignAsRegEx() {
+        assertTrue(new SearchQuery("author=123", true, true).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryWithEqualSignNotAsRegEx() {
+        assertTrue(new SearchQuery("author=asdf", true, false).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryWithNumbersAndEqualSignNotAsRegEx() {
+        assertTrue(new SearchQuery("author=123", true, false).isValid());
+    }
 }
