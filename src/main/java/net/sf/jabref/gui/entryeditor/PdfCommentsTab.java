@@ -28,7 +28,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.pdf.PdfCommentImporter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.pdf.PdfComment;
 
 import com.jgoodies.forms.builder.FormBuilder;
@@ -74,6 +73,11 @@ public class PdfCommentsTab extends JPanel {
         this.tabTitle = Localization.lang("PDF comments");
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         listModel  = new DefaultListModel<>();
+        try {
+            addComments();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         this.setUpPdfCommentsTab();
         this.setUpInformationPanel();
     }
@@ -134,7 +138,6 @@ public class PdfCommentsTab extends JPanel {
         dateArea.setText(comment.getDate());
         pageArea.setText(String.valueOf(comment.getPage()));
         commentTxtArea.setText(comment.getContent());
-        filenameArea.setText(FileField.parse(parent.getEntry().getField(FieldName.FILE).get()).get(0).getLink());
     }
 
     private void setUpInformationPanel(){
@@ -171,6 +174,7 @@ public class PdfCommentsTab extends JPanel {
         pageArea.setBackground(SystemColor.control);
         pageArea.setEditable(false);
         commentTxtArea.setEditable(false);
+        commentTxtArea.setLineWrap(true);
         filenameArea.setEditable(false);
         filenameArea.setBackground(SystemColor.control);
 
