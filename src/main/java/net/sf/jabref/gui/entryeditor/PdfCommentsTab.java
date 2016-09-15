@@ -13,6 +13,7 @@ import java.util.Optional;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -28,6 +29,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.pdf.PdfCommentImporter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.pdf.PdfComment;
 
 import com.jgoodies.forms.builder.FormBuilder;
@@ -40,7 +42,7 @@ public class PdfCommentsTab extends JPanel {
     private final JScrollPane commentScrollPane = new JScrollPane();
     private final JLabel commentLabel = new JLabel(Localization.lang("Comments"), JLabel.LEFT);
     private final JLabel fileNameLabel = new JLabel(Localization.lang("Filename"),JLabel.CENTER);
-    private final JTextArea filenameArea = new JTextArea("filename");
+    private final JComboBox<String> filenameArea = new JComboBox<>();
     private final JScrollPane fileNameScrollPane = new JScrollPane();
     private final JLabel authorLabel = new JLabel(Localization.lang("Author"), JLabel.CENTER);
     private final JTextArea authorArea = new JTextArea("author");
@@ -138,6 +140,7 @@ public class PdfCommentsTab extends JPanel {
         dateArea.setText(comment.getDate());
         pageArea.setText(String.valueOf(comment.getPage()));
         commentTxtArea.setText(comment.getContent());
+        filenameArea.setSelectedIndex(FileField.parse(parent.getEntry().getField(FieldName.FILE).get()).size());
     }
 
     private void setUpInformationPanel(){
@@ -146,7 +149,7 @@ public class PdfCommentsTab extends JPanel {
                 .rows("pref, $lg, pref, $lg, pref, $lg, pref, $lg, fill:pref:grow, $lg, pref")
                 .padding(Paddings.DIALOG)
                 .add(fileNameLabel).xy(1,1, "left, top")
-                .add(fileNameScrollPane).xy(3,1)
+.add(fileNameScrollPane).xy(3, 1)
                 .add(authorLabel).xy(1,3, "left, top")
                 .add(authorScrollPane).xy(3,3)
                 .add(dateLabel).xy(1,5, "left, top")
@@ -157,6 +160,7 @@ public class PdfCommentsTab extends JPanel {
                 .add(commentTxtScrollPane).xy(3,9)
                 .add(this.setUpButtons()).xy(3,11)
                 .build();
+
 
         fileNameScrollPane.setViewportView(filenameArea);
         fileNameScrollPane.setBorder(null);
