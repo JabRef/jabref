@@ -1158,8 +1158,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 highlightEntry(be);
 
-                markBaseChanged(); // The database just changed.
-                getEntryEditor(be).requestFocus();
+                // The database just changed.
+                markBaseChanged();
+
+                final EntryEditor entryEditor = getEntryEditor(be);
+                this.showEntryEditor(entryEditor);
+                entryEditor.requestFocus();
 
                 return be;
             } catch (KeyCollisionException ex) {
@@ -1329,6 +1333,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             selectionListener.editSignalled();
             final EntryEditor editor = getEntryEditor(entries.get(0));
             editor.setFocusToField(fieldName);
+            this.showEntryEditor(editor);
             editor.requestFocus();
         }
     }
