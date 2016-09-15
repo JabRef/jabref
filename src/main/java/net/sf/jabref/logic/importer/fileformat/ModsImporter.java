@@ -35,7 +35,9 @@ import net.sf.jabref.logic.importer.fileformat.mods.NamePartDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.NoteDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.OriginInfoDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.PartDefinition;
+import net.sf.jabref.logic.importer.fileformat.mods.PhysicalLocationDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.PlaceDefinition;
+import net.sf.jabref.logic.importer.fileformat.mods.PlaceTermDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.RecordInfoDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.RelatedItemDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.StringPlusLanguage;
@@ -43,6 +45,7 @@ import net.sf.jabref.logic.importer.fileformat.mods.StringPlusLanguagePlusAuthor
 import net.sf.jabref.logic.importer.fileformat.mods.StringPlusLanguagePlusSupplied;
 import net.sf.jabref.logic.importer.fileformat.mods.SubjectDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.TitleInfoDefinition;
+import net.sf.jabref.logic.importer.fileformat.mods.UrlDefinition;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -153,7 +156,7 @@ public class ModsImporter extends ImportFormat {
             genreDefinition.ifPresent(genre -> entry.setType(genre.getValue()));
 
             languageDefinition.ifPresent(
-                    languageDef -> languageDef.getLanguageTerm().stream().map(languageTerm -> languageTerm.getValue())
+                    languageDef -> languageDef.getLanguageTerm().stream().map(LanguageTermDefinition::getValue)
                             .forEach(language -> putIfValueNotNull(fields, FieldName.LANGUAGE, language)));
 
             locationDefinition.ifPresent(location -> parseLocationAndUrl(fields, location));
@@ -257,11 +260,11 @@ public class ModsImporter extends ImportFormat {
     }
 
     private void parseLocationAndUrl(Map<String, String> fields, LocationDefinition locationDefinition) {
-        List<String> locations = locationDefinition.getPhysicalLocation().stream().map(location -> location.getValue())
-                .collect(Collectors.toList());
+        List<String> locations = locationDefinition.getPhysicalLocation().stream()
+                .map(PhysicalLocationDefinition::getValue).collect(Collectors.toList());
         putIfListIsNotEmpty(fields, locations, FieldName.LOCATION, ", ");
 
-        List<String> urls = locationDefinition.getUrl().stream().map(url -> url.getValue())
+        List<String> urls = locationDefinition.getUrl().stream().map(UrlDefinition::getValue)
                 .collect(Collectors.toList());
         putIfListIsNotEmpty(fields, urls, FieldName.URL, ", ");
     }
@@ -276,7 +279,7 @@ public class ModsImporter extends ImportFormat {
             } else if (value instanceof LanguageDefinition) {
                 LanguageDefinition language = (LanguageDefinition) value;
                 List<LanguageTermDefinition> languageTerms = language.getLanguageTerm();
-                List<String> languages = languageTerms.stream().map(languageTerm -> languageTerm.getValue())
+                List<String> languages = languageTerms.stream().map(LanguageTermDefinition::getValue)
                         .collect(Collectors.toList());
                 putIfListIsNotEmpty(fields, languages, FieldName.LANGUAGE, ", ");
             }
@@ -355,7 +358,7 @@ public class ModsImporter extends ImportFormat {
         List<String> places = new ArrayList<>();
         placeDefinition
                 .ifPresent(place -> place.getPlaceTerm().stream().filter(placeTerm -> placeTerm.getValue() != null)
-                        .map(element -> element.getValue()).forEach(element -> places.add(element)));
+                        .map(PlaceTermDefinition::getValue).forEach(element -> places.add(element)));
         putIfListIsNotEmpty(fields, places, FieldName.ADDRESS, ", ");
 
         dateDefinition.ifPresent(date -> putDate(fields, elementName, date));
@@ -376,25 +379,25 @@ public class ModsImporter extends ImportFormat {
         if (date.getValue() != null) {
             switch (elementName) {
 
-            case "dateIssued":
-                //The first 4 digits of dateIssued should be the year
-                fields.put(FieldName.YEAR, date.getValue().substring(0, 4));
-                break;
-            case "dateCreated":
-                //If there was no year in date issued, then take the year from date created
-                if (fields.get(FieldName.YEAR) == null) {
+                case "dateIssued":
+                    //The first 4 digits of dateIssued should be the year
                     fields.put(FieldName.YEAR, date.getValue().substring(0, 4));
-                }
-                fields.put("created", date.getValue());
-                break;
-            case "dateCaptured":
-                fields.put("captured", date.getValue());
-                break;
-            case "dateModified":
-                fields.put("modified", date.getValue());
-                break;
-            default:
-                break;
+                    break;
+                case "dateCreated":
+                    //If there was no year in date issued, then take the year from date created
+                    if (fields.get(FieldName.YEAR) == null) {
+                        fields.put(FieldName.YEAR, date.getValue().substring(0, 4));
+                    }
+                    fields.put("created", date.getValue());
+                    break;
+                case "dateCaptured":
+                    fields.put("captured", date.getValue());
+                    break;
+                case "dateModified":
+                    fields.put("modified", date.getValue());
+                    break;
+                default:
+                    break;
             }
         }
     }
