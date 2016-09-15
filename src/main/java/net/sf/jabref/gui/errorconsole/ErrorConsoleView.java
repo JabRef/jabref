@@ -27,11 +27,18 @@ import javafx.util.Callback;
 
 import net.sf.jabref.gui.FXAlert;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.logic.error.LogMessage;
-import net.sf.jabref.logic.error.MessageType;
 import net.sf.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.FXMLView;
+import com.sun.star.lang.IndexOutOfBoundsException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.LogEvent;
+
+import static org.apache.logging.log4j.Level.ERROR;
+import static org.apache.logging.log4j.Level.INFO;
+import static org.apache.logging.log4j.Level.WARN;
 
 public class ErrorConsoleView extends FXMLView {
 
@@ -44,7 +51,7 @@ public class ErrorConsoleView extends FXMLView {
     @FXML
     private Button createIssueButton;
     @FXML
-    private ListView<LogMessage> allMessages;
+    private ListView<LogEvent> allMessages;
     @FXML
     private Label descriptionLabel;
 
@@ -59,12 +66,14 @@ public class ErrorConsoleView extends FXMLView {
         errorConsole.setDialogPane(pane);
         errorConsole.setResizable(true);
         errorConsole.show();
+        Log log = LogFactory.getLog(this.getClass());
+        log.error("", new IndexOutOfBoundsException());
     }
 
     @FXML
     private void initialize() {
         listViewStyle();
-        allMessages.setItems(errorViewModel.getAllMessagesData());
+        allMessages.itemsProperty().bind(errorViewModel.allMessagesDataproperty());
         descriptionLabel.setGraphic(IconTheme.JabRefIcon.CONSOLE.getGraphicNode());
     }
 
@@ -90,38 +99,32 @@ public class ErrorConsoleView extends FXMLView {
     private void listViewStyle() {
         // Handler for listCell appearance (example for exception Cell)
         allMessages.setCellFactory(
-                new Callback<ListView<LogMessage>, ListCell<LogMessage>>() {
+                new Callback<ListView<LogEvent>, ListCell<LogEvent>>() {
                     @Override
-                    public ListCell<LogMessage> call(
-                            ListView<LogMessage> listView) {
-                        return new ListCell<LogMessage>() {
+                    public ListCell<LogEvent> call(
+                            ListView<LogEvent> listView) {
+                        return new ListCell<LogEvent>() {
 
                             @Override
-                            public void updateItem(LogMessage logMessage, boolean empty) {
+                            public void updateItem(LogEvent logMessage, boolean empty) {
                                 super.updateItem(logMessage, empty);
                                 if (logMessage != null) {
-                                    setText(logMessage.getMessage());
+                                    setText(logMessage.getMessage().toString());
 
-                                    MessageType prio = logMessage.getPriority();
-                                    switch (prio) {
-                                        case EXCEPTION:
-                                            getStyleClass().add("exception");
-                                            setGraphic(IconTheme.JabRefIcon.INTEGRITY_FAIL.getGraphicNode());
-                                            break;
-                                        case OUTPUT:
-                                            getStyleClass().add("output");
-                                            setGraphic(IconTheme.JabRefIcon.INTEGRITY_WARN.getGraphicNode());
-                                            break;
-                                        case LOG:
-                                            getStyleClass().add("log");
-                                            setGraphic(IconTheme.JabRefIcon.INTEGRITY_INFO.getGraphicNode());
-                                            break;
-                                        default:
-                                            break;
+                                    Level prio = logMessage.getLevel();
+                                    if (prio.equals(ERROR)) {
+                                        getStyleClass().add("exception");
+                                        setGraphic(IconTheme.JabRefIcon.INTEGRITY_FAIL.getGraphicNode());
+                                    } else if (prio.equals(WARN)) {
+                                        getStyleClass().add("output");
+                                        setGraphic(IconTheme.JabRefIcon.INTEGRITY_WARN.getGraphicNode());
+                                    } else if (prio.equals(INFO)) {
+                                        getStyleClass().add("log");
+                                        setGraphic(IconTheme.JabRefIcon.INTEGRITY_INFO.getGraphicNode());
+                                    } else {
+                                        setText(null);
+                                        setGraphic(null);
                                     }
-                                } else {
-                                    setText(null);
-                                    setGraphic(null);
                                 }
                             }
                         };

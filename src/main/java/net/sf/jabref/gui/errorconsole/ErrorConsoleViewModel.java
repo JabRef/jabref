@@ -21,14 +21,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import javafx.collections.ObservableList;
+import javafx.beans.property.ListProperty;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.FXDialogs;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
-import net.sf.jabref.logic.error.LogMessage;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.logging.LogMessages;
 import net.sf.jabref.logic.util.BuildInfo;
@@ -36,15 +35,16 @@ import net.sf.jabref.logic.util.BuildInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.logging.log4j.core.LogEvent;
 
 public class ErrorConsoleViewModel {
 
     private static final Log LOGGER = LogFactory.getLog(ErrorConsoleViewModel.class);
     private final DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
     private final Date date = new Date();
-    private ObservableList<LogMessage> allMessagesData = LogMessages.getInstance().messagesProperty();
+    private ListProperty<LogEvent> allMessagesData = LogMessages.getInstance().messagesProperty();
 
-    public ObservableList<LogMessage> getAllMessagesData(){
+    public ListProperty<LogEvent> allMessagesDataproperty(){
         return this.allMessagesData;
     }
 
@@ -54,8 +54,8 @@ public class ErrorConsoleViewModel {
      */
     private String getLogMessagesAsString (){
         StringBuilder logMessagesContent = new StringBuilder();
-        for (LogMessage message : getAllMessagesData()) {
-            logMessagesContent.append(message.getMessage() + System.lineSeparator());
+        for (LogEvent message : allMessagesDataproperty()) {
+            logMessagesContent.append(message.getMessage().toString() + System.lineSeparator());
         }
         return logMessagesContent.toString();
     }

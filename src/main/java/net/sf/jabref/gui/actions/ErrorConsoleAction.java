@@ -8,9 +8,7 @@ import javax.swing.Action;
 import javafx.application.Platform;
 
 import net.sf.jabref.gui.errorconsole.ErrorConsoleView;
-import net.sf.jabref.logic.error.StreamEavesdropper;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.logging.Cache;
 
 /**
  * Such an error console can be
@@ -21,7 +19,7 @@ import net.sf.jabref.logic.logging.Cache;
  */
 public class ErrorConsoleAction extends AbstractAction {
 
-    public ErrorConsoleAction(StreamEavesdropper streamEavesdropper, Cache cache) {
+    public ErrorConsoleAction() {
         super(Localization.menuTitle("View event log"));
         putValue(Action.SHORT_DESCRIPTION, Localization.lang("Display all error messages"));
     }

@@ -1,16 +1,14 @@
 package net.sf.jabref.logic.logging;
 
-import javafx.beans.Observable;
 import javafx.beans.property.ListProperty;
 import javafx.beans.property.SimpleListProperty;
 import javafx.collections.FXCollections;
 
-import net.sf.jabref.logic.error.LogMessage;
+import org.apache.logging.log4j.core.LogEvent;
 
 /**
- * This call saves all messages in a list.
- * <p></p>
- * The list is used in ErrorConsoleViewModel to filter messages according to their priority.
+ * This class is used for storing and archiving all message output of JabRef as log events.
+ * To listen to changes on the stored logs one can bind to the {@code messagesProperty}.
  */
 public class LogMessages {
 
@@ -23,14 +21,13 @@ public class LogMessages {
         return instance;
     }
 
-    private final ListProperty<LogMessage> messages = new SimpleListProperty<>(FXCollections.observableArrayList((item ->
-            new Observable[]{item.isFilteredProperty()})));
+    private final ListProperty<LogEvent> messages = new SimpleListProperty<>(FXCollections.observableArrayList());
 
-    public ListProperty<LogMessage> messagesProperty() {
+    public ListProperty<LogEvent> messagesProperty() {
         return messages;
     }
 
-    public void add(LogMessage s) {
+    public void add(LogEvent s) {
         messages.add(s);
     }
 
