@@ -256,11 +256,18 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         return jPanel;
     }
 
+    private void stopFetching() {
+        if (fetcherWorker.getState() == SwingWorker.StateValue.STARTED) {
+            fetcherWorker.cancel(true);
+        }
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof TypeButton) {
             type = ((TypeButton) e.getSource()).getType();
         }
+        stopFetching();
         dispose();
     }
 
@@ -276,7 +283,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            fetcherWorker.cancel(true);
+            stopFetching();
             dispose();
         }
     }
