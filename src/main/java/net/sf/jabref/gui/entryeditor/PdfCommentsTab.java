@@ -68,6 +68,7 @@ public class PdfCommentsTab extends JPanel {
 
     HashMap<String, PdfComment> importedNotes = new HashMap<>();
 
+
     public PdfCommentsTab(EntryEditor parent, JabRefFrame frame, BasePanel basePanel) {
         this.parent = parent;
         this.frame = frame;
@@ -152,7 +153,6 @@ public class PdfCommentsTab extends JPanel {
                 .add(commentTxtScrollPane).xy(3,9)
                 .add(this.setUpButtons()).xy(3,11)
                 .build();
-
 
         fileNameScrollPane.setViewportView(filenameArea);
         fileNameScrollPane.setBorder(null);
