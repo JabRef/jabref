@@ -20,7 +20,7 @@ import org.jbibtex.TokenMgrError;
 
 
 /**
- * WARNING: The generation of a citation may take some time, better call it in outside the main Thread
+ * WARNING: the citation is generated with JavaScript which may take some time, better call it in outside the main Thread
  */
 public class CitationStyleGenerator {
 
@@ -31,17 +31,17 @@ public class CitationStyleGenerator {
 
     /**
      * Generates a Citation based on the given entry and style
-     * WARNING: this may take some time, better call it in outside the main Thread
+     * WARNING: the citation is generated with JavaScript which may take some time, better call it in outside the main Thread
      */
-    public static String generateCitation(BibEntry entry, String style) {
+    static String generateCitation(BibEntry entry, String style) {
         return generateCitation(entry, style, CitationStyleOutputFormat.HTML);
     }
 
     /**
      * Generates a Citation based on the given entry, style, and output format
-     * WARNING: this may take some time, better call it in outside the main Thread
+     * WARNING: the citation is generated with JavaScript which may take some time, better call it in outside the main Thread
      */
-    public static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat) {
+    static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat) {
         try {
             BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(entry.getType()), new Key(entry.getCiteKey()));
             for (Map.Entry<String, String> field : entry.getFieldMap().entrySet()) {
