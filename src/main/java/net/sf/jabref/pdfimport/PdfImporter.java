@@ -245,7 +245,6 @@ public class PdfImporter {
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
             EntryEditor editor = panel.getEntryEditor(entry);
             panel.showEntryEditor(editor);
-            panel.adjustSplitter();
         }
         res.add(entry);
     }

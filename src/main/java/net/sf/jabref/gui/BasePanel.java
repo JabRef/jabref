@@ -1695,7 +1695,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             newEntryShowing(editor.getEntry());
         }
         adjustSplitter();
-
     }
 
     /**
