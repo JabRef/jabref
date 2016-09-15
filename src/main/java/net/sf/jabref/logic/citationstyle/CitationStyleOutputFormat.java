@@ -9,10 +9,14 @@ public enum CitationStyleOutputFormat {
     FO("fo"),
     RTF("rtf");
 
-    public final String format;
+    private final String format;
 
     CitationStyleOutputFormat(String format) {
         this.format = format;
+    }
+
+    public String getFormat() {
+        return format;
     }
 
     @Override

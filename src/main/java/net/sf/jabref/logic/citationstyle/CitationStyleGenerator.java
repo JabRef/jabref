@@ -50,7 +50,7 @@ public class CitationStyleGenerator {
             }
 
             CSLItemData cslItemData = BIBTEX_CONVERTER.toItemData(bibTeXEntry);
-            Bibliography bibliography = CSL.makeAdhocBibliography(style, cslItemData);
+            Bibliography bibliography = CSL.makeAdhocBibliography(style, outputFormat.getFormat(), cslItemData);
             return bibliography.getEntries()[0];
 
         } catch (IOException  e) {
