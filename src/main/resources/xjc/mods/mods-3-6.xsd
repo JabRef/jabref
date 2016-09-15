@@ -167,7 +167,7 @@ End list of "top level" MODS elements
 		<xs:simpleContent>
 			<xs:extension base="stringPlusLanguage">
 				<xs:attribute name="displayLabel" type="xs:string"/>
-				<xs:attribute name="typeValue" type="xs:string"/>
+				<xs:attribute name="type" type="xs:string"/>
 				<xs:attributeGroup ref="xlink:simpleLink"/>
 				<xs:attribute name="shareable" fixed="no"/>
 				<xs:attribute name="altRepGroup" type="xs:string"/>
@@ -188,7 +188,7 @@ End list of "top level" MODS elements
 			<xs:extension base="extensionDefinition">
 				<xs:attributeGroup ref="xlink:simpleLink"/>
 				<xs:attributeGroup ref="languageAttributeGroup"/>
-				<xs:attribute name="typeValue" type="xs:string"/>
+				<xs:attribute name="type" type="xs:string"/>
 				<xs:attribute name="altRepGroup" type="xs:string"/>
 				<xs:attributeGroup ref="altFormatAttributeGroup"/>
 			</xs:extension>
@@ -351,7 +351,7 @@ End list of "top level" MODS elements
 			<xs:extension base="stringPlusLanguagePlusAuthority">
 				<xs:attributeGroup ref="xlink:simpleLink"/>
 				<xs:attribute name="displayLabel" type="xs:string"/>
-				<xs:attribute name="typeValue" type="xs:string"/>
+				<xs:attribute name="type" type="xs:string"/>
 			</xs:extension>
 		</xs:simpleContent>
 	</xs:complexType>
@@ -383,7 +383,7 @@ End list of "top level" MODS elements
 					<xs:simpleContent>
 						<xs:extension base="stringPlusLanguage">
 							<xs:attribute name="displayLabel" type="xs:string"/>
-							<xs:attribute name="typeValue" type="xs:string"/>
+							<xs:attribute name="type" type="xs:string"/>
 							<xs:attributeGroup ref="xlink:simpleLink"/>
 							<xs:attribute name="ID" type="xs:ID"/>
 						</xs:extension>
@@ -541,7 +541,7 @@ Choice two.	With <etal>.
 		<xs:attribute name="altRepGroup" type="xs:string"/>
 		<xs:attribute name="nameTitleGroup" type="xs:string"/>
 		<xs:attribute name="usage" fixed="primary"/>
-		<xs:attribute name="typeValue">
+		<xs:attribute name="type">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="personal"/>
@@ -620,7 +620,7 @@ Choice two.	With <etal>.
 		<xs:simpleContent>
 			<xs:extension base="stringPlusLanguage">
 				<xs:attribute name="displayLabel" type="xs:string"/>
-				<xs:attribute name="typeValue" type="xs:string"/>
+				<xs:attribute name="type" type="xs:string"/>
 				<xs:attribute name="typeURI" type="xs:anyURI"/>
 				<xs:attributeGroup ref="xlink:simpleLink"/>
 				<xs:attribute name="ID" type="xs:ID"/>
@@ -849,7 +849,7 @@ Choice two.	With <etal>.
 			<xs:simpleContent>
 				<xs:extension base="stringPlusLanguage">
 					<xs:attribute name="displayLabel" type="xs:string"/>
-					<xs:attribute name="typeValue" type="xs:string"/>
+					<xs:attribute name="type" type="xs:string"/>
 					<xs:attributeGroup ref="xlink:simpleLink"/>
 				</xs:extension>
 			</xs:simpleContent>
@@ -929,7 +929,7 @@ Choice two.	With <etal>.
 		<xs:simpleContent>
 			<xs:extension base="stringPlusLanguage">
 				<xs:attribute name="displayLabel" type="xs:string"/>
-				<xs:attribute name="typeValue" type="xs:string"/>
+				<xs:attribute name="type" type="xs:string"/>
 				<xs:attribute name="typeURI" type="xs:anyURI"/>
 				<xs:attributeGroup ref="xlink:simpleLink"/>
 				<xs:attribute name="ID" type="xs:ID"/>
@@ -1001,7 +1001,7 @@ Choice two.	With <etal>.
 	<!-- -->
 	<xs:complexType name="relatedItemDefinition">
 		<xs:group ref="modsGroup" minOccurs="0" maxOccurs="unbounded"/>
-		<xs:attribute name="typeValue">
+		<xs:attribute name="type">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="preceding"/>
@@ -1097,7 +1097,7 @@ Choice two.	With <etal>.
 		<xs:attributeGroup ref="xlink:simpleLink"/>
 		<xs:attributeGroup ref="languageAttributeGroup"/>
 		<xs:attribute name="displayLabel" type="xs:string"/>
-		<xs:attribute name="typeValue">
+		<xs:attribute name="type">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="abbreviated"/>
@@ -1122,7 +1122,7 @@ Choice two.	With <etal>.
 			<xs:element ref="nameIdentifier"/>
 			<!-- -->
 		</xs:choice>
-		<xs:attribute name="typeValue">
+		<xs:attribute name="type">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="personal"/>
@@ -1300,7 +1300,7 @@ Choice two.	With <etal>.
 		<xs:simpleContent>
 			<xs:extension base="stringPlusLanguage">
 				<xs:attribute name="displayLabel" type="xs:string"/>
-				<xs:attribute name="typeValue" type="xs:string"/>
+				<xs:attribute name="type" type="xs:string"/>
 				<xs:attributeGroup ref="xlink:simpleLink"/>
 				<xs:attribute name="shareable" fixed="no"/>
 				<xs:attribute name="altRepGroup" type="xs:string"/>
@@ -1339,7 +1339,7 @@ Choice two.	With <etal>.
 			<xs:element ref="partName"/>
 			<xs:element ref="nonSort"/>
 		</xs:choice>
-		<xs:attribute name="typeValue">
+		<xs:attribute name="type">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
 					<xs:enumeration value="abbreviated"/>
@@ -1481,7 +1481,8 @@ String Definitions
   ********** languageAttributeGroup   **********  	                       	  
 -->
 	<xs:attributeGroup name="languageAttributeGroup">
-		<xs:attribute name="langValue" type="xs:string"/>
+		<xs:attribute name="lang" type="xs:string"/>
+		<xs:attribute ref="xml:lang"/>
 		<xs:attribute name="script" type="xs:string"/>
 		<xs:attribute name="transliteration" type="xs:string"/>
 	</xs:attributeGroup>

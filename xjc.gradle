@@ -25,6 +25,7 @@ task xjc {
         }
         ant.xjc(destdir: 'src/main/gen/', package: 'net.sf.jabref.logic.importer.fileformat.mods') {
             schema(dir: 'src/main/resources/xjc/mods', includes: 'mods-3-6.xsd')
+            binding(dir: 'src/main/resources/xjc/mods', includes: 'mods-binding.xjb')
         }
     }
 }

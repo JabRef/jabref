@@ -343,11 +343,11 @@ public class ModsImporter extends ImportFormat {
         }
     }
 
-    private void putPlaceOrPublisherOrDate(Map<String, String> fields, String elementName, Object value) {
-        Optional<IssuanceDefinition> issuanceDefinition = getElement(elementName, IssuanceDefinition.class);
-        Optional<PlaceDefinition> placeDefinition = getElement(elementName, PlaceDefinition.class);
-        Optional<DateDefinition> dateDefinition = getElement(elementName, DateDefinition.class);
-        Optional<StringPlusLanguagePlusSupplied> publisherOrEdition = getElement(elementName,
+    private void putPlaceOrPublisherOrDate(Map<String, String> fields, String elementName, Object object) {
+        Optional<IssuanceDefinition> issuanceDefinition = getElement(object, IssuanceDefinition.class);
+        Optional<PlaceDefinition> placeDefinition = getElement(object, PlaceDefinition.class);
+        Optional<DateDefinition> dateDefinition = getElement(object, DateDefinition.class);
+        Optional<StringPlusLanguagePlusSupplied> publisherOrEdition = getElement(object,
                 StringPlusLanguagePlusSupplied.class);
 
         issuanceDefinition.ifPresent(issuance -> putIfValueNotNull(fields, "issuance", issuance.value()));
@@ -414,7 +414,7 @@ public class ModsImporter extends ImportFormat {
             String elementName = element.getName().getLocalPart();
             if (value instanceof NamePartDefinition) {
                 NamePartDefinition namePart = (NamePartDefinition) value;
-                String type = namePart.getType();
+                String type = namePart.getAtType();
                 if ((type == null) && (namePart.getValue() != null)) {
                     authors.add(namePart.getValue());
                 }
