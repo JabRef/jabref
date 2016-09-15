@@ -15,6 +15,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.mods.AbstractDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.DateDefinition;
@@ -35,7 +36,6 @@ import net.sf.jabref.logic.importer.fileformat.mods.NoteDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.OriginInfoDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.PartDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.PlaceDefinition;
-import net.sf.jabref.logic.importer.fileformat.mods.PlaceTermDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.RecordInfoDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.RelatedItemDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.StringPlusLanguage;
@@ -128,81 +128,55 @@ public class ModsImporter extends ImportFormat {
         List<String> keywords = new ArrayList<>();
         List<String> authors = new ArrayList<>();
         List<String> notes = new ArrayList<>();
+
         for (Object groupElement : modsGroup) {
 
-            //Get the element. Only one of the elements should be not an empty optional. This element will be catched
-            //by the if clauses below.
+            //Get the element. Only one of the elements should be not an empty optional.
             Optional<AbstractDefinition> abstractDefinition = getElement(groupElement, AbstractDefinition.class);
-            Optional<GenreDefinition> genre = getElement(groupElement, GenreDefinition.class);
+            Optional<GenreDefinition> genreDefinition = getElement(groupElement, GenreDefinition.class);
             Optional<LanguageDefinition> languageDefinition = getElement(groupElement, LanguageDefinition.class);
-            Optional<LocationDefinition> location = getElement(groupElement, LocationDefinition.class);
-            Optional<NameDefinition> name = getElement(groupElement, NameDefinition.class);
-            Optional<OriginInfoDefinition> originInfo = getElement(groupElement, OriginInfoDefinition.class);
-            Optional<RecordInfoDefinition> recordInfo = getElement(groupElement, RecordInfoDefinition.class);
-            Optional<NoteDefinition> note = getElement(groupElement, NoteDefinition.class);
-            Optional<RelatedItemDefinition> relatedItem = getElement(groupElement, RelatedItemDefinition.class);
-            Optional<SubjectDefinition> subject = getElement(groupElement, SubjectDefinition.class);
+            Optional<LocationDefinition> locationDefinition = getElement(groupElement, LocationDefinition.class);
+            Optional<NameDefinition> nameDefinition = getElement(groupElement, NameDefinition.class);
+            Optional<OriginInfoDefinition> originInfoDefinition = getElement(groupElement, OriginInfoDefinition.class);
+            Optional<RecordInfoDefinition> recordInfoDefinition = getElement(groupElement, RecordInfoDefinition.class);
+            Optional<NoteDefinition> noteDefinition = getElement(groupElement, NoteDefinition.class);
+            Optional<RelatedItemDefinition> relatedItemDefinition = getElement(groupElement,
+                    RelatedItemDefinition.class);
+            Optional<SubjectDefinition> subjectDefinition = getElement(groupElement, SubjectDefinition.class);
             Optional<IdentifierDefinition> identifierDefinition = getElement(groupElement, IdentifierDefinition.class);
-            Optional<TitleInfoDefinition> titleInfo = getElement(groupElement, TitleInfoDefinition.class);
+            Optional<TitleInfoDefinition> titleInfoDefinition = getElement(groupElement, TitleInfoDefinition.class);
 
-            if (abstractDefinition.isPresent()) {
-                putIfValueNotNull(fields, FieldName.ABSTRACT, abstractDefinition.get().getValue());
-            } else if (genre.isPresent()) {
-                entry.setType(genre.get().getValue());
-            } else if (languageDefinition.isPresent()) {
-                List<LanguageTermDefinition> languageTerms = languageDefinition.get().getLanguageTerm();
-                languageTerms.stream().map(languageTerm -> languageTerm.getValue())
-                        .forEach(language -> putIfValueNotNull(fields, FieldName.LANGUAGE, language));
-            } else if (location.isPresent()) {
-                parseLocationAndUrl(fields, location.get());
-            } else if (name.isPresent()) {
-                handleAuthorsInNamePart(name.get(), authors, fields);
-            } else if (originInfo.isPresent()) {
+            //Now parse the information if the element is present
+            abstractDefinition
+                    .ifPresent(abstractDef -> putIfValueNotNull(fields, FieldName.ABSTRACT, abstractDef.getValue()));
 
-                originInfo.get().getPlaceOrPublisherOrDateIssued().stream()
-                        .forEach(element -> putPlaceOrPublisherOrDate(fields, element.getName().getLocalPart(),
-                                element.getValue()));
-            } else if (recordInfo.isPresent()) {
-                parseRecordInfo(fields, recordInfo.get());
-            } else if (note.isPresent()) {
-                notes.add(note.get().getValue());
-            } else if (relatedItem.isPresent()) {
-                List<Object> relatedModsGroup = relatedItem.get().getModsGroup();
-                parseRelatedModsGroup(fields, relatedModsGroup);
-            } else if (subject.isPresent()) {
-                List<JAXBElement<?>> topicOrGeographicOrTemporal = subject.get().getTopicOrGeographicOrTemporal();
-                for (JAXBElement<?> jaxbElement : topicOrGeographicOrTemporal) {
-                    Object value = jaxbElement.getValue();
-                    String elementName = jaxbElement.getName().getLocalPart();
-                    if (value instanceof HierarchicalGeographicDefinition) {
-                        HierarchicalGeographicDefinition hierarchichalGeographic = (HierarchicalGeographicDefinition) value;
-                        parseGeographicInformation(fields, hierarchichalGeographic);
-                    } else if ((value instanceof StringPlusLanguagePlusAuthority) && "topic".equals(elementName)) {
-                        StringPlusLanguagePlusAuthority topic = (StringPlusLanguagePlusAuthority) value;
-                        keywords.add(topic.getValue());
-                    }
-                }
-            } else if (identifierDefinition.isPresent()) {
-                IdentifierDefinition identifier = identifierDefinition.get();
-                String type = identifier.getType();
-                if ("citekey".equals(type) && !entry.getCiteKeyOptional().isPresent()) {
-                    entry.setCiteKey(identifier.getValue());
-                } else if (!"local".equals(type) && !"citekey".equals(type)) {
-                    //put all identifiers (doi, issn, isbn,...) except of local and citekey
-                    putIfValueNotNull(fields, identifier.getType(), identifier.getValue());
-                }
-            } else if (titleInfo.isPresent()) {
-                List<Object> titleOrSubTitleOrPartNumber = titleInfo.get().getTitleOrSubTitleOrPartNumber();
-                for (Object object : titleOrSubTitleOrPartNumber) {
-                    if (object instanceof JAXBElement) {
-                        JAXBElement<StringPlusLanguage> element = (JAXBElement<StringPlusLanguage>) object;
-                        if ("title".equals(element.getName().getLocalPart())) {
-                            StringPlusLanguage title = element.getValue();
-                            fields.put(FieldName.TITLE, title.getValue());
-                        }
-                    }
-                }
-            }
+            genreDefinition.ifPresent(genre -> entry.setType(genre.getValue()));
+
+            languageDefinition.ifPresent(
+                    languageDef -> languageDef.getLanguageTerm().stream().map(languageTerm -> languageTerm.getValue())
+                            .forEach(language -> putIfValueNotNull(fields, FieldName.LANGUAGE, language)));
+
+            locationDefinition.ifPresent(location -> parseLocationAndUrl(fields, location));
+
+            nameDefinition.ifPresent(name -> handleAuthorsInNamePart(name, authors, fields));
+
+            originInfoDefinition.ifPresent(originInfo -> originInfo.getPlaceOrPublisherOrDateIssued().stream()
+                    .forEach(element -> putPlaceOrPublisherOrDate(fields, element.getName().getLocalPart(),
+                            element.getValue())));
+
+            recordInfoDefinition.ifPresent(recordInfo -> parseRecordInfo(fields, recordInfo));
+
+            noteDefinition.ifPresent(note -> notes.add(note.getValue()));
+
+            relatedItemDefinition.ifPresent(relatedItem -> parseRelatedModsGroup(fields, relatedItem.getModsGroup()));
+
+            subjectDefinition
+                    .ifPresent(subject -> parseTopic(fields, subject.getTopicOrGeographicOrTemporal(), keywords));
+
+            identifierDefinition.ifPresent(identifier -> parseIdentifier(fields, identifier, entry));
+
+            titleInfoDefinition.ifPresent(titleInfo -> parseTitle(fields, titleInfo.getTitleOrSubTitleOrPartNumber()));
+
         }
 
         //The element subject can appear more than one time, that's why the keywords has to be put out of the for loop
@@ -211,6 +185,43 @@ public class ModsImporter extends ImportFormat {
         putIfListIsNotEmpty(fields, authors, FieldName.AUTHOR, " and ");
         putIfListIsNotEmpty(fields, notes, FieldName.NOTE, ", ");
 
+    }
+
+    private void parseTitle(Map<String, String> fields, List<Object> titleOrSubTitleOrPartNumber) {
+        for (Object object : titleOrSubTitleOrPartNumber) {
+            if (object instanceof JAXBElement) {
+                JAXBElement<StringPlusLanguage> element = (JAXBElement<StringPlusLanguage>) object;
+                if ("title".equals(element.getName().getLocalPart())) {
+                    StringPlusLanguage title = element.getValue();
+                    fields.put(FieldName.TITLE, title.getValue());
+                }
+            }
+        }
+    }
+
+    private void parseIdentifier(Map<String, String> fields, IdentifierDefinition identifier, BibEntry entry) {
+        String type = identifier.getType();
+        if ("citekey".equals(type) && !entry.getCiteKeyOptional().isPresent()) {
+            entry.setCiteKey(identifier.getValue());
+        } else if (!"local".equals(type) && !"citekey".equals(type)) {
+            //put all identifiers (doi, issn, isbn,...) except of local and citekey
+            putIfValueNotNull(fields, identifier.getType(), identifier.getValue());
+        }
+    }
+
+    private void parseTopic(Map<String, String> fields, List<JAXBElement<?>> topicOrGeographicOrTemporal,
+            List<String> keywords) {
+        for (JAXBElement<?> jaxbElement : topicOrGeographicOrTemporal) {
+            Object value = jaxbElement.getValue();
+            String elementName = jaxbElement.getName().getLocalPart();
+            if (value instanceof HierarchicalGeographicDefinition) {
+                HierarchicalGeographicDefinition hierarchichalGeographic = (HierarchicalGeographicDefinition) value;
+                parseGeographicInformation(fields, hierarchichalGeographic);
+            } else if ((value instanceof StringPlusLanguagePlusAuthority) && "topic".equals(elementName)) {
+                StringPlusLanguagePlusAuthority topic = (StringPlusLanguagePlusAuthority) value;
+                keywords.add(topic.getValue());
+            }
+        }
     }
 
     /**
@@ -333,47 +344,58 @@ public class ModsImporter extends ImportFormat {
     }
 
     private void putPlaceOrPublisherOrDate(Map<String, String> fields, String elementName, Object value) {
-        if (value instanceof IssuanceDefinition) {
-            IssuanceDefinition issuance = (IssuanceDefinition) value;
-            putIfValueNotNull(fields, "issuance", issuance.value());
-        } else if (value instanceof PlaceDefinition) {
-            PlaceDefinition place = (PlaceDefinition) value;
-            List<PlaceTermDefinition> placeTerms = place.getPlaceTerm();
-            List<String> places = placeTerms.stream().filter(placeTerm -> placeTerm.getValue() != null)
-                    .map(element -> element.getValue()).collect(Collectors.toList());
-            putIfListIsNotEmpty(fields, places, FieldName.ADDRESS, ", ");
-        } else if (value instanceof DateDefinition) {
-            DateDefinition date = (DateDefinition) value;
-            if (date.getValue() != null) {
-                switch (elementName) {
+        Optional<IssuanceDefinition> issuanceDefinition = getElement(elementName, IssuanceDefinition.class);
+        Optional<PlaceDefinition> placeDefinition = getElement(elementName, PlaceDefinition.class);
+        Optional<DateDefinition> dateDefinition = getElement(elementName, DateDefinition.class);
+        Optional<StringPlusLanguagePlusSupplied> publisherOrEdition = getElement(elementName,
+                StringPlusLanguagePlusSupplied.class);
 
-                case "dateIssued":
-                    //The first 4 digits of dateIssued should be the year
+        issuanceDefinition.ifPresent(issuance -> putIfValueNotNull(fields, "issuance", issuance.value()));
+
+        List<String> places = new ArrayList<>();
+        placeDefinition
+                .ifPresent(place -> place.getPlaceTerm().stream().filter(placeTerm -> placeTerm.getValue() != null)
+                        .map(element -> element.getValue()).forEach(element -> places.add(element)));
+        putIfListIsNotEmpty(fields, places, FieldName.ADDRESS, ", ");
+
+        dateDefinition.ifPresent(date -> putDate(fields, elementName, date));
+
+        publisherOrEdition.ifPresent(pubOrEd -> putPublisherOrEdition(fields, elementName, pubOrEd));
+    }
+
+    private void putPublisherOrEdition(Map<String, String> fields, String elementName,
+            StringPlusLanguagePlusSupplied pubOrEd) {
+        if ("publisher".equals(elementName)) {
+            putIfValueNotNull(fields, FieldName.PUBLISHER, pubOrEd.getValue());
+        } else if ("edition".equals(elementName)) {
+            putIfValueNotNull(fields, FieldName.EDITION, pubOrEd.getValue());
+        }
+    }
+
+    private void putDate(Map<String, String> fields, String elementName, DateDefinition date) {
+        if (date.getValue() != null) {
+            switch (elementName) {
+
+            case "dateIssued":
+                //The first 4 digits of dateIssued should be the year
+                fields.put(FieldName.YEAR, date.getValue().substring(0, 4));
+                break;
+            case "dateCreated":
+                //If there was no year in date issued, then take the year from date created
+                if (fields.get(FieldName.YEAR) == null) {
                     fields.put(FieldName.YEAR, date.getValue().substring(0, 4));
-                    break;
-                case "dateCreated":
-                    //If there was no year in date issued, then take the year from date created
-                    if (fields.get(FieldName.YEAR) == null) {
-                        fields.put(FieldName.YEAR, date.getValue().substring(0, 4));
-                    }
-                    fields.put("created", date.getValue());
-                    break;
-                case "dateCaptured":
-                    fields.put("captured", date.getValue());
-                    break;
-                case "dateModified":
-                    fields.put("modified", date.getValue());
-                    break;
-                default:
-                    break;
                 }
+                fields.put("created", date.getValue());
+                break;
+            case "dateCaptured":
+                fields.put("captured", date.getValue());
+                break;
+            case "dateModified":
+                fields.put("modified", date.getValue());
+                break;
+            default:
+                break;
             }
-        } else if ((value instanceof StringPlusLanguagePlusSupplied) && "publisher".equals(elementName)) {
-            StringPlusLanguagePlusSupplied publisher = (StringPlusLanguagePlusSupplied) value;
-            putIfValueNotNull(fields, FieldName.PUBLISHER, publisher.getValue());
-        } else if ((value instanceof StringPlusLanguagePlusSupplied) && "edition".equals(elementName)) {
-            StringPlusLanguagePlusSupplied edition = (StringPlusLanguagePlusSupplied) value;
-            putIfValueNotNull(fields, FieldName.EDITION, edition.getValue());
         }
     }
 
