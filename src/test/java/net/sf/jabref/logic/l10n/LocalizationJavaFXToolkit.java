@@ -7,6 +7,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.security.AccessControlContext;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,6 @@ import javafx.stage.Modality;
 import javafx.stage.StageStyle;
 import javafx.stage.Window;
 
-import com.sun.glass.ui.Application;
 import com.sun.glass.ui.CommonDialogs;
 import com.sun.glass.ui.Screen;
 import com.sun.javafx.application.PlatformImpl;
@@ -320,7 +320,7 @@ public class LocalizationJavaFXToolkit extends Toolkit {
 
         try {
             // Ensure that the toolkit can only be started here
-            Application.run(this::runToolkit);
+            runToolkit();
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -735,12 +735,12 @@ public class LocalizationJavaFXToolkit extends Toolkit {
 
     @Override
     public Object getPrimaryScreen() {
-        return Screen.getMainScreen();
+        return null;
     }
 
     @Override
     public List<?> getScreens() {
-        return Screen.getScreens();
+        return Collections.emptyList();
     }
 
     @Override
