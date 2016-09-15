@@ -32,7 +32,6 @@ import net.sf.jabref.gui.fieldeditors.FileListEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.model.entry.BibEntry;
@@ -260,7 +259,7 @@ class EntryEditorTab {
             /**
              * Corrected to fix [ 1594169 ] Entry editor: navigation between panels
              */
-            new FocusRequester(activeField.getTextComponent());
+            activeField.getTextComponent().requestFocus();
         }
     }
 

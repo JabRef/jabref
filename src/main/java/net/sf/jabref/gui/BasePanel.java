@@ -83,7 +83,6 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.CallBack;
@@ -308,7 +307,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.UNDO, undoAction);
         actions.put(Actions.REDO, redoAction);
 
-        actions.put(Actions.FOCUS_TABLE, (BaseAction) () -> new FocusRequester(mainTable));
+        actions.put(Actions.FOCUS_TABLE, (BaseAction) () -> {
+            mainTable.requestFocus();
+        });
 
         // The action for opening an entry editor.
         actions.put(Actions.EDIT, (BaseAction) selectionListener::editSignalled);
@@ -1158,7 +1159,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 highlightEntry(be);
 
                 markBaseChanged(); // The database just changed.
-                new FocusRequester(getEntryEditor(be));
+                getEntryEditor(be).requestFocus();
 
                 return be;
             } catch (KeyCollisionException ex) {
@@ -1328,7 +1329,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             selectionListener.editSignalled();
             final EntryEditor editor = getEntryEditor(entries.get(0));
             editor.setFocusToField(fieldName);
-            new FocusRequester(editor);
+            editor.requestFocus();
         }
     }
 
