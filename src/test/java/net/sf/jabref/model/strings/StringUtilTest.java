@@ -1,10 +1,9 @@
-package net.sf.jabref.model.util;
+package net.sf.jabref.model.strings;
 
 import java.util.Optional;
 
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.FileField;
-import net.sf.jabref.model.strings.StringUtil;
 
 import org.junit.Test;
 
