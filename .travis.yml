@@ -20,6 +20,9 @@ services:
   - postgresql
   - mysql
 
+env:
+  - GRADLE_OPTS=-Dorg.gradle.daemon=false
+
 # skip installation as this is also done during the script step
 install: true
 
