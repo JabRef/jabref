@@ -21,7 +21,7 @@ import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.metadata.MetaData;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 public class FieldFormatterCleanups {
 
@@ -106,7 +106,7 @@ public class FieldFormatterCleanups {
         // first remove all newlines for easier parsing
         String remainingString = formatterString;
 
-        remainingString = ModelStringUtil.unifyLineBreaksToConfiguredLineBreaks(remainingString, OS.NEWLINE).replaceAll(OS.NEWLINE, "");
+        remainingString = StringUtil.unifyLineBreaksToConfiguredLineBreaks(remainingString, OS.NEWLINE).replaceAll(OS.NEWLINE, "");
         try {
             while (startIndex < formatterString.length()) {
                 // read the field name

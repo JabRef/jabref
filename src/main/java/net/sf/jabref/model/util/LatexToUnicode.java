@@ -2,6 +2,8 @@ package net.sf.jabref.model.util;
 
 import java.util.Map;
 
+import net.sf.jabref.model.strings.StringUtil;
+
 public class LatexToUnicode {
 
     private static final Map<String, String> CHARS = HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP;
@@ -47,7 +49,7 @@ public class LatexToUnicode {
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             } else if (Character.isLetter(c) || (c == '%')
-                    || ModelStringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
+                    || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
 
                 if (!incommand) {
@@ -55,7 +57,7 @@ public class LatexToUnicode {
                 } else {
                     currentCommand.append(c);
                     if ((currentCommand.length() == 1)
-                            && ModelStringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())
+                            && StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())
                             && !(i >= (field.length() - 1))) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
@@ -65,7 +67,7 @@ public class LatexToUnicode {
                         c = field.charAt(i);
                         String commandBody;
                         if (c == '{') {
-                            String part = ModelStringUtil.getPart(field, i, false);
+                            String part = StringUtil.getPart(field, i, false);
                             i += part.length();
                             commandBody = part;
                         } else {
@@ -119,7 +121,7 @@ public class LatexToUnicode {
                     String command = currentCommand.toString();
 
                     if (c == '{') {
-                        String argument = ModelStringUtil.getPart(field, i, true);
+                        String argument = StringUtil.getPart(field, i, true);
                         i += argument.length();
                         // handle common case of general latex command
                         String result = CHARS.get(command + argument);

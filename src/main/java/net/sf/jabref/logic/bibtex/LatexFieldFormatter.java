@@ -5,7 +5,7 @@ import java.util.List;
 
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * Currently the only implementation of net.sf.jabref.exporter.FieldFormatter
@@ -250,7 +250,7 @@ public class LatexFieldFormatter {
     }
 
     private void putIn(String s) {
-        stringBuilder.append(ModelStringUtil.wrap(s, prefs.getLineLength(), OS.NEWLINE));
+        stringBuilder.append(StringUtil.wrap(s, prefs.getLineLength(), OS.NEWLINE));
     }
 
     private static void checkBraces(String text) throws IllegalArgumentException {

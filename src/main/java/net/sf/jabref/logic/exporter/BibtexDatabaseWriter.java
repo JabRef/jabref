@@ -15,7 +15,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.metadata.MetaData;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWriter<E> {
 
@@ -30,7 +30,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
 
     @Override
     protected void writeEpilogue(String epilogue) throws SaveException {
-        if (!ModelStringUtil.isNullOrEmpty(epilogue)) {
+        if (!StringUtil.isNullOrEmpty(epilogue)) {
             try {
                 getWriter().write(OS.NEWLINE);
                 getWriter().write(epilogue);
@@ -59,7 +59,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
 
     @Override
     protected void writePreamble(String preamble) throws SaveException {
-        if (!ModelStringUtil.isNullOrEmpty(preamble)) {
+        if (!StringUtil.isNullOrEmpty(preamble)) {
             try {
                 getWriter().write(OS.NEWLINE);
                 getWriter().write(PREAMBLE_PREFIX + "{");
@@ -91,7 +91,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
                 getWriter().write(OS.NEWLINE);
             }
 
-            getWriter().write(STRING_PREFIX + "{" + bibtexString.getName() + ModelStringUtil
+            getWriter().write(STRING_PREFIX + "{" + bibtexString.getName() + StringUtil
                     .repeatSpaces(maxKeyLength - bibtexString.getName().length()) + " = ");
             if (bibtexString.getContent().isEmpty()) {
                 getWriter().write("{}");

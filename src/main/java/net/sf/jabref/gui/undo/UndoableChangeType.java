@@ -2,7 +2,7 @@ package net.sf.jabref.gui.undo;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * This class represents the change of type for an entry.
@@ -21,9 +21,9 @@ public class UndoableChangeType extends AbstractUndoableJabRefEdit {
     @Override
     public String getPresentationName() {
         return Localization.lang("change type of entry %0 from %1 to %2",
-                ModelStringUtil.boldHTML(entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))),
-                ModelStringUtil.boldHTML(oldType, Localization.lang("undefined")),
-                ModelStringUtil.boldHTML(newType));
+                StringUtil.boldHTML(entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))),
+                StringUtil.boldHTML(oldType, Localization.lang("undefined")),
+                StringUtil.boldHTML(newType));
     }
 
     @Override

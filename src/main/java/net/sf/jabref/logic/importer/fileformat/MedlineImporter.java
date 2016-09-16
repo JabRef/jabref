@@ -67,7 +67,7 @@ import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Joiner;
 import org.apache.commons.logging.Log;
@@ -522,7 +522,7 @@ public class MedlineImporter extends ImportFormat {
                 addPubDate(fields, journalIssue.getPubDate());
             } else if (object instanceof ArticleTitle) {
                 ArticleTitle articleTitle = (ArticleTitle) object;
-                fields.put(FieldName.TITLE, ModelStringUtil.stripBrackets(articleTitle.getContent().toString()));
+                fields.put(FieldName.TITLE, StringUtil.stripBrackets(articleTitle.getContent().toString()));
             } else if (object instanceof Pagination) {
                 Pagination pagination = (Pagination) object;
                 addPagination(fields, pagination);

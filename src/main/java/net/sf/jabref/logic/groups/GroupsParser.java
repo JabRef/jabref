@@ -12,7 +12,7 @@ import net.sf.jabref.model.groups.GroupHierarchyType;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.groups.KeywordGroup;
 import net.sf.jabref.model.groups.SearchGroup;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * Converts string representation of groups to a parsed {@link GroupTreeNode}.
@@ -97,9 +97,9 @@ public class GroupsParser {
         String expression = tok.nextToken();
         boolean caseSensitive = Integer.parseInt(tok.nextToken()) == 1;
         boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
-        return new KeywordGroup(ModelStringUtil.unquote(name, AbstractGroup.QUOTE_CHAR),
-                ModelStringUtil.unquote(field, AbstractGroup.QUOTE_CHAR),
-                ModelStringUtil.unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
+        return new KeywordGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR),
+                StringUtil.unquote(field, AbstractGroup.QUOTE_CHAR),
+                StringUtil.unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
                 GroupHierarchyType.getByNumber(context), keywordSeparator);
     }
 
@@ -125,7 +125,7 @@ public class GroupsParser {
      */
     private static void addLegacyEntryKeys(QuotedStringTokenizer tok, ExplicitGroup group) {
         while (tok.hasMoreTokens()) {
-            String key = ModelStringUtil.unquote(tok.nextToken(), AbstractGroup.QUOTE_CHAR);
+            String key = StringUtil.unquote(tok.nextToken(), AbstractGroup.QUOTE_CHAR);
             group.addLegacyEntryKey(key);
         }
     }
@@ -157,8 +157,8 @@ public class GroupsParser {
         boolean regExp = Integer.parseInt(tok.nextToken()) == 1;
         // version 0 contained 4 additional booleans to specify search
         // fields; these are ignored now, all fields are always searched
-        return new SearchGroup(ModelStringUtil.unquote(name, AbstractGroup.QUOTE_CHAR),
-                ModelStringUtil.unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
+        return new SearchGroup(StringUtil.unquote(name, AbstractGroup.QUOTE_CHAR),
+                StringUtil.unquote(expression, AbstractGroup.QUOTE_CHAR), caseSensitive, regExp,
                 GroupHierarchyType.getByNumber(context));
     }
 }

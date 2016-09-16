@@ -10,7 +10,7 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.FileField;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public final class ExternalFileTypes {
@@ -278,7 +278,7 @@ public final class ExternalFileTypes {
             return;
         }
         // Read the prefs information for file types:
-        String[][] vals = ModelStringUtil
+        String[][] vals = StringUtil
                 .decodeStringDoubleArray(Globals.prefs.get(JabRefPreferences.EXTERNAL_FILE_TYPES, ""));
         for (String[] val : vals) {
             if ((val.length == 2) && val[1].equals(FILE_TYPE_REMOVED_FLAG)) {

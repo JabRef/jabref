@@ -36,7 +36,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.metadata.MetaData;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
@@ -85,7 +85,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             filesToOpen.addAll(chosenStrings.stream().map(File::new).collect(Collectors.toList()));
         } else {
             LOGGER.info(Action.NAME + " " + e.getActionCommand());
-            filesToOpen.add(new File(ModelStringUtil.getCorrectFileName(e.getActionCommand(), "bib")));
+            filesToOpen.add(new File(StringUtil.getCorrectFileName(e.getActionCommand(), "bib")));
         }
 
         openFiles(filesToOpen, true);

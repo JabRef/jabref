@@ -1,4 +1,4 @@
-package net.sf.jabref.model.util;
+package net.sf.jabref.model.strings;
 
 import java.util.HashMap;
 

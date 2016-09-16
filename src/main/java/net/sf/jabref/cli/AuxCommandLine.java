@@ -3,14 +3,14 @@ package net.sf.jabref.cli;
 import net.sf.jabref.logic.auxparser.AuxParser;
 import net.sf.jabref.logic.auxparser.AuxParserResult;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 public class AuxCommandLine {
     private final String auxFile;
     private final BibDatabase database;
 
     public AuxCommandLine(String auxFile, BibDatabase database) {
-        this.auxFile = ModelStringUtil.getCorrectFileName(auxFile, "aux");
+        this.auxFile = StringUtil.getCorrectFileName(auxFile, "aux");
         this.database = database;
     }
 

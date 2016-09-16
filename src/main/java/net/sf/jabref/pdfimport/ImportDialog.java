@@ -24,7 +24,7 @@ import javax.swing.WindowConstants;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -105,7 +105,7 @@ public class ImportDialog extends JDialog {
             this.radioButtononlyAttachPDF.setEnabled(false);
         }
         String name = new File(fileName).getName();
-        labelFileName.setText(ModelStringUtil.limitStringLength(name, 34));
+        labelFileName.setText(StringUtil.limitStringLength(name, 34));
         this.setTitle(Localization.lang("Import metadata from PDF"));
 
         setModal(true);

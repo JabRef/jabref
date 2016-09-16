@@ -5,7 +5,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.event.EntryEventSource;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,7 +34,7 @@ public class UndoableRemoveEntry extends AbstractUndoableJabRefEdit {
     @Override
     public String getPresentationName() {
         return Localization.lang("remove entry %0",
-                ModelStringUtil.boldHTML(entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
+                StringUtil.boldHTML(entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))));
     }
 
     @Override

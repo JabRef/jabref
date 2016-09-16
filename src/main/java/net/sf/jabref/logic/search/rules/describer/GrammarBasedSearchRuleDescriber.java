@@ -6,7 +6,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.search.rules.GrammarBasedSearchRule;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.search.SearchBaseVisitor;
 import net.sf.jabref.search.SearchParser;
 
@@ -68,11 +68,11 @@ public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
                 final GrammarBasedSearchRule.ComparisonOperator operator = GrammarBasedSearchRule.ComparisonOperator.build(context.operator.getText());
 
                 final boolean regExpFieldSpec = !Pattern.matches("\\w+", field);
-                final String termQuoted = ModelStringUtil.quoteForHTML(value);
+                final String termQuoted = StringUtil.quoteForHTML(value);
                 final String fieldSpecQuoted = regExpFieldSpec ? Localization.lang(
                         "any field that matches the regular expression <b>%0</b>",
-                        ModelStringUtil.quoteForHTML(field)) : Localization.lang("the field <b>%0</b>",
-                        ModelStringUtil.quoteForHTML(field));
+                        StringUtil.quoteForHTML(field)) : Localization.lang("the field <b>%0</b>",
+                        StringUtil.quoteForHTML(field));
 
                 if (operator == GrammarBasedSearchRule.ComparisonOperator.CONTAINS) {
                     if (regExp) {

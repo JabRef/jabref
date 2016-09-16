@@ -15,7 +15,7 @@ import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.model.metadata.SaveOrderConfig;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * A comparator for BibEntry fields
@@ -113,8 +113,8 @@ public class FieldComparator implements Comparator<BibEntry> {
             f1 = AuthorList.fixAuthorForAlphabetization(f1);
             f2 = AuthorList.fixAuthorForAlphabetization(f2);
         } else if (fieldType == FieldType.YEAR) {
-            Integer f1year = ModelStringUtil.intValueOfOptional(f1).orElse(0);
-            Integer f2year = ModelStringUtil.intValueOfOptional(f2).orElse(0);
+            Integer f1year = StringUtil.intValueOfOptional(f1).orElse(0);
+            Integer f2year = StringUtil.intValueOfOptional(f2).orElse(0);
             int comparisonResult = Integer.compare(f1year, f2year);
             return comparisonResult * multiplier;
         } else if (fieldType == FieldType.MONTH) {
@@ -122,8 +122,8 @@ public class FieldComparator implements Comparator<BibEntry> {
         }
 
         if (isNumeric) {
-            Optional<Integer> i1 = ModelStringUtil.intValueOfOptional(f1);
-            Optional<Integer> i2 = ModelStringUtil.intValueOfOptional(f2);
+            Optional<Integer> i1 = StringUtil.intValueOfOptional(f1);
+            Optional<Integer> i2 = StringUtil.intValueOfOptional(f2);
 
             if ((i2.isPresent()) && (i1.isPresent())) {
                 // Ok, parsing was successful. Update f1 and f2:

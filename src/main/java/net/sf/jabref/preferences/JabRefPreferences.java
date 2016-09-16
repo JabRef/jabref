@@ -83,7 +83,7 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.SpecialFields;
 import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 import net.sf.jabref.model.metadata.SaveOrderConfig;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -993,7 +993,7 @@ public class JabRefPreferences {
     }
 
     private static String convertListToString(List<String> value) {
-        return value.stream().map(val -> ModelStringUtil.quote(val, ";", '\\')).collect(Collectors.joining(";"));
+        return value.stream().map(val -> StringUtil.quote(val, ";", '\\')).collect(Collectors.joining(";"));
     }
 
     /**

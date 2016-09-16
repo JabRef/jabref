@@ -4,7 +4,7 @@ import java.util.Map;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.model.util.HTMLUnicodeConversionMaps;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * This formatter escapes characters so they are suitable for HTML.
@@ -51,7 +51,7 @@ public class HTMLChars implements LayoutFormatter {
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             } else if (Character.isLetter(c) || (c == '%')
-                    || ModelStringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
+                    || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
 
                 if (!incommand) {
@@ -59,7 +59,7 @@ public class HTMLChars implements LayoutFormatter {
                 } else {
                     currentCommand.append(c);
                     testCharCom: if ((currentCommand.length() == 1)
-                            && ModelStringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
+                            && StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
                         if (i >= (field.length() - 1)) {
@@ -71,7 +71,7 @@ public class HTMLChars implements LayoutFormatter {
                         c = field.charAt(i);
                         String commandBody;
                         if (c == '{') {
-                            String part = ModelStringUtil.getPart(field, i, false);
+                            String part = StringUtil.getPart(field, i, false);
                             i += part.length();
                             commandBody = part;
                         } else {
@@ -116,11 +116,11 @@ public class HTMLChars implements LayoutFormatter {
                     // If so, handle.
                     String tag = getHTMLTag(command);
                     if (!tag.isEmpty()) {
-                        String part = ModelStringUtil.getPart(field, i, true);
+                        String part = StringUtil.getPart(field, i, true);
                         i += part.length();
                         sb.append('<').append(tag).append('>').append(part).append("</").append(tag).append('>');
                     } else if (c == '{') {
-                        String argument = ModelStringUtil.getPart(field, i, true);
+                        String argument = StringUtil.getPart(field, i, true);
                         i += argument.length();
                         // handle common case of general latex command
                         String result = HTML_CHARS.get(command + argument);

@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * This class provides the reformatting needed when reading BibTeX fields formatted
@@ -44,7 +44,7 @@ public class FieldContentParser {
 
         if (multiLineFields.contains(bibtexField)) {
             // Unify line breaks
-            return ModelStringUtil.unifyLineBreaksToConfiguredLineBreaks(fieldContent, OS.NEWLINE);
+            return StringUtil.unifyLineBreaksToConfiguredLineBreaks(fieldContent, OS.NEWLINE);
         }
 
         return WHITESPACE.matcher(fieldContent).replaceAll(" ");

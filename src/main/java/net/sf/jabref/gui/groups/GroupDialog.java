@@ -43,7 +43,7 @@ import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
 import net.sf.jabref.model.groups.KeywordGroup;
 import net.sf.jabref.model.groups.SearchGroup;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -432,11 +432,11 @@ class GroupDialog extends JDialog {
             if (i > 0) {
                 sb.append("<br>");
             }
-            sb.append(ModelStringUtil.quoteForHTML(sa[i]));
+            sb.append(StringUtil.quoteForHTML(sa[i]));
         }
         String s = Localization.lang(
                 "The regular expression <b>%0</b> is invalid:",
-                ModelStringUtil.quoteForHTML(regExp))
+                StringUtil.quoteForHTML(regExp))
                 + "<p><tt>"
                 + sb
                 + "</tt>";

@@ -32,7 +32,7 @@ import net.sf.jabref.logic.importer.fileformat.SilverPlatterImporter;
 import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.model.database.BibDatabases;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -146,7 +146,7 @@ public class ImportFormatReader {
             sb.append("  ");
             sb.append(imFo.getFormatName());
 
-            sb.append(ModelStringUtil.repeatSpaces(pad));
+            sb.append(StringUtil.repeatSpaces(pad));
 
             sb.append(" : ");
             sb.append(imFo.getId());

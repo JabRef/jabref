@@ -1,4 +1,4 @@
-package net.sf.jabref.model.util;
+package net.sf.jabref.model.strings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import com.google.common.base.CharMatcher;
 import org.apache.commons.lang3.StringUtils;
 
-public class ModelStringUtil {
+public class StringUtil {
 
     // Non-letters which are used to denote accents in LaTeX-commands, e.g., in {\"{a}}
     public static final String SPECIAL_COMMAND_CHARS = "\"`^~'=.|";

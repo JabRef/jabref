@@ -3,7 +3,7 @@ package net.sf.jabref.gui.undo;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * This class represents a change in any field value. The relevant
@@ -29,8 +29,8 @@ public class UndoableKeyChange extends AbstractUndoableJabRefEdit {
     @Override
     public String getPresentationName() {
         return Localization.lang("change key from %0 to %1",
-                ModelStringUtil.boldHTML(oldValue, Localization.lang("undefined")),
-                ModelStringUtil.boldHTML(newValue, Localization.lang("undefined")));
+                StringUtil.boldHTML(oldValue, Localization.lang("undefined")),
+                StringUtil.boldHTML(newValue, Localization.lang("undefined")));
 
     }
 
