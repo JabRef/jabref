@@ -21,7 +21,6 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.importer.ParserResultWarningDialog;
 import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
 import net.sf.jabref.gui.importer.worker.AutosaveStartupPrompter;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.worker.VersionWorker;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
@@ -191,7 +190,7 @@ public class JabRefGUI {
         }
 
         if (!bibDatabases.isEmpty()) {
-            new FocusRequester(JabRefGUI.getMainFrame().getCurrentBasePanel().getMainTable());
+            JabRefGUI.getMainFrame().getCurrentBasePanel().getMainTable().requestFocus();
         }
     }
 

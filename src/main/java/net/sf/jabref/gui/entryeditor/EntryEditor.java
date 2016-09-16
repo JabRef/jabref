@@ -72,7 +72,6 @@ import net.sf.jabref.gui.undo.UndoableChangeType;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.gui.util.component.VerticalLabelUI;
 import net.sf.jabref.logic.TypedBibEntry;
@@ -645,7 +644,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         if (activeTab instanceof EntryEditorTab) {
             ((EntryEditorTab) activeTab).activate();
         } else {
-            new FocusRequester(source);
+            source.requestFocus();
         }
     }
 

@@ -104,7 +104,6 @@ import net.sf.jabref.gui.protectedterms.ProtectedTermsDialog;
 import net.sf.jabref.gui.push.PushToApplicationButton;
 import net.sf.jabref.gui.push.PushToApplications;
 import net.sf.jabref.gui.search.GlobalSearchBar;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.CustomEntryTypesManager;
@@ -667,7 +666,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             // Set correct enabled state for Back and Forward actions:
             currentBasePanel.setBackAndForwardEnabledState();
             currentBasePanel.getUndoManager().postUndoRedoEvent();
-            new FocusRequester(currentBasePanel.getMainTable());
+            currentBasePanel.getMainTable().requestFocus();
         });
 
         //Note: The registration of Apple event is at the end of initialization, because
