@@ -3,7 +3,6 @@ package net.sf.jabref.logic.importer.fetcher;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.Optional;
 
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
