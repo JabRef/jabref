@@ -39,13 +39,13 @@ import net.sf.jabref.logic.logging.JabRefLogger;
 import net.sf.jabref.logic.search.DatabaseSearcher;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.metadata.MetaData;
+import net.sf.jabref.model.util.ModelStringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.SearchPreferences;
 import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
@@ -289,7 +289,7 @@ public class ArgumentProcessor {
 
             // write an output, if something could be resolved
             if ((newBase != null) && newBase.hasEntries()) {
-                String subName = StringUtil.getCorrectFileName(data[1], "bib");
+                String subName = ModelStringUtil.getCorrectFileName(data[1], "bib");
 
                 try {
                     System.out.println(Localization.lang("Saving") + ": " + subName);

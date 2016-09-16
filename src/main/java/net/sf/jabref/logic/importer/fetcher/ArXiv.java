@@ -25,12 +25,12 @@ import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.importer.util.OAI2Handler;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.io.XMLUtil;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.model.util.ModelStringUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
@@ -63,7 +63,7 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
         // 1. Eprint
         Optional<String> identifier = entry.getField(FieldName.EPRINT);
-        if (StringUtil.isNotBlank(identifier)) {
+        if (ModelStringUtil.isNotBlank(identifier)) {
             try {
                 // Get pdf of entry with the specified id
                 Optional<URL> pdfUrl = searchForEntryById(identifier.get()).flatMap(ArXivEntry::getPdfUrl);

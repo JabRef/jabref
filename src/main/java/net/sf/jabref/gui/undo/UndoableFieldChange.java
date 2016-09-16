@@ -1,9 +1,9 @@
 package net.sf.jabref.gui.undo;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.util.ModelStringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,10 +36,10 @@ public class UndoableFieldChange extends AbstractUndoableJabRefEdit {
 
     @Override
     public String getPresentationName() {
-        return Localization.lang("change field %0 of entry %1 from %2 to %3", StringUtil.boldHTML(field),
-                StringUtil.boldHTML(entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))),
-                StringUtil.boldHTML(oldValue, Localization.lang("undefined")),
-                StringUtil.boldHTML(newValue, Localization.lang("undefined")));
+        return Localization.lang("change field %0 of entry %1 from %2 to %3", ModelStringUtil.boldHTML(field),
+                ModelStringUtil.boldHTML(entry.getCiteKeyOptional().orElse(Localization.lang("undefined"))),
+                ModelStringUtil.boldHTML(oldValue, Localization.lang("undefined")),
+                ModelStringUtil.boldHTML(newValue, Localization.lang("undefined")));
     }
 
     @Override

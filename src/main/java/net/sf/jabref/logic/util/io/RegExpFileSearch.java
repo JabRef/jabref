@@ -13,9 +13,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.util.ModelStringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -212,7 +212,7 @@ public class RegExpFileSearch {
 
                 File[] subDirs = actualDirectory.listFiles();
                 if (subDirs != null) {
-                    String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
+                    String restOfFileString = ModelStringUtil.join(fileParts, "/", i + 1, fileParts.length);
                     for (File subDir : subDirs) {
                         if (subDir.isDirectory()) {
                             res.addAll(findFile(entry, subDir, restOfFileString, extensionRegExp));
@@ -225,7 +225,7 @@ public class RegExpFileSearch {
                 List<File> toDo = new LinkedList<>();
                 toDo.add(actualDirectory);
 
-                String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
+                String restOfFileString = ModelStringUtil.join(fileParts, "/", i + 1, fileParts.length);
 
                 while (!toDo.isEmpty()) {
 
@@ -296,7 +296,7 @@ public class RegExpFileSearch {
      */
     public static String getFieldAndFormat(String fieldAndFormat, BibEntry entry, BibDatabase database) {
 
-        String strippedFieldAndFormat = StringUtil.stripBrackets(fieldAndFormat);
+        String strippedFieldAndFormat = ModelStringUtil.stripBrackets(fieldAndFormat);
 
         int colon = strippedFieldAndFormat.indexOf(':');
 

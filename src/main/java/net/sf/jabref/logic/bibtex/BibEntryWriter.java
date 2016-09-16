@@ -11,13 +11,12 @@ import java.util.function.Predicate;
 
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.InternalBibtexFields;
-
+import net.sf.jabref.model.util.ModelStringUtil;
 
 public class BibEntryWriter {
 
@@ -130,7 +129,7 @@ public class BibEntryWriter {
     }
 
     private void writeKeyField(BibEntry entry, Writer out) throws IOException {
-        String keyField = StringUtil.shaveString(entry.getCiteKeyOptional().orElse(""));
+        String keyField = ModelStringUtil.shaveString(entry.getCiteKeyOptional().orElse(""));
         out.write(keyField + ',' + OS.NEWLINE);
     }
 
@@ -184,6 +183,6 @@ public class BibEntryWriter {
             actualField = "UNKNOWN";
         }
 
-        return actualField.toLowerCase() + StringUtil.repeatSpaces(intendation - actualField.length()) + " = ";
+        return actualField.toLowerCase() + ModelStringUtil.repeatSpaces(intendation - actualField.length()) + " = ";
     }
 }

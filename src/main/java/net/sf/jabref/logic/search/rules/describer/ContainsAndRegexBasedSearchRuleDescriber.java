@@ -4,8 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.search.rules.SentenceAnalyzer;
+import net.sf.jabref.model.util.ModelStringUtil;
 
 public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber {
 
@@ -26,15 +26,15 @@ public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber
 
         StringBuilder searchDescription = new StringBuilder(regExp ? Localization.lang(
                 "This search contains entries in which any field contains the regular expression <b>%0</b>",
-                StringUtil.quoteForHTML(firstWord))
+                ModelStringUtil.quoteForHTML(firstWord))
                 : Localization.lang("This search contains entries in which any field contains the term <b>%0</b>",
-                        StringUtil.quoteForHTML(firstWord)));
+                        ModelStringUtil.quoteForHTML(firstWord)));
 
         if(words.size() > 1) {
             List<String> unprocessedWords = words.subList(1, words.size());
             List<String> unprocessedWordsInHtmlFormat = new LinkedList<>();
             for(String word : unprocessedWords) {
-                unprocessedWordsInHtmlFormat.add(String.format("<b>%s</b>", StringUtil.quoteForHTML(word)));
+                unprocessedWordsInHtmlFormat.add(String.format("<b>%s</b>", ModelStringUtil.quoteForHTML(word)));
             }
             String andSeparator = String.format(" %s ", Localization.lang("and"));
             searchDescription.append(String.join(andSeparator, unprocessedWordsInHtmlFormat));

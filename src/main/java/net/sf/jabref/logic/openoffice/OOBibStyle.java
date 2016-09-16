@@ -26,12 +26,12 @@ import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.Author;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.util.ModelStringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -720,7 +720,7 @@ public class OOBibStyle implements Comparable<OOBibStyle> {
             Optional<String> content = BibDatabase.getResolvedField(s, entry, database);
 
             if ((content.isPresent()) && !content.get().trim().isEmpty()) {
-                if (field.equals(authorField) && StringUtil.isInCurlyBrackets(content.get())) {
+                if (field.equals(authorField) && ModelStringUtil.isInCurlyBrackets(content.get())) {
                     return "{" + fieldFormatter.format(content.get()) + "}";
                 }
                 return fieldFormatter.format(content.get());

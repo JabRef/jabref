@@ -76,10 +76,10 @@ import net.sf.jabref.logic.layout.format.WrapFileLinks;
 import net.sf.jabref.logic.layout.format.XMLChars;
 import net.sf.jabref.logic.openoffice.OOPreFormatter;
 import net.sf.jabref.logic.search.MatchesHighlighter;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.util.ModelStringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -389,7 +389,7 @@ class LayoutEntry {
     }
 
     private void doOptionField(String s) {
-        List<String> v = StringUtil.tokenizeToList(s, "\n");
+        List<String> v = ModelStringUtil.tokenizeToList(s, "\n");
 
         if (v.size() == 1) {
             text = v.get(0);

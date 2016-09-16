@@ -19,9 +19,9 @@ import javax.xml.transform.stream.StreamResult;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.format.XMLChars;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.util.ModelStringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -200,7 +200,7 @@ class MODSEntry {
             if (title != null) {
                 Element titleInfo = d.createElement("titleInfo");
                 Element mainTitle = d.createElement("title");
-                mainTitle.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(title)));
+                mainTitle.appendChild(d.createTextNode(ModelStringUtil.stripNonValidXMLCharacters(title)));
                 titleInfo.appendChild(mainTitle);
                 mods.appendChild(titleInfo);
             }
@@ -212,14 +212,14 @@ class MODSEntry {
                         Element namePart = d.createElement("namePart");
                         namePart.setAttribute("type", "family");
                         namePart.appendChild(
-                                d.createTextNode(StringUtil.stripNonValidXMLCharacters(name.getSurname())));
+                                d.createTextNode(ModelStringUtil.stripNonValidXMLCharacters(name.getSurname())));
                         modsName.appendChild(namePart);
                     }
                     if (name.getGivenNames() != null) {
                         Element namePart = d.createElement("namePart");
                         namePart.setAttribute("type", "given");
                         namePart.appendChild(
-                                d.createTextNode(StringUtil.stripNonValidXMLCharacters(name.getGivenNames())));
+                                d.createTextNode(ModelStringUtil.stripNonValidXMLCharacters(name.getGivenNames())));
                         modsName.appendChild(namePart);
                     }
                     Element role = d.createElement("role");
@@ -236,34 +236,34 @@ class MODSEntry {
             mods.appendChild(originInfo);
             if (this.publisher != null) {
                 Element publisherElement = d.createElement(FieldName.PUBLISHER);
-                publisherElement.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(this.publisher)));
+                publisherElement.appendChild(d.createTextNode(ModelStringUtil.stripNonValidXMLCharacters(this.publisher)));
                 originInfo.appendChild(publisherElement);
             }
             if (date != null) {
                 Element dateIssued = d.createElement("dateIssued");
-                dateIssued.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(date)));
+                dateIssued.appendChild(d.createTextNode(ModelStringUtil.stripNonValidXMLCharacters(date)));
                 originInfo.appendChild(dateIssued);
             }
             Element issuanceElement = d.createElement("issuance");
-            issuanceElement.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(this.issuance)));
+            issuanceElement.appendChild(d.createTextNode(ModelStringUtil.stripNonValidXMLCharacters(this.issuance)));
             originInfo.appendChild(issuanceElement);
 
             if (id != null) {
                 Element idref = d.createElement("identifier");
-                idref.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(id)));
+                idref.appendChild(d.createTextNode(ModelStringUtil.stripNonValidXMLCharacters(id)));
                 mods.appendChild(idref);
                 mods.setAttribute("ID", id);
 
             }
             Element typeOfResource = d.createElement("typeOfResource");
             String type = "text";
-            typeOfResource.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(type)));
+            typeOfResource.appendChild(d.createTextNode(ModelStringUtil.stripNonValidXMLCharacters(type)));
             mods.appendChild(typeOfResource);
 
             if (genre != null) {
                 Element genreElement = d.createElement("genre");
                 genreElement.setAttribute("authority", "marc");
-                genreElement.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(genre)));
+                genreElement.appendChild(d.createTextNode(ModelStringUtil.stripNonValidXMLCharacters(genre)));
                 mods.appendChild(genreElement);
             }
 
@@ -285,7 +285,7 @@ class MODSEntry {
                     continue;
                 }
                 Element theData = d.createElement(field);
-                theData.appendChild(d.createTextNode(StringUtil.stripNonValidXMLCharacters(value)));
+                theData.appendChild(d.createTextNode(ModelStringUtil.stripNonValidXMLCharacters(value)));
                 extension.appendChild(theData);
                 mods.appendChild(extension);
             }

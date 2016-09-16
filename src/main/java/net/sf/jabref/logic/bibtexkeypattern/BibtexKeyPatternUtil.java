@@ -12,12 +12,12 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.metadata.MetaData;
+import net.sf.jabref.model.util.ModelStringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -156,7 +156,7 @@ public class BibtexKeyPatternUtil {
      * @return True if the author or editor is an institution.
      */
     private static boolean isInstitution(String author) {
-        return StringUtil.isInCurlyBrackets(author);
+        return ModelStringUtil.isInCurlyBrackets(author);
     }
 
     /**
@@ -1319,7 +1319,7 @@ public class BibtexKeyPatternUtil {
         // Replace non-English characters like umlauts etc. with a sensible
         // letter or letter combination that bibtex can accept.
 
-        return StringUtil.replaceSpecialCharacters(newKey.toString());
+        return ModelStringUtil.replaceSpecialCharacters(newKey.toString());
     }
 
 }

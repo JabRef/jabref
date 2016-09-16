@@ -15,7 +15,7 @@ import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.util.ModelStringUtil;
 
 public class FieldTextMenu implements MouseListener {
     private final FieldEditor field;
@@ -79,7 +79,7 @@ public class FieldTextMenu implements MouseListener {
             if (!data.isEmpty()) {
                 pasteStatus = true;
                 pasteAction.putValue(Action.SHORT_DESCRIPTION, Localization.lang("Paste from clipboard") + ": "
-                        + StringUtil.limitStringLength(data, MAX_PASTE_PREVIEW_LENGTH));
+                        + ModelStringUtil.limitStringLength(data, MAX_PASTE_PREVIEW_LENGTH));
             } else {
                 pasteAction.putValue(Action.SHORT_DESCRIPTION, Localization.lang("Paste from clipboard"));
             }

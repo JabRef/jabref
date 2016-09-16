@@ -9,13 +9,13 @@ import net.sf.jabref.logic.bibtex.BibEntryWriter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatter;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.metadata.MetaData;
+import net.sf.jabref.model.util.ModelStringUtil;
 
 public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWriter<E> {
 
@@ -30,7 +30,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
 
     @Override
     protected void writeEpilogue(String epilogue) throws SaveException {
-        if (!StringUtil.isNullOrEmpty(epilogue)) {
+        if (!ModelStringUtil.isNullOrEmpty(epilogue)) {
             try {
                 getWriter().write(OS.NEWLINE);
                 getWriter().write(epilogue);
@@ -59,7 +59,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
 
     @Override
     protected void writePreamble(String preamble) throws SaveException {
-        if (!StringUtil.isNullOrEmpty(preamble)) {
+        if (!ModelStringUtil.isNullOrEmpty(preamble)) {
             try {
                 getWriter().write(OS.NEWLINE);
                 getWriter().write(PREAMBLE_PREFIX + "{");
@@ -91,7 +91,7 @@ public class BibtexDatabaseWriter<E extends SaveSession> extends BibDatabaseWrit
                 getWriter().write(OS.NEWLINE);
             }
 
-            getWriter().write(STRING_PREFIX + "{" + bibtexString.getName() + StringUtil
+            getWriter().write(STRING_PREFIX + "{" + bibtexString.getName() + ModelStringUtil
                     .repeatSpaces(maxKeyLength - bibtexString.getName().length()) + " = ");
             if (bibtexString.getContent().isEmpty()) {
                 getWriter().write("{}");

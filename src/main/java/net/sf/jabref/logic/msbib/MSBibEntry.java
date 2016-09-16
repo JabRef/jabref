@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.mods.PageNumbers;
 import net.sf.jabref.logic.mods.PersonName;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.util.ModelStringUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -315,7 +315,7 @@ class MSBibEntry {
             return;
         }
         Element elem = document.createElementNS(MSBibDatabase.NAMESPACE, MSBibDatabase.PREFIX + name);
-        elem.appendChild(document.createTextNode(StringUtil.stripNonValidXMLCharacters(value)));
+        elem.appendChild(document.createTextNode(ModelStringUtil.stripNonValidXMLCharacters(value)));
         parent.appendChild(elem);
     }
 

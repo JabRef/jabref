@@ -2,8 +2,8 @@ package net.sf.jabref.logic.mods;
 
 import java.util.List;
 
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.util.ModelStringUtil;
 
 /**
  * @author Michael Wrighton, S M Mahbub Murshed
@@ -47,7 +47,7 @@ public class PersonName {
 
         // Tokenize just the firstName and middleNames as we have the surname
         // before the comma.
-        List<String> names = StringUtil.tokenizeToList(authorMod.substring(endOfLastName + 1).trim(), " \n\r");
+        List<String> names = ModelStringUtil.tokenizeToList(authorMod.substring(endOfLastName + 1).trim(), " \n\r");
         if (endOfLastName >= 0) {
             names.add(authorMod.substring(0, endOfLastName));
         }
