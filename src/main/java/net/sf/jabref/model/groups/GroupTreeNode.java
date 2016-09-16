@@ -216,8 +216,8 @@ public class GroupTreeNode extends TreeNode<GroupTreeNode> {
         return group.getName();
     }
 
-    public GroupTreeNode addSubgroup(AbstractGroup group) {
-        GroupTreeNode child = GroupTreeNode.fromGroup(group);
+    public GroupTreeNode addSubgroup(AbstractGroup subgroup) {
+        GroupTreeNode child = GroupTreeNode.fromGroup(subgroup);
         addChild(child);
         return child;
     }
