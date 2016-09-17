@@ -39,14 +39,14 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
     private final JTextField fileNamePattern;
     private final JButton selectFileNamePattern;
 
-    private final JTextField fileDirPattern = new JTextField(50);
+    private final JTextField fileDirPattern;
 
 
     public ImportSettingsTab(JabRefPreferences prefs) {
         this.prefs = Objects.requireNonNull(prefs);
 
         setLayout(new BorderLayout());
-        FormLayout layout = new FormLayout("1dlu, 10dlu, left:pref, 4dlu, fill:3dlu");
+        FormLayout layout = new FormLayout("1dlu, 8dlu, left:pref, 4dlu, fill:3dlu");
         radioButtonNoMeta = new JRadioButton(Localization.lang("Create_blank_entry_linking_the_PDF"));
         radioButtonXmp = new JRadioButton(Localization.lang("Create_entry_based_on_XMP_data"));
         radioButtonPDFcontent = new JRadioButton(Localization.lang("Create_entry_based_on_content"));
@@ -61,6 +61,7 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
                 Localization.lang("Always use this PDF import style (and do not ask for each import)"));
 
         fileNamePattern = new JTextField(50);
+        fileDirPattern = new JTextField(50);
         selectFileNamePattern = new JButton(Localization.lang("Choose pattern"));
         selectFileNamePattern.addActionListener(e -> openFilePatternMenu());
 
@@ -88,17 +89,21 @@ public class ImportSettingsTab extends JPanel implements PrefsTab {
         builder.appendSeparator(Localization.lang("Default PDF file link action"));
         builder.nextLine();
         builder.append(pan);
+
         JPanel pan2 = new JPanel();
         JLabel lab = new JLabel(Localization.lang("Filename format pattern").concat(":"));
         pan2.add(lab);
         pan2.add(fileNamePattern);
-
-        JLabel lbfileDirPattern = new JLabel("FileDir pattern:");
-
-        pan2.add(lbfileDirPattern);
-        pan2.add(fileDirPattern);
-
+        pan2.add(selectFileNamePattern);
         builder.append(pan2);
+
+        JPanel pan3 = new JPanel();
+        JLabel lbfileDirPattern = new JLabel("FileDir pattern:");
+        pan3.add(lbfileDirPattern);
+        pan3.add(fileDirPattern);
+
+        builder.nextLine();
+        builder.append(pan3);
 
         pan = builder.getPanel();
         pan.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
