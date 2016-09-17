@@ -239,6 +239,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         if ((type.getOptionalFields() != null) && !type.getOptionalFields().isEmpty()) {
             if (!frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
+                displayedOptionalFields.addAll(type.getOptionalFields());
+
                 addOptionalTab(type);
             } else {
                 displayedOptionalFields.addAll(type.getPrimaryOptionalFields());
