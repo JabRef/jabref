@@ -53,7 +53,7 @@ public class DoiFetcherTest {
 
     @Test
     public void testGetHelpPage() {
-        assertEquals("DOItoBibTeXHelp", fetcher.getHelpPage().getPageName());
+        assertEquals("DOItoBibTeX", fetcher.getHelpPage().getPageName());
     }
 
     @Test
