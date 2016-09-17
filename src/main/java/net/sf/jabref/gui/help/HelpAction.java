@@ -34,7 +34,7 @@ public class HelpAction extends MnemonicAwareAction {
     /**
      * New languages of the help have to be added here
      */
-    Set<String> avaiableLangFiles = Stream.of("en", "de", "fr", "in", "ja")
+    private final Set<String> avaiableLangFiles = Stream.of("en", "de", "fr", "in", "ja")
             .collect(Collectors.toCollection(HashSet::new));
 
     private HelpFile helpPage;
