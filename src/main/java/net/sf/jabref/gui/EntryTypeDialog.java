@@ -120,9 +120,8 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
             if (!CustomEntryTypesManager.ALL.isEmpty()) {
                 panel.add(createEntryGroupPanel(Localization.lang("Custom"), CustomEntryTypesManager.ALL));
             }
-
-            panel.add(createIdFetcherPanel());
         }
+        panel.add(createIdFetcherPanel());
 
         return panel;
     }
