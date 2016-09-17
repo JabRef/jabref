@@ -49,6 +49,7 @@ import net.sf.jabref.logic.importer.fileformat.mods.UrlDefinition;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.base.Joiner;
 import org.apache.commons.logging.Log;
@@ -64,7 +65,8 @@ import org.apache.commons.logging.LogFactory;
 public class ModsImporter extends ImportFormat {
 
     private static final Log LOGGER = LogFactory.getLog(ModsImporter.class);
-    private static final String KEYWORD_SEPARATOR = "; ";
+    private static final String KEYWORD_SEPARATOR = JabRefPreferences.getInstance().getImportFormatPreferences()
+            .getKeywordSeparator();
 
     private static final Pattern MODS_PATTERN = Pattern.compile("<mods .*>");
 
@@ -431,10 +433,10 @@ public class ModsImporter extends ImportFormat {
                 putIfValueNotNull(fields, "affiliation", affiliation.getValue());
             }
         }
-        if (!foreName.isEmpty() && !"".equals(familyName)) {
+        if (!foreName.isEmpty() && !familyName.isEmpty()) {
             String author = familyName + ", " + Joiner.on(" ").join(foreName);
             authors.add(author);
-        } else if (foreName.isEmpty() && !"".equals(familyName)) {
+        } else if (foreName.isEmpty() && !familyName.isEmpty()) {
             authors.add(familyName);
         }
     }
