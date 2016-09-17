@@ -6,6 +6,10 @@ import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.Action;
 import javax.swing.Icon;
@@ -26,6 +30,12 @@ import net.sf.jabref.preferences.JabRefPreferences;
  * Dialog unless it is already visible, and shows the URL in it.
  */
 public class HelpAction extends MnemonicAwareAction {
+
+    /**
+     * New languages of the help have to be added here
+     */
+    Set<String> avaiableLangFiles = Stream.of("en", "de", "fr", "in", "ja")
+            .collect(Collectors.toCollection(HashSet::new));
 
     private HelpFile helpPage;
 
@@ -67,6 +77,7 @@ public class HelpAction extends MnemonicAwareAction {
         helpLabel.setForeground(Color.BLUE);
         helpLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         helpLabel.addMouseListener(new MouseAdapter() {
+
             @Override
             public void mouseClicked(MouseEvent e) {
                 openHelpPage();
@@ -85,7 +96,16 @@ public class HelpAction extends MnemonicAwareAction {
     }
 
     private void openHelpPage() {
-        String url = "https://help.jabref.org/" + Globals.prefs.get(JabRefPreferences.LANGUAGE) + "/" + helpPage.getPageName();
-        JabRefDesktop.openBrowserShowPopup(url);
+        String lang = Globals.prefs.get(JabRefPreferences.LANGUAGE);
+        StringBuilder sb = new StringBuilder("https://help.jabref.org/");
+
+        if (avaiableLangFiles.contains(lang)) {
+            sb.append(lang);
+            sb.append("/");
+        } else {
+            sb.append("en/");
+        }
+        sb.append(helpPage.getPageName());
+        JabRefDesktop.openBrowserShowPopup(sb.toString().trim());
     }
 }
