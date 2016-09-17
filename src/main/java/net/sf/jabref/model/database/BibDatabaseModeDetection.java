@@ -1,6 +1,7 @@
 package net.sf.jabref.model.database;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -11,9 +12,10 @@ import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
 
 public class BibDatabaseModeDetection {
-    private static final List<EntryType> bibtex = BibtexEntryTypes.ALL;
-    private static final List<EntryType> biblatex = BibLatexEntryTypes.ALL;
-    private static final List<String> exclusiveBiblatex = filterEntryTypesNames(biblatex, isNotIncludedIn(bibtex));
+
+    private static final List<EntryType> BIBTEX = BibtexEntryTypes.ALL;
+    private static final List<EntryType> BIBLATEX = BibLatexEntryTypes.ALL;
+    private static final List<String> EXCLUSIVE_BIBLATEX = filterEntryTypesNames(BIBLATEX, isNotIncludedIn(BIBTEX));
 
     /**
      * Tries to infer the database type by examining a BibDatabase database.
@@ -32,7 +34,7 @@ public class BibDatabaseModeDetection {
         final Stream<String> entryTypes = database.getEntries().stream().map(BibEntry::getType);
 
         // type-based check
-        if (entryTypes.anyMatch(type -> exclusiveBiblatex.contains(type.toLowerCase()))) {
+        if (entryTypes.anyMatch(type -> EXCLUSIVE_BIBLATEX.contains(type.toLowerCase(Locale.ENGLISH)))) {
             return BibDatabaseMode.BIBLATEX;
         } else {
             // field-based check

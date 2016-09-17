@@ -31,7 +31,6 @@ import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
@@ -213,7 +212,7 @@ public class ImportCustomizationDialog extends JDialog {
         this.setSize(getSize());
         pack();
         this.setLocationRelativeTo(frame);
-        new FocusRequester(customImporterTable);
+        customImporterTable.requestFocus();
     }
 
     /*

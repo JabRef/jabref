@@ -10,7 +10,6 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
 import net.sf.jabref.gui.SaveOrderConfigDisplay;
-import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -91,7 +90,7 @@ class FileSortTab extends JPanel implements PrefsTab {
 
         boolean selected = prefs.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER);
         exportOrderPanel.setEnabled(selected);
-        exportOrderPanel.setSaveOrderConfig(SaveOrderConfig.loadExportSaveOrderFromPreferences(prefs));
+        exportOrderPanel.setSaveOrderConfig(prefs.loadExportSaveOrder());
     }
 
     @Override
@@ -99,7 +98,7 @@ class FileSortTab extends JPanel implements PrefsTab {
         prefs.putBoolean(JabRefPreferences.EXPORT_IN_ORIGINAL_ORDER, exportInOriginalOrder.isSelected());
         prefs.putBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER, exportInSpecifiedOrder.isSelected());
 
-        exportOrderPanel.getSaveOrderConfig().storeAsExportSaveOrderInPreferences(prefs);
+        prefs.storeExportSaveOrder(exportOrderPanel.getSaveOrderConfig());
     }
 
     @Override

@@ -1,7 +1,5 @@
 package net.sf.jabref.logic.exporter;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
@@ -50,8 +48,8 @@ public class FileSaveSession extends SaveSession {
 
     private static VerifyingWriter getWriterForFile(Charset encoding, Path file) throws SaveException {
         try {
-            return new VerifyingWriter(new FileOutputStream(file.toFile()), encoding);
-        } catch (FileNotFoundException e) {
+            return new VerifyingWriter(Files.newOutputStream(file), encoding);
+        } catch (IOException e) {
             throw new SaveException(e);
         }
     }
@@ -104,7 +102,7 @@ public class FileSaveSession extends SaveSession {
             FileBasedLock.deleteLockFile(file);
         }
         try {
-            Files.delete(temporaryFile);
+            Files.deleteIfExists(temporaryFile);
         } catch (IOException e) {
             LOGGER.warn("Cannot delete temporary file", e);
         }
@@ -113,7 +111,7 @@ public class FileSaveSession extends SaveSession {
     @Override
     public void cancel() {
         try {
-            Files.delete(temporaryFile);
+            Files.deleteIfExists(temporaryFile);
         } catch (IOException e) {
             LOGGER.warn("Cannot delete temporary file", e);
         }

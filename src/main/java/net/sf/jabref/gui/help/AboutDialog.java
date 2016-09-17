@@ -74,8 +74,8 @@ public class AboutDialog extends JDialog {
 
         String text = String.format("%n2003-%s%n%s%n%s%n%nDevelopers: %s%n%nAuthors: %s%n%nExternal Libraries: %s%nCode: %s",
                 Globals.BUILD_INFO.getYear(),
-                "http://www.jabref.org",
-                "GNU General Public License v2 or later",
+                "https://www.jabref.org",
+                "MIT License",
                 Globals.BUILD_INFO.getDevelopers(),
                 Globals.BUILD_INFO.getAuthors(),
                 "https://github.com/JabRef/jabref/blob/master/external-libraries.txt",

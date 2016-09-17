@@ -1,5 +1,6 @@
 package net.sf.jabref.model;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -26,8 +27,10 @@ public class EntryTypes {
         private final Map<String, EntryType> STANDARD_TYPES;
         private final EntryType defaultType;
 
-        public InternalEntryTypes(EntryType defaultType, List<EntryType>... entryTypes) {
+
+        public InternalEntryTypes(EntryType defaultType, List<List<EntryType>> entryTypes) {
             this.defaultType = defaultType;
+
             for (List<EntryType> list : entryTypes) {
                 for (EntryType type : list) {
                     ALL_TYPES.put(type.getName().toLowerCase(), type);
@@ -95,8 +98,11 @@ public class EntryTypes {
 
     }
 
-    public static final InternalEntryTypes BIBTEX = new InternalEntryTypes(BibtexEntryTypes.MISC, BibtexEntryTypes.ALL, IEEETranEntryTypes.ALL);
-    public static final InternalEntryTypes BIBLATEX = new InternalEntryTypes(BibLatexEntryTypes.MISC, BibLatexEntryTypes.ALL);
+
+    public static final InternalEntryTypes BIBTEX = new InternalEntryTypes(BibtexEntryTypes.MISC,
+            Arrays.asList(BibtexEntryTypes.ALL, IEEETranEntryTypes.ALL));
+    public static final InternalEntryTypes BIBLATEX = new InternalEntryTypes(BibLatexEntryTypes.MISC,
+            Arrays.asList(BibLatexEntryTypes.ALL));
 
     /**
      * This method returns the BibtexEntryType for the name of a type,

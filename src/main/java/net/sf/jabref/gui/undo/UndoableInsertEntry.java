@@ -54,7 +54,7 @@ public class UndoableInsertEntry extends AbstractUndoableJabRefEdit {
     @Override
     public void redo() {
         super.redo();
-        base.insertEntry(entry);
+        base.insertEntryWithDuplicationCheck(entry);
     }
 
 }
