@@ -106,6 +106,6 @@ public class HelpAction extends MnemonicAwareAction {
             sb.append("en/");
         }
         sb.append(helpPage.getPageName());
-        JabRefDesktop.openBrowserShowPopup(sb.toString().trim());
+        JabRefDesktop.openBrowserShowPopup(sb.toString());
     }
 }
