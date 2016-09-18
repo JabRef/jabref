@@ -28,12 +28,12 @@ import net.sf.jabref.model.entry.ParsedFileField;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.openjdk.jmh.annotations.TearDown;
 
 import static org.mockito.Mockito.mock;
 
@@ -325,7 +325,7 @@ public class CleanupWorkerTest {
         Assert.assertEquals(Optional.of("01"), entry.getField("month"));
     }
 
-    @TearDown
+    @After
     public void tearDown() {
         JabRefPreferences.getInstance().putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, false);
 
