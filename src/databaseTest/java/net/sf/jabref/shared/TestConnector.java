@@ -1,6 +1,5 @@
 package net.sf.jabref.shared;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
 public class TestConnector {
@@ -8,15 +7,15 @@ public class TestConnector {
     public static DBMSType currentConnectionType;
 
 
-    public static Connection getTestConnection(DBMSType dbmsType) throws ClassNotFoundException, SQLException {
+    public static DBMSConnection getTestDBMSConnection(DBMSType dbmsType) throws SQLException {
         currentConnectionType = dbmsType;
 
-        DBMSConnectionProperties properties = getConnectionProperties(dbmsType);
+        DBMSConnectionProperties properties = getTestConnectionProperties(dbmsType);
 
-        return DBMSConnector.getNewConnection(properties);
+        return new DBMSConnection(properties);
     }
 
-    public static DBMSConnectionProperties getConnectionProperties(DBMSType dbmsType) {
+    public static DBMSConnectionProperties getTestConnectionProperties(DBMSType dbmsType) {
 
         if (dbmsType == DBMSType.MYSQL) {
             return new DBMSConnectionProperties(dbmsType, "localhost", dbmsType.getDefaultPort(), "jabref", "root", "");

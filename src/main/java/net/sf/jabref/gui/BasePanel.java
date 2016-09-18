@@ -274,7 +274,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             }
         } else if (databaseLocation == DatabaseLocation.SHARED) {
             title.append(
-                    this.bibDatabaseContext.getDBSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]");
+                    this.bibDatabaseContext.getDBMSSynchronizer().getDBName() + " [" + Localization.lang("shared") + "]");
         }
 
         return title.toString();
@@ -555,7 +555,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 .openConsole(frame.getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null)));
 
         actions.put(Actions.PULL_CHANGES_FROM_SHARED_DATABASE, (BaseAction) () -> {
-            DBMSSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBSynchronizer();
+            DBMSSynchronizer dbmsSynchronizer = frame.getCurrentBasePanel().getBibDatabaseContext().getDBMSSynchronizer();
             dbmsSynchronizer.pullChanges();
         });
 

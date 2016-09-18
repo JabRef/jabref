@@ -1,6 +1,5 @@
 package net.sf.jabref.shared;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -26,7 +25,7 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class DBMSProcessorTest {
 
-    private static Connection connection;
+    private DBMSConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
 
     @Parameter
@@ -34,18 +33,15 @@ public class DBMSProcessorTest {
 
 
     @Before
-    public void setUp() throws ClassNotFoundException, SQLException {
-        // Get only one connection for each parameter
-        if (TestConnector.currentConnectionType != dbmsType) {
-            connection = TestConnector.getTestConnection(dbmsType);
-        }
-        dbmsProcessor = DBMSProcessor.getProcessorInstance(connection, dbmsType);
+    public void setUp() throws SQLException {
+        dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
+        dbmsProcessor = DBMSProcessor.getProcessorInstance(dbmsConnection);
         dbmsProcessor.setupSharedDatabase();
     }
 
     @Parameters(name = "Test with {0} database system")
     public static Collection<DBMSType> getTestingDatabaseSystems() {
-        return DBMSConnector.getAvailableDBMSTypes();
+        return DBMSConnection.getAvailableDBMSTypes();
     }
 
     @Test
@@ -275,7 +271,7 @@ public class DBMSProcessorTest {
 
     private ResultSet selectFrom(String table) {
         try {
-            return connection.createStatement().executeQuery("SELECT * FROM " + escape(table));
+            return dbmsConnection.getConnection().createStatement().executeQuery("SELECT * FROM " + escape(table));
         } catch (SQLException e) {
             Assert.fail(e.getMessage());
             return null;
@@ -286,7 +282,7 @@ public class DBMSProcessorTest {
     // Therefore this function was defined to improve the readability and to keep the code short.
     private void insertMetaData(String key, String value) {
         try {
-            connection.createStatement().executeUpdate("INSERT INTO " + escape("METADATA") + "("
+            dbmsConnection.getConnection().createStatement().executeUpdate("INSERT INTO " + escape("METADATA") + "("
                     + escape("KEY") + ", " + escape("VALUE") + ") VALUES("
                     + escapeValue(key) + ", " + escapeValue(value) + ")");
         } catch (SQLException e) {
@@ -304,23 +300,6 @@ public class DBMSProcessorTest {
 
     @After
     public void clear() throws SQLException {
-        if ((dbmsType == DBMSType.MYSQL) || (dbmsType == DBMSType.POSTGRESQL)) {
-            connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape("FIELD"));
-            connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape("ENTRY"));
-            connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape("METADATA"));
-        } else if (dbmsType == DBMSType.ORACLE) {
-            connection.createStatement().executeUpdate(
-                    "BEGIN\n" +
-                    "EXECUTE IMMEDIATE 'DROP TABLE " + escape("FIELD") + "';\n" +
-                    "EXECUTE IMMEDIATE 'DROP TABLE " + escape("ENTRY") + "';\n" +
-                    "EXECUTE IMMEDIATE 'DROP TABLE " + escape("METADATA") + "';\n" +
-                    "EXECUTE IMMEDIATE 'DROP SEQUENCE " + escape("ENTRY_SEQ") + "';\n" +
-                    "EXCEPTION\n" +
-                    "WHEN OTHERS THEN\n" +
-                    "IF SQLCODE != -942 THEN\n" +
-                    "RAISE;\n" +
-                    "END IF;\n" +
-                    "END;");
-        }
+        TestManager.clearTables(dbmsConnection);
     }
 }

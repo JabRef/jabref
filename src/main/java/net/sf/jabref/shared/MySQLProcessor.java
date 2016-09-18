@@ -1,6 +1,5 @@
 package net.sf.jabref.shared;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
@@ -8,11 +7,7 @@ import java.sql.SQLException;
  */
 public class MySQLProcessor extends DBMSProcessor {
 
-    /**
-     * @param connection Working SQL connection
-     * @param dbmsType Instance of {@link DBMSType}
-     */
-    public MySQLProcessor(Connection connection) {
+    public MySQLProcessor(DBMSConnection connection) {
         super(connection);
     }
 
@@ -45,5 +40,20 @@ public class MySQLProcessor extends DBMSProcessor {
     @Override
     public String escape(String expression) {
         return "`" + expression + "`";
+    }
+
+    @Override
+    public void startNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
+        // not supported by this database system
+    }
+
+    @Override
+    public void stopNotificationListener() {
+        // not supported by this database system
+    }
+
+    @Override
+    public void notifyClients() {
+        // not supported by this database system
     }
 }

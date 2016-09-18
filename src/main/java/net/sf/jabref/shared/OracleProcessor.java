@@ -1,6 +1,5 @@
 package net.sf.jabref.shared;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
@@ -8,11 +7,7 @@ import java.sql.SQLException;
  */
 public class OracleProcessor extends DBMSProcessor {
 
-    /**
-     * @param connection Working SQL connection
-     * @param dbmsType Instance of {@link DBMSType}
-     */
-    public OracleProcessor(Connection connection) {
+    public OracleProcessor(DBMSConnection connection) {
         super(connection);
     }
 
@@ -52,5 +47,20 @@ public class OracleProcessor extends DBMSProcessor {
     @Override
     public String escape(String expression) {
         return "\"" + expression + "\"";
+    }
+
+    @Override
+    public void startNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
+        // not supported yet
+    }
+
+    @Override
+    public void stopNotificationListener() {
+        // not supported yet
+    }
+
+    @Override
+    public void notifyClients() {
+        // not supported yet
     }
 }

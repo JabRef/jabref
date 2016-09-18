@@ -1,10 +1,15 @@
 package net.sf.jabref.gui.shared;
 
-import javax.swing.JOptionPane;
+import java.util.Objects;
 
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.undo.UndoableRemoveEntry;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.shared.DBMSSynchronizer;
 import net.sf.jabref.shared.event.ConnectionLostEvent;
 import net.sf.jabref.shared.event.SharedEntryNotPresentEvent;
@@ -20,7 +25,7 @@ public class SharedDatabaseUIManager {
 
     public SharedDatabaseUIManager(JabRefFrame jabRefFrame, String keywordSeparator) {
         this.jabRefFrame = jabRefFrame;
-        this.dbmsSynchronizer = jabRefFrame.getCurrentBasePanel().getBibDatabaseContext().getDBSynchronizer();
+        this.dbmsSynchronizer = jabRefFrame.getCurrentBasePanel().getBibDatabaseContext().getDBMSSynchronizer();
         this.keywordSeparator = keywordSeparator;
     }
 
@@ -62,23 +67,19 @@ public class SharedDatabaseUIManager {
     }
 
     @Subscribe
-    public void listen(SharedEntryNotPresentEvent sharedEntryNotPresentEvent) {
-        BibEntry bibEntry = sharedEntryNotPresentEvent.getBibEntry();
+    public void listen(SharedEntryNotPresentEvent event) {
+        BasePanel panel = jabRefFrame.getCurrentBasePanel();
+        EntryEditor entryEditor = panel.getCurrentEditor();
 
-        String[] options = {Localization.lang("Keep"), Localization.lang("Delete")};
+        panel.getUndoManager().addEdit(new UndoableRemoveEntry(panel.getDatabase(), event.getBibEntry(), panel));
 
-        int answer = JOptionPane.showOptionDialog(jabRefFrame,
-                Localization.lang("The BibEntry you currently work on has been deleted on the shared side. "
-                        + "Hit \"Keep\" to recover the entry.") + "\n\n",
-                Localization.lang("Update refused"), JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.INFORMATION_MESSAGE,
-                null, options, options[0]);
+        if (Objects.nonNull(entryEditor) && (entryEditor.getEntry() == event.getBibEntry())) {
+            JOptionPane.showMessageDialog(jabRefFrame,
+                    Localization.lang("The BibEntry you currently work on has been deleted on the shared side.")
+                            + "\n" + Localization.lang("You can restore the entry using the \"Undo\" operation."),
+                    Localization.lang("Shared entry is no longer present"), JOptionPane.INFORMATION_MESSAGE);
 
-        if (answer == 0) {
-            dbmsSynchronizer.getDBProcessor().insertEntry(bibEntry);
-        } else if (answer == 1) {
-            jabRefFrame.getCurrentBasePanel().hideBottomComponent();
+            SwingUtilities.invokeLater(() -> panel.hideBottomComponent());
         }
-        dbmsSynchronizer.pullChanges();
     }
-
 }

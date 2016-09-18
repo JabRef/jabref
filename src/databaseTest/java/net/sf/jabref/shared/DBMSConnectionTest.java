@@ -3,6 +3,7 @@ package net.sf.jabref.shared;
 import java.sql.SQLException;
 import java.util.Collection;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -10,7 +11,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
-public class DBMSConnectorTest {
+public class DBMSConnectionTest {
 
     @Parameter
     public DBMSType dbmsType;
@@ -18,17 +19,17 @@ public class DBMSConnectorTest {
 
     @Parameters(name = "Test with {0} database system")
     public static Collection<DBMSType> getTestingDatabaseSystems() {
-        return DBMSConnector.getAvailableDBMSTypes();
+        return DBMSConnection.getAvailableDBMSTypes();
     }
 
     @Test
-    public void testGetNewConnection() throws ClassNotFoundException, SQLException {
-        DBMSConnectionProperties properties = TestConnector.getConnectionProperties(dbmsType);
-        DBMSConnector.getNewConnection(properties);
+    public void testGetConnection() throws SQLException {
+        DBMSConnectionProperties properties = TestConnector.getTestConnectionProperties(dbmsType);
+        Assert.assertNotNull(new DBMSConnection(properties).getConnection());
     }
 
     @Test(expected = SQLException.class)
-    public void testGetNewConnectionFail() throws SQLException, ClassNotFoundException {
-        DBMSConnector.getNewConnection(new DBMSConnectionProperties(dbmsType, "XXXX", 0, "XXXX", "XXXX", "XXXX"));
+    public void testGetConnectionFail() throws SQLException {
+        new DBMSConnection(new DBMSConnectionProperties(dbmsType, "XXXX", 0, "XXXX", "XXXX", "XXXX")).getConnection();
     }
 }
