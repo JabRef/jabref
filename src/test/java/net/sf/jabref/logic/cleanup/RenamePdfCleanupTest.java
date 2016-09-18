@@ -32,12 +32,15 @@ public class RenamePdfCleanupTest {
     private BibEntry entry;
     private JabRefPreferences prefs;
 
+
     @Before
     public void setUp() throws Exception {
         prefs = JabRefPreferences.getInstance();
         MetaData metaData = new MetaData();
         context = new BibDatabaseContext(new BibDatabase(), metaData, new Defaults());
         context.setDatabaseFile(testFolder.newFile("test.bib"));
+
+        prefs.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, true);
 
         entry = new BibEntry();
         entry.setCiteKey("Toot");
@@ -49,11 +52,12 @@ public class RenamePdfCleanupTest {
     @Test
     public void cleanupRenamePdfRenamesFileEvenIfOnlyDifferenceIsCase() throws IOException {
         String fileNamePattern = "\\bibtexkey";
+        String fileDirPattern = "";
         File tempFile = testFolder.newFile("toot.tmp");
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPattern,
                 mock(LayoutFormatterPreferences.class), prefs.getFileDirectoryPreferences());
         cleanup.cleanup(entry);
 
@@ -64,13 +68,14 @@ public class RenamePdfCleanupTest {
     @Test
     public void cleanupRenamePdfRenamesWithMultipleFiles() throws IOException {
         String fileNamePattern = "\\bibtexkey - \\title";
+        String fileDirPattern = "";
         File tempFile = testFolder.newFile("Toot.tmp");
 
         entry.setField("title", "test title");
-        entry.setField("file", FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("","",""),
-                new ParsedFileField("", tempFile.getAbsolutePath(), ""), new ParsedFileField("","",""))));
+        entry.setField("file", FileField.getStringRepresentation(Arrays.asList(new ParsedFileField("", "", ""),
+                new ParsedFileField("", tempFile.getAbsolutePath(), ""), new ParsedFileField("", "", ""))));
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPattern,
                 mock(LayoutFormatterPreferences.class), prefs.getFileDirectoryPreferences());
         cleanup.cleanup(entry);
 
@@ -83,12 +88,13 @@ public class RenamePdfCleanupTest {
     @Test
     public void cleanupRenamePdfRenamesFileStartingWithBibtexKey() throws IOException {
         String fileNamePattern = "\\bibtexkey - \\title";
+        String fileDirPattern = "";
         File tempFile = testFolder.newFile("Toot.tmp");
         ParsedFileField fileField = new ParsedFileField("", tempFile.getAbsolutePath(), "");
         entry.setField("file", FileField.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPattern,
                 mock(LayoutFormatterPreferences.class), prefs.getFileDirectoryPreferences());
         cleanup.cleanup(entry);
 
@@ -99,12 +105,13 @@ public class RenamePdfCleanupTest {
     @Test
     public void cleanupRenamePdfRenamesFileInSameFolder() throws IOException {
         String fileNamePattern = "\\bibtexkey\\begin{title} - \\format[RemoveBrackets]{\\title}\\end{title}";
+        String fileDirPattern = "";
         testFolder.newFile("Toot.pdf");
         ParsedFileField fileField = new ParsedFileField("", "Toot.pdf", "PDF");
         entry.setField("file", FileField.getStringRepresentation(fileField));
         entry.setField("title", "test title");
 
-        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern,
+        RenamePdfCleanup cleanup = new RenamePdfCleanup(false, context, fileNamePattern, fileDirPattern,
                 prefs.getLayoutFormatterPreferences(mock(JournalAbbreviationLoader.class)),
                 prefs.getFileDirectoryPreferences());
         cleanup.cleanup(entry);

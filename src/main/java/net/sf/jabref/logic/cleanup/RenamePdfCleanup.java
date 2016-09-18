@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -19,7 +18,6 @@ import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.ParsedFileField;
 import net.sf.jabref.model.metadata.FileDirectoryPreferences;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,6 +29,7 @@ public class RenamePdfCleanup implements CleanupJob {
     private final BibDatabaseContext databaseContext;
     private final boolean onlyRelativePaths;
     private final String fileNamePattern;
+    private final String fileDirPattern;
     private final LayoutFormatterPreferences prefs;
     private final FileDirectoryPreferences fileDirectoryPreferences;
 
@@ -38,10 +37,12 @@ public class RenamePdfCleanup implements CleanupJob {
 
 
     public RenamePdfCleanup(boolean onlyRelativePaths, BibDatabaseContext databaseContext, String fileNamePattern,
-            LayoutFormatterPreferences prefs, FileDirectoryPreferences fileDirectoryPreferences) {
+            String fileDirPattern, LayoutFormatterPreferences prefs,
+            FileDirectoryPreferences fileDirectoryPreferences) {
         this.databaseContext = Objects.requireNonNull(databaseContext);
         this.onlyRelativePaths = onlyRelativePaths;
         this.fileNamePattern = Objects.requireNonNull(fileNamePattern);
+        this.fileDirPattern = Objects.requireNonNull(fileDirPattern);
         this.prefs = Objects.requireNonNull(prefs);
         this.fileDirectoryPreferences = fileDirectoryPreferences;
     }
@@ -64,8 +65,14 @@ public class RenamePdfCleanup implements CleanupJob {
             StringBuilder targetFileName = new StringBuilder(FileUtil
                     .createFileNameFromPattern(databaseContext.getDatabase(), entry, fileNamePattern, prefs).trim());
 
-            String targetDirName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry,
-                    Globals.prefs.get(JabRefPreferences.IMPORT_FILEDIRPATTERN), prefs);
+            String targetDirName = "";
+            if (!fileDirPattern.isEmpty()) {
+                targetDirName = FileUtil.createFileNameFromPattern(databaseContext.getDatabase(), entry, fileDirPattern,
+                        prefs);
+            }
+            System.out.println("FileDirPrefs " + fileDirPattern);
+
+            System.out.println("TARGET DIR " + targetDirName);
 
             //Add extension to newFilename
             targetFileName.append('.').append(FileUtil.getFileExtension(realOldFilename).orElse("pdf"));
@@ -83,6 +90,7 @@ public class RenamePdfCleanup implements CleanupJob {
 
             Path newPath = expandedOldFile.get().toPath().getParent().resolve(targetDirName)
                     .resolve(targetFileName.toString());
+
             System.out.println("New Path 2 " + newPath);
             //            String newPath = expandedOldFile.get().getParent().concat(OS.FILE_SEPARATOR).concat(targetFileName.toString());
 
@@ -128,7 +136,9 @@ public class RenamePdfCleanup implements CleanupJob {
                     if ((parent == null)
                             || databaseContext.getFileDirectories(fileDirectoryPreferences).contains(parent)) {
                         newFileEntryFileName = targetFileName.toString();
+
                     } else {
+
                         String par = parent.relativize(newPath).toString();
                         System.out.println("NewEntryFileName " + par);
                         newFileEntryFileName = par;
