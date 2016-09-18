@@ -1,11 +1,26 @@
 package net.sf.jabref.shared;
 
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.Properties;
+
+import oracle.jdbc.OracleConnection;
+import oracle.jdbc.OracleStatement;
+import oracle.jdbc.dcn.DatabaseChangeEvent;
+import oracle.jdbc.dcn.DatabaseChangeListener;
+import oracle.jdbc.dcn.DatabaseChangeRegistration;
 
 /**
  * Processes all incoming or outgoing bib data to Oracle database and manages its structure.
  */
 public class OracleProcessor extends DBMSProcessor {
+
+    private OracleConnection oracleConnection;
+
+    private OracleNotificationListener listener;
+
+    private DatabaseChangeRegistration databaseChangeRegistration;
+
 
     public OracleProcessor(DBMSConnection connection) {
         super(connection);
@@ -49,18 +64,66 @@ public class OracleProcessor extends DBMSProcessor {
         return "\"" + expression + "\"";
     }
 
+
+    private class OracleNotificationListener implements DatabaseChangeListener {
+
+        private final DBMSSynchronizer dbmsSynchronizer;
+
+
+        public OracleNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
+            this.dbmsSynchronizer = dbmsSynchronizer;
+        }
+
+        @Override
+        public void onDatabaseChangeNotification(DatabaseChangeEvent event) {
+            dbmsSynchronizer.pullChanges();
+        }
+    }
+
     @Override
     public void startNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
-        // not supported yet
+
+        this.listener = new OracleNotificationListener(dbmsSynchronizer);
+
+        try {
+            oracleConnection = (OracleConnection) connection;
+
+            Properties properties = new Properties();
+            properties.setProperty(OracleConnection.DCN_NOTIFY_ROWIDS, "true");
+            properties.setProperty(OracleConnection.DCN_QUERY_CHANGE_NOTIFICATION, "true");
+
+            databaseChangeRegistration = oracleConnection.registerDatabaseChangeNotification(properties);
+            databaseChangeRegistration.addListener(listener);
+
+            try (Statement statement = oracleConnection.createStatement()) {
+                ((OracleStatement) statement).setDatabaseChangeRegistration(databaseChangeRegistration);
+                StringBuilder selectQuery = new StringBuilder()
+                        .append("SELECT 1 FROM ")
+                        .append(escape("ENTRY"))
+                        .append(", ")
+                        .append(escape("METADATA"));
+                // this execution registers all tables mentioned in selectQuery
+                statement.executeQuery(selectQuery.toString());
+            }
+
+        } catch (SQLException e) {
+            LOGGER.error("SQL Error: ", e);
+        }
+
     }
 
     @Override
     public void stopNotificationListener() {
-        // not supported yet
+        try {
+            oracleConnection.unregisterDatabaseChangeNotification(databaseChangeRegistration);
+            oracleConnection.close();
+        } catch (SQLException e) {
+            LOGGER.error("SQL Error: ", e);
+        }
     }
 
     @Override
     public void notifyClients() {
-        // not supported yet
+        // Do nothing because Oracle triggers notifications automatically.
     }
 }

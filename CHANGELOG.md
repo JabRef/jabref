@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Implementation of LiveUpdate for Oracle systems. Related to [#970](https://github.com/JabRef/jabref/issues/970).
 - Implementation of LiveUpdate for PostgreSQL systems. Related to [#970](https://github.com/JabRef/jabref/issues/970).
 - Added fetcher for [MathSciNet](http://www.ams.org/mathscinet), [zbMATH](https://www.zbmath.org/) and [Astrophysics Data System](http://www.adsabs.harvard.edu/)
 - Implemented [#825](https://github.com/JabRef/jabref/issues/825): Search Bar across all bib files instead each having its own
