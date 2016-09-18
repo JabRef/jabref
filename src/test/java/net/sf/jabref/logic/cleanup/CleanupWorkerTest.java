@@ -33,6 +33,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.openjdk.jmh.annotations.TearDown;
 
 import static org.mockito.Mockito.mock;
 
@@ -55,6 +56,7 @@ public class CleanupWorkerTest {
         BibDatabaseContext context = new BibDatabaseContext(new BibDatabase(), metaData, bibFolder.newFile("test.bib"));
 
         JabRefPreferences prefs = JabRefPreferences.getInstance();
+        prefs.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, true);
         worker = new CleanupWorker(context,
                 new CleanupPreferences(JabRefPreferences.getInstance().get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
                         prefs.get(JabRefPreferences.IMPORT_FILEDIRPATTERN),
@@ -321,5 +323,11 @@ public class CleanupWorkerTest {
 
         worker.cleanup(preset, entry);
         Assert.assertEquals(Optional.of("01"), entry.getField("month"));
+    }
+
+    @TearDown
+    public void tearDown() {
+        JabRefPreferences.getInstance().putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, false);
+
     }
 }

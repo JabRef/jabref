@@ -20,6 +20,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+import org.openjdk.jmh.annotations.TearDown;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -118,5 +119,11 @@ public class RenamePdfCleanupTest {
 
         ParsedFileField newFileField = new ParsedFileField("", "Toot - test title.pdf", "PDF");
         assertEquals(Optional.of(FileField.getStringRepresentation(newFileField)), entry.getField("file"));
+    }
+
+    @TearDown
+    public void tearDown() {
+        JabRefPreferences.getInstance().putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, false);
+
     }
 }
