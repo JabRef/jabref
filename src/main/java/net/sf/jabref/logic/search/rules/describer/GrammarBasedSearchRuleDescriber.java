@@ -10,7 +10,6 @@ import net.sf.jabref.model.search.rules.GrammarBasedSearchRule;
 import net.sf.jabref.search.SearchBaseVisitor;
 import net.sf.jabref.search.SearchParser;
 
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 public class GrammarBasedSearchRuleDescriber implements SearchDescriber {
