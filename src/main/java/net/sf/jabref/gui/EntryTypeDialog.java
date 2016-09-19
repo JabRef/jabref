@@ -52,7 +52,10 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
     private static final Log LOGGER = LogFactory.getLog(EntryTypeDialog.class);
 
     private EntryType type;
-    private SwingWorker<Optional<BibEntry>, Void> fetcherWorker;
+    private SwingWorker fetcherWorker = new FetcherWorker();
+    private JButton generateButton;
+    private JTextField idTextField;
+    private JComboBox<String> comboBox;
     private final JabRefFrame frame;
     private static final int COLUMN = 3;
     private final boolean biblatexMode;
@@ -173,54 +176,17 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
     }
 
     private JPanel createIdFetcherPanel() {
-        JButton generateButton = new JButton(Localization.lang("Generate"));
-        JTextField idTextField = new JTextField("");
-        JComboBox<String> comboBox = new JComboBox<>();
+        generateButton = new JButton(Localization.lang("Generate"));
+        idTextField = new JTextField("");
+        comboBox = new JComboBox<>();
         EntryFetchers.getIdFetchers().forEach(fetcher -> comboBox.addItem(fetcher.getName()));
         JLabel fetcherLabel = new JLabel(Localization.lang("ID type"));
         JLabel idLabel = new JLabel(Localization.lang("ID"));
 
-        fetcherWorker = new SwingWorker<Optional<BibEntry>, Void>() {
-            Optional<BibEntry> bibEntry = Optional.empty();
-            IdBasedFetcher fetcher = null;
-            String searchID = "";
-
-            @Override
-            protected Optional<BibEntry> doInBackground() throws Exception {
-                generateButton.setEnabled(false);
-                generateButton.setText(Localization.lang("Searching..."));
-                searchID = idTextField.getText().trim();
-                fetcher = EntryFetchers.getIdFetchers().get(comboBox.getSelectedIndex());
-                if (!searchID.isEmpty()) {
-                    try {
-                        bibEntry = fetcher.performSearchById(searchID);
-                    } catch (FetcherException e) {
-                        LOGGER.error(e.getMessage(), e);
-                        JOptionPane.showMessageDialog(null,
-                                Localization.lang("Error while fetching from %0", fetcher.getName()) + "\n" + e.getMessage(),
-                                Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-                dispose();
-                return bibEntry;
-            }
-
-            @Override
-            protected void done() {
-                try {
-                    Optional<BibEntry> result = get();
-                    if (result.isPresent()) {
-                        frame.getCurrentBasePanel().insertEntry(result.get());
-                    } else {
-                        JOptionPane.showMessageDialog(null, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID), Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
-                    }
-                } catch (ExecutionException | InterruptedException e) {
-                    LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchID, fetcher.getName()), e);
-                }
-            }
-        };
-
-        generateButton.addActionListener(action -> fetcherWorker.execute());
+        generateButton.addActionListener(action -> {
+            fetcherWorker.execute();
+            fetcherWorker = new FetcherWorker();
+        });
 
         JPanel jPanel = new JPanel();
 
@@ -286,6 +252,51 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         public void actionPerformed(ActionEvent e) {
             stopFetching();
             dispose();
+        }
+    }
+
+    class FetcherWorker extends SwingWorker<Optional<BibEntry>, Void> {
+        Optional<BibEntry> bibEntry = Optional.empty();
+        IdBasedFetcher fetcher = null;
+        String searchID = "";
+
+        @Override
+        protected Optional<BibEntry> doInBackground() throws Exception {
+            generateButton.setEnabled(false);
+            generateButton.setText(Localization.lang("Searching..."));
+            searchID = idTextField.getText().trim();
+            fetcher = EntryFetchers.getIdFetchers().get(comboBox.getSelectedIndex());
+            if (!searchID.isEmpty()) {
+                try {
+                    bibEntry = fetcher.performSearchById(searchID);
+                    dispose();
+
+                } catch (FetcherException e) {
+                    LOGGER.error(e.getMessage(), e);
+                    JOptionPane.showMessageDialog(null,
+                            Localization.lang("Error while fetching from %0", fetcher.getName()) + "\n" + e.getMessage(),
+                            Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+
+                }
+            }
+            return bibEntry;
+        }
+
+        @Override
+        protected void done() {
+            try {
+                Optional<BibEntry> result = get();
+                if (result.isPresent()) {
+                    frame.getCurrentBasePanel().insertEntry(result.get());
+                } else {
+                    JOptionPane.showMessageDialog(null, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID), Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
+
+                    generateButton.setText(Localization.lang("Generate"));
+                    generateButton.setEnabled(true);
+                }
+            } catch (ExecutionException | InterruptedException e) {
+                LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchID, fetcher.getName()), e);
+            }
         }
     }
 
