@@ -1,8 +1,25 @@
 package net.sf.jabref.shared;
 
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TestManager {
+
+    public static Collection<DBMSType> getDBMSTypeTestParameter() {
+
+        Set<DBMSType> dbmsTypes = new HashSet<>();
+        for (DBMSType dbmsType : DBMSType.values()) {
+            try {
+                TestConnector.getTestDBMSConnection(dbmsType);
+                dbmsTypes.add(dbmsType);
+            } catch (SQLException e) {
+                // skip parameter
+            }
+        }
+        return dbmsTypes;
+    }
 
     public static void clearTables(DBMSConnection dbmsConnection) throws SQLException {
         DBMSType dbmsType = dbmsConnection.getProperties().getType();

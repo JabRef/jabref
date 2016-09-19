@@ -19,7 +19,7 @@ public class DBMSConnectionTest {
 
     @Parameters(name = "Test with {0} database system")
     public static Collection<DBMSType> getTestingDatabaseSystems() {
-        return DBMSConnection.getAvailableDBMSTypes();
+        return TestManager.getDBMSTypeTestParameter();
     }
 
     @Test
