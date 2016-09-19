@@ -229,7 +229,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private void setupFieldPanels() {
         tabbed.removeAll();
         tabs.clear();
-
         EntryType type = EntryTypes.getTypeOrDefault(entry.getType(), this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
 
         // required fields
@@ -305,7 +304,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         addGeneralTabs();
         // source tab
         addSourceTab();
-
         addPdfTab();
     }
 
@@ -371,10 +369,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * Add a tab for displaying comments from a PDF
      */
     private void addPdfTab() {
-        PdfCommentsTab pdfCommentsTab = new PdfCommentsTab(this, frame, panel);
-        tabbed.addTab(Localization.lang("PDF comments"), IconTheme.JabRefIcon.PDF_FILE.getSmallIcon(), pdfCommentsTab,
-                Localization.lang("Show PDF comments"));
-        tabs.add(pdfCommentsTab);
+            PdfCommentsTab pdfCommentsTab = new PdfCommentsTab(this, frame, panel);
+            tabbed.addTab(Localization.lang("PDF comments"), IconTheme.JabRefIcon.PDF_FILE.getSmallIcon(), pdfCommentsTab,
+                    Localization.lang("Show PDF comments"));
+            tabs.add(pdfCommentsTab);
+
     }
 
     public String getDisplayedBibEntryType() {
@@ -475,7 +474,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         // Remove change listener, because the rebuilding causes meaningless
         // events and trouble:
         tabbed.removeChangeListener(tabListener);
-
         setupFieldPanels();
         // Add the change listener again:
         tabbed.addChangeListener(tabListener);
@@ -653,7 +651,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private void activateVisible() {
         Object activeTab = tabs.get(tabbed.getSelectedIndex());
-
         if (activeTab instanceof EntryEditorTab) {
             ((EntryEditorTab) activeTab).activate();
         } else {
@@ -919,9 +916,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
      */
     public void validateAllFields() {
         for (Object tab : tabs) {
+            System.out.println(tab);
             if (tab instanceof EntryEditorTab) {
                 ((EntryEditorTab) tab).validateAllFields();
             }
+            
         }
     }
 
@@ -1038,13 +1037,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 if (activeTab instanceof EntryEditorTab) {
                     ((EntryEditorTab) activeTab).updateAll();
                     activateVisible();
-                }
-                if (activeTab instanceof PdfCommentsTab) {
-                    try {
-                        ((PdfCommentsTab) activeTab).addComments();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
                 }
             });
         }

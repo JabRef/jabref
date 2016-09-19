@@ -1,16 +1,10 @@
 package net.sf.jabref.logic.pdf;
 
 import java.awt.geom.Rectangle2D;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
-import net.sf.jabref.logic.util.io.FileUtil;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.pdf.PdfComment;
 
 import org.apache.pdfbox.cos.COSArray;
@@ -33,14 +27,21 @@ public class PdfCommentImporter {
     }
 
     /**
-     * Imports the comments from a pdf specified by its URI
+     * Imports the comments from a pdf specified by its path
      *
-     * @param document a PDDocument to get the annotations from
-     * @return a hashmap with the unique name as key and the notes content as value
+     * @param path a path to a pdf
+     * @return a list with the all the annotations found in the file of the path
      */
-    public HashMap<String, PdfComment> importNotes(final PDDocument document) {
+    public ArrayList<PdfComment> importNotes(final String path) {
 
-        HashMap<String, PdfComment> annotationsMap = new HashMap<>();
+        ArrayList<PdfComment> annotationsMap = new ArrayList<>();
+
+        PDDocument document = null;
+        try {
+            document = importPdfFile(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         pdfPages = document.getDocumentCatalog().getAllPages();
         for (int i = 0; i < pdfPages.size(); i++) {
@@ -84,7 +85,7 @@ public class PdfCommentImporter {
                         }
                         annotation.setContents(highlightedText);
                     }
-                    annotationsMap.put( annotation.getAnnotationName(), new PdfComment(annotation, i));
+                    annotationsMap.add(new PdfComment(annotation, i));
                 }
             } catch (IOException e1) {
                 e1.printStackTrace();
@@ -98,17 +99,11 @@ public class PdfCommentImporter {
         return annotationsMap;
     }
 
-    public List<PDDocument> importPdfFile(final List<BibEntry> entryList, final BibDatabaseContext bibDatabaseContext) throws IOException {
+    public PDDocument importPdfFile(final String path) throws IOException {
 
-        final List<File> files = FileUtil.getListOfLinkedFiles(entryList,
-                bibDatabaseContext.getFileDirectory(Globals.prefs.getFileDirectoryPreferences()));
-
-        ArrayList<PDDocument> documents = new ArrayList<>();
-        for(File linkedFile : files){
-            if(linkedFile.getName().toLowerCase().endsWith(".pdf")){
-                documents.add(PDDocument.load(linkedFile));
+            if(path.toLowerCase().endsWith(".pdf")){
+               return PDDocument.load("/"+ path);
             }
-        }
-        return documents;
+        return null;
     }
 }

@@ -6,8 +6,6 @@ import java.awt.SystemColor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Optional;
 
 import javax.swing.BoxLayout;
@@ -34,15 +32,13 @@ import net.sf.jabref.model.pdf.PdfComment;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.factories.Paddings;
-import org.apache.pdfbox.pdmodel.PDDocument;
 
 public class PdfCommentsTab extends JPanel {
 
     private final JList<PdfComment> commentList = new JList<>();
     private final JScrollPane commentScrollPane = new JScrollPane();
-    private final JLabel commentLabel = new JLabel(Localization.lang("Comments"), JLabel.LEFT);
     private final JLabel fileNameLabel = new JLabel(Localization.lang("Filename"),JLabel.CENTER);
-    private final JComboBox<String> filenameArea = new JComboBox<>();
+    private final JComboBox<String> fileNameComboBox = new JComboBox<>();
     private final JScrollPane fileNameScrollPane = new JScrollPane();
     private final JLabel authorLabel = new JLabel(Localization.lang("Author"), JLabel.CENTER);
     private final JTextArea authorArea = new JTextArea("author");
@@ -66,7 +62,8 @@ public class PdfCommentsTab extends JPanel {
     private final BasePanel basePanel;
     private int commentListSelectedIndex;
 
-    HashMap<String, PdfComment> importedNotes = new HashMap<>();
+    private ArrayList<PdfComment> importedNotes = new  ArrayList<PdfComment>();
+    private ArrayList<ArrayList<PdfComment>> allNotes = new ArrayList<>();
 
     public PdfCommentsTab(EntryEditor parent, JabRefFrame frame, BasePanel basePanel) {
         this.parent = parent;
@@ -89,7 +86,6 @@ public class PdfCommentsTab extends JPanel {
                 .columns("fill:pref:grow")
                 .rows("pref, $lg, fill:pref:grow")
                 .padding(Paddings.DIALOG)
-                .add(commentLabel).xy(1,1)
                 .add(commentScrollPane).xy(1,3)
                 .build();
         commentScrollPane.setViewportView(commentList);
@@ -109,16 +105,24 @@ public class PdfCommentsTab extends JPanel {
             ArrayList<BibEntry> entries = new ArrayList<>();
             entries.add(parent.getEntry());
 
-            List<PDDocument> documents = commentImporter.importPdfFile(entries,
-                    basePanel.getBibDatabaseContext());
-            if (documents.isEmpty()) {
-                listModel.clear();
-                listModel.addElement(new PdfComment("", "", "", 0, Localization.lang("Attached_file_has_no_valid_path"), ""));
+            int indexSelectedByComboBox;
+            if (fileNameComboBox.getItemCount() == 0) {
+                indexSelectedByComboBox = 0;
             } else {
-                importedNotes = commentImporter.importNotes(documents.get(0));
-                updateShownComments(importedNotes);
-                commentList.setSelectedIndex(commentListSelectedIndex);
+                indexSelectedByComboBox = fileNameComboBox.getSelectedIndex();
             }
+            FileField.parse(parent.getEntry().getField(FieldName.FILE).get()).stream()
+                    .filter(parsedFileField -> parsedFileField.getLink().toLowerCase().endsWith(".pdf"))
+                    .forEach(parsedFileField ->
+                    allNotes.add(commentImporter.importNotes(parsedFileField.getLink())));
+
+            updateShownComments(allNotes.get(indexSelectedByComboBox));
+            commentList.setSelectedIndex(commentListSelectedIndex);
+            //set up the comboBox for representing the selected file
+            fileNameComboBox.removeAllItems();
+            FileField.parse(parent.getEntry().getField(FieldName.FILE).get()).stream()
+                    .filter(parsedFileField -> parsedFileField.getLink().toLowerCase().endsWith(".pdf") )
+                    .forEach(((parsedField) -> fileNameComboBox.addItem(parsedField.getLink())));
         }
     }
 
@@ -126,13 +130,17 @@ public class PdfCommentsTab extends JPanel {
      * Updates the list model to show the given notes exclusive those with no content
      * @param importedNotes value is the comments name and the value is a pdfComment object to add to the list model
      */
-    private void updateShownComments(HashMap<String, PdfComment> importedNotes){
+    private void updateShownComments(ArrayList<PdfComment> importedNotes){
         listModel.clear();
-        Comparator<PdfComment> byPage = (comment1, comment2) -> Integer.compare(comment1.getPage(), comment2.getPage());
-        importedNotes.values().stream()
-                .filter(comment -> !(null == comment.getContent()))
-                .sorted(byPage)
-                .forEach(listModel::addElement);
+        if(importedNotes.isEmpty()){
+            listModel.addElement(new PdfComment("", "", "", 0, Localization.lang("Attached_file_has_no_valid_path"), ""));
+        } else {
+            Comparator<PdfComment> byPage = (comment1, comment2) -> Integer.compare(comment1.getPage(), comment2.getPage());
+            importedNotes.stream()
+                    .filter(comment -> !(null == comment.getContent()))
+                    .sorted(byPage)
+                    .forEach(listModel::addElement);
+        }
     }
 
     private void updateTextFields(PdfComment comment) {
@@ -140,7 +148,21 @@ public class PdfCommentsTab extends JPanel {
         dateArea.setText(comment.getDate());
         pageArea.setText(String.valueOf(comment.getPage()));
         commentTxtArea.setText(comment.getContent());
-        filenameArea.setSelectedIndex(FileField.parse(parent.getEntry().getField(FieldName.FILE).get()).size());
+    }
+
+    private void updateFileNameComboBox() {
+        int indexSelectedByComboBox;
+        if (fileNameComboBox.getItemCount() == 0) {
+            indexSelectedByComboBox = 0;
+        } else {
+            indexSelectedByComboBox = fileNameComboBox.getSelectedIndex();
+        }
+        fileNameComboBox.removeAllItems();
+        FileField.parse(parent.getEntry().getField(FieldName.FILE).get()).stream()
+                .filter(parsedFileField -> parsedFileField.getLink().toLowerCase().endsWith(".pdf") )
+                .forEach(((parsedField) -> fileNameComboBox.addItem(parsedField.getLink())));
+        fileNameComboBox.setSelectedIndex(indexSelectedByComboBox);
+        updateShownComments(allNotes.get(indexSelectedByComboBox));
     }
 
     private void setUpInformationPanel(){
@@ -149,7 +171,7 @@ public class PdfCommentsTab extends JPanel {
                 .rows("pref, $lg, pref, $lg, pref, $lg, pref, $lg, fill:pref:grow, $lg, pref")
                 .padding(Paddings.DIALOG)
                 .add(fileNameLabel).xy(1,1, "left, top")
-.add(fileNameScrollPane).xy(3, 1)
+                .add(fileNameScrollPane).xy(3, 1)
                 .add(authorLabel).xy(1,3, "left, top")
                 .add(authorScrollPane).xy(3,3)
                 .add(dateLabel).xy(1,5, "left, top")
@@ -161,8 +183,7 @@ public class PdfCommentsTab extends JPanel {
                 .add(this.setUpButtons()).xy(3,11)
                 .build();
 
-
-        fileNameScrollPane.setViewportView(filenameArea);
+        fileNameScrollPane.setViewportView(fileNameComboBox);
         fileNameScrollPane.setBorder(null);
         authorScrollPane.setViewportView(authorArea);
         authorScrollPane.setBorder(null);
@@ -179,8 +200,9 @@ public class PdfCommentsTab extends JPanel {
         pageArea.setEditable(false);
         commentTxtArea.setEditable(false);
         commentTxtArea.setLineWrap(true);
-        filenameArea.setEditable(false);
-        filenameArea.setBackground(SystemColor.control);
+        fileNameComboBox.setEditable(false);
+        fileNameComboBox.setBackground(SystemColor.control);
+        fileNameComboBox.addActionListener(e -> updateFileNameComboBox());
 
         this.add(informationPanel);
     }
