@@ -24,6 +24,7 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.ClipBoardManager;
+import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.pdf.PdfCommentImporter;
@@ -68,6 +69,7 @@ public class PdfCommentsTab extends JPanel {
 
     HashMap<String, PdfComment> importedNotes = new HashMap<>();
 
+
     public PdfCommentsTab(EntryEditor parent, JabRefFrame frame, BasePanel basePanel) {
         this.parent = parent;
         this.frame = frame;
@@ -89,6 +91,7 @@ public class PdfCommentsTab extends JPanel {
                 .build();
         commentScrollPane.setViewportView(commentList);
 
+        commentLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
         this.add(commentListPanel);
     }
 
@@ -153,7 +156,11 @@ public class PdfCommentsTab extends JPanel {
                 .add(this.setUpButtons()).xy(3,11)
                 .build();
 
-
+        fileNameLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
+        authorLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
+        dateLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
+        pageLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
+        commentTxtLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
         fileNameScrollPane.setViewportView(filenameArea);
         fileNameScrollPane.setBorder(null);
         authorScrollPane.setViewportView(authorArea);
