@@ -81,7 +81,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
     private final CopyPreviewAction copyPreviewAction = new CopyPreviewAction();
 
     private Optional<Pattern> highlightPattern = Optional.empty();
-    private CitationStyleWorker citationStyleWorker;
+    private Optional<CitationStyleWorker> citationStyleWorker = Optional.empty();
 
     /**
      * @param databaseContext
@@ -187,8 +187,8 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
         this.databaseContext = Optional.ofNullable(databaseContext);
     }
 
-    public BasePanel getBasePanel() {
-        return this.basePanel.orElse(null);
+    public Optional<BasePanel> getBasePanel() {
+        return this.basePanel;
     }
 
     public void setBasePanel(BasePanel basePanel) {
@@ -205,18 +205,18 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
         String style = previewPreferences.getPreviewCycle().get(previewPreferences.getCyclePreviewPosition());
 
         if (CitationStyle.isCitationStyleFile(style)) {
-            if (getBasePanel() != null) {
+            if (basePanel.isPresent()) {
                 layout = Optional.empty();
                 CitationStyle citationStyle = CitationStyle.createCitationStyleFromFile(style);
                 if (citationStyle != null) {
-                    getBasePanel().getCitationStyleCache().setCitationStyle(citationStyle);
-                    getBasePanel().output(Localization.lang("Preview style changed to: %0", citationStyle.getTitle()));
+                    basePanel.get().getCitationStyleCache().setCitationStyle(citationStyle);
+                    basePanel.get().output(Localization.lang("Preview style changed to: %0", citationStyle.getTitle()));
                 }
             }
         } else {
             updatePreviewLayout(previewPreferences.getPreviewStyle());
-            if (getBasePanel() != null) {
-                getBasePanel().output(Localization.lang("Preview style changed to: %0", Localization.lang("Preview")));
+            if (basePanel.isPresent()) {
+                basePanel.get().output(Localization.lang("Preview style changed to: %0", Localization.lang("Preview")));
             }
         }
 
@@ -266,9 +266,9 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
     public void update() {
         ExportFormats.entryNumber = 1; // Set entry number in case that is included in the preview layout.
 
-        if (citationStyleWorker != null){
-            citationStyleWorker.cancel(true);
-            citationStyleWorker = null;
+        if (citationStyleWorker.isPresent()){
+            citationStyleWorker.get().cancel(true);
+            citationStyleWorker = Optional.empty();
         }
 
         if (layout.isPresent()){
@@ -278,8 +278,8 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
             setPreviewLabel(sb.toString());
         }
         else if (basePanel.isPresent()){
-            citationStyleWorker = new CitationStyleWorker(this, previewPane);
-            citationStyleWorker.execute();
+            citationStyleWorker = Optional.of(new CitationStyleWorker(this, previewPane));
+            citationStyleWorker.get().execute();
         }
     }
 
@@ -325,7 +325,9 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
             updatePreviewLayout((String) parameter);
         } else if (parameter instanceof CitationStyle) {
             layout = Optional.empty();
-            getBasePanel().getCitationStyleCache().setCitationStyle((CitationStyle) parameter);
+            if (basePanel.isPresent()){
+                basePanel.get().getCitationStyleCache().setCitationStyle((CitationStyle) parameter);
+            }
         } else {
             LOGGER.error("unknown style type");
         }

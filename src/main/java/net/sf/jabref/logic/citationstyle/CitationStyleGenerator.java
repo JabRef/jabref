@@ -33,7 +33,7 @@ public class CitationStyleGenerator {
      * Generates a Citation based on the given entry and style
      * WARNING: the citation is generated with JavaScript which may take some time, better call it in outside the main Thread
      */
-    static String generateCitation(BibEntry entry, String style) {
+    protected static String generateCitation(BibEntry entry, String style) {
         return generateCitation(entry, style, CitationStyleOutputFormat.HTML);
     }
 
@@ -41,7 +41,7 @@ public class CitationStyleGenerator {
      * Generates a Citation based on the given entry, style, and output format
      * WARNING: the citation is generated with JavaScript which may take some time, better call it in outside the main Thread
      */
-    static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat) {
+    protected static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat) {
         try {
             BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(entry.getType()), new Key(entry.getCiteKey()));
             for (Map.Entry<String, String> field : entry.getFieldMap().entrySet()) {
@@ -59,7 +59,7 @@ public class CitationStyleGenerator {
             LOGGER.error("Bad character inside BibEntry", e);
             // sadly one can not easily retrieve the bad char from the TokenMgrError
             return  new StringBuilder()
-                    .append(Localization.lang("Bad character inside BibEntry"))
+                    .append(Localization.lang("Bad character inside entry"))
                     .append(outputFormat == CitationStyleOutputFormat.HTML ? "<br>" : "\n")
                     .append(e.getLocalizedMessage())
                     .toString();

@@ -161,4 +161,18 @@ public class CitationStyle {
     public String toString() {
         return title;
     }
+
+    @Override
+    public boolean equals(Object other) {
+        if (this == other) {
+            return true;
+        }
+        if (other == null || getClass() != other.getClass()) {
+            return false;
+        }
+
+        CitationStyle that = (CitationStyle) other;
+        return source != null ? source.equals(that.source) : that.source == null;
+    }
+
 }

@@ -10,6 +10,7 @@ import javax.swing.SwingWorker;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.PreviewPanel;
+import net.sf.jabref.logic.citationstyle.CitationStyle;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.MatchesHighlighter;
 import net.sf.jabref.model.entry.BibEntry;
@@ -32,20 +33,26 @@ public class CitationStyleWorker extends SwingWorker<String, Void> {
         this.previewPanel = Objects.requireNonNull(previewPanel);
         Objects.requireNonNull(previewPane);
 
-        previewPane.setText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style") + ": " +
-                previewPanel.getBasePanel().getCitationStyleCache().getCitationStyle().getTitle() + " ...") + "</i>");
+        Optional<BasePanel> basePanel = previewPanel.getBasePanel();
+        if (basePanel.isPresent()){
+            Optional<CitationStyle> citationStyle = basePanel.get().getCitationStyleCache().getCitationStyle();
+            if (citationStyle.isPresent()) {
+                previewPane.setText("<i>" + Localization.lang("Processing %0", Localization.lang("Citation Style")) +
+                        ": " + citationStyle.get().getTitle() + " ..." + "</i>");
+            }
+        }
         previewPane.revalidate();
     }
 
     @Override
     protected String doInBackground() throws Exception {
-        BasePanel basePanel = this.previewPanel.getBasePanel();
+        Optional<BasePanel> basePanel = this.previewPanel.getBasePanel();
         BibEntry entry = this.previewPanel.getEntry();
         Optional<Pattern> highlightPattern = this.previewPanel.getHighlightPattern();
 
         String fieldText = "";
-        if (entry != null && basePanel != null) {
-            fieldText = basePanel.getCitationStyleCache().getCitationFor(entry);
+        if (entry != null && basePanel.isPresent()) {
+            fieldText = basePanel.get().getCitationStyleCache().getCitationFor(entry);
             fieldText = MatchesHighlighter.highlightWordsWithHTML(fieldText, highlightPattern);
         }
         return fieldText;
@@ -60,7 +67,7 @@ public class CitationStyleWorker extends SwingWorker<String, Void> {
         try {
             text = this.get();
         } catch (InterruptedException | ExecutionException e) {
-            LOGGER.error("Error while generating  citation style", e);
+            LOGGER.error("Error while generating citation style", e);
             text = Localization.lang("Error while generating citation style");
         }
 

@@ -2,6 +2,8 @@ package net.sf.jabref.logic.citationstyle;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.event.EntryRemovedEvent;
@@ -17,7 +19,7 @@ import com.google.common.eventbus.Subscribe;
  */
 public class CitationStyleCache {
 
-    private CitationStyle citationStyle;
+    private Optional<CitationStyle> citationStyle = Optional.of(CitationStyle.getDefault());
     private Map<BibEntry, String> citationStylesCache = new HashMap<>();
 
 
@@ -36,23 +38,21 @@ public class CitationStyleCache {
     public String getCitationFor(BibEntry entry) {
         String citation = citationStylesCache.get(entry);
         if (citation == null) {
-            citation = CitationStyleGenerator.generateCitation(entry, this.citationStyle.getSource());
+            citation = CitationStyleGenerator.generateCitation(entry, this.citationStyle.get().getSource());
             citationStylesCache.put(entry, citation);
         }
         return citation;
     }
 
     public void setCitationStyle(CitationStyle citationStyle) {
-        if (citationStyle == null || this.citationStyle == citationStyle) {
-            return;
-        }
-        if (this.citationStyle == null || !this.citationStyle.getSource().equals(citationStyle.getSource())) {
-            this.citationStyle = citationStyle;
-            citationStylesCache.clear();
+        Objects.requireNonNull(citationStyle);
+        if (!this.citationStyle.isPresent() || !this.citationStyle.get().equals(citationStyle)){
+            this.citationStyle = Optional.of(citationStyle);
+            this.citationStylesCache.clear();
         }
     }
 
-    public CitationStyle getCitationStyle() {
+    public Optional<CitationStyle> getCitationStyle() {
         return citationStyle;
     }
 
@@ -63,9 +63,7 @@ public class CitationStyleCache {
          */
         @Subscribe
         public void listen(EntryChangedEvent entryChangedEvent) {
-            if (entryChangedEvent != null && entryChangedEvent.getBibEntry() != null){
-                citationStylesCache.remove(entryChangedEvent.getBibEntry());
-            }
+            citationStylesCache.remove(entryChangedEvent.getBibEntry());
         }
 
         /**
@@ -73,9 +71,7 @@ public class CitationStyleCache {
          */
         @Subscribe
         public void listen(EntryRemovedEvent entryRemovedEvent) {
-            if (entryRemovedEvent != null && entryRemovedEvent.getBibEntry() != null) {
-                citationStylesCache.remove(entryRemovedEvent.getBibEntry());
-            }
+            citationStylesCache.remove(entryRemovedEvent.getBibEntry());
         }
     }
 

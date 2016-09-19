@@ -77,8 +77,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         this.table = table;
         this.panel = panel;
         this.tableRows = table.getTableModel().getTableRows();
-        if (panel.getPreviewPanel() != null){
-            preview = panel.getPreviewPanel();
+        Optional<PreviewPanel> previewPanel = panel.getPreviewPanel();
+        if (previewPanel.isPresent()){
+            preview = previewPanel.get();
         } else {
             preview = new PreviewPanel(panel.getBibDatabaseContext(), null, panel);
         }

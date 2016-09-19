@@ -393,7 +393,7 @@ public class SearchResultFrame {
         entries.add(entry);
         entryHome.put(entry, panel);
 
-        if (preview.getEntry() == null || preview.getBasePanel() == null){
+        if (preview.getEntry() == null || !preview.getBasePanel().isPresent()){
             preview.setEntry(entry);
             preview.setBasePanel(panel);
             preview.setDatabaseContext(panel.getBibDatabaseContext());

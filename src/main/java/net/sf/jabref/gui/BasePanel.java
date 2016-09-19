@@ -161,7 +161,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
     private EntryEditor currentEditor;
 
-    private PreviewPanel currentPreview;
+    private Optional<PreviewPanel> currentPreview = Optional.empty();
     private MainTableSelectionListener selectionListener;
 
     private ListEventListener<BibEntry> groupsHighlightListener;
@@ -1494,7 +1494,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // otherwise set the bottom component to null.
         if (mode == BasePanelMode.SHOWING_PREVIEW) {
             mode = BasePanelMode.SHOWING_NOTHING;
-            highlightEntry(currentPreview.getEntry());
+            if (currentPreview.isPresent()) {
+                highlightEntry(currentPreview.get().getEntry());
+            }
         } else if (mode == BasePanelMode.SHOWING_EDITOR) {
             mode = BasePanelMode.SHOWING_NOTHING;
         } else {
@@ -1712,7 +1714,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public void showPreview(PreviewPanel preview) {
         mode = BasePanelMode.SHOWING_PREVIEW;
-        currentPreview = preview;
+        currentPreview = Optional.of(preview);
         splitPane.setBottomComponent(preview);
     }
 
@@ -1778,7 +1780,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public void ensureNotShowingBottomPanel(BibEntry entry) {
         if (((mode == BasePanelMode.SHOWING_EDITOR) && (currentEditor.getEntry() == entry))
-                || ((mode == BasePanelMode.SHOWING_PREVIEW) && (currentPreview.getEntry() == entry))) {
+                || ((mode == BasePanelMode.SHOWING_PREVIEW) && currentPreview.isPresent()
+                && (currentPreview.get().getEntry() == entry))) {
             hideBottomComponent();
         }
     }
@@ -2103,11 +2106,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         @Override
         public void action() throws Exception {
-            if (currentPreview == null) {
+            if (!currentPreview.isPresent()) {
                 selectionListener.setPreviewActive(true);
                 showPreview(selectionListener.getPreview());
+            } else {
+                currentPreview.get().getPrintAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
             }
-            currentPreview.getPrintAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
         }
     }
 
@@ -2461,7 +2465,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         return citationStyleCache;
     }
 
-    public PreviewPanel getPreviewPanel() {
+    public Optional<PreviewPanel> getPreviewPanel() {
         return currentPreview;
     }
 
