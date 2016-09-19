@@ -28,7 +28,7 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
     private final JScrollPane scrollPane;
 
-    private final FieldNameLabel label;
+    protected final FieldNameLabel label;
 
     private String fieldName;
 
@@ -37,7 +37,6 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
 
     public TextArea(String fieldName, String content) {
         super(content);
-
 
         updateFont();
 
@@ -56,7 +55,6 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
         label = new FieldNameLabel(fieldName);
         setBackground(GUIGlobals.validFieldBackgroundColor);
         setForeground(GUIGlobals.editorTextColor);
-
 
         FieldTextMenu popMenu = new FieldTextMenu(this);
         this.addMouseListener(popMenu);
@@ -159,5 +157,11 @@ public class TextArea extends JTextAreaWithHighlighting implements FieldEditor {
         if (autoCompleteListener != null) {
             autoCompleteListener.clearCurrentSuggestion(this);
         }
+    }
+
+    @Override
+    public void setVisible(boolean isVisible) {
+        getPane().setVisible(isVisible);
+        getLabel().setVisible(isVisible);
     }
 }

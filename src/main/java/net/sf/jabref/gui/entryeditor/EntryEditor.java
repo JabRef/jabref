@@ -293,8 +293,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
 
         // other fields
-        List<String> displayedFields = Stream.concat(requiredFields.stream(), displayedOptionalFields.stream()).map(String::toLowerCase).collect(Collectors.toList());
-        List<String> otherFields = entry.getFieldNames().stream().map(String::toLowerCase).filter(f -> !displayedFields.contains(f)).collect(Collectors.toList());
+        // other fields also do not contain hidden fields
+        Set<String> displayedFields = Stream.concat(requiredFields.stream(), displayedOptionalFields.stream())
+                .map(String::toLowerCase).flatMap(f -> Stream.of(f, "_" + f)).collect(Collectors.toSet());
+        List<String> otherFields = entry.getFieldNames().stream().map(String::toLowerCase)
+                .filter(f -> !displayedFields.contains(f)).collect(Collectors.toList());
         otherFields.remove(BibEntry.KEY_FIELD);
         otherFields.removeAll(Globals.prefs.getCustomTabFieldNames());
 
@@ -343,8 +346,16 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private List<String> addRequiredTab(EntryType type) {
         List<String> requiredFields = type.getRequiredFieldsFlat();
+        // build a list of all required fields, where each required field is followed by the hidden counter part
+        List<String> allRequiredFields = new ArrayList<>();
+        for (String fieldName : requiredFields) {
+            allRequiredFields.add(fieldName);
+            allRequiredFields.add("_" + fieldName);
+        }
 
-        EntryEditorTab requiredPanel = new EntryEditorTab(frame, panel, requiredFields, this, true, false, Localization.lang("Required fields"));
+        EntryEditorTab requiredPanel = new EntryEditorTab(frame, panel, allRequiredFields, this, true, false,
+                Localization.lang("Required fields"));
+
         if (requiredPanel.fileListEditor != null) {
             fileListEditor = requiredPanel.fileListEditor;
         }

@@ -80,4 +80,7 @@ public interface FieldEditor {
     void setAutoCompleteListener(AutoCompleteListener listener);
 
     void clearAutoCompleteSuggestion();
+
+    void setVisible(boolean isVisible);
+
 }

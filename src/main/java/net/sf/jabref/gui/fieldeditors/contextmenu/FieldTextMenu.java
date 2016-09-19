@@ -12,7 +12,10 @@ import javax.swing.text.JTextComponent;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.actions.CopyAction;
 import net.sf.jabref.gui.actions.PasteAction;
+import net.sf.jabref.gui.actions.textarea.HideFieldAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
+import net.sf.jabref.gui.fieldeditors.TextAreaForHiddenField;
+import net.sf.jabref.gui.fieldeditors.TextAreaForVisibleField;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.StringUtil;
@@ -29,7 +32,7 @@ public class FieldTextMenu implements MouseListener {
 
 
     public FieldTextMenu(FieldEditor fieldComponent) {
-        field = fieldComponent;
+        this.field = fieldComponent;
         copyAction = new CopyAction((JTextComponent) field);
         pasteAction = new PasteAction((JTextComponent) field);
         initMenu();
@@ -94,6 +97,11 @@ public class FieldTextMenu implements MouseListener {
     private void initMenu() {
         inputMenu.add(pasteAction);
         inputMenu.add(copyAction);
+        if (field instanceof TextAreaForVisibleField) {
+            inputMenu.add(new HideFieldAction((TextAreaForVisibleField) field));
+        } else if (field instanceof TextAreaForHiddenField) {
+
+        }
         inputMenu.addSeparator();
         inputMenu.add(new ReplaceAction());
 
