@@ -33,21 +33,6 @@ public class SearchQueryHighlightObservable {
         return this;
     }
 
-    public int getListenerCount() {
-        return listeners.size();
-    }
-
-    /**
-     * Remove a SearchQueryHighlightListener
-     *
-     * @param l SearchQueryHighlightListener to be removed
-     */
-    public void removeSearchListener(SearchQueryHighlightListener l) {
-        Objects.requireNonNull(l);
-
-        listeners.remove(l);
-    }
-
     /**
      * Parses the search query for valid words and returns a list these words. For example, "The great Vikinger" will
      * give ["The","great","Vikinger"]
