@@ -256,6 +256,8 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
     }
 
     class FetcherWorker extends SwingWorker<Optional<BibEntry>, Void> {
+        boolean fetcherException = false;
+        String fetcherExceptionMessage = "";
         Optional<BibEntry> bibEntry = Optional.empty();
         IdBasedFetcher fetcher = null;
         String searchID = "";
@@ -273,10 +275,8 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
                 } catch (FetcherException e) {
                     LOGGER.error(e.getMessage(), e);
-                    JOptionPane.showMessageDialog(null,
-                            Localization.lang("Error while fetching from %0", fetcher.getName()) + "\n" + e.getMessage(),
-                            Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-
+                    fetcherException = true;
+                    fetcherExceptionMessage = e.getMessage();
                 }
             }
             return bibEntry;
@@ -288,9 +288,14 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
                 Optional<BibEntry> result = get();
                 if (result.isPresent()) {
                     frame.getCurrentBasePanel().insertEntry(result.get());
-                } else {
-                    JOptionPane.showMessageDialog(null, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID), Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
-
+                } else if(!fetcherException){
+                    JOptionPane.showMessageDialog(null, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID)+ "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
+                    generateButton.setText(Localization.lang("Generate"));
+                    generateButton.setEnabled(true);
+                }else {
+                    JOptionPane.showMessageDialog(null,
+                            Localization.lang("Error while fetching from %0", fetcher.getName()) + "\n" + fetcherExceptionMessage,
+                            Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                     generateButton.setText(Localization.lang("Generate"));
                     generateButton.setEnabled(true);
                 }
