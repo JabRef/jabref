@@ -1,0 +1,54 @@
+.list-content {
+	-fx-padding: 10.0px;
+}
+
+.info-section {
+	-fx-padding: 10.0px;
+}
+
+.info-section .icon {
+	-fx-font-size: 48.0;
+}
+
+.list-cell {
+    -fx-background-color: white;
+ }
+ 
+ .icon {
+ 	-fx-font-family: 'Material Design Icons';
+	-fx-font-size: 16.0;
+	-fx-fill : #5e5f5e;
+}
+
+.exception{
+    -fx-text-fill: red;
+}
+
+.exception .icon {
+	-fx-fill: #FF0000;
+}
+
+.log {
+    -fx-text-fill: blue;
+}
+
+.log .icon {
+	-fx-fill: #00008B;
+}
+
+.output {
+    -fx-text-fill: black;
+}
+
+.output .icon {
+	-fx-fill: #000000;
+}
+
+.custom-buttons {
+	-fx-padding: 5.0px;
+}
+
+.dialog-pane *.button-bar {
+	-fx-max-height: 0.0;
+	-fx-pref-height: 0.0;
+}

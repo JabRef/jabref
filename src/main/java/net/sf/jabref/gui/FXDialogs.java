@@ -126,7 +126,7 @@ public abstract class FXDialogs {
     }
 
     private static FXAlert createDialog(AlertType type, String title, String content) {
-        FXAlert alert = new FXAlert(type, title);
+        FXAlert alert = new FXAlert(type, title, true);
         alert.setHeaderText(null);
         alert.setContentText(content);
         return alert;

@@ -23,6 +23,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 
 import net.sf.jabref.Globals;
@@ -71,10 +72,19 @@ public class FXAlert extends Alert {
         }
     };
 
+    public FXAlert(AlertType type, String title, Image image, boolean isModal) {
+        this(type, title, isModal);
+        setDialogIcon(image);
+    }
 
     public FXAlert(AlertType type, String title, Image image) {
-        this(type, title);
+        this(type, title, true);
         setDialogIcon(image);
+    }
+
+    public FXAlert(AlertType type, String title, boolean isModal) {
+        this(type, isModal);
+        setTitle(title);
     }
 
     public FXAlert(AlertType type, String title) {
@@ -82,19 +92,23 @@ public class FXAlert extends Alert {
         setTitle(title);
     }
 
-    public FXAlert(AlertType type) {
+    public FXAlert(AlertType type, boolean isModal) {
         super(type);
 
         Image image = new Image(IconTheme.getIconUrl("jabrefIcon48").toString());
         setDialogIcon(image);
 
         Stage fxDialogWindow = getDialogWindow();
-
+        fxDialogWindow.setOnCloseRequest(evt -> this.close());
+        if (isModal) {
+            initModality(Modality.APPLICATION_MODAL);
+        } else {
+            initModality(Modality.NONE);
+        }
         fxDialogWindow.setOnShown(evt -> {
-            setSwingWindowsEnabledAndFocusable(false);
+            setSwingWindowsEnabledAndFocusable(!isModal);
             setLocationRelativeToMainWindow();
         });
-
         fxDialogWindow.setOnHiding(evt -> setSwingWindowsEnabledAndFocusable(true));
 
         fxDialogWindow.setOnCloseRequest(evt -> this.close());
@@ -105,6 +119,10 @@ public class FXAlert extends Alert {
                 fxDialogWindow.close();
             }
         });
+    }
+
+    public FXAlert(AlertType type) {
+        this(type, true);
     }
 
     public void setDialogStyle(String pathToStyleSheet) {
