@@ -40,13 +40,11 @@ import javax.swing.tree.TreePath;
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.collab.FileUpdateListener;
 import net.sf.jabref.collab.FileUpdatePanel;
-import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.actions.CleanupAction;
@@ -85,7 +83,6 @@ import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableInsertEntry;
 import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.gui.worker.CallBack;
@@ -114,14 +111,17 @@ import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.io.RegExpFileSearch;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.DatabaseLocation;
 import net.sf.jabref.model.database.KeyCollisionException;
+import net.sf.jabref.model.database.event.EntryAddedEvent;
+import net.sf.jabref.model.database.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
-import net.sf.jabref.model.event.EntryAddedEvent;
-import net.sf.jabref.model.event.EntryChangedEvent;
+import net.sf.jabref.model.entry.event.EntryChangedEvent;
+import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.preferences.HighlightMatchingGroupPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.DBMSSynchronizer;
@@ -307,7 +307,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.UNDO, undoAction);
         actions.put(Actions.REDO, redoAction);
 
-        actions.put(Actions.FOCUS_TABLE, (BaseAction) () -> new FocusRequester(mainTable));
+        actions.put(Actions.FOCUS_TABLE, (BaseAction) () -> {
+            mainTable.requestFocus();
+        });
 
         // The action for opening an entry editor.
         actions.put(Actions.EDIT, (BaseAction) selectionListener::editSignalled);
@@ -1156,8 +1158,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
                 highlightEntry(be);
 
-                markBaseChanged(); // The database just changed.
-                new FocusRequester(getEntryEditor(be));
+                // The database just changed.
+                markBaseChanged();
+
+                final EntryEditor entryEditor = getEntryEditor(be);
+                this.showEntryEditor(entryEditor);
+                entryEditor.requestFocus();
 
                 return be;
             } catch (KeyCollisionException ex) {
@@ -1280,6 +1286,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         @Subscribe
         public void listen(EntryChangedEvent entryChangedEvent) {
+            frame.getGlobalSearchBar().setDontSelectSearchBar(true);
+            frame.getGlobalSearchBar().performSearch();
+        }
+
+        @Subscribe
+        public void listen(EntryRemovedEvent removedEntryEvent) {
             frame.getGlobalSearchBar().performSearch();
         }
     }
@@ -1321,7 +1333,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             selectionListener.editSignalled();
             final EntryEditor editor = getEntryEditor(entries.get(0));
             editor.setFocusToField(fieldName);
-            new FocusRequester(editor);
+            this.showEntryEditor(editor);
+            editor.requestFocus();
         }
     }
 
@@ -1588,7 +1601,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         }
 
-        EntryEditor form;
+        EntryEditor entryEditor;
         int divLoc = -1;
         String visName = null;
         if ((getShowing() != null) && isShowingEditor()) {
@@ -1600,21 +1613,21 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         if (entryEditors.containsKey(be.getType())) {
             // We already have an editor for this entry type.
-            form = entryEditors.get(be.getType());
-            form.switchTo(be);
+            entryEditor = entryEditors.get(be.getType());
+            entryEditor.switchTo(be);
             if (visName != null) {
-                form.setVisiblePanel(visName);
+                entryEditor.setVisiblePanel(visName);
             }
-            splitPane.setBottomComponent(form);
+            splitPane.setBottomComponent(entryEditor);
         } else {
             // We must instantiate a new editor for this type.
-            form = new EntryEditor(frame, BasePanel.this, be);
+            entryEditor = new EntryEditor(frame, BasePanel.this, be);
             if (visName != null) {
-                form.setVisiblePanel(visName);
+                entryEditor.setVisiblePanel(visName);
             }
-            splitPane.setBottomComponent(form);
+            splitPane.setBottomComponent(entryEditor);
 
-            entryEditors.put(be.getType(), form);
+            entryEditors.put(be.getType(), entryEditor);
 
         }
         if (divLoc > 0) {
@@ -1636,30 +1649,30 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * @return A suitable entry editor.
      */
     public EntryEditor getEntryEditor(BibEntry entry) {
-        EntryEditor form;
+        EntryEditor entryEditor;
         if (entryEditors.containsKey(entry.getType())) {
             EntryEditor visibleNow = currentEditor;
 
             // We already have an editor for this entry type.
-            form = entryEditors.get(entry.getType());
+            entryEditor = entryEditors.get(entry.getType());
 
             // If the cached editor is not the same as the currently shown one,
             // make sure the current one stores its current edit:
-            if ((visibleNow != null) && (!(form.equals(visibleNow)))) {
+            if ((visibleNow != null) && (!(entryEditor.equals(visibleNow)))) {
                 visibleNow.storeCurrentEdit();
             }
 
-            form.switchTo(entry);
+            entryEditor.switchTo(entry);
         } else {
             // We must instantiate a new editor for this type. First make sure the old one
             // stores its last edit:
             storeCurrentEdit();
             // Then start the new one:
-            form = new EntryEditor(frame, BasePanel.this, entry);
+            entryEditor = new EntryEditor(frame, BasePanel.this, entry);
 
-            entryEditors.put(entry.getType(), form);
+            entryEditors.put(entry.getType(), entryEditor);
         }
-        return form;
+        return entryEditor;
     }
 
     public EntryEditor getCurrentEditor() {
@@ -1687,7 +1700,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             newEntryShowing(editor.getEntry());
         }
         adjustSplitter();
-
     }
 
     /**
@@ -1722,7 +1734,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      * If an entryEditor is shown, it is given focus afterwards.
      */
     public void highlightEntry(int pos) {
-        if (pos >= 0 && pos < mainTable.getRowCount()) {
+        if ((pos >= 0) && (pos < mainTable.getRowCount())) {
             mainTable.setRowSelectionInterval(pos, pos);
             mainTable.ensureVisible(pos);
         }
@@ -1734,6 +1746,15 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public void selectNextEntry() {
         highlightEntry((mainTable.getSelectedRow() + 1) % mainTable.getRowCount());
+    }
+
+
+    public void selectFirstEntry() {
+        highlightEntry(0);
+    }
+
+    public void selectLastEntry() {
+        highlightEntry(mainTable.getRowCount() - 1);
     }
 
     /**

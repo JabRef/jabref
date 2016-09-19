@@ -10,7 +10,6 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -49,7 +48,7 @@ public class DatePickerButton implements ActionListener {
                         .getDateAt(date));
             }
             // Set focus to editor component after changing its text:
-            new FocusRequester(editor.getTextComponent());
+            editor.getTextComponent().requestFocus();
         }
     }
 

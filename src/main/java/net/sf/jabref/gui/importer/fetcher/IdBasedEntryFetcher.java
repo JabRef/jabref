@@ -34,7 +34,7 @@ public class IdBasedEntryFetcher implements EntryFetcher {
             match.ifPresent(inspector::addEntry);
             return match.isPresent();
         } catch (FetcherException e) {
-            status.setStatus(Localization.lang("Error while fetching from %0", fetcher.getName()));
+            status.setStatus(e.getLocalizedMessage());
             LOGGER.error("Error while fetching from" + fetcher.getName(), e);
         }
 

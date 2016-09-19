@@ -7,13 +7,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Defaults;
-import net.sf.jabref.MetaData;
+import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Rule;
@@ -225,6 +225,7 @@ public class IntegrityCheckTest {
         assertCorrect(createContext("title", "Not a single {HTML} character"));
         assertCorrect(createContext("month", "#jan#"));
         assertCorrect(createContext("author", "A. Einstein and I. Newton"));
+        assertCorrect(createContext("url", "http://www.thinkmind.org/index.php?view=article&amp;articleid=cloud_computing_2013_1_20_20130"));
         assertWrong(createContext("author", "Lenhard, J&ouml;rg"));
         assertWrong(createContext("author", "Lenhard, J&#227;rg"));
         assertWrong(createContext("journal", "&Auml;rling Str&ouml;m for &#8211; &#x2031;"));

@@ -7,6 +7,12 @@ res_dir = "src/main/resources/l10n"
 keyFiles = {}
 
 
+def enum(**enums):
+    return type('Enum', (), enums)
+
+OUTPUT_COLORS = enum(OK='\033[0;32m', FAIL='\033[0;31m', ENDC='\033[0;37m')
+
+
 def get_keys_from_lines(lines):
     """
     Builds a list of all translation keys in the list of lines.
@@ -147,6 +153,102 @@ def find_duplicate_keys_and_keys_with_no_value(current_file, display_keys):
     print current_file + ": " + message
 
 
+def has_duplicate_keys(keys_to_check):
+    """
+    Checks if the property lines has duplicates
+
+    :param lines: a list of Strings
+    :return: a boolean
+    """
+    keys_checked = []
+    for key in keys_to_check:
+        if key in keys_checked:
+            return True
+        else:
+            keys_checked.append(key)
+    return False
+
+
+def get_key_from_line(line):
+    """
+    Tries to extract the key from the line
+
+    :param line: a String
+    :return: the key (String) or None
+    """
+    comment_line = line.find("#")
+    if comment_line != 0:
+        index_key_end = line.find("=")
+        while (index_key_end > 0) and (line[index_key_end - 1] == "\\"):
+            index_key_end = line.find("=", index_key_end + 1)
+        if index_key_end > 0:
+            return line[0:index_key_end]
+    return None
+
+
+def get_keys_dict(property_lines):
+    """
+    Saves all the localizations (the whole String 'translationKey=translation')
+    in a dict with their translationKey as the dict key
+
+    :param property_lines: a list
+    :return: a dict
+    """
+    keys = {}
+    for line in property_lines:
+        key = get_key_from_line(line)
+        if key is not None:
+            keys[key] = line
+    return keys
+
+
+def sort_property_files_to_main_property_file(main_properties_file, other_property_file):
+    """
+    Sorts the properties in the second property file in accordance of the first one
+
+    :param main_properties_file:
+    :param other_property_file:
+    :return:
+    """
+    lines_in_property_file = read_all_lines(main_properties_file)
+    keys_in_property_file = get_keys_from_lines(lines_in_property_file)
+
+    for other_property_file in other_property_file:
+        lines_in_other_property_file = read_all_lines(other_property_file)
+        keys_in_other_property_file = get_keys_from_lines(lines_in_other_property_file)
+        keys_missing = find_missing_keys(keys_in_property_file, keys_in_other_property_file)
+        keys_obsolete = find_missing_keys(keys_in_other_property_file, keys_in_property_file)
+        other_has_duplicate_keys = has_duplicate_keys(keys_in_other_property_file)
+
+        error_message = ""
+        if len(keys_missing) > 0:
+            error_message += " has missing keys;"
+        if len(keys_obsolete) > 0:
+            error_message += " has obsolete keys;"
+        if other_has_duplicate_keys:
+            error_message += " has duplicate keys;"
+        if len(error_message) > 0:
+            print "{color_fail}{file}:{message} skip file{color_end}" \
+                    .format(color_fail=OUTPUT_COLORS.FAIL, file=other_property_file, message=error_message, color_end=OUTPUT_COLORS.ENDC)
+            continue
+
+        other_lines_to_write = []
+        other_lines_key_map = get_keys_dict(lines_in_other_property_file)
+        for line in lines_in_property_file:
+            key = get_key_from_line(line)
+            if key is not None:
+                line_to_write = other_lines_key_map[key]
+                if not line_to_write.endswith("\n"):
+                    line_to_write += "\n"
+                other_lines_to_write.append(line_to_write)
+            else:
+                other_lines_to_write.append(line)
+        open(other_property_file, "w").writelines(other_lines_to_write)
+
+        print "{color_ok}{file} has been sorted successfully{color_end}" \
+                .format(color_ok=OUTPUT_COLORS.OK, file=other_property_file, color_end=OUTPUT_COLORS.ENDC)
+
+
 if len(sys.argv) == 1:
     print """This program must be run from the jabref base directory.
     
@@ -161,6 +263,9 @@ Option can be one of the following:
         translations for the same key. There is currently no option to remove duplicates
         automatically.
         
+    -s: Sort the keys in all language files according to "JabRef_en.properties" and "Menu_en.properties".
+        If there are duplicates or keys are missing the specific language file will be skipped!
+
     -t [-u]: Compare the contents of "JabRef_en.properties" and "Menu_en.properties" against the other
         language files. The program will list for all the other files which keys from the English
         file are missing. Additionally, the program will list keys in the other files which are
@@ -169,6 +274,15 @@ Option can be one of the following:
         If the -u option is specified, all missing keys will automatically be added to the files
         and all obsolete keys will be automatically removed.
 """
+
+elif (len(sys.argv) >= 2) and (sys.argv[1] == "-s"):
+    filesJabRef = filter(lambda s: (s.startswith('JabRef_') and not (s.startswith('JabRef_en'))), os.listdir(res_dir))
+    filesJabRef = [os.path.join(res_dir, i) for i in filesJabRef]
+    filesMenu = filter(lambda s: (s.startswith('Menu_') and not (s.startswith('Menu_en'))), os.listdir(res_dir))
+    filesMenu = [os.path.join(res_dir, i) for i in filesMenu]
+
+    sort_property_files_to_main_property_file(os.path.join(res_dir, "JabRef_en.properties"), filesJabRef)
+    sort_property_files_to_main_property_file(os.path.join(res_dir, "Menu_en.properties"), filesMenu)
 
 elif (len(sys.argv) >= 2) and (sys.argv[1] == "-t"):
     if (len(sys.argv) >= 3) and (sys.argv[2] == "-u"):

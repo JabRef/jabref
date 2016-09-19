@@ -3,7 +3,7 @@ package net.sf.jabref.logic.layout.format;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.StringInt;
 import net.sf.jabref.logic.util.strings.RtfCharMap;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.util.ModelStringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,13 +50,13 @@ public class RTFChars implements LayoutFormatter {
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
             } else if (Character.isLetter(c)
-                    || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
+                    || ModelStringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
                 if (incommand) {
                     // Else we are in a command, and should not keep the letter.
                     currentCommand.append(c);
                     testCharCom: if ((currentCommand.length() == 1)
-                            && StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
+                            && ModelStringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
                         if (i >= (field.length() - 1)) {

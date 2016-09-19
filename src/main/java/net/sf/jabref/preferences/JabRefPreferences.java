@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 import javax.swing.JTable;
 import javax.swing.UIManager;
 
-import net.sf.jabref.FileDirectoryPreferences;
 import net.sf.jabref.JabRefException;
 import net.sf.jabref.JabRefMain;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
@@ -43,6 +42,7 @@ import net.sf.jabref.logic.autocompleter.AutoCompletePreferences;
 import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import net.sf.jabref.logic.cleanup.CleanupPreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.exporter.CustomExportList;
@@ -62,15 +62,16 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.logic.layout.format.NameFormatterPreferences;
+import net.sf.jabref.logic.net.ProxyPreferences;
 import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsList;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
+import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.UpdateFieldPreferences;
 import net.sf.jabref.logic.util.io.FileHistory;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -80,6 +81,9 @@ import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.SpecialFields;
+import net.sf.jabref.model.metadata.FileDirectoryPreferences;
+import net.sf.jabref.model.metadata.SaveOrderConfig;
+import net.sf.jabref.model.util.ModelStringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -495,7 +499,7 @@ public class JabRefPreferences {
         defaults.put(LATEX_EDITOR_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("LEd", "LEd"));
         defaults.put(TEXSTUDIO_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
 
-        defaults.put(BIBLATEX_DEFAULT_MODE, false);
+        defaults.put(BIBLATEX_DEFAULT_MODE, Boolean.FALSE);
 
         if (OS.OS_X) {
             defaults.put(EMACS_PATH, "emacsclient");
@@ -507,7 +511,7 @@ public class JabRefPreferences {
         } else if (OS.WINDOWS) {
             defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.looks.windows.WindowsLookAndFeel");
             defaults.put(EMACS_PATH, "emacsclient.exe");
-            defaults.put(EMACS_23, true);
+            defaults.put(EMACS_23, Boolean.TRUE);
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
             defaults.put(FONT_FAMILY, "Arial");
 
@@ -517,7 +521,7 @@ public class JabRefPreferences {
             defaults.put(FONT_FAMILY, "SansSerif");
 
             defaults.put(EMACS_PATH, "gnuclient");
-            defaults.put(EMACS_23, false);
+            defaults.put(EMACS_23, Boolean.FALSE);
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
         }
         defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
@@ -711,9 +715,9 @@ public class JabRefPreferences {
             defaults.put(OO_JARS_PATH, "/opt/openoffice.org/basis3.0");
         }
 
-        defaults.put(OO_SYNC_WHEN_CITING, false);
-        defaults.put(OO_SHOW_PANEL, false);
-        defaults.put(OO_USE_ALL_OPEN_BASES, true);
+        defaults.put(OO_SYNC_WHEN_CITING, Boolean.FALSE);
+        defaults.put(OO_SHOW_PANEL, Boolean.FALSE);
+        defaults.put(OO_USE_ALL_OPEN_BASES, Boolean.TRUE);
         defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE,
                 StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
@@ -992,7 +996,7 @@ public class JabRefPreferences {
     }
 
     private static String convertListToString(List<String> value) {
-        return value.stream().map(val -> StringUtil.quote(val, ";", '\\')).collect(Collectors.joining(";"));
+        return value.stream().map(val -> ModelStringUtil.quote(val, ";", '\\')).collect(Collectors.joining(";"));
     }
 
     /**
@@ -1397,7 +1401,7 @@ public class JabRefPreferences {
         List<String> fields = Arrays.asList(FieldName.FILE, FieldName.PDF, FieldName.PS);
         Map<String, String> fieldDirectories = new HashMap<>();
         fields.stream()
-                .forEach(fieldName -> fieldDirectories.put(fieldName, get(fieldName + FileLinkPreferences.DIR_SUFFIX)));
+                .forEach(fieldName -> fieldDirectories.put(fieldName, get(fieldName + FileDirectoryPreferences.DIR_SUFFIX)));
         return new FileDirectoryPreferences(getUser(), fieldDirectories,
                 getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
     }
@@ -1452,8 +1456,27 @@ public class JabRefPreferences {
     }
 
     public FileLinkPreferences getFileLinkPreferences() {
-        return new FileLinkPreferences(Collections.singletonList(get(FieldName.FILE + FileLinkPreferences.DIR_SUFFIX)),
+        return new FileLinkPreferences(Collections.singletonList(get(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX)),
                 fileDirForDatabase);
+    }
+
+    public void storeProxyPreferences(ProxyPreferences proxyPreferences) {
+        putBoolean(PROXY_USE, proxyPreferences.isUseProxy());
+        put(PROXY_HOSTNAME, proxyPreferences.getHostname());
+        put(PROXY_PORT, proxyPreferences.getPort());
+        putBoolean(PROXY_USE_AUTHENTICATION, proxyPreferences.isUseAuthentication());
+        put(PROXY_USERNAME, proxyPreferences.getUsername());
+        put(PROXY_PASSWORD, proxyPreferences.getPassword());
+    }
+
+    public ProxyPreferences getProxyPreferences() {
+        Boolean useProxy = getBoolean(PROXY_USE);
+        String hostname = get(PROXY_HOSTNAME);
+        String port = get(PROXY_PORT);
+        Boolean useAuthentication = getBoolean(PROXY_USE_AUTHENTICATION);
+        String username = get(PROXY_USERNAME);
+        String password = get(PROXY_PASSWORD);
+        return new ProxyPreferences(useProxy, hostname, port, useAuthentication, username, password);
     }
 
     public ProtectedTermsPreferences getProtectedTermsPreferences() {
@@ -1495,6 +1518,54 @@ public class JabRefPreferences {
         putStringList(PROTECTED_TERMS_ENABLED_INTERNAL, enabledInternalList);
         putStringList(PROTECTED_TERMS_DISABLED_INTERNAL, disabledInternalList);
 
+    }
+
+    public CleanupPreferences getCleanupPreferences(JournalAbbreviationLoader journalAbbreviationLoader) {
+        return new CleanupPreferences(get(IMPORT_FILENAMEPATTERN),
+                getLayoutFormatterPreferences(journalAbbreviationLoader), getFileDirectoryPreferences());
+    }
+
+    public RemotePreferences getRemotePreferences() {
+        return new RemotePreferences(getInt(REMOTE_SERVER_PORT), getBoolean(USE_REMOTE_SERVER));
+    }
+
+    public void setRemotePreferences(RemotePreferences remotePreferences) {
+        putInt(REMOTE_SERVER_PORT, remotePreferences.getPort());
+        putBoolean(USE_REMOTE_SERVER, remotePreferences.useRemoteServer());
+    }
+
+    public void storeExportSaveOrder(SaveOrderConfig config) {
+        putBoolean(EXPORT_PRIMARY_SORT_DESCENDING, config.sortCriteria[0].descending);
+        putBoolean(EXPORT_SECONDARY_SORT_DESCENDING, config.sortCriteria[1].descending);
+        putBoolean(EXPORT_TERTIARY_SORT_DESCENDING, config.sortCriteria[2].descending);
+
+        put(EXPORT_PRIMARY_SORT_FIELD, config.sortCriteria[0].field);
+        put(EXPORT_SECONDARY_SORT_FIELD, config.sortCriteria[1].field);
+        put(EXPORT_TERTIARY_SORT_FIELD, config.sortCriteria[2].field);
+    }
+
+    public SaveOrderConfig loadTableSaveOrder() {
+        SaveOrderConfig config = new SaveOrderConfig();
+        config.sortCriteria[0].field = get(TABLE_PRIMARY_SORT_FIELD);
+        config.sortCriteria[0].descending = getBoolean(TABLE_PRIMARY_SORT_DESCENDING);
+        config.sortCriteria[1].field = get(TABLE_SECONDARY_SORT_FIELD);
+        config.sortCriteria[1].descending = getBoolean(TABLE_SECONDARY_SORT_DESCENDING);
+        config.sortCriteria[2].field = get(TABLE_TERTIARY_SORT_FIELD);
+        config.sortCriteria[2].descending = getBoolean(TABLE_TERTIARY_SORT_DESCENDING);
+
+        return config;
+    }
+
+    public SaveOrderConfig loadExportSaveOrder() {
+        SaveOrderConfig config = new SaveOrderConfig();
+        config.sortCriteria[0].field = get(EXPORT_PRIMARY_SORT_FIELD);
+        config.sortCriteria[0].descending = getBoolean(EXPORT_PRIMARY_SORT_DESCENDING);
+        config.sortCriteria[1].field = get(EXPORT_SECONDARY_SORT_FIELD);
+        config.sortCriteria[1].descending = getBoolean(EXPORT_SECONDARY_SORT_DESCENDING);
+        config.sortCriteria[2].field = get(EXPORT_TERTIARY_SORT_FIELD);
+        config.sortCriteria[2].descending = getBoolean(EXPORT_TERTIARY_SORT_DESCENDING);
+
+        return config;
     }
 
 }

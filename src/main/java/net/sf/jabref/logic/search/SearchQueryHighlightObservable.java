@@ -8,7 +8,7 @@ import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.logic.search.rules.SentenceAnalyzer;
+import net.sf.jabref.model.search.rules.SentenceAnalyzer;
 
 public class SearchQueryHighlightObservable {
 
