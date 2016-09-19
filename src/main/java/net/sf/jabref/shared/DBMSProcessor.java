@@ -18,7 +18,6 @@ import java.util.UUID;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.shared.exception.OfflineLockException;
-import net.sf.jabref.shared.exception.SharedEntryNotPresentException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -30,11 +29,12 @@ public abstract class DBMSProcessor {
 
     protected static final Log LOGGER = LogFactory.getLog(DBMSProcessor.class);
 
-    protected static final String PROCESSOR_ID = UUID.randomUUID().toString();
 
     protected final Connection connection;
 
     protected DBMSConnectionProperties connectionProperties;
+
+    public static final String PROCESSOR_ID = UUID.randomUUID().toString();
 
 
     protected DBMSProcessor(DBMSConnection dbmsConnection) {
@@ -129,11 +129,11 @@ public abstract class DBMSProcessor {
      * @param bibEntry {@link BibEntry} to be inserted
      */
     public void insertEntry(BibEntry bibEntry) {
-        if (checkForBibEntryExistence(bibEntry)) {
-            return;
+        if (!checkForBibEntryExistence(bibEntry)) {
+            insertIntoEntryTable(bibEntry);
+            insertIntoFieldTable(bibEntry);
         }
-        insertIntoEntryTable(bibEntry);
-        insertIntoFieldTable(bibEntry);
+
     }
 
     /**
@@ -238,14 +238,14 @@ public abstract class DBMSProcessor {
      * @param localBibEntry {@link BibEntry} affected by changes
      * @throws SQLException
      */
-    public void updateEntry(BibEntry localBibEntry) throws OfflineLockException, SharedEntryNotPresentException, SQLException {
+    public void updateEntry(BibEntry localBibEntry) throws OfflineLockException, SQLException {
         connection.setAutoCommit(false); // disable auto commit due to transaction
 
         try {
             Optional<BibEntry> sharedEntryOptional = getSharedEntry(localBibEntry.getSharedBibEntryData().getSharedID());
 
             if (!sharedEntryOptional.isPresent()) {
-                throw new SharedEntryNotPresentException(localBibEntry);
+                return;
             }
 
             BibEntry sharedBibEntry = sharedEntryOptional.get();

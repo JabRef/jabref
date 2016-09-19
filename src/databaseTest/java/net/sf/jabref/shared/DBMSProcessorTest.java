@@ -11,7 +11,6 @@ import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.shared.exception.OfflineLockException;
-import net.sf.jabref.shared.exception.SharedEntryNotPresentException;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -90,7 +89,7 @@ public class DBMSProcessorTest {
     }
 
     @Test
-    public void testUpdateEntry() throws OfflineLockException, SharedEntryNotPresentException, SQLException {
+    public void testUpdateEntry() throws OfflineLockException, SQLException {
         BibEntry expectedEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(expectedEntry);
@@ -112,14 +111,8 @@ public class DBMSProcessorTest {
         }
     }
 
-    @Test(expected = SharedEntryNotPresentException.class)
-    public void testUpdateNotExistingEntry() throws SharedEntryNotPresentException, OfflineLockException, SQLException {
-        BibEntry expectedEntry = getBibEntryExample();
-        dbmsProcessor.updateEntry(expectedEntry);
-    }
-
     @Test(expected = OfflineLockException.class)
-    public void testUpdateNewerEntry() throws OfflineLockException, SharedEntryNotPresentException, SQLException {
+    public void testUpdateNewerEntry() throws OfflineLockException, SQLException {
         BibEntry bibEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(bibEntry);
@@ -131,7 +124,7 @@ public class DBMSProcessorTest {
     }
 
     @Test
-    public void testUpdateEqualEntry() throws OfflineLockException, SharedEntryNotPresentException, SQLException {
+    public void testUpdateEqualEntry() throws OfflineLockException, SQLException {
         BibEntry expectedBibEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(expectedBibEntry);
@@ -196,7 +189,7 @@ public class DBMSProcessorTest {
     }
 
     @Test
-    public void testGetSharedIDVersionMapping() throws OfflineLockException, SharedEntryNotPresentException, SQLException {
+    public void testGetSharedIDVersionMapping() throws OfflineLockException, SQLException {
         BibEntry firstEntry = getBibEntryExample();
         BibEntry secondEntry = getBibEntryExample();
 

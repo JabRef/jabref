@@ -4,10 +4,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
+import net.sf.jabref.shared.listener.OracleNotificationListener;
+
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.OracleStatement;
-import oracle.jdbc.dcn.DatabaseChangeEvent;
-import oracle.jdbc.dcn.DatabaseChangeListener;
 import oracle.jdbc.dcn.DatabaseChangeRegistration;
 
 /**
@@ -62,22 +62,6 @@ public class OracleProcessor extends DBMSProcessor {
     @Override
     public String escape(String expression) {
         return "\"" + expression + "\"";
-    }
-
-
-    private class OracleNotificationListener implements DatabaseChangeListener {
-
-        private final DBMSSynchronizer dbmsSynchronizer;
-
-
-        public OracleNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
-            this.dbmsSynchronizer = dbmsSynchronizer;
-        }
-
-        @Override
-        public void onDatabaseChangeNotification(DatabaseChangeEvent event) {
-            dbmsSynchronizer.pullChanges();
-        }
     }
 
     @Override

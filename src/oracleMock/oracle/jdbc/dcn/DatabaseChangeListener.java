@@ -1,7 +1,7 @@
 package oracle.jdbc.dcn;
 
 /**
- * Mocking interface
+ * A mocking class used as a placeholder for the real Oracle JDBC drivers to prevent build errors.
  */
 public interface DatabaseChangeListener {
 

@@ -26,7 +26,6 @@ import net.sf.jabref.shared.event.SharedEntryNotPresentEvent;
 import net.sf.jabref.shared.event.UpdateRefusedEvent;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.exception.OfflineLockException;
-import net.sf.jabref.shared.exception.SharedEntryNotPresentException;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -244,8 +243,6 @@ public class DBMSSynchronizer {
             dbmsProcessor.updateEntry(bibEntry);
         } catch (OfflineLockException exception) {
             eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
-        } catch (SharedEntryNotPresentException exception) {
-            // do nothing
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
         }
@@ -295,8 +292,6 @@ public class DBMSSynchronizer {
                     dbmsProcessor.updateEntry(bibEntry);
                 } catch (OfflineLockException exception) {
                     eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
-                } catch (SharedEntryNotPresentException exception) {
-                    // do nothing
                 } catch (SQLException e) {
                     LOGGER.error("SQL Error: ", e);
                 }

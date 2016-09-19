@@ -8,9 +8,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.shared.listener.PostgresSQLNotificationListener;
 
 import com.impossibl.postgres.api.jdbc.PGConnection;
-import com.impossibl.postgres.api.jdbc.PGNotificationListener;
 import com.impossibl.postgres.jdbc.PGDataSource;
 import com.impossibl.postgres.jdbc.ThreadedHousekeeper;
 
@@ -85,24 +85,6 @@ public class PostgreSQLProcessor extends DBMSProcessor {
         return "\"" + expression + "\"";
     }
 
-
-    private class PostgresSQLNotificationListener implements PGNotificationListener {
-
-        private final DBMSSynchronizer dbmsSynchronizer;
-
-
-        public PostgresSQLNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
-            this.dbmsSynchronizer = dbmsSynchronizer;
-        }
-
-        @Override
-        public void notification(int processId, String channel, String payload) {
-            if (!payload.equals(PROCESSOR_ID)) {
-                dbmsSynchronizer.pullChanges();
-            }
-        }
-
-    }
 
     @Override
     public void startNotificationListener(DBMSSynchronizer dbmsSynchronizer) {

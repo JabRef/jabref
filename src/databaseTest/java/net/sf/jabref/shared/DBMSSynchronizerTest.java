@@ -15,7 +15,6 @@ import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.exception.OfflineLockException;
-import net.sf.jabref.shared.exception.SharedEntryNotPresentException;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -159,7 +158,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void testSynchronizeLocalDatabaseWithEntryUpdate() throws OfflineLockException, SharedEntryNotPresentException, SQLException {
+    public void testSynchronizeLocalDatabaseWithEntryUpdate() throws OfflineLockException, SQLException {
         BibEntry bibEntry = getBibEntryExample(1);
         bibDatabase.insertEntry(bibEntry);
         Assert.assertEquals(1, bibDatabase.getEntries().size());

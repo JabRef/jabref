@@ -649,7 +649,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             } else {
                 String content = "";
                 SearchQuery currentSearchQuery = currentBasePanel.getCurrentSearchQuery();
-                if ((currentSearchQuery != null) && !currentSearchQuery.getQuery().trim().isEmpty()) {
+                if (currentSearchQuery != null && !currentSearchQuery.getQuery().trim().isEmpty()) {
                     content = currentSearchQuery.getQuery();
                 }
                 globalSearchBar.setSearchTerm(content, true);
