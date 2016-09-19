@@ -109,13 +109,13 @@ public class AdsFetcherTest {
     }
 
     @Test
-    public void testPerformSearchById() throws Exception {
+    public void testPerformSearchByDOIlrr201210() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.12942/lrr-2012-10");
         assertEquals(Optional.of(firstEntry), fetchedEntry);
     }
 
     @Test
-    public void testPerformSearchByIdEmpty() throws Exception {
+    public void testPerformSearchByIdEmptyDOI() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("");
         assertEquals(Optional.empty(), fetchedEntry);
     }
@@ -127,7 +127,7 @@ public class AdsFetcherTest {
     }
 
     @Test
-    public void testPerformSearchById2() throws Exception {
+    public void testPerformSearchByDOInmat3160() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1038/nmat3160");
         assertEquals(Optional.of(secondEntry), fetchedEntry);
     }
