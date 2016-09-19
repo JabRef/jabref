@@ -36,6 +36,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - <kbd>Pos1</kbd> / <kbd>HOME</kbd> now select the first/last entry in the main table and the search result frame.
 - <kbd>UP</kbd> / <kbd>Down</kbd> / <kbd>Tab</kbd> / <kbd>shift+Tab</kbd> in the search result frame have now the same functionality as in the main  table.
 - Generalize german translation of database into "Datenbank"
+- Improve language quality of the german translation of shared database
 
 ### Fixed
 - Fixed selecting an entry out of multiple duplicates
@@ -59,6 +60,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed InvalidBackgroundColor flickering with Ctrl-s and File > Save database
 - Fixed loop when pulling changes (shared database) when current selected field has changed
 - Fixed [#1958](https://github.com/JabRef/jabref/issues/1958): Verbatim fields are no longer checked for HTML encoded characters by integrity checks
+- Fixed file menu displays wrong hotkey in the german translation
 
 ### Removed
 - The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field. 
