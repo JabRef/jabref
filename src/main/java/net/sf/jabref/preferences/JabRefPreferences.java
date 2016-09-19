@@ -496,7 +496,7 @@ public class JabRefPreferences {
         defaults.put(LATEX_EDITOR_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("LEd", "LEd"));
         defaults.put(TEXSTUDIO_PATH, JabRefDesktop.getNativeDesktop().detectProgramPath("texstudio", "TeXstudio"));
 
-        defaults.put(BIBLATEX_DEFAULT_MODE, false);
+        defaults.put(BIBLATEX_DEFAULT_MODE, Boolean.FALSE);
 
         if (OS.OS_X) {
             defaults.put(EMACS_PATH, "emacsclient");
@@ -508,7 +508,7 @@ public class JabRefPreferences {
         } else if (OS.WINDOWS) {
             defaults.put(WIN_LOOK_AND_FEEL, "com.jgoodies.looks.windows.WindowsLookAndFeel");
             defaults.put(EMACS_PATH, "emacsclient.exe");
-            defaults.put(EMACS_23, true);
+            defaults.put(EMACS_23, Boolean.TRUE);
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-n -e");
             defaults.put(FONT_FAMILY, "Arial");
 
@@ -518,7 +518,7 @@ public class JabRefPreferences {
             defaults.put(FONT_FAMILY, "SansSerif");
 
             defaults.put(EMACS_PATH, "gnuclient");
-            defaults.put(EMACS_23, false);
+            defaults.put(EMACS_23, Boolean.FALSE);
             defaults.put(EMACS_ADDITIONAL_PARAMETERS, "-batch -eval");
         }
         defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
@@ -712,9 +712,9 @@ public class JabRefPreferences {
             defaults.put(OO_JARS_PATH, "/opt/openoffice.org/basis3.0");
         }
 
-        defaults.put(OO_SYNC_WHEN_CITING, false);
-        defaults.put(OO_SHOW_PANEL, false);
-        defaults.put(OO_USE_ALL_OPEN_BASES, true);
+        defaults.put(OO_SYNC_WHEN_CITING, Boolean.FALSE);
+        defaults.put(OO_SHOW_PANEL, Boolean.FALSE);
+        defaults.put(OO_USE_ALL_OPEN_BASES, Boolean.TRUE);
         defaults.put(OO_BIBLIOGRAPHY_STYLE_FILE,
                 StyleLoader.DEFAULT_AUTHORYEAR_STYLE_PATH);
         defaults.put(OO_EXTERNAL_STYLE_FILES, "");
