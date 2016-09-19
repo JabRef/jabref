@@ -32,7 +32,6 @@ import javax.swing.event.ListSelectionListener;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -222,7 +221,7 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
                     optComp2.setFields(new ArrayList<>());
                     optComp2.setEnabled(true);
                 }
-                new FocusRequester(reqComp);
+                reqComp.requestFocus();
             }
         } else {
             reqComp.setFields(rl);

@@ -60,6 +60,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed InvalidBackgroundColor flickering with Ctrl-s and File > Save database
 - Fixed loop when pulling changes (shared database) when current selected field has changed
 - Fixed [#1958](https://github.com/JabRef/jabref/issues/1958): Verbatim fields are no longer checked for HTML encoded characters by integrity checks
+- Fixed [#1937](https://github.com/JabRef/jabref/issues/1937): If no help page for the current chosen language exists, the english help page will be shown
 - Fixed file menu displays wrong hotkey in the german translation
 
 ### Removed

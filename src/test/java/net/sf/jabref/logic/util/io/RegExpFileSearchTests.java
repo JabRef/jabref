@@ -1,7 +1,6 @@
 package net.sf.jabref.logic.util.io;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +22,7 @@ public class RegExpFileSearchTests {
     private BibEntry entry;
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() {
 
         entry = new BibEntry();
         entry.setType(BibtexEntryTypes.ARTICLE);
