@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+<modsCollection xmlns="http://www.loc.gov/mods/v3">
+	<mods ID="Mock++2003">
+		<titleInfo>
+			<title>A new microcosm to investigate oxygen dynamics at the sea ice water interface</title>
+		</titleInfo>
+		<name type="personal">
+			<namePart type="family">Mock</namePart>
+			<namePart type="given">T</namePart>
+			<role>
+				<roleTerm authority="marcrelator" type="text">author</roleTerm>
+			</role>
+		</name>
+		<name type="personal">
+			<namePart type="family">Kruse</namePart>
+			<namePart type="given">M</namePart>
+			<role>
+				<roleTerm authority="marcrelator" type="text">author</roleTerm>
+			</role>
+		</name>
+		<name type="personal">
+			<namePart type="family">Dieckmann</namePart>
+			<namePart type="given">GS</namePart>
+			<role>
+				<roleTerm authority="marcrelator" type="text">author</roleTerm>
+			</role>
+		</name>
+		<originInfo>
+			<dateIssued>2003</dateIssued>
+		</originInfo>
+		<language>English</language>
+		<subject>
+			<topic>_Fragilariopsis cylindrus_</topic>
+		</subject>
+		<subject>
+			<topic>Methods</topic>
+		</subject>
+		<subject>
+			<topic>Microcosm</topic>
+		</subject>
+		<subject>
+			<topic>Micro-optodes</topic>
+		</subject>
+		<subject>
+			<topic>Oxygen exchange</topic>
+		</subject>
+		<subject>
+			<topic>Photosynthesis</topic>
+		</subject>
+		<subject>
+			<topic>Sea ice</topic>
+		</subject>
+		<subject>
+			<topic>Ice</topic>
+		</subject>
+		<subject>
+			<topic>Water</topic>
+		</subject>
+		<subject>
+			<topic>Diatoms</topic>
+		</subject>
+		<subject>
+			<topic>Epontic environment</topic>
+		</subject>
+		<subject>
+			<topic>Gas exchange</topic>
+		</subject>
+		<subject>
+			<topic>Diffusion</topic>
+		</subject>
+		<subject>
+			<topic>Boundary layers</topic>
+		</subject>
+		<subject>
+			<topic>Oxygen</topic>
+		</subject>
+		<subject>
+			<topic>Patchiness</topic>
+		</subject>
+		<subject>
+			<topic>Epontic organisms</topic>
+		</subject>
+		<subject>
+			<topic>Laminar boundary layer</topic>
+		</subject>
+		<subject>
+			<topic>Ice-water interface</topic>
+		</subject>
+		<subject>
+			<topic>Methodology</topic>
+		</subject>
+		<subject>
+			<topic>Bacillariophyceae</topic>
+		</subject>
+		<note>Marine</note>
+		<typeOfResource>text</typeOfResource>
+		<location>
+			<url>http://int-res.com/abstracts/ame/v30/n2/p197-205.html</url>
+			<physicalLocation>Indiana University, Bloomington. University Archives P07803</physicalLocation>
+		</location>
+		<identifier type="uri">http://int-res.com/abstracts/ame/v30/n2/p197-205.html</identifier>
+		<identifier type="citekey">Mock++2003</identifier>
+		<identifier type="local">IPÖ @ msteffens @ 713</identifier>
+		<relatedItem type="host">
+			<titleInfo>
+				<title>Aquatic Microbial Ecology</title>
+			</titleInfo>
+			<titleInfo type="abbreviated">
+				<title>Aquat Microb Ecol</title>
+			</titleInfo>
+			<originInfo>
+				<dateIssued>2003</dateIssued>
+				<publisher>Inter-Research</publisher>
+				<place>
+					<placeTerm type="text">Oldendorf/Luhe</placeTerm>
+				</place>
+				<issuance>continuing</issuance>
+			</originInfo>
+			<genre authority="marc">periodical</genre>
+			<genre>academic journal</genre>
+			<part>
+				<detail type="volume">
+					<number>30</number>
+				</detail>
+				<detail type="issue">
+					<number>2</number>
+				</detail>
+				<extent unit="page">
+					<start>197</start>
+					<end>205</end>
+				</extent>
+			</part>
+			<identifier type="issn">0948-3055</identifier>
+		</relatedItem>
+	</mods>
+	<mods ID="Schewe+Soltwedel2003">
+		<titleInfo>
+			<title>Benthic response to ice-edge-induced particle flux in the Arctic Ocean</title>
+		</titleInfo>
+		<name type="personal">
+			<namePart type="family">Schewe</namePart>
+			<namePart type="given">I</namePart>
+			<role>
+				<roleTerm authority="marcrelator" type="text">author</roleTerm>
+			</role>
+		</name>
+		<name type="personal">
+			<namePart type="family">Soltwedel</namePart>
+			<namePart type="given">T</namePart>
+			<role>
+				<roleTerm authority="marcrelator" type="text">author</roleTerm>
+			</role>
+		</name>
+		<originInfo>
+			<dateIssued>2003</dateIssued>
+		</originInfo>
+		<language>English</language>
+		<typeOfResource>text</typeOfResource>
+		<identifier type="doi">10.1007/s00300-003-0526-8</identifier>
+		<identifier type="citekey">Schewe+Soltwedel2003</identifier>
+		<identifier type="local">IPÖ @ msteffens @ 688</identifier>
+		<relatedItem type="host">
+			<titleInfo>
+				<title>Polar Biology</title>
+			</titleInfo>
+			<titleInfo type="abbreviated">
+				<title>Polar Biol</title>
+			</titleInfo>
+			<originInfo>
+				<dateIssued>2003</dateIssued>
+				<publisher>Springer-Verlag</publisher>
+				<place>
+					<placeTerm type="text">Heidelberg</placeTerm>
+				</place>
+				<issuance>continuing</issuance>
+			</originInfo>
+			<genre authority="marc">periodical</genre>
+			<genre>academic journal</genre>
+			<part>
+				<detail type="volume">
+					<number>26</number>
+				</detail>
+				<detail type="issue">
+					<number>9</number>
+				</detail>
+				<extent unit="page">
+					<start>610</start>
+					<end>620</end>
+				</extent>
+			</part>
+			<identifier type="issn">0722-4060</identifier>
+		</relatedItem>
+	</mods>
+	<mods ID="Thomas+Dieckmann2003">
+		<titleInfo>
+			<title>Sea ice - an introduction to its physics, chemistry, biology and geology</title>
+		</titleInfo>
+		<name type="personal">
+			<namePart type="family">Thomas</namePart>
+			<namePart type="given">DN</namePart>
+			<role>
+				<roleTerm authority="marcrelator" type="text">editor</roleTerm>
+			</role>
+		</name>
+		<name type="personal">
+			<namePart type="family">Dieckmann</namePart>
+			<namePart type="given">GS</namePart>
+			<role>
+				<roleTerm authority="marcrelator" type="text">editor</roleTerm>
+			</role>
+		</name>
+		<originInfo>
+			<dateIssued>2003</dateIssued>
+			<publisher>Blackwell Science Ltd</publisher>
+			<place>
+				<placeTerm type="text">Oxford</placeTerm>
+			</place>
+			<issuance>monographic</issuance>
+		</originInfo>
+		<language>English</language>
+		<subject>
+			<topic>zoology</topic>
+		</subject>
+		<subject>
+			<topic>sea ice</topic>
+		</subject>
+		<typeOfResource>text</typeOfResource>
+		<identifier type="citekey">Thomas+Dieckmann2003</identifier>
+		<identifier type="local">IPÖ @ library @ 34/436/1</identifier>
+		<identifier type="local">IPÖ @ msteffens @ IPÖ-34/436/1</identifier>
+		<genre authority="marc">book</genre>
+		<physicalDescription>
+			<extent unit="page">
+				<total>402</total>
+			</extent>
+		</physicalDescription>
+		<identifier type="isbn">0-632-05808-0</identifier>
+	</mods>
+</modsCollection>

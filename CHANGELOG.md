@@ -35,6 +35,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Implemented integrity check for `note` and `howpublished` field: Should have the first letter capitalized (BibTeX)
 - <kbd>Pos1</kbd> / <kbd>HOME</kbd> now select the first/last entry in the main table and the search result frame.
 - <kbd>UP</kbd> / <kbd>Down</kbd> / <kbd>Tab</kbd> / <kbd>shift+Tab</kbd> in the search result frame have now the same functionality as in the main  table.
+- Importer for MODS format added
 
 ### Fixed
 - Fixed selecting an entry out of multiple duplicates
