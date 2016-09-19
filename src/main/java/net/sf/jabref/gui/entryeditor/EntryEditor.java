@@ -916,7 +916,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
      */
     public void validateAllFields() {
         for (Object tab : tabs) {
-            System.out.println(tab);
             if (tab instanceof EntryEditorTab) {
                 ((EntryEditorTab) tab).validateAllFields();
             }
