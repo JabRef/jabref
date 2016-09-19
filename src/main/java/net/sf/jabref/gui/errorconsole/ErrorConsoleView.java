@@ -30,15 +30,8 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.logic.l10n.Localization;
 
 import com.airhacks.afterburner.views.FXMLView;
-import com.sun.star.lang.IndexOutOfBoundsException;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LogEvent;
-
-import static org.apache.logging.log4j.Level.ERROR;
-import static org.apache.logging.log4j.Level.INFO;
-import static org.apache.logging.log4j.Level.WARN;
 
 public class ErrorConsoleView extends FXMLView {
 
@@ -66,8 +59,6 @@ public class ErrorConsoleView extends FXMLView {
         errorConsole.setDialogPane(pane);
         errorConsole.setResizable(true);
         errorConsole.show();
-        Log log = LogFactory.getLog(this.getClass());
-        log.error("", new IndexOutOfBoundsException());
     }
 
     @FXML
@@ -111,19 +102,24 @@ public class ErrorConsoleView extends FXMLView {
                                 if (logMessage != null) {
                                     setText(logMessage.getMessage().toString());
 
-                                    Level prio = logMessage.getLevel();
-                                    if (prio.equals(ERROR)) {
-                                        getStyleClass().add("exception");
-                                        setGraphic(IconTheme.JabRefIcon.INTEGRITY_FAIL.getGraphicNode());
-                                    } else if (prio.equals(WARN)) {
-                                        getStyleClass().add("output");
-                                        setGraphic(IconTheme.JabRefIcon.INTEGRITY_WARN.getGraphicNode());
-                                    } else if (prio.equals(INFO)) {
-                                        getStyleClass().add("log");
-                                        setGraphic(IconTheme.JabRefIcon.INTEGRITY_INFO.getGraphicNode());
-                                    } else {
-                                        setText(null);
-                                        setGraphic(null);
+                                    Level logLevel = logMessage.getLevel();
+                                    switch (logLevel.getStandardLevel()) {
+                                        case ERROR:
+                                            getStyleClass().add("exception");
+                                            setGraphic(IconTheme.JabRefIcon.INTEGRITY_FAIL.getGraphicNode());
+                                            break;
+                                        case WARN:
+                                            getStyleClass().add("output");
+                                            setGraphic(IconTheme.JabRefIcon.INTEGRITY_WARN.getGraphicNode());
+                                            break;
+                                        case INFO:
+                                            getStyleClass().add("log");
+                                            setGraphic(IconTheme.JabRefIcon.INTEGRITY_INFO.getGraphicNode());
+                                            break;
+                                        default:
+                                            setText(null);
+                                            setGraphic(null);
+                                            break;
                                     }
                                 }
                             }

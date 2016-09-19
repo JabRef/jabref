@@ -36,10 +36,11 @@ public class StreamEavesdropper {
 
     /**
      * Return a new {@code PrintStream} which also creates a new log event with {@link Level#WARN} for each message and forwards it to the {@link LogMessages} archive.
+     *
      * @return a PrintStream
      */
     public PrintStream getOutStream() {
-        return new PrintStream(systemOut)  {
+        return new PrintStream(systemOut) {
             @Override
             public void write(byte[] buf, int off, int len) {
                 super.write(buf, off, len);
@@ -51,6 +52,7 @@ public class StreamEavesdropper {
 
     /**
      * Return a new {@code PrintStream} which also creates a new log event with {@link Level#ERROR} for each message and forwards it to the {@link LogMessages} archive.
+     *
      * @return a PrintStream
      */
     public PrintStream getErrStream() {
@@ -66,14 +68,15 @@ public class StreamEavesdropper {
 
     /**
      * Creates a new log event with the given parameters and forwards it to the {@link LogMessages} archive.
+     *
      * @param message message of log event
-     * @param priority level of log event
+     * @param level   level of log event
      */
-    private void addToLog(String message, Level priority) {
+    private void addToLog(String message, Level level) {
         if (!message.equals(System.lineSeparator())) {
             String messageFormat = message.replaceAll(System.lineSeparator(), "");
-            LogEvent messageWithPriority = Log4jLogEvent.newBuilder().setMessage(new SimpleMessage(messageFormat)).setLevel(priority).build();
-            Platform.runLater(() -> LogMessages.getInstance().add(messageWithPriority));
+            LogEvent messageWithLevel = Log4jLogEvent.newBuilder().setMessage(new SimpleMessage(messageFormat)).setLevel(level).build();
+            Platform.runLater(() -> LogMessages.getInstance().add(messageWithLevel));
         }
     }
 

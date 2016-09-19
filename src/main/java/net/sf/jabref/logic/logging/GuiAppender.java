@@ -43,6 +43,7 @@ public class GuiAppender extends AbstractAppender {
      * The log event will be forwarded to the {@link LogMessages} archive.
      * <p/>
      * All logged messages will pass this method. For each line in the messages of the log event a new log event will be created.
+     *
      * @param event log event
      */
     @Override
@@ -52,12 +53,12 @@ public class GuiAppender extends AbstractAppender {
         // stack traces logged by 'Log.error("message"), e' will be split by new lines so we can create a new log event for each line as 'e.printStackTrace()' would do.
         if (event.getLevel() == Level.ERROR) {
             Arrays.asList(message.split("\n")).stream().filter(s -> !s.isEmpty()).forEach(log -> {
-                LogEvent messageWithPriority = Log4jLogEvent.newBuilder().setMessage(new SimpleMessage(log.replace("\n", ""))).setLevel(event.getLevel()).build();
-                LogMessages.getInstance().add(messageWithPriority);
+                LogEvent messageWithLevel = Log4jLogEvent.newBuilder().setMessage(new SimpleMessage(log.replace("\n", ""))).setLevel(event.getLevel()).build();
+                LogMessages.getInstance().add(messageWithLevel);
             });
         } else {
-            LogEvent messageWithPriority = Log4jLogEvent.newBuilder().setMessage(new SimpleMessage(message.replace("\n", ""))).setLevel(event.getLevel()).build();
-            LogMessages.getInstance().add(messageWithPriority);
+            LogEvent messageWithLevel = Log4jLogEvent.newBuilder().setMessage(new SimpleMessage(message.replace("\n", ""))).setLevel(event.getLevel()).build();
+            LogMessages.getInstance().add(messageWithLevel);
         }
     }
 }

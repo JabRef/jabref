@@ -44,18 +44,19 @@ public class ErrorConsoleViewModel {
     private final Date date = new Date();
     private ListProperty<LogEvent> allMessagesData = LogMessages.getInstance().messagesProperty();
 
-    public ListProperty<LogEvent> allMessagesDataproperty(){
+    public ListProperty<LogEvent> allMessagesDataproperty() {
         return this.allMessagesData;
     }
 
     /**
      * Handler for get of log messages in listview
+     *
      * @return all messages as String
      */
-    private String getLogMessagesAsString (){
+    private String getLogMessagesAsString() {
         StringBuilder logMessagesContent = new StringBuilder();
         for (LogEvent message : allMessagesDataproperty()) {
-            logMessagesContent.append(message.getMessage().toString() + System.lineSeparator());
+            logMessagesContent.append(message.getMessage().getFormattedMessage() + System.lineSeparator());
         }
         return logMessagesContent.toString();
     }
