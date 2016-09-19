@@ -13,15 +13,18 @@ public class PdfComment {
     private int page;
     private String content;
     private String text;
+    private String annotationType;
     private final static int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
 
-    public PdfComment(String commentId, String author, String date, int page, String content, String text) {
+    public PdfComment( final String commentId, final String author, final String date, final int page,
+                       final String content, final String text, final String annotationType) {
         this.author = author;
         this.date = date;
         this.page = page;
         this.content = content;
         this.text = text;
         this.commentId = commentId;
+        this.annotationType = annotationType;
     }
     public PdfComment(PDAnnotation annotation, int page){
         COSDictionary dict = annotation.getDictionary();
@@ -30,6 +33,7 @@ public class PdfComment {
         this.date = annotation.getModifiedDate();
         this.page = page;
         this.content = annotation.getContents();
+        this.annotationType = annotation.getSubtype();
 
     }
 
@@ -98,5 +102,9 @@ public class PdfComment {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public String getAnnotationType() {
+        return annotationType;
     }
 }

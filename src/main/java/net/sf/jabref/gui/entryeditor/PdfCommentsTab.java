@@ -1,5 +1,7 @@
 package net.sf.jabref.gui.entryeditor;
 
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.SystemColor;
@@ -9,6 +11,7 @@ import java.util.Comparator;
 import java.util.Optional;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -23,6 +26,7 @@ import javax.swing.event.ListSelectionListener;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.GUIGlobals;
+import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.pdf.PdfCommentImporter;
@@ -33,6 +37,7 @@ import net.sf.jabref.model.pdf.PdfComment;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.factories.Paddings;
+import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationHighlight;
 
 public class PdfCommentsTab extends JPanel {
 
@@ -61,7 +66,7 @@ public class PdfCommentsTab extends JPanel {
     private final String tabTitle;
     private final JabRefFrame frame;
     private final BasePanel basePanel;
-    private int commentListSelectedIndex;
+    private int commentListSelectedIndex = 0;
 
     private ArrayList<PdfComment> importedNotes = new  ArrayList<PdfComment>();
     private ArrayList<ArrayList<PdfComment>> allNotes = new ArrayList<>();
@@ -102,6 +107,7 @@ public class PdfCommentsTab extends JPanel {
             if (!commentList.getModel().equals(listModel)) {
                 commentList.setModel(listModel);
                 commentList.addListSelectionListener(new CommentListSelectionListener());
+                commentList.setCellRenderer(new CommentsListCellRenderer());
             }
             PdfCommentImporter commentImporter = new PdfCommentImporter();
             ArrayList<BibEntry> entries = new ArrayList<>();
@@ -135,7 +141,7 @@ public class PdfCommentsTab extends JPanel {
     private void updateShownComments(ArrayList<PdfComment> importedNotes){
         listModel.clear();
         if(importedNotes.isEmpty()){
-            listModel.addElement(new PdfComment("", "", "", 0, Localization.lang("Attached_file_has_no_valid_path"), ""));
+            listModel.addElement(new PdfComment("", "", "", 0, Localization.lang("Attached_file_has_no_valid_path"), "", ""));
         } else {
             Comparator<PdfComment> byPage = (comment1, comment2) -> Integer.compare(comment1.getPage(), comment2.getPage());
             importedNotes.stream()
@@ -222,6 +228,8 @@ public class PdfCommentsTab extends JPanel {
                 index = commentList.getSelectedIndex();
                 updateTextFields(listModel.get(index));
                 commentListSelectedIndex = index;
+            } else {
+                commentListSelectedIndex = 0;
             }
             commentList.setSelectedIndex(commentListSelectedIndex);
         }
@@ -254,5 +262,42 @@ public class PdfCommentsTab extends JPanel {
 
     private void openPdf() {
 
+    }
+
+    class CommentsListCellRenderer extends DefaultListCellRenderer {
+
+        JLabel label;
+
+        public CommentsListCellRenderer() {
+            this.label = new JLabel();
+        }
+
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+
+            PdfComment comment = (PdfComment) value;
+
+            switch(comment.getAnnotationType()){
+                case FDFAnnotationHighlight.SUBTYPE:
+                    label.setIcon(IconTheme.JabRefIcon.MARKER.getSmallIcon());
+                    break;
+                default:
+                    label.setIcon(IconTheme.JabRefIcon.COMMENT.getSmallIcon());
+                    break;
+            }
+
+            label.setToolTipText(comment.getAnnotationType());
+            label.setText(comment.toString());
+
+            if (isSelected) {
+                label.setBackground(GUIGlobals.ACTIVE_EDITOR_COLOR);
+                label.setForeground(Color.BLACK);
+            } else {
+                label.setBackground(Color.WHITE);
+                label.setForeground(Color.BLACK);
+            }
+
+            return label;
+        }
     }
 }
