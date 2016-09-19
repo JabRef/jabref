@@ -1,5 +1,7 @@
 package net.sf.jabref.logic.search;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.logic.l10n.Localization;
@@ -10,6 +12,7 @@ import net.sf.jabref.model.search.rules.ContainBasedSearchRule;
 import net.sf.jabref.model.search.rules.GrammarBasedSearchRule;
 import net.sf.jabref.model.search.rules.SearchRule;
 import net.sf.jabref.model.search.rules.SearchRules;
+import net.sf.jabref.model.search.rules.SentenceAnalyzer;
 
 public class SearchQuery implements SearchMatcher {
 
@@ -104,4 +107,17 @@ public class SearchQuery implements SearchMatcher {
         return description;
     }
 
+    /**
+     * Returns a list of words this query searches for.
+     * The returned strings can be a regular expression.
+     */
+    public List<String> getSearchWords() {
+        if (isRegularExpression()) {
+            return Collections.singletonList(getQuery());
+        } else {
+            // Parses the search query for valid words and returns a list these words.
+            // For example, "The great Vikinger" will give ["The","great","Vikinger"]
+            return (new SentenceAnalyzer(getQuery())).getWords();
+        }
+    }
 }

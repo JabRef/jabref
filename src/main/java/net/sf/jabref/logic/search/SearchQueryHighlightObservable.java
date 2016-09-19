@@ -1,15 +1,16 @@
 package net.sf.jabref.logic.search;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.model.search.rules.SentenceAnalyzer;
-
+/**
+ * @deprecated rewrite this class using the EventBus framework
+ */
+@Deprecated
 public class SearchQueryHighlightObservable {
 
     private final List<SearchQueryHighlightListener> listeners = new ArrayList<>();
@@ -34,17 +35,6 @@ public class SearchQueryHighlightObservable {
     }
 
     /**
-     * Parses the search query for valid words and returns a list these words. For example, "The great Vikinger" will
-     * give ["The","great","Vikinger"]
-     *
-     * @param searchText the search query
-     * @return list of words found in the search query
-     */
-    private List<String> getSearchwords(String searchText) {
-        return (new SentenceAnalyzer(searchText)).getWords();
-    }
-
-    /**
      * Fires an event if a search was started (or cleared)
      *
      * @param searchQuery the search query
@@ -53,13 +43,8 @@ public class SearchQueryHighlightObservable {
         Objects.requireNonNull(searchQuery);
 
         // Parse the search string to words
-        if (searchQuery.isGrammarBasedSearch()) {
-            pattern = Optional.empty();
-        } else if (searchQuery.isRegularExpression()) {
-            pattern = getPatternForWords(Collections.singletonList(searchQuery.getQuery()), true, searchQuery.isCaseSensitive());
-        } else {
-            pattern = getPatternForWords(getSearchwords(searchQuery.getQuery()), searchQuery.isRegularExpression(), searchQuery.isCaseSensitive());
-        }
+        pattern = getPatternForWords(searchQuery.getSearchWords(), searchQuery.isRegularExpression(),
+                searchQuery.isCaseSensitive());
 
         update();
     }
