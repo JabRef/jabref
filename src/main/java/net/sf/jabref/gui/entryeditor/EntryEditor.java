@@ -945,6 +945,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     public void updateField(final Object sourceObject) {
+        System.out.println("updatefield called");
         getStoreFieldAction().actionPerformed(new ActionEvent(sourceObject, 0, ""));
     }
 

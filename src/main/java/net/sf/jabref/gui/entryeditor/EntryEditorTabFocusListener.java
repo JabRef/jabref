@@ -102,6 +102,8 @@ class EntryEditorTabFocusListener implements FocusListener {
                 documentListener = null;
             }
         }
+        System.out.println("focusLost");
+        System.out.println(event);
         if (!event.isTemporary()) {
             entryEditorTab.getParent().updateField(event.getSource());
         }
