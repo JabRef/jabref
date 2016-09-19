@@ -1,16 +1,201 @@
 # coding=utf-8
+import codecs
+import datetime
 import os
+import subprocess
 import sys
+import webbrowser
 
-res_dir = "src/main/resources/l10n"
+import logger
 
-keyFiles = {}
+RES_DIR = "src/main/resources/l10n"
+STATUS_FILE = "status.md"
 
 
-def enum(**enums):
-    return type('Enum', (), enums)
+def get_current_branch():
+    """
+    :return: string: the current git branch
+    """
+    return subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).strip("\n")
 
-OUTPUT_COLORS = enum(OK='\033[0;32m', FAIL='\033[0;31m', ENDC='\033[0;37m')
+
+def get_current_hash_short():
+    """
+    :return: string: the current git hash (short)
+    """
+    return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip("\n")
+
+
+def open_file(filename):
+    """
+    :param filename: string: opens the file with its associated application
+    """
+    webbrowser.open(filename)
+
+
+def get_filename(filepath):
+    """
+    removes the res_dir path
+
+    :param filepath: string
+    :return: string
+    """
+    return filepath.replace("{}\\".format(RES_DIR), "")
+
+
+def read_file(filename, encoding="UTF-8"):
+    """
+    :param filename: string
+    :param encoding: string: the encoding of the file to read (standard: `UTF-8`)
+    :return: list of strings: the lines of the file
+    """
+    with codecs.open(filename, encoding=encoding) as file:
+        return file.readlines()
+
+
+def write_file(filename, content):
+    """
+    writes the lines to the file in `UTF-8`
+    :param filename: string
+    :param content: list: the lines to write
+    """
+    codecs.open(filename, "w", encoding='utf-8').writelines(content)
+
+
+def get_main_jabref_preferences():
+    """
+    :return: string: path to JabRef_en.preference
+    """
+    return os.path.join(RES_DIR, "JabRef_en.properties")
+
+
+def get_other_jabref_properties():
+    """
+    :return: list of strings: all the JabRef_*.preferences files without the english one
+    """
+    jabref_property_files = filter(lambda s: (s.startswith('JabRef_') and not (s.startswith('JabRef_en'))), os.listdir(RES_DIR))
+    return [os.path.join(RES_DIR, file) for file in jabref_property_files]
+
+
+def get_all_jabref_properties():
+    """
+    :return: list of strings: all the JabRef_*.preferences files with the english at the beginning
+    """
+    jabref_property_files = get_other_jabref_properties()
+    jabref_property_files.insert(0, os.path.join(RES_DIR, "JabRef_en.properties"))
+    return jabref_property_files
+
+
+def get_main_menu_properties():
+    """
+    :return: string: path to Menu_en.preference
+    """
+    return os.path.join(RES_DIR, "Menu_en.properties")
+
+
+def get_other_menu_properties():
+    """
+    :return: list of strings: all the Menu_*.preferences files without the english one
+    """
+    menu_property_files = filter(lambda s: (s.startswith('Menu_') and not (s.startswith('Menu_en'))), os.listdir(RES_DIR))
+    return [os.path.join(RES_DIR, file) for file in menu_property_files]
+
+
+def get_all_menu_properties():
+    """
+    :return: list of strings: all the Menu_*.preferences files with the english at the beginning
+    """
+    menu_property_files = get_other_menu_properties()
+    menu_property_files.insert(0, os.path.join(RES_DIR, "Menu_en.properties"))
+    return menu_property_files
+
+
+def get_key_from_line(line):
+    """
+    Tries to extract the key from the line
+
+    :param line: a String
+    :return: the key (String) or None
+    """
+    if line.find("#") != 0 or line.find("!") != 0:
+        index_key_end = line.find("=")
+        while (index_key_end > 0) and (line[index_key_end - 1] == "\\"):
+            index_key_end = line.find("=", index_key_end + 1)
+        if index_key_end > 0:
+            return line[0:index_key_end].strip()
+    return None
+
+
+def get_key_and_value_from_line(line):
+    """
+    Tries to extract the key and value from the line
+
+    :param line: string
+    :return: (string, string) or (None, None): (key, value)
+    """
+    if line.find("#") != 0 or line.find("!") != 0:
+        index_key_end = line.find("=")
+        while (index_key_end > 0) and (line[index_key_end - 1] == "\\"):
+            index_key_end = line.find("=", index_key_end + 1)
+        if index_key_end > 0:
+            return line[0:index_key_end].strip(), line[index_key_end + 1:].strip()
+    return None, None
+
+
+def get_translations_as_dict(lines):
+    """
+    :param lines: list of strings
+    :return: dict of strings:
+    """
+    translations = {}
+    for line in lines:
+        key, value = get_key_and_value_from_line(line=line)
+        if key:
+            translations[key] = value
+    return translations
+
+
+def get_empty_keys(lines):
+    """
+    :param lines: list of strings
+    :return: list of strings: the keys with empty values
+    """
+    not_translated = []
+    keys = get_translations_as_dict(lines=lines)
+    for key, value in keys.iteritems():
+        if not value:
+            not_translated.append(key)
+    return not_translated
+
+
+def fix_duplicates(lines):
+    """
+    Fixes all unambiguous duplicates
+
+    :param lines: list of strings
+    :return: (list of strings, list of strings): not fixed ambiguous duplicates, fixed unambiguous duplicates
+    """
+    keys = {}
+    fixed = []
+    not_fixed = []
+    for line in lines:
+        key, value = get_key_and_value_from_line(line=line)
+        if key:
+            if key in keys:
+                if not keys[key]:
+                    fixed.append("{key}={value}".format(key=key, value=keys[key]))
+                    keys[key] = value
+                elif not value:
+                    fixed.append("{key}={value}".format(key=key, value=value))
+                elif keys[key] == value:
+                    fixed.append("{key}={value}".format(key=key, value=value))
+                elif keys[key] != value:
+                    not_fixed.append("{key}={value}".format(key=key, value=value))
+                    not_fixed.append("{key}={value}".format(key=key, value=keys[key]))
+            else:
+                keys[key] = value
+
+    return keys, not_fixed, fixed
 
 
 def get_keys_from_lines(lines):
@@ -22,17 +207,13 @@ def get_keys_from_lines(lines):
     """
     keys = []
     for line in lines:
-        comment = line.find("#")
-        if comment != 0:
-            index = line.find("=")
-            while (index > 0) and (line[index - 1] == "\\"):
-                index = line.find("=", index + 1)
-            if index > 0:
-                keys.append(line[0:index])
+        key = get_key_from_line(line)
+        if key:
+            keys.append(key)
     return keys
 
 
-def find_missing_keys(first_list, second_list):
+def get_missing_keys(first_list, second_list):
     """
     Finds all keys in the first list that are not present in the second list
 
@@ -47,260 +228,217 @@ def find_missing_keys(first_list, second_list):
     return missing
 
 
-def read_all_lines(filename):
-    f1 = open(filename)
-    lines = f1.readlines()
-    f1.close()
-    return lines
-
-
-def append_keys_to_file(filename, keys):
+def get_duplicates(lines):
     """
-    Appends all the given keys to the file terminating with an equals sign
-    """
-    f = open(filename, "a")
-    f.write("\n")
-    for key in keys:
-        f.write(key + "=\n")
-    f.close()
+    finds all the duplicates and returns them
 
-def remove_keys_from_file(filename, keys):
-    lines = open(filename).readlines()
-    lines_to_write = []
+    :param lines: list of strings
+    :return: list of strings
+    """
+    duplicates = []
+    keys_checked = {}
     for line in lines:
-        add = True
-        for key in keys:
-            if(line.startswith(key+"=")):
-                add = False
-        if add:
-            lines_to_write.append(line)
-    open(filename, 'w').writelines(lines_to_write)
-
-
-def compare_property_files_to_main_property_file(main_properties_file, other_properties_files, append_missing_keys_to_other_properties_files):
-    keys_in_properties_file = get_keys_from_lines(read_all_lines(main_properties_file))
-
-    for other_properties_file in other_properties_files:
-        keys_in_other_properties_file = get_keys_from_lines(read_all_lines(other_properties_file))
-        keys_missing = find_missing_keys(keys_in_properties_file, keys_in_other_properties_file)
-        keys_obsolete = find_missing_keys(keys_in_other_properties_file, keys_in_properties_file)
-
-        print "\n\nFile '" + other_properties_file + "'\n"
-        if not keys_missing:
-            print "----> No missing keys."
-        else:
-            print "----> Missing keys:"
-            for key in keys_missing:
-                print key
-
-            if append_missing_keys_to_other_properties_files:
-                append_keys_to_file(other_properties_file, keys_missing)
-            print ""
-
-        if not keys_obsolete:
-            print "----> No possible obsolete keys (not in English language file)."
-        else:
-            print "----> Possible obsolete keys (not in English language file):"
-            for key in keys_obsolete:
-                print key
-
-            if append_missing_keys_to_other_properties_files:
-                remove_keys_from_file(other_properties_file, keys_obsolete)
-                
-            print ""
-
-
-def append_property(properties_file, key, value):
-    f = open(properties_file, "a")
-    f.write(key + "=" + value + "\n")
-    f.close()
-
-
-def find_duplicate_keys_and_keys_with_no_value(current_file, display_keys):
-    lines = read_all_lines(current_file)
-    mappings = {}
-    duplication_count = 0
-    empty_values_count = 0
-    for line in lines:
-        is_no_comment = line.find("#") != 0
-        index = line.find("=")
-        contains_property = index > 0
-        if is_no_comment and contains_property:
-            key = line[0:index]
-            value = line[index + 1:].strip()
-            if key in mappings:
-                mappings[key].append(value)
-                duplication_count += 1
-                if display_keys:
-                    print "Duplicate: " + current_file + ": " + key + " =",
-                    print mappings[key]
+        key, value = get_key_and_value_from_line(line=line)
+        if key:
+            if key in keys_checked:
+                duplicates.append("{key}={value}".format(key=key, value=value))
+                translation_in_list = "{key}={value}".format(key=key, value=keys_checked[key])
+                if translation_in_list not in duplicates:
+                    duplicates.append(translation_in_list)
             else:
-                mappings[key] = [value]
-                if value == "":
-                    empty_values_count += 1
-                    if display_keys:
-                        print "Empty value: " + current_file + ": " + key
-
-    issues_count = duplication_count + empty_values_count
-
-    message = ""
-    if issues_count == 0:
-        message = "ok"
-    elif duplication_count > 0:
-        message += str(duplication_count) + " duplicates. "
-    elif empty_values_count > 0:
-        message += str(empty_values_count) + " empty values. "
-    print current_file + ": " + message
+                keys_checked[key] = value
+    return duplicates
 
 
-def has_duplicate_keys(keys_to_check):
+def status(extended):
     """
-    Checks if the property lines has duplicates
+    prints the current status to the terminal
 
-    :param lines: a list of Strings
-    :return: a boolean
+    :param extended: boolean: if the keys with problems should be printed
     """
-    keys_checked = []
-    for key in keys_to_check:
-        if key in keys_checked:
-            return True
-        else:
-            keys_checked.append(key)
-    return False
+    def check_properties(main_property_file, property_files):
+        main_lines = read_file(filename=main_property_file)
+        main_keys = get_keys_from_lines(lines=main_lines)
+
+        # the main property file gets compared to itself, but that is OK
+        for file in property_files:
+            filename = get_filename(filepath=file)
+            lines = read_file(file)
+            keys = get_keys_from_lines(lines=lines)
+
+            keys_missing = get_missing_keys(main_keys, keys)
+            keys_obsolete = get_missing_keys(keys, main_keys)
+            keys_duplicate = get_duplicates(lines=lines)
+            keys_not_translated = get_empty_keys(lines=lines)
+
+            num_keys = len(keys)
+            num_keys_missing = len(keys_missing)
+            num_keys_not_translated = len(keys_not_translated)
+            num_keys_obsolete = len(keys_obsolete)
+            num_keys_duplicate = len(keys_duplicate)
+            num_keys_translated = num_keys - num_keys_not_translated
+
+            log = logger.error if num_keys_missing != 0 or num_keys_not_translated != 0 or num_keys_obsolete != 0 or num_keys_duplicate != 0 else logger.ok
+            log("Status of file '{file}' with {num_keys} Keys".format(file=filename, num_keys=num_keys))
+            logger.ok("\t{} translated keys".format(num_keys_translated))
+
+            log = logger.error if num_keys_not_translated != 0 else logger.ok
+            log("\t{} not translated keys".format(num_keys_not_translated))
+            if extended and num_keys_not_translated != 0:
+                logger.neutral("\t\t{}".format(", ".join(keys_not_translated)))
+
+            log = logger.error if num_keys_missing != 0 else logger.ok
+            log("\t{} missing keys".format(num_keys_missing))
+            if extended and num_keys_missing != 0:
+                logger.neutral("\t\t{}".format(", ".join(keys_missing)))
+
+            log = logger.error if num_keys_obsolete != 0 else logger.ok
+            log("\t{} obsolete keys".format(num_keys_obsolete))
+            if extended and num_keys_obsolete != 0:
+                logger.neutral("\t\t{}".format(", ".join(keys_obsolete)))
+
+            log = logger.error if num_keys_duplicate != 0 else logger.ok
+            log("\t{} duplicates".format(num_keys_duplicate))
+            if extended and num_keys_duplicate != 0:
+                logger.neutral("\t\t{}".format(", ".join(keys_duplicate)))
+
+    check_properties(main_property_file=get_main_jabref_preferences(), property_files=get_all_jabref_properties())
+    check_properties(main_property_file=get_main_menu_properties(), property_files=get_all_menu_properties())
 
 
-def get_key_from_line(line):
+def update(extended):
     """
-    Tries to extract the key from the line
+    updates all the localization files
+    fixing unambiguous duplicates, removing obsolete keys, adding missing keys, and sorting them
 
-    :param line: a String
-    :return: the key (String) or None
+    :param extended: boolean: if the keys with problems should be printed
     """
-    comment_line = line.find("#")
-    if comment_line != 0:
-        index_key_end = line.find("=")
-        while (index_key_end > 0) and (line[index_key_end - 1] == "\\"):
-            index_key_end = line.find("=", index_key_end + 1)
-        if index_key_end > 0:
-            return line[0:index_key_end]
-    return None
+    def update_properties(main_property_file, other_property_files):
+        main_lines = read_file(filename=main_property_file)
+        main_keys = get_keys_from_lines(lines=main_lines)
+
+        main_duplicates = get_duplicates(lines=main_lines)
+        num_main_duplicates = len(main_duplicates)
+        if num_main_duplicates != 0:
+            logger.error("There are {num_duplicates} duplicates in {file}, please fix them manually".format(num_duplicates=num_main_duplicates, file=get_filename(filepath=main_property_file)))
+            if extended:
+                logger.neutral("\t{}".format(main_duplicates))
+            return
+
+        for other_property_file in other_property_files:
+            filename = get_filename(filepath=other_property_file)
+            lines = read_file(filename=other_property_file)
+            keys, not_fixed, fixed = fix_duplicates(lines=lines)
+
+            num_keys = len(keys)
+            num_not_fixed = len(not_fixed)
+            num_fixed = len(fixed)
+
+            if num_not_fixed != 0:
+                logger.error("There are {num_not_fixed_duplicates} ambiguous duplicates in {file}, please fix them manually".format(num_not_fixed_duplicates=num_not_fixed, file=filename))
+                if extended:
+                    logger.neutral("\t\t{}".format(not_fixed))
+                continue
+
+            keys_missing = get_missing_keys(main_keys, keys)
+            keys_obsolete = get_missing_keys(keys, main_keys)
+
+            num_keys_missing = len(keys_missing)
+            num_keys_obsolete = len(keys_obsolete)
+
+            for missing_key in keys_missing:
+                keys[missing_key] = ""
+
+            for obsolete_key in keys_obsolete:
+                del keys[obsolete_key]
+
+            other_lines_to_write = []
+            for line in main_lines:
+                key = get_key_from_line(line)
+                if key is not None:
+                    other_lines_to_write.append(u"{key}={value}\n".format(key=key, value=keys[key]))
+                else:
+                    other_lines_to_write.append(line)
+            write_file(filename=other_property_file, content=other_lines_to_write)
 
 
-def get_keys_dict(property_lines):
+            logger.ok("Processing file '{file}' with {num_keys} Keys".format(file=filename, num_keys=num_keys))
+            logger.ok("\tfixed {} unambiguous duplicates".format(num_fixed))
+            if extended and num_fixed != 0:
+                logger.neutral("\t\t{}".format(fixed))
+
+            logger.ok("\tadded {} missing keys".format(num_keys_missing))
+            if extended and num_keys_missing != 0:
+                logger.neutral("\t\t{}".format(keys_missing))
+
+            logger.ok("\tdeleted {} obsolete keys".format(num_keys_obsolete))
+            if extended and num_keys_obsolete != 0:
+                logger.neutral("\t\t{}".format(keys_obsolete))
+
+            logger.ok("\thas been sorted successfully")
+
+    update_properties(main_property_file=get_main_jabref_preferences(), other_property_files=get_other_jabref_properties())
+    update_properties(main_property_file=get_main_menu_properties(), other_property_files=get_other_menu_properties())
+
+
+def status_create_markdown():
     """
-    Saves all the localizations (the whole String 'translationKey=translation')
-    in a dict with their translationKey as the dict key
-
-    :param property_lines: a list
-    :return: a dict
+    creates a markdown file of the current status and opens it
     """
-    keys = {}
-    for line in property_lines:
-        key = get_key_from_line(line)
-        if key is not None:
-            keys[key] = line
-    return keys
+    def write_properties(property_files):
+        markdown.append("\n| Property file | Keys | Keys translated | Keys not translated | % translated |\n")
+        markdown.append("| ------------- | ---- | --------------- | ------------------- | ------------ |\n")
+
+        for file in property_files:
+            lines = read_file(file)
+            keys = get_translations_as_dict(lines=lines)
+            keys_missing_value = get_empty_keys(lines=lines)
+
+            num_keys = len(keys)
+            num_keys_missing_value = len(keys_missing_value)
+            num_keys_translated = num_keys - num_keys_missing_value
+            percent_translated = int((num_keys_translated / float(num_keys)) * 100) if num_keys != 0 else 0
+
+            markdown.append("| {file} | {num_keys} | {num_keys_translated} | {num_keys_missing} | {percent_translated} |\n"
+                .format(file=get_filename(filepath=file), num_keys=num_keys, num_keys_translated=num_keys_translated, num_keys_missing=num_keys_missing_value, percent_translated=percent_translated))
+
+    markdown = []
+    date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
+    markdown.append("### Localization files status ({date} - Branch `{branch}` `{hash}`)\n".format(date=date, branch=get_current_branch(), hash=get_current_hash_short()))
+
+    write_properties(property_files=get_all_jabref_properties())
+    write_properties(property_files=get_all_menu_properties())
+    write_file(STATUS_FILE, markdown)
+    logger.ok("Current status written to {}".format(STATUS_FILE))
+    open_file(STATUS_FILE)
 
 
-def sort_property_files_to_main_property_file(main_properties_file, other_property_file):
-    """
-    Sorts the properties in the second property file in accordance of the first one
+if len(sys.argv) == 2 and sys.argv[1] == "markdown":
+    status_create_markdown()
 
-    :param main_properties_file:
-    :param other_property_file:
-    :return:
-    """
-    lines_in_property_file = read_all_lines(main_properties_file)
-    keys_in_property_file = get_keys_from_lines(lines_in_property_file)
+elif (len(sys.argv) == 2 or len(sys.argv) == 3) and sys.argv[1] == "update":
+    update(extended=len(sys.argv) == 3 and sys.argv[2] == "--extended")
 
-    for other_property_file in other_property_file:
-        lines_in_other_property_file = read_all_lines(other_property_file)
-        keys_in_other_property_file = get_keys_from_lines(lines_in_other_property_file)
-        keys_missing = find_missing_keys(keys_in_property_file, keys_in_other_property_file)
-        keys_obsolete = find_missing_keys(keys_in_other_property_file, keys_in_property_file)
-        other_has_duplicate_keys = has_duplicate_keys(keys_in_other_property_file)
+elif (len(sys.argv) == 2 or len(sys.argv) == 3) and sys.argv[1] == "status":
+    status(extended=len(sys.argv) == 3 and sys.argv[2] == "--extended")
 
-        error_message = ""
-        if len(keys_missing) > 0:
-            error_message += " has missing keys;"
-        if len(keys_obsolete) > 0:
-            error_message += " has obsolete keys;"
-        if other_has_duplicate_keys:
-            error_message += " has duplicate keys;"
-        if len(error_message) > 0:
-            print "{color_fail}{file}:{message} skip file{color_end}" \
-                    .format(color_fail=OUTPUT_COLORS.FAIL, file=other_property_file, message=error_message, color_end=OUTPUT_COLORS.ENDC)
-            continue
+else:
+    logger.neutral("""This program must be run from the jabref base directory.
 
-        other_lines_to_write = []
-        other_lines_key_map = get_keys_dict(lines_in_other_property_file)
-        for line in lines_in_property_file:
-            key = get_key_from_line(line)
-            if key is not None:
-                line_to_write = other_lines_key_map[key]
-                if not line_to_write.endswith("\n"):
-                    line_to_write += "\n"
-                other_lines_to_write.append(line_to_write)
-            else:
-                other_lines_to_write.append(line)
-        open(other_property_file, "w").writelines(other_lines_to_write)
-
-        print "{color_ok}{file} has been sorted successfully{color_end}" \
-                .format(color_ok=OUTPUT_COLORS.OK, file=other_property_file, color_end=OUTPUT_COLORS.ENDC)
-
-
-if len(sys.argv) == 1:
-    print """This program must be run from the jabref base directory.
-    
-Usage: syncLang.py option   
+Usage: syncLang.py {markdown, status [--extended], update [--extended]}
 Option can be one of the following:
- 
-    -c: Search the language files for empty and duplicate translations. Display only
-        counts for duplicated and empty values in each language file.
 
-    -d: Search the language files for empty and duplicate translations. 
-        For each duplicate set found, a list will be printed showing the various 
-        translations for the same key. There is currently no option to remove duplicates
-        automatically.
-        
-    -s: Sort the keys in all language files according to "JabRef_en.properties" and "Menu_en.properties".
-        If there are duplicates or keys are missing the specific language file will be skipped!
+    status [--extended]:
+        prints the current status to the terminal
+        [--extended]:
+            if the translations keys which create problems should be printed
 
-    -t [-u]: Compare the contents of "JabRef_en.properties" and "Menu_en.properties" against the other
-        language files. The program will list for all the other files which keys from the English
-        file are missing. Additionally, the program will list keys in the other files which are
-        not present in the English file - possible obsolete keys.
-        
-        If the -u option is specified, all missing keys will automatically be added to the files
-        and all obsolete keys will be automatically removed.
-"""
+    markdown:
+        Creates a markdown file of the current status and opens it
 
-elif (len(sys.argv) >= 2) and (sys.argv[1] == "-s"):
-    filesJabRef = filter(lambda s: (s.startswith('JabRef_') and not (s.startswith('JabRef_en'))), os.listdir(res_dir))
-    filesJabRef = [os.path.join(res_dir, i) for i in filesJabRef]
-    filesMenu = filter(lambda s: (s.startswith('Menu_') and not (s.startswith('Menu_en'))), os.listdir(res_dir))
-    filesMenu = [os.path.join(res_dir, i) for i in filesMenu]
-
-    sort_property_files_to_main_property_file(os.path.join(res_dir, "JabRef_en.properties"), filesJabRef)
-    sort_property_files_to_main_property_file(os.path.join(res_dir, "Menu_en.properties"), filesMenu)
-
-elif (len(sys.argv) >= 2) and (sys.argv[1] == "-t"):
-    if (len(sys.argv) >= 3) and (sys.argv[2] == "-u"):
-        change_files = True
-    else:
-        change_files = False
-
-    filesJabRef = filter(lambda s: (s.startswith('JabRef_') and not (s.startswith('JabRef_en'))), os.listdir(res_dir))
-    filesJabRef = [os.path.join(res_dir, i) for i in filesJabRef]
-    filesMenu = filter(lambda s: (s.startswith('Menu_') and not (s.startswith('Menu_en'))), os.listdir(res_dir))
-    filesMenu = [os.path.join(res_dir, i) for i in filesMenu]
-
-    compare_property_files_to_main_property_file(os.path.join(res_dir, "JabRef_en.properties"), filesJabRef, change_files)
-    compare_property_files_to_main_property_file(os.path.join(res_dir, "Menu_en.properties"), filesMenu, change_files)
-
-elif (len(sys.argv) >= 2) and ((sys.argv[1] == "-d") or (sys.argv[1] == "-c")):
-    files = filter(lambda s: (s.startswith('JabRef_') and not (s.startswith('JabRef_en'))), os.listdir(res_dir))
-    files.extend(filter(lambda s: (s.startswith('Menu_') and not (s.startswith('Menu_en'))), os.listdir(res_dir)))
-    files = [os.path.join(res_dir, i) for i in files]
-    for f in files:
-        find_duplicate_keys_and_keys_with_no_value(f, sys.argv[1] == "-d")
+    update [--extended]:
+        compares all the localization files against the English one and fixes unambiguous duplicates,
+        removes obsolete keys, adds missing keys, and sorts them
+        [--extended]:
+            if the translations keys which create problems should be printed
+""")
