@@ -1,12 +1,11 @@
 package net.sf.jabref.logic.importer.fetcher;
 
-import java.io.IOException;
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -20,7 +19,7 @@ public class IsbnFetcherTest {
 
     @Before
     public void setUp() {
-        fetcher = new IsbnFetcher(Globals.prefs.getImportFormatPreferences());
+        fetcher = new IsbnFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
 
         bibEntry = new BibEntry();
         bibEntry.setType(BibLatexEntryTypes.BOOK);
@@ -42,42 +41,39 @@ public class IsbnFetcherTest {
 
     @Test
     public void testHelpPage() {
-        assertEquals("ISBNtoBibTeXHelp", fetcher.getHelpPage().getPageName());
+        assertEquals("ISBNtoBibTeX", fetcher.getHelpPage().getPageName());
     }
 
     @Test
-    public void testFetcher10() throws FetcherException, IOException {
+    public void searchByIdSuccessfulWithShortISBN() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("0321356683");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
     @Test
-    public void testFetcher13() throws FetcherException, IOException {
+    public void searchByIdSuccessfulWithLongISBN() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("978-0321356680");
         assertEquals(Optional.of(bibEntry), fetchedEntry);
     }
 
     @Test
-    public void testFetcher10Empty() throws FetcherException, IOException {
+    public void searchByIdReturnsEmptyWithEmptyISBN() throws FetcherException {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("");
         assertEquals(Optional.empty(), fetchedEntry);
     }
 
-    @Test
-    public void testFetcher10ShortISBN() throws FetcherException, IOException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("123456789");
-        assertEquals(Optional.empty(), fetchedEntry);
+    @Test(expected = FetcherException.class)
+    public void searchByIdThrowsExceptionForShortInvalidISBN() throws FetcherException {
+        fetcher.performSearchById("123456789");
     }
 
-    @Test
-    public void testFetcher10LongISBN() throws FetcherException, IOException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("012345678910");
-        assertEquals(Optional.empty(), fetchedEntry);
+    @Test(expected = FetcherException.class)
+    public void searchByIdThrowsExceptionForLongInvalidISB() throws FetcherException {
+        fetcher.performSearchById("012345678910");
     }
 
-    @Test
-    public void testFetcher10InvalidISBN() throws FetcherException, IOException {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("jabref-4-ever");
-        assertEquals(Optional.empty(), fetchedEntry);
+    @Test(expected = FetcherException.class)
+    public void searchByIdThrowsExceptionForInvalidISBN() throws FetcherException {
+        fetcher.performSearchById("jabref-4-ever");
     }
 }
