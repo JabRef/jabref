@@ -92,7 +92,6 @@ public class PdfCommentsTab extends JPanel {
                 .build();
         commentScrollPane.setViewportView(commentList);
 
-        commentLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
         this.add(commentListPanel);
     }
 

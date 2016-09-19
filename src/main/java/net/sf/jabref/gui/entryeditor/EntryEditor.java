@@ -161,6 +161,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private final BasePanel panel;
 
+    private PdfCommentsTab pdfCommentsTab;
+
     private final Set<FieldContentSelector> contentSelectors = new HashSet<>();
 
     private boolean updateSource = true; // This can be set to false to stop the source
@@ -369,10 +371,14 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * Add a tab for displaying comments from a PDF
      */
     private void addPdfTab() {
-            PdfCommentsTab pdfCommentsTab = new PdfCommentsTab(this, frame, panel);
+        tabbed.remove(pdfCommentsTab);
+        Optional<String> field = entry.getField(FieldName.FILE);
+        if (field.isPresent()) {
+            pdfCommentsTab = new PdfCommentsTab(this, frame, panel);
             tabbed.addTab(Localization.lang("PDF comments"), IconTheme.JabRefIcon.PDF_FILE.getSmallIcon(), pdfCommentsTab,
                     Localization.lang("Show PDF comments"));
             tabs.add(pdfCommentsTab);
+        }
 
     }
 
@@ -764,6 +770,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         validateAllFields();
         updateSource();
         panel.newEntryShowing(switchEntry);
+        addPdfTab();
 
     }
 
