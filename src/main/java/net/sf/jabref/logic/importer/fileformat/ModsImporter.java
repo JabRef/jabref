@@ -69,6 +69,7 @@ public class ModsImporter extends ImportFormat {
             .getKeywordSeparator();
 
     private static final Pattern MODS_PATTERN = Pattern.compile("<mods .*>");
+    private JAXBContext context;
 
 
     @Override
@@ -82,9 +83,10 @@ public class ModsImporter extends ImportFormat {
 
         List<BibEntry> bibItems = new ArrayList<>();
 
-        JAXBContext context;
         try {
-            context = JAXBContext.newInstance("net.sf.jabref.logic.importer.fileformat.mods");
+            if (context == null) {
+                context = JAXBContext.newInstance("net.sf.jabref.logic.importer.fileformat.mods");
+            }
             Unmarshaller unmarshaller = context.createUnmarshaller();
 
             //The unmarshalled object is a jaxbElement.
