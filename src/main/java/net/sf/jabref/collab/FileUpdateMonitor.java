@@ -180,12 +180,7 @@ public class FileUpdateMonitor implements Runnable {
 
         public boolean copy() {
 
-            boolean res = false;
-            try {
-                res = FileUtil.copyFile(file, tmpFile, true);
-            } catch (IOException ex) {
-                LOGGER.info("Cannot copy to temporary file '" + tmpFile + '\'', ex);
-            }
+            boolean res = FileUtil.copyFile(file, tmpFile, true);
             return res;
         }
 

@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -110,36 +111,46 @@ public class FileUtil {
     /**
      * Copies a file.
      *
-     * @param pathToSourceFile Path Source file
+     * @param pathToSourceFile      Path Source file
      * @param pathToDestinationFile Path Destination file
-     * @param replaceExisting boolean Determines whether the copy goes on even if the file exists.
+     * @param replaceExisting       boolean Determines whether the copy goes on even if the file exists.
      * @return boolean Whether the copy succeeded, or was stopped due to the file already existing.
      * @throws IOException
      */
-    public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean replaceExisting) throws IOException {
+    public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean replaceExisting) {
         // Check if the file already exists.
         if (!Files.exists(pathToSourceFile)) {
+            LOGGER.error("Path to the source file doesn't exist.");
             return false;
         }
         if (Files.exists(pathToDestinationFile) && !replaceExisting) {
+            LOGGER.error("Path to the destination file is not exists and the file shouldn't be replace.");
             return false;
         }
-        return Files.copy(pathToSourceFile, pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING) != null;
+        try {
+            return Files.copy(pathToSourceFile, pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING) != null;
+        } catch (IOException e) {
+            LOGGER.error("Copying Files failed.", e);
+            return false;
+        }
     }
 
     /**
-     * @param fromFile Path Source file
-     * @param toFile Path Rename file or Path directory
-     * @return boolean Whether the rename succeeded, or was stopped, if the file on this path not exist or is null.
+     * Renames a given file
+     *
+     * @param fromFile The source filename to rename
+     * @param toFile   The target fileName
+     * @return True if the rename was successful, false if an exception occurred
      */
-    public static boolean renameFile(Path fromFile, Path toFile) throws IOException {
-        Objects.requireNonNull(fromFile);
-        Objects.requireNonNull(toFile);
-        if (!Files.exists(fromFile) || !Files.exists(toFile)) {
+    public static boolean renameFile(String fromFile, String toFile) {
+
+        try {
+            Path src = Paths.get(fromFile);
+            return Files.move(src, src.resolveSibling(toFile)) != null;
+        } catch (IOException e) {
+            LOGGER.error("Renaming Files failed", e);
             return false;
         }
-        return Files.move(fromFile, fromFile.resolveSibling(toFile), StandardCopyOption.REPLACE_EXISTING) != null;
-
     }
 
     /**

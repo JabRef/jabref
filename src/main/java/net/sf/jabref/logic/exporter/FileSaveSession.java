@@ -5,7 +5,6 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
 
@@ -70,12 +69,7 @@ public class FileSaveSession extends SaveSession {
         if (backup && Files.exists(file)) {
             Path fileName = file.getFileName();
             Path backupFile = file.resolveSibling(fileName + BACKUP_EXTENSION);
-            try {
-                FileUtil.copyFile(file, backupFile, true);
-            } catch (IOException ex) {
-                LOGGER.error("Problem copying file", ex);
-                throw SaveException.BACKUP_CREATION;
-            }
+            FileUtil.copyFile(file, backupFile, true);
         }
         try {
             // Always use a lock file
@@ -91,13 +85,6 @@ public class FileSaveSession extends SaveSession {
             }
 
             FileUtil.copyFile(temporaryFile, file, true);
-        } catch (IOException ex2) {
-            // If something happens here, what can we do to correct the problem? The file is corrupted, but we still
-            // have a clean copy in tmp. However, we just failed to copy tmp to file, so it's not likely that
-            // repeating the action will have a different result.
-            // On the other hand, our temporary file should still be clean, and won't be deleted.
-            throw new SaveException("Save failed while committing changes: " + ex2.getMessage(),
-                    Localization.lang("Save failed while committing changes: %0", ex2.getMessage()));
         } finally {
             FileBasedLock.deleteLockFile(file);
         }

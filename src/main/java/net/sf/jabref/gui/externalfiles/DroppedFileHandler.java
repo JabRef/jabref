@@ -540,12 +540,7 @@ public class DroppedFileHandler {
                 return false;
             }
         }
-        try {
-            FileUtil.copyFile(Paths.get(fileName), Paths.get(destFile.toURI()), true);
-        } catch (IOException e) {
-            LOGGER.error("Problem copying file", e);
-            return false;
-        }
+        FileUtil.copyFile(Paths.get(fileName), Paths.get(destFile.toURI()), true);
 
         return true;
     }
