@@ -3,8 +3,10 @@ package net.sf.jabref.logic.importer.fetcher;
 import java.util.Optional;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,7 +20,7 @@ public class AdsFetcherTest {
 
     @Before
     public void setUp() {
-        fetcher = new AdsFetcher(Globals.prefs.getImportFormatPreferences());
+        fetcher = new AdsFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
 
         firstEntry = new BibEntry();
         firstEntry.setType(BibLatexEntryTypes.ARTICLE);
@@ -100,12 +102,12 @@ public class AdsFetcherTest {
 
     @Test
     public void testName() {
-        assertEquals("ADS from ADS-DOI", fetcher.getName());
+        assertEquals("ADS-DOI", fetcher.getName());
     }
 
     @Test
     public void testHelpPage() {
-        assertEquals("ADSHelp", fetcher.getHelpPage().getPageName());
+        assertEquals("ADS", fetcher.getHelpPage().getPageName());
     }
 
     @Test
@@ -120,7 +122,7 @@ public class AdsFetcherTest {
         assertEquals(Optional.empty(), fetchedEntry);
     }
 
-    @Test
+    @Test(expected = FetcherException.class)
     public void testPerformSearchByIdInvalidDoi() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("this.doi.will.fail");
         assertEquals(Optional.empty(), fetchedEntry);
