@@ -15,8 +15,7 @@ import net.sf.jabref.model.entry.FieldName;
 
 public class MonthChecker implements Checker {
 
-    private static final Predicate<String> ONLY_AN_INTEGER_AND_MONTH_NORMALIZED = Pattern
-            .compile("[1-9]|10|11|12|#jan#|#feb#|#mar#|#apr#|#may#|#jun#|#jul#|#aug#|#sep#|#oct#|#nov#|#dec#")
+    private static final Predicate<String> ONLY_AN_INTEGER = Pattern.compile("[1-9]|10|11|12")
             .asPredicate();
     private static final Predicate<String> MONTH_NORMALIZED = Pattern
             .compile("#jan#|#feb#|#mar#|#apr#|#may#|#jun#|#jul#|#aug#|#sep#|#oct#|#nov#|#dec#")
@@ -46,7 +45,7 @@ public class MonthChecker implements Checker {
 
         //BibLaTeX
         if (bibDatabaseContextMonth.isBiblatexMode()
-                && !ONLY_AN_INTEGER_AND_MONTH_NORMALIZED.test(value.get().trim())) {
+                && !(ONLY_AN_INTEGER.test(value.get().trim()) || MONTH_NORMALIZED.test(value.get().trim()))) {
             return Collections.singletonList(new IntegrityMessage(
                     Localization.lang("should be an integer or normalized"), entry, FieldName.MONTH));
         }
