@@ -74,76 +74,76 @@ public class BibTeXMLExportFormat extends ExportFormat {
 
             String type = bibEntry.getType().toLowerCase(ENGLISH);
             switch (type) {
-            case "article":
-                Article article = new Article();
-                parse(article, bibEntry);
-                entry.setArticle(article);
-                break;
-            case "book":
-                Book book = new Book();
-                parse(book, bibEntry);
-                entry.setBook(book);
-                break;
-            case "booklet":
-                Booklet booklet = new Booklet();
-                parse(booklet, bibEntry);
-                entry.setBooklet(booklet);
-                break;
-            case "conference":
-                Conference conference = new Conference();
-                parse(conference, bibEntry);
-                entry.setConference(conference);
-                break;
-            case "inbook":
-                Inbook inbook = new Inbook();
-                parseInbook(inbook, bibEntry);
-                entry.setInbook(inbook);
-                break;
-            case "incollection":
-                Incollection incollection = new Incollection();
-                parse(incollection, bibEntry);
-                entry.setIncollection(incollection);
-                break;
-            case "inproceedings":
-                Inproceedings inproceedings = new Inproceedings();
-                parse(inproceedings, bibEntry);
-                entry.setInproceedings(inproceedings);
-                break;
-            case "mastersthesis":
-                Mastersthesis mastersthesis = new Mastersthesis();
-                parse(mastersthesis, bibEntry);
-                entry.setMastersthesis(mastersthesis);
-                break;
-            case "manual":
-                Manual manual = new Manual();
-                parse(manual, bibEntry);
-                entry.setManual(manual);
-                break;
-            case "misc":
-                Misc misc = new Misc();
-                parse(misc, bibEntry);
-                entry.setMisc(misc);
-                break;
-            case "phdthesis":
-                Phdthesis phdthesis = new Phdthesis();
-                parse(phdthesis, bibEntry);
-                entry.setPhdthesis(phdthesis);
-                break;
-            case "proceedings":
-                Proceedings proceedings = new Proceedings();
-                parse(proceedings, bibEntry);
-                entry.setProceedings(proceedings);
-                break;
-            case "techreport":
-                Techreport techreport = new Techreport();
-                parse(techreport, bibEntry);
-                entry.setTechreport(techreport);
-                break;
-            case "unpublished":
-                Unpublished unpublished = new Unpublished();
-                parse(unpublished, bibEntry);
-                entry.setUnpublished(unpublished);
-                break;
+                case "article":
+                    Article article = new Article();
+                    parse(article, bibEntry);
+                    entry.setArticle(article);
+                    break;
+                case "book":
+                    Book book = new Book();
+                    parse(book, bibEntry);
+                    entry.setBook(book);
+                    break;
+                case "booklet":
+                    Booklet booklet = new Booklet();
+                    parse(booklet, bibEntry);
+                    entry.setBooklet(booklet);
+                    break;
+                case "conference":
+                    Conference conference = new Conference();
+                    parse(conference, bibEntry);
+                    entry.setConference(conference);
+                    break;
+                case "inbook":
+                    Inbook inbook = new Inbook();
+                    parseInbook(inbook, bibEntry);
+                    entry.setInbook(inbook);
+                    break;
+                case "incollection":
+                    Incollection incollection = new Incollection();
+                    parse(incollection, bibEntry);
+                    entry.setIncollection(incollection);
+                    break;
+                case "inproceedings":
+                    Inproceedings inproceedings = new Inproceedings();
+                    parse(inproceedings, bibEntry);
+                    entry.setInproceedings(inproceedings);
+                    break;
+                case "mastersthesis":
+                    Mastersthesis mastersthesis = new Mastersthesis();
+                    parse(mastersthesis, bibEntry);
+                    entry.setMastersthesis(mastersthesis);
+                    break;
+                case "manual":
+                    Manual manual = new Manual();
+                    parse(manual, bibEntry);
+                    entry.setManual(manual);
+                    break;
+                case "misc":
+                    Misc misc = new Misc();
+                    parse(misc, bibEntry);
+                    entry.setMisc(misc);
+                    break;
+                case "phdthesis":
+                    Phdthesis phdthesis = new Phdthesis();
+                    parse(phdthesis, bibEntry);
+                    entry.setPhdthesis(phdthesis);
+                    break;
+                case "proceedings":
+                    Proceedings proceedings = new Proceedings();
+                    parse(proceedings, bibEntry);
+                    entry.setProceedings(proceedings);
+                    break;
+                case "techreport":
+                    Techreport techreport = new Techreport();
+                    parse(techreport, bibEntry);
+                    entry.setTechreport(techreport);
+                    break;
+                case "unpublished":
+                    Unpublished unpublished = new Unpublished();
+                    parse(unpublished, bibEntry);
+                    entry.setUnpublished(unpublished);
+                    break;
             }
 
             file.getEntry().add(entry);
@@ -171,7 +171,7 @@ public class BibTeXMLExportFormat extends ExportFormat {
                     calendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(value);
 
                     JAXBElement<XMLGregorianCalendar> year = new JAXBElement<>(
-                            new QName(BIBTEXML_NAMESPACE_URI, key),
+                            new QName(BIBTEXML_NAMESPACE_URI, "year"),
                             XMLGregorianCalendar.class, calendar);
                     inbook.getContent().add(year);
                 } catch (DatatypeConfigurationException e) {
@@ -222,23 +222,6 @@ public class BibTeXMLExportFormat extends ExportFormat {
                 }
             }
         }
-
-        //        //set the entryType to the entry
-        //        List<Method> entryMethods = Arrays.asList(entry.getClass().getDeclaredMethods()).stream()
-        //                .filter(method -> method.getName().startsWith("set")).collect(Collectors.toList());
-        //        for (Method method : entryMethods) {
-        //            String methodWithoutSet = method.getName().replace("set", "");
-        //            String simpleClassName = entryType.getClass().getSimpleName().replaceAll("[", "").replaceAll("]", "");
-        //            if(methodWithoutSet.equals(simpleClassName)) {
-        //                try {
-        //                    method.invoke(entry, entryType);
-        //                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-        //                    // TODO Auto-generated catch block
-        //                    e.printStackTrace();
-        //                }
-        //            }
-        //        }
-
     }
 
     private <T> List<Method> getListOfSetMethods(T entryType) {
