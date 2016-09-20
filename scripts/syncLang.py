@@ -50,7 +50,7 @@ def read_file(filename, encoding="UTF-8"):
     :return: list of strings: the lines of the file
     """
     with codecs.open(filename, encoding=encoding) as file:
-        return file.readlines()
+        return [u"{}\n".format(line.strip()) for line in file.readlines()]
 
 
 def write_file(filename, content):
@@ -315,6 +315,8 @@ def update(extended):
     """
     def update_properties(main_property_file, other_property_files):
         main_lines = read_file(filename=main_property_file)
+        # saved the stripped lines
+        write_file(main_property_file, main_lines)
         main_keys = get_keys_from_lines(lines=main_lines)
 
         main_duplicates = get_duplicates(lines=main_lines)
@@ -324,6 +326,7 @@ def update(extended):
             if extended:
                 logger.neutral("\t{}".format(main_duplicates))
             return
+
 
         for other_property_file in other_property_files:
             filename = get_filename(filepath=other_property_file)
