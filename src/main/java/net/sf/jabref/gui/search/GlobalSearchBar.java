@@ -27,7 +27,6 @@ import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.component.JTextFieldWithUnfocusedText;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.help.HelpFile;
@@ -151,7 +150,7 @@ public class GlobalSearchBar extends JPanel {
                 autoCompleteSupport.setVisible(false);
                 BasePanel currentBasePanel = frame.getCurrentBasePanel();
                 Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
-                new FocusRequester(currentBasePanel.getMainTable());
+                currentBasePanel.getMainTable().requestFocus();
             }
         });
 
@@ -255,7 +254,7 @@ public class GlobalSearchBar extends JPanel {
         if (currentBasePanel != null) {
             clearSearch(currentBasePanel);
             Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
-            new FocusRequester(currentBasePanel.getMainTable());
+            currentBasePanel.getMainTable().requestFocus();
         }
     }
 

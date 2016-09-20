@@ -142,7 +142,7 @@ public class AuxParserTest {
     }
 
     @Test
-    public void testFileNotFound() throws URISyntaxException, IOException {
+    public void testFileNotFound() {
         AuxParser auxParser = new AuxParser("unknownfile.bib", new BibDatabase());
         AuxParserResult auxResult = auxParser.parse();
 

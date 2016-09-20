@@ -21,15 +21,15 @@ public class SearchQueryTest {
 
     @Test
     public void testIsContainsBasedSearch() {
-        assertTrue(new SearchQuery("asdf", true, false).isContainsBasedSearch());
+        assertFalse(new SearchQuery("asdf", true, false).isContainsBasedSearch());
         assertFalse(new SearchQuery("asdf", true, true).isContainsBasedSearch());
         assertFalse(new SearchQuery("author=asdf", true, false).isContainsBasedSearch());
     }
 
     @Test
     public void testIsGrammarBasedSearch() {
-        assertFalse(new SearchQuery("asdf", true, false).isGrammarBasedSearch());
-        assertFalse(new SearchQuery("asdf", true, true).isGrammarBasedSearch());
+        assertTrue(new SearchQuery("asdf", true, false).isGrammarBasedSearch());
+        assertTrue(new SearchQuery("asdf", true, true).isGrammarBasedSearch());
         assertTrue(new SearchQuery("author=asdf", true, false).isGrammarBasedSearch());
     }
 
@@ -90,7 +90,7 @@ public class SearchQueryTest {
 
     @Test
     public void testIsNotValidQueryContainsBracketNotAsRegEx() {
-        assertFalse(new SearchQuery("asdf[", true, true).isValid());
+        assertTrue(new SearchQuery("asdf[", true, true).isValid());
     }
 
     @Test
@@ -105,7 +105,7 @@ public class SearchQueryTest {
 
     @Test
     public void testIsValidQueryContainsBracketAsRegEx() {
-        assertFalse(new SearchQuery("asdf[", true, true).isValid());
+        assertTrue(new SearchQuery("asdf[", true, true).isValid());
     }
 
     @Test
@@ -126,5 +126,15 @@ public class SearchQueryTest {
     @Test
     public void testIsValidQueryWithNumbersAndEqualSignNotAsRegEx() {
         assertTrue(new SearchQuery("author=123", true, false).isValid());
+    }
+
+    @Test
+    public void isMatchedForNormalAndFieldBasedSearchMixed() {
+        BibEntry entry = new BibEntry();
+        entry.setType(BibtexEntryTypes.ARTICLE);
+        entry.setField("author", "asdf");
+        entry.setField("abstract", "text");
+
+        assertTrue(new SearchQuery("text AND author=asdf", true, true).isMatch(entry));
     }
 }

@@ -629,7 +629,7 @@ public class AuthorList {
      * Regarding to the name affixes.
      * @return New string with correct seperation
      */
-    private static StringBuilder buildWithAffix(Collection<Integer> indexArray, List nameList) {
+    private static StringBuilder buildWithAffix(Collection<Integer> indexArray, List<String> nameList) {
         StringBuilder stringBuilder = new StringBuilder();
         // avoidedTimes needs to be increased by the count of avoided terms for correct odd/even calculation
         int avoidedTimes = 0;
