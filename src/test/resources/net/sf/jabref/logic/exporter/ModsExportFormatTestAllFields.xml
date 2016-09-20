@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<modsCollection xmlns:link="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:ns4="http://www.w3.org/2001/XMLSchema-instance" ns4:schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd">
+<modsCollection xmlns:mods="http://www.loc.gov/mods/v3" xmlns:ns3="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns4="http://www.w3.org/1999/xlink" ns3:schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd">
     <mods:mods>
         <mods:genre>article</mods:genre>
         <mods:note>a note</mods:note>
@@ -22,6 +22,9 @@
         <mods:language>
             <mods:languageTerm>en</mods:languageTerm>
         </mods:language>
+        <mods:titleInfo>
+            <title>title</title>
+        </mods:titleInfo>
         <mods:name>
             <affiliation>an affiliation</affiliation>
         </mods:name>
@@ -37,7 +40,9 @@
         <mods:abstract>abstract</mods:abstract>
         <mods:identifier type="pmid">123456789</mods:identifier>
         <mods:identifier type="uri">an uri</mods:identifier>
-        <mods:abstract ns4:type="mods:urlDefinition">someWebSite</mods:abstract>
+        <mods:location>
+            <mods:url>someWebSite</mods:url>
+        </mods:location>
         <mods:location>
             <mods:physicalLocation>somewhere</mods:physicalLocation>
         </mods:location>

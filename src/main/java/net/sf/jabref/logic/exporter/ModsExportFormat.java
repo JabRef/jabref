@@ -1,6 +1,7 @@
 package net.sf.jabref.logic.exporter;
 
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
 import java.util.List;
@@ -46,15 +47,20 @@ import net.sf.jabref.logic.importer.fileformat.mods.UrlDefinition;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 
-import com.sun.xml.bind.marshaller.NamespacePrefixMapper;
-
+import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
 /**
  * ExportFormat for exporting in MODS XML format.
  */
 class ModsExportFormat extends ExportFormat {
 
-    private static final String KEYWORD_SEPARATOR = ";";
+    private static final String KEYWORD_SEPARATOR = JabRefPreferences.getInstance().getImportFormatPreferences()
+            .getKeywordSeparator();
+    private static final String MODS_SCHEMA_LOCATION = "http://www.loc.gov/standards/mods/v3/mods-3-6.xsd";
+    private static final String PREFIX_MAPPER_PACKAGE = "com.sun.xml.internal.bind.namespacePrefixMapper";
+    protected static final String MODS_NAMESPACE_URI = "http://www.loc.gov/mods/v3";
+    private JAXBContext context;
 
 
     public ModsExportFormat() {
@@ -63,7 +69,7 @@ class ModsExportFormat extends ExportFormat {
 
     @Override
     public void performExport(final BibDatabaseContext databaseContext, final String file, final Charset encoding,
-            List<BibEntry> entries) throws SaveException {
+            List<BibEntry> entries) throws SaveException, IOException {
         Objects.requireNonNull(databaseContext);
         Objects.requireNonNull(entries);
         if (entries.isEmpty()) { // Only export if entries exist
@@ -75,16 +81,10 @@ class ModsExportFormat extends ExportFormat {
             for (BibEntry bibEntry : entries) {
                 ModsDefinition mods = new ModsDefinition();
 
-                Optional<String> citeKey = bibEntry.getCiteKeyOptional();
-                if (citeKey.isPresent()) {
-                    mods.setID(citeKey.get());
-                    addIdentifier("citekey", citeKey.get(), mods);
-                }
+                addCiteKey(bibEntry, mods);
 
                 Map<String, String> fieldMap = bibEntry.getFieldMap();
-                GenreDefinition genre = new GenreDefinition();
-                genre.setValue(bibEntry.getType());
-                mods.getModsGroup().add(genre);
+                addGenre(bibEntry, mods);
 
                 OriginInfoDefinition originInfo = new OriginInfoDefinition();
                 PartDefinition partDefinition = new PartDefinition();
@@ -93,169 +93,78 @@ class ModsExportFormat extends ExportFormat {
                 for (Map.Entry<String, String> entry : fieldMap.entrySet()) {
                     String key = entry.getKey();
                     String value = entry.getValue();
-                    if (FieldName.AUTHOR.equals(key)) {
-                        NameDefinition name = new NameDefinition();
-                        name.setAtType("personal");
-                        String[] authors = value.split(" and ");
-                        for (String author : authors) {
-                            NamePartDefinition namePart = new NamePartDefinition();
-                            if (author.contains(",")) {
-                                //if author contains ","  then this indicates that the author has a forename and family name
-                                int commaIndex = author.indexOf(',');
-                                String familyName = author.substring(0, commaIndex);
-                                namePart.setAtType("family");
-                                namePart.setValue(familyName);
 
-                                JAXBElement<NamePartDefinition> element = new JAXBElement<>(new QName("namePart"),
-                                        NamePartDefinition.class, namePart);
-                                name.getNamePartOrDisplayFormOrAffiliation().add(element);
+                    switch (key) {
 
-                                //now take care of the forenames
-                                String forename = author.substring(commaIndex + 1, author.length());
-                                String[] forenames = forename.split(" ");
-                                for (String given : forenames) {
-                                    NamePartDefinition namePartDefinition = new NamePartDefinition();
-                                    namePartDefinition.setAtType("given");
-                                    namePartDefinition.setValue(given);
-                                    element = new JAXBElement<>(new QName("", "namePart"), NamePartDefinition.class,
-                                            namePartDefinition);
-                                    name.getNamePartOrDisplayFormOrAffiliation().add(element);
-                                }
-                            } else {
-                                //no "," indicates that there should only be a family name
-                                namePart.setAtType("family");
-                                namePart.setValue(author);
-                                JAXBElement<NamePartDefinition> element = new JAXBElement<>(new QName("namePart"),
-                                        NamePartDefinition.class, namePart);
-                                name.getNamePartOrDisplayFormOrAffiliation().add(element);
-                            }
-                        }
-                        mods.getModsGroup().add(name);
-                    } else if ("affiliation".equals(key)) {
-                        NameDefinition nameDefinition = new NameDefinition();
-                        StringPlusLanguage affiliation = new StringPlusLanguage();
-                        affiliation.setValue(value);
-                        JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName("affiliation"),
-                                StringPlusLanguage.class, affiliation);
-                        nameDefinition.getAffiliationOrRoleOrDescription().add(element);
-                        mods.getModsGroup().add(nameDefinition);
-                    } else if (FieldName.ABSTRACT.equals(key)) {
-                        AbstractDefinition abstractDefinition = new AbstractDefinition();
-                        abstractDefinition.setValue(value);
-                        mods.getModsGroup().add(abstractDefinition);
-                    } else if (FieldName.TITLE.equals(key)) {
-                        TitleInfoDefinition titleInfo = new TitleInfoDefinition();
-                        StringPlusLanguage title = new StringPlusLanguage();
-                        title.setValue(value);
-                        JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName("title"),
-                                StringPlusLanguage.class, title);
-                        titleInfo.getTitleOrSubTitleOrPartNumber().add(element);
-                    } else if (FieldName.LANGUAGE.equals(key)) {
-                        LanguageDefinition language = new LanguageDefinition();
-                        LanguageTermDefinition languageTerm = new LanguageTermDefinition();
-                        languageTerm.setValue(value);
-                        language.getLanguageTerm().add(languageTerm);
-                        mods.getModsGroup().add(language);
-                    } else if (FieldName.LOCATION.equals(key)) {
-                        LocationDefinition locationDefinition = new LocationDefinition();
-                        //There can be more than one location
-                        String[] locations = value.split(", ");
-                        for (String location : locations) {
-                            PhysicalLocationDefinition physicalLocation = new PhysicalLocationDefinition();
-                            physicalLocation.setValue(location);
-                            locationDefinition.getPhysicalLocation().add(physicalLocation);
-                        }
-                        mods.getModsGroup().add(locationDefinition);
-                    } else if (FieldName.URL.equals(key)) {
-                        String[] urls = value.split(", ");
-                        for (String url : urls) {
-                            UrlDefinition urlDefinition = new UrlDefinition();
-                            urlDefinition.setValue(url);
-                            mods.getModsGroup().add(urlDefinition);
-                        }
-                    } else if (FieldName.NOTE.equals(key)) {
-                        String[] notes = value.split(", ");
-                        for (String note : notes) {
-                            NoteDefinition noteDefinition = new NoteDefinition();
-                            noteDefinition.setValue(note);
-                            mods.getModsGroup().add(noteDefinition);
-                        }
-                    } else if (FieldName.KEYWORDS.equals(key)) {
-                        String[] keywords = null;
-                        if (value.contains(KEYWORD_SEPARATOR)) {
-                            keywords = value.split(KEYWORD_SEPARATOR);
-                        } else if (value.contains(", ")) {
-                            keywords = value.split(", ");
-                        }
-
-                        if (keywords != null) {
-                            for (String keyword : keywords) {
-                                SubjectDefinition subject = new SubjectDefinition();
-                                StringPlusLanguagePlusAuthority topic = new StringPlusLanguagePlusAuthority();
-                                topic.setValue(keyword);
-                                JAXBElement<?> element = new JAXBElement<>(new QName("topic"),
-                                        StringPlusLanguagePlusAuthority.class, topic);
-                                subject.getTopicOrGeographicOrTemporal().add(element);
-                                mods.getModsGroup().add(subject);
-                            }
-                        } else {
-                            SubjectDefinition subject = new SubjectDefinition();
-                            StringPlusLanguagePlusAuthority topic = new StringPlusLanguagePlusAuthority();
-                            topic.setValue(value);
-                            JAXBElement<?> element = new JAXBElement<>(new QName("topic"),
-                                    StringPlusLanguagePlusAuthority.class, topic);
-                            subject.getTopicOrGeographicOrTemporal().add(element);
-                            mods.getModsGroup().add(subject);
-                        }
-                    } else if (FieldName.VOLUME.equals(key)) {
+                    case FieldName.AUTHOR:
+                        handleAuthors(mods, value);
+                        break;
+                    case "affiliation":
+                        addAffiliation(mods, value);
+                        break;
+                    case FieldName.ABSTRACT:
+                        addAbstract(mods, value);
+                        break;
+                    case FieldName.TITLE:
+                        addTitle(mods, value);
+                        break;
+                    case FieldName.LANGUAGE:
+                        addLanguage(mods, value);
+                        break;
+                    case FieldName.LOCATION:
+                        addLocation(mods, value);
+                        break;
+                    case FieldName.URL:
+                        addUrl(mods, value);
+                        break;
+                    case FieldName.NOTE:
+                        addNote(mods, value);
+                        break;
+                    case FieldName.KEYWORDS:
+                        addKeyWords(mods, value);
+                        break;
+                    case FieldName.VOLUME:
                         addDetail(FieldName.VOLUME, value, partDefinition);
-                    } else if (FieldName.ISSUE.equals(key)) {
+                        break;
+                    case FieldName.ISSUE:
                         addDetail(FieldName.ISSUE, value, partDefinition);
-                    } else if (FieldName.PAGES.equals(key)) {
-                        if (value.contains("--")) {
-                            addStartAndEndPage(value, partDefinition, "--");
-                        } else if (value.contains("-")) {
-                            addStartAndEndPage(value, partDefinition, "-");
-                        } else {
-                            BigInteger total = new BigInteger(value);
-                            ExtentDefinition extent = new ExtentDefinition();
-                            extent.setTotal(total);
-                            partDefinition.getDetailOrExtentOrDate().add(extent);
-                        }
-                    } else if (FieldName.URI.equals(key)) {
+                        break;
+                    case FieldName.PAGES:
+                        addPages(partDefinition, value);
+                        break;
+                    case FieldName.URI:
                         addIdentifier(FieldName.URI, value, mods);
-                    } else if (FieldName.ISBN.equals(key)) {
+                        break;
+                    case FieldName.ISBN:
                         addIdentifier(FieldName.ISBN, value, mods);
-                    } else if (FieldName.ISSN.equals(key)) {
+                        break;
+                    case FieldName.ISSN:
                         addIdentifier(FieldName.ISSN, value, mods);
-                    } else if (FieldName.DOI.equals(key)) {
+                        break;
+                    case FieldName.DOI:
                         addIdentifier(FieldName.DOI, value, mods);
-                    } else if (FieldName.PMID.equals(key)) {
+                        break;
+                    case FieldName.PMID:
                         addIdentifier(FieldName.PMID, value, mods);
-                    } else if (FieldName.JOURNAL.equals(key)) {
-                        TitleInfoDefinition titleInfo = new TitleInfoDefinition();
-                        StringPlusLanguage title = new StringPlusLanguage();
-                        title.setValue(value);
-                        JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName("title"),
-                                StringPlusLanguage.class, title);
-                        titleInfo.getTitleOrSubTitleOrPartNumber().add(element);
-                        relatedItem.getModsGroup().add(titleInfo);
+                        break;
+                    case FieldName.JOURNAL:
+                        addJournal(value, relatedItem);
+                        break;
+                    default:
+                        break;
                     }
 
                     addOriginInformation(key, value, originInfo);
                 }
-
-                relatedItem.getModsGroup().add(partDefinition);
-                relatedItem.setAtType("host");
-                mods.getModsGroup().add(relatedItem);
                 mods.getModsGroup().add(originInfo);
-                TypeOfResourceDefinition typeOfResource = new TypeOfResourceDefinition();
-                typeOfResource.setValue("text");
-                mods.getModsGroup().add(typeOfResource);
+
+                addRelatedAndOriginInfoToModsGroup(relatedItem, partDefinition, mods);
                 modsCollection.getMods().add(mods);
             }
 
-            JAXBContext context = JAXBContext.newInstance(ModsCollectionDefinition.class);
+            if (context == null) {
+                context = JAXBContext.newInstance(ModsCollectionDefinition.class);
+            }
             Marshaller marshaller = context.createMarshaller();
             JAXBElement<ModsCollectionDefinition> jaxbElement = new JAXBElement<>(new QName("modsCollection"),
                     ModsCollectionDefinition.class, modsCollection);
@@ -266,10 +175,8 @@ class ModsExportFormat extends ExportFormat {
 
                 @Override
                 public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
-                    if ("http://www.loc.gov/mods/v3".equals(namespaceUri)) {
+                    if (MODS_NAMESPACE_URI.equals(namespaceUri)) {
                         return "mods";
-                    } else if ("http://www.w3.org/1999/xlink".equals(namespaceUri)) {
-                        return "link";
                     }
                     return "";
                 }
@@ -277,15 +184,197 @@ class ModsExportFormat extends ExportFormat {
 
             //formate the output
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
-                    "http://www.loc.gov/standards/mods/v3/mods-3-6.xsd");
-            marshaller.setProperty("com.sun.xml.bind.namespacePrefixMapper", myPrefixMapper);
+            marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, MODS_SCHEMA_LOCATION);
+            marshaller.setProperty(PREFIX_MAPPER_PACKAGE, myPrefixMapper);
 
             // Write to File
             marshaller.marshal(jaxbElement, new File(file));
         } catch (JAXBException ex) {
             throw new SaveException(ex);
         }
+    }
+
+    private void addRelatedAndOriginInfoToModsGroup(RelatedItemDefinition relatedItem, PartDefinition partDefinition,
+            ModsDefinition mods) {
+
+        relatedItem.getModsGroup().add(partDefinition);
+        relatedItem.setAtType("host");
+        mods.getModsGroup().add(relatedItem);
+        TypeOfResourceDefinition typeOfResource = new TypeOfResourceDefinition();
+        typeOfResource.setValue("text");
+        mods.getModsGroup().add(typeOfResource);
+    }
+
+    private void addGenre(BibEntry bibEntry, ModsDefinition mods) {
+        GenreDefinition genre = new GenreDefinition();
+        genre.setValue(bibEntry.getType());
+        mods.getModsGroup().add(genre);
+    }
+
+    private void addCiteKey(BibEntry bibEntry, ModsDefinition mods) {
+        Optional<String> citeKey = bibEntry.getCiteKeyOptional();
+        if (citeKey.isPresent()) {
+            mods.setID(citeKey.get());
+            addIdentifier("citekey", citeKey.get(), mods);
+        }
+    }
+
+    private void addAbstract(ModsDefinition mods, String value) {
+        AbstractDefinition abstractDefinition = new AbstractDefinition();
+        abstractDefinition.setValue(value);
+        mods.getModsGroup().add(abstractDefinition);
+    }
+
+    private void addTitle(ModsDefinition mods, String value) {
+        TitleInfoDefinition titleInfo = new TitleInfoDefinition();
+        StringPlusLanguage title = new StringPlusLanguage();
+        title.setValue(value);
+        JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName("title"), StringPlusLanguage.class,
+                title);
+        titleInfo.getTitleOrSubTitleOrPartNumber().add(element);
+        mods.getModsGroup().add(titleInfo);
+    }
+
+    private void addAffiliation(ModsDefinition mods, String value) {
+        NameDefinition nameDefinition = new NameDefinition();
+        StringPlusLanguage affiliation = new StringPlusLanguage();
+        affiliation.setValue(value);
+        JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName("affiliation"), StringPlusLanguage.class,
+                affiliation);
+        nameDefinition.getAffiliationOrRoleOrDescription().add(element);
+        mods.getModsGroup().add(nameDefinition);
+    }
+
+    private void addLocation(ModsDefinition mods, String value) {
+        LocationDefinition locationDefinition = new LocationDefinition();
+        //There can be more than one location
+        String[] locations = value.split(", ");
+        for (String location : locations) {
+            PhysicalLocationDefinition physicalLocation = new PhysicalLocationDefinition();
+            physicalLocation.setValue(location);
+            locationDefinition.getPhysicalLocation().add(physicalLocation);
+        }
+        mods.getModsGroup().add(locationDefinition);
+    }
+
+    private void addNote(ModsDefinition mods, String value) {
+        String[] notes = value.split(", ");
+        for (String note : notes) {
+            NoteDefinition noteDefinition = new NoteDefinition();
+            noteDefinition.setValue(note);
+            mods.getModsGroup().add(noteDefinition);
+        }
+    }
+
+    private void addUrl(ModsDefinition mods, String value) {
+        String[] urls = value.split(", ");
+        LocationDefinition location = new LocationDefinition();
+        for (String url : urls) {
+            UrlDefinition urlDefinition = new UrlDefinition();
+            urlDefinition.setValue(url);
+            location.getUrl().add(urlDefinition);
+            mods.getModsGroup().add(location);
+        }
+    }
+
+    private void addJournal(String value, RelatedItemDefinition relatedItem) {
+        TitleInfoDefinition titleInfo = new TitleInfoDefinition();
+        StringPlusLanguage title = new StringPlusLanguage();
+        title.setValue(value);
+        JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName("title"), StringPlusLanguage.class,
+                title);
+        titleInfo.getTitleOrSubTitleOrPartNumber().add(element);
+        relatedItem.getModsGroup().add(titleInfo);
+    }
+
+    private void addLanguage(ModsDefinition mods, String value) {
+        LanguageDefinition language = new LanguageDefinition();
+        LanguageTermDefinition languageTerm = new LanguageTermDefinition();
+        languageTerm.setValue(value);
+        language.getLanguageTerm().add(languageTerm);
+        mods.getModsGroup().add(language);
+    }
+
+    private void addPages(PartDefinition partDefinition, String value) {
+        if (value.contains("--")) {
+            addStartAndEndPage(value, partDefinition, "--");
+        } else if (value.contains("-")) {
+            addStartAndEndPage(value, partDefinition, "-");
+        } else {
+            BigInteger total = new BigInteger(value);
+            ExtentDefinition extent = new ExtentDefinition();
+            extent.setTotal(total);
+            partDefinition.getDetailOrExtentOrDate().add(extent);
+        }
+    }
+
+    private void addKeyWords(ModsDefinition mods, String value) {
+        String[] keywords = null;
+        if (value.contains(KEYWORD_SEPARATOR)) {
+            keywords = value.split(KEYWORD_SEPARATOR);
+        } else if (value.contains(", ")) {
+            keywords = value.split(", ");
+        }
+
+        if (keywords != null) {
+            for (String keyword : keywords) {
+                SubjectDefinition subject = new SubjectDefinition();
+                StringPlusLanguagePlusAuthority topic = new StringPlusLanguagePlusAuthority();
+                topic.setValue(keyword);
+                JAXBElement<?> element = new JAXBElement<>(new QName("topic"), StringPlusLanguagePlusAuthority.class,
+                        topic);
+                subject.getTopicOrGeographicOrTemporal().add(element);
+                mods.getModsGroup().add(subject);
+            }
+        } else {
+            SubjectDefinition subject = new SubjectDefinition();
+            StringPlusLanguagePlusAuthority topic = new StringPlusLanguagePlusAuthority();
+            topic.setValue(value);
+            JAXBElement<?> element = new JAXBElement<>(new QName("topic"), StringPlusLanguagePlusAuthority.class,
+                    topic);
+            subject.getTopicOrGeographicOrTemporal().add(element);
+            mods.getModsGroup().add(subject);
+        }
+    }
+
+    private void handleAuthors(ModsDefinition mods, String value) {
+        NameDefinition name = new NameDefinition();
+        name.setAtType("personal");
+        String[] authors = value.split(" and ");
+        for (String author : authors) {
+            NamePartDefinition namePart = new NamePartDefinition();
+            if (author.contains(",")) {
+                //if author contains ","  then this indicates that the author has a forename and family name
+                int commaIndex = author.indexOf(',');
+                String familyName = author.substring(0, commaIndex);
+                namePart.setAtType("family");
+                namePart.setValue(familyName);
+
+                JAXBElement<NamePartDefinition> element = new JAXBElement<>(new QName("namePart"),
+                        NamePartDefinition.class, namePart);
+                name.getNamePartOrDisplayFormOrAffiliation().add(element);
+
+                //now take care of the forenames
+                String forename = author.substring(commaIndex + 1, author.length());
+                String[] forenames = forename.split(" ");
+                for (String given : forenames) {
+                    NamePartDefinition namePartDefinition = new NamePartDefinition();
+                    namePartDefinition.setAtType("given");
+                    namePartDefinition.setValue(given);
+                    element = new JAXBElement<>(new QName("", "namePart"), NamePartDefinition.class,
+                            namePartDefinition);
+                    name.getNamePartOrDisplayFormOrAffiliation().add(element);
+                }
+            } else {
+                //no "," indicates that there should only be a family name
+                namePart.setAtType("family");
+                namePart.setValue(author);
+                JAXBElement<NamePartDefinition> element = new JAXBElement<>(new QName("namePart"),
+                        NamePartDefinition.class, namePart);
+                name.getNamePartOrDisplayFormOrAffiliation().add(element);
+            }
+        }
+        mods.getModsGroup().add(name);
     }
 
     private void addIdentifier(String key, String value, ModsDefinition mods) {

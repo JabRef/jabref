@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<modsCollection xmlns:link="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:ns4="http://www.w3.org/2001/XMLSchema-instance" ns4:schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd">
+<modsCollection xmlns:mods="http://www.loc.gov/mods/v3" xmlns:ns3="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns4="http://www.w3.org/1999/xlink" ns3:schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd">
     <mods:mods>
         <mods:genre>book</mods:genre>
         <mods:identifier type="issn">123456789</mods:identifier>
         <mods:subject>
-            <topic>note</topic>
-        </mods:subject>
-        <mods:subject>
-            <topic> and another note</topic>
+            <topic>note; and another note;</topic>
         </mods:subject>
         <mods:identifier type="isbn">123456789</mods:identifier>
+        <mods:originInfo/>
         <mods:relatedItem type="host">
             <mods:part>
                 <mods:extent>
@@ -18,7 +16,6 @@
                 </mods:extent>
             </mods:part>
         </mods:relatedItem>
-        <mods:originInfo/>
         <mods:typeOfResource>text</mods:typeOfResource>
     </mods:mods>
 </modsCollection>

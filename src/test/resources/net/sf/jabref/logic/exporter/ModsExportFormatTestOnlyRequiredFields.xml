@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<modsCollection xmlns:link="http://www.w3.org/1999/xlink" xmlns:mods="http://www.loc.gov/mods/v3" xmlns:ns4="http://www.w3.org/2001/XMLSchema-instance" ns4:schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd">
+<modsCollection xmlns:mods="http://www.loc.gov/mods/v3" xmlns:ns3="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns4="http://www.w3.org/1999/xlink" ns3:schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd">
     <mods:mods ID="ShruthiVinodhkumarSelvamani2016">
         <mods:identifier type="citekey">ShruthiVinodhkumarSelvamani2016</mods:identifier>
         <mods:genre>article</mods:genre>
@@ -13,6 +13,9 @@
             <namePart type="given">Palani</namePart>
             <namePart type="family">Selvamani</namePart>
         </mods:name>
+        <mods:titleInfo>
+            <title>Proteomics: A new perspective for cancer.</title>
+        </mods:titleInfo>
         <mods:relatedItem type="host">
             <mods:titleInfo>
                 <title>Advanced biomedical research</title>
