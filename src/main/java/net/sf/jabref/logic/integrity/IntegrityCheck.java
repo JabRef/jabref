@@ -53,6 +53,7 @@ public class IntegrityCheck {
         result.addAll(new EditionChecker(bibDatabaseContext).check(entry));
         result.addAll(new NoteChecker(bibDatabaseContext).check(entry));
         result.addAll(new HowpublishedChecker(bibDatabaseContext).check(entry));
+        result.addAll(new MonthChecker(bibDatabaseContext).check(entry));
         result.addAll(new UrlChecker().check(entry));
         result.addAll(new FileChecker(bibDatabaseContext, fileDirectoryPreferences).check(entry));
         result.addAll(new TypeChecker().check(entry));

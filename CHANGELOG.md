@@ -14,14 +14,17 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Changed
 - Implementation of LiveUpdate for PostgreSQL & Oracle systems. Related to [#970](https://github.com/JabRef/jabref/issues/970).
 - Added fetcher for [MathSciNet](http://www.ams.org/mathscinet), [zbMATH](https://www.zbmath.org/) and [Astrophysics Data System](http://www.adsabs.harvard.edu/)
-- Implemented [#825](https://github.com/JabRef/jabref/issues/825): Search Bar across all bib files instead each having its own
-- Implemented [#573](https://github.com/JabRef/jabref/issues/573): Add key shortcut for global search (`ctrl+shift+f`, if the searchfield is empty it will be focused instead)
-- The search result Window will now show which entry belongs to which bib file
-- The search result Window will now remember its location
-- The search result Window won't stay on top anymore if the main Window is focused and will be present in the taskbar
-- The user can jump from the searchbar to the maintable  with `ctrl+enter`
-- Implemented [#573 (comment)](https://github.com/JabRef/jabref/issues/573#issuecomment-232284156): Added shortcut: closing the search result window with `ctrl+w`
+- Improved search:
+  - Search queries consisting of a normal query and a field-based query are now supported (for example, `JabRef AND author == you`)
+  - Implemented [#825](https://github.com/JabRef/jabref/issues/825): Search Bar across all bib files instead each having its own
+  - Implemented [#573](https://github.com/JabRef/jabref/issues/573): Add key shortcut for global search (`ctrl+shift+f`, if the searchfield is empty it will be focused instead)
+  - The search result Window will now show which entry belongs to which bib file
+  - The search result Window will now remember its location
+  - The search result Window won't stay on top anymore if the main Window is focused and will be present in the taskbar
+  - The user can jump from the searchbar to the maintable  with `ctrl+enter`
+  - Implemented [#573 (comment)](https://github.com/JabRef/jabref/issues/573#issuecomment-232284156): Added shortcut: closing the search result window with `ctrl+w`
 - Added integrity check for fields with BibTeX keys, e.g., `crossref` and `related`, to check that the key exists
+- Fields linking to other entries (e.g., `crossref` and `related`) have now specialized editors in the entry editor. Check the tabs "Other fields" and "General".
 - [#1496](https://github.com/JabRef/jabref/issues/1496) Keep track of which entry a downloaded file belongs to
 - Made it possible to download multiple entries in one action
 - [#1813](https://github.com/JabRef/jabref/issues/1813) Import/Export preferences dialog default directory set to working directory
@@ -36,6 +39,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Implemented integrity check for `note` and `howpublished` field: Should have the first letter capitalized (BibTeX)
 - <kbd>Pos1</kbd> / <kbd>HOME</kbd> now select the first/last entry in the main table and the search result frame.
 - <kbd>UP</kbd> / <kbd>Down</kbd> / <kbd>Tab</kbd> / <kbd>shift+Tab</kbd> in the search result frame have now the same functionality as in the main  table.
+- Importer for MODS format added
+- [#2012](https://github.com/JabRef/jabref/issues/2012) Implemented integrity check for `month` field: Should be an integer or normalized (BibLaTeX), Should be normalized (BibTeX)
 
 ### Fixed
 - Fixed selecting an entry out of multiple duplicates
@@ -60,6 +65,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed loop when pulling changes (shared database) when current selected field has changed
 - Fixed [#1958](https://github.com/JabRef/jabref/issues/1958): Verbatim fields are no longer checked for HTML encoded characters by integrity checks
 - Fixed [#1937](https://github.com/JabRef/jabref/issues/1937): If no help page for the current chosen language exists, the english help page will be shown
+- Fixed [#1996](https://github.com/JabRef/jabref/issues/1996): Unnecessary other fields tab in entry editor removed (BibTeX mode)
 
 ### Removed
 - The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field. 
