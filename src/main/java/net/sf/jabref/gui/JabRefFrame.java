@@ -789,6 +789,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 prefs.putStringList(JabRefPreferences.LAST_EDITED, filenames);
                 File focusedDatabase = getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null);
                 new LastFocusedTabPreferences(prefs).setLastFocusedTab(focusedDatabase);
+                prefs.putBoolean(JabRefPreferences.SHARED_DATABASE_LAST_FOCUSED,
+                        getCurrentBasePanel().getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED);
             }
 
         }
@@ -828,6 +830,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // Ask here if the user really wants to close, if the base
         // has not been saved since last save.
         boolean close = true;
+
+        prefs.putBoolean(JabRefPreferences.SHARED_DATABASE_LAST_EDITED, Boolean.FALSE);
+
         List<String> filenames = new ArrayList<>();
         if (tabbedPane.getTabCount() > 0) {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
@@ -862,6 +867,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                             break;
                         }
                     }
+                } else if (getBasePanelAt(i).getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED) {
+                    prefs.putBoolean(JabRefPreferences.SHARED_DATABASE_LAST_EDITED, Boolean.TRUE);
                 }
 
                 getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile().map(File::getAbsolutePath)

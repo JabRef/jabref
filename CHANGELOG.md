@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Add restoration functionality for shared database. Related to [#1703](https://github.com/JabRef/jabref/issues/1703)
 - Added fetcher for [MathSciNet](http://www.ams.org/mathscinet), [zbMATH](https://www.zbmath.org/) and [Astrophysics Data System](http://www.adsabs.harvard.edu/)
 - Implemented [#825](https://github.com/JabRef/jabref/issues/825): Search Bar across all bib files instead each having its own
 - Implemented [#573](https://github.com/JabRef/jabref/issues/573): Add key shortcut for global search (`ctrl+shift+f`, if the searchfield is empty it will be focused instead)

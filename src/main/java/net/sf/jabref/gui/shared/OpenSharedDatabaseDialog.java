@@ -34,10 +34,6 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.Defaults;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.database.DatabaseLocation;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.DBMSConnectionProperties;
 import net.sf.jabref.shared.DBMSConnector;
@@ -83,7 +79,6 @@ public class OpenSharedDatabaseDialog extends JDialog {
     private final SharedDatabasePreferences prefs = new SharedDatabasePreferences();
 
     private DBMSConnectionProperties connectionProperties;
-    private BibDatabaseContext bibDatabaseContext;
 
     /**
      * @param frame the JabRef Frame
@@ -102,13 +97,8 @@ public class OpenSharedDatabaseDialog extends JDialog {
         setLoadingConnectButtonText(true);
 
         try {
-            bibDatabaseContext.getDBSynchronizer().openSharedDatabase(connectionProperties);
-            frame.addTab(bibDatabaseContext, true);
+            new SharedDatabaseUIManager(frame, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR)).openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
-            bibDatabaseContext.getDBSynchronizer()
-                    .registerListener(
-                            new SharedDatabaseUIManager(frame, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR)));
-            frame.output(Localization.lang("Connection_to_%0_server_established.", connectionProperties.getType().toString()));
             dispose();
             return; // setLoadingConnectButtonText(false) should not be reached regularly.
         } catch (ClassNotFoundException exception) {
@@ -134,10 +124,6 @@ public class OpenSharedDatabaseDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     checkFields();
-                    BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
-
-                    bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode),
-                            DatabaseLocation.SHARED, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
 
                     connectionProperties = new DBMSConnectionProperties();
                     connectionProperties.setType((DBMSType) dbmsTypeDropDown.getSelectedItem());

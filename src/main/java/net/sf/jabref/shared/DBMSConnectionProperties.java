@@ -1,9 +1,21 @@
 package net.sf.jabref.shared;
 
+import java.io.UnsupportedEncodingException;
+import java.security.GeneralSecurityException;
+import java.util.Optional;
+
+import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
+import net.sf.jabref.shared.security.Password;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Keeps all essential data for establishing a new connection to a DBMS using {@link DBMSConnector}.
  */
 public class DBMSConnectionProperties {
+
+    private static final Log LOGGER = LogFactory.getLog(DBMSConnectionProperties.class);
 
     private DBMSType type;
     private String host;
@@ -15,6 +27,10 @@ public class DBMSConnectionProperties {
 
     public DBMSConnectionProperties() {
         // no data
+    }
+
+    public DBMSConnectionProperties(SharedDatabasePreferences prefs) {
+        setFromPreferences(prefs);
     }
 
     public DBMSConnectionProperties(DBMSType type, String host, int port, String database, String user,
@@ -73,6 +89,47 @@ public class DBMSConnectionProperties {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    /**
+     *  Gets all required data from {@link SharedDatabasePreferences} and sets them if present.
+     */
+    private void setFromPreferences(SharedDatabasePreferences prefs) {
+        if (prefs.getType().isPresent()) {
+            Optional<DBMSType> dbmsType = DBMSType.fromString(prefs.getType().get());
+            if (dbmsType.isPresent()) {
+                this.type = dbmsType.get();
+            }
+        }
+
+        if (prefs.getHost().isPresent()) {
+            this.host = prefs.getHost().get();
+        }
+
+        if (prefs.getPort().isPresent()) {
+            this.port = Integer.parseInt(prefs.getPort().get());
+        }
+
+        if (prefs.getName().isPresent()) {
+            this.database = prefs.getName().get();
+        }
+
+        if (prefs.getUser().isPresent()) {
+            this.user = prefs.getUser().get();
+        }
+
+        if (prefs.getPassword().isPresent() && prefs.getUser().isPresent()) {
+            try {
+                this.password = new Password(prefs.getPassword().get().toCharArray(), prefs.getUser().get()).decrypt();
+            } catch (UnsupportedEncodingException | GeneralSecurityException e) {
+                LOGGER.error("Could not decrypt pasword" + e);
+            }
+        }
+
+        if (!prefs.getPassword().isPresent()) {
+            // Some DBMS require a non-null value as a password (in case of using an empty string).
+            this.password = "";
+        }
     }
 
 }
