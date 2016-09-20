@@ -162,36 +162,45 @@ class ModsExportFormat extends ExportFormat {
                 modsCollection.getMods().add(mods);
             }
 
-            if (context == null) {
-                context = JAXBContext.newInstance(ModsCollectionDefinition.class);
-            }
-            Marshaller marshaller = context.createMarshaller();
+
             JAXBElement<ModsCollectionDefinition> jaxbElement = new JAXBElement<>(new QName("modsCollection"),
                     ModsCollectionDefinition.class, modsCollection);
 
-            //since it has to be a prefix, use mods everywhere as prefix for elements
-            //see also http://www.loc.gov/standards/mods/v3/mods-userguide-intro.html
-            NamespacePrefixMapper myPrefixMapper = new NamespacePrefixMapper() {
 
-                @Override
-                public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
-                    if (MODS_NAMESPACE_URI.equals(namespaceUri)) {
-                        return "mods";
-                    }
-                    return "";
-                }
-            };
-
-            //formate the output
-            marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-            marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, MODS_SCHEMA_LOCATION);
-            marshaller.setProperty(PREFIX_MAPPER_PACKAGE, myPrefixMapper);
-
-            // Write to File
-            marshaller.marshal(jaxbElement, new File(file));
+            createMarshallerAndWriteToFile(file, jaxbElement);
         } catch (JAXBException ex) {
             throw new SaveException(ex);
         }
+    }
+
+    private void createMarshallerAndWriteToFile(String file, JAXBElement<ModsCollectionDefinition> jaxbElement)
+            throws JAXBException {
+
+        if (context == null) {
+            context = JAXBContext.newInstance(ModsCollectionDefinition.class);
+        }
+        Marshaller marshaller = context.createMarshaller();
+
+        //since it has to be a prefix, use mods everywhere as prefix for elements
+        //see also http://www.loc.gov/standards/mods/v3/mods-userguide-intro.html
+        NamespacePrefixMapper myPrefixMapper = new NamespacePrefixMapper() {
+
+            @Override
+            public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
+                if (MODS_NAMESPACE_URI.equals(namespaceUri)) {
+                    return "mods";
+                }
+                return "";
+            }
+        };
+
+        //formate the output
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+        marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, MODS_SCHEMA_LOCATION);
+        marshaller.setProperty(PREFIX_MAPPER_PACKAGE, myPrefixMapper);
+
+        // Write to File
+        marshaller.marshal(jaxbElement, new File(file));
     }
 
     private void addRelatedAndOriginInfoToModsGroup(RelatedItemDefinition relatedItem, PartDefinition partDefinition,

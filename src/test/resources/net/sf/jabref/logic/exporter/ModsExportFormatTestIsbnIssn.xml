@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<modsCollection xmlns:mods="http://www.loc.gov/mods/v3" xmlns:ns3="http://www.w3.org/2001/XMLSchema-instance" xmlns:ns4="http://www.w3.org/1999/xlink" ns3:schemaLocation="http://www.loc.gov/standards/mods/v3/mods-3-6.xsd">
+    <mods:mods ID="test">
+        <mods:identifier type="citekey">test</mods:identifier>
+        <mods:genre>inbook</mods:genre>
+        <mods:identifier type="issn">12345678</mods:identifier>
+        <mods:subject>
+            <topic>keyword</topic>
+        </mods:subject>
+        <mods:name type="personal">
+            <namePart type="family">Mustermann</namePart>
+        </mods:name>
+        <mods:identifier type="isbn">123456789</mods:identifier>
+        <mods:originInfo/>
+        <mods:relatedItem type="host">
+            <mods:part>
+                <mods:extent>
+                    <mods:total>1234</mods:total>
+                </mods:extent>
+            </mods:part>
+        </mods:relatedItem>
+        <mods:typeOfResource>text</mods:typeOfResource>
+    </mods:mods>
+</modsCollection>
