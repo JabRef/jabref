@@ -176,12 +176,13 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
     }
 
     private JPanel createIdFetcherPanel() {
+        JLabel fetcherLabel = new JLabel(Localization.lang("ID type"));
+        JLabel idLabel = new JLabel(Localization.lang("ID"));
         generateButton = new JButton(Localization.lang("Generate"));
         idTextField = new JTextField("");
         comboBox = new JComboBox<>();
+
         EntryFetchers.getIdFetchers().forEach(fetcher -> comboBox.addItem(fetcher.getName()));
-        JLabel fetcherLabel = new JLabel(Localization.lang("ID type"));
-        JLabel idLabel = new JLabel(Localization.lang("ID"));
 
         generateButton.addActionListener(action -> {
             fetcherWorker.execute();
@@ -191,33 +192,39 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         JPanel jPanel = new JPanel();
 
         GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(4,4,4,4);
 
         GridBagLayout layout = new GridBagLayout();
         jPanel.setLayout(layout);
+
         constraints.fill = GridBagConstraints.HORIZONTAL;
+
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.weightx = 1;
         jPanel.add(fetcherLabel, constraints);
+
         constraints.gridx = 1;
         constraints.gridy = 0;
         constraints.weightx = 2;
         jPanel.add(comboBox, constraints);
+
         constraints.gridx = 0;
         constraints.gridy = 1;
         constraints.weightx = 1;
         jPanel.add(idLabel, constraints);
+
         constraints.gridx = 1;
         constraints.gridy = 1;
         constraints.weightx = 2;
         jPanel.add(idTextField, constraints);
 
         constraints.gridy = 2;
-        JPanel buttons = new JPanel();
-        ButtonBarBuilder bb = new ButtonBarBuilder(buttons);
-        bb.addButton(generateButton);
+        constraints.gridx = 0;
+        constraints.gridwidth = 2;
+        constraints.fill = GridBagConstraints.NONE;
+        jPanel.add(generateButton, constraints);
 
-        jPanel.add(buttons, constraints);
         jPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("ID-based_entry_generator")));
 
         return jPanel;
