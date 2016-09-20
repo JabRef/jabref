@@ -19,6 +19,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTextArea;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -66,17 +67,19 @@ public class PdfCommentsTab extends JPanel {
     private final String tabTitle;
     private final JabRefFrame frame;
     private final BasePanel basePanel;
+    private final JTabbedPane tabbed;
     private int commentListSelectedIndex = 0;
 
     private ArrayList<PdfComment> importedNotes = new  ArrayList<PdfComment>();
     private ArrayList<ArrayList<PdfComment>> allNotes = new ArrayList<>();
 
 
-    public PdfCommentsTab(EntryEditor parent, JabRefFrame frame, BasePanel basePanel) {
+    public PdfCommentsTab(EntryEditor parent, JabRefFrame frame, BasePanel basePanel, JTabbedPane tabbed) {
         this.parent = parent;
         this.frame = frame;
         this.basePanel = basePanel;
         this.tabTitle = Localization.lang("PDF comments");
+        this.tabbed = tabbed;
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         listModel  = new DefaultListModel<>();
         try {
@@ -125,7 +128,11 @@ public class PdfCommentsTab extends JPanel {
                     allNotes.add(commentImporter.importNotes(parsedFileField.getLink())));
 
             updateShownComments(allNotes.get(indexSelectedByComboBox));
-            commentList.setSelectedIndex(commentListSelectedIndex);
+            if(listModel.isEmpty()) {
+                tabbed.remove(this);
+            } else if(commentList.isSelectionEmpty()){
+                commentList.setSelectedIndex(0);
+            }
             //set up the comboBox for representing the selected file
             fileNameComboBox.removeAllItems();
             FileField.parse(parent.getEntry().getField(FieldName.FILE).get()).stream()
@@ -155,7 +162,7 @@ public class PdfCommentsTab extends JPanel {
         authorArea.setText(comment.getAuthor());
         dateArea.setText(comment.getDate());
         pageArea.setText(String.valueOf(comment.getPage()));
-        commentTxtArea.setText(comment.getContent() + " " + comment.getLinkedPdfComment().getContent());
+        commentTxtArea.setText(comment.getContent());
 
     }
 
@@ -253,8 +260,6 @@ public class PdfCommentsTab extends JPanel {
         @Override
         public void valueChanged(ListSelectionEvent e) {
 
-            //render previously marked linked pdf comments to not show the mark anymore
-            triggerRenderingACell(commentListSelectedIndex);
             int index;
             if (commentList.getSelectedIndex() >= 0) {
                 index = commentList.getSelectedIndex();
@@ -264,7 +269,8 @@ public class PdfCommentsTab extends JPanel {
                 commentListSelectedIndex = 0;
             }
             commentList.setSelectedIndex(commentListSelectedIndex);
-            triggerRenderingACell(commentListSelectedIndex);
+            //repaint the list to refresh the linked annotation highlighting
+            commentList.repaint();
         }
     }
 
@@ -280,6 +286,10 @@ public class PdfCommentsTab extends JPanel {
         }
     }
 
+    /**
+     * Cell renderer that shows different icons dependent on the annotation subtype and highlights annotations that are
+     * linked with each other eg.
+     */
     class CommentsListCellRenderer extends DefaultListCellRenderer {
 
         JLabel label;
