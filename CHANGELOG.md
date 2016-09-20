@@ -23,6 +23,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
   - The user can jump from the searchbar to the maintable  with `ctrl+enter`
   - Implemented [#573 (comment)](https://github.com/JabRef/jabref/issues/573#issuecomment-232284156): Added shortcut: closing the search result window with `ctrl+w`
 - Added integrity check for fields with BibTeX keys, e.g., `crossref` and `related`, to check that the key exists
+- Fields linking to other entries (e.g., `crossref` and `related`) have now specialized editors in the entry editor. Check the tabs "Other fields" and "General".
 - [#1496](https://github.com/JabRef/jabref/issues/1496) Keep track of which entry a downloaded file belongs to
 - Made it possible to download multiple entries in one action
 - [#1813](https://github.com/JabRef/jabref/issues/1813) Import/Export preferences dialog default directory set to working directory
