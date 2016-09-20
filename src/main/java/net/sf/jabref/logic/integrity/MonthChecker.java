@@ -22,11 +22,11 @@ public class MonthChecker implements Checker {
             .compile("#jan#|#feb#|#mar#|#apr#|#may#|#jun#|#jul#|#aug#|#sep#|#oct#|#nov#|#dec#")
             .asPredicate();
 
-    private final BibDatabaseContext bibDatabaseContextEdition;
+    private final BibDatabaseContext bibDatabaseContextMonth;
 
 
     public MonthChecker(BibDatabaseContext bibDatabaseContext) {
-        this.bibDatabaseContextEdition = Objects.requireNonNull(bibDatabaseContext);
+        this.bibDatabaseContextMonth = Objects.requireNonNull(bibDatabaseContext);
     }
 
     /**
@@ -45,14 +45,14 @@ public class MonthChecker implements Checker {
         }
 
         //BibLaTeX
-        if (bibDatabaseContextEdition.isBiblatexMode()
+        if (bibDatabaseContextMonth.isBiblatexMode()
                 && !ONLY_AN_INTEGER_AND_MONTH_NORMALIZED.test(value.get().trim())) {
             return Collections.singletonList(new IntegrityMessage(
                     Localization.lang("should be an integer or normalized"), entry, FieldName.MONTH));
         }
 
         //BibTeX
-        if (!bibDatabaseContextEdition.isBiblatexMode() && !MONTH_NORMALIZED.test(value.get().trim())) {
+        if (!bibDatabaseContextMonth.isBiblatexMode() && !MONTH_NORMALIZED.test(value.get().trim())) {
             return Collections.singletonList(new IntegrityMessage(
                     Localization.lang("should be normalized"), entry, FieldName.MONTH));
         }
