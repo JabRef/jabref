@@ -14,8 +14,8 @@ import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
-import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationCaret;
 import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationHighlight;
+import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationText;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.util.PDFTextStripperByArea;
 
@@ -54,14 +54,19 @@ public class PdfCommentImporter {
                     Optional<String> annotationTypeInfo = Optional.empty();
 
                     String subtype = annotation.getSubtype();
-                    if (subtype.equals(FDFAnnotationHighlight.SUBTYPE) || subtype.equals(FDFAnnotationCaret.SUBTYPE)) {
-                        PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();
+                    if (subtype.equals(FDFAnnotationHighlight.SUBTYPE)) {
 
+                        PdfComment annotationBelongingToHighlighting = new PdfComment(annotation.getAnnotationName(),
+                                annotation.getDictionary().getString(COSName.T), annotation.getModifiedDate(),
+                                i + 1, annotation.getContents(), FDFAnnotationText.SUBTYPE);
+
+                        PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();
+                        annotationTypeInfo = Optional.of(annotation.getContents());
                         COSArray quadsArray = (COSArray) annotation.getDictionary().getDictionaryObject(COSName.getPDFName("QuadPoints"));
                         String highlightedText = null;
                         for (int j = 1, k = 0; j <= (quadsArray.size() / 8); j++) {
 
-                            COSFloat upperLeftX = (COSFloat) quadsArray.get(0 + k);
+                            COSFloat upperLeftX = (COSFloat) quadsArray.get(k);
                             COSFloat upperLeftY = (COSFloat) quadsArray.get(1 + k);
                             COSFloat upperRightX = (COSFloat) quadsArray.get(2 + k);
                             COSFloat upperRightY = (COSFloat) quadsArray.get(3 + k);
@@ -89,16 +94,16 @@ public class PdfCommentImporter {
                                 highlightedText = highlightedTextInLine;
                             }
                         }
-
                         annotation.setContents(highlightedText);
 
-                        if(subtype.equals(FDFAnnotationHighlight.SUBTYPE)){
-                            annotationTypeInfo = Optional.of("HIGHLIGHTED_TEXT_PDF");
-                        } else {
-                            annotationTypeInfo = Optional.of("CARET_TEXT_PDF");
-                        }
+                        PdfComment highlighting = new PdfComment(annotation, i + 1);
+                        highlighting.linkComments(annotationBelongingToHighlighting);
+                        annotationsMap.add(annotationBelongingToHighlighting);
+                        annotationsMap.add(highlighting);
+
+                    } else {
+                        annotationsMap.add(new PdfComment(annotation, i + 1));
                     }
-                    annotationsMap.add(new PdfComment(annotation, i, annotationTypeInfo));
                 }
             } catch (IOException e1) {
                 e1.printStackTrace();

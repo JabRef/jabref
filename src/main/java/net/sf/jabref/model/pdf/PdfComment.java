@@ -16,20 +16,20 @@ public class PdfComment {
     private String content;
     private Optional<String> annotationTypeInfo;
     private String annotationType;
+    private PdfComment linkedPdfComment;
     private final static int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
 
     public PdfComment(final String commentId, final String author, final String date, final int page,
-                      final String content, final Optional<String> annotationTypeInfo, final String annotationType) {
+                      final String content, final String annotationType) {
         this.author = author;
         this.date = date;
         this.page = page;
         this.content = content;
-        this.annotationTypeInfo = annotationTypeInfo;
         this.commentId = commentId;
         this.annotationType = annotationType;
     }
 
-    public PdfComment(final PDAnnotation annotation, final int page, final Optional<String> annotationTypeInfo){
+    public PdfComment(final PDAnnotation annotation, final int page ){
         COSDictionary dict = annotation.getDictionary();
         this.author = dict.getString(COSName.T);
         this.commentId = annotation.getAnnotationName();
@@ -37,7 +37,6 @@ public class PdfComment {
         this.page = page;
         this.content = annotation.getContents();
         this.annotationType = annotation.getSubtype();
-        this.annotationTypeInfo = annotationTypeInfo;
 
     }
 
@@ -55,9 +54,22 @@ public class PdfComment {
         return annotationName;
     }
 
+    public void linkComments(PdfComment commentToLinkTo){
+        linkedPdfComment = commentToLinkTo;
+        commentToLinkTo.setLinkedPdfComment(this);
+    }
+
     @Override
     public String toString() {
         return abbreviateAnnotationName(content);
+    }
+
+    public PdfComment getLinkedPdfComment() {
+        return linkedPdfComment;
+    }
+
+    public void setLinkedPdfComment(PdfComment linkedPdfComment) {
+        this.linkedPdfComment = linkedPdfComment;
     }
 
     public String getCommentId() {
@@ -104,7 +116,4 @@ public class PdfComment {
         return annotationType;
     }
 
-    public Optional<String> getAnnotationTypeInfo() {
-        return annotationTypeInfo;
-    }
 }

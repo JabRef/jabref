@@ -1,5 +1,6 @@
 package net.sf.jabref.gui.entryeditor;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -134,13 +135,13 @@ public class PdfCommentsTab extends JPanel {
     }
 
     /**
-     * Updates the list model to show the given notes exclusive those with no content
+     * Updates the list model to show the given notes without those with no content
      * @param importedNotes value is the comments name and the value is a pdfComment object to add to the list model
      */
     private void updateShownComments(ArrayList<PdfComment> importedNotes){
         listModel.clear();
         if(importedNotes.isEmpty()){
-            listModel.addElement(new PdfComment("", "", "", 0, Localization.lang("Attached_file_has_no_valid_path"), Optional.empty(), ""));
+            listModel.addElement(new PdfComment("", "", "", 0, Localization.lang("Attached_file_has_no_valid_path"), ""));
         } else {
             Comparator<PdfComment> byPage = (comment1, comment2) -> Integer.compare(comment1.getPage(), comment2.getPage());
             importedNotes.stream()
@@ -154,7 +155,8 @@ public class PdfCommentsTab extends JPanel {
         authorArea.setText(comment.getAuthor());
         dateArea.setText(comment.getDate());
         pageArea.setText(String.valueOf(comment.getPage()));
-        commentTxtArea.setText(comment.getContent());
+        commentTxtArea.setText(comment.getContent() + " " + comment.getLinkedPdfComment().getContent());
+
     }
 
     private void updateFileNameComboBox() {
@@ -219,27 +221,10 @@ public class PdfCommentsTab extends JPanel {
         this.add(informationPanel);
     }
 
-    private class CommentListSelectionListener implements ListSelectionListener {
-        @Override
-        public void valueChanged(ListSelectionEvent e) {
-            int index;
-            if (commentList.getSelectedIndex() >= 0) {
-                index = commentList.getSelectedIndex();
-                updateTextFields(listModel.get(index));
-                commentListSelectedIndex = index;
-            } else {
-                commentListSelectedIndex = 0;
-            }
-            commentList.setSelectedIndex(commentListSelectedIndex);
-        }
-    }
-
     private JPanel setUpButtons(){
         JPanel buttonPanel = new JPanel(new GridBagLayout());
         GridBagConstraints buttonConstraints = new GridBagConstraints();
 
-        buttonConstraints.gridx = 0;
-        buttonConstraints.gridy = 0;
         buttonConstraints.gridy = 10;
         buttonConstraints.gridx = 10;
         openPdfButton.setText(Localization.lang("Open PDF"));
@@ -263,6 +248,38 @@ public class PdfCommentsTab extends JPanel {
 
     }
 
+
+    private class CommentListSelectionListener implements ListSelectionListener {
+        @Override
+        public void valueChanged(ListSelectionEvent e) {
+
+            //render previously marked linked pdf comments to not show the mark anymore
+            triggerRenderingACell(commentListSelectedIndex);
+            int index;
+            if (commentList.getSelectedIndex() >= 0) {
+                index = commentList.getSelectedIndex();
+                updateTextFields(listModel.get(index));
+                commentListSelectedIndex = index;
+            } else {
+                commentListSelectedIndex = 0;
+            }
+            commentList.setSelectedIndex(commentListSelectedIndex);
+            triggerRenderingACell(commentListSelectedIndex);
+        }
+    }
+
+    /**
+     * Triggers the cellRenderer to render the given cell
+     * @param cellIndex index in the listModel of the comment which is in the cell that has to be rendered
+     */
+    private void triggerRenderingACell(int cellIndex){
+        if(null != (listModel.get(cellIndex).getLinkedPdfComment())) {
+            commentList.getCellRenderer().getListCellRendererComponent(commentList,
+                    listModel.get(cellIndex).getLinkedPdfComment(),
+                    listModel.indexOf(listModel.get(cellIndex).getLinkedPdfComment()), false, false);
+        }
+    }
+
     class CommentsListCellRenderer extends DefaultListCellRenderer {
 
         JLabel label;
@@ -274,10 +291,16 @@ public class PdfCommentsTab extends JPanel {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 
+            boolean isLinkedComment = false;
+            PdfComment comment = (PdfComment) value;
+
+            if(comment.equals(commentList.getSelectedValue().getLinkedPdfComment())){
+                isLinkedComment = true;
+            }
+
             //call the super method so that the cell selection is done as usual
             label = (JLabel)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
-            PdfComment comment = (PdfComment) value;
             //If more different comment types should be reflected by icons in the list, add them here
             switch(comment.getAnnotationType()){
                 case FDFAnnotationHighlight.SUBTYPE:
@@ -290,6 +313,10 @@ public class PdfCommentsTab extends JPanel {
 
             label.setToolTipText(comment.getAnnotationType());
             label.setText(comment.toString());
+
+            if(isLinkedComment){
+                label.setBackground(Color.BLUE);
+            }
 
             return label;
         }
