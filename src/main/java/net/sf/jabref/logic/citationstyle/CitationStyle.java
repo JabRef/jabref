@@ -132,7 +132,7 @@ public class CitationStyle {
             }
             return citationStyles;
         } catch (IOException | URISyntaxException ex) {
-            LOGGER.error("something went wrong while searching available CitationStyles\n" +
+            LOGGER.error("something went wrong while searching available CitationStyles. " +
                     "Are you running directly from source code?", ex);
         }
         return Collections.emptyList();

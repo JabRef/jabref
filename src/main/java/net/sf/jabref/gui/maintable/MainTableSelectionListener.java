@@ -59,7 +59,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     private final EventList<BibEntry> tableRows;
 
     private PreviewPanel preview;
-    private boolean previewActive = new PreviewPreferences(Globals.prefs).isPreviewEnabled();
+    private boolean previewActive = Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled();
     private boolean workingOnPreview;
 
     private boolean enabled = true;
@@ -454,11 +454,11 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     }
 
     public void nextPreviewStyle(){
-        cyclePreview(new PreviewPreferences(Globals.prefs).getCyclePreviewPosition() + 1);
+        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() + 1);
     }
 
     public void previousPreviewStyle(){
-        cyclePreview(new PreviewPreferences(Globals.prefs).getCyclePreviewPosition() - 1);
+        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() - 1);
     }
 
     private void cyclePreview(int newPosition) {
@@ -466,7 +466,11 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             return;
         }
 
-        new PreviewPreferences(Globals.prefs).setCyclePreviewPosition(newPosition);
+        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
+                .getBuilder()
+                .withPreviewCyclePosition(newPosition)
+                .build();
+        Globals.prefs.storePreviewPreferences(previewPreferences);
 
         preview.updateLayout();
         preview.update();

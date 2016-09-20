@@ -43,7 +43,8 @@ public class CitationStyleGenerator {
      */
     protected static String generateCitation(BibEntry entry, String style, CitationStyleOutputFormat outputFormat) {
         try {
-            BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(entry.getType()), new Key(entry.getCiteKey()));
+            String citeKey = entry.getCiteKeyOptional().orElse("");
+            BibTeXEntry bibTeXEntry = new BibTeXEntry(new Key(entry.getType()), new Key(citeKey));
             for (Map.Entry<String, String> field : entry.getFieldMap().entrySet()) {
                 String value = UNICODE_TO_LATEX_FORMATTER.format(field.getValue());
                 bibTeXEntry.addField(new Key(field.getKey()), new DigitStringValue(value));
@@ -53,7 +54,7 @@ public class CitationStyleGenerator {
             Bibliography bibliography = CSL.makeAdhocBibliography(style, outputFormat.getFormat(), cslItemData);
             return bibliography.getEntries()[0];
 
-        } catch (IOException  e) {
+        } catch (IOException | ArrayIndexOutOfBoundsException e) {
             LOGGER.error("Could not generate BibEntry Citation", e);
         } catch (TokenMgrError e) {
             LOGGER.error("Bad character inside BibEntry", e);

@@ -1,108 +1,106 @@
 package net.sf.jabref.preferences;
 
 import java.util.List;
-import java.util.Map;
-
-import net.sf.jabref.logic.citationstyle.CitationStyle;
-
-import static net.sf.jabref.Globals.prefs;
 
 
 public class PreviewPreferences {
 
-    private static final String CYCLE_PREVIEW_POS = "cyclePreviewPos";
-    private static final String CYCLE_PREVIEW = "cyclePreview";
-    private static final String PREVIEW_PANEL_HEIGHT = "previewPanelHeight";
-    private static final String PREVIEW_STYLE = "previewStyle";
-    private static final String PREVIEW_ENABLED = "previewEnabled";
+    private final List<String> previewCycle;
+    private final int previewCyclePosition;
+    private final int previewPanelHeight;
+    private final boolean previewPanelEnabled;
+    private final String previewStyle;
+    private final String previewStyleDefault;
 
-    private final JabRefPreferences preferences;
 
-
-    public PreviewPreferences(JabRefPreferences preferences) {
-        this.preferences = preferences;
-    }
-
-    public static void putDefaults(Map<String, Object> defaults) {
-        defaults.put(CYCLE_PREVIEW, "Preview;" + CitationStyle.DEFAULT);
-        defaults.put(CYCLE_PREVIEW_POS, 0);
-
-        defaults.put(PREVIEW_PANEL_HEIGHT, 200);
-        defaults.put(PREVIEW_ENABLED, Boolean.TRUE);
-        defaults.put(PREVIEW_STYLE,
-                "<font face=\"sans-serif\">"
-                        + "<b><i>\\bibtextype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>"
-                        + "\\end{bibtexkey}</b><br>__NEWLINE__"
-                        + "\\begin{author} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\author}<BR>\\end{author}__NEWLINE__"
-                        + "\\begin{editor} \\format[Authors(LastFirst,Initials,Semicolon,Amp),HTMLChars]{\\editor} "
-                        + "<i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}__NEWLINE__"
-                        + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>__NEWLINE__"
-                        + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}__NEWLINE__"
-                        + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}__NEWLINE__"
-                        // Include the booktitle field for @inproceedings, @proceedings, etc.
-                        + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}__NEWLINE__"
-                        + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}__NEWLINE__"
-                        + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}__NEWLINE__"
-                        + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}__NEWLINE__"
-                        + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}"
-                        + "\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}__NEWLINE__"
-                        + "\\begin{abstract}<BR><BR><b>Abstract: </b> \\format[HTMLChars]{\\abstract} \\end{abstract}__NEWLINE__"
-                        + "\\begin{review}<BR><BR><b>Review: </b> \\format[HTMLChars]{\\review} \\end{review}"
-                        + "</dd>__NEWLINE__<p></p></font>");
+    public PreviewPreferences(List<String> previewCycle, int previeCyclePosition, int previewPanelHeight, boolean previewPanelEnabled, String previewStyle, String previewStyleDefault) {
+        this.previewCycle = previewCycle;
+        this.previewCyclePosition = previeCyclePosition;
+        this.previewPanelHeight = previewPanelHeight;
+        this.previewPanelEnabled = previewPanelEnabled;
+        this.previewStyle = previewStyle;
+        this.previewStyleDefault = previewStyleDefault;
     }
 
     public List<String> getPreviewCycle() {
-        return preferences.getStringList(CYCLE_PREVIEW);
+        return previewCycle;
     }
 
-    public int getCyclePreviewPosition() {
-        return prefs.getInt(CYCLE_PREVIEW_POS);
-    }
-
-    public PreviewPreferences setCyclePreviewPosition(final int position) {
-        int pos = position;
-        while (pos < 0) {
-            pos += getPreviewCycle().size();
-        }
-        pos %= getPreviewCycle().size();
-        preferences.putInt(CYCLE_PREVIEW_POS, pos);
-        return this;
-    }
-
-    public PreviewPreferences setPreviewCycle(List<String> previewCircle) {
-        preferences.putStringList(CYCLE_PREVIEW, previewCircle);
-        return this;
+    public int getPreviewCyclePosition() {
+        return previewCyclePosition;
     }
 
     public int getPreviewPanelHeight() {
-        return preferences.getInt(PREVIEW_PANEL_HEIGHT);
+        return previewPanelHeight;
     }
 
-    public PreviewPreferences setPreviewPanelHeight(int height) {
-        preferences.putInt(PREVIEW_PANEL_HEIGHT, height);
-        return this;
-    }
-
-    public String getPreviewStyleDefault() {
-        return (String) preferences.defaults.get(PREVIEW_STYLE);
+    public boolean isPreviewPanelEnabled() {
+        return previewPanelEnabled;
     }
 
     public String getPreviewStyle() {
-        return preferences.get(PREVIEW_STYLE);
+        return previewStyle;
     }
 
-    public PreviewPreferences setPreviewStyle(String preview0) {
-        preferences.put(PREVIEW_STYLE, preview0);
-        return this;
+    public String getPreviewStyleDefault() {
+        return previewStyleDefault;
     }
 
-    public boolean isPreviewEnabled() {
-        return preferences.getBoolean(PREVIEW_ENABLED);
+    public Builder getBuilder() {
+        return new Builder(this);
     }
 
-    public PreviewPreferences setPreviewEnabled(boolean previewEnabled) {
-        preferences.putBoolean(PREVIEW_ENABLED, previewEnabled);
-        return this;
+
+    public static class Builder {
+        private List<String> previewCycle;
+        private int previeCyclePosition;
+        private int previewPanelHeight;
+        private boolean previewPanelEnabled;
+        private String previewStyle;
+        private final String previewStyleDefault;
+
+
+        public Builder(PreviewPreferences previewPreferences) {
+            this.previewCycle = previewPreferences.getPreviewCycle();
+            this.previeCyclePosition = previewPreferences.getPreviewCyclePosition();
+            this.previewPanelHeight = previewPreferences.getPreviewPanelHeight();
+            this.previewPanelEnabled = previewPreferences.isPreviewPanelEnabled();
+            this.previewStyle = previewPreferences.getPreviewStyle();
+            this.previewStyleDefault = previewPreferences.getPreviewStyleDefault();
+        }
+
+        public Builder withPreviewCycle(List<String> previewCycle) {
+            this.previewCycle = previewCycle;
+            return withPreviewCyclePosition(previeCyclePosition);
+        }
+
+        public Builder withPreviewCyclePosition(int position) {
+            previeCyclePosition = position;
+            while (previeCyclePosition < 0) {
+                previeCyclePosition += previewCycle.size();
+            }
+            previeCyclePosition %= previewCycle.size();
+            return this;
+        }
+
+        public Builder withPreviewPanelHeight(int previewPanelHeight) {
+            this.previewPanelHeight = previewPanelHeight;
+            return this;
+        }
+
+        public Builder withPreviewPanelEnabled(boolean previewPanelEnabled) {
+            this.previewPanelEnabled = previewPanelEnabled;
+            return this;
+        }
+
+        public Builder withPreviewStyle(String previewStyle) {
+            this.previewStyle = previewStyle;
+            return this;
+        }
+
+        public PreviewPreferences build() {
+            return new PreviewPreferences(previewCycle, previeCyclePosition, previewPanelHeight, previewPanelEnabled, previewStyle, previewStyleDefault);
+        }
     }
 
 }

@@ -114,9 +114,8 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         });
 
 
-        btnDefault.addActionListener(event ->
-                layout.setText(new PreviewPreferences(Globals.prefs)
-                        .getPreviewStyleDefault().replace("__NEWLINE__", "\n")));
+        btnDefault.addActionListener(event -> layout.setText(Globals.prefs.getPreviewPreferences()
+                .getPreviewStyleDefault().replace("__NEWLINE__", "\n")));
 
         btnTest.addActionListener(event -> {
             try {
@@ -168,7 +167,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        PreviewPreferences previewPreferences = new PreviewPreferences(Globals.prefs);
+        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
 
         chosenModel.clear();
         boolean isPreviewChosen = false;
@@ -224,7 +223,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
         };
         discoverCitationStyleWorker.execute();
 
-        layout.setText(new PreviewPreferences(Globals.prefs).getPreviewStyle().replace("__NEWLINE__", "\n"));
+        layout.setText(Globals.prefs.getPreviewPreferences().getPreviewStyle().replace("__NEWLINE__", "\n"));
     }
 
     @Override
@@ -239,9 +238,12 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
                 styles.add("Preview");
             }
         }
-        new PreviewPreferences(Globals.prefs)
-                .setPreviewCycle(styles)
-                .setPreviewStyle(layout.getText().replace("\n", "__NEWLINE__"));
+        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
+                .getBuilder()
+                .withPreviewCycle(styles)
+                .withPreviewStyle(layout.getText().replace("\n", "__NEWLINE__"))
+                .build();
+        Globals.prefs.storePreviewPreferences(previewPreferences);
 
         // update preview
         for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {

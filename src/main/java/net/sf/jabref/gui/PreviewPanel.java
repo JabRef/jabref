@@ -201,8 +201,8 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
             return;
         }
 
-        PreviewPreferences previewPreferences = new PreviewPreferences(Globals.prefs);
-        String style = previewPreferences.getPreviewCycle().get(previewPreferences.getCyclePreviewPosition());
+        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
+        String style = previewPreferences.getPreviewCycle().get(previewPreferences.getPreviewCyclePosition());
 
         if (CitationStyle.isCitationStyleFile(style)) {
             if (basePanel.isPresent()) {

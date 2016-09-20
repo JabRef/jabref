@@ -128,7 +128,6 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.preferences.HighlightMatchingGroupPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.LastFocusedTabPreferences;
-import net.sf.jabref.preferences.PreviewPreferences;
 import net.sf.jabref.preferences.SearchPreferences;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
@@ -666,7 +665,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             }
 
             groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
-            previewToggle.setSelected(new PreviewPreferences(Globals.prefs).isPreviewEnabled());
+            previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
             fetcherToggle.setSelected(sidePaneManager.isComponentVisible(generalFetcher.getTitle()));
             Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
             setWindowTitle();
