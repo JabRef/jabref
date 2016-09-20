@@ -94,6 +94,24 @@ public class IntegrityCheckTest {
     }
 
     @Test
+    public void testMonthChecks() {
+        assertCorrect(withMode(createContext("month", "#mar#"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("month", "#dec#"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("month", "#bla#"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("month", "Dec"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("month", "December"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("month", "Lorem"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("month", "10"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("month", "1"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("month", "10"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("month", "#jan#"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("month", "jan"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("month", "january"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("month", "January"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("month", "Lorem"), BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
     public void testBracketChecks() {
         assertCorrect(createContext("title", "x"));
         assertCorrect(createContext("title", "{x}"));
