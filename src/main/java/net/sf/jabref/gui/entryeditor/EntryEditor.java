@@ -72,7 +72,6 @@ import net.sf.jabref.gui.undo.UndoableChangeType;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.gui.util.component.VerticalLabelUI;
 import net.sf.jabref.logic.TypedBibEntry;
@@ -97,7 +96,7 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.model.event.FieldChangedEvent;
+import net.sf.jabref.model.entry.event.FieldChangedEvent;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 
@@ -241,6 +240,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         if ((type.getOptionalFields() != null) && !type.getOptionalFields().isEmpty()) {
             if (!frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
+                displayedOptionalFields.addAll(type.getOptionalFields());
+
                 addOptionalTab(type);
             } else {
                 displayedOptionalFields.addAll(type.getPrimaryOptionalFields());
@@ -536,8 +537,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
             return FieldExtraComponents.getPaginationExtraComponent(editor, this);
         } else if (fieldExtras.contains(FieldProperty.TYPE)) {
             return FieldExtraComponents.getTypeExtraComponent(editor, this, "patent".equalsIgnoreCase(entry.getType()));
-        } else if (fieldExtras.contains(FieldProperty.CROSSREF)) {
-            return FieldExtraComponents.getCrossrefExtraComponent(editor, frame.getCurrentBasePanel());
         }
         return Optional.empty();
     }
@@ -660,7 +659,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         if (activeTab instanceof EntryEditorTab) {
             ((EntryEditorTab) activeTab).activate();
         } else {
-            new FocusRequester(source);
+            source.requestFocus();
         }
     }
 
@@ -775,11 +774,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private boolean storeSource() {
-        BibtexParser bibtexParser = new BibtexParser(new StringReader(source.getText()),
-                Globals.prefs.getImportFormatPreferences());
-
+        BibtexParser bibtexParser = new BibtexParser(Globals.prefs.getImportFormatPreferences());
         try {
-            ParserResult parserResult = bibtexParser.parse();
+            ParserResult parserResult = bibtexParser.parse(new StringReader(source.getText()));
             BibDatabase database = parserResult.getDatabase();
 
             if (database.getEntryCount() > 1) {

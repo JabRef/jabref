@@ -21,12 +21,12 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.event.FieldChangedEvent;
+import net.sf.jabref.model.entry.event.EntryEventSource;
+import net.sf.jabref.model.entry.event.FieldChangedEvent;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
@@ -730,6 +730,15 @@ public class BibEntry implements Cloneable {
     public String getUserComments() {
         // delete trailing whitespaces (between entry and text) from stored serialization
         return REMOVE_TRAILING_WHITESPACE.matcher(commentsBeforeEntry).replaceFirst("");
+    }
+
+    public List<ParsedEntryLink> getEntryLinkList(String fieldName, BibDatabase database) {
+        return getField(fieldName).map(fieldValue -> EntryLinkList.parse(fieldValue, database))
+                .orElse(Collections.emptyList());
+    }
+
+    public Optional<FieldChange> setEntryLinkList(String fieldName, List<ParsedEntryLink> list) {
+        return setField(fieldName, EntryLinkList.serialize(list));
     }
 
     public Set<String> getFieldAsWords(String field) {

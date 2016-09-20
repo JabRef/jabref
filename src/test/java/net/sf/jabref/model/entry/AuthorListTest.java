@@ -525,6 +525,15 @@ public class AuthorListTest {
     }
 
     @Test
+    public void testGetAuthorsLastFirstAndsCaching() {
+        // getAsLastFirstNamesWithAnd caches its results, therefore we call the method twice using the same arguments
+        Assert.assertEquals("Smith, John", AuthorList.parse("John Smith").getAsLastFirstNamesWithAnd(false));
+        Assert.assertEquals("Smith, John", AuthorList.parse("John Smith").getAsLastFirstNamesWithAnd(false));
+        Assert.assertEquals("Smith, J.", AuthorList.parse("John Smith").getAsLastFirstNamesWithAnd(true));
+        Assert.assertEquals("Smith, J.", AuthorList.parse("John Smith").getAsLastFirstNamesWithAnd(true));
+    }
+
+    @Test
     public void testGetAuthorsFirstFirst() {
 
         AuthorList al;
@@ -636,4 +645,5 @@ public class AuthorListTest {
         Author expected = new Author("H{e}lene", "H.", null, "Fiaux", null);
         Assert.assertEquals(new AuthorList(expected), AuthorList.parse("H{e}lene Fiaux"));
     }
+
 }

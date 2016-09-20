@@ -61,7 +61,7 @@ public class GvkFetcherTest {
 
     @Test
     public void testGetHelpPage() {
-        assertEquals("GVKHelp", fetcher.getHelpPage().getPageName());
+        assertEquals("GVK", fetcher.getHelpPage().getPageName());
     }
 
     @Test
@@ -74,7 +74,7 @@ public class GvkFetcherTest {
     @Test
     public void simpleSearchQueryURLCorrect() throws MalformedURLException, URISyntaxException, FetcherException {
         String query = "java jdk";
-        URL url = fetcher.getQueryURL(query);
+        URL url = fetcher.getURLForQuery(query);
         assertEquals("http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=pica.all%3Djava+jdk&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
     }
 
@@ -88,7 +88,7 @@ public class GvkFetcherTest {
     @Test
     public void complexSearchQueryURLCorrect() throws MalformedURLException, URISyntaxException, FetcherException {
         String query = "kon java tit jdk";
-        URL url = fetcher.getQueryURL(query);
+        URL url = fetcher.getURLForQuery(query);
         assertEquals("http://sru.gbv.de/gvk?version=1.1&operation=searchRetrieve&query=pica.kon%3Djava+and+pica.tit%3Djdk&maximumRecords=50&recordSchema=picaxml&sortKeys=Year%2C%2C1", url.toString());
     }
 

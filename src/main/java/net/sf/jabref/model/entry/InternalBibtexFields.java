@@ -178,6 +178,10 @@ public class InternalBibtexFields {
         dummy.setExtras(EnumSet.of(FieldProperty.FILE_EDITOR, FieldProperty.VERBATIM));
         add(dummy);
 
+        dummy = new BibtexSingleField(FieldName.RELATED, false);
+        dummy.setExtras(EnumSet.of(FieldProperty.MULTIPLE_ENTRY_LINK));
+        add(dummy);
+
         // some BibLatex fields
         dummy = new BibtexSingleField(FieldName.GENDER, true, BibtexSingleField.SMALL_W);
         dummy.getFieldProperties().add(FieldProperty.GENDER);

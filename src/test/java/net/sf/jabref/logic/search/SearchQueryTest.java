@@ -21,15 +21,15 @@ public class SearchQueryTest {
 
     @Test
     public void testIsContainsBasedSearch() {
-        assertTrue(new SearchQuery("asdf", true, false).isContainsBasedSearch());
+        assertFalse(new SearchQuery("asdf", true, false).isContainsBasedSearch());
         assertFalse(new SearchQuery("asdf", true, true).isContainsBasedSearch());
         assertFalse(new SearchQuery("author=asdf", true, false).isContainsBasedSearch());
     }
 
     @Test
     public void testIsGrammarBasedSearch() {
-        assertFalse(new SearchQuery("asdf", true, false).isGrammarBasedSearch());
-        assertFalse(new SearchQuery("asdf", true, true).isGrammarBasedSearch());
+        assertTrue(new SearchQuery("asdf", true, false).isGrammarBasedSearch());
+        assertTrue(new SearchQuery("asdf", true, true).isGrammarBasedSearch());
         assertTrue(new SearchQuery("author=asdf", true, false).isGrammarBasedSearch());
     }
 
@@ -66,4 +66,75 @@ public class SearchQueryTest {
         assertTrue(searchQuery.isMatch(e));
     }
 
+
+    @Test
+    public void testIsMatch() {
+        BibEntry entry = new BibEntry();
+        entry.setType(BibtexEntryTypes.ARTICLE);
+        entry.setField("author", "asdf");
+
+        assertFalse(new SearchQuery("qwer", true, true).isMatch(entry));
+        assertTrue(new SearchQuery("asdf", true, true).isMatch(entry));
+        assertTrue(new SearchQuery("author=asdf", true, true).isMatch(entry));
+    }
+
+    @Test
+    public void testIsValidQueryNotAsRegEx() {
+        assertTrue(new SearchQuery("asdf", true, false).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryContainsBracketNotAsRegEx() {
+        assertTrue(new SearchQuery("asdf[", true, false).isValid());
+    }
+
+    @Test
+    public void testIsNotValidQueryContainsBracketNotAsRegEx() {
+        assertTrue(new SearchQuery("asdf[", true, true).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryAsRegEx() {
+        assertTrue(new SearchQuery("asdf", true, true).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryWithNumbersAsRegEx() {
+        assertTrue(new SearchQuery("123", true, true).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryContainsBracketAsRegEx() {
+        assertTrue(new SearchQuery("asdf[", true, true).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryWithEqualSignAsRegEx() {
+        assertTrue(new SearchQuery("author=asdf", true, true).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryWithNumbersAndEqualSignAsRegEx() {
+        assertTrue(new SearchQuery("author=123", true, true).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryWithEqualSignNotAsRegEx() {
+        assertTrue(new SearchQuery("author=asdf", true, false).isValid());
+    }
+
+    @Test
+    public void testIsValidQueryWithNumbersAndEqualSignNotAsRegEx() {
+        assertTrue(new SearchQuery("author=123", true, false).isValid());
+    }
+
+    @Test
+    public void isMatchedForNormalAndFieldBasedSearchMixed() {
+        BibEntry entry = new BibEntry();
+        entry.setType(BibtexEntryTypes.ARTICLE);
+        entry.setField("author", "asdf");
+        entry.setField("abstract", "text");
+
+        assertTrue(new SearchQuery("text AND author=asdf", true, true).isMatch(entry));
+    }
 }
