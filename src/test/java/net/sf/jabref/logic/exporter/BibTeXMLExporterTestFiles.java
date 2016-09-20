@@ -18,6 +18,7 @@ import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,7 +33,6 @@ import org.xmlunit.diff.DefaultNodeMatcher;
 import org.xmlunit.diff.ElementSelectors;
 import org.xmlunit.matchers.CompareMatcher;
 
-import static org.junit.Assert.*;
 
 @RunWith(Parameterized.class)
 public class BibTeXMLExporterTestFiles {
@@ -83,7 +83,7 @@ public class BibTeXMLExporterTestFiles {
         Builder control = Input.from(Files.newInputStream(resourceDir.resolve(xmlFileName)));
         Builder test = Input.from(Files.newInputStream(Paths.get(tempFilename)));
 
-        assertThat(test, CompareMatcher.isSimilarTo(control)
+        Assert.assertThat(test, CompareMatcher.isSimilarTo(control)
                 .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
 }

@@ -22,8 +22,8 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
 import net.sf.jabref.logic.importer.fileformat.bibtexml.Article;
-import net.sf.jabref.logic.importer.fileformat.bibtexml.Booklet;
 import net.sf.jabref.logic.importer.fileformat.bibtexml.Book;
+import net.sf.jabref.logic.importer.fileformat.bibtexml.Booklet;
 import net.sf.jabref.logic.importer.fileformat.bibtexml.Conference;
 import net.sf.jabref.logic.importer.fileformat.bibtexml.Entry;
 import net.sf.jabref.logic.importer.fileformat.bibtexml.File;
@@ -48,6 +48,7 @@ public class BibTeXMLExportFormat extends ExportFormat {
     private static final String BIBTEXML_NAMESPACE_URI = "http://bibtexml.sf.net/";
     private static final Locale ENGLISH = Locale.ENGLISH;
     private static final Log LOGGER = LogFactory.getLog(BibTeXMLExportFormat.class);
+    private JAXBContext context;
 
 
     public BibTeXMLExportFormat() {
@@ -75,82 +76,61 @@ public class BibTeXMLExportFormat extends ExportFormat {
             String type = bibEntry.getType().toLowerCase(ENGLISH);
             switch (type) {
                 case "article":
-                    Article article = new Article();
-                    parse(article, bibEntry);
-                    entry.setArticle(article);
+                    parse(new Article(), bibEntry, entry);
                     break;
                 case "book":
-                    Book book = new Book();
-                    parse(book, bibEntry);
-                    entry.setBook(book);
+                    parse(new Book(), bibEntry, entry);
                     break;
                 case "booklet":
-                    Booklet booklet = new Booklet();
-                    parse(booklet, bibEntry);
-                    entry.setBooklet(booklet);
+                    parse(new Booklet(), bibEntry, entry);
                     break;
                 case "conference":
-                    Conference conference = new Conference();
-                    parse(conference, bibEntry);
-                    entry.setConference(conference);
+                    parse(new Conference(), bibEntry, entry);
                     break;
                 case "inbook":
-                    Inbook inbook = new Inbook();
-                    parseInbook(inbook, bibEntry);
-                    entry.setInbook(inbook);
+                    parseInbook(new Inbook(), bibEntry, entry);
                     break;
                 case "incollection":
-                    Incollection incollection = new Incollection();
-                    parse(incollection, bibEntry);
-                    entry.setIncollection(incollection);
+                    parse(new Incollection(), bibEntry, entry);
                     break;
                 case "inproceedings":
-                    Inproceedings inproceedings = new Inproceedings();
-                    parse(inproceedings, bibEntry);
-                    entry.setInproceedings(inproceedings);
+                    parse(new Inproceedings(), bibEntry, entry);
                     break;
                 case "mastersthesis":
-                    Mastersthesis mastersthesis = new Mastersthesis();
-                    parse(mastersthesis, bibEntry);
-                    entry.setMastersthesis(mastersthesis);
+                    parse(new Mastersthesis(), bibEntry, entry);
                     break;
                 case "manual":
-                    Manual manual = new Manual();
-                    parse(manual, bibEntry);
-                    entry.setManual(manual);
+                    parse(new Manual(), bibEntry, entry);
                     break;
                 case "misc":
-                    Misc misc = new Misc();
-                    parse(misc, bibEntry);
-                    entry.setMisc(misc);
+                    parse(new Misc(), bibEntry, entry);
                     break;
                 case "phdthesis":
-                    Phdthesis phdthesis = new Phdthesis();
-                    parse(phdthesis, bibEntry);
-                    entry.setPhdthesis(phdthesis);
+                    parse(new Phdthesis(), bibEntry, entry);
                     break;
                 case "proceedings":
-                    Proceedings proceedings = new Proceedings();
-                    parse(proceedings, bibEntry);
-                    entry.setProceedings(proceedings);
+                    parse(new Proceedings(), bibEntry, entry);
                     break;
                 case "techreport":
-                    Techreport techreport = new Techreport();
-                    parse(techreport, bibEntry);
-                    entry.setTechreport(techreport);
+                    parse(new Techreport(), bibEntry, entry);
                     break;
                 case "unpublished":
-                    Unpublished unpublished = new Unpublished();
-                    parse(unpublished, bibEntry);
-                    entry.setUnpublished(unpublished);
+                    parse(new Unpublished(), bibEntry, entry);
+                    break;
+                default:
+                    LOGGER.warn("unexpected type appeared");
                     break;
             }
-
             file.getEntry().add(entry);
         }
+        createMarshallerAndWriteToFile(file, resultFile);
+    }
 
+    private void createMarshallerAndWriteToFile(File file, String resultFile) throws SaveException {
         try {
-            JAXBContext context = JAXBContext.newInstance(File.class);
+            if (context == null) {
+                context = JAXBContext.newInstance(File.class);
+            }
             Marshaller marshaller = context.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 
@@ -160,9 +140,14 @@ public class BibTeXMLExportFormat extends ExportFormat {
         }
     }
 
-    private void parseInbook(Inbook inbook, BibEntry bibEntry) {
+    /**
+     * Contains same logic as the parse method, but inbook needs a special treatment, because
+     * the contents of inbook are stored in a List of JAXBElements. So we first need to create
+     * a JAXBElement for every field and then add it to the content list.
+     */
+    private void parseInbook(Inbook inbook, BibEntry bibEntry, Entry entry) {
         Map<String, String> fieldMap = bibEntry.getFieldMap();
-        for (java.util.Map.Entry<String, String> entryField : fieldMap.entrySet()) {
+        for (Map.Entry<String, String> entryField : fieldMap.entrySet()) {
             String value = entryField.getValue();
             String key = entryField.getKey();
             if ("year".equals(key)) {
@@ -171,16 +156,14 @@ public class BibTeXMLExportFormat extends ExportFormat {
                     calendar = DatatypeFactory.newInstance().newXMLGregorianCalendar(value);
 
                     JAXBElement<XMLGregorianCalendar> year = new JAXBElement<>(
-                            new QName(BIBTEXML_NAMESPACE_URI, "year"),
-                            XMLGregorianCalendar.class, calendar);
+                            new QName(BIBTEXML_NAMESPACE_URI, "year"), XMLGregorianCalendar.class, calendar);
                     inbook.getContent().add(year);
                 } catch (DatatypeConfigurationException e) {
                     LOGGER.error("A configuration error occured");
                 }
             } else if ("number".equals(key)) {
                 JAXBElement<BigInteger> number = new JAXBElement<>(new QName(BIBTEXML_NAMESPACE_URI, "number"),
-                        BigInteger.class,
-                        new BigInteger(value));
+                        BigInteger.class, new BigInteger(value));
                 inbook.getContent().add(number);
             } else {
                 JAXBElement<String> element = new JAXBElement<>(new QName(BIBTEXML_NAMESPACE_URI, key), String.class,
@@ -188,12 +171,29 @@ public class BibTeXMLExportFormat extends ExportFormat {
                 inbook.getContent().add(element);
             }
         }
+
+        //set the entryType to the entry
+        entry.setInbook(inbook);
     }
 
-    private <T> void parse(T entryType, BibEntry bibEntry) {
+    /**
+     * Generic method that gets an instance of an entry type (article, book, booklet ...). It also
+     * gets one bibEntry. Then the method checks all fields of the entry and then for all fields the method
+     * uses the set method of the entry type with the fieldname. So for example if a bib entry has the field
+     * author and the value for it is "Max Mustermann" and the given type is an article, then this method
+     * will invoke <Code>article.setAuthor("Max Mustermann")</Code>. <br>
+     * <br>
+     * The second part of this method is that the entry type will be set to the entry. So e.g., if the type is
+     * article then <Code>entry.setArticle(article)</Code> will be invoked.
+     *
+     * @param entryType The type parameterized type of the entry.
+     * @param bibEntry  The bib entry, which fields will be set to the entryType.
+     * @param entry     The bibtexml entry. The entryType will be set to this entry.
+     */
+    private <T> void parse(T entryType, BibEntry bibEntry, Entry entry) {
         List<Method> declaredSetMethods = getListOfSetMethods(entryType);
         Map<String, String> fieldMap = bibEntry.getFieldMap();
-        for (java.util.Map.Entry<String, String> entryField : fieldMap.entrySet()) {
+        for (Map.Entry<String, String> entryField : fieldMap.entrySet()) {
             String value = entryField.getValue();
             String key = entryField.getKey();
             for (Method method : declaredSetMethods) {
@@ -219,6 +219,21 @@ public class BibTeXMLExportFormat extends ExportFormat {
                     }
                 } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                     LOGGER.error("Could not invoke method", e);
+                }
+            }
+
+            //set the entryType to the entry
+            List<Method> entryMethods = getListOfSetMethods(entryType);
+            for (Method method : entryMethods) {
+                String methodWithoutSet = method.getName().replace("set", "");
+                String simpleClassName = entryType.getClass().getSimpleName().replaceAll("\\[", "").replaceAll("\\]",
+                        "");
+                if (methodWithoutSet.equals(simpleClassName)) {
+                    try {
+                        method.invoke(entry, entryType);
+                    } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                        LOGGER.warn("Could not set the type to the entry");
+                    }
                 }
             }
         }
