@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mods xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.loc.gov/mods/v3" version="3.4" xsi:schemaLocation="http://www.loc.gov/mods/v3 http://www.loc.gov/standards/mods/v3/mods-3-4.xsd">
+<genre>article</genre>
+<titleInfo>
+<title>At Gettysburg, or, What a Girl Saw and Heard of the Battle: A True Narrative</title>
+</titleInfo>
+<name type="personal">
+<namePart>Alleman, Tillie Pierce</namePart>
+<role>
+<roleTerm type="code" authority="marcrelator">aut</roleTerm>
+<roleTerm type="text" authority="marcrelator">Author</roleTerm>
+</role>
+</name>
+<typeOfResource>text</typeOfResource>
+<originInfo>
+<place>
+<placeTerm type="text">New York</placeTerm>
+</place>
+<publisher>W. Lake Borland</publisher>
+<dateIssued keyDate="yes" encoding="w3cdtf">1889</dateIssued>
+</originInfo>
+<language>
+<languageTerm authority="iso639-2b">eng</languageTerm>
+<languageTerm type="text">English</languageTerm>
+</language>
+<physicalDescription>
+<internetMediaType>text/html</internetMediaType>
+<digitalOrigin>reformatted digital</digitalOrigin>
+</physicalDescription>
+<subject authority="lcsh">
+<topic >Gettysburg, Battle of, Gettysburg, Pa., 1863</topic>
+</subject>
+<subject authority="lcsh">
+<topic>Gettysburg (Pa.) -- History -- Civil War, 1861-1865</topic>
+</subject>
+<subject authority="lcsh">
+<topic>United States -- History -- Civil War, 1861-1865 -- Campaigns</topic>
+</subject>
+<classification authority="lcc">E475.53 .A42</classification>
+<relatedItem type="host">
+<titleInfo type="uniform" authority="dlfaqcoll">
+<title>A Celebration of Women Writers: Americana</title>
+</titleInfo>
+</relatedItem>
+<location>
+<url usage="primary display" access="object in context"> http://digital.library.upenn.edu/women/alleman/gettysburg/gettysburg.html</url>
+</location>
+<accessCondition>Personal, noncommercial use of this item is permitted in the United States of America. Please see http://digital.library.upenn.edu/women/ for other rights and restrictions that may apply to this resource.
+</accessCondition>
+<recordInfo>
+<recordContentSource>University of Pennsylvania Digital Library</recordContentSource>
+<recordOrigin>MODS auto-converted from a simple Online Books Page metadata record. For details, see http://onlinebooks.library.upenn.edu/mods.html</recordOrigin>
+<languageOfCataloging>
+<languageTerm type="code" authority="iso639-2b">eng</languageTerm>
+</languageOfCataloging>
+</recordInfo>
+</mods>
