@@ -4,6 +4,7 @@ import java.awt.geom.Rectangle2D;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.model.pdf.PdfComment;
 
@@ -13,6 +14,7 @@ import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.common.PDRectangle;
+import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationCaret;
 import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationHighlight;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.util.PDFTextStripperByArea;
@@ -48,7 +50,11 @@ public class PdfCommentImporter {
             page = (PDPage) pdfPages.get(i);
             try {
                 for (PDAnnotation annotation : page.getAnnotations()) {
-                    if (annotation.getSubtype().equals(FDFAnnotationHighlight.SUBTYPE)) {
+
+                    Optional<String> annotationTypeInfo = Optional.empty();
+
+                    String subtype = annotation.getSubtype();
+                    if (subtype.equals(FDFAnnotationHighlight.SUBTYPE) || subtype.equals(FDFAnnotationCaret.SUBTYPE)) {
                         PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();
 
                         COSArray quadsArray = (COSArray) annotation.getDictionary().getDictionaryObject(COSName.getPDFName("QuadPoints"));
@@ -83,9 +89,16 @@ public class PdfCommentImporter {
                                 highlightedText = highlightedTextInLine;
                             }
                         }
+
                         annotation.setContents(highlightedText);
+
+                        if(subtype.equals(FDFAnnotationHighlight.SUBTYPE)){
+                            annotationTypeInfo = Optional.of("HIGHLIGHTED_TEXT_PDF");
+                        } else {
+                            annotationTypeInfo = Optional.of("CARET_TEXT_PDF");
+                        }
                     }
-                    annotationsMap.add(new PdfComment(annotation, i));
+                    annotationsMap.add(new PdfComment(annotation, i, annotationTypeInfo));
                 }
             } catch (IOException e1) {
                 e1.printStackTrace();

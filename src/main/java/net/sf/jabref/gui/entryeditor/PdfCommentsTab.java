@@ -1,6 +1,5 @@
 package net.sf.jabref.gui.entryeditor;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -141,7 +140,7 @@ public class PdfCommentsTab extends JPanel {
     private void updateShownComments(ArrayList<PdfComment> importedNotes){
         listModel.clear();
         if(importedNotes.isEmpty()){
-            listModel.addElement(new PdfComment("", "", "", 0, Localization.lang("Attached_file_has_no_valid_path"), "", ""));
+            listModel.addElement(new PdfComment("", "", "", 0, Localization.lang("Attached_file_has_no_valid_path"), Optional.empty(), ""));
         } else {
             Comparator<PdfComment> byPage = (comment1, comment2) -> Integer.compare(comment1.getPage(), comment2.getPage());
             importedNotes.stream()
@@ -275,8 +274,11 @@ public class PdfCommentsTab extends JPanel {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 
-            PdfComment comment = (PdfComment) value;
+            //call the super method so that the cell selection is done as usual
+            label = (JLabel)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
 
+            PdfComment comment = (PdfComment) value;
+            //If more different comment types should be reflected by icons in the list, add them here
             switch(comment.getAnnotationType()){
                 case FDFAnnotationHighlight.SUBTYPE:
                     label.setIcon(IconTheme.JabRefIcon.MARKER.getSmallIcon());
@@ -288,14 +290,6 @@ public class PdfCommentsTab extends JPanel {
 
             label.setToolTipText(comment.getAnnotationType());
             label.setText(comment.toString());
-
-            if (isSelected) {
-                label.setBackground(GUIGlobals.ACTIVE_EDITOR_COLOR);
-                label.setForeground(Color.BLACK);
-            } else {
-                label.setBackground(Color.WHITE);
-                label.setForeground(Color.BLACK);
-            }
 
             return label;
         }

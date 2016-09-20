@@ -1,6 +1,8 @@
 package net.sf.jabref.model.pdf;
 
 
+import java.util.Optional;
+
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
@@ -12,21 +14,22 @@ public class PdfComment {
     private String date;
     private int page;
     private String content;
-    private String text;
+    private Optional<String> annotationTypeInfo;
     private String annotationType;
     private final static int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
 
-    public PdfComment( final String commentId, final String author, final String date, final int page,
-                       final String content, final String text, final String annotationType) {
+    public PdfComment(final String commentId, final String author, final String date, final int page,
+                      final String content, final Optional<String> annotationTypeInfo, final String annotationType) {
         this.author = author;
         this.date = date;
         this.page = page;
         this.content = content;
-        this.text = text;
+        this.annotationTypeInfo = annotationTypeInfo;
         this.commentId = commentId;
         this.annotationType = annotationType;
     }
-    public PdfComment(PDAnnotation annotation, int page){
+
+    public PdfComment(final PDAnnotation annotation, final int page, final Optional<String> annotationTypeInfo){
         COSDictionary dict = annotation.getDictionary();
         this.author = dict.getString(COSName.T);
         this.commentId = annotation.getAnnotationName();
@@ -34,6 +37,7 @@ public class PdfComment {
         this.page = page;
         this.content = annotation.getContents();
         this.annotationType = annotation.getSubtype();
+        this.annotationTypeInfo = annotationTypeInfo;
 
     }
 
@@ -96,15 +100,11 @@ public class PdfComment {
         this.content = content;
     }
 
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
     public String getAnnotationType() {
         return annotationType;
+    }
+
+    public Optional<String> getAnnotationTypeInfo() {
+        return annotationTypeInfo;
     }
 }
