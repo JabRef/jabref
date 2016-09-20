@@ -102,27 +102,18 @@ public class DBMSConnectionProperties {
             }
         }
 
-        if (prefs.getHost().isPresent()) {
-            this.host = prefs.getHost().get();
-        }
-
-        if (prefs.getPort().isPresent()) {
-            this.port = Integer.parseInt(prefs.getPort().get());
-        }
-
-        if (prefs.getName().isPresent()) {
-            this.database = prefs.getName().get();
-        }
+        prefs.getHost().ifPresent(theHost -> this.host = theHost);
+        prefs.getPort().ifPresent(thePort -> this.port = Integer.parseInt(thePort));
+        prefs.getName().ifPresent(theDatabase -> this.database = theDatabase);
 
         if (prefs.getUser().isPresent()) {
             this.user = prefs.getUser().get();
-        }
-
-        if (prefs.getPassword().isPresent() && prefs.getUser().isPresent()) {
-            try {
-                this.password = new Password(prefs.getPassword().get().toCharArray(), prefs.getUser().get()).decrypt();
-            } catch (UnsupportedEncodingException | GeneralSecurityException e) {
-                LOGGER.error("Could not decrypt pasword" + e);
+            if (prefs.getPassword().isPresent()) {
+                try {
+                    this.password = new Password(prefs.getPassword().get().toCharArray(), prefs.getUser().get()).decrypt();
+                } catch (UnsupportedEncodingException | GeneralSecurityException e) {
+                    LOGGER.error("Could not decrypt password", e);
+                }
             }
         }
 
@@ -131,5 +122,4 @@ public class DBMSConnectionProperties {
             this.password = "";
         }
     }
-
 }
