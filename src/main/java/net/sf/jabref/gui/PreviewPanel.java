@@ -115,7 +115,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
         createPreviewPane();
         updateLayout();
 
-        if (panel != null) {
+        if (this.basePanel.isPresent()) {
             // dropped files handler only created for main window
             // not for Windows as like the search results window
             this.previewPane.setTransferHandler(new PreviewPanelTransferHandler(panel.frame(), this, this.previewPane.getTransferHandler()));

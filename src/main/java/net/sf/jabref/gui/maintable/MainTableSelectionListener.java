@@ -77,13 +77,13 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         this.table = table;
         this.panel = panel;
         this.tableRows = table.getTableModel().getTableRows();
-        Optional<PreviewPanel> previewPanel = panel.getPreviewPanel();
-        if (previewPanel.isPresent()){
-            preview = previewPanel.get();
+        PreviewPanel previewPanel = panel.getPreviewPanel();
+        if (previewPanel != null){
+            preview = previewPanel;
         } else {
             preview = new PreviewPanel(panel.getBibDatabaseContext(), null, panel);
+            panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview);
         }
-        panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview);
     }
 
     public void setEnabled(boolean enabled) {
@@ -462,10 +462,6 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
     }
 
     private void cyclePreview(int newPosition) {
-        if (!previewActive){
-            return;
-        }
-
         PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
                 .getBuilder()
                 .withPreviewCyclePosition(newPosition)
@@ -474,6 +470,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
 
         preview.updateLayout();
         preview.update();
+        panel.showPreview(preview);
         if (!table.getSelected().isEmpty()) {
             updatePreview(table.getSelected().get(0), true);
         }

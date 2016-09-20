@@ -5,7 +5,6 @@ import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 
 import javax.swing.BoxLayout;
@@ -247,10 +246,7 @@ public class PreviewPrefsTab extends JPanel implements PrefsTab {
 
         // update preview
         for (BasePanel basePanel : JabRefGUI.getMainFrame().getBasePanelList()) {
-            Optional<PreviewPanel> previewPanel = basePanel.getPreviewPanel();
-            if (previewPanel.isPresent()){
-                previewPanel.get().updateLayout();
-            }
+            basePanel.getPreviewPanel().updateLayout();
         }
     }
 

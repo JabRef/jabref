@@ -659,10 +659,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 globalSearchBar.setSearchTerm(content, true);
             }
 
-            Optional<PreviewPanel> previewPanel = currentBasePanel.getPreviewPanel();
-            if (previewPanel.isPresent()) {
-                previewPanel.get().updateLayout();
-            }
+            currentBasePanel.getPreviewPanel().updateLayout();
 
             groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
             previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
