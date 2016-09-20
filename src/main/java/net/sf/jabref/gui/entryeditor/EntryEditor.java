@@ -366,8 +366,17 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private void addOptionalTab(EntryType type) {
-        EntryEditorTab optionalPanel = new EntryEditorTab(frame, panel, type.getPrimaryOptionalFields(), this,
-                false, true, Localization.lang("Optional fields"));
+        //        EntryEditorTab optionalPanel = new EntryEditorTab(frame, panel, type.getPrimaryOptionalFields(), this,
+        //                false, true, Localization.lang("Optional fields"));
+        List<String> optionalFields = type.getPrimaryOptionalFields();
+        List<String> allOptionalFields = new ArrayList<>();
+        for (String fieldName : optionalFields) {
+            allOptionalFields.add(fieldName);
+            allOptionalFields.add("_" + fieldName);
+        }
+
+        EntryEditorTab optionalPanel = new EntryEditorTab(frame, panel, allOptionalFields, this, true, false,
+                Localization.lang("Optionals fields"));
 
         if (optionalPanel.fileListEditor != null) {
             fileListEditor = optionalPanel.fileListEditor;

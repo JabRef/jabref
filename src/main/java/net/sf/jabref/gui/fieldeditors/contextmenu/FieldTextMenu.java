@@ -13,6 +13,7 @@ import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.actions.CopyAction;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.actions.textarea.HideFieldAction;
+import net.sf.jabref.gui.actions.textarea.ShowFieldAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.TextAreaForHiddenField;
 import net.sf.jabref.gui.fieldeditors.TextAreaForVisibleField;
@@ -100,7 +101,7 @@ public class FieldTextMenu implements MouseListener {
         if (field instanceof TextAreaForVisibleField) {
             inputMenu.add(new HideFieldAction((TextAreaForVisibleField) field));
         } else if (field instanceof TextAreaForHiddenField) {
-
+            inputMenu.add(new ShowFieldAction((TextAreaForHiddenField) field));
         }
         inputMenu.addSeparator();
         inputMenu.add(new ReplaceAction());
