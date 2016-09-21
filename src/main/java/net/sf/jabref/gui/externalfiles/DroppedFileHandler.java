@@ -540,7 +540,7 @@ public class DroppedFileHandler {
                 return false;
             }
         }
-        FileUtil.copyFile(Paths.get(fileName), Paths.get(destFile.toURI()), true);
+        FileUtil.copyFile(Paths.get(fileName), destFile.toPath(), true);
 
         return true;
     }
