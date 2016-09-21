@@ -75,4 +75,14 @@ public class DBMSConnectionProperties {
         this.password = password;
     }
 
+    /**
+     * Compares all properties except the password.
+     */
+    public boolean equals(DBMSConnectionProperties properties) {
+        return this.type.equals(properties.getType())
+                && this.host.equalsIgnoreCase(properties.getHost())
+                && this.port == properties.getPort()
+                && this.database.equals(properties.getDatabase())
+                && this.user.equals(properties.getUser());
+    }
 }
