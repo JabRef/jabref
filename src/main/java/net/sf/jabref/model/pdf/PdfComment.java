@@ -1,8 +1,6 @@
 package net.sf.jabref.model.pdf;
 
 
-import java.util.Optional;
-
 import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
@@ -14,10 +12,11 @@ public class PdfComment {
     private String date;
     private int page;
     private String content;
-    private Optional<String> annotationTypeInfo;
     private String annotationType;
     private PdfComment linkedPdfComment;
     private final static int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
+
+    private boolean linkedComment;
 
     public PdfComment(final String commentId, final String author, final String date, final int page,
                       final String content, final String annotationType) {
@@ -57,6 +56,8 @@ public class PdfComment {
     public void linkComments(PdfComment commentToLinkTo){
         linkedPdfComment = commentToLinkTo;
         commentToLinkTo.setLinkedPdfComment(this);
+        commentToLinkTo.setLinkedComment(true);
+        linkedComment = true;
     }
 
     @Override
@@ -116,4 +117,11 @@ public class PdfComment {
         return annotationType;
     }
 
+    public boolean hasLinkedComment() {
+        return linkedComment;
+    }
+
+    public void setLinkedComment(boolean linkedComment) {
+        this.linkedComment = linkedComment;
+    }
 }

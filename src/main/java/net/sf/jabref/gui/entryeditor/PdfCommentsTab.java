@@ -150,7 +150,7 @@ public class PdfCommentsTab extends JPanel {
         authorArea.setText(comment.getAuthor());
         dateArea.setText(comment.getDate());
         pageArea.setText(String.valueOf(comment.getPage()));
-        commentTxtArea.setText(comment.getContent());
+        commentTxtArea.setText(combineHighlightAndTextAnnotations(comment));
 
     }
 
@@ -255,6 +255,43 @@ public class PdfCommentsTab extends JPanel {
 
     }
 
+    /**
+     * Combines highlighted text with it's linked comment and the other way round. If the comment is not linked with
+     * a highlighted text, the comments content is returned
+     * Combined text should look like this:
+     * "Annotation content: some text
+     * Highlighted Text: the highlighted text"
+     *
+     * @param comment either a text comment or a highlighting from a pdf
+     * @return a string with the comments content combined with highlighted text if some is linked to it
+     */
+    private String combineHighlightAndTextAnnotations(final PdfComment comment){
+
+        if(comment.hasLinkedComment()){
+            PdfComment textComment;
+            PdfComment highlightedText;
+
+            if(comment.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE)){
+                highlightedText = comment;
+                textComment = comment.getLinkedPdfComment();
+            } else {
+                highlightedText = comment.getLinkedPdfComment();
+                textComment = comment;
+            }
+
+            StringBuilder builder = new StringBuilder();
+            builder.append(Localization.lang("Annotation content") + ":")
+                    .append(System.getProperty("line.separator"))
+                    .append(textComment.getContent())
+                    .append(System.getProperty("line.separator"))
+                    .append(Localization.lang("Highlighted text") + ":")
+                    .append(System.getProperty("line.separator"))
+                    .append(highlightedText.getContent());
+
+            return builder.toString();
+        }
+        return comment.getContent();
+    }
 
     private class CommentListSelectionListener implements ListSelectionListener {
         @Override
