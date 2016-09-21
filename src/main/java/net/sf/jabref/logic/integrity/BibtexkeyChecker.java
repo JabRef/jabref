@@ -9,13 +9,10 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class BibtexkeyChecker implements Checker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        String valuekey = entry.getCiteKey();
         Optional<String> valueauthor = entry.getField(FieldName.AUTHOR);
         Optional<String> valuetitle = entry.getField(FieldName.TITLE);
         Optional<String> valueyear = entry.getField(FieldName.YEAR);
@@ -25,7 +22,7 @@ public class BibtexkeyChecker implements Checker {
             return Collections.emptyList();
         }
 
-        if (StringUtils.isBlank(valuekey)) {
+        if (!entry.getCiteKeyOptional().isPresent() || entry.getCiteKeyOptional().get().isEmpty()) {
             return Collections.singletonList(new IntegrityMessage(
                     Localization.lang("empty bibtexkey") + ": " + authortitleyear, entry, BibEntry.KEY_FIELD));
         }
