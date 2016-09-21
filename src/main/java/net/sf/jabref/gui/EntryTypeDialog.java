@@ -271,8 +271,8 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
         @Override
         protected Optional<BibEntry> doInBackground() throws Exception {
-            generateButton.setEnabled(false);
-            generateButton.setText(Localization.lang("Searching..."));
+            //generateButton.setEnabled(false);
+            //generateButton.setText(Localization.lang("Searching..."));
             searchID = idTextField.getText().trim();
             fetcher = EntryFetchers.getIdFetchers().get(comboBox.getSelectedIndex());
             if (!searchID.isEmpty()) {
