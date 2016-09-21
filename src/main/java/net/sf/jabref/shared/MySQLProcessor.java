@@ -38,22 +38,7 @@ public class MySQLProcessor extends DBMSProcessor {
     }
 
     @Override
-    public String escape(String expression) {
+    String escape(String expression) {
         return "`" + expression + "`";
-    }
-
-    @Override
-    public void startNotificationListener(DBMSSynchronizer dbmsSynchronizer) {
-        // not supported by this database system
-    }
-
-    @Override
-    public void stopNotificationListener() {
-        // not supported by this database system
-    }
-
-    @Override
-    public void notifyClients() {
-        // not supported by this database system
     }
 }

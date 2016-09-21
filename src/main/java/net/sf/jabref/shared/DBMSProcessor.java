@@ -117,10 +117,12 @@ public abstract class DBMSProcessor {
      * Escapes parts of SQL expressions like table or field name to match the conventions
      * of the database system using the current dbmsType.
      *
+     * This method is package private, because of DBMSProcessorTest
+     *
      * @param expression Table or field name
      * @return Correctly escaped expression
      */
-    public abstract String escape(String expression);
+    abstract String escape(String expression);
 
 
     /**
@@ -566,19 +568,27 @@ public abstract class DBMSProcessor {
 
     /**
      * Listens for notifications from DBMS.
+     * Needs to be implemented if LiveUpdate is supported by the DBMS
      *
      * @param dbmsSynchronizer {@link DBMSSynchronizer} which handles the notification.
      */
-    public abstract void startNotificationListener(DBMSSynchronizer dbmsSynchronizer);
+    public void startNotificationListener(@SuppressWarnings("unused") DBMSSynchronizer dbmsSynchronizer) {
+        // nothing to do
+    }
 
     /**
      * Terminates the notification listener.
+     * Needs to be implemented if LiveUpdate is supported by the DBMS
      */
-    public abstract void stopNotificationListener();
+    public void stopNotificationListener() {
+        // nothing to do
+    }
 
     /**
      * Notifies all clients ({@link DBMSSynchronizer}) which are connected to the same DBMS.
+     * Needs to be implemented if LiveUpdate is supported by the DBMS
      */
-    public abstract void notifyClients();
-
+    public void notifyClients() {
+        // nothing to do
+    }
 }

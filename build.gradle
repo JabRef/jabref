@@ -127,7 +127,7 @@ dependencies {
 sourceSets {
     main {
         java {
-            // remove "src/oracleMock" as soon as the right driver is available
+            // remove "src/oracleMock" if ojdbc.jar is available
             srcDirs = ["src/main/java", "src/main/gen", "src/oracleMock"]
         }
     }

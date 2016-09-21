@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * {@link TestManager} provides helping methods for database tests.
+ * This class provides helping methods for database tests.
  * Furthermore it determines database systems which are ready to be used for tests.
  */
 public class TestManager {
