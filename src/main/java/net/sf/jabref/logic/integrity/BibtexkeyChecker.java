@@ -3,17 +3,18 @@ package net.sf.jabref.logic.integrity;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import net.sf.jabref.logic.integrity.IntegrityCheck.Checker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class BibtexkeyChecker implements Checker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
-        Optional<String> valuekey = entry.getField(BibEntry.KEY_FIELD);
+        String valuekey = entry.getCiteKey();
         Optional<String> valueauthor = entry.getField(FieldName.AUTHOR);
         Optional<String> valuetitle = entry.getField(FieldName.TITLE);
         Optional<String> valueyear = entry.getField(FieldName.YEAR);
@@ -23,7 +24,7 @@ public class BibtexkeyChecker implements Checker {
             return Collections.emptyList();
         }
 
-        if (!valuekey.isPresent()) {
+        if (StringUtils.isBlank(valuekey)) {
             return Collections.singletonList(new IntegrityMessage(
                     Localization.lang("empty bibtexkey") + ": " + authortitleyear, entry, BibEntry.KEY_FIELD));
         }
