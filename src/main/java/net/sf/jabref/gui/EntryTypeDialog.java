@@ -295,17 +295,17 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
                 Optional<BibEntry> result = get();
                 if (result.isPresent()) {
                     frame.getCurrentBasePanel().insertEntry(result.get());
-                } else if(!fetcherException){
+                } else if(searchID.trim().isEmpty()){
+                    JOptionPane.showMessageDialog(null, "Search ID was empty!", "Empty search ID", JOptionPane.WARNING_MESSAGE);
+                }else if(!fetcherException){
                     JOptionPane.showMessageDialog(null, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID)+ "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
-                    generateButton.setText(Localization.lang("Generate"));
-                    generateButton.setEnabled(true);
                 }else {
                     JOptionPane.showMessageDialog(null,
                             Localization.lang("Error while fetching from %0", fetcher.getName()) + "\n" + fetcherExceptionMessage,
                             Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-                    generateButton.setText(Localization.lang("Generate"));
-                    generateButton.setEnabled(true);
                 }
+                generateButton.setText(Localization.lang("Generate"));
+                generateButton.setEnabled(true);
             } catch (ExecutionException | InterruptedException e) {
                 LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchID, fetcher.getName()), e);
             }
