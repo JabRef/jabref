@@ -39,7 +39,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - <kbd>UP</kbd> / <kbd>Down</kbd> / <kbd>Tab</kbd> / <kbd>shift+Tab</kbd> in the search result frame have now the same functionality as in the main  table.
 - Importer for MODS format added
 - Generalize german translation of database into "Datenbank"
-- Improve language quality of the german translation of shared database
+- Improve language quality of the German translation of shared database
 
 ### Fixed
 - Fixed selecting an entry out of multiple duplicates
