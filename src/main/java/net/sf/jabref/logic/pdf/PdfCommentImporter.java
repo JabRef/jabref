@@ -1,12 +1,15 @@
 package net.sf.jabref.logic.pdf;
 
 import java.awt.geom.Rectangle2D;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
+import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.pdf.PdfComment;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSFloat;
@@ -34,13 +37,21 @@ public class PdfCommentImporter {
      * @param path a path to a pdf
      * @return a list with the all the annotations found in the file of the path
      */
-    public ArrayList<PdfComment> importNotes(final String path) {
+    public ArrayList<PdfComment> importNotes(final String path, final BibDatabaseContext context) {
 
         ArrayList<PdfComment> annotationsMap = new ArrayList<>();
 
         PDDocument document = null;
         try {
-            document = importPdfFile(path);
+            try{
+                document = importPdfFile(path);
+            } catch (FileNotFoundException notFound) {
+                String absolutePath = FileUtil.expandFilename(context, path,
+                        JabRefPreferences.getInstance().getFileDirectoryPreferences())
+                        .get().getAbsolutePath();
+                document = importPdfFile(absolutePath);
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -51,7 +62,6 @@ public class PdfCommentImporter {
             try {
                 for (PDAnnotation annotation : page.getAnnotations()) {
 
-                    Optional<String> annotationTypeInfo = Optional.empty();
 
                     String subtype = annotation.getSubtype();
                     if (subtype.equals(FDFAnnotationHighlight.SUBTYPE)) {
@@ -61,7 +71,6 @@ public class PdfCommentImporter {
                                 i + 1, annotation.getContents(), FDFAnnotationText.SUBTYPE);
 
                         PDFTextStripperByArea stripperByArea = new PDFTextStripperByArea();
-                        annotationTypeInfo = Optional.of(annotation.getContents());
                         COSArray quadsArray = (COSArray) annotation.getDictionary().getDictionaryObject(COSName.getPDFName("QuadPoints"));
                         String highlightedText = null;
                         for (int j = 1, k = 0; j <= (quadsArray.size() / 8); j++) {

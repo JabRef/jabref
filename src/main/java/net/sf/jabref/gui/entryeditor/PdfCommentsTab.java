@@ -102,16 +102,18 @@ public class PdfCommentsTab extends JPanel {
             ArrayList<BibEntry> entries = new ArrayList<>();
             entries.add(parent.getEntry());
 
+            //check which attached file is selected in the combo box
             int indexSelectedByComboBox;
             if (fileNameComboBox.getItemCount() == 0) {
                 indexSelectedByComboBox = 0;
             } else {
                 indexSelectedByComboBox = fileNameComboBox.getSelectedIndex();
             }
+            //import notes if the selected file is a pdf
             FileField.parse(parent.getEntry().getField(FieldName.FILE).get()).stream()
                     .filter(parsedFileField -> parsedFileField.getLink().toLowerCase().endsWith(".pdf"))
                     .forEach(parsedFileField ->
-                    allNotes.add(commentImporter.importNotes(parsedFileField.getLink())));
+                    allNotes.add(commentImporter.importNotes(parsedFileField.getLink(), basePanel.getDatabaseContext())));
 
             updateShownComments(allNotes.get(indexSelectedByComboBox));
             if(listModel.isEmpty()) {
@@ -302,7 +304,7 @@ public class PdfCommentsTab extends JPanel {
             boolean isLinkedComment = false;
             PdfComment comment = (PdfComment) value;
 
-            if(comment.equals(commentList.getSelectedValue().getLinkedPdfComment())){
+            if(!commentList.isSelectionEmpty() && comment.equals(commentList.getSelectedValue().getLinkedPdfComment())){
                 isLinkedComment = true;
             }
 
