@@ -91,19 +91,6 @@ public class PdfCommentsTab extends JPanel {
         this.setUpInformationPanel();
     }
 
-    private void setUpPdfCommentsTab() {
-        JPanel commentListPanel = FormBuilder.create()
-                .columns("fill:pref:grow")
-                .rows("pref, $lg, fill:pref:grow")
-                .padding(Paddings.DIALOG)
-                .add(commentScrollPane).xy(1,3)
-                .build();
-        commentScrollPane.setViewportView(commentList);
-
-        this.add(commentListPanel);
-    }
-
-
     public void addComments() throws IOException {
         Optional<String> field = parent.getEntry().getField(FieldName.FILE);
         if (field.isPresent()) {
@@ -181,13 +168,25 @@ public class PdfCommentsTab extends JPanel {
         updateShownComments(allNotes.get(indexSelectedByComboBox));
     }
 
+    private void setUpPdfCommentsTab() {
+        JPanel commentListPanel = FormBuilder.create()
+                .columns("pref, $lcgap, pref:grow")
+                .rows("pref, $lg, fill:pref:grow, $lg, pref")
+                .padding(Paddings.DIALOG)
+                .add(fileNameLabel).xy(1,1, "left, top")
+                .add(fileNameScrollPane).xyw(2, 1, 2)
+                .add(commentScrollPane).xyw(1, 3, 3)
+                .build();
+        commentScrollPane.setViewportView(commentList);
+
+        this.add(commentListPanel);
+    }
+
     private void setUpInformationPanel(){
         JPanel informationPanel  = FormBuilder.create()
                 .columns("pref, $lcgap, pref:grow")
                 .rows("pref, $lg, pref, $lg, pref, $lg, pref, $lg, fill:pref:grow, $lg, pref")
                 .padding(Paddings.DIALOG)
-                .add(fileNameLabel).xy(1,1, "left, top")
-                .add(fileNameScrollPane).xy(3, 1)
                 .add(authorLabel).xy(1,3, "left, top")
                 .add(authorScrollPane).xy(3,3)
                 .add(dateLabel).xy(1,5, "left, top")
