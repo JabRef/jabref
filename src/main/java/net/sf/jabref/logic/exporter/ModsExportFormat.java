@@ -7,7 +7,6 @@ import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -50,6 +49,7 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
+
 /**
  * ExportFormat for exporting in MODS XML format.
  */
@@ -80,8 +80,7 @@ class ModsExportFormat extends ExportFormat {
             ModsCollectionDefinition modsCollection = new ModsCollectionDefinition();
             for (BibEntry bibEntry : entries) {
                 ModsDefinition mods = new ModsDefinition();
-
-                addCiteKey(bibEntry, mods);
+                bibEntry.getCiteKeyOptional().ifPresent(citeKey -> addIdentifier("citekey", citeKey, mods));
 
                 Map<String, String> fieldMap = bibEntry.getFieldMap();
                 addGenre(bibEntry, mods);
@@ -96,62 +95,62 @@ class ModsExportFormat extends ExportFormat {
 
                     switch (key) {
 
-                    case FieldName.AUTHOR:
-                        handleAuthors(mods, value);
-                        break;
-                    case "affiliation":
-                        addAffiliation(mods, value);
-                        break;
-                    case FieldName.ABSTRACT:
-                        addAbstract(mods, value);
-                        break;
-                    case FieldName.TITLE:
-                        addTitle(mods, value);
-                        break;
-                    case FieldName.LANGUAGE:
-                        addLanguage(mods, value);
-                        break;
-                    case FieldName.LOCATION:
-                        addLocation(mods, value);
-                        break;
-                    case FieldName.URL:
-                        addUrl(mods, value);
-                        break;
-                    case FieldName.NOTE:
-                        addNote(mods, value);
-                        break;
-                    case FieldName.KEYWORDS:
-                        addKeyWords(mods, value);
-                        break;
-                    case FieldName.VOLUME:
-                        addDetail(FieldName.VOLUME, value, partDefinition);
-                        break;
-                    case FieldName.ISSUE:
-                        addDetail(FieldName.ISSUE, value, partDefinition);
-                        break;
-                    case FieldName.PAGES:
-                        addPages(partDefinition, value);
-                        break;
-                    case FieldName.URI:
-                        addIdentifier(FieldName.URI, value, mods);
-                        break;
-                    case FieldName.ISBN:
-                        addIdentifier(FieldName.ISBN, value, mods);
-                        break;
-                    case FieldName.ISSN:
-                        addIdentifier(FieldName.ISSN, value, mods);
-                        break;
-                    case FieldName.DOI:
-                        addIdentifier(FieldName.DOI, value, mods);
-                        break;
-                    case FieldName.PMID:
-                        addIdentifier(FieldName.PMID, value, mods);
-                        break;
-                    case FieldName.JOURNAL:
-                        addJournal(value, relatedItem);
-                        break;
-                    default:
-                        break;
+                        case FieldName.AUTHOR:
+                            handleAuthors(mods, value);
+                            break;
+                        case "affiliation":
+                            addAffiliation(mods, value);
+                            break;
+                        case FieldName.ABSTRACT:
+                            addAbstract(mods, value);
+                            break;
+                        case FieldName.TITLE:
+                            addTitle(mods, value);
+                            break;
+                        case FieldName.LANGUAGE:
+                            addLanguage(mods, value);
+                            break;
+                        case FieldName.LOCATION:
+                            addLocation(mods, value);
+                            break;
+                        case FieldName.URL:
+                            addUrl(mods, value);
+                            break;
+                        case FieldName.NOTE:
+                            addNote(mods, value);
+                            break;
+                        case FieldName.KEYWORDS:
+                            addKeyWords(mods, value);
+                            break;
+                        case FieldName.VOLUME:
+                            addDetail(FieldName.VOLUME, value, partDefinition);
+                            break;
+                        case FieldName.ISSUE:
+                            addDetail(FieldName.ISSUE, value, partDefinition);
+                            break;
+                        case FieldName.PAGES:
+                            addPages(partDefinition, value);
+                            break;
+                        case FieldName.URI:
+                            addIdentifier(FieldName.URI, value, mods);
+                            break;
+                        case FieldName.ISBN:
+                            addIdentifier(FieldName.ISBN, value, mods);
+                            break;
+                        case FieldName.ISSN:
+                            addIdentifier(FieldName.ISSN, value, mods);
+                            break;
+                        case FieldName.DOI:
+                            addIdentifier(FieldName.DOI, value, mods);
+                            break;
+                        case FieldName.PMID:
+                            addIdentifier(FieldName.PMID, value, mods);
+                            break;
+                        case FieldName.JOURNAL:
+                            addJournal(value, relatedItem);
+                            break;
+                        default:
+                            break;
                     }
 
                     addOriginInformation(key, value, originInfo);
@@ -162,10 +161,8 @@ class ModsExportFormat extends ExportFormat {
                 modsCollection.getMods().add(mods);
             }
 
-
             JAXBElement<ModsCollectionDefinition> jaxbElement = new JAXBElement<>(new QName("modsCollection"),
                     ModsCollectionDefinition.class, modsCollection);
-
 
             createMarshallerAndWriteToFile(file, jaxbElement);
         } catch (JAXBException ex) {
@@ -187,14 +184,11 @@ class ModsExportFormat extends ExportFormat {
 
             @Override
             public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
-                if (MODS_NAMESPACE_URI.equals(namespaceUri)) {
-                    return "mods";
-                }
-                return "";
+                return MODS_NAMESPACE_URI.equals(namespaceUri) ? "mods" : "";
             }
         };
 
-        //formate the output
+        //format the output
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, MODS_SCHEMA_LOCATION);
         marshaller.setProperty(PREFIX_MAPPER_PACKAGE, myPrefixMapper);
@@ -218,14 +212,6 @@ class ModsExportFormat extends ExportFormat {
         GenreDefinition genre = new GenreDefinition();
         genre.setValue(bibEntry.getType());
         mods.getModsGroup().add(genre);
-    }
-
-    private void addCiteKey(BibEntry bibEntry, ModsDefinition mods) {
-        Optional<String> citeKey = bibEntry.getCiteKeyOptional();
-        if (citeKey.isPresent()) {
-            mods.setID(citeKey.get());
-            addIdentifier("citekey", citeKey.get(), mods);
-        }
     }
 
     private void addAbstract(ModsDefinition mods, String value) {
@@ -321,8 +307,8 @@ class ModsExportFormat extends ExportFormat {
         String[] keywords = null;
         if (value.contains(KEYWORD_SEPARATOR)) {
             keywords = value.split(KEYWORD_SEPARATOR);
-        } else if (value.contains(", ")) {
-            keywords = value.split(", ");
+        } else if (value.contains(";")) {
+            keywords = value.split(";");
         }
 
         if (keywords != null) {
@@ -367,12 +353,14 @@ class ModsExportFormat extends ExportFormat {
                 String forename = author.substring(commaIndex + 1, author.length());
                 String[] forenames = forename.split(" ");
                 for (String given : forenames) {
-                    NamePartDefinition namePartDefinition = new NamePartDefinition();
-                    namePartDefinition.setAtType("given");
-                    namePartDefinition.setValue(given);
-                    element = new JAXBElement<>(new QName("", "namePart"), NamePartDefinition.class,
-                            namePartDefinition);
-                    name.getNamePartOrDisplayFormOrAffiliation().add(element);
+                    if (!given.isEmpty()) {
+                        NamePartDefinition namePartDefinition = new NamePartDefinition();
+                        namePartDefinition.setAtType("given");
+                        namePartDefinition.setValue(given);
+                        element = new JAXBElement<>(new QName("", "namePart"), NamePartDefinition.class,
+                                namePartDefinition);
+                        name.getNamePartOrDisplayFormOrAffiliation().add(element);
+                    }
                 }
             } else {
                 //no "," indicates that there should only be a family name
@@ -387,6 +375,9 @@ class ModsExportFormat extends ExportFormat {
     }
 
     private void addIdentifier(String key, String value, ModsDefinition mods) {
+        if ("citekey".equals(key)) {
+            mods.setID(value);
+        }
         IdentifierDefinition identifier = new IdentifierDefinition();
         identifier.setType(key);
         identifier.setValue(value);
@@ -394,14 +385,19 @@ class ModsExportFormat extends ExportFormat {
     }
 
     private void addStartAndEndPage(String value, PartDefinition partDefinition, String minus) {
-        int doubleMinusIndex = value.indexOf(minus);
-        String startPage = value.substring(0, doubleMinusIndex);
-        String endPage = value.substring(doubleMinusIndex + 1, value.length());
+        int minusIndex = value.indexOf(minus);
+        String startPage = value.substring(0, minusIndex);
+        String endPage = "";
+        if ("-".equals(minus)) {
+            endPage = value.substring(minusIndex + 1);
+        } else if ("--".equals(minus)) {
+            endPage = value.substring(minusIndex + 2);
+        }
 
         StringPlusLanguage start = new StringPlusLanguage();
         start.setValue(startPage);
         StringPlusLanguage end = new StringPlusLanguage();
-        start.setValue(endPage);
+        end.setValue(endPage);
         ExtentDefinition extent = new ExtentDefinition();
         extent.setStart(start);
         extent.setEnd(end);

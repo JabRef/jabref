@@ -19,11 +19,9 @@
         </mods:subject>
         <mods:name type="personal">
             <namePart type="family">Shruthi</namePart>
-            <namePart type="given"></namePart>
             <namePart type="given">Basavaradhya</namePart>
             <namePart type="given">Sahukar</namePart>
             <namePart type="family">Vinodhkumar</namePart>
-            <namePart type="given"></namePart>
             <namePart type="given">Palani</namePart>
             <namePart type="family">Selvamani</namePart>
         </mods:name>
@@ -56,11 +54,9 @@
         <mods:genre>inproceedings</mods:genre>
         <mods:name type="personal">
             <namePart type="family">Shruthi</namePart>
-            <namePart type="given"></namePart>
             <namePart type="given">Basavaradhya</namePart>
             <namePart type="given">Sahukar</namePart>
             <namePart type="family">Vinodhkumar</namePart>
-            <namePart type="given"></namePart>
             <namePart type="given">Palani</namePart>
             <namePart type="family">Selvamani</namePart>
         </mods:name>

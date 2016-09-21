@@ -30,10 +30,8 @@
         </mods:name>
         <mods:name type="personal">
             <namePart type="family">Don't</namePart>
-            <namePart type="given"></namePart>
             <namePart type="given">know</namePart>
             <namePart type="family">Realy</namePart>
-            <namePart type="given"></namePart>
             <namePart type="given">don't</namePart>
             <namePart type="given">know</namePart>
         </mods:name>
@@ -47,14 +45,26 @@
             <mods:physicalLocation>somewhere</mods:physicalLocation>
         </mods:location>
         <mods:identifier type="doi">someDoi</mods:identifier>
+        <mods:originInfo>
+            <dateIssued keyDate="yes">2000</dateIssued>
+            <edition>2</edition>
+            <dateCaptured keyDate="yes">2000-11-11</dateCaptured>
+            <dateModified keyDate="yes">2000-12-10</dateModified>
+            <place>
+                <mods:placeTerm type="text">India</mods:placeTerm>
+            </place>
+            <dateCreated keyDate="yes">2000-11-10</dateCreated>
+            <issuance>monographic</issuance>
+            <publisher>Verlag verlag</publisher>
+        </mods:originInfo>
         <mods:relatedItem type="host">
             <mods:titleInfo>
-                <title>Some jorunalt</title>
+                <title>Some journal</title>
             </mods:titleInfo>
             <mods:part>
                 <mods:extent>
-                    <mods:start>68</mods:start>
-                    <mods:end/>
+                    <mods:start>67</mods:start>
+                    <mods:end>68</mods:end>
                 </mods:extent>
                 <mods:detail type="issue">
                     <number>10</number>
@@ -64,18 +74,6 @@
                 </mods:detail>
             </mods:part>
         </mods:relatedItem>
-        <mods:originInfo>
-            <dateIssued keyDate="yes">2000</dateIssued>
-            <edition>2</edition>
-            <dateCaptured keyDate="yes">2000-10-10</dateCaptured>
-            <dateModified keyDate="yes">2000-10-10</dateModified>
-            <place>
-                <mods:placeTerm type="text">India</mods:placeTerm>
-            </place>
-            <dateCreated keyDate="yes">2000-10-10</dateCreated>
-            <issuance>monographic</issuance>
-            <publisher>Verlag verlag</publisher>
-        </mods:originInfo>
         <mods:typeOfResource>text</mods:typeOfResource>
     </mods:mods>
 </modsCollection>
