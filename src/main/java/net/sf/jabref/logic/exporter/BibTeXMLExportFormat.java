@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
@@ -43,6 +42,9 @@ import net.sf.jabref.model.entry.BibEntry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+/**
+ * Export format for the BibTeXML format.
+ */
 public class BibTeXMLExportFormat extends ExportFormat {
 
     private static final String BIBTEXML_NAMESPACE_URI = "http://bibtexml.sf.net/";
@@ -68,10 +70,7 @@ public class BibTeXMLExportFormat extends ExportFormat {
         for (BibEntry bibEntry : entries) {
             Entry entry = new Entry();
 
-            Optional<String> citeKey = bibEntry.getCiteKeyOptional();
-            if (citeKey.isPresent()) {
-                entry.setId(citeKey.get());
-            }
+            bibEntry.getCiteKeyOptional().ifPresent(citeKey -> entry.setId(citeKey));
 
             String type = bibEntry.getType().toLowerCase(ENGLISH);
             switch (type) {
@@ -141,7 +140,7 @@ public class BibTeXMLExportFormat extends ExportFormat {
     }
 
     /**
-     * Contains same logic as the parse method, but inbook needs a special treatment, because
+     * Contains same logic as the {@link parse()} method, but inbook needs a special treatment, because
      * the contents of inbook are stored in a List of JAXBElements. So we first need to create
      * a JAXBElement for every field and then add it to the content list.
      */
@@ -223,11 +222,11 @@ public class BibTeXMLExportFormat extends ExportFormat {
             }
 
             //set the entryType to the entry
-            List<Method> entryMethods = getListOfSetMethods(entryType);
+            List<Method> entryMethods = getListOfSetMethods(entry);
             for (Method method : entryMethods) {
                 String methodWithoutSet = method.getName().replace("set", "");
-                String simpleClassName = entryType.getClass().getSimpleName().replaceAll("\\[", "").replaceAll("\\]",
-                        "");
+                String simpleClassName = entryType.getClass().getSimpleName();
+
                 if (methodWithoutSet.equals(simpleClassName)) {
                     try {
                         method.invoke(entry, entryType);
