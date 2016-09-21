@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Optional;
+import java.util.StringJoiner;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
@@ -278,17 +279,13 @@ public class PdfCommentsTab extends JPanel {
                 highlightedText = comment.getLinkedPdfComment();
                 textComment = comment;
             }
+            StringJoiner joiner = new StringJoiner(System.getProperty("line.seperator"));
+            joiner.add(Localization.lang("Annotation content") + ":")
+                    .add(textComment.getContent())
+                    .add(Localization.lang("Highlighted text") + ":")
+                    .add(highlightedText.getContent());
 
-            StringBuilder builder = new StringBuilder();
-            builder.append(Localization.lang("Annotation content") + ":")
-                    .append(System.getProperty("line.separator"))
-                    .append(textComment.getContent())
-                    .append(System.getProperty("line.separator"))
-                    .append(Localization.lang("Highlighted text") + ":")
-                    .append(System.getProperty("line.separator"))
-                    .append(highlightedText.getContent());
-
-            return builder.toString();
+            return joiner.toString();
         }
         return comment.getContent();
     }
