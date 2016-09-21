@@ -279,7 +279,7 @@ public class PdfCommentsTab extends JPanel {
                 highlightedText = comment.getLinkedPdfComment();
                 textComment = comment;
             }
-            StringJoiner joiner = new StringJoiner(System.getProperty("line.seperator"));
+            StringJoiner joiner = new StringJoiner(System.getProperty("line.separator"));
             joiner.add(Localization.lang("Annotation content") + ":")
                     .add(textComment.getContent())
                     .add(Localization.lang("Highlighted text") + ":")
