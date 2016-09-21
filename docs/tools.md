@@ -23,16 +23,28 @@ Here, we collect some helpful git hints
 
 See also: https://help.github.com/articles/syncing-a-fork/
 
-## General git tooling on Windows
+## Tooling for Windows
+
+(As Administrator - one time)
+
+1. Install [chocolatey](https://chocolatey.org/)
+2. `choco install git`
+3. `choco install conemu clink`
+4. `choco install notepadplusplus`
+5. If you want to have your jdk also managed via chocolatey: `choco install jdk8`
+
+Then, each weak do `choco upgrade all` to ensure all tooling is uptodate.
+
+### General git tooling on Windows
 
 * Use [git for windows](https://git-for-windows.github.io/), no additional git tooling required
   * [Git Credential Manager for Windows](https://github.com/Microsoft/Git-Credential-Manager-for-Windows) is included. Ensure that you include that in the installation
 * [Use notepad++ as editor](http://stackoverflow.com/a/2486342/873282) for `git rebase -i`
 *  - Aim: Store password for GitHub permanently for https repository locations
 
-## Better console applications
+### Better console applications
 
-### ConEmu plus clink
+#### ConEmu plus clink
 
 * [ConEmu] -> Preview Version  - Aim: Colorful console with tabs
   * At first start:
@@ -43,12 +55,12 @@ See also: https://help.github.com/articles/syncing-a-fork/
     * `Save Settings`
 * [clink] - Aim: Unix keys (Alt+b, Ctrl+s, etc.) also available at the prompt of `cmd.exe`
 
-### Other bundles
+#### Other bundles
 
 * [Cmder] - bundles ConEmu plus clink
 
 
-## Some useful keyboard shortcuts
+### Some useful keyboard shortcuts
 
 * [AutoHotkey](http://autohotkey.com/) - Preparation for the next step
 * https://github.com/koppor/autohotkey-scripts - Aim: Have Windows+`v` opening ConEmu
