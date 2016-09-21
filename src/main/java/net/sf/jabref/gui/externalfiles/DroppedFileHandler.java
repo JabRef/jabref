@@ -293,7 +293,7 @@ public class DroppedFileHandler {
 
                 aXmpEntriesInFile.setId(IdGenerator.next());
                 edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), aXmpEntriesInFile, panel));
-                panel.getDatabase().insertEntryWithDuplicationCheck(aXmpEntriesInFile);
+                panel.getDatabase().insertEntry(aXmpEntriesInFile);
                 doLink(aXmpEntriesInFile, fileType, destFilename, true, edits);
 
             }

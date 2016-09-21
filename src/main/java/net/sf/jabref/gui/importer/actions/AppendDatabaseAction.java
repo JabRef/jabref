@@ -118,7 +118,7 @@ public class AppendDatabaseAction implements BaseAction {
                 be.setId(IdGenerator.next());
                 UpdateField.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp,
                         Globals.prefs.getUpdateFieldPreferences());
-                database.insertEntryWithDuplicationCheck(be);
+                database.insertEntry(be);
                 appendedEntries.add(be);
                 originalEntries.add(originalEntry);
                 ce.addEdit(new UndoableInsertEntry(database, be, panel));
