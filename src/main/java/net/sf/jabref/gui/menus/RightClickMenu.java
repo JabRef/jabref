@@ -79,10 +79,22 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         add(new GeneralAction(Actions.PASTE, Localization.lang("Paste"), IconTheme.JabRefIcon.PASTE.getSmallIcon()));
         add(new GeneralAction(Actions.CUT, Localization.lang("Cut"), IconTheme.JabRefIcon.CUT.getSmallIcon()));
         add(new GeneralAction(Actions.DELETE, Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getSmallIcon()));
-        add(new GeneralAction(Actions.PRINT_PREVIEW, Localization.lang("Print entry preview"), IconTheme.JabRefIcon.PRINTED.getSmallIcon()));
+        add(new GeneralAction(Actions.PRINT_PREVIEW, Localization.lang("Print entry preview"), IconTheme.JabRefIcon.PRINTED.getSmallIcon()) {
+            {
+                if (multiple) {
+                    this.setEnabled(false);
+                }
+            }
+        });
         addSeparator();
 
-        add(new GeneralAction(Actions.SEND_AS_EMAIL, Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getSmallIcon()));
+        add(new GeneralAction(Actions.SEND_AS_EMAIL, Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getSmallIcon()) {
+            {
+                if (multiple) {
+                    this.setEnabled(false);
+                }
+            }
+        });
         addSeparator();
 
         JMenu markSpecific = JabRefFrame.subMenu(Localization.menuTitle("Mark specific color"));
@@ -179,7 +191,13 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
         add(frame.getMassSetField());
-        add(new GeneralAction(Actions.ADD_FILE_LINK, Localization.lang("Attach file"), IconTheme.JabRefIcon.ATTACH_FILE.getSmallIcon()));
+        add(new GeneralAction(Actions.ADD_FILE_LINK, Localization.lang("Attach file"), IconTheme.JabRefIcon.ATTACH_FILE.getSmallIcon()) {
+            {
+                if (multiple) {
+                    this.setEnabled(false);
+                }
+            }
+        });
         add(frame.getManageKeywords());
         add(new GeneralAction(Actions.MERGE_ENTRIES,
                 Localization.lang("Merge entries") + "...",
