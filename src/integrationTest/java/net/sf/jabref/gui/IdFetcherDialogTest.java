@@ -49,7 +49,7 @@ public class IdFetcherDialogTest extends AbstractUITest {
 
             @Override
             protected boolean isMatching(@Nonnull JButton jButton) {
-                return "Generate".equals(jButton.getText()) || "Searching...".equals(jButton.getText());
+                return "Generate".equals(jButton.getText());
             }
         }).click();
 
@@ -123,8 +123,8 @@ public class IdFetcherDialogTest extends AbstractUITest {
     public static Collection<Object[]> instancesToTest() {
         return Arrays.asList(
                 new Object[]{"BibTeX", "DOI", "10.1002/9781118257517"},
-                new Object[]{"BibLaTeX", "DOI", "10.1002/9781118257517"},
-                new Object[]{"BibTeX", "ISBN", "9780321356680"},
+                //new Object[]{"BibLaTeX", "DOI", "10.1002/9781118257517"},
+                //new Object[]{"BibTeX", "ISBN", "9780321356680"},
                 new Object[]{"BibLaTeX", "ISBN", "9780321356680"}
         );
     }
