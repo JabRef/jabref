@@ -109,7 +109,7 @@ public class FileUpdateMonitor implements Runnable {
             try {
                 entry.updateTimeStamp();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.error("Couldn't update timestamp", e);
             }
         }
     }
