@@ -1,6 +1,5 @@
 package net.sf.jabref.gui.entryeditor;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -324,7 +323,7 @@ public class PdfCommentsTab extends JPanel {
             label.setText(comment.toString());
 
             if(isLinkedComment){
-                label.setBackground(Color.BLUE);
+                label.setBackground(GUIGlobals.activeBackgroundColor);
             }
 
             return label;
