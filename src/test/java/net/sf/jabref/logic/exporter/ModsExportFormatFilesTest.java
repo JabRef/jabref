@@ -32,7 +32,7 @@ import org.xmlunit.diff.ElementSelectors;
 import org.xmlunit.matchers.CompareMatcher;
 
 @RunWith(Parameterized.class)
-public class ModsExportFormatTestFiles {
+public class ModsExportFormatFilesTest {
 
     public Charset charset;
     private BibDatabaseContext databaseContext;
@@ -50,7 +50,7 @@ public class ModsExportFormatTestFiles {
 
     @Parameters(name = "{0}")
     public static Collection<String> fileNames() throws Exception {
-        try (Stream<Path> stream = Files.list(Paths.get(ModsExportFormatTestFiles.class.getResource("").toURI()))) {
+        try (Stream<Path> stream = Files.list(Paths.get(ModsExportFormatFilesTest.class.getResource("").toURI()))) {
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
                     .filter(n -> n.startsWith("Mods")).collect(Collectors.toList());
         }
