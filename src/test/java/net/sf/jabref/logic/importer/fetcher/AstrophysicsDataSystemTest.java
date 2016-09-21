@@ -17,6 +17,7 @@ import org.junit.Test;
 import static net.sf.jabref.logic.util.OS.NEWLINE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -175,8 +176,8 @@ public class AstrophysicsDataSystemTest {
 
     @Test(expected = FetcherException.class)
     public void testPerformSearchByIdInvalidDoi() throws Exception {
-        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("this.doi.will.fail");
-        assertEquals(Optional.empty(), fetchedEntry);
+        fetcher.performSearchById("this.doi.will.fail");
+        fail();
     }
 
     @Test

@@ -36,6 +36,8 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
     private static String API_QUERY_URL = "http://adsabs.harvard.edu/cgi-bin/nph-basic_connect";
     private static String API_ENTRY_URL = "http://adsabs.harvard.edu/cgi-bin/nph-abs_connect";
     private static String API_DOI_URL = "http://adsabs.harvard.edu/doi/";
+
+    private final String patternRemoveDOI = "^(doi:|DOI:)";
     private final ImportFormatPreferences preferences;
 
     public AstrophysicsDataSystem(ImportFormatPreferences preferences) {
@@ -94,7 +96,7 @@ public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBased
 
     @Override
     public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
-        String key = identifier.replaceAll("^(doi:|DOI:)", "");
+        String key = identifier.replaceAll(patternRemoveDOI, "");
         URIBuilder uriBuilder = new URIBuilder(API_DOI_URL + key);
         uriBuilder.addParameter("data_type", "BIBTEXPLUS");
         return uriBuilder.build().toURL();
