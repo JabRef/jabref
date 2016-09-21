@@ -194,7 +194,7 @@ public class BibDatabaseContext {
         return this.dbmsSynchronizer;
     }
 
-    public void unsetDBMSSynchronizer() {
+    public void clearDBMSSynchronizer() {
         this.dbmsSynchronizer = null;
     }
 

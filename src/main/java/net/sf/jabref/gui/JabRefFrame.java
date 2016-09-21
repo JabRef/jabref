@@ -864,7 +864,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 } else if (context.getLocation() == DatabaseLocation.SHARED) {
                     context.convertToLocalDatabase();
                     context.getDBMSSynchronizer().closeSharedDatabase();
-                    context.unsetDBMSSynchronizer();
+                    context.clearDBMSSynchronizer();
                 }
 
                 context.getDatabaseFile().map(File::getAbsolutePath).ifPresent(filenames::add);
@@ -2147,7 +2147,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         } else if (context.getLocation() == DatabaseLocation.SHARED) {
             context.convertToLocalDatabase();
             context.getDBMSSynchronizer().closeSharedDatabase();
-            context.unsetDBMSSynchronizer();
+            context.clearDBMSSynchronizer();
             removeTab(panel);
         } else {
             removeTab(panel);
