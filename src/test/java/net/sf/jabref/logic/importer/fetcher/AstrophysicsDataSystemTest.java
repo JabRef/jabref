@@ -10,6 +10,7 @@ import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,8 +24,8 @@ import static org.mockito.Mockito.when;
 
 public class AstrophysicsDataSystemTest {
 
-    AstrophysicsDataSystem fetcher;
-    BibEntry diezSliceTheoremEntry,famaeyMcGaughEntry, sunWelchEntry;
+    private AstrophysicsDataSystem fetcher;
+    private BibEntry diezSliceTheoremEntry, famaeyMcGaughEntry, sunWelchEntry, xiongSunEntry, ingersollPollardEntry, luceyPaulEntry;
 
     @Before
     public void setUp() throws Exception {
@@ -62,7 +63,6 @@ public class AstrophysicsDataSystemTest {
                         + "theory illustrate that the presented approach conveniently handles the" + NEWLINE
                         + "occurring symmetries." + NEWLINE);
 
-
         famaeyMcGaughEntry = new BibEntry();
         famaeyMcGaughEntry.setType(BibLatexEntryTypes.ARTICLE);
         famaeyMcGaughEntry.setField("bibtexkey", "2012LRR....15...10F");
@@ -76,55 +76,10 @@ public class AstrophysicsDataSystemTest {
         famaeyMcGaughEntry.setField("doi", "10.12942/lrr-2012-10");
         famaeyMcGaughEntry.setField("eprint", "1112.3960");
         famaeyMcGaughEntry.setField("keywords", "astronomical observations, Newtonian limit, equations of motion, extragalactic astronomy, cosmology, theories of gravity, fundamental physics, astrophysics");
-        famaeyMcGaughEntry.setField("abstract", "A wealth of astronomical data indicate the presence of mass" + NEWLINE
-                + "discrepancies in the Universe. The motions observed in a variety of" + NEWLINE
-                + "classes of extragalactic systems exceed what can be explained by the" + NEWLINE
-                + "mass visible in stars and gas. Either (i) there is a vast amount of" + NEWLINE
-                + "unseen mass in some novel form - dark matter - or (ii) the data indicate" + NEWLINE
-                + "a breakdown of our understanding of dynamics on the relevant scales, or" + NEWLINE
-                + "(iii) both. Here, we first review a few outstanding challenges for the" + NEWLINE
-                + "dark matter interpretation of mass discrepancies in galaxies, purely" + NEWLINE
-                + "based on observations and independently of any alternative theoretical" + NEWLINE
-                + "framework. We then show that many of these puzzling observations are" + NEWLINE
-                + "predicted by one single relation - Milgrom's law - involving an" + NEWLINE
-                + "acceleration constant a\\_0 (or a characteristic surface density" + NEWLINE
-                + "{$\\Sigma$}\\_{\\dagger} = a\\_0/G) on the order of the square-root of the" + NEWLINE
-                + "cosmological constant in natural units. This relation can at present" + NEWLINE
-                + "most easily be interpreted as the effect of a single universal force law" + NEWLINE
-                + "resulting from a modification of Newtonian dynamics (MOND) on galactic" + NEWLINE
-                + "scales. We exhaustively review the current observational successes and" + NEWLINE
-                + "problems of this alternative paradigm at all astrophysical scales, and" + NEWLINE
-                + "summarize the various theoretical attempts (TeVeS, GEA, BIMOND, and" + NEWLINE
-                + "others) made to effectively embed this modification of Newtonian" + NEWLINE
-                + "dynamics within a relativistic theory of gravity."+  NEWLINE);
-
 
         sunWelchEntry = new BibEntry();
         sunWelchEntry.setType(BibLatexEntryTypes.ARTICLE);
         sunWelchEntry.setField("bibtexkey", "2012NatMa..11...44S");
-        sunWelchEntry.setField("abstract", "Organic photovoltaic devices that can be fabricated by simple processing"+ NEWLINE
-                + "techniques are under intense investigation in academic and industrial"+ NEWLINE
-                + "laboratories because of their potential to enable mass production of"+ NEWLINE
-                + "flexible and cost-effective devices. Most of the attention has been"+ NEWLINE
-                + "focused on solution-processed polymer bulk-heterojunction (BHJ) solar"+ NEWLINE
-                + "cells. A combination of polymer design, morphology control, structural"+ NEWLINE
-                + "insight and device engineering has led to power conversion efficiencies"+ NEWLINE
-                + "(PCEs) reaching the 6-8\\% range for conjugated polymer/fullerene blends."+ NEWLINE
-                + "Solution-processed small-molecule BHJ (SM BHJ) solar cells have received"+ NEWLINE
-                + "less attention, and their efficiencies have remained below those of"+ NEWLINE
-                + "their polymeric counterparts. Here, we report efficient"+ NEWLINE
-                + "solution-processed SM BHJ solar cells based on a new molecular donor,"+ NEWLINE
-                + "DTS(PTTh$_{2}$)$_{2}$. A record PCE of 6.7\\% under AM"+ NEWLINE
-                + "1.5{\\thinsp}G irradiation (100{\\thinsp}mW{\\thinsp}cm$^{-2}$) is"+ NEWLINE
-                + "achieved for small-molecule BHJ devices from"+ NEWLINE
-                + "DTS(PTTh$_{2}$)$_{2}$:PC$_{70}$BM (donor to acceptor"+ NEWLINE
-                + "ratio of 7:3). This high efficiency was obtained by using remarkably"+ NEWLINE
-                + "small percentages of solvent additive (0.25\\%{\\thinsp}v/v of"+ NEWLINE
-                + "1,8-diiodooctane, DIO) during the film-forming process, which leads to"+ NEWLINE
-                + "reduced domain sizes in the BHJ layer. These results provide important"+ NEWLINE
-                + "progress for solution-processed organic photovoltaics and demonstrate"+ NEWLINE
-                + "that solar cells fabricated from small donor molecules can compete with"+ NEWLINE
-                + "their polymeric counterparts."+ NEWLINE);
         sunWelchEntry.setField("author", "Sun, Y. and Welch, G. C. and Leong, W. L. and Takacs, C. J. and Bazan, G. C. and Heeger, A. J.");
         sunWelchEntry.setField("doi", "10.1038/nmat3160");
         sunWelchEntry.setField("journal", "Nature Materials");
@@ -133,6 +88,43 @@ public class AstrophysicsDataSystemTest {
         sunWelchEntry.setField("title", "Solution-processed small-molecule solar cells with 6.7\\% efficiency");
         sunWelchEntry.setField("volume", "11");
         sunWelchEntry.setField("year", "2012");
+
+        xiongSunEntry = new BibEntry();
+        xiongSunEntry.setType(BibLatexEntryTypes.ARTICLE);
+        xiongSunEntry.setField("bibtexkey", "2007ITGRS..45..879X");
+        xiongSunEntry.setField("author", "Xiong, X. and Sun, J. and Barnes, W. and Salomonson, V. and Esposito, J. and Erives, H. and Guenther, B.");
+        xiongSunEntry.setField("doi", "10.1109/TGRS.2006.890567");
+        xiongSunEntry.setField("journal", "IEEE Transactions on Geoscience and Remote Sensing");
+        xiongSunEntry.setField("month", "#apr#");
+        xiongSunEntry.setField("pages", "879-889");
+        xiongSunEntry.setField("title", "Multiyear On-Orbit Calibration and Performance of Terra MODIS Reflective Solar Bands");
+        xiongSunEntry.setField("volume", "45");
+        xiongSunEntry.setField("year", "2007");
+
+        ingersollPollardEntry = new BibEntry();
+        ingersollPollardEntry.setType(BibLatexEntryTypes.ARTICLE);
+        ingersollPollardEntry.setField("bibtexkey", "1982Icar...52...62I");
+        ingersollPollardEntry.setField("author", "Ingersoll, A. P. and Pollard, D.");
+        ingersollPollardEntry.setField("doi", "10.1016/0019-1035(82)90169-5");
+        ingersollPollardEntry.setField("journal", "\\icarus");
+        ingersollPollardEntry.setField("keywords", "Atmospheric Circulation, Barotropic Flow, Convective Flow, Flow Stability, Jupiter Atmosphere, Rotating Fluids, Saturn Atmosphere, Adiabatic Flow, Anelasticity, Compressible Fluids, Planetary Rotation, Rotating Cylinders, Scaling Laws, Wind Profiles, PLANETS, JUPITER, SATURN, MOTION, INTERIORS, ATMOSPHERE, ANALYSIS, SCALE, BAROTROPY, CHARACTERISTICS, STRUCTURE, WINDS, VISCOSITY, DATA, CONVECTION, ROTATION, EDDY EFFECTS, ENERGY, ADIABATICITY, DIAGRAMS, REVIEW, LATITUDE, ZONES, VELOCITY, MATHEMATICAL MODELS, HEAT FLOW, EQUATIONS OF MOTION, FLUIDS, DYNAMICS, TEMPERATURE, GRADIENTS");
+        ingersollPollardEntry.setField("month", "#oct#");
+        ingersollPollardEntry.setField("pages", "62-80");
+        ingersollPollardEntry.setField("title", "Motion in the interiors and atmospheres of Jupiter and Saturn - Scale analysis, anelastic equations, barotropic stability criterion");
+        ingersollPollardEntry.setField("volume", "52");
+        ingersollPollardEntry.setField("year", "1982");
+
+        luceyPaulEntry = new BibEntry();
+        luceyPaulEntry.setType(BibLatexEntryTypes.ARTICLE);
+        luceyPaulEntry.setField("bibtexkey", "2000JGR...10520297L");
+        luceyPaulEntry.setField("author", "Lucey, P. G. and Blewett, D. T. and Jolliff, B. L.");
+        luceyPaulEntry.setField("doi", "10.1029/1999JE001117");
+        luceyPaulEntry.setField("journal", "\\jgr");
+        luceyPaulEntry.setField("keywords", "Planetology: Solid Surface Planets: Composition, Planetology: Solid Surface Planets: Remote sensing, Planetology: Solid Surface Planets: Surface materials and properties, Planetology: Solar System Objects: Moon (1221)");
+        luceyPaulEntry.setField("pages", "20297-20306");
+        luceyPaulEntry.setField("title", "Lunar iron and titanium abundance algorithms based on final processing of Clementine ultraviolet-visible images");
+        luceyPaulEntry.setField("volume", "105");
+        luceyPaulEntry.setField("year", "2000");
     }
 
     @Test
@@ -165,6 +157,7 @@ public class AstrophysicsDataSystemTest {
     @Test
     public void testPerformSearchByFamaeyMcGaughEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.12942/lrr-2012-10");
+        fetchedEntry.ifPresent(entry -> entry.clearField(FieldName.ABSTRACT));//Remove abstract due to copyright
         assertEquals(Optional.of(famaeyMcGaughEntry), fetchedEntry);
     }
 
@@ -183,6 +176,25 @@ public class AstrophysicsDataSystemTest {
     @Test
     public void testPerformSearchBySunWelchEntry() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1038/nmat3160");
+        fetchedEntry.ifPresent(entry -> entry.clearField(FieldName.ABSTRACT)); //Remove abstract due to copyright
         assertEquals(Optional.of(sunWelchEntry), fetchedEntry);
+    }
+
+    @Test
+    public void testPerformSearchByXiongSunEntry() throws Exception {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1109/TGRS.2006.890567");
+        assertEquals(Optional.of(xiongSunEntry), fetchedEntry);
+    }
+
+    @Test
+    public void testPerformSearchByIngersollPollardEntry() throws Exception {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1016/0019-1035(82)90169-5");
+        assertEquals(Optional.of(ingersollPollardEntry), fetchedEntry);
+    }
+
+    @Test
+    public void testPerformSearchByLuceyPaulEntry() throws Exception {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1029/1999JE001117");
+        assertEquals(Optional.of(luceyPaulEntry), fetchedEntry);
     }
 }
