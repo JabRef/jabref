@@ -2,6 +2,7 @@ package net.sf.jabref.gui.externalfiles;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
@@ -539,12 +540,7 @@ public class DroppedFileHandler {
                 return false;
             }
         }
-        try {
-            FileUtil.copyFile(new File(fileName), destFile, true);
-        } catch (IOException e) {
-            LOGGER.error("Problem copying file", e);
-            return false;
-        }
+        FileUtil.copyFile(Paths.get(fileName), destFile.toPath(), true);
 
         return true;
     }
