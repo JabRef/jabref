@@ -70,7 +70,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1958](https://github.com/JabRef/jabref/issues/1958): Verbatim fields are no longer checked for HTML encoded characters by integrity checks
 - Fixed [#1937](https://github.com/JabRef/jabref/issues/1937): If no help page for the current chosen language exists, the english help page will be shown
 - Fixed [#1996](https://github.com/JabRef/jabref/issues/1996): Unnecessary other fields tab in entry editor removed (BibTeX mode)
-- Fixed file menu displays wrong hotkey in the german translation
+- Fixed file menu displays wrong hotkey in the German translation
 
 ### Removed
 - The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field. 
