@@ -20,6 +20,9 @@ services:
   - postgresql
   - mysql
 
+env:
+  - GRADLE_OPTS=-Dorg.gradle.daemon=false
+
 # skip installation as this is also done during the script step
 install: true
 
@@ -30,8 +33,7 @@ before_script:
 script:
   - ./gradlew check
   - ./gradlew databaseTest
-  # Integration tests currently often fail with "Process 'Gradle Test Executor 1' finished with non-zero exit value 137"
-  # They should run, but the result is ignored
+  # Prepare integration tests
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
   - sleep 3 # give xvfb some time to start
@@ -49,7 +51,8 @@ script:
   - sudo service resolvconf stop
   - sudo service sshguard stop
   - sudo service ssh stop
-  - ./gradlew integrationTest --info || true
+  # Integratation tests run in a timeout. Just start them and kill them after 60s
+  - timeout 60 ./gradlew integrationTest --info || true
 
 after_script:
   # enable codecov report

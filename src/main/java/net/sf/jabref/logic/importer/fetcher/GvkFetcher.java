@@ -38,7 +38,7 @@ public class GvkFetcher implements SearchBasedParserFetcher {
         return HelpFile.FETCHER_GVK;
     }
 
-    private String getSearchQueryStringForComplexQuery(List<String> queryList) throws FetcherException {
+    private String getSearchQueryStringForComplexQuery(List<String> queryList) {
         String query = "";
         boolean lastWasNoKey = false;
 
@@ -56,7 +56,7 @@ public class GvkFetcher implements SearchBasedParserFetcher {
         return query.trim();
     }
 
-    protected String getSearchQueryString(String query) throws FetcherException {
+    protected String getSearchQueryString(String query) {
         Objects.requireNonNull(query);
         LinkedList<String> queryList = new LinkedList<>(Arrays.asList(query.split("\\s")));
 

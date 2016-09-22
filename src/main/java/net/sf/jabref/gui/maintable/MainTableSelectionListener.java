@@ -32,7 +32,6 @@ import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.filelist.FileListEntry;
 import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.menus.RightClickMenu;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
@@ -185,9 +184,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         EntryEditor editor = panel.getEntryEditor(entry);
         if (mode != BasePanelMode.SHOWING_EDITOR) {
             panel.showEntryEditor(editor);
-            panel.adjustSplitter();
         }
-        new FocusRequester(editor);
+        editor.requestFocus();
     }
 
     @Override
@@ -429,7 +427,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             panel.hideBottomComponent();
         }
         panel.adjustSplitter();
-        new FocusRequester(table);
+        table.requestFocus();
     }
 
     @Override

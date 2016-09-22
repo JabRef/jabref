@@ -108,6 +108,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             init(query);
             return true;
         } catch (ParseCancellationException e) {
+            LOGGER.warn("Search query invalid", e);
             return false;
         }
     }
@@ -209,15 +210,19 @@ public class GrammarBasedSearchRule implements SearchRule {
         }
 
         @Override
-        public Boolean visitComparison(SearchParser.ComparisonContext ctx) {
+        public Boolean visitComparison(SearchParser.ComparisonContext context) {
             // remove possible enclosing " symbols
-            String right = ctx.right.getText();
+            String right = context.right.getText();
             if(right.startsWith("\"") && right.endsWith("\"")) {
                 right = right.substring(1, right.length() - 1);
             }
 
-            return comparison(ctx.left.getText(), ComparisonOperator.build(ctx.operator.getText()), right);
-
+            Optional<SearchParser.NameContext> fieldDescriptor = Optional.ofNullable(context.left);
+            if (fieldDescriptor.isPresent()) {
+                return comparison(fieldDescriptor.get().getText(), ComparisonOperator.build(context.operator.getText()), right);
+            } else {
+                return new ContainBasedSearchRule(caseSensitive).applyRule(right, entry);
+            }
         }
 
         @Override

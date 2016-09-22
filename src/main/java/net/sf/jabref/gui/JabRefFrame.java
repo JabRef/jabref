@@ -104,7 +104,6 @@ import net.sf.jabref.gui.protectedterms.ProtectedTermsDialog;
 import net.sf.jabref.gui.push.PushToApplicationButton;
 import net.sf.jabref.gui.push.PushToApplications;
 import net.sf.jabref.gui.search.GlobalSearchBar;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.CustomEntryTypesManager;
@@ -672,7 +671,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             // Set correct enabled state for Back and Forward actions:
             currentBasePanel.setBackAndForwardEnabledState();
             currentBasePanel.getUndoManager().postUndoRedoEvent();
-            new FocusRequester(currentBasePanel.getMainTable());
+            currentBasePanel.getMainTable().requestFocus();
         });
 
         //Note: The registration of Apple event is at the end of initialization, because
@@ -714,7 +713,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     .orElse(GUIGlobals.UNTITLED_TITLE);
                 setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
         } else if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED) {
-            setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBSynchronizer().getDBName() + " ["
+            setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBMSSynchronizer().getDBName() + " ["
                     + Localization.lang("shared") + "]" + modeInfo);
         }
     }
@@ -837,12 +836,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         List<String> filenames = new ArrayList<>();
         if (tabbedPane.getTabCount() > 0) {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                if (getBasePanelAt(i).isModified()
-                        && (getBasePanelAt(i).getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL)) {
-                    tabbedPane.setSelectedIndex(i);
-                    String filename = getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile()
-                            .map(File::getAbsolutePath).orElse(GUIGlobals.UNTITLED_TITLE);
+                BibDatabaseContext context = getBasePanelAt(i).getBibDatabaseContext();
 
+                if (getBasePanelAt(i).isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
+                    tabbedPane.setSelectedIndex(i);
+                    String filename = context.getDatabaseFile().map(File::getAbsolutePath).orElse(GUIGlobals.UNTITLED_TITLE);
                     int answer = showSaveDialog(filename);
 
                     if ((answer == JOptionPane.CANCEL_OPTION) ||
@@ -868,10 +866,13 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                             break;
                         }
                     }
+                } else if (context.getLocation() == DatabaseLocation.SHARED) {
+                    context.convertToLocalDatabase();
+                    context.getDBMSSynchronizer().closeSharedDatabase();
+                    context.clearDBMSSynchronizer();
                 }
 
-                getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile().map(File::getAbsolutePath)
-                        .ifPresent(filenames::add);
+                context.getDatabaseFile().map(File::getAbsolutePath).ifPresent(filenames::add);
             }
         }
 
@@ -2143,10 +2144,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             return;
         }
 
-        if (panel.isModified() && (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL)) {
+        BibDatabaseContext context = panel.getBibDatabaseContext();
+
+        if (panel.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
             if (confirmClose(panel)) {
                 removeTab(panel);
             }
+        } else if (context.getLocation() == DatabaseLocation.SHARED) {
+            context.convertToLocalDatabase();
+            context.getDBMSSynchronizer().closeSharedDatabase();
+            context.clearDBMSSynchronizer();
+            removeTab(panel);
         } else {
             removeTab(panel);
         }

@@ -27,7 +27,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
 import net.sf.jabref.logic.importer.fileformat.ImportFormat;
@@ -122,7 +121,7 @@ class ZipFileChooser extends JDialog {
         this.setSize(getSize());
         pack();
         this.setLocationRelativeTo(importCustomizationDialog);
-        new FocusRequester(table);
+        table.requestFocus();
     }
 
     /**

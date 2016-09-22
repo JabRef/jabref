@@ -191,7 +191,7 @@ public class PdfImporter {
         entry = localRes.get(0);
 
         // insert entry to database and link file
-        panel.getDatabase().insertEntryWithDuplicationCheck(entry);
+        panel.getDatabase().insertEntry(entry);
         panel.markBaseChanged();
         FileListTableModel tm = new FileListTableModel();
         File toLink = new File(fileName);
@@ -235,7 +235,7 @@ public class PdfImporter {
         BibEntry entry = result.getDatabase().getEntries().get(0);
 
         // insert entry to database and link file
-        panel.getDatabase().insertEntryWithDuplicationCheck(entry);
+        panel.getDatabase().insertEntry(entry);
         panel.markBaseChanged();
         BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
                 Globals.prefs.getBibtexKeyPatternPreferences());
@@ -245,7 +245,6 @@ public class PdfImporter {
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_OPEN_FORM)) {
             EntryEditor editor = panel.getEntryEditor(entry);
             panel.showEntryEditor(editor);
-            panel.adjustSplitter();
         }
         res.add(entry);
     }
@@ -262,7 +261,7 @@ public class PdfImporter {
             String id = IdGenerator.next();
             final BibEntry bibEntry = new BibEntry(id, type.getName());
             try {
-                panel.getDatabase().insertEntryWithDuplicationCheck(bibEntry);
+                panel.getDatabase().insertEntry(bibEntry);
 
                 // Set owner/timestamp if options are enabled:
                 List<BibEntry> list = new ArrayList<>();
