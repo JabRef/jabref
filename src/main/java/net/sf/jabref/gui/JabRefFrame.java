@@ -124,6 +124,7 @@ import net.sf.jabref.model.database.DatabaseLocation;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.preferences.HighlightMatchingGroupPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.LastFocusedTabPreferences;
@@ -502,6 +503,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final List<Object> sharedDatabaseOnlyActions = new LinkedList<>();
     private final List<Object> noSharedDatabaseActions = new LinkedList<>();
     private final List<Object> oneEntryOnlyActions = new LinkedList<>();
+    private final List<Object> oneEntryWithFileOnlyActions = new LinkedList<>();
+    private final List<Object> oneEntryWithURLorDOIOnlyActions = new LinkedList<>();
+    private final List<Object> twoEntryOnlyActions = new LinkedList<>();
 
 
     private class EditModeAction extends AbstractAction {
@@ -1520,6 +1524,15 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         oneEntryOnlyActions.clear();
         oneEntryOnlyActions.addAll(Arrays.asList(editEntry, sendAsEmail));
 
+        oneEntryWithFileOnlyActions.clear();
+        oneEntryWithFileOnlyActions.addAll(Arrays.asList(openFolder, openFile));
+
+        oneEntryWithURLorDOIOnlyActions.clear();
+        oneEntryWithURLorDOIOnlyActions.addAll(Arrays.asList(openUrl));
+
+        twoEntryOnlyActions.clear();
+        twoEntryOnlyActions.addAll(Arrays.asList(mergeEntries));
+
         tabbedPane.addChangeListener(event -> updateEnabledState());
 
     }
@@ -1578,6 +1591,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
             boolean oneEntrySelected = current.getSelectedEntries().size() == 1;
             setEnabled(oneEntryOnlyActions, oneEntrySelected);
+            setEnabled(oneEntryWithFileOnlyActions, isExistFile(current.getSelectedEntries()));
+            setEnabled(oneEntryWithURLorDOIOnlyActions, isExistURLorDOI(current.getSelectedEntries()));
+
+            boolean twoEntrySelected = current.getSelectedEntries().size() == 2;
+            setEnabled(twoEntryOnlyActions, twoEntrySelected);
         }
     }
 
@@ -1878,6 +1896,36 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             SwingUtilities.invokeLater(() -> progressBar.setMaximum(value));
         }
 
+    }
+
+    /**
+     * Return a boolean, if the selected entry have file
+     * @param selectEntryList A selected entries list of the current base pane
+     * @return true, if the selected entry contains file
+     * <p/>
+     * false, if multiple entries are selected or the selected entry doesn't contains file
+     */
+    private boolean isExistFile(List<BibEntry> selectEntryList) {
+        if (selectEntryList.size() == 1) {
+            BibEntry selectedEntry = selectEntryList.get(0);
+            return selectedEntry.getField(FieldName.FILE).isPresent();
+        }
+        return false;
+    }
+
+    /**
+     * Return a boolean, if the selected entry have url or doi
+     * @param selectEntryList A selected entries list of the current base pane
+     * @return true, if the selected entry contains url or doi
+     * <p/>
+     * false, if multiple entries are selected or the selected entry doesn't contains url or doi
+     */
+    private boolean isExistURLorDOI(List<BibEntry> selectEntryList) {
+        if (selectEntryList.size() == 1) {
+            BibEntry selectedEntry = selectEntryList.get(0);
+            return (selectedEntry.getField(FieldName.URL).isPresent() || selectedEntry.getField(FieldName.DOI).isPresent());
+        }
+        return false;
     }
 
     private class ChangeTabAction extends MnemonicAwareAction {
