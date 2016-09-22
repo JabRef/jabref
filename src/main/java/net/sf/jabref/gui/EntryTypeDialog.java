@@ -186,7 +186,6 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
         generateButton.addActionListener(action -> {
             fetcherWorker.execute();
-            fetcherWorker = new FetcherWorker();
         });
 
         JPanel jPanel = new JPanel();
@@ -278,8 +277,6 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
             if (!searchID.isEmpty()) {
                 try {
                     bibEntry = fetcher.performSearchById(searchID);
-                    dispose();
-
                 } catch (FetcherException e) {
                     LOGGER.error(e.getMessage(), e);
                     fetcherException = true;
@@ -295,15 +292,17 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
                 Optional<BibEntry> result = get();
                 if (result.isPresent()) {
                     frame.getCurrentBasePanel().insertEntry(result.get());
+                    dispose();
                 } else if(searchID.trim().isEmpty()){
-                    JOptionPane.showMessageDialog(null, "Search ID was empty!", "Empty search ID", JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(null, Localization.lang("Search ID was empty!"), Localization.lang("Empty search ID"), JOptionPane.WARNING_MESSAGE);
                 }else if(!fetcherException){
                     JOptionPane.showMessageDialog(null, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID)+ "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
                 }else {
                     JOptionPane.showMessageDialog(null,
-                            Localization.lang("Error while fetching from %0", fetcher.getName()) + "\n" + fetcherExceptionMessage,
+                            Localization.lang("Error while fetching from %0", fetcher.getName()) +"." + "\n" + fetcherExceptionMessage,
                             Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                 }
+                fetcherWorker = new FetcherWorker();
                 generateButton.setText(Localization.lang("Generate"));
                 generateButton.setEnabled(true);
             } catch (ExecutionException | InterruptedException e) {
