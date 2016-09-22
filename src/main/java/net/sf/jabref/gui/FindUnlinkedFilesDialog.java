@@ -1024,7 +1024,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
         Iterator<EntryType> iterator = EntryTypes
                 .getAllValues(frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).iterator();
         Vector<BibtexEntryTypeWrapper> list = new Vector<>();
-        list.add(new BibtexEntryTypeWrapper(null));
+        list.add(
+                new BibtexEntryTypeWrapper(null));
         while (iterator.hasNext()) {
             list.add(new BibtexEntryTypeWrapper(iterator.next()));
         }

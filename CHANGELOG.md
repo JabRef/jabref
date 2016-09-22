@@ -14,6 +14,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Changed
 - Add session restoring functionality for shared database. Related to [#1703](https://github.com/JabRef/jabref/issues/1703)
 - Implementation of LiveUpdate for PostgreSQL & Oracle systems. Related to [#970](https://github.com/JabRef/jabref/issues/970).
+- Added support for [1.0.1 CitationStyles](http://citationstyles.org/)
+- You can set and cycle between different preview styles (including CitationStyles)
 - Added fetcher for [MathSciNet](http://www.ams.org/mathscinet), [zbMATH](https://www.zbmath.org/) and [Astrophysics Data System](http://www.adsabs.harvard.edu/)
 - Improved search:
   - Search queries consisting of a normal query and a field-based query are now supported (for example, `JabRef AND author == you`)
@@ -72,7 +74,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1996](https://github.com/JabRef/jabref/issues/1996): Unnecessary other fields tab in entry editor removed (BibTeX mode)
 
 ### Removed
-- The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field. 
+- Removed 2nd preview style
+- The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field.
 - Automatic migration for the `evastar_pdf` field is removed.
 
 
