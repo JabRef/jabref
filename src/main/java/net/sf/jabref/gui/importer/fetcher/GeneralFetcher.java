@@ -177,6 +177,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         // We have two categories of fetchers. One category can show previews first and ask the
         // user which ones to download:
         if (activeFetcher instanceof PreviewEntryFetcher) {
+
             frame.output(Localization.lang("Searching..."));
             frame.setProgressBarIndeterminate(true);
             frame.setProgressBarVisible(true);
@@ -213,11 +214,11 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                     activeFetcher.getTitle(), false);
             dialog.addCallBack(activeFetcher);
             dialog.setLocationRelativeTo(frame);
-            dialog.setVisible(true);
 
             JabRefExecutorService.INSTANCE.execute(() -> {
                 if (activeFetcher.processQuery(tf.getText().trim(), dialog, dialog)) {
                     dialog.entryListComplete();
+                    dialog.setVisible(true);
                 } else {
                     dialog.dispose();
                 }

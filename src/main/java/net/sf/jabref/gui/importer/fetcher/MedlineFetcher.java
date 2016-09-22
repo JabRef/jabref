@@ -3,10 +3,8 @@ package net.sf.jabref.gui.importer.fetcher;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,45 +62,38 @@ public class MedlineFetcher implements EntryFetcher {
     /**
      * Gets the initial list of ids
      */
-    private SearchResult getIds(String term, int start, int pacing) {
-
+    private SearchResult getIds(String term, int start, int pacing) throws IOException {
         String baseUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils";
         String medlineUrl = baseUrl + "/esearch.fcgi?db=pubmed&retmax=" + Integer.toString(pacing) +
                 "&retstart=" + Integer.toString(start) + "&term=";
 
-
         boolean doCount = true;
         SearchResult result = new SearchResult();
-        try {
-            URL ncbi = new URL(medlineUrl + term);
-            // get the ids
-            BufferedReader in = new BufferedReader(new InputStreamReader(ncbi.openStream()));
-            String inLine;
-            while ((inLine = in.readLine()) != null) {
 
-                // get the count
-                Matcher idMatcher = ID_PATTERN.matcher(inLine);
-                if (idMatcher.find()) {
-                    result.addID(idMatcher.group(1));
-                }
-                Matcher retMaxMatcher = RET_MAX_PATTERN.matcher(inLine);
-                if (retMaxMatcher.find()) {
-                    result.retmax = Integer.parseInt(retMaxMatcher.group(1));
-                }
-                Matcher retStartMatcher = RET_START_PATTERN.matcher(inLine);
-                if (retStartMatcher.find()) {
-                    result.retstart = Integer.parseInt(retStartMatcher.group(1));
-                }
-                Matcher countMatcher = COUNT_PATTERN.matcher(inLine);
-                if (doCount && countMatcher.find()) {
-                    result.count = Integer.parseInt(countMatcher.group(1));
-                    doCount = false;
-                }
+        URL ncbi = new URL(medlineUrl + term);
+        // get the ids
+        BufferedReader in = new BufferedReader(new InputStreamReader(ncbi.openStream()));
+        String inLine;
+        while ((inLine = in.readLine()) != null) {
+
+            // get the count
+            Matcher idMatcher = ID_PATTERN.matcher(inLine);
+            if (idMatcher.find()) {
+                result.addID(idMatcher.group(1));
             }
-        } catch (MalformedURLException e) { // new URL() failed
-            LOGGER.warn("Bad url", e);
-        } catch (IOException e) { // openConnection() failed
-            LOGGER.warn("Connection failed", e);
+            Matcher retMaxMatcher = RET_MAX_PATTERN.matcher(inLine);
+            if (retMaxMatcher.find()) {
+                result.retmax = Integer.parseInt(retMaxMatcher.group(1));
+            }
+            Matcher retStartMatcher = RET_START_PATTERN.matcher(inLine);
+            if (retStartMatcher.find()) {
+                result.retstart = Integer.parseInt(retStartMatcher.group(1));
+            }
+            Matcher countMatcher = COUNT_PATTERN.matcher(inLine);
+            if (doCount && countMatcher.find()) {
+                result.count = Integer.parseInt(countMatcher.group(1));
+                doCount = false;
+            }
         }
         return result;
     }
@@ -130,83 +121,91 @@ public class MedlineFetcher implements EntryFetcher {
 
     @Override
     public boolean processQuery(String query, ImportInspector iIDialog, OutputPrinter frameOP) {
+        try {
+            shouldContinue = true;
 
-        shouldContinue = true;
+            String cleanQuery = query.trim().replace(';', ',');
+            if (cleanQuery.matches("\\d+[,\\d+]*")) {
+                frameOP.setStatus(Localization.lang("Fetching Medline by id..."));
 
-        String cleanQuery = query.trim().replace(';', ',');
-
-        if (cleanQuery.matches("\\d+[,\\d+]*")) {
-            frameOP.setStatus(Localization.lang("Fetching Medline by id..."));
-
-            List<BibEntry> bibs = fetchMedline(cleanQuery, frameOP);
-
-            if (bibs.isEmpty()) {
-                frameOP.showMessage(Localization.lang("No references found"));
-            }
-
-            for (BibEntry entry : bibs) {
-                iIDialog.addEntry(entry);
-            }
-            return true;
-        }
-
-        if (!query.isEmpty()) {
-            frameOP.setStatus(Localization.lang("Fetching Medline by term..."));
-
-            String searchTerm = toSearchTerm(query);
-
-            // get the ids from entrez
-            SearchResult result = getIds(searchTerm, 0, 1);
-
-            if (result.count == 0) {
-                frameOP.showMessage(Localization.lang("No references found"));
-                return false;
-            }
-
-            int numberToFetch = result.count;
-            if (numberToFetch > MedlineFetcher.PACING) {
-
-                while (true) {
-                    String strCount = JOptionPane.showInputDialog(Localization.lang("References found") +
-                            ": " + numberToFetch + "  " +
-                            Localization.lang("Number of references to fetch?"), Integer
-                            .toString(numberToFetch));
-
-                    if (strCount == null) {
-                        frameOP.setStatus(Localization.lang("%0 import canceled", "Medline"));
-                        return false;
-                    }
-
-                    try {
-                        numberToFetch = Integer.parseInt(strCount.trim());
-                        break;
-                    } catch (NumberFormatException ex) {
-                        frameOP.showMessage(Localization.lang("Please enter a valid number"));
-                    }
-                }
-            }
-
-            for (int i = 0; i < numberToFetch; i += MedlineFetcher.PACING) {
-                if (!shouldContinue) {
-                    break;
+                List<BibEntry> bibs = fetchMedline(cleanQuery, frameOP);
+                if (bibs.isEmpty()) {
+                    frameOP.showMessage(Localization.lang("No references found"),
+                            Localization.lang("Search %0", getTitle()), JOptionPane.INFORMATION_MESSAGE);
+                    return false;
                 }
 
-                int noToFetch = Math.min(MedlineFetcher.PACING, numberToFetch - i);
-
-                // get the ids from entrez
-                result = getIds(searchTerm, i, noToFetch);
-
-                List<BibEntry> bibs = fetchMedline(result.ids, frameOP);
                 for (BibEntry entry : bibs) {
                     iIDialog.addEntry(entry);
                 }
-                iIDialog.setProgress(i + noToFetch, numberToFetch);
+                return true;
             }
-            return true;
+
+            if (!query.isEmpty()) {
+                frameOP.setStatus(Localization.lang("Fetching Medline by term..."));
+
+                String searchTerm = toSearchTerm(query);
+
+                // get the ids from entrez
+                SearchResult result = getIds(searchTerm, 0, 1);
+
+                if (result.count == 0) {
+                    frameOP.showMessage(Localization.lang("No references found"),
+                            Localization.lang("Search %0", getTitle()), JOptionPane.INFORMATION_MESSAGE);
+                    return false;
+                }
+
+                int numberToFetch = result.count;
+                if (numberToFetch > MedlineFetcher.PACING) {
+                    while (true) {
+                        String strCount = JOptionPane.showInputDialog(Localization.lang("References found") +
+                                ": " + numberToFetch + " " +
+                                Localization.lang("Number of references to fetch?"), Integer.toString(numberToFetch));
+
+                        if (strCount == null) {
+                            frameOP.setStatus(Localization.lang("%0 import canceled", "Medline"));
+                            return false;
+                        }
+
+                        try {
+                            numberToFetch = Integer.parseInt(strCount.trim());
+                            break;
+                        } catch (NumberFormatException ex) {
+                            frameOP.showMessage(Localization.lang("Please enter a valid number"));
+                        }
+                    }
+                }
+
+                for (int i = 0; i < numberToFetch; i += MedlineFetcher.PACING) {
+                    if (!shouldContinue) {
+                        break;
+                    }
+
+                    int noToFetch = Math.min(MedlineFetcher.PACING, numberToFetch - i);
+
+                    // get the ids from entrez
+                    result = getIds(searchTerm, i, noToFetch);
+
+                    List<BibEntry> bibs = fetchMedline(result.ids, frameOP);
+                    for (BibEntry entry : bibs) {
+                        iIDialog.addEntry(entry);
+                    }
+                    iIDialog.setProgress(i + noToFetch, numberToFetch);
+                }
+                return true;
+            }
+            else {
+                frameOP.showMessage(
+                        Localization.lang("Please enter a comma separated list of Medline IDs (numbers) or search terms."),
+                        Localization.lang("Search %0", getTitle()) + ": " + Localization.lang("Input error"), JOptionPane.ERROR_MESSAGE);
+                return false;
+            }
+        } catch (IOException e) {
+            LOGGER.error("Error while fetching from " + getTitle(), e);
+            frameOP.showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
+                            Localization.lang("Please try again later and/or check your network connection."),
+                    Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
         }
-        frameOP.showMessage(
-                Localization.lang("Please enter a comma separated list of Medline IDs (numbers) or search terms."),
-                Localization.lang("Input error"), JOptionPane.ERROR_MESSAGE);
         return false;
     }
 
@@ -217,21 +216,17 @@ public class MedlineFetcher implements EntryFetcher {
      *
      * @return Will return an empty list on error.
      */
-    private static List<BibEntry> fetchMedline(String id, OutputPrinter status) {
+    private static List<BibEntry> fetchMedline(String id, OutputPrinter status) throws IOException {
         String baseUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&rettype=citation&id=" +
                 id;
-        try {
-            URL url = new URL(baseUrl);
-            URLConnection data = url.openConnection();
-            ParserResult result = new MedlineImporter().importDatabase(
-                    new BufferedReader(new InputStreamReader(data.getInputStream())));
-            if (result.hasWarnings()) {
-                status.showMessage(result.getErrorMessage());
-            }
-            return result.getDatabase().getEntries();
-        } catch (IOException e) {
-            return new ArrayList<>();
+        URL url = new URL(baseUrl);
+        URLConnection data = url.openConnection();
+        ParserResult result = new MedlineImporter().importDatabase(
+                new BufferedReader(new InputStreamReader(data.getInputStream())));
+        if (result.hasWarnings()) {
+            status.showMessage(result.getErrorMessage());
         }
+        return result.getDatabase().getEntries();
     }
 
     static class SearchResult {

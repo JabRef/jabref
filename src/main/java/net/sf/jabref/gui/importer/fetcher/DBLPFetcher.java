@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
@@ -14,6 +15,7 @@ import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.importer.util.DBLPHelper;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.entry.BibEntry;
@@ -40,12 +42,9 @@ public class DBLPFetcher implements EntryFetcher {
     }
 
     @Override
-    public boolean processQuery(String newQuery, ImportInspector inspector,
-            OutputPrinter status) {
+    public boolean processQuery(String newQuery, ImportInspector inspector, OutputPrinter status) {
 
         final HashMap<String, Boolean> bibentryKnown = new HashMap<>();
-
-        boolean res = false;
         this.query = newQuery;
 
         shouldContinue = true;
@@ -122,20 +121,18 @@ public class DBLPFetcher implements EntryFetcher {
                 inspector.setProgress(count, bibtexUrlList.size());
                 count++;
             }
-
-
-            // everything went smooth
-            res = true;
+            return true;
 
         } catch (IOException e) {
-            LOGGER.warn("Communcation problems", e);
-            status.showMessage(e.getMessage());
+            LOGGER.error("Error while fetching from " + getTitle(), e);
+            status.showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
+                            Localization.lang("Please try again later and/or check your network connection."),
+                    Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
         } finally {
             // Restore the threshold
             DuplicateCheck.duplicateThreshold = saveThreshold;
         }
-
-        return res;
+        return false;
     }
 
     private String makeSearchURL() {

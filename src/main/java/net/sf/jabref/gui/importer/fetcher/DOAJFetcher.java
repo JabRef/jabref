@@ -96,15 +96,16 @@ public class DOAJFetcher implements EntryFetcher {
                 return true;
             } else {
                 status.showMessage(Localization.lang("No entries found for the search string '%0'", query),
-                        Localization.lang("Search %0", "DOAJ"), JOptionPane.INFORMATION_MESSAGE);
+                        Localization.lang("Search %0", getTitle()), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
         } catch (UnirestException e) {
-            LOGGER.warn("Problem searching DOAJ", e);
-            status.setStatus(Localization.lang("%0 import canceled", "DOAJ"));
+            LOGGER.error("Error while fetching from " + getTitle(), e);
+            status.showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
+                            Localization.lang("Please try again later and/or check your network connection."),
+                    Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
             return false;
         }
-
     }
 
     @Override

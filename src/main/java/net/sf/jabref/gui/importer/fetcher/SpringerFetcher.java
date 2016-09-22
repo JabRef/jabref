@@ -1,6 +1,6 @@
 package net.sf.jabref.gui.importer.fetcher;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.net.URLEncoder;
 
 import javax.swing.JOptionPane;
@@ -102,10 +102,11 @@ public class SpringerFetcher implements EntryFetcher {
                         Localization.lang("Search %0", getTitle()), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             }
-        } catch (UnirestException e) {
-            LOGGER.warn("Problem searching Springer", e);
-        } catch (UnsupportedEncodingException e) {
-            LOGGER.warn("Cannot encode query", e);
+        } catch (IOException | UnirestException e) {
+            LOGGER.error("Error while fetching from " + getTitle(), e);
+            status.showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
+                            Localization.lang("Please try again later and/or check your network connection."),
+                    Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
         }
         return false;
 

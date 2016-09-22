@@ -5,7 +5,6 @@ import java.awt.GridLayout;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.ConnectException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -138,8 +137,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             }
 
             if (hits == 0) {
-                status.showMessage(Localization.lang("No entries found for the search string '%0'",
-                        terms),
+                status.showMessage(Localization.lang("No entries found for the search string '%0'", terms),
                         Localization.lang("Search %0", getTitle()), JOptionPane.INFORMATION_MESSAGE);
                 return false;
             } else if (hits > 20) {
@@ -157,19 +155,13 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
             return true;
 
-        } catch (MalformedURLException e) {
-            LOGGER.warn("Problem with ACM fetcher URL", e);
-        } catch (ConnectException e) {
-            status.showMessage(Localization.lang("Could not connect to %0", getTitle()),
-                    Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
-            LOGGER.warn("Problem with ACM connection", e);
         } catch (IOException e) {
-            status.showMessage(e.getMessage(),
+            LOGGER.error("Error while fetching from " + getTitle(), e);
+            status.showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
+                            Localization.lang("Please try again later and/or check your network connection."),
                     Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
-            LOGGER.warn("Problem with ACM Portal", e);
+            return false;
         }
-        return false;
-
     }
 
     @Override

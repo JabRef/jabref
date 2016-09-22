@@ -2,11 +2,8 @@ package net.sf.jabref.gui.importer.fetcher;
 
 import java.awt.BorderLayout;
 import java.io.IOException;
-import java.net.ConnectException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
-import java.net.MalformedURLException;
-import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -165,14 +162,11 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
             return true;
 
-        } catch (MalformedURLException e) {
-            LOGGER.warn("Bad URL", e);
-        } catch (ConnectException | UnknownHostException e) {
-            status.showMessage(Localization.lang("Could not connect to %0", getTitle()), DIALOG_TITLE,
-                    JOptionPane.ERROR_MESSAGE);
         } catch (IOException | JSONException e) {
-            status.showMessage(e.getMessage(), DIALOG_TITLE, JOptionPane.ERROR_MESSAGE);
-            LOGGER.warn("Search IEEEXplore: " + e.getMessage(), e);
+            LOGGER.error("Error while fetching from " + getTitle(), e);
+            status.showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
+                            Localization.lang("Please try again later and/or check your network connection."),
+                    Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
         }
 
         return false;
