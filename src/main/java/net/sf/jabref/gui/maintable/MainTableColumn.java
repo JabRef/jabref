@@ -94,7 +94,7 @@ public class MainTableColumn {
 
         Optional<String> content = Optional.empty();
         for (String field : bibtexFields) {
-            content = entry.getResolvedFieldOrAlias(field, database.orElse(null));
+            content = BibDatabase.getResolvedField(field, entry, database.orElse(null));
             if (content.isPresent()) {
                 isNameColumn = InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES);
                 break;
@@ -127,7 +127,7 @@ public class MainTableColumn {
      * The reasons for being different are (combinations may also happen):
      * - The entry has a crossref where the field content is obtained from
      * - The field has a string in it (which getColumnValue() resolves)
-     * - There are some alias fields. For example, if the entry has a date field but no year field, getResolvedFieldOrAlias()
+     * - There are some alias fields. For example, if the entry has a date field but no year field, getResolvedField()
      *   will return the year value from the date field when queried for year
      *
      *
@@ -148,7 +148,7 @@ public class MainTableColumn {
                 return false;
             } else {
                 plainFieldContent = entry.getField(field);
-                resolvedFieldContent = entry.getResolvedFieldOrAlias(field, database.orElse(null));
+                resolvedFieldContent = BibDatabase.getResolvedField(field, entry, database.orElse(null));
             }
 
             if (resolvedFieldContent.isPresent()) {

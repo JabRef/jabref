@@ -830,7 +830,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // independently of the copied
                 // ones.
                 be.setId(IdGenerator.next());
-                bibDatabaseContext.getDatabase().insertEntryWithDuplicationCheck(be);
+                bibDatabaseContext.getDatabase().insertEntry(be);
 
                 ce.addEdit(new UndoableInsertEntry(bibDatabaseContext.getDatabase(), be, BasePanel.this));
 
@@ -1138,7 +1138,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             String id = IdGenerator.next();
             final BibEntry be = new BibEntry(id, actualType.getName());
             try {
-                bibDatabaseContext.getDatabase().insertEntryWithDuplicationCheck(be);
+                bibDatabaseContext.getDatabase().insertEntry(be);
                 // Set owner/timestamp if options are enabled:
                 List<BibEntry> list = new ArrayList<>();
                 list.add(be);
@@ -1305,7 +1305,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void insertEntry(final BibEntry bibEntry) {
         if (bibEntry != null) {
             try {
-                bibDatabaseContext.getDatabase().insertEntryWithDuplicationCheck(bibEntry);
+                bibDatabaseContext.getDatabase().insertEntry(bibEntry);
                 if (Globals.prefs.getBoolean(JabRefPreferences.USE_OWNER)) {
                     // Set owner field to default value
                     UpdateField.setAutomaticFields(bibEntry, true, true, Globals.prefs.getUpdateFieldPreferences());
