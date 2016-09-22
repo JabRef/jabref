@@ -1,8 +1,6 @@
-package net.sf.jabref.model.util;
+package net.sf.jabref.model.strings;
 
 import java.util.Map;
-
-import net.sf.jabref.model.strings.StringUtil;
 
 public class LatexToUnicode {
 
