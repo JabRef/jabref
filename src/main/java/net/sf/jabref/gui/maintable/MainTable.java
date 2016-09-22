@@ -555,30 +555,39 @@ public class MainTable extends JTable {
     }
 
     private boolean matches(int row, Matcher<BibEntry> m) {
-        return m.matches(getBibEntry(row));
+        Optional<BibEntry> bibEntry = getBibEntry(row);
+
+        if (bibEntry.isPresent()) {
+            return m.matches(bibEntry.get());
+        }
+        return m.matches(null);
     }
 
     private boolean isComplete(int row) {
-        try {
-            BibEntry entry = getBibEntry(row);
-            TypedBibEntry typedEntry = new TypedBibEntry(entry, panel.getBibDatabaseContext());
+        Optional<BibEntry> bibEntry = getBibEntry(row);
+
+        if (bibEntry.isPresent()) {
+            TypedBibEntry typedEntry = new TypedBibEntry(bibEntry.get(), panel.getBibDatabaseContext());
             return typedEntry.hasAllRequiredFields();
-        } catch (NullPointerException ex) {
-            return true;
         }
+        return true;
     }
 
     private int isMarked(int row) {
-        try {
-            BibEntry be = getBibEntry(row);
-            return EntryMarker.isMarked(be);
-        } catch (NullPointerException ex) {
-            return 0;
+        Optional<BibEntry> bibEntry = getBibEntry(row);
+
+        if (bibEntry.isPresent()) {
+            return EntryMarker.isMarked(bibEntry.get());
         }
+        return 0;
     }
 
-    private BibEntry getBibEntry(int row) {
-        return model.getTableRows().get(row);
+    private Optional<BibEntry> getBibEntry(int row) {
+        try {
+            return Optional.of(model.getTableRows().get(row));
+        } catch (IndexOutOfBoundsException e) {
+            return Optional.empty();
+        }
     }
 
     public void scrollTo(int y) {
