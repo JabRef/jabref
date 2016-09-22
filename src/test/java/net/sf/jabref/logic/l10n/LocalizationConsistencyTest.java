@@ -156,7 +156,7 @@ public class LocalizationConsistencyTest {
             System.out.println();
             System.out.println("1. CAREFULLY CHECK IF THE KEY IS REALLY NOT USED ANYMORE");
             System.out.println("2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE");
-            System.out.println("3. EXECUTE gradlew -b localization.gradle generateMissingTranslationKeys TO");
+            System.out.println("3. EXECUTE gradlew update");
             System.out.println("REMOVE THESE FROM THE NON-ENGLISH LANGUAGE FILES");
             fail("Obsolete keys " + obsoleteKeys + " found in properties file which should be removed");
         }
@@ -172,7 +172,7 @@ public class LocalizationConsistencyTest {
             System.out.println(obsoleteKeys.stream().map(Object::toString).collect(Collectors.joining("\n")));
             System.out.println();
             System.out.println("1. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE");
-            System.out.println("2. EXECUTE gradlew -b localization.gradle generateMissingTranslationKeys" + " TO");
+            System.out.println("3. EXECUTE gradlew update");
             System.out.println("REMOVE THESE FROM THE NON-ENGLISH LANGUAGE FILES");
             fail("Obsolete keys " + obsoleteKeys + " found in menu properties file which should be removed");
         }
@@ -189,6 +189,7 @@ public class LocalizationConsistencyTest {
 
     private String convertToEnglishPropertiesFile(List<LocalizationEntry> missingKeys) {
         System.out.println("PASTE THIS INTO THE ENGLISH LANGUAGE FILE");
+        System.out.println("AND EXECUTE gradlew update");
         StringJoiner result = new StringJoiner("\n");
         for (LocalizationEntry key : missingKeys) {
             result.add(String.format("%s=%s", key.getKey(), key.getKey()));
@@ -197,7 +198,7 @@ public class LocalizationConsistencyTest {
     }
 
     private String convertPropertiesFile(List<LocalizationEntry> missingKeys) {
-        System.out.println("EXECUTE gradlew -b localization.gradle generateMissingTranslationKeys TO");
+        System.out.println("EXECUTE gradlew update");
         System.out.println("PASTE THIS INTO THE NON-ENGLISH LANGUAGE FILES");
         StringJoiner result = new StringJoiner("\n");
         for (LocalizationEntry key : missingKeys) {
