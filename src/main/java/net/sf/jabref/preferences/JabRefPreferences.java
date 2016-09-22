@@ -83,7 +83,7 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.SpecialFields;
 import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 import net.sf.jabref.model.metadata.SaveOrderConfig;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -191,6 +191,8 @@ public class JabRefPreferences {
     public static final String LAST_EDITED = "lastEdited";
     public static final String OPEN_LAST_EDITED = "openLastEdited";
     public static final String LAST_FOCUSED = "lastFocused";
+    public static final String SHARED_DATABASE_LAST_EDITED = "sharedDatabaseLastEdited";
+    public static final String SHARED_DATABASE_LAST_FOCUSED = "sharedDatabaseLastFocused";
     public static final String BACKUP = "backup";
     public static final String AUTO_OPEN_FORM = "autoOpenForm";
     public static final String FILE_WORKING_DIRECTORY = "fileWorkingDirectory";
@@ -599,6 +601,8 @@ public class JabRefPreferences {
         defaults.put(BACKUP, Boolean.TRUE);
         defaults.put(OPEN_LAST_EDITED, Boolean.TRUE);
         defaults.put(LAST_EDITED, "");
+        defaults.put(SHARED_DATABASE_LAST_EDITED, Boolean.FALSE);
+        defaults.put(SHARED_DATABASE_LAST_FOCUSED, Boolean.FALSE);
         defaults.put(LAST_FOCUSED, "");
         defaults.put(STRINGS_POS_X, 0);
         defaults.put(STRINGS_POS_Y, 0);
@@ -989,7 +993,7 @@ public class JabRefPreferences {
     }
 
     private static String convertListToString(List<String> value) {
-        return value.stream().map(val -> ModelStringUtil.quote(val, ";", '\\')).collect(Collectors.joining(";"));
+        return value.stream().map(val -> StringUtil.quote(val, ";", '\\')).collect(Collectors.joining(";"));
     }
 
     /**

@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.util.LatexToUnicode;
+import net.sf.jabref.model.strings.LatexToUnicode;
 
 /**
  * Search rule for contain-based search.
