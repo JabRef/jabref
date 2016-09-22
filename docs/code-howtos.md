@@ -8,10 +8,10 @@ This page provides some development support in the form of howtos. See also [[Hi
   * [Using the EventSystem](#using-the-eventsystem)
   * [Logging](#logging)
   * [Using Localization correctly](#using-localization-correctly)
-  * [Cleanup / Formatters](#cleanup-/-formatters)
+  * [Cleanup and Formatters](#cleanup-and-formatters)
   * [Drag and Drop](#drag-and-drop)
-  * [Get the JabRef frame / panel](#get-the-jabref-frame-/-panel)
-  * [Get Absolute/Expanded Filename](#get-absolute/expanded-filename)
+  * [Get the JabRef frame panel](#get-the-jabref-frame-panel)
+  * [Get Absolute Filename or Path](#get-absolute-filename-or-path)
   * [Setting a Database Directory for a .bib File](#setting-a-database-directory-for-a-.bib-file)
   * [How to work with Preferences](#how-to-work-with-preferences)
   * [Test Cases](#test-cases)
@@ -198,7 +198,7 @@ The tests check whether translation strings appear correctly in the resource bun
 4. With `gradlew generateMissingTranslationKeys` the "KEY" is added to the other translation files as well.
 5. Tests are green again. 
 
-## Cleanup / Formatters
+## Cleanup and Formatters
 
 We try to build a cleanup mechanism based on formatters. The idea is that we can register these actions in arbitrary places, e.g., onSave, onImport, onExport, cleanup, etc. and apply them to different fields. The formatters themself are independent of any logic and therefore easy to test. 
 
@@ -208,18 +208,20 @@ Example: (PageNumbersFormatter)[https://github.com/JabRef/jabref/blob/master/src
 
 `net.sf.jabref.external.DroppedFileHandler.handleDroppedfile(String, ExternalFileType, boolean, BibtexEntry) FileListEditor` sets a `TransferHandler` inherited from `FileListEditorTransferHandler`. There, at `importData`, a `DroppedFileHandler` is instantiated and `handleDroppedfile` called. 
 
-## Get the JabRef frame / panel
+## Get the JabRef frame panel
 
 ```java
 net.sf.jabref.JabRefFrame jrf = JabRef.jrf;
 net.sf.jabref.BasePanel basePanel = JabRef.jrf.basepanel();
 ```
 
-## Get Absolute/Expanded Filename
+## Get Absolute Filename or Path
 
 ```java
-File f = Util.expandFilename(flEntry.getLink(), frame.basePanel().metaData().getFileDirectory(GUIGlobals.FILE_FIELD)); 
+File f = FileUtil.expandFilename(basePanel.getDatabaseContext(), path, JabRefPreferences.getInstance().getFileDirectoryPreferences()).get(); 
 ```
+`String path` Can be the files name or a relative path to it.
+
 
 ## Setting a Database Directory for a .bib File
 
