@@ -42,7 +42,7 @@ public class ExportFormats {
                 "tablerefsabsbib", "tablerefsabsbib", "tablerefsabsbib", ".html", layoutPreferences, savePreferences));
         ExportFormats.putFormat(new ExportFormat("Harvard RTF", "harvard", "harvard", "harvard", ".rtf",
                 layoutPreferences, savePreferences));
-        ExportFormats.putFormat(new ExportFormat("ISO 690", "iso690rtf", "iso690RTF", "iso690rtf", ".rtf",
+        ExportFormats.putFormat(new ExportFormat("ISO 690 RTF", "iso690rtf", "iso690RTF", "iso690rtf", ".rtf",
                 layoutPreferences, savePreferences));
         ExportFormats.putFormat(new ExportFormat("ISO 690", "iso690txt", "iso690", "iso690txt", ".txt",
                 layoutPreferences, savePreferences));

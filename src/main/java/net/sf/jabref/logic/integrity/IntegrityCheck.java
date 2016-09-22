@@ -50,6 +50,7 @@ public class IntegrityCheck {
 
         result.addAll(new BracketChecker(FieldName.TITLE).check(entry));
         result.addAll(new YearChecker().check(entry));
+        result.addAll(new BibtexkeyChecker().check(entry));
         result.addAll(new EditionChecker(bibDatabaseContext).check(entry));
         result.addAll(new NoteChecker(bibDatabaseContext).check(entry));
         result.addAll(new HowpublishedChecker(bibDatabaseContext).check(entry));

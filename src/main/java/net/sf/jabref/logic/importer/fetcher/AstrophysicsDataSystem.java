@@ -9,8 +9,10 @@ import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.EntryBasedParserFetcher;
 import net.sf.jabref.logic.importer.FetcherException;
+import net.sf.jabref.logic.importer.IdBasedParserFetcher;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.Parser;
 import net.sf.jabref.logic.importer.SearchBasedParserFetcher;
@@ -29,10 +31,13 @@ import org.apache.http.client.utils.URIBuilder;
  * There is also a new API (https://github.com/adsabs/adsabs-dev-api) but it returns JSON
  * (or at least needs multiple calls to get BibTeX, status: September 2016)
  */
-public class AstrophysicsDataSystem implements SearchBasedParserFetcher, EntryBasedParserFetcher {
+public class AstrophysicsDataSystem implements IdBasedParserFetcher, SearchBasedParserFetcher, EntryBasedParserFetcher {
 
     private static String API_QUERY_URL = "http://adsabs.harvard.edu/cgi-bin/nph-basic_connect";
     private static String API_ENTRY_URL = "http://adsabs.harvard.edu/cgi-bin/nph-abs_connect";
+    private static String API_DOI_URL = "http://adsabs.harvard.edu/doi/";
+
+    private final String patternRemoveDOI = "^(doi:|DOI:)";
     private final ImportFormatPreferences preferences;
 
     public AstrophysicsDataSystem(ImportFormatPreferences preferences) {
@@ -87,6 +92,19 @@ public class AstrophysicsDataSystem implements SearchBasedParserFetcher, EntryBa
         });
 
         return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public URL getURLForID(String identifier) throws URISyntaxException, MalformedURLException, FetcherException {
+        String key = identifier.replaceAll(patternRemoveDOI, "");
+        URIBuilder uriBuilder = new URIBuilder(API_DOI_URL + key);
+        uriBuilder.addParameter("data_type", "BIBTEXPLUS");
+        return uriBuilder.build().toURL();
+    }
+
+    @Override
+    public HelpFile getHelpPage() {
+        return HelpFile.FETCHER_ADS;
     }
 
     @Override

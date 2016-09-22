@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.print.PrinterException;
 import java.io.IOException;
 import java.io.StringReader;
-import java.lang.reflect.InvocationTargetException;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -263,14 +262,10 @@ public class PreviewPanel extends JPanel
             previewPane.setText(newValue);
             previewPane.revalidate();
         } else {
-            try {
-                SwingUtilities.invokeAndWait(() -> {
-                    previewPane.setText(newValue);
-                    previewPane.revalidate();
-                });
-            } catch (InvocationTargetException | InterruptedException e) {
-                LOGGER.info("Problem setting preview text", e);
-            }
+            SwingUtilities.invokeLater(() -> {
+                previewPane.setText(newValue);
+                previewPane.revalidate();
+            });
         }
         // Scroll to top:
         scrollToTop();

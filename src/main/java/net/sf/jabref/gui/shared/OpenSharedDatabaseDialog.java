@@ -39,8 +39,8 @@ import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.DatabaseLocation;
 import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.shared.DBMSConnection;
 import net.sf.jabref.shared.DBMSConnectionProperties;
-import net.sf.jabref.shared.DBMSConnector;
 import net.sf.jabref.shared.DBMSType;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
@@ -102,18 +102,15 @@ public class OpenSharedDatabaseDialog extends JDialog {
         setLoadingConnectButtonText(true);
 
         try {
-            bibDatabaseContext.getDBSynchronizer().openSharedDatabase(connectionProperties);
+            bibDatabaseContext.getDBMSSynchronizer().openSharedDatabase(connectionProperties);
             frame.addTab(bibDatabaseContext, true);
             setPreferences();
-            bibDatabaseContext.getDBSynchronizer()
+            bibDatabaseContext.getDBMSSynchronizer()
                     .registerListener(
                             new SharedDatabaseUIManager(frame, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR)));
             frame.output(Localization.lang("Connection_to_%0_server_established.", connectionProperties.getType().toString()));
             dispose();
             return; // setLoadingConnectButtonText(false) should not be reached regularly.
-        } catch (ClassNotFoundException exception) {
-            JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this, exception.getMessage(),
-                    Localization.lang("Driver error"), JOptionPane.ERROR_MESSAGE);
         } catch (SQLException exception) {
             JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this, exception.getMessage(),
                     Localization.lang("Connection error"), JOptionPane.ERROR_MESSAGE);
@@ -235,7 +232,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
         connectionPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("Connection")));
         connectionPanel.setLayout(gridBagLayout);
 
-        Set<DBMSType> availableDBMSTypes = DBMSConnector.getAvailableDBMSTypes();
+        Set<DBMSType> availableDBMSTypes = DBMSConnection.getAvailableDBMSTypes();
         DefaultComboBoxModel<DBMSType> comboBoxModel = new DefaultComboBoxModel<>(
                 availableDBMSTypes.toArray(new DBMSType[availableDBMSTypes.size()]));
 
