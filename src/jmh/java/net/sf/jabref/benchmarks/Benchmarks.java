@@ -91,7 +91,7 @@ public class Benchmarks {
         // FIXME: Reuse SearchWorker here
         SearchQuery searchQuery = new SearchQuery("Journal Title 500", false, false);
         List<BibEntry> matchedEntries = new ArrayList<>();
-        matchedEntries.addAll(database.getEntries().stream().filter(searchQuery::isMatch).collect(Collectors.toList()));
+        matchedEntries.addAll(database.getEntries().parallelStream().filter(searchQuery::isMatch).collect(Collectors.toList()));
         return matchedEntries;
     }
 

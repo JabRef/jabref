@@ -41,7 +41,7 @@ class SearchWorker extends SwingWorker<List<BibEntry>, Void> {
 
     @Override
     protected List<BibEntry> doInBackground() throws Exception {
-        return database.getEntries().stream()
+        return database.getEntries().parallelStream()
                 .filter(searchQuery::isMatch)
                 .collect(Collectors.toList());
     }
