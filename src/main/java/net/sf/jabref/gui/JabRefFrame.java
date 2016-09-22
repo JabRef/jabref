@@ -501,6 +501,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final List<Object> openAndSavedDatabasesOnlyActions = new LinkedList<>();
     private final List<Object> sharedDatabaseOnlyActions = new LinkedList<>();
     private final List<Object> noSharedDatabaseActions = new LinkedList<>();
+    private final List<Object> oneEntryOnlyActions = new LinkedList<>();
 
 
     private class EditModeAction extends AbstractAction {
@@ -1514,6 +1515,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         sharedDatabaseOnlyActions.addAll(Collections.singletonList(pullChangesFromSharedDatabase));
         noSharedDatabaseActions.addAll(Arrays.asList(save, saveAll));
 
+        oneEntryOnlyActions.clear();
+        oneEntryOnlyActions.addAll(Arrays.asList(editEntry, sendAsEmail));
+
         tabbedPane.addChangeListener(event -> updateEnabledState());
 
     }
@@ -1569,6 +1573,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             boolean isShared = current.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED;
             setEnabled(sharedDatabaseOnlyActions, isShared);
             setEnabled(noSharedDatabaseActions, !isShared);
+
+            boolean oneEntrySelected = current.getSelectedEntries().size() == 1;
+            setEnabled(oneEntryOnlyActions, oneEntrySelected);
         }
     }
 
