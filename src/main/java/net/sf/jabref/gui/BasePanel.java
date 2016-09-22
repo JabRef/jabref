@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimerTask;
+import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -105,6 +106,7 @@ import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.FileExtensions;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -533,6 +535,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for copying the BibTeX key and the title for the first selected entry
         actions.put(Actions.COPY_KEY_AND_TITLE, (BaseAction) () -> copyKeyAndTitle());
 
+        // The action for copying the BibTeX key as hyperlink to the url of the first selected entry
+        actions.put(Actions.COPY_KEY_AND_LINK, (BaseAction) () -> copyKeyAndLink());
+
         actions.put(Actions.MERGE_DATABASE, new AppendDatabaseAction(frame, this));
 
         actions.put(Actions.ADD_FILE_LINK, new AttachFileAction(this));
@@ -946,6 +951,40 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             } else {
                 output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
                         Integer.toString(bes.size() - copied), Integer.toString(bes.size())));
+            }
+        }
+    }
+
+    private void copyKeyAndLink() {
+        List<BibEntry> selectedEntries = mainTable.getSelectedEntries();
+        if (!selectedEntries.isEmpty()) {
+            storeCurrentEdit();
+
+            StringBuilder sb = new StringBuilder();
+
+            long copied = 0;
+            for (BibEntry entry : selectedEntries.stream().filter(BibEntry::hasCiteKey).collect(Collectors.toList())) {
+                String key = entry.getCiteKeyOptional().get();
+                String url = entry.getField(FieldName.URL).isPresent() ? entry.getField(FieldName.URL).get() : "";
+                sb.append(String.format("<a href=\"%s\">%s</a>", url, key));
+                sb.append(OS.NEWLINE);
+                copied++;
+            }
+
+            if (copied == 0) {
+                output(Localization.lang("None of the selected entries have BibTeX keys."));
+                return;
+            }
+
+            final StringSelection ss = new StringSelection(sb.toString());
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
+
+            if (copied == selectedEntries.size()) {
+                // All entries had keys.
+                output((selectedEntries.size() > 1 ? Localization.lang("Copied keys") : Localization.lang("Copied key")) + '.');
+            } else {
+                output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
+                        Long.toString(selectedEntries.size() - copied), Integer.toString(selectedEntries.size())));
             }
         }
     }
