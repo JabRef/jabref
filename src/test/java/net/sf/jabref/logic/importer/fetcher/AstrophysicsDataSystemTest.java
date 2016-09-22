@@ -2,11 +2,15 @@ package net.sf.jabref.logic.importer.fetcher;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
+import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibLatexEntryTypes;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -14,13 +18,14 @@ import org.junit.Test;
 import static net.sf.jabref.logic.util.OS.NEWLINE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class AstrophysicsDataSystemTest {
 
-    AstrophysicsDataSystem fetcher;
-    BibEntry diezSliceTheoremEntry;
+    private AstrophysicsDataSystem fetcher;
+    private BibEntry diezSliceTheoremEntry, famaeyMcGaughEntry, sunWelchEntry, xiongSunEntry, ingersollPollardEntry, luceyPaulEntry;
 
     @Before
     public void setUp() throws Exception {
@@ -57,6 +62,79 @@ public class AstrophysicsDataSystemTest {
                         + "setting. The examples of the Klein-Gordon field and general Yang-Mills" + NEWLINE
                         + "theory illustrate that the presented approach conveniently handles the" + NEWLINE
                         + "occurring symmetries." + NEWLINE);
+
+        famaeyMcGaughEntry = new BibEntry();
+        famaeyMcGaughEntry.setType(BibLatexEntryTypes.ARTICLE);
+        famaeyMcGaughEntry.setField("bibtexkey", "2012LRR....15...10F");
+        famaeyMcGaughEntry.setField("author", "Famaey, B. and McGaugh, S. S.");
+        famaeyMcGaughEntry.setField("title", "Modified Newtonian Dynamics (MOND): Observational Phenomenology and Relativistic Extensions");
+        famaeyMcGaughEntry.setField("journal", "Living Reviews in Relativity");
+        famaeyMcGaughEntry.setField("year", "2012");
+        famaeyMcGaughEntry.setField("volume", "15");
+        famaeyMcGaughEntry.setField("month", "#sep#");
+        famaeyMcGaughEntry.setField("archiveprefix", "arXiv");
+        famaeyMcGaughEntry.setField("doi", "10.12942/lrr-2012-10");
+        famaeyMcGaughEntry.setField("eprint", "1112.3960");
+        famaeyMcGaughEntry.setField("keywords", "astronomical observations, Newtonian limit, equations of motion, extragalactic astronomy, cosmology, theories of gravity, fundamental physics, astrophysics");
+
+        sunWelchEntry = new BibEntry();
+        sunWelchEntry.setType(BibLatexEntryTypes.ARTICLE);
+        sunWelchEntry.setField("bibtexkey", "2012NatMa..11...44S");
+        sunWelchEntry.setField("author", "Sun, Y. and Welch, G. C. and Leong, W. L. and Takacs, C. J. and Bazan, G. C. and Heeger, A. J.");
+        sunWelchEntry.setField("doi", "10.1038/nmat3160");
+        sunWelchEntry.setField("journal", "Nature Materials");
+        sunWelchEntry.setField("month", "#jan#");
+        sunWelchEntry.setField("pages", "44-48");
+        sunWelchEntry.setField("title", "Solution-processed small-molecule solar cells with 6.7\\% efficiency");
+        sunWelchEntry.setField("volume", "11");
+        sunWelchEntry.setField("year", "2012");
+
+        xiongSunEntry = new BibEntry();
+        xiongSunEntry.setType(BibLatexEntryTypes.ARTICLE);
+        xiongSunEntry.setField("bibtexkey", "2007ITGRS..45..879X");
+        xiongSunEntry.setField("author", "Xiong, X. and Sun, J. and Barnes, W. and Salomonson, V. and Esposito, J. and Erives, H. and Guenther, B.");
+        xiongSunEntry.setField("doi", "10.1109/TGRS.2006.890567");
+        xiongSunEntry.setField("journal", "IEEE Transactions on Geoscience and Remote Sensing");
+        xiongSunEntry.setField("month", "#apr#");
+        xiongSunEntry.setField("pages", "879-889");
+        xiongSunEntry.setField("title", "Multiyear On-Orbit Calibration and Performance of Terra MODIS Reflective Solar Bands");
+        xiongSunEntry.setField("volume", "45");
+        xiongSunEntry.setField("year", "2007");
+
+        ingersollPollardEntry = new BibEntry();
+        ingersollPollardEntry.setType(BibLatexEntryTypes.ARTICLE);
+        ingersollPollardEntry.setField("bibtexkey", "1982Icar...52...62I");
+        ingersollPollardEntry.setField("author", "Ingersoll, A. P. and Pollard, D.");
+        ingersollPollardEntry.setField("doi", "10.1016/0019-1035(82)90169-5");
+        ingersollPollardEntry.setField("journal", "\\icarus");
+        ingersollPollardEntry.setField("keywords", "Atmospheric Circulation, Barotropic Flow, Convective Flow, Flow Stability, Jupiter Atmosphere, Rotating Fluids, Saturn Atmosphere, Adiabatic Flow, Anelasticity, Compressible Fluids, Planetary Rotation, Rotating Cylinders, Scaling Laws, Wind Profiles, PLANETS, JUPITER, SATURN, MOTION, INTERIORS, ATMOSPHERE, ANALYSIS, SCALE, BAROTROPY, CHARACTERISTICS, STRUCTURE, WINDS, VISCOSITY, DATA, CONVECTION, ROTATION, EDDY EFFECTS, ENERGY, ADIABATICITY, DIAGRAMS, REVIEW, LATITUDE, ZONES, VELOCITY, MATHEMATICAL MODELS, HEAT FLOW, EQUATIONS OF MOTION, FLUIDS, DYNAMICS, TEMPERATURE, GRADIENTS");
+        ingersollPollardEntry.setField("month", "#oct#");
+        ingersollPollardEntry.setField("pages", "62-80");
+        ingersollPollardEntry.setField("title", "Motion in the interiors and atmospheres of Jupiter and Saturn - Scale analysis, anelastic equations, barotropic stability criterion");
+        ingersollPollardEntry.setField("volume", "52");
+        ingersollPollardEntry.setField("year", "1982");
+
+        luceyPaulEntry = new BibEntry();
+        luceyPaulEntry.setType(BibLatexEntryTypes.ARTICLE);
+        luceyPaulEntry.setField("bibtexkey", "2000JGR...10520297L");
+        luceyPaulEntry.setField("author", "Lucey, P. G. and Blewett, D. T. and Jolliff, B. L.");
+        luceyPaulEntry.setField("doi", "10.1029/1999JE001117");
+        luceyPaulEntry.setField("journal", "\\jgr");
+        luceyPaulEntry.setField("keywords", "Planetology: Solid Surface Planets: Composition, Planetology: Solid Surface Planets: Remote sensing, Planetology: Solid Surface Planets: Surface materials and properties, Planetology: Solar System Objects: Moon (1221)");
+        luceyPaulEntry.setField("pages", "20297-20306");
+        luceyPaulEntry.setField("title", "Lunar iron and titanium abundance algorithms based on final processing of Clementine ultraviolet-visible images");
+        luceyPaulEntry.setField("volume", "105");
+        luceyPaulEntry.setField("year", "2000");
+    }
+
+    @Test
+    public void testHelpPage() {
+        assertEquals("ADS", fetcher.getHelpPage().getPageName());
+    }
+
+    @Test
+    public void testGetName() {
+        assertEquals("SAO/NASA Astrophysics Data System", fetcher.getName());
     }
 
     @Test
@@ -74,5 +152,49 @@ public class AstrophysicsDataSystemTest {
         List<BibEntry> fetchedEntries = fetcher.performSearch(searchEntry);
         assertFalse(fetchedEntries.isEmpty());
         assertEquals(diezSliceTheoremEntry, fetchedEntries.get(0));
+    }
+
+    @Test
+    public void testPerformSearchByFamaeyMcGaughEntry() throws Exception {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.12942/lrr-2012-10");
+        fetchedEntry.ifPresent(entry -> entry.clearField(FieldName.ABSTRACT));//Remove abstract due to copyright
+        assertEquals(Optional.of(famaeyMcGaughEntry), fetchedEntry);
+    }
+
+    @Test
+    public void testPerformSearchByIdEmptyDOI() throws Exception {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("");
+        assertEquals(Optional.empty(), fetchedEntry);
+    }
+
+    @Test(expected = FetcherException.class)
+    public void testPerformSearchByIdInvalidDoi() throws Exception {
+        fetcher.performSearchById("this.doi.will.fail");
+        fail();
+    }
+
+    @Test
+    public void testPerformSearchBySunWelchEntry() throws Exception {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1038/nmat3160");
+        fetchedEntry.ifPresent(entry -> entry.clearField(FieldName.ABSTRACT)); //Remove abstract due to copyright
+        assertEquals(Optional.of(sunWelchEntry), fetchedEntry);
+    }
+
+    @Test
+    public void testPerformSearchByXiongSunEntry() throws Exception {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1109/TGRS.2006.890567");
+        assertEquals(Optional.of(xiongSunEntry), fetchedEntry);
+    }
+
+    @Test
+    public void testPerformSearchByIngersollPollardEntry() throws Exception {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1016/0019-1035(82)90169-5");
+        assertEquals(Optional.of(ingersollPollardEntry), fetchedEntry);
+    }
+
+    @Test
+    public void testPerformSearchByLuceyPaulEntry() throws Exception {
+        Optional<BibEntry> fetchedEntry = fetcher.performSearchById("10.1029/1999JE001117");
+        assertEquals(Optional.of(luceyPaulEntry), fetchedEntry);
     }
 }

@@ -15,10 +15,13 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.database.event.EntryAddedEvent;
 import net.sf.jabref.model.database.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.entry.EntryType;
+import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
@@ -153,14 +156,8 @@ public class BibDatabase {
      * @return false if the insert was done without a duplicate warning
      * @throws KeyCollisionException thrown if the entry id ({@link BibEntry#getId()}) is already  present in the database
      */
-    @Deprecated // use insertEntry and DuplicationChecker separately
-    public synchronized boolean insertEntryWithDuplicationCheck(BibEntry entry) throws KeyCollisionException {
-        insertEntry(entry);
-        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
-    }
-
-    public synchronized void insertEntry(BibEntry entry) {
-        insertEntry(entry, EntryEventSource.LOCAL);
+    public synchronized boolean insertEntry(BibEntry entry) throws KeyCollisionException {
+        return insertEntry(entry, EntryEventSource.LOCAL);
     }
 
     /**
@@ -169,8 +166,9 @@ public class BibDatabase {
      *
      * @param entry BibEntry to insert
      * @param eventSource Source the event is sent from
+     * @return false if the insert was done without a duplicate warning
      */
-    public synchronized void insertEntry(BibEntry entry, EntryEventSource eventSource) throws KeyCollisionException {
+    public synchronized boolean insertEntry(BibEntry entry, EntryEventSource eventSource) throws KeyCollisionException {
         Objects.requireNonNull(entry);
 
         String id = entry.getId();
@@ -183,6 +181,7 @@ public class BibDatabase {
         entry.registerListener(this);
 
         eventBus.post(new EntryAddedEvent(entry, eventSource));
+        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
     }
 
     /**
@@ -222,7 +221,6 @@ public class BibDatabase {
      *
      * @return true, if the entry contains the key, false if not
      */
-    @Deprecated // use BibEntry.setCiteKey (and DuplicationChecker)
     public synchronized boolean setCiteKeyForEntry(BibEntry entry, String key) {
         String oldKey = entry.getCiteKey();
         if (key == null) {
@@ -493,7 +491,61 @@ public class BibDatabase {
     }
 
     /**
+     * Returns the text stored in the given field of the given bibtex entry
+     * which belongs to the given database.
+     * <p>
+     * If a database is given, this function will try to resolve any string
+     * references in the field-value.
+     * Also, if a database is given, this function will try to find values for
+     * unset fields in the entry linked by the "crossref" field, if any.
+     *
+     * @param field    The field to return the value of.
+     * @param entry    The bibtex entry which contains the field.
+     * @param database maybenull
+     *                 The database of the bibtex entry.
+     * @return The resolved field value or null if not found.
+     */
+    public static Optional<String> getResolvedField(String field, BibEntry entry, BibDatabase database) {
+        Objects.requireNonNull(entry, "entry cannot be null");
+
+        if (BibEntry.TYPE_HEADER.equals(field) || BibEntry.OBSOLETE_TYPE_HEADER.equals(field)) {
+            Optional<EntryType> entryType = EntryTypes.getType(entry.getType(), BibDatabaseMode.BIBLATEX);
+            if (entryType.isPresent()) {
+                return Optional.of(entryType.get().getName());
+            } else {
+                return Optional.of(EntryUtil.capitalizeFirst(entry.getType()));
+            }
+        }
+
+        if (BibEntry.KEY_FIELD.equals(field)) {
+            return entry.getCiteKeyOptional();
+        }
+
+        // Changed this to also consider alias fields, which is the expected
+        // behavior for the preview layout and for the check whatever all fields are present.
+        // TODO: But there might be unwanted side-effects?!
+        Optional<String> result = entry.getFieldOrAlias(field);
+
+        // If this field is not set, and the entry has a crossref, try to look up the
+        // field in the referred entry: Do not do this for the bibtex key.
+        if (!result.isPresent() && (database != null)) {
+            Optional<String> crossrefKey = entry.getField(FieldName.CROSSREF);
+            if (crossrefKey.isPresent() && !crossrefKey.get().isEmpty()) {
+                Optional<BibEntry> referred = database.getEntryByKey(crossrefKey.get());
+                if (referred.isPresent()) {
+                    // Ok, we found the referred entry. Get the field value from that
+                    // entry. If it is unset there, too, stop looking:
+                    result = referred.get().getFieldOrAlias(field);
+                }
+            }
+        }
+
+        return result.map(resultText -> BibDatabase.getText(resultText, database));
+    }
+
+    /**
      * @deprecated use  {@link BibDatabase#resolveForStrings(String)}
+     *
      * Returns a text with references resolved according to an optionally given database.
      *
      * @param toResolve maybenull The text to resolve.

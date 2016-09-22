@@ -21,6 +21,7 @@ public enum FileExtensions {
     ISI(Localization.lang("%0 file", "ISI"), "isi", "txt"),
     MEDLINE(Localization.lang("%0 file", "Medline"), "nbib", "xml"),
     MEDLINE_PLAIN(Localization.lang("%0 file", "MedlinePlain"), "nbib", "txt"),
+    MODS(Localization.lang("%0 file", "MODS"), "xml"),
     MSBIB(Localization.lang("%0 file", "MSBib"), "xml"),
     OVID(Localization.lang("%0 file", "Ovid"), "txt"),
     PDF_CONTENT(Localization.lang("%0 file", "PDF content "), "pdf"),

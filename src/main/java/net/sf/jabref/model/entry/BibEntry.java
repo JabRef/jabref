@@ -37,26 +37,10 @@ public class BibEntry implements Cloneable {
 
     private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
 
-    // All these fields should be private or protected
-    /**
-     * @deprecated use get/setType
-     */
-    @Deprecated
     public static final String TYPE_HEADER = "entrytype";
-    @Deprecated
     public static final String OBSOLETE_TYPE_HEADER = "bibtextype";
-
-    /**
-     * @deprecated use dedicated methods like get/set/clearCiteKey
-     */
-    @Deprecated
     public static final String KEY_FIELD = "bibtexkey";
     protected static final String ID_FIELD = "id";
-
-    /**
-     * @deprecated use constructor without type
-     */
-    @Deprecated
     public static final String DEFAULT_TYPE = "misc";
 
     private static final Pattern REMOVE_TRAILING_WHITESPACE = Pattern.compile("\\s+$");
@@ -730,6 +714,15 @@ public class BibEntry implements Cloneable {
     public String getUserComments() {
         // delete trailing whitespaces (between entry and text) from stored serialization
         return REMOVE_TRAILING_WHITESPACE.matcher(commentsBeforeEntry).replaceFirst("");
+    }
+
+    public List<ParsedEntryLink> getEntryLinkList(String fieldName, BibDatabase database) {
+        return getField(fieldName).map(fieldValue -> EntryLinkList.parse(fieldValue, database))
+                .orElse(Collections.emptyList());
+    }
+
+    public Optional<FieldChange> setEntryLinkList(String fieldName, List<ParsedEntryLink> list) {
+        return setField(fieldName, EntryLinkList.serialize(list));
     }
 
     public Set<String> getFieldAsWords(String field) {
