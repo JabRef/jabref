@@ -13,6 +13,7 @@ public class BibtexkeyChecker implements Checker {
 
     @Override
     public List<IntegrityMessage> check(BibEntry entry) {
+        Optional<String> valuekey = entry.getCiteKeyOptional();
         Optional<String> valueauthor = entry.getField(FieldName.AUTHOR);
         Optional<String> valuetitle = entry.getField(FieldName.TITLE);
         Optional<String> valueyear = entry.getField(FieldName.YEAR);
@@ -22,7 +23,7 @@ public class BibtexkeyChecker implements Checker {
             return Collections.emptyList();
         }
 
-        if (!entry.getCiteKeyOptional().isPresent() || entry.getCiteKeyOptional().get().isEmpty()) {
+        if (!valuekey.isPresent() || valuekey.get().isEmpty()) {
             return Collections.singletonList(new IntegrityMessage(
                     Localization.lang("empty bibtexkey") + ": " + authortitleyear, entry, BibEntry.KEY_FIELD));
         }
