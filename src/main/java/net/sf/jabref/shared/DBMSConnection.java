@@ -11,33 +11,20 @@ import net.sf.jabref.logic.l10n.Localization;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-/**
- * Used to establish connections between JabRef and database systems like MySQL, PostgreSQL and Oracle.
- */
-public class DBMSConnector {
+public class DBMSConnection {
 
-    private static final Log LOGGER = LogFactory.getLog(DBMSConnector.class);
+    private static final Log LOGGER = LogFactory.getLog(DBMSConnection.class);
+
+    private final Connection connection;
+    private final DBMSConnectionProperties properties;
 
 
-    /**
-     * Determines the suitable driver and retrieves a working SQL Connection in normal case.
-     *
-     * @param dbmsType Enum entry of {@link DBMSType} which determines the driver
-     * @param host Hostname, Domain or IP address
-     * @param port Port number the server is listening on
-     * @param database An already existent database name.
-     * @param user Username
-     * @param password Password
-     * @return
-     * @throws ClassNotFoundException Thrown if no suitable drivers were found
-     * @throws SQLException Thrown if connection has failed
-     */
-    public static Connection getNewConnection(DBMSConnectionProperties properties)
-            throws ClassNotFoundException, SQLException {
+    public DBMSConnection(DBMSConnectionProperties properties) throws SQLException {
+        this.properties = properties;
 
         try {
             DriverManager.setLoginTimeout(3);
-            return DriverManager.getConnection(
+            this.connection = DriverManager.getConnection(
                     properties.getType().getUrl(properties.getHost(), properties.getPort(), properties.getDatabase()),
                     properties.getUser(), properties.getPassword());
         } catch (SQLException e) {
@@ -47,6 +34,14 @@ public class DBMSConnector {
 
             throw e;
         }
+    }
+
+    public Connection getConnection() {
+        return this.connection;
+    }
+
+    public DBMSConnectionProperties getProperties() {
+        return this.properties;
     }
 
     /**
