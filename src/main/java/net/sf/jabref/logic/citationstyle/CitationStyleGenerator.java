@@ -58,7 +58,7 @@ public class CitationStyleGenerator {
             LOGGER.error("Could not generate BibEntry Citation", e);
         } catch (TokenMgrError e) {
             LOGGER.error("Bad character inside BibEntry", e);
-            // sadly one can not easily retrieve the bad char from the TokenMgrError
+            // sadly one cannot easily retrieve the bad char from the TokenMgrError
             return  new StringBuilder()
                     .append(Localization.lang("Bad character inside entry"))
                     .append(outputFormat == CitationStyleOutputFormat.HTML ? "<br>" : "\n")
