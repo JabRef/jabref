@@ -188,6 +188,7 @@ class EntryEditorTab {
                 builder.append(fieldEditor.getPane());
                 JPanel pan = new JPanel();
                 pan.setLayout(new BorderLayout());
+
                 pan.add(extra.get(), BorderLayout.NORTH);
                 builder.append(pan);
             } else {
@@ -203,7 +204,6 @@ class EntryEditorTab {
             final TextField textField = new TextField(BibEntry.KEY_FIELD,
                     parent.getEntry().getCiteKeyOptional().orElse(""), true);
             setupJTextComponent(textField, null);
-
             editors.put(BibEntry.KEY_FIELD, textField);
             /*
              * If the key field is the only field, we should have only one

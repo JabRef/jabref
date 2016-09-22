@@ -24,7 +24,6 @@ public class HideFieldAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
         String text = this.textAreaForVisibleField.getText();
-
         this.textAreaForVisibleField.setText(null);
         this.textAreaForVisibleField.getTwin().setText(text);
         this.textAreaForVisibleField.getTwin().setVisible(true);
