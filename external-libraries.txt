@@ -52,6 +52,11 @@ Project: java-diff-utils
 URL:     http://code.google.com/p/java-diff-utils/
 License: Apache 2.0
 
+Id:      com.impossibl.pgjdbc-ng:pgjdbc-ng
+Project: pgjdbc-ng
+URL:     http://impossibl.github.io/pgjdbc-ng
+License: BSD
+
 Id:      com.jgoodies:jgoodies-common
 Project: JGoodies Common
 URL:     http://www.jgoodies.com/downloads/libraries/
@@ -141,11 +146,6 @@ Id:      org.swinglabs.swingx:swingx-core
 Project: SwingX
 URL:     https://swingx.java.net/
 License: LGPL 3.0
-
-Id:      org.postgresql:postgresql
-Project: PostgreSQL JDBC Driver
-URL:     http://jdbc.postgresql.org/download.html
-License: BSD
 
 Id:      microba
 Path:    lib/microba.jar

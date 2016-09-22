@@ -58,7 +58,7 @@ public class Benchmarks {
             entry.setField("keyword", "testkeyword");
             entry.setField("year", "1" + i);
             entry.setField("rnd", "2" + randomizer.nextInt());
-            database.insertEntryWithDuplicationCheck(entry);
+            database.insertEntry(entry);
         }
         BibtexDatabaseWriter<StringSaveSession> databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new);
         StringSaveSession saveSession = databaseWriter.savePartOfDatabase(

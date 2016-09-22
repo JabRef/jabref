@@ -204,7 +204,7 @@ public class JabRefGUI {
 
             try {
                 new SharedDatabaseUIManager(mainFrame, keywordSeparator).openLastSharedDatabaseTab(isFocused);
-            } catch (ClassNotFoundException | SQLException | DatabaseNotSupportedException e) {
+            } catch (SQLException | DatabaseNotSupportedException e) {
                 LOGGER.info("Failed to restore shared database. Use connection dialog to connect.");
                 new OpenSharedDatabaseDialog(mainFrame).setVisible(true);
             }
