@@ -31,6 +31,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#1496](https://github.com/JabRef/jabref/issues/1496) Keep track of which entry a downloaded file belongs to
 - Made it possible to download multiple entries in one action
 - [#1506](https://github.com/JabRef/jabref/issues/1506) It is possible to apply two new key modifier `title_case` for Title Case, `capitalize` for Capitalized first character of each word (difference is that title case will leave prepositions etc in lower case), and `sentence_case` for normal sentence case (first word capitalized). In addition `lower_case` and `upper_case` can be used instead of `lower` and `upper`. 
+- Added two new pseudo-fields for search: `anykeyword` to search for a specific keyword and `anyfield` to search in all fields (useful in combination with search in specific fields)
 - [#1813](https://github.com/JabRef/jabref/issues/1813) Import/Export preferences dialog default directory set to working directory
 - [#1897](https://github.com/JabRef/jabref/issues/1897) Implemented integrity check for `year` field: Last four nonpunctuation characters should be numerals
 - Address in MS-Office 2007 xml format is now imported as `location`
