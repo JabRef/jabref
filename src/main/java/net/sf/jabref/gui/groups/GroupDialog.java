@@ -36,7 +36,6 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.groups.GroupDescriptions;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.groups.AbstractGroup;
@@ -44,6 +43,7 @@ import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
 import net.sf.jabref.model.groups.KeywordGroup;
 import net.sf.jabref.model.groups.SearchGroup;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;

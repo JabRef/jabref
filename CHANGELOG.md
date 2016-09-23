@@ -12,7 +12,10 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Add session restoring functionality for shared database. Related to [#1703](https://github.com/JabRef/jabref/issues/1703)
 - Implementation of LiveUpdate for PostgreSQL & Oracle systems. Related to [#970](https://github.com/JabRef/jabref/issues/970).
+- Added support for [1.0.1 CitationStyles](http://citationstyles.org/)
+- You can set and cycle between different preview styles (including CitationStyles)
 - Added fetcher for [MathSciNet](http://www.ams.org/mathscinet), [zbMATH](https://www.zbmath.org/) and [Astrophysics Data System](http://www.adsabs.harvard.edu/)
 - Improved search:
   - Search queries consisting of a normal query and a field-based query are now supported (for example, `JabRef AND author == you`)
@@ -27,6 +30,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fields linking to other entries (e.g., `crossref` and `related`) have now specialized editors in the entry editor. Check the tabs "Other fields" and "General".
 - [#1496](https://github.com/JabRef/jabref/issues/1496) Keep track of which entry a downloaded file belongs to
 - Made it possible to download multiple entries in one action
+- Added two new pseudo-fields for search: `anykeyword` to search for a specific keyword and `anyfield` to search in all fields (useful in combination with search in specific fields)
 - [#1813](https://github.com/JabRef/jabref/issues/1813) Import/Export preferences dialog default directory set to working directory
 - [#1897](https://github.com/JabRef/jabref/issues/1897) Implemented integrity check for `year` field: Last four nonpunctuation characters should be numerals
 - Address in MS-Office 2007 xml format is now imported as `location`
@@ -41,7 +45,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - <kbd>UP</kbd> / <kbd>Down</kbd> / <kbd>Tab</kbd> / <kbd>shift+Tab</kbd> in the search result frame have now the same functionality as in the main  table.
 - Importer for MODS format added
 - [#2012](https://github.com/JabRef/jabref/issues/2012) Implemented integrity check for `month` field: Should be an integer or normalized (BibLaTeX), Should be normalized (BibTeX)
-- [#1779](https://github.com/JabRef/jabref/issues/1779) Implemented integrity check for `bibtexkey` field: Empty bibtexkey
+- [#1779](https://github.com/JabRef/jabref/issues/1779) Implemented integrity check for `bibtexkey` field: Empty BibTeX key
+- Prohibit more than one connections to the same shared database.
 - Generalize German translation of database into "Datenbank"
 - Improve language quality of the German translation of shared database
 
@@ -73,7 +78,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed file menu displays wrong hotkey in the German translation
 
 ### Removed
-- The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field. 
+- Removed 2nd preview style
+- The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field.
 - Automatic migration for the `evastar_pdf` field is removed.
 
 
