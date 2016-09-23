@@ -26,7 +26,7 @@ public class BibtexkeyChecker implements Checker {
 
         if (StringUtil.isBlank(valuekey)) {
             return Collections.singletonList(new IntegrityMessage(
-                    Localization.lang("empty bibtexkey") + ": " + authortitleyear, entry, BibEntry.KEY_FIELD));
+                    Localization.lang("empty BibTeX key") + ": " + authortitleyear, entry, BibEntry.KEY_FIELD));
         }
 
         return Collections.emptyList();
