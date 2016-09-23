@@ -962,29 +962,30 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
             StringBuilder sb = new StringBuilder();
 
-            long copied = 0;
-            for (BibEntry entry : selectedEntries.stream().filter(BibEntry::hasCiteKey).collect(Collectors.toList())) {
-                String key = entry.getCiteKeyOptional().get();
-                String url = entry.getField(FieldName.URL).isPresent() ? entry.getField(FieldName.URL).get() : "";
-                sb.append(String.format("<a href=\"%s\">%s</a>", url, key));
-                sb.append(OS.NEWLINE);
-                copied++;
-            }
-
-            if (copied == 0) {
+            List<BibEntry> entriesWithKey = selectedEntries.stream().filter(BibEntry::hasCiteKey).collect(Collectors.toList());
+            
+            if (entriesWithKey.isEmpty()) {
                 output(Localization.lang("None of the selected entries have BibTeX keys."));
                 return;
             }
+            for (BibEntry entry : entriesWithKey) {
+                String key = entry.getCiteKeyOptional().get();
+                String url = entry.getField(FieldName.URL).isPresent() ? entry.getField(FieldName.URL).get() : "";
+                sb.append(url.isEmpty() ? key : String.format("<a href=\"%s\">%s</a>", url, key));
+                sb.append(OS.NEWLINE);
+            }
 
-            final StringSelection ss = new StringSelection(sb.toString());
-            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(ss, BasePanel.this);
+            ClipBoardManager clipboard = new ClipBoardManager();
+            clipboard.setClipboardContents(sb.toString());
 
-            if (copied == selectedEntries.size()) {
+            int copied = entriesWithKey.size();
+            int toCopy = selectedEntries.size();
+            if (copied == toCopy) {
                 // All entries had keys.
                 output((selectedEntries.size() > 1 ? Localization.lang("Copied keys") : Localization.lang("Copied key")) + '.');
             } else {
                 output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
-                        Long.toString(selectedEntries.size() - copied), Integer.toString(selectedEntries.size())));
+                        Long.toString(toCopy - copied), Integer.toString(toCopy)));
             }
         }
     }
