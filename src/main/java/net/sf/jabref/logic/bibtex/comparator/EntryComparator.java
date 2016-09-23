@@ -13,8 +13,7 @@ import net.sf.jabref.model.entry.InternalBibtexFields;
  * structured as a node in a linked list of comparators, where each node can contain a link to a new comparator that
  * decides the ordering (by recursion) if this one can't find a difference. The next node, if any, is given at
  * construction time, and an arbitrary number of nodes can be included. If the entries are equal by this comparator, and
- * there is no next entry, the entries' unique IDs will decide the ordering. Consequently, this comparator can never
- * return 0 unless the entries are the same object.
+ * there is no next entry, the entries' unique IDs will decide the ordering.
  */
 public class EntryComparator implements Comparator<BibEntry> {
 
@@ -25,25 +24,27 @@ public class EntryComparator implements Comparator<BibEntry> {
     private final Comparator<BibEntry> next;
 
 
-    public EntryComparator(boolean binary, boolean desc, String field, Comparator<BibEntry> next) {
+    public EntryComparator(boolean binary, boolean descending, String field, Comparator<BibEntry> next) {
         this.binary = binary;
         this.sortField = field;
-        this.descending = desc;
+        this.descending = descending;
         this.next = next;
         this.numeric = InternalBibtexFields.isNumeric(sortField);
     }
 
-    public EntryComparator(boolean binary, boolean desc, String field) {
+    public EntryComparator(boolean binary, boolean descending, String field) {
         this.binary = binary;
         this.sortField = field;
-        this.descending = desc;
+        this.descending = descending;
         this.next = null;
         this.numeric = InternalBibtexFields.isNumeric(sortField);
     }
 
     @Override
     public int compare(BibEntry e1, BibEntry e2) {
-
+        // default equals
+        // TODO: with the new default equals this does not only return 0 for identical objects,
+        // but for all objects that have the same id and same fields
         if (Objects.equals(e1, e2)) {
             return 0;
         }

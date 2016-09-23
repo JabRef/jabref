@@ -73,4 +73,7 @@ public class ISBN {
         return (sum % 10) == 0;
     }
 
+    public boolean isValid() {
+        return isValidFormat() && isValidChecksum();
+    }
 }

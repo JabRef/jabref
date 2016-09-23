@@ -8,7 +8,6 @@ import java.util.Map;
 
 import javax.swing.JOptionPane;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
@@ -17,6 +16,7 @@ import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.AutoSaveUtil;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 /**

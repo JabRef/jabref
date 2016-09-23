@@ -3,7 +3,7 @@ package net.sf.jabref.logic.layout.format;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.layout.StringInt;
 import net.sf.jabref.logic.util.strings.RtfCharMap;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

@@ -27,12 +27,12 @@ import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
+import net.sf.jabref.gui.fieldeditors.EntryLinkListEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.model.entry.BibEntry;
@@ -142,9 +142,17 @@ class EntryEditorTab {
                 GUIUtil.correctRowHeight(fileListEditor);
 
                 defaultHeight = 0;
+            } else if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.SINGLE_ENTRY_LINK)) {
+                fieldEditor = new EntryLinkListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent,
+                        true);
+                defaultHeight = 0;
+            } else if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.MULTIPLE_ENTRY_LINK)) {
+                fieldEditor = new EntryLinkListEditor(frame, bPanel.getBibDatabaseContext(), field, null, parent,
+                        false);
+                defaultHeight = 0;
             } else {
                 fieldEditor = new TextArea(field, null);
-                bPanel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener((TextArea) fieldEditor);
+                bPanel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
 
@@ -260,7 +268,7 @@ class EntryEditorTab {
             /**
              * Corrected to fix [ 1594169 ] Entry editor: navigation between panels
              */
-            new FocusRequester(activeField.getTextComponent());
+            activeField.getTextComponent().requestFocus();
         }
     }
 
@@ -292,7 +300,12 @@ class EntryEditorTab {
         if (!editors.containsKey(field)) {
             return false;
         }
+
         FieldEditor fieldEditor = editors.get(field);
+        if (fieldEditor.getText().equals(content)){
+            return true;
+        }
+
         // trying to preserve current edit position (fixes SF bug #1285)
         if(fieldEditor.getTextComponent() instanceof JTextComponent) {
             int initialCaretPosition = ((JTextComponent) fieldEditor).getCaretPosition();

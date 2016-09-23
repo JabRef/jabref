@@ -7,26 +7,26 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.exporter.StringSaveSession;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
-import net.sf.jabref.logic.groups.GroupHierarchyType;
-import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.layout.format.HTMLChars;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.search.SearchQuery;
+import net.sf.jabref.model.Defaults;
+import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.database.BibDatabaseModeDetection;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.groups.GroupHierarchyType;
+import net.sf.jabref.model.groups.KeywordGroup;
+import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.openjdk.jmh.Main;
@@ -73,10 +73,8 @@ public class Benchmarks {
 
     @Benchmark
     public ParserResult parse() throws IOException {
-        StringReader bibtexStringReader = new StringReader(bibtexString);
-        BibtexParser parser = new BibtexParser(bibtexStringReader,
-                Globals.prefs.getImportFormatPreferences());
-        return parser.parse();
+        BibtexParser parser = new BibtexParser(Globals.prefs.getImportFormatPreferences());
+        return parser.parse(new StringReader(bibtexString));
     }
 
     @Benchmark
@@ -123,7 +121,7 @@ public class Benchmarks {
     @Benchmark
     public boolean keywordGroupContains() throws ParseException {
         KeywordGroup group = new KeywordGroup("testGroup", "keyword", "testkeyword", false, false,
-                GroupHierarchyType.INDEPENDENT, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+                GroupHierarchyType.INDEPENDENT, ", ");
         return group.containsAll(database.getEntries());
     }
 

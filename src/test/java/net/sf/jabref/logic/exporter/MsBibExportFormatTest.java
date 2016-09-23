@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.util.Collections;
 import java.util.List;
 
-import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 
 import com.google.common.base.Charsets;

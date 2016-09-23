@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<file xmlns="http://bibtexml.sf.net/">
+    <entry id="Mustermann2016">
+        <inbook>
+            <volume>1</volume>
+            <chapter>8</chapter>
+            <pages>18-25</pages>
+            <month>February</month>
+            <keywords>java</keywords>
+            <year>2016</year>
+            <author>Max Mustermann</author>
+            <bibtexkey>Mustermann2016</bibtexkey>
+            <publisher>Java Book Publisher</publisher>
+            <title>Java 8 Lambdas</title>
+        </inbook>
+    </entry>
+</file>

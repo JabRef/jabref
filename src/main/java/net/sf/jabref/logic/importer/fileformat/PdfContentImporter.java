@@ -12,9 +12,10 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
-import net.sf.jabref.logic.importer.fetcher.DOItoBibTeX;
+import net.sf.jabref.logic.importer.fetcher.DoiFetcher;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.logic.util.FileExtensions;
@@ -207,8 +208,7 @@ public class PdfContentImporter extends ImportFormat {
             Optional<DOI> doi = DOI.findInText(firstPageContents);
             if (doi.isPresent()) {
                 ParserResult parserResult = new ParserResult(result);
-                Optional<BibEntry> entry = DOItoBibTeX.getEntryFromDOI(doi.get().getDOI(), parserResult,
-                        importFormatPreferences);
+                Optional<BibEntry> entry = new DoiFetcher(importFormatPreferences).performSearchById(doi.get().getDOI());
                 entry.ifPresent(parserResult.getDatabase()::insertEntry);
                 return parserResult;
             }
@@ -479,6 +479,8 @@ public class PdfContentImporter extends ImportFormat {
             return ParserResult.fromErrorMessage(Localization.lang("Decryption not supported."));
         } catch(IOException exception) {
             return ParserResult.fromErrorMessage(exception.getLocalizedMessage());
+        } catch (FetcherException e) {
+            return ParserResult.fromErrorMessage(e.getMessage());
         }
 
         return new ParserResult(result);

@@ -18,8 +18,8 @@ public enum DBMSType {
             "jdbc:oracle:thin:@%s:%d:%s", 1521),
     POSTGRESQL(
             "PostgreSQL",
-            "org.postgresql.Driver",
-            "jdbc:postgresql://%s:%d/%s", 5432);
+            "com.impossibl.postgres.jdbc.PGDriver",
+            "jdbc:pgsql://%s:%d/%s", 5432);
 
     private final String type;
     private final String driverPath;

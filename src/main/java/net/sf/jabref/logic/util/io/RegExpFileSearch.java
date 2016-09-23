@@ -13,9 +13,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -327,7 +327,7 @@ public class RegExpFileSearch {
             return fieldValue;
         }
 
-        String[] parts = afterColon.split(":");
+        List<String> parts = Arrays.asList(afterColon.split(":"));
         fieldValue = BibtexKeyPatternUtil.applyModifiers(fieldValue, parts, 0);
 
         return fieldValue;

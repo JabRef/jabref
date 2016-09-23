@@ -1,9 +1,12 @@
 package net.sf.jabref.gui.mergeentries;
 
+import java.awt.event.ActionEvent;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JSeparator;
@@ -12,7 +15,7 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.undo.UndoableChangeType;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
-import net.sf.jabref.gui.util.PositionWindow;
+import net.sf.jabref.gui.util.WindowLocation;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.InternalBibtexFields;
@@ -70,15 +73,11 @@ public class MergeFetchedEntryDialog extends JDialog {
         // Create buttons
         ButtonBarBuilder bb = new ButtonBarBuilder();
         bb.addGlue();
-        JButton cancel = new JButton(Localization.lang("Cancel"));
-        cancel.setActionCommand("cancel");
-        cancel.addActionListener(e -> buttonPressed(e.getActionCommand()));
 
-        JButton replaceentry = new JButton(Localization.lang("Replace original entry"));
-        replaceentry.setActionCommand("done");
-        replaceentry.addActionListener(e -> buttonPressed(e.getActionCommand()));
+        JButton cancel = new JButton(new CancelAction());
+        JButton replaceEntry = new JButton(new ReplaceAction());
 
-        bb.addButton(new JButton[] {replaceentry, cancel});
+        bb.addButton(replaceEntry, cancel);
         this.add(bb.getPanel(), cc.xy(1, 5));
 
         // Add some margin around the layout
@@ -87,25 +86,34 @@ public class MergeFetchedEntryDialog extends JDialog {
         layout.insertRow(1, RowSpec.decode(MARGIN));
         layout.insertColumn(1, ColumnSpec.decode(MARGIN));
 
-        PositionWindow pw = new PositionWindow(this, JabRefPreferences.MERGEENTRIES_POS_X,
+        WindowLocation pw = new WindowLocation(this, JabRefPreferences.MERGEENTRIES_POS_X,
                 JabRefPreferences.MERGEENTRIES_POS_Y, JabRefPreferences.MERGEENTRIES_SIZE_X,
                 JabRefPreferences.MERGEENTRIES_SIZE_Y);
-        pw.setWindowPosition();
+        pw.displayWindowAtStoredLocation();
 
     }
 
-    /**
-     * Act on button pressed
-     *
-     * @param button Button pressed
-     */
-    private void buttonPressed(String button) {
-        BibEntry mergedEntry = mergeEntries.getMergeEntry();
+    private class CancelAction extends AbstractAction {
+        CancelAction(){
+            putValue(Action.NAME, Localization.lang("Cancel"));
+        }
 
-        if ("cancel".equals(button)) {
-            // Canceled, throw it away
+        @Override
+        public void actionPerformed(ActionEvent e) {
             panel.output(Localization.lang("Canceled merging entries"));
-        } else if ("done".equals(button)) {
+            dispose();
+        }
+    }
+
+    private class ReplaceAction extends AbstractAction {
+        ReplaceAction(){
+            putValue(Action.NAME, Localization.lang("Replace original entry"));
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            BibEntry mergedEntry = mergeEntries.getMergeEntry();
+
             // Updated the original entry with the new fields
             Set<String> jointFields = new TreeSet<>(mergedEntry.getFieldNames());
             Set<String> originalFields = new TreeSet<>(originalEntry.getFieldNames());
@@ -152,7 +160,8 @@ public class MergeFetchedEntryDialog extends JDialog {
             } else {
                 panel.output(Localization.lang("No information added"));
             }
+
+            dispose();
         }
-        dispose();
     }
 }

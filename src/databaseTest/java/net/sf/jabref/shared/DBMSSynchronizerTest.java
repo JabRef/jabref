@@ -1,6 +1,5 @@
 package net.sf.jabref.shared;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -8,16 +7,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Globals;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.event.source.EntryEventSource;
+import net.sf.jabref.logic.exporter.MetaDataSerializer;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.model.entry.event.EntryEventSource;
+import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.exception.OfflineLockException;
-import net.sf.jabref.shared.exception.SharedEntryNotPresentException;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -32,7 +29,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class DBMSSynchronizerTest {
 
     private DBMSSynchronizer dbmsSynchronizer;
-    private Connection connection;
+    private DBMSConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
     private BibDatabase bibDatabase;
 
@@ -41,27 +38,25 @@ public class DBMSSynchronizerTest {
 
 
     @Before
-    public void setUp() throws ClassNotFoundException, SQLException, DatabaseNotSupportedException {
+    public void setUp() throws SQLException, DatabaseNotSupportedException {
 
-        Globals.prefs = JabRefPreferences.getInstance();
-
-        connection = TestConnector.getTestConnection(dbmsType);
+        dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
 
         bibDatabase = new BibDatabase();
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
 
 
-        dbmsSynchronizer = new DBMSSynchronizer(context);
-        dbmsProcessor = DBMSProcessor.getProcessorInstance(connection, dbmsType);
+        dbmsSynchronizer = new DBMSSynchronizer(context, ", ");
+        dbmsProcessor = DBMSProcessor.getProcessorInstance(dbmsConnection);
 
         bibDatabase.registerListener(dbmsSynchronizer);
 
-        dbmsSynchronizer.openSharedDatabase(connection, dbmsType, "TEST");
+        dbmsSynchronizer.openSharedDatabase(dbmsConnection);
     }
 
     @Parameters(name = "Test with {0} database system")
     public static Collection<DBMSType> getTestingDatabaseSystems() {
-        return DBMSConnector.getAvailableDBMSTypes();
+        return TestManager.getDBMSTypeTestParameter();
     }
 
     @Test
@@ -124,7 +119,7 @@ public class DBMSSynchronizerTest {
         dbmsSynchronizer.setMetaData(testMetaData);
         testMetaData.putData("databaseType", Arrays.asList("bibtex"));
 
-        Map<String, String> expectedMap = testMetaData.getAsStringMap();
+        Map<String, String> expectedMap = MetaDataSerializer.getSerializedStringMap(testMetaData);
         Map<String, String> actualMap = dbmsProcessor.getSharedMetaData();
 
         Assert.assertEquals(expectedMap, actualMap);
@@ -163,7 +158,7 @@ public class DBMSSynchronizerTest {
     }
 
     @Test
-    public void testSynchronizeLocalDatabaseWithEntryUpdate() throws OfflineLockException, SharedEntryNotPresentException, SQLException {
+    public void testSynchronizeLocalDatabaseWithEntryUpdate() throws OfflineLockException, SQLException {
         BibEntry bibEntry = getBibEntryExample(1);
         bibDatabase.insertEntry(bibEntry);
         Assert.assertEquals(1, bibDatabase.getEntries().size());
@@ -204,30 +199,9 @@ public class DBMSSynchronizerTest {
         return bibEntry;
     }
 
-    private String escape(String expression) {
-        return dbmsProcessor.escape(expression);
-    }
-
     @After
     public void clear() throws SQLException {
-        if ((dbmsType == DBMSType.MYSQL) || (dbmsType == DBMSType.POSTGRESQL)) {
-            connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape("FIELD"));
-            connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape("ENTRY"));
-            connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape("METADATA"));
-        } else if (dbmsType == DBMSType.ORACLE) {
-            connection.createStatement().executeUpdate(
-                    "BEGIN\n" +
-                    "EXECUTE IMMEDIATE 'DROP TABLE " + escape("FIELD") + "';\n" +
-                    "EXECUTE IMMEDIATE 'DROP TABLE " + escape("ENTRY") + "';\n" +
-                    "EXECUTE IMMEDIATE 'DROP TABLE " + escape("METADATA") + "';\n" +
-                    "EXECUTE IMMEDIATE 'DROP SEQUENCE " + escape("ENTRY_SEQ") + "';\n" +
-                    "EXCEPTION\n" +
-                    "WHEN OTHERS THEN\n" +
-                    "IF SQLCODE != -942 THEN\n" +
-                    "RAISE;\n" +
-                    "END IF;\n" +
-                    "END;");
-        }
+        TestManager.clearTables(dbmsConnection);
     }
 
 }

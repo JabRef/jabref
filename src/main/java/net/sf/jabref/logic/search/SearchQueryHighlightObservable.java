@@ -1,15 +1,16 @@
 package net.sf.jabref.logic.search;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.logic.search.rules.SentenceAnalyzer;
-
+/**
+ * @deprecated rewrite this class using the EventBus framework
+ */
+@Deprecated
 public class SearchQueryHighlightObservable {
 
     private final List<SearchQueryHighlightListener> listeners = new ArrayList<>();
@@ -20,45 +21,17 @@ public class SearchQueryHighlightObservable {
      * Adds a SearchQueryHighlightListener to the search bar. The added listener is immediately informed about the current search.
      * Subscribers will be notified about searches.
      *
-     * @param l SearchQueryHighlightListener to be added
+     * @param newListener SearchQueryHighlightListener to be added
      */
-    public void addSearchListener(SearchQueryHighlightListener l) {
-        Objects.requireNonNull(l);
+    public SearchQueryHighlightObservable addSearchListener(SearchQueryHighlightListener newListener) {
+        Objects.requireNonNull(newListener);
 
-        if (listeners.contains(l)) {
-            return;
-        } else {
-            listeners.add(l);
+        if (!listeners.contains(newListener)) {
+            listeners.add(newListener);
+            newListener.highlightPattern(pattern);
         }
 
-        // fire event for the new subscriber
-        l.highlightPattern(pattern);
-    }
-
-    public int getListenerCount() {
-        return listeners.size();
-    }
-
-    /**
-     * Remove a SearchQueryHighlightListener
-     *
-     * @param l SearchQueryHighlightListener to be removed
-     */
-    public void removeSearchListener(SearchQueryHighlightListener l) {
-        Objects.requireNonNull(l);
-
-        listeners.remove(l);
-    }
-
-    /**
-     * Parses the search query for valid words and returns a list these words. For example, "The great Vikinger" will
-     * give ["The","great","Vikinger"]
-     *
-     * @param searchText the search query
-     * @return list of words found in the search query
-     */
-    private List<String> getSearchwords(String searchText) {
-        return (new SentenceAnalyzer(searchText)).getWords();
+        return this;
     }
 
     /**
@@ -70,13 +43,8 @@ public class SearchQueryHighlightObservable {
         Objects.requireNonNull(searchQuery);
 
         // Parse the search string to words
-        if (searchQuery.isGrammarBasedSearch()) {
-            pattern = Optional.empty();
-        } else if (searchQuery.isRegularExpression()) {
-            pattern = getPatternForWords(Collections.singletonList(searchQuery.getQuery()), true, searchQuery.isCaseSensitive());
-        } else {
-            pattern = getPatternForWords(getSearchwords(searchQuery.getQuery()), searchQuery.isRegularExpression(), searchQuery.isCaseSensitive());
-        }
+        pattern = getPatternForWords(searchQuery.getSearchWords(), searchQuery.isRegularExpression(),
+                searchQuery.isCaseSensitive());
 
         update();
     }

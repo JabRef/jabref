@@ -29,13 +29,12 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinder;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.metadata.MetaData;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
@@ -122,7 +121,7 @@ class ContentSelectorDialog2 extends JDialog {
         wordList.addListSelectionListener(e -> {
             wordEditField.setText(wordList.getSelectedValue());
             wordEditField.selectAll();
-            new FocusRequester(wordEditField);
+            wordEditField.requestFocus();
         });
 
         newWord.addActionListener(e -> newWordAction());
@@ -158,8 +157,7 @@ class ContentSelectorDialog2 extends JDialog {
             fieldNameField.setEnabled(true);
             fieldNameField.setText(currentField);
             fieldNameField.selectAll();
-
-            new FocusRequester(fieldNameField);
+            fieldNameField.requestFocus();
         });
 
         fieldNameField.addActionListener(e -> fieldNameField.transferFocus());

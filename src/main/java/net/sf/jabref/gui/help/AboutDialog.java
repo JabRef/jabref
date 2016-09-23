@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.Frame;
 import java.util.Objects;
 
 import javax.swing.Box;
@@ -21,16 +22,15 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyledDocument;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.CopyVersionToClipboardAction;
 import net.sf.jabref.logic.l10n.Localization;
 
 public class AboutDialog extends JDialog {
 
-    public AboutDialog(JabRefFrame bf) {
-        super(Objects.requireNonNull(bf), Localization.lang("About JabRef"), true);
+    public AboutDialog(Frame owner) {
+        super(Objects.requireNonNull(owner), Localization.lang("About JabRef"), true);
         setSize(new Dimension(750, 600));
-        setLocationRelativeTo(bf);
+        setLocationRelativeTo(owner);
 
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
@@ -74,8 +74,8 @@ public class AboutDialog extends JDialog {
 
         String text = String.format("%n2003-%s%n%s%n%s%n%nDevelopers: %s%n%nAuthors: %s%n%nExternal Libraries: %s%nCode: %s",
                 Globals.BUILD_INFO.getYear(),
-                "http://www.jabref.org",
-                "GNU General Public License v2 or later",
+                "https://www.jabref.org",
+                "MIT License",
                 Globals.BUILD_INFO.getDevelopers(),
                 Globals.BUILD_INFO.getAuthors(),
                 "https://github.com/JabRef/jabref/blob/master/external-libraries.txt",

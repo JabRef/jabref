@@ -1,6 +1,7 @@
 package net.sf.jabref.gui.search;
 
 import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.Objects;
 
 import javax.swing.JTextArea;

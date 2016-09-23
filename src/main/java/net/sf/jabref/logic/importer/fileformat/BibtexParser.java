@@ -1,9 +1,13 @@
 package net.sf.jabref.logic.importer.fileformat;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PushbackReader;
 import java.io.Reader;
 import java.io.StringReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Deque;
@@ -14,13 +18,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.bibtex.FieldContentParser;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.Parser;
+import net.sf.jabref.logic.importer.ParserException;
 import net.sf.jabref.logic.importer.ParserResult;
-import net.sf.jabref.logic.importer.util.ParseException;
+import net.sf.jabref.logic.importer.util.MetaDataParser;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
@@ -31,6 +37,7 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.metadata.MetaData;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -50,11 +57,11 @@ import org.apache.commons.logging.LogFactory;
  * <p>
  * Can be used stand-alone.
  */
-public class BibtexParser {
+public class BibtexParser implements Parser {
 
     private static final Log LOGGER = LogFactory.getLog(BibtexParser.class);
 
-    private final PushbackReader pushbackReader;
+    private PushbackReader pushbackReader;
     private BibDatabase database;
     private Map<String, EntryType> entryTypes;
     private boolean eof;
@@ -66,11 +73,9 @@ public class BibtexParser {
     private final ImportFormatPreferences importFormatPreferences;
 
 
-    public BibtexParser(Reader in, ImportFormatPreferences importFormatPreferences) {
-        Objects.requireNonNull(in);
+    public BibtexParser(ImportFormatPreferences importFormatPreferences) {
         this.importFormatPreferences = Objects.requireNonNull(importFormatPreferences);
         fieldContentParser = new FieldContentParser(importFormatPreferences.getFieldContentParserPreferences());
-        pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
     }
 
     /**
@@ -78,10 +83,10 @@ public class BibtexParser {
      *
      * @param in the Reader to read from
      * @throws IOException
+     * @deprecated inline this method
      */
     public static ParserResult parse(Reader in, ImportFormatPreferences importFormatPreferences) throws IOException {
-        BibtexParser parser = new BibtexParser(in, importFormatPreferences);
-        return parser.parse();
+        return new BibtexParser(importFormatPreferences).parse(in);
     }
 
     /**
@@ -89,13 +94,14 @@ public class BibtexParser {
      *
      * @param bibtexString
      * @return Returns returns an empty collection if no entries where found or if an error occurred.
+     * @deprecated use parseEntries
      */
+    @Deprecated
     public static List<BibEntry> fromString(String bibtexString, ImportFormatPreferences importFormatPreferences) {
-        StringReader reader = new StringReader(bibtexString);
-        BibtexParser parser = new BibtexParser(reader, importFormatPreferences);
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
 
         try {
-            return parser.parse().getDatabase().getEntries();
+            return parser.parseEntries(bibtexString);
         } catch (Exception e) {
             LOGGER.warn("BibtexParser.fromString(String): " + e.getMessage(), e);
             return Collections.emptyList();
@@ -119,6 +125,24 @@ public class BibtexParser {
         return Optional.of(entries.iterator().next());
     }
 
+    @Override
+    public List<BibEntry> parseEntries(InputStream inputStream) throws ParserException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+        return parseEntries(reader);
+    }
+
+    public List<BibEntry> parseEntries(Reader reader) throws ParserException {
+        try {
+            return parse(reader).getDatabase().getEntries();
+        } catch (IOException e) {
+            throw new ParserException(e);
+        }
+    }
+
+    public List<BibEntry> parseEntries(String bibtexString) throws ParserException {
+        return parseEntries(new StringReader(bibtexString));
+    }
+
     /**
      * Will parse the BibTex-Data found when reading from reader. Ignores any encoding supplied in the file by
      * "Encoding: myEncoding".
@@ -130,11 +154,10 @@ public class BibtexParser {
      * @return ParserResult
      * @throws IOException
      */
-    public ParserResult parse() throws IOException {
-        // If we already parsed this, just return it.
-        if (parserResult != null) {
-            return parserResult;
-        }
+    public ParserResult parse(Reader in) throws IOException {
+        Objects.requireNonNull(in);
+        pushbackReader = new PushbackReader(in, BibtexParser.LOOKAHEAD);
+
         // Bibtex related contents.
         initializeParserResult();
 
@@ -187,7 +210,7 @@ public class BibtexParser {
 
         // Instantiate meta data:
         try {
-            parserResult.setMetaData(MetaData.parse(meta, importFormatPreferences.getKeywordSeparator()));
+            parserResult.setMetaData(MetaDataParser.parse(meta, importFormatPreferences.getKeywordSeparator()));
         } catch (ParseException exception) {
             parserResult.addWarning(exception.getLocalizedMessage());
         }

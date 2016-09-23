@@ -62,9 +62,8 @@ public class BibEntryAssert {
     private static List<BibEntry> getListFromInputStream(InputStream is) throws IOException {
         ParserResult result;
         try (Reader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-            BibtexParser parser = new BibtexParser(reader,
-                    JabRefPreferences.getInstance().getImportFormatPreferences());
-            result = parser.parse();
+            BibtexParser parser = new BibtexParser(JabRefPreferences.getInstance().getImportFormatPreferences());
+            result = parser.parse(reader);
         }
         Assert.assertNotNull(result);
         Assert.assertFalse(result.isNullResult());
