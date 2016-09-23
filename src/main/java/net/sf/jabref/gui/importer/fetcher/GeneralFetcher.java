@@ -31,7 +31,6 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.importer.FetcherPreviewDialog;
 import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -109,7 +108,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         JButton reset = new JButton(Localization.lang("Reset"));
         reset.addActionListener(event -> {
             tf.setText("");
-            new FocusRequester(tf);
+            tf.requestFocus();
         });
 
         JPanel main = new JPanel();
@@ -246,7 +245,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
             if (frame.getTabbedPane().getTabCount() > 0) {
                 sidePaneManager.toggle(GeneralFetcher.this.getTitle());
                 if (sidePaneManager.isComponentVisible(GeneralFetcher.this.getTitle())) {
-                    new FocusRequester(getTextField());
+                    getTextField().requestFocus();
                 }
             }
         }

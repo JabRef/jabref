@@ -84,7 +84,6 @@ public class RenamePdfCleanup implements CleanupJob {
 
             //do rename
             boolean renameSuccessful = FileUtil.renameFile(expandedOldFilePath, newPath);
-
             if (renameSuccessful) {
                 changed = true;
 

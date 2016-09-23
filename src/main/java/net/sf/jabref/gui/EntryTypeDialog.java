@@ -120,9 +120,8 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
             if (!CustomEntryTypesManager.ALL.isEmpty()) {
                 panel.add(createEntryGroupPanel(Localization.lang("Custom"), CustomEntryTypesManager.ALL));
             }
-
-            panel.add(createIdFetcherPanel());
         }
+        panel.add(createIdFetcherPanel());
 
         return panel;
     }
@@ -196,8 +195,10 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
                     try {
                         bibEntry = fetcher.performSearchById(searchID);
                     } catch (FetcherException e) {
-                        LOGGER.error("Error fetching from " + fetcher.getName(), e);
-                        JOptionPane.showMessageDialog(null, Localization.lang("Error while fetching from %0", fetcher.getName()), Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                        LOGGER.error(e.getMessage(), e);
+                        JOptionPane.showMessageDialog(null,
+                                Localization.lang("Error while fetching from %0", fetcher.getName()) + "\n" + e.getMessage(),
+                                Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                     }
                 }
                 dispose();
@@ -256,11 +257,18 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         return jPanel;
     }
 
+    private void stopFetching() {
+        if (fetcherWorker.getState() == SwingWorker.StateValue.STARTED) {
+            fetcherWorker.cancel(true);
+        }
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() instanceof TypeButton) {
             type = ((TypeButton) e.getSource()).getType();
         }
+        stopFetching();
         dispose();
     }
 
@@ -276,7 +284,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            fetcherWorker.cancel(true);
+            stopFetching();
             dispose();
         }
     }

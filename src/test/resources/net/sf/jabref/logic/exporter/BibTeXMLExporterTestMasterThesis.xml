@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<file xmlns="http://bibtexml.sf.net/">
+    <entry id="Mustermann2016">
+        <mastersthesis>
+            <author>Max Mustermann</author>
+            <title>Java MasterThesis</title>
+            <school>University</school>
+            <year>2016</year>
+            <type>Thesis</type>
+            <address>Stuttgart</address>
+            <month>February</month>
+            <keywords>java</keywords>
+        </mastersthesis>
+    </entry>
+</file>

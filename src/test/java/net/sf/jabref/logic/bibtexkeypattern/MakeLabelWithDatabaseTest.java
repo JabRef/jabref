@@ -102,7 +102,7 @@ public class MakeLabelWithDatabaseTest {
         entry3.setField("author", "John Doe");
         entry3.setField("year", "2016");
         entry3.setCiteKey(entry.getCiteKeyOptional().get());
-        database.insertEntryWithDuplicationCheck(entry3);
+        database.insertEntry(entry3);
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry3, preferences);
         assertEquals(Optional.of("Doe2016a"), entry3.getCiteKeyOptional());
     }
@@ -114,12 +114,12 @@ public class MakeLabelWithDatabaseTest {
         entry2.setField("author", "John Doe");
         entry2.setField("year", "2016");
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry2, preferences);
-        database.insertEntryWithDuplicationCheck(entry2);
+        database.insertEntry(entry2);
         BibEntry entry3 = new BibEntry();
         entry3.setField("author", "John Doe");
         entry3.setField("year", "2016");
         entry3.setCiteKey(entry.getCiteKeyOptional().get());
-        database.insertEntryWithDuplicationCheck(entry3);
+        database.insertEntry(entry3);
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry3, preferences);
         assertEquals(Optional.of("Doe2016b"), entry3.getCiteKeyOptional());
     }

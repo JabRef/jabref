@@ -8,7 +8,7 @@ import java.util.TreeSet;
 
 import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,7 +70,7 @@ public class ExplicitGroup extends KeywordGroup {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(ExplicitGroup.ID).append(
-                ModelStringUtil.quote(getName(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).
+                StringUtil.quote(getName(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).
                 append(AbstractGroup.SEPARATOR).append(getContext().ordinal()).append(AbstractGroup.SEPARATOR);
 
         // write legacy entry keys in well-defined order for CVS compatibility
@@ -78,7 +78,7 @@ public class ExplicitGroup extends KeywordGroup {
         sortedKeys.addAll(legacyEntryKeys);
 
         for (String sortedKey : sortedKeys) {
-            sb.append(ModelStringUtil.quote(sortedKey, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(
+            sb.append(StringUtil.quote(sortedKey, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(
                     AbstractGroup.SEPARATOR);
         }
         return sb.toString();

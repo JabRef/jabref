@@ -37,8 +37,8 @@ public class DatabaseSearcherTest {
     }
 
     @Test
-    public void testNoMatchesFromDatabaseWithEmptyEntry() {
-        database.insertEntryWithDuplicationCheck(new BibEntry());
+    public void testGetDatabaseFromMatchesDatabaseWithEmptyEntries() {
+        database.insertEntry(new BibEntry());
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", true, true), database).getMatches();
         assertEquals(Collections.emptyList(), matches);
     }
@@ -48,7 +48,7 @@ public class DatabaseSearcherTest {
         BibEntry entry = new BibEntry();
         entry.setType("article");
         entry.setField("author", "harrer");
-        database.insertEntryWithDuplicationCheck(entry);
+        database.insertEntry(entry);
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("whatever", true, true), database).getMatches();
         assertEquals(Collections.emptyList(), matches);
     }
@@ -58,7 +58,7 @@ public class DatabaseSearcherTest {
         BibEntry entry = new BibEntry();
         entry.setType("article");
         entry.setField("author", "harrer");
-        database.insertEntryWithDuplicationCheck(entry);
+        database.insertEntry(entry);
         List<BibEntry> matches = new DatabaseSearcher(new SearchQuery("harrer", true, true), database).getMatches();
         assertEquals(Collections.singletonList(entry), matches);
     }
@@ -98,7 +98,7 @@ public class DatabaseSearcherTest {
         SearchQuery query = new SearchQuery("tonho", true, true);
         DatabaseSearcher databaseSearcher = new DatabaseSearcher(query, database);
 
-        assertEquals(Collections.emptyList(), databaseSearcher.getMatches());
+        assertEquals(Collections.singletonList(entry), databaseSearcher.getMatches());
     }
 
     @Test

@@ -154,8 +154,9 @@ public class LocalizationConsistencyTest {
             System.out.println("Obsolete keys found:");
             System.out.println(obsoleteKeys.stream().map(Object::toString).collect(Collectors.joining("\n")));
             System.out.println();
-            System.out.println("1. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE");
-            System.out.println("2. EXECUTE gradlew -b localization.gradle generateMissingTranslationKeys TO");
+            System.out.println("1. CAREFULLY CHECK IF THE KEY IS REALLY NOT USED ANYMORE");
+            System.out.println("2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE");
+            System.out.println("3. EXECUTE gradlew -b localization.gradle generateMissingTranslationKeys TO");
             System.out.println("REMOVE THESE FROM THE NON-ENGLISH LANGUAGE FILES");
             fail("Obsolete keys " + obsoleteKeys + " found in properties file which should be removed");
         }

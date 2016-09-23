@@ -179,7 +179,7 @@ public class MergeEntries {
         // Setup a PreviewPanel and a Bibtex source box for the merged entry
         mainPanel.add(boldFontLabel(Localization.lang("Merged entry")), CELL_CONSTRAINTS.xyw(1, 6, 6));
 
-        entryPreview = new PreviewPanel(null, mergedEntry, null, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+        entryPreview = new PreviewPanel(null, mergedEntry, null);
         mainPanel.add(entryPreview, CELL_CONSTRAINTS.xyw(1, 8, 6));
 
         mainPanel.add(boldFontLabel(Localization.lang("Merged BibTeX source code")), CELL_CONSTRAINTS.xyw(8, 6, 4));

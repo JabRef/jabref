@@ -76,10 +76,10 @@ import net.sf.jabref.logic.layout.format.WrapFileLinks;
 import net.sf.jabref.logic.layout.format.XMLChars;
 import net.sf.jabref.logic.openoffice.OOPreFormatter;
 import net.sf.jabref.logic.search.MatchesHighlighter;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -193,7 +193,7 @@ class LayoutEntry {
         case LayoutHelper.IS_LAYOUT_TEXT:
             return text;
         case LayoutHelper.IS_SIMPLE_FIELD:
-            String value = bibtex.getResolvedFieldOrAlias(text, database).orElse("");
+            String value = BibDatabase.getResolvedField(text, bibtex, database).orElse("");
 
             // If a post formatter has been set, call it:
             if (postFormatter != null) {
@@ -212,7 +212,7 @@ class LayoutEntry {
             // Printing the encoding name is not supported in entry layouts, only
             // in begin/end layouts. This prevents breakage if some users depend
             // on a field called "encoding". We simply return this field instead:
-            return bibtex.getResolvedFieldOrAlias("encoding", database).orElse(null);
+            return BibDatabase.getResolvedField("encoding", bibtex, database).orElse(null);
         default:
             return "";
         }
@@ -231,8 +231,8 @@ class LayoutEntry {
         } else {
             // changed section begin - arudert
             // resolve field (recognized by leading backslash) or text
-            fieldEntry = text.startsWith("\\") ? bibtex
-                    .getResolvedFieldOrAlias(text.substring(1), database)
+            fieldEntry = text.startsWith("\\") ? BibDatabase
+                    .getResolvedField(text.substring(1), bibtex, database)
                     .orElse("") : BibDatabase.getText(text, database);
             // changed section end - arudert
         }
@@ -254,13 +254,13 @@ class LayoutEntry {
     private String handleFieldOrGroupStart(BibEntry bibtex, BibDatabase database, Optional<Pattern> highlightPattern) {
         Optional<String> field;
         if (type == LayoutHelper.IS_GROUP_START) {
-            field = bibtex.getResolvedFieldOrAlias(text, database);
+            field = BibDatabase.getResolvedField(text, bibtex, database);
         } else if (text.matches(".*(;|(\\&+)).*")) {
             // split the strings along &, && or ; for AND formatter
             String[] parts = text.split("\\s*(;|(\\&+))\\s*");
             field = Optional.empty();
             for (String part : parts) {
-                field = bibtex.getResolvedFieldOrAlias(part, database);
+                field = BibDatabase.getResolvedField(part, bibtex, database);
                 if (!field.isPresent()) {
                     break;
                 }
@@ -270,7 +270,7 @@ class LayoutEntry {
             String[] parts = text.split("\\s*(\\|+)\\s*");
             field = Optional.empty();
             for (String part : parts) {
-                field = bibtex.getResolvedFieldOrAlias(part, database);
+                field = BibDatabase.getResolvedField(part, bibtex, database);
                 if (field.isPresent()) {
                     break;
                 }

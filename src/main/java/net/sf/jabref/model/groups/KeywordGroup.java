@@ -11,7 +11,7 @@ import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.EntryUtil;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -67,13 +67,13 @@ public class KeywordGroup extends AbstractGroup {
      */
     @Override
     public String toString() {
-        return KeywordGroup.ID + ModelStringUtil.quote(getName(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) +
+        return KeywordGroup.ID + StringUtil.quote(getName(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) +
                 AbstractGroup.SEPARATOR
                 + getContext().ordinal() + AbstractGroup.SEPARATOR
-                + ModelStringUtil.quote(searchField, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
-                + ModelStringUtil.quote(searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
-                + AbstractGroup.SEPARATOR + ModelStringUtil.booleanToBinaryString(caseSensitive) + AbstractGroup.SEPARATOR
-                + ModelStringUtil.booleanToBinaryString(regExp) + AbstractGroup.SEPARATOR;
+                + StringUtil.quote(searchField, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
+                + StringUtil.quote(searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
+                + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(caseSensitive) + AbstractGroup.SEPARATOR
+                + StringUtil.booleanToBinaryString(regExp) + AbstractGroup.SEPARATOR;
     }
 
     @Override
