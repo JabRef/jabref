@@ -1,5 +1,7 @@
 package net.sf.jabref.model.entry.event;
 
+import java.util.Objects;
+
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -24,8 +26,8 @@ public abstract class EntryEvent {
      * @param location Location affected by this event
      */
     public EntryEvent(BibEntry bibEntry, EntryEventSource location) {
-        this.bibEntry = bibEntry;
-        this.location = location;
+        this.bibEntry = Objects.requireNonNull(bibEntry);
+        this.location = Objects.requireNonNull(location);
     }
 
     public BibEntry getBibEntry() {

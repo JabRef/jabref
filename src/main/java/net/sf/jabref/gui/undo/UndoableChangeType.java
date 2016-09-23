@@ -1,8 +1,8 @@
 package net.sf.jabref.gui.undo;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * This class represents the change of type for an entry.

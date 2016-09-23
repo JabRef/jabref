@@ -375,9 +375,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             Localization.lang("Disable highlight groups matching entries")));
 
 
-    private final AbstractAction switchPreview = new GeneralAction(Actions.SWITCH_PREVIEW,
-            Localization.menuTitle("Switch preview layout"),
-            Globals.getKeyPrefs().getKey(KeyBinding.SWITCH_PREVIEW_LAYOUT));
+    private final AbstractAction nextPreviewStyle = new GeneralAction(Actions.NEXT_PREVIEW_STYLE,
+            Localization.menuTitle("Next preview layout"),
+            Globals.getKeyPrefs().getKey(KeyBinding.NEXT_PREVIEW_LAYOUT));
+    private final AbstractAction previousPreviewStyle = new GeneralAction(Actions.PREVIOUS_PREVIEW_STYLE,
+            Localization.menuTitle("Previous preview layout"),
+            Globals.getKeyPrefs().getKey(KeyBinding.PREVIOUS_PREVIEW_LAYOUT));
     private final AbstractAction makeKeyAction = new GeneralAction(Actions.MAKE_KEY,
             Localization.menuTitle("Autogenerate BibTeX keys"),
             Localization.lang("Autogenerate BibTeX keys"),
@@ -649,14 +652,16 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             } else {
                 String content = "";
                 SearchQuery currentSearchQuery = currentBasePanel.getCurrentSearchQuery();
-                if (currentSearchQuery != null && !currentSearchQuery.getQuery().trim().isEmpty()) {
+                if ((currentSearchQuery != null) && !currentSearchQuery.getQuery().trim().isEmpty()) {
                     content = currentSearchQuery.getQuery();
                 }
                 globalSearchBar.setSearchTerm(content, true);
             }
 
+            currentBasePanel.getPreviewPanel().updateLayout();
+
             groupToggle.setSelected(sidePaneManager.isComponentVisible("groups"));
-            previewToggle.setSelected(Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED));
+            previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
             fetcherToggle.setSelected(sidePaneManager.isComponentVisible(generalFetcher.getTitle()));
             Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
             setWindowTitle();
@@ -708,7 +713,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     .orElse(GUIGlobals.UNTITLED_TITLE);
                 setTitle(FRAME_TITLE + " - " + databaseFile + changeFlag + modeInfo);
         } else if (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED) {
-            setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBSynchronizer().getDBName() + " ["
+            setTitle(FRAME_TITLE + " - " + panel.getBibDatabaseContext().getDBMSSynchronizer().getDBName() + " ["
                     + Localization.lang("shared") + "]" + modeInfo);
         }
     }
@@ -789,6 +794,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 prefs.putStringList(JabRefPreferences.LAST_EDITED, filenames);
                 File focusedDatabase = getCurrentBasePanel().getBibDatabaseContext().getDatabaseFile().orElse(null);
                 new LastFocusedTabPreferences(prefs).setLastFocusedTab(focusedDatabase);
+                prefs.putBoolean(JabRefPreferences.SHARED_DATABASE_LAST_FOCUSED,
+                        getCurrentBasePanel().getBibDatabaseContext().getLocation() == DatabaseLocation.SHARED);
             }
 
         }
@@ -828,15 +835,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         // Ask here if the user really wants to close, if the base
         // has not been saved since last save.
         boolean close = true;
+
+        prefs.putBoolean(JabRefPreferences.SHARED_DATABASE_LAST_EDITED, Boolean.FALSE);
+
         List<String> filenames = new ArrayList<>();
         if (tabbedPane.getTabCount() > 0) {
             for (int i = 0; i < tabbedPane.getTabCount(); i++) {
-                if (getBasePanelAt(i).isModified()
-                        && (getBasePanelAt(i).getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL)) {
-                    tabbedPane.setSelectedIndex(i);
-                    String filename = getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile()
-                            .map(File::getAbsolutePath).orElse(GUIGlobals.UNTITLED_TITLE);
+                BibDatabaseContext context = getBasePanelAt(i).getBibDatabaseContext();
 
+                if (getBasePanelAt(i).isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
+                    tabbedPane.setSelectedIndex(i);
+                    String filename = context.getDatabaseFile().map(File::getAbsolutePath).orElse(GUIGlobals.UNTITLED_TITLE);
                     int answer = showSaveDialog(filename);
 
                     if ((answer == JOptionPane.CANCEL_OPTION) ||
@@ -862,10 +871,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                             break;
                         }
                     }
+                } else if (context.getLocation() == DatabaseLocation.SHARED) {
+                    prefs.putBoolean(JabRefPreferences.SHARED_DATABASE_LAST_EDITED, Boolean.TRUE);
+                    context.convertToLocalDatabase();
+                    context.getDBMSSynchronizer().closeSharedDatabase();
+                    context.clearDBMSSynchronizer();
                 }
 
-                getBasePanelAt(i).getBibDatabaseContext().getDatabaseFile().map(File::getAbsolutePath)
-                        .ifPresent(filenames::add);
+                context.getDatabaseFile().map(File::getAbsolutePath).ifPresent(filenames::add);
             }
         }
 
@@ -1259,7 +1272,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         view.add(new JCheckBoxMenuItem(enableToggle(generalFetcher.getAction())));
         view.add(new JCheckBoxMenuItem(toggleGroups));
         view.add(new JCheckBoxMenuItem(togglePreview));
-        view.add(getSwitchPreviewAction());
+        view.add(getNextPreviewStyleAction());
+        view.add(getPreviousPreviewStyleAction());
 
         mb.add(view);
 
@@ -1497,7 +1511,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 sendAsEmail, downloadFullText, writeXmpAction, optMenuItem, findUnlinkedFiles, addToGroup, removeFromGroup,
                 moveToGroup, autoLinkFile, resolveDuplicateKeys, openUrl, openFolder, openFile, togglePreview,
                 dupliCheck, autoSetFile, newEntryAction, newSpec, customizeAction, plainTextImport, getMassSetField(), getManageKeywords(),
-                pushExternalButton.getMenuAction(), closeDatabaseAction, getSwitchPreviewAction(), checkIntegrity,
+                pushExternalButton.getMenuAction(), closeDatabaseAction, getNextPreviewStyleAction(), getPreviousPreviewStyleAction(), checkIntegrity,
                 toggleHighlightAny, toggleHighlightAll, toggleHighlightDisable, databaseProperties, abbreviateIso, abbreviateMedline,
                 unabbreviate, exportAll, exportSelected, importCurrent, saveAll, focusTable, increaseFontSize, decreseFontSize,
                 toggleRelevance, toggleQualityAssured, togglePrinted, pushExternalButton.getComponent()));
@@ -2136,10 +2150,17 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             return;
         }
 
-        if (panel.isModified() && (panel.getBibDatabaseContext().getLocation() == DatabaseLocation.LOCAL)) {
+        BibDatabaseContext context = panel.getBibDatabaseContext();
+
+        if (panel.isModified() && (context.getLocation() == DatabaseLocation.LOCAL)) {
             if (confirmClose(panel)) {
                 removeTab(panel);
             }
+        } else if (context.getLocation() == DatabaseLocation.SHARED) {
+            context.convertToLocalDatabase();
+            context.getDBMSSynchronizer().closeSharedDatabase();
+            context.clearDBMSSynchronizer();
+            removeTab(panel);
         } else {
             removeTab(panel);
         }
@@ -2287,8 +2308,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         return back;
     }
 
-    public AbstractAction getSwitchPreviewAction() {
-        return switchPreview;
+    public AbstractAction getNextPreviewStyleAction() {
+        return nextPreviewStyle;
+    }
+
+    public AbstractAction getPreviousPreviewStyleAction() {
+        return previousPreviewStyle;
     }
 
     public JSplitPane getSplitPane() {

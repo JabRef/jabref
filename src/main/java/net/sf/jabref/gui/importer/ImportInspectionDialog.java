@@ -199,7 +199,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         this.undoName = undoName;
         this.newDatabase = newDatabase;
         setIconImage(new ImageIcon(IconTheme.getIconUrl("jabrefIcon48")).getImage());
-        preview = new PreviewPanel(null, bibDatabaseContext, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+        preview = new PreviewPanel(panel, bibDatabaseContext);
 
         duplLabel.setToolTipText(Localization.lang("Possible duplicate of existing entry. Click to resolve."));
 
@@ -459,7 +459,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             entry.setId(IdGenerator.next());
             // Add the entry to the database we are working with:
-            database.insertEntryWithDuplicationCheck(entry);
+            database.insertEntry(entry);
 
             // Generate a unique key:
             BibtexKeyPatternUtil.makeLabel(localMetaData, database, entry,
@@ -502,7 +502,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             for (BibEntry entry : entries) {
 
                 entry.setId(IdGenerator.next());
-                database.insertEntryWithDuplicationCheck(entry);
+                database.insertEntry(entry);
 
                 BibtexKeyPatternUtil.makeLabel(localMetaData, database, entry,
                         Globals.prefs.getBibtexKeyPatternPreferences());
@@ -736,7 +736,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 }
 
                 entry.setId(IdGenerator.next());
-                panel.getDatabase().insertEntryWithDuplicationCheck(entry);
+                panel.getDatabase().insertEntry(entry);
                 ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
 
             }
