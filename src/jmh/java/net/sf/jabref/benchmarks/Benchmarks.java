@@ -2,7 +2,6 @@ package net.sf.jabref.benchmarks;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -90,9 +89,14 @@ public class Benchmarks {
     public List<BibEntry> search() {
         // FIXME: Reuse SearchWorker here
         SearchQuery searchQuery = new SearchQuery("Journal Title 500", false, false);
-        List<BibEntry> matchedEntries = new ArrayList<>();
-        matchedEntries.addAll(database.getEntries().parallelStream().filter(searchQuery::isMatch).collect(Collectors.toList()));
-        return matchedEntries;
+        return database.getEntries().stream().filter(searchQuery::isMatch).collect(Collectors.toList());
+    }
+
+    @Benchmark
+    public List<BibEntry> parallelSearch() {
+        // FIXME: Reuse SearchWorker here
+        SearchQuery searchQuery = new SearchQuery("Journal Title 500", false, false);
+        return database.getEntries().parallelStream().filter(searchQuery::isMatch).collect(Collectors.toList());
     }
 
     @Benchmark
