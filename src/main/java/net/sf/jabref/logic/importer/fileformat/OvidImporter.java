@@ -162,11 +162,11 @@ public class OvidImporter extends ImportFormat {
 
                 } else if ("Publication Type".equals(fieldName)) {
                     if (content.contains("Book")) {
-                        h.put("entrytype", "book");
+                        h.put(BibEntry.TYPE_HEADER, "book");
                     } else if (content.contains("Journal")) {
-                        h.put("entrytype", "article");
+                        h.put(BibEntry.TYPE_HEADER, "article");
                     } else if (content.contains("Conference Paper")) {
-                        h.put("entrytype", "inproceedings");
+                        h.put(BibEntry.TYPE_HEADER, "inproceedings");
                     }
                 } else if (fieldName.startsWith("Language")) {
                     h.put(FieldName.LANGUAGE, content);
@@ -199,8 +199,8 @@ public class OvidImporter extends ImportFormat {
             }
 
             // Set the entrytype properly:
-            String entryType = h.containsKey("entrytype") ? h.get("entrytype") : BibEntry.DEFAULT_TYPE;
-            h.remove("entrytype");
+            String entryType = h.containsKey(BibEntry.TYPE_HEADER) ? h.get(BibEntry.TYPE_HEADER) : BibEntry.DEFAULT_TYPE;
+            h.remove(BibEntry.TYPE_HEADER);
             if ("book".equals(entryType) && h.containsKey("chaptertitle")) {
                 // This means we have an "incollection" entry.
                 entryType = "incollection";
