@@ -20,6 +20,7 @@ public class MakeLabelWithDatabaseTest {
     private MetaData metadata;
     private BibtexKeyPatternPreferences preferences;
     private GlobalBibtexKeyPattern pattern;
+    private DatabaseBibtexKeyPattern bibtexKeyPattern;
     private BibEntry entry;
 
     @Before
@@ -33,6 +34,7 @@ public class MakeLabelWithDatabaseTest {
         entry.setField("title", "An awesome paper on JabRef");
         database.insertEntry(entry);
         pattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern.split("[auth][year]"));
+        bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
         preferences = new BibtexKeyPatternPreferences("", "", false, true, true, pattern);
     }
 
@@ -126,7 +128,6 @@ public class MakeLabelWithDatabaseTest {
 
     @Test
     public void generateDefaultKeyLowerModified() {
-        DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
         bibtexKeyPattern.setDefaultValue("[auth:lower][year]");
         metadata.setBibtexKeyPattern(bibtexKeyPattern);
 
@@ -136,7 +137,6 @@ public class MakeLabelWithDatabaseTest {
 
     @Test
     public void generateDefaultKeyUpperModified() {
-        DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
         bibtexKeyPattern.setDefaultValue("[auth:upper][year]");
         metadata.setBibtexKeyPattern(bibtexKeyPattern);
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
@@ -145,7 +145,6 @@ public class MakeLabelWithDatabaseTest {
 
     @Test
     public void generateDefaultKeyFixedValue() {
-        DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
         bibtexKeyPattern.setDefaultValue("[auth]Test[year]");
         metadata.setBibtexKeyPattern(bibtexKeyPattern);
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
@@ -154,7 +153,6 @@ public class MakeLabelWithDatabaseTest {
 
     @Test
     public void generateKeyShortYear() {
-        DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
         bibtexKeyPattern.setDefaultValue("[shortyear]");
         metadata.setBibtexKeyPattern(bibtexKeyPattern);
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
@@ -172,7 +170,6 @@ public class MakeLabelWithDatabaseTest {
 
     @Test
     public void generateKeyAuthNShortName() {
-        DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
         bibtexKeyPattern.setDefaultValue("[auth10]");
         metadata.setBibtexKeyPattern(bibtexKeyPattern);
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
