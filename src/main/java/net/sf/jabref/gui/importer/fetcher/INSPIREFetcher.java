@@ -10,10 +10,10 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
@@ -144,21 +144,19 @@ public class INSPIREFetcher implements EntryFetcher {
      * @see java.lang.Runnable
      */
     @Override
-    public boolean processQuery(String query, ImportInspector dialog, OutputPrinter frame) {
+    public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
         try {
-            frame.setStatus(Localization.lang("Fetching entries from Inspire"));
+            status.setStatus(Localization.lang("Fetching entries from Inspire"));
             /* query the archive and load the results into the BibEntry */
-            BibDatabase bd = importInspireEntries(query, frame);
+            BibDatabase bd = importInspireEntries(query, status);
 
-            frame.setStatus(Localization.lang("Adding fetched entries"));
+            status.setStatus(Localization.lang("Adding fetched entries"));
             /* add the entry to the inspection dialog */
             bd.getEntries().forEach(dialog::addEntry);
             return true;
         } catch (Exception e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
-            frame.showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
-                            Localization.lang("Please try again later and/or check your network connection."),
-                    Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
+            ((ImportInspectionDialog)dialog).showErrorMessage(this);
         }
         return false;
     }

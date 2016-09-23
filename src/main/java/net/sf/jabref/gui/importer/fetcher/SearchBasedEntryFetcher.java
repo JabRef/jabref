@@ -3,9 +3,9 @@ package net.sf.jabref.gui.importer.fetcher;
 import java.util.List;
 import java.util.Objects;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.ImportInspector;
@@ -38,10 +38,8 @@ public class SearchBasedEntryFetcher implements EntryFetcher{
             matches.forEach(inspector::addEntry);
             return !matches.isEmpty();
         } catch (FetcherException e) {
-            LOGGER.error("Error while fetching from " + fetcher.getName(), e);
-            status.showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
-                            Localization.lang("Please try again later and/or check your network connection."),
-                    Localization.lang("Search %0", fetcher.getName()), JOptionPane.ERROR_MESSAGE);
+            LOGGER.error("Error while fetching from " + getTitle(), e);
+            ((ImportInspectionDialog)inspector).showErrorMessage(this);
         }
 
         return false;

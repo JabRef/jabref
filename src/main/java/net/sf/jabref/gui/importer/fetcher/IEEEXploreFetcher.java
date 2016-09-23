@@ -19,6 +19,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
@@ -148,8 +149,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             Collection<BibEntry> parsedBibtexCollection = BibtexParser.fromString(bibtexPage,
                     Globals.prefs.getImportFormatPreferences());
             if (parsedBibtexCollection == null) {
-                status.showMessage(Localization.lang("Error while fetching from %0", getTitle()),
-                        DIALOG_TITLE, JOptionPane.INFORMATION_MESSAGE);
+                ((ImportInspectionDialog)dialog).showErrorMessage(this);
                 return false;
             }
             int nEntries = parsedBibtexCollection.size();
@@ -164,9 +164,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
         } catch (IOException | JSONException e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
-            status.showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
-                            Localization.lang("Please try again later and/or check your network connection."),
-                    Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
+            ((ImportInspectionDialog)dialog).showErrorMessage(this);
         }
 
         return false;

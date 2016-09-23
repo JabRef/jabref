@@ -83,24 +83,20 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
                 hasRunConfig = true;
             }
             Map<String, JLabel> citations = getCitations(query);
-            if (citations.size() == 0) {
-                status.showMessage(Localization.lang("No entries found for the search string '%0'", query),
-                        Localization.lang("Search %0", getTitle()), JOptionPane.INFORMATION_MESSAGE);
-                return false;
+            if (!citations.isEmpty()) {
+                for (Map.Entry<String, JLabel> linkEntry : citations.entrySet()) {
+                    preview.addEntry(linkEntry.getKey(), linkEntry.getValue());
+                }
+                return true;
             }
 
-            for (Map.Entry<String, JLabel> linkEntry : citations.entrySet()) {
-                preview.addEntry(linkEntry.getKey(), linkEntry.getValue());
-            }
-            return true;
-
+            status.showMessage(Localization.lang("No entries found for the search string '%0'", query),
+                    Localization.lang("Search %0", getTitle()), JOptionPane.INFORMATION_MESSAGE);
         } catch (IOException e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
-            status.showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
-                            Localization.lang("Please try again later and/or check your network connection."),
-                    Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
-            return false;
+            preview.showErrorMessage(this);
         }
+        return false;
     }
 
     @Override

@@ -6,16 +6,15 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.importer.util.DBLPHelper;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.entry.BibEntry;
@@ -125,9 +124,7 @@ public class DBLPFetcher implements EntryFetcher {
 
         } catch (IOException e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
-            status.showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
-                            Localization.lang("Please try again later and/or check your network connection."),
-                    Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
+            ((ImportInspectionDialog)inspector).showErrorMessage(this);
         } finally {
             // Restore the threshold
             DuplicateCheck.duplicateThreshold = saveThreshold;

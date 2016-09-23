@@ -4,6 +4,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
@@ -44,31 +45,26 @@ public class DOAJFetcher implements EntryFetcher {
             HttpResponse<JsonNode> jsonResponse;
             jsonResponse = Unirest.get(SEARCH_URL + query + "?pageSize=1").header("accept", "application/json").asJson();
             JSONObject jo = jsonResponse.getBody().getObject();
-            int hits = jo.getInt("total");
-            int numberToFetch = 0;
-            if (hits > 0) {
-                if (hits > MAX_PER_PAGE) {
-                    while (true) {
-                        String strCount = JOptionPane
-                                .showInputDialog(
-                                        Localization.lang("References found") + ": " + hits + "  "
-                                                + Localization.lang("Number of references to fetch?"),
-                                        Integer.toString(hits));
+            int numberToFetch = jo.getInt("total");
+            if (numberToFetch > 0) {
+                if (numberToFetch > MAX_PER_PAGE) {
+                    boolean numberEntered = false;
+                    do {
+                        String strCount = JOptionPane.showInputDialog(Localization.lang("References found") +": " + numberToFetch + " " +
+                                Localization.lang("Number of references to fetch?"), Integer.toString(numberToFetch));
 
                         if (strCount == null) {
-                            status.setStatus(Localization.lang("%0 import canceled", "DOAJ"));
+                            status.setStatus(Localization.lang("%0 import canceled", getTitle()));
                             return false;
                         }
 
                         try {
                             numberToFetch = Integer.parseInt(strCount.trim());
-                            break;
+                            numberEntered = true;
                         } catch (NumberFormatException ex) {
                             status.showMessage(Localization.lang("Please enter a valid number"));
                         }
-                    }
-                } else {
-                    numberToFetch = hits;
+                    } while (!numberEntered);
                 }
 
                 int fetched = 0; // Keep track of number of items fetched for the progress bar
@@ -101,9 +97,7 @@ public class DOAJFetcher implements EntryFetcher {
             }
         } catch (UnirestException e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
-            status.showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
-                            Localization.lang("Please try again later and/or check your network connection."),
-                    Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
+            ((ImportInspectionDialog)inspector).showErrorMessage(this);
             return false;
         }
     }

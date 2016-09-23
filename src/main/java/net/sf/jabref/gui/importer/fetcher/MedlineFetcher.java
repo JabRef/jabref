@@ -12,6 +12,7 @@ import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
@@ -120,29 +121,29 @@ public class MedlineFetcher implements EntryFetcher {
     }
 
     @Override
-    public boolean processQuery(String query, ImportInspector iIDialog, OutputPrinter frameOP) {
+    public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
         try {
             shouldContinue = true;
 
             String cleanQuery = query.trim().replace(';', ',');
             if (cleanQuery.matches("\\d+[,\\d+]*")) {
-                frameOP.setStatus(Localization.lang("Fetching Medline by id..."));
+                status.setStatus(Localization.lang("Fetching Medline by id..."));
 
-                List<BibEntry> bibs = fetchMedline(cleanQuery, frameOP);
+                List<BibEntry> bibs = fetchMedline(cleanQuery, status);
                 if (bibs.isEmpty()) {
-                    frameOP.showMessage(Localization.lang("No references found"),
+                    status.showMessage(Localization.lang("No references found"),
                             Localization.lang("Search %0", getTitle()), JOptionPane.INFORMATION_MESSAGE);
                     return false;
                 }
 
                 for (BibEntry entry : bibs) {
-                    iIDialog.addEntry(entry);
+                    dialog.addEntry(entry);
                 }
                 return true;
             }
 
             if (!query.isEmpty()) {
-                frameOP.setStatus(Localization.lang("Fetching Medline by term..."));
+                status.setStatus(Localization.lang("Fetching Medline by term..."));
 
                 String searchTerm = toSearchTerm(query);
 
@@ -150,61 +151,55 @@ public class MedlineFetcher implements EntryFetcher {
                 SearchResult result = getIds(searchTerm, 0, 1);
 
                 if (result.count == 0) {
-                    frameOP.showMessage(Localization.lang("No references found"),
+                    status.showMessage(Localization.lang("No references found"),
                             Localization.lang("Search %0", getTitle()), JOptionPane.INFORMATION_MESSAGE);
                     return false;
                 }
 
                 int numberToFetch = result.count;
                 if (numberToFetch > MedlineFetcher.PACING) {
-                    while (true) {
-                        String strCount = JOptionPane.showInputDialog(Localization.lang("References found") +
-                                ": " + numberToFetch + " " +
+                    boolean numberEntered = false;
+                    do {
+                        String strCount = JOptionPane.showInputDialog(Localization.lang("References found") + ": " + numberToFetch + " " +
                                 Localization.lang("Number of references to fetch?"), Integer.toString(numberToFetch));
 
                         if (strCount == null) {
-                            frameOP.setStatus(Localization.lang("%0 import canceled", "Medline"));
+                            status.setStatus(Localization.lang("%0 import canceled", getTitle()));
                             return false;
                         }
 
                         try {
                             numberToFetch = Integer.parseInt(strCount.trim());
-                            break;
+                            numberEntered = true;
                         } catch (NumberFormatException ex) {
-                            frameOP.showMessage(Localization.lang("Please enter a valid number"));
+                            status.showMessage(Localization.lang("Please enter a valid number"));
                         }
-                    }
+                    } while (!numberEntered);
                 }
 
-                for (int i = 0; i < numberToFetch; i += MedlineFetcher.PACING) {
-                    if (!shouldContinue) {
-                        break;
-                    }
-
+                for (int i = 0; i < numberToFetch && shouldContinue; i += MedlineFetcher.PACING) {
                     int noToFetch = Math.min(MedlineFetcher.PACING, numberToFetch - i);
 
                     // get the ids from entrez
                     result = getIds(searchTerm, i, noToFetch);
 
-                    List<BibEntry> bibs = fetchMedline(result.ids, frameOP);
+                    List<BibEntry> bibs = fetchMedline(result.ids, status);
                     for (BibEntry entry : bibs) {
-                        iIDialog.addEntry(entry);
+                        dialog.addEntry(entry);
                     }
-                    iIDialog.setProgress(i + noToFetch, numberToFetch);
+                    dialog.setProgress(i + noToFetch, numberToFetch);
                 }
                 return true;
             }
             else {
-                frameOP.showMessage(
+                status.showMessage(
                         Localization.lang("Please enter a comma separated list of Medline IDs (numbers) or search terms."),
                         Localization.lang("Search %0", getTitle()) + ": " + Localization.lang("Input error"), JOptionPane.ERROR_MESSAGE);
                 return false;
             }
         } catch (IOException e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
-            frameOP.showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
-                            Localization.lang("Please try again later and/or check your network connection."),
-                    Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
+            ((ImportInspectionDialog)dialog).showErrorMessage(this);
         }
         return false;
     }

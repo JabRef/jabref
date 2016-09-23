@@ -3,9 +3,9 @@ package net.sf.jabref.gui.importer.fetcher;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
@@ -36,9 +36,7 @@ public class IdBasedEntryFetcher implements EntryFetcher {
             return match.isPresent();
         } catch (FetcherException e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
-            status.showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
-                            Localization.lang("Please try again later and/or check your network connection."),
-                    Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
+            ((ImportInspectionDialog)inspector).showErrorMessage(this);
         }
 
         return false;

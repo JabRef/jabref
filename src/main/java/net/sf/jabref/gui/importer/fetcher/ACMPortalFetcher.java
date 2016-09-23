@@ -157,9 +157,7 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
 
         } catch (IOException e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
-            status.showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
-                            Localization.lang("Please try again later and/or check your network connection."),
-                    Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
+            preview.showErrorMessage(this);
             return false;
         }
     }
