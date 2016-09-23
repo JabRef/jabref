@@ -61,7 +61,6 @@ import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.SearchPreferences;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -128,10 +127,7 @@ public class SearchResultFrame {
         searchResultFrame.setTitle(title);
         searchResultFrame.setIconImage(IconTheme.getImage("jabrefIcon48").getImage());
 
-        int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
-        String layoutFile = activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs
-                .get(JabRefPreferences.PREVIEW_1);
-        preview = new PreviewPanel(null, null, layoutFile);
+        preview = new PreviewPanel(null, null);
 
         sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, FieldName.AUTHOR));
         model = (DefaultEventTableModel<BibEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,
@@ -396,6 +392,12 @@ public class SearchResultFrame {
     private void addEntry(BibEntry entry, BasePanel panel) {
         entries.add(entry);
         entryHome.put(entry, panel);
+
+        if (preview.getEntry() == null || !preview.getBasePanel().isPresent()){
+            preview.setEntry(entry);
+            preview.setBasePanel(panel);
+            preview.setDatabaseContext(panel.getBibDatabaseContext());
+        }
     }
 
     private void selectEntryInBasePanel(BibEntry entry){
@@ -545,6 +547,8 @@ public class SearchResultFrame {
                 preview.setDatabaseContext(basePanel.getBibDatabaseContext());
                 // Update the preview's entry:
                 preview.setEntry(entry);
+                preview.setBasePanel(entryHome.get(entry));
+                preview.setDatabaseContext(entryHome.get(entry).getBibDatabaseContext());
                 contentPane.setDividerLocation(0.5f);
                 SwingUtilities.invokeLater(() -> preview.scrollRectToVisible(toRect));
             }
