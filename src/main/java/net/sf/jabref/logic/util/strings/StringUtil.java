@@ -85,6 +85,13 @@ public class StringUtil {
     }
 
     /**
+    * Replaces the unicode dashes from the given string.
+    */
+    public static String ReplaceUniCodeDashes(String string) {
+        return string.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--");
+    }
+
+    /**
      * extends the filename with a default Extension, if no Extension '.x' could
      * be found
      */

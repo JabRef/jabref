@@ -7,11 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -66,14 +68,12 @@ public class MedlinePlainImporter extends ImportFormat {
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
-        StringBuilder sb = new StringBuilder();
-        String str;
-        while ((str = reader.readLine()) != null) {
-            sb.append(str);
-            sb.append('\n');
-        }
-        String[] entries = sb.toString().replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
-                .split("\\n\\n");
+
+        //use optional here, so that no exception will be thrown if the file is empty
+        Optional<String> OptionalLines = reader.lines().reduce((line, nextline) -> line + "\n" + nextline);
+        String linesAsString = OptionalLines.isPresent() ? OptionalLines.get() : "";
+
+        String[] entries = StringUtil.ReplaceUniCodeDashes(linesAsString).split("\\n\\n");
 
         for (String entry1 : entries) {
 
