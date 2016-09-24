@@ -1412,7 +1412,6 @@ public class JabRefPreferences {
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(customImports, getDefaultEncoding(), getKeywordDelimiter(),
                 getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(),
-                getBoolean(USE_UNIT_FORMATTER_ON_SEARCH), getBoolean(USE_CASE_KEEPER_ON_SEARCH),
                 isKeywordSyncEnabled());
     }
 
