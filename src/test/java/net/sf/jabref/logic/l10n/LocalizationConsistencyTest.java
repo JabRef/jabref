@@ -128,7 +128,7 @@ public class LocalizationConsistencyTest {
                 missingKeys.parallelStream()
                         .map(key -> String.format("%s=%s", key.getKey(), key.getKey()))
                         .collect(Collectors.toList()),
-                Collections.EMPTY_LIST, missingKeys);
+                Collections.<LocalizationEntry>emptyList(), missingKeys);
     }
 
     @Test
@@ -142,7 +142,7 @@ public class LocalizationConsistencyTest {
                 missingKeys.parallelStream()
                         .map(key -> String.format("%s=%s", key.getKey(), key.getKey()))
                         .collect(Collectors.toList()),
-                Collections.EMPTY_LIST, missingKeys);
+                Collections.<LocalizationEntry>emptyList(), missingKeys);
     }
 
     @Test
@@ -153,7 +153,7 @@ public class LocalizationConsistencyTest {
                 "1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
                 "2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE\n" +
                 "3. EXECUTE: gradlew localizationUpdate\n",
-                Collections.EMPTY_LIST, obsoleteKeys);
+                Collections.<String>emptyList(), obsoleteKeys);
     }
 
     @Test
@@ -164,7 +164,7 @@ public class LocalizationConsistencyTest {
                 "1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
                 "2. REMOVE THESE FROM THE ENGLISH MENU FILE\n" +
                 "3. EXECUTE: gradlew localizationUpdate\n",
-                Collections.EMPTY_LIST, obsoleteKeys);
+                Collections.<String>emptyList(), obsoleteKeys);
     }
 
 }
