@@ -202,14 +202,13 @@ public class BibEntryTests {
     }
     @Test
     public void testGetSeparatedKeywordsAreCorrect() {
-        assertEquals(Arrays.asList(new Keyword("Foo"), new Keyword("Bar")), keywordEntry.getKeywords(','));
+        assertEquals(new KeywordList("Foo", "Bar"), keywordEntry.getKeywords(','));
     }
 
     @Test
     public void testAddKeywordIsCorrect() {
         keywordEntry.addKeyword("FooBar", ',');
-        assertEquals(Arrays.asList(new Keyword("Foo"), new Keyword("Bar"), new Keyword("FooBar")),
-                keywordEntry.getKeywords(','));
+        assertEquals(new KeywordList("Foo", "Bar", "FooBar"), keywordEntry.getKeywords(','));
     }
 
     @Test
@@ -222,15 +221,13 @@ public class BibEntryTests {
     public void testAddKeywordTwiceYiedsOnlyOne() {
         keywordEntry.addKeyword("FooBar", ',');
         keywordEntry.addKeyword("FooBar", ',');
-        assertEquals(Arrays.asList(new Keyword("Foo"), new Keyword("Bar"), new Keyword("FooBar")),
-                keywordEntry.getKeywords(','));
+        assertEquals(new KeywordList("Foo", "Bar", "FooBar"), keywordEntry.getKeywords(','));
     }
 
     @Test
     public void addKeywordIsCaseSensitive() {
         keywordEntry.addKeyword("FOO", ',');
-        assertEquals(Arrays.asList(new Keyword("Foo"), new Keyword("Bar"), new Keyword("FOO")),
-                keywordEntry.getKeywords(','));
+        assertEquals(new KeywordList("Foo", "Bar", "FOO"), keywordEntry.getKeywords(','));
     }
 
     @Test
@@ -242,7 +239,7 @@ public class BibEntryTests {
     @Test
     public void testAddKeywordEmptyKeywordIsNotAdded() {
         keywordEntry.addKeyword("", ',');
-        assertEquals(Arrays.asList(new Keyword("Foo"), new Keyword("Bar")), keywordEntry.getKeywords(','));
+        assertEquals(new KeywordList("Foo", "Bar"), keywordEntry.getKeywords(','));
     }
 
     @Test
@@ -271,13 +268,13 @@ public class BibEntryTests {
     @Test
     public void testAddKeywordsWorksAsExpected() {
         emptyEntry.addKeywords(Arrays.asList("Foo", "Bar"), ',');
-        assertEquals(Arrays.asList(new Keyword("Foo"), new Keyword("Bar")), emptyEntry.getKeywords(','));
+        assertEquals(new KeywordList("Foo", "Bar"), emptyEntry.getKeywords(','));
     }
 
     @Test
     public void testPutKeywordsOverwritesOldKeywords() {
         keywordEntry.putKeywords(Arrays.asList("Yin", "Yang"), ',');
-        assertEquals(Arrays.asList(new Keyword("Yin"), new Keyword("Yang")), keywordEntry.getKeywords(','));
+        assertEquals(new KeywordList("Yin", "Yang"), keywordEntry.getKeywords(','));
     }
 
     @Test
@@ -339,8 +336,7 @@ public class BibEntryTests {
     public void getKeywordsReturnsParsedKeywordListFromKeywordsField() {
         BibEntry entry = new BibEntry();
         entry.setField(FieldName.KEYWORDS, "w1, w2a w2b, w3");
-        assertEquals(Arrays.asList(new Keyword("w1"), new Keyword("w2a w2b"), new Keyword("w3")),
-                entry.getKeywords(','));
+        assertEquals(new KeywordList("w1", "w2a w2b", "w3"), entry.getKeywords(','));
     }
 
     @Test
