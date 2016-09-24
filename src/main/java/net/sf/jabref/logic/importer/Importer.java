@@ -99,7 +99,7 @@ public abstract class Importer implements Comparable<Importer> {
      *
      * @return format name, must be unique and not <code>null</code>
      */
-    public abstract String getFormatName();
+    public abstract String getName();
 
 
     /**
@@ -115,7 +115,7 @@ public abstract class Importer implements Comparable<Importer> {
      * @return ID, must be unique and not <code>null</code>
      */
     public String getId() {
-        String id = getFormatName();
+        String id = getName();
         StringBuilder result = new StringBuilder(id.length());
         for (int i = 0; i < id.length(); i++) {
             char c = id.charAt(i);
@@ -142,7 +142,7 @@ public abstract class Importer implements Comparable<Importer> {
 
     @Override
     public int hashCode() {
-        return getFormatName().hashCode();
+        return getName().hashCode();
     }
 
     @Override
@@ -154,16 +154,16 @@ public abstract class Importer implements Comparable<Importer> {
             return false;
         }
         Importer other = (Importer)obj;
-        return Objects.equals(this.getFormatName(), other.getFormatName());
+        return Objects.equals(this.getName(), other.getName());
     }
 
     @Override
     public String toString() {
-        return getFormatName();
+        return getName();
     }
 
     @Override
     public int compareTo(Importer o) {
-        return getFormatName().compareTo(o.getFormatName());
+        return getName().compareTo(o.getName());
     }
 }

@@ -34,7 +34,7 @@ public class PdfXmpImporterTest {
 
     @Test
     public void testGetFormatName() {
-        assertEquals("XMP-annotated PDF", importer.getFormatName());
+        assertEquals("XMP-annotated PDF", importer.getName());
     }
 
     @Test

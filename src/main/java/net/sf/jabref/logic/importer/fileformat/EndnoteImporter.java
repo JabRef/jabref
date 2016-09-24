@@ -39,7 +39,7 @@ public class EndnoteImporter extends Importer {
     }
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "Refer/Endnote";
     }
 

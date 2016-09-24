@@ -26,7 +26,7 @@ public class PdfXmpImporter extends Importer {
     }
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return Localization.lang("XMP-annotated PDF");
     }
 

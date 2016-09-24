@@ -43,7 +43,7 @@ public class OvidImporter extends Importer {
     private static final int MAX_ITEMS = 50;
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "Ovid";
     }
 

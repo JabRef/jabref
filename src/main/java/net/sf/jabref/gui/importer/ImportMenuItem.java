@@ -45,7 +45,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
     }
 
     public ImportMenuItem(JabRefFrame frame, boolean openInNew, Importer importer) {
-        super(importer == null ? Localization.lang("Autodetect format") : importer.getFormatName());
+        super(importer == null ? Localization.lang("Autodetect format") : importer.getName());
         this.importer = importer;
         this.frame = frame;
         this.openInNew = openInNew;
@@ -113,10 +113,10 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         // This import method never throws an IOException:
                         imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename));
                     } else {
-                        frame.output(Localization.lang("Importing in %0 format", importer.getFormatName()) + "...");
+                        frame.output(Localization.lang("Importing in %0 format", importer.getName()) + "...");
                         // Specific importer:
                         ParserResult pr = importer.importDatabase(file, Globals.prefs.getDefaultEncoding());
-                        imports.add(new ImportFormatReader.UnknownFormatImport(importer.getFormatName(), pr));
+                        imports.add(new ImportFormatReader.UnknownFormatImport(importer.getName(), pr));
                     }
                 } catch (IOException e) {
                     // This indicates that a specific importer was specified, and that

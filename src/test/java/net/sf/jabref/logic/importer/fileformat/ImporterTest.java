@@ -38,7 +38,7 @@ public class ImporterTest {
 
     @Test
     public void getFormatterNameDoesNotReturnNull() {
-        Assert.assertNotNull(format.getFormatName());
+        Assert.assertNotNull(format.getName());
     }
 
     @Test
@@ -60,7 +60,7 @@ public class ImporterTest {
     @Test
     public void getIdStripsSpecialCharactersAndConvertsToLowercase() {
         Importer importer = Mockito.mock(Importer.class, Mockito.CALLS_REAL_METHODS);
-        when(importer.getFormatName()).thenReturn("*Test-Importer");
+        when(importer.getName()).thenReturn("*Test-Importer");
         Assert.assertEquals("testimporter", importer.getId());
     }
 

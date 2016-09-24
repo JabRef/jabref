@@ -163,7 +163,7 @@ public class RepecNepImporter extends Importer {
     }
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "REPEC New Economic Papers (NEP)";
     }
 

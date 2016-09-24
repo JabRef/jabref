@@ -31,7 +31,7 @@ public class RisImporter extends Importer {
 
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "RIS";
     }
 

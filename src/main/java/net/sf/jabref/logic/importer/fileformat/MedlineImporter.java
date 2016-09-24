@@ -89,7 +89,7 @@ public class MedlineImporter extends Importer {
 
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "Medline";
     }
 

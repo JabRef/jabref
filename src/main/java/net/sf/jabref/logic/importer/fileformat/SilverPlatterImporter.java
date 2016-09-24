@@ -24,7 +24,7 @@ public class SilverPlatterImporter extends Importer {
     private static final Pattern START_PATTERN = Pattern.compile("Record.*INSPEC.*");
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "SilverPlatter";
     }
 

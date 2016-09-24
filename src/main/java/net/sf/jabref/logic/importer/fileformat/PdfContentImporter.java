@@ -586,7 +586,7 @@ public class PdfContentImporter extends Importer {
     }
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "PDFcontent";
     }
 

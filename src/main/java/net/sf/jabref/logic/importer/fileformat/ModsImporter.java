@@ -463,7 +463,7 @@ public class ModsImporter extends Importer {
     }
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "MODS";
     }
 

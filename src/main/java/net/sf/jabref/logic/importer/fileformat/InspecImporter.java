@@ -23,7 +23,7 @@ public class InspecImporter extends Importer {
     private static final Pattern INSPEC_PATTERN = Pattern.compile("Record.*INSPEC.*");
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "INSPEC";
     }
 

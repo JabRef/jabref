@@ -71,7 +71,7 @@ public class BibtexImporter extends Importer {
     }
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "BibTeX";
     }
 

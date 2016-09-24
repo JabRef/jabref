@@ -23,7 +23,7 @@ import net.sf.jabref.model.entry.FieldName;
 public class BiblioscapeImporter extends Importer {
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "Biblioscape";
     }
 

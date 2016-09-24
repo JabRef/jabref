@@ -223,7 +223,7 @@ public class FreeCiteImporter extends Importer {
     }
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "text citations";
     }
 

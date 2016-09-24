@@ -25,7 +25,7 @@ public class CopacImporter extends Importer {
     private static final Pattern COPAC_PATTERN = Pattern.compile("^\\s*TI- ");
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "Copac";
     }
 

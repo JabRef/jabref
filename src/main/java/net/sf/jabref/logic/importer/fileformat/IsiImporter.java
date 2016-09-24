@@ -45,7 +45,7 @@ public class IsiImporter extends Importer {
 
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "ISI";
     }
 

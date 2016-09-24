@@ -83,7 +83,7 @@ public class RepecNepImporterTest {
 
     @Test
     public final void testGetFormatName() {
-        Assert.assertEquals("REPEC New Economic Papers (NEP)", testImporter.getFormatName());
+        Assert.assertEquals("REPEC New Economic Papers (NEP)", testImporter.getName());
 
     }
 

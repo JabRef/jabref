@@ -20,7 +20,7 @@ public class FreeCiteImporterTest {
 
     @Test
     public void testGetFormatName() {
-        assertEquals("text citations", importer.getFormatName());
+        assertEquals("text citations", importer.getName());
     }
 
     @Test

@@ -36,7 +36,7 @@ public class MedlinePlainImporter extends Importer {
 
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "MedlinePlain";
     }
 

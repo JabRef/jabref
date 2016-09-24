@@ -51,7 +51,7 @@ public class MsBibImporter extends Importer {
     }
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "MSBib";
     }
 
