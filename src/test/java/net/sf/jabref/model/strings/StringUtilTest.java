@@ -57,13 +57,13 @@ public class StringUtilTest {
     @Test
     public void testUnifyLineBreaks() {
         // Mac < v9
-        String result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r", "newline");
+        String result = StringUtil.unifyLineBreaks("\r", "newline");
         assertEquals("newline", result);
         // Windows
-        result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r\n", "newline");
+        result = StringUtil.unifyLineBreaks("\r\n", "newline");
         assertEquals("newline", result);
         // Unix
-        result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\n", "newline");
+        result = StringUtil.unifyLineBreaks("\n", "newline");
         assertEquals("newline", result);
     }
 

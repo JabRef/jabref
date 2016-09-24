@@ -9,12 +9,15 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.Keyword;
+import net.sf.jabref.model.entry.KeywordList;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.strings.StringUtil;
 

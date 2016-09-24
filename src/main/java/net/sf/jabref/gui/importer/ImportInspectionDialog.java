@@ -99,6 +99,7 @@ import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.EntriesGroupChange;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.metadata.MetaData;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.BasicEventList;

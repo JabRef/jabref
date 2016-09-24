@@ -102,7 +102,7 @@ public class SharedDatabaseUIManager {
         JabRefFrame frame = JabRefGUI.getMainFrame();
         BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode), DatabaseLocation.SHARED,
-                keywordSeparator);
+                Globals.prefs.getKeywordDelimiter());
 
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
         dbmsSynchronizer.openSharedDatabase(dbmsConnectionProperties);

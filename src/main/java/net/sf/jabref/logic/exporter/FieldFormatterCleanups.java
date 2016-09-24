@@ -106,7 +106,7 @@ public class FieldFormatterCleanups {
         // first remove all newlines for easier parsing
         String remainingString = formatterString;
 
-        remainingString = StringUtil.unifyLineBreaks(remainingString, OS.NEWLINE).replaceAll(OS.NEWLINE, "");
+        remainingString = StringUtil.unifyLineBreaks(remainingString, "");
         try {
             while (startIndex < formatterString.length()) {
                 // read the field name

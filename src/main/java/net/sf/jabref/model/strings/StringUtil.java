@@ -616,10 +616,6 @@ public class StringUtil {
         return ((toTest == null) || toTest.isEmpty());
     }
 
-    public static boolean isNotBlank(Optional<String> string) {
-        return string.isPresent() && isNotBlank(string.get());
-    }
-
     public static boolean isBlank(String string) {
         return !isNotBlank(string);
     }
@@ -632,8 +628,8 @@ public class StringUtil {
         return StringUtils.isNotBlank(string);
     }
 
-    public static boolean isBlank(String string) {
-        return StringUtils.isBlank(string);
+    public static boolean isNotBlank(Optional<String> string) {
+        return string.isPresent() && isNotBlank(string.get());
     }
 
     /**

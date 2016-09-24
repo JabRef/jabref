@@ -107,7 +107,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
         setLoadingConnectButtonText(true);
 
         try {
-            new SharedDatabaseUIManager(frame, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR)).openNewSharedDatabaseTab(connectionProperties);
+            new SharedDatabaseUIManager(frame).openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
             dispose();
             return; // setLoadingConnectButtonText(false) should not be reached regularly.

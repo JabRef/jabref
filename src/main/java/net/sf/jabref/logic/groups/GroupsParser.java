@@ -61,7 +61,7 @@ public class GroupsParser {
      * @throws ParseException If an error occurred and a group could not be created,
      *                        e.g. due to a malformed regular expression.
      */
-    public static AbstractGroup fromString(String s, String keywordSeparator)
+    public static AbstractGroup fromString(String s, Character keywordSeparator)
             throws ParseException {
         if (s.startsWith(KeywordGroup.ID)) {
             return GroupsParser.keywordGroupFromString(s, keywordSeparator);
@@ -84,7 +84,7 @@ public class GroupsParser {
      * @param s The String representation obtained from
      *          KeywordGroup.toString()
      */
-    public static AbstractGroup keywordGroupFromString(String s, String keywordSeparator) throws ParseException {
+    public static AbstractGroup keywordGroupFromString(String s, Character keywordSeparator) throws ParseException {
         if (!s.startsWith(KeywordGroup.ID)) {
             throw new IllegalArgumentException("KeywordGroup cannot be created from \"" + s + "\".");
         }
@@ -103,7 +103,7 @@ public class GroupsParser {
                 GroupHierarchyType.getByNumber(context), keywordSeparator);
     }
 
-    public static ExplicitGroup explicitGroupFromString(String s, String keywordSeparator) throws ParseException {
+    public static ExplicitGroup explicitGroupFromString(String s, Character keywordSeparator) throws ParseException {
         if (!s.startsWith(ExplicitGroup.ID)) {
             throw new IllegalArgumentException("ExplicitGroup cannot be created from \"" + s + "\".");
         }

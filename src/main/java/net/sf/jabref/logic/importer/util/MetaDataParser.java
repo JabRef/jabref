@@ -22,13 +22,13 @@ public class MetaDataParser {
 
     private static final Log LOGGER = LogFactory.getLog(MetaDataParser.class);
 
-    public static MetaData parse(Map<String, String> data, String keywordSeparator) throws ParseException {
+    public static MetaData parse(Map<String, String> data, Character keywordSeparator) throws ParseException {
         MetaData metaData = new MetaData();
         metaData.setParsedData(getParsedData(data, keywordSeparator, metaData));
         return metaData;
     }
 
-    public static Map<String, List<String>> getParsedData(Map<String, String> inData, String keywordSeparator,
+    public static Map<String, List<String>> getParsedData(Map<String, String> inData, Character keywordSeparator,
             MetaData metaData)
             throws ParseException {
         final Map<String, List<String>> newMetaData = new HashMap<>();

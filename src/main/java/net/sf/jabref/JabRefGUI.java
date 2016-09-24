@@ -200,10 +200,8 @@ public class JabRefGUI {
         boolean isSharedDatabaseEdited = Globals.prefs.getBoolean(JabRefPreferences.SHARED_DATABASE_LAST_EDITED);
         if (isSharedDatabaseEdited) {
             boolean isFocused = Globals.prefs.getBoolean(JabRefPreferences.SHARED_DATABASE_LAST_FOCUSED);
-            String keywordSeparator = Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR);
-
             try {
-                new SharedDatabaseUIManager(mainFrame, keywordSeparator).openLastSharedDatabaseTab(isFocused);
+                new SharedDatabaseUIManager(mainFrame).openLastSharedDatabaseTab(isFocused);
             } catch (SQLException | DatabaseNotSupportedException e) {
                 LOGGER.info("Failed to restore shared database. Use connection dialog to connect.");
                 new OpenSharedDatabaseDialog(mainFrame).setVisible(true);
