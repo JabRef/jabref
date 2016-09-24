@@ -1,8 +1,5 @@
 package net.sf.jabref.model.entry;
 
-import java.util.Arrays;
-import java.util.Collections;
-
 import org.junit.Before;
 import org.junit.Test;
 

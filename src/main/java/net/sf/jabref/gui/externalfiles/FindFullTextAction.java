@@ -61,7 +61,7 @@ public class FindFullTextAction extends AbstractWorker {
             }
         }
         for (BibEntry entry : basePanel.getSelectedEntries()) {
-            FulltextFetchers fft = new FulltextFetchers(Globals.prefs.getKeywordDelimiter());
+            FulltextFetchers fft = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
             downloads.put(fft.findFullTextPDF(entry), entry);
         }
     }

@@ -21,6 +21,7 @@ import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.FulltextFetcher;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.importer.util.OAI2Handler;
 import net.sf.jabref.logic.util.DOI;
@@ -54,10 +55,10 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
     private static final Log LOGGER = LogFactory.getLog(ArXiv.class);
     private static final String API_URL = "http://export.arxiv.org/api/query";
-    private final Character keywordDelimiter;
+    private final ImportFormatPreferences importFormatPreferences;
 
-    public ArXiv(Character keywordDelimiter) {
-        this.keywordDelimiter = keywordDelimiter;
+    public ArXiv(ImportFormatPreferences importFormatPreferences) {
+        this.importFormatPreferences = importFormatPreferences;
     }
 
     @Override
@@ -213,13 +214,13 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
         return searchForEntries(query).stream().map(
-                (arXivEntry) -> arXivEntry.toBibEntry(keywordDelimiter)).collect(Collectors.toList());
+                (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator())).collect(Collectors.toList());
     }
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         return searchForEntryById(identifier).map(
-                (arXivEntry) -> arXivEntry.toBibEntry(keywordDelimiter));
+                (arXivEntry) -> arXivEntry.toBibEntry(importFormatPreferences.getKeywordSeparator()));
     }
 
 

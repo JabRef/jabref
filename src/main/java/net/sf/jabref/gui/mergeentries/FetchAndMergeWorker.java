@@ -39,8 +39,7 @@ public class FetchAndMergeWorker extends SwingWorker<Optional<BibEntry>, Void> {
 
     @Override
     protected Optional<BibEntry> doInBackground() throws Exception {
-        Optional<IdBasedFetcher> fetcher = WebFetchers.getIdBasedFetcherForField(field, Globals.prefs.getImportFormatPreferences(),
-                Globals.prefs.getKeywordDelimiter());
+        Optional<IdBasedFetcher> fetcher = WebFetchers.getIdBasedFetcherForField(field, Globals.prefs.getImportFormatPreferences());
 
         try {
             Optional<String> fieldContentValue = fieldContent;

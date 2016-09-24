@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import net.sf.jabref.logic.importer.FetcherException;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
 
@@ -16,6 +17,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
 public class ArXivTest {
 
@@ -26,7 +28,7 @@ public class ArXivTest {
 
     @Before
     public void setUp() {
-        finder = new ArXiv(',');
+        finder = new ArXiv(mock(ImportFormatPreferences.class));
         entry = new BibEntry();
 
         sliceTheoremPaper = new BibEntry();
