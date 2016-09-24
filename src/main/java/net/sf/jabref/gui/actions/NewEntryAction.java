@@ -11,7 +11,7 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -34,14 +34,14 @@ public class NewEntryAction extends MnemonicAwareAction {
     public NewEntryAction(JabRefFrame jabRefFrame, String type) {
         this.jabRefFrame = jabRefFrame;
         // This action leads to the creation of a specific entry.
-        putValue(Action.NAME, EntryUtil.capitalizeFirst(type));
+        putValue(Action.NAME, StringUtil.capitalizeFirst(type));
         this.type = type;
     }
 
     public NewEntryAction(JabRefFrame jabRefFrame, String type, KeyStroke key) {
         this.jabRefFrame = jabRefFrame;
         // This action leads to the creation of a specific entry.
-        putValue(Action.NAME, EntryUtil.capitalizeFirst(type));
+        putValue(Action.NAME, StringUtil.capitalizeFirst(type));
         putValue(Action.ACCELERATOR_KEY, key);
         this.type = type;
     }

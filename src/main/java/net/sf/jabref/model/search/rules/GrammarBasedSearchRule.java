@@ -9,6 +9,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.Keyword;
 import net.sf.jabref.search.SearchBaseVisitor;
 import net.sf.jabref.search.SearchLexer;
 import net.sf.jabref.search.SearchParser;
@@ -148,7 +149,7 @@ public class GrammarBasedSearchRule implements SearchRule {
 
             // special case for searching a single keyword
             if (fieldPattern.matcher("anykeyword").matches()) {
-                return entry.getKeywords().stream().anyMatch(this::matchFieldValue);
+                return entry.getKeywords(',').stream().map(Keyword::toString).anyMatch(this::matchFieldValue);
             }
 
             // specification of fieldsKeys to search is done in the search expression itself
