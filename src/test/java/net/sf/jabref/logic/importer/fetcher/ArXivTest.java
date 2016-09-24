@@ -18,6 +18,7 @@ import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ArXivTest {
 
@@ -28,7 +29,9 @@ public class ArXivTest {
 
     @Before
     public void setUp() {
-        finder = new ArXiv(mock(ImportFormatPreferences.class));
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+        when(importFormatPreferences.getKeywordSeparator()).thenReturn(',');
+        finder = new ArXiv(importFormatPreferences);
         entry = new BibEntry();
 
         sliceTheoremPaper = new BibEntry();
