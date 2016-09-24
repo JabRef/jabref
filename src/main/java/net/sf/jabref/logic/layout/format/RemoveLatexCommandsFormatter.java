@@ -1,8 +1,7 @@
 package net.sf.jabref.logic.layout.format;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
-import net.sf.jabref.model.util.ModelStringUtil;
-
+import net.sf.jabref.model.strings.StringUtil;
 
 public class RemoveLatexCommandsFormatter implements LayoutFormatter {
 
@@ -25,12 +24,12 @@ public class RemoveLatexCommandsFormatter implements LayoutFormatter {
                 currentCommand = new StringBuilder();
             } else if (!incommand && ((c == '{') || (c == '}'))) {
                 // Swallow the brace.
-            } else if (Character.isLetter(c) || ModelStringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
+            } else if (Character.isLetter(c) || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
                 if (incommand) {
                     currentCommand.append(c);
                     if ((currentCommand.length() == 1)
-                            && ModelStringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
+                            && StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type \^o or \~{n}
                         incommand = false;
                         escaped = false;

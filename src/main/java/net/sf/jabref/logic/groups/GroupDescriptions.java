@@ -1,10 +1,10 @@
 package net.sf.jabref.logic.groups;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.KeywordGroup;
 import net.sf.jabref.model.groups.SearchGroup;
+import net.sf.jabref.model.strings.StringUtil;
 
 public class GroupDescriptions {
 

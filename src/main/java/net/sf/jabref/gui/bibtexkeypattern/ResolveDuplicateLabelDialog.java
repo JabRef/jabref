@@ -38,19 +38,6 @@ class ResolveDuplicateLabelDialog {
     private boolean okPressed;
     private boolean cancelPressed;
 
-    private static final String LAYOUT = "<font face=\"arial\"><b><i>\\entrytype</i><a name=\"\\bibtexkey\">\\begin{bibtexkey} (\\bibtexkey)</a>\\end{bibtexkey}</b><br>\n"
-            + "\\begin{author} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\author}<BR>\\end{author}\n"
-            + "\\begin{editor} \\format[HTMLChars,AuthorAbbreviator,AuthorAndsReplacer]{\\editor} <i>(\\format[IfPlural(Eds.,Ed.)]{\\editor})</i><BR>\\end{editor}\n"
-            + "\\begin{title} \\format[HTMLChars]{\\title} \\end{title}<BR>\n"
-            + "\\begin{chapter} \\format[HTMLChars]{\\chapter}<BR>\\end{chapter}\n"
-            + "\\begin{journal} <em>\\format[HTMLChars]{\\journal}, </em>\\end{journal}\n"
-            + "\\begin{booktitle} <em>\\format[HTMLChars]{\\booktitle}, </em>\\end{booktitle}\n"
-            + "\\begin{school} <em>\\format[HTMLChars]{\\school}, </em>\\end{school}\n"
-            + "\\begin{institution} <em>\\format[HTMLChars]{\\institution}, </em>\\end{institution}\n"
-            + "\\begin{publisher} <em>\\format[HTMLChars]{\\publisher}, </em>\\end{publisher}\n"
-            + "\\begin{year}<b>\\year</b>\\end{year}\\begin{volume}<i>, \\volume</i>\\end{volume}\\begin{pages}, \\format[FormatPagesForHTML]{\\pages} \\end{pages}\n"
-            + "<p></p></font>";
-
 
     public ResolveDuplicateLabelDialog(BasePanel panel, String key, List<BibEntry> entries) {
         diag = new JDialog(panel.frame(), Localization.lang("Duplicate BibTeX key"), true);
@@ -66,7 +53,7 @@ class ResolveDuplicateLabelDialog {
             JCheckBox cb = new JCheckBox(Localization.lang("Generate BibTeX key"), !first);
             b.appendRows("1dlu, p");
             b.add(cb).xy(1, row);
-            PreviewPanel pp = new PreviewPanel(null, entry, null, ResolveDuplicateLabelDialog.LAYOUT);
+            PreviewPanel pp = new PreviewPanel(null, entry, null);
             pp.setPreferredSize(new Dimension(800, 90));
             b.add(new JScrollPane(pp)).xy(3, row);
             row += 2;

@@ -268,9 +268,6 @@ public class GlobalSearchBar extends JPanel {
     }
 
     private void clearSearch(BasePanel currentBasePanel) {
-        SearchQuery searchQuery = getSearchQuery();
-        updateResults(0, searchQuery.getDescription(), searchQuery.isGrammarBasedSearch());
-
         currentResults.setText("");
         searchField.setText("");
         searchField.setBackground(NEUTRAL_COLOR);
