@@ -49,6 +49,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Prohibit more than one connections to the same shared database.
 
 ### Fixed
+- Fixed [#2054](https://github.com/JabRef/jabref/issues/2054): Ignoring a new version now works as expected
 - Fixed selecting an entry out of multiple duplicates
 - Fixed [#617](https://github.com/JabRef/jabref/issues/617): `Enter` in global search opens the selected entry & `Enter` in search dialog window opens the selected entry
 - Entries in the SearchResultPanel will be shown correctly (Latex to Unicode)
