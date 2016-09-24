@@ -26,37 +26,44 @@ public class KeywordListTest {
 
     @Test
     public void parseOneWordReturnsOneKeyword() throws Exception {
-        assertEquals(Collections.singletonList(new Keyword("keywordOne")), KeywordList.parse("keywordOne", ','));
+        assertEquals(new KeywordList("keywordOne"),
+                KeywordList.parse("keywordOne", ','));
     }
 
     @Test
     public void parseTwoWordReturnsTwoKeywords() throws Exception {
-        assertEquals(Arrays.asList(new Keyword("keywordOne"), new Keyword("keywordTwo")),
+        assertEquals(new KeywordList("keywordOne", "keywordTwo"),
                 KeywordList.parse("keywordOne, keywordTwo", ','));
     }
 
     @Test
     public void parseTwoWordReturnsTwoKeywordsWithoutSpace() throws Exception {
-        assertEquals(Arrays.asList(new Keyword("keywordOne"), new Keyword("keywordTwo")),
+        assertEquals(new KeywordList("keywordOne", "keywordTwo"),
                 KeywordList.parse("keywordOne,keywordTwo", ','));
     }
 
     @Test
     public void parseTwoWordReturnsTwoKeywordsWithDifferentDelimiter() throws Exception {
-        assertEquals(Arrays.asList(new Keyword("keywordOne"), new Keyword("keywordTwo")),
+        assertEquals(new KeywordList("keywordOne", "keywordTwo"),
                 KeywordList.parse("keywordOne| keywordTwo", '|'));
     }
 
     @Test
     public void parseWordsWithWhitespaceReturnsOneKeyword() throws Exception {
-        assertEquals(Collections.singletonList(new Keyword("keyword and one")),
+        assertEquals(new KeywordList("keyword and one"),
                 KeywordList.parse("keyword and one", ','));
     }
 
     @Test
     public void parseWordsWithWhitespaceAndCommaReturnsTwoKeyword() throws Exception {
-        assertEquals(Arrays.asList(new Keyword("keyword and one"), new Keyword("and two")),
+        assertEquals(new KeywordList("keyword and one", "and two"),
                 KeywordList.parse("keyword and one, and two", ','));
+    }
+
+    @Test
+    public void parseIgnoresDuplicates() throws Exception {
+        assertEquals(new KeywordList("keywordOne", "keywordTwo"),
+                KeywordList.parse("keywordOne, keywordTwo, keywordOne", ','));
     }
 
     @Test

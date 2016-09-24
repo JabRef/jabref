@@ -331,50 +331,46 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
         KeywordList clone;
 
         // Priority
-        clone = createClone(keywordsToAdd);
+        clone = keywordsToAdd.createClone();
         clone.retainAll(Priority.getInstance().getKeyWords());
         if (!clone.isEmpty()) {
             keywordsToRemove.addAll(Priority.getInstance().getKeyWords());
         }
 
         // Quality
-        clone = createClone(keywordsToAdd);
+        clone = keywordsToAdd.createClone();
         clone.retainAll(Quality.getInstance().getKeyWords());
         if (!clone.isEmpty()) {
             keywordsToRemove.addAll(Quality.getInstance().getKeyWords());
         }
 
         // Rank
-        clone = createClone(keywordsToAdd);
+        clone = keywordsToAdd.createClone();
         clone.retainAll(Rank.getInstance().getKeyWords());
         if (!clone.isEmpty()) {
             keywordsToRemove.addAll(Rank.getInstance().getKeyWords());
         }
 
         // Relevance
-        clone = createClone(keywordsToAdd);
+        clone = keywordsToAdd.createClone();
         clone.retainAll(Relevance.getInstance().getKeyWords());
         if (!clone.isEmpty()) {
             keywordsToRemove.addAll(Relevance.getInstance().getKeyWords());
         }
 
         // Read status
-        clone = createClone(keywordsToAdd);
+        clone = keywordsToAdd.createClone();
         clone.retainAll(ReadStatus.getInstance().getKeyWords());
         if (!clone.isEmpty()) {
             keywordsToRemove.addAll(ReadStatus.getInstance().getKeyWords());
         }
 
         // Printed
-        clone = createClone(keywordsToAdd);
+        clone = keywordsToAdd.createClone();
         clone.retainAll(Printed.getInstance().getKeyWords());
         if (!clone.isEmpty()) {
             keywordsToRemove.addAll(Printed.getInstance().getKeyWords());
         }
-    }
-
-    private static KeywordList createClone(KeywordList keywordsToAdd) {
-        return new KeywordList(keywordsToAdd);
     }
 
     private void fillKeyWordList() {
