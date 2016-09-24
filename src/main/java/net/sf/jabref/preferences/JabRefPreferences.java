@@ -72,6 +72,7 @@ import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.UpdateFieldPreferences;
+import net.sf.jabref.logic.util.Version;
 import net.sf.jabref.logic.util.io.FileHistory;
 import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
@@ -1441,6 +1442,16 @@ public class JabRefPreferences {
     public FileLinkPreferences getFileLinkPreferences() {
         return new FileLinkPreferences(Collections.singletonList(get(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX)),
                 fileDirForDatabase);
+    }
+
+    public JabRefPreferences storeVersionPreferences(VersionPreferences versionPreferences) {
+        put(VERSION_IGNORED_UPDATE, versionPreferences.getIgnoredVersion().toString());
+        return this;
+    }
+
+    public VersionPreferences getVersionPreferences() {
+        Version ignoredVersion = new Version(get(VERSION_IGNORED_UPDATE));
+        return new VersionPreferences(ignoredVersion);
     }
 
     public JabRefPreferences storePreviewPreferences(PreviewPreferences previewPreferences) {
