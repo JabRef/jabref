@@ -18,6 +18,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.medline.Abstract;
 import net.sf.jabref.logic.importer.fileformat.medline.AbstractText;

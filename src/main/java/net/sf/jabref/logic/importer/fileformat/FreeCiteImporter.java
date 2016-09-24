@@ -22,6 +22,7 @@ import javax.xml.stream.XMLStreamReader;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;

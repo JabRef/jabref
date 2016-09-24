@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.importer.fileformat;
+package net.sf.jabref.logic.importer;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -10,7 +10,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.Objects;
 
-import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 
 /**
@@ -36,7 +35,7 @@ public abstract class Importer implements Comparable<Importer> {
      * Thus the correct behaviour is to return false if it is certain that the file is
      * not of the suitable type, and true otherwise. Returning true is the safe choice if not certain.
      */
-    protected abstract boolean isRecognizedFormat(BufferedReader input) throws IOException;
+    public abstract boolean isRecognizedFormat(BufferedReader input) throws IOException;
 
     public boolean isRecognizedFormat(Path filePath, Charset encoding) throws IOException {
         try (BufferedReader bufferedReader = getReader(filePath, encoding)) {
@@ -59,7 +58,7 @@ public abstract class Importer implements Comparable<Importer> {
      *
      * @param input the input to read from
      */
-    protected abstract ParserResult importDatabase(BufferedReader input) throws IOException ;
+    public abstract ParserResult importDatabase(BufferedReader input) throws IOException ;
 
     /**
      * Parse the database in the specified file.

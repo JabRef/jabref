@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.TreeSet;
 
 import net.sf.jabref.Globals;
-import net.sf.jabref.logic.importer.CustomImporter;
-import net.sf.jabref.logic.importer.fileformat.Importer;
+import net.sf.jabref.logic.importer.fileformat.CustomImporter;
+import net.sf.jabref.logic.importer.Importer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

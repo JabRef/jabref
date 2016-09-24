@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fetcher.DoiFetcher;
 import net.sf.jabref.logic.l10n.Localization;

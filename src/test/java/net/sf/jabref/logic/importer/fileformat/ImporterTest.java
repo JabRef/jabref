@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 

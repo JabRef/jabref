@@ -15,7 +15,7 @@ import java.util.List;
 
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.importer.fileformat.Importer;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 

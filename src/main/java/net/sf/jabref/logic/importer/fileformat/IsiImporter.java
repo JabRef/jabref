@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.formatter.casechanger.TitleCaseFormatter;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;

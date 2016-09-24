@@ -16,6 +16,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.mods.AbstractDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.DateDefinition;
@@ -73,7 +74,7 @@ public class ModsImporter extends Importer {
 
 
     @Override
-    protected boolean isRecognizedFormat(BufferedReader input) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
         return input.lines().anyMatch(line -> MODS_PATTERN.matcher(line).find());
     }
 

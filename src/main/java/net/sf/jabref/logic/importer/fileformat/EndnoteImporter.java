@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.AuthorList;

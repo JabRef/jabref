@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import net.sf.jabref.logic.importer.fileformat.Importer;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.util.FileExtensions;
 
 class ImportFileFilter extends FileFilter implements Comparable<ImportFileFilter> {

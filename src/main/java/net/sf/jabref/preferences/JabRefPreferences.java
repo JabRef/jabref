@@ -55,7 +55,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
-import net.sf.jabref.logic.importer.fileformat.Importer;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;

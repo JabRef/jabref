@@ -11,7 +11,7 @@ import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.importer.fileformat.Importer;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.EntryTypes;

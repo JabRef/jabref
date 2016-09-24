@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.OS;

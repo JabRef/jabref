@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Objects;
 
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
@@ -53,7 +54,7 @@ public class PdfXmpImporter extends Importer {
     }
 
     @Override
-    protected boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
         throw new UnsupportedOperationException(
                 "PdfXmpImporter does not support isRecognizedFormat(BufferedReader reader)."

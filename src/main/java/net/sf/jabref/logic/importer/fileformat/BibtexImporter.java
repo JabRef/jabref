@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 

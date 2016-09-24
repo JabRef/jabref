@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;

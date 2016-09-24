@@ -28,8 +28,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.gui.util.GUIUtil;
-import net.sf.jabref.logic.importer.CustomImporter;
-import net.sf.jabref.logic.importer.fileformat.Importer;
+import net.sf.jabref.logic.importer.fileformat.CustomImporter;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.l10n.Localization;
 
 import org.apache.commons.logging.Log;

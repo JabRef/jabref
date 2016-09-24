@@ -21,7 +21,7 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.importer.ImportFormatReader;
 import net.sf.jabref.logic.importer.ParserResult;
-import net.sf.jabref.logic.importer.fileformat.Importer;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.database.BibDatabase;
