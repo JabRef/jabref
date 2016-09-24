@@ -1,12 +1,12 @@
 package net.sf.jabref.logic.util.io;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,17 +20,17 @@ import java.util.Stack;
 import java.util.Vector;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.FileDirectoryPreferences;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
+import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -111,46 +111,46 @@ public class FileUtil {
     /**
      * Copies a file.
      *
-     * @param source         File Source file
-     * @param dest           File Destination file
-     * @param deleteIfExists boolean Determines whether the copy goes on even if the file
-     *                       exists.
-     * @return boolean Whether the copy succeeded, or was stopped due to the
-     * file already existing.
+     * @param pathToSourceFile      Path Source file
+     * @param pathToDestinationFile Path Destination file
+     * @param replaceExisting       boolean Determines whether the copy goes on even if the file exists.
+     * @return boolean Whether the copy succeeded, or was stopped due to the file already existing.
      * @throws IOException
      */
-    public static boolean copyFile(File source, File dest, boolean deleteIfExists) throws IOException {
+    public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean replaceExisting) {
         // Check if the file already exists.
-        if (dest.exists() && !deleteIfExists) {
+        if (!Files.exists(pathToSourceFile)) {
+            LOGGER.error("Path to the source file doesn't exist.");
             return false;
         }
-        try (BufferedInputStream in = new BufferedInputStream(new FileInputStream(source));
-                BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(dest))) {
-
-
-            int el;
-            while ((el = in.read()) >= 0) {
-                out.write(el);
-            }
-            out.flush();
+        if (Files.exists(pathToDestinationFile) && !replaceExisting) {
+            LOGGER.error("Path to the destination file is not exists and the file shouldn't be replace.");
+            return false;
         }
-        return true;
+        try {
+            return Files.copy(pathToSourceFile, pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING) != null;
+        } catch (IOException e) {
+            LOGGER.error("Copying Files failed.", e);
+            return false;
+        }
     }
 
     /**
-     * @param fileName
-     * @param destFilename
-     * @return
+     * Renames a given file
+     *
+     * @param fromFile The source filename to rename
+     * @param toFile   The target fileName
+     * @return True if the rename was successful, false if an exception occurred
      */
-    public static boolean renameFile(String fileName, String destFilename) {
-        // File (or directory) with old name
-        File fromFile = new File(fileName);
+    public static boolean renameFile(String fromFile, String toFile) {
 
-        // File (or directory) with new name
-        File toFile = new File(destFilename);
-
-        // Rename file (or directory)
-        return fromFile.renameTo(toFile);
+        try {
+            Path src = Paths.get(fromFile);
+            return Files.move(src, src.resolveSibling(toFile)) != null;
+        } catch (IOException e) {
+            LOGGER.error("Renaming Files failed", e);
+            return false;
+        }
     }
 
     /**

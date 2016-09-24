@@ -15,11 +15,8 @@ import javax.swing.Action;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
@@ -34,8 +31,11 @@ import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.io.AutoSaveUtil;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.migrations.FileLinksUpgradeWarning;
+import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
+import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 

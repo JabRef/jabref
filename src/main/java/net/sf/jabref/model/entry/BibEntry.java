@@ -21,12 +21,12 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.event.FieldChangedEvent;
+import net.sf.jabref.model.entry.event.EntryEventSource;
+import net.sf.jabref.model.entry.event.FieldChangedEvent;
 import net.sf.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Strings;
@@ -38,15 +38,10 @@ public class BibEntry implements Cloneable {
 
     private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
 
-    // All these fields should be private or protected
-    @Deprecated // use get/setType
     public static final String TYPE_HEADER = "entrytype";
-    @Deprecated
     public static final String OBSOLETE_TYPE_HEADER = "bibtextype";
-    @Deprecated // use dedicated methods like get/set/clearCiteKey
     public static final String KEY_FIELD = "bibtexkey";
     protected static final String ID_FIELD = "id";
-    @Deprecated // use constructor without type
     public static final String DEFAULT_TYPE = "misc";
 
     private static final Pattern REMOVE_TRAILING_WHITESPACE = Pattern.compile("\\s+$");
@@ -157,7 +152,6 @@ public class BibEntry implements Cloneable {
             Optional<BibEntry> referred = database.getReferencedEntry(this);
             result = referred.flatMap(entry -> entry.getFieldOrAlias(field));
         }
-
         return result.map(resultText -> BibDatabase.getText(resultText, database));
     }
 
@@ -576,8 +570,8 @@ public class BibEntry implements Cloneable {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[] {getField(FieldName.AUTHOR).orElse("N/A"),
-                getField(FieldName.TITLE).orElse("N/A"), getField(FieldName.YEAR).orElse("N/A")};
+        String[] s = new String[] {getField(FieldName.AUTHOR).orElse("N/A"), getField(FieldName.TITLE).orElse("N/A"),
+                getField(FieldName.YEAR).orElse("N/A")};
 
         String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
         if ((maxCharacters <= 0) || (text.length() <= maxCharacters)) {
@@ -740,6 +734,15 @@ public class BibEntry implements Cloneable {
     public String getUserComments() {
         // delete trailing whitespaces (between entry and text) from stored serialization
         return REMOVE_TRAILING_WHITESPACE.matcher(commentsBeforeEntry).replaceFirst("");
+    }
+
+    public List<ParsedEntryLink> getEntryLinkList(String fieldName, BibDatabase database) {
+        return getField(fieldName).map(fieldValue -> EntryLinkList.parse(fieldValue, database))
+                .orElse(Collections.emptyList());
+    }
+
+    public Optional<FieldChange> setEntryLinkList(String fieldName, List<ParsedEntryLink> list) {
+        return setField(fieldName, EntryLinkList.serialize(list));
     }
 
     public Set<String> getFieldAsWords(String field) {

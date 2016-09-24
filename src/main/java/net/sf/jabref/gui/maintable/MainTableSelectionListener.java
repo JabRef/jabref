@@ -20,24 +20,23 @@ import javax.swing.Timer;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefGUI;
-import net.sf.jabref.external.ExternalFileMenuItem;
-import net.sf.jabref.external.ExternalFileType;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.BasePanelMode;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
+import net.sf.jabref.gui.externalfiletype.ExternalFileMenuItem;
+import net.sf.jabref.gui.externalfiletype.ExternalFileType;
+import net.sf.jabref.gui.filelist.FileListEntry;
+import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.menus.RightClickMenu;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.preferences.PreviewPreferences;
 import net.sf.jabref.specialfields.SpecialFieldValue;
 import net.sf.jabref.specialfields.SpecialFieldsUtils;
 
@@ -54,14 +53,12 @@ import org.apache.commons.logging.LogFactory;
 public class MainTableSelectionListener implements ListEventListener<BibEntry>, MouseListener,
         KeyListener, FocusListener {
 
-    private final PreviewPanel[] previewPanel;
     private final MainTable table;
     private final BasePanel panel;
     private final EventList<BibEntry> tableRows;
 
-    private int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
     private PreviewPanel preview;
-    private boolean previewActive = Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED);
+    private boolean previewActive = Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled();
     private boolean workingOnPreview;
 
     private boolean enabled = true;
@@ -79,25 +76,17 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         this.table = table;
         this.panel = panel;
         this.tableRows = table.getTableModel().getTableRows();
-        previewPanel = new PreviewPanel[] {
-                new PreviewPanel(panel.getBibDatabaseContext(), null, panel,
-                        Globals.prefs.get(JabRefPreferences.PREVIEW_0)),
-                new PreviewPanel(panel.getBibDatabaseContext(), null, panel,
-                        Globals.prefs.get(JabRefPreferences.PREVIEW_1))};
-
-        panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[0]);
-        panel.getSearchBar().getSearchQueryHighlightObservable().addSearchListener(previewPanel[1]);
-
-        this.preview = previewPanel[activePreview];
+        PreviewPanel previewPanel = panel.getPreviewPanel();
+        if (previewPanel != null){
+            preview = previewPanel;
+        } else {
+            preview = new PreviewPanel(panel.getBibDatabaseContext(), null, panel);
+            panel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener(preview);
+        }
     }
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
-    }
-
-    public void updatePreviews() {
-        previewPanel[0].updateLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_0));
-        previewPanel[1].updateLayout(Globals.prefs.get(JabRefPreferences.PREVIEW_1));
     }
 
     @Override
@@ -112,6 +101,11 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         }
 
         final BibEntry newSelected = selected.get(0);
+        if (Objects.nonNull(panel.getCurrentEditor()) && (newSelected == panel.getCurrentEditor().getEntry())) {
+            // is already selected
+            return;
+        }
+
         if (newSelected != null) {
             final BasePanelMode mode = panel.getMode(); // What is the panel already showing?
             if ((mode == BasePanelMode.WILL_SHOW_EDITOR) || (mode == BasePanelMode.SHOWING_EDITOR)) {
@@ -190,9 +184,8 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         EntryEditor editor = panel.getEntryEditor(entry);
         if (mode != BasePanelMode.SHOWING_EDITOR) {
             panel.showEntryEditor(editor);
-            panel.adjustSplitter();
         }
-        new FocusRequester(editor);
+        editor.requestFocus();
     }
 
     @Override
@@ -434,7 +427,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             panel.hideBottomComponent();
         }
         panel.adjustSplitter();
-        new FocusRequester(table);
+        table.requestFocus();
     }
 
     @Override
@@ -458,19 +451,26 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         }
     }
 
-    public void switchPreview() {
-        if (activePreview < (previewPanel.length - 1)) {
-            activePreview++;
-        } else {
-            activePreview = 0;
-        }
-        Globals.prefs.putInt(JabRefPreferences.ACTIVE_PREVIEW, activePreview);
-        if (previewActive) {
-            this.preview = previewPanel[activePreview];
+    public void nextPreviewStyle(){
+        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() + 1);
+    }
 
-            if (!table.getSelected().isEmpty()) {
-                updatePreview(table.getSelected().get(0), true);
-            }
+    public void previousPreviewStyle(){
+        cyclePreview(Globals.prefs.getPreviewPreferences().getPreviewCyclePosition() - 1);
+    }
+
+    private void cyclePreview(int newPosition) {
+        PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
+                .getBuilder()
+                .withPreviewCyclePosition(newPosition)
+                .build();
+        Globals.prefs.storePreviewPreferences(previewPreferences);
+
+        preview.updateLayout();
+        preview.update();
+        panel.showPreview(preview);
+        if (!table.getSelected().isEmpty()) {
+            updatePreview(table.getSelected().get(0), true);
         }
     }
 

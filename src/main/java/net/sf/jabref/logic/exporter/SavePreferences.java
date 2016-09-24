@@ -3,7 +3,7 @@ package net.sf.jabref.logic.exporter;
 import java.nio.charset.Charset;
 
 import net.sf.jabref.logic.bibtex.LatexFieldFormatterPreferences;
-import net.sf.jabref.logic.config.SaveOrderConfig;
+import net.sf.jabref.model.metadata.SaveOrderConfig;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public class SavePreferences {
@@ -42,9 +42,9 @@ public class SavePreferences {
         SaveOrderConfig saveOrder = null;
         if (!saveInOriginalOrder) {
             if (preferences.getBoolean(JabRefPreferences.EXPORT_IN_SPECIFIED_ORDER)) {
-                saveOrder = SaveOrderConfig.loadExportSaveOrderFromPreferences(preferences);
+                saveOrder = preferences.loadExportSaveOrder();
             } else {
-                saveOrder = SaveOrderConfig.loadTableSaveOrderFromPreferences(preferences);
+                saveOrder = preferences.loadTableSaveOrder();
             }
         }
         Charset encoding = preferences.getDefaultEncoding();

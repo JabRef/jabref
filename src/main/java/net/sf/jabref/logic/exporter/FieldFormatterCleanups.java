@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.StringJoiner;
 
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -19,9 +20,13 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.strings.StringUtil;
 
 public class FieldFormatterCleanups {
+
+    public static final String ENABLED = "enabled";
+    public static final String DISABLED = "disabled";
 
     private final List<FieldFormatterCleanup> actions;
 
@@ -203,9 +208,9 @@ public class FieldFormatterCleanups {
         List<String> stringRepresentation = new ArrayList<>();
 
         if (enabled) {
-            stringRepresentation.add("enabled");
+            stringRepresentation.add(ENABLED);
         } else {
-            stringRepresentation.add("disabled");
+            stringRepresentation.add(DISABLED);
         }
 
         String formatterString = FieldFormatterCleanups.getMetaDataString(actions);
@@ -216,7 +221,7 @@ public class FieldFormatterCleanups {
     public static FieldFormatterCleanups parse(List<String> formatterMetaList) {
 
         if ((formatterMetaList != null) && (formatterMetaList.size() >= 2)) {
-            boolean enablementStatus = "enabled".equals(formatterMetaList.get(0));
+            boolean enablementStatus = ENABLED.equals(formatterMetaList.get(0));
             String formatterString = formatterMetaList.get(1);
             return new FieldFormatterCleanups(enablementStatus, formatterString);
         } else {
@@ -224,5 +229,9 @@ public class FieldFormatterCleanups {
             return FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS;
         }
 
+    }
+
+    public static Optional<FieldFormatterCleanups> fromMetaData(MetaData metadata) {
+        return metadata.getSaveActions().map(FieldFormatterCleanups::parse);
     }
 }

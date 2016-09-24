@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<file xmlns="http://bibtexml.sf.net/">
+    <entry id="Mustermann2016">
+        <incollection>
+            <author>Max Mustermann</author>
+            <title>Java InCollection</title>
+            <booktitle>Java Testing</booktitle>
+            <publisher>Java Publisher</publisher>
+            <year>2016</year>
+            <editor>Maxima Musterfrau</editor>
+            <volume>1</volume>
+            <number>1</number>
+            <pages>18-26</pages>
+            <month>February</month>
+            <keywords>java</keywords>
+        </incollection>
+    </entry>
+</file>

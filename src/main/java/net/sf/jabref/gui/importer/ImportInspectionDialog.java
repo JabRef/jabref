@@ -49,25 +49,23 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.external.DownloadExternalFile;
-import net.sf.jabref.external.ExternalFileMenuItem;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.DuplicateResolverDialog;
 import net.sf.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
 import net.sf.jabref.gui.EntryMarker;
-import net.sf.jabref.gui.FileListEntry;
-import net.sf.jabref.gui.FileListEntryEditor;
-import net.sf.jabref.gui.FileListTableModel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.gui.externalfiles.AutoSetLinks;
+import net.sf.jabref.gui.externalfiles.DownloadExternalFile;
+import net.sf.jabref.gui.externalfiletype.ExternalFileMenuItem;
+import net.sf.jabref.gui.filelist.FileListEntry;
+import net.sf.jabref.gui.filelist.FileListEntryEditor;
+import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
 import net.sf.jabref.gui.groups.UndoableChangeEntriesOfGroup;
 import net.sf.jabref.gui.help.HelpAction;
@@ -81,16 +79,15 @@ import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
-import net.sf.jabref.logic.groups.AllEntriesGroup;
-import net.sf.jabref.logic.groups.EntriesGroupChange;
-import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
+import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
@@ -98,7 +95,10 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.model.strings.StringUtil;
+import net.sf.jabref.model.groups.AllEntriesGroup;
+import net.sf.jabref.model.groups.EntriesGroupChange;
+import net.sf.jabref.model.groups.GroupTreeNode;
+import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -198,7 +198,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         this.undoName = undoName;
         this.newDatabase = newDatabase;
         setIconImage(new ImageIcon(IconTheme.getIconUrl("jabrefIcon48")).getImage());
-        preview = new PreviewPanel(null, bibDatabaseContext, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+        preview = new PreviewPanel(panel, bibDatabaseContext);
 
         duplLabel.setToolTipText(Localization.lang("Possible duplicate of existing entry. Click to resolve."));
 
@@ -250,7 +250,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         // Add "Attach file" menu choices to right click menu:
         popup.add(new LinkLocalFile());
         popup.add(new DownloadFile());
-        popup.add(new AutoSetLinks());
+        popup.add(new InternalAutoSetLinks());
         popup.add(new AttachUrl());
         getContentPane().add(centerPan, BorderLayout.CENTER);
 
@@ -458,7 +458,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             entry.setId(IdGenerator.next());
             // Add the entry to the database we are working with:
-            database.insertEntryWithDuplicationCheck(entry);
+            database.insertEntry(entry);
 
             // Generate a unique key:
             BibtexKeyPatternUtil.makeLabel(localMetaData, database, entry,
@@ -501,7 +501,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             for (BibEntry entry : entries) {
 
                 entry.setId(IdGenerator.next());
-                database.insertEntryWithDuplicationCheck(entry);
+                database.insertEntry(entry);
 
                 BibtexKeyPatternUtil.makeLabel(localMetaData, database, entry,
                         Globals.prefs.getBibtexKeyPatternPreferences());
@@ -735,7 +735,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 }
 
                 entry.setId(IdGenerator.next());
-                panel.getDatabase().insertEntryWithDuplicationCheck(entry);
+                panel.getDatabase().insertEntry(entry);
                 ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
 
             }
@@ -1195,9 +1195,9 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         }
     }
 
-    private class AutoSetLinks extends JMenuItem implements ActionListener {
+    private class InternalAutoSetLinks extends JMenuItem implements ActionListener {
 
-        public AutoSetLinks() {
+        public InternalAutoSetLinks() {
             super(Localization.lang("Automatically set file links"));
             addActionListener(this);
         }
@@ -1223,8 +1223,8 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             // We have a static utility method for searching for all relevant
             // links:
             JDialog diag = new JDialog(ImportInspectionDialog.this, true);
-            JabRefExecutorService.INSTANCE.execute(
-                    net.sf.jabref.external.AutoSetLinks.autoSetLinks(entry, localModel, bibDatabaseContext, e -> {
+            JabRefExecutorService.INSTANCE
+                    .execute(AutoSetLinks.autoSetLinks(entry, localModel, bibDatabaseContext, e -> {
                         if (e.getID() > 0) {
 
                             entries.getReadWriteLock().writeLock().lock();
@@ -1235,7 +1235,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                             }
                             glTable.repaint();
                         }
-                    }, diag));
+                    } , diag));
 
         }
     }

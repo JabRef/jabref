@@ -3,6 +3,9 @@ package net.sf.jabref.gui.preftabs;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ItemListener;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -10,6 +13,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
@@ -22,9 +26,9 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.layout.format.FileLinkPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.DefaultFormBuilder;
@@ -189,7 +193,7 @@ class FileTab extends JPanel implements PrefsTab {
 
     @Override
     public void setValues() {
-        fileDir.setText(prefs.get(FieldName.FILE + FileLinkPreferences.DIR_SUFFIX));
+        fileDir.setText(prefs.get(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX));
         bibLocAsPrimaryDir.setSelected(prefs.getBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR));
         runAutoFileSearch.setSelected(prefs.getBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH));
         allowFileAutoOpenBrowse.setSelected(prefs.getBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE));
@@ -229,7 +233,7 @@ class FileTab extends JPanel implements PrefsTab {
 
     @Override
     public void storeSettings() {
-        prefs.put(FieldName.FILE + FileLinkPreferences.DIR_SUFFIX, fileDir.getText());
+        prefs.put(FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX, fileDir.getText());
         prefs.putBoolean(JabRefPreferences.BIB_LOC_AS_PRIMARY_DIR, bibLocAsPrimaryDir.isSelected());
         prefs.putBoolean(JabRefPreferences.RUN_AUTOMATIC_FILE_SEARCH, runAutoFileSearch.isSelected());
         prefs.putBoolean(JabRefPreferences.ALLOW_FILE_AUTO_OPEN_BROWSE, allowFileAutoOpenBrowse.isSelected());
@@ -281,7 +285,14 @@ class FileTab extends JPanel implements PrefsTab {
 
     @Override
     public boolean validateSettings() {
-        return true;
+        Path path = Paths.get(fileDir.getText());
+        boolean valid = Files.exists(path) && Files.isDirectory(path);
+        if (!valid) {
+            String content = String.format("%s -> %s %n %n %s: %n %s", Localization.lang("File"),
+                    Localization.lang("Main file directory"), Localization.lang("Directory not found"), path);
+            JOptionPane.showMessageDialog(this.frame, content, Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+        }
+        return valid;
     }
 
     @Override

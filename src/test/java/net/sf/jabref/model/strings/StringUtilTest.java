@@ -2,7 +2,6 @@ package net.sf.jabref.model.strings;
 
 import java.util.Optional;
 
-import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.entry.FileField;
 
 import org.junit.Test;
@@ -13,6 +12,37 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class StringUtilTest {
+
+    @Test
+    public void testBooleanToBinaryString() {
+        assertEquals("0", StringUtil.booleanToBinaryString(false));
+        assertEquals("1", StringUtil.booleanToBinaryString(true));
+    }
+
+    @Test
+    public void testQuoteSimple() {
+        assertEquals("a::", StringUtil.quote("a:", "", ':'));
+    }
+
+    @Test
+    public void testQuoteNullQuotation() {
+        assertEquals("a::", StringUtil.quote("a:", null, ':'));
+    }
+
+    @Test
+    public void testQuoteNullString() {
+        assertEquals("", StringUtil.quote(null, ";", ':'));
+    }
+
+    @Test
+    public void testQuoteQuotationCharacter() {
+        assertEquals("a:::;", StringUtil.quote("a:;", ";", ':'));
+    }
+
+    @Test
+    public void testQuoteMoreComplicated() {
+        assertEquals("a::b:%c:;", StringUtil.quote("a:b%c;", "%;", ':'));
+    }
 
     private static final String[][] STRING_ARRAY_1 = {{"a", "b"}, {"c", "d"}};
     private static final String ENCODED_STRING_ARRAY_1 = "a:b;c:d";
@@ -27,14 +57,14 @@ public class StringUtilTest {
     @Test
     public void testUnifyLineBreaks() {
         // Mac < v9
-        String result = StringUtil.unifyLineBreaks("\r", OS.NEWLINE);
-        assertEquals(OS.NEWLINE, result);
+        String result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r", "newline");
+        assertEquals("newline", result);
         // Windows
-        result = StringUtil.unifyLineBreaks("\r\n", OS.NEWLINE);
-        assertEquals(OS.NEWLINE, result);
+        result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r\n", "newline");
+        assertEquals("newline", result);
         // Unix
-        result = StringUtil.unifyLineBreaks("\n", OS.NEWLINE);
-        assertEquals(OS.NEWLINE, result);
+        result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\n", "newline");
+        assertEquals("newline", result);
     }
 
     @Test
@@ -122,29 +152,20 @@ public class StringUtilTest {
 
     @Test
     public void testWrap() {
-        assertEquals("aaaaa" + OS.NEWLINE + "\tbbbbb" + OS.NEWLINE + "\tccccc",
-                StringUtil.wrap("aaaaa bbbbb ccccc", 5, OS.NEWLINE));
-        assertEquals("aaaaa bbbbb" + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 8, OS.NEWLINE));
-        assertEquals("aaaaa bbbbb" + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 11, OS.NEWLINE));
-        assertEquals("aaaaa bbbbb ccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 12, OS.NEWLINE));
-        assertEquals("aaaaa" + OS.NEWLINE + "\t" + OS.NEWLINE + "\tbbbbb" + OS.NEWLINE + "\t"
-                + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\nbbbbb\nccccc", 12, OS.NEWLINE));
+        String newline = "newline";
+        assertEquals("aaaaa" + newline + "\tbbbbb" + newline + "\tccccc",
+                StringUtil.wrap("aaaaa bbbbb ccccc", 5, newline));
+        assertEquals("aaaaa bbbbb" + newline + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 8, newline));
+        assertEquals("aaaaa bbbbb" + newline + "\tccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 11, newline));
+        assertEquals("aaaaa bbbbb ccccc", StringUtil.wrap("aaaaa bbbbb ccccc", 12, newline));
+        assertEquals("aaaaa" + newline + "\t" + newline + "\tbbbbb" + newline + "\t" + newline + "\tccccc",
+                StringUtil.wrap("aaaaa\nbbbbb\nccccc", 12, newline));
         assertEquals(
-                "aaaaa" + OS.NEWLINE + "\t" + OS.NEWLINE + "\t" + OS.NEWLINE + "\tbbbbb"
-                        + OS.NEWLINE + "\t" + OS.NEWLINE + "\tccccc",
-                StringUtil.wrap("aaaaa\n\nbbbbb\nccccc", 12, OS.NEWLINE));
-        assertEquals("aaaaa" + OS.NEWLINE + "\t" + OS.NEWLINE + "\tbbbbb" + OS.NEWLINE + "\t"
-                + OS.NEWLINE + "\tccccc", StringUtil.wrap("aaaaa\r\nbbbbb\r\nccccc", 12, OS.NEWLINE));
+                "aaaaa" + newline + "\t" + newline + "\t" + newline + "\tbbbbb" + newline + "\t" + newline + "\tccccc",
+                StringUtil.wrap("aaaaa\n\nbbbbb\nccccc", 12, newline));
+        assertEquals("aaaaa" + newline + "\t" + newline + "\tbbbbb" + newline + "\t" + newline + "\tccccc",
+                StringUtil.wrap("aaaaa\r\nbbbbb\r\nccccc", 12, newline));
     }
-
-    @Test
-    public void testUnquote() {
-        assertEquals("a:", StringUtil.unquote("a::", ':'));
-        assertEquals("a:;", StringUtil.unquote("a:::;", ':'));
-        assertEquals("a:b%c;", StringUtil.unquote("a::b:%c:;", ':'));
-    }
-
-
 
     @Test
     public void testEncodeStringArray() {
@@ -161,12 +182,6 @@ public class StringUtilTest {
         // arrays first differed at element [0][1]; expected: null<null> but was: java.lang.String<null>
         // assertArrayEquals(stringArray2res, StringUtil.decodeStringDoubleArray(encStringArray2));
         assertArrayEquals(STRING_ARRAY_3, StringUtil.decodeStringDoubleArray(ENCODED_STRING_ARRAY_3));
-    }
-
-    @Test
-    public void testBooleanToBinaryString() {
-        assertEquals("0", StringUtil.booleanToBinaryString(false));
-        assertEquals("1", StringUtil.booleanToBinaryString(true));
     }
 
     @Test
@@ -224,17 +239,17 @@ public class StringUtilTest {
 
     @Test(expected = NumberFormatException.class)
     public void testIntValueOfExceptionIfStringContainsLetter() {
-            StringUtil.intValueOf("12A2");
+        StringUtil.intValueOf("12A2");
     }
 
     @Test(expected = NumberFormatException.class)
     public void testIntValueOfExceptionIfStringNull() {
-            StringUtil.intValueOf(null);
+        StringUtil.intValueOf(null);
     }
 
     @Test(expected = NumberFormatException.class)
     public void testIntValueOfExceptionfIfStringEmpty() {
-            StringUtil.intValueOf("");
+        StringUtil.intValueOf("");
     }
 
     @Test
@@ -267,31 +282,6 @@ public class StringUtilTest {
     @Test
     public void testIntValueOfWithNullExceptionfIfStringEmpty() {
         assertEquals(Optional.empty(), StringUtil.intValueOfOptional(""));
-    }
-
-    @Test
-    public void testQuoteSimple() {
-        assertEquals("a::", StringUtil.quote("a:", "", ':'));
-    }
-
-    @Test
-    public void testQuoteNullQuotation() {
-        assertEquals("a::", StringUtil.quote("a:", null, ':'));
-    }
-
-    @Test
-    public void testQuoteNullString() {
-        assertEquals("", StringUtil.quote(null, ";", ':'));
-    }
-
-    @Test
-    public void testQuoteQuotationCharacter() {
-        assertEquals("a:::;", StringUtil.quote("a:;", ";", ':'));
-    }
-
-    @Test
-    public void testQuoteMoreComplicated() {
-        assertEquals("a::b:%c:;", StringUtil.quote("a:b%c;", "%;", ':'));
     }
 
     @Test
@@ -343,6 +333,13 @@ public class StringUtilTest {
     @Test
     public void testBoldHTMLReturnsAlternativeTextIfNull() {
         assertEquals("<b>BB</b>", StringUtil.boldHTML(null, "BB"));
+    }
+
+    @Test
+    public void testUnquote() {
+        assertEquals("a:", StringUtil.unquote("a::", ':'));
+        assertEquals("a:;", StringUtil.unquote("a:::;", ':'));
+        assertEquals("a:b%c;", StringUtil.unquote("a::b:%c:;", ':'));
     }
 
     @Test

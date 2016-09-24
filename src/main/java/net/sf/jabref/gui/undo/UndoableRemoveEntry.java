@@ -1,10 +1,10 @@
 package net.sf.jabref.gui.undo;
 
-import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;

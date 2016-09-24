@@ -12,7 +12,6 @@ import net.sf.jabref.model.strings.StringUtil;
  *
  */
 public class FieldName {
-
     // Character separating field names that are to be used in sequence as
     // fallbacks for a single column (e.g. "author/editor" to use editor where
     // author is not set):
@@ -130,7 +129,6 @@ public class FieldName {
     // Map to hold alternative display names
     private static final Map<String, String> displayNames = new HashMap<>();
 
-
     public static String orFields(String... fields) {
         return String.join(FieldName.FIELD_SEPARATOR, fields);
     }
@@ -150,7 +148,6 @@ public class FieldName {
         displayNames.put(FieldName.URI, "URI");
         displayNames.put(FieldName.URL, "URL");
     }
-
 
     /**
      * @param field - field to get the display version for

@@ -87,6 +87,7 @@ public class ImportFormatTest {
                 new Object[]{new IsiImporter()},
                 new Object[]{new MedlineImporter()},
                 new Object[]{new MedlinePlainImporter()},
+                new Object[]{new ModsImporter()},
                 new Object[]{new MsBibImporter()},
                 new Object[]{new OvidImporter()},
                 new Object[]{new PdfContentImporter(importFormatPreferences)},

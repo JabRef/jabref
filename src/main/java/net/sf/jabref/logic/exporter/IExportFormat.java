@@ -4,7 +4,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 
-import net.sf.jabref.BibDatabaseContext;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 
 public interface IExportFormat {

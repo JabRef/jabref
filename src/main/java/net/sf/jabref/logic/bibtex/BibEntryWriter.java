@@ -18,7 +18,6 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.strings.StringUtil;
 
-
 public class BibEntryWriter {
 
     private final LatexFieldFormatter fieldFormatter;

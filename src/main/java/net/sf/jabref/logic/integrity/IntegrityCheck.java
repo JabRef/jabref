@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.FileDirectoryPreferences;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 
 public class IntegrityCheck {
 
@@ -50,7 +50,11 @@ public class IntegrityCheck {
 
         result.addAll(new BracketChecker(FieldName.TITLE).check(entry));
         result.addAll(new YearChecker().check(entry));
+        result.addAll(new BibtexkeyChecker().check(entry));
         result.addAll(new EditionChecker(bibDatabaseContext).check(entry));
+        result.addAll(new NoteChecker(bibDatabaseContext).check(entry));
+        result.addAll(new HowpublishedChecker(bibDatabaseContext).check(entry));
+        result.addAll(new MonthChecker(bibDatabaseContext).check(entry));
         result.addAll(new UrlChecker().check(entry));
         result.addAll(new FileChecker(bibDatabaseContext, fileDirectoryPreferences).check(entry));
         result.addAll(new TypeChecker().check(entry));

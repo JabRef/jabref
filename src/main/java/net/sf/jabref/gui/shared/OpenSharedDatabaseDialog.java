@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -28,18 +29,16 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefException;
+import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.database.DatabaseLocation;
+import net.sf.jabref.shared.DBMSConnection;
 import net.sf.jabref.shared.DBMSConnectionProperties;
-import net.sf.jabref.shared.DBMSConnector;
 import net.sf.jabref.shared.DBMSType;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
@@ -82,7 +81,6 @@ public class OpenSharedDatabaseDialog extends JDialog {
     private final SharedDatabasePreferences prefs = new SharedDatabasePreferences();
 
     private DBMSConnectionProperties connectionProperties;
-    private BibDatabaseContext bibDatabaseContext;
 
     /**
      * @param frame the JabRef Frame
@@ -98,21 +96,21 @@ public class OpenSharedDatabaseDialog extends JDialog {
     }
 
     public void openSharedDatabase() {
+
+        if (isSharedDatabaseAlreadyPresent()) {
+            JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this,
+                    Localization.lang("You are already connected to a database using entered connection details."),
+                    Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         setLoadingConnectButtonText(true);
 
         try {
-            bibDatabaseContext.getDBSynchronizer().openSharedDatabase(connectionProperties);
-            frame.addTab(bibDatabaseContext, true);
+            new SharedDatabaseUIManager(frame, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR)).openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
-            bibDatabaseContext.getDBSynchronizer()
-                    .registerListener(
-                            new SharedDatabaseUIManager(frame));
-            frame.output(Localization.lang("Connection_to_%0_server_established.", connectionProperties.getType().toString()));
             dispose();
             return; // setLoadingConnectButtonText(false) should not be reached regularly.
-        } catch (ClassNotFoundException exception) {
-            JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this, exception.getMessage(),
-                    Localization.lang("Driver error"), JOptionPane.ERROR_MESSAGE);
         } catch (SQLException exception) {
             JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this, exception.getMessage(),
                     Localization.lang("Connection error"), JOptionPane.ERROR_MESSAGE);
@@ -133,10 +131,6 @@ public class OpenSharedDatabaseDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     checkFields();
-                    BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
-
-                    bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode),
-                            DatabaseLocation.SHARED, Globals.prefs.getKeywordDelimiter());
 
                     connectionProperties = new DBMSConnectionProperties();
                     connectionProperties.setType((DBMSType) dbmsTypeDropDown.getSelectedItem());
@@ -234,7 +228,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
         connectionPanel.setBorder(BorderFactory.createTitledBorder(BorderFactory.createEtchedBorder(), Localization.lang("Connection")));
         connectionPanel.setLayout(gridBagLayout);
 
-        Set<DBMSType> availableDBMSTypes = DBMSConnector.getAvailableDBMSTypes();
+        Set<DBMSType> availableDBMSTypes = DBMSConnection.getAvailableDBMSTypes();
         DefaultComboBoxModel<DBMSType> comboBoxModel = new DefaultComboBoxModel<>(
                 availableDBMSTypes.toArray(new DBMSType[availableDBMSTypes.size()]));
 
@@ -384,4 +378,18 @@ public class OpenSharedDatabaseDialog extends JDialog {
         }
     }
 
+    /**
+     * Checks whether a database with the given @link {@link DBMSConnectionProperties} is already opened.
+     */
+    private boolean isSharedDatabaseAlreadyPresent() {
+        List<BasePanel> panels = JabRefGUI.getMainFrame().getBasePanelList();
+        for (BasePanel panel : panels) {
+            DBMSConnectionProperties dbmsConnectionProperties = panel.getBibDatabaseContext().getDBMSSynchronizer()
+                    .getDBProcessor().getDBMSConnectionProperties();
+            if (this.connectionProperties.equals(dbmsConnectionProperties)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }

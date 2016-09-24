@@ -65,7 +65,6 @@ import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.JabRefGUI;
@@ -77,6 +76,7 @@ import net.sf.jabref.gui.importer.UnlinkedPDFFileFilter;
 import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.EntryTypes;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibtexEntryType;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
@@ -1024,7 +1024,8 @@ public class FindUnlinkedFilesDialog extends JDialog {
         Iterator<EntryType> iterator = EntryTypes
                 .getAllValues(frame.getCurrentBasePanel().getBibDatabaseContext().getMode()).iterator();
         Vector<BibtexEntryTypeWrapper> list = new Vector<>();
-        list.add(new BibtexEntryTypeWrapper(null));
+        list.add(
+                new BibtexEntryTypeWrapper(null));
         while (iterator.hasNext()) {
             list.add(new BibtexEntryTypeWrapper(iterator.next()));
         }

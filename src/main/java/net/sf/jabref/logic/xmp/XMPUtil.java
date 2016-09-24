@@ -260,7 +260,7 @@ public class XMPUtil {
             if (key.startsWith("bibtex/")) {
                 String value = dict.getString(key);
                 key = key.substring("bibtex/".length());
-                if ("entrytype".equals(key)) {
+                if (BibEntry.TYPE_HEADER.equals(key)) {
                     entry.setType(value);
                 } else {
                     entry.setField(key, value);

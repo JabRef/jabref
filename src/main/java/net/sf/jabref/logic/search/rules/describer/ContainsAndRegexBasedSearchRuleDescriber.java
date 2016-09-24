@@ -4,7 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.rules.SentenceAnalyzer;
+import net.sf.jabref.model.search.rules.SentenceAnalyzer;
 import net.sf.jabref.model.strings.StringUtil;
 
 public class ContainsAndRegexBasedSearchRuleDescriber implements SearchDescriber {

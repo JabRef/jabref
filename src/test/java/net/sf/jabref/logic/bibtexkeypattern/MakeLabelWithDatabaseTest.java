@@ -2,12 +2,12 @@ package net.sf.jabref.logic.bibtexkeypattern;
 
 import java.util.Optional;
 
-import net.sf.jabref.MetaData;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.metadata.MetaData;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +31,7 @@ public class MakeLabelWithDatabaseTest {
         entry.setField("author", "John Doe");
         entry.setField("year", "2016");
         entry.setField("title", "An awesome paper on JabRef");
-        database.insertEntryWithDuplicationCheck(entry);
+        database.insertEntry(entry);
         pattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern.split("[auth][year]"));
         preferences = new BibtexKeyPatternPreferences("", "", false, true, true, pattern);
     }
@@ -97,12 +97,12 @@ public class MakeLabelWithDatabaseTest {
         entry2.setField("author", "John Doe");
         entry2.setField("year", "2016");
         entry2.setCiteKey(entry.getCiteKeyOptional().get());
-        database.insertEntryWithDuplicationCheck(entry2);
+        database.insertEntry(entry2);
         BibEntry entry3 = new BibEntry();
         entry3.setField("author", "John Doe");
         entry3.setField("year", "2016");
         entry3.setCiteKey(entry.getCiteKeyOptional().get());
-        database.insertEntryWithDuplicationCheck(entry3);
+        database.insertEntry(entry3);
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry3, preferences);
         assertEquals(Optional.of("Doe2016a"), entry3.getCiteKeyOptional());
     }
@@ -114,12 +114,12 @@ public class MakeLabelWithDatabaseTest {
         entry2.setField("author", "John Doe");
         entry2.setField("year", "2016");
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry2, preferences);
-        database.insertEntryWithDuplicationCheck(entry2);
+        database.insertEntry(entry2);
         BibEntry entry3 = new BibEntry();
         entry3.setField("author", "John Doe");
         entry3.setField("year", "2016");
         entry3.setCiteKey(entry.getCiteKeyOptional().get());
-        database.insertEntryWithDuplicationCheck(entry3);
+        database.insertEntry(entry3);
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry3, preferences);
         assertEquals(Optional.of("Doe2016b"), entry3.getCiteKeyOptional());
     }
