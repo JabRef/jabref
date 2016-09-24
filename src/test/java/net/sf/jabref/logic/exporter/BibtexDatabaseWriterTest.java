@@ -11,7 +11,7 @@ import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.importer.fileformat.ImportFormat;
+import net.sf.jabref.logic.importer.fileformat.Importer;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.EntryTypes;
@@ -267,7 +267,7 @@ public class BibtexDatabaseWriterTest {
     public void roundtrip() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding),
+        ParserResult result = BibtexParser.parse(Importer.getReader(testBibtexFile, encoding),
                 importFormatPreferences);
 
         SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
@@ -284,7 +284,7 @@ public class BibtexDatabaseWriterTest {
     public void roundtripWithUserComment() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding),
+        ParserResult result = BibtexParser.parse(Importer.getReader(testBibtexFile, encoding),
                 importFormatPreferences);
 
         SavePreferences preferences = new SavePreferences().withEncoding(encoding).withSaveInOriginalOrder(true);
@@ -301,7 +301,7 @@ public class BibtexDatabaseWriterTest {
     public void roundtripWithUserCommentAndEntryChange() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/bibWithUserComments.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding),
+        ParserResult result = BibtexParser.parse(Importer.getReader(testBibtexFile, encoding),
                 importFormatPreferences);
 
         BibEntry entry = result.getDatabase().getEntryByKey("1137631").get();
@@ -322,7 +322,7 @@ public class BibtexDatabaseWriterTest {
     public void roundtripWithUserCommentBeforeStringAndChange() throws Exception {
         Path testBibtexFile = Paths.get("src/test/resources/testbib/complex.bib");
         Charset encoding = StandardCharsets.UTF_8;
-        ParserResult result = BibtexParser.parse(ImportFormat.getReader(testBibtexFile, encoding),
+        ParserResult result = BibtexParser.parse(Importer.getReader(testBibtexFile, encoding),
                 importFormatPreferences);
 
         for (BibtexString string : result.getDatabase().getStringValues()) {

@@ -24,7 +24,7 @@ import net.sf.jabref.model.entry.MonthUtil;
  * Several Biblioscape field types are ignored. Others are only included in the BibTeX
  * field "comment".
  */
-public class RisImporter extends ImportFormat {
+public class RisImporter extends Importer {
 
     private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY  - .*");
 

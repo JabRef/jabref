@@ -15,7 +15,7 @@ import java.util.List;
 
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.importer.fileformat.ImportFormat;
+import net.sf.jabref.logic.importer.fileformat.Importer;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -103,38 +103,38 @@ public class BibEntryAssert {
     }
 
     /**
-     * Compares two InputStreams. For each InputStream a list will be created. expectedIs is read directly, actualIs is filtered through importFormat to convert to a list of BibEntries.
+     * Compares two InputStreams. For each InputStream a list will be created. expectedIs is read directly, actualIs is filtered through importer to convert to a list of BibEntries.
      * @param expectedIs A BibtexImporter InputStream.
      * @param fileToImport The path to the file to be imported.
-     * @param importFormat The fileformat you want to use to read the passed file to get the list of expected BibEntries
+     * @param importer The fileformat you want to use to read the passed file to get the list of expected BibEntries
      * @throws IOException
      */
-    public static void assertEquals(InputStream expectedIs, Path fileToImport, ImportFormat importFormat)
+    public static void assertEquals(InputStream expectedIs, Path fileToImport, Importer importer)
             throws IOException {
-        assertEquals(getListFromInputStream(expectedIs), fileToImport, importFormat);
+        assertEquals(getListFromInputStream(expectedIs), fileToImport, importer);
     }
 
-    public static void assertEquals(InputStream expectedIs, URL fileToImport, ImportFormat importFormat)
+    public static void assertEquals(InputStream expectedIs, URL fileToImport, Importer importer)
             throws URISyntaxException, IOException {
-        assertEquals(expectedIs, Paths.get(fileToImport.toURI()), importFormat);
+        assertEquals(expectedIs, Paths.get(fileToImport.toURI()), importer);
     }
 
     /**
      * Compares a list of BibEntries to an InputStream. actualIs is filtered through importerForActualIs to convert to a list of BibEntries.
      * @param expected A BibtexImporter InputStream.
      * @param fileToImport The path to the file to be imported.
-     * @param importFormat The fileformat you want to use to read the passed file to get the list of expected BibEntries
+     * @param importer The fileformat you want to use to read the passed file to get the list of expected BibEntries
      * @throws IOException
      */
-    public static void assertEquals(List<BibEntry> expected, Path fileToImport, ImportFormat importFormat)
+    public static void assertEquals(List<BibEntry> expected, Path fileToImport, Importer importer)
             throws IOException {
-        List<BibEntry> actualEntries = importFormat.importDatabase(fileToImport, Charset.defaultCharset())
+        List<BibEntry> actualEntries = importer.importDatabase(fileToImport, Charset.defaultCharset())
                 .getDatabase().getEntries();
         Assert.assertEquals(expected, actualEntries);
     }
 
-    public static void assertEquals(List<BibEntry> expected, URL fileToImport, ImportFormat importFormat)
+    public static void assertEquals(List<BibEntry> expected, URL fileToImport, Importer importer)
             throws URISyntaxException, IOException {
-        assertEquals(expected, Paths.get(fileToImport.toURI()), importFormat);
+        assertEquals(expected, Paths.get(fileToImport.toURI()), importer);
     }
 }

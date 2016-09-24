@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import net.sf.jabref.logic.importer.CustomImporter;
+
 import org.junit.Before;
 import org.junit.Test;
 

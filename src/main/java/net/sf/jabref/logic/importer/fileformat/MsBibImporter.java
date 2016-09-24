@@ -20,7 +20,7 @@ import org.xml.sax.InputSource;
  *
  * ...
  */
-public class MsBibImporter extends ImportFormat {
+public class MsBibImporter extends Importer {
 
     @Override
     public boolean isRecognizedFormat(BufferedReader reader) throws IOException {

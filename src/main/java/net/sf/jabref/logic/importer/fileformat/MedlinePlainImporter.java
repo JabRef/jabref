@@ -25,7 +25,7 @@ import net.sf.jabref.model.entry.FieldName;
  *
  * @author vegeziel
  */
-public class MedlinePlainImporter extends ImportFormat {
+public class MedlinePlainImporter extends Importer {
 
     private static final Pattern PMID_PATTERN = Pattern.compile("PMID.*-.*");
     private static final Pattern PMC_PATTERN = Pattern.compile("PMC.*-.*");

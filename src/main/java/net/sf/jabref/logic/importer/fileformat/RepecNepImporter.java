@@ -143,7 +143,7 @@ import org.apache.commons.logging.LogFactory;
  * @author andreas_sf at rudert-home dot de
  * @see <a href="http://nep.repec.org">NEP</a>
  */
-public class RepecNepImporter extends ImportFormat {
+public class RepecNepImporter extends Importer {
 
     private static final Log LOGGER = LogFactory.getLog(RepecNepImporter.class);
 

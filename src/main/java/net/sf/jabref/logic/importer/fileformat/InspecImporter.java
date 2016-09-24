@@ -17,7 +17,7 @@ import net.sf.jabref.model.entry.FieldName;
 /**
  * INSPEC format importer.
  */
-public class InspecImporter extends ImportFormat {
+public class InspecImporter extends Importer {
 
     private static final Pattern INSPEC_PATTERN = Pattern.compile("Record.*INSPEC.*");
 

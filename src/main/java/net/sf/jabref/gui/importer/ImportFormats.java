@@ -19,7 +19,7 @@ import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.importer.fileformat.ImportFormat;
+import net.sf.jabref.logic.importer.fileformat.Importer;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -59,7 +59,7 @@ public class ImportFormats {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                SortedSet<ImportFormat> importers = Globals.IMPORT_FORMAT_READER.getImportFormats();
+                SortedSet<Importer> importers = Globals.IMPORT_FORMAT_READER.getImportFormats();
                 List<FileExtensions> extensions = importers.stream().map(p -> p.getExtensions()).collect(Collectors.toList());
                 FileDialog dialog = new FileDialog(frame, Globals.prefs.get(JabRefPreferences.IMPORT_WORKING_DIRECTORY));
                 // Add file filter for all supported types
@@ -81,7 +81,7 @@ public class ImportFormats {
                             return;
                         }
 
-                        Optional<ImportFormat> format = importers.stream()
+                        Optional<Importer> format = importers.stream()
                                 .filter(i -> Objects.equals(i.getExtensions().getDescription(), dialog.getFileFilter().getDescription()))
                                 .findFirst();
                         ImportMenuItem importMenu = new ImportMenuItem(frame, newDatabase, format.orElse(null));

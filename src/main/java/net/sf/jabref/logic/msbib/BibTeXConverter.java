@@ -7,7 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import net.sf.jabref.logic.importer.fileformat.ImportFormat;
+import net.sf.jabref.logic.importer.fileformat.Importer;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.MonthUtil;
@@ -29,7 +29,7 @@ public class BibTeXConverter {
 
         String bibTexEntryType = MSBibMapping.getBibLaTeXEntryType(entry.getType());
         if (entry.getCiteKey() == null) {
-            result = new BibEntry(ImportFormat.DEFAULT_BIBTEXENTRY_ID, bibTexEntryType);
+            result = new BibEntry(Importer.DEFAULT_BIBTEXENTRY_ID, bibTexEntryType);
 
         } else {
             // TODO: the cite key should not be the ID?!

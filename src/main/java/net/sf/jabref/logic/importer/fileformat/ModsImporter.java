@@ -62,7 +62,7 @@ import org.apache.commons.logging.LogFactory;
  * The newest xml schema can also be found here <a href="www.loc.gov/standards/mods/mods-schemas.html.">www.loc.gov/standards/mods/mods-schemas.html.</a>.
  *
  */
-public class ModsImporter extends ImportFormat {
+public class ModsImporter extends Importer {
 
     private static final Log LOGGER = LogFactory.getLog(ModsImporter.class);
     private static final String KEYWORD_SEPARATOR = JabRefPreferences.getInstance().getImportFormatPreferences()

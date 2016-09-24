@@ -37,7 +37,7 @@ import org.apache.pdfbox.util.PDFTextStripper;
  * <p>
  * Integrating XMP support is future work
  */
-public class PdfContentImporter extends ImportFormat {
+public class PdfContentImporter extends Importer {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
 

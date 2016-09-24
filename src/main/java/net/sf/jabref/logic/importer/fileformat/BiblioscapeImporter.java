@@ -19,7 +19,7 @@ import net.sf.jabref.model.entry.FieldName;
  * Biblioscape field types are ignored. Others are only included in the BibTeX
  * field "comment".
  */
-public class BiblioscapeImporter extends ImportFormat {
+public class BiblioscapeImporter extends Importer {
 
     @Override
     public String getFormatName() {

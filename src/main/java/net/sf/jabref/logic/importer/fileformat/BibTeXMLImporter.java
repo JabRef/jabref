@@ -37,7 +37,7 @@ import org.apache.commons.logging.LogFactory;
  * check here for details on the format
  * http://bibtexml.sourceforge.net/
  */
-public class BibTeXMLImporter extends ImportFormat {
+public class BibTeXMLImporter extends Importer {
 
     private static final Log LOGGER = LogFactory.getLog(BibTeXMLImporter.class);
 

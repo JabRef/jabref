@@ -18,7 +18,7 @@ import net.sf.jabref.model.entry.FieldName;
  * Imports a SilverPlatter exported file. This is a poor format to parse,
  * so it currently doesn't handle everything correctly.
  */
-public class SilverPlatterImporter extends ImportFormat {
+public class SilverPlatterImporter extends Importer {
 
     private static final Pattern START_PATTERN = Pattern.compile("Record.*INSPEC.*");
 

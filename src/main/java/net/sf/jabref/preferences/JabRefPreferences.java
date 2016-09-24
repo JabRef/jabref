@@ -55,6 +55,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.fileformat.Importer;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
@@ -456,7 +457,7 @@ public class JabRefPreferences {
     private static final String USER_HOME = System.getProperty("user.home");
 
     /**
-     * Set with all custom {@link net.sf.jabref.logic.importer.fileformat.ImportFormat}s
+     * Set with all custom {@link Importer}s
      */
     public final CustomImportList customImports;
 

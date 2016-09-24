@@ -33,8 +33,8 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.fileformat.CustomImporter;
-import net.sf.jabref.logic.importer.fileformat.ImportFormat;
+import net.sf.jabref.logic.importer.CustomImporter;
+import net.sf.jabref.logic.importer.fileformat.Importer;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
 
@@ -107,7 +107,7 @@ public class ImportCustomizationDialog extends JDialog {
             }
         });
         addFromFolderButton
-                .setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a class path.")
+                .setToolTipText(Localization.lang("Add a (compiled) custom Importer class from a class path.")
                         + "\n" + Localization.lang("The path need not be on the classpath of JabRef."));
 
         JButton addFromJarButton = new JButton(Localization.lang("Add from JAR"));
@@ -136,7 +136,7 @@ public class ImportCustomizationDialog extends JDialog {
             }
         });
         addFromJarButton
-                .setToolTipText(Localization.lang("Add a (compiled) custom ImportFormat class from a ZIP-archive.")
+                .setToolTipText(Localization.lang("Add a (compiled) custom Importer class from a ZIP-archive.")
                         + "\n" + Localization.lang("The ZIP-archive need not be on the classpath of JabRef."));
 
         JButton showDescButton = new JButton(Localization.lang("Show description"));
@@ -147,7 +147,7 @@ public class ImportCustomizationDialog extends JDialog {
             } else {
                 CustomImporter importer = ((ImportTableModel) customImporterTable.getModel()).getImporter(row);
                 try {
-                    ImportFormat importFormat = importer.getInstance();
+                    Importer importFormat = importer.getInstance();
                     JOptionPane.showMessageDialog(frame, importFormat.getDescription());
                 } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException exc) {
                     LOGGER.warn("Could not instantiate importer " + importer.getName(), exc);
@@ -269,7 +269,7 @@ public class ImportCustomizationDialog extends JDialog {
     private class ImportTableModel extends AbstractTableModel {
 
         private final String[] columnNames = new String[] {Localization.lang("Import name"),
-                Localization.lang("Command line id"), Localization.lang("ImportFormat class"),
+                Localization.lang("Command line id"), Localization.lang("Importer class"),
                 Localization.lang("Contained in")};
 
 

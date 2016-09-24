@@ -21,7 +21,7 @@ import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.importer.ImportFormatReader;
 import net.sf.jabref.logic.importer.ParserResult;
-import net.sf.jabref.logic.importer.fileformat.ImportFormat;
+import net.sf.jabref.logic.importer.fileformat.Importer;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.database.BibDatabase;
@@ -37,14 +37,14 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
     private final JabRefFrame frame;
     private final boolean openInNew;
-    private final ImportFormat importer;
+    private final Importer importer;
     private IOException importError;
 
     public ImportMenuItem(JabRefFrame frame, boolean openInNew) {
         this(frame, openInNew, null);
     }
 
-    public ImportMenuItem(JabRefFrame frame, boolean openInNew, ImportFormat importer) {
+    public ImportMenuItem(JabRefFrame frame, boolean openInNew, Importer importer) {
         super(importer == null ? Localization.lang("Autodetect format") : importer.getFormatName());
         this.importer = importer;
         this.frame = frame;

@@ -24,7 +24,7 @@ import net.sf.jabref.model.entry.FieldName;
  * check here for details on the format
  * http://libguides.csuchico.edu/c.php?g=414245&p=2822898
  */
-public class EndnoteImporter extends ImportFormat {
+public class EndnoteImporter extends Importer {
 
     private static final String ENDOFRECORD = "__EOREOR__";
 

@@ -19,7 +19,7 @@ import net.sf.jabref.model.entry.FieldName;
  *
  * http://copac.ac.uk/faq/#format
  */
-public class CopacImporter extends ImportFormat {
+public class CopacImporter extends Importer {
 
     private static final Pattern COPAC_PATTERN = Pattern.compile("^\\s*TI- ");
 

@@ -34,7 +34,7 @@ import net.sf.jabref.model.entry.MonthUtil;
  * <li>Deal with capitalization correctly</li>
  * </ul>
  */
-public class IsiImporter extends ImportFormat {
+public class IsiImporter extends Importer {
 
     private static final Pattern SUB_SUP_PATTERN = Pattern.compile("/(sub|sup)\\s+(.*?)\\s*/");
 

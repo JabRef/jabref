@@ -18,7 +18,7 @@ import net.sf.jabref.logic.util.FileExtensions;
  * It is NOT intended to import a BIB file. This is done via the option action, which treats the metadata fields
  * The metadata is not required to be read here, as this class is NOT called at --import
  */
-public class BibtexImporter extends ImportFormat {
+public class BibtexImporter extends Importer {
 
     // Signature written at the top of the .bib file in earlier versions.
     private static final String SIGNATURE = "This file was created with JabRef";

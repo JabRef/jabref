@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  * This importer parses text format citations using the online API of FreeCite -
  * Open Source Citation Parser http://freecite.library.brown.edu/
  */
-public class FreeCiteImporter extends ImportFormat {
+public class FreeCiteImporter extends Importer {
 
     private static final Log LOGGER = LogFactory.getLog(FreeCiteImporter.class);
 

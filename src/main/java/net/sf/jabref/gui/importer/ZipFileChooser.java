@@ -28,8 +28,8 @@ import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.gui.util.GUIUtil;
-import net.sf.jabref.logic.importer.fileformat.CustomImporter;
-import net.sf.jabref.logic.importer.fileformat.ImportFormat;
+import net.sf.jabref.logic.importer.CustomImporter;
+import net.sf.jabref.logic.importer.fileformat.Importer;
 import net.sf.jabref.logic.l10n.Localization;
 
 import org.apache.commons.logging.Log;
@@ -88,7 +88,7 @@ class ZipFileChooser extends JDialog {
                         .replace("/", ".");
                 importer.setClassName(className);
                 try {
-                    ImportFormat importFormat = importer.getInstance();
+                    Importer importFormat = importer.getInstance();
                     importer.setName(importFormat.getFormatName());
                     importer.setCliId(importFormat.getId());
                     importCustomizationDialog.addOrReplaceImporter(importer);

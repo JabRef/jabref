@@ -16,7 +16,7 @@ import net.sf.jabref.logic.util.FileExtensions;
 /**
  * Role of an importer for JabRef.
  */
-public abstract class ImportFormat implements Comparable<ImportFormat> {
+public abstract class Importer implements Comparable<Importer> {
 
     /**
      * Using this when I have no database open or when I read
@@ -151,10 +151,10 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
         if (this == obj) {
             return true;
         }
-        if(!(obj instanceof ImportFormat)) {
+        if(!(obj instanceof Importer)) {
             return false;
         }
-        ImportFormat other = (ImportFormat)obj;
+        Importer other = (Importer)obj;
         return Objects.equals(this.getFormatName(), other.getFormatName());
     }
 
@@ -164,7 +164,7 @@ public abstract class ImportFormat implements Comparable<ImportFormat> {
     }
 
     @Override
-    public int compareTo(ImportFormat o) {
+    public int compareTo(Importer o) {
         return getFormatName().compareTo(o.getFormatName());
     }
 }

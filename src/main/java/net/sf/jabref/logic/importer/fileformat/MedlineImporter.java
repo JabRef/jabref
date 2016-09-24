@@ -79,7 +79,7 @@ import org.apache.commons.logging.LogFactory;
  * check here for details on the format
  * https://www.nlm.nih.gov/bsd/licensee/elements_descriptions.html
  */
-public class MedlineImporter extends ImportFormat {
+public class MedlineImporter extends Importer {
 
     private static final Log LOGGER = LogFactory.getLog(MedlineImporter.class);
     private static final String KEYWORD_SEPARATOR = "; ";

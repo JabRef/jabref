@@ -13,9 +13,9 @@ import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
 /**
- * Wraps the XMPUtility function to be used as an ImportFormat.
+ * Wraps the XMPUtility function to be used as an Importer.
  */
-public class PdfXmpImporter extends ImportFormat {
+public class PdfXmpImporter extends Importer {
 
     private final XMPPreferences xmpPreferences;
 
@@ -77,7 +77,7 @@ public class PdfXmpImporter extends ImportFormat {
 
     @Override
     public String getDescription() {
-        return "Wraps the XMPUtility function to be used as an ImportFormat.";
+        return "Wraps the XMPUtility function to be used as an Importer.";
     }
 
 }

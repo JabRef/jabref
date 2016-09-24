@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.importer.fileformat;
+package net.sf.jabref.logic.importer;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,6 +8,8 @@ import java.net.URLClassLoader;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
+import net.sf.jabref.logic.importer.fileformat.Importer;
 
 /**
  * Object with data for a custom importer.
@@ -38,7 +40,7 @@ public class CustomImporter implements Comparable<CustomImporter> {
         this.basePath = basePath;
     }
 
-    public CustomImporter(ImportFormat importer) {
+    public CustomImporter(Importer importer) {
         this(importer.getFormatName(), importer.getId(), importer.getClass().getName(),
                 "src/main/java/net/sf/jabref/logic/importer/fileformat/" + importer.getFormatName() + "Importer.java");
     }
@@ -119,11 +121,11 @@ public class CustomImporter implements Comparable<CustomImporter> {
         return this.name;
     }
 
-    public ImportFormat getInstance() throws IOException, ClassNotFoundException,
+    public Importer getInstance() throws IOException, ClassNotFoundException,
             InstantiationException, IllegalAccessException {
         try (URLClassLoader cl = new URLClassLoader(new URL[] {getBasePathUrl()})) {
             Class<?> clazz = Class.forName(className, true, cl);
-            ImportFormat importFormat = (ImportFormat) clazz.newInstance();
+            Importer importFormat = (Importer) clazz.newInstance();
             return importFormat;
         }
     }

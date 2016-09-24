@@ -20,10 +20,10 @@ import org.mockito.Mockito;
 import static org.mockito.Mockito.when;
 
 @RunWith(Parameterized.class)
-public class ImportFormatTest {
+public class ImporterTest {
 
     @Parameter
-    public ImportFormat format;
+    public Importer format;
 
     @Test(expected = NullPointerException.class)
     public void isRecognizedFormatWithNullThrowsException() throws IOException {
@@ -58,9 +58,9 @@ public class ImportFormatTest {
 
     @Test
     public void getIdStripsSpecialCharactersAndConvertsToLowercase() {
-        ImportFormat importFormat = Mockito.mock(ImportFormat.class, Mockito.CALLS_REAL_METHODS);
-        when(importFormat.getFormatName()).thenReturn("*Test-Importer");
-        Assert.assertEquals("testimporter", importFormat.getId());
+        Importer importer = Mockito.mock(Importer.class, Mockito.CALLS_REAL_METHODS);
+        when(importer.getFormatName()).thenReturn("*Test-Importer");
+        Assert.assertEquals("testimporter", importer.getId());
     }
 
     @Test
@@ -70,7 +70,7 @@ public class ImportFormatTest {
 
     @Parameters(name = "{index}: {0}")
     public static Collection<Object[]> instancesToTest() {
-        // all classes implementing {@link ImportFormat}
+        // all classes implementing {@link Importer}
         // sorted alphabetically
 
         ImportFormatPreferences importFormatPreferences = JabRefPreferences.getInstance().getImportFormatPreferences();

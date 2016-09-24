@@ -19,7 +19,7 @@ import net.sf.jabref.model.entry.IdGenerator;
 /**
  * Imports an Ovid file.
  */
-public class OvidImporter extends ImportFormat {
+public class OvidImporter extends Importer {
 
     private static final Pattern OVID_SOURCE_PATTERN = Pattern
             .compile("Source ([ \\w&\\-,:]+)\\.[ ]+([0-9]+)\\(([\\w\\-]+)\\):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
