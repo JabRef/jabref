@@ -78,13 +78,7 @@ public class ImportFormatReader {
          * Get custom import formats
          */
         for (CustomImporter importer : importFormatPreferences.getCustomImportList()) {
-            try {
-                Importer imFo = importer.getInstance();
-                formats.add(imFo);
-            } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                LOGGER.error("Could not instantiate " + importer.getName()
-                        + " importer, will ignore it. Please check if the class is still available.", e);
-            }
+            formats.add(importer);
         }
     }
 
@@ -141,9 +135,9 @@ public class ImportFormatReader {
         StringBuilder sb = new StringBuilder();
 
         for (Importer imFo : formats) {
-            int pad = Math.max(0, 14 - imFo.getFormatName().length());
+            int pad = Math.max(0, 14 - imFo.getName().length());
             sb.append("  ");
-            sb.append(imFo.getFormatName());
+            sb.append(imFo.getName());
 
             sb.append(StringUtil.repeatSpaces(pad));
 
@@ -214,7 +208,7 @@ public class ImportFormatReader {
                 if (entryCount > bestResultCount) {
                     bestResult = entries;
                     bestResultCount = bestResult.size();
-                    bestFormatName = imFo.getFormatName();
+                    bestFormatName = imFo.getName();
                 }
             } catch (IOException ex) {
                 // The import did not succeed. Go on.

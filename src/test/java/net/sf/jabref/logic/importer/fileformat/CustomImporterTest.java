@@ -1,8 +1,7 @@
 package net.sf.jabref.logic.importer.fileformat;
 
-import java.io.File;
+import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.List;
 
 import net.sf.jabref.logic.importer.Importer;
 
@@ -10,7 +9,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 public class CustomImporterTest {
@@ -28,8 +26,8 @@ public class CustomImporterTest {
     }
 
     @Test
-    public void testGetCliId() {
-        assertEquals("cpc", importer.getClidId());
+    public void testGetId() {
+        assertEquals("cpc", importer.getId());
     }
 
     @Test
@@ -39,45 +37,25 @@ public class CustomImporterTest {
 
     @Test
     public void testGetBasePath() {
-        assertEquals("src/main/java/net/sf/jabref/logic/importer/fileformat/CopacImporter.java",
+        assertEquals(Paths.get("src/main/java/net/sf/jabref/logic/importer/fileformat/CopacImporter.java"),
                 importer.getBasePath());
     }
 
     @Test
-    public void testGetInstance() throws Exception {
-        assertEquals(new CopacImporter(), importer.getInstance());
-    }
-
-    @Test
-    public void testGetFileFromBasePath() {
-        assertEquals(new File("src/main/java/net/sf/jabref/logic/importer/fileformat/CopacImporter.java"),
-                importer.getFileFromBasePath());
-    }
-
-    @Test
-    public void testGetBasePathUrl() throws Exception {
-        assertEquals(
-                new File("src/main/java/net/sf/jabref/logic/importer/fileformat/CopacImporter.java").toURI().toURL(),
-                importer.getBasePathUrl());
-    }
-
-    @Test
     public void testGetAsStringList() {
-        assertEquals("Copac", importer.getAsStringList().get(0));
-        assertEquals("cpc", importer.getAsStringList().get(1));
-        assertEquals("net.sf.jabref.logic.importer.fileformat.CopacImporter", importer.getAsStringList().get(2));
-        assertEquals("src/main/java/net/sf/jabref/logic/importer/fileformat/CopacImporter.java",
-                importer.getAsStringList().get(3));
+        assertEquals(Arrays.asList("src/main/java/net/sf/jabref/logic/importer/fileformat/CopacImporter.java",
+                "net.sf.jabref.logic.importer.fileformat.CopacImporter"), importer.getAsStringList());
     }
 
     @Test
-    public void testEqualsTrue() {
+    public void equalsWithSameReference() {
         assertEquals(importer, importer);
     }
 
     @Test
-    public void testEqualsFalse() {
-        assertNotEquals(new CopacImporter(), importer);
+    public void equalsIsBasedOnName() {
+        //noinspection AssertEqualsBetweenInconvertibleTypes
+        assertEquals(new CopacImporter(), importer);
     }
 
     @Test
@@ -107,37 +85,15 @@ public class CustomImporterTest {
 
     @Test
     public void testClassicConstructor() throws Exception {
-        CustomImporter customImporter = new CustomImporter("Copac", "cpc",
-                "net.sf.jabref.logic.importer.fileformat.CopacImporter",
-                "src/main/java/net/sf/jabref/logic/importer/fileformat/CopacImporter.java");
+        CustomImporter customImporter = new CustomImporter(
+                "src/main/java/net/sf/jabref/logic/importer/fileformat/CopacImporter.java",
+                "net.sf.jabref.logic.importer.fileformat.CopacImporter");
         assertEquals(importer, customImporter);
     }
 
-    @Test
-    public void testListConstructor() throws Exception {
-        List<String> dataTest = Arrays.asList("Ovid", "ovid", "net.sf.jabref.logic.importer.fileformat.OvidImporter",
-                "src/main/java/net/sf/jabref/logic/importer/fileformat/OvidImporter.java");
-        CustomImporter customImporter = new CustomImporter(dataTest);
-        CustomImporter customOvidImporter = asCustomImporter(new OvidImporter());
-
-        assertEquals(customImporter, customOvidImporter);
-    }
-
-    @Test
-    public void testEmptyConstructor() throws Exception {
-        CustomImporter customImporter = new CustomImporter();
-        customImporter.setName("Ovid");
-        customImporter.setCliId("ovid");
-        customImporter.setClassName("net.sf.jabref.logic.importer.fileformat.OvidImporter");
-        customImporter.setBasePath("src/main/java/net/sf/jabref/logic/importer/fileformat/OvidImporter.java");
-
-        CustomImporter customOvidImporter = asCustomImporter(new OvidImporter());
-
-        assertEquals(customImporter, customOvidImporter);
-    }
-
-    public CustomImporter asCustomImporter(Importer importer) throws Exception {
-        return new CustomImporter(importer.getFormatName(), importer.getId(), importer.getClass().getName(),
-                "src/main/java/net/sf/jabref/logic/importer/fileformat/" + importer.getFormatName() + "Importer.java");
+    private CustomImporter asCustomImporter(Importer importer) throws Exception {
+        return new CustomImporter(
+                "src/main/java/net/sf/jabref/logic/importer/fileformat/" + importer.getName() + "Importer.java",
+                importer.getClass().getName());
     }
 }

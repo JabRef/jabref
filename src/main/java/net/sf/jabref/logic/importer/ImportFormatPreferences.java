@@ -5,6 +5,7 @@ import java.util.Set;
 
 import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
+import net.sf.jabref.logic.importer.fileformat.CustomImporter;
 
 public class ImportFormatPreferences {
 

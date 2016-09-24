@@ -33,8 +33,7 @@ import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.help.HelpFile;
-import net.sf.jabref.logic.importer.CustomImporter;
-import net.sf.jabref.logic.importer.fileformat.Importer;
+import net.sf.jabref.logic.importer.fileformat.CustomImporter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
 
@@ -79,21 +78,19 @@ public class ImportCustomizationDialog extends JDialog {
 
         JButton addFromFolderButton = new JButton(Localization.lang("Add from folder"));
         addFromFolderButton.addActionListener(e -> {
-            CustomImporter importer = new CustomImporter();
 
             FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.CLASS);
             dialog.setDefaultExtension(FileExtensions.CLASS);
             Optional<Path> selectedFile = dialog.showDialogAndGetSelectedFile();
 
             if (selectedFile.isPresent() && (selectedFile.get().getParent() != null)) {
-                importer.setBasePath(selectedFile.get().getParent().toString());
-
-                String chosenFileStr = selectedFile.toString();
+                String chosenFileStr = selectedFile.get().toString();
 
                 try {
-                    importer.setClassName(pathToClass(importer.getFileFromBasePath(), new File(chosenFileStr)));
-                    importer.setName(importer.getInstance().getFormatName());
-                    importer.setCliId(importer.getInstance().getId());
+                    String basePath = selectedFile.get().getParent().toString();
+                    String className = pathToClass(basePath, new File(chosenFileStr));
+                    CustomImporter importer = new CustomImporter(basePath, className);
+
                     addOrReplaceImporter(importer);
                     customImporterTable.revalidate();
                     customImporterTable.repaint();
@@ -146,14 +143,7 @@ public class ImportCustomizationDialog extends JDialog {
                 JOptionPane.showMessageDialog(frame, Localization.lang("Please select an importer."));
             } else {
                 CustomImporter importer = ((ImportTableModel) customImporterTable.getModel()).getImporter(row);
-                try {
-                    Importer importFormat = importer.getInstance();
-                    JOptionPane.showMessageDialog(frame, importFormat.getDescription());
-                } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException exc) {
-                    LOGGER.warn("Could not instantiate importer " + importer.getName(), exc);
-                    JOptionPane.showMessageDialog(frame, Localization.lang("Could not instantiate %0 %1",
-                            importer.getName() + ":\n", exc.getMessage()));
-                }
+                JOptionPane.showMessageDialog(frame, importer.getDescription());
             }
         });
 
@@ -232,11 +222,11 @@ public class ImportCustomizationDialog extends JDialog {
      * @param path  path that includes base-path as a prefix
      * @return  class name
      */
-    private static String pathToClass(File basePath, File path) {
+    private static String pathToClass(String basePath, File path) {
         String className = null;
         File actualPath = path;
         // remove leading basepath from path
-        while (!actualPath.equals(basePath)) {
+        while (!actualPath.equals(new File(basePath))) {
             className = actualPath.getName() + (className == null ? "" : "." + className);
             actualPath = actualPath.getParentFile();
         }
@@ -280,11 +270,11 @@ public class ImportCustomizationDialog extends JDialog {
             if (columnIndex == 0) {
                 value = importer.getName();
             } else if (columnIndex == 1) {
-                value = importer.getClidId();
+                value = importer.getName();
             } else if (columnIndex == 2) {
                 value = importer.getClassName();
             } else if (columnIndex == 3) {
-                value = importer.getFileFromBasePath();
+                value = importer.getBasePath();
             }
             return value;
         }
