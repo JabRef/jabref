@@ -149,7 +149,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
             Collection<BibEntry> parsedBibtexCollection = BibtexParser.fromString(bibtexPage,
                     Globals.prefs.getImportFormatPreferences());
             if (parsedBibtexCollection == null) {
-                ((ImportInspectionDialog)dialog).showErrorMessage(this);
+                ((ImportInspectionDialog)dialog).showErrorMessage(this.getTitle());
                 return false;
             }
             int nEntries = parsedBibtexCollection.size();
@@ -164,7 +164,7 @@ public class IEEEXploreFetcher implements EntryFetcher {
 
         } catch (IOException | JSONException e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
-            ((ImportInspectionDialog)dialog).showErrorMessage(this);
+            ((ImportInspectionDialog)dialog).showErrorMessage(this.getTitle());
         }
 
         return false;

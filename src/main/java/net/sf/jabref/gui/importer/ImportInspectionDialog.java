@@ -69,7 +69,6 @@ import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.groups.GroupTreeNodeViewModel;
 import net.sf.jabref.gui.groups.UndoableChangeEntriesOfGroup;
 import net.sf.jabref.gui.help.HelpAction;
-import net.sf.jabref.gui.importer.fetcher.EntryFetcher;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -1473,10 +1472,13 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         JOptionPane.showMessageDialog(this, message);
     }
 
-    public void showErrorMessage(EntryFetcher fetcher) {
-        showMessage(Localization.lang("Error while fetching from %0", fetcher.getTitle()) +"\n"+
+    /**
+     * Displays a dialog which tells the user that an error occurred while fetching entries
+     */
+    public void showErrorMessage(String fetcherTitle) {
+        showMessage(Localization.lang("Error while fetching from %0", fetcherTitle) +"\n"+
                         Localization.lang("Please try again later and/or check your network connection."),
-                Localization.lang("Search %0", fetcher.getTitle()), JOptionPane.ERROR_MESSAGE);
+                Localization.lang("Search %0", fetcherTitle), JOptionPane.ERROR_MESSAGE);
     }
 
     public JabRefFrame getFrame() {

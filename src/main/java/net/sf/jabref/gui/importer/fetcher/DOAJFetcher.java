@@ -97,7 +97,7 @@ public class DOAJFetcher implements EntryFetcher {
             }
         } catch (UnirestException e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
-            ((ImportInspectionDialog)inspector).showErrorMessage(this);
+            ((ImportInspectionDialog)inspector).showErrorMessage(this.getTitle());
             return false;
         }
     }

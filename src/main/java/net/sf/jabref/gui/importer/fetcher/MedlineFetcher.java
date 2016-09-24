@@ -199,7 +199,7 @@ public class MedlineFetcher implements EntryFetcher {
             }
         } catch (IOException e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
-            ((ImportInspectionDialog)dialog).showErrorMessage(this);
+            ((ImportInspectionDialog)dialog).showErrorMessage(this.getTitle());
         }
         return false;
     }

@@ -124,7 +124,7 @@ public class DBLPFetcher implements EntryFetcher {
 
         } catch (IOException e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
-            ((ImportInspectionDialog)inspector).showErrorMessage(this);
+            ((ImportInspectionDialog)inspector).showErrorMessage(this.getTitle());
         } finally {
             // Restore the threshold
             DuplicateCheck.duplicateThreshold = saveThreshold;

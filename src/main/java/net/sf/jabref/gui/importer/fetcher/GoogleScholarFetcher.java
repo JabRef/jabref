@@ -94,7 +94,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
                     Localization.lang("Search %0", getTitle()), JOptionPane.INFORMATION_MESSAGE);
         } catch (IOException e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
-            preview.showErrorMessage(this);
+            preview.showErrorMessage(this.getTitle());
         }
         return false;
     }
