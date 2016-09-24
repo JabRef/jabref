@@ -53,7 +53,8 @@ class AutoGroupDialog extends JDialog implements CaretListener {
             Localization.lang("Generate groups from keywords in a BibTeX field"));
     private final JRadioButton authors = new JRadioButton(Localization.lang("Generate groups for author last names"));
     private final JRadioButton editors = new JRadioButton(Localization.lang("Generate groups for editor last names"));
-    private final JCheckBox nd = new JCheckBox(Localization.lang("Use the following delimiter character(s):"));
+    private final JCheckBox useCustomDelimiter = new JCheckBox(
+            Localization.lang("Use the following delimiter character(s):"));
     private final JButton ok = new JButton(Localization.lang("OK"));
     private final GroupTreeNodeViewModel m_groupsRoot;
     private final JabRefFrame frame;
@@ -72,7 +73,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         field.setText(defaultField);
         remove.setText(defaultRemove);
         deliminator.setText(defaultDeliminator);
-        nd.setSelected(true);
+        useCustomDelimiter.setSelected(true);
         ActionListener okListener = e -> {
             dispose();
 
@@ -81,32 +82,31 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                         new ExplicitGroup(Localization.lang("Automatically created groups"),
                                 GroupHierarchyType.INCLUDING,
                                 Globals.prefs.getKeywordDelimiter()));
-                Set<String> hs;
-                String fieldText = field.getText();
-                if (keywords.isSelected()) {
-                    if (nd.isSelected()) {
-                        hs = GroupsUtil.findDeliminatedWordsInField(panel.getDatabase(),
-                                field.getText().toLowerCase().trim(), deliminator.getText());
+                Set<String> keywords;
+                String fieldText = field.getText().toLowerCase().trim();
+                if (this.keywords.isSelected()) {
+                    if (useCustomDelimiter.isSelected()) {
+                        keywords = GroupsUtil.findDeliminatedWordsInField(panel.getDatabase(), fieldText,
+                                deliminator.getText());
                     } else {
-                        hs = GroupsUtil.findAllWordsInField(panel.getDatabase(), field.getText().toLowerCase().trim(),
-                                remove.getText());
+                        keywords = GroupsUtil.findAllWordsInField(panel.getDatabase(), fieldText, remove.getText());
 
                     }
                 } else if (authors.isSelected()) {
                     List<String> fields = new ArrayList<>(2);
                     fields.add(FieldName.AUTHOR);
-                    hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
+                    keywords = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
                     fieldText = FieldName.AUTHOR;
                 } else { // editors.isSelected() as it is a radio button group.
                     List<String> fields = new ArrayList<>(2);
                     fields.add(FieldName.EDITOR);
-                    hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
+                    keywords = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
                     fieldText = FieldName.EDITOR;
                 }
 
                 LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
 
-                for (String keyword : hs) {
+                for (String keyword : keywords) {
                     KeywordGroup group = new KeywordGroup(formatter.format(keyword), fieldText, keyword, false, false,
                             GroupHierarchyType.INDEPENDENT, Globals.prefs.getKeywordDelimiter());
                     autoGroupsRoot.addChild(GroupTreeNode.fromGroup(group));
@@ -159,7 +159,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         b.add(field).xy(5, 3);
         b.add(Localization.lang("Characters to ignore") + ":").xy(3, 5);
         b.add(remove).xy(5, 5);
-        b.add(nd).xy(3, 7);
+        b.add(useCustomDelimiter).xy(3, 7);
         b.add(deliminator).xy(5, 7);
         b.add(authors).xyw(1, 9, 5);
         b.add(editors).xyw(1, 11, 5);

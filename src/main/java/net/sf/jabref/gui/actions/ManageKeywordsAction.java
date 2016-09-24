@@ -406,8 +406,8 @@ public class ManageKeywordsAction extends MnemonicAwareAction {
                 sortedKeywordsOfAllEntriesBeforeUpdateByUser.retainAll(separatedKeywords);
             }
         }
-        for (Keyword s : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
-            keywordListModel.addElement(s);
+        for (Keyword keyword : sortedKeywordsOfAllEntriesBeforeUpdateByUser) {
+            keywordListModel.addElement(keyword);
         }
     }
 
