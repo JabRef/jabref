@@ -5,6 +5,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Optional;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
@@ -26,7 +27,7 @@ public class ArXivTest {
 
     @Before
     public void setUp() {
-        finder = new ArXiv();
+        finder = new ArXiv(',');
         entry = new BibEntry();
 
         sliceTheoremPaper = new BibEntry();

@@ -29,14 +29,14 @@ public class FulltextFetchers {
 
     private final List<FulltextFetcher> finders = new ArrayList<>();
 
-    public FulltextFetchers() {
+    public FulltextFetchers(Character keywordDelimiter) {
         // Ordering is important, authorities first!
         // Publisher
         finders.add(new DoiResolution());
         finders.add(new ScienceDirect());
         finders.add(new SpringerLink());
         finders.add(new ACS());
-        finders.add(new ArXiv());
+        finders.add(new ArXiv(keywordDelimiter));
         finders.add(new IEEE());
         // Meta search
         finders.add(new GoogleScholar());

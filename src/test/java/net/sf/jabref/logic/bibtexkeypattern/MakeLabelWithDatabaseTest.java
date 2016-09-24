@@ -33,7 +33,7 @@ public class MakeLabelWithDatabaseTest {
         entry.setField("title", "An awesome paper on JabRef");
         database.insertEntry(entry);
         pattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern.split("[auth][year]"));
-        preferences = new BibtexKeyPatternPreferences("", "", false, true, true, pattern);
+        preferences = new BibtexKeyPatternPreferences("", "", false, true, true, pattern, ',');
     }
 
     @Test
@@ -54,14 +54,14 @@ public class MakeLabelWithDatabaseTest {
 
     @Test
     public void generateDefaultKeyAlwaysLetter() {
-        preferences = new BibtexKeyPatternPreferences("", "", true, true, true, pattern);
+        preferences = new BibtexKeyPatternPreferences("", "", true, true, true, pattern, ',');
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
         assertEquals(Optional.of("Doe2016a"), entry.getCiteKeyOptional());
     }
 
     @Test
     public void generateDefaultKeyAlwaysLetterAlreadyExistsDuplicatesStartAtB() {
-        preferences = new BibtexKeyPatternPreferences("", "", true, true, true, pattern);
+        preferences = new BibtexKeyPatternPreferences("", "", true, true, true, pattern, ',');
 
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
         BibEntry entry2 = new BibEntry();
@@ -73,14 +73,14 @@ public class MakeLabelWithDatabaseTest {
 
     @Test
     public void generateDefaultKeyStartDuplicatesAtB() {
-        preferences = new BibtexKeyPatternPreferences("", "", false, false, true, pattern);
+        preferences = new BibtexKeyPatternPreferences("", "", false, false, true, pattern, ',');
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
         assertEquals(Optional.of("Doe2016"), entry.getCiteKeyOptional());
     }
 
     @Test
     public void generateDefaultKeyAlreadyExistsDuplicatesStartAtB() {
-        preferences = new BibtexKeyPatternPreferences("", "", false, false, true, pattern);
+        preferences = new BibtexKeyPatternPreferences("", "", false, false, true, pattern, ',');
 
         BibtexKeyPatternUtil.makeLabel(metadata, database, entry, preferences);
         BibEntry entry2 = new BibEntry();
@@ -293,7 +293,7 @@ public class MakeLabelWithDatabaseTest {
 
     @Test
     public void generateKeyRegExReplace() {
-        preferences = new BibtexKeyPatternPreferences("2", "3", false, true, true, pattern);
+        preferences = new BibtexKeyPatternPreferences("2", "3", false, true, true, pattern, ',');
         DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
         bibtexKeyPattern.setDefaultValue("[auth][year]");
         metadata.setBibtexKeyPattern(bibtexKeyPattern);

@@ -9,7 +9,8 @@ import net.sf.jabref.model.entry.FieldName;
 
 public class WebFetchers {
 
-    public static Optional<IdBasedFetcher> getIdBasedFetcherForField(String field, ImportFormatPreferences preferences) {
+    public static Optional<IdBasedFetcher> getIdBasedFetcherForField(String field, ImportFormatPreferences preferences,
+            Character keywordDelimiter) {
         IdBasedFetcher fetcher;
         switch (field) {
             case FieldName.DOI:
@@ -19,7 +20,7 @@ public class WebFetchers {
                 fetcher = new IsbnFetcher(preferences);
                 break;
             case FieldName.EPRINT:
-                fetcher = new ArXiv();
+                fetcher = new ArXiv(keywordDelimiter);
                 break;
             default:
                 return Optional.empty();

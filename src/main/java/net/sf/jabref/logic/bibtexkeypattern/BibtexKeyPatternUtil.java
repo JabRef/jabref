@@ -9,7 +9,6 @@ import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import net.sf.jabref.model.database.BibDatabase;
@@ -399,7 +398,7 @@ public class BibtexKeyPatternUtil {
                     // check whether there is a modifier on the end such as
                     // ":lower"
                     List<String> parts = parseFieldMarker(typeListEntry);
-                    String label = makeLabel(entry, parts.get(0));
+                    String label = makeLabel(entry, parts.get(0), bibtexKeyPatternPreferences.getKeywordDelimiter());
 
                     // apply modifier if present
                     if (parts.size() > 1) {
@@ -527,7 +526,7 @@ public class BibtexKeyPatternUtil {
         return resultingLabel;
     }
 
-    public static String makeLabel(BibEntry entry, String value) {
+    public static String makeLabel(BibEntry entry, String value, Character keywordDelimiter) {
         String val = value;
         try {
             if (val.startsWith("auth") || val.startsWith("pureauth")) {
@@ -678,7 +677,7 @@ public class BibtexKeyPatternUtil {
             } else if (val.matches("keyword\\d+")) {
                 // according to LabelPattern.php, it returns keyword number n
                 int num = Integer.parseInt(val.substring(7));
-                KeywordList separatedKeywords = entry.getKeywords(Globals.prefs.getKeywordDelimiter());
+                KeywordList separatedKeywords = entry.getKeywords(keywordDelimiter);
                 if (separatedKeywords.size() < num) {
                     // not enough keywords
                     return "";
@@ -694,7 +693,7 @@ public class BibtexKeyPatternUtil {
                 } else {
                     num = Integer.MAX_VALUE;
                 }
-                KeywordList separatedKeywords = entry.getKeywords(Globals.prefs.getKeywordDelimiter());
+                KeywordList separatedKeywords = entry.getKeywords(keywordDelimiter);
                 StringBuilder sb = new StringBuilder();
                 int i = 0;
                 for (Keyword keyword : separatedKeywords) {

@@ -16,7 +16,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
@@ -55,7 +54,11 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
     private static final Log LOGGER = LogFactory.getLog(ArXiv.class);
     private static final String API_URL = "http://export.arxiv.org/api/query";
+    private final Character keywordDelimiter;
 
+    public ArXiv(Character keywordDelimiter) {
+        this.keywordDelimiter = keywordDelimiter;
+    }
 
     @Override
     public Optional<URL> findFullText(BibEntry entry) throws IOException {
@@ -209,12 +212,14 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
 
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
-        return searchForEntries(query).stream().map(ArXivEntry::toBibEntry).collect(Collectors.toList());
+        return searchForEntries(query).stream().map(
+                (arXivEntry) -> arXivEntry.toBibEntry(keywordDelimiter)).collect(Collectors.toList());
     }
 
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        return searchForEntryById(identifier).map(ArXivEntry::toBibEntry);
+        return searchForEntryById(identifier).map(
+                (arXivEntry) -> arXivEntry.toBibEntry(keywordDelimiter));
     }
 
 
@@ -327,12 +332,12 @@ public class ArXiv implements FulltextFetcher, SearchBasedFetcher, IdBasedFetche
             });
         }
 
-        public BibEntry toBibEntry() {
+        public BibEntry toBibEntry(Character keywordDelimiter) {
             BibEntry bibEntry = new BibEntry();
             bibEntry.setType(BibtexEntryTypes.ARTICLE);
             bibEntry.setField(FieldName.EPRINTTYPE, "arXiv");
             bibEntry.setField(FieldName.AUTHOR, String.join(" and ", authorNames));
-            bibEntry.addKeywords(categories, Globals.prefs.getKeywordDelimiter());
+            bibEntry.addKeywords(categories, keywordDelimiter);
             getId().ifPresent(id -> bibEntry.setField(FieldName.EPRINT, id));
             title.ifPresent(titleContent -> bibEntry.setField(FieldName.TITLE, titleContent));
             doi.ifPresent(doiContent -> bibEntry.setField(FieldName.DOI, doiContent));
