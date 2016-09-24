@@ -1,7 +1,6 @@
 package net.sf.jabref.gui.shared;
 
 import java.sql.SQLException;
-
 import java.util.Objects;
 
 import javax.swing.JOptionPane;
