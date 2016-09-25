@@ -48,6 +48,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#2012](https://github.com/JabRef/jabref/issues/2012) Implemented integrity check for `month` field: Should be an integer or normalized (BibLaTeX), Should be normalized (BibTeX)
 - [#1779](https://github.com/JabRef/jabref/issues/1779) Implemented integrity check for `bibtexkey` field: Empty BibTeX key
 - Prohibit more than one connections to the same shared database.
+- Implemented integrity check for `journaltitle` field: BibLaTeX field only (BibTeX)
 
 ### Fixed
 - Fixed [#2054](https://github.com/JabRef/jabref/issues/2054): Ignoring a new version now works as expected
