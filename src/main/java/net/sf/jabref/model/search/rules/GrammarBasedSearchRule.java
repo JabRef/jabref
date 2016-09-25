@@ -1,6 +1,5 @@
 package net.sf.jabref.model.search.rules;
 
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -10,6 +9,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.Keyword;
 import net.sf.jabref.search.SearchBaseVisitor;
 import net.sf.jabref.search.SearchLexer;
 import net.sf.jabref.search.SearchParser;
@@ -108,6 +108,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             init(query);
             return true;
         } catch (ParseCancellationException e) {
+            LOGGER.warn("Search query invalid", e);
             return false;
         }
     }
@@ -142,16 +143,25 @@ public class GrammarBasedSearchRule implements SearchRule {
 
         public boolean compare(BibEntry entry) {
             // special case for searching for entrytype=phdthesis
-            if (fieldPattern.matcher("entrytype").matches()) {
+            if (fieldPattern.matcher(BibEntry.TYPE_HEADER).matches()) {
                 return matchFieldValue(entry.getType());
+            }
+
+            // special case for searching a single keyword
+            if (fieldPattern.matcher("anykeyword").matches()) {
+                return entry.getKeywords(',').stream().map(Keyword::toString).anyMatch(this::matchFieldValue);
             }
 
             // specification of fieldsKeys to search is done in the search expression itself
             Set<String> fieldsKeys = entry.getFieldNames();
 
-            List<String> matchedFieldKeys = fieldsKeys.stream().filter(matchFieldKey()).collect(Collectors.toList());
+            // special case for searching allfields=cat and title=dog
+            if (!fieldPattern.matcher("anyfield").matches()) {
+                // Filter out the requested fields
+                fieldsKeys = fieldsKeys.stream().filter(matchFieldKey()).collect(Collectors.toSet());
+            }
 
-            for (String field : matchedFieldKeys) {
+            for (String field : fieldsKeys) {
                 Optional<String> fieldValue = entry.getField(field);
                 if (fieldValue.isPresent()) {
                     if (matchFieldValue(fieldValue.get())) {
@@ -161,7 +171,7 @@ public class GrammarBasedSearchRule implements SearchRule {
             }
 
             // special case of asdf!=whatever and entry does not contain asdf
-            return matchedFieldKeys.isEmpty() && (operator == ComparisonOperator.DOES_NOT_CONTAIN);
+            return fieldsKeys.isEmpty() && (operator == ComparisonOperator.DOES_NOT_CONTAIN);
         }
 
         private Predicate<String> matchFieldKey() {
@@ -209,15 +219,19 @@ public class GrammarBasedSearchRule implements SearchRule {
         }
 
         @Override
-        public Boolean visitComparison(SearchParser.ComparisonContext ctx) {
+        public Boolean visitComparison(SearchParser.ComparisonContext context) {
             // remove possible enclosing " symbols
-            String right = ctx.right.getText();
+            String right = context.right.getText();
             if(right.startsWith("\"") && right.endsWith("\"")) {
                 right = right.substring(1, right.length() - 1);
             }
 
-            return comparison(ctx.left.getText(), ComparisonOperator.build(ctx.operator.getText()), right);
-
+            Optional<SearchParser.NameContext> fieldDescriptor = Optional.ofNullable(context.left);
+            if (fieldDescriptor.isPresent()) {
+                return comparison(fieldDescriptor.get().getText(), ComparisonOperator.build(context.operator.getText()), right);
+            } else {
+                return new ContainBasedSearchRule(caseSensitive).applyRule(right, entry);
+            }
         }
 
         @Override

@@ -3,7 +3,7 @@ package net.sf.jabref.gui;
 import java.util.Arrays;
 import java.util.Collection;
 
-import net.sf.jabref.model.entry.EntryUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.assertj.swing.fixture.JTableFixture;
 import org.junit.Ignore;
@@ -31,7 +31,7 @@ public class ParameterizedMenuNewEntryTest extends AbstractUITest {
         JTableFixture entryTable = mainFrame.table();
 
         entryTable.requireRowCount(0);
-        mainFrame.menuItemWithPath("BibTeX", "New entry by type...", EntryUtil.capitalizeFirst(entryType)).click();
+        mainFrame.menuItemWithPath("BibTeX", "New entry by type...", StringUtil.capitalizeFirst(entryType)).click();
         entryTable.requireRowCount(1);
     }
 

@@ -3,7 +3,6 @@ package net.sf.jabref.collab;
 import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.PreviewPanel;
 import net.sf.jabref.gui.undo.NamedCompound;
@@ -12,7 +11,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -41,7 +39,7 @@ class EntryDeleteChange extends Change {
         LOGGER.debug("Modified entry: " + memEntry.getCiteKeyOptional().orElse("<no BibTeX key set>")
                 + "\n Modified locally: " + isModifiedLocally);
 
-        PreviewPanel pp = new PreviewPanel(null, memEntry, null, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+        PreviewPanel pp = new PreviewPanel(null, memEntry, null);
         sp = new JScrollPane(pp);
     }
 

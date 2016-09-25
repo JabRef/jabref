@@ -10,48 +10,49 @@ dependencies {
     jython 'org.python:jython-standalone:2.7.0'
 }
 
-task checkTranslations(type: JavaExec) {
-    description "Print empty and duplicate translations."
+task localizationStatusWithMarkdown(type: JavaExec) {
+    description "Creates an update file in Markdown"
     group = 'Localization'
     main 'org.python.util.jython'
     classpath project.configurations.jython.asPath
     args file("scripts/syncLang.py")
-    args "-d"
+    args "markdown"
 }
 
-task checkTranslationsSummary(type: JavaExec) {
-    description "Print summary of empty and duplicate translations."
+task localizationStatus(type: JavaExec) {
+    description "Prints the current status"
     group = 'Localization'
     main 'org.python.util.jython'
     classpath project.configurations.jython.asPath
     args file("scripts/syncLang.py")
-    args "-c"
+    args "status"
 }
 
-task showMissingTranslationKeys(type: JavaExec) {
-    description "Prints differences between the English translation and translations in other languages."
+task localizationStatusExtended(type: JavaExec) {
+    description "Prints the current status (extended output)"
     group = 'Localization'
     main 'org.python.util.jython'
     classpath project.configurations.jython.asPath
     args file("scripts/syncLang.py")
-    args "-t"
+    args "status"
+    args "--extended"
 }
 
-task generateMissingTranslationKeys(type: JavaExec) {
-    description "Prints differences between the English translation and translations in other languages, and updates translations if possible."
+task localizationUpdate(type: JavaExec) {
+    description "Updates the localization files (fixes duplicates, adds missing keys, and sort them"
     group = 'Localization'
     main 'org.python.util.jython'
     classpath project.configurations.jython.asPath
     args file("scripts/syncLang.py")
-    args "-t"
-    args "-u"
+    args "update"
 }
 
-task sortKeysInTranslationFiles(type: JavaExec) {
-    description "Sorts the the keys in all localization Files according to the key order in the english files"
+task localizationUpdateExtended(type: JavaExec) {
+    description "Updates the localization files (fixes duplicates, adds missing keys, and sort them (extended output)"
     group = 'Localization'
     main 'org.python.util.jython'
     classpath project.configurations.jython.asPath
     args file("scripts/syncLang.py")
-    args "-s"
+    args "update"
+    args "--extended"
 }

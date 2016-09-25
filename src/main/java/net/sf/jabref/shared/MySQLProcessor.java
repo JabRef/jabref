@@ -1,6 +1,5 @@
 package net.sf.jabref.shared;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
 /**
@@ -8,11 +7,7 @@ import java.sql.SQLException;
  */
 public class MySQLProcessor extends DBMSProcessor {
 
-    /**
-     * @param connection Working SQL connection
-     * @param dbmsType Instance of {@link DBMSType}
-     */
-    public MySQLProcessor(Connection connection) {
+    public MySQLProcessor(DBMSConnection connection) {
         super(connection);
     }
 
@@ -43,7 +38,7 @@ public class MySQLProcessor extends DBMSProcessor {
     }
 
     @Override
-    public String escape(String expression) {
+    String escape(String expression) {
         return "`" + expression + "`";
     }
 }

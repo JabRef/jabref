@@ -3,7 +3,7 @@ package net.sf.jabref.logic.layout.format;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatter;
-import net.sf.jabref.model.util.LatexToUnicode;
+import net.sf.jabref.model.strings.LatexToUnicode;
 
 /**
  * This formatter converts LaTeX character sequences their equivalent unicode characters,

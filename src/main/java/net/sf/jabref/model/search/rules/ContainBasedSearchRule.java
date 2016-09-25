@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.util.LatexToUnicode;
+import net.sf.jabref.model.strings.LatexToUnicode;
 
 /**
  * Search rule for contain-based search.
@@ -39,7 +39,7 @@ public class ContainBasedSearchRule implements SearchRule {
         List<String> unmatchedWords = new SentenceAnalyzer(searchString).getWords();
 
         for (String fieldContent : bibEntry.getFieldValues()) {
-            String formattedFieldContent = ContainBasedSearchRule.LATEX_TO_UNICODE_FORMATTER.format(fieldContent);
+            String formattedFieldContent = LATEX_TO_UNICODE_FORMATTER.format(fieldContent);
             if (!caseSensitive) {
                 formattedFieldContent = formattedFieldContent.toLowerCase();
             }
