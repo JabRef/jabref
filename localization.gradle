@@ -10,7 +10,7 @@ dependencies {
     jython 'org.python:jython-standalone:2.7.0'
 }
 
-task statusWithMarkdown(type: JavaExec) {
+task localizationStatusWithMarkdown(type: JavaExec) {
     description "Creates an update file in Markdown"
     group = 'Localization'
     main 'org.python.util.jython'
@@ -19,7 +19,7 @@ task statusWithMarkdown(type: JavaExec) {
     args "markdown"
 }
 
-task status(type: JavaExec) {
+task localizationStatus(type: JavaExec) {
     description "Prints the current status"
     group = 'Localization'
     main 'org.python.util.jython'
@@ -28,7 +28,7 @@ task status(type: JavaExec) {
     args "status"
 }
 
-task statusExtended(type: JavaExec) {
+task localizationStatusExtended(type: JavaExec) {
     description "Prints the current status (extended output)"
     group = 'Localization'
     main 'org.python.util.jython'
@@ -38,7 +38,7 @@ task statusExtended(type: JavaExec) {
     args "--extended"
 }
 
-task update(type: JavaExec) {
+task localizationUpdate(type: JavaExec) {
     description "Updates the localization files (fixes duplicates, adds missing keys, and sort them"
     group = 'Localization'
     main 'org.python.util.jython'
@@ -47,7 +47,7 @@ task update(type: JavaExec) {
     args "update"
 }
 
-task updateExtended(type: JavaExec) {
+task localizationUpdateExtended(type: JavaExec) {
     description "Updates the localization files (fixes duplicates, adds missing keys, and sort them (extended output)"
     group = 'Localization'
     main 'org.python.util.jython'
