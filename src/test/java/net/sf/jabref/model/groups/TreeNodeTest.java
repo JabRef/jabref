@@ -7,15 +7,21 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+@RunWith(MockitoJUnitRunner.class)
 public class TreeNodeTest {
+
+    @Mock
+    Consumer<TreeNodeMock> subscriber;
 
     /**
      * Gets the marked node in the following tree:
@@ -24,7 +30,7 @@ public class TreeNodeTest {
      *      A (= parent)
      *          B (<-- this)
      */
-    public TreeNodeMock getNodeInSimpleTree(TreeNodeMock root) {
+    private TreeNodeMock getNodeInSimpleTree(TreeNodeMock root) {
         root.addChild(new TreeNodeMock());
         TreeNodeMock parent = new TreeNodeMock();
         root.addChild(parent);
@@ -33,7 +39,7 @@ public class TreeNodeTest {
         return node;
     }
 
-    public TreeNodeMock getNodeInSimpleTree() {
+    private TreeNodeMock getNodeInSimpleTree() {
         return getNodeInSimpleTree(new TreeNodeMock());
     }
 
@@ -54,7 +60,7 @@ public class TreeNodeTest {
      *          B
      *      A
      */
-    public TreeNodeMock getNodeInComplexTree(TreeNodeMock root) {
+    private TreeNodeMock getNodeInComplexTree(TreeNodeMock root) {
         root.addChild(new TreeNodeMock());
         root.addChild(new TreeNodeMock());
         TreeNodeMock grandParent = new TreeNodeMock();
@@ -77,7 +83,7 @@ public class TreeNodeTest {
         return node;
     }
 
-    public TreeNodeMock getNodeInComplexTree() {
+    private TreeNodeMock getNodeInComplexTree() {
         return getNodeInComplexTree(new TreeNodeMock());
     }
 
@@ -89,7 +95,7 @@ public class TreeNodeTest {
      *      A (<- this)
      *      A
      */
-    public TreeNodeMock getNodeAsChild(TreeNodeMock root) {
+    private TreeNodeMock getNodeAsChild(TreeNodeMock root) {
         root.addChild(new TreeNodeMock());
         root.addChild(new TreeNodeMock());
         TreeNodeMock node = new TreeNodeMock();
@@ -98,7 +104,6 @@ public class TreeNodeTest {
         return node;
     }
 
-    @SuppressWarnings("unused")
     @Test(expected = UnsupportedOperationException.class)
     public void constructorChecksThatClassImplementsCorrectInterface() {
         new WrongTreeNodeImplementation();
@@ -613,7 +618,6 @@ public class TreeNodeTest {
         TreeNodeMock root = new TreeNodeMock();
         TreeNodeMock node = getNodeInComplexTree(root);
 
-        Consumer<TreeNodeMock> subscriber = mock(Consumer.class);
         root.subscribeToDescendantChanged(subscriber);
 
         node.addChild(new TreeNodeMock());
@@ -626,7 +630,6 @@ public class TreeNodeTest {
         TreeNodeMock node = getNodeInComplexTree(root);
         TreeNodeMock oldParent = node.getParent().get();
 
-        Consumer<TreeNodeMock> subscriber = mock(Consumer.class);
         root.subscribeToDescendantChanged(subscriber);
 
         node.moveTo(root);
@@ -640,7 +643,6 @@ public class TreeNodeTest {
         TreeNodeMock node = getNodeInComplexTree(root);
         TreeNodeMock child = node.addChild(new TreeNodeMock());
 
-        Consumer<TreeNodeMock> subscriber = mock(Consumer.class);
         root.subscribeToDescendantChanged(subscriber);
 
         node.removeChild(child);
@@ -653,7 +655,6 @@ public class TreeNodeTest {
         TreeNodeMock node = getNodeInComplexTree(root);
         node.addChild(new TreeNodeMock());
 
-        Consumer<TreeNodeMock> subscriber = mock(Consumer.class);
         root.subscribeToDescendantChanged(subscriber);
 
         node.removeChild(0);

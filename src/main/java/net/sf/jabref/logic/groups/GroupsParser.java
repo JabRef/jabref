@@ -4,7 +4,6 @@ import java.util.List;
 
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.groups.AbstractGroup;
 import net.sf.jabref.model.groups.AllEntriesGroup;
@@ -13,13 +12,14 @@ import net.sf.jabref.model.groups.GroupHierarchyType;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.groups.KeywordGroup;
 import net.sf.jabref.model.groups.SearchGroup;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * Converts string representation of groups to a parsed {@link GroupTreeNode}.
  */
 public class GroupsParser {
 
-    public static GroupTreeNode importGroups(List<String> orderedData, String keywordSeparator)
+    public static GroupTreeNode importGroups(List<String> orderedData, Character keywordSeparator)
             throws ParseException {
         GroupTreeNode cursor = null;
         GroupTreeNode root = null;
@@ -61,7 +61,7 @@ public class GroupsParser {
      * @throws ParseException If an error occurred and a group could not be created,
      *                        e.g. due to a malformed regular expression.
      */
-    public static AbstractGroup fromString(String s, String keywordSeparator)
+    public static AbstractGroup fromString(String s, Character keywordSeparator)
             throws ParseException {
         if (s.startsWith(KeywordGroup.ID)) {
             return GroupsParser.keywordGroupFromString(s, keywordSeparator);
@@ -84,7 +84,7 @@ public class GroupsParser {
      * @param s The String representation obtained from
      *          KeywordGroup.toString()
      */
-    public static AbstractGroup keywordGroupFromString(String s, String keywordSeparator) throws ParseException {
+    public static AbstractGroup keywordGroupFromString(String s, Character keywordSeparator) throws ParseException {
         if (!s.startsWith(KeywordGroup.ID)) {
             throw new IllegalArgumentException("KeywordGroup cannot be created from \"" + s + "\".");
         }
@@ -103,7 +103,7 @@ public class GroupsParser {
                 GroupHierarchyType.getByNumber(context), keywordSeparator);
     }
 
-    public static ExplicitGroup explicitGroupFromString(String s, String keywordSeparator) throws ParseException {
+    public static ExplicitGroup explicitGroupFromString(String s, Character keywordSeparator) throws ParseException {
         if (!s.startsWith(ExplicitGroup.ID)) {
             throw new IllegalArgumentException("ExplicitGroup cannot be created from \"" + s + "\".");
         }

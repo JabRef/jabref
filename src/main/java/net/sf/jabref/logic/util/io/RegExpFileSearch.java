@@ -13,9 +13,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,14 +45,15 @@ public class RegExpFileSearch {
      * @param extensions The extensions that are acceptable.
      * @param directories The root directories to search.
      * @param regExp The expression deciding which names are acceptable.
+     * @param keywordDelimiter
      * @return A map linking each given entry to a list of files matching the given criteria.
      */
     public static Map<BibEntry, List<File>> findFilesForSet(List<BibEntry> entries, List<String> extensions,
-            List<File> directories, String regExp) {
+            List<File> directories, String regExp, Character keywordDelimiter) {
 
         Map<BibEntry, List<File>> res = new HashMap<>();
         for (BibEntry entry : entries) {
-            res.put(entry, findFiles(entry, extensions, directories, regExp));
+            res.put(entry, findFiles(entry, extensions, directories, regExp, keywordDelimiter));
         }
         return res;
     }
@@ -64,14 +65,15 @@ public class RegExpFileSearch {
      * @param extensions The extensions that are acceptable.
      * @param directories The root directories to search.
      * @param regularExpression The expression deciding which names are acceptable.
+     * @param keywordDelimiter
      * @return A list of files paths matching the given criteria.
      */
     private static List<File> findFiles(BibEntry entry, List<String> extensions, List<File> directories,
-            String regularExpression) {
+            String regularExpression, Character keywordDelimiter) {
 
         String extensionRegExp = '(' + String.join("|", extensions) + ')';
 
-        return findFile(entry, directories, regularExpression, extensionRegExp);
+        return findFile(entry, directories, regularExpression, extensionRegExp, keywordDelimiter);
     }
 
     /**
@@ -96,6 +98,7 @@ public class RegExpFileSearch {
      * <li>.* Anything else is taken to be a Regular expression.</li>
      * </ul>
      *
+     * @param keywordDelimiter
      * @param entry
      *            non-null
      * @param dirs
@@ -106,16 +109,14 @@ public class RegExpFileSearch {
      * @param file
      *            non-null
      *
-     * @param relative
-     *            whether to return relative file paths or absolute ones
-     *
      * @return Will return the first file found to match the given criteria or
      *         null if none was found.
      */
-    private static List<File> findFile(BibEntry entry, List<File> dirs, String file, String extensionRegExp) {
+    private static List<File> findFile(BibEntry entry, List<File> dirs, String file, String extensionRegExp,
+            Character keywordDelimiter) {
         List<File> res = new ArrayList<>();
         for (File directory : dirs) {
-            res.addAll(findFile(entry, directory.getPath(), file, extensionRegExp));
+            res.addAll(findFile(entry, directory.getPath(), file, extensionRegExp, keywordDelimiter));
         }
         return res;
     }
@@ -125,7 +126,8 @@ public class RegExpFileSearch {
      * base the search on.
      *
      */
-    private static List<File> findFile(BibEntry entry, String directory, String file, String extensionRegExp) {
+    private static List<File> findFile(BibEntry entry, String directory, String file, String extensionRegExp,
+            Character keywordDelimiter) {
 
         File root;
         if (directory == null) {
@@ -136,7 +138,7 @@ public class RegExpFileSearch {
         if (!root.exists()) {
             return Collections.emptyList();
         }
-        List<File> fileList = RegExpFileSearch.findFile(entry, root, file, extensionRegExp);
+        List<File> fileList = RegExpFileSearch.findFile(entry, root, file, extensionRegExp, keywordDelimiter);
 
         List<File> result = new ArrayList<>();
         for (File tmpFile : fileList) {
@@ -165,7 +167,8 @@ public class RegExpFileSearch {
      * The actual work-horse. Will find absolute filepaths starting from the
      * given directory using the given regular expression string for search.
      */
-    private static List<File> findFile(BibEntry entry, File directory, String file, String extensionRegExp) {
+    private static List<File> findFile(BibEntry entry, File directory, String file, String extensionRegExp,
+            Character keywordDelimiter) {
 
         List<File> res = new ArrayList<>();
 
@@ -195,7 +198,7 @@ public class RegExpFileSearch {
         for (int i = 0; i < (fileParts.length - 1); i++) {
 
             String dirToProcess = fileParts[i];
-            dirToProcess = expandBrackets(dirToProcess, entry, null);
+            dirToProcess = expandBrackets(dirToProcess, entry, null, keywordDelimiter);
 
             if (dirToProcess.matches("^.:$")) { // Windows Drive Letter
                 actualDirectory = new File(dirToProcess + '/');
@@ -215,7 +218,7 @@ public class RegExpFileSearch {
                     String restOfFileString = StringUtil.join(fileParts, "/", i + 1, fileParts.length);
                     for (File subDir : subDirs) {
                         if (subDir.isDirectory()) {
-                            res.addAll(findFile(entry, subDir, restOfFileString, extensionRegExp));
+                            res.addAll(findFile(entry, subDir, restOfFileString, extensionRegExp, keywordDelimiter));
                         }
                     }
                 }
@@ -241,7 +244,7 @@ public class RegExpFileSearch {
                         if (!subDir.isDirectory()) {
                             continue;
                         }
-                        res.addAll(findFile(entry, subDir, restOfFileString, extensionRegExp));
+                        res.addAll(findFile(entry, subDir, restOfFileString, extensionRegExp, keywordDelimiter));
                     }
                 }
 
@@ -250,7 +253,7 @@ public class RegExpFileSearch {
 
         // Last step: check if the given file can be found in this directory
         String filePart = fileParts[fileParts.length - 1].replace("[extension]", EXT_MARKER);
-        String filenameToLookFor = expandBrackets(filePart, entry, null).replaceAll(EXT_MARKER, extensionRegExp);
+        String filenameToLookFor = expandBrackets(filePart, entry, null, keywordDelimiter).replaceAll(EXT_MARKER, extensionRegExp);
         final Pattern toMatch = Pattern.compile('^' + filenameToLookFor.replaceAll("\\\\\\\\", "\\\\") + '$',
                 Pattern.CASE_INSENSITIVE);
 
@@ -271,13 +274,15 @@ public class RegExpFileSearch {
      * @param bracketString
      * @param entry
      * @param database
+     * @param keywordDelimiter
      * @return
      */
-    public static String expandBrackets(String bracketString, BibEntry entry, BibDatabase database) {
+    public static String expandBrackets(String bracketString, BibEntry entry, BibDatabase database,
+            Character keywordDelimiter) {
         Matcher m = SQUARE_BRACKETS_PATTERN.matcher(bracketString);
         StringBuffer s = new StringBuffer();
         while (m.find()) {
-            String replacement = getFieldAndFormat(m.group(), entry, database);
+            String replacement = getFieldAndFormat(m.group(), entry, database, keywordDelimiter);
             m.appendReplacement(s, replacement);
         }
         m.appendTail(s);
@@ -292,9 +297,11 @@ public class RegExpFileSearch {
      * @param fieldAndFormat
      * @param entry
      * @param database
+     * @param keywordDelimiter
      * @return
      */
-    public static String getFieldAndFormat(String fieldAndFormat, BibEntry entry, BibDatabase database) {
+    public static String getFieldAndFormat(String fieldAndFormat, BibEntry entry, BibDatabase database,
+            Character keywordDelimiter) {
 
         String strippedFieldAndFormat = StringUtil.stripBrackets(fieldAndFormat);
 
@@ -317,7 +324,7 @@ public class RegExpFileSearch {
 
         // If no field value was found, try to interpret it as a key generator field marker:
         String fieldValue = BibDatabase.getResolvedField(beforeColon, entry, database)
-                .orElse(BibtexKeyPatternUtil.makeLabel(entry, beforeColon));
+                .orElse(BibtexKeyPatternUtil.makeLabel(entry, beforeColon, keywordDelimiter));
 
         if (fieldValue == null) {
             return "";

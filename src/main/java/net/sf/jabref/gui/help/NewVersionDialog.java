@@ -21,7 +21,7 @@ import net.sf.jabref.preferences.VersionPreferences;
 
 public class NewVersionDialog extends JDialog {
 
-    public NewVersionDialog(JFrame frame, Version currentVersion, Version latestVersion, Version toBeIgnored) {
+    public NewVersionDialog(JFrame frame, Version currentVersion, Version latestVersion) {
         super(frame);
         setTitle(Localization.lang("New version available"));
 
@@ -41,7 +41,7 @@ public class NewVersionDialog extends JDialog {
 
         JButton btnIgnoreUpdate = new JButton(Localization.lang("Ignore this update"));
         btnIgnoreUpdate.addActionListener(e -> {
-            new VersionPreferences(Globals.prefs).setAsIgnoredVersion(toBeIgnored);
+            Globals.prefs.storeVersionPreferences(new VersionPreferences(latestVersion));
             dispose();
         });
 

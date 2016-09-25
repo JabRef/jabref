@@ -112,6 +112,11 @@ public class IntegrityCheckTest {
     }
 
     @Test
+    public void testBibtexkeyChecks() {
+        assertCorrect(createContext("bibtexkey", "Knuth2014"));
+    }
+
+    @Test
     public void testBracketChecks() {
         assertCorrect(createContext("title", "x"));
         assertCorrect(createContext("title", "{x}"));

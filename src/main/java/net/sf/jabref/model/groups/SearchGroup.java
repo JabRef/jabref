@@ -6,7 +6,7 @@ import java.util.Optional;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.search.GroupSearchQuery;
 import net.sf.jabref.model.search.rules.SearchRule;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -53,11 +53,11 @@ public class SearchGroup extends AbstractGroup {
      */
     @Override
     public String toString() {
-        return SearchGroup.ID + ModelStringUtil.quote(getName(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
+        return SearchGroup.ID + StringUtil.quote(getName(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
                 + AbstractGroup.SEPARATOR + getContext().ordinal() + AbstractGroup.SEPARATOR
-                + ModelStringUtil.quote(getSearchExpression(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
-                + AbstractGroup.SEPARATOR + ModelStringUtil.booleanToBinaryString(isCaseSensitive())
-                + AbstractGroup.SEPARATOR + ModelStringUtil.booleanToBinaryString(isRegExp()) + AbstractGroup.SEPARATOR;
+                + StringUtil.quote(getSearchExpression(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
+                + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(isCaseSensitive())
+                + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(isRegExp()) + AbstractGroup.SEPARATOR;
     }
 
     public String getSearchExpression() {

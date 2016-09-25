@@ -20,7 +20,7 @@ public class SearchGroupTest {
         BibEntry entry = new BibEntry();
         assertFalse(group.contains(entry));
 
-        entry.addKeyword("review", ", ");
+        entry.addKeyword("review", ',');
         assertTrue(group.contains(entry));
     }
 
