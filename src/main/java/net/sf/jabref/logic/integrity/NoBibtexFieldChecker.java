@@ -26,7 +26,7 @@ public class NoBibtexFieldChecker implements Checker {
         //BibTeX
         if (value.isPresent()) {
             return Collections.singletonList(
-                    new IntegrityMessage(Localization.lang("no BibTeX field"), entry, FieldName.JOURNALTITLE));
+                    new IntegrityMessage(Localization.lang("BibLaTeX field only"), entry, FieldName.JOURNALTITLE));
         }
 
         return Collections.emptyList();
