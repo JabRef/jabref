@@ -55,6 +55,7 @@ public class MetaData implements Iterable<String> {
      * it has been passed.
      */
     public MetaData(Map<String, List<String>> parsedData) {
+        Objects.requireNonNull(parsedData);
         clearMetaData();
         metaData.putAll(parsedData);
     }
@@ -188,10 +189,10 @@ public class MetaData implements Iterable<String> {
         // set new value if it is not a default value
         Set<String> allKeys = bibtexKeyPattern.getAllKeys();
         for (String key : allKeys) {
-            String metaDataKey = PREFIX_KEYPATTERN + key;
             if (!bibtexKeyPattern.isDefaultValue(key)) {
                 List<String> data = new ArrayList<>();
                 data.add(bibtexKeyPattern.getValue(key).get(0));
+                String metaDataKey = PREFIX_KEYPATTERN + key;
                 this.putData(metaDataKey, data);
             }
         }

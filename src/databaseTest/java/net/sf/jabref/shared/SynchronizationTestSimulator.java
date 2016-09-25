@@ -37,10 +37,10 @@ public class SynchronizationTestSimulator {
     public void setUp() throws SQLException, DatabaseNotSupportedException {
         this.dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
 
-        clientContextA = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ", ");
+        clientContextA = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ',');
         clientContextA.getDBMSSynchronizer().openSharedDatabase(dbmsConnection);
 
-        clientContextB = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ", ");
+        clientContextB = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ',');
         clientContextB.getDBMSSynchronizer().openSharedDatabase(dbmsConnection);
         eventListenerB = new SynchronizationTestEventListener();
         clientContextB.getDBMSSynchronizer().registerListener(eventListenerB);
