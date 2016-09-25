@@ -25,7 +25,7 @@ public class JSONEntryParserTest {
                 + "\"id\": \"1563-5171\"},{\"type\": \"doi\",\"id\": \"10.1155/2014/217495\""
                 + "}],\"created_date\":\"2014-05-09T19:38:31Z\"}\"";
         JSONObject jsonObject = new JSONObject(jsonString);
-        BibEntry bibEntry = jc.parseBibJSONtoBibtex(jsonObject, ", ");
+        BibEntry bibEntry = jc.parseBibJSONtoBibtex(jsonObject, ',');
 
         Assert.assertEquals("article", bibEntry.getType());
         Assert.assertEquals(Optional.of("VLSI Design"), bibEntry.getField("journal"));

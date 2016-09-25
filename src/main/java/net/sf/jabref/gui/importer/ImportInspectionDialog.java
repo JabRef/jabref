@@ -91,7 +91,6 @@ import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -100,6 +99,7 @@ import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.EntriesGroupChange;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.metadata.MetaData;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -1409,7 +1409,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 return Localization.lang("Keep");
             }
             if (i >= PAD) {
-                return EntryUtil.capitalizeFirst(INSPECTION_FIELDS.get(i - PAD));
+                return StringUtil.capitalizeFirst(INSPECTION_FIELDS.get(i - PAD));
             }
             return "";
         }

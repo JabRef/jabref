@@ -48,7 +48,7 @@ public class TitleChecker implements Checker {
 
         if (hasCapitalLettersThatBibtexWillConvertToSmallerOnes) {
             return Collections.singletonList(
-                    new IntegrityMessage(Localization.lang("large capitals are not masked using curly brackets {}"),
+                    new IntegrityMessage(Localization.lang("capital letters are not masked using curly brackets {}"),
                             entry, FieldName.TITLE));
         }
 

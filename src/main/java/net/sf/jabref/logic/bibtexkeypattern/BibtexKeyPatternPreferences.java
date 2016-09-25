@@ -10,17 +10,18 @@ public class BibtexKeyPatternPreferences {
     private final boolean firstLetterA;
     private final boolean enforceLegalKey;
     private final GlobalBibtexKeyPattern keyPattern;
+    private Character keywordDelimiter;
 
-
-    public BibtexKeyPatternPreferences(String keyPatternRegex, String keyPatternReplacement,
-            boolean alwaysAddLetter, boolean firstLetterA, boolean enforceLegalKey,
-            GlobalBibtexKeyPattern keyPattern) {
+    public BibtexKeyPatternPreferences(String keyPatternRegex, String keyPatternReplacement, boolean alwaysAddLetter,
+            boolean firstLetterA, boolean enforceLegalKey, GlobalBibtexKeyPattern keyPattern,
+            Character keywordDelimiter) {
         this.keyPatternRegex = keyPatternRegex;
         this.keyPatternReplacement = keyPatternReplacement;
         this.alwaysAddLetter = alwaysAddLetter;
         this.firstLetterA = firstLetterA;
         this.enforceLegalKey = enforceLegalKey;
         this.keyPattern = keyPattern;
+        this.keywordDelimiter = keywordDelimiter;
     }
 
     public String getKeyPatternRegex() {
@@ -45,5 +46,9 @@ public class BibtexKeyPatternPreferences {
 
     public GlobalBibtexKeyPattern getKeyPattern() {
         return keyPattern;
+    }
+
+    public Character getKeywordDelimiter() {
+        return keywordDelimiter;
     }
 }

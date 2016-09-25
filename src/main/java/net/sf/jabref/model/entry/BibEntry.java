@@ -27,6 +27,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.model.entry.event.FieldChangedEvent;
+import net.sf.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Strings;
 import com.google.common.eventbus.EventBus;
@@ -105,6 +106,14 @@ public class BibEntry implements Cloneable {
         this.sharedBibEntryData = new SharedBibEntryData();
     }
 
+    public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace, Optional<Keyword> newValue,
+            Character keywordDelimiter) {
+        KeywordList keywordList = getKeywords(keywordDelimiter);
+        keywordList.replaceKeywords(keywordsToReplace, newValue);
+
+        return putKeywords(keywordList, keywordDelimiter);
+    }
+
     /**
      * Returns the text stored in the given field of the given bibtex entry
      * which belongs to the given database.
@@ -127,7 +136,7 @@ public class BibEntry implements Cloneable {
             if (entryType.isPresent()) {
                 return Optional.of(entryType.get().getName());
             } else {
-                return Optional.of(EntryUtil.capitalizeFirst(getType()));
+                return Optional.of(StringUtil.capitalizeFirst(getType()));
             }
         }
 
@@ -614,7 +623,12 @@ public class BibEntry implements Cloneable {
         this.changed = changed;
     }
 
-    public Optional<FieldChange> putKeywords(Collection<String> keywords, String separator) {
+    public Optional<FieldChange> putKeywords(List<String> keywords, Character delimiter) {
+        Objects.requireNonNull(delimiter);
+        return putKeywords(new KeywordList(keywords), delimiter);
+    }
+
+    public Optional<FieldChange> putKeywords(KeywordList keywords, Character delimiter) {
         Objects.requireNonNull(keywords);
         Optional<String> oldValue = this.getField(FieldName.KEYWORDS);
 
@@ -628,7 +642,7 @@ public class BibEntry implements Cloneable {
         }
 
         // Set new keyword field
-        String newValue = String.join(separator, keywords);
+        String newValue = keywords.getAsString(delimiter);
         return this.setField(FieldName.KEYWORDS, newValue);
     }
 
@@ -637,16 +651,20 @@ public class BibEntry implements Cloneable {
      *
      * @param keyword Keyword to add
      */
-    public void addKeyword(String keyword, String separator) {
+    public void addKeyword(String keyword, Character delimiter) {
         Objects.requireNonNull(keyword, "keyword must not be null");
 
         if (keyword.isEmpty()) {
             return;
         }
 
-        Set<String> keywords = this.getKeywords();
+        addKeyword(new Keyword(keyword), delimiter);
+    }
+
+    public void addKeyword(Keyword keyword, Character delimiter) {
+        KeywordList keywords = this.getKeywords(delimiter);
         keywords.add(keyword);
-        this.putKeywords(keywords, separator);
+        this.putKeywords(keywords, delimiter);
     }
 
     /**
@@ -654,16 +672,18 @@ public class BibEntry implements Cloneable {
      *
      * @param keywords Keywords to add
      */
-    public void addKeywords(Collection<String> keywords, String separator) {
+    public void addKeywords(Collection<String> keywords, Character delimiter) {
         Objects.requireNonNull(keywords);
-
-        for (String keyword : keywords) {
-            this.addKeyword(keyword, separator);
-        }
+        keywords.forEach(keyword -> addKeyword(keyword, delimiter));
     }
 
-    public Set<String> getKeywords() {
-        return net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(this);
+    public KeywordList getKeywords(Character delimiter) {
+        Optional<String> keywordsContent = getField(FieldName.KEYWORDS);
+        if (keywordsContent.isPresent()) {
+            return KeywordList.parse(keywordsContent.get(), delimiter);
+        } else {
+            return new KeywordList();
+        }
     }
 
     public Collection<String> getFieldValues() {
@@ -735,7 +755,7 @@ public class BibEntry implements Cloneable {
             if (fieldValue == null) {
                 return Collections.emptySet();
             } else {
-                HashSet<String> words = new HashSet<>(EntryUtil.getStringAsWords(fieldValue));
+                HashSet<String> words = new HashSet<>(StringUtil.getStringAsWords(fieldValue));
                 fieldsAsWords.put(fieldName, words);
                 return words;
             }

@@ -47,7 +47,7 @@ def read_file(filename, encoding="UTF-8"):
     """
     :param filename: string
     :param encoding: string: the encoding of the file to read (standard: `UTF-8`)
-    :return: list of strings: the lines of the file
+    :return: list of unicode strings: the lines of the file
     """
     with codecs.open(filename, encoding=encoding) as file:
         return [u"{}\n".format(line.strip()) for line in file.readlines()]
@@ -57,7 +57,7 @@ def write_file(filename, content):
     """
     writes the lines to the file in `UTF-8`
     :param filename: string
-    :param content: list: the lines to write
+    :param content: list of unicode unicode: the lines to write
     """
     codecs.open(filename, "w", encoding='utf-8').writelines(content)
 
@@ -114,8 +114,8 @@ def get_key_from_line(line):
     """
     Tries to extract the key from the line
 
-    :param line: a String
-    :return: the key (String) or None
+    :param line: unicode string
+    :return: unicode string: the key or None
     """
     if line.find("#") != 0 or line.find("!") != 0:
         index_key_end = line.find("=")
@@ -130,8 +130,8 @@ def get_key_and_value_from_line(line):
     """
     Tries to extract the key and value from the line
 
-    :param line: string
-    :return: (string, string) or (None, None): (key, value)
+    :param line: unicode string
+    :return: (unicode string, unicode string) or (None, None): (key, value)
     """
     if line.find("#") != 0 or line.find("!") != 0:
         index_key_end = line.find("=")
@@ -144,8 +144,8 @@ def get_key_and_value_from_line(line):
 
 def get_translations_as_dict(lines):
     """
-    :param lines: list of strings
-    :return: dict of strings:
+    :param lines: list of unicode strings
+    :return: dict of unicode strings:
     """
     translations = {}
     for line in lines:
@@ -157,8 +157,8 @@ def get_translations_as_dict(lines):
 
 def get_empty_keys(lines):
     """
-    :param lines: list of strings
-    :return: list of strings: the keys with empty values
+    :param lines: list of unicode strings
+    :return: list of unicode strings: the keys with empty values
     """
     not_translated = []
     keys = get_translations_as_dict(lines=lines)
@@ -172,8 +172,8 @@ def fix_duplicates(lines):
     """
     Fixes all unambiguous duplicates
 
-    :param lines: list of strings
-    :return: (list of strings, list of strings): not fixed ambiguous duplicates, fixed unambiguous duplicates
+    :param lines: list of unicode strings
+    :return: (list of unicode strings, list of unicode strings): not fixed ambiguous duplicates, fixed unambiguous duplicates
     """
     keys = {}
     fixed = []
@@ -183,15 +183,15 @@ def fix_duplicates(lines):
         if key:
             if key in keys:
                 if not keys[key]:
-                    fixed.append("{key}={value}".format(key=key, value=keys[key]))
+                    fixed.append(u"{key}={value}".format(key=key, value=keys[key]))
                     keys[key] = value
                 elif not value:
-                    fixed.append("{key}={value}".format(key=key, value=value))
+                    fixed.append(u"{key}={value}".format(key=key, value=value))
                 elif keys[key] == value:
-                    fixed.append("{key}={value}".format(key=key, value=value))
+                    fixed.append(u"{key}={value}".format(key=key, value=value))
                 elif keys[key] != value:
-                    not_fixed.append("{key}={value}".format(key=key, value=value))
-                    not_fixed.append("{key}={value}".format(key=key, value=keys[key]))
+                    not_fixed.append(u"{key}={value}".format(key=key, value=value))
+                    not_fixed.append(u"{key}={value}".format(key=key, value=keys[key]))
             else:
                 keys[key] = value
 
@@ -202,8 +202,8 @@ def get_keys_from_lines(lines):
     """
     Builds a list of all translation keys in the list of lines.
 
-    :param lines: a list of strings
-    :return: the sorted keys within the list of strings
+    :param lines: a list of unicode strings
+    :return: list of unicode strings: the sorted keys within the lines
     """
     keys = []
     for line in lines:
@@ -217,9 +217,9 @@ def get_missing_keys(first_list, second_list):
     """
     Finds all keys in the first list that are not present in the second list
 
-    :param first_list: a list
-    :param second_list: a list
-    :return: a list
+    :param first_list: list of unicode strings
+    :param second_list: list of unicode strings
+    :return: list of unicode strings
     """
     missing = []
     for key in first_list:
@@ -232,8 +232,8 @@ def get_duplicates(lines):
     """
     finds all the duplicates and returns them
 
-    :param lines: list of strings
-    :return: list of strings
+    :param lines: list of unicode strings
+    :return: list of unicode strings
     """
     duplicates = []
     keys_checked = {}
@@ -241,8 +241,8 @@ def get_duplicates(lines):
         key, value = get_key_and_value_from_line(line=line)
         if key:
             if key in keys_checked:
-                duplicates.append("{key}={value}".format(key=key, value=value))
-                translation_in_list = "{key}={value}".format(key=key, value=keys_checked[key])
+                duplicates.append(u"{key}={value}".format(key=key, value=value))
+                translation_in_list = u"{key}={value}".format(key=key, value=keys_checked[key])
                 if translation_in_list not in duplicates:
                     duplicates.append(translation_in_list)
             else:
@@ -368,15 +368,15 @@ def update(extended):
             logger.ok("Processing file '{file}' with {num_keys} Keys".format(file=filename, num_keys=num_keys))
             logger.ok("\tfixed {} unambiguous duplicates".format(num_fixed))
             if extended and num_fixed != 0:
-                logger.neutral("\t\t{}".format(fixed))
+                logger.neutral("\t\t{}".format(", ".join(fixed)))
 
             logger.ok("\tadded {} missing keys".format(num_keys_missing))
             if extended and num_keys_missing != 0:
-                logger.neutral("\t\t{}".format(keys_missing))
+                logger.neutral("\t\t{}".format(", ".join(keys_missing)))
 
             logger.ok("\tdeleted {} obsolete keys".format(num_keys_obsolete))
             if extended and num_keys_obsolete != 0:
-                logger.neutral("\t\t{}".format(keys_obsolete))
+                logger.neutral("\t\t{}".format(", ".join(keys_obsolete)))
 
             logger.ok("\thas been sorted successfully")
 

@@ -14,18 +14,18 @@ public class ExplicitGroupTest {
 
     @Test
      public void testToStringSimple() throws ParseException {
-        ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ", ");
+        ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
         assertEquals("ExplicitGroup:myExplicitGroup;0;", group.toString());
     }
 
     @Test
     public void toStringDoesNotWriteAssignedEntries() throws ParseException {
-        ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INCLUDING, ", ");
+        ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INCLUDING, ',');
         group.add(makeBibtexEntry());
         assertEquals("ExplicitGroup:myExplicitGroup;2;", group.toString());
     }
 
-    public BibEntry makeBibtexEntry() {
+    private BibEntry makeBibtexEntry() {
         BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INCOLLECTION.getName());
         e.setField("title", "Marine finfish larviculture in Europe");
         e.setField("bibtexkey", "shields01");
