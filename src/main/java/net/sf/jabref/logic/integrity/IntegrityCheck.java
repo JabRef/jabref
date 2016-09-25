@@ -44,6 +44,7 @@ public class IntegrityCheck {
             result.addAll(new TitleChecker().check(entry));
             result.addAll(new PagesChecker().check(entry));
             result.addAll(new ASCIICharacterChecker().check(entry));
+            result.addAll(new NoBibtexFieldChecker().check(entry));
         } else {
             result.addAll(new BiblatexPagesChecker().check(entry));
         }
@@ -55,7 +56,6 @@ public class IntegrityCheck {
         result.addAll(new NoteChecker(bibDatabaseContext).check(entry));
         result.addAll(new HowpublishedChecker(bibDatabaseContext).check(entry));
         result.addAll(new MonthChecker(bibDatabaseContext).check(entry));
-        result.addAll(new NoBibtexFieldChecker(bibDatabaseContext).check(entry));
         result.addAll(new UrlChecker().check(entry));
         result.addAll(new FileChecker(bibDatabaseContext, fileDirectoryPreferences).check(entry));
         result.addAll(new TypeChecker().check(entry));
