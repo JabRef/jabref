@@ -13,7 +13,7 @@ public class ImportFormatPreferences {
 
     private final Charset encoding;
 
-    private final String keywordSeparator;
+    private final Character keywordSeparator;
 
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
 
@@ -26,7 +26,7 @@ public class ImportFormatPreferences {
 
 
     public ImportFormatPreferences(Set<CustomImporter> customImportList, Charset encoding,
-            String keywordSeparator, BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
+            Character keywordSeparator, BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
             FieldContentParserPreferences fieldContentParserPreferences, boolean convertUnitsOnSearch,
             boolean useCaseKeeperOnSearch, boolean keywordSyncEnabled) {
         this.customImportList = customImportList;
@@ -47,7 +47,7 @@ public class ImportFormatPreferences {
         return encoding;
     }
 
-    public String getKeywordSeparator() {
+    public Character getKeywordSeparator() {
         return keywordSeparator;
     }
 

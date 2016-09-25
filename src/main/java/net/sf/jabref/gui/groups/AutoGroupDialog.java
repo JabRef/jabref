@@ -36,7 +36,6 @@ import net.sf.jabref.model.groups.GroupHierarchyType;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.groups.GroupsUtil;
 import net.sf.jabref.model.groups.KeywordGroup;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
 import com.jgoodies.forms.builder.FormBuilder;
@@ -54,7 +53,8 @@ class AutoGroupDialog extends JDialog implements CaretListener {
             Localization.lang("Generate groups from keywords in a BibTeX field"));
     private final JRadioButton authors = new JRadioButton(Localization.lang("Generate groups for author last names"));
     private final JRadioButton editors = new JRadioButton(Localization.lang("Generate groups for editor last names"));
-    private final JCheckBox nd = new JCheckBox(Localization.lang("Use the following delimiter character(s):"));
+    private final JCheckBox useCustomDelimiter = new JCheckBox(
+            Localization.lang("Use the following delimiter character(s):"));
     private final JButton ok = new JButton(Localization.lang("OK"));
     private final GroupTreeNodeViewModel m_groupsRoot;
     private final JabRefFrame frame;
@@ -73,61 +73,56 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         field.setText(defaultField);
         remove.setText(defaultRemove);
         deliminator.setText(defaultDeliminator);
-        nd.setSelected(true);
-        ActionListener okListener = new ActionListener() {
+        useCustomDelimiter.setSelected(true);
+        ActionListener okListener = e -> {
+            dispose();
 
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dispose();
+            try {
+                GroupTreeNode autoGroupsRoot = GroupTreeNode.fromGroup(
+                        new ExplicitGroup(Localization.lang("Automatically created groups"),
+                                GroupHierarchyType.INCLUDING,
+                                Globals.prefs.getKeywordDelimiter()));
+                Set<String> keywords;
+                String fieldText = field.getText().toLowerCase().trim();
+                if (this.keywords.isSelected()) {
+                    if (useCustomDelimiter.isSelected()) {
+                        keywords = GroupsUtil.findDeliminatedWordsInField(panel.getDatabase(), fieldText,
+                                deliminator.getText());
+                    } else {
+                        keywords = GroupsUtil.findAllWordsInField(panel.getDatabase(), fieldText, remove.getText());
 
-                try {
-                    GroupTreeNode autoGroupsRoot = GroupTreeNode.fromGroup(
-                            new ExplicitGroup(Localization.lang("Automatically created groups"),
-                                    GroupHierarchyType.INCLUDING,
-                                    Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR)));
-                    Set<String> hs;
-                    String fieldText = field.getText();
-                    if (keywords.isSelected()) {
-                        if (nd.isSelected()) {
-                            hs = GroupsUtil.findDeliminatedWordsInField(panel.getDatabase(),
-                                    field.getText().toLowerCase().trim(), deliminator.getText());
-                        } else {
-                            hs = GroupsUtil.findAllWordsInField(panel.getDatabase(), field.getText().toLowerCase().trim(),
-                                    remove.getText());
-
-                        }
-                    } else if (authors.isSelected()) {
-                        List<String> fields = new ArrayList<>(2);
-                        fields.add(FieldName.AUTHOR);
-                        hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
-                        fieldText = FieldName.AUTHOR;
-                    } else { // editors.isSelected() as it is a radio button group.
-                        List<String> fields = new ArrayList<>(2);
-                        fields.add(FieldName.EDITOR);
-                        hs = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
-                        fieldText = FieldName.EDITOR;
                     }
-
-                    LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
-
-                    for (String keyword : hs) {
-                        KeywordGroup group = new KeywordGroup(formatter.format(keyword), fieldText, keyword, false, false,
-                                GroupHierarchyType.INDEPENDENT, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
-                        autoGroupsRoot.addChild(GroupTreeNode.fromGroup(group));
-                    }
-
-                    autoGroupsRoot.moveTo(m_groupsRoot.getNode());
-                    NamedCompound ce = new NamedCompound(Localization.lang("Automatically create groups"));
-                    UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(m_groupsRoot, new GroupTreeNodeViewModel(autoGroupsRoot), UndoableAddOrRemoveGroup.ADD_NODE);
-                    ce.addEdit(undo);
-
-                    panel.markBaseChanged(); // a change always occurs
-                    frame.output(Localization.lang("Created groups."));
-                    ce.end();
-                    panel.getUndoManager().addEdit(ce);
-                } catch (ParseException exception) {
-                    frame.showMessage(exception.getLocalizedMessage());
+                } else if (authors.isSelected()) {
+                    List<String> fields = new ArrayList<>(2);
+                    fields.add(FieldName.AUTHOR);
+                    keywords = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
+                    fieldText = FieldName.AUTHOR;
+                } else { // editors.isSelected() as it is a radio button group.
+                    List<String> fields = new ArrayList<>(2);
+                    fields.add(FieldName.EDITOR);
+                    keywords = GroupsUtil.findAuthorLastNames(panel.getDatabase(), fields);
+                    fieldText = FieldName.EDITOR;
                 }
+
+                LatexToUnicodeFormatter formatter = new LatexToUnicodeFormatter();
+
+                for (String keyword : keywords) {
+                    KeywordGroup group = new KeywordGroup(formatter.format(keyword), fieldText, keyword, false, false,
+                            GroupHierarchyType.INDEPENDENT, Globals.prefs.getKeywordDelimiter());
+                    autoGroupsRoot.addChild(GroupTreeNode.fromGroup(group));
+                }
+
+                autoGroupsRoot.moveTo(m_groupsRoot.getNode());
+                NamedCompound ce = new NamedCompound(Localization.lang("Automatically create groups"));
+                UndoableAddOrRemoveGroup undo = new UndoableAddOrRemoveGroup(m_groupsRoot, new GroupTreeNodeViewModel(autoGroupsRoot), UndoableAddOrRemoveGroup.ADD_NODE);
+                ce.addEdit(undo);
+
+                panel.markBaseChanged(); // a change always occurs
+                frame.output(Localization.lang("Created groups."));
+                ce.end();
+                panel.getUndoManager().addEdit(ce);
+            } catch (ParseException exception) {
+                frame.showMessage(exception.getLocalizedMessage());
             }
         };
         remove.addActionListener(okListener);
@@ -164,7 +159,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
         b.add(field).xy(5, 3);
         b.add(Localization.lang("Characters to ignore") + ":").xy(3, 5);
         b.add(remove).xy(5, 5);
-        b.add(nd).xy(3, 7);
+        b.add(useCustomDelimiter).xy(3, 7);
         b.add(deliminator).xy(5, 7);
         b.add(authors).xyw(1, 9, 5);
         b.add(editors).xyw(1, 11, 5);

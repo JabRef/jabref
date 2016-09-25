@@ -57,10 +57,10 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.SearchPreferences;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -569,7 +569,7 @@ public class SearchResultFrame {
         @Override
         public String getColumnName(int column) {
             if (column >= PAD) {
-                return EntryUtil.capitalizeFirst(FIELDS[column - PAD]);
+                return StringUtil.capitalizeFirst(FIELDS[column - PAD]);
             } else if (column == DATABASE_COL){
                 return Localization.lang("Database");
             } else {

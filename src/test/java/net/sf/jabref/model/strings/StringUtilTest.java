@@ -57,13 +57,13 @@ public class StringUtilTest {
     @Test
     public void testUnifyLineBreaks() {
         // Mac < v9
-        String result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r", "newline");
+        String result = StringUtil.unifyLineBreaks("\r", "newline");
         assertEquals("newline", result);
         // Windows
-        result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\r\n", "newline");
+        result = StringUtil.unifyLineBreaks("\r\n", "newline");
         assertEquals("newline", result);
         // Unix
-        result = StringUtil.unifyLineBreaksToConfiguredLineBreaks("\n", "newline");
+        result = StringUtil.unifyLineBreaks("\n", "newline");
         assertEquals("newline", result);
     }
 
@@ -340,5 +340,13 @@ public class StringUtilTest {
         assertEquals("a:", StringUtil.unquote("a::", ':'));
         assertEquals("a:;", StringUtil.unquote("a:::;", ':'));
         assertEquals("a:b%c;", StringUtil.unquote("a::b:%c:;", ':'));
+    }
+
+    @Test
+    public void testCapitalizeFirst() {
+        assertEquals("", StringUtil.capitalizeFirst(""));
+        assertEquals("Hello world", StringUtil.capitalizeFirst("Hello World"));
+        assertEquals("A", StringUtil.capitalizeFirst("a"));
+        assertEquals("Aa", StringUtil.capitalizeFirst("AA"));
     }
 }

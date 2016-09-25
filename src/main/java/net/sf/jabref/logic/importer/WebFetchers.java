@@ -19,7 +19,7 @@ public class WebFetchers {
                 fetcher = new IsbnFetcher(preferences);
                 break;
             case FieldName.EPRINT:
-                fetcher = new ArXiv();
+                fetcher = new ArXiv(preferences);
                 break;
             default:
                 return Optional.empty();

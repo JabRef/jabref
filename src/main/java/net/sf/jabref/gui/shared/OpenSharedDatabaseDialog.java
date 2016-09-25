@@ -29,7 +29,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefException;
 import net.sf.jabref.JabRefGUI;
 import net.sf.jabref.gui.BasePanel;
@@ -37,7 +36,6 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.DBMSConnection;
 import net.sf.jabref.shared.DBMSConnectionProperties;
 import net.sf.jabref.shared.DBMSType;
@@ -108,7 +106,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
         setLoadingConnectButtonText(true);
 
         try {
-            new SharedDatabaseUIManager(frame, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR)).openNewSharedDatabaseTab(connectionProperties);
+            new SharedDatabaseUIManager(frame).openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
             dispose();
             return; // setLoadingConnectButtonText(false) should not be reached regularly.
@@ -320,8 +318,8 @@ public class OpenSharedDatabaseDialog extends JDialog {
     /**
      * Saves the data from this dialog persistently to facilitate the usage.
      */
-    public void setPreferences() {
-        prefs.setType(((DBMSType) dbmsTypeDropDown.getSelectedItem()).toString());
+    private void setPreferences() {
+        prefs.setType(dbmsTypeDropDown.getSelectedItem().toString());
         prefs.setHost(hostField.getText());
         prefs.setPort(portField.getText());
         prefs.setName(databaseField.getText());
