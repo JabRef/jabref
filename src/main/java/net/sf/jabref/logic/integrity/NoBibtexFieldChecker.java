@@ -19,16 +19,13 @@ public class NoBibtexFieldChecker implements Checker {
     public List<IntegrityMessage> check(BibEntry entry) {
         Optional<String> value = entry.getField(FieldName.JOURNALTITLE);
 
+        //BibTeX
         if (!value.isPresent()) {
             return Collections.emptyList();
         }
-
-        //BibTeX
-        if (value.isPresent()) {
+        else {
             return Collections.singletonList(
                     new IntegrityMessage(Localization.lang("BibLaTeX field only"), entry, FieldName.JOURNALTITLE));
         }
-
-        return Collections.emptyList();
     }
 }
