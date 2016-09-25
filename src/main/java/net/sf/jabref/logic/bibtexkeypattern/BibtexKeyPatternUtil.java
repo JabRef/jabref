@@ -6,9 +6,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.formatter.Formatters;
 import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import net.sf.jabref.model.database.BibDatabase;
@@ -488,17 +491,13 @@ public class BibtexKeyPatternUtil {
      * @param offset The number of initial items in the modifiers array to skip.
      * @return The modified label.
      */
-    public static String applyModifiers(String label, List<String> parts, int offset) {
+    public static String applyModifiers(final String label, final List<String> parts, final int offset) {
         String resultingLabel = label;
         if (parts.size() > offset) {
             for (int j = offset; j < parts.size(); j++) {
                 String modifier = parts.get(j);
 
-                if ("lower".equals(modifier)) {
-                    resultingLabel = resultingLabel.toLowerCase(Locale.ENGLISH);
-                } else if ("upper".equals(modifier)) {
-                    resultingLabel = resultingLabel.toUpperCase(Locale.ENGLISH);
-                } else if ("abbr".equals(modifier)) {
+                if ("abbr".equals(modifier)) {
                     // Abbreviate - that is,
                     StringBuilder abbreviateSB = new StringBuilder();
                     String[] words = resultingLabel.replaceAll("[\\{\\}']", "")
@@ -508,21 +507,28 @@ public class BibtexKeyPatternUtil {
                             abbreviateSB.append(word.charAt(0));
                         }
                     }
-                    resultingLabel = abbreviateSB.toString();
-
-                } else if (!modifier.isEmpty() && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
-                    // Alternate text modifier in parentheses. Should be inserted if
-                    // the label is empty:
-                    if (resultingLabel.isEmpty() && (modifier.length() > 2)) {
-                        return modifier.substring(1, modifier.length() - 1);
-                    }
-
+                    resultingLabel =  abbreviateSB.toString();
                 } else {
-                    LOGGER.info("Key generator warning: unknown modifier '"
-                            + modifier + "'.");
+                    Optional<Formatter> formatter = Formatters.getFormatterForModifier(modifier);
+                    if (formatter.isPresent()) {
+                        resultingLabel = formatter.get().format(label);
+                    } else if (!modifier.isEmpty() && modifier.length()>= 2 && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
+                        // Alternate text modifier in parentheses. Should be inserted if
+                        // the label is empty:
+                        if (label.isEmpty() && (modifier.length() > 2)) {
+                            resultingLabel = modifier.substring(1, modifier.length() - 1);
+                        } else {
+                            resultingLabel = label;
+                        }
+                    } else {
+                        LOGGER.info("Key generator warning: unknown modifier '"
+                                + modifier + "'.");
+                        resultingLabel = label;
+                    }
                 }
             }
         }
+
         return resultingLabel;
     }
 
