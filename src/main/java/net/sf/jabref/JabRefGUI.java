@@ -32,7 +32,6 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.Version;
 import net.sf.jabref.migrations.PreferencesMigrations;
 import net.sf.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.preferences.VersionPreferences;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
@@ -69,7 +68,7 @@ public class JabRefGUI {
     }
 
     public static void checkForNewVersion(boolean manualExecution) {
-        Version toBeIgnored = new VersionPreferences(Globals.prefs).getIgnoredVersion();
+        Version toBeIgnored = Globals.prefs.getVersionPreferences().getIgnoredVersion();
         Version currentVersion = Globals.BUILD_INFO.getVersion();
         new VersionWorker(JabRefGUI.getMainFrame(), manualExecution, currentVersion, toBeIgnored).execute();
     }
@@ -200,10 +199,8 @@ public class JabRefGUI {
         boolean isSharedDatabaseEdited = Globals.prefs.getBoolean(JabRefPreferences.SHARED_DATABASE_LAST_EDITED);
         if (isSharedDatabaseEdited) {
             boolean isFocused = Globals.prefs.getBoolean(JabRefPreferences.SHARED_DATABASE_LAST_FOCUSED);
-            String keywordSeparator = Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR);
-
             try {
-                new SharedDatabaseUIManager(mainFrame, keywordSeparator).openLastSharedDatabaseTab(isFocused);
+                new SharedDatabaseUIManager(mainFrame).openLastSharedDatabaseTab(isFocused);
             } catch (SQLException | DatabaseNotSupportedException e) {
                 LOGGER.info("Failed to restore shared database. Use connection dialog to connect.");
                 new OpenSharedDatabaseDialog(mainFrame).setVisible(true);

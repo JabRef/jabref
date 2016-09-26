@@ -112,6 +112,12 @@ public class IntegrityCheckTest {
     }
 
     @Test
+    public void testJournaltitleChecks() {
+        assertCorrect(withMode(createContext("journaltitle", "A journal"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("journaltitle", "A journal"), BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
     public void testBibtexkeyChecks() {
         assertCorrect(createContext("bibtexkey", "Knuth2014"));
     }

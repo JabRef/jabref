@@ -1,6 +1,7 @@
 package net.sf.jabref.model.strings;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -399,7 +400,7 @@ public class StringUtil {
      *
      * @return a String with only OS.NEWLINE as line breaks
      */
-    public static String unifyLineBreaksToConfiguredLineBreaks(String s, String newline) {
+    public static String unifyLineBreaks(String s, String newline) {
         return LINE_BREAKS.matcher(s).replaceAll(newline);
     }
 
@@ -615,10 +616,6 @@ public class StringUtil {
         return ((toTest == null) || toTest.isEmpty());
     }
 
-    public static boolean isNotBlank(Optional<String> string) {
-        return string.isPresent() && isNotBlank(string.get());
-    }
-
     public static boolean isBlank(String string) {
         return !isNotBlank(string);
     }
@@ -629,6 +626,10 @@ public class StringUtil {
 
     public static boolean isNotBlank(String string) {
         return StringUtils.isNotBlank(string);
+    }
+
+    public static boolean isNotBlank(Optional<String> string) {
+        return string.isPresent() && isNotBlank(string.get());
     }
 
     /**
@@ -675,5 +676,33 @@ public class StringUtil {
             }
         }
         return result.toString();
+    }
+    public static String stripAccents(String searchQuery) {
+        return StringUtils.stripAccents(searchQuery);
+    }
+
+    /**
+     * Make first character of String uppercase, and the
+     * rest lowercase.
+     */
+    public static String capitalizeFirst(String toCapitalize) {
+        if (toCapitalize.length() > 1) {
+            return toCapitalize.substring(0, 1).toUpperCase()
+                    + toCapitalize.substring(1, toCapitalize.length()).toLowerCase();
+        } else {
+            return toCapitalize.toUpperCase();
+        }
+
+    }
+
+    /**
+     * Returns a list of words contained in the given text.
+     * Whitespace, comma and semicolon are considered as separator between words.
+     *
+     * @param text the input
+     * @return a list of words
+     */
+    public static List<String> getStringAsWords(String text) {
+        return Arrays.asList(text.split("[\\s,;]+"));
     }
 }

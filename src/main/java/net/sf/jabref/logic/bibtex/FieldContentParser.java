@@ -44,7 +44,7 @@ public class FieldContentParser {
 
         if (multiLineFields.contains(bibtexField)) {
             // Unify line breaks
-            return StringUtil.unifyLineBreaksToConfiguredLineBreaks(fieldContent, OS.NEWLINE);
+            return StringUtil.unifyLineBreaks(fieldContent, OS.NEWLINE);
         }
 
         return WHITESPACE.matcher(fieldContent).replaceAll(" ");

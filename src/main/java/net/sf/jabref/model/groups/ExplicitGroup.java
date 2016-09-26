@@ -27,7 +27,7 @@ public class ExplicitGroup extends KeywordGroup {
     private static final Log LOGGER = LogFactory.getLog(ExplicitGroup.class);
 
 
-    public ExplicitGroup(String name, GroupHierarchyType context, String keywordSeparator)
+    public ExplicitGroup(String name, GroupHierarchyType context, Character keywordSeparator)
             throws ParseException {
         super(name, FieldName.GROUPS, name, true, false, context, keywordSeparator);
     }

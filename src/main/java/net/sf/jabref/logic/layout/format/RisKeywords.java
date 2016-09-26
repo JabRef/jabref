@@ -1,9 +1,9 @@
 package net.sf.jabref.logic.layout.format;
 
-import java.util.Set;
-
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.entry.Keyword;
+import net.sf.jabref.model.entry.KeywordList;
 
 public class RisKeywords implements LayoutFormatter {
 
@@ -13,11 +13,11 @@ public class RisKeywords implements LayoutFormatter {
             return "";
         }
         StringBuilder sb = new StringBuilder();
-        Set<String> keywords = net.sf.jabref.model.entry.EntryUtil.getSeparatedKeywords(s);
+        KeywordList keywords = KeywordList.parse(s, ',');
         int i = 0;
-        for (String keyword : keywords) {
+        for (Keyword keyword : keywords) {
             sb.append("KW  - ");
-            sb.append(keyword);
+            sb.append(keyword.toString());
             if (i < (keywords.size() - 1)) {
                 sb.append(OS.NEWLINE);
             }
