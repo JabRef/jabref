@@ -96,7 +96,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
 
         } catch (IOException e) {
             LOGGER.warn("Communcation problems", e);
-            ((ImportInspectionDialog)dialog).showErrorMessage(this.getTitle());
+            ((ImportInspectionDialog)dialog).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
         }
         return false;
     }

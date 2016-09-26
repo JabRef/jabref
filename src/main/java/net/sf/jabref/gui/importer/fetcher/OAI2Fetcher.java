@@ -276,8 +276,8 @@ public class OAI2Fetcher implements EntryFetcher {
             return true;
         } catch (IOException | InterruptedException e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
-            ((ImportInspectionDialog)dialog).showErrorMessage(this.getTitle());
-        }
+            ((ImportInspectionDialog)dialog).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
+    }
         return false;
     }
 

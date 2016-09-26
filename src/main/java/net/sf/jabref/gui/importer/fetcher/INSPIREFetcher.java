@@ -156,7 +156,7 @@ public class INSPIREFetcher implements EntryFetcher {
             return true;
         } catch (Exception e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
-            ((ImportInspectionDialog)dialog).showErrorMessage(this.getTitle());
+            ((ImportInspectionDialog)dialog).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
         }
         return false;
     }

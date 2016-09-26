@@ -100,7 +100,7 @@ public class SpringerFetcher implements EntryFetcher {
             }
         } catch (IOException | UnirestException e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
-            ((ImportInspectionDialog)inspector).showErrorMessage(this.getTitle());
+            ((ImportInspectionDialog)inspector).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
         }
         return false;
 
