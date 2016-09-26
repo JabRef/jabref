@@ -28,7 +28,6 @@ public class Actions {
     public static final String FOCUS_TABLE = "focusTable";
     public static final String FORWARD = "forward";
     public static final String MAKE_KEY = "makeKey";
-    public static final String MANAGE_SELECTORS = "manageSelectors";
     public static final String MARK_ENTRIES = "markEntries";
     public static final String MERGE_DATABASE = "mergeDatabase";
     public static final String MERGE_ENTRIES = "mergeEntries";

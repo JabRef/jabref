@@ -49,6 +49,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#1779](https://github.com/JabRef/jabref/issues/1779) Implemented integrity check for `bibtexkey` field: Empty BibTeX key
 - Prohibit more than one connections to the same shared database.
 - Implemented integrity check for `journaltitle` field: BibLaTeX field only (BibTeX)
+- [#463](https://github.com/JabRef/jabref/issues/463): Disable certain menu items, toolbar buttons and context menu items while multiple entries are selected
 - [#490](https://github.com/JabRef/jabref/issues/490) Added right click menu to main table and entry editor to allow copying doi url
 
 ### Fixed
@@ -82,7 +83,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Removed 2nd preview style
 - The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field.
 - Automatic migration for the `evastar_pdf` field is removed.
-
+- We removed the customizable "content selectors" since they are replaced by the auto-completion feature
 
 
 

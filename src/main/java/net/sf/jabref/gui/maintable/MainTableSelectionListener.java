@@ -312,6 +312,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             tableRows.get(row).getField(FieldName.CROSSREF)
                     .ifPresent(crossref -> panel.getDatabase().getEntryByKey(crossref).ifPresent(entry -> panel.highlightEntry(entry)));
         }
+        panel.frame().updateEnabledState();
     }
 
     /**
@@ -533,6 +534,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         } else if (e.getKeyChar() == KeyEvent.VK_ESCAPE) {
             lastPressedCount = 0;
         }
+        panel.frame().updateEnabledState();
     }
 
     @Override
