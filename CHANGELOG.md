@@ -51,6 +51,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Implemented integrity check for `journaltitle` field: BibLaTeX field only (BibTeX)
 
 ### Fixed
+- Fixed [koppor#160](https://github.com/koppor/jabref/issues/160): Tooltips now working in the main table
 - Fixed [#2054](https://github.com/JabRef/jabref/issues/2054): Ignoring a new version now works as expected
 - Fixed selecting an entry out of multiple duplicates
 - Fixed [#617](https://github.com/JabRef/jabref/issues/617): `Enter` in global search opens the selected entry & `Enter` in search dialog window opens the selected entry
