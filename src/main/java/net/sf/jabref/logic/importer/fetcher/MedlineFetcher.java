@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -20,6 +21,7 @@ import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.importer.fileformat.MedlineImporter;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;
@@ -124,12 +126,12 @@ public class MedlineFetcher implements SearchBasedFetcher {
         String cleanQuery = query.trim().replace(';', ',');
 
         if (cleanQuery.matches("\\d+[,\\d+]*")) {
-            System.out.println("Fetching Medline by id...");
+            //fetch medline by id
 
             List<BibEntry> bibs = fetchMedline(cleanQuery);
 
             if (bibs.isEmpty()) {
-                System.out.println("No references found");
+                LOGGER.warn(Localization.lang("No references found"));
             }
 
             for (BibEntry entry : bibs) {
@@ -139,7 +141,7 @@ public class MedlineFetcher implements SearchBasedFetcher {
         }
 
         if (!query.isEmpty()) {
-            System.out.println("Fetching Medline by term...");
+            //fetch medline by term
 
             String searchTerm = toSearchTerm(query);
 
@@ -147,7 +149,7 @@ public class MedlineFetcher implements SearchBasedFetcher {
             SearchResult result = getIds(searchTerm, 0, 1);
 
             if (result.count == 0) {
-                System.out.println("No references found");
+                LOGGER.warn(Localization.lang("No references found"));
                 return Collections.emptyList();
             }
 
@@ -170,9 +172,7 @@ public class MedlineFetcher implements SearchBasedFetcher {
             }
             return entryList;
         }
-        System.out.println("Please enter a comma separated list of Medline IDs (numbers) or search terms.");
-        System.out.println("Input error");
-        return Collections.emptyList();
+        throw new FetcherException("Input Error. Please enter a comma separated list of Medline IDs (numbers) or search terms.");
     }
 
     /**
@@ -193,10 +193,11 @@ public class MedlineFetcher implements SearchBasedFetcher {
             ParserResult result = new MedlineImporter().importDatabase(
                     new BufferedReader(new InputStreamReader(data.getInputStream(), StandardCharsets.UTF_8)));
             if (result.hasWarnings()) {
-                System.out.println(result.getErrorMessage());
+                LOGGER.warn(result.getErrorMessage());
             }
             return result.getDatabase().getEntries();
         } catch (URISyntaxException | IOException e) {
+            LOGGER.warn(e.getLocalizedMessage(), e);
             return new ArrayList<>();
         }
     }
