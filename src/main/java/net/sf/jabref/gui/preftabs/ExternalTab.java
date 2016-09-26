@@ -231,6 +231,7 @@ class ExternalTab extends JPanel implements PrefsTab {
         prefs.put(JabRefPreferences.CONSOLE_COMMAND, consoleCommand.getText());
         prefs.put(JabRefPreferences.ADOBE_ACROBAT_COMMAND, adobeAcrobatReaderPath.getText());
         prefs.put(JabRefPreferences.SUMATRA_COMMAND, sumatraReaderPath.getText());
+        readerSelected();
     }
 
     @Override
@@ -269,6 +270,15 @@ class ExternalTab extends JPanel implements PrefsTab {
         int answer = adobeChooser.showOpenDialog(ExternalTab.this);
         if (answer == JFileChooser.APPROVE_OPTION) {
             sumatraReaderPath.setText(adobeChooser.getSelectedFile().getAbsolutePath());
+        }
+    }
+
+    private void readerSelected() {
+        if(adobeAcrobatReader.isSelected()) {
+            prefs.put(JabRefPreferences.USE_PDF_READER, adobeAcrobatReaderPath.getText());
+        }
+        else if (sumatraReader.isSelected()) {
+            prefs.put(JabRefPreferences.USE_PDF_READER, sumatraReaderPath.getText());
         }
     }
 }
