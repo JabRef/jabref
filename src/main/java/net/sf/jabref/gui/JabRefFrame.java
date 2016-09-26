@@ -508,7 +508,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final List<Object> oneEntryOnlyActions = new LinkedList<>();
     private final List<Object> oneEntryWithFileOnlyActions = new LinkedList<>();
     private final List<Object> oneEntryWithURLorDOIOnlyActions = new LinkedList<>();
-    private final List<Object> twoEntryOnlyActions = new LinkedList<>();
+    private final List<Object> twoEntriesOnlyActions = new LinkedList<>();
 
 
     private class EditModeAction extends AbstractAction {
@@ -1534,7 +1534,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         noSharedDatabaseActions.addAll(Arrays.asList(save, saveAll));
 
         oneEntryOnlyActions.clear();
-        oneEntryOnlyActions.addAll(Arrays.asList(editEntry, sendAsEmail));
+        oneEntryOnlyActions.addAll(Arrays.asList(editEntry));
 
         oneEntryWithFileOnlyActions.clear();
         oneEntryWithFileOnlyActions.addAll(Arrays.asList(openFolder, openFile));
@@ -1542,8 +1542,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         oneEntryWithURLorDOIOnlyActions.clear();
         oneEntryWithURLorDOIOnlyActions.addAll(Arrays.asList(openUrl));
 
-        twoEntryOnlyActions.clear();
-        twoEntryOnlyActions.addAll(Arrays.asList(mergeEntries));
+        twoEntriesOnlyActions.clear();
+        twoEntriesOnlyActions.addAll(Arrays.asList(mergeEntries));
 
         tabbedPane.addChangeListener(event -> updateEnabledState());
 
@@ -1606,8 +1606,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             setEnabled(oneEntryWithFileOnlyActions, isExistFile(current.getSelectedEntries()));
             setEnabled(oneEntryWithURLorDOIOnlyActions, isExistURLorDOI(current.getSelectedEntries()));
 
-            boolean twoEntrySelected = current.getSelectedEntries().size() == 2;
-            setEnabled(twoEntryOnlyActions, twoEntrySelected);
+            boolean twoEntriesSelected = current.getSelectedEntries().size() == 2;
+            setEnabled(twoEntriesOnlyActions, twoEntriesSelected);
         }
     }
 
@@ -1913,8 +1913,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     /**
      * Return a boolean, if the selected entry have file
      * @param selectEntryList A selected entries list of the current base pane
-     * @return true, if the selected entry contains file
-     * <p/>
+     * @return true, if the selected entry contains file.
      * false, if multiple entries are selected or the selected entry doesn't contains file
      */
     private boolean isExistFile(List<BibEntry> selectEntryList) {
@@ -1928,8 +1927,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     /**
      * Return a boolean, if the selected entry have url or doi
      * @param selectEntryList A selected entries list of the current base pane
-     * @return true, if the selected entry contains url or doi
-     * <p/>
+     * @return true, if the selected entry contains url or doi.
      * false, if multiple entries are selected or the selected entry doesn't contains url or doi
      */
     private boolean isExistURLorDOI(List<BibEntry> selectEntryList) {

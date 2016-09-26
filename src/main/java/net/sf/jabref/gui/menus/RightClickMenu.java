@@ -88,13 +88,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         });
         addSeparator();
 
-        add(new GeneralAction(Actions.SEND_AS_EMAIL, Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getSmallIcon()) {
-            {
-                if (multiple) {
-                    this.setEnabled(false);
-                }
-            }
-        });
+        add(new GeneralAction(Actions.SEND_AS_EMAIL, Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getSmallIcon()));
         addSeparator();
 
         JMenu markSpecific = JabRefFrame.subMenu(Localization.menuTitle("Mark specific color"));
