@@ -328,4 +328,22 @@ public class MetaData implements Iterable<String> {
     public void unregisterListener(Object listener) {
         this.eventBus.unregister(listener);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        MetaData strings = (MetaData) o;
+        return Objects.equals(metaData, strings.metaData) && Objects.equals(groupsRoot, strings.groupsRoot) && Objects
+                .equals(bibtexKeyPattern, strings.bibtexKeyPattern) && Objects.equals(encoding, strings.encoding);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(metaData, groupsRoot, bibtexKeyPattern, encoding);
+    }
 }
