@@ -92,7 +92,6 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQueryHighlightListener;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
@@ -104,6 +103,7 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.event.FieldChangedEvent;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 

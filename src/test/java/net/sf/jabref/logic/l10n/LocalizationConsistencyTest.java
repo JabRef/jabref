@@ -10,6 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.Test;
@@ -21,13 +22,13 @@ public class LocalizationConsistencyTest {
     @Test
     public void allFilesMustHaveSameKeys() {
         for (String bundle : Arrays.asList("JabRef", "Menu")) {
-            List<String> englishKeys = LocalizationParser
+            Set<String> englishKeys = LocalizationParser
                     .getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, "en"));
 
             List<String> nonEnglishLanguages = Languages.LANGUAGES.values().stream().filter(l -> !"en".equals(l))
                     .collect(Collectors.toList());
             for (String lang : nonEnglishLanguages) {
-                List<String> nonEnglishKeys = LocalizationParser
+                Set<String> nonEnglishKeys = LocalizationParser
                         .getKeysInPropertiesFile(String.format("/l10n/%s_%s.properties", bundle, lang));
 
                 List<String> missing = new LinkedList<>(englishKeys);
@@ -147,24 +148,24 @@ public class LocalizationConsistencyTest {
 
     @Test
     public void findObsoleteLocalizationKeys() throws IOException {
-        List<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundle.LANG);
+        Set<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundle.LANG);
 
         assertEquals("Obsolete keys found in language properties file: " + obsoleteKeys + "\n" +
                 "1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
                 "2. REMOVE THESE FROM THE ENGLISH LANGUAGE FILE\n" +
                 "3. EXECUTE: gradlew localizationUpdate\n",
-                Collections.<String>emptyList(), obsoleteKeys);
+                Collections.<String>emptySet(), obsoleteKeys);
     }
 
     @Test
     public void findObsoleteMenuLocalizationKeys() throws IOException {
-        List<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundle.MENU);
+        Set<String> obsoleteKeys = LocalizationParser.findObsolete(LocalizationBundle.MENU);
 
         assertEquals("Obsolete keys found in the menu properties file: " + obsoleteKeys + "\n" +
                 "1. CHECK IF THE KEY IS REALLY NOT USED ANYMORE\n" +
                 "2. REMOVE THESE FROM THE ENGLISH MENU FILE\n" +
                 "3. EXECUTE: gradlew localizationUpdate\n",
-                Collections.<String>emptyList(), obsoleteKeys);
+                Collections.<String>emptySet(), obsoleteKeys);
     }
 
 }
