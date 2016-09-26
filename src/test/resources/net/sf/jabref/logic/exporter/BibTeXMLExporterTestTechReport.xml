@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<file xmlns="http://bibtexml.sf.net/">
+    <entry id="Mustermann2016">
+        <techreport>
+            <author>Max Mustermann</author>
+            <title>Java TechReport</title>
+            <institution>JIOT</institution>
+            <year>2016</year>
+            <type>Report</type>
+            <number>1</number>
+            <address>Stuttgart</address>
+            <month>February</month>
+            <keywords>java</keywords>
+        </techreport>
+    </entry>
+</file>

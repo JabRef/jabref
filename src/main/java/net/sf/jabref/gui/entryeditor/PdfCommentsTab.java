@@ -7,6 +7,7 @@ import java.awt.SystemColor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
 
@@ -28,7 +29,6 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.pdf.PdfCommentImporter;
 import net.sf.jabref.model.entry.BibEntry;
@@ -64,21 +64,16 @@ public class PdfCommentsTab extends JPanel {
     DefaultListModel<PdfComment> listModel;
 
     private final EntryEditor parent;
-    private final String tabTitle;
-    private final JabRefFrame frame;
     private final BasePanel basePanel;
     private final JTabbedPane tabbed;
     private int commentListSelectedIndex = 0;
 
-    private ArrayList<PdfComment> importedNotes = new  ArrayList<PdfComment>();
-    private ArrayList<ArrayList<PdfComment>> allNotes = new ArrayList<>();
+    private List<List<PdfComment>> allNotes = new ArrayList<>();
 
 
-    public PdfCommentsTab(EntryEditor parent, JabRefFrame frame, BasePanel basePanel, JTabbedPane tabbed) {
+    public PdfCommentsTab(EntryEditor parent, BasePanel basePanel, JTabbedPane tabbed) {
         this.parent = parent;
-        this.frame = frame;
         this.basePanel = basePanel;
-        this.tabTitle = Localization.lang("PDF comments");
         this.tabbed = tabbed;
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         listModel  = new DefaultListModel<>();
@@ -91,6 +86,11 @@ public class PdfCommentsTab extends JPanel {
         this.setUpInformationPanel();
     }
 
+    /**
+     * Adds pdf comments from all attached pdf files belonging to the entry selected in the main table and
+     * shows those from the first file in the comments tab
+     * @throws IOException
+     */
     public void addComments() throws IOException {
         Optional<String> field = parent.getEntry().getField(FieldName.FILE);
         if (field.isPresent()) {
@@ -134,7 +134,7 @@ public class PdfCommentsTab extends JPanel {
      * Updates the list model to show the given notes without those with no content
      * @param importedNotes value is the comments name and the value is a pdfComment object to add to the list model
      */
-    private void updateShownComments(ArrayList<PdfComment> importedNotes){
+    private void updateShownComments(List<PdfComment> importedNotes){
         listModel.clear();
         if(importedNotes.isEmpty()){
             listModel.addElement(new PdfComment("", "", "", 0, Localization.lang("Attached_file_has_no_valid_path"), ""));
@@ -147,6 +147,10 @@ public class PdfCommentsTab extends JPanel {
         }
     }
 
+    /**
+     * Updates the text fields showing meta data and the content from the selected comment
+     * @param comment pdf comment which data should be shown in the text fields
+     */
     private void updateTextFields(PdfComment comment) {
         authorArea.setText(comment.getAuthor());
         dateArea.setText(comment.getDate());
@@ -155,6 +159,9 @@ public class PdfCommentsTab extends JPanel {
 
     }
 
+    /**
+     * Updates the selection of files that are attached to the pdf file
+     */
     private void updateFileNameComboBox() {
         int indexSelectedByComboBox;
         if (fileNameComboBox.getItemCount() == 0) {

@@ -240,8 +240,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         if ((type.getOptionalFields() != null) && !type.getOptionalFields().isEmpty()) {
             if (!frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
-                displayedOptionalFields.addAll(type.getOptionalFields());
-
                 addOptionalTab(type);
             } else {
                 displayedOptionalFields.addAll(type.getPrimaryOptionalFields());
@@ -375,7 +373,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         tabbed.remove(pdfCommentsTab);
         Optional<String> field = entry.getField(FieldName.FILE);
         if (field.isPresent()) {
-            pdfCommentsTab = new PdfCommentsTab(this, frame, panel, tabbed);
+            pdfCommentsTab = new PdfCommentsTab(this, panel, tabbed);
             tabbed.addTab(Localization.lang("PDF comments"), IconTheme.JabRefIcon.PDF_FILE.getSmallIcon(), pdfCommentsTab,
                     Localization.lang("Show PDF comments"));
             tabs.add(pdfCommentsTab);

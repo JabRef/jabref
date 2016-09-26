@@ -46,7 +46,7 @@ public class DBMSSynchronizerTest {
         BibDatabaseContext context = new BibDatabaseContext(bibDatabase);
 
 
-        dbmsSynchronizer = new DBMSSynchronizer(context, ", ");
+        dbmsSynchronizer = new DBMSSynchronizer(context, ',');
         dbmsProcessor = DBMSProcessor.getProcessorInstance(dbmsConnection);
 
         bibDatabase.registerListener(dbmsSynchronizer);

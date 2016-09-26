@@ -37,9 +37,9 @@ public class PdfCommentImporter {
      * @param path a path to a pdf
      * @return a list with the all the annotations found in the file of the path
      */
-    public ArrayList<PdfComment> importNotes(final String path, final BibDatabaseContext context) {
+    public List<PdfComment> importNotes(final String path, final BibDatabaseContext context) {
 
-        ArrayList<PdfComment> annotationsMap = new ArrayList<>();
+        List<PdfComment> annotationsList = new ArrayList<>();
 
         PDDocument document = null;
         try {
@@ -62,8 +62,8 @@ public class PdfCommentImporter {
             try {
                 for (PDAnnotation annotation : page.getAnnotations()) {
 
-
                     String subtype = annotation.getSubtype();
+                    //highlighted text has to be extracted by the rectangle calculated from the highlighting
                     if (subtype.equals(FDFAnnotationHighlight.SUBTYPE)) {
 
                         PdfComment annotationBelongingToHighlighting = new PdfComment(annotation.getAnnotationName(),
@@ -106,12 +106,13 @@ public class PdfCommentImporter {
                         annotation.setContents(highlightedText);
 
                         PdfComment highlighting = new PdfComment(annotation, i + 1);
+                        //highlighted text that has a sticky note on it should be linked to the sticky note
                         highlighting.linkComments(annotationBelongingToHighlighting);
-                        annotationsMap.add(annotationBelongingToHighlighting);
-                        annotationsMap.add(highlighting);
+                        annotationsList.add(annotationBelongingToHighlighting);
+                        annotationsList.add(highlighting);
 
                     } else {
-                        annotationsMap.add(new PdfComment(annotation, i + 1));
+                        annotationsList.add(new PdfComment(annotation, i + 1));
                     }
                 }
             } catch (IOException e1) {
@@ -123,9 +124,15 @@ public class PdfCommentImporter {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return annotationsMap;
+        return annotationsList;
     }
 
+    /**
+     *
+     * @param path the absolute path to the pdf file
+     * @return a PDDocument representing the pdf file
+     * @throws IOException
+     */
     public PDDocument importPdfFile(final String path) throws IOException {
 
             if(path.toLowerCase().endsWith(".pdf")){
