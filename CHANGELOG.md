@@ -48,6 +48,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#2012](https://github.com/JabRef/jabref/issues/2012) Implemented integrity check for `month` field: Should be an integer or normalized (BibLaTeX), Should be normalized (BibTeX)
 - [#1779](https://github.com/JabRef/jabref/issues/1779) Implemented integrity check for `bibtexkey` field: Empty BibTeX key
 - Prohibit more than one connections to the same shared database.
+- Implemented integrity check for `journaltitle` field: BibLaTeX field only (BibTeX)
 - [#549](https://github.com/JabRef/jabref/issues/549) Added new shortcut to copy the BibTeX key as a hyperlink to its url to the clipboard
 
 ### Fixed
@@ -76,6 +77,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1958](https://github.com/JabRef/jabref/issues/1958): Verbatim fields are no longer checked for HTML encoded characters by integrity checks
 - Fixed [#1937](https://github.com/JabRef/jabref/issues/1937): If no help page for the current chosen language exists, the english help page will be shown
 - Fixed [#1996](https://github.com/JabRef/jabref/issues/1996): Unnecessary other fields tab in entry editor removed (BibTeX mode)
+- Fixed [#2060](https://github.com/JabRef/jabref/issues/2060): Medline fetcher now imports data in UTF-8 encoding
 
 ### Removed
 - Removed 2nd preview style
