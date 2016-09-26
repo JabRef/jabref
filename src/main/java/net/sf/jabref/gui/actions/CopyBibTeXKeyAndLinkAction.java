@@ -16,11 +16,11 @@ import net.sf.jabref.model.entry.FieldName;
  * In case an entry doesn't have a BibTeX key it will not be copied.
  * In case an entry doesn't have an url this will only copy the BibTeX key.
  */
-public class CopyBibTeXKeyAndLink implements BaseAction {
+public class CopyBibTeXKeyAndLinkAction implements BaseAction {
 
     private final MainTable mainTable;
 
-    public CopyBibTeXKeyAndLink(MainTable mainTable) {
+    public CopyBibTeXKeyAndLinkAction(MainTable mainTable) {
         this.mainTable = mainTable;
     }
 

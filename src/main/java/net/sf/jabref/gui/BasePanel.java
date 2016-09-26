@@ -48,7 +48,7 @@ import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.actions.CleanupAction;
-import net.sf.jabref.gui.actions.CopyBibTeXKeyAndLink;
+import net.sf.jabref.gui.actions.CopyBibTeXKeyAndLinkAction;
 import net.sf.jabref.gui.bibtexkeypattern.SearchFixDuplicateLabels;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
@@ -540,7 +540,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.COPY_KEY_AND_TITLE, (BaseAction) () -> copyKeyAndTitle());
 
         // The action for copying the BibTeX keys as hyperlinks to the urls of the selected entries
-        actions.put(Actions.COPY_KEY_AND_LINK, new CopyBibTeXKeyAndLink(mainTable));
+        actions.put(Actions.COPY_KEY_AND_LINK, new CopyBibTeXKeyAndLinkAction(mainTable));
 
         actions.put(Actions.MERGE_DATABASE, new AppendDatabaseAction(frame, this));
 
