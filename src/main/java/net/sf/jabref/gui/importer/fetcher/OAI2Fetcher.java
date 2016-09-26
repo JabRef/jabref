@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Locale;
 
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
@@ -248,7 +249,16 @@ public class OAI2Fetcher implements EntryFetcher {
                 }
 
                 /* query the archive and load the results into the BibEntry */
-                BibEntry be = importOai2Entry(key);
+                BibEntry be = null;
+                try {
+                    be = importOai2Entry(key);
+                } catch (SAXException e) {
+                    String url = constructUrl(OAI2Fetcher.fixKey(key));
+                    LOGGER.error("Error while fetching from " + getTitle(), e);
+                    ((ImportInspectionDialog)dialog).showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
+                                    Localization.lang("A SAX exception occurred while parsing '%0':", url),
+                            Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
+                }
 
                 if (shouldWait()) {
                     lastCall = new Date();
@@ -264,7 +274,7 @@ public class OAI2Fetcher implements EntryFetcher {
             }
 
             return true;
-        } catch (IOException | SAXException | InterruptedException e) {
+        } catch (IOException | InterruptedException e) {
             LOGGER.error("Error while fetching from " + getTitle(), e);
             ((ImportInspectionDialog)dialog).showErrorMessage(this.getTitle());
         }
