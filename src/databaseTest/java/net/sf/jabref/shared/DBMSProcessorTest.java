@@ -1,6 +1,5 @@
 package net.sf.jabref.shared;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -12,7 +11,6 @@ import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.shared.exception.OfflineLockException;
-import net.sf.jabref.shared.exception.SharedEntryNotPresentException;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -26,7 +24,7 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class DBMSProcessorTest {
 
-    private static Connection connection;
+    private DBMSConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
 
     @Parameter
@@ -34,18 +32,15 @@ public class DBMSProcessorTest {
 
 
     @Before
-    public void setUp() throws ClassNotFoundException, SQLException {
-        // Get only one connection for each parameter
-        if (TestConnector.currentConnectionType != dbmsType) {
-            connection = TestConnector.getTestConnection(dbmsType);
-        }
-        dbmsProcessor = DBMSProcessor.getProcessorInstance(connection, dbmsType);
+    public void setUp() throws SQLException {
+        dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
+        dbmsProcessor = DBMSProcessor.getProcessorInstance(dbmsConnection);
         dbmsProcessor.setupSharedDatabase();
     }
 
     @Parameters(name = "Test with {0} database system")
     public static Collection<DBMSType> getTestingDatabaseSystems() {
-        return DBMSConnector.getAvailableDBMSTypes();
+        return TestManager.getDBMSTypeTestParameter();
     }
 
     @Test
@@ -94,7 +89,7 @@ public class DBMSProcessorTest {
     }
 
     @Test
-    public void testUpdateEntry() throws OfflineLockException, SharedEntryNotPresentException, SQLException {
+    public void testUpdateEntry() throws OfflineLockException, SQLException {
         BibEntry expectedEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(expectedEntry);
@@ -116,14 +111,8 @@ public class DBMSProcessorTest {
         }
     }
 
-    @Test(expected = SharedEntryNotPresentException.class)
-    public void testUpdateNotExistingEntry() throws SharedEntryNotPresentException, OfflineLockException, SQLException {
-        BibEntry expectedEntry = getBibEntryExample();
-        dbmsProcessor.updateEntry(expectedEntry);
-    }
-
     @Test(expected = OfflineLockException.class)
-    public void testUpdateNewerEntry() throws OfflineLockException, SharedEntryNotPresentException, SQLException {
+    public void testUpdateNewerEntry() throws OfflineLockException, SQLException {
         BibEntry bibEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(bibEntry);
@@ -135,7 +124,7 @@ public class DBMSProcessorTest {
     }
 
     @Test
-    public void testUpdateEqualEntry() throws OfflineLockException, SharedEntryNotPresentException, SQLException {
+    public void testUpdateEqualEntry() throws OfflineLockException, SQLException {
         BibEntry expectedBibEntry = getBibEntryExample();
 
         dbmsProcessor.insertEntry(expectedBibEntry);
@@ -200,7 +189,7 @@ public class DBMSProcessorTest {
     }
 
     @Test
-    public void testGetSharedIDVersionMapping() throws OfflineLockException, SharedEntryNotPresentException, SQLException {
+    public void testGetSharedIDVersionMapping() throws OfflineLockException, SQLException {
         BibEntry firstEntry = getBibEntryExample();
         BibEntry secondEntry = getBibEntryExample();
 
@@ -275,7 +264,7 @@ public class DBMSProcessorTest {
 
     private ResultSet selectFrom(String table) {
         try {
-            return connection.createStatement().executeQuery("SELECT * FROM " + escape(table));
+            return dbmsConnection.getConnection().createStatement().executeQuery("SELECT * FROM " + escape(table));
         } catch (SQLException e) {
             Assert.fail(e.getMessage());
             return null;
@@ -286,7 +275,7 @@ public class DBMSProcessorTest {
     // Therefore this function was defined to improve the readability and to keep the code short.
     private void insertMetaData(String key, String value) {
         try {
-            connection.createStatement().executeUpdate("INSERT INTO " + escape("METADATA") + "("
+            dbmsConnection.getConnection().createStatement().executeUpdate("INSERT INTO " + escape("METADATA") + "("
                     + escape("KEY") + ", " + escape("VALUE") + ") VALUES("
                     + escapeValue(key) + ", " + escapeValue(value) + ")");
         } catch (SQLException e) {
@@ -304,23 +293,6 @@ public class DBMSProcessorTest {
 
     @After
     public void clear() throws SQLException {
-        if ((dbmsType == DBMSType.MYSQL) || (dbmsType == DBMSType.POSTGRESQL)) {
-            connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape("FIELD"));
-            connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape("ENTRY"));
-            connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape("METADATA"));
-        } else if (dbmsType == DBMSType.ORACLE) {
-            connection.createStatement().executeUpdate(
-                    "BEGIN\n" +
-                    "EXECUTE IMMEDIATE 'DROP TABLE " + escape("FIELD") + "';\n" +
-                    "EXECUTE IMMEDIATE 'DROP TABLE " + escape("ENTRY") + "';\n" +
-                    "EXECUTE IMMEDIATE 'DROP TABLE " + escape("METADATA") + "';\n" +
-                    "EXECUTE IMMEDIATE 'DROP SEQUENCE " + escape("ENTRY_SEQ") + "';\n" +
-                    "EXCEPTION\n" +
-                    "WHEN OTHERS THEN\n" +
-                    "IF SQLCODE != -942 THEN\n" +
-                    "RAISE;\n" +
-                    "END IF;\n" +
-                    "END;");
-        }
+        TestManager.clearTables(dbmsConnection);
     }
 }

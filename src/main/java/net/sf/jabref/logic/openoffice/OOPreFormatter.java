@@ -3,8 +3,8 @@ package net.sf.jabref.logic.openoffice;
 import java.util.Map;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
-import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.strings.HTMLUnicodeConversionMaps;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * This formatter preprocesses JabRef fields before they are run through the layout of the

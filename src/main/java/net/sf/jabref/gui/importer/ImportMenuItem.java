@@ -206,7 +206,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
                 // Merge entries:
                 for (BibEntry entry : pr.getDatabase().getEntries()) {
-                    database.insertEntryWithDuplicationCheck(entry);
+                    database.insertEntry(entry);
                 }
 
                 // Merge strings:
@@ -233,7 +233,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     if (markEntries) {
                         EntryMarker.markEntry(entry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
                     }
-                    database.insertEntryWithDuplicationCheck(entry);
+                    database.insertEntry(entry);
                 }
             }
         }

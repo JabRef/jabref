@@ -27,7 +27,6 @@ import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.component.JTextFieldWithUnfocusedText;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.help.HelpFile;
@@ -65,7 +64,11 @@ public class GlobalSearchBar extends JPanel {
     private SearchResultFrame searchResultFrame;
 
     private SearchDisplayMode searchDisplayMode;
-    private boolean switchedDatabase;
+
+    /**
+     * if this flag is set the searchbar won't be selected after the next search
+     */
+    private boolean dontSelectSearchBar;
 
 
     public GlobalSearchBar(JabRefFrame frame) {
@@ -79,13 +82,15 @@ public class GlobalSearchBar extends JPanel {
         currentResults.setFont(currentResults.getFont().deriveFont(Font.BOLD));
         searchField.setColumns(30);
 
-        JToggleButton globalSearch = new JToggleButton(IconTheme.JabRefIcon.GLOBAL_SEARCH_OFF.getSmallIcon(), searchPreferences.isGlobalSearch());
-        globalSearch.setSelectedIcon(IconTheme.JabRefIcon.GLOBAL_SEARCH_ON.getSmallIcon());
+        JToggleButton globalSearch = new JToggleButton(IconTheme.JabRefIcon.GLOBAL_SEARCH.getSmallIcon(), searchPreferences.isGlobalSearch());
         globalSearch.setToolTipText(Localization.lang("Search globally"));
         globalSearch.addActionListener(e -> {
             searchPreferences.setGlobalSearch(globalSearch.isSelected());
-            String localization = globalSearch.isSelected() ? "Search in all open databases" : "Show search results in a window";
-            openCurrentResultsInDialog.setToolTipText(Localization.lang(localization));
+            if (globalSearch.isSelected()) {
+                openCurrentResultsInDialog.setToolTipText(Localization.lang("Search in all open databases"));
+            } else {
+                openCurrentResultsInDialog.setToolTipText(Localization.lang("Show search results in a window"));
+            }
         });
 
         openCurrentResultsInDialog.setDisabledIcon(IconTheme.JabRefIcon.OPEN_IN_NEW_WINDOW.getSmallIcon().createDisabledIcon());
@@ -145,7 +150,7 @@ public class GlobalSearchBar extends JPanel {
                 autoCompleteSupport.setVisible(false);
                 BasePanel currentBasePanel = frame.getCurrentBasePanel();
                 Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
-                new FocusRequester(currentBasePanel.getMainTable());
+                currentBasePanel.getMainTable().requestFocus();
             }
         });
 
@@ -249,7 +254,7 @@ public class GlobalSearchBar extends JPanel {
         if (currentBasePanel != null) {
             clearSearch(currentBasePanel);
             Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
-            new FocusRequester(currentBasePanel.getMainTable());
+            currentBasePanel.getMainTable().requestFocus();
         }
     }
 
@@ -263,9 +268,6 @@ public class GlobalSearchBar extends JPanel {
     }
 
     private void clearSearch(BasePanel currentBasePanel) {
-        SearchQuery searchQuery = getSearchQuery();
-        updateResults(0, searchQuery.getDescription(), searchQuery.isGrammarBasedSearch());
-
         currentResults.setText("");
         searchField.setText("");
         searchField.setBackground(NEUTRAL_COLOR);
@@ -277,8 +279,8 @@ public class GlobalSearchBar extends JPanel {
             currentBasePanel.getMainTable().getTableModel().updateSearchState(MainTableDataModel.DisplayOption.DISABLED);
         }
 
-        if (switchedDatabase){
-            switchedDatabase = false;
+        if (dontSelectSearchBar){
+            dontSelectSearchBar = false;
             return;
         }
         focus();
@@ -370,15 +372,19 @@ public class GlobalSearchBar extends JPanel {
         this.searchResultFrame = searchResultFrame;
     }
 
-    public void setSearchTerm(String searchTerm, boolean switchedDatabase) {
+    public void setSearchTerm(String searchTerm, boolean dontSelectSearchBar) {
         if (searchTerm.equals(searchField.getText())){
             return;
         }
 
-        this.switchedDatabase = switchedDatabase;
+        setDontSelectSearchBar(dontSelectSearchBar);
         searchField.setText(searchTerm);
         // to hinder the autocomplete window to popup
         autoCompleteSupport.setVisible(false);
+    }
+
+    public void setDontSelectSearchBar(boolean dontSelectSearchBar) {
+        this.dontSelectSearchBar = dontSelectSearchBar;
     }
 
 }

@@ -52,6 +52,11 @@ Project: java-diff-utils
 URL:     http://code.google.com/p/java-diff-utils/
 License: Apache 2.0
 
+Id:      com.impossibl.pgjdbc-ng:pgjdbc-ng
+Project: pgjdbc-ng
+URL:     http://impossibl.github.io/pgjdbc-ng
+License: BSD
+
 Id:      com.jgoodies:jgoodies-common
 Project: JGoodies Common
 URL:     http://www.jgoodies.com/downloads/libraries/
@@ -142,11 +147,6 @@ Project: SwingX
 URL:     https://swingx.java.net/
 License: LGPL 3.0
 
-Id:      org.postgresql:postgresql
-Project: PostgreSQL JDBC Driver
-URL:     http://jdbc.postgresql.org/download.html
-License: BSD
-
 Id:      microba
 Path:    lib/microba.jar
 Project: Microba
@@ -159,6 +159,26 @@ Project: Spin
 URL:     http://spin.sourceforge.net/
 License: LGPL 2.1+
 
+Id:      org.citationstyles.styles
+Project: CSL Styles
+URL:     citationStyles.org
+Licence: Creative Commons Attribution-ShareAlike 3.0 Unported license
+
+Id:      org.citationstyles.locales
+Project: CSL Locales
+URL:     citationStyles.org
+Licence: Creative Commons Attribution-ShareAlike 3.0 Unported license
+
+Id:      de.undercouch.citeproc-java
+Project: Citeproc-Java
+URL:     http://michel-kraemer.github.io/citeproc-java/
+Licence: Apache License, Version 2.0
+
+Id:      org.mozilla.rhino
+Project: Rhino
+URL:     https://developer.mozilla.org/de/docs/Rhino
+Licence: Mozilla Public License Version 2.0
+
 Id:      com.airhacks:afterburner.fx
 Project: afterburner.fx
 URL:     https://github.com/AdamBien/afterburner.fx
@@ -167,6 +187,6 @@ License: Apache 2.0
 Id:      de.codecentric.centerdevice
 Project: javafxsvg
 URL:     https://github.com/codecentric/javafxsvg
-License: BSD 3-Clause		 
+License: BSD 3-Clause
 
 The last entry has to end with an empty line. Otherwise the entry is not present in About.html.

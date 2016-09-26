@@ -61,7 +61,7 @@ public class FindFullTextAction extends AbstractWorker {
             }
         }
         for (BibEntry entry : basePanel.getSelectedEntries()) {
-            FulltextFetchers fft = new FulltextFetchers();
+            FulltextFetchers fft = new FulltextFetchers(Globals.prefs.getImportFormatPreferences());
             downloads.put(fft.findFullTextPDF(entry), entry);
         }
     }
@@ -78,7 +78,7 @@ public class FindFullTextAction extends AbstractWorker {
                 if (dirs.isEmpty()) {
                     JOptionPane.showMessageDialog(basePanel.frame(),
                             Localization.lang("Main file directory not set!") + " " + Localization.lang("Preferences")
-                                    + " -> " + Localization.lang("External programs"),
+                                    + " -> " + Localization.lang("File"),
                             Localization.lang("Directory not found"), JOptionPane.ERROR_MESSAGE);
                     return;
                 }

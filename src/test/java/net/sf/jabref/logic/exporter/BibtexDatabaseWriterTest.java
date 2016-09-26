@@ -4,35 +4,34 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Scanner;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Defaults;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
-import net.sf.jabref.logic.groups.AllEntriesGroup;
-import net.sf.jabref.logic.groups.ExplicitGroup;
-import net.sf.jabref.logic.groups.GroupHierarchyType;
-import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
 import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.CustomEntryType;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.model.groups.AllEntriesGroup;
+import net.sf.jabref.model.groups.ExplicitGroup;
+import net.sf.jabref.model.groups.GroupHierarchyType;
+import net.sf.jabref.model.groups.GroupTreeNode;
+import net.sf.jabref.model.metadata.MetaData;
+import net.sf.jabref.model.metadata.SaveOrderConfig;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.google.common.base.Charsets;
@@ -111,7 +110,7 @@ public class BibtexDatabaseWriterTest {
     public void writeEntry() throws Exception {
         BibEntry entry = new BibEntry();
         entry.setType(BibtexEntryTypes.ARTICLE);
-        database.insertEntryWithDuplicationCheck(entry);
+        database.insertEntry(entry);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry), new SavePreferences());
 
@@ -126,7 +125,7 @@ public class BibtexDatabaseWriterTest {
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
         BibEntry entry = new BibEntry();
         entry.setType(BibtexEntryTypes.ARTICLE);
-        database.insertEntryWithDuplicationCheck(entry);
+        database.insertEntry(entry);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry), preferences);
 
@@ -185,8 +184,8 @@ public class BibtexDatabaseWriterTest {
 
     @Test
     public void writeGroups() throws Exception {
-        GroupTreeNode groupRoot = GroupTreeNode.fromGroup(new AllEntriesGroup());
-        groupRoot.addSubgroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING, ", "));
+        GroupTreeNode groupRoot = GroupTreeNode.fromGroup(new AllEntriesGroup(""));
+        groupRoot.addSubgroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING, ','));
         metaData.setGroups(groupRoot);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
@@ -204,8 +203,8 @@ public class BibtexDatabaseWriterTest {
     public void writeGroupsAndEncoding() throws Exception {
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
 
-        GroupTreeNode groupRoot = GroupTreeNode.fromGroup(new AllEntriesGroup());
-        groupRoot.addChild(GroupTreeNode.fromGroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING, ", ")));
+        GroupTreeNode groupRoot = GroupTreeNode.fromGroup(new AllEntriesGroup(""));
+        groupRoot.addChild(GroupTreeNode.fromGroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING, ',')));
         metaData.setGroups(groupRoot);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), preferences);
@@ -247,7 +246,7 @@ public class BibtexDatabaseWriterTest {
             EntryTypes.addOrModifyCustomEntryType(new CustomEntryType("customizedType", "required", "optional"));
             BibEntry entry = new BibEntry();
             entry.setType("customizedType");
-            database.insertEntryWithDuplicationCheck(entry);
+            database.insertEntry(entry);
 
             StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry), new SavePreferences());
 
@@ -348,7 +347,7 @@ public class BibtexDatabaseWriterTest {
         entry.setField("author", "Mr. author");
         entry.setParsedSerialization("presaved serialization");
         entry.setChanged(false);
-        database.insertEntryWithDuplicationCheck(entry);
+        database.insertEntry(entry);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry), new SavePreferences());
 
@@ -363,7 +362,7 @@ public class BibtexDatabaseWriterTest {
         entry.setField("author", "Mr. author");
         entry.setParsedSerialization("wrong serialization");
         entry.setChanged(false);
-        database.insertEntryWithDuplicationCheck(entry);
+        database.insertEntry(entry);
 
         SavePreferences preferences = new SavePreferences().withReformatFile(true);
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.singletonList(entry), preferences);
@@ -404,7 +403,7 @@ public class BibtexDatabaseWriterTest {
     public void writeSaveActions() throws Exception {
         FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
                 Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())));
-        metaData.setSaveActions(saveActions);
+        metaData.setSaveActions(saveActions.getAsStringList());
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
 
@@ -461,16 +460,6 @@ public class BibtexDatabaseWriterTest {
     }
 
     @Test
-    public void writeContentSelectors() throws Exception {
-        metaData.setContentSelectors("title", Arrays.asList("testWord", "word2"));
-
-        StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
-
-        assertEquals(OS.NEWLINE + "@Comment{jabref-meta: selector_title:testWord;word2;}" + OS.NEWLINE,
-                session.getStringValue());
-    }
-
-    @Test
     public void writeFileDirectories() throws Exception {
         metaData.setDefaultFileDirectory("\\Literature\\");
         metaData.setUserFileDirectory("defaultOwner-user", "D:\\Documents");
@@ -480,24 +469,6 @@ public class BibtexDatabaseWriterTest {
         assertEquals(OS.NEWLINE + "@Comment{jabref-meta: fileDirectory:\\\\Literature\\\\;}" + OS.NEWLINE +
                 OS.NEWLINE + "@Comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"
                 + OS.NEWLINE, session.getStringValue());
-    }
-
-    @Test
-    public void writeNotEmptyContentSelectors() throws Exception {
-        metaData.setContentSelectors("title", Collections.singletonList(""));
-
-        StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
-
-        assertEquals("", session.getStringValue());
-    }
-
-    @Test
-    public void writeNotCompletelyEmptyContentSelectors() throws Exception {
-        metaData.setContentSelectors("title", Collections.emptyList());
-
-        StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
-
-        assertEquals("", session.getStringValue());
     }
 
     @Test
@@ -522,9 +493,9 @@ public class BibtexDatabaseWriterTest {
         thirdEntry.setField("author", "B");
         thirdEntry.setField("year", "2000");
 
-        database.insertEntryWithDuplicationCheck(secondEntry);
-        database.insertEntryWithDuplicationCheck(thirdEntry);
-        database.insertEntryWithDuplicationCheck(firstEntry);
+        database.insertEntry(secondEntry);
+        database.insertEntry(thirdEntry);
+        database.insertEntry(firstEntry);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, database.getEntries(), new SavePreferences());
 
@@ -566,9 +537,9 @@ public class BibtexDatabaseWriterTest {
         thirdEntry.setField("author", "A");
         thirdEntry.setField("year", "2000");
 
-        database.insertEntryWithDuplicationCheck(firstEntry);
-        database.insertEntryWithDuplicationCheck(secondEntry);
-        database.insertEntryWithDuplicationCheck(thirdEntry);
+        database.insertEntry(firstEntry);
+        database.insertEntry(secondEntry);
+        database.insertEntry(thirdEntry);
 
         SavePreferences preferences = new SavePreferences().withSaveInOriginalOrder(false);
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, database.getEntries(), preferences);

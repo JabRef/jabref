@@ -57,11 +57,10 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.SearchPreferences;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -128,10 +127,7 @@ public class SearchResultFrame {
         searchResultFrame.setTitle(title);
         searchResultFrame.setIconImage(IconTheme.getImage("jabrefIcon48").getImage());
 
-        int activePreview = Globals.prefs.getInt(JabRefPreferences.ACTIVE_PREVIEW);
-        String layoutFile = activePreview == 0 ? Globals.prefs.get(JabRefPreferences.PREVIEW_0) : Globals.prefs
-                .get(JabRefPreferences.PREVIEW_1);
-        preview = new PreviewPanel(null, null, layoutFile);
+        preview = new PreviewPanel(null, null);
 
         sortedEntries = new SortedList<>(entries, new EntryComparator(false, true, FieldName.AUTHOR));
         model = (DefaultEventTableModel<BibEntry>) GlazedListsSwing.eventTableModelWithThreadProxyList(sortedEntries,
@@ -166,14 +162,59 @@ public class SearchResultFrame {
             }
         };
 
-        ActionMap am = contentPane.getActionMap();
-        InputMap im = contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
-        im.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DATABASE), "close");
-        am.put("close", closeAction);
+        ActionMap actionMap = contentPane.getActionMap();
+        InputMap inputMap = contentPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW);
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DIALOG), "close");
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.CLOSE_DATABASE), "close");
+        actionMap.put("close", closeAction);
 
-        entryTable.getActionMap().put("copy", new AbstractAction() {
+        actionMap = entryTable.getActionMap();
+        inputMap = entryTable.getInputMap();
+        //Override 'selectNextColumnCell' and 'selectPreviousColumnCell' to move rows instead of cells on TAB
+        actionMap.put("selectNextColumnCell", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectNextEntry();
+            }
+        });
+        actionMap.put("selectPreviousColumnCell", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectPreviousEntry();
+            }
+        });
+        actionMap.put("selectNextRow", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectNextEntry();
+            }
+        });
+        actionMap.put("selectPreviousRow", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                selectPreviousEntry();
+            }
+        });
 
+        String selectFirst = "selectFirst";
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SELECT_FIRST_ENTRY), selectFirst);
+        actionMap.put(selectFirst, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                selectFirstEntry();
+            }
+        });
+
+        String selectLast = "selectLast";
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SELECT_LAST_ENTRY), selectLast);
+        actionMap.put(selectLast, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                selectLastEntry();
+            }
+        });
+
+        actionMap.put("copy", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (!selectionModel.getSelected().isEmpty()) {
@@ -191,7 +232,7 @@ public class SearchResultFrame {
 
         // override standard enter-action; enter opens the selected entry
         entryTable.getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "Enter");
-        entryTable.getActionMap().put("Enter", new AbstractAction() {
+        actionMap.put("Enter", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 BibEntry entry = sortedEntries.get(entryTable.getSelectedRow());
@@ -244,8 +285,24 @@ public class SearchResultFrame {
     }
 
     public void selectFirstEntry() {
-        if (entryTable.getRowCount() > 0) {
-            entryTable.setRowSelectionInterval(0, 0);
+        selectEntry(0);
+    }
+
+    public void selectLastEntry() {
+        selectEntry(entryTable.getRowCount() - 1);
+    }
+
+    public void selectPreviousEntry() {
+        selectEntry((entryTable.getSelectedRow() - 1 + entryTable.getRowCount()) % entryTable.getRowCount());
+    }
+
+    public void selectNextEntry() {
+        selectEntry((entryTable.getSelectedRow() + 1) % entryTable.getRowCount());
+    }
+
+    public void selectEntry(int index) {
+        if (index >= 0 && index < entryTable.getRowCount()) {
+            entryTable.changeSelection(index, 0, false, false);
         } else {
             contentPane.setDividerLocation(1.0f);
         }
@@ -335,6 +392,12 @@ public class SearchResultFrame {
     private void addEntry(BibEntry entry, BasePanel panel) {
         entries.add(entry);
         entryHome.put(entry, panel);
+
+        if (preview.getEntry() == null || !preview.getBasePanel().isPresent()){
+            preview.setEntry(entry);
+            preview.setBasePanel(panel);
+            preview.setDatabaseContext(panel.getBibDatabaseContext());
+        }
     }
 
     private void selectEntryInBasePanel(BibEntry entry){
@@ -484,6 +547,8 @@ public class SearchResultFrame {
                 preview.setDatabaseContext(basePanel.getBibDatabaseContext());
                 // Update the preview's entry:
                 preview.setEntry(entry);
+                preview.setBasePanel(entryHome.get(entry));
+                preview.setDatabaseContext(entryHome.get(entry).getBibDatabaseContext());
                 contentPane.setDividerLocation(0.5f);
                 SwingUtilities.invokeLater(() -> preview.scrollRectToVisible(toRect));
             }
@@ -504,7 +569,7 @@ public class SearchResultFrame {
         @Override
         public String getColumnName(int column) {
             if (column >= PAD) {
-                return EntryUtil.capitalizeFirst(FIELDS[column - PAD]);
+                return StringUtil.capitalizeFirst(FIELDS[column - PAD]);
             } else if (column == DATABASE_COL){
                 return Localization.lang("Database");
             } else {

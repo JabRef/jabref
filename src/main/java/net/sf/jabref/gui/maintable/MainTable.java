@@ -1,7 +1,6 @@
 package net.sf.jabref.gui.maintable;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -15,7 +14,7 @@ import java.util.Optional;
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
-import javax.swing.JLabel;
+import javax.swing.InputMap;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -33,6 +32,7 @@ import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.groups.EntryTableTransferHandler;
 import net.sf.jabref.gui.groups.GroupMatcher;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.renderer.CompleteRenderer;
 import net.sf.jabref.gui.renderer.GeneralRenderer;
 import net.sf.jabref.gui.renderer.IncompleteRenderer;
@@ -169,29 +169,48 @@ public class MainTable extends JTable {
         setWidths();
 
         //Override 'selectNextColumnCell' and 'selectPreviousColumnCell' to move rows instead of cells on TAB
-        ActionMap am = getActionMap();
-        am.put("selectNextColumnCell", new AbstractAction() {
+        ActionMap actionMap = getActionMap();
+        InputMap inputMap = getInputMap();
+        actionMap.put("selectNextColumnCell", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 panel.selectNextEntry();
             }
         });
-        am.put("selectPreviousColumnCell", new AbstractAction() {
+        actionMap.put("selectPreviousColumnCell", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 panel.selectPreviousEntry();
             }
         });
-        am.put("selectNextRow", new AbstractAction() {
+        actionMap.put("selectNextRow", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 panel.selectNextEntry();
             }
         });
-        am.put("selectPreviousRow", new AbstractAction() {
+        actionMap.put("selectPreviousRow", new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 panel.selectPreviousEntry();
+            }
+        });
+
+        String selectFirst = "selectFirst";
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SELECT_FIRST_ENTRY), selectFirst);
+        actionMap.put(selectFirst, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                panel.selectFirstEntry();
+            }
+        });
+
+        String selectLast = "selectLast";
+        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SELECT_LAST_ENTRY), selectLast);
+        actionMap.put(selectLast, new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                panel.selectLastEntry();
             }
         });
     }
@@ -210,18 +229,14 @@ public class MainTable extends JTable {
 
     @Override
     public String getToolTipText(MouseEvent e) {
-
-        // Set tooltip text for all columns which are not fully displayed
-
-        String toolTipText = null;
+        String toolTipText = super.getToolTipText(e);
         Point p = e.getPoint();
         int col = columnAtPoint(p);
         int row = rowAtPoint(p);
-        Component comp = prepareRenderer(getCellRenderer(row, col), row, col);
 
         Rectangle bounds = getCellRect(row, col, false);
-
-        Dimension d = comp.getPreferredSize();
+        Dimension d = prepareRenderer(getCellRenderer(row, col), row, col).getPreferredSize();
+        // if the content of the cell is bigger than the cell itself render it as the tooltip (thus throwing the original tooltip away)
         if ((d != null) && (d.width > bounds.width) && (getValueAt(row, col) != null)) {
             toolTipText = getValueAt(row, col).toString();
         }
@@ -278,7 +293,6 @@ public class MainTable extends JTable {
                 MainTable.incRenderer.setNumber(row);
                 renderer = MainTable.incRenderer;
             }
-            renderer.setHorizontalAlignment(JLabel.CENTER);
         } else if (tableColorCodes || tableResolvedColorCodes) {
             CellRendererMode status = getCellStatus(row, column, tableResolvedColorCodes);
             if (status == CellRendererMode.REQUIRED) {
@@ -534,30 +548,39 @@ public class MainTable extends JTable {
     }
 
     private boolean matches(int row, Matcher<BibEntry> m) {
-        return m.matches(getBibEntry(row));
+        Optional<BibEntry> bibEntry = getBibEntry(row);
+
+        if (bibEntry.isPresent()) {
+            return m.matches(bibEntry.get());
+        }
+        return m.matches(null);
     }
 
     private boolean isComplete(int row) {
-        try {
-            BibEntry entry = getBibEntry(row);
-            TypedBibEntry typedEntry = new TypedBibEntry(entry, panel.getBibDatabaseContext());
+        Optional<BibEntry> bibEntry = getBibEntry(row);
+
+        if (bibEntry.isPresent()) {
+            TypedBibEntry typedEntry = new TypedBibEntry(bibEntry.get(), panel.getBibDatabaseContext());
             return typedEntry.hasAllRequiredFields();
-        } catch (NullPointerException ex) {
-            return true;
         }
+        return true;
     }
 
     private int isMarked(int row) {
-        try {
-            BibEntry be = getBibEntry(row);
-            return EntryMarker.isMarked(be);
-        } catch (NullPointerException ex) {
-            return 0;
+        Optional<BibEntry> bibEntry = getBibEntry(row);
+
+        if (bibEntry.isPresent()) {
+            return EntryMarker.isMarked(bibEntry.get());
         }
+        return 0;
     }
 
-    private BibEntry getBibEntry(int row) {
-        return model.getTableRows().get(row);
+    private Optional<BibEntry> getBibEntry(int row) {
+        try {
+            return Optional.of(model.getTableRows().get(row));
+        } catch (IndexOutOfBoundsException e) {
+            return Optional.empty();
+        }
     }
 
     public void scrollTo(int y) {

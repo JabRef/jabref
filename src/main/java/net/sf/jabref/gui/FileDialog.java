@@ -1,5 +1,6 @@
 package net.sf.jabref.gui;
 
+import java.awt.Component;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -13,7 +14,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.swing.JFileChooser;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -55,7 +55,7 @@ public class FileDialog {
         }
     };
 
-    private final JFrame parent;
+    private final Component parent;
     private final String directory;
     private Collection<FileExtensions> extensions = EnumSet.noneOf(FileExtensions.class);
 
@@ -63,7 +63,7 @@ public class FileDialog {
      * Creates a new filedialog showing the current working dir {@link JabRefPreferences#WORKING_DIRECTORY}
      * @param parent The parent frame associated with this dialog
      */
-    public FileDialog(JFrame parent) {
+    public FileDialog(Component parent) {
         this(parent, getWorkingDir());
     }
 
@@ -72,7 +72,7 @@ public class FileDialog {
      * @param parent The parent frame associated with this dialog
      * @param dir The starting directory to show in the dialog
      */
-    public FileDialog(JFrame parent, String dir) {
+    public FileDialog(Component parent, String dir) {
         Objects.requireNonNull(dir, "Directory must not be null");
 
         this.parent = parent;

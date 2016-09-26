@@ -13,19 +13,13 @@ import java.util.Optional;
 import java.util.Set;
 
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.logic.config.SaveOrderConfig;
 import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
-import net.sf.jabref.logic.groups.AllEntriesGroup;
-import net.sf.jabref.logic.groups.ExplicitGroup;
-import net.sf.jabref.logic.groups.GroupHierarchyType;
-import net.sf.jabref.logic.groups.GroupTreeNode;
-import net.sf.jabref.logic.groups.KeywordGroup;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
-import net.sf.jabref.logic.importer.util.ParseException;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -34,6 +28,13 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.IdGenerator;
+import net.sf.jabref.model.groups.AllEntriesGroup;
+import net.sf.jabref.model.groups.ExplicitGroup;
+import net.sf.jabref.model.groups.GroupHierarchyType;
+import net.sf.jabref.model.groups.GroupTreeNode;
+import net.sf.jabref.model.groups.KeywordGroup;
+import net.sf.jabref.model.metadata.MetaData;
+import net.sf.jabref.model.metadata.SaveOrderConfig;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.BeforeClass;
@@ -60,8 +61,8 @@ public class BibtexParserTest {
 
     @SuppressWarnings("unused")
     @Test(expected = NullPointerException.class)
-    public void initalizationWithNullThrowsNullPointerException() {
-        new BibtexParser(null, importFormatPreferences);
+    public void parseWithNullThrowsNullPointerException() throws Exception {
+        new BibtexParser(importFormatPreferences).parse(null);
     }
 
     @Test
@@ -124,15 +125,6 @@ public class BibtexParserTest {
     public void singleFromStringReturnsNullIfNoEntryRecognized() {
         Optional<BibEntry> parsed = BibtexParser.singleFromString("@@article@@{{{{{{}", importFormatPreferences);
         assertEquals(Optional.empty(), parsed);
-    }
-
-    @Test
-    public void parseTwoTimesReturnsSameResult() throws IOException {
-        BibtexParser parser = new BibtexParser(new StringReader("@article{test,author={Ed von Test}}"),
-                importFormatPreferences);
-        ParserResult result = parser.parse();
-
-        assertEquals(result, parser.parse());
     }
 
     @Test
@@ -1394,7 +1386,9 @@ public class BibtexParserTest {
 
     @Test
     public void parseRecognizesSaveActionsAfterEntry() throws IOException {
-        BibtexParser parser = new BibtexParser(
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+
+        ParserResult parserResult = parser.parse(
                 new StringReader("@InProceedings{6055279,\n" + "  Title                    = {Educational session 1},\n"
                         + "  Booktitle                = {Custom Integrated Circuits Conference (CICC), 2011 IEEE},\n"
                         + "  Year                     = {2011},\n" + "  Month                    = {Sept},\n"
@@ -1402,12 +1396,10 @@ public class BibtexParserTest {
                         + "  Abstract                 = {Start of the above-titled section of the conference proceedings record.},\n"
                         + "  DOI                      = {10.1109/CICC.2011.6055279},\n"
                         + "  ISSN                     = {0886-5930}\n" + "}\n" + "\n"
-                        + "@comment{jabref-meta: saveActions:enabled;title[lower_case]}"),
-                importFormatPreferences);
+                        + "@comment{jabref-meta: saveActions:enabled;title[lower_case]}")
+                );
 
-        ParserResult parserResult = parser.parse();
-
-        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
+        FieldFormatterCleanups saveActions = FieldFormatterCleanups.fromMetaData(parserResult.getMetaData()).get();
 
         assertTrue(saveActions.isEnabled());
         assertEquals(Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())),
@@ -1416,12 +1408,11 @@ public class BibtexParserTest {
 
     @Test
     public void integrationTestSaveActions() throws IOException {
-        BibtexParser parser = new BibtexParser(
-                new StringReader("@comment{jabref-meta: saveActions:enabled;title[lower_case]}"),
-                importFormatPreferences);
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
 
-        ParserResult parserResult = parser.parse();
-        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
+        ParserResult parserResult = parser.parse(
+                new StringReader("@comment{jabref-meta: saveActions:enabled;title[lower_case]}"));
+        FieldFormatterCleanups saveActions = FieldFormatterCleanups.fromMetaData(parserResult.getMetaData()).get();
 
         assertTrue(saveActions.isEnabled());
         assertEquals(Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())),
@@ -1494,15 +1485,14 @@ public class BibtexParserTest {
 
         GroupTreeNode root = result.getMetaData().getGroups().get();
 
-        assertEquals(new AllEntriesGroup(), root.getGroup());
+        assertEquals(new AllEntriesGroup(""), root.getGroup());
         assertEquals(3, root.getNumberOfChildren());
         assertEquals(
                 new KeywordGroup("Fréchet", "keywords", "FrechetSpace", false, true, GroupHierarchyType.INDEPENDENT,
-                        ", "),
-                root.getChildren().get(0).getGroup());
+                        ','), root.getChildren().get(0).getGroup());
         assertEquals(
                 new KeywordGroup("Invariant theory", "keywords", "GIT", false, false, GroupHierarchyType.INDEPENDENT,
-                        ", "),
+                        ','),
                 root.getChildren().get(1).getGroup());
         assertEquals(Arrays.asList("Key1", "Key2"),
                 ((ExplicitGroup) root.getChildren().get(2).getGroup()).getLegacyEntryKeys());
@@ -1517,11 +1507,11 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void integrationTestContentSelectors() throws IOException {
+    public void integrationTestOldContentSelectorsAreIgnored() throws IOException {
         ParserResult result = BibtexParser.parse(
                 new StringReader("@comment{jabref-meta: selector_title:testWord;word2;}"), importFormatPreferences);
 
-        assertEquals(Arrays.asList("testWord", "word2"), result.getMetaData().getContentSelectors("title"));
+        assertEquals(new MetaData(), result.getMetaData());
     }
 
     @Test

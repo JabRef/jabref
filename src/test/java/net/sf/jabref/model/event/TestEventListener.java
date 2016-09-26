@@ -1,6 +1,9 @@
 package net.sf.jabref.model.event;
 
+import net.sf.jabref.model.database.event.EntryAddedEvent;
+import net.sf.jabref.model.database.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.event.EntryChangedEvent;
 
 import com.google.common.eventbus.Subscribe;
 

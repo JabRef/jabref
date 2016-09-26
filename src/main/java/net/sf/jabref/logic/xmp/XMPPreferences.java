@@ -6,10 +6,10 @@ public class XMPPreferences {
 
     private final boolean useXMPPrivacyFilter;
     private final List<String> xmpPrivacyFilter;
-    private final String keywordSeparator;
+    private final Character keywordSeparator;
 
 
-    public XMPPreferences(boolean useXMPPrivacyFilter, List<String> xmpPrivacyFilter, String keywordSeparator) {
+    public XMPPreferences(boolean useXMPPrivacyFilter, List<String> xmpPrivacyFilter, Character keywordSeparator) {
         this.useXMPPrivacyFilter = useXMPPrivacyFilter;
         this.xmpPrivacyFilter = xmpPrivacyFilter;
         this.keywordSeparator = keywordSeparator;
@@ -23,7 +23,7 @@ public class XMPPreferences {
         return xmpPrivacyFilter;
     }
 
-    public String getKeywordSeparator() {
+    public Character getKeywordSeparator() {
         return keywordSeparator;
     }
 }

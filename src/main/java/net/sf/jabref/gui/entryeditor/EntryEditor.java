@@ -59,7 +59,6 @@ import javafx.scene.web.WebView;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryContainer;
-import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
@@ -79,7 +78,6 @@ import net.sf.jabref.gui.undo.UndoableChangeType;
 import net.sf.jabref.gui.undo.UndoableFieldChange;
 import net.sf.jabref.gui.undo.UndoableKeyChange;
 import net.sf.jabref.gui.undo.UndoableRemoveEntry;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.gui.util.component.VerticalLabelUI;
 import net.sf.jabref.logic.TypedBibEntry;
@@ -105,7 +103,7 @@ import net.sf.jabref.model.entry.EntryType;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
-import net.sf.jabref.model.event.FieldChangedEvent;
+import net.sf.jabref.model.entry.event.FieldChangedEvent;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.specialfields.SpecialFieldUpdateListener;
 
@@ -168,8 +166,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private final JabRefFrame frame;
 
     private final BasePanel panel;
-
-    private final Set<FieldContentSelector> contentSelectors = new HashSet<>();
 
     private boolean updateSource = true; // This can be set to false to stop the source
     private boolean movingToDifferentEntry; // Indicates that we are about to go to the next or previous entry
@@ -544,10 +540,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {
             // Add controls for switching between abbreviated and full journal names.
             // If this field also has a FieldContentSelector, we need to combine these.
-            return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors,
-                    getStoreFieldAction());
-        } else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectors(fieldName).isEmpty()) {
-            return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors, getStoreFieldAction());
+            return FieldExtraComponents.getJournalExtraComponent(panel, editor, entry, getStoreFieldAction());
         } else if (fieldExtras.contains(FieldProperty.DOI)) {
             return FieldExtraComponents.getDoiExtraComponent(panel, this, editor);
         } else if (fieldExtras.contains(FieldProperty.EPRINT)) {
@@ -568,8 +561,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
             return FieldExtraComponents.getPaginationExtraComponent(editor, this);
         } else if (fieldExtras.contains(FieldProperty.TYPE)) {
             return FieldExtraComponents.getTypeExtraComponent(editor, this, "patent".equalsIgnoreCase(entry.getType()));
-        } else if (fieldExtras.contains(FieldProperty.CROSSREF)) {
-            return FieldExtraComponents.getCrossrefExtraComponent(editor, frame.getCurrentBasePanel());
         }
         return Optional.empty();
     }
@@ -693,7 +684,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         if (activeTab instanceof EntryEditorTab) {
             ((EntryEditorTab) activeTab).activate();
         } else {
-            new FocusRequester(source);
+            source.requestFocus();
         }
     }
 
@@ -807,11 +798,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private boolean storeSource() {
-        BibtexParser bibtexParser = new BibtexParser(new StringReader(source.getText()),
-                Globals.prefs.getImportFormatPreferences());
-
+        BibtexParser bibtexParser = new BibtexParser(Globals.prefs.getImportFormatPreferences());
         try {
-            ParserResult parserResult = bibtexParser.parse();
+            ParserResult parserResult = bibtexParser.parse(new StringReader(source.getText()));
             BibDatabase database = parserResult.getDatabase();
 
             if (database.getEntryCount() > 1) {
@@ -957,14 +946,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         for (Object tab : tabs) {
             if (tab instanceof EntryEditorTab) {
                 ((EntryEditorTab) tab).validateAllFields();
-            }
-        }
-    }
-
-    public void updateAllContentSelectors() {
-        if (!contentSelectors.isEmpty()) {
-            for (FieldContentSelector contentSelector : contentSelectors) {
-                contentSelector.rebuildComboBox();
             }
         }
     }

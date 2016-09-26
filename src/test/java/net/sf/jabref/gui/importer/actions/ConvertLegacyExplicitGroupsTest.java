@@ -4,12 +4,12 @@ import java.util.Collections;
 import java.util.Optional;
 
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.logic.groups.AllEntriesGroup;
-import net.sf.jabref.logic.groups.ExplicitGroup;
-import net.sf.jabref.logic.groups.GroupHierarchyType;
-import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.groups.AllEntriesGroup;
+import net.sf.jabref.model.groups.ExplicitGroup;
+import net.sf.jabref.model.groups.GroupHierarchyType;
+import net.sf.jabref.model.groups.GroupTreeNode;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +31,7 @@ public class ConvertLegacyExplicitGroupsTest {
 
         entry = new BibEntry();
         entry.setCiteKey("Entry1");
-        group = new ExplicitGroup("TestGroup", GroupHierarchyType.INCLUDING, ", ");
+        group = new ExplicitGroup("TestGroup", GroupHierarchyType.INCLUDING, ',');
         group.addLegacyEntryKey("Entry1");
     }
 
@@ -55,8 +55,8 @@ public class ConvertLegacyExplicitGroupsTest {
 
     @Test
     public void performActionWritesGroupMembershipInEntryForComplexGroupTree() throws Exception {
-        GroupTreeNode root = GroupTreeNode.fromGroup(new AllEntriesGroup());
-        root.addSubgroup(new ExplicitGroup("TestGroup2", GroupHierarchyType.INCLUDING, ", "));
+        GroupTreeNode root = GroupTreeNode.fromGroup(new AllEntriesGroup(""));
+        root.addSubgroup(new ExplicitGroup("TestGroup2", GroupHierarchyType.INCLUDING, ','));
         root.addSubgroup(group);
         ParserResult parserResult = generateParserResult(entry, root);
 

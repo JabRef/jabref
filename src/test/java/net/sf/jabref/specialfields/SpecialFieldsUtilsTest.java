@@ -2,14 +2,15 @@ package net.sf.jabref.specialfields;
 
 import java.util.Optional;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import static net.sf.jabref.Globals.prefs;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -17,9 +18,21 @@ import static org.junit.Assert.assertTrue;
 
 public class SpecialFieldsUtilsTest {
 
+    private JabRefPreferences backup;
+
     @Before
     public void setUp() {
-        Globals.prefs = JabRefPreferences.getInstance();
+        prefs = JabRefPreferences.getInstance();
+        backup = prefs;
+
+        prefs.putBoolean(JabRefPreferences.SPECIALFIELDSENABLED, true);
+        prefs.putBoolean(JabRefPreferences.AUTOSYNCSPECIALFIELDSTOKEYWORDS, true);
+    }
+
+    @After
+    public void tearDown() {
+        //clean up preferences to default state
+        prefs.overwritePreferences(backup);
     }
 
     @Test

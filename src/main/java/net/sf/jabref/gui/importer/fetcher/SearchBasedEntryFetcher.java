@@ -37,7 +37,7 @@ public class SearchBasedEntryFetcher implements EntryFetcher{
             matches.forEach(inspector::addEntry);
             return !matches.isEmpty();
         } catch (FetcherException e) {
-            status.setStatus(Localization.lang("Error while fetching from %0", fetcher.getName()));
+            status.setStatus(e.getLocalizedMessage());
             LOGGER.error("Error while fetching from" + fetcher.getName(), e);
         }
 

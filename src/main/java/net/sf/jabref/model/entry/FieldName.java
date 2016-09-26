@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import net.sf.jabref.model.strings.StringUtil;
+
 /**
  * String constants for BibTeX entry field names
  *
  */
 public class FieldName {
-
     // Character separating field names that are to be used in sequence as
     // fallbacks for a single column (e.g. "author/editor" to use editor where
     // author is not set):
@@ -128,7 +129,6 @@ public class FieldName {
     // Map to hold alternative display names
     private static final Map<String, String> displayNames = new HashMap<>();
 
-
     public static String orFields(String... fields) {
         return String.join(FieldName.FIELD_SEPARATOR, fields);
     }
@@ -149,7 +149,6 @@ public class FieldName {
         displayNames.put(FieldName.URL, "URL");
     }
 
-
     /**
      * @param field - field to get the display version for
      * @return A version of the field name more suitable for display
@@ -160,6 +159,6 @@ public class FieldName {
         if (displayNames.containsKey(lowercaseField)) {
             return displayNames.get(lowercaseField);
         }
-        return EntryUtil.capitalizeFirst(field);
+        return StringUtil.capitalizeFirst(field);
     }
 }

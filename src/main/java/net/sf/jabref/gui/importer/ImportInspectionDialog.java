@@ -49,11 +49,8 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.Defaults;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.MetaData;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.DuplicateResolverDialog;
 import net.sf.jabref.gui.DuplicateResolverDialog.DuplicateResolverResult;
@@ -82,24 +79,27 @@ import net.sf.jabref.gui.util.comparator.IconComparator;
 import net.sf.jabref.gui.util.component.CheckBoxMessage;
 import net.sf.jabref.logic.bibtex.comparator.FieldComparator;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
-import net.sf.jabref.logic.groups.AllEntriesGroup;
-import net.sf.jabref.logic.groups.EntriesGroupChange;
-import net.sf.jabref.logic.groups.GroupTreeNode;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
+import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.DuplicateCheck;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.IdGenerator;
 import net.sf.jabref.model.entry.InternalBibtexFields;
+import net.sf.jabref.model.groups.AllEntriesGroup;
+import net.sf.jabref.model.groups.EntriesGroupChange;
+import net.sf.jabref.model.groups.GroupTreeNode;
+import net.sf.jabref.model.metadata.MetaData;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -199,7 +199,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         this.undoName = undoName;
         this.newDatabase = newDatabase;
         setIconImage(new ImageIcon(IconTheme.getIconUrl("jabrefIcon48")).getImage());
-        preview = new PreviewPanel(null, bibDatabaseContext, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+        preview = new PreviewPanel(panel, bibDatabaseContext);
 
         duplLabel.setToolTipText(Localization.lang("Possible duplicate of existing entry. Click to resolve."));
 
@@ -459,7 +459,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             entry.setId(IdGenerator.next());
             // Add the entry to the database we are working with:
-            database.insertEntryWithDuplicationCheck(entry);
+            database.insertEntry(entry);
 
             // Generate a unique key:
             BibtexKeyPatternUtil.makeLabel(localMetaData, database, entry,
@@ -502,7 +502,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             for (BibEntry entry : entries) {
 
                 entry.setId(IdGenerator.next());
-                database.insertEntryWithDuplicationCheck(entry);
+                database.insertEntry(entry);
 
                 BibtexKeyPatternUtil.makeLabel(localMetaData, database, entry,
                         Globals.prefs.getBibtexKeyPatternPreferences());
@@ -736,7 +736,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 }
 
                 entry.setId(IdGenerator.next());
-                panel.getDatabase().insertEntryWithDuplicationCheck(entry);
+                panel.getDatabase().insertEntry(entry);
                 ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
 
             }
@@ -1409,7 +1409,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 return Localization.lang("Keep");
             }
             if (i >= PAD) {
-                return EntryUtil.capitalizeFirst(INSPECTION_FIELDS.get(i - PAD));
+                return StringUtil.capitalizeFirst(INSPECTION_FIELDS.get(i - PAD));
             }
             return "";
         }

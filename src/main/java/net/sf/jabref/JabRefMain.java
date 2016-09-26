@@ -26,6 +26,7 @@ import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.remote.RemotePreferences;
 import net.sf.jabref.logic.remote.client.RemoteListenerClient;
 import net.sf.jabref.logic.util.OS;
+import net.sf.jabref.migrations.PreferencesMigrations;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -54,7 +55,7 @@ public class JabRefMain extends Application {
     private static void start(String[] args) {
         JabRefPreferences preferences = JabRefPreferences.getInstance();
 
-        ProxyPreferences proxyPreferences = ProxyPreferences.loadFromPreferences(preferences);
+        ProxyPreferences proxyPreferences = preferences.getProxyPreferences();
         ProxyRegisterer.register(proxyPreferences);
         if (proxyPreferences.isUseProxy() && proxyPreferences.isUseAuthentication()) {
             Authenticator.setDefault(new ProxyAuthenticator());
@@ -64,6 +65,12 @@ public class JabRefMain extends Application {
         Globals.prefs = preferences;
         Localization.setLanguage(preferences.get(JabRefPreferences.LANGUAGE));
         Globals.prefs.setLanguageDependentDefaultValues();
+
+        // Perform Migrations
+        // Perform checks and changes for users with a preference set from an older JabRef version.
+        PreferencesMigrations.upgradeSortOrder();
+        PreferencesMigrations.upgradeFaultyEncodingStrings();
+        PreferencesMigrations.upgradeLabelPatternToBibtexKeyPattern();
 
         // Update handling of special fields based on preferences
         InternalBibtexFields
@@ -92,7 +99,7 @@ public class JabRefMain extends Application {
         ProtectTermsFormatter.setProtectedTermsLoader(Globals.protectedTermsLoader);
 
         // Check for running JabRef
-        RemotePreferences remotePreferences = new RemotePreferences(Globals.prefs);
+        RemotePreferences remotePreferences = Globals.prefs.getRemotePreferences();
         if (remotePreferences.useRemoteServer()) {
             Globals.REMOTE_LISTENER.open(new JabRefMessageHandler(), remotePreferences.getPort());
 

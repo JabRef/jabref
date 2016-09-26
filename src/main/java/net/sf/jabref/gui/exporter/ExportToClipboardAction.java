@@ -77,9 +77,9 @@ public class ExportToClipboardAction extends AbstractWorker {
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         int answer = JOptionPane.showOptionDialog(frame, list, Localization.lang("Select export format"),
                 JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, null,
-                new String[] {Localization.lang("Export with selected format"),
-                        Localization.lang("Return to JabRef")},
-                Localization.lang("Export with selected format"));
+                new String[] {Localization.lang("Export"),
+                        Localization.lang("Cancel")},
+                Localization.lang("Export"));
         if (answer == JOptionPane.NO_OPTION) {
             return;
         }

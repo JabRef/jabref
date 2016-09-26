@@ -7,24 +7,25 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import net.sf.jabref.BibDatabaseContext;
-import net.sf.jabref.MetaData;
-import net.sf.jabref.event.MetaDataChangedEvent;
-import net.sf.jabref.event.source.EntryEventSource;
 import net.sf.jabref.logic.exporter.BibDatabaseWriter;
-import net.sf.jabref.logic.importer.util.ParseException;
+import net.sf.jabref.logic.exporter.MetaDataSerializer;
+import net.sf.jabref.logic.importer.util.MetaDataParser;
+import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
+import net.sf.jabref.model.database.event.EntryAddedEvent;
+import net.sf.jabref.model.database.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.event.EntryAddedEvent;
-import net.sf.jabref.model.event.EntryEvent;
-import net.sf.jabref.model.event.EntryRemovedEvent;
-import net.sf.jabref.model.event.FieldChangedEvent;
+import net.sf.jabref.model.entry.event.EntryEvent;
+import net.sf.jabref.model.entry.event.EntryEventSource;
+import net.sf.jabref.model.entry.event.FieldChangedEvent;
+import net.sf.jabref.model.metadata.MetaData;
+import net.sf.jabref.model.metadata.event.MetaDataChangedEvent;
 import net.sf.jabref.shared.event.ConnectionLostEvent;
 import net.sf.jabref.shared.event.SharedEntryNotPresentEvent;
 import net.sf.jabref.shared.event.UpdateRefusedEvent;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 import net.sf.jabref.shared.exception.OfflineLockException;
-import net.sf.jabref.shared.exception.SharedEntryNotPresentException;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -37,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
  */
 public class DBMSSynchronizer {
 
-    private static final Log LOGGER = LogFactory.getLog(DBMSConnector.class);
+    private static final Log LOGGER = LogFactory.getLog(DBMSSynchronizer.class);
 
     private DBMSProcessor dbmsProcessor;
     private DBMSType dbmsType;
@@ -47,10 +48,10 @@ public class DBMSSynchronizer {
     private final BibDatabase bibDatabase;
     private final EventBus eventBus;
     private Connection currentConnection;
-    private final String keywordSeparator;
+    private final Character keywordSeparator;
 
 
-    public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, String keywordSeparator) {
+    public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.bibDatabase = bibDatabaseContext.getDatabase();
         this.metaData = bibDatabaseContext.getMetaData();
@@ -118,6 +119,14 @@ public class DBMSSynchronizer {
             synchronizeSharedMetaData(event.getMetaData());
             synchronizeLocalDatabase();
             applyMetaData();
+            dbmsProcessor.notifyClients();
+        }
+    }
+
+    @Subscribe
+    public void listen(EntryEvent event) {
+        if (isEventSourceAccepted(event)) {
+            dbmsProcessor.notifyClients();
         }
     }
 
@@ -125,7 +134,6 @@ public class DBMSSynchronizer {
      * Sets the table structure of shared database if needed and pulls all shared entries
      * to the new local database.
      *
-     * @param bibDatabase Local {@link BibDatabase}
      * @throws DatabaseNotSupportedException if the version of shared database does not match
      *          the version of current shared database support ({@link DBMSProcessor}).
      */
@@ -143,6 +151,7 @@ public class DBMSSynchronizer {
 
         synchronizeLocalMetaData();
         synchronizeLocalDatabase();
+        dbmsProcessor.startNotificationListener(this);
     }
 
     /**
@@ -214,6 +223,7 @@ public class DBMSSynchronizer {
                 }
             }
             if (!match) {
+                eventBus.post(new SharedEntryNotPresentEvent(localEntry));
                 bibDatabase.removeEntry(localEntry, EntryEventSource.SHARED); // Should not reach the listeners above.
                 i--; // due to index shift on localEntries
             }
@@ -232,8 +242,6 @@ public class DBMSSynchronizer {
             dbmsProcessor.updateEntry(bibEntry);
         } catch (OfflineLockException exception) {
             eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
-        } catch (SharedEntryNotPresentException exception) {
-            eventBus.post(new SharedEntryNotPresentEvent(exception.getNonPresentBibEntry()));
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
         }
@@ -248,7 +256,8 @@ public class DBMSSynchronizer {
         }
 
         try {
-            metaData.setData(dbmsProcessor.getSharedMetaData(), keywordSeparator);
+            metaData.setParsedData(MetaDataParser.getParsedData(dbmsProcessor.getSharedMetaData(), keywordSeparator,
+                    metaData));
         } catch (ParseException e) {
             LOGGER.error("Parse error", e);
         }
@@ -262,7 +271,7 @@ public class DBMSSynchronizer {
             return;
         }
         try {
-            dbmsProcessor.setSharedMetaData(data.getAsStringMap());
+            dbmsProcessor.setSharedMetaData(MetaDataSerializer.getSerializedStringMap(data));
         } catch (SQLException e) {
             LOGGER.error("SQL Error: ", e);
         }
@@ -282,8 +291,6 @@ public class DBMSSynchronizer {
                     dbmsProcessor.updateEntry(bibEntry);
                 } catch (OfflineLockException exception) {
                     eventBus.post(new UpdateRefusedEvent(bibDatabaseContext, exception.getLocalBibEntry(), exception.getSharedBibEntry()));
-                } catch (SharedEntryNotPresentException exception) {
-                    eventBus.post(new SharedEntryNotPresentEvent(exception.getNonPresentBibEntry()));
                 } catch (SQLException e) {
                     LOGGER.error("SQL Error: ", e);
                 }
@@ -334,16 +341,25 @@ public class DBMSSynchronizer {
         return ((eventSource == EntryEventSource.LOCAL) || (eventSource == EntryEventSource.UNDO));
     }
 
-    public void openSharedDatabase(Connection connection, DBMSType type, String name) throws DatabaseNotSupportedException, SQLException {
-        this.dbmsType = type;
-        this.dbName = name;
-        this.currentConnection = connection;
-        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(connection, type);
+    public void openSharedDatabase(DBMSConnection connection) throws DatabaseNotSupportedException, SQLException {
+        this.dbmsType = connection.getProperties().getType();
+        this.dbName = connection.getProperties().getDatabase();
+        this.currentConnection = connection.getConnection();
+        this.dbmsProcessor = DBMSProcessor.getProcessorInstance(connection);
         initializeDatabases();
     }
 
-    public void openSharedDatabase(DBMSConnectionProperties properties) throws ClassNotFoundException, SQLException, DatabaseNotSupportedException {
-        openSharedDatabase(DBMSConnector.getNewConnection(properties), properties.getType(), properties.getDatabase());
+    public void openSharedDatabase(DBMSConnectionProperties properties) throws SQLException, DatabaseNotSupportedException {
+        openSharedDatabase(new DBMSConnection(properties));
+    }
+
+    public void closeSharedDatabase() {
+        try {
+            dbmsProcessor.stopNotificationListener();
+            currentConnection.close();
+        } catch (SQLException e) {
+            LOGGER.error("SQL Error:", e);
+        }
     }
 
     private boolean isPresentLocalBibEntry(BibEntry bibEntry) {

@@ -8,14 +8,14 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.logic.config.SaveOrderConfig;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
+import net.sf.jabref.model.metadata.SaveOrderConfig;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * A comparator for BibEntry fields

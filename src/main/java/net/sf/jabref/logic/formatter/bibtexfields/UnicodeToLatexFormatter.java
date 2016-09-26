@@ -6,7 +6,7 @@ import java.util.Objects;
 import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatter;
-import net.sf.jabref.logic.util.strings.HTMLUnicodeConversionMaps;
+import net.sf.jabref.model.strings.HTMLUnicodeConversionMaps;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

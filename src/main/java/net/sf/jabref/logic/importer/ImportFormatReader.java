@@ -21,6 +21,7 @@ import net.sf.jabref.logic.importer.fileformat.InspecImporter;
 import net.sf.jabref.logic.importer.fileformat.IsiImporter;
 import net.sf.jabref.logic.importer.fileformat.MedlineImporter;
 import net.sf.jabref.logic.importer.fileformat.MedlinePlainImporter;
+import net.sf.jabref.logic.importer.fileformat.ModsImporter;
 import net.sf.jabref.logic.importer.fileformat.MsBibImporter;
 import net.sf.jabref.logic.importer.fileformat.OvidImporter;
 import net.sf.jabref.logic.importer.fileformat.PdfContentImporter;
@@ -28,10 +29,10 @@ import net.sf.jabref.logic.importer.fileformat.PdfXmpImporter;
 import net.sf.jabref.logic.importer.fileformat.RepecNepImporter;
 import net.sf.jabref.logic.importer.fileformat.RisImporter;
 import net.sf.jabref.logic.importer.fileformat.SilverPlatterImporter;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.model.database.BibDatabases;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -65,6 +66,7 @@ public class ImportFormatReader {
         formats.add(new IsiImporter());
         formats.add(new MedlineImporter());
         formats.add(new MedlinePlainImporter());
+        formats.add(new ModsImporter());
         formats.add(new MsBibImporter());
         formats.add(new OvidImporter());
         formats.add(new PdfContentImporter(importFormatPreferences));

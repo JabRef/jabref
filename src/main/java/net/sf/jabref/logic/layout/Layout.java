@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabase;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;

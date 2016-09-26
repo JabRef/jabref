@@ -4,13 +4,13 @@ import java.io.File;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.gui.JabRefFrame;
@@ -23,6 +23,7 @@ import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -198,28 +199,20 @@ public class DownloadExternalFile {
                 }
             }
 
-            try {
-                boolean success = FileUtil.copyFile(tmp, toFile, true);
-                if (!success) {
-                    // OOps, the file exists!
-                    LOGGER.error("File already exists! DownloadExternalFile.download()");
-                }
-
-                // If the local file is in or below the main file directory, change the
-                // path to relative:
-                if ((dirPrefix != null) && fileListEntry.link.startsWith(directory)
-                        && (fileListEntry.link.length() > dirPrefix.length())) {
-                    fileListEntry = new FileListEntry(fileListEntry.description,
-                            fileListEntry.link.substring(dirPrefix.length()), fileListEntry.type);
-                }
-
-                callback.downloadComplete(fileListEntry);
-            } catch (IOException ex) {
-                String content = String.format("%s %n %s", Localization.lang("Error message:"),
-                        ex.getLocalizedMessage());
-                JOptionPane.showMessageDialog(this.frame, content,
-                        Localization.lang("Error while writing"), JOptionPane.ERROR_MESSAGE);
+            boolean success = FileUtil.copyFile(Paths.get(tmp.toURI()), Paths.get(toFile.toURI()), true);
+            if (!success) {
+                // OOps, the file exists!
+                LOGGER.error("File already exists! DownloadExternalFile.download()");
             }
+
+            // If the local file is in or below the main file directory, change the
+            // path to relative:
+            if ((dirPrefix != null) && fileListEntry.link.startsWith(directory)
+                    && (fileListEntry.link.length() > dirPrefix.length())) {
+                fileListEntry = new FileListEntry(fileListEntry.description,
+                        fileListEntry.link.substring(dirPrefix.length()), fileListEntry.type);
+            }
+            callback.downloadComplete(fileListEntry);
 
             if (!tmp.delete()) {
                 LOGGER.info("Cannot delete temporary file");

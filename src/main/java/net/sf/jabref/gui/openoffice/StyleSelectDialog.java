@@ -32,7 +32,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
 import javax.swing.table.TableColumnModel;
 
-import net.sf.jabref.BibDatabaseContext;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
@@ -51,6 +50,7 @@ import net.sf.jabref.logic.openoffice.OpenOfficePreferences;
 import net.sf.jabref.logic.openoffice.StyleLoader;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.TestEntry;
+import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -134,7 +134,7 @@ class StyleSelectDialog {
 
         // Create a preview panel for previewing styles
         // Must be done before creating the table to avoid NPEs
-        preview = new PreviewPanel(null, null, "");
+        preview = new PreviewPanel(null, null);
         // Use the test entry from the Preview settings tab in Preferences:
         preview.setEntry(prevEntry);
 
