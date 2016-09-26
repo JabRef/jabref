@@ -294,7 +294,6 @@ public class MainTable extends JTable {
                 MainTable.incRenderer.setNumber(row);
                 renderer = MainTable.incRenderer;
             }
-            renderer.setHorizontalAlignment(JLabel.CENTER);
         } else if (tableColorCodes || tableResolvedColorCodes) {
             CellRendererMode status = getCellStatus(row, column, tableResolvedColorCodes);
             if (status == CellRendererMode.REQUIRED) {
