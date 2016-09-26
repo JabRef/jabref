@@ -170,6 +170,7 @@ public class PreferencesDialog extends JDialog {
                     JOptionPane.showMessageDialog(PreferencesDialog.this,
                             Localization.lang("You must restart JabRef for this to come into effect."),
                             Localization.lang("Import preferences"), JOptionPane.WARNING_MESSAGE);
+                    this.dispose();
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
