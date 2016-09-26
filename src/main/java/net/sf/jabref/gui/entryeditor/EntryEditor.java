@@ -309,6 +309,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private void addAbstractReviewTabs() {
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
+        //i starts with 1 because 0 is the GeneralTab
         for (int i = 1; i < tabList.getTabCount(); i++) {
             EntryEditorTab newTab = new EntryEditorTab(frame, panel, tabList.getTabFields(i), this, false, false,
                     tabList.getTabName(i));
@@ -324,20 +325,19 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private void addGeneralTab() {
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
         List<String> allGeneralFields = new ArrayList<>();
-        for (int i = 0; i < 1; i++) {
 
-            for (String fieldName : tabList.getTabFields(i)) {
+        for (String fieldName : tabList.getTabFields(0)) {
                 allGeneralFields.add(fieldName);
                 allGeneralFields.add("_" + fieldName);
             }
             EntryEditorTab newTab = new EntryEditorTab(frame, panel, allGeneralFields, this, true, false,
-                    tabList.getTabName(i));
+                tabList.getTabName(0));
             if (newTab.fileListEditor != null) {
                 fileListEditor = newTab.fileListEditor;
             }
-            tabbed.addTab(tabList.getTabName(i), newTab.getPane());
+        tabbed.addTab(tabList.getTabName(0), newTab.getPane());
             tabs.add(newTab);
-        }
+
     }
 
 
