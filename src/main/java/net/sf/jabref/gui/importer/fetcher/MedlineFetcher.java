@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -208,8 +209,6 @@ public class MedlineFetcher implements EntryFetcher {
      * Fetch and parse an medline item from eutils.ncbi.nlm.nih.gov.
      *
      * @param id One or several ids, separated by ","
-     *
-     * @return Will return an empty list on error.
      */
     private static List<BibEntry> fetchMedline(String id, OutputPrinter status) throws IOException {
         String baseUrl = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&rettype=citation&id=" +
@@ -217,7 +216,7 @@ public class MedlineFetcher implements EntryFetcher {
         URL url = new URL(baseUrl);
         URLConnection data = url.openConnection();
         ParserResult result = new MedlineImporter().importDatabase(
-                new BufferedReader(new InputStreamReader(data.getInputStream())));
+                new BufferedReader(new InputStreamReader(data.getInputStream(), StandardCharsets.UTF_8)));
         if (result.hasWarnings()) {
             status.showMessage(result.getErrorMessage());
         }
