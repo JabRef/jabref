@@ -33,7 +33,6 @@ public class MetaData implements Iterable<String> {
 
     public static final String GROUPSTREE = "groupstree";
     private static final String FILE_DIRECTORY = FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX;
-    public static final String SELECTOR_META_PREFIX = "selector_";
     private static final String PROTECTED_FLAG_META = "protectedFlag";
 
     public static final char ESCAPE_CHARACTER = '\\';
@@ -230,15 +229,6 @@ public class MetaData implements Iterable<String> {
         }
     }
 
-    public List<String> getContentSelectors(String fieldName) {
-        List<String> contentSelectors = getData(SELECTOR_META_PREFIX + fieldName);
-        if (contentSelectors == null) {
-            return Collections.emptyList();
-        } else {
-            return contentSelectors;
-        }
-    }
-
     public Optional<String> getDefaultFileDirectory() {
         List<String> fileDirectory = getData(FILE_DIRECTORY);
         if ((fileDirectory == null) || fileDirectory.isEmpty()) {
@@ -278,10 +268,6 @@ public class MetaData implements Iterable<String> {
         putData(PROTECTED_FLAG_META, Collections.singletonList("true"));
     }
 
-    public void setContentSelectors(String fieldName, List<String> contentSelectors) {
-        putData(SELECTOR_META_PREFIX + fieldName, contentSelectors);
-    }
-
     public void setDefaultFileDirectory(String path) {
         putData(FILE_DIRECTORY, Collections.singletonList(path));
     }
@@ -296,10 +282,6 @@ public class MetaData implements Iterable<String> {
 
     public void clearUserFileDirectory(String user) {
         remove(FILE_DIRECTORY + '-' + user);
-    }
-
-    public void clearContentSelectors(String fieldName) {
-        remove(SELECTOR_META_PREFIX + fieldName);
     }
 
     public void markAsNotProtected() {
