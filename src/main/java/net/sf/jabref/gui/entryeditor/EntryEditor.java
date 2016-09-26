@@ -327,9 +327,15 @@ public class EntryEditor extends JPanel implements EntryContainer {
         List<String> allGeneralFields = new ArrayList<>();
 
         for (String fieldName : tabList.getTabFields(0)) {
+            if (!fieldName.equals("file")) {
+
                 allGeneralFields.add(fieldName);
                 allGeneralFields.add("_" + fieldName);
+                System.out.println("<<<<<<<" + fieldName + ">>>>>>>>");
+            } else {
+                allGeneralFields.add(fieldName);
             }
+        }
             EntryEditorTab newTab = new EntryEditorTab(frame, panel, allGeneralFields, this, true, false,
                 tabList.getTabName(0));
             if (newTab.fileListEditor != null) {
