@@ -36,13 +36,10 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.pdf.PdfComment;
-import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.factories.Paddings;
 import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationHighlight;
-
-import static net.sf.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
 
 public class PdfCommentsTab extends JPanel {
 
@@ -267,12 +264,8 @@ public class PdfCommentsTab extends JPanel {
 
         try {
 
-            String pdfReaderPath = JabRefPreferences.getInstance().get(ADOBE_ACROBAT_COMMAND);
-            if(JabRefPreferences.getInstance().get(ADOBE_ACROBAT_COMMAND).equals("")){
-                pdfReaderPath = JabRefPreferences.getInstance().get(JabRefPreferences.SUMATRA_COMMAND);
-            }
             JabRefDesktop.getNativeDesktop().openFileWithApplication("/" + fileNameComboBox.getSelectedItem().toString(),
-                    pdfReaderPath + " /a page=" + commentList.getSelectedValue().getPage());
+                    "acroread /a page=" + commentList.getSelectedValue().getPage());
             System.out.println(commentList.getSelectedValue().getCommentId());
         } catch (IOException e) {
             e.printStackTrace();
