@@ -34,7 +34,7 @@ public class EntryFetchers {
         entryFetchers.add(new DOAJFetcher());
         entryFetchers.add(new SpringerFetcher());
 
-        entryFetchers.add(new SearchBasedEntryFetcher(new ArXiv()));
+        entryFetchers.add(new SearchBasedEntryFetcher(new ArXiv(Globals.prefs.getImportFormatPreferences())));
         entryFetchers.add(new SearchBasedEntryFetcher(new GvkFetcher()));
         entryFetchers.add(new SearchBasedEntryFetcher(new MedlineFetcher()));
         entryFetchers.add(

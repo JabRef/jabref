@@ -94,6 +94,7 @@ import net.sf.jabref.logic.autocompleter.AutoCompleter;
 import net.sf.jabref.logic.autocompleter.AutoCompleterFactory;
 import net.sf.jabref.logic.autocompleter.ContentAutoCompleters;
 import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternUtil;
+import net.sf.jabref.logic.citationstyle.CitationStyleCache;
 import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.logic.exporter.FileSaveSession;
 import net.sf.jabref.logic.exporter.SaveException;
@@ -124,6 +125,7 @@ import net.sf.jabref.model.entry.event.EntryChangedEvent;
 import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.preferences.HighlightMatchingGroupPreferences;
 import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.preferences.PreviewPreferences;
 import net.sf.jabref.shared.DBMSSynchronizer;
 import net.sf.jabref.specialfields.Printed;
 import net.sf.jabref.specialfields.Priority;
@@ -151,12 +153,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private final BibDatabaseContext bibDatabaseContext;
     private final MainTableDataModel tableModel;
 
+    private final CitationStyleCache citationStyleCache;
+
     // To contain instantiated entry editors. This is to save time
     // As most enums, this must not be null
     private BasePanelMode mode = BasePanelMode.SHOWING_NOTHING;
     private EntryEditor currentEditor;
 
-    private PreviewPanel currentPreview;
     private MainTableSelectionListener selectionListener;
 
     private ListEventListener<BibEntry> groupsHighlightListener;
@@ -219,6 +222,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.sidePaneManager = frame.getSidePaneManager();
         this.frame = frame;
         this.tableModel = new MainTableDataModel(getBibDatabaseContext());
+
+        citationStyleCache = new CitationStyleCache(bibDatabaseContext);
 
         setupMainPanel();
 
@@ -694,8 +699,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         }
 
         actions.put(Actions.TOGGLE_PREVIEW, (BaseAction) () -> {
-            boolean enabled = !Globals.prefs.getBoolean(JabRefPreferences.PREVIEW_ENABLED);
-            Globals.prefs.putBoolean(JabRefPreferences.PREVIEW_ENABLED, enabled);
+            PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences();
+            boolean enabled = !previewPreferences.isPreviewPanelEnabled();
+            PreviewPreferences newPreviewPreferences = previewPreferences
+                    .getBuilder()
+                    .withPreviewPanelEnabled(enabled)
+                    .build();
+            Globals.prefs.storePreviewPreferences(newPreviewPreferences);
             setPreviewActiveBasePanels(enabled);
             frame.setPreviewToggle(enabled);
         });
@@ -718,13 +728,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             groupsHighlightListener.listChanged(null);
         });
 
-        actions.put(Actions.SWITCH_PREVIEW, (BaseAction) selectionListener::switchPreview);
-
-        actions.put(Actions.MANAGE_SELECTORS, (BaseAction) () -> {
-            ContentSelectorDialog2 csd = new ContentSelectorDialog2(frame, frame, BasePanel.this, false, null);
-            csd.setLocationRelativeTo(frame);
-            csd.setVisible(true);
-        });
+        actions.put(Actions.NEXT_PREVIEW_STYLE, (BaseAction) selectionListener::nextPreviewStyle);
+        actions.put(Actions.PREVIOUS_PREVIEW_STYLE, (BaseAction) selectionListener::previousPreviewStyle);
 
         actions.put(Actions.EXPORT_TO_CLIPBOARD, new ExportToClipboardAction(frame));
         actions.put(Actions.SEND_AS_EMAIL, new SendAsEMailAction(frame));
@@ -1492,7 +1497,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // otherwise set the bottom component to null.
         if (mode == BasePanelMode.SHOWING_PREVIEW) {
             mode = BasePanelMode.SHOWING_NOTHING;
-            highlightEntry(currentPreview.getEntry());
+            highlightEntry(selectionListener.getPreview().getEntry());
         } else if (mode == BasePanelMode.SHOWING_EDITOR) {
             mode = BasePanelMode.SHOWING_NOTHING;
         } else {
@@ -1510,8 +1515,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         AutoCompletePreferences autoCompletePreferences = new AutoCompletePreferences(Globals.prefs);
         // Set up AutoCompleters for this panel:
         if (Globals.prefs.getBoolean(JabRefPreferences.AUTO_COMPLETE)) {
-            autoCompleters = new ContentAutoCompleters(getDatabase(), bibDatabaseContext.getMetaData(),
-                    autoCompletePreferences, Globals.journalAbbreviationLoader);
+            autoCompleters = new ContentAutoCompleters(getDatabase(), autoCompletePreferences, Globals.journalAbbreviationLoader);
             // ensure that the autocompleters are in sync with entries
             this.getDatabase().registerListener(new AutoCompleteListener());
         } else {
@@ -1568,7 +1572,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void adjustSplitter() {
         if (mode == BasePanelMode.SHOWING_PREVIEW) {
             splitPane.setDividerLocation(
-                    splitPane.getHeight() - Globals.prefs.getInt(JabRefPreferences.PREVIEW_PANEL_HEIGHT));
+                    splitPane.getHeight() - Globals.prefs.getPreviewPreferences().getPreviewPanelHeight());
         } else {
             splitPane.setDividerLocation(
                     splitPane.getHeight() - Globals.prefs.getInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT));
@@ -1689,9 +1693,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         if (mode == BasePanelMode.SHOWING_EDITOR) {
             Globals.prefs.putInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT,
                     splitPane.getHeight() - splitPane.getDividerLocation());
-        } else if (mode == BasePanelMode.SHOWING_PREVIEW) {
-            Globals.prefs.putInt(JabRefPreferences.PREVIEW_PANEL_HEIGHT,
-                    splitPane.getHeight() - splitPane.getDividerLocation());
         }
         mode = BasePanelMode.SHOWING_EDITOR;
         currentEditor = editor;
@@ -1709,8 +1710,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public void showPreview(PreviewPanel preview) {
         mode = BasePanelMode.SHOWING_PREVIEW;
-        currentPreview = preview;
         splitPane.setBottomComponent(preview);
+        adjustSplitter();
     }
 
     /**
@@ -1775,7 +1776,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public void ensureNotShowingBottomPanel(BibEntry entry) {
         if (((mode == BasePanelMode.SHOWING_EDITOR) && (currentEditor.getEntry() == entry))
-                || ((mode == BasePanelMode.SHOWING_PREVIEW) && (currentPreview.getEntry() == entry))) {
+                || ((mode == BasePanelMode.SHOWING_PREVIEW) && (selectionListener.getPreview().getEntry() == entry))) {
             hideBottomComponent();
         }
     }
@@ -1801,18 +1802,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         if (isShowingEditor()) {
             final EntryEditor editor = (EntryEditor) splitPane.getBottomComponent();
             editor.storeCurrentEdit();
-        }
-    }
-
-    /**
-     * This method iterates through all existing entry editors in this BasePanel, telling each to update all its
-     * instances of FieldContentSelector. This is done to ensure that the list of words in each selector is up-to-date
-     * after the user has made changes in the Manage dialog.
-     */
-    public void updateAllContentSelectors() {
-        for (Map.Entry<String, EntryEditor> stringEntryEditorEntry : entryEditors.entrySet()) {
-            EntryEditor ed = stringEntryEditorEntry.getValue();
-            ed.updateAllContentSelectors();
         }
     }
 
@@ -1984,8 +1973,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public void saveDividerLocation() {
         if (mode == BasePanelMode.SHOWING_PREVIEW) {
-            Globals.prefs.putInt(JabRefPreferences.PREVIEW_PANEL_HEIGHT,
-                    splitPane.getHeight() - splitPane.getDividerLocation());
+            int previewPanelHeight = splitPane.getHeight() - splitPane.getDividerLocation();
+            PreviewPreferences previewPreferences = Globals.prefs.getPreviewPreferences()
+                    .getBuilder()
+                    .withPreviewPanelHeight(previewPanelHeight)
+                    .build();
+            Globals.prefs.storePreviewPreferences(previewPreferences);
         } else if (mode == BasePanelMode.SHOWING_EDITOR) {
             Globals.prefs.putInt(JabRefPreferences.ENTRY_EDITOR_HEIGHT,
                     splitPane.getHeight() - splitPane.getDividerLocation());
@@ -2100,11 +2093,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         @Override
         public void action() throws Exception {
-            if (currentPreview == null) {
-                selectionListener.setPreviewActive(true);
-                showPreview(selectionListener.getPreview());
-            }
-            currentPreview.getPrintAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
+            selectionListener.setPreviewActive(true);
+            showPreview(selectionListener.getPreview());
+            selectionListener.getPreview().getPrintAction().actionPerformed(new ActionEvent(this, ActionEvent.ACTION_PERFORMED, null));
         }
     }
 
@@ -2387,7 +2378,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             Map<BibEntry, List<File>> result;
             if (Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
                 String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
-                result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
+                result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp,
+                        Globals.prefs.getKeywordDelimiter());
             } else {
                 boolean autoLinkExactKeyOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
                 result = FileUtil.findAssociatedFiles(entries, extensions, dirs, autoLinkExactKeyOnly);
@@ -2453,4 +2445,17 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void setCurrentSearchQuery(SearchQuery currentSearchQuery) {
         this.currentSearchQuery = currentSearchQuery;
     }
+
+    public CitationStyleCache getCitationStyleCache() {
+        return citationStyleCache;
+    }
+
+    public PreviewPanel getPreviewPanel() {
+        if (selectionListener == null) {
+            // only occurs if this is called while instantiating this BasePanel
+            return null;
+        }
+        return selectionListener.getPreview();
+    }
+
 }
