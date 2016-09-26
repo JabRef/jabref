@@ -14,6 +14,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ### Changed
 - Add session restoring functionality for shared database. Related to [#1703](https://github.com/JabRef/jabref/issues/1703)
 - Implementation of LiveUpdate for PostgreSQL & Oracle systems. Related to [#970](https://github.com/JabRef/jabref/issues/970).
+- [koppor#31](https://github.com/koppor/jabref/issues/31): Number column in the main table is always Left aligned
 - Added support for [1.0.1 CitationStyles](http://citationstyles.org/)
 - You can set and cycle between different preview styles (including CitationStyles)
 - Added fetcher for [MathSciNet](http://www.ams.org/mathscinet), [zbMATH](https://www.zbmath.org/) and [Astrophysics Data System](http://www.adsabs.harvard.edu/)
