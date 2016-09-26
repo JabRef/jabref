@@ -11,8 +11,6 @@ import net.sf.jabref.logic.importer.util.OAI2Handler;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.IdGenerator;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -27,8 +25,6 @@ import org.xml.sax.SAXException;
  * @author Christopher Oezbek
  */
 public class OAI2HandlerFetcherTest {
-
-    private static final Log LOGGER = LogFactory.getLog(OAI2HandlerFetcherTest.class);
 
     protected OAI2Handler handler;
 
