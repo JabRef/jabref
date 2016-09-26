@@ -1,7 +1,5 @@
 package net.sf.jabref.logic.importer.fetcher;
 
-import net.sf.jabref.preferences.JabRefPreferences;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,7 +11,7 @@ public class MedlineFetcherTest {
 
     @Before
     public void setUp(){
-        fetcher = new MedlineFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
+        fetcher = new MedlineFetcher();
     }
 
     @Test

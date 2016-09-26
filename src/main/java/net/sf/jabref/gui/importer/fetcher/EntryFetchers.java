@@ -36,10 +36,10 @@ public class EntryFetchers {
 
         entryFetchers.add(new SearchBasedEntryFetcher(new ArXiv()));
         entryFetchers.add(new SearchBasedEntryFetcher(new GvkFetcher()));
+        entryFetchers.add(new SearchBasedEntryFetcher(new MedlineFetcher()));
         entryFetchers.add(
                 new SearchBasedEntryFetcher(new AstrophysicsDataSystem(Globals.prefs.getImportFormatPreferences())));
         entryFetchers.add(new SearchBasedEntryFetcher(new MathSciNet(Globals.prefs.getImportFormatPreferences())));
-        entryFetchers.add(new SearchBasedEntryFetcher(new MedlineFetcher(Globals.prefs.getImportFormatPreferences())));
         entryFetchers.add(new SearchBasedEntryFetcher(new zbMATH(Globals.prefs.getImportFormatPreferences())));
     }
 
