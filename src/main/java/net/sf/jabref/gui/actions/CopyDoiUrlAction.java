@@ -1,7 +1,6 @@
 package net.sf.jabref.gui.actions;
 
 import java.awt.event.ActionEvent;
-import java.net.URI;
 import java.util.Optional;
 
 import javax.swing.AbstractAction;
@@ -34,16 +33,10 @@ public class CopyDoiUrlAction extends AbstractAction {
     public void actionPerformed(ActionEvent e) {
         identifier = component == null ? identifier : component.getText();
 
-        Optional<DOI> doiOptional = DOI.build(identifier);
-        if (doiOptional.isPresent()) {
-            DOI doi = doiOptional.get();
-            String url = "";
-            Optional<URI> doiUri = doi.getURI();
-            if (doiUri.isPresent()) {
-                url = doiUri.get().toASCIIString();
-            }
+        Optional<String> urlOptional = DOI.build(identifier).map(DOI::getURIAsASCIIString);
+        if (urlOptional.isPresent()) {
             ClipBoardManager clipBoard = new ClipBoardManager();
-            clipBoard.setClipboardContents(url);
+            clipBoard.setClipboardContents(urlOptional.get());
             JabRefGUI.getMainFrame().output(Localization.lang("The link has been copied to the clipboard."));
         } else {
             JabRefGUI.getMainFrame().output(Localization.lang("Invalid DOI: '%0'.", identifier));
