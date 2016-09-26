@@ -52,7 +52,6 @@ import javax.swing.text.JTextComponent;
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.EntryContainer;
-import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
@@ -160,8 +159,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private final BasePanel panel;
 
-    private final Set<FieldContentSelector> contentSelectors = new HashSet<>();
-
     private boolean updateSource = true; // This can be set to false to stop the source
     private boolean movingToDifferentEntry; // Indicates that we are about to go to the next or previous entry
     private boolean validEntry = true;
@@ -239,8 +236,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         if ((type.getOptionalFields() != null) && !type.getOptionalFields().isEmpty()) {
             if (!frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
-                displayedOptionalFields.addAll(type.getOptionalFields());
-
                 addOptionalTab(type);
             } else {
                 displayedOptionalFields.addAll(type.getPrimaryOptionalFields());
@@ -537,10 +532,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         } else if (fieldExtras.contains(FieldProperty.JOURNAL_NAME)) {
             // Add controls for switching between abbreviated and full journal names.
             // If this field also has a FieldContentSelector, we need to combine these.
-            return FieldExtraComponents.getJournalExtraComponent(frame, panel, editor, entry, contentSelectors,
-                    getStoreFieldAction());
-        } else if (!panel.getBibDatabaseContext().getMetaData().getContentSelectors(fieldName).isEmpty()) {
-            return FieldExtraComponents.getSelectorExtraComponent(frame, panel, editor, contentSelectors, getStoreFieldAction());
+            return FieldExtraComponents.getJournalExtraComponent(panel, editor, entry, getStoreFieldAction());
         } else if (fieldExtras.contains(FieldProperty.DOI)) {
             return FieldExtraComponents.getDoiExtraComponent(panel, this, editor);
         } else if (fieldExtras.contains(FieldProperty.EPRINT)) {
@@ -561,8 +553,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
             return FieldExtraComponents.getPaginationExtraComponent(editor, this);
         } else if (fieldExtras.contains(FieldProperty.TYPE)) {
             return FieldExtraComponents.getTypeExtraComponent(editor, this, "patent".equalsIgnoreCase(entry.getType()));
-        } else if (fieldExtras.contains(FieldProperty.CROSSREF)) {
-            return FieldExtraComponents.getCrossrefExtraComponent(editor, frame.getCurrentBasePanel());
         }
         return Optional.empty();
     }
@@ -948,14 +938,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
         for (Object tab : tabs) {
             if (tab instanceof EntryEditorTab) {
                 ((EntryEditorTab) tab).validateAllFields();
-            }
-        }
-    }
-
-    public void updateAllContentSelectors() {
-        if (!contentSelectors.isEmpty()) {
-            for (FieldContentSelector contentSelector : contentSelectors) {
-                contentSelector.rebuildComboBox();
             }
         }
     }

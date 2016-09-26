@@ -6,7 +6,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -19,8 +18,6 @@ import javax.swing.text.JTextComponent;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FieldContentSelector;
-import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.date.DatePickerButton;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor.StoreFieldAction;
@@ -36,8 +33,6 @@ import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.entry.FieldProperty;
-import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -53,24 +48,16 @@ public class FieldExtraComponents {
      * Add controls for switching between abbreviated and full journal names.
      * If this field also has a FieldContentSelector, we need to combine these.
      *
-     * @param frame
      * @param panel
      * @param editor
      * @param entry
-     * @param contentSelectors
      * @param storeFieldAction
      * @return
      */
-    public static Optional<JComponent> getJournalExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
-            BibEntry entry, Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
+    public static Optional<JComponent> getJournalExtraComponent(BasePanel panel, FieldEditor editor, BibEntry entry,
+            StoreFieldAction storeFieldAction) {
         JPanel controls = new JPanel();
         controls.setLayout(new BorderLayout());
-        if (!panel.getBibDatabaseContext().getMetaData().getContentSelectors(editor.getFieldName()).isEmpty()) {
-            FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor, storeFieldAction, false,
-                    ", ");
-            contentSelectors.add(ws);
-            controls.add(ws, BorderLayout.NORTH);
-        }
 
         // Button to toggle abbreviated/full journal names
         JButton button = new JButton(Localization.lang("Toggle abbreviation"));
@@ -394,26 +381,6 @@ public class FieldExtraComponents {
     }
 
     /**
-     * Return a button opening a content selector for fields where one exists
-     *
-     * @param frame
-     * @param panel
-     * @param editor
-     * @param contentSelectors
-     * @param storeFieldAction
-     * @return
-     */
-    public static Optional<JComponent> getSelectorExtraComponent(JabRefFrame frame, BasePanel panel, FieldEditor editor,
-            Set<FieldContentSelector> contentSelectors, StoreFieldAction storeFieldAction) {
-        FieldContentSelector ws = new FieldContentSelector(frame, panel, frame, editor,
-                storeFieldAction, false,
-                InternalBibtexFields.getFieldProperties(editor.getFieldName())
-                        .contains(FieldProperty.PERSON_NAMES) ? " and " : ", ");
-        contentSelectors.add(ws);
-        return Optional.of(ws);
-    }
-
-    /**
      * Set up field such that double click inserts the current date
      * If isDataPicker is True, a button with a data picker is returned
      *
@@ -546,53 +513,6 @@ public class FieldExtraComponents {
             entryEditor.updateField(fieldEditor);
         });
         return Optional.of(gender);
-
-    }
-
-    /**
-     * Return a button which allows to go to the parent entry of the crossref field
-     * @param fieldEditor The FieldEditor component to get the entry key from
-     * @param panel The current BasePanel
-     * @return
-     */
-
-    public static Optional<JComponent> getCrossrefExtraComponent(FieldEditor fieldEditor,
-            BasePanel panel) {
-        JButton button = new JButton(Localization.lang("Select"));
-        JTextComponent crossref = (JTextComponent) fieldEditor;
-
-        button.addActionListener(
-                actionEvent -> panel.getDatabase().getEntryByKey(crossref.getText()).ifPresent(e -> panel.highlightEntry(e))
-        );
-
-        // enable/disable button
-        crossref.getDocument().addDocumentListener(new DocumentListener() {
-
-            @Override
-            public void changedUpdate(DocumentEvent documentEvent) {
-                checkValidKey();
-            }
-
-            @Override
-            public void insertUpdate(DocumentEvent documentEvent) {
-                checkValidKey();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent documentEvent) {
-                checkValidKey();
-            }
-
-            private void checkValidKey() {
-                if (panel.getDatabase().getEntryByKey(crossref.getText()) != null) {
-                    button.setEnabled(true);
-                } else {
-                    button.setEnabled(false);
-                }
-            }
-        });
-
-        return Optional.of(button);
 
     }
 

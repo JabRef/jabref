@@ -39,7 +39,7 @@ public class DoiFetcherTest {
         bibEntryDecker2007.setField("author", "Gero Decker and Oliver Kopp and Frank Leymann and Mathias Weske");
         bibEntryDecker2007.setField("booktitle", "{IEEE} International Conference on Web Services ({ICWS} 2007)");
         bibEntryDecker2007.setField("month", "jul");
-        bibEntryDecker2007.setField("publisher", "Institute of Electrical {\\&} Electronics Engineers ({IEEE})");
+        bibEntryDecker2007.setField("publisher", "Institute of Electrical and Electronics Engineers ({IEEE})");
         bibEntryDecker2007.setField("title", "{BPEL}4Chor: Extending {BPEL} for Modeling Choreographies");
         bibEntryDecker2007.setField("url", "http://dx.doi.org/10.1109/ICWS.2007.59");
         bibEntryDecker2007.setField("year", "2007");

@@ -28,11 +28,11 @@ public class Actions {
     public static final String FOCUS_TABLE = "focusTable";
     public static final String FORWARD = "forward";
     public static final String MAKE_KEY = "makeKey";
-    public static final String MANAGE_SELECTORS = "manageSelectors";
     public static final String MARK_ENTRIES = "markEntries";
     public static final String MERGE_DATABASE = "mergeDatabase";
     public static final String MERGE_ENTRIES = "mergeEntries";
     public static final String MERGE_WITH_FETCHED_ENTRY = "mergeWithFetchedEntry";
+    public static final String NEXT_PREVIEW_STYLE = "nextPreviewStyle";
     public static final String MOVE_TO_GROUP = "moveToGroup";
     public static final String OPEN_CONSOLE = "openConsole";
     public static final String OPEN_EXTERNAL_FILE = "openExternalFile";
@@ -40,6 +40,7 @@ public class Actions {
     public static final String OPEN_URL = "openUrl";
     public static final String PASTE = "paste";
     public static final String PLAIN_TEXT_IMPORT = "plainTextImport";
+    public static final String PREVIOUS_PREVIEW_STYLE = "previousPreviewStyle";
     public static final String PULL_CHANGES_FROM_SHARED_DATABASE = "pullChangesFromSharedDatabase";
     public static final String REDO = "redo";
     public static final String REMOVE_FROM_GROUP = "removeFromGroup";
@@ -53,7 +54,6 @@ public class Actions {
     public static final String GLOBAL_SEARCH = "globalSearch";
     public static final String SELECT_ALL = "selectAll";
     public static final String SEND_AS_EMAIL = "sendAsEmail";
-    public static final String SWITCH_PREVIEW = "switchPreview";
     public static final String TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ALL = "toggleHighlightGroupsMatchingAll";
     public static final String TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_ANY = "toggleHighlightGroupsMatchingAny";
     public static final String TOGGLE_HIGHLIGHTS_GROUPS_MATCHING_DISABLE = "toggleHighlightGroupsMatchingDisable";

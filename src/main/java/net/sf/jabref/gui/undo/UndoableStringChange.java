@@ -2,8 +2,8 @@ package net.sf.jabref.gui.undo;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.BibtexString;
+import net.sf.jabref.model.strings.StringUtil;
 
 public class UndoableStringChange extends AbstractUndoableJabRefEdit {
 

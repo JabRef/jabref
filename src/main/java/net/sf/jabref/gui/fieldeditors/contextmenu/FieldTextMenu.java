@@ -19,7 +19,7 @@ import net.sf.jabref.gui.fieldeditors.TextAreaForHiddenField;
 import net.sf.jabref.gui.fieldeditors.TextAreaForVisibleField;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 public class FieldTextMenu implements MouseListener {
     private final FieldEditor field;

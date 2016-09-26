@@ -21,22 +21,22 @@ public class SearchQueryTest {
 
     @Test
     public void testIsContainsBasedSearch() {
-        assertTrue(new SearchQuery("asdf", true, false).isContainsBasedSearch());
+        assertFalse(new SearchQuery("asdf", true, false).isContainsBasedSearch());
         assertFalse(new SearchQuery("asdf", true, true).isContainsBasedSearch());
         assertFalse(new SearchQuery("author=asdf", true, false).isContainsBasedSearch());
     }
 
     @Test
     public void testIsGrammarBasedSearch() {
-        assertFalse(new SearchQuery("asdf", true, false).isGrammarBasedSearch());
-        assertFalse(new SearchQuery("asdf", true, true).isGrammarBasedSearch());
+        assertTrue(new SearchQuery("asdf", true, false).isGrammarBasedSearch());
+        assertTrue(new SearchQuery("asdf", true, true).isGrammarBasedSearch());
         assertTrue(new SearchQuery("author=asdf", true, false).isGrammarBasedSearch());
     }
 
     @Test
     public void testGrammarSearch() {
         BibEntry entry = new BibEntry();
-        entry.addKeyword("one two", ", ");
+        entry.addKeyword("one two", ',');
         SearchQuery searchQuery = new SearchQuery("keywords=\"one two\"", false, false);
         assertTrue(searchQuery.isMatch(entry));
     }
@@ -66,6 +66,53 @@ public class SearchQueryTest {
         assertTrue(searchQuery.isMatch(e));
     }
 
+    @Test
+    public void testSearchMatchesSingleKeywordNotPart() {
+        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
+        e.setField("keywords", "banana, pineapple, orange");
+
+        SearchQuery searchQuery = new SearchQuery("anykeyword==apple", false, false);
+        assertFalse(searchQuery.isMatch(e));
+    }
+
+    @Test
+    public void testSearchMatchesSingleKeyword() {
+        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
+        e.setField("keywords", "banana, pineapple, orange");
+
+        SearchQuery searchQuery = new SearchQuery("anykeyword==pineapple", false, false);
+        assertTrue(searchQuery.isMatch(e));
+    }
+
+    @Test
+    public void testSearchAllFields() {
+        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
+        e.setField("title", "Fruity features");
+        e.setField("keywords", "banana, pineapple, orange");
+
+        SearchQuery searchQuery = new SearchQuery("anyfield==\"fruity features\"", false, false);
+        assertTrue(searchQuery.isMatch(e));
+    }
+
+    @Test
+    public void testSearchAllFieldsNotForSpecificField() {
+        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
+        e.setField("title", "Fruity features");
+        e.setField("keywords", "banana, pineapple, orange");
+
+        SearchQuery searchQuery = new SearchQuery("anyfield=fruit and keywords!=banana", false, false);
+        assertFalse(searchQuery.isMatch(e));
+    }
+
+    @Test
+    public void testSearchAllFieldsAndSpecificField() {
+        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
+        e.setField("title", "Fruity features");
+        e.setField("keywords", "banana, pineapple, orange");
+
+        SearchQuery searchQuery = new SearchQuery("anyfield=fruit and keywords=apple", false, false);
+        assertTrue(searchQuery.isMatch(e));
+    }
 
     @Test
     public void testIsMatch() {
@@ -90,7 +137,7 @@ public class SearchQueryTest {
 
     @Test
     public void testIsNotValidQueryContainsBracketNotAsRegEx() {
-        assertFalse(new SearchQuery("asdf[", true, true).isValid());
+        assertTrue(new SearchQuery("asdf[", true, true).isValid());
     }
 
     @Test
@@ -105,7 +152,7 @@ public class SearchQueryTest {
 
     @Test
     public void testIsValidQueryContainsBracketAsRegEx() {
-        assertFalse(new SearchQuery("asdf[", true, true).isValid());
+        assertTrue(new SearchQuery("asdf[", true, true).isValid());
     }
 
     @Test
@@ -127,4 +174,16 @@ public class SearchQueryTest {
     public void testIsValidQueryWithNumbersAndEqualSignNotAsRegEx() {
         assertTrue(new SearchQuery("author=123", true, false).isValid());
     }
+
+    @Test
+    public void isMatchedForNormalAndFieldBasedSearchMixed() {
+        BibEntry entry = new BibEntry();
+        entry.setType(BibtexEntryTypes.ARTICLE);
+        entry.setField("author", "asdf");
+        entry.setField("abstract", "text");
+
+        assertTrue(new SearchQuery("text AND author=asdf", true, true).isMatch(entry));
+
+    }
+
 }

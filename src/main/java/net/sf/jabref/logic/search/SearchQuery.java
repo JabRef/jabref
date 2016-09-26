@@ -1,9 +1,10 @@
 package net.sf.jabref.logic.search;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.search.rules.describer.SearchDescriber;
 import net.sf.jabref.logic.search.rules.describer.SearchDescribers;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.search.SearchMatcher;
@@ -11,6 +12,7 @@ import net.sf.jabref.model.search.rules.ContainBasedSearchRule;
 import net.sf.jabref.model.search.rules.GrammarBasedSearchRule;
 import net.sf.jabref.model.search.rules.SearchRule;
 import net.sf.jabref.model.search.rules.SearchRules;
+import net.sf.jabref.model.search.rules.SentenceAnalyzer;
 
 public class SearchQuery implements SearchMatcher {
 
@@ -24,8 +26,8 @@ public class SearchQuery implements SearchMatcher {
         this.query = Objects.requireNonNull(query);
         this.caseSensitive = caseSensitive;
         this.regularExpression = regularExpression;
-        this.rule = Objects.requireNonNull(getSearchRule());
-        this.description = Objects.requireNonNull(getSearchDescriber().getDescription());
+        this.rule = SearchRules.getSearchRuleByQuery(query, caseSensitive, regularExpression);
+        this.description = SearchDescribers.getSearchDescriberFor(rule, query).getDescription();
     }
 
     @Override
@@ -35,23 +37,15 @@ public class SearchQuery implements SearchMatcher {
 
     @Override
     public boolean isMatch(BibEntry entry) {
-        return this.getRule().applyRule(getQuery(), entry);
+        return rule.applyRule(getQuery(), entry);
     }
 
     public boolean isValid() {
-        return this.getRule().validateSearchStrings(getQuery());
+        return rule.validateSearchStrings(getQuery());
     }
 
     public boolean isContainsBasedSearch() {
-        return this.getRule() instanceof ContainBasedSearchRule;
-    }
-
-    private SearchRule getSearchRule() {
-        return SearchRules.getSearchRuleByQuery(getQuery(), isCaseSensitive(), isRegularExpression());
-    }
-
-    private SearchDescriber getSearchDescriber() {
-        return SearchDescribers.getSearchDescriberFor(getSearchRule(), getQuery());
+        return rule instanceof ContainBasedSearchRule;
     }
 
     private String getCaseSensitiveDescription() {
@@ -94,7 +88,7 @@ public class SearchQuery implements SearchMatcher {
     }
 
     public boolean isGrammarBasedSearch() {
-        return this.getRule() instanceof GrammarBasedSearchRule;
+        return rule instanceof GrammarBasedSearchRule;
     }
 
     public String getQuery() {
@@ -113,7 +107,17 @@ public class SearchQuery implements SearchMatcher {
         return description;
     }
 
-    private SearchRule getRule() {
-        return rule;
+    /**
+     * Returns a list of words this query searches for.
+     * The returned strings can be a regular expression.
+     */
+    public List<String> getSearchWords() {
+        if (isRegularExpression()) {
+            return Collections.singletonList(getQuery());
+        } else {
+            // Parses the search query for valid words and returns a list these words.
+            // For example, "The great Vikinger" will give ["The","great","Vikinger"]
+            return (new SentenceAnalyzer(getQuery())).getWords();
+        }
     }
 }
