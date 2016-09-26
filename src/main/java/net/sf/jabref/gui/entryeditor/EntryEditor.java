@@ -18,7 +18,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -308,12 +307,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         addGeneralTab();
         // general fields from preferences
-        addGeneralTabs();
+        addAbstractReviewTabs();
         // source tab
         addSourceTab();
     }
 
-    private void addGeneralTabs() {
+    private void addAbstractReviewTabs() {
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
         for (int i = 1; i < tabList.getTabCount(); i++) {
             EntryEditorTab newTab = new EntryEditorTab(frame, panel, tabList.getTabFields(i), this, false, false,
@@ -328,19 +327,22 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private void addGeneralTab() {
-        List<String> generalFields = Arrays.asList(Globals.prefs.get(JabRefPreferences.CUSTOM_TAB_FIELDS + "_def0"));
+        EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
         List<String> allGeneralFields = new ArrayList<>();
-        for (String fieldName : generalFields) {
-            allGeneralFields.add(fieldName);
-            allGeneralFields.add("_" + fieldName);
+        for (int i = 0; i < 1; i++) {
+
+            for (String fieldName : tabList.getTabFields(i)) {
+                allGeneralFields.add(fieldName);
+                allGeneralFields.add("_" + fieldName);
+            }
+            EntryEditorTab newTab = new EntryEditorTab(frame, panel, allGeneralFields, this, true, false,
+                    tabList.getTabName(i));
+            if (newTab.fileListEditor != null) {
+                fileListEditor = newTab.fileListEditor;
+            }
+            tabbed.addTab(tabList.getTabName(i), newTab.getPane());
+            tabs.add(newTab);
         }
-        EntryEditorTab generalPanel = new EntryEditorTab(frame, panel, allGeneralFields, this, true, false,
-                Localization.lang("General"));
-        if (generalPanel.fileListEditor != null) {
-            fileListEditor = generalPanel.fileListEditor;
-        }
-        tabbed.addTab(Localization.lang("General"), null, generalPanel.getPane());
-        tabs.add(generalPanel);
     }
 
 
