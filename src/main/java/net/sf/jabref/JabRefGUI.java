@@ -30,7 +30,6 @@ import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.Version;
-import net.sf.jabref.migrations.PreferencesMigrations;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 
@@ -74,10 +73,6 @@ public class JabRefGUI {
     }
 
     private void openWindow() {
-        // Perform checks and changes for users with a preference set from an older JabRef version.
-        PreferencesMigrations.upgradeSortOrder();
-        PreferencesMigrations.upgradeFaultyEncodingStrings();
-        PreferencesMigrations.upgradeLabelPatternToBibtexKeyPattern();
 
         // This property is set to make the Mac OSX Java VM move the menu bar to the top of the screen
         if (OS.OS_X) {

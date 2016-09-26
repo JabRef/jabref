@@ -1,7 +1,6 @@
 package net.sf.jabref.gui.maintable;
 
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -231,18 +230,14 @@ public class MainTable extends JTable {
 
     @Override
     public String getToolTipText(MouseEvent e) {
-
-        // Set tooltip text for all columns which are not fully displayed
-
-        String toolTipText = null;
+        String toolTipText = super.getToolTipText(e);
         Point p = e.getPoint();
         int col = columnAtPoint(p);
         int row = rowAtPoint(p);
-        Component comp = prepareRenderer(getCellRenderer(row, col), row, col);
 
         Rectangle bounds = getCellRect(row, col, false);
-
-        Dimension d = comp.getPreferredSize();
+        Dimension d = prepareRenderer(getCellRenderer(row, col), row, col).getPreferredSize();
+        // if the content of the cell is bigger than the cell itself render it as the tooltip (thus throwing the original tooltip away)
         if ((d != null) && (d.width > bounds.width) && (getValueAt(row, col) != null)) {
             toolTipText = getValueAt(row, col).toString();
         }

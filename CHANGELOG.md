@@ -50,10 +50,12 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Prohibit more than one connections to the same shared database.
 - Implemented integrity check for `journaltitle` field: BibLaTeX field only (BibTeX)
 - [#463](https://github.com/JabRef/jabref/issues/463): Disable certain menu items, toolbar buttons and context menu items while multiple entries are selected
+- [#490](https://github.com/JabRef/jabref/issues/490) Added right click menu to main table and entry editor to allow copying doi url
 - Generalize German translation of database into "Datenbank"
 - Improve language quality of the German translation of shared database
 
 ### Fixed
+- Fixed [koppor#160](https://github.com/koppor/jabref/issues/160): Tooltips now working in the main table
 - Fixed [#2054](https://github.com/JabRef/jabref/issues/2054): Ignoring a new version now works as expected
 - Fixed selecting an entry out of multiple duplicates
 - Fixed [#617](https://github.com/JabRef/jabref/issues/617): `Enter` in global search opens the selected entry & `Enter` in search dialog window opens the selected entry
