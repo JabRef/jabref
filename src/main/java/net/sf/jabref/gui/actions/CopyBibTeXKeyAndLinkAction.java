@@ -12,7 +12,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
 /**
- * This class will copy each selected entry's BibTeX key as a hyperlink to it's url to the clipboard.
+ * This class will copy each selected entry's BibTeX key as a hyperlink to its url to the clipboard.
  * In case an entry doesn't have a BibTeX key it will not be copied.
  * In case an entry doesn't have an url this will only copy the BibTeX key.
  */
