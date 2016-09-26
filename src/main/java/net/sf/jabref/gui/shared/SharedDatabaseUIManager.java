@@ -1,7 +1,6 @@
 package net.sf.jabref.gui.shared;
 
 import java.sql.SQLException;
-
 import java.util.Objects;
 
 import javax.swing.JOptionPane;
@@ -31,12 +30,10 @@ import com.google.common.eventbus.Subscribe;
 public class SharedDatabaseUIManager {
 
     private final JabRefFrame jabRefFrame;
-    private final String keywordSeparator;
     private DBMSSynchronizer dbmsSynchronizer;
 
-    public SharedDatabaseUIManager(JabRefFrame jabRefFrame, String keywordSeparator) {
+    public SharedDatabaseUIManager(JabRefFrame jabRefFrame) {
         this.jabRefFrame = jabRefFrame;
-        this.keywordSeparator = keywordSeparator;
     }
 
     @Subscribe
@@ -104,7 +101,7 @@ public class SharedDatabaseUIManager {
         JabRefFrame frame = JabRefGUI.getMainFrame();
         BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
         BibDatabaseContext bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode), DatabaseLocation.SHARED,
-                keywordSeparator);
+                Globals.prefs.getKeywordDelimiter());
 
         dbmsSynchronizer = bibDatabaseContext.getDBMSSynchronizer();
         dbmsSynchronizer.openSharedDatabase(dbmsConnectionProperties);

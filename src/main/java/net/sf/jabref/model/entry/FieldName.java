@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import net.sf.jabref.model.strings.StringUtil;
+
 /**
  * String constants for BibTeX entry field names
  *
@@ -157,6 +159,6 @@ public class FieldName {
         if (displayNames.containsKey(lowercaseField)) {
             return displayNames.get(lowercaseField);
         }
-        return EntryUtil.capitalizeFirst(field);
+        return StringUtil.capitalizeFirst(field);
     }
 }

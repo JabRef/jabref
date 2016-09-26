@@ -6,16 +6,20 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
-import java.util.Set;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.formatter.Formatters;
 import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.entry.Keyword;
+import net.sf.jabref.model.entry.KeywordList;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.strings.StringUtil;
 
@@ -397,7 +401,7 @@ public class BibtexKeyPatternUtil {
                     // check whether there is a modifier on the end such as
                     // ":lower"
                     List<String> parts = parseFieldMarker(typeListEntry);
-                    String label = makeLabel(entry, parts.get(0));
+                    String label = makeLabel(entry, parts.get(0), bibtexKeyPatternPreferences.getKeywordDelimiter());
 
                     // apply modifier if present
                     if (parts.size() > 1) {
@@ -487,17 +491,13 @@ public class BibtexKeyPatternUtil {
      * @param offset The number of initial items in the modifiers array to skip.
      * @return The modified label.
      */
-    public static String applyModifiers(String label, List<String> parts, int offset) {
+    public static String applyModifiers(final String label, final List<String> parts, final int offset) {
         String resultingLabel = label;
         if (parts.size() > offset) {
             for (int j = offset; j < parts.size(); j++) {
                 String modifier = parts.get(j);
 
-                if ("lower".equals(modifier)) {
-                    resultingLabel = resultingLabel.toLowerCase(Locale.ENGLISH);
-                } else if ("upper".equals(modifier)) {
-                    resultingLabel = resultingLabel.toUpperCase(Locale.ENGLISH);
-                } else if ("abbr".equals(modifier)) {
+                if ("abbr".equals(modifier)) {
                     // Abbreviate - that is,
                     StringBuilder abbreviateSB = new StringBuilder();
                     String[] words = resultingLabel.replaceAll("[\\{\\}']", "")
@@ -507,25 +507,32 @@ public class BibtexKeyPatternUtil {
                             abbreviateSB.append(word.charAt(0));
                         }
                     }
-                    resultingLabel = abbreviateSB.toString();
-
-                } else if (!modifier.isEmpty() && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
-                    // Alternate text modifier in parentheses. Should be inserted if
-                    // the label is empty:
-                    if (resultingLabel.isEmpty() && (modifier.length() > 2)) {
-                        return modifier.substring(1, modifier.length() - 1);
-                    }
-
+                    resultingLabel =  abbreviateSB.toString();
                 } else {
-                    LOGGER.info("Key generator warning: unknown modifier '"
-                            + modifier + "'.");
+                    Optional<Formatter> formatter = Formatters.getFormatterForModifier(modifier);
+                    if (formatter.isPresent()) {
+                        resultingLabel = formatter.get().format(label);
+                    } else if (!modifier.isEmpty() && modifier.length()>= 2 && (modifier.charAt(0) == '(') && modifier.endsWith(")")) {
+                        // Alternate text modifier in parentheses. Should be inserted if
+                        // the label is empty:
+                        if (label.isEmpty() && (modifier.length() > 2)) {
+                            resultingLabel = modifier.substring(1, modifier.length() - 1);
+                        } else {
+                            resultingLabel = label;
+                        }
+                    } else {
+                        LOGGER.info("Key generator warning: unknown modifier '"
+                                + modifier + "'.");
+                        resultingLabel = label;
+                    }
                 }
             }
         }
+
         return resultingLabel;
     }
 
-    public static String makeLabel(BibEntry entry, String value) {
+    public static String makeLabel(BibEntry entry, String value, Character keywordDelimiter) {
         String val = value;
         try {
             if (val.startsWith("auth") || val.startsWith("pureauth")) {
@@ -676,13 +683,13 @@ public class BibtexKeyPatternUtil {
             } else if (val.matches("keyword\\d+")) {
                 // according to LabelPattern.php, it returns keyword number n
                 int num = Integer.parseInt(val.substring(7));
-                Set<String> separatedKeywords = entry.getKeywords();
+                KeywordList separatedKeywords = entry.getKeywords(keywordDelimiter);
                 if (separatedKeywords.size() < num) {
                     // not enough keywords
                     return "";
                 } else {
                     // num counts from 1 to n, but index in arrayList count from 0 to n-1
-                    return new ArrayList<>(separatedKeywords).get(num-1);
+                    return separatedKeywords.get(num-1).toString();
                 }
             } else if (val.matches("keywords\\d*")) {
                 // return all keywords, not separated
@@ -692,13 +699,12 @@ public class BibtexKeyPatternUtil {
                 } else {
                     num = Integer.MAX_VALUE;
                 }
-                Set<String> separatedKeywords = entry.getKeywords();
+                KeywordList separatedKeywords = entry.getKeywords(keywordDelimiter);
                 StringBuilder sb = new StringBuilder();
                 int i = 0;
-                for (String keyword : separatedKeywords) {
+                for (Keyword keyword : separatedKeywords) {
                     // remove all spaces
-                    keyword = keyword.replaceAll("\\s+", "");
-                    sb.append(keyword);
+                    sb.append(keyword.toString().replaceAll("\\s+", ""));
 
                     i++;
                     if (i >= num) {
