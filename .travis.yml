@@ -20,6 +20,7 @@ services:
   - postgresql
   - mysql
 
+# JavaFX localization tests need a running X environment
 before_install:
   - "export DISPLAY=:99.0"
   - "sh -e /etc/init.d/xvfb start"
