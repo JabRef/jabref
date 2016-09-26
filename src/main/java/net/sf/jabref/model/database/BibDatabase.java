@@ -21,13 +21,13 @@ import net.sf.jabref.model.database.event.EntryRemovedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
 import net.sf.jabref.model.entry.EntryType;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.entry.MonthUtil;
 import net.sf.jabref.model.entry.event.EntryChangedEvent;
 import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.model.entry.event.FieldChangedEvent;
+import net.sf.jabref.model.strings.StringUtil;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -513,7 +513,7 @@ public class BibDatabase {
             if (entryType.isPresent()) {
                 return Optional.of(entryType.get().getName());
             } else {
-                return Optional.of(EntryUtil.capitalizeFirst(entry.getType()));
+                return Optional.of(StringUtil.capitalizeFirst(entry.getType()));
             }
         }
 

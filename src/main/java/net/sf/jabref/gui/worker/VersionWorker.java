@@ -68,7 +68,7 @@ public class VersionWorker extends SwingWorker<Version, Void> {
 
             boolean newer = latestVersion.isNewerThan(installedVersion);
             if (newer){
-                new NewVersionDialog(this.mainFrame, installedVersion, latestVersion, toBeIgnored);
+                new NewVersionDialog(this.mainFrame, installedVersion, latestVersion);
                 return;
             }
 

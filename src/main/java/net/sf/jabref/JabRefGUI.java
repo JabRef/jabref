@@ -1,6 +1,7 @@
 package net.sf.jabref;
 
 import java.io.File;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -21,6 +22,8 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.importer.ParserResultWarningDialog;
 import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
 import net.sf.jabref.gui.importer.worker.AutosaveStartupPrompter;
+import net.sf.jabref.gui.shared.OpenSharedDatabaseDialog;
+import net.sf.jabref.gui.shared.SharedDatabaseUIManager;
 import net.sf.jabref.gui.worker.VersionWorker;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
@@ -29,7 +32,7 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.Version;
 import net.sf.jabref.migrations.PreferencesMigrations;
 import net.sf.jabref.preferences.JabRefPreferences;
-import net.sf.jabref.preferences.VersionPreferences;
+import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
 
 import com.jgoodies.looks.plastic.Plastic3DLookAndFeel;
 import com.jgoodies.looks.plastic.theme.SkyBluer;
@@ -65,7 +68,7 @@ public class JabRefGUI {
     }
 
     public static void checkForNewVersion(boolean manualExecution) {
-        Version toBeIgnored = new VersionPreferences(Globals.prefs).getIgnoredVersion();
+        Version toBeIgnored = Globals.prefs.getVersionPreferences().getIgnoredVersion();
         Version currentVersion = Globals.BUILD_INFO.getVersion();
         new VersionWorker(JabRefGUI.getMainFrame(), manualExecution, currentVersion, toBeIgnored).execute();
     }
@@ -191,6 +194,17 @@ public class JabRefGUI {
 
         if (!bibDatabases.isEmpty()) {
             JabRefGUI.getMainFrame().getCurrentBasePanel().getMainTable().requestFocus();
+        }
+
+        boolean isSharedDatabaseEdited = Globals.prefs.getBoolean(JabRefPreferences.SHARED_DATABASE_LAST_EDITED);
+        if (isSharedDatabaseEdited) {
+            boolean isFocused = Globals.prefs.getBoolean(JabRefPreferences.SHARED_DATABASE_LAST_FOCUSED);
+            try {
+                new SharedDatabaseUIManager(mainFrame).openLastSharedDatabaseTab(isFocused);
+            } catch (SQLException | DatabaseNotSupportedException e) {
+                LOGGER.info("Failed to restore shared database. Use connection dialog to connect.");
+                new OpenSharedDatabaseDialog(mainFrame).setVisible(true);
+            }
         }
     }
 

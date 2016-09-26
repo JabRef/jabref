@@ -8,6 +8,7 @@ import net.sf.jabref.logic.integrity.IntegrityCheck.Checker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.model.strings.StringUtil;
 
 public class BibtexkeyChecker implements Checker {
 
@@ -23,9 +24,9 @@ public class BibtexkeyChecker implements Checker {
             return Collections.emptyList();
         }
 
-        if (!valuekey.isPresent() || valuekey.get().isEmpty()) {
+        if (StringUtil.isBlank(valuekey)) {
             return Collections.singletonList(new IntegrityMessage(
-                    Localization.lang("empty bibtexkey") + ": " + authortitleyear, entry, BibEntry.KEY_FIELD));
+                    Localization.lang("empty BibTeX key") + ": " + authortitleyear, entry, BibEntry.KEY_FIELD));
         }
 
         return Collections.emptyList();

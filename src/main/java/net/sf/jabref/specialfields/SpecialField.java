@@ -1,6 +1,5 @@
 package net.sf.jabref.specialfields;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
@@ -9,6 +8,7 @@ import java.util.Optional;
 import javax.swing.Icon;
 
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.entry.KeywordList;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -21,17 +21,17 @@ public abstract class SpecialField {
     // public static String TEXT_UNDO;
 
     private List<SpecialFieldValue> values;
-    private List<String> keywords;
+    private KeywordList keywords;
     private HashMap<String, SpecialFieldValue> map;
 
-
+    @Deprecated // create via a new constructor SpecialField(List<SpecialFieldValue> values) instead
     protected void setValues(List<SpecialFieldValue> values) {
         this.values = values;
-        this.keywords = new ArrayList<>();
+        this.keywords = new KeywordList();
         this.map = new HashMap<>();
-        for (SpecialFieldValue v : values) {
-            v.getKeyword().ifPresent(keywords::add);
-            v.getFieldValue().ifPresent(fieldValue -> map.put(fieldValue, v));
+        for (SpecialFieldValue value : values) {
+            value.getKeyword().ifPresent(keywords::add);
+            value.getFieldValue().ifPresent(fieldValue -> map.put(fieldValue, value));
         }
     }
 
@@ -39,7 +39,7 @@ public abstract class SpecialField {
         return this.values;
     }
 
-    public List<String> getKeyWords() {
+    public KeywordList getKeyWords() {
         return this.keywords;
     }
 

@@ -48,10 +48,10 @@ public class DBMSSynchronizer {
     private final BibDatabase bibDatabase;
     private final EventBus eventBus;
     private Connection currentConnection;
-    private final String keywordSeparator;
+    private final Character keywordSeparator;
 
 
-    public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, String keywordSeparator) {
+    public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.bibDatabase = bibDatabaseContext.getDatabase();
         this.metaData = bibDatabaseContext.getMetaData();
@@ -134,7 +134,6 @@ public class DBMSSynchronizer {
      * Sets the table structure of shared database if needed and pulls all shared entries
      * to the new local database.
      *
-     * @param bibDatabase Local {@link BibDatabase}
      * @throws DatabaseNotSupportedException if the version of shared database does not match
      *          the version of current shared database support ({@link DBMSProcessor}).
      */

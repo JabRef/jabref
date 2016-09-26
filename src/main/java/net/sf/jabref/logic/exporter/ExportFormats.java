@@ -31,8 +31,6 @@ public class ExportFormats {
         ExportFormats.putFormat(new ExportFormat("DIN 1505", "din1505", "din1505winword", "din1505", ".rtf",
                 layoutPreferences, savePreferences));
         ExportFormats.putFormat(
-                new ExportFormat("BibTeXML", "bibtexml", "bibtexml", null, ".xml", layoutPreferences, savePreferences));
-        ExportFormats.putFormat(
                 new ExportFormat("BibO RDF", "bibordf", "bibordf", null, ".rdf", layoutPreferences, savePreferences));
         ExportFormats.putFormat(new ExportFormat(Localization.lang("HTML table"), "tablerefs", "tablerefs", "tablerefs",
                 ".html", layoutPreferences, savePreferences));
@@ -56,6 +54,7 @@ public class ExportFormats {
         ExportFormats.putFormat(
                 new ExportFormat("MIS Quarterly", "misq", "misq", "misq", ".rtf", layoutPreferences, savePreferences));
 
+        ExportFormats.putFormat(new BibTeXMLExportFormat());
         ExportFormats.putFormat(new OpenOfficeDocumentCreator());
         ExportFormats.putFormat(new OpenDocumentSpreadsheetCreator());
         ExportFormats.putFormat(new MSBibExportFormat());

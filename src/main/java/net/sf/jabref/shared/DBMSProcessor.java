@@ -566,6 +566,10 @@ public abstract class DBMSProcessor {
         return null; // can never happen except new types were added without updating this method.
     }
 
+    public DBMSConnectionProperties getDBMSConnectionProperties() {
+        return this.connectionProperties;
+    }
+
     /**
      * Listens for notifications from DBMS.
      * Needs to be implemented if LiveUpdate is supported by the DBMS
