@@ -539,7 +539,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // The action for copying the BibTeX key and the title for the first selected entry
         actions.put(Actions.COPY_KEY_AND_TITLE, (BaseAction) () -> copyKeyAndTitle());
 
-        // The action for copying the BibTeX key as hyperlink to the url of the first selected entry
+        // The action for copying the BibTeX keys as hyperlinks to the urls of the selected entries
         actions.put(Actions.COPY_KEY_AND_LINK, new CopyBibTeXKeyAndLink(mainTable));
 
         actions.put(Actions.MERGE_DATABASE, new AppendDatabaseAction(frame, this));
