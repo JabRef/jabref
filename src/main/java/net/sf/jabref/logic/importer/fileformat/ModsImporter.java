@@ -65,7 +65,7 @@ import org.apache.commons.logging.LogFactory;
 public class ModsImporter extends ImportFormat {
 
     private static final Log LOGGER = LogFactory.getLog(ModsImporter.class);
-    private static final String KEYWORD_SEPARATOR = JabRefPreferences.getInstance().getImportFormatPreferences()
+    private static final Character KEYWORD_SEPARATOR = JabRefPreferences.getInstance().getImportFormatPreferences()
             .getKeywordSeparator();
 
     private static final Pattern MODS_PATTERN = Pattern.compile("<mods .*>");
@@ -187,7 +187,7 @@ public class ModsImporter extends ImportFormat {
         }
 
         //The element subject can appear more than one time, that's why the keywords has to be put out of the for loop
-        putIfListIsNotEmpty(fields, keywords, FieldName.KEYWORDS, KEYWORD_SEPARATOR);
+        putIfListIsNotEmpty(fields, keywords, FieldName.KEYWORDS, KEYWORD_SEPARATOR.toString());
         //same goes for authors and notes
         putIfListIsNotEmpty(fields, authors, FieldName.AUTHOR, " and ");
         putIfListIsNotEmpty(fields, notes, FieldName.NOTE, ", ");

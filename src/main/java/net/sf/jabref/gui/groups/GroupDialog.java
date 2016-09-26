@@ -36,7 +36,6 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.logic.groups.GroupDescriptions;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.search.SearchQuery;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.groups.AbstractGroup;
@@ -44,6 +43,7 @@ import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
 import net.sf.jabref.model.groups.KeywordGroup;
 import net.sf.jabref.model.groups.SearchGroup;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import com.jgoodies.forms.builder.ButtonBarBuilder;
@@ -267,14 +267,14 @@ class GroupDialog extends JDialog {
             try {
                 if (explicitRadioButton.isSelected()) {
                     resultingGroup = new ExplicitGroup(nameField.getText().trim(), getContext(),
-                            Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+                            Globals.prefs.getKeywordDelimiter());
                 } else if (keywordsRadioButton.isSelected()) {
                     // regex is correct, otherwise OK would have been disabled
                     // therefore I don't catch anything here
                     resultingGroup = new KeywordGroup(nameField.getText().trim(),
                             keywordGroupSearchField.getText().trim(), keywordGroupSearchTerm.getText().trim(),
                             keywordGroupCaseSensitive.isSelected(), keywordGroupRegExp.isSelected(), getContext(),
-                            Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+                            Globals.prefs.getKeywordDelimiter());
                 } else if (searchRadioButton.isSelected()) {
                     try {
                         // regex is correct, otherwise OK would have been

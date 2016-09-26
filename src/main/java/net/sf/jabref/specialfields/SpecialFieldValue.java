@@ -6,13 +6,14 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.model.entry.Keyword;
 
 public class SpecialFieldValue {
 
     private final SpecialField field;
 
     // keyword used at keyword field
-    private final String keyword;
+    private final Optional<Keyword> keyword;
 
     // action belonging to this value
     private final String actionName;
@@ -49,15 +50,15 @@ public class SpecialFieldValue {
             Icon icon,
             String toolTipText) {
         this.field = field;
-        this.keyword = keyword;
+        this.keyword = Optional.ofNullable(keyword).map(Keyword::new);
         this.actionName = actionName;
         this.menuString = menuString;
         this.icon = icon;
         this.toolTipText = toolTipText;
     }
 
-    public Optional<String> getKeyword() {
-        return Optional.ofNullable(this.keyword);
+    public Optional<Keyword> getKeyword() {
+        return keyword;
     }
 
     public String getActionName() {
@@ -75,7 +76,7 @@ public class SpecialFieldValue {
     }
 
     public Optional<String> getFieldValue() {
-        return Optional.ofNullable(this.keyword);
+        return keyword.map(Keyword::toString);
     }
 
     public Icon getIcon() {

@@ -118,7 +118,7 @@ public class AppendDatabaseAction implements BaseAction {
                 be.setId(IdGenerator.next());
                 UpdateField.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp,
                         Globals.prefs.getUpdateFieldPreferences());
-                database.insertEntryWithDuplicationCheck(be);
+                database.insertEntry(be);
                 appendedEntries.add(be);
                 originalEntries.add(originalEntry);
                 ce.addEdit(new UndoableInsertEntry(database, be, panel));
@@ -141,7 +141,7 @@ public class AppendDatabaseAction implements BaseAction {
                     // create a dummy group
                     try {
                         ExplicitGroup group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT,
-                                Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+                                Globals.prefs.getKeywordDelimiter());
                         newGroups.setGroup(group);
                         group.add(appendedEntries);
                     } catch (ParseException e) {

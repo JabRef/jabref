@@ -109,7 +109,8 @@ public class AutoSetLinks {
                 Map<BibEntry, List<File>> result;
                 if (Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_USE_REG_EXP_SEARCH_KEY)) {
                     String regExp = Globals.prefs.get(JabRefPreferences.REG_EXP_SEARCH_EXPRESSION_KEY);
-                    result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp);
+                    result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs, regExp,
+                            Globals.prefs.getKeywordDelimiter());
                 } else {
                     boolean autoLinkExactKeyOnly = Globals.prefs.getBoolean(JabRefPreferences.AUTOLINK_EXACT_KEY_ONLY);
                     result = FileUtil.findAssociatedFiles(entries, extensions, dirs, autoLinkExactKeyOnly);

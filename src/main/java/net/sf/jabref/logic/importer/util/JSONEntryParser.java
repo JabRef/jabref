@@ -1,7 +1,6 @@
 package net.sf.jabref.logic.importer.util;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 import net.sf.jabref.model.entry.BibEntry;
@@ -23,7 +22,7 @@ public class JSONEntryParser {
      * @param bibJsonEntry The JSONObject to convert
      * @return the converted BibEntry
      */
-    public BibEntry parseBibJSONtoBibtex(JSONObject bibJsonEntry, String keywordSeparator) {
+    public BibEntry parseBibJSONtoBibtex(JSONObject bibJsonEntry, Character keywordSeparator) {
         // Fields that are directly accessible at the top level BibJson object
         String[] singleFieldStrings = {FieldName.YEAR, FieldName.TITLE, FieldName.ABSTRACT, FieldName.MONTH};
 
@@ -90,13 +89,11 @@ public class JSONEntryParser {
         // Keywords
         if (bibJsonEntry.has("keywords")) {
             JSONArray keywords = bibJsonEntry.getJSONArray("keywords");
-            LinkedHashSet<String> keywordList = new LinkedHashSet<>();
             for (int i = 0; i < keywords.length(); i++) {
                 if (!keywords.isNull(i)) {
-                    keywordList.add(keywords.getString(i));
+                    entry.addKeyword(keywords.getString(i), keywordSeparator);
                 }
             }
-            entry.putKeywords(keywordList, keywordSeparator);
         }
 
         // Identifiers

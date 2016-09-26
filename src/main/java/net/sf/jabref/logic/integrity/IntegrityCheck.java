@@ -44,12 +44,14 @@ public class IntegrityCheck {
             result.addAll(new TitleChecker().check(entry));
             result.addAll(new PagesChecker().check(entry));
             result.addAll(new ASCIICharacterChecker().check(entry));
+            result.addAll(new NoBibtexFieldChecker().check(entry));
         } else {
             result.addAll(new BiblatexPagesChecker().check(entry));
         }
 
         result.addAll(new BracketChecker(FieldName.TITLE).check(entry));
         result.addAll(new YearChecker().check(entry));
+        result.addAll(new BibtexkeyChecker().check(entry));
         result.addAll(new EditionChecker(bibDatabaseContext).check(entry));
         result.addAll(new NoteChecker(bibDatabaseContext).check(entry));
         result.addAll(new HowpublishedChecker(bibDatabaseContext).check(entry));
