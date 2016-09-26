@@ -10,6 +10,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
+import java.util.stream.Collectors;
 
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListCellRenderer;
@@ -35,6 +36,7 @@ import net.sf.jabref.logic.pdf.PdfCommentImporter;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
+import net.sf.jabref.model.entry.ParsedFileField;
 import net.sf.jabref.model.pdf.PdfComment;
 
 import com.jgoodies.forms.builder.FormBuilder;
@@ -111,10 +113,9 @@ public class PdfCommentsTab extends JPanel {
             } else {
                 indexSelectedByComboBox = fileNameComboBox.getSelectedIndex();
             }
+
             //import notes if the selected file is a pdf
-            FileField.parse(parent.getEntry().getField(FieldName.FILE).get()).stream()
-                    .filter(parsedFileField -> parsedFileField.getLink().toLowerCase().endsWith(".pdf"))
-                    .forEach(parsedFileField ->
+            getFilteredFileList().forEach(parsedFileField ->
                     allNotes.add(commentImporter.importNotes(parsedFileField.getLink(), basePanel.getDatabaseContext())));
 
             updateShownComments(allNotes.get(indexSelectedByComboBox));
@@ -125,8 +126,7 @@ public class PdfCommentsTab extends JPanel {
             }
             //set up the comboBox for representing the selected file
             fileNameComboBox.removeAllItems();
-            FileField.parse(parent.getEntry().getField(FieldName.FILE).get()).stream()
-                    .filter(parsedFileField -> parsedFileField.getLink().toLowerCase().endsWith(".pdf") )
+            getFilteredFileList()
                     .forEach(((parsedField) -> fileNameComboBox.addItem(parsedField.getLink())));
         }
     }
@@ -143,6 +143,8 @@ public class PdfCommentsTab extends JPanel {
             Comparator<PdfComment> byPage = (comment1, comment2) -> Integer.compare(comment1.getPage(), comment2.getPage());
             importedNotes.stream()
                     .filter(comment -> !(null == comment.getContent()))
+                    .filter(comment -> comment.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE)
+                            || (null == comment.getLinkedPdfComment()))
                     .sorted(byPage)
                     .forEach(listModel::addElement);
         }
@@ -171,8 +173,7 @@ public class PdfCommentsTab extends JPanel {
             indexSelectedByComboBox = fileNameComboBox.getSelectedIndex();
         }
         fileNameComboBox.removeAllItems();
-        FileField.parse(parent.getEntry().getField(FieldName.FILE).get()).stream()
-                .filter(parsedFileField -> parsedFileField.getLink().toLowerCase().endsWith(".pdf") )
+        getFilteredFileList().stream().filter(parsedFileField -> parsedFileField.getLink().toLowerCase().endsWith(".pdf") )
                 .forEach(((parsedField) -> fileNameComboBox.addItem(parsedField.getLink())));
         fileNameComboBox.setSelectedIndex(indexSelectedByComboBox);
         updateShownComments(allNotes.get(indexSelectedByComboBox));
@@ -307,6 +308,16 @@ public class PdfCommentsTab extends JPanel {
         return comment.getContent();
     }
 
+    /**
+     * Filter files with a web address containing "www."
+     * @return a list of file parsed files
+     */
+    private List<ParsedFileField> getFilteredFileList(){
+       return FileField.parse(parent.getEntry().getField(FieldName.FILE).get()).stream()
+                .filter(parsedFileField -> parsedFileField.getLink().toLowerCase().endsWith(".pdf"))
+                .filter(parsedFileField -> !parsedFileField.getLink().contains("www.")).collect(Collectors.toList());
+    }
+
     private class CommentListSelectionListener implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent e) {
@@ -322,18 +333,6 @@ public class PdfCommentsTab extends JPanel {
             commentList.setSelectedIndex(commentListSelectedIndex);
             //repaint the list to refresh the linked annotation highlighting
             commentList.repaint();
-        }
-    }
-
-    /**
-     * Triggers the cellRenderer to render the given cell
-     * @param cellIndex index in the listModel of the comment which is in the cell that has to be rendered
-     */
-    private void triggerRenderingACell(int cellIndex){
-        if(null != (listModel.get(cellIndex).getLinkedPdfComment())) {
-            commentList.getCellRenderer().getListCellRendererComponent(commentList,
-                    listModel.get(cellIndex).getLinkedPdfComment(),
-                    listModel.indexOf(listModel.get(cellIndex).getLinkedPdfComment()), false, false);
         }
     }
 
@@ -374,10 +373,6 @@ public class PdfCommentsTab extends JPanel {
 
             label.setToolTipText(comment.getAnnotationType());
             label.setText(comment.toString());
-
-            if(isLinkedComment){
-                label.setBackground(GUIGlobals.activeBackgroundColor);
-            }
 
             return label;
         }
