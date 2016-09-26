@@ -29,7 +29,6 @@ import javax.swing.event.CaretListener;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
-import net.sf.jabref.gui.FieldContentSelector;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
@@ -144,7 +143,6 @@ class GroupDialog extends JDialog {
         builderKG.nextLine();
         builderKG.append(Localization.lang("Keyword"));
         builderKG.append(keywordGroupSearchTerm);
-        builderKG.append(new FieldContentSelector(jabrefFrame, basePanel, this, keywordGroupSearchTerm, null, true, ", "));
         builderKG.nextLine();
         builderKG.append(keywordGroupCaseSensitive, 3);
         builderKG.nextLine();
