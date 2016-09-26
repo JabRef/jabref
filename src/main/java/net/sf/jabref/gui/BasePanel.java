@@ -27,7 +27,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TimerTask;
-import java.util.stream.Collectors;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -49,6 +48,7 @@ import net.sf.jabref.collab.FileUpdatePanel;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.BaseAction;
 import net.sf.jabref.gui.actions.CleanupAction;
+import net.sf.jabref.gui.actions.CopyBibTeXKeyAndLink;
 import net.sf.jabref.gui.bibtexkeypattern.SearchFixDuplicateLabels;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
@@ -107,7 +107,6 @@ import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutHelper;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.FileExtensions;
-import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -541,7 +540,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         actions.put(Actions.COPY_KEY_AND_TITLE, (BaseAction) () -> copyKeyAndTitle());
 
         // The action for copying the BibTeX key as hyperlink to the url of the first selected entry
-        actions.put(Actions.COPY_KEY_AND_LINK, (BaseAction) () -> copyKeyAndLink());
+        actions.put(Actions.COPY_KEY_AND_LINK, new CopyBibTeXKeyAndLink(mainTable));
 
         actions.put(Actions.MERGE_DATABASE, new AppendDatabaseAction(frame, this));
 
@@ -962,41 +961,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             } else {
                 output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
                         Integer.toString(bes.size() - copied), Integer.toString(bes.size())));
-            }
-        }
-    }
-
-    private void copyKeyAndLink() {
-        List<BibEntry> selectedEntries = mainTable.getSelectedEntries();
-        if (!selectedEntries.isEmpty()) {
-            storeCurrentEdit();
-
-            StringBuilder sb = new StringBuilder();
-
-            List<BibEntry> entriesWithKey = selectedEntries.stream().filter(BibEntry::hasCiteKey).collect(Collectors.toList());
-            
-            if (entriesWithKey.isEmpty()) {
-                output(Localization.lang("None of the selected entries have BibTeX keys."));
-                return;
-            }
-            for (BibEntry entry : entriesWithKey) {
-                String key = entry.getCiteKeyOptional().get();
-                String url = entry.getField(FieldName.URL).isPresent() ? entry.getField(FieldName.URL).get() : "";
-                sb.append(url.isEmpty() ? key : String.format("<a href=\"%s\">%s</a>", url, key));
-                sb.append(OS.NEWLINE);
-            }
-
-            ClipBoardManager clipboard = new ClipBoardManager();
-            clipboard.setClipboardContents(sb.toString());
-
-            int copied = entriesWithKey.size();
-            int toCopy = selectedEntries.size();
-            if (copied == toCopy) {
-                // All entries had keys.
-                output((selectedEntries.size() > 1 ? Localization.lang("Copied keys") : Localization.lang("Copied key")) + '.');
-            } else {
-                output(Localization.lang("Warning: %0 out of %1 entries have undefined BibTeX key.",
-                        Long.toString(toCopy - copied), Integer.toString(toCopy)));
             }
         }
     }
