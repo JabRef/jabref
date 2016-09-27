@@ -21,6 +21,7 @@ import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.database.BibDatabase;
@@ -37,6 +38,7 @@ import org.apache.commons.logging.LogFactory;
 public class BibEntry implements Cloneable {
 
     private static final Log LOGGER = LogFactory.getLog(BibEntry.class);
+    private static final LatexToUnicodeFormatter LATEX_TO_UNICODE_FORMATTER = new LatexToUnicodeFormatter();
 
     public static final String TYPE_HEADER = "entrytype";
     public static final String OBSOLETE_TYPE_HEADER = "bibtextype";
@@ -52,7 +54,10 @@ public class BibEntry implements Cloneable {
 
     private String type;
     private Map<String, String> fields = new ConcurrentHashMap<>();
-    /*
+    /** contains the same values as {@link #fields} but formatted with the {@link LatexToUnicodeFormatter} */
+    private Map<String, String> fieldsLatexFree = new ConcurrentHashMap<>();
+
+    /**
      * Map to store the words in every field
      */
     private final Map<String, Set<String>> fieldsAsWords = new HashMap<>();
@@ -422,6 +427,7 @@ public class BibEntry implements Cloneable {
         changed = true;
 
         fields.put(fieldName, value);
+        fieldsLatexFree.put(fieldName, LATEX_TO_UNICODE_FORMATTER.format(value));
         fieldsAsWords.remove(fieldName);
 
         FieldChange change = new FieldChange(this, fieldName, oldValue, value);
@@ -478,6 +484,7 @@ public class BibEntry implements Cloneable {
         changed = true;
 
         fields.remove(fieldName);
+        fieldsLatexFree.remove(fieldName);
         fieldsAsWords.remove(fieldName);
         FieldChange change = new FieldChange(this, fieldName, oldValue.get(), null);
         eventBus.post(new FieldChangedEvent(change, eventSource));
@@ -533,6 +540,7 @@ public class BibEntry implements Cloneable {
     public Object clone() {
         BibEntry clone = new BibEntry(id, type);
         clone.fields = new HashMap<>(fields);
+        clone.fieldsLatexFree = new HashMap<>(fieldsLatexFree);
         return clone;
     }
 
@@ -686,8 +694,8 @@ public class BibEntry implements Cloneable {
         }
     }
 
-    public Collection<String> getFieldValues() {
-        return fields.values();
+    public Map<String, String> getFieldsLatexFree() {
+        return fieldsLatexFree;
     }
 
     public Map<String, String> getFieldMap() {
