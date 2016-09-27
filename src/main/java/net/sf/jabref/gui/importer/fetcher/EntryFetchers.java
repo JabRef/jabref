@@ -53,6 +53,7 @@ public class EntryFetchers {
         list.add(new IsbnFetcher(Globals.prefs.getImportFormatPreferences()));
         list.add(new DiVA(Globals.prefs.getImportFormatPreferences()));
         list.add(new DoiFetcher(Globals.prefs.getImportFormatPreferences()));
+        list.add(new MedlineFetcher());
         list.sort((fetcher1, fetcher2) -> fetcher1.getName().compareTo(fetcher2.getName()));
         return list;
     }

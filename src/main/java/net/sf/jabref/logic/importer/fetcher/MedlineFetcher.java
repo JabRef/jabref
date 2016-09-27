@@ -18,11 +18,13 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
+import net.sf.jabref.logic.importer.IdBasedFetcher;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.importer.fileformat.MedlineImporter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -31,7 +33,7 @@ import org.apache.http.client.utils.URIBuilder;
 /**
  * Fetch or search from Pubmed http://www.ncbi.nlm.nih.gov/sites/entrez/
  */
-public class MedlineFetcher implements SearchBasedFetcher {
+public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(MedlineFetcher.class);
 
@@ -123,26 +125,7 @@ public class MedlineFetcher implements SearchBasedFetcher {
     public List<BibEntry> performSearch(String query) throws FetcherException {
         List<BibEntry> entryList = new LinkedList<>();
 
-        String cleanQuery = query.trim().replace(';', ',');
-
-        if (cleanQuery.matches("\\d+[,\\d+]*")) {
-            //fetch medline by id
-
-            List<BibEntry> bibs = fetchMedline(cleanQuery);
-
-            if (bibs.isEmpty()) {
-                LOGGER.warn(Localization.lang("No references found"));
-            }
-
-            for (BibEntry entry : bibs) {
-                entryList.add(entry);
-            }
-            return entryList;
-        }
-
         if (!query.isEmpty()) {
-            //fetch medline by term
-
             String searchTerm = toSearchTerm(query);
 
             // get the ids from entrez
@@ -154,9 +137,6 @@ public class MedlineFetcher implements SearchBasedFetcher {
             }
 
             int numberToFetch = result.count;
-            if (numberToFetch > MedlineFetcher.PACING) {
-                numberToFetch = 20;
-            }
 
             for (int i = 0; i < numberToFetch; i += MedlineFetcher.PACING) {
 
@@ -200,6 +180,28 @@ public class MedlineFetcher implements SearchBasedFetcher {
             LOGGER.warn(e.getLocalizedMessage(), e);
             return new ArrayList<>();
         }
+    }
+
+    private BibEntry doPostCleanUp(BibEntry entry) {
+        Optional<String> bibEntryOptional = entry.getField(FieldName.MONTH);
+        //TODO: Month Checker
+        return entry;
+    }
+
+    @Override
+    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+        String cleanQuery = identifier.trim().replace(';', ',');
+
+        if (cleanQuery.matches("\\d+[,\\d+]*")) {
+            List<BibEntry> bibs = fetchMedline(cleanQuery);
+
+            if (bibs.isEmpty()) {
+                LOGGER.warn(Localization.lang("No references found"));
+            }
+
+            return Optional.of(bibs.get(0));
+        }
+        return Optional.empty();
     }
 
     static class SearchResult {
