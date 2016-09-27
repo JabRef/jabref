@@ -13,7 +13,6 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
-
 import net.sf.jabref.logic.importer.fileformat.mods.AbstractDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.CodeOrText;
 import net.sf.jabref.logic.importer.fileformat.mods.DateDefinition;
@@ -55,6 +54,8 @@ import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
  */
 class ModsExportFormat extends ExportFormat {
 
+    private static final String MINUS = "-";
+    private static final String DOUBLE_MINUS = "--";
     private static final String KEYWORD_SEPARATOR = JabRefPreferences.getInstance().getImportFormatPreferences()
             .getKeywordSeparator();
     private static final String MODS_SCHEMA_LOCATION = "http://www.loc.gov/standards/mods/v3/mods-3-6.xsd";
@@ -161,8 +162,8 @@ class ModsExportFormat extends ExportFormat {
                 modsCollection.getMods().add(mods);
             }
 
-            JAXBElement<ModsCollectionDefinition> jaxbElement = new JAXBElement<>(new QName("modsCollection"),
-                    ModsCollectionDefinition.class, modsCollection);
+            JAXBElement<ModsCollectionDefinition> jaxbElement = new JAXBElement<>(
+                    new QName(MODS_NAMESPACE_URI, "modsCollection"), ModsCollectionDefinition.class, modsCollection);
 
             createMarshallerAndWriteToFile(file, jaxbElement);
         } catch (JAXBException ex) {
@@ -224,8 +225,8 @@ class ModsExportFormat extends ExportFormat {
         TitleInfoDefinition titleInfo = new TitleInfoDefinition();
         StringPlusLanguage title = new StringPlusLanguage();
         title.setValue(value);
-        JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName("title"), StringPlusLanguage.class,
-                title);
+        JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "title"),
+                StringPlusLanguage.class, title);
         titleInfo.getTitleOrSubTitleOrPartNumber().add(element);
         mods.getModsGroup().add(titleInfo);
     }
@@ -234,8 +235,8 @@ class ModsExportFormat extends ExportFormat {
         NameDefinition nameDefinition = new NameDefinition();
         StringPlusLanguage affiliation = new StringPlusLanguage();
         affiliation.setValue(value);
-        JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName("affiliation"), StringPlusLanguage.class,
-                affiliation);
+        JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "affiliation"),
+                StringPlusLanguage.class, affiliation);
         nameDefinition.getAffiliationOrRoleOrDescription().add(element);
         mods.getModsGroup().add(nameDefinition);
     }
@@ -276,8 +277,8 @@ class ModsExportFormat extends ExportFormat {
         TitleInfoDefinition titleInfo = new TitleInfoDefinition();
         StringPlusLanguage title = new StringPlusLanguage();
         title.setValue(value);
-        JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName("title"), StringPlusLanguage.class,
-                title);
+        JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "title"),
+                StringPlusLanguage.class, title);
         titleInfo.getTitleOrSubTitleOrPartNumber().add(element);
         relatedItem.getModsGroup().add(titleInfo);
     }
@@ -291,10 +292,10 @@ class ModsExportFormat extends ExportFormat {
     }
 
     private void addPages(PartDefinition partDefinition, String value) {
-        if (value.contains("--")) {
-            addStartAndEndPage(value, partDefinition, "--");
-        } else if (value.contains("-")) {
-            addStartAndEndPage(value, partDefinition, "-");
+        if (value.contains(DOUBLE_MINUS)) {
+            addStartAndEndPage(value, partDefinition, DOUBLE_MINUS);
+        } else if (value.contains(MINUS)) {
+            addStartAndEndPage(value, partDefinition, MINUS);
         } else {
             BigInteger total = new BigInteger(value);
             ExtentDefinition extent = new ExtentDefinition();
@@ -304,39 +305,24 @@ class ModsExportFormat extends ExportFormat {
     }
 
     private void addKeyWords(ModsDefinition mods, String value) {
-        String[] keywords = null;
-        if (value.contains(KEYWORD_SEPARATOR)) {
-            keywords = value.split(KEYWORD_SEPARATOR);
-        } else if (value.contains(";")) {
-            keywords = value.split(";");
-        }
+        String[] keywords = value.split(", ");
 
-        if (keywords != null) {
             for (String keyword : keywords) {
                 SubjectDefinition subject = new SubjectDefinition();
                 StringPlusLanguagePlusAuthority topic = new StringPlusLanguagePlusAuthority();
-                topic.setValue(keyword);
-                JAXBElement<?> element = new JAXBElement<>(new QName("topic"), StringPlusLanguagePlusAuthority.class,
-                        topic);
+            topic.setValue(keyword);
+                JAXBElement<?> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "topic"),
+                        StringPlusLanguagePlusAuthority.class, topic);
                 subject.getTopicOrGeographicOrTemporal().add(element);
                 mods.getModsGroup().add(subject);
             }
-        } else {
-            SubjectDefinition subject = new SubjectDefinition();
-            StringPlusLanguagePlusAuthority topic = new StringPlusLanguagePlusAuthority();
-            topic.setValue(value);
-            JAXBElement<?> element = new JAXBElement<>(new QName("topic"), StringPlusLanguagePlusAuthority.class,
-                    topic);
-            subject.getTopicOrGeographicOrTemporal().add(element);
-            mods.getModsGroup().add(subject);
-        }
     }
 
     private void handleAuthors(ModsDefinition mods, String value) {
-        NameDefinition name = new NameDefinition();
-        name.setAtType("personal");
-        String[] authors = value.split(" and ");
+        String[] authors = value.split("and");
         for (String author : authors) {
+            NameDefinition name = new NameDefinition();
+            name.setAtType("personal");
             NamePartDefinition namePart = new NamePartDefinition();
             if (author.contains(",")) {
                 //if author contains ","  then this indicates that the author has a forename and family name
@@ -345,7 +331,7 @@ class ModsExportFormat extends ExportFormat {
                 namePart.setAtType("family");
                 namePart.setValue(familyName);
 
-                JAXBElement<NamePartDefinition> element = new JAXBElement<>(new QName("namePart"),
+                JAXBElement<NamePartDefinition> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "namePart"),
                         NamePartDefinition.class, namePart);
                 name.getNamePartOrDisplayFormOrAffiliation().add(element);
 
@@ -357,21 +343,22 @@ class ModsExportFormat extends ExportFormat {
                         NamePartDefinition namePartDefinition = new NamePartDefinition();
                         namePartDefinition.setAtType("given");
                         namePartDefinition.setValue(given);
-                        element = new JAXBElement<>(new QName("", "namePart"), NamePartDefinition.class,
+                        element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "namePart"), NamePartDefinition.class,
                                 namePartDefinition);
                         name.getNamePartOrDisplayFormOrAffiliation().add(element);
                     }
                 }
+                mods.getModsGroup().add(name);
             } else {
                 //no "," indicates that there should only be a family name
                 namePart.setAtType("family");
                 namePart.setValue(author);
-                JAXBElement<NamePartDefinition> element = new JAXBElement<>(new QName("namePart"),
+                JAXBElement<NamePartDefinition> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "namePart"),
                         NamePartDefinition.class, namePart);
                 name.getNamePartOrDisplayFormOrAffiliation().add(element);
+                mods.getModsGroup().add(name);
             }
         }
-        mods.getModsGroup().add(name);
     }
 
     private void addIdentifier(String key, String value, ModsDefinition mods) {
@@ -388,9 +375,9 @@ class ModsExportFormat extends ExportFormat {
         int minusIndex = value.indexOf(minus);
         String startPage = value.substring(0, minusIndex);
         String endPage = "";
-        if ("-".equals(minus)) {
+        if (MINUS.equals(minus)) {
             endPage = value.substring(minusIndex + 1);
-        } else if ("--".equals(minus)) {
+        } else if (DOUBLE_MINUS.equals(minus)) {
             endPage = value.substring(minusIndex + 2);
         }
 
@@ -410,8 +397,8 @@ class ModsExportFormat extends ExportFormat {
         StringPlusLanguage detailType = new StringPlusLanguage();
         detailType.setValue(value);
         detail.setType(detailName);
-        JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName("number"), StringPlusLanguage.class,
-                detailType);
+        JAXBElement<StringPlusLanguage> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "number"),
+                StringPlusLanguage.class, detailType);
         detail.getNumberOrCaptionOrTitle().add(element);
         partDefinition.getDetailOrExtentOrDate().add(detail);
     }
@@ -428,13 +415,13 @@ class ModsExportFormat extends ExportFormat {
         } else if (FieldName.PUBLISHER.equals(key)) {
             StringPlusLanguagePlusSupplied publisher = new StringPlusLanguagePlusSupplied();
             publisher.setValue(value);
-            JAXBElement<StringPlusLanguagePlusSupplied> element = new JAXBElement<>(new QName("publisher"),
-                    StringPlusLanguagePlusSupplied.class, publisher);
+            JAXBElement<StringPlusLanguagePlusSupplied> element = new JAXBElement<>(
+                    new QName(MODS_NAMESPACE_URI, "publisher"), StringPlusLanguagePlusSupplied.class, publisher);
             originInfo.getPlaceOrPublisherOrDateIssued().add(element);
         } else if ("issuance".equals(key)) {
             IssuanceDefinition issuance = IssuanceDefinition.fromValue(value);
-            JAXBElement<IssuanceDefinition> element = new JAXBElement<>(new QName("issuance"), IssuanceDefinition.class,
-                    issuance);
+            JAXBElement<IssuanceDefinition> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "issuance"),
+                    IssuanceDefinition.class, issuance);
             originInfo.getPlaceOrPublisherOrDateIssued().add(element);
         } else if ("address".equals(key)) {
             PlaceDefinition placeDefinition = new PlaceDefinition();
@@ -448,14 +435,14 @@ class ModsExportFormat extends ExportFormat {
                 placeTerm.setValue(place);
                 placeDefinition.getPlaceTerm().add(placeTerm);
             }
-            JAXBElement<PlaceDefinition> element = new JAXBElement<>(new QName("place"), PlaceDefinition.class,
-                    placeDefinition);
+            JAXBElement<PlaceDefinition> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "place"),
+                    PlaceDefinition.class, placeDefinition);
             originInfo.getPlaceOrPublisherOrDateIssued().add(element);
         } else if ("edition".equals(key)) {
             StringPlusLanguagePlusSupplied edition = new StringPlusLanguagePlusSupplied();
             edition.setValue(value);
-            JAXBElement<StringPlusLanguagePlusSupplied> element = new JAXBElement<>(new QName("edition"),
-                    StringPlusLanguagePlusSupplied.class, edition);
+            JAXBElement<StringPlusLanguagePlusSupplied> element = new JAXBElement<>(
+                    new QName(MODS_NAMESPACE_URI, "edition"), StringPlusLanguagePlusSupplied.class, edition);
             originInfo.getPlaceOrPublisherOrDateIssued().add(element);
         }
     }
@@ -464,7 +451,8 @@ class ModsExportFormat extends ExportFormat {
         DateDefinition dateIssued = new DateDefinition();
         dateIssued.setKeyDate("yes");
         dateIssued.setValue(value);
-        JAXBElement<DateDefinition> element = new JAXBElement<>(new QName(dateName), DateDefinition.class, dateIssued);
+        JAXBElement<DateDefinition> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, dateName),
+                DateDefinition.class, dateIssued);
         originInfo.getPlaceOrPublisherOrDateIssued().add(element);
     }
 }

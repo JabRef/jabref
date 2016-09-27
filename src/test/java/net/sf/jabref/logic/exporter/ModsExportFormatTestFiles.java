@@ -11,7 +11,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.sf.jabref.logic.bibtex.BibEntryAssert;
 import net.sf.jabref.logic.importer.fileformat.BibtexImporter;
+import net.sf.jabref.logic.importer.fileformat.ModsImporter;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.preferences.JabRefPreferences;
@@ -32,13 +34,14 @@ import org.xmlunit.diff.ElementSelectors;
 import org.xmlunit.matchers.CompareMatcher;
 
 @RunWith(Parameterized.class)
-public class ModsExportFormatFilesTest {
+public class ModsExportFormatTestFiles {
 
     public Charset charset;
     private BibDatabaseContext databaseContext;
     private File tempFile;
     private ModsExportFormat modsExportFormat;
-    private BibtexImporter testImporter;
+    private BibtexImporter bibtexImporter;
+    private ModsImporter modsImporter;
 
     @Parameter
     public String filename;
@@ -50,7 +53,8 @@ public class ModsExportFormatFilesTest {
 
     @Parameters(name = "{0}")
     public static Collection<String> fileNames() throws Exception {
-        try (Stream<Path> stream = Files.list(Paths.get(ModsExportFormatFilesTest.class.getResource("").toURI()))) {
+        try (Stream<Path> stream = Files.list(Paths.get(ModsExportFormatTestFiles.class.getResource("").toURI()))) {
+            //            stream.forEach(n -> System.out.println(n));
             return stream.map(n -> n.getFileName().toString()).filter(n -> n.endsWith(".bib"))
                     .filter(n -> n.startsWith("Mods")).collect(Collectors.toList());
         }
@@ -59,11 +63,12 @@ public class ModsExportFormatFilesTest {
     @Before
     public void setUp() throws Exception {
         databaseContext = new BibDatabaseContext();
-        resourceDir = Paths.get(MSBibExportFormatTestFiles.class.getResource("").toURI());
+        resourceDir = Paths.get(ModsExportFormatTestFiles.class.getResource("").toURI());
         charset = StandardCharsets.UTF_8;
         modsExportFormat = new ModsExportFormat();
         tempFile = testFolder.newFile();
-        testImporter = new BibtexImporter(JabRefPreferences.getInstance().getImportFormatPreferences());
+        bibtexImporter = new BibtexImporter(JabRefPreferences.getInstance().getImportFormatPreferences());
+        modsImporter = new ModsImporter();
     }
 
     @Test
@@ -71,7 +76,7 @@ public class ModsExportFormatFilesTest {
         String xmlFileName = filename.replace(".bib", ".xml");
         Path importFile = resourceDir.resolve(filename);
         String tempFilename = tempFile.getCanonicalPath();
-        List<BibEntry> entries = testImporter.importDatabase(importFile, charset).getDatabase().getEntries();
+        List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
 
         modsExportFormat.performExport(databaseContext, tempFile.getPath(), charset, entries);
 
@@ -81,4 +86,33 @@ public class ModsExportFormatFilesTest {
         Assert.assertThat(test, CompareMatcher.isSimilarTo(control)
                 .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
     }
+
+    @Test
+    public final void testExportAsModsAndThenImportAsMods() throws Exception {
+        String xmlFile = filename.replace(".bib", ".xml");
+
+        Path importFile = resourceDir.resolve(filename);
+        List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
+        Path modsFile = resourceDir.resolve(xmlFile);
+
+        modsExportFormat.performExport(databaseContext, modsFile, charset, entries);
+        BibEntryAssert.assertEquals(entries, modsFile, modsImporter);
+    }
+
+    @Test
+    public final void testImportAsModsAndExportAsMods() throws Exception {
+        String xmlFileName = filename.replace(".bib", ".xml");
+        Path importFile = resourceDir.resolve(xmlFileName);
+        String tempFilename = tempFile.getCanonicalPath();
+        List<BibEntry> entries = modsImporter.importDatabase(importFile, charset).getDatabase().getEntries();
+
+        modsExportFormat.performExport(databaseContext, tempFile.getPath(), charset, entries);
+
+        Builder control = Input.from(Files.newInputStream(resourceDir.resolve(xmlFileName)));
+        Builder test = Input.from(Files.newInputStream(Paths.get(tempFilename)));
+
+        Assert.assertThat(test, CompareMatcher.isSimilarTo(control)
+                .withNodeMatcher(new DefaultNodeMatcher(ElementSelectors.byNameAndText)).throwComparisonFailure());
+    }
+
 }

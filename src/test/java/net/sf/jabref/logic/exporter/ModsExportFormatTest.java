@@ -26,11 +26,12 @@ public class ModsExportFormatTest {
     public Charset charset;
     private ModsExportFormat modsExportFormat;
     private BibDatabaseContext databaseContext;
-    private BibtexImporter testImporter;
+    private BibtexImporter bibtexImporter;
     private File tempFile;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
+    private Path resourceDir;
 
 
     @Before
@@ -38,15 +39,16 @@ public class ModsExportFormatTest {
         databaseContext = new BibDatabaseContext();
         charset = StandardCharsets.UTF_8;
         modsExportFormat = new ModsExportFormat();
-        testImporter = new BibtexImporter(JabRefPreferences.getInstance().getImportFormatPreferences());
+        bibtexImporter = new BibtexImporter(JabRefPreferences.getInstance().getImportFormatPreferences());
         tempFile = testFolder.newFile();
+        resourceDir = Paths.get(ModsExportFormatTest.class.getResource("").toURI());
     }
 
     @Test(expected = SaveException.class)
     public final void testPerformExportTrowsSaveException() throws Exception {
         String filename = "ModsExportFormatTestAllFields.bib";
-        Path importFile = Paths.get(ModsExportFormatFilesTest.class.getResource(filename).toURI());
-        List<BibEntry> entries = testImporter.importDatabase(importFile, charset).getDatabase()
+        Path importFile = resourceDir.resolve(filename);
+        List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase()
                 .getEntries();
 
         modsExportFormat.performExport(databaseContext, "", charset, entries);
