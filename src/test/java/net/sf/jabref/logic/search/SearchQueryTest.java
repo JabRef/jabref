@@ -36,7 +36,7 @@ public class SearchQueryTest {
     @Test
     public void testGrammarSearch() {
         BibEntry entry = new BibEntry();
-        entry.addKeyword("one two", ", ");
+        entry.addKeyword("one two", ',');
         SearchQuery searchQuery = new SearchQuery("keywords=\"one two\"", false, false);
         assertTrue(searchQuery.isMatch(entry));
     }
@@ -66,6 +66,53 @@ public class SearchQueryTest {
         assertTrue(searchQuery.isMatch(e));
     }
 
+    @Test
+    public void testSearchMatchesSingleKeywordNotPart() {
+        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
+        e.setField("keywords", "banana, pineapple, orange");
+
+        SearchQuery searchQuery = new SearchQuery("anykeyword==apple", false, false);
+        assertFalse(searchQuery.isMatch(e));
+    }
+
+    @Test
+    public void testSearchMatchesSingleKeyword() {
+        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
+        e.setField("keywords", "banana, pineapple, orange");
+
+        SearchQuery searchQuery = new SearchQuery("anykeyword==pineapple", false, false);
+        assertTrue(searchQuery.isMatch(e));
+    }
+
+    @Test
+    public void testSearchAllFields() {
+        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
+        e.setField("title", "Fruity features");
+        e.setField("keywords", "banana, pineapple, orange");
+
+        SearchQuery searchQuery = new SearchQuery("anyfield==\"fruity features\"", false, false);
+        assertTrue(searchQuery.isMatch(e));
+    }
+
+    @Test
+    public void testSearchAllFieldsNotForSpecificField() {
+        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
+        e.setField("title", "Fruity features");
+        e.setField("keywords", "banana, pineapple, orange");
+
+        SearchQuery searchQuery = new SearchQuery("anyfield=fruit and keywords!=banana", false, false);
+        assertFalse(searchQuery.isMatch(e));
+    }
+
+    @Test
+    public void testSearchAllFieldsAndSpecificField() {
+        BibEntry e = new BibEntry(IdGenerator.next(), BibtexEntryTypes.INPROCEEDINGS.getName());
+        e.setField("title", "Fruity features");
+        e.setField("keywords", "banana, pineapple, orange");
+
+        SearchQuery searchQuery = new SearchQuery("anyfield=fruit and keywords=apple", false, false);
+        assertTrue(searchQuery.isMatch(e));
+    }
 
     @Test
     public void testIsMatch() {
@@ -136,5 +183,7 @@ public class SearchQueryTest {
         entry.setField("abstract", "text");
 
         assertTrue(new SearchQuery("text AND author=asdf", true, true).isMatch(entry));
+
     }
+
 }

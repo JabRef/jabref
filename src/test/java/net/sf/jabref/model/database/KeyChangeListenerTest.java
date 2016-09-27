@@ -26,21 +26,21 @@ public class KeyChangeListenerTest {
         entry1 = new BibEntry();
         entry1.setCiteKey("Entry1");
         entry1.setField(FieldName.CROSSREF, "Entry4");
-        db.insertEntryWithDuplicationCheck(entry1);
+        db.insertEntry(entry1);
 
         entry2 = new BibEntry();
         entry2.setCiteKey("Entry2");
         entry2.setField(FieldName.RELATED, "Entry1,Entry3");
-        db.insertEntryWithDuplicationCheck(entry2);
+        db.insertEntry(entry2);
 
         entry3 = new BibEntry();
         entry3.setCiteKey("Entry3");
         entry3.setField(FieldName.RELATED, "Entry1,Entry2,Entry3");
-        db.insertEntryWithDuplicationCheck(entry3);
+        db.insertEntry(entry3);
 
         entry4 = new BibEntry();
         entry4.setCiteKey("Entry4");
-        db.insertEntryWithDuplicationCheck(entry4);
+        db.insertEntry(entry4);
 
     }
 

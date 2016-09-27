@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.logic.util.strings.StringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

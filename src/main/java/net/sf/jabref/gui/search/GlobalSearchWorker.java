@@ -42,7 +42,7 @@ class GlobalSearchWorker extends SwingWorker<Map<BasePanel, List<BibEntry>>, Voi
     protected Map<BasePanel, List<BibEntry>> doInBackground() throws Exception {
         Map<BasePanel, List<BibEntry>> matches = new HashMap<>();
         for (BasePanel basePanel : frame.getBasePanelList()) {
-            matches.put(basePanel, basePanel.getDatabase().getEntries().stream()
+            matches.put(basePanel, basePanel.getDatabase().getEntries().parallelStream()
                     .filter(searchQuery::isMatch)
                     .collect(Collectors.toList()));
         }

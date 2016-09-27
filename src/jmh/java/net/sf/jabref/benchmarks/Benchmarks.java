@@ -2,7 +2,6 @@ package net.sf.jabref.benchmarks;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -58,7 +57,7 @@ public class Benchmarks {
             entry.setField("keyword", "testkeyword");
             entry.setField("year", "1" + i);
             entry.setField("rnd", "2" + randomizer.nextInt());
-            database.insertEntryWithDuplicationCheck(entry);
+            database.insertEntry(entry);
         }
         BibtexDatabaseWriter<StringSaveSession> databaseWriter = new BibtexDatabaseWriter<>(StringSaveSession::new);
         StringSaveSession saveSession = databaseWriter.savePartOfDatabase(
@@ -90,9 +89,14 @@ public class Benchmarks {
     public List<BibEntry> search() {
         // FIXME: Reuse SearchWorker here
         SearchQuery searchQuery = new SearchQuery("Journal Title 500", false, false);
-        List<BibEntry> matchedEntries = new ArrayList<>();
-        matchedEntries.addAll(database.getEntries().stream().filter(searchQuery::isMatch).collect(Collectors.toList()));
-        return matchedEntries;
+        return database.getEntries().stream().filter(searchQuery::isMatch).collect(Collectors.toList());
+    }
+
+    @Benchmark
+    public List<BibEntry> parallelSearch() {
+        // FIXME: Reuse SearchWorker here
+        SearchQuery searchQuery = new SearchQuery("Journal Title 500", false, false);
+        return database.getEntries().parallelStream().filter(searchQuery::isMatch).collect(Collectors.toList());
     }
 
     @Benchmark
@@ -121,7 +125,7 @@ public class Benchmarks {
     @Benchmark
     public boolean keywordGroupContains() throws ParseException {
         KeywordGroup group = new KeywordGroup("testGroup", "keyword", "testkeyword", false, false,
-                GroupHierarchyType.INDEPENDENT, ", ");
+                GroupHierarchyType.INDEPENDENT, ',');
         return group.containsAll(database.getEntries());
     }
 

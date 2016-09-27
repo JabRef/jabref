@@ -2,8 +2,8 @@ package net.sf.jabref.logic.msbib;
 
 import java.util.List;
 
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * @author Michael Wrighton, S M Mahbub Murshed

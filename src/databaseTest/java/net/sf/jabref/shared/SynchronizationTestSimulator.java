@@ -1,6 +1,5 @@
 package net.sf.jabref.shared;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Collection;
 
@@ -23,43 +22,40 @@ import org.junit.runners.Parameterized.Parameters;
 @RunWith(Parameterized.class)
 public class SynchronizationTestSimulator {
 
-    private static Connection connection;
-
     private BibDatabaseContext clientContextA;
     private BibDatabaseContext clientContextB;
 
     private SynchronizationTestEventListener eventListenerB; // used to monitor occurring events
+
+    private DBMSConnection dbmsConnection;
 
     @Parameter
     public DBMSType dbmsType;
 
 
     @Before
-    public void setUp() throws ClassNotFoundException, SQLException, DatabaseNotSupportedException {
-        // Get only one connection for each parameter
-        if (TestConnector.currentConnectionType != dbmsType) {
-            connection = TestConnector.getTestConnection(dbmsType);
-        }
+    public void setUp() throws SQLException, DatabaseNotSupportedException {
+        this.dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
 
-        clientContextA = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ", ");
-        clientContextA.getDBSynchronizer().openSharedDatabase(connection, dbmsType, "A");
+        clientContextA = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ',');
+        clientContextA.getDBMSSynchronizer().openSharedDatabase(dbmsConnection);
 
-        clientContextB = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ", ");
-        clientContextB.getDBSynchronizer().openSharedDatabase(connection, dbmsType, "B");
+        clientContextB = new BibDatabaseContext(new Defaults(BibDatabaseMode.BIBTEX), DatabaseLocation.SHARED, ',');
+        clientContextB.getDBMSSynchronizer().openSharedDatabase(dbmsConnection);
         eventListenerB = new SynchronizationTestEventListener();
-        clientContextB.getDBSynchronizer().registerListener(eventListenerB);
+        clientContextB.getDBMSSynchronizer().registerListener(eventListenerB);
     }
 
     @Parameters(name = "Test with {0} database system")
     public static Collection<DBMSType> getTestingDatabaseSystems() {
-        return DBMSConnector.getAvailableDBMSTypes();
+        return TestManager.getDBMSTypeTestParameter();
     }
 
     @Test
     public void simulateEntryInsertionAndManualPull() {
         clientContextA.getDatabase().insertEntry(getBibEntryExample(1)); // client A inserts an entry
         clientContextA.getDatabase().insertEntry(getBibEntryExample(2)); // client A inserts another entry
-        clientContextB.getDBSynchronizer().pullChanges(); // client B pulls the changes
+        clientContextB.getDBMSSynchronizer().pullChanges(); // client B pulls the changes
 
         Assert.assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
     }
@@ -71,7 +67,7 @@ public class SynchronizationTestSimulator {
         bibEntry.setField("custom", "custom value"); // client A changes the entry
         bibEntry.clearField("author");
 
-        clientContextB.getDBSynchronizer().pullChanges(); // client B pulls the changes
+        clientContextB.getDBMSSynchronizer().pullChanges(); // client B pulls the changes
 
         Assert.assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
     }
@@ -80,14 +76,14 @@ public class SynchronizationTestSimulator {
     public void simulateEntryDelitionAndManualPull() {
         BibEntry bibEntry = getBibEntryExample(1);
         clientContextA.getDatabase().insertEntry(bibEntry); // client A inserts an entry
-        clientContextB.getDBSynchronizer().pullChanges(); // client B pulls the entry
+        clientContextB.getDBMSSynchronizer().pullChanges(); // client B pulls the entry
 
         Assert.assertFalse(clientContextA.getDatabase().getEntries().isEmpty());
         Assert.assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
         Assert.assertEquals(clientContextA.getDatabase().getEntries(), clientContextB.getDatabase().getEntries());
 
         clientContextA.getDatabase().removeEntry(bibEntry); // client A removes the entry
-        clientContextB.getDBSynchronizer().pullChanges(); // client B pulls the change
+        clientContextB.getDBMSSynchronizer().pullChanges(); // client B pulls the change
 
         Assert.assertTrue(clientContextA.getDatabase().getEntries().isEmpty());
         Assert.assertTrue(clientContextB.getDatabase().getEntries().isEmpty());
@@ -97,7 +93,7 @@ public class SynchronizationTestSimulator {
     public void simulateUpdateOnNoLongerExistingEntry() {
         BibEntry bibEntryOfClientA = getBibEntryExample(1);
         clientContextA.getDatabase().insertEntry(bibEntryOfClientA); // client A inserts an entry
-        clientContextB.getDBSynchronizer().pullChanges(); // client B pulls the entry
+        clientContextB.getDBMSSynchronizer().pullChanges(); // client B pulls the entry
 
         Assert.assertFalse(clientContextA.getDatabase().getEntries().isEmpty());
         Assert.assertFalse(clientContextB.getDatabase().getEntries().isEmpty());
@@ -120,7 +116,7 @@ public class SynchronizationTestSimulator {
     public void simulateEntryChangeConflicts() {
         BibEntry bibEntryOfClientA = getBibEntryExample(1);
         clientContextA.getDatabase().insertEntry(bibEntryOfClientA); // client A inserts an entry
-        clientContextB.getDBSynchronizer().pullChanges(); // client B pulls the entry
+        clientContextB.getDBMSSynchronizer().pullChanges(); // client B pulls the entry
 
         bibEntryOfClientA.setField("year", "2001"); // A now increases the version number
 
@@ -150,29 +146,8 @@ public class SynchronizationTestSimulator {
         return bibEntry;
     }
 
-    private String escape(String expression) {
-        return DBMSProcessor.getProcessorInstance(connection, dbmsType).escape(expression);
-    }
-
     @After
     public void clear() throws SQLException {
-        if ((dbmsType == DBMSType.MYSQL) || (dbmsType == DBMSType.POSTGRESQL)) {
-            connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape("FIELD"));
-            connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape("ENTRY"));
-            connection.createStatement().executeUpdate("DROP TABLE IF EXISTS " + escape("METADATA"));
-        } else if (dbmsType == DBMSType.ORACLE) {
-            connection.createStatement().executeUpdate(
-                    "BEGIN\n" +
-                    "EXECUTE IMMEDIATE 'DROP TABLE " + escape("FIELD") + "';\n" +
-                    "EXECUTE IMMEDIATE 'DROP TABLE " + escape("ENTRY") + "';\n" +
-                    "EXECUTE IMMEDIATE 'DROP TABLE " + escape("METADATA") + "';\n" +
-                    "EXECUTE IMMEDIATE 'DROP SEQUENCE " + escape("ENTRY_SEQ") + "';\n" +
-                    "EXCEPTION\n" +
-                    "WHEN OTHERS THEN\n" +
-                    "IF SQLCODE != -942 THEN\n" +
-                    "RAISE;\n" +
-                    "END IF;\n" +
-                    "END;");
-        }
+        TestManager.clearTables(dbmsConnection);
     }
 }

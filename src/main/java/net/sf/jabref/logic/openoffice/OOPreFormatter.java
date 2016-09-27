@@ -3,8 +3,8 @@ package net.sf.jabref.logic.openoffice;
 import java.util.Map;
 
 import net.sf.jabref.logic.layout.LayoutFormatter;
-import net.sf.jabref.model.util.HTMLUnicodeConversionMaps;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.HTMLUnicodeConversionMaps;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * This formatter preprocesses JabRef fields before they are run through the layout of the
@@ -55,7 +55,7 @@ public class OOPreFormatter implements LayoutFormatter {
                 //Swallow braces, necessary for replacing encoded characters
 
             } else if (Character.isLetter(c) || (c == '%')
-                    || ModelStringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
+                    || StringUtil.SPECIAL_COMMAND_CHARS.contains(String.valueOf(c))) {
                 escaped = false;
 
                 if (!incommand) {
@@ -63,7 +63,7 @@ public class OOPreFormatter implements LayoutFormatter {
                 } else {
                     currentCommand.append(c);
                     testCharCom: if ((currentCommand.length() == 1)
-                            && ModelStringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
+                            && StringUtil.SPECIAL_COMMAND_CHARS.contains(currentCommand.toString())) {
                         // This indicates that we are in a command of the type
                         // \^o or \~{n}
                         if (i >= (finalResult.length() - 1)) {
@@ -75,7 +75,7 @@ public class OOPreFormatter implements LayoutFormatter {
                         c = finalResult.charAt(i);
                         String combody;
                         if (c == '{') {
-                            String part = ModelStringUtil.getPart(finalResult, i, false);
+                            String part = StringUtil.getPart(finalResult, i, false);
                             i += part.length();
                             combody = part;
                         } else {
@@ -120,11 +120,11 @@ public class OOPreFormatter implements LayoutFormatter {
                     // If so, handle.
                     String tag = getHTMLTag(command);
                     if (!tag.isEmpty()) {
-                        String part = ModelStringUtil.getPart(finalResult, i, true);
+                        String part = StringUtil.getPart(finalResult, i, true);
                         i += part.length();
                         sb.append('<').append(tag).append('>').append(part).append("</").append(tag).append('>');
                     } else if (c == '{') {
-                        String part = ModelStringUtil.getPart(finalResult, i, true);
+                        String part = StringUtil.getPart(finalResult, i, true);
                         i += part.length();
                         argument = part;
                         // handle common case of general latex command

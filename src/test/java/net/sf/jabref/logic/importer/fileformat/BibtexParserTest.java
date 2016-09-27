@@ -33,6 +33,7 @@ import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.groups.KeywordGroup;
+import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.metadata.SaveOrderConfig;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -1488,11 +1489,10 @@ public class BibtexParserTest {
         assertEquals(3, root.getNumberOfChildren());
         assertEquals(
                 new KeywordGroup("Fréchet", "keywords", "FrechetSpace", false, true, GroupHierarchyType.INDEPENDENT,
-                        ", "),
-                root.getChildren().get(0).getGroup());
+                        ','), root.getChildren().get(0).getGroup());
         assertEquals(
                 new KeywordGroup("Invariant theory", "keywords", "GIT", false, false, GroupHierarchyType.INDEPENDENT,
-                        ", "),
+                        ','),
                 root.getChildren().get(1).getGroup());
         assertEquals(Arrays.asList("Key1", "Key2"),
                 ((ExplicitGroup) root.getChildren().get(2).getGroup()).getLegacyEntryKeys());
@@ -1507,11 +1507,11 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void integrationTestContentSelectors() throws IOException {
+    public void integrationTestOldContentSelectorsAreIgnored() throws IOException {
         ParserResult result = BibtexParser.parse(
                 new StringReader("@comment{jabref-meta: selector_title:testWord;word2;}"), importFormatPreferences);
 
-        assertEquals(Arrays.asList("testWord", "word2"), result.getMetaData().getContentSelectors("title"));
+        assertEquals(new MetaData(), result.getMetaData());
     }
 
     @Test
