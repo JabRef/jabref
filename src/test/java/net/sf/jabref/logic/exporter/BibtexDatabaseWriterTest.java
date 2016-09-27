@@ -4,7 +4,6 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Scanner;
 
@@ -186,7 +185,7 @@ public class BibtexDatabaseWriterTest {
     @Test
     public void writeGroups() throws Exception {
         GroupTreeNode groupRoot = GroupTreeNode.fromGroup(new AllEntriesGroup(""));
-        groupRoot.addSubgroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING, ", "));
+        groupRoot.addSubgroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING, ','));
         metaData.setGroups(groupRoot);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
@@ -205,7 +204,7 @@ public class BibtexDatabaseWriterTest {
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
 
         GroupTreeNode groupRoot = GroupTreeNode.fromGroup(new AllEntriesGroup(""));
-        groupRoot.addChild(GroupTreeNode.fromGroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING, ", ")));
+        groupRoot.addChild(GroupTreeNode.fromGroup(new ExplicitGroup("test", GroupHierarchyType.INCLUDING, ',')));
         metaData.setGroups(groupRoot);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), preferences);
@@ -461,16 +460,6 @@ public class BibtexDatabaseWriterTest {
     }
 
     @Test
-    public void writeContentSelectors() throws Exception {
-        metaData.setContentSelectors("title", Arrays.asList("testWord", "word2"));
-
-        StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
-
-        assertEquals(OS.NEWLINE + "@Comment{jabref-meta: selector_title:testWord;word2;}" + OS.NEWLINE,
-                session.getStringValue());
-    }
-
-    @Test
     public void writeFileDirectories() throws Exception {
         metaData.setDefaultFileDirectory("\\Literature\\");
         metaData.setUserFileDirectory("defaultOwner-user", "D:\\Documents");
@@ -480,24 +469,6 @@ public class BibtexDatabaseWriterTest {
         assertEquals(OS.NEWLINE + "@Comment{jabref-meta: fileDirectory:\\\\Literature\\\\;}" + OS.NEWLINE +
                 OS.NEWLINE + "@Comment{jabref-meta: fileDirectory-defaultOwner-user:D:\\\\Documents;}"
                 + OS.NEWLINE, session.getStringValue());
-    }
-
-    @Test
-    public void writeNotEmptyContentSelectors() throws Exception {
-        metaData.setContentSelectors("title", Collections.singletonList(""));
-
-        StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
-
-        assertEquals("", session.getStringValue());
-    }
-
-    @Test
-    public void writeNotCompletelyEmptyContentSelectors() throws Exception {
-        metaData.setContentSelectors("title", Collections.emptyList());
-
-        StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
-
-        assertEquals("", session.getStringValue());
     }
 
     @Test

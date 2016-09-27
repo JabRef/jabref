@@ -9,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -28,17 +29,13 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefException;
+import net.sf.jabref.JabRefGUI;
+import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.Defaults;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.database.DatabaseLocation;
-import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.shared.DBMSConnection;
 import net.sf.jabref.shared.DBMSConnectionProperties;
 import net.sf.jabref.shared.DBMSType;
@@ -83,7 +80,6 @@ public class OpenSharedDatabaseDialog extends JDialog {
     private final SharedDatabasePreferences prefs = new SharedDatabasePreferences();
 
     private DBMSConnectionProperties connectionProperties;
-    private BibDatabaseContext bibDatabaseContext;
 
     /**
      * @param frame the JabRef Frame
@@ -99,16 +95,19 @@ public class OpenSharedDatabaseDialog extends JDialog {
     }
 
     public void openSharedDatabase() {
+
+        if (isSharedDatabaseAlreadyPresent()) {
+            JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this,
+                    Localization.lang("You are already connected to a database using entered connection details."),
+                    Localization.lang("Warning"), JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
         setLoadingConnectButtonText(true);
 
         try {
-            bibDatabaseContext.getDBMSSynchronizer().openSharedDatabase(connectionProperties);
-            frame.addTab(bibDatabaseContext, true);
+            new SharedDatabaseUIManager(frame).openNewSharedDatabaseTab(connectionProperties);
             setPreferences();
-            bibDatabaseContext.getDBMSSynchronizer()
-                    .registerListener(
-                            new SharedDatabaseUIManager(frame, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR)));
-            frame.output(Localization.lang("Connection_to_%0_server_established.", connectionProperties.getType().toString()));
             dispose();
             return; // setLoadingConnectButtonText(false) should not be reached regularly.
         } catch (SQLException exception) {
@@ -131,10 +130,6 @@ public class OpenSharedDatabaseDialog extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 try {
                     checkFields();
-                    BibDatabaseMode selectedMode = Globals.prefs.getDefaultBibDatabaseMode();
-
-                    bibDatabaseContext = new BibDatabaseContext(new Defaults(selectedMode),
-                            DatabaseLocation.SHARED, Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
 
                     connectionProperties = new DBMSConnectionProperties();
                     connectionProperties.setType((DBMSType) dbmsTypeDropDown.getSelectedItem());
@@ -323,8 +318,8 @@ public class OpenSharedDatabaseDialog extends JDialog {
     /**
      * Saves the data from this dialog persistently to facilitate the usage.
      */
-    public void setPreferences() {
-        prefs.setType(((DBMSType) dbmsTypeDropDown.getSelectedItem()).toString());
+    private void setPreferences() {
+        prefs.setType(dbmsTypeDropDown.getSelectedItem().toString());
         prefs.setHost(hostField.getText());
         prefs.setPort(portField.getText());
         prefs.setName(databaseField.getText());
@@ -382,4 +377,18 @@ public class OpenSharedDatabaseDialog extends JDialog {
         }
     }
 
+    /**
+     * Checks whether a database with the given @link {@link DBMSConnectionProperties} is already opened.
+     */
+    private boolean isSharedDatabaseAlreadyPresent() {
+        List<BasePanel> panels = JabRefGUI.getMainFrame().getBasePanelList();
+        for (BasePanel panel : panels) {
+            DBMSConnectionProperties dbmsConnectionProperties = panel.getBibDatabaseContext().getDBMSSynchronizer()
+                    .getDBProcessor().getDBMSConnectionProperties();
+            if (this.connectionProperties.equals(dbmsConnectionProperties)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
