@@ -27,8 +27,7 @@ public class RTFCharsTest {
 
         Assert.assertEquals("hallo", formatter.format("hallo"));
 
-        // We should be able to replace the ? with e
-        Assert.assertEquals("R\\u233?flexions sur le timing de la quantit\\u233?",
+        Assert.assertEquals("R\\u233eflexions sur le timing de la quantit\\u233e",
                 formatter.format("Réflexions sur le timing de la quantité"));
 
         Assert.assertEquals("h\\u225allo", formatter.format("h\\'allo"));
@@ -54,7 +53,7 @@ public class RTFCharsTest {
         Assert.assertEquals("R\\u233eflexions sur le timing de la quantit\\u233e \\u230ae should be \\u230ae",
                 formatter.format("Réflexions sur le timing de la quantité \\ae should be æ"));
 
-        Assert.assertEquals("h\\u225all{\\uc2\\u339oe}", formatter.format("h\\'all\\oe "));
+        Assert.assertEquals("h\\u225all\\u339oe", formatter.format("h\\'all\\oe "));
     }
 
     @Test
@@ -66,12 +65,12 @@ public class RTFCharsTest {
         Assert.assertEquals("\\'f6", formatter.format("\\\"{o}")); // ö
         Assert.assertEquals("\\u245o", formatter.format("\\~{o}")); // õ
         Assert.assertEquals("\\u333o", formatter.format("\\={o}"));
-        Assert.assertEquals("\\u334O", formatter.format("\\u{o}"));
+        Assert.assertEquals("\\u335o", formatter.format("\\u{o}"));
         Assert.assertEquals("\\u231c", formatter.format("\\c{c}")); // ç
-        Assert.assertEquals("{\\uc2\\u339oe}", formatter.format("\\oe"));
-        Assert.assertEquals("{\\uc2\\u338OE}", formatter.format("\\OE"));
-        Assert.assertEquals("{\\uc2\\u230ae}", formatter.format("\\ae")); // æ
-        Assert.assertEquals("{\\uc2\\u198AE}", formatter.format("\\AE")); // Æ
+        Assert.assertEquals("\\u339oe", formatter.format("\\oe"));
+        Assert.assertEquals("\\u338OE", formatter.format("\\OE"));
+        Assert.assertEquals("\\u230ae", formatter.format("\\ae")); // æ
+        Assert.assertEquals("\\u198AE", formatter.format("\\AE")); // Æ
 
         Assert.assertEquals("", formatter.format("\\.{o}")); // ???
         Assert.assertEquals("", formatter.format("\\v{o}")); // ???
