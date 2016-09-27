@@ -408,7 +408,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             }
                             menu.add(new ExternalFileMenuItem(panel.frame(), entry, content.get(), content.get(), icon,
                                     panel.getBibDatabaseContext(), field));
-                            if (field == FieldName.DOI) {
+                            if (field.equals(FieldName.DOI)) {
                                 menu.add(new CopyDoiUrlAction(content.get()));
                             }
                             showDefaultPopup = false;

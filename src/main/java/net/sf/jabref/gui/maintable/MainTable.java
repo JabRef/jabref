@@ -15,7 +15,6 @@ import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.InputMap;
-import javax.swing.JLabel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
@@ -294,7 +293,6 @@ public class MainTable extends JTable {
                 MainTable.incRenderer.setNumber(row);
                 renderer = MainTable.incRenderer;
             }
-            renderer.setHorizontalAlignment(JLabel.CENTER);
         } else if (tableColorCodes || tableResolvedColorCodes) {
             CellRendererMode status = getCellStatus(row, column, tableResolvedColorCodes);
             if (status == CellRendererMode.REQUIRED) {
