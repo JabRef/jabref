@@ -13,7 +13,6 @@ import java.util.regex.Pattern;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -73,7 +72,8 @@ public class MedlinePlainImporter extends ImportFormat {
         Optional<String> OptionalLines = reader.lines().reduce((line, nextline) -> line + "\n" + nextline);
         String linesAsString = OptionalLines.isPresent() ? OptionalLines.get() : "";
 
-        String[] entries = StringUtil.ReplaceUniCodeDashes(linesAsString).split("\\n\\n");
+        String[] entries = linesAsString.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
+                .split("\\n\\n");
 
         for (String entry1 : entries) {
 
