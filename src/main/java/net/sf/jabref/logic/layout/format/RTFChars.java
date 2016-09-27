@@ -155,7 +155,7 @@ public class RTFChars implements LayoutFormatter {
             if (c < 128) {
                 sb.append(c);
             } else {
-                sb.append("\\u").append((long) c).append('?');
+                sb.append("\\u").append((long) c).append(transformSpecialCharacter((long) c));
             }
         }
 
@@ -199,4 +199,48 @@ public class RTFChars implements LayoutFormatter {
         // the wrong "}" at the end is removed by "format(res)"
         return new StringInt(format(res), part.length());
     }
+
+    private String transformSpecialCharacter(long c) {
+        if(192 <= c && c <= 198)
+            return "A";
+        if(199 == c)
+            return "C";
+        if(200 <= c && c <= 203)
+            return "E";
+        if(204 <= c && c <= 207)
+            return "I";
+        if(208 == c)
+            return "D";
+        if(209 <= c)
+            return "N";
+        if(210 <= c && c <=214 || c == 216 )
+            return "O";
+        if(217 <= c && c <= 220)
+            return "U";
+        if(221 == c)
+            return "Y";
+        if(222 == c)
+            return "TH";
+        if(223 == c)
+            return "ss";
+        if(224 <= c && c <= )
+        return "";
+        if( <= c && c <= )
+        return "";
+        if( <= c && c <= )
+        return "";
+        if( <= c && c <= )
+        return "";
+        if( <= c && c <= )
+        return "";
+
+
+
+        if(232 <= c && c <= 235 )
+            return = "e";
+
+        return "?";
+    }
 }
+//if( <= c && c <= )
+//        return "";

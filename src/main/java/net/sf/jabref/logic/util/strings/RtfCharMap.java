@@ -57,17 +57,23 @@ public class RtfCharMap extends HashMap<String, String> {
         put("AA", "\\u197A"); // "Aring"
         // RTFCHARS.put("AE", "{\\uc2\\u198AE}"); // "AElig"
         put("AE", "{\\u198A}"); // "AElig"
+
         put("cC", "\\u199C"); // "Ccedil"
+
         put("`E", "\\u200E"); // "Egrave"
         put("'E", "\\u201E"); // "Eacute"
         put("^E", "\\u202E"); // "Ecirc"
         put("\"E", "\\u203E"); // "Euml"
+
         put("`I", "\\u204I"); // "Igrave
         put("'I", "\\u205I"); // "Iacute"
         put("^I", "\\u206I"); // "Icirc"
         put("\"I", "\\u207I"); // "Iuml"
+
         put("DH", "\\u208D"); // "ETH"
+
         put("~N", "\\u209N"); // "Ntilde"
+
         put("`O", "\\u210O"); // "Ograve"
         put("'O", "\\u211O"); // "Oacute"
         put("^O", "\\u212O"); // "Ocirc"
@@ -79,14 +85,19 @@ public class RtfCharMap extends HashMap<String, String> {
         put("O", "\\u216O"); // "Oslash"
         //  RTFCHARS.put("O", "\\'d8");
         put("o", "\\'f8");
+
         put("`U", "\\u217U"); // "Ugrave"
         put("'U", "\\u218U"); // "Uacute"
         put("^U", "\\u219U"); // "Ucirc"
         put("\"U", "\\u220U"); // "Uuml"
+
         put("'Y", "\\u221Y"); // "Yacute"
+
         put("TH", "{\\uc2\\u222TH}"); // "THORN"
+
         put("ss", "{\\uc2\\u223ss}"); // "szlig"
         //RTFCHARS.put("ss", "AFFEN"); // "szlig"
+
         put("`a", "\\u224a"); // "agrave"
         put("'a", "\\u225a"); // "aacute"
         put("^a", "\\u226a"); // "acirc"
@@ -95,6 +106,7 @@ public class RtfCharMap extends HashMap<String, String> {
         put("aa", "\\u229a"); // "aring"
         //  RTFCHARS.put("ae", "{\\uc2\\u230ae}"); // "aelig" \\u230e6
         put("ae", "{\\u230a}"); // "aelig" \\u230e6
+
         put("cc", "\\u231c"); // "ccedil"
         put("`e", "\\u232e"); // "egrave"
         put("'e", "\\u233e"); // "eacute"
