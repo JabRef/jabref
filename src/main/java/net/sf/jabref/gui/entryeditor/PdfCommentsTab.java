@@ -3,7 +3,6 @@ package net.sf.jabref.gui.entryeditor;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.SystemColor;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -244,18 +243,14 @@ public class PdfCommentsTab extends JPanel {
         pageScrollPane.setBorder(null);
         commentTxtScrollPane.setViewportView(contentTxtArea);
         highlightScrollPane.setViewportView(highlightTxtArea);
-        authorArea.setBackground(SystemColor.control);
         authorArea.setEditable(false);
-        dateArea.setBackground(SystemColor.control);
         dateArea.setEditable(false);
-        pageArea.setBackground(SystemColor.control);
         pageArea.setEditable(false);
         contentTxtArea.setEditable(false);
         contentTxtArea.setLineWrap(true);
         highlightTxtArea.setEditable(false);
         highlightTxtArea.setLineWrap(true);
         fileNameComboBox.setEditable(false);
-        fileNameComboBox.setBackground(SystemColor.control);
         fileNameComboBox.addActionListener(e -> updateFileNameComboBox());
 
         this.add(informationPanel);
