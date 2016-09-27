@@ -157,7 +157,6 @@ class EntryEditorTab {
                 defaultHeight = 0;
             } else {
                 if (field.startsWith("_")) {
-                    System.out.println("<<<<<<<" + field);
                     textAreaForHiddenField = new TextAreaForHiddenField(field);
                     // the assumption is that each hidden field appears after its visible twin
                     // i.e., visible, hidden, visible, hidden, ...
@@ -165,8 +164,6 @@ class EntryEditorTab {
                     textAreaForVisibleField.setTwin(textAreaForHiddenField);
                     fieldEditor = textAreaForHiddenField;
                 } else {
-                    System.out.println("xxxxxxxx" + field);
-
                     textAreaForVisibleField = new TextAreaForVisibleField(field);
                     fieldEditor = textAreaForVisibleField;
                 }

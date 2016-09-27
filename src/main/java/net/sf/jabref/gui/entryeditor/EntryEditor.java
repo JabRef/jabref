@@ -318,7 +318,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
             for (String fieldName : tabList.getTabFields(i)) {
                 tabFields.add(fieldName);
                 tabFields.add("_" + fieldName);
-                System.out.println("Tabfields liste  " + tabFields);
             }
             EntryEditorTab newTab = new EntryEditorTab(frame, panel, tabFields, this, true, false,
                     tabList.getTabName(i));
