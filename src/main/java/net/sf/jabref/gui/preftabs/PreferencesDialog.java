@@ -222,15 +222,15 @@ public class PreferencesDialog extends JDialog {
     private void storeAllSettings(){
         // First check that all tabs are ready to close:
         int count = main.getComponentCount();
-        Component[] comps = main.getComponents();
-        for (int i = 0; i < count; i++) {
-            if (!((PrefsTab) comps[i]).validateSettings()) {
+        Component[] preferenceTabs = main.getComponents();
+        for (Component tab: preferenceTabs) {
+            if (!((PrefsTab) tab).validateSettings()) {
                 return; // If not, break off.
             }
         }
         // Then store settings and close:
-        for (int i = 0; i < count; i++) {
-            ((PrefsTab) comps[i]).storeSettings();
+        for (Component tab: preferenceTabs) {
+            ((PrefsTab) tab).storeSettings();
         }
         prefs.flush();
 
@@ -274,7 +274,7 @@ public class PreferencesDialog extends JDialog {
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
-                            Localization.lang("Export preferences"), JOptionPane.ERROR_MESSAGE);
+                            Localization.lang("Export preferences"), JOptionPane.WARNING_MESSAGE);
                 }
             });
         }
