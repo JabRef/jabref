@@ -52,6 +52,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Implemented integrity check for `journaltitle` field: BibLaTeX field only (BibTeX)
 - [#463](https://github.com/JabRef/jabref/issues/463): Disable certain menu items, toolbar buttons and context menu items while multiple entries are selected
 - [#490](https://github.com/JabRef/jabref/issues/490) Added right click menu to main table and entry editor to allow copying doi url
+- [#549](https://github.com/JabRef/jabref/issues/549) Added new shortcut to copy the BibTeX key as a hyperlink to its url to the clipboard
 
 ### Fixed
 - Fixed [koppor#160](https://github.com/koppor/jabref/issues/160): Tooltips now working in the main table
