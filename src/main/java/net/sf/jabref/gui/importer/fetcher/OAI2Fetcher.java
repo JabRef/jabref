@@ -171,32 +171,31 @@ public class OAI2Fetcher implements EntryFetcher {
         oai2Connection.setRequestProperty("User-Agent", "JabRef");
 
         /* create an empty BibEntry and set the oai2identifier field */
-        BibEntry be = new BibEntry(IdGenerator.next(), "article");
-        be.setField(OAI2Fetcher.OAI2_IDENTIFIER_FIELD, fixedKey);
-        DefaultHandler handlerBase = new OAI2Handler(be);
+        BibEntry entry = new BibEntry(IdGenerator.next(), "article");
+        entry.setField(OAI2Fetcher.OAI2_IDENTIFIER_FIELD, fixedKey);
+        DefaultHandler handlerBase = new OAI2Handler(entry);
 
         try (InputStream inputStream = oai2Connection.getInputStream()) {
-
             /* parse the result */
             saxParser.parse(inputStream, handlerBase);
 
             /* Correct line breaks and spacing */
-            for (String name : be.getFieldNames()) {
-                be.getField(name)
-                        .ifPresent(content -> be.setField(name, OAI2Handler.correctLineBreaks(content)));
+            for (String name : entry.getFieldNames()) {
+                entry.getField(name)
+                        .ifPresent(content -> entry.setField(name, OAI2Handler.correctLineBreaks(content)));
             }
 
             if (fixedKey.matches("\\d\\d\\d\\d\\..*")) {
-                be.setField(FieldName.YEAR, "20" + fixedKey.substring(0, 2));
+                entry.setField(FieldName.YEAR, "20" + fixedKey.substring(0, 2));
 
                 int monthNumber = Integer.parseInt(fixedKey.substring(2, 4));
                 MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
                 if (month.isValid()) {
-                    be.setField(FieldName.MONTH, month.bibtexFormat);
+                    entry.setField(FieldName.MONTH, month.bibtexFormat);
                 }
             }
         }
-        return be;
+        return entry;
     }
 
     @Override

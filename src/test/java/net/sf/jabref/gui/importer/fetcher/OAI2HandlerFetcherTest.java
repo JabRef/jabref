@@ -131,6 +131,7 @@ public class OAI2HandlerFetcherTest {
                     be.getField("title"));
             Assert.assertEquals(Optional.of("Javier López Peña and Gabriel Navarro"), be.getField("author"));
             Assert.assertEquals(Optional.of("2007"), be.getField("year"));
+
             Thread.sleep(20000);
         }
 
@@ -144,6 +145,7 @@ public class OAI2HandlerFetcherTest {
                     Optional.of(
                             "Magnetized Hypermassive Neutron Star Collapse: a candidate central engine for short-hard GRBs"),
                     be.getField("title"));
+
             Thread.sleep(20000);
         }
 
@@ -165,13 +167,12 @@ public class OAI2HandlerFetcherTest {
             Thread.sleep(20000);
         }
 
-        {
-            OAI2Fetcher fetcher = new OAI2Fetcher();
-            be = fetcher.importOai2Entry("0709.3040");
-            Assert.assertNotNull(be);
+        OAI2Fetcher fetcher = new OAI2Fetcher();
+        be = fetcher.importOai2Entry("0709.3040");
+        Assert.assertNotNull(be);
 
-            Assert.assertEquals(Optional.of("2007"), be.getField("year"));
-            Assert.assertEquals(Optional.of("#sep#"), be.getField("month"));
-        }
+        Assert.assertEquals(Optional.of("2007"), be.getField("year"));
+        Assert.assertEquals(Optional.of("#sep#"), be.getField("month"));
+
     }
 }
