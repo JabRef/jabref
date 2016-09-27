@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.msbib;
+package net.sf.jabref.logic.mods;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.msbib;
+package net.sf.jabref.logic.mods;
 
 import java.util.List;
 
