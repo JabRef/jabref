@@ -25,6 +25,7 @@ import net.sf.jabref.gui.BasePanelMode;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.PreviewPanel;
+import net.sf.jabref.gui.actions.CopyDoiUrlAction;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.entryeditor.EntryEditor;
 import net.sf.jabref.gui.externalfiletype.ExternalFileMenuItem;
@@ -311,6 +312,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
             tableRows.get(row).getField(FieldName.CROSSREF)
                     .ifPresent(crossref -> panel.getDatabase().getEntryByKey(crossref).ifPresent(entry -> panel.highlightEntry(entry)));
         }
+        panel.frame().updateEnabledState();
     }
 
     /**
@@ -406,6 +408,9 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
                             }
                             menu.add(new ExternalFileMenuItem(panel.frame(), entry, content.get(), content.get(), icon,
                                     panel.getBibDatabaseContext(), field));
+                            if (field.equals(FieldName.DOI)) {
+                                menu.add(new CopyDoiUrlAction(content.get()));
+                            }
                             showDefaultPopup = false;
                         }
                     }
@@ -529,6 +534,7 @@ public class MainTableSelectionListener implements ListEventListener<BibEntry>, 
         } else if (e.getKeyChar() == KeyEvent.VK_ESCAPE) {
             lastPressedCount = 0;
         }
+        panel.frame().updateEnabledState();
     }
 
     @Override
