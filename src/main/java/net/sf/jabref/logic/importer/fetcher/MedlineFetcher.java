@@ -40,9 +40,6 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
     private static final String API_MEDLINE_FETCH = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
     private static final String API_MEDLINE_SEARCH = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
 
-    private static final Pattern PART1_PATTERN = Pattern.compile(", ");
-    private static final Pattern PART2_PATTERN = Pattern.compile(",");
-
     private static final Pattern ID_PATTERN = Pattern.compile("<Id>(\\d+)</Id>");
     private static final Pattern COUNT_PATTERN = Pattern.compile("<Count>(\\d+)<\\/Count>");
     private static final Pattern RET_MAX_PATTERN = Pattern.compile("<RetMax>(\\d+)<\\/RetMax>");
@@ -54,16 +51,10 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
      */
     private static final int PACING = 20;
 
-    private static String toSearchTerm(String in) {
-        // This can probably be simplified using simple String.replace()...
-        String result = in;
-        Matcher matcher;
-        matcher = PART1_PATTERN.matcher(result);
-        result = matcher.replaceAll("\\+AND\\+");
-        matcher = PART2_PATTERN.matcher(result);
-        result = matcher.replaceAll("\\+AND\\+");
-        result = result.replace(" ", "+");
-        return result;
+    private static String toSearchTerm(String query) {
+        query = query.replaceAll(", ", " AND ");
+        query = query.replaceAll(",", " AND ");
+        return query;
     }
 
     /**
@@ -199,7 +190,9 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
                 LOGGER.warn(Localization.lang("No references found"));
             }
 
-            return Optional.of(bibs.get(0));
+            if(bibs.size() == 1) {
+                return Optional.of(bibs.get(0));
+            }
         }
         return Optional.empty();
     }
