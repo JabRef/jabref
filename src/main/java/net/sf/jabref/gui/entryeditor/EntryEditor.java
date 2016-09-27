@@ -324,7 +324,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 Localization.lang("Show/edit BibTeX source"));
         tabs.add(srcPanel);
         sourceIndex = tabs.size() - 1; // Set the sourceIndex variable.
-        srcPanel.setFocusCycleRoot(true);
+        srcPanel.setFocusCycleRoot(false);
     }
 
     private void addOtherTab(List<String> otherFields) {
@@ -368,6 +368,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
      */
     private void addPdfTab() {
         tabbed.remove(pdfCommentsTab);
+        tabs.remove(pdfCommentsTab);
         Optional<String> field = entry.getField(FieldName.FILE);
         if (field.isPresent()) {
             pdfCommentsTab = new PdfCommentsTab(this, panel, tabbed);
@@ -650,6 +651,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
         Object activeTab = tabs.get(tabbed.getSelectedIndex());
         if (activeTab instanceof EntryEditorTab) {
             ((EntryEditorTab) activeTab).activate();
+        } else if (activeTab instanceof PdfCommentsTab) {
+            ((PdfCommentsTab)activeTab).requestFocus();
         } else {
             source.requestFocus();
         }
@@ -1021,6 +1024,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
             // or more of the same fields as this one:
             SwingUtilities.invokeLater(() -> {
                 Object activeTab = tabs.get(tabbed.getSelectedIndex());
+                if (activeTab instanceof PdfCommentsTab && !((PdfCommentsTab) activeTab).isInitialized()) {
+                    PdfCommentsTab.initializeTab((PdfCommentsTab) activeTab);
+                }
+
                 if (activeTab instanceof EntryEditorTab) {
                     ((EntryEditorTab) activeTab).updateAll();
                     activateVisible();
@@ -1028,7 +1035,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
             });
         }
     }
-
 
 
     class DeleteAction extends AbstractAction {

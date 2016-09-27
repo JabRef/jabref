@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import javax.swing.BoxLayout;
@@ -60,8 +59,11 @@ public class PdfCommentsTab extends JPanel {
     private final JTextArea pageArea = new JTextArea("page");
     private final JScrollPane pageScrollPane = new JScrollPane();
     private final JLabel commentTxtLabel = new JLabel(Localization.lang("Content"),JLabel.CENTER);
-    private final JTextArea commentTxtArea = new JTextArea("comment content");
+    private final JTextArea contentTxtArea = new JTextArea();
+    private final JLabel highlightTxtLabel = new JLabel(Localization.lang("Highlighted text"), JLabel.CENTER);
+    private final JTextArea highlightTxtArea = new JTextArea();
     private final JScrollPane commentTxtScrollPane = new JScrollPane();
+    private final JScrollPane highlightScrollPane = new JScrollPane();
     private final JButton copyToClipboardButton = new JButton();
     private final JButton openPdfButton = new JButton();
     DefaultListModel<PdfComment> listModel;
@@ -70,6 +72,8 @@ public class PdfCommentsTab extends JPanel {
     private final BasePanel basePanel;
     private final JTabbedPane tabbed;
     private int commentListSelectedIndex = 0;
+
+    private boolean isInitialized;
 
     private List<List<PdfComment>> allNotes = new ArrayList<>();
 
@@ -80,13 +84,26 @@ public class PdfCommentsTab extends JPanel {
         this.tabbed = tabbed;
         setLayout(new BoxLayout(this, BoxLayout.X_AXIS));
         listModel  = new DefaultListModel<>();
-        try {
-            addComments();
-        } catch (IOException e) {
-            e.printStackTrace();
+        this.isInitialized = false;
+
+    }
+
+    public static PdfCommentsTab initializeTab(PdfCommentsTab tab){
+
+        if(!tab.isInitialized) {
+            
+            try {
+                tab.addComments();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            tab.setUpPdfCommentsPanel();
+            tab.setUpInformationPanel();
+
+            tab.isInitialized = true;
+            return tab;
         }
-        this.setUpPdfCommentsTab();
-        this.setUpInformationPanel();
+        return tab;
     }
 
     /**
@@ -158,7 +175,7 @@ public class PdfCommentsTab extends JPanel {
         authorArea.setText(comment.getAuthor());
         dateArea.setText(comment.getDate());
         pageArea.setText(String.valueOf(comment.getPage()));
-        commentTxtArea.setText(combineHighlightAndTextAnnotations(comment));
+        updateContentAndHighlightTextfields(comment);
 
     }
 
@@ -179,7 +196,7 @@ public class PdfCommentsTab extends JPanel {
         updateShownComments(allNotes.get(indexSelectedByComboBox));
     }
 
-    private void setUpPdfCommentsTab() {
+    private void setUpPdfCommentsPanel() {
         JPanel commentListPanel = FormBuilder.create()
                 .columns("pref, $lcgap, pref:grow")
                 .rows("pref, $lg, fill:pref:grow, $lg, pref")
@@ -196,7 +213,7 @@ public class PdfCommentsTab extends JPanel {
     private void setUpInformationPanel(){
         JPanel informationPanel  = FormBuilder.create()
                 .columns("pref, $lcgap, pref:grow")
-                .rows("pref, $lg, pref, $lg, pref, $lg, pref, $lg, fill:pref:grow, $lg, pref")
+                .rows("pref, $lg, pref, $lg, pref, $lg, pref, $lg, pref:grow, $lg, pref:grow, $lg, fill:pref")
                 .padding(Paddings.DIALOG)
                 .add(authorLabel).xy(1,3, "left, top")
                 .add(authorScrollPane).xy(3,3)
@@ -205,8 +222,10 @@ public class PdfCommentsTab extends JPanel {
                 .add(pageLabel).xy(1,7, "left, top")
                 .add(pageScrollPane).xy(3,7)
                 .add(commentTxtLabel).xy(1,9, "left, top")
-                .add(commentTxtScrollPane).xy(3,9)
-                .add(this.setUpButtons()).xy(3,11)
+                .add(commentTxtScrollPane).xywh(3,9, 1, 2)
+                .add(highlightTxtLabel).xy(1, 11, "left, top")
+                .add(highlightScrollPane).xywh(3, 11, 1, 2)
+                .add(this.setUpButtons()).xy(3, 13)
                 .build();
 
         fileNameScrollPane.setViewportView(fileNameComboBox);
@@ -215,6 +234,7 @@ public class PdfCommentsTab extends JPanel {
         dateLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
         pageLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
         commentTxtLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
+        highlightTxtLabel.setForeground(GUIGlobals.ENTRY_EDITOR_LABEL_COLOR);
         fileNameScrollPane.setBorder(null);
         authorScrollPane.setViewportView(authorArea);
         authorScrollPane.setBorder(null);
@@ -222,15 +242,18 @@ public class PdfCommentsTab extends JPanel {
         dateScrollPane.setBorder(null);
         pageScrollPane.setViewportView(pageArea);
         pageScrollPane.setBorder(null);
-        commentTxtScrollPane.setViewportView(commentTxtArea);
+        commentTxtScrollPane.setViewportView(contentTxtArea);
+        highlightScrollPane.setViewportView(highlightTxtArea);
         authorArea.setBackground(SystemColor.control);
         authorArea.setEditable(false);
         dateArea.setBackground(SystemColor.control);
         dateArea.setEditable(false);
         pageArea.setBackground(SystemColor.control);
         pageArea.setEditable(false);
-        commentTxtArea.setEditable(false);
-        commentTxtArea.setLineWrap(true);
+        contentTxtArea.setEditable(false);
+        contentTxtArea.setLineWrap(true);
+        highlightTxtArea.setEditable(false);
+        highlightTxtArea.setLineWrap(true);
         fileNameComboBox.setEditable(false);
         fileNameComboBox.setBackground(SystemColor.control);
         fileNameComboBox.addActionListener(e -> updateFileNameComboBox());
@@ -258,7 +281,7 @@ public class PdfCommentsTab extends JPanel {
     }
 
     private void copyToClipboard(){
-        new ClipBoardManager().setClipboardContents(commentTxtArea.getText());
+        new ClipBoardManager().setClipboardContents(contentTxtArea.getText());
     }
 
     private void openPdf() {
@@ -275,37 +298,32 @@ public class PdfCommentsTab extends JPanel {
     }
 
     /**
-     * Combines highlighted text with it's linked comment and the other way round. If the comment is not linked with
-     * a highlighted text, the comments content is returned
-     * Combined text should look like this:
-     * "Annotation content: some text
-     * Highlighted Text: the highlighted text"
+     * Fills the highlight and comment texts and enables/disables the highlight area if there is no highlighted text
      *
      * @param comment either a text comment or a highlighting from a pdf
-     * @return a string with the comments content combined with highlighted text if some is linked to it
      */
-    private String combineHighlightAndTextAnnotations(final PdfComment comment){
+    private void updateContentAndHighlightTextfields(final PdfComment comment){
 
         if(comment.hasLinkedComment()){
-            PdfComment textComment;
-            PdfComment highlightedText;
+            String textComment = "";
+            String highlightedText = "";
 
             if(comment.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE)){
-                highlightedText = comment;
-                textComment = comment.getLinkedPdfComment();
+                highlightedText = comment.getContent();
+                textComment = comment.getLinkedPdfComment().getContent();
             } else {
-                highlightedText = comment.getLinkedPdfComment();
-                textComment = comment;
+                highlightedText = comment.getLinkedPdfComment().getContent();
+                textComment = comment.getContent();
             }
-            StringJoiner joiner = new StringJoiner(System.getProperty("line.separator"));
-            joiner.add(Localization.lang("Annotation content") + ":")
-                    .add(textComment.getContent())
-                    .add(Localization.lang("Highlighted text") + ":")
-                    .add(highlightedText.getContent());
+            highlightTxtArea.setEnabled(true);
+            contentTxtArea.setText(textComment);
+            highlightTxtArea.setText(highlightedText);
 
-            return joiner.toString();
+        } else {
+            contentTxtArea.setText(comment.getContent());
+            highlightTxtArea.setText("N/A");
+            highlightTxtArea.setEnabled(false);
         }
-        return comment.getContent();
     }
 
     /**
@@ -376,5 +394,9 @@ public class PdfCommentsTab extends JPanel {
 
             return label;
         }
+    }
+
+    public boolean isInitialized() {
+        return isInitialized;
     }
 }
