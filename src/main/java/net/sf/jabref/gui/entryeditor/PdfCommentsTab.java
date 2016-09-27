@@ -60,7 +60,7 @@ public class PdfCommentsTab extends JPanel {
     private final JScrollPane pageScrollPane = new JScrollPane();
     private final JLabel commentTxtLabel = new JLabel(Localization.lang("Content"),JLabel.CENTER);
     private final JTextArea contentTxtArea = new JTextArea();
-    private final JLabel highlightTxtLabel = new JLabel(Localization.lang("Highlighted text"), JLabel.CENTER);
+    private final JLabel highlightTxtLabel = new JLabel(Localization.lang("Highlight"), JLabel.CENTER);
     private final JTextArea highlightTxtArea = new JTextArea();
     private final JScrollPane commentTxtScrollPane = new JScrollPane();
     private final JScrollPane highlightScrollPane = new JScrollPane();
@@ -155,7 +155,7 @@ public class PdfCommentsTab extends JPanel {
     private void updateShownComments(List<PdfComment> importedNotes){
         listModel.clear();
         if(importedNotes.isEmpty()){
-            listModel.addElement(new PdfComment("", "", "", 0, Localization.lang("Attached_file_has_no_valid_path"), ""));
+            listModel.addElement(new PdfComment("", "", "", 0, Localization.lang("PDF has no attached annotations"), ""));
         } else {
             Comparator<PdfComment> byPage = (comment1, comment2) -> Integer.compare(comment1.getPage(), comment2.getPage());
             importedNotes.stream()
