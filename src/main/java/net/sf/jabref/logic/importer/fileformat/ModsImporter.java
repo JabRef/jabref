@@ -15,6 +15,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.mods.AbstractDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.DateDefinition;
@@ -64,8 +65,8 @@ import org.apache.commons.logging.LogFactory;
 public class ModsImporter extends ImportFormat {
 
     private static final Log LOGGER = LogFactory.getLog(ModsImporter.class);
-    private static final Character KEYWORD_SEPARATOR = JabRefPreferences.getInstance().getImportFormatPreferences()
-            .getKeywordSeparator();
+    private static final String KEYWORD_SEPARATOR = JabRefPreferences.getInstance().getImportFormatPreferences()
+            .getKeywordSeparator() + " ";
 
     private static final Pattern MODS_PATTERN = Pattern.compile("<mods .*>");
     private JAXBContext context;
@@ -448,7 +449,7 @@ public class ModsImporter extends ImportFormat {
         if (!foreName.isEmpty() && !familyName.isEmpty()) {
             author = familyName + ", " + Joiner.on(" ").join(foreName);
             authors.add(author.trim());
-            foreName.removeAll(foreName);
+            foreName.clear();
         } else if (foreName.isEmpty() && !familyName.isEmpty()) {
             authors.add(familyName.trim());
         }

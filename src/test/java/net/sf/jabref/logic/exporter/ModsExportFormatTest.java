@@ -31,7 +31,7 @@ public class ModsExportFormatTest {
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
-    private Path resourceDir;
+    private Path importFile;
 
 
     @Before
@@ -41,13 +41,11 @@ public class ModsExportFormatTest {
         modsExportFormat = new ModsExportFormat();
         bibtexImporter = new BibtexImporter(JabRefPreferences.getInstance().getImportFormatPreferences());
         tempFile = testFolder.newFile();
-        resourceDir = Paths.get(ModsExportFormatTest.class.getResource("").toURI());
+        importFile = Paths.get(ModsExportFormatTest.class.getResource("ModsExportFormatTestAllFields.bib").toURI());
     }
 
     @Test(expected = SaveException.class)
     public final void testPerformExportTrowsSaveException() throws Exception {
-        String filename = "ModsExportFormatTestAllFields.bib";
-        Path importFile = resourceDir.resolve(filename);
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase()
                 .getEntries();
 

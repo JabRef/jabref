@@ -13,6 +13,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
+
 import net.sf.jabref.logic.importer.fileformat.mods.AbstractDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.CodeOrText;
 import net.sf.jabref.logic.importer.fileformat.mods.DateDefinition;
@@ -45,9 +46,7 @@ import net.sf.jabref.logic.importer.fileformat.mods.UrlDefinition;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.preferences.JabRefPreferences;
 
-import com.sun.xml.internal.bind.marshaller.NamespacePrefixMapper;
 
 /**
  * ExportFormat for exporting in MODS XML format.
@@ -56,10 +55,7 @@ class ModsExportFormat extends ExportFormat {
 
     private static final String MINUS = "-";
     private static final String DOUBLE_MINUS = "--";
-    private static final String KEYWORD_SEPARATOR = JabRefPreferences.getInstance().getImportFormatPreferences()
-            .getKeywordSeparator();
     private static final String MODS_SCHEMA_LOCATION = "http://www.loc.gov/standards/mods/v3/mods-3-6.xsd";
-    private static final String PREFIX_MAPPER_PACKAGE = "com.sun.xml.internal.bind.namespacePrefixMapper";
     protected static final String MODS_NAMESPACE_URI = "http://www.loc.gov/mods/v3";
     private JAXBContext context;
 
@@ -178,25 +174,14 @@ class ModsExportFormat extends ExportFormat {
             context = JAXBContext.newInstance(ModsCollectionDefinition.class);
         }
         Marshaller marshaller = context.createMarshaller();
-
-        //since it has to be a prefix, use mods everywhere as prefix for elements
-        //see also http://www.loc.gov/standards/mods/v3/mods-userguide-intro.html
-        NamespacePrefixMapper myPrefixMapper = new NamespacePrefixMapper() {
-
-            @Override
-            public String getPreferredPrefix(String namespaceUri, String suggestion, boolean requirePrefix) {
-                return MODS_NAMESPACE_URI.equals(namespaceUri) ? "mods" : "";
-            }
-        };
-
         //format the output
         marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
         marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, MODS_SCHEMA_LOCATION);
-        marshaller.setProperty(PREFIX_MAPPER_PACKAGE, myPrefixMapper);
 
         // Write to File
         marshaller.marshal(jaxbElement, new File(file));
     }
+
 
     private void addRelatedAndOriginInfoToModsGroup(RelatedItemDefinition relatedItem, PartDefinition partDefinition,
             ModsDefinition mods) {
@@ -307,15 +292,15 @@ class ModsExportFormat extends ExportFormat {
     private void addKeyWords(ModsDefinition mods, String value) {
         String[] keywords = value.split(", ");
 
-            for (String keyword : keywords) {
-                SubjectDefinition subject = new SubjectDefinition();
-                StringPlusLanguagePlusAuthority topic = new StringPlusLanguagePlusAuthority();
+        for (String keyword : keywords) {
+            SubjectDefinition subject = new SubjectDefinition();
+            StringPlusLanguagePlusAuthority topic = new StringPlusLanguagePlusAuthority();
             topic.setValue(keyword);
-                JAXBElement<?> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "topic"),
-                        StringPlusLanguagePlusAuthority.class, topic);
-                subject.getTopicOrGeographicOrTemporal().add(element);
-                mods.getModsGroup().add(subject);
-            }
+            JAXBElement<?> element = new JAXBElement<>(new QName(MODS_NAMESPACE_URI, "topic"),
+                    StringPlusLanguagePlusAuthority.class, topic);
+            subject.getTopicOrGeographicOrTemporal().add(element);
+            mods.getModsGroup().add(subject);
+        }
     }
 
     private void handleAuthors(ModsDefinition mods, String value) {
