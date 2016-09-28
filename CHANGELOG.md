@@ -62,8 +62,9 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - [#463](https://github.com/JabRef/jabref/issues/463): Disable certain menu items, toolbar buttons and context menu items while multiple entries are selected
 - [#490](https://github.com/JabRef/jabref/issues/490) Added right click menu to main table and entry editor to allow copying doi url
 - [#549](https://github.com/JabRef/jabref/issues/549) Added new shortcut to copy the BibTeX key as a hyperlink to its url to the clipboard
-- Generalize german translation of database into "Datenbank"
+- Complete vietnam language translation in menu
 - Improve language quality of the German translation of shared database
+- Generalize German translation of database into "Datenbank"
 
 ### Fixed
 - Fixed [koppor#160](https://github.com/koppor/jabref/issues/160): Tooltips now working in the main table
@@ -92,7 +93,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1958](https://github.com/JabRef/jabref/issues/1958): Verbatim fields are no longer checked for HTML encoded characters by integrity checks
 - Fixed [#1937](https://github.com/JabRef/jabref/issues/1937): If no help page for the current chosen language exists, the english help page will be shown
 - Fixed [#2060](https://github.com/JabRef/jabref/issues/2060): Medline fetcher now imports data in UTF-8 encoding
-- Fixed file menu displays wrong hotkey in the german translation
+- Fixed file menu displays wrong hotkey in the German translation
 
 ### Removed
 - Removed 2nd preview style
