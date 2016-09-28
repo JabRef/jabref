@@ -36,6 +36,7 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(MedlineFetcher.class);
 
+    private static final String CLEAN_ID_QUERY = "\\d+[,\\d+]*";
     private static final String API_MEDLINE_FETCH = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
     private static final String API_MEDLINE_SEARCH = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
 
@@ -45,15 +46,8 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
     private static final Pattern RET_START_PATTERN = Pattern.compile("<RetStart>(\\d+)<\\/RetStart>");
 
 
-    /**
-     * How many entries to query in one request
-     */
-    private static final int PACING = 20;
-
-    private static String toSearchTerm(String query) {
-        query = query.replaceAll(", ", " AND ");
-        query = query.replaceAll(",", " AND ");
-        return query;
+    private static String replaceCommaWithAND(String query) {
+        return query.replaceAll(", ", " AND ").replaceAll(",", " AND ");
     }
 
     /**
@@ -113,11 +107,11 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
-        int numberToFetch = 50;
+        final int numberToFetch = 50;
         List<BibEntry> entryList = new LinkedList<>();
 
         if (!query.isEmpty()) {
-            String searchTerm = toSearchTerm(query);
+            String searchTerm = replaceCommaWithAND(query);
 
             // get the ids from entrez
             SearchResult result = getIds(searchTerm, 0, 1);
@@ -127,12 +121,9 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
                 return Collections.emptyList();
             }
 
-            for (int i = 0; i < numberToFetch; i += MedlineFetcher.PACING) {
-
-                int noToFetch = Math.min(MedlineFetcher.PACING, numberToFetch - i);
-
+            for (int i = 0; i < numberToFetch; i++) {
                 // get the ids from entrez
-                result = getIds(searchTerm, i, noToFetch);
+                result = getIds(searchTerm, i, numberToFetch - i);
 
                 List<BibEntry> bibs = fetchMedline(result.ids);
                 entryList.addAll(bibs);
@@ -173,15 +164,15 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         String cleanQuery = identifier.trim().replace(';', ',');
 
-        if (cleanQuery.matches("\\d+[,\\d+]*")) {
-            List<BibEntry> bibs = fetchMedline(cleanQuery);
+        if (cleanQuery.matches(CLEAN_ID_QUERY)) {
+            List<BibEntry> entry = fetchMedline(cleanQuery);
 
-            if (bibs.isEmpty()) {
+            if (entry.isEmpty()) {
                 LOGGER.warn(Localization.lang("No references found"));
             }
             LOGGER.info("Fetcher " + getName() + "found more than one result for identifier " + identifier
                     + ". We will use the first entry.");
-            return Optional.of(bibs.get(0));
+            return Optional.of(entry.get(0));
 
         }
         return Optional.empty();
