@@ -113,6 +113,7 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
 
     @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
+        int numberToFetch = 50;
         List<BibEntry> entryList = new LinkedList<>();
 
         if (!query.isEmpty()) {
@@ -126,8 +127,6 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
                 return Collections.emptyList();
             }
 
-            int numberToFetch = result.count;
-
             for (int i = 0; i < numberToFetch; i += MedlineFetcher.PACING) {
 
                 int noToFetch = Math.min(MedlineFetcher.PACING, numberToFetch - i);
@@ -136,9 +135,7 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
                 result = getIds(searchTerm, i, noToFetch);
 
                 List<BibEntry> bibs = fetchMedline(result.ids);
-                for (BibEntry entry : bibs) {
-                    entryList.add(entry);
-                }
+                entryList.addAll(bibs);
             }
             return entryList;
         }
