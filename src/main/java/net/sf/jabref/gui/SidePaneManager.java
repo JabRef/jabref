@@ -67,7 +67,7 @@ public class SidePaneManager {
     }
 
     /**
-     * if panel is visible it will be hidden and the other way around
+     * If panel is visible it will be hidden and the other way around
      *
      * @param name name of the panel
      */
@@ -80,14 +80,15 @@ public class SidePaneManager {
     }
 
     /**
-     * if panel is hidden it will be shown and focused
-     * if panel is visible but not focused it will be focused
-     * ig panel is visible and focused it will be hidden
+     * If panel is hidden it will be shown and focused
+     * If panel is visible but not focused it will be focused
+     * If panel is visible and focused it will be hidden
      *
      * @param name name of the panel
      */
     public synchronized void toggleThreeWay(String name){
-        if (isComponentVisible(name) && Globals.getFocusListener().getFocused() == components.get(name)) {
+        boolean isPanelFocused = Globals.getFocusListener().getFocused() == components.get(name);
+        if (isComponentVisible(name) && isPanelFocused) {
             hide(name);
         } else {
             show(name);
