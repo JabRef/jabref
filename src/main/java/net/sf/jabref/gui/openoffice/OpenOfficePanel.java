@@ -80,9 +80,11 @@ import org.apache.commons.logging.LogFactory;
  */
 public class OpenOfficePanel extends AbstractWorker {
 
+    public static final String NAME = "OpenOffice/LibreOffice";
+
     private static final Log LOGGER = LogFactory.getLog(OpenOfficePanel.class);
 
-    private OOPanel comp;
+    private OOPanel sidePane;
     private JDialog diag;
     private final JButton connect;
     private final JButton manualConnect;
@@ -101,7 +103,6 @@ public class OpenOfficePanel extends AbstractWorker {
             HelpFile.OPENOFFICE_LIBREOFFICE).getHelpButton();
     private OOBibBase ooBase;
     private JabRefFrame frame;
-    private SidePaneManager manager;
     private OOBibStyle style;
     private StyleSelectDialog styleDialog;
     private boolean dialogOkPressed;
@@ -114,7 +115,7 @@ public class OpenOfficePanel extends AbstractWorker {
     private static OpenOfficePanel instance;
 
 
-    private OpenOfficePanel() {
+    public OpenOfficePanel(JabRefFrame jabRefFrame, SidePaneManager spManager) {
         Icon connectImage = IconTheme.JabRefIcon.CONNECT_OPEN_OFFICE.getSmallIcon();
 
         connect = new JButton(connectImage);
@@ -134,36 +135,11 @@ public class OpenOfficePanel extends AbstractWorker {
         loader = new StyleLoader(preferences,
                 Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader),
                 Globals.prefs.getDefaultEncoding());
-    }
 
-    public static OpenOfficePanel getInstance() {
-        if (OpenOfficePanel.instance == null) {
-            OpenOfficePanel.instance = new OpenOfficePanel();
-        }
-        return OpenOfficePanel.instance;
-    }
-
-    public SidePaneComponent getSidePaneComponent() {
-        return comp;
-    }
-
-    public void init(JabRefFrame jabRefFrame, SidePaneManager spManager) {
         this.frame = jabRefFrame;
-        this.manager = spManager;
-        comp = new OOPanel(spManager, IconTheme.getImage("openoffice"), "OpenOffice/LibreOffice", this);
+        sidePane = new OOPanel(spManager, IconTheme.getImage("openoffice"), "OpenOffice/LibreOffice");
         initPanel();
-        spManager.register(getName(), comp);
-    }
-
-    public JMenuItem getMenuItem() {
-        if (preferences.showPanel()) {
-            manager.show(getName());
-        }
-        JMenuItem item = new JMenuItem(Localization.lang("OpenOffice/LibreOffice connection"),
-                IconTheme.getImage("openoffice"));
-        item.addActionListener(event -> manager.show(getName()));
-        item.setAccelerator(Globals.getKeyPrefs().getKey(KeyBinding.OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION));
-        return item;
+        spManager.register(sidePane);
     }
 
     private void initPanel() {
@@ -326,7 +302,7 @@ public class OpenOfficePanel extends AbstractWorker {
         mainBuilder.add(settingsB).xy(1, 10);
 
         JPanel content = new JPanel();
-        comp.setContentContainer(content);
+        sidePane.setContentContainer(content);
         content.setLayout(new BorderLayout());
         content.add(mainBuilder.getPanel(), BorderLayout.CENTER);
 
@@ -804,24 +780,27 @@ public class OpenOfficePanel extends AbstractWorker {
         menu.show(settingsB, 0, settingsB.getHeight());
     }
 
-    public String getName() {
-        return "OpenOffice/LibreOffice";
+    public SidePaneComponent.ToggleAction getAction() {
+        return sidePane.getToggleAction();
     }
 
 
     private class OOPanel extends SidePaneComponent {
 
-        private final OpenOfficePanel openOfficePanel;
+        private final ToggleAction toggleAction;
 
 
-        public OOPanel(SidePaneManager sidePaneManager, Icon url, String s, OpenOfficePanel panel) {
-            super(sidePaneManager, url, s);
-            openOfficePanel = panel;
-        }
+        public OOPanel(SidePaneManager sidePaneManager, Icon icon, String title) {
+            super(sidePaneManager, icon, title);
+            sidePaneManager.register(this);
+            if (preferences.showPanel()) {
+                manager.show(NAME);
+            }
 
-        @Override
-        public String getName() {
-            return openOfficePanel.getName();
+            toggleAction = new ToggleAction(Localization.lang("OpenOffice/LibreOffice connection"),
+                    Localization.lang("OpenOffice/LibreOffice connection"),
+                    Globals.getKeyPrefs().getKey(KeyBinding.OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION),
+                    icon);
         }
 
         @Override
@@ -835,9 +814,19 @@ public class OpenOfficePanel extends AbstractWorker {
         }
 
         @Override
+        public String getSidePaneName() {
+            return NAME;
+        }
+
+        @Override
         public int getRescalingWeight() {
             return 0;
         }
+
+        public ToggleAction getToggleAction() {
+            return toggleAction;
+        }
+
     }
 
 }

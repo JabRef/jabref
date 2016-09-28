@@ -32,7 +32,6 @@ public class SidePaneManager {
     private final SidePane sidep;
 
     private final Map<String, SidePaneComponent> components = new LinkedHashMap<>();
-    private final Map<SidePaneComponent, String> componentNames = new HashMap<>();
 
     private final List<SidePaneComponent> visible = new LinkedList<>();
 
@@ -67,8 +66,28 @@ public class SidePaneManager {
         }
     }
 
+    /**
+     * if panel is visible it will be hidden and the other way around
+     *
+     * @param name name of the panel
+     */
     public synchronized void toggle(String name) {
         if (isComponentVisible(name)) {
+            hide(name);
+        } else {
+            show(name);
+        }
+    }
+
+    /**
+     * if panel is hidden it will be shown and focused
+     * if panel is visible but not focused it will be focused
+     * ig panel is visible and focused it will be hidden
+     *
+     * @param name name of the panel
+     */
+    public synchronized void toggleThreeWay(String name){
+        if (isComponentVisible(name) && Globals.getFocusListener().getFocused() == components.get(name)) {
             hide(name);
         } else {
             show(name);
@@ -98,9 +117,8 @@ public class SidePaneManager {
         }
     }
 
-    public synchronized void register(String name, SidePaneComponent comp) {
-        components.put(name, comp);
-        componentNames.put(comp, name);
+    public synchronized void register(SidePaneComponent comp) {
+        components.put(comp.getSidePaneName(), comp);
     }
 
     private synchronized void show(SidePaneComponent component) {
@@ -114,14 +132,12 @@ public class SidePaneManager {
             updateView();
             component.componentOpening();
         }
+        Globals.getFocusListener().setFocused(component);
+        component.grabFocus();
     }
 
     public synchronized SidePaneComponent getComponent(String name) {
         return components.get(name);
-    }
-
-    private synchronized String getComponentName(SidePaneComponent comp) {
-        return componentNames.get(comp);
     }
 
     public synchronized void hideComponent(SidePaneComponent comp) {
@@ -168,8 +184,7 @@ public class SidePaneManager {
         // Update the preferred positions of all visible components
         int index = 0;
         for (SidePaneComponent comp : visible) {
-            String componentName = getComponentName(comp);
-            preferredPositions.put(componentName, index);
+            preferredPositions.put(comp.getSidePaneName(), index);
             index++;
         }
 
@@ -195,8 +210,8 @@ public class SidePaneManager {
 
         @Override
         public int compare(SidePaneComponent comp1, SidePaneComponent comp2) {
-            int pos1 = preferredPositions.getOrDefault(getComponentName(comp1), 0);
-            int pos2 = preferredPositions.getOrDefault(getComponentName(comp2), 0);
+            int pos1 = preferredPositions.getOrDefault(comp1.getSidePaneName(), 0);
+            int pos2 = preferredPositions.getOrDefault(comp2.getSidePaneName(), 0);
             return Integer.valueOf(pos1).compareTo(pos2);
         }
     }
@@ -231,7 +246,6 @@ public class SidePaneManager {
     }
 
     public synchronized void unregisterComponent(String name) {
-        componentNames.remove(components.get(name));
         components.remove(name);
     }
 

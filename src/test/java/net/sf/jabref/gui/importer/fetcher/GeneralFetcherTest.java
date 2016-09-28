@@ -61,7 +61,7 @@ public class GeneralFetcherTest {
         GeneralFetcherTest.acmpf = new ACMPortalFetcher();
         ArrayList<EntryFetcher> al = new ArrayList<>();
         al.add(GeneralFetcherTest.acmpf);
-        GeneralFetcherTest.gf = new GeneralFetcher(GeneralFetcherTest.spm, GeneralFetcherTest.jrf);
+        GeneralFetcherTest.gf = new GeneralFetcher(GeneralFetcherTest.jrf, GeneralFetcherTest.spm);
     }
 
     @After

@@ -17,8 +17,7 @@ import net.sf.jabref.gui.SidePaneComponent;
 import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.logic.l10n.Localization;
 
-public class FileUpdatePanel extends SidePaneComponent implements ActionListener,
-        ChangeScanner.DisplayResultCallback {
+public class FileUpdatePanel extends SidePaneComponent implements ActionListener, ChangeScanner.DisplayResultCallback {
 
     public static final String NAME = "fileUpdate";
 
@@ -66,6 +65,11 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
     @Override
     public void componentClosing() {
         manager.unregisterComponent(FileUpdatePanel.NAME);
+    }
+
+    @Override
+    public String getSidePaneName() {
+        return NAME;
     }
 
     @Override
