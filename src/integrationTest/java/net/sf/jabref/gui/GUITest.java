@@ -10,7 +10,6 @@ import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import org.assertj.swing.core.GenericTypeMatcher;
 import org.assertj.swing.dependency.jsr305.Nonnull;
 import org.assertj.swing.fixture.DialogFixture;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.assertj.swing.finder.WindowFinder.findDialog;
@@ -44,7 +43,6 @@ public class GUITest extends AbstractUITest {
         takeScreenshot(mainFrame, "MainWindowWithOneDatabase");
     }
 
-    @Ignore
     @Test
     public void testOpenAndSavePreferences() throws IOException {
         mainFrame.menuItemWithPath("Options", "Preferences").click();

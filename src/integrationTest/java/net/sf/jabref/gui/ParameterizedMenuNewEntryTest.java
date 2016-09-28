@@ -6,7 +6,6 @@ import java.util.Collection;
 import net.sf.jabref.model.strings.StringUtil;
 
 import org.assertj.swing.fixture.JTableFixture;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -24,7 +23,6 @@ public class ParameterizedMenuNewEntryTest extends AbstractUITest {
     }
 
     // Not working on Travis
-    @Ignore
     @Test
     public void addEntryOfGivenType() {
         mainFrame.menuItemWithPath("File", "New " + databaseMode + " database").click();
@@ -43,7 +41,7 @@ public class ParameterizedMenuNewEntryTest extends AbstractUITest {
         // @formatter:off
         return Arrays.asList(
                 new Object[]{"BibTeX", "article"},
-/*                new Object[]{"BibTeX", "inbook"},
+                new Object[]{"BibTeX", "inbook"},
                 new Object[]{"BibTeX", "book"},
                 new Object[]{"BibTeX", "booklet"},
                 new Object[]{"BibTeX", "incollection"},
@@ -68,7 +66,7 @@ public class ParameterizedMenuNewEntryTest extends AbstractUITest {
                 new Object[]{"BibLaTeX", "mastersthesis"},
                 new Object[]{"BibLaTeX", "phdthesis"},
                 new Object[]{"BibLaTeX", "techreport"},
-                new Object[]{"BibLaTeX", "unpublished"}, */
+                new Object[]{"BibLaTeX", "unpublished"},
                 new Object[]{"BibLaTeX", "misc"}
         );
         // @formatter:on

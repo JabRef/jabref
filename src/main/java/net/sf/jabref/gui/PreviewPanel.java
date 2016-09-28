@@ -112,7 +112,6 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
         this.basePanel = Optional.ofNullable(panel);
 
         createPreviewPane();
-        updateLayout();
 
         if (this.basePanel.isPresent()) {
             // dropped files handler only created for main window
@@ -129,6 +128,7 @@ public class PreviewPanel extends JPanel implements SearchQueryHighlightListener
         add(scrollPane, BorderLayout.CENTER);
 
         this.createKeyBindings();
+        updateLayout();
     }
 
     private void createKeyBindings(){
