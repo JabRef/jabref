@@ -294,7 +294,7 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
                     frame.getCurrentBasePanel().insertEntry(result.get());
                     dispose();
                 } else if(searchID.trim().isEmpty()){
-                    JOptionPane.showMessageDialog(null, Localization.lang("The given search ID was empty") +"!", Localization.lang("Empty search ID"), JOptionPane.WARNING_MESSAGE);
+                    JOptionPane.showMessageDialog(null, Localization.lang("The given search ID was empty"), Localization.lang("Empty search ID"), JOptionPane.WARNING_MESSAGE);
                 }else if(!fetcherException){
                     JOptionPane.showMessageDialog(null, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID)+ "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
                 }else {
