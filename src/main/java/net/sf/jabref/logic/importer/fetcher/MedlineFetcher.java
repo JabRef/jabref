@@ -24,7 +24,6 @@ import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.importer.fileformat.MedlineImporter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -143,7 +142,7 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
             }
             return entryList;
         }
-        throw new FetcherException("Input Error. Please enter a comma separated list of Medline IDs (numbers) or search terms.");
+        throw new FetcherException(Localization.lang("Input error") +". " +Localization.lang("Please enter a comma separated list of Medline IDs (numbers) or search terms."));
     }
 
     /**
@@ -173,12 +172,6 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
         }
     }
 
-    private BibEntry doPostCleanUp(BibEntry entry) {
-        Optional<String> bibEntryOptional = entry.getField(FieldName.MONTH);
-        //TODO: Month Checker
-        return entry;
-    }
-
     @Override
     public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
         String cleanQuery = identifier.trim().replace(';', ',');
@@ -189,26 +182,26 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
             if (bibs.isEmpty()) {
                 LOGGER.warn(Localization.lang("No references found"));
             }
+            LOGGER.info("Fetcher " + getName() + "found more than one result for identifier " + identifier
+                    + ". We will use the first entry.");
+            return Optional.of(bibs.get(0));
 
-            if(bibs.size() == 1) {
-                return Optional.of(bibs.get(0));
-            }
         }
         return Optional.empty();
     }
 
     static class SearchResult {
 
-        public int count;
+        int count;
 
-        public int retmax;
+        int retmax;
 
-        public int retstart;
+        int retstart;
 
-        public String ids = "";
+        String ids = "";
 
 
-        public void addID(String id) {
+        void addID(String id) {
             if (ids.isEmpty()) {
                 ids = id;
             } else {
