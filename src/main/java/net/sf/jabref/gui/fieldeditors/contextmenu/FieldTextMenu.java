@@ -25,6 +25,7 @@ import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.strings.StringUtil;
 
 public class FieldTextMenu implements MouseListener {
+
     private final FieldEditor field;
     private final JPopupMenu inputMenu = new JPopupMenu();
     private final CopyAction copyAction;
@@ -114,27 +115,30 @@ public class FieldTextMenu implements MouseListener {
             inputMenu.add(new HideFieldAction((TextAreaForVisibleField) field));
         } else if (field instanceof TextAreaForHiddenField) {
             inputMenu.add(new ShowFieldAction((TextAreaForHiddenField) field));
-        if (field.getTextComponent() instanceof JTextComponent) {
-            inputMenu.add(doiMenuItem);
-        }
-        inputMenu.addSeparator();
+            if (field.getTextComponent() instanceof JTextComponent) {
+                inputMenu.add(doiMenuItem);
+            }
+            inputMenu.addSeparator();
             inputMenu.add(new ReplaceAction());
 
-        if (field.getTextComponent() instanceof JTextComponent) {
-            inputMenu.add(new CaseChangeMenu((JTextComponent) field.getTextComponent()));
-            inputMenu.add(new ConversionMenu((JTextComponent) field.getTextComponent()));
-            inputMenu.addSeparator();
-            protectedTermsMenu = new ProtectedTermsMenu((JTextComponent) field.getTextComponent());
-            inputMenu.add(protectedTermsMenu);
+            if (field.getTextComponent() instanceof JTextComponent) {
+                inputMenu.add(new CaseChangeMenu((JTextComponent) field.getTextComponent()));
+                inputMenu.add(new ConversionMenu((JTextComponent) field.getTextComponent()));
+                inputMenu.addSeparator();
+                protectedTermsMenu = new ProtectedTermsMenu((JTextComponent) field.getTextComponent());
+                inputMenu.add(protectedTermsMenu);
+            }
         }
     }
-    }
+
 
     @SuppressWarnings("serial")
     class ReplaceAction extends AbstractAction {
+
         public ReplaceAction() {
             putValue(Action.NAME, Localization.lang("Normalize to BibTeX name format"));
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("If possible, normalize this list of names to conform to standard BibTeX name formatting"));
+            putValue(Action.SHORT_DESCRIPTION, Localization
+                    .lang("If possible, normalize this list of names to conform to standard BibTeX name formatting"));
         }
 
         @Override
@@ -147,4 +151,3 @@ public class FieldTextMenu implements MouseListener {
         }
     }
 }
-
