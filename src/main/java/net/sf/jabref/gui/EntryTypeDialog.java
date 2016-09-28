@@ -22,6 +22,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import net.sf.jabref.Globals;
@@ -188,6 +189,13 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
             fetcherWorker.execute();
         });
 
+        comboBox.addActionListener(e -> {
+            idTextField.requestFocus();
+            idTextField.selectAll();
+        });
+
+        idTextField.addActionListener(event -> fetcherWorker.execute());
+
         JPanel jPanel = new JPanel();
 
         GridBagConstraints constraints = new GridBagConstraints();
@@ -295,18 +303,22 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
                 if (result.isPresent()) {
                     frame.getCurrentBasePanel().insertEntry(result.get());
                     dispose();
-                } else if(searchID.trim().isEmpty()){
-                    JOptionPane.showMessageDialog(null, Localization.lang("The given search ID was empty"), Localization.lang("Empty search ID"), JOptionPane.WARNING_MESSAGE);
-                }else if(!fetcherException){
-                    JOptionPane.showMessageDialog(null, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID)+ "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
-                }else {
-                    JOptionPane.showMessageDialog(null,
+                } else if (searchID.trim().isEmpty()) {
+                    JOptionPane.showMessageDialog(frame, Localization.lang("The given search ID was empty."), Localization.lang("Empty search ID"), JOptionPane.WARNING_MESSAGE);
+                } else if (!fetcherException) {
+                    JOptionPane.showMessageDialog(frame, Localization.lang("Fetcher_'%0'_did_not_find_an_entry_for_id_'%1'.", fetcher.getName(), searchID)+ "\n" + fetcherExceptionMessage, Localization.lang("No files found."), JOptionPane.WARNING_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(frame,
                             Localization.lang("Error while fetching from %0", fetcher.getName()) +"." + "\n" + fetcherExceptionMessage,
                             Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
                 }
                 fetcherWorker = new FetcherWorker();
-                generateButton.setText(Localization.lang("Generate"));
-                generateButton.setEnabled(true);
+                SwingUtilities.invokeLater(() -> {
+                    idTextField.requestFocus();
+                    idTextField.selectAll();
+                    generateButton.setText(Localization.lang("Generate"));
+                    generateButton.setEnabled(true);
+                });
             } catch (ExecutionException | InterruptedException e) {
                 LOGGER.error(String.format("Exception during fetching when using fetcher '%s' with entry id '%s'.", searchID, fetcher.getName()), e);
             }
