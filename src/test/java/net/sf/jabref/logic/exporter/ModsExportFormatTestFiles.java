@@ -42,10 +42,11 @@ public class ModsExportFormatTestFiles {
     private ModsExportFormat modsExportFormat;
     private BibtexImporter bibtexImporter;
     private ModsImporter modsImporter;
+    private Path importFile;
+
 
     @Parameter
     public String filename;
-    public Path resourceDir;
 
     @Rule
     public TemporaryFolder testFolder = new TemporaryFolder();
@@ -63,7 +64,7 @@ public class ModsExportFormatTestFiles {
     @Before
     public void setUp() throws Exception {
         databaseContext = new BibDatabaseContext();
-        resourceDir = Paths.get(ModsExportFormatTestFiles.class.getResource("").toURI());
+        importFile = Paths.get(ModsExportFormatTestFiles.class.getResource(filename).toURI());
         charset = StandardCharsets.UTF_8;
         modsExportFormat = new ModsExportFormat();
         tempFile = testFolder.newFile();
@@ -74,13 +75,13 @@ public class ModsExportFormatTestFiles {
     @Test
     public final void testPerformExport() throws Exception {
         String xmlFileName = filename.replace(".bib", ".xml");
-        Path importFile = resourceDir.resolve(filename);
         String tempFilename = tempFile.getCanonicalPath();
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
+        Path xmlFile = Paths.get(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
 
         modsExportFormat.performExport(databaseContext, tempFile.getPath(), charset, entries);
 
-        Builder control = Input.from(Files.newInputStream(resourceDir.resolve(xmlFileName)));
+        Builder control = Input.from(Files.newInputStream(xmlFile));
         Builder test = Input.from(Files.newInputStream(Paths.get(tempFilename)));
 
         Assert.assertThat(test, CompareMatcher.isSimilarTo(control)
@@ -89,11 +90,10 @@ public class ModsExportFormatTestFiles {
 
     @Test
     public final void testExportAsModsAndThenImportAsMods() throws Exception {
-        String xmlFile = filename.replace(".bib", ".xml");
-
-        Path importFile = resourceDir.resolve(filename);
+        String xmlFileName = filename.replace(".bib", ".xml");
+        Path xmlFile = Paths.get(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
         List<BibEntry> entries = bibtexImporter.importDatabase(importFile, charset).getDatabase().getEntries();
-        Path modsFile = resourceDir.resolve(xmlFile);
+        Path modsFile = importFile.resolve(xmlFile);
 
         modsExportFormat.performExport(databaseContext, modsFile, charset, entries);
         BibEntryAssert.assertEquals(entries, modsFile, modsImporter);
@@ -102,13 +102,14 @@ public class ModsExportFormatTestFiles {
     @Test
     public final void testImportAsModsAndExportAsMods() throws Exception {
         String xmlFileName = filename.replace(".bib", ".xml");
-        Path importFile = resourceDir.resolve(xmlFileName);
         String tempFilename = tempFile.getCanonicalPath();
-        List<BibEntry> entries = modsImporter.importDatabase(importFile, charset).getDatabase().getEntries();
+        Path xmlFile = Paths.get(ModsExportFormatTestFiles.class.getResource(xmlFileName).toURI());
+
+        List<BibEntry> entries = modsImporter.importDatabase(xmlFile, charset).getDatabase().getEntries();
 
         modsExportFormat.performExport(databaseContext, tempFile.getPath(), charset, entries);
 
-        Builder control = Input.from(Files.newInputStream(resourceDir.resolve(xmlFileName)));
+        Builder control = Input.from(Files.newInputStream(xmlFile));
         Builder test = Input.from(Files.newInputStream(Paths.get(tempFilename)));
 
         Assert.assertThat(test, CompareMatcher.isSimilarTo(control)
