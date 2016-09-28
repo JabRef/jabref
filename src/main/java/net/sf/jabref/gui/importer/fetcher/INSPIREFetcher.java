@@ -7,7 +7,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 import javax.swing.JPanel;
@@ -107,7 +106,7 @@ public class INSPIREFetcher implements EntryFetcher {
         InputStream inputStream = conn.getInputStream();
 
         try (INSPIREBibtexFilterReader reader = new INSPIREBibtexFilterReader(
-                new InputStreamReader(inputStream, Charset.forName("UTF-8")))) {
+                new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
 
             ParserResult pr = BibtexParser.parse(reader, Globals.prefs.getImportFormatPreferences());
             return pr.getDatabase();

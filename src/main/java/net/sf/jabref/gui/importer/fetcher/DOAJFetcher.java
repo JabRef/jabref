@@ -49,8 +49,7 @@ public class DOAJFetcher implements EntryFetcher {
                 if (numberToFetch > MAX_PER_PAGE) {
                     boolean numberEntered = false;
                     do {
-                        String strCount = JOptionPane.showInputDialog(Localization.lang("References found") +": " + numberToFetch + " " +
-                                Localization.lang("Number of references to fetch?"), Integer.toString(numberToFetch));
+                        String strCount = JOptionPane.showInputDialog(Localization.lang("%0 references found. Number of references to fetch?", String.valueOf(numberToFetch)));
 
                         if (strCount == null) {
                             status.setStatus(Localization.lang("%0 import canceled", getTitle()));

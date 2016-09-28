@@ -41,6 +41,7 @@ public class MedlineFetcher implements EntryFetcher {
     private static final Pattern RET_MAX_PATTERN = Pattern.compile("<RetMax>(\\d+)<\\/RetMax>");
     private static final Pattern RET_START_PATTERN = Pattern.compile("<RetStart>(\\d+)<\\/RetStart>");
 
+    private static final Pattern NUMBER_PATTERN = Pattern.compile("\\d+[,\\d+]*");
 
 
     /**
@@ -127,7 +128,7 @@ public class MedlineFetcher implements EntryFetcher {
             shouldContinue = true;
 
             String cleanQuery = query.trim().replace(';', ',');
-            if (cleanQuery.matches("\\d+[,\\d+]*")) {
+            if (NUMBER_PATTERN.matcher(cleanQuery).find()) {
                 status.setStatus(Localization.lang("Fetching Medline by id..."));
 
                 List<BibEntry> bibs = fetchMedline(cleanQuery, status);
@@ -161,9 +162,7 @@ public class MedlineFetcher implements EntryFetcher {
                 if (numberToFetch > MedlineFetcher.PACING) {
                     boolean numberEntered = false;
                     do {
-                        String strCount = JOptionPane.showInputDialog(Localization.lang("References found") + ": " + numberToFetch + " " +
-                                Localization.lang("Number of references to fetch?"), Integer.toString(numberToFetch));
-
+                        String strCount = JOptionPane.showInputDialog(Localization.lang("%0 references found. Number of references to fetch?", String.valueOf(numberToFetch)));
                         if (strCount == null) {
                             status.setStatus(Localization.lang("%0 import canceled", getTitle()));
                             return false;
