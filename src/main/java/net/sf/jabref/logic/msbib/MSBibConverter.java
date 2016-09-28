@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Locale;
 
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
+import net.sf.jabref.logic.mods.PageNumbers;
+import net.sf.jabref.logic.mods.PersonName;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
