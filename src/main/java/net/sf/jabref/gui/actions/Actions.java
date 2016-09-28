@@ -16,6 +16,7 @@ public class Actions {
     public static final String COPY_KEY = "copyKey";
     public static final String COPY_CITE_KEY = "copyCiteKey";
     public static final String COPY_KEY_AND_TITLE = "copyKeyAndTitle";
+    public static final String COPY_KEY_AND_LINK = "copyKeyAndLink";
     public static final String CUT = "cut";
     public static final String DB_CONNECT = "dbConnect";
     public static final String DELETE = "delete";
@@ -28,7 +29,6 @@ public class Actions {
     public static final String FOCUS_TABLE = "focusTable";
     public static final String FORWARD = "forward";
     public static final String MAKE_KEY = "makeKey";
-    public static final String MANAGE_SELECTORS = "manageSelectors";
     public static final String MARK_ENTRIES = "markEntries";
     public static final String MERGE_DATABASE = "mergeDatabase";
     public static final String MERGE_ENTRIES = "mergeEntries";
