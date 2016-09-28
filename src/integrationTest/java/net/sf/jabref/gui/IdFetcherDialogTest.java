@@ -102,7 +102,6 @@ public class IdFetcherDialogTest extends AbstractUITest {
         }).enterText(fetchID);
 
         findDialog(matcher).withTimeout(10_000).using(robot()).button(new GenericTypeMatcher<JButton>(JButton.class) {
-
             @Override
             protected boolean isMatching(@Nonnull JButton jButton) {
                 return "Generate".equals(jButton.getText());

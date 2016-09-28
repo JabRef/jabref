@@ -269,15 +269,15 @@ public class EntryTypeDialog extends JDialog implements ActionListener {
         }
     }
 
-    class FetcherWorker extends SwingWorker<Optional<BibEntry>, Void> {
-        boolean fetcherException = false;
-        String fetcherExceptionMessage = "";
-        Optional<BibEntry> bibEntry = Optional.empty();
-        IdBasedFetcher fetcher = null;
-        String searchID = "";
+    private class FetcherWorker extends SwingWorker<Optional<BibEntry>, Void> {
+        private boolean fetcherException = false;
+        private String fetcherExceptionMessage = "";
+        private IdBasedFetcher fetcher = null;
+        private String searchID = "";
 
         @Override
         protected Optional<BibEntry> doInBackground() throws Exception {
+            Optional<BibEntry> bibEntry = Optional.empty();
             SwingUtilities.invokeLater(() -> {
                 generateButton.setEnabled(false);
                 generateButton.setText(Localization.lang("Searching..."));
