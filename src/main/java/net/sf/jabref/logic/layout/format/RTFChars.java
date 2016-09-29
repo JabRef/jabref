@@ -201,9 +201,9 @@ public class RTFChars implements LayoutFormatter {
     }
 
     private String transformSpecialCharacter(long c) {
-        if(192 <= c && c <= 197 || c == 256 || c == 258 || c == 260)
+        if((192 <= c && c <= 197) || c == 256 || c == 258 || c == 260)
             return "A";
-        if(224 <= c && c <= 229 || c == 257 || c == 259 || c == 261)
+        if((224 <= c && c <= 229) || c == 257 || c == 259 || c == 261)
             return "a";
         if(199 == c || 262 == c || 264 == c || 266 == c || 268 == c)
             return "C";
@@ -213,11 +213,11 @@ public class RTFChars implements LayoutFormatter {
             return "D";
         if(240 == c || 273 == c)
             return "d";
-        if(200 <= c && c <= 203 || 274 == c || 276 == c || 278 == c || 280 == c || 282 == c)
+        if((200 <= c && c <= 203) || 274 == c || 276 == c || 278 == c || 280 == c || 282 == c)
             return "E";
-        if(232 <= c && c <= 235 || 275 == c || 277 == c || 279 == c || 281 == c || 283 == c)
+        if((232 <= c && c <= 235) || 275 == c || 277 == c || 279 == c || 281 == c || 283 == c)
             return "e";
-        if(284 == c || 286 == c || 288 == c || 290 == c || 330 == c)
+        if((284 == c || 286 == c) || 288 == c || 290 == c || 330 == c)
             return "G";
         if(285 == c || 287 == c || 289 == c || 291 == c || 331 == c)
             return "g";
@@ -225,9 +225,9 @@ public class RTFChars implements LayoutFormatter {
             return "H";
         if(293 == c || 295 == c)
             return "h";
-        if(204 <= c && c <= 207 || 296 == c || 298 == c || 300 == c || 302 == c || 304 == c)
+        if((204 <= c && c <= 207) || 296 == c || 298 == c || 300 == c || 302 == c || 304 == c)
             return "I";
-        if(236 <= c && c <= 239 || 297 == c || 299 == c || 301 == c || 303 == c || 305 == c)
+        if((236 <= c && c <= 239) || 297 == c || 299 == c || 301 == c || 303 == c || 305 == c)
             return "i";
         if(308 == c)
             return "J";
@@ -245,9 +245,9 @@ public class RTFChars implements LayoutFormatter {
             return "N";
         if(241 == c || 324 == c || 326 == c || 328 == c)
             return "n";
-        if(210 <= c && c <=214 || c == 216 || 332 == c || 334 == c)
+        if((210 <= c && c <=214) || c == 216 || 332 == c || 334 == c)
             return "O";
-        if(242 <= c && c <= 248 || 247 != c || 333 == c || 335 == c)
+        if((242 <= c && c <= 248 && 247 != c) || 333 == c || 335 == c)
             return "o";
         if(340 == c || 342 == c || 344 == c)
             return "R";
@@ -261,9 +261,9 @@ public class RTFChars implements LayoutFormatter {
             return "T";
         if(355 == c || 359 == c)
             return "t";
-        if(217 <= c && c <= 220 || 360 == c || 362 == c || 364 == c || 366 == c || 370 == c)
+        if((217 <= c && c <= 220) || 360 == c || 362 == c || 364 == c || 366 == c || 370 == c)
             return "U";
-        if(249 <= c && c <= 251 || 361 == c || 363 == c || 365 == c || 367 == c || 371 == c)
+        if((249 <= c && c <= 251) || 361 == c || 363 == c || 365 == c || 367 == c || 371 == c)
             return "u";
         if(372 == c)
             return "W";
@@ -289,6 +289,8 @@ public class RTFChars implements LayoutFormatter {
             return "TH";
         if(223 == c)
             return "ss";
+        if(161 ==c)
+            return "!";
         return "?";
     }
 }
