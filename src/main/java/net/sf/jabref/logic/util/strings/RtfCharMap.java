@@ -49,6 +49,12 @@ public class RtfCharMap extends HashMap<String, String> {
         // Use UNICODE characters for RTF-Chars which can not be found in the
         // standard codepage
 
+        put("S", "\\u167S"); // Section sign
+        put("`!", "\\u161!"); // Inverted exclamation point
+        put("pounds","\\u163?"); // Pound sign
+        put("copyright","\\u169?"); // Copyright sign
+        put("P", "\\u182P"); // Paragraph sign
+        put("`?", "\\u191?"); // Inverted question mark
         put("`A", "\\u192A"); // "Agrave"
         put("'A", "\\u193A"); // "Aacute"
         put("^A", "\\u194A"); // "Acirc"
@@ -74,11 +80,8 @@ public class RtfCharMap extends HashMap<String, String> {
 
         put("~N", "\\u209N"); // "Ntilde"
 
-//        put("`O", "\\u210O"); // "Ograve"
         put("'O", "\\u211O"); // "Oacute"
-//        put("^O", "\\u212O"); // "Ocirc"
         put("~O", "\\u213O"); // "Otilde"
-//        put("\"O", "\\u214O"); // "Ouml"
         // According to ISO 8859-1 the "\times" symbol should be placed here
         // (#215).
         // Omitting this, because it is a mathematical symbol.
@@ -93,9 +96,9 @@ public class RtfCharMap extends HashMap<String, String> {
 
         put("'Y", "\\u221Y"); // "Yacute"
 
-        put("TH", "{\\uc2\\u222TH}"); // "THORN"
+        put("TH", "\\u222TH"); // "THORN"
 
-        put("ss", "{\\uc2\\u223ss}"); // "szlig"
+        put("ss", "\\u223ss"); // "szlig"
         //RTFCHARS.put("ss", "AFFEN"); // "szlig"
 
         put("`a", "\\u224a"); // "agrave"
@@ -123,11 +126,8 @@ public class RtfCharMap extends HashMap<String, String> {
 
         put("~n", "\\u241n"); // "ntilde"
 
-//        put("`o", "\\u242o"); // "ograve"
         put("'o", "\\u243o"); // "oacute"
-//        put("^o", "\\u244o"); // "ocirc"
         put("~o", "\\u245o"); // "otilde"
-//        put("\"o", "\\u246o"); // "ouml"
         // According to ISO 8859-1 the "\div" symbol should be placed here
         // (#247).
         // Omitting this, because it is a mathematical symbol.
@@ -140,7 +140,7 @@ public class RtfCharMap extends HashMap<String, String> {
         // codepage
 
         put("'y", "\\u253y"); // "yacute"
-        put("th", "{\\uc2\\u254th}"); // "thorn"
+        put("th", "\\u254th"); // "thorn"
         put("\"y", "\\u255y"); // "yuml"
 
         put("=A", "\\u256A"); // "Amacr"
