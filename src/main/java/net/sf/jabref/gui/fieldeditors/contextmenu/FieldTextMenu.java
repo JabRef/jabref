@@ -131,7 +131,6 @@ public class FieldTextMenu implements MouseListener {
         }
     }
 
-
     @SuppressWarnings("serial")
     class ReplaceAction extends AbstractAction {
 

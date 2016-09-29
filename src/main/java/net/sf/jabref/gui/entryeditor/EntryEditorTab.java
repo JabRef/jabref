@@ -308,8 +308,7 @@ class EntryEditorTab {
 
                 boolean displayableFieldValueExists;
                 boolean hiddenFieldValueExists;
-                boolean currentFieldNameIsHidden = isHiddenField(fieldName);
-                if (currentFieldNameIsHidden) {
+                if (isHiddenField(fieldName)) {
                     displayableFieldValueExists = !entry.getField(fieldName.substring(1)).orElse("").isEmpty();
                     hiddenFieldValueExists = !entry.getField(fieldName).orElse("").isEmpty();
                 } else {
@@ -317,7 +316,7 @@ class EntryEditorTab {
                     hiddenFieldValueExists = !entry.getField("_" + fieldName).orElse("").isEmpty();
                 }
 
-                boolean currentFieldEditorIsVisibleFieldEditor = !currentFieldNameIsHidden;
+                boolean currentFieldEditorIsVisibleFieldEditor = !isHiddenField(fieldName);
                 boolean isVisible;
                 if (currentFieldEditorIsVisibleFieldEditor) {
                     // do not display if hidden field value exists (because other editor is shown)
