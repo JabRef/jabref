@@ -221,7 +221,6 @@ public class PreferencesDialog extends JDialog {
 
     private void storeAllSettings(){
         // First check that all tabs are ready to close:
-        int count = main.getComponentCount();
         Component[] preferenceTabs = main.getComponents();
         for (Component tab: preferenceTabs) {
             if (!((PrefsTab) tab).validateSettings()) {
