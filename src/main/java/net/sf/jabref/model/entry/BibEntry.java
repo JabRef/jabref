@@ -426,8 +426,8 @@ public class BibEntry implements Cloneable {
 
         changed = true;
 
-        fields.put(fieldName, value);
-        fieldsLatexFree.put(fieldName, LATEX_TO_UNICODE_FORMATTER.format(value));
+        fields.put(fieldName, value.intern());
+        fieldsLatexFree.put(fieldName, LATEX_TO_UNICODE_FORMATTER.format(value).intern());
         fieldsAsWords.remove(fieldName);
 
         FieldChange change = new FieldChange(this, fieldName, oldValue, value);
