@@ -1,12 +1,16 @@
 package net.sf.jabref.model.strings;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class LatexToUnicode {
 
     private static final Map<String, String> CHARS = HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP;
     private static final Map<String, String> ACCENTS = HTMLUnicodeConversionMaps.UNICODE_ESCAPED_ACCENTS;
 
+    private Pattern AMP_LATEX = Pattern.compile("&|\\\\&");
+    private Pattern P_LATEX = Pattern.compile("[\\n]{1,}");
+    private Pattern DOLLARS_LATEX = Pattern.compile("\\$([^\\$]*)\\$");
 
     public String format(String inField) {
         if (inField.isEmpty()) {
@@ -14,8 +18,10 @@ public class LatexToUnicode {
         }
         int i;
         // TODO: document what does this do
-        String field = inField.replaceAll("&|\\\\&", "&amp;").replaceAll("[\\n]{1,}", "<p>").replace("\\$", "&dollar;") // Replace \$ with &dollar;
-                .replaceAll("\\$([^\\$]*)\\$", "\\{$1\\}");
+        String field = AMP_LATEX.matcher(inField).replaceAll("&amp;");
+        field = P_LATEX.matcher(field).replaceAll("<p>");
+        field = field.replace("\\$", "&dollar;"); // Replace \$ with &dollar;
+        field = DOLLARS_LATEX.matcher(field).replaceAll("\\{$1\\}");
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
