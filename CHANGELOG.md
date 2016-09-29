@@ -56,7 +56,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Complete vietnam language translation in menu
 - Generalize German translation of database into "Datenbank"
 - Improve language quality of the German translation of shared database
-- Entryfields can now be hidden 
+- Entryfields can now be hidden (related to issue https://github.com/JabRef/jabref/pull/1883)
 
 ### Fixed
 - Fixed [koppor#160](https://github.com/koppor/jabref/issues/160): Tooltips now working in the main table
