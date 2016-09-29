@@ -101,6 +101,7 @@ public class FileDialog {
         for (FileExtensions ext : fileExtensions) {
             FileNameExtensionFilter extFilter = new FileNameExtensionFilter(ext.getDescription(), ext.getExtensions());
             fileChooser.addChoosableFileFilter(extFilter);
+            fileChooser.setAcceptAllFileFilterUsed(true);
         }
 
         return this;
