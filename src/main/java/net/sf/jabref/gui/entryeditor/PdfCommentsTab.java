@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import javax.swing.BoxLayout;
@@ -275,14 +276,26 @@ public class PdfCommentsTab extends JPanel {
         return buttonPanel;
     }
 
+    /**
+     * Copies the meta and content information of the pdf annotation to the clipboard
+     */
     private void copyToClipboard(){
-        new ClipBoardManager().setClipboardContents(contentTxtArea.getText());
+        StringJoiner sj = new StringJoiner(System.getProperty("line.separator"));
+        sj.add("Author: " + authorArea.getText());
+        sj.add("Date: " + dateArea.getText());
+        sj.add("Page: " + pageArea.getText());
+        sj.add("Content: " + contentTxtArea.getText());
+        sj.add("Highlighted: " + highlightTxtArea.getText());
+
+        new ClipBoardManager().setClipboardContents(sj.toString());
     }
 
+    /**
+     * TODO: implement for every OS
+     */
     private void openPdf() {
 
         try {
-
             JabRefDesktop.getNativeDesktop().openFileWithApplication("/" + fileNameComboBox.getSelectedItem().toString(),
                     "acroread /a page=" + commentList.getSelectedValue().getPage());
             System.out.println(commentList.getSelectedValue().getCommentId());
@@ -350,26 +363,20 @@ public class PdfCommentsTab extends JPanel {
     }
 
     /**
-     * Cell renderer that shows different icons dependent on the annotation subtype and highlights annotations that are
-     * linked with each other eg.
+     * Cell renderer that shows different icons dependent on the annotation subtype
      */
     class CommentsListCellRenderer extends DefaultListCellRenderer {
 
         JLabel label;
 
-        public CommentsListCellRenderer() {
+        CommentsListCellRenderer() {
             this.label = new JLabel();
         }
 
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 
-            boolean isLinkedComment = false;
             PdfComment comment = (PdfComment) value;
-
-            if(!commentList.isSelectionEmpty() && comment.equals(commentList.getSelectedValue().getLinkedPdfComment())){
-                isLinkedComment = true;
-            }
 
             //call the super method so that the cell selection is done as usual
             label = (JLabel)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
