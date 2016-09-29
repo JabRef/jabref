@@ -370,7 +370,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private List<String> addRequiredTab(EntryType type) {
         List<String> requiredFields = type.getRequiredFieldsFlat();
-        // build a list of all required fields, where each required field is followed by the hidden counter part
         List<String> allRequiredFields = addFieldAndHiddenField(requiredFields);
 
         EntryEditorTab requiredPanel = new EntryEditorTab(frame, panel, allRequiredFields, this, true, false,
@@ -402,6 +401,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     public static List<String> addFieldAndHiddenField(List<String> list) {
         List<String> returnList = new ArrayList<>();
+        /**
+         * build a list of all required fields, where each required field is followed by the hidden counter part
+         */
         for (String fieldName : list) {
             returnList.add(fieldName);
             returnList.add("_" + fieldName);
