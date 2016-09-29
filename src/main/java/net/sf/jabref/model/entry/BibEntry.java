@@ -433,7 +433,7 @@ public class BibEntry implements Cloneable {
 
         changed = true;
 
-        fields.put(fieldName, value);
+        fields.put(fieldName, value.intern());
         fieldsAsWords.remove(fieldName);
         invalidateLatexFreeCache(fieldName);
 
@@ -791,7 +791,7 @@ public class BibEntry implements Cloneable {
         } else if (latexFreeFields.containsKey(name)) {
             return Optional.ofNullable(latexFreeFields.get(toLowerCase(name)));
         } else {
-            String latexFreeField = unicodeConverter.format(getField(name).get());
+            String latexFreeField = unicodeConverter.format(getField(name).get()).intern();
             latexFreeFields.put(name, latexFreeField);
             return Optional.of(latexFreeField);
         }
