@@ -5,7 +5,6 @@ import net.sf.jabref.logic.layout.LayoutFormatter;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class RTFCharsTest {
@@ -48,16 +47,14 @@ public class RTFCharsTest {
     }
 
     @Test
-    @Ignore
     public void testComplicated() {
-        Assert.assertEquals("R\\u233eflexions sur le timing de la quantit\\u233e \\u230ae should be \\u230ae",
-                formatter.format("Réflexions sur le timing de la quantité \\ae should be æ"));
+        Assert.assertEquals("R\\u233eflexions sur le timing de la quantit\\u233e {\\u230ae} should be \\u230ae",
+                formatter.format("Réflexions sur le timing de la quantité {\\ae} should be æ"));
 
-        Assert.assertEquals("h\\u225all\\u339oe", formatter.format("h\\'all\\oe "));
+        Assert.assertEquals("h\\u225all{\\u339oe}", formatter.format("h\\'all{\\oe}"));
     }
 
     @Test
-    @Ignore
     public void testSpecialCharacters() {
         Assert.assertEquals("\\u243o", formatter.format("\\'{o}")); // ó
         Assert.assertEquals("\\'f2", formatter.format("\\`{o}")); // ò
@@ -65,34 +62,34 @@ public class RTFCharsTest {
         Assert.assertEquals("\\'f6", formatter.format("\\\"{o}")); // ö
         Assert.assertEquals("\\u245o", formatter.format("\\~{o}")); // õ
         Assert.assertEquals("\\u333o", formatter.format("\\={o}"));
-        Assert.assertEquals("\\u335o", formatter.format("\\u{o}"));
-        Assert.assertEquals("\\u231c", formatter.format("\\c{c}")); // ç
-        Assert.assertEquals("\\u339oe", formatter.format("\\oe"));
-        Assert.assertEquals("\\u338OE", formatter.format("\\OE"));
-        Assert.assertEquals("\\u230ae", formatter.format("\\ae")); // æ
-        Assert.assertEquals("\\u198AE", formatter.format("\\AE")); // Æ
+        Assert.assertEquals("\\u335o", formatter.format("{\\uo}"));
+        Assert.assertEquals("\\u231c", formatter.format("{\\cc}")); // ç
+        Assert.assertEquals("{\\u339oe}", formatter.format("{\\oe}"));
+        Assert.assertEquals("{\\u338OE}", formatter.format("{\\OE}"));
+        Assert.assertEquals("{\\u230ae}", formatter.format("{\\ae}")); // æ
+        Assert.assertEquals("{\\u198AE}", formatter.format("{\\AE}")); // Æ
 
         Assert.assertEquals("", formatter.format("\\.{o}")); // ???
-        Assert.assertEquals("", formatter.format("\\v{o}")); // ???
-        Assert.assertEquals("", formatter.format("\\H{a}")); // ã // ???
-        Assert.assertEquals("", formatter.format("\\t{oo}"));
-        Assert.assertEquals("", formatter.format("\\d{o}")); // ???
-        Assert.assertEquals("", formatter.format("\\b{o}")); // ???
-        Assert.assertEquals("", formatter.format("\\aa")); // å
-        Assert.assertEquals("", formatter.format("\\AA")); // Å
-        Assert.assertEquals("", formatter.format("\\o")); // ø
-        Assert.assertEquals("", formatter.format("\\O")); // Ø
-        Assert.assertEquals("", formatter.format("\\l"));
-        Assert.assertEquals("", formatter.format("\\L"));
-        Assert.assertEquals("{\\uc2\\u223ss}", formatter.format("\\ss")); // ß
-        Assert.assertEquals("", formatter.format("?`")); // ¿
-        Assert.assertEquals("", formatter.format("!`")); // ¡
+        Assert.assertEquals("", formatter.format("\\vo")); // ???
+        Assert.assertEquals("", formatter.format("\\Ha")); // ã // ???
+        Assert.assertEquals("", formatter.format("\\too"));
+        Assert.assertEquals("", formatter.format("\\do")); // ???
+        Assert.assertEquals("", formatter.format("\\bo")); // ???
+        Assert.assertEquals("\\u229a", formatter.format("{\\aa}")); // å
+        Assert.assertEquals("\\u197A", formatter.format("{\\AA}")); // Å
+        Assert.assertEquals("\\u248o", formatter.format("{\\o}")); // ø
+        Assert.assertEquals("\\u216O", formatter.format("{\\O}")); // Ø
+        Assert.assertEquals("\\u322l", formatter.format("{\\l}"));
+        Assert.assertEquals("\\u321L", formatter.format("{\\L}"));
+        Assert.assertEquals("\\u223ss", formatter.format("{\\ss}")); // ß
+        Assert.assertEquals("\\u191?", formatter.format("\\`?")); // ¿
+        Assert.assertEquals("\\u161!", formatter.format("\\`!")); // ¡
 
         Assert.assertEquals("", formatter.format("\\dag"));
         Assert.assertEquals("", formatter.format("\\ddag"));
-        Assert.assertEquals("", formatter.format("\\S")); // §
-        Assert.assertEquals("", formatter.format("\\P")); // ¶
-        Assert.assertEquals("", formatter.format("\\copyright")); // ©
-        Assert.assertEquals("", formatter.format("\\pounds")); // £
+        Assert.assertEquals("\\u167S", formatter.format("{\\S}")); // §
+        Assert.assertEquals("\\u182P", formatter.format("{\\P}")); // ¶
+        Assert.assertEquals("\\u169?", formatter.format("{\\copyright}")); // ©
+        Assert.assertEquals("\\u163?", formatter.format("{\\pounds}")); // £
     }
 }
