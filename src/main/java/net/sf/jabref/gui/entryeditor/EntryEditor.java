@@ -1035,6 +1035,17 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
+    public void close() {
+        if (tabbed.getSelectedComponent() == srcPanel) {
+            updateField(source);
+            if (lastSourceAccepted) {
+                panel.entryEditorClosing(EntryEditor.this);
+            }
+        } else {
+            panel.entryEditorClosing(EntryEditor.this);
+        }
+    }
+
     class CloseAction extends AbstractAction {
         public CloseAction() {
             super(Localization.lang("Close window"), IconTheme.JabRefIcon.CLOSE.getSmallIcon());
@@ -1043,14 +1054,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (tabbed.getSelectedComponent() == srcPanel) {
-                updateField(source);
-                if (lastSourceAccepted) {
-                    panel.entryEditorClosing(EntryEditor.this);
-                }
-            } else {
-                panel.entryEditorClosing(EntryEditor.this);
-            }
+            close();
         }
     }
 
