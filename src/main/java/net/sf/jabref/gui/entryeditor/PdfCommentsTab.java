@@ -33,7 +33,6 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.desktop.os.Linux;
 import net.sf.jabref.gui.desktop.os.NativeDesktop;
-import net.sf.jabref.gui.desktop.os.Windows;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.pdf.PdfCommentImporter;
 import net.sf.jabref.model.entry.BibEntry;
@@ -306,17 +305,14 @@ public class PdfCommentsTab extends JPanel {
             if( commentList.getSelectedValue().getPage() != 0) {
                 pageNo =  String.valueOf(commentList.getSelectedValue().getPage());
             }
-            String openPdfString;
-            String pathToFile = System.getProperty("file.separator")
-                    + fileNameComboBox.getSelectedItem().toString();
-
+            String pathToFile = fileNameComboBox.getSelectedItem().toString();
             StringJoiner sj = new StringJoiner(" ");
-            if(desktop instanceof Linux || desktop instanceof Windows){
-                sj.add("/a page=" + pageNo);
-            }  else {
-                sj.add(" ");
-            }
+            sj.add("/a page=" + pageNo);
 
+            if(desktop instanceof Linux){
+                pathToFile = System.getProperty("file.separator")
+                        + fileNameComboBox.getSelectedItem().toString();
+            }
             JabRefDesktop.getNativeDesktop()
                     .openPdfWithParameters(pathToFile, Arrays.asList(sj.toString().split(" ")));
 
