@@ -30,6 +30,10 @@ import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
+import net.sf.jabref.gui.desktop.os.Linux;
+import net.sf.jabref.gui.desktop.os.NativeDesktop;
+import net.sf.jabref.gui.desktop.os.OSX;
+import net.sf.jabref.gui.desktop.os.Windows;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.pdf.PdfCommentImporter;
 import net.sf.jabref.model.entry.BibEntry;
@@ -296,9 +300,19 @@ public class PdfCommentsTab extends JPanel {
     private void openPdf() {
 
         try {
-            JabRefDesktop.getNativeDesktop().openFileWithApplication("/" + fileNameComboBox.getSelectedItem().toString(),
-                    "acroread /a page=" + commentList.getSelectedValue().getPage());
-            System.out.println(commentList.getSelectedValue().getCommentId());
+            NativeDesktop desktop = JabRefDesktop.getNativeDesktop();
+            String openPdfString;
+            if(desktop instanceof Linux){
+                openPdfString = "acroread /a page=";
+            } else if (desktop instanceof Windows) {
+                openPdfString = "adobe.exe /a page=";
+            } else if (desktop instanceof OSX) {
+                openPdfString = "go buy urself a real computer";
+            } else {
+                openPdfString = "";
+            }
+            JabRefDesktop.getNativeDesktop().openFileWithApplication(System.getProperty("file.separator") + fileNameComboBox.getSelectedItem().toString(),
+                    openPdfString + commentList.getSelectedValue().getPage());
         } catch (IOException e) {
             e.printStackTrace();
         }
