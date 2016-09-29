@@ -156,7 +156,7 @@ class EntryEditorTab {
                         false);
                 defaultHeight = 0;
             } else {
-                if (field.startsWith("_")) {
+                if (isHiddenField(field)) {
                     textAreaForHiddenField = new TextAreaForHiddenField(field);
                     // the assumption is that each hidden field appears after its visible twin
                     // i.e., visible, hidden, visible, hidden, ...
@@ -227,6 +227,9 @@ class EntryEditorTab {
         }
     }
 
+    private boolean isHiddenField(String field) {
+        return field.startsWith("_");
+    }
 
     private BibEntry getEntry() {
         return entry;
@@ -305,7 +308,7 @@ class EntryEditorTab {
 
                 boolean displayableFieldValueExists;
                 boolean hiddenFieldValueExists;
-                boolean currentFieldNameIsHidden = fieldName.startsWith("_");
+                boolean currentFieldNameIsHidden = isHiddenField(fieldName);
                 if (currentFieldNameIsHidden) {
                     displayableFieldValueExists = !entry.getField(fieldName.substring(1)).orElse("").isEmpty();
                     hiddenFieldValueExists = !entry.getField(fieldName).orElse("").isEmpty();

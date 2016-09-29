@@ -115,7 +115,8 @@ public class FieldTextMenu implements MouseListener {
             inputMenu.add(new HideFieldAction((TextAreaForVisibleField) field));
         } else if (field instanceof TextAreaForHiddenField) {
             inputMenu.add(new ShowFieldAction((TextAreaForHiddenField) field));
-            if (field.getTextComponent() instanceof JTextComponent) {
+        }
+        if (field.getTextComponent() instanceof JTextComponent) {
                 inputMenu.add(doiMenuItem);
             }
             inputMenu.addSeparator();
@@ -127,7 +128,6 @@ public class FieldTextMenu implements MouseListener {
                 inputMenu.addSeparator();
                 protectedTermsMenu = new ProtectedTermsMenu((JTextComponent) field.getTextComponent());
                 inputMenu.add(protectedTermsMenu);
-            }
         }
     }
 
