@@ -40,7 +40,8 @@ public class RISImporterTestFiles {
     @Parameters(name = "{0}")
     public static Collection<String> fileNames() {
         return Arrays.asList("RisImporterTest1", "RisImporterTest3", "RisImporterTest4a", "RisImporterTest4b",
-                "RisImporterTest4c", "RisImporterTest5a", "RisImporterTest5b", "RisImporterTest6");
+                "RisImporterTest4c", "RisImporterTest5a", "RisImporterTest5b", "RisImporterTest6",
+                "RisImporterTestDoiAndJournalTitle", "RisImporterTestScopus");
     }
 
     @Test

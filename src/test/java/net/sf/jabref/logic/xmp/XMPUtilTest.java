@@ -1258,7 +1258,6 @@ public class XMPUtilTest {
      * @throws TransformerException
      */
     @Test
-    @Ignore
     public void testCommandLineSeveral() throws IOException, TransformerException {
 
         File tempBib = File.createTempFile("JabRef", ".bib");

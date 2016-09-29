@@ -1,4 +1,5 @@
 # coding=utf-8
+from __future__ import print_function
 import codecs
 import datetime
 import os
@@ -16,14 +17,14 @@ def get_current_branch():
     """
     :return: string: the current git branch
     """
-    return subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).strip("\n")
+    return subprocess.check_output(['git', 'rev-parse', '--abbrev-ref', 'HEAD']).rstrip()
 
 
 def get_current_hash_short():
     """
     :return: string: the current git hash (short)
     """
-    return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip("\n")
+    return subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).rstrip()
 
 
 def open_file(filename):
@@ -50,7 +51,7 @@ def read_file(filename, encoding="UTF-8"):
     :return: list of unicode strings: the lines of the file
     """
     with codecs.open(filename, encoding=encoding) as file:
-        return [u"{}\n".format(line.strip()) for line in file.readlines()]
+        return [u"{}\r\n".format(line.strip()) for line in file.readlines()]
 
 
 def write_file(filename, content):
@@ -285,22 +286,22 @@ def status(extended):
             log = logger.error if num_keys_not_translated != 0 else logger.ok
             log("\t{} not translated keys".format(num_keys_not_translated))
             if extended and num_keys_not_translated != 0:
-                logger.neutral("\t\t{}".format(", ".join(keys_not_translated)))
+                logger.neutral(u"\t\t{}".format(", ".join(keys_not_translated)))
 
             log = logger.error if num_keys_missing != 0 else logger.ok
             log("\t{} missing keys".format(num_keys_missing))
             if extended and num_keys_missing != 0:
-                logger.neutral("\t\t{}".format(", ".join(keys_missing)))
+                logger.neutral(u"\t\t{}".format(", ".join(keys_missing)))
 
             log = logger.error if num_keys_obsolete != 0 else logger.ok
             log("\t{} obsolete keys".format(num_keys_obsolete))
             if extended and num_keys_obsolete != 0:
-                logger.neutral("\t\t{}".format(", ".join(keys_obsolete)))
+                logger.neutral(u"\t\t{}".format(", ".join(keys_obsolete)))
 
             log = logger.error if num_keys_duplicate != 0 else logger.ok
             log("\t{} duplicates".format(num_keys_duplicate))
             if extended and num_keys_duplicate != 0:
-                logger.neutral("\t\t{}".format(", ".join(keys_duplicate)))
+                logger.neutral(u"\t\t{}".format(", ".join(keys_duplicate)))
 
     check_properties(main_property_file=get_main_jabref_preferences(), property_files=get_all_jabref_properties())
     check_properties(main_property_file=get_main_menu_properties(), property_files=get_all_menu_properties())
@@ -324,7 +325,7 @@ def update(extended):
         if num_main_duplicates != 0:
             logger.error("There are {num_duplicates} duplicates in {file}, please fix them manually".format(num_duplicates=num_main_duplicates, file=get_filename(filepath=main_property_file)))
             if extended:
-                logger.neutral("\t{}".format(main_duplicates))
+                logger.neutral(u"\t{}".format(", ".join(main_duplicates)))
             return
 
 
@@ -340,7 +341,7 @@ def update(extended):
             if num_not_fixed != 0:
                 logger.error("There are {num_not_fixed_duplicates} ambiguous duplicates in {file}, please fix them manually".format(num_not_fixed_duplicates=num_not_fixed, file=filename))
                 if extended:
-                    logger.neutral("\t\t{}".format(not_fixed))
+                    logger.error(u"\t{}".format(u", ".join(not_fixed)))
                 continue
 
             keys_missing = get_missing_keys(main_keys, keys)
@@ -359,26 +360,36 @@ def update(extended):
             for line in main_lines:
                 key = get_key_from_line(line)
                 if key is not None:
-                    other_lines_to_write.append(u"{key}={value}\n".format(key=key, value=keys[key]))
+                    other_lines_to_write.append(u"{key}={value}\r\n".format(key=key, value=keys[key]))
                 else:
                     other_lines_to_write.append(line)
+
+            sorted = len(lines) != len(other_lines_to_write)
+            if not sorted:
+                for old_line, new_lines in zip(lines, other_lines_to_write):
+                    if old_line != new_lines:
+                        sorted = True
+
             write_file(filename=other_property_file, content=other_lines_to_write)
 
-
             logger.ok("Processing file '{file}' with {num_keys} Keys".format(file=filename, num_keys=num_keys))
-            logger.ok("\tfixed {} unambiguous duplicates".format(num_fixed))
-            if extended and num_fixed != 0:
-                logger.neutral("\t\t{}".format(", ".join(fixed)))
+            if num_fixed != 0:
+                logger.ok("\tfixed {} unambiguous duplicates".format(num_fixed))
+                if extended:
+                    logger.neutral(u"\t\t{}".format(", ".join(fixed)))
 
-            logger.ok("\tadded {} missing keys".format(num_keys_missing))
-            if extended and num_keys_missing != 0:
-                logger.neutral("\t\t{}".format(", ".join(keys_missing)))
+            if num_keys_missing != 0:
+                logger.ok("\tadded {} missing keys".format(num_keys_missing))
+                if extended:
+                    logger.neutral(u"\t\t{}".format(", ".join(keys_missing)))
 
-            logger.ok("\tdeleted {} obsolete keys".format(num_keys_obsolete))
-            if extended and num_keys_obsolete != 0:
-                logger.neutral("\t\t{}".format(", ".join(keys_obsolete)))
+            if num_keys_obsolete != 0:
+                logger.ok("\tdeleted {} obsolete keys".format(num_keys_obsolete))
+                if extended:
+                    logger.neutral(u"\t\t{}".format(", ".join(keys_obsolete)))
 
-            logger.ok("\thas been sorted successfully")
+            if sorted:
+                logger.ok("\thas been sorted successfully")
 
     update_properties(main_property_file=get_main_jabref_preferences(), other_property_files=get_other_jabref_properties())
     update_properties(main_property_file=get_main_menu_properties(), other_property_files=get_other_menu_properties())
@@ -420,28 +431,28 @@ if len(sys.argv) == 2 and sys.argv[1] == "markdown":
     status_create_markdown()
 
 elif (len(sys.argv) == 2 or len(sys.argv) == 3) and sys.argv[1] == "update":
-    update(extended=len(sys.argv) == 3 and sys.argv[2] == "--extended")
+    update(extended=len(sys.argv) == 3 and (sys.argv[2] == "-e" or sys.argv[2] == "--extended"))
 
 elif (len(sys.argv) == 2 or len(sys.argv) == 3) and sys.argv[1] == "status":
-    status(extended=len(sys.argv) == 3 and sys.argv[2] == "--extended")
+    status(extended=len(sys.argv) == 3 and (sys.argv[2] == "-e" or sys.argv[2] == "--extended"))
 
 else:
-    logger.neutral("""This program must be run from the jabref base directory.
+    logger.neutral("""This program must be run from the JabRef base directory.
 
-Usage: syncLang.py {markdown, status [--extended], update [--extended]}
+Usage: syncLang.py {markdown, status [-e | --extended], update [-e | --extended]}
 Option can be one of the following:
 
-    status [--extended]:
+    status [-e | --extended]:
         prints the current status to the terminal
-        [--extended]:
+        [-e | --extended]:
             if the translations keys which create problems should be printed
 
     markdown:
         Creates a markdown file of the current status and opens it
 
-    update [--extended]:
+    update [-e | --extended]:
         compares all the localization files against the English one and fixes unambiguous duplicates,
         removes obsolete keys, adds missing keys, and sorts them
-        [--extended]:
+        [-e | --extended]:
             if the translations keys which create problems should be printed
 """)
