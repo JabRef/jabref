@@ -2,7 +2,6 @@ package net.sf.jabref.gui.importer.fetcher;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -12,7 +11,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -36,16 +34,15 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(GoogleScholarFetcher.class);
 
-    private boolean hasRunConfig;
-    private static final int MAX_ENTRIES_TO_LOAD = 50;
     private static final String QUERY_MARKER = "___QUERY___";
     private static final String URL_START = "https://scholar.google.com";
-    private static final String URL_SETTING = "https://scholar.google.com/scholar_settings";
-    private static final String URL_SETPREFS = "https://scholar.google.com/scholar_setprefs";
     private static final String SEARCH_URL = GoogleScholarFetcher.URL_START + "/scholar?q=" + GoogleScholarFetcher.QUERY_MARKER
             + "&hl=en&btnG=Search&oe=utf-8";
+    private static final String CITATIONS_PAGE_URL_BASE = "https://scholar.google.de/scholar?q=info:";
+    private static final String CITATIONS_PAGE_URL_SUFFIX = ":scholar.google.com/&output=cite&scirp=0&hl=en";
 
-    private static final Pattern BIBTEX_LINK_PATTERN = Pattern.compile("<a href=\"([^\"]*)\"[^>]*>[A-Za-z ]*BibTeX");
+    private static final Pattern SCHOLAR_ID_PATTERN = Pattern.compile("gs_ocit\\(event,'(\\w*)'");
+    private static final Pattern BIBTEX_LINK_PATTERN = Pattern.compile("href=\"(.*)\">BibTeX");
     private static final Pattern TITLE_START_PATTERN = Pattern.compile("<div class=\"gs_ri\">");
     private static final Pattern LINK_PATTERN = Pattern.compile("<h3 class=\"gs_rt\"><a href=\"([^\"]*)\">");
     private static final Pattern TITLE_END_PATTERN = Pattern.compile("<div class=\"gs_fl\">");
@@ -77,10 +74,6 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         entryLinks.clear();
         stopFetching = false;
         try {
-            if (!hasRunConfig) {
-                runConfig();
-                hasRunConfig = true;
-            }
             Map<String, JLabel> citations = getCitations(query);
             for (Map.Entry<String, JLabel> linkEntry : citations.entrySet()) {
                 preview.addEntry(linkEntry.getKey(), linkEntry.getValue());
@@ -148,27 +141,6 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         stopFetching = true;
     }
 
-    private static void runConfig() throws IOException {
-        try {
-            new URLDownload("http://scholar.google.com").downloadToString(StandardCharsets.UTF_8);
-            String settingsPage = new URLDownload(GoogleScholarFetcher.URL_SETTING)
-                    .downloadToString(StandardCharsets.UTF_8);
-            // Get the form items and their values from the page:
-            Map<String, String> formItems = GoogleScholarFetcher.getFormElements(settingsPage);
-            // Override the important ones:
-            formItems.put("scis", "yes");
-            formItems.put("scisf", "4");
-            formItems.put("num", String.valueOf(GoogleScholarFetcher.MAX_ENTRIES_TO_LOAD));
-            String request = formItems.entrySet().stream().map(Object::toString)
-                    .collect(Collectors.joining("&", GoogleScholarFetcher.URL_SETPREFS + "?", "&submit="));
-            // Download the URL to set preferences:
-            new URLDownload(request).downloadToString(Globals.prefs.getDefaultEncoding());
-
-        } catch (UnsupportedEncodingException ex) {
-            LOGGER.error("Unsupported encoding.", ex);
-        }
-    }
-
     /**
      * @param query The search term to query Google Scholar for.
      * @return a list of IDs
@@ -193,13 +165,21 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     }
 
     private String getCitationsFromUrl(String urlQuery, Map<String, JLabel> ids) throws IOException {
-        String cont = new URLDownload(urlQuery).downloadToString(StandardCharsets.UTF_8);
-        Matcher m = GoogleScholarFetcher.BIBTEX_LINK_PATTERN.matcher(cont);
+        String cont = URLDownload.createURLDownloadWithBrowserUserAgent(urlQuery).downloadToString(StandardCharsets.UTF_8);
+
+        Matcher m = GoogleScholarFetcher.SCHOLAR_ID_PATTERN.matcher(cont);
         int lastRegionStart = 0;
 
         while (m.find()) {
-            String link = m.group(1).replace("&amp;", "&");
-            link = link+"&oe=utf-8"; // append param 'oe=utf-8' to tell google to serve UTF-8 encoded results
+
+            String citationsPageURL = CITATIONS_PAGE_URL_BASE+m.group(1)+CITATIONS_PAGE_URL_SUFFIX;
+
+            String citationsPage = URLDownload.createURLDownloadWithBrowserUserAgent(citationsPageURL).downloadToString(StandardCharsets.UTF_8);
+
+            Matcher citationPageMatcher = GoogleScholarFetcher.BIBTEX_LINK_PATTERN.matcher(citationsPage);
+            citationPageMatcher.find();
+            String link = citationPageMatcher.group(1).replace("&amp;", "&");;
+
             String pText;
             String part = cont.substring(lastRegionStart, m.start());
             Matcher titleS = GoogleScholarFetcher.TITLE_START_PATTERN.matcher(part);
@@ -217,6 +197,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             }
 
             pText = pText.replace("[PDF]", "");
+            pText = pText.replace("[HTML]", "");
             JLabel preview = new JLabel("<html>" + pText + "</html>");
             ids.put(link, preview);
 
@@ -241,7 +222,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
     private BibEntry downloadEntry(String link) throws IOException {
         try {
-            String s = new URLDownload(link).downloadToString(StandardCharsets.UTF_8);
+            String s = URLDownload.createURLDownloadWithBrowserUserAgent(link).downloadToString(StandardCharsets.UTF_8);
             BibtexParser bp = new BibtexParser(Globals.prefs.getImportFormatPreferences());
             ParserResult pr = bp.parse(new StringReader(s));
             if ((pr != null) && (pr.getDatabase() != null)) {
@@ -282,26 +263,5 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
             LOGGER.error("Malformed URL.", ex);
             return null;
         }
-    }
-
-
-
-    private static Map<String, String> getFormElements(String page) {
-        Matcher m = GoogleScholarFetcher.INPUT_PATTERN.matcher(page);
-        Map<String, String> items = new HashMap<>();
-        while (m.find()) {
-            String name = m.group(2);
-            if ((name.length() > 2) && (name.charAt(0) == '"')
-                    && (name.charAt(name.length() - 1) == '"')) {
-                name = name.substring(1, name.length() - 1);
-            }
-            String value = m.group(3);
-            if ((value.length() > 2) && (value.charAt(0) == '"')
-                    && (value.charAt(value.length() - 1) == '"')) {
-                value = value.substring(1, value.length() - 1);
-            }
-            items.put(name, value);
-        }
-        return items;
     }
 }

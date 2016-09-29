@@ -65,8 +65,8 @@ import org.apache.commons.logging.LogFactory;
 public class ModsImporter extends ImportFormat {
 
     private static final Log LOGGER = LogFactory.getLog(ModsImporter.class);
-    private static final Character KEYWORD_SEPARATOR = JabRefPreferences.getInstance().getImportFormatPreferences()
-            .getKeywordSeparator();
+    private static final String KEYWORD_SEPARATOR = JabRefPreferences.getInstance().getImportFormatPreferences()
+            .getKeywordSeparator() + " ";
 
     private static final Pattern MODS_PATTERN = Pattern.compile("<mods .*>");
     private JAXBContext context;
@@ -226,7 +226,7 @@ public class ModsImporter extends ImportFormat {
                 parseGeographicInformation(fields, hierarchichalGeographic);
             } else if ((value instanceof StringPlusLanguagePlusAuthority) && "topic".equals(elementName)) {
                 StringPlusLanguagePlusAuthority topic = (StringPlusLanguagePlusAuthority) value;
-                keywords.add(topic.getValue());
+                keywords.add(topic.getValue().trim());
             }
         }
     }
@@ -334,18 +334,16 @@ public class ModsImporter extends ImportFormat {
     }
 
     private void putPageInformation(ExtentDefinition extentDefinition, Map<String, String> fields) {
-        if ("page".equals(extentDefinition.getUnit())) {
-            if (extentDefinition.getTotal() != null) {
-                putIfValueNotNull(fields, FieldName.PAGETOTAL, String.valueOf(extentDefinition.getTotal()));
-            } else if (extentDefinition.getStart() != null) {
-                putIfValueNotNull(fields, FieldName.PAGES, extentDefinition.getStart().getValue());
-                if (extentDefinition.getEnd() != null) {
-                    String endPage = extentDefinition.getEnd().getValue();
-                    //if end appears, then there has to be a start page appeared, so get it and put it together with
-                    //the end page
-                    String startPage = fields.get(FieldName.PAGES);
-                    fields.put(FieldName.PAGES, startPage + "-" + endPage);
-                }
+        if (extentDefinition.getTotal() != null) {
+            putIfValueNotNull(fields, FieldName.PAGES, String.valueOf(extentDefinition.getTotal()));
+        } else if (extentDefinition.getStart() != null) {
+            putIfValueNotNull(fields, FieldName.PAGES, extentDefinition.getStart().getValue());
+            if (extentDefinition.getEnd() != null) {
+                String endPage = extentDefinition.getEnd().getValue();
+                //if end appears, then there has to be a start page appeared, so get it and put it together with
+                //the end page
+                String startPage = fields.get(FieldName.PAGES);
+                fields.put(FieldName.PAGES, startPage + "-" + endPage);
             }
         }
     }
@@ -416,6 +414,7 @@ public class ModsImporter extends ImportFormat {
         List<JAXBElement<?>> namePartOrDisplayFormOrAffiliation = name.getNamePartOrDisplayFormOrAffiliation();
         List<String> foreName = new ArrayList<>();
         String familyName = "";
+        String author = "";
         for (JAXBElement<?> element : namePartOrDisplayFormOrAffiliation) {
             Object value = element.getValue();
             String elementName = element.getName().getLocalPart();
@@ -424,22 +423,35 @@ public class ModsImporter extends ImportFormat {
                 String type = namePart.getAtType();
                 if ((type == null) && (namePart.getValue() != null)) {
                     authors.add(namePart.getValue());
-                }
-                if ("given".equals(type) && (namePart.getValue() != null)) {
-                    foreName.add(namePart.getValue());
                 } else if ("family".equals(type) && (namePart.getValue() != null)) {
+                    //family should come first, so if family appears we can set the author then comes before
+                    //we have to check if forename and family name are not empty in case it's the first author
+                    if (!foreName.isEmpty() && !familyName.isEmpty()) {
+                        //now set and add the old author
+                        author = familyName + ", " + Joiner.on(" ").join(foreName);
+                        authors.add(author);
+                        //remove old forenames
+                        foreName.clear();
+                    } else if (foreName.isEmpty() && !familyName.isEmpty()) {
+                        authors.add(familyName);
+                    }
                     familyName = namePart.getValue();
+                } else if ("given".equals(type) && (namePart.getValue() != null)) {
+                    foreName.add(namePart.getValue());
                 }
             } else if ((value instanceof StringPlusLanguage) && "affiliation".equals(elementName)) {
                 StringPlusLanguage affiliation = (StringPlusLanguage) value;
                 putIfValueNotNull(fields, "affiliation", affiliation.getValue());
             }
         }
+
+        //last author is not added, so do it here
         if (!foreName.isEmpty() && !familyName.isEmpty()) {
-            String author = familyName + ", " + Joiner.on(" ").join(foreName);
-            authors.add(author);
+            author = familyName + ", " + Joiner.on(" ").join(foreName);
+            authors.add(author.trim());
+            foreName.clear();
         } else if (foreName.isEmpty() && !familyName.isEmpty()) {
-            authors.add(familyName);
+            authors.add(familyName.trim());
         }
     }
 
