@@ -705,4 +705,15 @@ public class StringUtil {
     public static List<String> getStringAsWords(String text) {
         return Arrays.asList(text.split("[\\s,;]+"));
     }
+
+
+    /**
+     * Removes all comma's in a given String
+     *
+     * @param query input to remove comma's
+     * @return input without comma's
+     */
+    public static String replaceCommaWithAND(String query) {
+        return query.replaceAll(", ", " AND ").replaceAll(",", " AND ");
+    }
 }

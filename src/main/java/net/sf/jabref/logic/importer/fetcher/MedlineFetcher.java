@@ -24,6 +24,7 @@ import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.importer.fileformat.MedlineImporter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -36,7 +37,6 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
 
     private static final Log LOGGER = LogFactory.getLog(MedlineFetcher.class);
 
-    private static final String CLEAN_ID_QUERY = "\\d+[,\\d+]*";
     private static final String API_MEDLINE_FETCH = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi";
     private static final String API_MEDLINE_SEARCH = "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi";
 
@@ -45,11 +45,6 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
     private static final Pattern RET_MAX_PATTERN = Pattern.compile("<RetMax>(\\d+)<\\/RetMax>");
     private static final Pattern RET_START_PATTERN = Pattern.compile("<RetStart>(\\d+)<\\/RetStart>");
 
-
-    private static String replaceCommaWithAND(String query) {
-        return query.replaceAll(", ", " AND ").replaceAll(",", " AND ");
-    }
-
     /**
      * Gets the initial list of ids
      */
@@ -57,12 +52,7 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
         boolean doCount = true;
         SearchResult result = new SearchResult();
         try {
-            URIBuilder uriBuilder = new URIBuilder(API_MEDLINE_SEARCH);
-            uriBuilder.addParameter("db", "pubmed");
-            uriBuilder.addParameter("retmax", Integer.toString(pacing));
-            uriBuilder.addParameter("retstart", Integer.toString(start));
-            uriBuilder.addParameter("term", term);
-            URL ncbi = uriBuilder.build().toURL();
+            URL ncbi = createSearchUrl(term, start, pacing);
             // get the ids
             BufferedReader in = new BufferedReader(new InputStreamReader(ncbi.openStream()));
             String inLine;
@@ -106,12 +96,28 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
     }
 
     @Override
+    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
+        String cleanQuery = identifier.trim().replace(';', ',');
+
+        List<BibEntry> entry = fetchMedline(cleanQuery);
+
+        if (entry.isEmpty()) {
+            LOGGER.warn(Localization.lang("No references found"));
+        } else if (entry.size() > 1) {
+            LOGGER.info("Fetcher " + getName() + " " +
+                    "found more than one result for identifier " + identifier
+                    + ". We will use the first entry.");
+        }
+        return Optional.of(entry.get(0));
+    }
+
+    @Override
     public List<BibEntry> performSearch(String query) throws FetcherException {
-        final int numberToFetch = 50;
+        final int NUMBER_TO_FETCH = 50;
         List<BibEntry> entryList = new LinkedList<>();
 
         if (!query.isEmpty()) {
-            String searchTerm = replaceCommaWithAND(query);
+            String searchTerm = StringUtil.replaceCommaWithAND(query);
 
             // get the ids from entrez
             SearchResult result = getIds(searchTerm, 0, 1);
@@ -121,16 +127,36 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
                 return Collections.emptyList();
             }
 
-            for (int i = 0; i < numberToFetch; i++) {
-                // get the ids from entrez
-                result = getIds(searchTerm, i, numberToFetch - i);
+            result = getIds(searchTerm, 0, NUMBER_TO_FETCH);
 
-                List<BibEntry> bibs = fetchMedline(result.ids);
-                entryList.addAll(bibs);
-            }
+            List<BibEntry> bibs = fetchMedline(result.ids);
+            entryList.addAll(bibs);
+
             return entryList;
         }
-        throw new FetcherException(Localization.lang("Input error") +". " +Localization.lang("Please enter a comma separated list of Medline IDs (numbers) or search terms."));
+        throw new FetcherException(Localization.lang("Input error") + ". " + Localization.lang("Please enter a comma separated list of Medline IDs (numbers) or search terms."));
+    }
+
+    static URL createSearchUrl(String term, int start, int pacing) throws URISyntaxException, MalformedURLException {
+        term = StringUtil.replaceCommaWithAND(term);
+        URIBuilder uriBuilder = new URIBuilder(API_MEDLINE_SEARCH);
+        uriBuilder.addParameter("db", "pubmed");
+        uriBuilder.addParameter("retmax", Integer.toString(pacing));
+        uriBuilder.addParameter("retstart", Integer.toString(start));
+        uriBuilder.addParameter("sort", "relevance");
+        uriBuilder.addParameter("term", term);
+        return uriBuilder.build().toURL();
+    }
+
+    /**
+     * @see <a href="https://www.ncbi.nlm.nih.gov/books/NBK25499/table/chapter4.T._valid_values_of__retmode_and/?report=objectonly">www.ncbi.nlm.nih.gov</a>
+     */
+    static URL createFetchUrl(String id) throws URISyntaxException, MalformedURLException {
+        URIBuilder uriBuilder = new URIBuilder(API_MEDLINE_FETCH);
+        uriBuilder.addParameter("db", "pubmed");
+        uriBuilder.addParameter("retmode", "xml");
+        uriBuilder.addParameter("id", id);
+        return uriBuilder.build().toURL();
     }
 
     /**
@@ -141,12 +167,7 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
      */
     private static List<BibEntry> fetchMedline(String id) {
         try {
-            URIBuilder uriBuilder = new URIBuilder(API_MEDLINE_FETCH);
-            uriBuilder.addParameter("db", "pubmed");
-            uriBuilder.addParameter("retmode", "xml");
-            uriBuilder.addParameter("rettype", "citation");
-            uriBuilder.addParameter("id", id);
-            URL fetchURL = uriBuilder.build().toURL();
+            URL fetchURL = createFetchUrl(id);
             URLConnection data = fetchURL.openConnection();
             ParserResult result = new MedlineImporter().importDatabase(
                     new BufferedReader(new InputStreamReader(data.getInputStream(), StandardCharsets.UTF_8)));
@@ -160,34 +181,11 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
         }
     }
 
-    @Override
-    public Optional<BibEntry> performSearchById(String identifier) throws FetcherException {
-        String cleanQuery = identifier.trim().replace(';', ',');
-
-        if (cleanQuery.matches(CLEAN_ID_QUERY)) {
-            List<BibEntry> entry = fetchMedline(cleanQuery);
-
-            if (entry.isEmpty()) {
-                LOGGER.warn(Localization.lang("No references found"));
-            }
-            LOGGER.info("Fetcher " + getName() + "found more than one result for identifier " + identifier
-                    + ". We will use the first entry.");
-            return Optional.of(entry.get(0));
-
-        }
-        return Optional.empty();
-    }
-
     static class SearchResult {
-
         int count;
-
         int retmax;
-
         int retstart;
-
         String ids = "";
-
 
         void addID(String id) {
             if (ids.isEmpty()) {
