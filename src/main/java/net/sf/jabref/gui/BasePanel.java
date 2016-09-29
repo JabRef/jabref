@@ -1658,28 +1658,14 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public EntryEditor getEntryEditor(BibEntry entry) {
         EntryEditor entryEditor;
-        if (entryEditors.containsKey(entry.getType())) {
-            EntryEditor visibleNow = currentEditor;
 
-            // We already have an editor for this entry type.
-            entryEditor = entryEditors.get(entry.getType());
+        // We must instantiate a new editor for this type. First make sure the old one
+        // stores its last edit:
+        storeCurrentEdit();
+        // Then start the new one:
+        entryEditor = new EntryEditor(frame, BasePanel.this, entry);
 
-            // If the cached editor is not the same as the currently shown one,
-            // make sure the current one stores its current edit:
-            if ((visibleNow != null) && (!(entryEditor.equals(visibleNow)))) {
-                visibleNow.storeCurrentEdit();
-            }
-
-            entryEditor.switchTo(entry);
-        } else {
-            // We must instantiate a new editor for this type. First make sure the old one
-            // stores its last edit:
-            storeCurrentEdit();
-            // Then start the new one:
-            entryEditor = new EntryEditor(frame, BasePanel.this, entry);
-
-            entryEditors.put(entry.getType(), entryEditor);
-        }
+        entryEditors.put(entry.getType(), entryEditor);
         return entryEditor;
     }
 

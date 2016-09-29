@@ -290,13 +290,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
 
         // other fields
-        EntryType biblatextype = EntryTypes.getTypeOrDefault(entry.getType(), BibDatabaseMode.BIBLATEX);
         List<String> displayedFields = type.getAllFields().stream().map(String::toLowerCase)
                 .collect(Collectors.toList());
-        List<String> otherFields = biblatextype.getAllFields().stream().map(String::toLowerCase)
+        List<String> otherFields = entry.getFieldNames().stream().map(String::toLowerCase)
                 .filter(f -> !displayedFields.contains(f)).collect(Collectors.toList());
-        otherFields.addAll(entry.getFieldNames().stream().map(String::toLowerCase)
-                .filter(f -> !displayedFields.contains(f)).collect(Collectors.toList()));
         if (!usedOptionalFieldsDeprecated.isEmpty()) {
             otherFields.removeAll(usedOptionalFieldsDeprecated);
         }
