@@ -24,7 +24,6 @@ import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.importer.fileformat.MedlineImporter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -45,12 +44,33 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
     private static final Pattern RET_MAX_PATTERN = Pattern.compile("<RetMax>(\\d+)<\\/RetMax>");
     private static final Pattern RET_START_PATTERN = Pattern.compile("<RetStart>(\\d+)<\\/RetStart>");
 
+    private int count;
+    private int retmax;
+    private int retstart;
+    private String ids = "";
+
+    private void addID(String id) {
+        if (ids.isEmpty()) {
+            ids = id;
+        } else {
+            ids += "," + id;
+        }
+    }
+
+    /**
+     * Removes all comma's in a given String
+     *
+     * @param query input to remove comma's
+     * @return input without comma's
+     */
+    private static String replaceCommaWithAND(String query) {
+        return query.replaceAll(", ", " AND ").replaceAll(",", " AND ");
+    }
     /**
      * Gets the initial list of ids
      */
-    private SearchResult getIds(String term, int start, int pacing) {
+    private void getIds(String term, int start, int pacing) {
         boolean doCount = true;
-        SearchResult result = new SearchResult();
         try {
             URL ncbi = createSearchUrl(term, start, pacing);
             // get the ids
@@ -61,19 +81,19 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
                 // get the count
                 Matcher idMatcher = ID_PATTERN.matcher(inLine);
                 if (idMatcher.find()) {
-                    result.addID(idMatcher.group(1));
+                    addID(idMatcher.group(1));
                 }
                 Matcher retMaxMatcher = RET_MAX_PATTERN.matcher(inLine);
                 if (retMaxMatcher.find()) {
-                    result.retmax = Integer.parseInt(retMaxMatcher.group(1));
+                    retmax = Integer.parseInt(retMaxMatcher.group(1));
                 }
                 Matcher retStartMatcher = RET_START_PATTERN.matcher(inLine);
                 if (retStartMatcher.find()) {
-                    result.retstart = Integer.parseInt(retStartMatcher.group(1));
+                    retstart = Integer.parseInt(retStartMatcher.group(1));
                 }
                 Matcher countMatcher = COUNT_PATTERN.matcher(inLine);
                 if (doCount && countMatcher.find()) {
-                    result.count = Integer.parseInt(countMatcher.group(1));
+                    count = Integer.parseInt(countMatcher.group(1));
                     doCount = false;
                 }
             }
@@ -82,7 +102,6 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
         } catch (IOException e) { // openConnection() failed
             LOGGER.warn("Connection failed", e);
         }
-        return result;
     }
 
     @Override
@@ -117,19 +136,19 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
         List<BibEntry> entryList = new LinkedList<>();
 
         if (!query.isEmpty()) {
-            String searchTerm = StringUtil.replaceCommaWithAND(query);
+            String searchTerm = replaceCommaWithAND(query);
 
             // get the ids from entrez
-            SearchResult result = getIds(searchTerm, 0, 1);
+            getIds(searchTerm, 0, 1);
 
-            if (result.count == 0) {
+            if (count == 0) {
                 LOGGER.warn(Localization.lang("No references found"));
                 return Collections.emptyList();
             }
 
-            result = getIds(searchTerm, 0, NUMBER_TO_FETCH);
+            getIds(searchTerm, 0, NUMBER_TO_FETCH-1);
 
-            List<BibEntry> bibs = fetchMedline(result.ids);
+            List<BibEntry> bibs = fetchMedline(ids);
             entryList.addAll(bibs);
 
             return entryList;
@@ -138,7 +157,7 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
     }
 
     static URL createSearchUrl(String term, int start, int pacing) throws URISyntaxException, MalformedURLException {
-        term = StringUtil.replaceCommaWithAND(term);
+        term = replaceCommaWithAND(term);
         URIBuilder uriBuilder = new URIBuilder(API_MEDLINE_SEARCH);
         uriBuilder.addParameter("db", "pubmed");
         uriBuilder.addParameter("retmax", Integer.toString(pacing));
@@ -180,20 +199,4 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
             return new ArrayList<>();
         }
     }
-
-    static class SearchResult {
-        int count;
-        int retmax;
-        int retstart;
-        String ids = "";
-
-        void addID(String id) {
-            if (ids.isEmpty()) {
-                ids = id;
-            } else {
-                ids += "," + id;
-            }
-        }
-    }
-
 }
