@@ -5,10 +5,16 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
+import java.util.StringJoiner;
 
 import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
+import net.sf.jabref.preferences.JabRefPreferences;
+
+import static net.sf.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
+import static net.sf.jabref.preferences.JabRefPreferences.USE_PDF_READER;
 
 public class Linux implements NativeDesktop {
     @Override
@@ -79,6 +85,23 @@ public class Linux implements NativeDesktop {
                 runtime.exec(emulatorName, null, new File(absolutePath));
             }
         }
+    }
+
+    @Override
+    public void openPdfWithParameters(String filePath, List<String> parameters) throws IOException {
+
+        String application;
+        if(JabRefPreferences.getInstance().get(USE_PDF_READER).equals(JabRefPreferences.getInstance().get(ADOBE_ACROBAT_COMMAND))){
+            application = "acroread";
+        } else {
+            application ="";
+        }
+
+        StringJoiner sj = new StringJoiner(" ");
+        sj.add(application);
+        parameters.forEach((param) -> sj.add(param));
+
+        openFileWithApplication(filePath, sj.toString());
     }
 
     @Override

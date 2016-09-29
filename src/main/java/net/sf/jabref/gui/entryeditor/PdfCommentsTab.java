@@ -5,6 +5,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +33,6 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.desktop.os.Linux;
 import net.sf.jabref.gui.desktop.os.NativeDesktop;
-import net.sf.jabref.gui.desktop.os.OSX;
 import net.sf.jabref.gui.desktop.os.Windows;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.pdf.PdfCommentImporter;
@@ -216,7 +216,7 @@ public class PdfCommentsTab extends JPanel {
 
     private void setUpInformationPanel(){
         JPanel informationPanel  = FormBuilder.create()
-                .columns("pref, $lcgap, pref:grow")
+                .columns("pref:grow, $lcgap, pref:grow")
                 .rows("pref, $lg, pref, $lg, pref, $lg, pref, $lg, pref:grow, $lg, pref:grow, $lg, fill:pref")
                 .padding(Paddings.DIALOG)
                 .add(authorLabel).xy(1,3, "left, top")
@@ -301,18 +301,25 @@ public class PdfCommentsTab extends JPanel {
 
         try {
             NativeDesktop desktop = JabRefDesktop.getNativeDesktop();
-            String openPdfString;
-            if(desktop instanceof Linux){
-                openPdfString = "acroread /a page=";
-            } else if (desktop instanceof Windows) {
-                openPdfString = "adobe.exe /a page=";
-            } else if (desktop instanceof OSX) {
-                openPdfString = "go buy urself a real computer";
-            } else {
-                openPdfString = "";
+
+            String pageNo = "1";
+            if( commentList.getSelectedValue().getPage() != 0) {
+                pageNo =  String.valueOf(commentList.getSelectedValue().getPage());
             }
-            JabRefDesktop.getNativeDesktop().openFileWithApplication(System.getProperty("file.separator") + fileNameComboBox.getSelectedItem().toString(),
-                    openPdfString + commentList.getSelectedValue().getPage());
+            String openPdfString;
+            String pathToFile = System.getProperty("file.separator")
+                    + fileNameComboBox.getSelectedItem().toString();
+
+            StringJoiner sj = new StringJoiner(" ");
+            if(desktop instanceof Linux || desktop instanceof Windows){
+                sj.add("/a page=" + pageNo);
+            }  else {
+                sj.add(" ");
+            }
+
+            JabRefDesktop.getNativeDesktop()
+                    .openPdfWithParameters(pathToFile, Arrays.asList(sj.toString().split(" ")));
+
         } catch (IOException e) {
             e.printStackTrace();
         }

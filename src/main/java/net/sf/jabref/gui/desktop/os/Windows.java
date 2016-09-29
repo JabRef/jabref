@@ -3,10 +3,16 @@ package net.sf.jabref.gui.desktop.os;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Optional;
+import java.util.StringJoiner;
 
 import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
+import net.sf.jabref.preferences.JabRefPreferences;
+
+import static net.sf.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
+import static net.sf.jabref.preferences.JabRefPreferences.USE_PDF_READER;
 
 public class Windows implements NativeDesktop {
     private static String DEFAULT_EXECUTABLE_EXTENSION = ".exe";
@@ -51,5 +57,19 @@ public class Windows implements NativeDesktop {
         ProcessBuilder process = new ProcessBuilder("cmd.exe", "/c", "start");
         process.directory(new File(absolutePath));
         process.start();
+    }
+
+    @Override
+    public void openPdfWithParameters(String filePath, List<String> parameters) throws IOException {
+
+        StringJoiner paramJoiner = new StringJoiner(" ");
+        if(JabRefPreferences.getInstance().get(USE_PDF_READER).equals(ADOBE_ACROBAT_COMMAND)) {
+            paramJoiner.add(JabRefPreferences.getInstance().get(USE_PDF_READER));
+            parameters.forEach((param) -> paramJoiner.add(param));
+        } else {
+            paramJoiner.add(parameters.get(0));
+        }
+
+        new ProcessBuilder(Paths.get(USE_PDF_READER).toString(), paramJoiner.toString());
     }
 }
