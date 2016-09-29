@@ -1,8 +1,10 @@
 package net.sf.jabref.logic.importer.fetcher;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
 import net.sf.jabref.model.entry.FieldName;
@@ -12,6 +14,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class MedlineFetcherTest {
 
@@ -178,5 +181,23 @@ public class MedlineFetcherTest {
         assertEquals(50, entryList.size());
         assertTrue(entryList.contains(bibEntryIchikawa));
         assertTrue(entryList.contains(bibEntrySari));
+    }
+
+    @Test(expected = IndexOutOfBoundsException.class)//caused by Optional.of(entry.get(0))
+    public void testInvalidSearchTermCauseIndexOutOfBoundsException() throws Exception {
+        fetcher.performSearchById("this.is.a.invalid.search.term.for.the.medline.fetcher");
+        fail();
+    }
+
+    @Test
+    public void testEmptyEntryList() throws Exception {
+        List<BibEntry> entryList = fetcher.performSearch("java is fantastic and awesome ");
+        assertEquals(Collections.emptyList(), entryList);
+    }
+
+    @Test(expected = FetcherException.class)
+    public void testEmptyInput() throws Exception {
+        fetcher.performSearch("");
+        fail();
     }
 }

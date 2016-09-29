@@ -66,6 +66,7 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
     private static String replaceCommaWithAND(String query) {
         return query.replaceAll(", ", " AND ").replaceAll(",", " AND ");
     }
+
     /**
      * Gets the initial list of ids
      */
@@ -97,9 +98,9 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
                     doCount = false;
                 }
             }
-        } catch (URISyntaxException | MalformedURLException e) { // new URL() failed
+        } catch (URISyntaxException e) {
             LOGGER.warn("Bad url", e);
-        } catch (IOException e) { // openConnection() failed
+        } catch (IOException e) {
             LOGGER.warn("Connection failed", e);
         }
     }
@@ -122,10 +123,6 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
 
         if (entry.isEmpty()) {
             LOGGER.warn(Localization.lang("No references found"));
-        } else if (entry.size() > 1) {
-            LOGGER.info("Fetcher " + getName() + " " +
-                    "found more than one result for identifier " + identifier
-                    + ". We will use the first entry.");
         }
         return Optional.of(entry.get(0));
     }
@@ -138,7 +135,6 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
         if (!query.isEmpty()) {
             String searchTerm = replaceCommaWithAND(query);
 
-            // get the ids from entrez
             getIds(searchTerm, 0, 1);
 
             if (count == 0) {
@@ -146,7 +142,7 @@ public class MedlineFetcher implements IdBasedFetcher, SearchBasedFetcher {
                 return Collections.emptyList();
             }
 
-            getIds(searchTerm, 0, NUMBER_TO_FETCH-1);
+            getIds(searchTerm, 0, NUMBER_TO_FETCH - 1);
 
             List<BibEntry> bibs = fetchMedline(ids);
             entryList.addAll(bibs);
