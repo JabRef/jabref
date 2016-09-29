@@ -22,7 +22,7 @@ public class FileHistoryMenu extends JMenu implements ActionListener {
 
 
     public FileHistoryMenu(JabRefPreferences prefs, JabRefFrame frame) {
-        String name = Localization.menuTitle("Recent files");
+        String name = Localization.menuTitle("Recent_databases");
         int i = name.indexOf('&');
         if (i >= 0) {
             setText(name.substring(0, i) + name.substring(i + 1));
