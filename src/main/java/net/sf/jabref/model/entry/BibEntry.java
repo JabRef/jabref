@@ -59,7 +59,7 @@ public class BibEntry implements Cloneable {
     private final Map<String, Set<String>> fieldsAsWords = new HashMap<>();
 
     /*
-     * Map that stores latex free versions of fields. Is populated as a cash
+     * Cache that stores latex free versions of fields. Is populated as a cash
      */
     private final Map<String, String> latexFreeFields = new ConcurrentHashMap<>();
 
@@ -191,7 +191,6 @@ public class BibEntry implements Cloneable {
 
     /**
      * Sets the cite key AKA citation key AKA BibTeX key.
-     * <p>
      * Note: This is <emph>not</emph> the internal Id of this entry. The internal Id is always present, whereas the BibTeX key might not be present.
      *
      * @param newCiteKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
