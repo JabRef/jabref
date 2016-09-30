@@ -8,9 +8,15 @@ public class LatexToUnicode {
     private static final Map<String, String> CHARS = HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP;
     private static final Map<String, String> ACCENTS = HTMLUnicodeConversionMaps.UNICODE_ESCAPED_ACCENTS;
 
-    private Pattern AMP_LATEX = Pattern.compile("&|\\\\&");
-    private Pattern P_LATEX = Pattern.compile("[\\n]{1,}");
-    private Pattern DOLLARS_LATEX = Pattern.compile("\\$([^\\$]*)\\$");
+    private static final Pattern AMP_LATEX = Pattern.compile("&|\\\\&");
+    private static final Pattern P_LATEX = Pattern.compile("[\\n]{1,}");
+    private static final Pattern DOLLAR_LATEX = Pattern.compile("\\\\\\$");
+    private static final Pattern DOLLARS_LATEX = Pattern.compile("\\$([^\\$]*)\\$");
+
+    private static final Pattern AMP = Pattern.compile("\\&amp;");
+    private static final Pattern P = Pattern.compile("<p>");
+    private static final Pattern DOLLAR = Pattern.compile("\\&dollar;");
+    private static final Pattern TILDE = Pattern.compile("~");
 
     public String format(String inField) {
         if (inField.isEmpty()) {
@@ -20,7 +26,7 @@ public class LatexToUnicode {
         // TODO: document what does this do
         String field = AMP_LATEX.matcher(inField).replaceAll("&amp;");
         field = P_LATEX.matcher(field).replaceAll("<p>");
-        field = field.replace("\\$", "&dollar;"); // Replace \$ with &dollar;
+        field = DOLLAR_LATEX.matcher(field).replaceAll("&dollar;");
         field = DOLLARS_LATEX.matcher(field).replaceAll("\\{$1\\}");
 
         StringBuilder sb = new StringBuilder();
@@ -193,8 +199,11 @@ public class LatexToUnicode {
             }
         }
 
-        return sb.toString().replace("&amp;", "&").replace("<p>", "\n").replace("&dollar;", "$").replace("~",
-                "\u00A0");
+        String result = AMP.matcher(sb.toString()).replaceAll("&");
+        result = P.matcher(result).replaceAll("\n");
+        result = DOLLAR.matcher(result).replaceAll("\\$");
+        result = TILDE.matcher(result).replaceAll("\u00A0");
+        return result;
 
     }
 }
