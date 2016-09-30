@@ -433,8 +433,7 @@ public class BibEntry implements Cloneable {
         changed = true;
 
         fields.put(fieldName, value.intern());
-        fieldsAsWords.remove(fieldName);
-        invalidateLatexFreeCache(fieldName);
+        invalidateFieldCache(fieldName);
 
         FieldChange change = new FieldChange(this, fieldName, oldValue, value);
         eventBus.post(new FieldChangedEvent(change, eventSource));
@@ -490,8 +489,7 @@ public class BibEntry implements Cloneable {
         changed = true;
 
         fields.remove(fieldName);
-        fieldsAsWords.remove(fieldName);
-        invalidateLatexFreeCache(fieldName);
+        invalidateFieldCache(fieldName);
 
         FieldChange change = new FieldChange(this, fieldName, oldValue.get(), null);
         eventBus.post(new FieldChangedEvent(change, eventSource));
@@ -780,8 +778,9 @@ public class BibEntry implements Cloneable {
         return clearField(KEY_FIELD);
     }
 
-    private void invalidateLatexFreeCache(String fieldName) {
+    private void invalidateFieldCache(String fieldName) {
         latexFreeFields.remove(fieldName);
+        fieldsAsWords.remove(fieldName);
     }
 
     public Optional<String> getLatexFreeField(String name) {
