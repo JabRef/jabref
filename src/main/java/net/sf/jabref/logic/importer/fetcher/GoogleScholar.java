@@ -38,9 +38,9 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
 
     private static final Pattern LINK_TO_BIB_PATTERN = Pattern.compile("(https:\\/\\/scholar.googleusercontent.com\\/scholar.bib[^\"]*)");
 
-    private static final String SEARCH_URLII = "https://scholar.google.com/scholar?hl=en&btnG=Search&oe=utf-8&q=";
+    private static final String BASIC_SEARCH_URL = "https://scholar.google.com/scholar?hl=en&btnG=Search&oe=utf-8&q=%s";
+    private static final String SEARCH_IN_TITLE_URL = "https://scholar.google.com//scholar?as_q=&as_epq=%s&as_occt=title";
 
-    private static final String SEARCH_URL = "https://scholar.google.com//scholar?as_q=&as_epq=%s&as_occt=title";
     private static final int NUM_RESULTS = 10;
 
     private final ImportFormatPreferences importFormatPreferences;
@@ -61,7 +61,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
             return pdfLink;
         }
 
-        String url = String.format(SEARCH_URL,
+        String url = String.format(SEARCH_IN_TITLE_URL,
                 URLEncoder.encode(entry.getField(FieldName.TITLE).orElse(null), StandardCharsets.UTF_8.name()));
 
         Document doc = Jsoup.connect(url)
@@ -100,7 +100,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
 
             List<BibEntry> foundEntries = new ArrayList<>(10);
 
-            String queryURL = SEARCH_URLII + URLEncoder.encode(query, StandardCharsets.UTF_8.name());
+            String queryURL = String.format(BASIC_SEARCH_URL, URLEncoder.encode(query, StandardCharsets.UTF_8.name()));
             String cont = URLDownload.createURLDownloadWithBrowserUserAgent(queryURL)
                     .downloadToString(StandardCharsets.UTF_8);
 
