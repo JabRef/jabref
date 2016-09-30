@@ -53,17 +53,18 @@ public class BibEntry implements Cloneable {
 
     private String type;
     private Map<String, String> fields = new ConcurrentHashMap<>();
-    /*
+
+    /**
      * Map to store the words in every field
      */
     private final Map<String, Set<String>> fieldsAsWords = new HashMap<>();
 
-    /*
-     * Cache that stores latex free versions of fields. Is populated as a cash
+    /**
+     * Cache that stores latex free versions of fields.
      */
     private final Map<String, String> latexFreeFields = new ConcurrentHashMap<>();
 
-    /*
+    /**
      * Used to cleanse field values for internal LaTeX-free storage
      */
     private LatexToUnicode unicodeConverter = new LatexToUnicode();
@@ -76,7 +77,7 @@ public class BibEntry implements Cloneable {
 
     private String commentsBeforeEntry = "";
 
-    /*
+    /**
      * Marks whether the complete serialization, which was read from file, should be used.
      *
      * Is set to false, if parts of the entry change. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
