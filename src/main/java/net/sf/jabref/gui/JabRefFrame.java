@@ -1120,6 +1120,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
+
     private void fillMenu() {
         mb.setBorder(null);
         JMenu file = JabRefFrame.subMenu(Localization.menuTitle("File"));
@@ -1191,31 +1192,40 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         edit.add(unmarkAll);
         edit.addSeparator();
         if (Globals.prefs.getBoolean(JabRefPreferences.SPECIALFIELDSENABLED)) {
+            boolean menuitem = false;
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RANKING)) {
                 rankSubMenu = new JMenu();
                 RightClickMenu.populateSpecialFieldMenu(rankSubMenu, Rank.getInstance(), this);
                 edit.add(rankSubMenu);
+                menuitem = true;
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_RELEVANCE)) {
                 edit.add(toggleRelevance);
+                menuitem = true;
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_QUALITY)) {
                 edit.add(toggleQualityAssured);
+                menuitem = true;
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRIORITY)) {
                 rankSubMenu = new JMenu();
                 RightClickMenu.populateSpecialFieldMenu(rankSubMenu, Priority.getInstance(), this);
                 edit.add(rankSubMenu);
+                menuitem = true;
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_PRINTED)) {
                 edit.add(togglePrinted);
+                menuitem = true;
             }
             if (Globals.prefs.getBoolean(JabRefPreferences.SHOWCOLUMN_READ)) {
                 rankSubMenu = new JMenu();
                 RightClickMenu.populateSpecialFieldMenu(rankSubMenu, ReadStatus.getInstance(), this);
                 edit.add(rankSubMenu);
+                menuitem = true;
             }
-            edit.addSeparator();
+            if (menuitem) {
+                edit.addSeparator();
+            }
         }
 
         edit.add(getManageKeywords());
@@ -1251,10 +1261,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         highlightButtonGroup.add(toggleHighlightAnyItem);
         highlightButtonGroup.add(toggleHighlightAllItem);
 
-        HighlightMatchingGroupPreferences highlightMatchingGroupPreferences = new HighlightMatchingGroupPreferences(Globals.prefs);
-        if(highlightMatchingGroupPreferences.isAll()) {
+        HighlightMatchingGroupPreferences highlightMatchingGroupPreferences = new HighlightMatchingGroupPreferences(
+                Globals.prefs);
+        if (highlightMatchingGroupPreferences.isAll()) {
             toggleHighlightAllItem.setSelected(true);
-        } else if(highlightMatchingGroupPreferences.isAny()) {
+        } else if (highlightMatchingGroupPreferences.isAny()) {
             toggleHighlightAnyItem.setSelected(true);
         } else {
             toggleHighlightDisableItem.setSelected(true);
