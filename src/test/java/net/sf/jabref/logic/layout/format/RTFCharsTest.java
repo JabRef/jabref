@@ -29,8 +29,8 @@ public class RTFCharsTest {
         Assert.assertEquals("R\\u233eflexions sur le timing de la quantit\\u233e",
                 formatter.format("Réflexions sur le timing de la quantité"));
 
-        Assert.assertEquals("h\\u225allo", formatter.format("h\\'allo"));
-        Assert.assertEquals("h\\u225allo", formatter.format("h\\'allo"));
+        Assert.assertEquals("h\\'e1llo", formatter.format("h\\'allo"));
+        Assert.assertEquals("h\\'e1llo", formatter.format("h\\'allo"));
     }
 
     @Test
@@ -51,12 +51,12 @@ public class RTFCharsTest {
         Assert.assertEquals("R\\u233eflexions sur le timing de la quantit\\u233e {\\u230ae} should be \\u230ae",
                 formatter.format("Réflexions sur le timing de la quantité {\\ae} should be æ"));
 
-        Assert.assertEquals("h\\u225all{\\u339oe}", formatter.format("h\\'all{\\oe}"));
+        Assert.assertEquals("h\\'e1ll{\\u339oe}", formatter.format("h\\'all{\\oe}"));
     }
 
     @Test
     public void testSpecialCharacters() {
-        Assert.assertEquals("\\u243o", formatter.format("\\'{o}")); // ó
+        Assert.assertEquals("\\'f3", formatter.format("\\'{o}")); // ó
         Assert.assertEquals("\\'f2", formatter.format("\\`{o}")); // ò
         Assert.assertEquals("\\'f4", formatter.format("\\^{o}")); // ô
         Assert.assertEquals("\\'f6", formatter.format("\\\"{o}")); // ö
@@ -91,5 +91,58 @@ public class RTFCharsTest {
         Assert.assertEquals("\\u182P", formatter.format("{\\P}")); // ¶
         Assert.assertEquals("\\u169?", formatter.format("{\\copyright}")); // ©
         Assert.assertEquals("\\u163?", formatter.format("{\\pounds}")); // £
+    }
+
+    @Test
+    public void testRTFCharacters(){
+        Assert.assertEquals("\\'e0",formatter.format("\\`{a}"));
+        Assert.assertEquals("\\'e8",formatter.format("\\`{e}"));
+        Assert.assertEquals("\\'ec",formatter.format("\\`{i}"));
+        Assert.assertEquals("\\'f2",formatter.format("\\`{o}"));
+        Assert.assertEquals("\\'f9",formatter.format("\\`{u}"));
+
+        Assert.assertEquals("\\'e1",formatter.format("\\'a"));
+        Assert.assertEquals("\\'e9",formatter.format("\\'e"));
+        Assert.assertEquals("\\'ed",formatter.format("\\'i"));
+        Assert.assertEquals("\\'f3",formatter.format("\\'o"));
+        Assert.assertEquals("\\'fa",formatter.format("\\'u"));
+
+        Assert.assertEquals("\\'e2",formatter.format("\\^a"));
+        Assert.assertEquals("\\'ea",formatter.format("\\^e"));
+        Assert.assertEquals("\\'ee",formatter.format("\\^i"));
+        Assert.assertEquals("\\'f4",formatter.format("\\^o"));
+        Assert.assertEquals("\\'fa",formatter.format("\\^u"));
+
+        Assert.assertEquals("\\'e4",formatter.format("\\\"a"));
+        Assert.assertEquals("\\'eb",formatter.format("\\\"e"));
+        Assert.assertEquals("\\'ef",formatter.format("\\\"i"));
+        Assert.assertEquals("\\'f6",formatter.format("\\\"o"));
+        Assert.assertEquals("\\u252u",formatter.format("\\\"u"));
+
+        Assert.assertEquals("\\'f1",formatter.format("\\~n"));
+
+        Assert.assertEquals("\\'c0",formatter.format("\\`A"));
+        Assert.assertEquals("\\'c8",formatter.format("\\`E"));
+        Assert.assertEquals("\\'cc",formatter.format("\\`I"));
+        Assert.assertEquals("\\'d2",formatter.format("\\`O"));
+        Assert.assertEquals("\\'d9",formatter.format("\\`U"));
+
+        Assert.assertEquals("\\'c1",formatter.format("\\'A"));
+        Assert.assertEquals("\\'c9",formatter.format("\\'E"));
+        Assert.assertEquals("\\'cd",formatter.format("\\'I"));
+        Assert.assertEquals("\\'d3",formatter.format("\\'O"));
+        Assert.assertEquals("\\'da",formatter.format("\\'U"));
+
+        Assert.assertEquals("\\'c2",formatter.format("\\^A"));
+        Assert.assertEquals("\\'ca",formatter.format("\\^E"));
+        Assert.assertEquals("\\'ce",formatter.format("\\^I"));
+        Assert.assertEquals("\\'d4",formatter.format("\\^O"));
+        Assert.assertEquals("\\'db",formatter.format("\\^U"));
+
+        Assert.assertEquals("\\'c4",formatter.format("\\\"A"));
+        Assert.assertEquals("\\'cb",formatter.format("\\\"E"));
+        Assert.assertEquals("\\'cf",formatter.format("\\\"I"));
+        Assert.assertEquals("\\'d6",formatter.format("\\\"O"));
+        Assert.assertEquals("\\'dc",formatter.format("\\\"U"));
     }
 }
