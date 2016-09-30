@@ -52,6 +52,27 @@ public class RTFCharsTest {
                 formatter.format("Réflexions sur le timing de la quantité {\\ae} should be æ"));
 
         Assert.assertEquals("h\\'e1ll{\\u339oe}", formatter.format("h\\'all{\\oe}"));
+
+        Assert.assertEquals("Le c\\u339oeur d\\u233e\\u231cu mais l'\\u226ame plut\\u244ot na\\u239ive, Lou\\u255ys r" +
+                "\\u234eva de crapa\\u252?ter en cano\\u235e au del\\u224a des \\u238iles, pr\\u232es du m\\u228alstr" +
+                "\\u246om o\\u249u br\\u251ulent les nov\\u230ae.", formatter.format("Le cœur déçu mais l'âme plutôt " +
+                "naïve, Louÿs rêva de crapaüter en canoë au delà des îles, près du mälström où brûlent les novæ."));
+
+        Assert.assertEquals("l'\\u238ile exigu\\u235e\n" +
+                "  O\\u249u l'ob\\u232ese jury m\\u251ur\n" +
+                "  F\\u234ete l'ha\\u239i volap\\u252?k,\n" +
+                "  \\u194Ane ex a\\u233equo au whist,\n" +
+                "  \\u212Otez ce v\\u339oeu d\\u233e\\u231cu.", formatter.format("l'île exiguë\n" +
+                "  Où l'obèse jury mûr\n" +
+                "  Fête l'haï volapük,\n" +
+                "  Âne ex aéquo au whist,\n" +
+                "  Ôtez ce vœu déçu."));
+
+        Assert.assertEquals("\\u193Arv\\u237izt\\u369?r\\u337? t\\u252?k\\u246orf\\u250ur\\u243og\\u233ep",
+                formatter.format("Árvíztűrő tükörfúrógép"));
+
+        Assert.assertEquals("Pchn\\u261a\\u263c w t\\u281e \\u322l\\u243od\\u378z je\\u380za lub o\\u347sm skrzy\\u324n fig"
+                ,formatter.format("Pchnąć w tę łódź jeża lub ośm skrzyń fig"));
     }
 
     @Test
