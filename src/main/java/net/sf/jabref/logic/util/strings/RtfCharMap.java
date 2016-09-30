@@ -9,11 +9,11 @@ public class RtfCharMap extends HashMap<String, String> {
         put("`i", "\\'ec");
         put("`o", "\\'f2");
         put("`u", "\\'f9");
-        put("?a", "\\'e1");
-        put("?e", "\\'e9");
-        put("?i", "\\'ed");
-        put("?o", "\\'f3");
-        put("?u", "\\'fa");
+        put("'a", "\\'e1");
+        put("'e", "\\'e9");
+        put("'i", "\\'ed");
+        put("'o", "\\'f3");
+        put("'u", "\\'fa");
         put("^a", "\\'e2");
         put("^e", "\\'ea");
         put("^i", "\\'ee");
@@ -30,11 +30,11 @@ public class RtfCharMap extends HashMap<String, String> {
         put("`I", "\\'cc");
         put("`O", "\\'d2");
         put("`U", "\\'d9");
-        put("?A", "\\'c1");
-        put("?E", "\\'c9");
-        put("?I", "\\'cd");
-        put("?O", "\\'d3");
-        put("?U", "\\'da");
+        put("'A", "\\'c1");
+        put("'E", "\\'c9");
+        put("'I", "\\'cd");
+        put("'O", "\\'d3");
+        put("'U", "\\'da");
         put("^A", "\\'c2");
         put("^E", "\\'ca");
         put("^I", "\\'ce");
@@ -55,32 +55,17 @@ public class RtfCharMap extends HashMap<String, String> {
         put("copyright","\\u169?"); // Copyright sign
         put("P", "\\u182P"); // Paragraph sign
         put("`?", "\\u191?"); // Inverted question mark
-        put("`A", "\\u192A"); // "Agrave"
-        put("'A", "\\u193A"); // "Aacute"
-        put("^A", "\\u194A"); // "Acirc"
         put("~A", "\\u195A"); // "Atilde"
-        put("\"A", "\\u196A"); // "Auml"
         put("AA", "\\u197A"); // "Aring"
         // RTFCHARS.put("AE", "{\\uc2\\u198AE}"); // "AElig"
         put("AE", "{\\u198AE}"); // "AElig"
 
         put("cC", "\\u199C"); // "Ccedil"
 
-        put("`E", "\\u200E"); // "Egrave"
-        put("'E", "\\u201E"); // "Eacute"
-        put("^E", "\\u202E"); // "Ecirc"
-        put("\"E", "\\u203E"); // "Euml"
-
-        put("`I", "\\u204I"); // "Igrave
-        put("'I", "\\u205I"); // "Iacute"
-        put("^I", "\\u206I"); // "Icirc"
-        put("\"I", "\\u207I"); // "Iuml"
-
         put("DH", "\\u208D"); // "ETH"
 
         put("~N", "\\u209N"); // "Ntilde"
 
-        put("'O", "\\u211O"); // "Oacute"
         put("~O", "\\u213O"); // "Otilde"
         // According to ISO 8859-1 the "\times" symbol should be placed here
         // (#215).
@@ -89,11 +74,6 @@ public class RtfCharMap extends HashMap<String, String> {
         //  RTFCHARS.put("O", "\\'d8");
         put("o", "\\'f8");
 
-        put("`U", "\\u217U"); // "Ugrave"
-        put("'U", "\\u218U"); // "Uacute"
-        put("^U", "\\u219U"); // "Ucirc"
-        put("\"U", "\\u220U"); // "Uuml"
-
         put("'Y", "\\u221Y"); // "Yacute"
 
         put("TH", "\\u222TH"); // "THORN"
@@ -101,41 +81,21 @@ public class RtfCharMap extends HashMap<String, String> {
         put("ss", "\\u223ss"); // "szlig"
         //RTFCHARS.put("ss", "AFFEN"); // "szlig"
 
-        put("`a", "\\u224a"); // "agrave"
-        put("'a", "\\u225a"); // "aacute"
-        put("^a", "\\u226a"); // "acirc"
         put("~a", "\\u227a"); // "atilde"
-        put("\"a", "\\u228a"); // "auml"
         put("aa", "\\u229a"); // "aring"
         //  RTFCHARS.put("ae", "{\\uc2\\u230ae}"); // "aelig" \\u230e6
         put("ae", "{\\u230ae}"); // "aelig" \\u230e6
 
         put("cc", "\\u231c"); // "ccedil"
 
-        put("`e", "\\u232e"); // "egrave"
-        put("'e", "\\u233e"); // "eacute"
-        put("^e", "\\u234e"); // "ecirc"
-        put("\"e", "\\u235e"); // "euml"
-
-        put("`i", "\\u236i"); // "igrave"
-        put("'i", "\\u237i"); // "iacute"
-        put("^i", "\\u238i"); // "icirc"
-        put("\"i", "\\u239i"); // "iuml"
-
         put("dh", "\\u240d"); // "eth"
 
-        put("~n", "\\u241n"); // "ntilde"
-
-        put("'o", "\\u243o"); // "oacute"
         put("~o", "\\u245o"); // "otilde"
         // According to ISO 8859-1 the "\div" symbol should be placed here
         // (#247).
         // Omitting this, because it is a mathematical symbol.
         put("o", "\\u248o"); // "oslash"
 
-        put("`u", "\\u249u"); // "ugrave"
-        put("'u", "\\u250u"); // "uacute"
-        put("^u", "\\u251u"); // "ucirc"
         // RTFCHARS.put("\"u", "\\u252"); // "uuml" exists in standard
         // codepage
 
@@ -198,8 +158,7 @@ public class RtfCharMap extends HashMap<String, String> {
         put("kI", "\\u302I"); // "Iogon"
         put("ki", "\\u303i"); // "iogon"
         put(".I", "\\u304I"); // "Idot"
-        put("i", "\\u305i"); // "inodot"
-
+        
         // Symbol #306 (IJ) has no special Latex command
         // Symbol #307 (ij) has no special Latex command
         put("^J", "\\u308J"); // "Jcirc"
