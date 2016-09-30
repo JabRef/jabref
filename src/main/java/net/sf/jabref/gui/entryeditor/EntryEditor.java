@@ -857,13 +857,15 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             Object[] options = {Localization.lang("Edit"), Localization.lang("Revert to original source")};
 
-            int answer = JOptionPane.showOptionDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
-                    Localization.lang("Problem with parsing entry"), JOptionPane.YES_NO_OPTION,
-                    JOptionPane.ERROR_MESSAGE, null, options, options[0]);
+            if (!SwingUtilities.isEventDispatchThread()) {
+                int answer = JOptionPane.showOptionDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
+                        Localization.lang("Problem with parsing entry"), JOptionPane.YES_NO_OPTION,
+                        JOptionPane.ERROR_MESSAGE, null, options, options[0]);
 
-            if (answer != 0) {
-                updateSource = true;
-                updateSource();
+                if (answer != 0) {
+                    updateSource = true;
+                    updateSource();
+                }
             }
 
             LOGGER.debug("Incorrect source", ex);
