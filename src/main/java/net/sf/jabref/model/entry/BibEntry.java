@@ -201,7 +201,6 @@ public class BibEntry implements Cloneable {
 
     /**
      * Returns the cite key AKA citation key AKA BibTeX key, or null if it is not set.
-     * <p>
      * Note: this is <emph>not</emph> the internal Id of this entry. The internal Id is always present, whereas the BibTeX key might not be present.
      */
     @Deprecated
