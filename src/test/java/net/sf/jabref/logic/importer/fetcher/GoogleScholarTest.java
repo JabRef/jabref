@@ -2,15 +2,25 @@ package net.sf.jabref.logic.importer.fetcher;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
+import net.sf.jabref.logic.bibtex.FieldContentParserPreferences;
+import net.sf.jabref.logic.importer.FetcherException;
+import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.BibtexEntryTypes;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.support.DevEnvironment;
 
 import org.junit.Assert;
 import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class GoogleScholarTest {
 
@@ -19,7 +29,10 @@ public class GoogleScholarTest {
 
     @Before
     public void setUp() {
-        finder = new GoogleScholar();
+        ImportFormatPreferences importFormatPreferences = mock(ImportFormatPreferences.class);
+        when(importFormatPreferences.getFieldContentParserPreferences()).thenReturn(
+                mock(FieldContentParserPreferences.class));
+        finder = new GoogleScholar(importFormatPreferences);
         entry = new BibEntry();
     }
 
@@ -55,5 +68,19 @@ public class GoogleScholarTest {
         entry.setField("title", "Pro WF: Windows Workflow in NET 3.5");
 
         Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
+    }
+
+    @Test
+    public void findSingleEntry() throws FetcherException {
+        entry.setType(BibtexEntryTypes.INPROCEEDINGS.getName());
+        entry.setField(FieldName.TITLE, "Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models.");
+        entry.setField(FieldName.AUTHOR, "Geiger, Matthias and Wirtz, Guido");
+        entry.setField(FieldName.BOOKTITLE, "ZEUS");
+        entry.setField(FieldName.YEAR, "2013");
+        entry.setField(FieldName.PAGES, "41--44");
+
+        List<BibEntry> foundEntries = finder.performSearch("info:RExzBa3OlkQJ:scholar.google.com");
+
+        Assert.assertEquals(Collections.singletonList(entry), foundEntries);
     }
 }
