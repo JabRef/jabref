@@ -200,6 +200,11 @@ public class RTFChars implements LayoutFormatter {
         return new StringInt(format(res), part.length());
     }
 
+    /**
+     * This method transforms the unicode of a special character into its base character: 233 (é) - > e
+     * @param c long
+     * @return returns the basic character of the given unicode
+     */
     private String transformSpecialCharacter(long c) {
         if((192 <= c && c <= 197) || c == 256 || c == 258 || c == 260)
             return "A";
@@ -294,5 +299,3 @@ public class RTFChars implements LayoutFormatter {
         return "?";
     }
 }
-//if( <= c && c <= )
-//        return "";
