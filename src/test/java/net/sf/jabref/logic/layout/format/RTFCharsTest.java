@@ -50,14 +50,23 @@ public class RTFCharsTest {
     public void testComplicated() {
         Assert.assertEquals("R\\u233eflexions sur le timing de la quantit\\u233e {\\u230ae} should be \\u230ae",
                 formatter.format("Réflexions sur le timing de la quantité {\\ae} should be æ"));
+    }
 
+    @Test
+    public void  testComplicated2() {
         Assert.assertEquals("h\\'e1ll{\\u339oe}", formatter.format("h\\'all{\\oe}"));
+    }
 
+    @Test
+    public void testComplicated3() {
         Assert.assertEquals("Le c\\u339oeur d\\u233e\\u231cu mais l'\\u226ame plut\\u244ot na\\u239ive, Lou\\u255ys r" +
                 "\\u234eva de crapa\\u252?ter en cano\\u235e au del\\u224a des \\u238iles, pr\\u232es du m\\u228alstr" +
                 "\\u246om o\\u249u br\\u251ulent les nov\\u230ae.", formatter.format("Le cœur déçu mais l'âme plutôt " +
                 "naïve, Louÿs rêva de crapaüter en canoë au delà des îles, près du mälström où brûlent les novæ."));
+    }
 
+    @Test
+    public void testComplicated4() {
         Assert.assertEquals("l'\\u238ile exigu\\u235e\n" +
                 "  O\\u249u l'ob\\u232ese jury m\\u251ur\n" +
                 "  F\\u234ete l'ha\\u239i volap\\u252?k,\n" +
@@ -67,10 +76,16 @@ public class RTFCharsTest {
                 "  Fête l'haï volapük,\n" +
                 "  Âne ex aéquo au whist,\n" +
                 "  Ôtez ce vœu déçu."));
+    }
 
+    @Test
+    public void testComplicated5() {
         Assert.assertEquals("\\u193Arv\\u237izt\\u369?r\\u337? t\\u252?k\\u246orf\\u250ur\\u243og\\u233ep",
                 formatter.format("Árvíztűrő tükörfúrógép"));
+    }
 
+    @Test
+    public void testComplicated6() {
         Assert.assertEquals("Pchn\\u261a\\u263c w t\\u281e \\u322l\\u243od\\u378z je\\u380za lub o\\u347sm skrzy\\u324n fig"
                 ,formatter.format("Pchnąć w tę łódź jeża lub ośm skrzyń fig"));
     }
@@ -141,7 +156,10 @@ public class RTFCharsTest {
         Assert.assertEquals("\\u252u",formatter.format("\\\"u"));
 
         Assert.assertEquals("\\'f1",formatter.format("\\~n"));
+    }
 
+    @Test
+    public void testRTFCharactersCapital() {
         Assert.assertEquals("\\'c0",formatter.format("\\`A"));
         Assert.assertEquals("\\'c8",formatter.format("\\`E"));
         Assert.assertEquals("\\'cc",formatter.format("\\`I"));
@@ -166,4 +184,5 @@ public class RTFCharsTest {
         Assert.assertEquals("\\'d6",formatter.format("\\\"O"));
         Assert.assertEquals("\\'dc",formatter.format("\\\"U"));
     }
+
 }
