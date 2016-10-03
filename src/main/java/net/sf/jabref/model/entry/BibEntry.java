@@ -27,6 +27,7 @@ import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.model.entry.event.FieldChangedEvent;
+import net.sf.jabref.model.strings.LatexToUnicode;
 import net.sf.jabref.model.strings.StringUtil;
 
 import com.google.common.base.Strings;
@@ -52,10 +53,21 @@ public class BibEntry implements Cloneable {
 
     private String type;
     private Map<String, String> fields = new ConcurrentHashMap<>();
-    /*
+
+    /**
      * Map to store the words in every field
      */
     private final Map<String, Set<String>> fieldsAsWords = new HashMap<>();
+
+    /**
+     * Cache that stores latex free versions of fields.
+     */
+    private final Map<String, String> latexFreeFields = new ConcurrentHashMap<>();
+
+    /**
+     * Used to cleanse field values for internal LaTeX-free storage
+     */
+    private LatexToUnicode unicodeConverter = new LatexToUnicode();
 
     // Search and grouping status is stored in boolean fields for quick reference:
     private boolean searchHit;
@@ -65,7 +77,7 @@ public class BibEntry implements Cloneable {
 
     private String commentsBeforeEntry = "";
 
-    /*
+    /**
      * Marks whether the complete serialization, which was read from file, should be used.
      *
      * Is set to false, if parts of the entry change. This causes the entry to be serialized based on the internal state (and not based on the old serialization)
@@ -95,7 +107,7 @@ public class BibEntry implements Cloneable {
     /**
      * Constructs a new BibEntry with the given ID and given type
      *
-     * @param id The ID to be used
+     * @param id   The ID to be used
      * @param type The type to set. May be null or empty. In that case, DEFAULT_TYPE is used.
      */
     public BibEntry(String id, String type) {
@@ -107,7 +119,7 @@ public class BibEntry implements Cloneable {
     }
 
     public Optional<FieldChange> replaceKeywords(KeywordList keywordsToReplace, Optional<Keyword> newValue,
-            Character keywordDelimiter) {
+                                                 Character keywordDelimiter) {
         KeywordList keywordList = getKeywords(keywordDelimiter);
         keywordList.replaceKeywords(keywordsToReplace, newValue);
 
@@ -180,7 +192,6 @@ public class BibEntry implements Cloneable {
 
     /**
      * Sets the cite key AKA citation key AKA BibTeX key.
-     *
      * Note: This is <emph>not</emph> the internal Id of this entry. The internal Id is always present, whereas the BibTeX key might not be present.
      *
      * @param newCiteKey The cite key to set. Must not be null; use {@link #clearCiteKey()} to remove the cite key.
@@ -191,7 +202,6 @@ public class BibEntry implements Cloneable {
 
     /**
      * Returns the cite key AKA citation key AKA BibTeX key, or null if it is not set.
-     *
      * Note: this is <emph>not</emph> the internal Id of this entry. The internal Id is always present, whereas the BibTeX key might not be present.
      */
     @Deprecated
@@ -396,8 +406,9 @@ public class BibEntry implements Cloneable {
 
     /**
      * Set a field, and notify listeners about the change.
-     * @param name  The field to set
-     * @param value The value to set
+     *
+     * @param name        The field to set
+     * @param value       The value to set
      * @param eventSource Source the event is sent from
      */
     public Optional<FieldChange> setField(String name, String value, EntryEventSource eventSource) {
@@ -421,8 +432,8 @@ public class BibEntry implements Cloneable {
 
         changed = true;
 
-        fields.put(fieldName, value);
-        fieldsAsWords.remove(fieldName);
+        fields.put(fieldName, value.intern());
+        invalidateFieldCache(fieldName);
 
         FieldChange change = new FieldChange(this, fieldName, oldValue, value);
         eventBus.post(new FieldChangedEvent(change, eventSource));
@@ -460,7 +471,7 @@ public class BibEntry implements Cloneable {
      * Remove the mapping for the field name, and notify listeners about
      * the change including the {@link EntryEventSource}.
      *
-     * @param name The field to clear.
+     * @param name        The field to clear.
      * @param eventSource the source a new {@link FieldChangedEvent} should be posten from.
      */
     public Optional<FieldChange> clearField(String name, EntryEventSource eventSource) {
@@ -478,7 +489,8 @@ public class BibEntry implements Cloneable {
         changed = true;
 
         fields.remove(fieldName);
-        fieldsAsWords.remove(fieldName);
+        invalidateFieldCache(fieldName);
+
         FieldChange change = new FieldChange(this, fieldName, oldValue.get(), null);
         eventBus.post(new FieldChangedEvent(change, eventSource));
         return Optional.of(change);
@@ -570,7 +582,7 @@ public class BibEntry implements Cloneable {
      * Author1, Author2: Title (Year)
      */
     public String getAuthorTitleYear(int maxCharacters) {
-        String[] s = new String[] {getField(FieldName.AUTHOR).orElse("N/A"), getField(FieldName.TITLE).orElse("N/A"),
+        String[] s = new String[]{getField(FieldName.AUTHOR).orElse("N/A"), getField(FieldName.TITLE).orElse("N/A"),
                 getField(FieldName.YEAR).orElse("N/A")};
 
         String text = s[0] + ": \"" + s[1] + "\" (" + s[2] + ')';
@@ -764,5 +776,22 @@ public class BibEntry implements Cloneable {
 
     public Optional<FieldChange> clearCiteKey() {
         return clearField(KEY_FIELD);
+    }
+
+    private void invalidateFieldCache(String fieldName) {
+        latexFreeFields.remove(fieldName);
+        fieldsAsWords.remove(fieldName);
+    }
+
+    public Optional<String> getLatexFreeField(String name) {
+        if (!hasField(name)) {
+            return Optional.empty();
+        } else if (latexFreeFields.containsKey(name)) {
+            return Optional.ofNullable(latexFreeFields.get(toLowerCase(name)));
+        } else {
+            String latexFreeField = unicodeConverter.format(getField(name).get()).intern();
+            latexFreeFields.put(name, latexFreeField);
+            return Optional.of(latexFreeField);
+        }
     }
 }
