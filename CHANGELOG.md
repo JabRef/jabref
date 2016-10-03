@@ -87,12 +87,14 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#2060](https://github.com/JabRef/jabref/issues/2060): Medline fetcher now imports data in UTF-8 encoding
 - Fixed file menu displays wrong hotkey in the German translation
 - Fixed [#2090](https://github.com/JabRef/jabref/issues/#2090): If special fields were not selected, two menu item separator were shown
+- Fixed [#2064](https://github.com/JabRef/jabref/issues/2064): Not all `other fields` are shown on entry change of same type
 
 ### Removed
 - Removed 2nd preview style
 - The non-supported feature of being able to define file directories for any extension is removed. Still, it should work for older databases using the legacy `ps` and `pdf` fields, although we strongly encourage using the `file` field.
 - Automatic migration for the `evastar_pdf` field is removed.
 - We removed the customizable "content selectors" since they are replaced by the auto-completion feature
+- Removed optional fields from `other fields` (BibTeX), Removed deprecated fields from `other fields` (BibLaTeX)
 
 
 
