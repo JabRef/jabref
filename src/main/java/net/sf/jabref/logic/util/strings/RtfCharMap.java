@@ -2,7 +2,10 @@ package net.sf.jabref.logic.util.strings;
 
 import java.util.HashMap;
 
-public class RtfCharMap extends HashMap<String, String> {
+public class RtfCharMap {
+
+    private HashMap<String, String> rtfMap = new HashMap<>();
+
     public RtfCharMap () {
         put("`a", "\\'e0");
         put("`e", "\\'e8");
@@ -254,4 +257,13 @@ public class RtfCharMap extends HashMap<String, String> {
         put("vz", "\\u382z"); // "zcaron"
         // Symbol #383 (f) has no special Latex command
     }
+
+    private void put(String key, String value) {
+        rtfMap.put(key, value);
+    }
+
+    public String get(String key) {
+        return rtfMap.get(key);
+    }
+
 }
