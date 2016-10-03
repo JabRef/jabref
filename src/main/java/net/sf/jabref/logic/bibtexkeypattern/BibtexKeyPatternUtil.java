@@ -10,7 +10,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.model.cleanup.Formatter;
 import net.sf.jabref.logic.formatter.Formatters;
 import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.logic.layout.format.RemoveLatexCommandsFormatter;

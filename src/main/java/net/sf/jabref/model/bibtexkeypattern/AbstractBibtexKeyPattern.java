@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractBibtexKeyPattern {
 
-    protected List<String> defaultPattern;
+    protected List<String> defaultPattern = new ArrayList<>();
 
     protected Map<String, List<String>> data = new HashMap<>();
 
@@ -132,6 +132,7 @@ public abstract class AbstractBibtexKeyPattern {
      * @param bibtexKeyPattern the pattern to store
      */
     public void setDefaultValue(String bibtexKeyPattern) {
+        Objects.requireNonNull(bibtexKeyPattern);
         this.defaultPattern = AbstractBibtexKeyPattern.split(bibtexKeyPattern);
     }
 

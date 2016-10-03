@@ -45,10 +45,10 @@ import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.citationstyle.CitationStyle;
 import net.sf.jabref.logic.cleanup.CleanupPreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
-import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.exporter.CustomExportList;
 import net.sf.jabref.logic.exporter.ExportComparator;
-import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
@@ -1366,7 +1366,7 @@ public class JabRefPreferences {
         storage.put(CLEANUP_UPGRADE_EXTERNAL_LINKS, preset.isCleanUpUpgradeExternalLinks());
         storage.put(CLEANUP_CONVERT_TO_BIBLATEX, preset.isConvertToBiblatex());
         storage.put(CLEANUP_FIX_FILE_LINKS, preset.isFixFileLinks());
-        storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().getAsStringList()));
+        storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().getAsStringList(OS.NEWLINE)));
     }
 
     public FileHistory getFileHistory() {

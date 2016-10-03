@@ -8,7 +8,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
@@ -20,6 +20,7 @@ import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsLoader;
 import net.sf.jabref.logic.protectedterms.ProtectedTermsPreferences;
 import net.sf.jabref.model.FieldChange;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;

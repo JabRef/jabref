@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 
-import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.logic.exporter.MetaDataSerializer;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import net.sf.jabref.logic.util.OS;

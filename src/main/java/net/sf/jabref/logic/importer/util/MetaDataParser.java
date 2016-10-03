@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
+import net.sf.jabref.logic.cleanup.Cleanups;
 import net.sf.jabref.logic.groups.GroupsParser;
 import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -54,7 +54,7 @@ public class MetaDataParser {
                 metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator));
                 break;
             case MetaData.SAVE_ACTIONS:
-                metaData.setSaveActions(FieldFormatterCleanups.parse(value));
+                metaData.setSaveActions(Cleanups.parse(value));
                 break;
             case MetaData.DATABASE_TYPE:
                 metaData.setMode(BibDatabaseMode.parse(getSingleItem(value)));

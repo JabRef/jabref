@@ -5,7 +5,8 @@ import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 
-import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
+import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 public class CleanupPreset {
@@ -63,7 +64,7 @@ public class CleanupPreset {
             activeJobs.add(CleanupStep.FIX_FILE_LINKS);
         }
 
-        FieldFormatterCleanups formatterCleanups = FieldFormatterCleanups.parse(
+        FieldFormatterCleanups formatterCleanups = Cleanups.parse(
                 preferences.getStringList(JabRefPreferences.CLEANUP_FORMATTERS));
 
         return new CleanupPreset(activeJobs, formatterCleanups);
@@ -118,7 +119,7 @@ public class CleanupPreset {
         preferences.putBoolean(JabRefPreferences.CLEANUP_CONVERT_TO_BIBLATEX, isActive(CleanupStep.CONVERT_TO_BIBLATEX));
         preferences.putBoolean(JabRefPreferences.CLEANUP_FIX_FILE_LINKS, isActive(CleanupStep.FIX_FILE_LINKS));
 
-        preferences.putStringList(JabRefPreferences.CLEANUP_FORMATTERS, formatterCleanups.getAsStringList());
+        preferences.putStringList(JabRefPreferences.CLEANUP_FORMATTERS, formatterCleanups.getAsStringList(OS.NEWLINE));
     }
 
     private Boolean isActive(CleanupStep step) {

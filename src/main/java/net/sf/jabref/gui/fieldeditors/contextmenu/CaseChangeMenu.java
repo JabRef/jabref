@@ -6,7 +6,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.text.JTextComponent;
 
-import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.model.cleanup.Formatter;
 import net.sf.jabref.logic.formatter.Formatters;
 import net.sf.jabref.logic.l10n.Localization;
 

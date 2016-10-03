@@ -8,6 +8,8 @@ import java.util.Optional;
 import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.FieldChange;
+import net.sf.jabref.model.cleanup.CleanupJob;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 

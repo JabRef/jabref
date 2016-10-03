@@ -25,9 +25,10 @@ import javax.swing.UIManager;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
-import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
-import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.logic.cleanup.Cleanups;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
+import net.sf.jabref.model.cleanup.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.InternalBibtexFields;
@@ -60,7 +61,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
     public void setValues(MetaData metaData) {
         Objects.requireNonNull(metaData);
         Optional<FieldFormatterCleanups> saveActions = metaData.getSaveActions();
-        setValues(saveActions.orElse(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS));
+        setValues(saveActions.orElse(Cleanups.DEFAULT_SAVE_ACTIONS));
     }
 
     public void setValues(FieldFormatterCleanups formatterCleanups) {
@@ -201,9 +202,9 @@ public class FieldFormatterCleanupsPanel extends JPanel {
         selectFieldCombobox.setEditable(true);
         builder.add(selectFieldCombobox).xy(1, 1);
 
-        List<String> formatterNames = fieldFormatterCleanups.getAvailableFormatters().stream()
+        List<String> formatterNames = Cleanups.getAvailableFormatters().stream()
                 .map(Formatter::getName).collect(Collectors.toList());
-        List<String> formatterDescriptions = fieldFormatterCleanups.getAvailableFormatters().stream()
+        List<String> formatterDescriptions = Cleanups.getAvailableFormatters().stream()
                 .map(Formatter::getDescription).collect(Collectors.toList());
         formattersCombobox = new JComboBox<>(formatterNames.toArray());
         formattersCombobox.setRenderer(new DefaultListCellRenderer() {
@@ -260,7 +261,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
     }
 
     public boolean isDefaultSaveActions() {
-        return FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS.equals(getFormatterCleanups());
+        return Cleanups.DEFAULT_SAVE_ACTIONS.equals(getFormatterCleanups());
     }
 
     private FieldFormatterCleanup getFieldFormatterCleanup() {
@@ -274,7 +275,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
     private Formatter getFieldFormatter() {
         Formatter selectedFormatter = null;
         String selectedFormatterName = formattersCombobox.getSelectedItem().toString();
-        for (Formatter formatter : fieldFormatterCleanups.getAvailableFormatters()) {
+        for (Formatter formatter : Cleanups.getAvailableFormatters()) {
             if (formatter.getName().equals(selectedFormatterName)) {
                 selectedFormatter = formatter;
                 break;

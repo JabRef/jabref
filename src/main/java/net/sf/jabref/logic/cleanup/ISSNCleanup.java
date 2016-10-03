@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import net.sf.jabref.logic.util.ISSN;
 import net.sf.jabref.model.FieldChange;
+import net.sf.jabref.model.cleanup.CleanupJob;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 

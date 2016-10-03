@@ -1,6 +1,6 @@
 package net.sf.jabref.logic.layout.format;
 
-import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.model.cleanup.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatter;
 import net.sf.jabref.model.strings.LatexToUnicode;
