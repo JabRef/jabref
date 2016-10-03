@@ -1,5 +1,6 @@
 package net.sf.jabref;
 
+import java.awt.Frame;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -8,13 +9,13 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.FontUIResource;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
@@ -143,7 +144,7 @@ public class JabRefGUI {
         }
 
         if (Globals.prefs.getBoolean(JabRefPreferences.WINDOW_MAXIMISED)) {
-            JabRefGUI.getMainFrame().setExtendedState(JFrame.MAXIMIZED_BOTH);
+            JabRefGUI.getMainFrame().setExtendedState(Frame.MAXIMIZED_BOTH);
         }
 
         JabRefGUI.getMainFrame().setVisible(true);
@@ -263,7 +264,7 @@ public class JabRefGUI {
                     && !System.getProperty("java.runtime.name").contains("OpenJDK")) {
                 // try to avoid ending up with the ugly Metal L&F
                 Plastic3DLookAndFeel lnf = new Plastic3DLookAndFeel();
-                Plastic3DLookAndFeel.setCurrentTheme(new SkyBluer());
+                MetalLookAndFeel.setCurrentTheme(new SkyBluer());
                 com.jgoodies.looks.Options.setPopupDropShadowEnabled(true);
                 UIManager.setLookAndFeel(lnf);
             } else {

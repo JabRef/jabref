@@ -59,8 +59,10 @@ public class XMPSchemaBibtex extends XMPSchema {
      *
      * @param e
      *            The existing XML element.
+     * @param namespace
+     *            The name space considered. Must currently be there for compatibility reasons despite being unused.
      */
-    public XMPSchemaBibtex(Element e) {
+    public XMPSchemaBibtex(Element e, @SuppressWarnings("unused") String namespace) {
         super(e, XMPSchemaBibtex.KEY);
     }
 

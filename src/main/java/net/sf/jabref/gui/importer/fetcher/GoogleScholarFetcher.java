@@ -48,8 +48,6 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
     private static final Pattern LINK_PATTERN = Pattern.compile("<h3 class=\"gs_rt\"><a href=\"([^\"]*)\">");
     private static final Pattern TITLE_END_PATTERN = Pattern.compile("<div class=\"gs_fl\">");
 
-    private static final Pattern INPUT_PATTERN = Pattern.compile("<input type=([^ ]+) name=([^ ]+) value=([^> ]+)");
-
     private final Map<String, String> entryLinks = new HashMap<>();
 
     private boolean stopFetching;

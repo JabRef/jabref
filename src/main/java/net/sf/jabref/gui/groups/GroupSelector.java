@@ -8,6 +8,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -30,6 +31,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.KeyStroke;
+import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ChangeEvent;
@@ -315,8 +317,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         groupsTree = new GroupsTree(this);
         groupsTree.addTreeSelectionListener(this);
 
-        JScrollPane groupsTreePane = new JScrollPane(groupsTree, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        JScrollPane groupsTreePane = new JScrollPane(groupsTree, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+                ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         groupsTreePane.setBorder(BorderFactory.createEmptyBorder(0,0,0,0));
         con.gridwidth = GridBagConstraints.REMAINDER;
         con.weighty = 1;
@@ -330,16 +332,16 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         setEditMode(editModeIndicator);
         definePopup();
         NodeAction moveNodeUpAction = new MoveNodeUpAction();
-        moveNodeUpAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_UP, KeyEvent.CTRL_MASK));
+        moveNodeUpAction.putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_UP, InputEvent.CTRL_MASK));
         NodeAction moveNodeDownAction = new MoveNodeDownAction();
         moveNodeDownAction.putValue(Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, KeyEvent.CTRL_MASK));
+                KeyStroke.getKeyStroke(KeyEvent.VK_DOWN, InputEvent.CTRL_MASK));
         NodeAction moveNodeLeftAction = new MoveNodeLeftAction();
         moveNodeLeftAction.putValue(Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, KeyEvent.CTRL_MASK));
+                KeyStroke.getKeyStroke(KeyEvent.VK_LEFT, InputEvent.CTRL_MASK));
         NodeAction moveNodeRightAction = new MoveNodeRightAction();
         moveNodeRightAction.putValue(Action.ACCELERATOR_KEY,
-                KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, KeyEvent.CTRL_MASK));
+                KeyStroke.getKeyStroke(KeyEvent.VK_RIGHT, InputEvent.CTRL_MASK));
 
 
         setGroups(GroupTreeNode.fromGroup(new AllEntriesGroup(Localization.lang("All entries"))));

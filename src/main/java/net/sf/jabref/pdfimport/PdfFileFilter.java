@@ -5,8 +5,6 @@ import java.io.FileFilter;
 
 public class PdfFileFilter implements FileFilter {
 
-    public static final PdfFileFilter INSTANCE = new PdfFileFilter();
-
     @Override
     public boolean accept(File file) {
         String path = file.getPath();
@@ -14,7 +12,7 @@ public class PdfFileFilter implements FileFilter {
         return isMatchingFileFilter(path);
     }
 
-    public boolean accept(String path) {
+    public static boolean accept(String path) {
         if ((path == null) || path.isEmpty() || !path.contains(".")) {
             return false;
         }
