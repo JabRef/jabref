@@ -62,6 +62,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#1993](https://github.com/JabRef/jabref/issues/1993): Various optimizations regarding search performance
 - Fixed [koppor#160](https://github.com/koppor/jabref/issues/160): Tooltips now working in the main table
 - Fixed [#2054](https://github.com/JabRef/jabref/issues/2054): Ignoring a new version now works as expected
+- Fixed [#1542](https://github.com/JabRef/jabref/issues/1542): Improved error messages when using fetcher
 - Fixed selecting an entry out of multiple duplicates
 - Fixed [#617](https://github.com/JabRef/jabref/issues/617): `Enter` in global search opens the selected entry & `Enter` in search dialog window opens the selected entry
 - Entries in the SearchResultPanel will be shown correctly (Latex to Unicode)

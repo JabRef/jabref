@@ -1472,6 +1472,16 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         JOptionPane.showMessageDialog(this, message);
     }
 
+    /**
+     * Displays a dialog which tells the user that an error occurred while fetching entries
+     */
+    public void showErrorMessage(String fetcherTitle, String localizedException) {
+        showMessage(Localization.lang("Error while fetching from %0", fetcherTitle) + "\n" +
+                        Localization.lang("Please try again later and/or check your network connection.") + "\n" +
+                        localizedException,
+                Localization.lang("Search %0", fetcherTitle), JOptionPane.ERROR_MESSAGE);
+    }
+
     public JabRefFrame getFrame() {
         return frame;
     }
