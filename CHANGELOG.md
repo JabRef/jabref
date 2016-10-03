@@ -56,6 +56,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Complete vietnam language translation in menu
 - Generalize German translation of database into "Datenbank"
 - Improve language quality of the German translation of shared database
+- Change "Recent files" to "Recent databases" to keep the file menu consistent
 
 ### Fixed
 - Fixed [#1993](https://github.com/JabRef/jabref/issues/1993): Various optimizations regarding search performance
