@@ -9,7 +9,7 @@ import net.sf.jabref.logic.importer.OutputPrinter;
 /**
  *
  */
-interface PreviewEntryFetcher extends EntryFetcher {
+public interface PreviewEntryFetcher extends EntryFetcher {
 
     boolean processQueryGetPreview(String query, FetcherPreviewDialog preview,
                                    OutputPrinter status);
