@@ -243,7 +243,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         helpButton.setMargin(butIns);
         openSettings.setMargin(butIns);
         newButton.addActionListener(e -> {
-            GroupDialog gd = new GroupDialog(frame, panel, null);
+            GroupDialog gd = new GroupDialog(frame, null);
             gd.setVisible(true);
             if (gd.okPressed()) {
                 AbstractGroup newGroup = gd.getResultingGroup();
@@ -775,7 +775,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         public void actionPerformed(ActionEvent e) {
             final GroupTreeNodeViewModel node = getNodeToUse();
             final AbstractGroup oldGroup = node.getNode().getGroup();
-            final GroupDialog gd = new GroupDialog(frame, panel, oldGroup);
+            final GroupDialog gd = new GroupDialog(frame, oldGroup);
             gd.setVisible(true);
             if (gd.okPressed()) {
                 AbstractGroup newGroup = gd.getResultingGroup();
@@ -822,7 +822,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            final GroupDialog gd = new GroupDialog(frame, panel, null);
+            final GroupDialog gd = new GroupDialog(frame, null);
             gd.setVisible(true);
             if (!gd.okPressed()) {
                 return; // ignore
@@ -853,7 +853,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            final GroupDialog gd = new GroupDialog(frame, panel, null);
+            final GroupDialog gd = new GroupDialog(frame, null);
             gd.setVisible(true);
             if (!gd.okPressed()) {
                 return; // ignore

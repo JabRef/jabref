@@ -183,7 +183,7 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
 
             Matcher citationPageMatcher = GoogleScholarFetcher.BIBTEX_LINK_PATTERN.matcher(citationsPage);
             citationPageMatcher.find();
-            String link = citationPageMatcher.group(1).replace("&amp;", "&");;
+            String link = citationPageMatcher.group(1).replace("&amp;", "&");
 
             String pText;
             String part = cont.substring(lastRegionStart, m.start());

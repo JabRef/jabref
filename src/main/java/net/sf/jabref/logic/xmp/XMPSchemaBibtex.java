@@ -60,7 +60,7 @@ public class XMPSchemaBibtex extends XMPSchema {
      * @param e
      *            The existing XML element.
      */
-    public XMPSchemaBibtex(Element e, String namespace) {
+    public XMPSchemaBibtex(Element e) {
         super(e, XMPSchemaBibtex.KEY);
     }
 
@@ -275,7 +275,7 @@ public class XMPSchemaBibtex extends XMPSchema {
         // Set all the values including key and entryType
         Set<String> fields = entry.getFieldNames();
 
-        if (xmpPreferences != null && xmpPreferences.isUseXMPPrivacyFilter()) {
+        if ((xmpPreferences != null) && xmpPreferences.isUseXMPPrivacyFilter()) {
             Set<String> filters = new TreeSet<>(xmpPreferences.getXmpPrivacyFilter());
             fields.removeAll(filters);
         }

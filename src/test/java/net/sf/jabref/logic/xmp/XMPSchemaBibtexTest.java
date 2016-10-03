@@ -66,7 +66,7 @@ public class XMPSchemaBibtexTest {
         DocumentBuilder builder = builderFactory.newDocumentBuilder();
         Element e = builder.newDocument().createElement("rdf:Description");
 
-        XMPSchemaBibtex bibtex = new XMPSchemaBibtex(e, "bibtex");
+        XMPSchemaBibtex bibtex = new XMPSchemaBibtex(e);
 
         Assert.assertEquals(e, bibtex.getElement());
         Assert.assertEquals("rdf:Description", bibtex.getElement().getTagName());

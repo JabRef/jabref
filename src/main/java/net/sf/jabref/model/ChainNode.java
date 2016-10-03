@@ -126,6 +126,7 @@ public abstract class ChainNode<T extends ChainNode<T>> {
      *
      */
     public void removeChild() {
+        // NPE if this is ever called
         child.setParent(null);
         child = null;
     }

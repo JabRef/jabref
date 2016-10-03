@@ -116,6 +116,7 @@ public class KeywordList implements Iterable<Keyword> {
         add(new Keyword(keywordsString));
     }
 
+    @Override
     public Iterator<Keyword> iterator() {
         return keywords.iterator();
     }
@@ -166,7 +167,7 @@ public class KeywordList implements Iterable<Keyword> {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ((o == null) || (getClass() != o.getClass())) {
             return false;
         }
         KeywordList keywords1 = (KeywordList) o;
