@@ -98,7 +98,7 @@ public class MetaData {
         Objects.requireNonNull(bibtexKeyPattern);
 
         List<String> defaultValue = bibtexKeyPattern.getDefaultValue();
-        Map<String, List<String>> nonDefaultPatterns = bibtexKeyPattern.getNonDefaultPatterns();
+        Map<String, List<String>> nonDefaultPatterns = bibtexKeyPattern.getPatterns();
         setCiteKeyPattern(defaultValue, nonDefaultPatterns);
     }
 

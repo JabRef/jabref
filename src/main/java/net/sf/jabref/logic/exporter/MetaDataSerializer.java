@@ -43,7 +43,7 @@ public class MetaDataSerializer {
                 stringyMetaData.put(metaDataKey, data);
             }
         }
-        if (citeKeyPattern.getDefaultValue() != null) {
+        if (citeKeyPattern.getDefaultValue() != null && !citeKeyPattern.getDefaultValue().isEmpty()) {
             List<String> data = new ArrayList<>();
             data.add(citeKeyPattern.getDefaultValue().get(0));
             stringyMetaData.put(MetaData.KEYPATTERNDEFAULT, data);

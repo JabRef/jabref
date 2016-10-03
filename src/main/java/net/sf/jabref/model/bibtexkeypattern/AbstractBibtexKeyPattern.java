@@ -77,7 +77,7 @@ public abstract class AbstractBibtexKeyPattern {
         if (result == null) {
             // check default value
             result = getDefaultValue();
-            if (result == null) {
+            if (result == null || result.isEmpty()) {
                 // we are the "last" to ask
                 // we don't have anything left
                 return getLastLevelBibtexKeyPattern(key);
@@ -140,8 +140,8 @@ public abstract class AbstractBibtexKeyPattern {
         return data.keySet();
     }
 
-    public Map<String, List<String>> getNonDefaultPatterns() {
-        return data.entrySet().stream().filter(entry -> isDefaultValue(entry.getKey())).collect(
+    public Map<String, List<String>> getPatterns() {
+        return data.entrySet().stream().collect(
                 Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 

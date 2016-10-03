@@ -10,17 +10,17 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.model.cleanup.Formatter;
 import net.sf.jabref.logic.formatter.Formatters;
 import net.sf.jabref.logic.formatter.casechanger.Word;
 import net.sf.jabref.logic.layout.format.RemoveLatexCommandsFormatter;
+import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import net.sf.jabref.model.cleanup.Formatter;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.Keyword;
 import net.sf.jabref.model.entry.KeywordList;
-import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
@@ -373,11 +373,12 @@ public class BibtexKeyPatternUtil {
      *
      * The given database is used to avoid duplicate keys.
      *
+     * @param citeKeyPattern
      * @param dBase a <code>BibDatabase</code>
      * @param entry a <code>BibEntry</code>
      * @return modified BibEntry
      */
-    public static void makeLabel(MetaData metaData, BibDatabase dBase, BibEntry entry,
+    public static void makeLabel(AbstractBibtexKeyPattern citeKeyPattern, BibDatabase dBase, BibEntry entry,
             BibtexKeyPatternPreferences bibtexKeyPatternPreferences) {
         database = dBase;
         String key;
@@ -386,8 +387,7 @@ public class BibtexKeyPatternUtil {
             // get the type of entry
             String entryType = entry.getType();
             // Get the arrayList corresponding to the type
-            List<String> typeList = new ArrayList<>(
-                    metaData.getCiteKeyPattern(bibtexKeyPatternPreferences.getKeyPattern()).getValue(entryType));
+            List<String> typeList = new ArrayList<>(citeKeyPattern.getValue(entryType));
             if (!typeList.isEmpty()) {
                 typeList.remove(0);
             }
