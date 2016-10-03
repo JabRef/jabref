@@ -245,7 +245,7 @@ public class RTFChars implements LayoutFormatter {
         if((204 <= c && c <= 207) || 296 == c || 298 == c || 300 == c || 302 == c || 304 == c) {
             return "I";
         }
-        if((236 <= c && c <= 239) || 297 == c || 299 == c || 301 == c || 303 == c || 305 == c) {
+        if((236 <= c && c <= 239) || 297 == c || 299 == c || 301 == c || 303 == c) {
             return "i";
         }
         if(308 == c) {
@@ -260,7 +260,7 @@ public class RTFChars implements LayoutFormatter {
         if(311 == c) {
             return "k";
         }
-        if(313 == c || 315 == c || 319 == c || 312 == c) {
+        if(313 == c || 315 == c || 319 == c) {
             return "L";
         }
         if(314 == c || 316 == c || 320 == c || 322 == c) {
