@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 /**
  * A small table, where an entry type is associated with a Bibtex key pattern (an
@@ -136,6 +137,11 @@ public abstract class AbstractBibtexKeyPattern {
 
     public Set<String> getAllKeys() {
         return data.keySet();
+    }
+
+    public Map<String, List<String>> getNonDefaultPatterns() {
+        return data.entrySet().stream().filter(entry -> isDefaultValue(entry.getKey())).collect(
+                Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public abstract List<String> getLastLevelBibtexKeyPattern(String key);

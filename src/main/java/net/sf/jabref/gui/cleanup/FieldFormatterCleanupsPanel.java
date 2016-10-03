@@ -59,7 +59,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
 
     public void setValues(MetaData metaData) {
         Objects.requireNonNull(metaData);
-        Optional<FieldFormatterCleanups> saveActions = FieldFormatterCleanups.fromMetaData(metaData);
+        Optional<FieldFormatterCleanups> saveActions = metaData.getSaveActions();
         setValues(saveActions.orElse(FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS));
     }
 
@@ -247,7 +247,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
             return;
         }
 
-        metaData.setSaveActions(formatterCleanups.getAsStringList());
+        metaData.setSaveActions(formatterCleanups);
     }
 
     public FieldFormatterCleanups getFormatterCleanups() {

@@ -25,6 +25,7 @@ import net.sf.jabref.logic.bibtex.comparator.FieldComparatorStack;
 import net.sf.jabref.logic.bibtex.comparator.IdComparator;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.FieldChange;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
@@ -53,7 +54,7 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
     private static List<FieldChange> applySaveActions(List<BibEntry> toChange, MetaData metaData) {
         List<FieldChange> changes = new ArrayList<>();
 
-        Optional<FieldFormatterCleanups> saveActions = FieldFormatterCleanups.fromMetaData(metaData);
+        Optional<FieldFormatterCleanups> saveActions = metaData.getSaveActions();
         saveActions.ifPresent(actions -> {
             // save actions defined -> apply for every entry
             for (BibEntry entry : toChange) {
@@ -193,7 +194,7 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
 
         if (preferences.getSaveType() != SavePreferences.DatabaseSaveType.PLAIN_BIBTEX) {
             // Write meta data.
-            writeMetaData(bibDatabaseContext.getMetaData());
+            writeMetaData(bibDatabaseContext.getMetaData(), preferences.getGlobalCiteKeyPattern());
 
             // Write type definitions, if any:
             writeEntryTypeDefinitions(typesToWrite);
@@ -220,10 +221,11 @@ public abstract class BibDatabaseWriter<E extends SaveSession> {
     /**
      * Writes all data to the specified writer, using each object's toString() method.
      */
-    protected void writeMetaData(MetaData metaData) throws SaveException {
+    protected void writeMetaData(MetaData metaData, GlobalBibtexKeyPattern globalCiteKeyPattern) throws SaveException {
         Objects.requireNonNull(metaData);
 
-        Map<String, String> serializedMetaData = MetaDataSerializer.getSerializedStringMap(metaData);
+        Map<String, String> serializedMetaData = MetaDataSerializer.getSerializedStringMap(metaData,
+                globalCiteKeyPattern);
 
         for(Map.Entry<String, String> metaItem : serializedMetaData.entrySet()) {
             writeMetaDataItem(metaItem);

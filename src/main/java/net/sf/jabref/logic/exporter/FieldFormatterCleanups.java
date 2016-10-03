@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.StringJoiner;
 
 import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
@@ -20,7 +19,6 @@ import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.model.FieldChange;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.strings.StringUtil;
 
 public class FieldFormatterCleanups {
@@ -231,7 +229,4 @@ public class FieldFormatterCleanups {
 
     }
 
-    public static Optional<FieldFormatterCleanups> fromMetaData(MetaData metadata) {
-        return metadata.getSaveActions().map(FieldFormatterCleanups::parse);
-    }
 }

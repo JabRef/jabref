@@ -1,16 +1,14 @@
 package net.sf.jabref.model.metadata;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
+import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
@@ -22,113 +20,46 @@ import net.sf.jabref.model.metadata.event.MetaDataChangedEvent;
 
 import com.google.common.eventbus.EventBus;
 
-public class MetaData implements Iterable<String> {
+public class MetaData {
     public static final String META_FLAG = "jabref-meta: ";
-    private static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
+    public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
 
     public static final String SAVE_ACTIONS = "saveActions";
-    private static final String PREFIX_KEYPATTERN = "keypattern_";
-    private static final String KEYPATTERNDEFAULT = "keypatterndefault";
-    private static final String DATABASE_TYPE = "databaseType";
+    public static final String PREFIX_KEYPATTERN = "keypattern_";
+    public static final String KEYPATTERNDEFAULT = "keypatterndefault";
+    public static final String DATABASE_TYPE = "databaseType";
 
     public static final String GROUPSTREE = "groupstree";
-    private static final String FILE_DIRECTORY = FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX;
-    private static final String PROTECTED_FLAG_META = "protectedFlag";
+    public static final String FILE_DIRECTORY = FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX;
+    public static final String PROTECTED_FLAG_META = "protectedFlag";
 
     public static final char ESCAPE_CHARACTER = '\\';
     public static final char SEPARATOR_CHARACTER = ';';
     public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHARACTER);
 
-    private final Map<String, List<String>> metaData = new HashMap<>();
     private GroupTreeNode groupsRoot;
     private final EventBus eventBus = new EventBus();
 
-    private AbstractBibtexKeyPattern bibtexKeyPattern;
-
     private Charset encoding;
+    private SaveOrderConfig saveOrderConfig;
+    private Map<String, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
+    private Map<String, String> userFileDirectory = new HashMap<>(); // <User, FilePath>
+    private String defaultCiteKeyPattern;
+    private FieldFormatterCleanups saveActions;
+    private BibDatabaseMode mode;
+    private boolean isProtected;
+    private String defaultFileDirectory;
 
     /**
-     * The MetaData object stores all meta data sets in Vectors. To ensure that
-     * the data is written correctly to string, the user of a meta data Vector
-     * must simply make sure the appropriate changes are reflected in the Vector
-     * it has been passed.
-     */
-    public MetaData(Map<String, List<String>> parsedData) {
-        Objects.requireNonNull(parsedData);
-        clearMetaData();
-        metaData.putAll(parsedData);
-    }
-
-
-
-    /**
-     * The MetaData object can be constructed with no data in it.
+     * Constructs an empty metadata.
      */
     public MetaData() {
         // Do nothing
     }
 
-    public MetaData(Charset encoding) {
-        this.encoding = encoding;
-    }
-
-
-    public void setParsedData(Map<String, List<String>> parsedMetaData) {
-        clearMetaData();
-        metaData.putAll(parsedMetaData);
-    }
-
-
     public Optional<SaveOrderConfig> getSaveOrderConfig() {
-        List<String> storedSaveOrderConfig = getData(SAVE_ORDER_CONFIG);
-        if (storedSaveOrderConfig != null) {
-            return Optional.of(SaveOrderConfig.parse(storedSaveOrderConfig));
-        }
-        return Optional.empty();
+        return Optional.ofNullable(saveOrderConfig);
     }
-
-    /**
-     * @return Iterator on all keys stored in the metadata
-     */
-    @Override
-    public Iterator<String> iterator() {
-        return metaData.keySet().iterator();
-    }
-
-    /**
-     * Retrieves the stored meta data.
-     *
-     * @param key the key to look up
-     * @return null if no data is found
-     */
-    public List<String> getData(String key) {
-        return metaData.get(key);
-    }
-
-    /**
-     * Removes the given key from metadata.
-     * Nothing is done if key is not found.
-     *
-     * @param key the key to remove
-     */
-    public void remove(String key) {
-        if (metaData.containsKey(key)) { //otherwise redundant and disturbing events are going to be posted
-            metaData.remove(key);
-            postChange();
-        }
-    }
-
-    /**
-     * Stores the specified data in this object, using the specified key. For
-     * certain keys (e.g. "groupstree"), the objects in orderedData are
-     * reconstructed from their textual (String) representation if they are of
-     * type String, and stored as an actual instance.
-     */
-    public void putData(String key, List<String> orderedData) {
-        metaData.put(key, orderedData);
-        postChange();
-    }
-
 
     public Optional<GroupTreeNode> getGroups() {
         return Optional.ofNullable(groupsRoot);
@@ -139,32 +70,20 @@ public class MetaData implements Iterable<String> {
      * returned by getGroups() so far!!!
      */
     public void setGroups(GroupTreeNode root) {
-        groupsRoot = root;
+        groupsRoot = Objects.requireNonNull(root);
+        groupsRoot.subscribeToDescendantChanged(groupTreeNode -> eventBus.post(new GroupUpdatedEvent(this)));
         eventBus.post(new GroupUpdatedEvent(this));
     }
 
     /**
      * @return the stored label patterns
      */
-    public AbstractBibtexKeyPattern getBibtexKeyPattern(GlobalBibtexKeyPattern globalPattern) {
-        if (bibtexKeyPattern != null) {
-            return bibtexKeyPattern;
-        }
+    public AbstractBibtexKeyPattern getCiteKeyPattern(GlobalBibtexKeyPattern globalPattern) {
+        AbstractBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(globalPattern);
 
-        bibtexKeyPattern = new DatabaseBibtexKeyPattern(globalPattern);
-
-        // read the data from the metadata and store it into the bibtexKeyPattern
-        for (String key : this) {
-            if (key.startsWith(PREFIX_KEYPATTERN)) {
-                List<String> value = getData(key);
-                String type = key.substring(PREFIX_KEYPATTERN.length());
-                bibtexKeyPattern.addBibtexKeyPattern(type, value.get(0));
-            }
-        }
-        List<String> defaultPattern = getData(KEYPATTERNDEFAULT);
-        if (defaultPattern != null) {
-            bibtexKeyPattern.setDefaultValue(defaultPattern.get(0));
-        }
+        // Add stored key patterns
+        citeKeyPatterns.forEach(bibtexKeyPattern::addBibtexKeyPattern);
+        getDefaultCiteKeyPattern().ifPresent(bibtexKeyPattern::setDefaultValue);
 
         return bibtexKeyPattern;
     }
@@ -173,139 +92,117 @@ public class MetaData implements Iterable<String> {
      * Updates the stored key patterns to the given key patterns.
      *
      * @param bibtexKeyPattern the key patterns to update to. <br />
-     *                     A reference to this object is stored internally and is returned at getBibtexKeyPattern();
+     *                     A reference to this object is stored internally and is returned at getCiteKeyPattern();
      */
-    public void setBibtexKeyPattern(AbstractBibtexKeyPattern bibtexKeyPattern) {
-        // remove all keypatterns from metadata
-        Iterator<String> iterator = this.iterator();
-        while (iterator.hasNext()) {
-            String key = iterator.next();
-            if (key.startsWith(PREFIX_KEYPATTERN)) {
-                iterator.remove();
-            }
-        }
+    public void setCiteKeyPattern(AbstractBibtexKeyPattern bibtexKeyPattern) {
+        Objects.requireNonNull(bibtexKeyPattern);
 
-        // set new value if it is not a default value
-        Set<String> allKeys = bibtexKeyPattern.getAllKeys();
-        for (String key : allKeys) {
-            if (!bibtexKeyPattern.isDefaultValue(key)) {
-                List<String> data = new ArrayList<>();
-                data.add(bibtexKeyPattern.getValue(key).get(0));
-                String metaDataKey = PREFIX_KEYPATTERN + key;
-                this.putData(metaDataKey, data);
-            }
-        }
-
-        // store default pattern
-        if (bibtexKeyPattern.getDefaultValue() == null) {
-            this.remove(KEYPATTERNDEFAULT);
-        } else {
-            List<String> data = new ArrayList<>();
-            data.add(bibtexKeyPattern.getDefaultValue().get(0));
-            this.putData(KEYPATTERNDEFAULT, data);
-        }
-
-        this.bibtexKeyPattern = bibtexKeyPattern;
+        List<String> defaultValue = bibtexKeyPattern.getDefaultValue();
+        Map<String, List<String>> nonDefaultPatterns = bibtexKeyPattern.getNonDefaultPatterns();
+        setCiteKeyPattern(defaultValue, nonDefaultPatterns);
     }
 
-    public Optional<List<String>> getSaveActions() {
-        return Optional.ofNullable(getData(SAVE_ACTIONS));
+    public void setCiteKeyPattern(List<String> defaultValue, Map<String, List<String>> nonDefaultPatterns) {
+        // Remove all patterns from metadata
+        citeKeyPatterns.clear();
+
+        // Set new value if it is not a default value
+        for (Map.Entry<String, List<String>> pattern : nonDefaultPatterns.entrySet()) {
+            citeKeyPatterns.put(pattern.getKey(), pattern.getValue().get(0));
+        }
+
+        // Store default pattern
+        if (defaultValue.isEmpty()) {
+            defaultCiteKeyPattern = null;
+        } else {
+            defaultCiteKeyPattern = defaultValue.get(0);
+        }
+
+        postChange();
+    }
+
+    public Optional<FieldFormatterCleanups> getSaveActions() {
+        return Optional.ofNullable(saveActions);
     }
 
     public Optional<BibDatabaseMode> getMode() {
-        List<String> data = getData(DATABASE_TYPE);
-        if ((data == null) || data.isEmpty()) {
-            return Optional.empty();
-        }
-        return Optional.of(BibDatabaseMode.parse(data.get(0)));
+        return Optional.ofNullable(mode);
     }
 
     public boolean isProtected() {
-        List<String> data = getData(PROTECTED_FLAG_META);
-        if ((data == null) || data.isEmpty()) {
-            return false;
-        } else {
-            return Boolean.parseBoolean(data.get(0));
-        }
+        return isProtected;
     }
 
     public Optional<String> getDefaultFileDirectory() {
-        List<String> fileDirectory = getData(FILE_DIRECTORY);
-        if ((fileDirectory == null) || fileDirectory.isEmpty()) {
-            return Optional.empty();
-        } else {
-            return Optional.of(fileDirectory.get(0).trim());
-        }
+        return Optional.ofNullable(defaultFileDirectory);
     }
 
     public Optional<String> getUserFileDirectory(String user) {
-        List<String> fileDirectory = getData(FILE_DIRECTORY + '-' + user);
-        if ((fileDirectory == null) || fileDirectory.isEmpty()) {
-            return Optional.empty();
-        } else {
-            return Optional.of(fileDirectory.get(0).trim());
-        }
+        return Optional.ofNullable(userFileDirectory.get(user));
     }
 
-    public Map<String, List<String>> getMetaData() {
-        return new HashMap<>(metaData);
-    }
-
-    public void setSaveActions(List<String> actionsSerialized) {
-        putData(SAVE_ACTIONS, actionsSerialized);
+    public void setSaveActions(FieldFormatterCleanups saveActions) {
+        this.saveActions = Objects.requireNonNull(saveActions);
+        postChange();
     }
 
     public void setSaveOrderConfig(SaveOrderConfig saveOrderConfig) {
-        List<String> serialized = saveOrderConfig.getAsStringList();
-        putData(SAVE_ORDER_CONFIG, serialized);
+        this.saveOrderConfig = saveOrderConfig;
+        postChange();
     }
 
     public void setMode(BibDatabaseMode mode) {
-        putData(DATABASE_TYPE, Collections.singletonList(mode.getAsString()));
+        this.mode = Objects.requireNonNull(mode);
+        postChange();
     }
 
     public void markAsProtected() {
-        putData(PROTECTED_FLAG_META, Collections.singletonList("true"));
+        isProtected = true;
+        postChange();
     }
 
     public void setDefaultFileDirectory(String path) {
-        putData(FILE_DIRECTORY, Collections.singletonList(path));
+        defaultFileDirectory = Objects.requireNonNull(path).trim();
+        postChange();
     }
 
     public void clearDefaultFileDirectory() {
-        remove(FILE_DIRECTORY);
+        defaultFileDirectory = null;
+        postChange();
     }
 
     public void setUserFileDirectory(String user, String path) {
-        putData(FILE_DIRECTORY + '-' + user, Collections.singletonList(path.trim()));
+        userFileDirectory.put(Objects.requireNonNull(user), Objects.requireNonNull(path));
+        postChange();
     }
 
     public void clearUserFileDirectory(String user) {
-        remove(FILE_DIRECTORY + '-' + user);
+        userFileDirectory.remove(user);
+        postChange();
     }
 
     public void markAsNotProtected() {
-        remove(PROTECTED_FLAG_META);
+        isProtected = false;
+        postChange();
     }
 
     public void clearSaveActions() {
-        remove(SAVE_ACTIONS);
+        saveActions = null;
+        postChange();
     }
 
     public void clearSaveOrderConfig() {
-        remove(SAVE_ORDER_CONFIG);
+        saveOrderConfig = null;
+        postChange();
     }
 
     /**
      * Posts a new {@link MetaDataChangedEvent} on the {@link EventBus}.
      */
-    public void postChange() {
+    private void postChange() {
         eventBus.post(new MetaDataChangedEvent(this));
     }
 
-    public void postGroupChange() {
-        eventBus.post(new MetaDataChangedEvent(this));
-    }
     /**
      * Returns the encoding used during parsing.
      */
@@ -315,10 +212,7 @@ public class MetaData implements Iterable<String> {
 
     public void setEncoding(Charset encoding) {
         this.encoding = Objects.requireNonNull(encoding);
-    }
-
-    public void clearMetaData() {
-        metaData.clear();
+        postChange();
     }
 
     public void registerListener(Object listener) {
@@ -329,6 +223,18 @@ public class MetaData implements Iterable<String> {
         this.eventBus.unregister(listener);
     }
 
+    private Optional<String> getDefaultCiteKeyPattern() {
+        return Optional.ofNullable(defaultCiteKeyPattern);
+    }
+
+    public boolean isEmpty() {
+        return this.equals(new MetaData());
+    }
+
+    public Map<String, String> getUserFileDirectories() {
+        return Collections.unmodifiableMap(userFileDirectory);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -337,13 +243,18 @@ public class MetaData implements Iterable<String> {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        MetaData strings = (MetaData) o;
-        return Objects.equals(metaData, strings.metaData) && Objects.equals(groupsRoot, strings.groupsRoot) && Objects
-                .equals(bibtexKeyPattern, strings.bibtexKeyPattern) && Objects.equals(encoding, strings.encoding);
+        MetaData metaData = (MetaData) o;
+        return isProtected == metaData.isProtected && Objects.equals(groupsRoot, metaData.groupsRoot) && Objects.equals(
+                encoding, metaData.encoding) && Objects.equals(saveOrderConfig, metaData.saveOrderConfig) && Objects
+                .equals(citeKeyPatterns, metaData.citeKeyPatterns) && Objects.equals(userFileDirectory,
+                metaData.userFileDirectory) && Objects.equals(defaultCiteKeyPattern, metaData.defaultCiteKeyPattern)
+                && Objects.equals(saveActions, metaData.saveActions) && mode == metaData.mode && Objects.equals(
+                defaultFileDirectory, metaData.defaultFileDirectory);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(metaData, groupsRoot, bibtexKeyPattern, encoding);
+        return Objects.hash(groupsRoot, encoding, saveOrderConfig, citeKeyPatterns, userFileDirectory,
+                defaultCiteKeyPattern, saveActions, mode, isProtected, defaultFileDirectory);
     }
 }

@@ -240,9 +240,14 @@ public class BibDatabase {
 
     /**
      * Returns the database's preamble.
+     * If the preamble text consists only of whitespace, then also an empty optional is returned.
      */
     public synchronized Optional<String> getPreamble() {
-        return Optional.ofNullable(preamble);
+        if (StringUtil.isBlank(preamble)) {
+            return Optional.empty();
+        } else {
+            return Optional.of(preamble);
+        }
     }
 
     /**

@@ -35,7 +35,7 @@ public class MakeLabelWithDatabaseTest {
         database.insertEntry(entry);
         pattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern.split("[auth][year]"));
         bibtexKeyPattern = new DatabaseBibtexKeyPattern(pattern);
-        metadata.setBibtexKeyPattern(bibtexKeyPattern);
+        metadata.setCiteKeyPattern(bibtexKeyPattern);
         preferences = new BibtexKeyPatternPreferences("", "", false, true, true, pattern, ',');
     }
 

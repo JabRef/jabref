@@ -20,7 +20,7 @@ import net.sf.jabref.shared.DBMSSynchronizer;
 public class BibDatabaseContext {
 
     private final BibDatabase database;
-    private final MetaData metaData;
+    private MetaData metaData;
     private final Defaults defaults;
     /** The file where this database was last saved to. */
     private File file;
@@ -109,6 +109,10 @@ public class BibDatabaseContext {
 
     public MetaData getMetaData() {
         return metaData;
+    }
+
+    public void setMetaData(MetaData metaData) {
+        this.metaData = Objects.requireNonNull(metaData);
     }
 
     public boolean isBiblatexMode() {

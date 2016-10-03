@@ -160,7 +160,7 @@ public class BibtexDatabaseWriterTest {
     public void writeMetadata() throws Exception {
         DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(prefs.getKeyPattern());
         bibtexKeyPattern.setDefaultValue("test");
-        metaData.setBibtexKeyPattern(bibtexKeyPattern);
+        metaData.setCiteKeyPattern(bibtexKeyPattern);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
 
@@ -173,7 +173,7 @@ public class BibtexDatabaseWriterTest {
         SavePreferences preferences = new SavePreferences().withEncoding(Charsets.US_ASCII);
         DatabaseBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(prefs.getKeyPattern());
         bibtexKeyPattern.setDefaultValue("test");
-        metaData.setBibtexKeyPattern(bibtexKeyPattern);
+        metaData.setCiteKeyPattern(bibtexKeyPattern);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), preferences);
 
@@ -403,7 +403,7 @@ public class BibtexDatabaseWriterTest {
     public void writeSaveActions() throws Exception {
         FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
                 Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())));
-        metaData.setSaveActions(saveActions.getAsStringList());
+        metaData.setSaveActions(saveActions);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
 
@@ -430,7 +430,7 @@ public class BibtexDatabaseWriterTest {
         AbstractBibtexKeyPattern pattern = new DatabaseBibtexKeyPattern(prefs.getKeyPattern());
         pattern.setDefaultValue("test");
         pattern.addBibtexKeyPattern("article", "articleTest");
-        metaData.setBibtexKeyPattern(pattern);
+        metaData.setCiteKeyPattern(pattern);
 
         StringSaveSession session = databaseWriter.savePartOfDatabase(bibtexContext, Collections.emptyList(), new SavePreferences());
 

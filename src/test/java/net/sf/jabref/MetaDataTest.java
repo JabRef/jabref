@@ -28,19 +28,21 @@ public class MetaDataTest {
 
     @Test
     public void serializeNewMetadataReturnsEmptyMap() throws Exception {
-        assertEquals(Collections.emptyMap(), MetaDataSerializer.getSerializedStringMap(metaData));
+        assertEquals(Collections.emptyMap(), MetaDataSerializer.getSerializedStringMap(metaData,
+                Globals.prefs.getKeyPattern()));
     }
 
     @Test
     public void serializeSingleSaveAction() {
         FieldFormatterCleanups saveActions = new FieldFormatterCleanups(true,
                 Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())));
-        metaData.setSaveActions(saveActions.getAsStringList());
+        metaData.setSaveActions(saveActions);
 
         Map<String, String> expectedSerialization = new TreeMap<>();
         expectedSerialization.put("saveActions",
                 "enabled;" + OS.NEWLINE + "title[lower_case]" + OS.NEWLINE + ";");
-        assertEquals(expectedSerialization, MetaDataSerializer.getSerializedStringMap(metaData));
+        assertEquals(expectedSerialization, MetaDataSerializer.getSerializedStringMap(metaData,
+                Globals.prefs.getKeyPattern()));
     }
 
     @Test

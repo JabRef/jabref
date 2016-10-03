@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import net.sf.jabref.Globals;
 import net.sf.jabref.logic.exporter.MetaDataSerializer;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
@@ -119,7 +120,8 @@ public class DBMSSynchronizerTest {
         dbmsSynchronizer.setMetaData(testMetaData);
         testMetaData.putData("databaseType", Arrays.asList("bibtex"));
 
-        Map<String, String> expectedMap = MetaDataSerializer.getSerializedStringMap(testMetaData);
+        Map<String, String> expectedMap = MetaDataSerializer.getSerializedStringMap(testMetaData,
+                Globals.prefs.getKeyPattern());
         Map<String, String> actualMap = dbmsProcessor.getSharedMetaData();
 
         Assert.assertEquals(expectedMap, actualMap);
