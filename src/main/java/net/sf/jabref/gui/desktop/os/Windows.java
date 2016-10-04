@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import static net.sf.jabref.preferences.JabRefPreferences.USE_PDF_READER;
 
@@ -60,7 +61,7 @@ public class Windows implements NativeDesktop {
     public void openPdfWithParameters(String filePath, List<String> parameters) throws IOException {
         String[] params = (String[]) parameters.toArray();
         String[] command = new String[parameters.size() + 1];
-        command[0] = Paths.get(USE_PDF_READER).toString();
+        command[0] = Paths.get(JabRefPreferences.getInstance().get(USE_PDF_READER)).toString();
         for( int i = 1; i < command.length; i++) {
             command[i] = parameters.get(i-1);
         }
