@@ -8,9 +8,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.exporter.MetaDataSerializer;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.database.BibDatabase;
@@ -38,10 +39,10 @@ public class DBMSSynchronizerTest {
     private DBMSConnection dbmsConnection;
     private DBMSProcessor dbmsProcessor;
     private BibDatabase bibDatabase;
+    private GlobalBibtexKeyPattern pattern;
 
     @Parameter
     public DBMSType dbmsType;
-
 
     @Before
     public void setUp() throws SQLException, DatabaseNotSupportedException {
@@ -58,6 +59,8 @@ public class DBMSSynchronizerTest {
         bibDatabase.registerListener(dbmsSynchronizer);
 
         dbmsSynchronizer.openSharedDatabase(dbmsConnection);
+
+        pattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern.split("[auth][year]"));
     }
 
     @Parameters(name = "Test with {0} database system")
@@ -125,8 +128,7 @@ public class DBMSSynchronizerTest {
         dbmsSynchronizer.setMetaData(testMetaData);
         testMetaData.setMode(BibDatabaseMode.BIBTEX);
 
-        Map<String, String> expectedMap = MetaDataSerializer.getSerializedStringMap(testMetaData,
-                Globals.prefs.getKeyPattern());
+        Map<String, String> expectedMap = MetaDataSerializer.getSerializedStringMap(testMetaData, pattern);
         Map<String, String> actualMap = dbmsProcessor.getSharedMetaData();
 
         Assert.assertEquals(expectedMap, actualMap);
