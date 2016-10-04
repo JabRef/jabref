@@ -61,7 +61,7 @@ after_script:
 
 after_failure:
   # show test results if build fails
-  - ./scripts/after-failure.sh
+  - /scripts/after-failure.sh
 
 # cache gradle dependencies
 # https://docs.travis-ci.com/user/languages/java#Caching
