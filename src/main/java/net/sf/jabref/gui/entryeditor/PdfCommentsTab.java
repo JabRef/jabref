@@ -293,9 +293,6 @@ public class PdfCommentsTab extends JPanel {
         new ClipBoardManager().setClipboardContents(sj.toString());
     }
 
-    /**
-     * TODO: implement for every OS
-     */
     private void openPdf() {
 
         try {

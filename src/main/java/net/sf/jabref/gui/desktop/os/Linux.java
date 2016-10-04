@@ -93,15 +93,15 @@ public class Linux implements NativeDesktop {
         String application;
         if(JabRefPreferences.getInstance().get(USE_PDF_READER).equals(JabRefPreferences.getInstance().get(ADOBE_ACROBAT_COMMAND))){
             application = "acroread";
+
+            StringJoiner sj = new StringJoiner(" ");
+            sj.add(application);
+            parameters.forEach((param) -> sj.add(param));
+
+            openFileWithApplication(filePath, sj.toString());
         } else {
-            application ="";
+            openFile( filePath, "PDF");
         }
-
-        StringJoiner sj = new StringJoiner(" ");
-        sj.add(application);
-        parameters.forEach((param) -> sj.add(param));
-
-        openFileWithApplication(filePath, sj.toString());
     }
 
     @Override
