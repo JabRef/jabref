@@ -79,6 +79,7 @@ public class MetaData {
      * @return the stored label patterns
      */
     public AbstractBibtexKeyPattern getCiteKeyPattern(GlobalBibtexKeyPattern globalPattern) {
+        Objects.requireNonNull(globalPattern);
         AbstractBibtexKeyPattern bibtexKeyPattern = new DatabaseBibtexKeyPattern(globalPattern);
 
         // Add stored key patterns
