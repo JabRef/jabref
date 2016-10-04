@@ -219,6 +219,12 @@ class ExternalTab extends JPanel implements PrefsTab {
         adobeAcrobatReaderPath.setText(Globals.prefs.get(JabRefPreferences.ADOBE_ACROBAT_COMMAND));
         sumatraReaderPath.setText(Globals.prefs.get(JabRefPreferences.SUMATRA_COMMAND));
 
+        if(Globals.prefs.get(JabRefPreferences.USE_PDF_READER).equals(adobeAcrobatReaderPath.getText())){
+            adobeAcrobatReader.setSelected(true);
+        } else if (Globals.prefs.get(JabRefPreferences.USE_PDF_READER).equals(sumatraReaderPath.getText())) {
+            sumatraReader.setSelected(true);
+        }
+
         updateExecuteConsoleButtonAndFieldEnabledState();
     }
 
