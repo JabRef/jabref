@@ -214,7 +214,6 @@ public class PreferencesDialog extends JDialog {
         SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
         ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
 
-        frame.removeCachedEntryEditors();
         Globals.prefs.updateEntryEditorTabList();
     }
 

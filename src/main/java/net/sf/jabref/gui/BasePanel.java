@@ -195,8 +195,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     // Variable to prevent erroneous update of back/forward histories at the time
     // when a Back or Forward operation is being processed:
     private boolean backOrForwardInProgress;
-    // To indicate which entry is currently shown.
-    private final Map<String, EntryEditor> entryEditors = new HashMap<>();
 
     // in switching between entries.
     private PreambleEditor preambleEditor;
@@ -1487,10 +1485,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         createMainTable();
 
-        for (EntryEditor ee : entryEditors.values()) {
-            ee.validateAllFields();
-        }
-
         splitPane.setTopComponent(mainTable.getPane());
 
         // Remove borders
@@ -1619,25 +1613,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             divLoc = splitPane.getDividerLocation();
         }
 
-        if (entryEditors.containsKey(be.getType())) {
-            // We already have an editor for this entry type.
-            entryEditor = entryEditors.get(be.getType());
-            entryEditor.switchTo(be);
-            if (visName != null) {
-                entryEditor.setVisiblePanel(visName);
-            }
-            splitPane.setBottomComponent(entryEditor);
-        } else {
-            // We must instantiate a new editor for this type.
-            entryEditor = new EntryEditor(frame, BasePanel.this, be);
-            if (visName != null) {
-                entryEditor.setVisiblePanel(visName);
-            }
-            splitPane.setBottomComponent(entryEditor);
-
-            entryEditors.put(be.getType(), entryEditor);
-
+        // We must instantiate a new editor.
+        entryEditor = new EntryEditor(frame, BasePanel.this, be);
+        if (visName != null) {
+            entryEditor.setVisiblePanel(visName);
         }
+        splitPane.setBottomComponent(entryEditor);
+
         if (divLoc > 0) {
             splitPane.setDividerLocation(divLoc);
         } else {
@@ -1658,28 +1640,13 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
      */
     public EntryEditor getEntryEditor(BibEntry entry) {
         EntryEditor entryEditor;
-        if (entryEditors.containsKey(entry.getType())) {
-            EntryEditor visibleNow = currentEditor;
 
-            // We already have an editor for this entry type.
-            entryEditor = entryEditors.get(entry.getType());
+        // We must instantiate a new editor. First make sure the old one
+        // stores its last edit:
+        storeCurrentEdit();
+        // Then start the new one:
+        entryEditor = new EntryEditor(frame, BasePanel.this, entry);
 
-            // If the cached editor is not the same as the currently shown one,
-            // make sure the current one stores its current edit:
-            if ((visibleNow != null) && (!(entryEditor.equals(visibleNow)))) {
-                visibleNow.storeCurrentEdit();
-            }
-
-            entryEditor.switchTo(entry);
-        } else {
-            // We must instantiate a new editor for this type. First make sure the old one
-            // stores its last edit:
-            storeCurrentEdit();
-            // Then start the new one:
-            entryEditor = new EntryEditor(frame, BasePanel.this, entry);
-
-            entryEditors.put(entry.getType(), entryEditor);
-        }
         return entryEditor;
     }
 
@@ -1806,13 +1773,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         if (isShowingEditor()) {
             final EntryEditor editor = (EntryEditor) splitPane.getBottomComponent();
             editor.storeCurrentEdit();
-        }
-    }
-
-    public void rebuildAllEntryEditors() {
-        for (Map.Entry<String, EntryEditor> stringEntryEditorEntry : entryEditors.entrySet()) {
-            EntryEditor ed = stringEntryEditorEntry.getValue();
-            ed.rebuildPanels();
         }
     }
 
@@ -2432,10 +2392,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public MainTable getMainTable() {
         return mainTable;
-    }
-
-    public Map<String, EntryEditor> getEntryEditors() {
-        return entryEditors;
     }
 
     public BibDatabaseContext getDatabaseContext() {

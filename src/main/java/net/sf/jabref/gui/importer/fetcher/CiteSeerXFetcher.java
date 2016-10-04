@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportInspector;
@@ -63,7 +64,8 @@ public class CiteSeerXFetcher implements EntryFetcher {
 
             return true;
         } catch (IOException e) {
-            LOGGER.warn("Could not download", e);
+            LOGGER.error("Error while fetching from " + getTitle(), e);
+            ((ImportInspectionDialog)inspector).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
             return false;
         }
     }
