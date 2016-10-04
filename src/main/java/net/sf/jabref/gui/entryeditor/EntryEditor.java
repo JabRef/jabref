@@ -610,8 +610,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
         actionMap.put("help", getHelpAction());
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), "save");
-        actionMap.put("save", getSaveDatabaseAction());
 
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB), "nexttab");
         actionMap.put("nexttab", frame.nextTab);
@@ -871,6 +869,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                 if (answer != 0) {
                     updateSource = true;
+                    lastSourceAccepted = true;
                     updateSource();
                 }
             }
