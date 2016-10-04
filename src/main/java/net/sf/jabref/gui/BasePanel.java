@@ -259,11 +259,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public String getTabTitle() {
         StringBuilder title = new StringBuilder();
         DatabaseLocation databaseLocation = this.bibDatabaseContext.getLocation();
+        boolean isAutosaveEnabled = Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE);
 
         if (databaseLocation == DatabaseLocation.LOCAL) {
             if (this.bibDatabaseContext.getDatabaseFile().isPresent()) {
                 // check if file is modified
-                String changeFlag = isModified() ? "*" : "";
+                String changeFlag = isModified() && !isAutosaveEnabled ? "*" : "";
                 title.append(this.bibDatabaseContext.getDatabaseFile().get().getName()).append(changeFlag);
             } else {
                 title.append(GUIGlobals.UNTITLED_TITLE);

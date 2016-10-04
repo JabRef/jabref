@@ -7,6 +7,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -19,7 +20,11 @@ public class DBMSConnection {
     private final DBMSConnectionProperties properties;
 
 
-    public DBMSConnection(DBMSConnectionProperties properties) throws SQLException {
+    public DBMSConnection(DBMSConnectionProperties properties) throws SQLException, InvalidDBMSConnectionPropertiesException {
+
+        if (!properties.isValid()) {
+            throw new InvalidDBMSConnectionPropertiesException();
+        }
         this.properties = properties;
 
         try {

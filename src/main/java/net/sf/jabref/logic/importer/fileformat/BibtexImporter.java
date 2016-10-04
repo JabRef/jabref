@@ -46,6 +46,7 @@ public class BibtexImporter extends ImportFormat {
         // encoding in the first place. Since the signature doesn't contain any fancy characters, we can
         // read it regardless of encoding, with either UTF-8 or UTF-16. That's the hypothesis, at any rate.
         // 8 bit is most likely, so we try that first:
+        ParserResult result;
         Optional<Charset> suppliedEncoding;
         try (BufferedReader utf8Reader = getUTF8Reader(filePath)) {
             suppliedEncoding = getSuppliedEncoding(utf8Reader);
@@ -57,11 +58,12 @@ public class BibtexImporter extends ImportFormat {
             }
         }
 
-        if(suppliedEncoding.isPresent()) {
-            return super.importDatabase(filePath, suppliedEncoding.get());
+        if (suppliedEncoding.isPresent()) {
+            result = super.importDatabase(filePath, suppliedEncoding.get());
         } else {
-            return super.importDatabase(filePath, defaultEncoding);
+            result = super.importDatabase(filePath, defaultEncoding);
         }
+        return result;
     }
 
     @Override
@@ -117,9 +119,6 @@ public class BibtexImporter extends ImportFormat {
                     }
 
                     return Optional.of(Charset.forName(encoding));
-                } else {
-                    // Line not recognized so stop parsing
-                    return Optional.empty();
                 }
             }
         } catch (IOException ignored) {

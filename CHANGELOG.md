@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Implementation of eventbased autosave functionality and file synchronization for shared DBs. Related to [#344](https://github.com/JabRef/jabref/issues/344)
 - Source tab in the entry editor displays "BibLaTeX Source" when using biblatex mode
 - Add session restoring functionality for shared database. Related to [#1703](https://github.com/JabRef/jabref/issues/1703)
 - Implementation of LiveUpdate for PostgreSQL & Oracle systems. Related to [#970](https://github.com/JabRef/jabref/issues/970).

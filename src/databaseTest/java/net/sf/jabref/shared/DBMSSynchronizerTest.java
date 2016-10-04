@@ -21,6 +21,7 @@ import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
+import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import net.sf.jabref.shared.exception.OfflineLockException;
 
 import org.junit.After;
@@ -45,7 +46,7 @@ public class DBMSSynchronizerTest {
     public DBMSType dbmsType;
 
     @Before
-    public void setUp() throws SQLException, DatabaseNotSupportedException {
+    public void setUp() throws SQLException, DatabaseNotSupportedException, InvalidDBMSConnectionPropertiesException {
 
         dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
 

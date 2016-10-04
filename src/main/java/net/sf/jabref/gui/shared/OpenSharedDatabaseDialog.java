@@ -40,6 +40,7 @@ import net.sf.jabref.shared.DBMSConnection;
 import net.sf.jabref.shared.DBMSConnectionProperties;
 import net.sf.jabref.shared.DBMSType;
 import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
+import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
 import net.sf.jabref.shared.security.Password;
 
@@ -110,7 +111,7 @@ public class OpenSharedDatabaseDialog extends JDialog {
             setPreferences();
             dispose();
             return; // setLoadingConnectButtonText(false) should not be reached regularly.
-        } catch (SQLException exception) {
+        } catch (SQLException | InvalidDBMSConnectionPropertiesException exception) {
             JOptionPane.showMessageDialog(OpenSharedDatabaseDialog.this, exception.getMessage(),
                     Localization.lang("Connection error"), JOptionPane.ERROR_MESSAGE);
         } catch (DatabaseNotSupportedException exception) {

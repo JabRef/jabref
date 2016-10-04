@@ -63,6 +63,8 @@ public class BibDatabase {
 
     private final EventBus eventBus = new EventBus();
 
+    private String databaseID;
+
 
     public BibDatabase() {
         this.registerListener(new KeyChangeListener(this));
@@ -602,5 +604,13 @@ public class BibDatabase {
 
     public Optional<BibEntry> getReferencedEntry(BibEntry entry) {
         return entry.getField(FieldName.CROSSREF).flatMap(this::getEntryByKey);
+    }
+
+    public String getDatabaseID() {
+        return this.databaseID;
+    }
+
+    public void setDatabaseID(String databaseID) {
+        this.databaseID = databaseID;
     }
 }

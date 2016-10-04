@@ -5,6 +5,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
+
 /**
  * This class provides helping methods for database tests.
  * Furthermore it determines database systems which are ready to be used for tests.
@@ -18,7 +20,7 @@ public class TestManager {
             try {
                 TestConnector.getTestDBMSConnection(dbmsType);
                 dbmsTypes.add(dbmsType);
-            } catch (SQLException e) {
+            } catch (SQLException | InvalidDBMSConnectionPropertiesException e) {
                 // skip parameter
             }
         }

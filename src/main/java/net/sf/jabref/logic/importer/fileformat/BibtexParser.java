@@ -19,6 +19,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.logic.bibtex.FieldContentParser;
+import net.sf.jabref.logic.exporter.BibtexDatabaseWriter;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.Parser;
@@ -161,6 +162,8 @@ public class BibtexParser implements Parser {
         // Bibtex related contents.
         initializeParserResult();
 
+        parseDatabaseID();
+
         skipWhitespace();
 
         try {
@@ -174,6 +177,28 @@ public class BibtexParser implements Parser {
         database = new BibDatabase();
         entryTypes = new HashMap<>(); // To store custom entry types parsed.
         parserResult = new ParserResult(database, null, entryTypes);
+    }
+
+
+    private void parseDatabaseID() throws IOException {
+
+        while (!eof) {
+            skipWhitespace();
+            char c = (char) read();
+
+            if (c == '%') {
+                skipWhitespace();
+                String label = parseTextToken().trim();
+
+                if (label.equals(BibtexDatabaseWriter.DATABASE_ID_PREFIX)) {
+                    skipWhitespace();
+                    database.setDatabaseID(parseTextToken().trim());
+                }
+            } else if (c == '@') {
+                unread(c);
+                break;
+            }
+        }
     }
 
     private ParserResult parseFileContent() throws IOException {

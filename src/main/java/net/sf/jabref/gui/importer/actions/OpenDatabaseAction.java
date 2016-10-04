@@ -4,10 +4,12 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.attribute.FileTime;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -24,20 +26,18 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
 import net.sf.jabref.gui.importer.ParserResultWarningDialog;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.shared.SharedDatabaseUIManager;
 import net.sf.jabref.logic.importer.OpenDatabase;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
-import net.sf.jabref.logic.util.io.AutoSaveUtil;
 import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.migrations.FileLinksUpgradeWarning;
-import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.database.BibDatabase;
-import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.database.BibDatabaseMode;
-import net.sf.jabref.model.metadata.MetaData;
 import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
+import net.sf.jabref.shared.exception.DatabaseNotSupportedException;
+import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -171,111 +171,71 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
         if ((file != null) && file.exists()) {
             File fileToLoad = file;
             frame.output(Localization.lang("Opening") + ": '" + file.getPath() + "'");
-            boolean tryingAutosave = false;
-            boolean autoSaveFound = AutoSaveUtil.newerAutoSaveExists(file);
-            if (autoSaveFound && !Globals.prefs.getBoolean(JabRefPreferences.PROMPT_BEFORE_USING_AUTOSAVE)) {
-                // We have found a newer autosave, and the preferences say we should load
-                // it without prompting, so we replace the fileToLoad:
-                fileToLoad = AutoSaveUtil.getAutoSaveFile(file);
-                tryingAutosave = true;
-            } else if (autoSaveFound) {
-                // We have found a newer autosave, but we are not allowed to use it without
-                // prompting.
-                int answer = JOptionPane
-                        .showConfirmDialog(
-                                null, "<html>"
-                                        + Localization
-                                                .lang("An autosave file was found for this database. This could indicate "
-                                                        + "that JabRef did not shut down cleanly last time the file was used.")
-                                        + "<br>"
-                                        + Localization
-                                                .lang("Do you want to recover the database from the autosave file?")
-                                        + "</html>",
-                                Localization.lang("Recover from autosave"), JOptionPane.YES_NO_OPTION);
-                if (answer == JOptionPane.YES_OPTION) {
-                    fileToLoad = AutoSaveUtil.getAutoSaveFile(file);
-                    tryingAutosave = true;
-                }
-            }
 
-            boolean done = false;
-            while (!done) {
-                String fileName = file.getPath();
-                Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
-                // Should this be done _after_ we know it was successfully opened?
+            String fileName = file.getPath();
+            Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
+            // Should this be done _after_ we know it was successfully opened?
 
-                if (FileBasedLock.hasLockFile(file.toPath())) {
-                    Optional<FileTime> modificationTime = FileBasedLock.getLockFileTimeStamp(file.toPath());
-                    if ((modificationTime.isPresent()) && ((System.currentTimeMillis()
+            if (FileBasedLock.hasLockFile(file.toPath())) {
+                Optional<FileTime> modificationTime = FileBasedLock.getLockFileTimeStamp(file.toPath());
+                if ((modificationTime.isPresent()) && ((System.currentTimeMillis()
                             - modificationTime.get().toMillis()) > FileBasedLock.LOCKFILE_CRITICAL_AGE)) {
-                        // The lock file is fairly old, so we can offer to "steal" the file:
-                        int answer = JOptionPane.showConfirmDialog(null,
-                                "<html>" + Localization.lang("Error opening file") + " '" + fileName + "'. "
+                    // The lock file is fairly old, so we can offer to "steal" the file:
+                    int answer = JOptionPane.showConfirmDialog(null,
+                            "<html>" + Localization.lang("Error opening file") + " '" + fileName + "'. "
                                         + Localization.lang("File is locked by another JabRef instance.") + "<p>"
                                         + Localization.lang("Do you want to override the file lock?"),
-                                Localization.lang("File locked"), JOptionPane.YES_NO_OPTION);
-                        if (answer == JOptionPane.YES_OPTION) {
-                            FileBasedLock.deleteLockFile(file.toPath());
-                        } else {
-                            return;
-                        }
-                    } else if (!FileBasedLock.waitForFileLock(file.toPath())) {
-                        JOptionPane.showMessageDialog(null,
-                                Localization.lang("Error opening file") + " '" + fileName + "'. "
-                                        + Localization.lang("File is locked by another JabRef instance."),
-                                Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+                            Localization.lang("File locked"), JOptionPane.YES_NO_OPTION);
+                    if (answer == JOptionPane.YES_OPTION) {
+                        FileBasedLock.deleteLockFile(file.toPath());
+                    } else {
                         return;
                     }
-
-                }
-
-                ParserResult result;
-                String errorMessage = null;
-                try {
-                    result = OpenDatabase.loadDatabase(fileToLoad,
-                            Globals.prefs.getImportFormatPreferences());
-                } catch (IOException ex) {
-                    LOGGER.error("Error loading database " + fileToLoad, ex);
-                    result = ParserResult.getNullResult();
-                }
-                if (result.isNullResult()) {
-                    JOptionPane.showMessageDialog(null, Localization.lang("Error opening file") + " '" + fileName + "'",
+                } else if (!FileBasedLock.waitForFileLock(file.toPath())) {
+                    JOptionPane.showMessageDialog(null,
+                            Localization.lang("Error opening file") + " '" + fileName + "'. "
+                                    + Localization.lang("File is locked by another JabRef instance."),
                             Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
-
-                    String message = "<html>" + errorMessage + "<p>"
-                            + (tryingAutosave ? Localization.lang(
-                                    "Error opening autosave of '%0'. Trying to load '%0' instead.",
-                                    file.getName()) : ""/*Globals.lang("Error opening file '%0'.", file.getName())*/)
-                            + "</html>";
-                    JOptionPane.showMessageDialog(null, message, Localization.lang("Error opening file"),
-                            JOptionPane.ERROR_MESSAGE);
-
-                    if (tryingAutosave) {
-                        tryingAutosave = false;
-                        fileToLoad = file;
-                    } else {
-                        done = true;
-                    }
-                    continue;
-                } else {
-                    done = true;
+                    return;
                 }
 
-                final BasePanel panel = addNewDatabase(result, file, raisePanel);
-                if (tryingAutosave) {
-                    panel.markNonUndoableBaseChanged();
-                }
-
-                // After adding the database, go through our list and see if
-                // any post open actions need to be done. For instance, checking
-                // if we found new entry types that can be imported, or checking
-                // if the database contents should be modified due to new features
-                // in this version of JabRef:
-                final ParserResult finalReferenceToResult = result;
-                SwingUtilities.invokeLater(
-                        () -> OpenDatabaseAction.performPostOpenActions(panel, finalReferenceToResult, true));
             }
 
+            ParserResult result;
+            try {
+                result = OpenDatabase.loadDatabase(fileToLoad, Globals.prefs.getImportFormatPreferences());
+            } catch (IOException ex) {
+                LOGGER.error("Error loading database " + fileToLoad, ex);
+                result = ParserResult.getNullResult();
+            }
+
+            if (result.isNullResult()) {
+                JOptionPane.showMessageDialog(null, Localization.lang("Error opening file") + " '" + fileName + "'",
+                        Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
+            }
+
+            if (Objects.nonNull(result.getDatabase().getDatabaseID())) {
+                try {
+                    new SharedDatabaseUIManager(frame).openSharedDatabaseFromParserResult(result);
+                } catch (SQLException | DatabaseNotSupportedException | InvalidDBMSConnectionPropertiesException e) {
+                    result.getDatabaseContext().setDatabaseFile(null); // do not open the original file
+                    result.getDatabase().setDatabaseID(null);
+                    LOGGER.error("Connection error", e);
+                    JOptionPane.showMessageDialog(frame,
+                            e.getMessage() + "\n\n" + Localization.lang("A local copy will be opened."),
+                            Localization.lang("Connection error"), JOptionPane.WARNING_MESSAGE);
+                }
+            }
+
+            BasePanel panel = addNewDatabase(result, file, raisePanel);
+
+            // After adding the database, go through our list and see if
+            // any post open actions need to be done. For instance, checking
+            // if we found new entry types that can be imported, or checking
+            // if the database contents should be modified due to new features
+            // in this version of JabRef:
+            final ParserResult finalReferenceToResult = result;
+            SwingUtilities.invokeLater(() -> OpenDatabaseAction.performPostOpenActions(panel, finalReferenceToResult, true));
         }
     }
 
@@ -298,24 +258,23 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
     private BasePanel addNewDatabase(ParserResult result, final File file, boolean raisePanel) {
 
-        String fileName = file.getPath();
         BibDatabase database = result.getDatabase();
-        MetaData meta = result.getMetaData();
 
         if (result.hasWarnings()) {
             JabRefExecutorService.INSTANCE
                     .execute(() -> ParserResultWarningDialog.showParserResultWarningDialog(result, frame));
         }
 
-        Defaults defaults = new Defaults(
-                BibDatabaseMode.fromPreference(Globals.prefs.getBoolean(JabRefPreferences.BIBLATEX_DEFAULT_MODE)));
-        BasePanel basePanel = new BasePanel(frame, new BibDatabaseContext(database, meta, file, defaults));
+        BasePanel basePanel = new BasePanel(frame, result.getDatabaseContext());
 
         // file is set to null inside the EventDispatcherThread
         SwingUtilities.invokeLater(() -> frame.addTab(basePanel, raisePanel));
 
-        frame.output(Localization.lang("Opened database") + " '" + fileName + "' " + Localization.lang("with") + " "
-                + database.getEntryCount() + " " + Localization.lang("entries") + ".");
+        if (Objects.nonNull(file)) {
+            frame.output(Localization.lang("Opened database") + " '" + file.getPath() + "' " + Localization.lang("with")
+                    + " "
+                    + database.getEntryCount() + " " + Localization.lang("entries") + ".");
+        }
 
         return basePanel;
     }

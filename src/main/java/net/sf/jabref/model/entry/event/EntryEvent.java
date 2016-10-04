@@ -2,13 +2,14 @@ package net.sf.jabref.model.entry.event;
 
 import java.util.Objects;
 
+import net.sf.jabref.event.BibDatabaseContextChangedEvent;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
  * This abstract class pretends a minimal set of attributes and methods
  * which an entry event should have.
  */
-public abstract class EntryEvent {
+public abstract class EntryEvent extends BibDatabaseContextChangedEvent {
 
     private final BibEntry bibEntry;
     private final EntryEventSource location;

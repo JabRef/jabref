@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.model.database.BibDatabase;
@@ -22,6 +23,7 @@ public class ParserResult {
     private final BibDatabase base;
     private MetaData metaData;
     private final Map<String, EntryType> entryTypes;
+    private BibDatabaseContext bibDatabaseContext;
 
     private File file;
     private final List<String> warnings = new ArrayList<>();
@@ -29,7 +31,6 @@ public class ParserResult {
 
     private String errorMessage;
 
-    private boolean postponedAutosaveFound;
     private boolean invalid;
     private boolean toOpenTab;
 
@@ -49,6 +50,9 @@ public class ParserResult {
         this.base = base;
         this.metaData = metaData;
         this.entryTypes = entryTypes;
+        if (Objects.nonNull(base) && Objects.nonNull(metaData)) {
+            this.bibDatabaseContext = new BibDatabaseContext(base, metaData, file);
+        }
     }
 
     public static ParserResult fromErrorMessage(String message) {
@@ -142,14 +146,6 @@ public class ParserResult {
         return duplicateKeys;
     }
 
-    public boolean isPostponedAutosaveFound() {
-        return postponedAutosaveFound;
-    }
-
-    public void setPostponedAutosaveFound(boolean postponedAutosaveFound) {
-        this.postponedAutosaveFound = postponedAutosaveFound;
-    }
-
     public boolean isInvalid() {
         return invalid;
     }
@@ -167,7 +163,18 @@ public class ParserResult {
     }
 
     public BibDatabaseContext getDatabaseContext() {
-        return new BibDatabaseContext(base, metaData, file);
+        if (Objects.isNull(this.bibDatabaseContext)) {
+            this.bibDatabaseContext = new BibDatabaseContext(base, metaData, file);
+        }
+        return this.bibDatabaseContext;
+    }
+
+    public void setDatabaseContext(BibDatabaseContext bibDatabaseContext) {
+        this.bibDatabaseContext = bibDatabaseContext;
+    }
+
+    public boolean hasDatabaseContext() {
+        return Objects.nonNull(this.bibDatabaseContext);
     }
 
     public boolean isNullResult() {

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.shared.exception.InvalidDBMSConnectionPropertiesException;
 import net.sf.jabref.shared.exception.OfflineLockException;
 
 import org.junit.After;
@@ -32,7 +33,7 @@ public class DBMSProcessorTest {
 
 
     @Before
-    public void setUp() throws SQLException {
+    public void setUp() throws SQLException, InvalidDBMSConnectionPropertiesException {
         dbmsConnection = TestConnector.getTestDBMSConnection(dbmsType);
         dbmsProcessor = DBMSProcessor.getProcessorInstance(dbmsConnection);
         dbmsProcessor.setupSharedDatabase();
