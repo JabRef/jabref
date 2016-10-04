@@ -42,7 +42,6 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import static net.sf.jabref.Globals.prefs;
 
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined in
@@ -208,15 +207,15 @@ public class PreferencesDialog extends JDialog {
 
     private void updateAfterPreferenceChanges() {
         setValues();
-        Map<String, ExportFormat> customFormats = prefs.customExports.getCustomExportFormats(prefs,
+        Map<String, ExportFormat> customFormats = Globals.prefs.customExports.getCustomExportFormats(Globals.prefs,
                 Globals.journalAbbreviationLoader);
-        LayoutFormatterPreferences layoutPreferences = prefs
+        LayoutFormatterPreferences layoutPreferences = Globals.prefs
                 .getLayoutFormatterPreferences(Globals.journalAbbreviationLoader);
-        SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(prefs);
+        SavePreferences savePreferences = SavePreferences.loadForExportFromPreferences(Globals.prefs);
         ExportFormats.initAllExports(customFormats, layoutPreferences, savePreferences);
 
         frame.removeCachedEntryEditors();
-        prefs.updateEntryEditorTabList();
+        Globals.prefs.updateEntryEditorTabList();
     }
 
     private void storeAllSettings(){
@@ -231,7 +230,7 @@ public class PreferencesDialog extends JDialog {
         for (Component tab: preferenceTabs) {
             ((PrefsTab) tab).storeSettings();
         }
-        prefs.flush();
+        Globals.prefs.flush();
 
         setVisible(false);
         MainTable.updateRenderers();
@@ -269,7 +268,7 @@ public class PreferencesDialog extends JDialog {
             path.ifPresent(exportFile -> {
                 try {
                     storeAllSettings();
-                    prefs.exportPreferences(exportFile.toString());
+                    Globals.prefs.exportPreferences(exportFile.toString());
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
