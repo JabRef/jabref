@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.FulltextFetcher;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
@@ -91,6 +92,11 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
     @Override
     public String getName() {
         return "Google Scholar";
+    }
+
+    @Override
+    public HelpFile getHelpPage() {
+        return HelpFile.FETCHER_GOOGLE_SCHOLAR;
     }
 
     @Override
