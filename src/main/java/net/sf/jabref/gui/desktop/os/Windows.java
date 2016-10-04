@@ -65,6 +65,6 @@ public class Windows implements NativeDesktop {
             command[i] = "\"" + parameters.get(i-1) + "\"";
         }
         command[command.length-1] = "\"" + filePath + "\"";
-        new ProcessBuilder(command);
+        new ProcessBuilder(command).start();
     }
 }
