@@ -5,13 +5,10 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
-import java.util.StringJoiner;
 
 import net.sf.jabref.gui.externalfiletype.ExternalFileType;
 import net.sf.jabref.gui.externalfiletype.ExternalFileTypes;
-import net.sf.jabref.preferences.JabRefPreferences;
 
-import static net.sf.jabref.preferences.JabRefPreferences.ADOBE_ACROBAT_COMMAND;
 import static net.sf.jabref.preferences.JabRefPreferences.USE_PDF_READER;
 
 public class Windows implements NativeDesktop {
@@ -61,15 +58,12 @@ public class Windows implements NativeDesktop {
 
     @Override
     public void openPdfWithParameters(String filePath, List<String> parameters) throws IOException {
-
-        StringJoiner paramJoiner = new StringJoiner(" ");
-        if(JabRefPreferences.getInstance().get(USE_PDF_READER).equals(ADOBE_ACROBAT_COMMAND)) {
-            paramJoiner.add(JabRefPreferences.getInstance().get(USE_PDF_READER));
-            parameters.forEach((param) -> paramJoiner.add(param));
-        } else {
-            paramJoiner.add(parameters.get(0));
+        String[] params = (String[]) parameters.toArray();
+        String[] command = new String[parameters.size() + 1];
+        command[0] = Paths.get(USE_PDF_READER).toString();
+        for( int i = 1; i < command.length; i++) {
+            command[i] = parameters.get(i-1);
         }
-
-        new ProcessBuilder(Paths.get(USE_PDF_READER).toString(), paramJoiner.toString());
+        new ProcessBuilder(command);
     }
 }
