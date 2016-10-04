@@ -107,18 +107,29 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
             List<BibEntry> foundEntries = new ArrayList<>(10);
 
             String queryURL = String.format(BASIC_SEARCH_URL, URLEncoder.encode(query, StandardCharsets.UTF_8.name()));
-            String cont = URLDownload.createURLDownloadWithBrowserUserAgent(queryURL)
-                    .downloadToString(StandardCharsets.UTF_8);
+            addHitsFromQuery(foundEntries, queryURL);
+            String content;
 
-            Matcher m = LINK_TO_BIB_PATTERN.matcher(cont);
-            while (m.find()) {
-                String citationsPageURL = m.group().replace("&amp;", "&");
-                BibEntry newEntry = downloadEntry(citationsPageURL);
-                foundEntries.add(newEntry);
+            if(foundEntries.size()==10) {
+                String secondPage = queryURL+"&start=10";
+                addHitsFromQuery(foundEntries, secondPage);
             }
+
             return foundEntries;
         } catch (IOException e) {
             throw new FetcherException("Fetching entries from Google Scholar failed: ", e);
+        }
+    }
+
+    private void addHitsFromQuery(List<BibEntry> entryList, String queryURL) throws IOException, FetcherException {
+        String content = URLDownload.createURLDownloadWithBrowserUserAgent(queryURL)
+                .downloadToString(StandardCharsets.UTF_8);
+
+        Matcher m = LINK_TO_BIB_PATTERN.matcher(content);
+        while (m.find()) {
+            String citationsPageURL = m.group().replace("&amp;", "&");
+            BibEntry newEntry = downloadEntry(citationsPageURL);
+            entryList.add(newEntry);
         }
     }
 
