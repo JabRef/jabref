@@ -59,12 +59,12 @@ public class Windows implements NativeDesktop {
 
     @Override
     public void openPdfWithParameters(String filePath, List<String> parameters) throws IOException {
-        String[] params = (String[]) parameters.toArray();
-        String[] command = new String[parameters.size() + 1];
-        command[0] = Paths.get(JabRefPreferences.getInstance().get(USE_PDF_READER)).toString();
-        for( int i = 1; i < command.length; i++) {
-            command[i] = parameters.get(i-1);
+        String[] command = new String[parameters.size() + 2];
+        command[0] = "\"" + Paths.get(JabRefPreferences.getInstance().get(USE_PDF_READER)).toString() + "\"";
+        for( int i = 1; i < command.length - 1; i++) {
+            command[i] = "\"" + parameters.get(i-1) + "\"";
         }
+        command[command.length-1] = "\"" + filePath + "\"";
         new ProcessBuilder(command);
     }
 }
