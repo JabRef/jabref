@@ -23,12 +23,10 @@ import com.google.common.eventbus.EventBus;
 public class MetaData {
     public static final String META_FLAG = "jabref-meta: ";
     public static final String SAVE_ORDER_CONFIG = "saveOrderConfig";
-
     public static final String SAVE_ACTIONS = "saveActions";
     public static final String PREFIX_KEYPATTERN = "keypattern_";
     public static final String KEYPATTERNDEFAULT = "keypatterndefault";
     public static final String DATABASE_TYPE = "databaseType";
-
     public static final String GROUPSTREE = "groupstree";
     public static final String FILE_DIRECTORY = FieldName.FILE + FileDirectoryPreferences.DIR_SUFFIX;
     public static final String PROTECTED_FLAG_META = "protectedFlag";
@@ -37,9 +35,8 @@ public class MetaData {
     public static final char SEPARATOR_CHARACTER = ';';
     public static final String SEPARATOR_STRING = String.valueOf(SEPARATOR_CHARACTER);
 
-    private GroupTreeNode groupsRoot;
     private final EventBus eventBus = new EventBus();
-
+    private GroupTreeNode groupsRoot;
     private Charset encoding;
     private SaveOrderConfig saveOrderConfig;
     private Map<String, String> citeKeyPatterns = new HashMap<>(); // <BibType, Pattern>
@@ -59,6 +56,11 @@ public class MetaData {
 
     public Optional<SaveOrderConfig> getSaveOrderConfig() {
         return Optional.ofNullable(saveOrderConfig);
+    }
+
+    public void setSaveOrderConfig(SaveOrderConfig saveOrderConfig) {
+        this.saveOrderConfig = saveOrderConfig;
+        postChange();
     }
 
     public Optional<GroupTreeNode> getGroups() {
@@ -126,8 +128,18 @@ public class MetaData {
         return Optional.ofNullable(saveActions);
     }
 
+    public void setSaveActions(FieldFormatterCleanups saveActions) {
+        this.saveActions = Objects.requireNonNull(saveActions);
+        postChange();
+    }
+
     public Optional<BibDatabaseMode> getMode() {
         return Optional.ofNullable(mode);
+    }
+
+    public void setMode(BibDatabaseMode mode) {
+        this.mode = Objects.requireNonNull(mode);
+        postChange();
     }
 
     public boolean isProtected() {
@@ -138,32 +150,17 @@ public class MetaData {
         return Optional.ofNullable(defaultFileDirectory);
     }
 
+    public void setDefaultFileDirectory(String path) {
+        defaultFileDirectory = Objects.requireNonNull(path).trim();
+        postChange();
+    }
+
     public Optional<String> getUserFileDirectory(String user) {
         return Optional.ofNullable(userFileDirectory.get(user));
     }
 
-    public void setSaveActions(FieldFormatterCleanups saveActions) {
-        this.saveActions = Objects.requireNonNull(saveActions);
-        postChange();
-    }
-
-    public void setSaveOrderConfig(SaveOrderConfig saveOrderConfig) {
-        this.saveOrderConfig = saveOrderConfig;
-        postChange();
-    }
-
-    public void setMode(BibDatabaseMode mode) {
-        this.mode = Objects.requireNonNull(mode);
-        postChange();
-    }
-
     public void markAsProtected() {
         isProtected = true;
-        postChange();
-    }
-
-    public void setDefaultFileDirectory(String path) {
-        defaultFileDirectory = Objects.requireNonNull(path).trim();
         postChange();
     }
 
