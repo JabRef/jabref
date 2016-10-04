@@ -213,11 +213,11 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
                     activeFetcher.getTitle(), false);
             dialog.addCallBack(activeFetcher);
             dialog.setLocationRelativeTo(frame);
-            dialog.setVisible(true);
 
             JabRefExecutorService.INSTANCE.execute(() -> {
                 if (activeFetcher.processQuery(tf.getText().trim(), dialog, dialog)) {
                     dialog.entryListComplete();
+                    dialog.setVisible(true);
                 } else {
                     dialog.dispose();
                 }

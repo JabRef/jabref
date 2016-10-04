@@ -47,6 +47,12 @@ public class URLDownload {
 
     private String postData = "";
 
+    public static URLDownload createURLDownloadWithBrowserUserAgent(String address) throws MalformedURLException {
+        URLDownload downloader = new URLDownload(address);
+        downloader.addParameters("User-Agent", "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0");
+        return downloader;
+    }
+
     /**
      * @param address the URL to download from
      * @throws MalformedURLException if no protocol is specified in the address, or an unknown protocol is found

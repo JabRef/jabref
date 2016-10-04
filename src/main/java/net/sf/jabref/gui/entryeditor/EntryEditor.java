@@ -25,7 +25,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -227,16 +226,21 @@ public class EntryEditor extends JPanel implements EntryContainer {
     private void setupFieldPanels() {
         tabbed.removeAll();
         tabs.clear();
-        EntryType type = EntryTypes.getTypeOrDefault(entry.getType(), this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+        EntryType type = EntryTypes.getTypeOrDefault(entry.getType(),
+                this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
 
         // required fields
-        List<String> requiredFields = addRequiredTab(type);
+        addRequiredTab(type);
 
         // optional fields
         List<String> displayedOptionalFields = new ArrayList<>();
+        Set<String> deprecatedFields = new HashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
+        Set<String> usedOptionalFieldsDeprecated = new HashSet<>(deprecatedFields);
 
         if ((type.getOptionalFields() != null) && !type.getOptionalFields().isEmpty()) {
             if (!frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
+                displayedOptionalFields.addAll(type.getOptionalFields());
+
                 addOptionalTab(type);
             } else {
                 displayedOptionalFields.addAll(type.getPrimaryOptionalFields());
@@ -244,7 +248,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                 addOptionalTab(type);
 
-                Set<String> deprecatedFields = new HashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
                 deprecatedFields.add(FieldName.YEAR);
                 deprecatedFields.add(FieldName.MONTH);
                 List<String> secondaryOptionalFields = type.getSecondaryOptionalFields();
@@ -261,7 +264,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
 
                 // Get all optional fields which are deprecated
-                Set<String> usedOptionalFieldsDeprecated = new HashSet<>(deprecatedFields);
                 usedOptionalFieldsDeprecated.retainAll(optionalFieldsAndAliases);
 
                 // Add tabs
@@ -270,8 +272,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 if (optPan2.fileListEditor != null) {
                     fileListEditor = optPan2.fileListEditor;
                 }
-                tabbed.addTab(Localization.lang("Optional fields 2"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optPan2
-                        .getPane(), Localization.lang("Show optional fields"));
+                tabbed.addTab(Localization.lang("Optional fields 2"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
+                        optPan2.getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan2);
 
                 if (!usedOptionalFieldsDeprecated.isEmpty()) {
@@ -281,16 +283,21 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     if (optPan3.fileListEditor != null) {
                         fileListEditor = optPan3.fileListEditor;
                     }
-                    tabbed.addTab(Localization.lang("Deprecated fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optPan3
-                            .getPane(), Localization.lang("Show deprecated BibTeX fields"));
+                    tabbed.addTab(Localization.lang("Deprecated fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
+                            optPan3.getPane(), Localization.lang("Show deprecated BibTeX fields"));
                     tabs.add(optPan3);
                 }
             }
         }
 
         // other fields
-        List<String> displayedFields = Stream.concat(requiredFields.stream(), displayedOptionalFields.stream()).map(String::toLowerCase).collect(Collectors.toList());
-        List<String> otherFields = entry.getFieldNames().stream().map(String::toLowerCase).filter(f -> !displayedFields.contains(f)).collect(Collectors.toList());
+        List<String> displayedFields = type.getAllFields().stream().map(String::toLowerCase)
+                .collect(Collectors.toList());
+        List<String> otherFields = entry.getFieldNames().stream().map(String::toLowerCase)
+                .filter(f -> !displayedFields.contains(f)).collect(Collectors.toList());
+        if (!usedOptionalFieldsDeprecated.isEmpty()) {
+            otherFields.removeAll(usedOptionalFieldsDeprecated);
+        }
         otherFields.remove(BibEntry.KEY_FIELD);
         otherFields.removeAll(Globals.prefs.getCustomTabFieldNames());
 
@@ -620,8 +627,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
         actionMap.put("help", getHelpAction());
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), "save");
-        actionMap.put("save", getSaveDatabaseAction());
 
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB), "nexttab");
         actionMap.put("nexttab", frame.nextTab);
@@ -876,13 +881,16 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             Object[] options = {Localization.lang("Edit"), Localization.lang("Revert to original source")};
 
-            int answer = JOptionPane.showOptionDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
-                    Localization.lang("Problem with parsing entry"), JOptionPane.YES_NO_OPTION,
-                    JOptionPane.ERROR_MESSAGE, null, options, options[0]);
+            if (!SwingUtilities.isEventDispatchThread()) {
+                int answer = JOptionPane.showOptionDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
+                        Localization.lang("Problem with parsing entry"), JOptionPane.YES_NO_OPTION,
+                        JOptionPane.ERROR_MESSAGE, null, options, options[0]);
 
-            if (answer != 0) {
-                updateSource = true;
-                updateSource();
+                if (answer != 0) {
+                    updateSource = true;
+                    lastSourceAccepted = true;
+                    updateSource();
+                }
             }
 
             LOGGER.debug("Incorrect source", ex);

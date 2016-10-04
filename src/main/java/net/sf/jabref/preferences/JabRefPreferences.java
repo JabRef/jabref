@@ -255,7 +255,7 @@ public class JabRefPreferences {
     public static final String OVERRIDE_DEFAULT_FONTS = "overrideDefaultFonts";
     public static final String FONT_SIZE = "fontSize";
     public static final String FONT_STYLE = "fontStyle";
-    public static final String RECENT_FILES = "recentFiles";
+    public static final String RECENT_DATABASES = "recentDatabases";
     public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
     public static final String DEFAULT_OWNER = "defaultOwner";
@@ -532,7 +532,7 @@ public class JabRefPreferences {
         }
         defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
 
-        defaults.put(RECENT_FILES, "");
+        defaults.put(RECENT_DATABASES, "");
         defaults.put(EXTERNAL_FILE_TYPES, "");
         defaults.put(KEY_PATTERN_REGEX, "");
         defaults.put(KEY_PATTERN_REPLACEMENT, "");
@@ -1381,12 +1381,12 @@ public class JabRefPreferences {
     }
 
     public FileHistory getFileHistory() {
-        return new FileHistory(getStringList(RECENT_FILES));
+        return new FileHistory(getStringList(RECENT_DATABASES));
     }
 
     public void storeFileHistory(FileHistory history) {
         if (!history.isEmpty()) {
-            putStringList(RECENT_FILES, history.getHistory());
+            putStringList(RECENT_DATABASES, history.getHistory());
         }
     }
 
