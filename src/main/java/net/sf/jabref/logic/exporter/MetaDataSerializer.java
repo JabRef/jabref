@@ -23,8 +23,6 @@ public class MetaDataSerializer {
     public static Map<String, String> getSerializedStringMap(MetaData metaData,
             GlobalBibtexKeyPattern globalCiteKeyPattern) {
 
-        Map<String, String> serializedMetaData = new TreeMap<>();
-
         // First write all meta data except groups
         Map<String, List<String>> stringyMetaData = new HashMap<>();
         metaData.getSaveOrderConfig().ifPresent(
@@ -32,29 +30,27 @@ public class MetaDataSerializer {
         metaData.getSaveActions().ifPresent(
                 saveActions -> stringyMetaData.put(MetaData.SAVE_ACTIONS, saveActions.getAsStringList(OS.NEWLINE)));
         if (metaData.isProtected()) {
-                stringyMetaData.put(MetaData.PROTECTED_FLAG_META, Collections.singletonList("true"));
+            stringyMetaData.put(MetaData.PROTECTED_FLAG_META, Collections.singletonList("true"));
         }
-        AbstractBibtexKeyPattern citeKeyPattern = metaData.getCiteKeyPattern(globalCiteKeyPattern);
-        for (String key : citeKeyPattern.getAllKeys()) {
-            if (!citeKeyPattern.isDefaultValue(key)) {
-                List<String> data = new ArrayList<>();
-                data.add(citeKeyPattern.getValue(key).get(0));
-                String metaDataKey = MetaData.PREFIX_KEYPATTERN + key;
-                stringyMetaData.put(metaDataKey, data);
-            }
-        }
-        if (citeKeyPattern.getDefaultValue() != null && !citeKeyPattern.getDefaultValue().isEmpty()) {
-            List<String> data = new ArrayList<>();
-            data.add(citeKeyPattern.getDefaultValue().get(0));
-            stringyMetaData.put(MetaData.KEYPATTERNDEFAULT, data);
-        }
+        stringyMetaData.putAll(serializeCiteKeyPattern(metaData, globalCiteKeyPattern));
         metaData.getMode().ifPresent(
                 mode -> stringyMetaData.put(MetaData.DATABASE_TYPE, Collections.singletonList(mode.getAsString())));
         metaData.getDefaultFileDirectory().ifPresent(
                 path -> stringyMetaData.put(MetaData.FILE_DIRECTORY, Collections.singletonList(path.trim())));
-        metaData.getUserFileDirectories().forEach(
-                (user, path) -> stringyMetaData.put(MetaData.FILE_DIRECTORY + '-' + user, Collections.singletonList(path.trim())));
+        metaData.getUserFileDirectories().forEach((user, path) -> stringyMetaData
+                .put(MetaData.FILE_DIRECTORY + '-' + user, Collections.singletonList(path.trim())));
 
+        Map<String, String> serializedMetaData = serializeMetaData(stringyMetaData);
+
+        // Write groups if present.
+        // Skip this if only the root node exists (which is always the AllEntriesGroup).
+        metaData.getGroups().filter(root -> root.getNumberOfChildren() > 0).ifPresent(
+                root -> serializedMetaData.put(MetaData.GROUPSTREE, serializeGroups(root)));
+        return serializedMetaData;
+    }
+
+    private static Map<String, String> serializeMetaData(Map<String, List<String>> stringyMetaData) {
+        Map<String, String> serializedMetaData = new TreeMap<>();
         for (Map.Entry<String, List<String>> metaItem : stringyMetaData.entrySet()) {
             StringBuilder stringBuilder = new StringBuilder();
             for (String dataItem : metaItem.getValue()) {
@@ -74,12 +70,26 @@ public class MetaDataSerializer {
                 serializedMetaData.put(metaItem.getKey(), serializedItem);
             }
         }
-
-        // Write groups if present.
-        // Skip this if only the root node exists (which is always the AllEntriesGroup).
-        metaData.getGroups().filter(root -> root.getNumberOfChildren() > 0).ifPresent(
-                root -> serializedMetaData.put(MetaData.GROUPSTREE, serializeGroups(root)));
         return serializedMetaData;
+    }
+
+    private static Map<String, List<String>> serializeCiteKeyPattern(MetaData metaData, GlobalBibtexKeyPattern globalCiteKeyPattern) {
+        Map<String, List<String>> stringyPattern = new HashMap<>();
+        AbstractBibtexKeyPattern citeKeyPattern = metaData.getCiteKeyPattern(globalCiteKeyPattern);
+        for (String key : citeKeyPattern.getAllKeys()) {
+            if (!citeKeyPattern.isDefaultValue(key)) {
+                List<String> data = new ArrayList<>();
+                data.add(citeKeyPattern.getValue(key).get(0));
+                String metaDataKey = MetaData.PREFIX_KEYPATTERN + key;
+                stringyPattern.put(metaDataKey, data);
+            }
+        }
+        if (citeKeyPattern.getDefaultValue() != null && !citeKeyPattern.getDefaultValue().isEmpty()) {
+            List<String> data = new ArrayList<>();
+            data.add(citeKeyPattern.getDefaultValue().get(0));
+            stringyPattern.put(MetaData.KEYPATTERNDEFAULT, data);
+        }
+        return stringyPattern;
     }
 
     private static String serializeGroups(GroupTreeNode root) {
