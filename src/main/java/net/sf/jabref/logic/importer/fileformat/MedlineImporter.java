@@ -513,7 +513,9 @@ public class MedlineImporter extends ImportFormat {
                 putIfValueNotNull(fields, FieldName.JOURNAL, journal.getTitle());
 
                 ISSN issn = journal.getISSN();
-                putIfValueNotNull(fields, FieldName.ISSN, issn.getContent());
+                if (issn != null) {
+                    putIfValueNotNull(fields, FieldName.ISSN, issn.getContent());
+                }
 
                 JournalIssue journalIssue = journal.getJournalIssue();
                 putIfValueNotNull(fields, FieldName.VOLUME, journalIssue.getVolume());
@@ -538,6 +540,7 @@ public class MedlineImporter extends ImportFormat {
             }
         }
     }
+
 
     private void addElocationID(Map<String, String> fields, ELocationID eLocationID) {
         if (FieldName.DOI.equals(eLocationID.getEIdType())) {
