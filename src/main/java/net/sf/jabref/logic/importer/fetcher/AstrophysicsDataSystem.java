@@ -5,7 +5,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Objects;
 
-import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
@@ -17,6 +16,7 @@ import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.Parser;
 import net.sf.jabref.logic.importer.SearchBasedParserFetcher;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 

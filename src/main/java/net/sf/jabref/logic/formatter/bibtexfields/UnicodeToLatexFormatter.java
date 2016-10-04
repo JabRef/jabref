@@ -3,9 +3,9 @@ package net.sf.jabref.logic.formatter.bibtexfields;
 import java.util.Map;
 import java.util.Objects;
 
-import net.sf.jabref.model.cleanup.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatter;
+import net.sf.jabref.model.cleanup.Formatter;
 import net.sf.jabref.model.strings.HTMLUnicodeConversionMaps;
 
 import org.apache.commons.logging.Log;

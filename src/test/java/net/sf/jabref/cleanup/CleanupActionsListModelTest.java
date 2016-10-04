@@ -10,9 +10,9 @@ import javax.swing.event.ListDataListener;
 
 import net.sf.jabref.gui.cleanup.CleanupActionsListModel;
 import net.sf.jabref.logic.cleanup.Cleanups;
+import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
-import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
 
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;

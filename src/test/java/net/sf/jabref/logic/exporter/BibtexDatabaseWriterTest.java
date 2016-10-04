@@ -7,7 +7,6 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Scanner;
 
-import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
@@ -18,6 +17,7 @@ import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.EntryTypes;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;

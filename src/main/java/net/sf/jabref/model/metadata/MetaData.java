@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.groups.GroupTreeNode;

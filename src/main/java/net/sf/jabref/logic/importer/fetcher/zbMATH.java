@@ -13,7 +13,6 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.cleanup.MoveFieldCleanup;
 import net.sf.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import net.sf.jabref.logic.importer.FetcherException;
@@ -21,6 +20,7 @@ import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.Parser;
 import net.sf.jabref.logic.importer.SearchBasedParserFetcher;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 

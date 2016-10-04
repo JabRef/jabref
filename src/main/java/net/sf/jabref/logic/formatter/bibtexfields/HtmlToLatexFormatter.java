@@ -5,9 +5,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import net.sf.jabref.model.cleanup.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatter;
+import net.sf.jabref.model.cleanup.Formatter;
 import net.sf.jabref.model.strings.HTMLUnicodeConversionMaps;
 
 import org.apache.commons.logging.Log;
