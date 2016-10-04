@@ -4,13 +4,18 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.logic.exporter.MetaDataSerializer;
+import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.event.EntryEventSource;
 import net.sf.jabref.model.metadata.MetaData;
@@ -118,7 +123,7 @@ public class DBMSSynchronizerTest {
         MetaData testMetaData = new MetaData();
         testMetaData.registerListener(dbmsSynchronizer);
         dbmsSynchronizer.setMetaData(testMetaData);
-        testMetaData.putData("databaseType", Arrays.asList("bibtex"));
+        testMetaData.setMode(BibDatabaseMode.BIBTEX);
 
         Map<String, String> expectedMap = MetaDataSerializer.getSerializedStringMap(testMetaData,
                 Globals.prefs.getKeyPattern());
@@ -183,7 +188,8 @@ public class DBMSSynchronizerTest {
         bibDatabase.insertEntry(bibEntry);
 
         MetaData testMetaData = new MetaData();
-        testMetaData.putData("saveActions", Arrays.asList("enabled", "author[lower_case]"));
+        testMetaData.setSaveActions(new FieldFormatterCleanups(true,
+                Collections.singletonList(new FieldFormatterCleanup("author", new LowerCaseFormatter()))));
         dbmsSynchronizer.setMetaData(testMetaData);
 
         dbmsSynchronizer.applyMetaData();
