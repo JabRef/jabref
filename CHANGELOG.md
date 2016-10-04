@@ -91,6 +91,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#2090](https://github.com/JabRef/jabref/issues/#2090): If special fields were not selected, two menu item separator were shown
 - Fixed [#2064](https://github.com/JabRef/jabref/issues/2064): Not all `other fields` are shown on entry change of same type
 - Fixed [#2104](https://github.com/JabRef/jabref/issues/#2104): Crash after saving BibTeX source with parsing error
+- Fixed [#2109](https://github.com/JabRef/jabref/issues/#2109): <kbd>Ctrl-s</kbd> doesn't trigger parsing error message
 
 
 ### Removed
