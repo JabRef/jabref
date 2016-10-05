@@ -53,7 +53,6 @@ public class Autosaver {
             });
         } catch (RejectedExecutionException e) {
             LOGGER.debug("Rejecting autosave while another save process is already running.");
-            // do not save
         }
     }
 

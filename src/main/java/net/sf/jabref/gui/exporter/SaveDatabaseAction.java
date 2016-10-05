@@ -323,13 +323,12 @@ public class SaveDatabaseAction extends AbstractWorker {
             new SharedDatabasePreferences(databaseID).putAllDBMSConnectionProperties(properties);
         }
 
-        File oldFile = context.getDatabaseFile().orElse(null);
         context.setDatabaseFile(file);
         Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
         runCommand();
         // If the operation failed, revert the file field and return:
         if (!success) {
-            context.setDatabaseFile(oldFile);
+            context.setDatabaseFile(context.getDatabaseFile().orElse(null));
             return;
         }
         // Register so we get notifications about outside changes to the file.
@@ -341,17 +340,17 @@ public class SaveDatabaseAction extends AbstractWorker {
             LOGGER.error("Problem registering file change notifications", ex);
         }
 
-        boolean autosave = (((context.getLocation() == DatabaseLocation.SHARED) && Globals.prefs.getBoolean(JabRefPreferences.SHARED_AUTO_SAVE)) ||
-                ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE))) &&
-                context.getDatabaseFile().isPresent();
-
-        // activate a new autosaver if enabled
-        if (autosave) {
+        if (isAutosaveEnabled(context) && context.getDatabaseFile().isPresent()) {
             new Autosaver(context).registerListener(new AutoSaveUIManager(panel));
         }
 
-        frame.getFileHistory().newFile(context.getDatabaseFile().get().getPath());
+        context.getDatabaseFile().ifPresent(presentFile -> frame.getFileHistory().newFile(presentFile.getPath()));
         frame.updateEnabledState();
+    }
+
+    private boolean isAutosaveEnabled(BibDatabaseContext context) {
+        return ((context.getLocation() == DatabaseLocation.SHARED) && Globals.prefs.getBoolean(JabRefPreferences.SHARED_AUTO_SAVE)) ||
+                ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE));
     }
 
     /**

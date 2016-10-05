@@ -1677,28 +1677,24 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
     }
 
-    public void addTab(BasePanel bp, boolean raisePanel) {
+    public void addTab(BasePanel basePanel, boolean raisePanel) {
         // add tab
-        tabbedPane.add(bp.getTabTitle(), bp);
+        tabbedPane.add(basePanel.getTabTitle(), basePanel);
 
         // update all tab titles
         updateAllTabTitles();
 
         if (raisePanel) {
-            tabbedPane.setSelectedComponent(bp);
+            tabbedPane.setSelectedComponent(basePanel);
         }
 
         // Register undo/redo listener
-        bp.getUndoManager().registerListener(new UndoRedoEventManager());
+        basePanel.getUndoManager().registerListener(new UndoRedoEventManager());
 
-        BibDatabaseContext context = bp.getBibDatabaseContext();
+        BibDatabaseContext context = basePanel.getBibDatabaseContext();
 
-        boolean autosave = (((context.getLocation() == DatabaseLocation.SHARED) && Globals.prefs.getBoolean(JabRefPreferences.SHARED_AUTO_SAVE)) ||
-                ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE))) &&
-                context.getDatabaseFile().isPresent();
-        // activate a new autosaver if enabled
-        if (autosave) {
-            new Autosaver(bp.getDatabaseContext()).registerListener(new AutoSaveUIManager(bp));
+        if (isAutosaveEnabled(context) && context.getDatabaseFile().isPresent()) {
+            new Autosaver(basePanel.getDatabaseContext()).registerListener(new AutoSaveUIManager(basePanel));
         }
     }
 
@@ -1708,6 +1704,11 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         BasePanel bp = new BasePanel(JabRefFrame.this, databaseContext);
         addTab(bp, raisePanel);
         return bp;
+    }
+
+    private boolean isAutosaveEnabled(BibDatabaseContext context) {
+        return ((context.getLocation() == DatabaseLocation.SHARED) && Globals.prefs.getBoolean(JabRefPreferences.SHARED_AUTO_SAVE)) ||
+                ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE));
     }
 
     /**

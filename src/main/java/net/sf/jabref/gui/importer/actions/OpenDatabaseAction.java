@@ -174,7 +174,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
 
             String fileName = file.getPath();
             Globals.prefs.put(JabRefPreferences.WORKING_DIRECTORY, file.getParent());
-            // Should this be done _after_ we know it was successfully opened?
 
             if (FileBasedLock.hasLockFile(file.toPath())) {
                 Optional<FileTime> modificationTime = FileBasedLock.getLockFileTimeStamp(file.toPath());
