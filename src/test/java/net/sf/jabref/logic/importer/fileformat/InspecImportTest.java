@@ -105,7 +105,7 @@ public class InspecImportTest {
 
     @Test
     public void testGetFormatName() {
-        assertEquals("INSPEC", importer.getFormatName());
+        assertEquals("INSPEC", importer.getName());
     }
 
     @Test

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.OS;
@@ -25,7 +26,7 @@ import net.sf.jabref.model.entry.FieldName;
  *
  * @author vegeziel
  */
-public class MedlinePlainImporter extends ImportFormat {
+public class MedlinePlainImporter extends Importer {
 
     private static final Pattern PMID_PATTERN = Pattern.compile("PMID.*-.*");
     private static final Pattern PMC_PATTERN = Pattern.compile("PMC.*-.*");
@@ -35,7 +36,7 @@ public class MedlinePlainImporter extends ImportFormat {
 
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "MedlinePlain";
     }
 

@@ -713,7 +713,9 @@ public class OpenOfficePanel extends AbstractWorker {
                 if (!entry.getCiteKeyOptional().isPresent()) {
                     // Generate key
                     BibtexKeyPatternUtil
-                            .makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
+                            .makeLabel(
+                                    panel.getBibDatabaseContext().getMetaData().getCiteKeyPattern(prefs.getKeyPattern()),
+                                    panel.getDatabase(), entry,
                             prefs);
                     // Add undo change
                     undoCompound.addEdit(

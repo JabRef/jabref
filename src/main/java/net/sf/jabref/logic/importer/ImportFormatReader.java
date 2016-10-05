@@ -16,7 +16,6 @@ import net.sf.jabref.logic.importer.fileformat.CopacImporter;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
 import net.sf.jabref.logic.importer.fileformat.EndnoteImporter;
 import net.sf.jabref.logic.importer.fileformat.FreeCiteImporter;
-import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.importer.fileformat.InspecImporter;
 import net.sf.jabref.logic.importer.fileformat.IsiImporter;
 import net.sf.jabref.logic.importer.fileformat.MedlineImporter;
@@ -44,9 +43,9 @@ public class ImportFormatReader {
 
     /**
      * All import formats.
-     * Sorted accordingly to {@link ImportFormat#compareTo}, which defaults to alphabetically by the name
+     * Sorted accordingly to {@link Importer#compareTo}, which defaults to alphabetically by the name
      */
-    private final SortedSet<ImportFormat> formats = new TreeSet<>();
+    private final SortedSet<Importer> formats = new TreeSet<>();
 
     private ImportFormatPreferences importFormatPreferences;
 
@@ -79,13 +78,7 @@ public class ImportFormatReader {
          * Get custom import formats
          */
         for (CustomImporter importer : importFormatPreferences.getCustomImportList()) {
-            try {
-                ImportFormat imFo = importer.getInstance();
-                formats.add(imFo);
-            } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException e) {
-                LOGGER.error("Could not instantiate " + importer.getName()
-                        + " importer, will ignore it. Please check if the class is still available.", e);
-            }
+            formats.add(importer);
         }
     }
 
@@ -98,8 +91,8 @@ public class ImportFormatReader {
      * @param cliId CLI-Id
      * @return Import Format or <code>null</code> if none matches
      */
-    private Optional<ImportFormat> getByCliId(String cliId) {
-        for (ImportFormat format : formats) {
+    private Optional<Importer> getByCliId(String cliId) {
+        for (Importer format : formats) {
             if (format.getId().equals(cliId)) {
                 return Optional.of(format);
             }
@@ -109,7 +102,7 @@ public class ImportFormatReader {
 
     public ParserResult importFromFile(String format, Path file)
             throws IOException {
-        Optional<ImportFormat> importer = getByCliId(format);
+        Optional<Importer> importer = getByCliId(format);
 
         if (!importer.isPresent()) {
             throw new IllegalArgumentException("Unknown import format: " + format);
@@ -127,7 +120,7 @@ public class ImportFormatReader {
      *
      * @return all custom importers, elements are of type InputFormat
      */
-    public SortedSet<ImportFormat> getImportFormats() {
+    public SortedSet<Importer> getImportFormats() {
         return this.formats;
     }
 
@@ -141,10 +134,10 @@ public class ImportFormatReader {
     public String getImportFormatList() {
         StringBuilder sb = new StringBuilder();
 
-        for (ImportFormat imFo : formats) {
-            int pad = Math.max(0, 14 - imFo.getFormatName().length());
+        for (Importer imFo : formats) {
+            int pad = Math.max(0, 14 - imFo.getName().length());
             sb.append("  ");
-            sb.append(imFo.getFormatName());
+            sb.append(imFo.getName());
 
             sb.append(StringUtil.repeatSpaces(pad));
 
@@ -200,7 +193,7 @@ public class ImportFormatReader {
         String bestFormatName = null;
 
         // Cycle through all importers:
-        for (ImportFormat imFo : getImportFormats()) {
+        for (Importer imFo : getImportFormats()) {
             try {
                 if (!imFo.isRecognizedFormat(filePath, importFormatPreferences.getEncoding())) {
                     continue;
@@ -215,7 +208,7 @@ public class ImportFormatReader {
                 if (entryCount > bestResultCount) {
                     bestResult = entries;
                     bestResultCount = bestResult.size();
-                    bestFormatName = imFo.getFormatName();
+                    bestFormatName = imFo.getName();
                 }
             } catch (IOException ex) {
                 // The import did not succeed. Go on.
