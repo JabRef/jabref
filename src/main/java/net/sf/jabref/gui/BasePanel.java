@@ -484,7 +484,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // Finally, set the new keys:
                 for (BibEntry entry : entries) {
                     bes = entry;
-                    BibtexKeyPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), bibDatabaseContext.getDatabase(),
+                    BibtexKeyPatternUtil.makeLabel(bibDatabaseContext.getMetaData()
+                            .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                            bibDatabaseContext.getDatabase(),
                             bes, Globals.prefs.getBibtexKeyPatternPreferences());
                     ce.addEdit(new UndoableKeyChange(bibDatabaseContext.getDatabase(), bes, oldvals.get(bes),
                             bes.getCiteKeyOptional().orElse(null)));
@@ -1906,7 +1908,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             for (BibEntry bes : bibDatabaseContext.getDatabase().getEntries()) {
                 Optional<String> oldKey = bes.getCiteKeyOptional();
                 if (!(oldKey.isPresent()) || oldKey.get().isEmpty()) {
-                    BibtexKeyPatternUtil.makeLabel(bibDatabaseContext.getMetaData(), bibDatabaseContext.getDatabase(),
+                    BibtexKeyPatternUtil.makeLabel(bibDatabaseContext.getMetaData()
+                            .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                            bibDatabaseContext.getDatabase(),
                             bes, Globals.prefs.getBibtexKeyPatternPreferences());
                     ce.addEdit(new UndoableKeyChange(bibDatabaseContext.getDatabase(), bes, null,
                             bes.getCiteKeyOptional().get())); // Cite key is set here

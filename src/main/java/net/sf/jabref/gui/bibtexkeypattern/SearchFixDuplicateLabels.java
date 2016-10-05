@@ -93,7 +93,9 @@ public class SearchFixDuplicateLabels extends AbstractWorker {
             NamedCompound ce = new NamedCompound(Localization.lang("Resolve duplicate BibTeX keys"));
             for (BibEntry entry : toGenerateFor) {
                 String oldKey = entry.getCiteKeyOptional().orElse(null);
-                BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
+                BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData()
+                        .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                        panel.getDatabase(), entry,
                         Globals.prefs.getBibtexKeyPatternPreferences());
                 ce.addEdit(new UndoableKeyChange(panel.getDatabase(), entry, oldKey, entry.getCiteKeyOptional().get()));
             }

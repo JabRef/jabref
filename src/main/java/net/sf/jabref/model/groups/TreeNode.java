@@ -599,7 +599,7 @@ import java.util.function.Consumer;
     protected void notifyAboutDescendantChange(T source) {
         onDescendantChanged.accept(source);
 
-        if(! isRoot()) {
+        if( !isRoot()) {
             parent.notifyAboutDescendantChange(source);
         }
     }

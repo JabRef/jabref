@@ -1,8 +1,8 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
-import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.LayoutFormatter;
+import net.sf.jabref.model.cleanup.Formatter;
 
 import org.apache.commons.lang3.StringEscapeUtils;
 
