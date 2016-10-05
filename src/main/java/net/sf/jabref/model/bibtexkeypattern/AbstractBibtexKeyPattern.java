@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 /**
  * A small table, where an entry type is associated with a Bibtex key pattern (an
@@ -14,7 +15,7 @@ import java.util.StringTokenizer;
  */
 public abstract class AbstractBibtexKeyPattern {
 
-    protected List<String> defaultPattern;
+    protected List<String> defaultPattern = new ArrayList<>();
 
     protected Map<String, List<String>> data = new HashMap<>();
 
@@ -76,7 +77,7 @@ public abstract class AbstractBibtexKeyPattern {
         if (result == null) {
             // check default value
             result = getDefaultValue();
-            if (result == null) {
+            if (result == null || result.isEmpty()) {
                 // we are the "last" to ask
                 // we don't have anything left
                 return getLastLevelBibtexKeyPattern(key);
@@ -131,11 +132,17 @@ public abstract class AbstractBibtexKeyPattern {
      * @param bibtexKeyPattern the pattern to store
      */
     public void setDefaultValue(String bibtexKeyPattern) {
+        Objects.requireNonNull(bibtexKeyPattern);
         this.defaultPattern = AbstractBibtexKeyPattern.split(bibtexKeyPattern);
     }
 
     public Set<String> getAllKeys() {
         return data.keySet();
+    }
+
+    public Map<String, List<String>> getPatterns() {
+        return data.entrySet().stream().collect(
+                Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public abstract List<String> getLastLevelBibtexKeyPattern(String key);

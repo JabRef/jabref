@@ -9,7 +9,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.model.cleanup.Formatter;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.apache.commons.logging.Log;

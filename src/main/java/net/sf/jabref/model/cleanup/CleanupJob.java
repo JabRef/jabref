@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.cleanup;
+package net.sf.jabref.model.cleanup;
 
 import java.util.List;
 

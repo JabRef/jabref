@@ -326,9 +326,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private void addSourceTab() {
-        srcPanel.setName(Localization.lang("BibTeX source"));
-        tabbed.addTab(Localization.lang("BibTeX source"), IconTheme.JabRefIcon.SOURCE.getSmallIcon(), srcPanel,
-                Localization.lang("Show/edit BibTeX source"));
+        String panelName = Localization.lang("%0 source", panel.getBibDatabaseContext().getMode().getFormattedName());
+        String toolTip = Localization.lang("Show/edit %0 source", panel.getBibDatabaseContext().getMode().getFormattedName());
+        srcPanel.setName(panelName);
+        tabbed.addTab(panelName, IconTheme.JabRefIcon.SOURCE.getSmallIcon(), srcPanel, toolTip);
         tabs.add(srcPanel);
         sourceIndex = tabs.size() - 1; // Set the sourceIndex variable.
         srcPanel.setFocusCycleRoot(false);
@@ -1355,7 +1356,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
             }
 
-            BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
+            BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData()
+                    .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()), panel.getDatabase(), entry,
                     Globals.prefs.getBibtexKeyPatternPreferences());
 
             // Store undo information:

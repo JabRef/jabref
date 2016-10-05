@@ -12,6 +12,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 ## [Unreleased]
 
 ### Changed
+- Source tab in the entry editor displays "BibLaTeX Source" when using biblatex mode
 - Add session restoring functionality for shared database. Related to [#1703](https://github.com/JabRef/jabref/issues/1703)
 - Implementation of LiveUpdate for PostgreSQL & Oracle systems. Related to [#970](https://github.com/JabRef/jabref/issues/970).
 - [koppor#31](https://github.com/koppor/jabref/issues/31): Number column in the main table is always Left aligned
@@ -92,7 +93,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Fixed [#2064](https://github.com/JabRef/jabref/issues/2064): Not all `other fields` are shown on entry change of same type
 - Fixed [#2104](https://github.com/JabRef/jabref/issues/#2104): Crash after saving BibTeX source with parsing error
 - Fixed [#2109](https://github.com/JabRef/jabref/issues/#2109): <kbd>Ctrl-s</kbd> doesn't trigger parsing error message
-
+- Fixed RTFChars would only use "?" for characters with unicode over the value of 127, now it uses the base character (é -> e instead of ?)
 
 ### Removed
 - Removed 2nd preview style
