@@ -27,6 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -227,13 +228,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         tabbed.removeAll();
         tabs.clear();
 
-<<<<<<< HEAD
         EntryType type = EntryTypes.getTypeOrDefault(entry.getType(), this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
-=======
-        EntryType type = EntryTypes.getTypeOrDefault(entry.getType(),
-                this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
-
->>>>>>> 6daa5b53d1415e139e3ac17f8eeedce26a2da34c
         // required fields
         addRequiredTab(type);
 
@@ -294,24 +289,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
             }
         }
-<<<<<<< HEAD
         // other fields also do not contain hidden fields
         Set<String> displayedFields = Stream
                 .concat(type.getAllFields().stream(), Globals.prefs.getCustomTabFieldNames().stream())
                 .map(String::toLowerCase).flatMap(f -> Stream.of(f, "_" + f)).collect(Collectors.toSet());
         List<String> otherFields = entry.getFieldNames().stream().map(String::toLowerCase)
                 .filter(f -> !displayedFields.contains(f)).collect(Collectors.toList());
-=======
-
-        // other fields
-        List<String> displayedFields = type.getAllFields().stream().map(String::toLowerCase)
-                .collect(Collectors.toList());
-        List<String> otherFields = entry.getFieldNames().stream().map(String::toLowerCase)
-                .filter(f -> !displayedFields.contains(f)).collect(Collectors.toList());
-        if (!usedOptionalFieldsDeprecated.isEmpty()) {
-            otherFields.removeAll(usedOptionalFieldsDeprecated);
-        }
->>>>>>> 6daa5b53d1415e139e3ac17f8eeedce26a2da34c
         otherFields.remove(BibEntry.KEY_FIELD);
         otherFields.removeAll(Globals.prefs.getCustomTabFieldNames());
 
@@ -319,8 +302,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
             addOtherTab(otherFields);
         }
 
-        addGeneralTab();
         // general fields from preferences
+        addGeneralTab();
+        // abstract and review fields from preferences
         addAbstractReviewTabs();
         // source tab
         addSourceTab();
@@ -419,11 +403,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
         tabs.add(optionalPanel);
     }
 
+    /**
+     * build a list of all required fields, where each required field is followed by the hidden counter part
+     */
     public static List<String> addFieldAndHiddenField(List<String> list) {
         List<String> returnList = new ArrayList<>();
-        /**
-         * build a list of all required fields, where each required field is followed by the hidden counter part
-         */
         for (String fieldName : list) {
             returnList.add(fieldName);
             returnList.add("_" + fieldName);
