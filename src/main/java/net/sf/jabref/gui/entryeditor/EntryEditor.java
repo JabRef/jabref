@@ -1056,6 +1056,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 updateField(source);
                 if (lastSourceAccepted) {
                     panel.entryEditorClosing(EntryEditor.this);
+                } else {
+                    panel.runCommand(Actions.SAVE);
+                    updateField(source);
+                    lastSourceAccepted = true;
                 }
             } else {
                 panel.entryEditorClosing(EntryEditor.this);
