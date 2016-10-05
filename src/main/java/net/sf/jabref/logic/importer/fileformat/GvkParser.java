@@ -9,6 +9,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.importer.Parser;
 import net.sf.jabref.logic.importer.ParserException;
 import net.sf.jabref.model.entry.BibEntry;
@@ -28,13 +29,13 @@ public class GvkParser implements Parser {
     private static final Log LOGGER = LogFactory.getLog(GvkParser.class);
 
     @Override
-    public List<BibEntry> parseEntries(InputStream inputStream) throws ParserException {
+    public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
         try {
             DocumentBuilder dbuild = DocumentBuilderFactory.newInstance().newDocumentBuilder();
             Document content = dbuild.parse(inputStream);
             return this.parseEntries(content);
         } catch (ParserConfigurationException|SAXException|IOException exception) {
-            throw new ParserException(exception);
+            throw new ParseException(exception);
         }
     }
 

@@ -17,7 +17,7 @@ import net.sf.jabref.logic.layout.format.HTMLChars;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.model.Defaults;
-import net.sf.jabref.model.ParseException;
+import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;

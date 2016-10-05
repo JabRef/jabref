@@ -1,6 +1,5 @@
 package net.sf.jabref.model.groups;
 
-import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -13,13 +12,13 @@ public class ExplicitGroupTest {
 
 
     @Test
-     public void testToStringSimple() throws ParseException {
+     public void testToStringSimple() {
         ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INDEPENDENT, ',');
         assertEquals("ExplicitGroup:myExplicitGroup;0;", group.toString());
     }
 
     @Test
-    public void toStringDoesNotWriteAssignedEntries() throws ParseException {
+    public void toStringDoesNotWriteAssignedEntries() {
         ExplicitGroup group = new ExplicitGroup("myExplicitGroup", GroupHierarchyType.INCLUDING, ',');
         group.add(makeBibtexEntry());
         assertEquals("ExplicitGroup:myExplicitGroup;2;", group.toString());
