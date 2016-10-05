@@ -83,4 +83,11 @@ public class GoogleScholarTest {
 
         Assert.assertEquals(Collections.singletonList(entry), foundEntries);
     }
+
+    @Test
+    public void find20Entries() throws FetcherException {
+        List<BibEntry> foundEntries = finder.performSearch("random test string");
+
+        Assert.assertEquals(20, foundEntries.size());
+    }
 }
