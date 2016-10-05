@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Objects;
 
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
@@ -143,7 +144,7 @@ import org.apache.commons.logging.LogFactory;
  * @author andreas_sf at rudert-home dot de
  * @see <a href="http://nep.repec.org">NEP</a>
  */
-public class RepecNepImporter extends ImportFormat {
+public class RepecNepImporter extends Importer {
 
     private static final Log LOGGER = LogFactory.getLog(RepecNepImporter.class);
 
@@ -162,7 +163,7 @@ public class RepecNepImporter extends ImportFormat {
     }
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "REPEC New Economic Papers (NEP)";
     }
 

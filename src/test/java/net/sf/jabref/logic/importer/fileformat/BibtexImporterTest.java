@@ -105,7 +105,7 @@ public class BibtexImporterTest {
 
     @Test
     public void testGetFormatName() {
-        assertEquals("BibTeX", importer.getFormatName());
+        assertEquals("BibTeX", importer.getName());
     }
 
     @Test

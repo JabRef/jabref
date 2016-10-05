@@ -54,7 +54,7 @@ public class MedlineImporterTest {
 
     @Test
     public void testGetFormatName() {
-        assertEquals("Medline", importer.getFormatName());
+        assertEquals("Medline", importer.getName());
     }
 
     @Test

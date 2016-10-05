@@ -1,90 +1,59 @@
 package net.sf.jabref.logic.importer.fileformat;
 
-import java.io.File;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
+import net.sf.jabref.logic.importer.Importer;
+import net.sf.jabref.logic.importer.ParserResult;
+import net.sf.jabref.logic.util.FileExtensions;
 
 /**
  * Object with data for a custom importer.
  *
  * <p>Is also responsible for instantiating the class loader.</p>
  */
-public class CustomImporter implements Comparable<CustomImporter> {
+public class CustomImporter extends Importer {
 
-    private String name;
-    private String cliId;
-    private String className;
-    private String basePath;
+    private final String className;
+    private final Path basePath;
 
+    private Importer importer;
 
-    public CustomImporter() {
-        super();
-    }
-
-    public CustomImporter(List<String> data) {
-        this(data.get(0), data.get(1), data.get(2), data.get(3));
-    }
-
-    public CustomImporter(String name, String cliId, String className, String basePath) {
-        this();
-        this.name = name;
-        this.cliId = cliId;
+    public CustomImporter(String basePath, String className) throws ClassNotFoundException {
+        this.basePath = Paths.get(basePath);
         this.className = className;
-        this.basePath = basePath;
+        try {
+            importer = load(this.basePath.toUri().toURL(), this.className);
+        } catch (IOException | InstantiationException | IllegalAccessException exception) {
+            throw new ClassNotFoundException("", exception);
+        }
     }
 
-    public CustomImporter(ImportFormat importer) {
-        this(importer.getFormatName(), importer.getId(), importer.getClass().getName(),
-                "src/main/java/net/sf/jabref/logic/importer/fileformat/" + importer.getFormatName() + "Importer.java");
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getClidId() {
-        return this.cliId;
-    }
-
-    public void setCliId(String cliId) {
-        this.cliId = cliId;
-    }
-
-    public String getClassName() {
-        return this.className;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
-    }
-
-    public void setBasePath(String basePath) {
-        this.basePath = basePath;
-    }
-
-    public String getBasePath() {
-        return basePath;
-    }
-
-    public File getFileFromBasePath() {
-        return new File(basePath);
-    }
-
-    public URL getBasePathUrl() throws MalformedURLException {
-        return getFileFromBasePath().toURI().toURL();
+    private static Importer load(URL basePathURL, String className)
+            throws IOException, ClassNotFoundException, InstantiationException, IllegalAccessException {
+        try (URLClassLoader cl = new URLClassLoader(new URL[] {basePathURL})) {
+            Class<?> clazz = Class.forName(className, true, cl);
+            return (Importer) clazz.newInstance();
+        }
     }
 
     public List<String> getAsStringList() {
-        return Arrays.asList(name, cliId, className, basePath);
+        return Arrays.asList(basePath.toString().replace('\\', '/'), className);
+    }
+
+    public String getClassName() {
+        return className;
+    }
+
+    public Path getBasePath() {
+        return basePath;
     }
 
     @Override
@@ -99,32 +68,46 @@ public class CustomImporter implements Comparable<CustomImporter> {
         }
 
         CustomImporter otherImporter = (CustomImporter) other;
-        return Objects.equals(name, otherImporter.name) && Objects.equals(cliId, otherImporter.cliId)
-                && Objects.equals(className, otherImporter.className)
-                && Objects.equals(basePath, otherImporter.basePath);
+        return Objects.equals(className, otherImporter.className) && Objects.equals(basePath, otherImporter.basePath);
+    }
+
+    @Override
+    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
+        return importer.isRecognizedFormat(input);
+    }
+
+    @Override
+    public ParserResult importDatabase(BufferedReader input) throws IOException {
+        return importer.importDatabase(input);
+    }
+
+    @Override
+    public String getName() {
+        return importer.getName();
+    }
+
+    @Override
+    public FileExtensions getExtensions() {
+        return importer.getExtensions();
+    }
+
+    @Override
+    public String getId() {
+        return importer.getId();
+    }
+
+    @Override
+    public String getDescription() {
+        return importer.getDescription();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, cliId, className, basePath);
-    }
-
-    @Override
-    public int compareTo(CustomImporter o) {
-        return this.getName().compareTo(o.getName());
+        return Objects.hash(className, basePath);
     }
 
     @Override
     public String toString() {
-        return this.name;
-    }
-
-    public ImportFormat getInstance() throws IOException, ClassNotFoundException,
-            InstantiationException, IllegalAccessException {
-        try (URLClassLoader cl = new URLClassLoader(new URL[] {getBasePathUrl()})) {
-            Class<?> clazz = Class.forName(className, true, cl);
-            ImportFormat importFormat = (ImportFormat) clazz.newInstance();
-            return importFormat;
-        }
+        return this.getName();
     }
 }
