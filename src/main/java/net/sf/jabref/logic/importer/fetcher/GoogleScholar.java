@@ -125,22 +125,22 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
         String content = URLDownload.createURLDownloadWithBrowserUserAgent(queryURL)
                 .downloadToString(StandardCharsets.UTF_8);
 
-        Matcher m = LINK_TO_BIB_PATTERN.matcher(content);
-        while (m.find()) {
-            String citationsPageURL = m.group().replace("&amp;", "&");
+        Matcher matcher = LINK_TO_BIB_PATTERN.matcher(content);
+        while (matcher.find()) {
+            String citationsPageURL = matcher.group().replace("&amp;", "&");
             BibEntry newEntry = downloadEntry(citationsPageURL);
             entryList.add(newEntry);
         }
     }
 
     private BibEntry downloadEntry(String link) throws IOException, FetcherException {
-        String s = URLDownload.createURLDownloadWithBrowserUserAgent(link).downloadToString(StandardCharsets.UTF_8);
-        BibtexParser bp = new BibtexParser(importFormatPreferences);
-        ParserResult pr = bp.parse(new StringReader(s));
-        if ((pr == null) || (pr.getDatabase() == null)) {
+        String downloadedContent = URLDownload.createURLDownloadWithBrowserUserAgent(link).downloadToString(StandardCharsets.UTF_8);
+        BibtexParser parser = new BibtexParser(importFormatPreferences);
+        ParserResult result = parser.parse(new StringReader(downloadedContent));
+        if ((result == null) || (result.getDatabase() == null)) {
             throw new FetcherException("Parsing entries from Google Scholar bib file failed.");
         } else {
-            Collection<BibEntry> entries = pr.getDatabase().getEntries();
+            Collection<BibEntry> entries = result.getDatabase().getEntries();
             if (entries.size() != 1) {
                 LOGGER.debug(entries.size() + " entries found! (" + link + ")");
                 throw new FetcherException("Parsing entries from Google Scholar bib file failed.");
