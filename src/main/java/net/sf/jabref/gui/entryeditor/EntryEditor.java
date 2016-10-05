@@ -300,6 +300,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         otherFields.remove(BibEntry.KEY_FIELD);
         otherFields.removeAll(Globals.prefs.getCustomTabFieldNames());
 
+        otherFields.add("otherfield");
         addOtherTab(otherFields);
 
         // general fields from preferences
