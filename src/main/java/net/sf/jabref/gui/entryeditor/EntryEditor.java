@@ -324,9 +324,17 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private void addSourceTab() {
-        srcPanel.setName(Localization.lang("BibTeX source"));
-        tabbed.addTab(Localization.lang("BibTeX source"), IconTheme.JabRefIcon.SOURCE.getSmallIcon(), srcPanel,
-                Localization.lang("Show/edit BibTeX source"));
+        boolean isBibtexMode = panel.getBibDatabaseContext().getMode().equals(BibDatabaseMode.BIBTEX);
+
+        if(isBibtexMode) {
+            srcPanel.setName(Localization.lang("BibTeX source"));
+            tabbed.addTab(Localization.lang("BibTeX source"), IconTheme.JabRefIcon.SOURCE.getSmallIcon(), srcPanel,
+                    Localization.lang("Show/edit BibTeX source"));
+        } else {
+            tabbed.addTab(Localization.lang("BibLaTeX source"), IconTheme.JabRefIcon.SOURCE.getSmallIcon(), srcPanel,
+                    Localization.lang("Show/edit BibLaTeX source"));
+        }
+
         tabs.add(srcPanel);
         sourceIndex = tabs.size() - 1; // Set the sourceIndex variable.
         srcPanel.setFocusCycleRoot(true);
