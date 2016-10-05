@@ -5,7 +5,7 @@ import org.apache.pdfbox.cos.COSDictionary;
 import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 
-public class PdfComment {
+public class FileAnnotation {
 
     private String commentId;
     private String author;
@@ -13,13 +13,13 @@ public class PdfComment {
     private int page;
     private String content;
     private String annotationType;
-    private PdfComment linkedPdfComment;
+    private FileAnnotation linkedFileAnnotation;
     private final static int ABBREVIATED_ANNOTATION_NAME_LENGTH = 45;
 
     private boolean linkedComment;
 
-    public PdfComment(final String commentId, final String author, final String date, final int page,
-                      final String content, final String annotationType) {
+    public FileAnnotation(final String commentId, final String author, final String date, final int page,
+                          final String content, final String annotationType) {
         this.author = author;
         this.date = date;
         this.page = page;
@@ -28,7 +28,7 @@ public class PdfComment {
         this.annotationType = annotationType;
     }
 
-    public PdfComment(final PDAnnotation annotation, final int page ){
+    public FileAnnotation(final PDAnnotation annotation, final int page ){
         COSDictionary dict = annotation.getDictionary();
         this.author = dict.getString(COSName.T);
         this.commentId = annotation.getAnnotationName();
@@ -53,9 +53,9 @@ public class PdfComment {
         return annotationName;
     }
 
-    public void linkComments(PdfComment commentToLinkTo){
-        linkedPdfComment = commentToLinkTo;
-        commentToLinkTo.setLinkedPdfComment(this);
+    public void linkComments(FileAnnotation commentToLinkTo){
+        linkedFileAnnotation = commentToLinkTo;
+        commentToLinkTo.setLinkedFileAnnotation(this);
         commentToLinkTo.setLinkedComment(true);
         linkedComment = true;
     }
@@ -65,12 +65,12 @@ public class PdfComment {
         return abbreviateAnnotationName(content);
     }
 
-    public PdfComment getLinkedPdfComment() {
-        return linkedPdfComment;
+    public FileAnnotation getLinkedFileAnnotation() {
+        return linkedFileAnnotation;
     }
 
-    public void setLinkedPdfComment(PdfComment linkedPdfComment) {
-        this.linkedPdfComment = linkedPdfComment;
+    public void setLinkedFileAnnotation(FileAnnotation linkedFileAnnotation) {
+        this.linkedFileAnnotation = linkedFileAnnotation;
     }
 
     public String getCommentId() {

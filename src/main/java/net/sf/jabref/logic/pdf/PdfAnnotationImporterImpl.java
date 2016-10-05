@@ -8,7 +8,7 @@ import java.util.List;
 
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.database.BibDatabaseContext;
-import net.sf.jabref.model.pdf.PdfComment;
+import net.sf.jabref.model.pdf.FileAnnotation;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.apache.pdfbox.cos.COSArray;
@@ -22,12 +22,12 @@ import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationText;
 import org.apache.pdfbox.pdmodel.interactive.annotation.PDAnnotation;
 import org.apache.pdfbox.util.PDFTextStripperByArea;
 
-public class PdfCommentImporter {
+public class PdfAnnotationImporterImpl implements AnnotationImporterInterface {
 
     private List pdfPages;
     private PDPage page;
 
-    public PdfCommentImporter() {
+    public PdfAnnotationImporterImpl() {
 
     }
 
@@ -37,9 +37,10 @@ public class PdfCommentImporter {
      * @param path a path to a pdf
      * @return a list with the all the annotations found in the file of the path
      */
-    public List<PdfComment> importNotes(final String path, final BibDatabaseContext context) {
+    @Override
+    public List<FileAnnotation> importAnnotations(final String path, final BibDatabaseContext context) {
 
-        List<PdfComment> annotationsList = new ArrayList<>();
+        List<FileAnnotation> annotationsList = new ArrayList<>();
 
         PDDocument document = null;
         try {
@@ -66,7 +67,7 @@ public class PdfCommentImporter {
                     //highlighted text has to be extracted by the rectangle calculated from the highlighting
                     if (subtype.equals(FDFAnnotationHighlight.SUBTYPE)) {
 
-                        PdfComment annotationBelongingToHighlighting = new PdfComment(annotation.getAnnotationName(),
+                        FileAnnotation annotationBelongingToHighlighting = new FileAnnotation(annotation.getAnnotationName(),
                                 annotation.getDictionary().getString(COSName.T), annotation.getModifiedDate(),
                                 i + 1, annotation.getContents(), FDFAnnotationText.SUBTYPE);
 
@@ -105,14 +106,14 @@ public class PdfCommentImporter {
                         }
                         annotation.setContents(highlightedText);
 
-                        PdfComment highlighting = new PdfComment(annotation, i + 1);
+                        FileAnnotation highlighting = new FileAnnotation(annotation, i + 1);
                         //highlighted text that has a sticky note on it should be linked to the sticky note
                         highlighting.linkComments(annotationBelongingToHighlighting);
                         annotationsList.add(annotationBelongingToHighlighting);
                         annotationsList.add(highlighting);
 
                     } else {
-                        annotationsList.add(new PdfComment(annotation, i + 1));
+                        annotationsList.add(new FileAnnotation(annotation, i + 1));
                     }
                 }
             } catch (IOException e1) {

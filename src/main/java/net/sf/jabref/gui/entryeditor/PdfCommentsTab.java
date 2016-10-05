@@ -34,12 +34,12 @@ import net.sf.jabref.gui.desktop.JabRefDesktop;
 import net.sf.jabref.gui.desktop.os.Linux;
 import net.sf.jabref.gui.desktop.os.NativeDesktop;
 import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.logic.pdf.PdfCommentImporter;
+import net.sf.jabref.logic.pdf.PdfAnnotationImporterImpl;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
-import net.sf.jabref.model.pdf.PdfComment;
+import net.sf.jabref.model.pdf.FileAnnotation;
 
 import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.factories.Paddings;
@@ -47,7 +47,7 @@ import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationHighlight;
 
 public class PdfCommentsTab extends JPanel {
 
-    private final JList<PdfComment> commentList = new JList<>();
+    private final JList<FileAnnotation> commentList = new JList<>();
     private final JScrollPane commentScrollPane = new JScrollPane();
     private final JLabel fileNameLabel = new JLabel(Localization.lang("Filename"),JLabel.CENTER);
     private final JComboBox<String> fileNameComboBox = new JComboBox<>();
@@ -69,7 +69,7 @@ public class PdfCommentsTab extends JPanel {
     private final JScrollPane highlightScrollPane = new JScrollPane();
     private final JButton copyToClipboardButton = new JButton();
     private final JButton openPdfButton = new JButton();
-    DefaultListModel<PdfComment> listModel;
+    DefaultListModel<FileAnnotation> listModel;
 
     private final EntryEditor parent;
     private final BasePanel basePanel;
@@ -78,7 +78,7 @@ public class PdfCommentsTab extends JPanel {
 
     private boolean isInitialized;
 
-    private List<List<PdfComment>> allNotes = new ArrayList<>();
+    private List<List<FileAnnotation>> allNotes = new ArrayList<>();
 
 
     public PdfCommentsTab(EntryEditor parent, BasePanel basePanel, JTabbedPane tabbed) {
@@ -122,9 +122,8 @@ public class PdfCommentsTab extends JPanel {
                 commentList.addListSelectionListener(new CommentListSelectionListener());
                 commentList.setCellRenderer(new CommentsListCellRenderer());
             }
-            PdfCommentImporter commentImporter = new PdfCommentImporter();
-            ArrayList<BibEntry> entries = new ArrayList<>();
-            entries.add(parent.getEntry());
+
+            PdfAnnotationImporterImpl annotationImporter;
 
             //check which attached file is selected in the combo box
             int indexSelectedByComboBox;
@@ -134,11 +133,15 @@ public class PdfCommentsTab extends JPanel {
                 indexSelectedByComboBox = fileNameComboBox.getSelectedIndex();
             }
 
-            //import notes if the selected file is a pdf
-            getFilteredFileList().forEach(parsedFileField ->
-                    allNotes.add(commentImporter.importNotes(parsedFileField.getLink(), basePanel.getDatabaseContext())));
+            ArrayList<BibEntry> entries = new ArrayList<>();
+            entries.add(parent.getEntry());
 
-            updateShownComments(allNotes.get(indexSelectedByComboBox));
+            annotationImporter = new PdfAnnotationImporterImpl();
+            //import notes if the selected file is a pdf
+            getFilteredFileList().forEach(parsedFileField -> allNotes.add(
+                    annotationImporter.importAnnotations(parsedFileField.getLink(), basePanel.getDatabaseContext())));
+            updateShownAnnotations(allNotes.get(indexSelectedByComboBox));
+            //select the first annotation or remove the whole tab when no annotations are present
             if(listModel.isEmpty()) {
                 tabbed.remove(this);
             } else if(commentList.isSelectionEmpty()){
@@ -155,16 +158,16 @@ public class PdfCommentsTab extends JPanel {
      * Updates the list model to show the given notes without those with no content
      * @param importedNotes value is the comments name and the value is a pdfComment object to add to the list model
      */
-    private void updateShownComments(List<PdfComment> importedNotes){
+    private void updateShownAnnotations(List<FileAnnotation> importedNotes){
         listModel.clear();
         if(importedNotes.isEmpty()){
-            listModel.addElement(new PdfComment("", "", "", 0, Localization.lang("PDF has no attached annotations"), ""));
+            listModel.addElement(new FileAnnotation("", "", "", 0, Localization.lang("PDF has no attached annotations"), ""));
         } else {
-            Comparator<PdfComment> byPage = (comment1, comment2) -> Integer.compare(comment1.getPage(), comment2.getPage());
+            Comparator<FileAnnotation> byPage = (annotation1, annotation2) -> Integer.compare(annotation1.getPage(), annotation2.getPage());
             importedNotes.stream()
-                    .filter(comment -> !(null == comment.getContent()))
-                    .filter(comment -> comment.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE)
-                            || (null == comment.getLinkedPdfComment()))
+                    .filter(annotation -> !(null == annotation.getContent()))
+                    .filter(annotation -> annotation.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE)
+                            || (null == annotation.getLinkedFileAnnotation()))
                     .sorted(byPage)
                     .forEach(listModel::addElement);
         }
@@ -174,7 +177,7 @@ public class PdfCommentsTab extends JPanel {
      * Updates the text fields showing meta data and the content from the selected comment
      * @param comment pdf comment which data should be shown in the text fields
      */
-    private void updateTextFields(PdfComment comment) {
+    private void updateTextFields(FileAnnotation comment) {
         authorArea.setText(comment.getAuthor());
         dateArea.setText(comment.getDate());
         pageArea.setText(String.valueOf(comment.getPage()));
@@ -196,7 +199,7 @@ public class PdfCommentsTab extends JPanel {
         getFilteredFileList().stream().filter(parsedFileField -> parsedFileField.getLink().toLowerCase().endsWith(".pdf") )
                 .forEach(((parsedField) -> fileNameComboBox.addItem(parsedField.getLink())));
         fileNameComboBox.setSelectedIndex(indexSelectedByComboBox);
-        updateShownComments(allNotes.get(indexSelectedByComboBox));
+        updateShownAnnotations(allNotes.get(indexSelectedByComboBox));
     }
 
     private void setUpPdfCommentsPanel() {
@@ -324,7 +327,7 @@ public class PdfCommentsTab extends JPanel {
      *
      * @param comment either a text comment or a highlighting from a pdf
      */
-    private void updateContentAndHighlightTextfields(final PdfComment comment){
+    private void updateContentAndHighlightTextfields(final FileAnnotation comment){
 
         if(comment.hasLinkedComment()){
             String textComment = "";
@@ -332,9 +335,9 @@ public class PdfCommentsTab extends JPanel {
 
             if(comment.getAnnotationType().equals(FDFAnnotationHighlight.SUBTYPE)){
                 highlightedText = comment.getContent();
-                textComment = comment.getLinkedPdfComment().getContent();
+                textComment = comment.getLinkedFileAnnotation().getContent();
             } else {
-                highlightedText = comment.getLinkedPdfComment().getContent();
+                highlightedText = comment.getLinkedFileAnnotation().getContent();
                 textComment = comment.getContent();
             }
             highlightTxtArea.setEnabled(true);
@@ -390,7 +393,7 @@ public class PdfCommentsTab extends JPanel {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 
-            PdfComment comment = (PdfComment) value;
+            FileAnnotation comment = (FileAnnotation) value;
 
             //call the super method so that the cell selection is done as usual
             label = (JLabel)super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
