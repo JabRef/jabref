@@ -2,9 +2,9 @@ package net.sf.jabref.logic.groups;
 
 import java.util.List;
 
+import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
-import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.model.groups.AbstractGroup;
 import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;

@@ -11,7 +11,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.importer.Parser;
-import net.sf.jabref.logic.importer.ParserException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.IdGenerator;
