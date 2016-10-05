@@ -250,7 +250,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 groupsRoot.addNewGroup(newGroup, panel.getUndoManager());
                 panel.markBaseChanged();
                 frame.output(Localization.lang("Created group \"%0\".", newGroup.getName()));
-                panel.getBibDatabaseContext().getMetaData().postChange();
             }
         });
         andCb.addActionListener(e -> valueChanged(null));
@@ -792,7 +791,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 UndoableModifyGroup undo = new UndoableModifyGroup(GroupSelector.this, groupsRoot, node, newGroup);
                 Optional<EntriesGroupChange> addChange = node.getNode().setGroup(newGroup, keepPreviousAssignments,
                         panel.getDatabase().getEntries());
-                panel.getBibDatabaseContext().getMetaData().postChange();
                 if (addChange.isPresent()) {
                     undoAddPreviousEntries = UndoableChangeEntriesOfGroup.getUndoableEdit(null, addChange.get());
                 }
@@ -871,7 +869,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             panel.getUndoManager().addEdit(undo);
             panel.markBaseChanged();
             frame.output(Localization.lang("Added group \"%0\".", newGroup.getName()));
-            panel.getBibDatabaseContext().getMetaData().postChange();
         }
     }
 
@@ -896,7 +893,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 panel.getUndoManager().addEdit(undo);
                 panel.markBaseChanged();
                 frame.output(Localization.lang("Removed group \"%0\" and its subgroups.", group.getName()));
-                panel.getBibDatabaseContext().getMetaData().postChange();
             }
         }
     }
@@ -922,7 +918,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 panel.getUndoManager().addEdit(undo);
                 panel.markBaseChanged();
                 frame.output(Localization.lang("Removed all subgroups of group \"%0\".", node.getName()));
-                panel.getBibDatabaseContext().getMetaData().postChange();
             }
         }
     }
@@ -950,7 +945,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
                 panel.getUndoManager().addEdit(undo);
                 panel.markBaseChanged();
                 frame.output(Localization.lang("Removed group \"%0\".", group.getName()));
-                panel.getBibDatabaseContext().getMetaData().postChange();
             }
         }
     }
@@ -976,7 +970,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             panel.getUndoManager().addEdit(undo);
             panel.markBaseChanged();
             frame.output(Localization.lang("Sorted immediate subgroups."));
-            panel.getBibDatabaseContext().getMetaData().postChange();
         }
     }
 
@@ -995,7 +988,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
             panel.getUndoManager().addEdit(undo);
             panel.markBaseChanged();
             frame.output(Localization.lang("Sorted all subgroups recursively."));
-            panel.getBibDatabaseContext().getMetaData().postChange();
         }
     }
 

@@ -27,7 +27,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -228,15 +227,25 @@ public class EntryEditor extends JPanel implements EntryContainer {
         tabbed.removeAll();
         tabs.clear();
 
+<<<<<<< HEAD
         EntryType type = EntryTypes.getTypeOrDefault(entry.getType(), this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+=======
+        EntryType type = EntryTypes.getTypeOrDefault(entry.getType(),
+                this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
+
+>>>>>>> 6daa5b53d1415e139e3ac17f8eeedce26a2da34c
         // required fields
-        List<String> requiredFields = addRequiredTab(type);
+        addRequiredTab(type);
 
         // optional fields
         List<String> displayedOptionalFields = new ArrayList<>();
+        Set<String> deprecatedFields = new HashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
+        Set<String> usedOptionalFieldsDeprecated = new HashSet<>(deprecatedFields);
 
         if ((type.getOptionalFields() != null) && !type.getOptionalFields().isEmpty()) {
             if (!frame.getCurrentBasePanel().getBibDatabaseContext().isBiblatexMode()) {
+                displayedOptionalFields.addAll(type.getOptionalFields());
+
                 addOptionalTab(type);
             } else {
                 displayedOptionalFields.addAll(type.getPrimaryOptionalFields());
@@ -244,7 +253,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
                 addOptionalTab(type);
 
-                Set<String> deprecatedFields = new HashSet<>(EntryConverter.FIELD_ALIASES_TEX_TO_LTX.keySet());
                 deprecatedFields.add(FieldName.YEAR);
                 deprecatedFields.add(FieldName.MONTH);
                 List<String> secondaryOptionalFields = type.getSecondaryOptionalFields();
@@ -261,7 +269,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
 
                 // Get all optional fields which are deprecated
-                Set<String> usedOptionalFieldsDeprecated = new HashSet<>(deprecatedFields);
                 usedOptionalFieldsDeprecated.retainAll(optionalFieldsAndAliases);
 
                 // Add tabs
@@ -270,8 +277,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 if (optPan2.fileListEditor != null) {
                     fileListEditor = optPan2.fileListEditor;
                 }
-                tabbed.addTab(Localization.lang("Optional fields 2"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optPan2
-                        .getPane(), Localization.lang("Show optional fields"));
+                tabbed.addTab(Localization.lang("Optional fields 2"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
+                        optPan2.getPane(), Localization.lang("Show optional fields"));
                 tabs.add(optPan2);
 
                 if (!usedOptionalFieldsDeprecated.isEmpty()) {
@@ -281,18 +288,30 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     if (optPan3.fileListEditor != null) {
                         fileListEditor = optPan3.fileListEditor;
                     }
-                    tabbed.addTab(Localization.lang("Deprecated fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optPan3
-                            .getPane(), Localization.lang("Show deprecated BibTeX fields"));
+                    tabbed.addTab(Localization.lang("Deprecated fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(),
+                            optPan3.getPane(), Localization.lang("Show deprecated BibTeX fields"));
                     tabs.add(optPan3);
                 }
             }
         }
+<<<<<<< HEAD
         // other fields also do not contain hidden fields
         Set<String> displayedFields = Stream
                 .concat(type.getAllFields().stream(), Globals.prefs.getCustomTabFieldNames().stream())
                 .map(String::toLowerCase).flatMap(f -> Stream.of(f, "_" + f)).collect(Collectors.toSet());
         List<String> otherFields = entry.getFieldNames().stream().map(String::toLowerCase)
                 .filter(f -> !displayedFields.contains(f)).collect(Collectors.toList());
+=======
+
+        // other fields
+        List<String> displayedFields = type.getAllFields().stream().map(String::toLowerCase)
+                .collect(Collectors.toList());
+        List<String> otherFields = entry.getFieldNames().stream().map(String::toLowerCase)
+                .filter(f -> !displayedFields.contains(f)).collect(Collectors.toList());
+        if (!usedOptionalFieldsDeprecated.isEmpty()) {
+            otherFields.removeAll(usedOptionalFieldsDeprecated);
+        }
+>>>>>>> 6daa5b53d1415e139e3ac17f8eeedce26a2da34c
         otherFields.remove(BibEntry.KEY_FIELD);
         otherFields.removeAll(Globals.prefs.getCustomTabFieldNames());
 
@@ -349,9 +368,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private void addSourceTab() {
-        srcPanel.setName(Localization.lang("BibTeX source"));
-        tabbed.addTab(Localization.lang("BibTeX source"), IconTheme.JabRefIcon.SOURCE.getSmallIcon(), srcPanel,
-                Localization.lang("Show/edit BibTeX source"));
+        String panelName = Localization.lang("%0 source", panel.getBibDatabaseContext().getMode().getFormattedName());
+        String toolTip = Localization.lang("Show/edit %0 source", panel.getBibDatabaseContext().getMode().getFormattedName());
+        srcPanel.setName(panelName);
+        tabbed.addTab(panelName, IconTheme.JabRefIcon.SOURCE.getSmallIcon(), srcPanel, toolTip);
         tabs.add(srcPanel);
         sourceIndex = tabs.size() - 1; // Set the sourceIndex variable.
         srcPanel.setFocusCycleRoot(true);
@@ -653,8 +673,6 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.HELP), "help");
         actionMap.put("help", getHelpAction());
-        inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.SAVE_DATABASE), "save");
-        actionMap.put("save", getSaveDatabaseAction());
 
         inputMap.put(Globals.getKeyPrefs().getKey(KeyBinding.NEXT_TAB), "nexttab");
         actionMap.put("nexttab", frame.nextTab);
@@ -907,13 +925,16 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             Object[] options = {Localization.lang("Edit"), Localization.lang("Revert to original source")};
 
-            int answer = JOptionPane.showOptionDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
-                    Localization.lang("Problem with parsing entry"), JOptionPane.YES_NO_OPTION,
-                    JOptionPane.ERROR_MESSAGE, null, options, options[0]);
+            if (!SwingUtilities.isEventDispatchThread()) {
+                int answer = JOptionPane.showOptionDialog(frame, Localization.lang("Error") + ": " + ex.getMessage(),
+                        Localization.lang("Problem with parsing entry"), JOptionPane.YES_NO_OPTION,
+                        JOptionPane.ERROR_MESSAGE, null, options, options[0]);
 
-            if (answer != 0) {
-                updateSource = true;
-                updateSource();
+                if (answer != 0) {
+                    updateSource = true;
+                    lastSourceAccepted = true;
+                    updateSource();
+                }
             }
 
             LOGGER.debug("Incorrect source", ex);
@@ -1372,7 +1393,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
             }
 
-            BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData(), panel.getDatabase(), entry,
+            BibtexKeyPatternUtil.makeLabel(panel.getBibDatabaseContext().getMetaData()
+                    .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()), panel.getDatabase(), entry,
                     Globals.prefs.getBibtexKeyPatternPreferences());
 
             // Store undo information:

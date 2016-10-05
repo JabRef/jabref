@@ -11,19 +11,19 @@ OUTPUT_COLORS = enum(
 
 
 def error(content):
-    print "{color_error}{content}{color_end}" \
-        .format(color_error=OUTPUT_COLORS.ERROR, content=str(content), color_end=OUTPUT_COLORS.ENDC)
+    print u"{color_error}{content}{color_end}".encode('utf8') \
+        .format(color_error=OUTPUT_COLORS.ERROR, content=str(content.encode('utf8')), color_end=OUTPUT_COLORS.ENDC)
 
 
 def warn(content):
-    print "{color_error}{content}{color_end}" \
-        .format(color_error=OUTPUT_COLORS.WARN, content=str(content), color_end=OUTPUT_COLORS.ENDC)
+    print u"{color_error}{content}{color_end}".encode('utf8') \
+        .format(color_error=OUTPUT_COLORS.WARN, content=str(content.encode('utf8')), color_end=OUTPUT_COLORS.ENDC).encode('utf8')
 
 
 def ok(content):
-    print "{color_error}{content}{color_end}" \
-        .format(color_error=OUTPUT_COLORS.OK, content=str(content), color_end=OUTPUT_COLORS.ENDC)
+    print u"{color_error}{content}{color_end}".encode('utf8') \
+        .format(color_error=OUTPUT_COLORS.OK, content=str(content.encode('utf8')), color_end=OUTPUT_COLORS.ENDC).encode('utf8')
 
 
 def neutral(content):
-    print content
+    print content.encode('utf8')

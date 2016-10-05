@@ -28,7 +28,7 @@ import net.sf.jabref.gui.SaveOrderConfigDisplay;
 import net.sf.jabref.gui.cleanup.FieldFormatterCleanupsPanel;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
+import net.sf.jabref.logic.cleanup.Cleanups;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
@@ -132,7 +132,7 @@ public class DatabasePropertiesDialog extends JDialog {
         builder.add(protect).xyw(1, 25, 5);
 
         fieldFormatterCleanupsPanel = new FieldFormatterCleanupsPanel(Localization.lang("Enable save actions"),
-                FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS);
+                Cleanups.DEFAULT_SAVE_ACTIONS);
         builder.addSeparator(Localization.lang("Save actions")).xyw(1, 27, 5);
         builder.add(fieldFormatterCleanupsPanel).xyw(1, 29, 5);
 

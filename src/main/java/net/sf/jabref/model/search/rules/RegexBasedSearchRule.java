@@ -53,8 +53,7 @@ public class RegexBasedSearchRule implements SearchRule {
         for (String field : bibEntry.getFieldNames()) {
             Optional<String> fieldOptional = bibEntry.getField(field);
             if (fieldOptional.isPresent()) {
-                String fieldContent = RegexBasedSearchRule.LATEX_TO_UNICODE_FORMATTER.format(fieldOptional.get());
-                String fieldContentNoBrackets = RegexBasedSearchRule.LATEX_TO_UNICODE_FORMATTER.format(fieldContent);
+                String fieldContentNoBrackets = bibEntry.getLatexFreeField(field).get();
                 Matcher m = pattern.matcher(fieldContentNoBrackets);
                 if (m.find()) {
                     return true;

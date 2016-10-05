@@ -21,36 +21,42 @@ public class GroupsParser {
 
     public static GroupTreeNode importGroups(List<String> orderedData, Character keywordSeparator)
             throws ParseException {
-        GroupTreeNode cursor = null;
-        GroupTreeNode root = null;
-        for (String string : orderedData) {
-            // This allows to read databases that have been modified by, e.g., BibDesk
-            string = string.trim();
-            if (string.isEmpty()) {
-                continue;
-            }
-
-            int spaceIndex = string.indexOf(' ');
-            if (spaceIndex <= 0) {
-                throw new ParseException("Expected \"" + string + "\" to contain whitespace");
-            }
-            int level = Integer.parseInt(string.substring(0, spaceIndex));
-            AbstractGroup group = GroupsParser.fromString(string.substring(spaceIndex + 1), keywordSeparator);
-            GroupTreeNode newNode = GroupTreeNode.fromGroup(group);
-            if (cursor == null) {
-                // create new root
-                cursor = newNode;
-                root = cursor;
-            } else {
-                // insert at desired location
-                while (level <= cursor.getLevel()) {
-                    cursor = cursor.getParent().get();
+        try {
+            GroupTreeNode cursor = null;
+            GroupTreeNode root = null;
+            for (String string : orderedData) {
+                // This allows to read databases that have been modified by, e.g., BibDesk
+                string = string.trim();
+                if (string.isEmpty()) {
+                    continue;
                 }
-                cursor.addChild(newNode);
-                cursor = newNode;
+
+                int spaceIndex = string.indexOf(' ');
+                if (spaceIndex <= 0) {
+                    throw new ParseException("Expected \"" + string + "\" to contain whitespace");
+                }
+                int level = Integer.parseInt(string.substring(0, spaceIndex));
+                AbstractGroup group = GroupsParser.fromString(string.substring(spaceIndex + 1), keywordSeparator);
+                GroupTreeNode newNode = GroupTreeNode.fromGroup(group);
+                if (cursor == null) {
+                    // create new root
+                    cursor = newNode;
+                    root = cursor;
+                } else {
+                    // insert at desired location
+                    while (level <= cursor.getLevel()) {
+                        cursor = cursor.getParent().get();
+                    }
+                    cursor.addChild(newNode);
+                    cursor = newNode;
+                }
             }
+            return root;
+        } catch (ParseException e) {
+            throw new ParseException(Localization
+                    .lang("Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."),
+                    e);
         }
-        return root;
     }
 
     /**

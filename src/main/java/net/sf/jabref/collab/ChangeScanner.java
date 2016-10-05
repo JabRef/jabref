@@ -3,10 +3,8 @@ package net.sf.jabref.collab;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -165,36 +163,15 @@ public class ChangeScanner implements Runnable {
         });
     }
 
-    private void scanMetaData(MetaData inMem1, MetaData inTemp1, MetaData onDisk) {
-        MetaDataChange metadataChange = new MetaDataChange(inMem1, inTemp1);
-        List<String> handledOnDisk = new ArrayList<>();
-        // Loop through the metadata entries of the "tmp" database, looking for
-        // matches
-        for (String key : inTemp1) {
-            // See if the key is missing in the disk database:
-            List<String> vod = onDisk.getData(key);
-            if (vod == null) {
-                metadataChange.insertMetaDataRemoval(key);
-            } else {
-                // Both exist. Check if they are different:
-                List<String> vit = inTemp1.getData(key);
-                if (!vod.equals(vit)) {
-                    metadataChange.insertMetaDataChange(key, vod);
-                }
-                // Remember that we've handled this one:
-                handledOnDisk.add(key);
+    private void scanMetaData(MetaData inMemory, MetaData onTmp, MetaData onDisk) {
+        if (!onTmp.isEmpty()) {
+            if (!inMemory.equals(onDisk)) {
+                changes.add(new MetaDataChange(inMemory, onDisk));
             }
-        }
-
-        // See if there are unhandled keys in the disk database:
-        for (String key : onDisk) {
-            if (!handledOnDisk.contains(key)) {
-                metadataChange.insertMetaDataAddition(key, onDisk.getData(key));
+        } else {
+            if (!onDisk.isEmpty() || !onTmp.equals(onDisk)) {
+                changes.add(new MetaDataChange(inMemory, onDisk));
             }
-        }
-
-        if (metadataChange.getChangeCount() > 0) {
-            changes.add(metadataChange);
         }
     }
 
@@ -346,7 +323,7 @@ public class ChangeScanner implements Runnable {
         Optional<String> tmp = onTmp.getPreamble();
         Optional<String> disk = onDisk.getPreamble();
         if (!tmp.isPresent()) {
-            disk.filter(diskContent -> !diskContent.isEmpty()).ifPresent(diskContent -> changes.add(new PreambleChange(mem, diskContent)));
+            disk.ifPresent(diskContent -> changes.add(new PreambleChange(mem, diskContent)));
         } else {
             if (!disk.isPresent() || !tmp.equals(disk)) {
                 changes.add(new PreambleChange(mem, disk.orElse(null)));
