@@ -45,7 +45,7 @@ import com.jgoodies.forms.builder.FormBuilder;
 import com.jgoodies.forms.factories.Paddings;
 import org.apache.pdfbox.pdmodel.fdf.FDFAnnotationHighlight;
 
-public class PdfCommentsTab extends JPanel {
+public class FileAnnotationTab extends JPanel {
 
     private final JList<FileAnnotation> commentList = new JList<>();
     private final JScrollPane commentScrollPane = new JScrollPane();
@@ -81,7 +81,7 @@ public class PdfCommentsTab extends JPanel {
     private List<List<FileAnnotation>> allNotes = new ArrayList<>();
 
 
-    public PdfCommentsTab(EntryEditor parent, BasePanel basePanel, JTabbedPane tabbed) {
+    public FileAnnotationTab(EntryEditor parent, BasePanel basePanel, JTabbedPane tabbed) {
         this.parent = parent;
         this.basePanel = basePanel;
         this.tabbed = tabbed;
@@ -91,7 +91,7 @@ public class PdfCommentsTab extends JPanel {
 
     }
 
-    public static PdfCommentsTab initializeTab(PdfCommentsTab tab){
+    public static FileAnnotationTab initializeTab(FileAnnotationTab tab){
 
         if(!tab.isInitialized) {
             
@@ -161,7 +161,7 @@ public class PdfCommentsTab extends JPanel {
     private void updateShownAnnotations(List<FileAnnotation> importedNotes){
         listModel.clear();
         if(importedNotes.isEmpty()){
-            listModel.addElement(new FileAnnotation("", "", "", 0, Localization.lang("PDF has no attached annotations"), ""));
+            listModel.addElement(new FileAnnotation("", "", "", 0, Localization.lang("File has no attached annotations"), ""));
         } else {
             Comparator<FileAnnotation> byPage = (annotation1, annotation2) -> Integer.compare(annotation1.getPage(), annotation2.getPage());
             importedNotes.stream()
@@ -269,7 +269,7 @@ public class PdfCommentsTab extends JPanel {
 
         buttonConstraints.gridy = 10;
         buttonConstraints.gridx = 10;
-        openPdfButton.setText(Localization.lang("Open PDF"));
+        openPdfButton.setText(Localization.lang("Open file"));
         openPdfButton.addActionListener(e -> openPdf());
         copyToClipboardButton.setText(Localization.lang("Copy to clipboard"));
         copyToClipboardButton.addActionListener(e -> copyToClipboard());

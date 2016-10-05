@@ -4,13 +4,13 @@ import javax.swing.JTabbedPane;
 
 public class EntryEditorTabbedPane extends JTabbedPane {
 
-    private PdfCommentsTab pdfTab;
+    private FileAnnotationTab pdfTab;
 
     public EntryEditorTabbedPane() {
         super();
     }
 
-    public void hidePdfTab(PdfCommentsTab pdfTab){
+    public void hidePdfTab(FileAnnotationTab pdfTab){
         this.pdfTab = pdfTab;
         this.remove(pdfTab);
     }

@@ -158,7 +158,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private final BasePanel panel;
 
-    private PdfCommentsTab pdfCommentsTab;
+    private FileAnnotationTab fileAnnotationTab;
 
     private boolean updateSource = true; // This can be set to false to stop the source
     private boolean movingToDifferentEntry; // Indicates that we are about to go to the next or previous entry
@@ -375,14 +375,14 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * Add a tab for displaying comments from a PDF
      */
     private void addPdfTab() {
-        tabbed.remove(pdfCommentsTab);
-        tabs.remove(pdfCommentsTab);
+        tabbed.remove(fileAnnotationTab);
+        tabs.remove(fileAnnotationTab);
         Optional<String> field = entry.getField(FieldName.FILE);
         if (field.isPresent()) {
-            pdfCommentsTab = new PdfCommentsTab(this, panel, tabbed);
-            tabbed.addTab(Localization.lang("PDF comments"), IconTheme.JabRefIcon.PDF_FILE.getSmallIcon(), pdfCommentsTab,
-                    Localization.lang("Show PDF comments"));
-            tabs.add(pdfCommentsTab);
+            fileAnnotationTab = new FileAnnotationTab(this, panel, tabbed);
+            tabbed.addTab(Localization.lang("File_annotations"), IconTheme.JabRefIcon.COMMENT.getSmallIcon(), fileAnnotationTab,
+                    Localization.lang("Show_File_annotations"));
+            tabs.add(fileAnnotationTab);
         }
 
     }
@@ -657,8 +657,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
         Object activeTab = tabs.get(tabbed.getSelectedIndex());
         if (activeTab instanceof EntryEditorTab) {
             ((EntryEditorTab) activeTab).activate();
-        } else if (activeTab instanceof PdfCommentsTab) {
-            ((PdfCommentsTab)activeTab).requestFocus();
+        } else if (activeTab instanceof FileAnnotationTab) {
+            ((FileAnnotationTab)activeTab).requestFocus();
         } else {
             source.requestFocus();
         }
@@ -1033,8 +1033,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
             // or more of the same fields as this one:
             SwingUtilities.invokeLater(() -> {
                 Object activeTab = tabs.get(tabbed.getSelectedIndex());
-                if (activeTab instanceof PdfCommentsTab && !((PdfCommentsTab) activeTab).isInitialized()) {
-                    PdfCommentsTab.initializeTab((PdfCommentsTab) activeTab);
+                if (activeTab instanceof FileAnnotationTab && !((FileAnnotationTab) activeTab).isInitialized()) {
+                    FileAnnotationTab.initializeTab((FileAnnotationTab) activeTab);
                 }
 
                 if (activeTab instanceof EntryEditorTab) {
