@@ -4,10 +4,10 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import net.sf.jabref.Globals;
 import net.sf.jabref.logic.exporter.BibDatabaseWriter;
 import net.sf.jabref.logic.exporter.MetaDataSerializer;
 import net.sf.jabref.logic.importer.util.MetaDataParser;
@@ -51,14 +51,16 @@ public class DBMSSynchronizer {
     private final EventBus eventBus;
     private Connection currentConnection;
     private final Character keywordSeparator;
+    private GlobalBibtexKeyPattern globalCiteKeyPattern;
 
-
-    public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator) {
-        this.bibDatabaseContext = bibDatabaseContext;
+    public DBMSSynchronizer(BibDatabaseContext bibDatabaseContext, Character keywordSeparator,
+            GlobalBibtexKeyPattern globalCiteKeyPattern) {
+        this.bibDatabaseContext = Objects.requireNonNull(bibDatabaseContext);
         this.bibDatabase = bibDatabaseContext.getDatabase();
         this.metaData = bibDatabaseContext.getMetaData();
         this.eventBus = new EventBus();
         this.keywordSeparator = keywordSeparator;
+        this.globalCiteKeyPattern = Objects.requireNonNull(globalCiteKeyPattern);
     }
 
     /**
@@ -118,7 +120,7 @@ public class DBMSSynchronizer {
     @Subscribe
     public void listen(MetaDataChangedEvent event) {
         if (checkCurrentConnection()) {
-            synchronizeSharedMetaData(event.getMetaData(), Globals.prefs.getKeyPattern());
+            synchronizeSharedMetaData(event.getMetaData(), globalCiteKeyPattern);
             synchronizeLocalDatabase();
             applyMetaData();
             dbmsProcessor.notifyClients();

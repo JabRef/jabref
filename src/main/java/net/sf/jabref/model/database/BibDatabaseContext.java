@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.model.Defaults;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 import net.sf.jabref.model.metadata.MetaData;
@@ -64,10 +65,11 @@ public class BibDatabaseContext {
         this(database, metaData, file, new Defaults());
     }
 
-    public BibDatabaseContext(Defaults defaults, DatabaseLocation location, Character keywordSeparator) {
+    public BibDatabaseContext(Defaults defaults, DatabaseLocation location, Character keywordSeparator,
+            GlobalBibtexKeyPattern globalCiteKeyPattern) {
         this(new BibDatabase(), new MetaData(), defaults);
         if (location == DatabaseLocation.SHARED) {
-            convertToSharedDatabase(keywordSeparator);
+            convertToSharedDatabase(keywordSeparator, globalCiteKeyPattern);
         }
     }
 
@@ -206,8 +208,8 @@ public class BibDatabaseContext {
         return this.location;
     }
 
-    public void convertToSharedDatabase(Character keywordSeparator) {
-        this.dbmsSynchronizer = new DBMSSynchronizer(this, keywordSeparator);
+    public void convertToSharedDatabase(Character keywordSeparator, GlobalBibtexKeyPattern globalCiteKeyPattern) {
+        this.dbmsSynchronizer = new DBMSSynchronizer(this, keywordSeparator, globalCiteKeyPattern);
         this.database.registerListener(dbmsSynchronizer);
         this.metaData.registerListener(dbmsSynchronizer);
 
