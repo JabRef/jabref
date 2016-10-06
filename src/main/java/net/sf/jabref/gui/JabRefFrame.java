@@ -544,7 +544,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
             // update all elements in current base panel
             JabRefFrame.this.getCurrentBasePanel().hideBottomComponent();
-            JabRefFrame.this.getCurrentBasePanel().rebuildAllEntryEditors();
             JabRefFrame.this.getCurrentBasePanel().updateEntryEditorIfShowing();
         }
 
@@ -1800,13 +1799,6 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
     public FileHistoryMenu getFileHistory() {
         return fileHistory;
-    }
-
-    public void removeCachedEntryEditors() {
-        for (int j = 0; j < tabbedPane.getTabCount(); j++) {
-            BasePanel bp = (BasePanel) tabbedPane.getComponentAt(j);
-            bp.getEntryEditors().clear();
-        }
     }
 
     /**

@@ -45,10 +45,8 @@ import net.sf.jabref.logic.bibtexkeypattern.BibtexKeyPatternPreferences;
 import net.sf.jabref.logic.citationstyle.CitationStyle;
 import net.sf.jabref.logic.cleanup.CleanupPreferences;
 import net.sf.jabref.logic.cleanup.CleanupPreset;
-import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.logic.exporter.CustomExportList;
 import net.sf.jabref.logic.exporter.ExportComparator;
-import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
@@ -57,6 +55,7 @@ import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
 import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.journals.JournalAbbreviationLoader;
 import net.sf.jabref.logic.journals.JournalAbbreviationPreferences;
 import net.sf.jabref.logic.l10n.Localization;
@@ -77,6 +76,8 @@ import net.sf.jabref.logic.util.io.FileHistory;
 import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.CustomEntryType;
@@ -255,7 +256,7 @@ public class JabRefPreferences {
     public static final String OVERRIDE_DEFAULT_FONTS = "overrideDefaultFonts";
     public static final String FONT_SIZE = "fontSize";
     public static final String FONT_STYLE = "fontStyle";
-    public static final String RECENT_FILES = "recentFiles";
+    public static final String RECENT_DATABASES = "recentDatabases";
     public static final String RENAME_ON_MOVE_FILE_TO_FILE_DIR = "renameOnMoveFileToFileDir";
     public static final String MEMORY_STICK_MODE = "memoryStickMode";
     public static final String DEFAULT_OWNER = "defaultOwner";
@@ -287,7 +288,7 @@ public class JabRefPreferences {
     public static final String USE_DEFAULT_CONSOLE_APPLICATION = "useDefaultConsoleApplication";
 
     // Currently, it is not possible to specify defaults for specific entry types
-    // When this should be made possible, the code to inspect is net.sf.jabref.gui.preftabs.BibtexKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getBibtexKeyPattern(); etc
+    // When this should be made possible, the code to inspect is net.sf.jabref.gui.preftabs.BibtexKeyPatternPrefTab.storeSettings() -> LabelPattern keypatterns = getCiteKeyPattern(); etc
     public static final String DEFAULT_BIBTEX_KEY_PATTERN = "defaultBibtexKeyPattern";
 
     public static final String GRAY_OUT_NON_HITS = "grayOutNonHits";
@@ -456,7 +457,7 @@ public class JabRefPreferences {
     private static final String USER_HOME = System.getProperty("user.home");
 
     /**
-     * Set with all custom {@link net.sf.jabref.logic.importer.fileformat.ImportFormat}s
+     * Set with all custom {@link Importer}s
      */
     public final CustomImportList customImports;
 
@@ -528,7 +529,7 @@ public class JabRefPreferences {
         }
         defaults.put(PUSH_TO_APPLICATION, "TeXstudio");
 
-        defaults.put(RECENT_FILES, "");
+        defaults.put(RECENT_DATABASES, "");
         defaults.put(EXTERNAL_FILE_TYPES, "");
         defaults.put(KEY_PATTERN_REGEX, "");
         defaults.put(KEY_PATTERN_REPLACEMENT, "");
@@ -1118,8 +1119,7 @@ public class JabRefPreferences {
      * @return LabelPattern containing all keys. Returned LabelPattern has no parent
      */
     public GlobalBibtexKeyPattern getKeyPattern() {
-        keyPattern = new GlobalBibtexKeyPattern(
-                AbstractBibtexKeyPattern.split(JabRefPreferences.getInstance().get(DEFAULT_BIBTEX_KEY_PATTERN)));
+        keyPattern = new GlobalBibtexKeyPattern(AbstractBibtexKeyPattern.split(get(DEFAULT_BIBTEX_KEY_PATTERN)));
         Preferences pre = Preferences.userNodeForPackage(JabRefMain.class).node(BIBTEX_KEY_PATTERNS_NODE);
         try {
             String[] keys = pre.keys();
@@ -1367,16 +1367,16 @@ public class JabRefPreferences {
         storage.put(CLEANUP_UPGRADE_EXTERNAL_LINKS, preset.isCleanUpUpgradeExternalLinks());
         storage.put(CLEANUP_CONVERT_TO_BIBLATEX, preset.isConvertToBiblatex());
         storage.put(CLEANUP_FIX_FILE_LINKS, preset.isFixFileLinks());
-        storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().getAsStringList()));
+        storage.put(CLEANUP_FORMATTERS, convertListToString(preset.getFormatterCleanups().getAsStringList(OS.NEWLINE)));
     }
 
     public FileHistory getFileHistory() {
-        return new FileHistory(getStringList(RECENT_FILES));
+        return new FileHistory(getStringList(RECENT_DATABASES));
     }
 
     public void storeFileHistory(FileHistory history) {
         if (!history.isEmpty()) {
-            putStringList(RECENT_FILES, history.getHistory());
+            putStringList(RECENT_DATABASES, history.getHistory());
         }
     }
 
@@ -1413,7 +1413,6 @@ public class JabRefPreferences {
     public ImportFormatPreferences getImportFormatPreferences() {
         return new ImportFormatPreferences(customImports, getDefaultEncoding(), getKeywordDelimiter(),
                 getBibtexKeyPatternPreferences(), getFieldContentParserPreferences(),
-                getBoolean(USE_UNIT_FORMATTER_ON_SEARCH), getBoolean(USE_CASE_KEEPER_ON_SEARCH),
                 isKeywordSyncEnabled());
     }
 

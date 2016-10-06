@@ -10,5 +10,5 @@ import net.sf.jabref.model.entry.BibEntry;
  */
 public interface Parser {
 
-    List<BibEntry> parseEntries(InputStream inputStream) throws ParserException;
+    List<BibEntry> parseEntries(InputStream inputStream) throws ParseException;
 }

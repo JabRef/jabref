@@ -16,6 +16,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.mods.AbstractDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.DateDefinition;
@@ -62,7 +63,7 @@ import org.apache.commons.logging.LogFactory;
  * The newest xml schema can also be found here <a href="www.loc.gov/standards/mods/mods-schemas.html.">www.loc.gov/standards/mods/mods-schemas.html.</a>.
  *
  */
-public class ModsImporter extends ImportFormat {
+public class ModsImporter extends Importer {
 
     private static final Log LOGGER = LogFactory.getLog(ModsImporter.class);
     private static final String KEYWORD_SEPARATOR = JabRefPreferences.getInstance().getImportFormatPreferences()
@@ -73,7 +74,7 @@ public class ModsImporter extends ImportFormat {
 
 
     @Override
-    protected boolean isRecognizedFormat(BufferedReader input) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
         return input.lines().anyMatch(line -> MODS_PATTERN.matcher(line).find());
     }
 
@@ -462,7 +463,7 @@ public class ModsImporter extends ImportFormat {
     }
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "MODS";
     }
 

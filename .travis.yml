@@ -65,6 +65,10 @@ after_script:
   - ./gradlew jacocoTestReport
   - bash <(curl -s https://codecov.io/bash)
 
+after_failure:
+  # show test results if build fails
+  - $TRAVIS_BUILD_DIR/scripts/after-failure.sh
+
 # cache gradle dependencies
 # https://docs.travis-ci.com/user/languages/java#Caching
 before_cache:

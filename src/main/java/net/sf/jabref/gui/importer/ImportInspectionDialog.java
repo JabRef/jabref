@@ -462,7 +462,9 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             database.insertEntry(entry);
 
             // Generate a unique key:
-            BibtexKeyPatternUtil.makeLabel(localMetaData, database, entry,
+            BibtexKeyPatternUtil.makeLabel(
+                    localMetaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                    database, entry,
                     Globals.prefs.getBibtexKeyPatternPreferences());
             // Remove the entry from the database again, since we only added it in
             // order to
@@ -504,7 +506,9 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 entry.setId(IdGenerator.next());
                 database.insertEntry(entry);
 
-                BibtexKeyPatternUtil.makeLabel(localMetaData, database, entry,
+                BibtexKeyPatternUtil.makeLabel(
+                        localMetaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                        database, entry,
                         Globals.prefs.getBibtexKeyPatternPreferences());
                 // Add the generated key to our list:   -- TODO: Why??
                 keys.add(entry.getCiteKeyOptional());
@@ -1470,6 +1474,16 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     @Override
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(this, message);
+    }
+
+    /**
+     * Displays a dialog which tells the user that an error occurred while fetching entries
+     */
+    public void showErrorMessage(String fetcherTitle, String localizedException) {
+        showMessage(Localization.lang("Error while fetching from %0", fetcherTitle) + "\n" +
+                        Localization.lang("Please try again later and/or check your network connection.") + "\n" +
+                        localizedException,
+                Localization.lang("Search %0", fetcherTitle), JOptionPane.ERROR_MESSAGE);
     }
 
     public JabRefFrame getFrame() {

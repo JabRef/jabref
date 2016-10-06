@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import javax.swing.JPanel;
 
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.IdBasedFetcher;
@@ -34,8 +35,8 @@ public class IdBasedEntryFetcher implements EntryFetcher {
             match.ifPresent(inspector::addEntry);
             return match.isPresent();
         } catch (FetcherException e) {
-            status.setStatus(e.getLocalizedMessage());
-            LOGGER.error("Error while fetching from" + fetcher.getName(), e);
+            LOGGER.error("Error while fetching from " + getTitle(), e);
+            ((ImportInspectionDialog)inspector).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
         }
 
         return false;

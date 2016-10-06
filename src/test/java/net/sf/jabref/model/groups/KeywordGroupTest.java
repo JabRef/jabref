@@ -1,6 +1,5 @@
 package net.sf.jabref.model.groups;
 
-import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.Test;
@@ -11,21 +10,21 @@ import static org.junit.Assert.assertTrue;
 public class KeywordGroupTest {
 
     @Test
-    public void testToString() throws ParseException {
+    public void testToString() {
         KeywordGroup group = new KeywordGroup("myExplicitGroup", "author", "asdf", true, true,
                 GroupHierarchyType.INDEPENDENT, ',');
         assertEquals("KeywordGroup:myExplicitGroup;0;author;asdf;1;1;", group.toString());
     }
 
     @Test
-    public void testToString2() throws ParseException {
+    public void testToString2() {
         KeywordGroup group = new KeywordGroup("myExplicitGroup", "author", "asdf", false, true,
                 GroupHierarchyType.REFINING, ',');
         assertEquals("KeywordGroup:myExplicitGroup;1;author;asdf;0;1;", group.toString());
     }
 
     @Test
-    public void containsSimpleWord() throws Exception {
+    public void containsSimpleWord() {
         KeywordGroup group = new KeywordGroup("name", "keywords", "test", false, false, GroupHierarchyType.INDEPENDENT,
                 ',');
         BibEntry entry = new BibEntry().withField("keywords", "test");

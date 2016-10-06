@@ -9,7 +9,7 @@ import java.net.URL;
 import java.util.List;
 import java.util.Objects;
 
-import net.sf.jabref.logic.formatter.Formatter;
+import net.sf.jabref.model.cleanup.Formatter;
 import net.sf.jabref.model.entry.BibEntry;
 
 /**
@@ -64,7 +64,7 @@ public interface EntryBasedParserFetcher extends EntryBasedFetcher {
         } catch (IOException e) {
             // TODO: Catch HTTP Response 401 errors and report that user has no rights to access resource
             throw new FetcherException("An I/O exception occurred", e);
-        } catch (ParserException e) {
+        } catch (ParseException e) {
             throw new FetcherException("An internal parser error occurred", e);
         }
     }

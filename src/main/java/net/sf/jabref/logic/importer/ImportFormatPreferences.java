@@ -10,35 +10,27 @@ import net.sf.jabref.logic.importer.fileformat.CustomImporter;
 public class ImportFormatPreferences {
 
     private final Set<CustomImporter> customImportList;
-
     private final Charset encoding;
-
     private final Character keywordSeparator;
-
     private final BibtexKeyPatternPreferences bibtexKeyPatternPreferences;
-
     private final FieldContentParserPreferences fieldContentParserPreferences;
-
-    private final boolean useCaseKeeperOnSearch;
-    private final boolean convertUnitsOnSearch;
-
     private final boolean keywordSyncEnabled;
 
-
-    public ImportFormatPreferences(Set<CustomImporter> customImportList, Charset encoding,
-            Character keywordSeparator, BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
-            FieldContentParserPreferences fieldContentParserPreferences, boolean convertUnitsOnSearch,
-            boolean useCaseKeeperOnSearch, boolean keywordSyncEnabled) {
+    public ImportFormatPreferences(Set<CustomImporter> customImportList, Charset encoding, Character keywordSeparator,
+            BibtexKeyPatternPreferences bibtexKeyPatternPreferences,
+            FieldContentParserPreferences fieldContentParserPreferences, boolean keywordSyncEnabled) {
         this.customImportList = customImportList;
         this.encoding = encoding;
         this.keywordSeparator = keywordSeparator;
         this.bibtexKeyPatternPreferences = bibtexKeyPatternPreferences;
         this.fieldContentParserPreferences = fieldContentParserPreferences;
-        this.convertUnitsOnSearch = convertUnitsOnSearch;
-        this.useCaseKeeperOnSearch = useCaseKeeperOnSearch;
         this.keywordSyncEnabled = keywordSyncEnabled;
     }
 
+    /**
+     * @deprecated importer should not know about the other custom importers
+     */
+    @Deprecated
     public Set<CustomImporter> getCustomImportList() {
         return customImportList;
     }
@@ -59,19 +51,15 @@ public class ImportFormatPreferences {
         return fieldContentParserPreferences;
     }
 
-    public boolean isConvertUnitsOnSearch() {
-        return convertUnitsOnSearch;
-    }
-
-    public boolean isUseCaseKeeperOnSearch() {
-        return useCaseKeeperOnSearch;
-    }
-
     public ImportFormatPreferences withEncoding(Charset newEncoding) {
         return new ImportFormatPreferences(customImportList, newEncoding, keywordSeparator, bibtexKeyPatternPreferences,
-                fieldContentParserPreferences, convertUnitsOnSearch, useCaseKeeperOnSearch, keywordSyncEnabled);
+                fieldContentParserPreferences, keywordSyncEnabled);
     }
 
+    /**
+     * @deprecated importer should not keyword synchronization; this is a post-import action
+     */
+    @Deprecated
     public boolean isKeywordSyncEnabled() {
         return keywordSyncEnabled;
     }
