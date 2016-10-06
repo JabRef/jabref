@@ -1400,6 +1400,9 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     case WILL_SHOW_EDITOR:
                         getCurrentEditor().close();
                         break;
+                    default:
+                        LOGGER.warn("unknown BasePanelMode: '" + mode + "', doing nothing");
+                        break;
                 }
             }
         });
