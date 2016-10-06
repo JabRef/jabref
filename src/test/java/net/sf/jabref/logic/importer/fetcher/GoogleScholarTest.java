@@ -73,6 +73,7 @@ public class GoogleScholarTest {
     @Test
     public void findSingleEntry() throws FetcherException {
         entry.setType(BibtexEntryTypes.INPROCEEDINGS.getName());
+        entry.setCiteKey("geiger2013detecting");
         entry.setField(FieldName.TITLE, "Detecting Interoperability and Correctness Issues in BPMN 2.0 Process Models.");
         entry.setField(FieldName.AUTHOR, "Geiger, Matthias and Wirtz, Guido");
         entry.setField(FieldName.BOOKTITLE, "ZEUS");
