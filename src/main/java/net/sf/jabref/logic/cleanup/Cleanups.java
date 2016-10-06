@@ -6,9 +6,14 @@ import java.util.List;
 
 import net.sf.jabref.logic.formatter.Formatters;
 import net.sf.jabref.logic.formatter.IdentityFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.HtmlToLatexFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.LatexCleanupFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeMonthFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.OrdinalsToSuperscriptFormatter;
+import net.sf.jabref.logic.formatter.bibtexfields.UnitsToLatexFormatter;
+import net.sf.jabref.logic.formatter.casechanger.ProtectTermsFormatter;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.cleanup.Formatter;
@@ -20,14 +25,20 @@ public class Cleanups {
     public static final FieldFormatterCleanups DEFAULT_SAVE_ACTIONS;
     public static List<Formatter> availableFormatters;
 
+
     static {
         availableFormatters = new ArrayList<>();
         availableFormatters.addAll(Formatters.ALL);
 
         List<FieldFormatterCleanup> defaultFormatters = new ArrayList<>();
         defaultFormatters.add(new FieldFormatterCleanup(FieldName.PAGES, new NormalizePagesFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup(FieldName.DATE, new NormalizeDateFormatter()));
         defaultFormatters.add(new FieldFormatterCleanup(FieldName.MONTH, new NormalizeMonthFormatter()));
-        defaultFormatters.add(new FieldFormatterCleanup(FieldName.BOOKTITLE, new OrdinalsToSuperscriptFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new ProtectTermsFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new UnitsToLatexFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new LatexCleanupFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup(FieldName.TITLE, new HtmlToLatexFormatter()));
+        defaultFormatters.add(new FieldFormatterCleanup(FieldName.ABSTRACT_ALL_TEXT_FIELDS_FIELD, new OrdinalsToSuperscriptFormatter()));
         DEFAULT_SAVE_ACTIONS = new FieldFormatterCleanups(false, defaultFormatters);
     }
 

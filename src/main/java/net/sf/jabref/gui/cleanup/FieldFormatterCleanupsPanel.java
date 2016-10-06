@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +32,7 @@ import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
 import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.cleanup.Formatter;
 import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.InternalBibtexFields;
 import net.sf.jabref.model.metadata.MetaData;
 
@@ -193,8 +195,7 @@ public class FieldFormatterCleanupsPanel extends JPanel {
                         "pref, 2dlu, pref:grow, 2dlu"));
 
         List<String> fieldNames = InternalBibtexFields.getAllPublicFieldNames();
-        fieldNames.add(BibEntry.KEY_FIELD);
-        fieldNames.add("all");
+        fieldNames.addAll(Arrays.asList(BibEntry.KEY_FIELD, FieldName.ABSTRACT_ALL_FIELD, FieldName.ABSTRACT_ALL_TEXT_FIELDS_FIELD));
         Collections.sort(fieldNames);
         String[] allPlusKey = fieldNames.toArray(new String[fieldNames.size()]);
 

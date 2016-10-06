@@ -17,6 +17,9 @@ public class FieldName {
     // author is not set):
     public static final String FIELD_SEPARATOR = "/";
 
+    public static final String ABSTRACT_ALL_FIELD = "all";
+    public static final String ABSTRACT_ALL_TEXT_FIELDS_FIELD = "all_text_fields";
+
     // Field name constants
     public static final String ABSTRACT = "abstract";
     public static final String ADDENDUM = "addendum";
