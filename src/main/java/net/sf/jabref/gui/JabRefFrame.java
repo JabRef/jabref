@@ -102,6 +102,7 @@ import net.sf.jabref.gui.menus.RightClickMenu;
 import net.sf.jabref.gui.openoffice.OpenOfficePanel;
 import net.sf.jabref.gui.preftabs.PreferencesDialog;
 import net.sf.jabref.gui.protectedterms.ProtectedTermsDialog;
+import net.sf.jabref.gui.prrv.PrrvAction;
 import net.sf.jabref.gui.push.PushToApplicationButton;
 import net.sf.jabref.gui.push.PushToApplications;
 import net.sf.jabref.gui.search.GlobalSearchBar;
@@ -229,6 +230,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
     private final AbstractAction help = new HelpAction(Localization.menuTitle("Online help"), Localization.lang("Online help"),
             HelpFile.CONTENTS, Globals.getKeyPrefs().getKey(KeyBinding.HELP));
     private final AbstractAction about = new AboutAction(Localization.menuTitle("About JabRef"), Localization.lang("About JabRef"),
+            IconTheme.getImage("about"));
+    private final AbstractAction prrv = new PrrvAction(Localization.menuTitle("Paper Reference Relationship Visualization"), Localization.lang("Paper Reference Relationship Visualization"),
             IconTheme.getImage("about"));
     private final AbstractAction editEntry = new GeneralAction(Actions.EDIT, Localization.menuTitle("Edit entry"),
             Localization.lang("Edit entry"), Globals.getKeyPrefs().getKey(KeyBinding.EDIT_ENTRY), IconTheme.JabRefIcon.EDIT_ENTRY.getIcon());
@@ -1288,6 +1291,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         view.add(new JCheckBoxMenuItem(togglePreview));
         view.add(getNextPreviewStyleAction());
         view.add(getPreviousPreviewStyleAction());
+        view.addSeparator();
+        view.add(prrv);
+
 
         mb.add(view);
 

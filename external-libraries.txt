@@ -184,9 +184,16 @@ Project: afterburner.fx
 URL:     https://github.com/AdamBien/afterburner.fx
 License: Apache 2.0
 
+Id:      prefux
+Project: lib/prefux.jar
+URL:     https://github.com/effrafax/Prefux
+License: BSD
+
 Id:      de.codecentric.centerdevice
 Project: javafxsvg
 URL:     https://github.com/codecentric/javafxsvg
 License: BSD 3-Clause
+
+
 
 The last entry has to end with an empty line. Otherwise the entry is not present in About.html.

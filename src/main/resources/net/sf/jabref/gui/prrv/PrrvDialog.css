@@ -1,0 +1,30 @@
+.about-heading {
+	-fx-background-color: linear-gradient(#F0EEF7, #D8D4EC);
+	-fx-background-radius: 20px;
+	-fx-background-insets: 10px;
+	-fx-border-style: solid;
+	-fx-border-radius: 20px;
+	-fx-border-insets: 10px;
+	-fx-padding: 5px;
+}
+
+.about-heading:pressed {
+	-fx-text-fill: #1E90FF;
+}
+
+.general-info {
+	-fx-padding: 5px;
+}
+
+.info-sections {
+	-fx-padding: 5px;
+}
+
+.custom-buttons {
+	-fx-padding: 5px;
+}
+
+.dialog-pane *.button-bar {
+	-fx-max-height: 0;
+	-fx-pref-height: 0;
+}
