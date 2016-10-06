@@ -103,7 +103,7 @@ public class MedlineFetcher implements IdBasedParserFetcher, SearchBasedFetcher 
                 }
             }
         } catch (IOException | URISyntaxException e) {
-            throw new FetcherException(e.getLocalizedMessage(), e);
+            throw new FetcherException("Unable to get PubMed ID's.", e);
         }
     }
 
