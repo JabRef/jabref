@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
@@ -23,6 +24,7 @@ import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.filelist.FileListTableModel;
+import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.mergeentries.FetchAndMergeEntry;
 import net.sf.jabref.gui.worker.MarkEntriesAction;
 import net.sf.jabref.logic.l10n.Localization;
@@ -67,20 +69,18 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         addPopupMenuListener(this);
 
         JMenu copySpecialMenu = new JMenu(Localization.lang("Copy") + "...");
-        copySpecialMenu.add(new GeneralAction(Actions.COPY_KEY, Localization.lang("Copy BibTeX key")));
-        copySpecialMenu.add(new GeneralAction(Actions.COPY_CITE_KEY, Localization.lang("Copy \\cite{BibTeX key}")));
-        copySpecialMenu
-                .add(new GeneralAction(Actions.COPY_KEY_AND_TITLE, Localization.lang("Copy BibTeX key and title")));
-        copySpecialMenu
-                .add(new GeneralAction(Actions.COPY_KEY_AND_LINK, Localization.lang("Copy BibTeX key and link")));
+        copySpecialMenu.add(new GeneralAction(Actions.COPY_KEY, Localization.lang("Copy BibTeX key"), KeyBinding.COPY_BIBTEX_KEY));
+        copySpecialMenu.add(new GeneralAction(Actions.COPY_CITE_KEY, Localization.lang("Copy \\cite{BibTeX key}"), KeyBinding.COPY_CITE_BIBTEX_KEY));
+        copySpecialMenu.add(new GeneralAction(Actions.COPY_KEY_AND_TITLE, Localization.lang("Copy BibTeX key and title"), KeyBinding.COPY_BIBTEX_KEY_AND_TITLE));
+        copySpecialMenu.add(new GeneralAction(Actions.COPY_KEY_AND_LINK, Localization.lang("Copy BibTeX key and link"), KeyBinding.COPY_BIBTEX_KEY_AND_LINK));
         copySpecialMenu.add(new GeneralAction(Actions.EXPORT_TO_CLIPBOARD, Localization.lang("Export to clipboard"),
                 IconTheme.JabRefIcon.EXPORT_TO_CLIPBOARD.getSmallIcon()));
 
-        add(new GeneralAction(Actions.COPY, Localization.lang("Copy"), IconTheme.JabRefIcon.COPY.getSmallIcon()));
+        add(new GeneralAction(Actions.COPY, Localization.lang("Copy"), IconTheme.JabRefIcon.COPY.getSmallIcon(), KeyBinding.COPY));
         add(copySpecialMenu);
-        add(new GeneralAction(Actions.PASTE, Localization.lang("Paste"), IconTheme.JabRefIcon.PASTE.getSmallIcon()));
-        add(new GeneralAction(Actions.CUT, Localization.lang("Cut"), IconTheme.JabRefIcon.CUT.getSmallIcon()));
-        add(new GeneralAction(Actions.DELETE, Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getSmallIcon()));
+        add(new GeneralAction(Actions.PASTE, Localization.lang("Paste"), IconTheme.JabRefIcon.PASTE.getSmallIcon(), KeyBinding.PASTE));
+        add(new GeneralAction(Actions.CUT, Localization.lang("Cut"), IconTheme.JabRefIcon.CUT.getSmallIcon(), KeyBinding.CUT));
+        add(new GeneralAction(Actions.DELETE, Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getSmallIcon(), KeyBinding.DELETE_ENTRY));
         add(new GeneralAction(Actions.PRINT_PREVIEW, Localization.lang("Print entry preview"), IconTheme.JabRefIcon.PRINTED.getSmallIcon()) {
             {
                 if (multiple) {
@@ -94,23 +94,24 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         addSeparator();
 
         JMenu markSpecific = JabRefFrame.subMenu(Localization.menuTitle("Mark specific color"));
+        markSpecific.setIcon(IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon());
         for (int i = 0; i < EntryMarker.MAX_MARKING_LEVEL; i++) {
             markSpecific.add(new MarkEntriesAction(frame, i).getMenuItem());
         }
 
         if (multiple) {
-            add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entries"), IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon()));
+            add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entries"), IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon(), KeyBinding.MARK_ENTRIES));
             add(markSpecific);
-            add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entries"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon()));
+            add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entries"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon(), KeyBinding.UNMARK_ENTRIES));
         } else if (be != null) {
             Optional<String> marked = be.getField(FieldName.MARKED_INTERNAL);
             // We have to check for "" too as the marked field may be empty
             if ((!marked.isPresent()) || marked.get().isEmpty()) {
-                add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entry"), IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon()));
+                add(new GeneralAction(Actions.MARK_ENTRIES, Localization.lang("Mark entry"), IconTheme.JabRefIcon.MARK_ENTRIES.getSmallIcon(), KeyBinding.MARK_ENTRIES));
                 add(markSpecific);
             } else {
                 add(markSpecific);
-                add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entry"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon()));
+                add(new GeneralAction(Actions.UNMARK_ENTRIES, Localization.lang("Unmark entry"), IconTheme.JabRefIcon.UNMARK_ENTRIES.getSmallIcon(), KeyBinding.UNMARK_ENTRIES));
             }
         }
 
@@ -150,7 +151,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         addSeparator();
 
-        add(new GeneralAction(Actions.OPEN_FOLDER, Localization.lang("Open folder")) {
+        add(new GeneralAction(Actions.OPEN_FOLDER, Localization.lang("Open folder"), KeyBinding.OPEN_FOLDER) {
             {
                 if (!isFieldSetForSelectedEntry(FieldName.FILE)) {
                     this.setEnabled(false);
@@ -158,7 +159,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
-        add(new GeneralAction(Actions.OPEN_EXTERNAL_FILE, Localization.lang("Open file"), getFileIconForSelectedEntry()) {
+        add(new GeneralAction(Actions.OPEN_EXTERNAL_FILE, Localization.lang("Open file"), getFileIconForSelectedEntry(), KeyBinding.OPEN_FILE) {
             {
                 if (!isFieldSetForSelectedEntry(FieldName.FILE)) {
                     this.setEnabled(false);
@@ -166,7 +167,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
             }
         });
 
-        add(new GeneralAction(Actions.OPEN_URL, Localization.lang("Open URL or DOI"), IconTheme.JabRefIcon.WWW.getSmallIcon()) {
+        add(new GeneralAction(Actions.OPEN_URL, Localization.lang("Open URL or DOI"), IconTheme.JabRefIcon.WWW.getSmallIcon(), KeyBinding.OPEN_URL_OR_DOI) {
             {
                 if(!(isFieldSetForSelectedEntry(FieldName.URL) || isFieldSetForSelectedEntry(FieldName.DOI))) {
                     this.setEnabled(false);
@@ -306,6 +307,18 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         public GeneralAction(String command, String name, Icon icon) {
             super(name, icon);
             this.command = command;
+        }
+
+        public GeneralAction(String command, String name, KeyBinding key) {
+            super(name);
+            this.command = command;
+            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(key));
+        }
+
+        public GeneralAction(String command, String name, Icon icon, KeyBinding key) {
+            super(name, icon);
+            this.command = command;
+            putValue(Action.ACCELERATOR_KEY, Globals.getKeyPrefs().getKey(key));
         }
 
         @Override
