@@ -5,7 +5,6 @@ import java.io.StringReader;
 import java.net.HttpCookie;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,7 +21,6 @@ import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
-import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -157,8 +155,6 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
                 throw new FetcherException("Parsing entries from Google Scholar bib file failed.");
             } else {
                 BibEntry entry = entries.iterator().next();
-                entry.clearField(BibEntry.KEY_FIELD);
-
                 return entry;
             }
         }
