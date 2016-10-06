@@ -2,7 +2,6 @@ package net.sf.jabref.gui.importer;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.io.IOException;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,7 +28,6 @@ import javax.swing.table.TableColumnModel;
 
 import net.sf.jabref.gui.util.GUIUtil;
 import net.sf.jabref.logic.importer.fileformat.CustomImporter;
-import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 
 import org.apache.commons.logging.Log;
@@ -82,21 +80,17 @@ class ZipFileChooser extends JDialog {
             } else {
                 ZipFileChooserTableModel model = (ZipFileChooserTableModel) table.getModel();
                 ZipEntry tempZipEntry = model.getZipEntry(row);
-                CustomImporter importer = new CustomImporter();
-                importer.setBasePath(model.getZipFile().getName());
-                String className = tempZipEntry.getName().substring(0, tempZipEntry.getName().lastIndexOf('.'))
-                        .replace("/", ".");
-                importer.setClassName(className);
+                String className = tempZipEntry.getName().substring(0, tempZipEntry.getName().lastIndexOf('.')).replace(
+                        "/", ".");
+
                 try {
-                    ImportFormat importFormat = importer.getInstance();
-                    importer.setName(importFormat.getFormatName());
-                    importer.setCliId(importFormat.getId());
+                    CustomImporter importer = new CustomImporter(model.getZipFile().getName(), className);
                     importCustomizationDialog.addOrReplaceImporter(importer);
                     dispose();
-                } catch (IOException | ClassNotFoundException | InstantiationException | IllegalAccessException exc) {
-                    LOGGER.warn("Could not instantiate importer: " + importer.getName(), exc);
+                } catch (ClassNotFoundException exc) {
+                    LOGGER.warn("Could not instantiate importer: " + className, exc);
                     JOptionPane.showMessageDialog(this, Localization.lang("Could not instantiate %0 %1",
-                            importer.getName() + ":\n", exc.getMessage()));
+                            className + ":\n", exc.getMessage()));
                 }
             }
         });

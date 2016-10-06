@@ -61,8 +61,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Entryfields can now be hidden (related to issue https://github.com/JabRef/jabref/pull/1883)
 
 
-
 ### Fixed
+- Fixed [#2092](https://github.com/JabRef/jabref/issues/2092): "None"-button in date picker clears the date field
 - Fixed [#1993](https://github.com/JabRef/jabref/issues/1993): Various optimizations regarding search performance
 - Fixed [koppor#160](https://github.com/koppor/jabref/issues/160): Tooltips now working in the main table
 - Fixed [#2054](https://github.com/JabRef/jabref/issues/2054): Ignoring a new version now works as expected

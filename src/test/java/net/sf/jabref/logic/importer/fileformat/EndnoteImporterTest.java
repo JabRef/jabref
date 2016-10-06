@@ -35,7 +35,7 @@ public class EndnoteImporterTest {
 
     @Test
     public void testGetFormatName() {
-        assertEquals("Refer/Endnote", importer.getFormatName());
+        assertEquals("Refer/Endnote", importer.getName());
     }
 
     @Test

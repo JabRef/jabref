@@ -7,6 +7,7 @@ import java.util.Objects;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.msbib.MSBibDatabase;
 import net.sf.jabref.logic.util.FileExtensions;
@@ -20,7 +21,7 @@ import org.xml.sax.InputSource;
  *
  * ...
  */
-public class MsBibImporter extends ImportFormat {
+public class MsBibImporter extends Importer {
 
     @Override
     public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
@@ -50,7 +51,7 @@ public class MsBibImporter extends ImportFormat {
     }
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "MSBib";
     }
 

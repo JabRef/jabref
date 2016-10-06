@@ -18,6 +18,7 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.medline.Abstract;
 import net.sf.jabref.logic.importer.fileformat.medline.AbstractText;
@@ -79,7 +80,7 @@ import org.apache.commons.logging.LogFactory;
  * check here for details on the format
  * https://www.nlm.nih.gov/bsd/licensee/elements_descriptions.html
  */
-public class MedlineImporter extends ImportFormat {
+public class MedlineImporter extends Importer {
 
     private static final Log LOGGER = LogFactory.getLog(MedlineImporter.class);
     private static final String KEYWORD_SEPARATOR = "; ";
@@ -88,7 +89,7 @@ public class MedlineImporter extends ImportFormat {
 
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "Medline";
     }
 
