@@ -160,7 +160,8 @@ All log messages are passed internally to Java's [java.util.logging](http://docs
   ```
 
 ## Using Localization correctly
-*(More information about this topic from the translator side is provided [here in the wiki](https://github.com/JabRef/jabref/wiki/Translating-JabRef))*
+*(More information about this topic from the translator side is provided [here] (https://github.com/JabRef/jabref/wiki/Translating-JabRef-Interface) about the JabRef interface and 
+[here] (https://github.com/JabRef/jabref/wiki/Translating-JabRef-Help) about the JabRef help files)*
 
 All labeled UI elements, descriptions and messages shown to the user should be localized, i.e., should be displayed in the chosen language.
 
