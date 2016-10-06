@@ -1008,13 +1008,16 @@ public class EntryEditor extends JPanel implements EntryContainer {
             //  This makes sure they are updated even if the tab we
             // just left contained one
             // or more of the same fields as this one:
-            SwingUtilities.invokeLater(() -> {
-                Object activeTab = tabs.get(tabbed.getSelectedIndex());
-                if (activeTab instanceof EntryEditorTab) {
-                    ((EntryEditorTab) activeTab).updateAll();
-                    activateVisible();
-                }
-            });
+            panel.runCommand(Actions.SAVE);
+            if (lastFieldAccepted) {
+                SwingUtilities.invokeLater(() -> {
+                    Object activeTab = tabs.get(tabbed.getSelectedIndex());
+                    if (activeTab instanceof EntryEditorTab) {
+                        ((EntryEditorTab) activeTab).updateAll();
+                        activateVisible();
+                    }
+                });
+            }
         }
     }
 
@@ -1248,10 +1251,15 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int i = tabbed.getSelectedIndex();
-            tabbed.setSelectedIndex(i > 0 ? i - 1 : tabbed.getTabCount() - 1);
+            if (lastFieldAccepted) {
+                int i = tabbed.getSelectedIndex();
+                tabbed.setSelectedIndex(i > 0 ? i - 1 : tabbed.getTabCount() - 1);
 
-            activateVisible();
+                activateVisible();
+            } else {
+                panel.runCommand(Actions.SAVE);
+                lastFieldAccepted = true;
+            }
         }
     }
 
@@ -1262,9 +1270,14 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            int i = tabbed.getSelectedIndex();
-            tabbed.setSelectedIndex(i < (tabbed.getTabCount() - 1) ? i + 1 : 0);
-            activateVisible();
+            if (lastFieldAccepted) {
+                int i = tabbed.getSelectedIndex();
+                tabbed.setSelectedIndex(i < (tabbed.getTabCount() - 1) ? i + 1 : 0);
+                activateVisible();
+            } else {
+                panel.runCommand(Actions.SAVE);
+                lastFieldAccepted = true;
+            }
 
         }
     }
@@ -1278,7 +1291,13 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            panel.selectNextEntry();
+            if (lastFieldAccepted) {
+                panel.selectNextEntry();
+            } else {
+                panel.runCommand(Actions.SAVE);
+                lastFieldAccepted = true;
+            }
+
         }
     }
 
@@ -1291,7 +1310,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            panel.selectPreviousEntry();
+            if (lastFieldAccepted) {
+                panel.selectPreviousEntry();
+            } else {
+                panel.runCommand(Actions.SAVE);
+                lastFieldAccepted = true;
+            }
         }
     }
 
