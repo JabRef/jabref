@@ -9,7 +9,6 @@ import java.util.Optional;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
@@ -50,8 +49,6 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     private final JMenuItem groupAdd;
     private final JMenuItem groupRemove;
     private final JMenuItem groupMoveTo;
-    private final JCheckBoxMenuItem floatMarked = new JCheckBoxMenuItem(Localization.lang("Float marked entries"),
-            Globals.prefs.getBoolean(JabRefPreferences.FLOAT_MARKED_ENTRIES));
 
 
     public RightClickMenu(JabRefFrame frame, BasePanel panel) {
@@ -81,13 +78,10 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         add(new GeneralAction(Actions.PASTE, Localization.lang("Paste"), IconTheme.JabRefIcon.PASTE.getSmallIcon(), KeyBinding.PASTE));
         add(new GeneralAction(Actions.CUT, Localization.lang("Cut"), IconTheme.JabRefIcon.CUT.getSmallIcon(), KeyBinding.CUT));
         add(new GeneralAction(Actions.DELETE, Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getSmallIcon(), KeyBinding.DELETE_ENTRY));
-        add(new GeneralAction(Actions.PRINT_PREVIEW, Localization.lang("Print entry preview"), IconTheme.JabRefIcon.PRINTED.getSmallIcon()) {
-            {
-                if (multiple) {
-                    this.setEnabled(false);
-                }
-            }
-        });
+        GeneralAction printPreviewAction = new GeneralAction(Actions.PRINT_PREVIEW, Localization.lang("Print entry preview"), IconTheme.JabRefIcon.PRINTED.getSmallIcon());
+        printPreviewAction.setEnabled(multiple);
+        add(printPreviewAction);
+
         addSeparator();
 
         add(new GeneralAction(Actions.SEND_AS_EMAIL, Localization.lang("Send as email"), IconTheme.JabRefIcon.EMAIL.getSmallIcon()));
@@ -151,62 +145,43 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
 
         addSeparator();
 
-        add(new GeneralAction(Actions.OPEN_FOLDER, Localization.lang("Open folder"), KeyBinding.OPEN_FOLDER) {
-            {
-                if (!isFieldSetForSelectedEntry(FieldName.FILE)) {
-                    this.setEnabled(false);
-                }
-            }
-        });
+        GeneralAction openFolderAction = new GeneralAction(Actions.OPEN_FOLDER, Localization.lang("Open folder"),
+                KeyBinding.OPEN_FOLDER);
+        openFolderAction.setEnabled(isFieldSetForSelectedEntry(FieldName.FILE));
+        add(openFolderAction);
 
-        add(new GeneralAction(Actions.OPEN_EXTERNAL_FILE, Localization.lang("Open file"), getFileIconForSelectedEntry(), KeyBinding.OPEN_FILE) {
-            {
-                if (!isFieldSetForSelectedEntry(FieldName.FILE)) {
-                    this.setEnabled(false);
-                }
-            }
-        });
+        GeneralAction openFileAction = new GeneralAction(Actions.OPEN_EXTERNAL_FILE, Localization.lang("Open file"),
+                getFileIconForSelectedEntry(), KeyBinding.OPEN_FILE);
+        openFileAction.setEnabled(isFieldSetForSelectedEntry(FieldName.FILE));
+        add(openFileAction);
 
-        add(new GeneralAction(Actions.OPEN_URL, Localization.lang("Open URL or DOI"), IconTheme.JabRefIcon.WWW.getSmallIcon(), KeyBinding.OPEN_URL_OR_DOI) {
-            {
-                if(!(isFieldSetForSelectedEntry(FieldName.URL) || isFieldSetForSelectedEntry(FieldName.DOI))) {
-                    this.setEnabled(false);
-                }
-            }
-        });
+        GeneralAction openUrlAction = new GeneralAction(Actions.OPEN_URL, Localization.lang("Open URL or DOI"),
+                IconTheme.JabRefIcon.WWW.getSmallIcon(), KeyBinding.OPEN_URL_OR_DOI);
+        openUrlAction.setEnabled(isFieldSetForSelectedEntry(FieldName.URL) || isFieldSetForSelectedEntry(FieldName.DOI));
+        add(openUrlAction);
 
         addSeparator();
 
         add(typeMenu);
 
-        add(new GeneralAction(Actions.MERGE_WITH_FETCHED_ENTRY,
-                Localization.lang("Get BibTeX data from %0", FetchAndMergeEntry.getDisplayNameOfSupportedFields())) {
-            {
-                if (!(isAnyFieldSetForSelectedEntry(FetchAndMergeEntry.SUPPORTED_FIELDS))) {
-                    this.setEnabled(false);
-                }
-            }
-        });
+        GeneralAction mergeFetchedEntryAction = new GeneralAction(Actions.MERGE_WITH_FETCHED_ENTRY,
+                Localization.lang("Get BibTeX data from %0", FetchAndMergeEntry.getDisplayNameOfSupportedFields()));
+        mergeFetchedEntryAction.setEnabled(isAnyFieldSetForSelectedEntry(FetchAndMergeEntry.SUPPORTED_FIELDS));
+        add(mergeFetchedEntryAction);
+
         add(frame.getMassSetField());
-        add(new GeneralAction(Actions.ADD_FILE_LINK, Localization.lang("Attach file"), IconTheme.JabRefIcon.ATTACH_FILE.getSmallIcon()) {
-            {
-                if (multiple) {
-                    this.setEnabled(false);
-                }
-            }
-        });
+
+        GeneralAction attachFileAction = new GeneralAction(Actions.ADD_FILE_LINK, Localization.lang("Attach file"),
+                IconTheme.JabRefIcon.ATTACH_FILE.getSmallIcon());
+        attachFileAction.setEnabled(!multiple);
+        add(attachFileAction);
+
         add(frame.getManageKeywords());
-        add(new GeneralAction(Actions.MERGE_ENTRIES,
-                Localization.lang("Merge entries") + "...",
-                IconTheme.JabRefIcon.MERGE_ENTRIES.getSmallIcon()) {
 
-            {
-                if (!(areExactlyTwoEntriesSelected())) {
-                    this.setEnabled(false);
-                }
-            }
-
-        });
+        GeneralAction mergeEntriesAction = new GeneralAction(Actions.MERGE_ENTRIES,
+                Localization.lang("Merge entries") + "...", IconTheme.JabRefIcon.MERGE_ENTRIES.getSmallIcon());
+        mergeEntriesAction.setEnabled(areExactlyTwoEntriesSelected());
+        add(mergeEntriesAction);
 
         addSeparator(); // for "add/move/remove to/from group" entries (appended here)
 
@@ -248,15 +223,11 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
     @Override
     public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
         panel.storeCurrentEdit();
-        if (panel.getBibDatabaseContext().getMetaData().getGroups().isPresent()) {
-            groupAdd.setEnabled(true);
-            groupRemove.setEnabled(true);
-            groupMoveTo.setEnabled(true);
-        } else {
-            groupAdd.setEnabled(false);
-            groupRemove.setEnabled(false);
-            groupMoveTo.setEnabled(false);
-        }
+
+        boolean groupsPresent = panel.getBibDatabaseContext().getMetaData().getGroups().isPresent();
+        groupAdd.setEnabled(groupsPresent);
+        groupRemove.setEnabled(groupsPresent);
+        groupMoveTo.setEnabled(groupsPresent);
     }
 
 
