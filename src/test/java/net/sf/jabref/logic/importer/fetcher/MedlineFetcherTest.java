@@ -8,6 +8,7 @@ import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibLatexEntryTypes;
 import net.sf.jabref.model.entry.FieldName;
+import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,18 +24,16 @@ public class MedlineFetcherTest {
 
     @Before
     public void setUp() {
-        fetcher = new MedlineFetcher();
+        fetcher = new MedlineFetcher(JabRefPreferences.getInstance().getImportFormatPreferences());
 
         entryWijedasa = new BibEntry();
         entryWijedasa.setType(BibLatexEntryTypes.ARTICLE);
         entryWijedasa.setField("author", "Wijedasa, Lahiru S and Jauhiainen, Jyrki and Könönen, Mari and Lampela, Maija and Vasander, Harri and LeBlanc, Marie-Claire and Evers, Stephanie and Smith, Thomas E L and Yule, Catherine M and Varkkey, Helena and Lupascu, Massimo and Parish, Faizal and Singleton, Ian and Clements, Gopalasamy R and Aziz, Sheema Abdul and Harrison, Mark E and Cheyne, Susan and Anshari, Gusti Z and Meijaard, Erik and Goldstein, Jenny E and Waldron, Susan and Hergoualc'h, Kristell and Dommain, René and Frolking, Steve and Evans, Christopher D and Posa, Mary Rose C and Glaser, Paul H and Suryadiputra, Nyoman and Lubis, Reza and Santika, Truly and Padfield, Rory and Kurnianto, Sofyan and Hadisiswoyo, Panut and Lim, Teck Wyn and Page, Susan E and Gauci, Vincent and van der Meer, Peter J and Buckland, Helen and Garnier, Fabien and Samuel, Marshall K and Choo, Liza Nuriati Lim Kim and O'Reilly, Patrick and Warren, Matthew and Suksuwan, Surin and Sumarga, Elham and Jain, Anuj and Laurance, William F and Couwenberg, John and Joosten, Hans and Vernimmen, Ronald and Hooijer, Aljosja and Malins, Chris and Cochrane, Mark A and Perumal, Balu and Siegert, Florian and Peh, Kelvin S-H and Comeau, Louis-Pierre and Verchot, Louis and Harvey, Charles F and Cobb, Alex and Jaafar, Zeehan and Wösten, Henk and Manuri, Solichin and Müller, Moritz and Giesen, Wim and Phelps, Jacob and Yong, Ding Li and Silvius, Marcel and Wedeux, Béatrice M M and Hoyt, Alison and Osaki, Mitsuru and Takashi, Hirano and Takahashi, Hidenori and Kohyama, Takashi S and Haraguchi, Akira and Nugroho, Nunung P and Coomes, David A and Quoi, Le Phat and Dohong, Alue and Gunawan, Haris and Gaveau, David L A and Langner, Andreas and Lim, Felix K S and Edwards, David P and Giam, Xingli and van der Werf, Guido and Carmenta, Rachel and Verwer, Caspar C and Gibson, Luke and Grandois, Laure and Graham, Laura Linda Bozena and Regalino, Jhanson and Wich, Serge A and Rieley, Jack and Kettridge, Nicholas and Brown, Chloe and Pirard, Romain and Moore, Sam and Ripoll Capilla, B and Ballhorn, Uwe and Ho, Hua Chew and Hoscilo, Agata and Lohberger, Sandra and Evans, Theodore A and Yulianti, Nina and Blackham, Grace and Onrizal and Husson, Simon and Murdiyarso, Daniel and Pangala, Sunita and Cole, Lydia E S and Tacconi, Luca and Segah, Hendrik and Tonoto, Prayoto and Lee, Janice S H and Schmilewski, Gerald and Wulffraat, Stephan and Putra, Erianto Indra and Cattau, Megan E and Clymo, R S and Morrison, Ross and Mujahid, Aazani and Miettinen, Jukka and Liew, Soo Chin and Valpola, Samu and Wilson, David and D'Arcy, Laura and Gerding, Michiel and Sundari, Siti and Thornton, Sara A and Kalisz, Barbara and Chapman, Stephen J and Su, Ahmad Suhaizi Mat and Basuki, Imam and Itoh, Masayuki and Traeholt, Carl and Sloan, Sean and Sayok, Alexander K and Andersen, Roxane");
-        entryWijedasa.setField("copyright", "This article is protected by copyright. All rights reserved.");
         entryWijedasa.setField("created", "2016-9-27");
         entryWijedasa.setField("doi", "10.1111/gcb.13516");
         entryWijedasa.setField("issn", "1365-2486");
         entryWijedasa.setField("issn-linking", "1354-1013");
         entryWijedasa.setField("journal", "Global change biology");
-        entryWijedasa.setField("journal-abbreviation", "Glob Chang Biol");
         entryWijedasa.setField("keywords", "Acacia; Agriculture; Emissions; Subsidence; Sustainability; Tropical peatlands; oil palm");
         entryWijedasa.setField("month", "Sep");
         entryWijedasa.setField("nlm-id", "9888746");
@@ -43,7 +42,6 @@ public class MedlineFetcherTest {
         entryWijedasa.setField("pubmodel", "Print-Electronic");
         entryWijedasa.setField("pubstatus", "aheadofprint");
         entryWijedasa.setField("revised", "2016-9-27");
-        entryWijedasa.setField("status", "Publisher");
         entryWijedasa.setField("title", "Denial of long-term issues with agriculture on tropical peatlands will have devastating consequences.");
         entryWijedasa.setField("year", "2016");
 
@@ -56,7 +54,6 @@ public class MedlineFetcherTest {
         entryEndharti.setField("issn-linking", "1472-6882");
         entryEndharti.setField("issue", "1");
         entryEndharti.setField("journal", "BMC complementary and alternative medicine");
-        entryEndharti.setField("journal-abbreviation", "BMC Complement Altern Med");
         entryEndharti.setField("keywords", "CAC; Dendrophtoe pentandra; IL-22; MPO; Proliferation; p53");
         entryEndharti.setField("nlm-id", "101088661");
         entryEndharti.setField("owner", "NLM");
@@ -65,7 +62,6 @@ public class MedlineFetcherTest {
         entryEndharti.setField("pubmodel", "Electronic");
         entryEndharti.setField("pubstatus", "epublish");
         entryEndharti.setField("revised", "2016-9-27");
-        entryEndharti.setField("status", "Publisher");
         entryEndharti.setField("volume", "16");
         entryEndharti.setField("year", "2016");
 
@@ -75,7 +71,6 @@ public class MedlineFetcherTest {
         bibEntryIchikawa.setField("chemicals", "Antibodies, Protozoan, Antigens, Protozoan, GRA7 protein, Toxoplasma gondii, Protozoan Proteins");
         bibEntryIchikawa.setField("citation-subset", "IM");
         bibEntryIchikawa.setField("completed", "2016-07-26");
-        bibEntryIchikawa.setField("copyright", "Copyright © 2015 Elsevier Ireland Ltd. All rights reserved.");
         bibEntryIchikawa.setField("country", "Netherlands");
         bibEntryIchikawa.setField("created", "2015-09-26");
         bibEntryIchikawa.setField("doi", "10.1016/j.parint.2015.07.004");
@@ -83,7 +78,6 @@ public class MedlineFetcherTest {
         bibEntryIchikawa.setField("issn-linking", "1383-5769");
         bibEntryIchikawa.setField("issue", "6");
         bibEntryIchikawa.setField("journal", "Parasitology international");
-        bibEntryIchikawa.setField("journal-abbreviation", "Parasitol Int");
         bibEntryIchikawa.setField("keywords", "Animals; Antibodies, Protozoan, blood; Antigens, Protozoan, immunology; Cattle, parasitology; Cattle Diseases, epidemiology, parasitology; Enzyme-Linked Immunosorbent Assay, veterinary; Geography; Humans; Indonesia, epidemiology; Livestock, immunology, parasitology; Meat, parasitology; Protozoan Proteins, immunology; Seroepidemiologic Studies; Swine, parasitology; Swine Diseases, epidemiology, parasitology; Toxoplasma, immunology; Toxoplasmosis, Animal, epidemiology, immunology, parasitology; Cattle; ELISA; Indonesia; Pig; TgGRA7; Toxoplasma gondii");
         bibEntryIchikawa.setField("month", "Dec");
         bibEntryIchikawa.setField("nlm-id", "9708549");
@@ -92,7 +86,6 @@ public class MedlineFetcherTest {
         bibEntryIchikawa.setField("pii", "S1383-5769(15)00124-5");
         bibEntryIchikawa.setField("pmid", "26197440");
         bibEntryIchikawa.setField("pubmodel", "Print-Electronic");
-        bibEntryIchikawa.setField("status", "MEDLINE");
         bibEntryIchikawa.setField("title", "Seroprevalence of antibody to TgGRA7 antigen of Toxoplasma gondii in livestock animals from Western Java, Indonesia.");
         bibEntryIchikawa.setField("volume", "64");
         bibEntryIchikawa.setField("year", "2015");
@@ -109,7 +102,6 @@ public class MedlineFetcherTest {
         bibEntrySari.setField("issn-linking", "0125-1562");
         bibEntrySari.setField("issue", "6");
         bibEntrySari.setField("journal", "The Southeast Asian journal of tropical medicine and public health");
-        bibEntrySari.setField("journal-abbreviation", "Southeast Asian J Trop Med Public Health");
         bibEntrySari.setField("keywords", "Antibodies, Protozoan; Antibodies, Viral, immunology; Coinfection, epidemiology, immunology; Female; HIV Infections, epidemiology; HTLV-I Antibodies, immunology; HTLV-I Infections, epidemiology, immunology; HTLV-II Antibodies, immunology; HTLV-II Infections, epidemiology, immunology; Hepatitis Antibodies, immunology; Hepatitis B Antibodies, immunology; Hepatitis C Antibodies, immunology; Hepatitis Delta Virus, immunology; Hepatitis, Viral, Human, epidemiology, immunology; Humans; Immunoglobulin G, immunology; Immunoglobulin M, immunology; Indonesia, epidemiology; Male; Prisoners; Seroepidemiologic Studies; Toxoplasma, immunology; Toxoplasmosis, epidemiology, immunology");
         bibEntrySari.setField("month", "Nov");
         bibEntrySari.setField("nlm-id", "0266303");
@@ -117,11 +109,9 @@ public class MedlineFetcherTest {
         bibEntrySari.setField("pages", "977--985");
         bibEntrySari.setField("pmid", "26867355");
         bibEntrySari.setField("pubmodel", "Print");
-        bibEntrySari.setField("status", "MEDLINE");
         bibEntrySari.setField("title", "TOXOPLASMA AND VIRAL ANTIBODIES AMONG HIV PATIENTS AND INMATES IN CENTRAL JAVA, INDONESIA.");
         bibEntrySari.setField("volume", "46");
         bibEntrySari.setField("year", "2015");
-
     }
 
     @Test
@@ -135,55 +125,43 @@ public class MedlineFetcherTest {
     }
 
     @Test
-    public void testFetchUrl() throws Exception {
-        String fetchID = "27670948";
-        assertEquals("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&id=" + fetchID, MedlineFetcher.createFetchUrl(fetchID).toString());
-    }
-
-    @Test
-    public void testSearchUrl() throws Exception {
-        String searchTerm = "java,jdk, jabref";
-        assertEquals("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=1&retstart=0&sort=relevance&term=java+AND+jdk+AND+jabref", MedlineFetcher.createSearchUrl(searchTerm, 0, 1).toString());
-    }
-
-    @Test
     public void testSearchByIDWijedasa() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("27670948");
-        fetchedEntry.ifPresent(entry -> entry.clearField(FieldName.ABSTRACT)); //Remove abstract due to copyright
+        cleanEntries(fetchedEntry.get());
         assertEquals(Optional.of(entryWijedasa), fetchedEntry);
     }
 
     @Test
     public void testSearchByIDEndharti() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("27670445");
-        fetchedEntry.ifPresent(entry -> entry.clearField(FieldName.ABSTRACT)); //Remove abstract due to copyright
+        cleanEntries(fetchedEntry.get());
         assertEquals(Optional.of(entryEndharti), fetchedEntry);
     }
 
     @Test
     public void testSearchByIDIchikawa() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("26197440");
-        fetchedEntry.ifPresent(entry -> entry.clearField(FieldName.ABSTRACT)); //Remove abstract due to copyright
+        cleanEntries(fetchedEntry.get());
         assertEquals(Optional.of(bibEntryIchikawa), fetchedEntry);
     }
 
     @Test
     public void testSearchByIDSari() throws Exception {
         Optional<BibEntry> fetchedEntry = fetcher.performSearchById("26867355");
-        fetchedEntry.ifPresent(entry -> entry.clearField(FieldName.ABSTRACT)); //Remove abstract due to copyright
+        cleanEntries(fetchedEntry.get());
         assertEquals(Optional.of(bibEntrySari), fetchedEntry);
     }
 
     @Test
     public void testMultipleEntries() throws Exception {
         List<BibEntry> entryList = fetcher.performSearch("java");
-        entryList.forEach(entry -> entry.clearField(FieldName.ABSTRACT));
+        entryList.forEach(entry -> cleanEntries(entry));
         assertEquals(50, entryList.size());
         assertTrue(entryList.contains(bibEntryIchikawa));
         assertTrue(entryList.contains(bibEntrySari));
     }
 
-    @Test(expected = IndexOutOfBoundsException.class)//caused by Optional.of(entry.get(0))
+    @Test(expected = FetcherException.class)//caused by Optional.of(entry.get(0))
     public void testInvalidSearchTermCauseIndexOutOfBoundsException() throws Exception {
         fetcher.performSearchById("this.is.a.invalid.search.term.for.the.medline.fetcher");
         fail();
@@ -195,9 +173,15 @@ public class MedlineFetcherTest {
         assertEquals(Collections.emptyList(), entryList);
     }
 
-    @Test(expected = FetcherException.class)
+    @Test
     public void testEmptyInput() throws Exception {
-        fetcher.performSearch("");
-        fail();
+        assertEquals(Collections.emptyList(),fetcher.performSearch(""));
+    }
+
+    private void cleanEntries(BibEntry entry){
+        entry.clearField(FieldName.ABSTRACT); //Remove abstract due to copyright
+        entry.clearField("copyright");
+        entry.clearField("journal-abbreviation");
+        entry.clearField("status");
     }
 }
