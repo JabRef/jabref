@@ -45,7 +45,7 @@ Please read https://github.com/cxxr/better-java
 
 ### Throwing and Catching Exceptions
 Principles: 
-- All Exceptions we throw should be or extend `JabRefException`
+- All Exceptions we throw should be or extend `JabRefException`; This is especially important if the message stored in the Exception should be shown to the user. `JabRefException` has already implemented the `getLocalizedMessage()` method which should be used for such cases (see details below!).
 - Catch and wrap all API exceptions (such as `IOExceptions`) and rethrow them
  - Example:
   ```java
@@ -63,7 +63,7 @@ Principles:
 *(Rationale and further reading: https://today.java.net/article/2006/04/04/exception-handling-antipatterns)*
 
 ### Outputting Errors in the UI
-Principle: Error messages shown to the User should not contain technical details (e.g., underlying exceptions, or even stack traces). Instead, the message should be concise, understandable for non-programmers and localized.
+Principle: Error messages shown to the User should not contain technical details (e.g., underlying exceptions, or even stack traces). Instead, the message should be concise, understandable for non-programmers and localized. The technical reasons (and stack traces) for a failure should only be logged.
 
 To show error message two different ways are usually used in JabRef:
 - showing an error dialog
