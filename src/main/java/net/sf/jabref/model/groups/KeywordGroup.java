@@ -8,7 +8,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import net.sf.jabref.model.FieldChange;
-import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.strings.StringUtil;
 
@@ -38,7 +37,7 @@ public class KeywordGroup extends AbstractGroup {
      */
     public KeywordGroup(String name, String searchField,
                         String searchExpression, boolean caseSensitive, boolean regExp,
-            GroupHierarchyType context, Character keywordSeparator) throws ParseException {
+                        GroupHierarchyType context, Character keywordSeparator) {
         super(name, context);
         this.searchField = searchField;
         this.searchExpression = searchExpression;
@@ -51,12 +50,12 @@ public class KeywordGroup extends AbstractGroup {
         this.searchWords = StringUtil.getStringAsWords(searchExpression);
     }
 
-    private void compilePattern() throws ParseException {
+    private void compilePattern() throws IllegalArgumentException {
         try {
             pattern = caseSensitive ? Pattern.compile("\\b" + searchExpression + "\\b") : Pattern.compile(
                     "\\b" + searchExpression + "\\b", Pattern.CASE_INSENSITIVE);
         } catch (PatternSyntaxException exception) {
-            throw new ParseException("Syntax error in regular-expression pattern: " + searchExpression);
+            throw new IllegalArgumentException("Syntax error in regular-expression pattern: " + searchExpression);
         }
     }
 
@@ -260,15 +259,8 @@ public class KeywordGroup extends AbstractGroup {
 
     @Override
     public AbstractGroup deepCopy() {
-        try {
-            return new KeywordGroup(getName(), searchField, searchExpression,
-                    caseSensitive, regExp, getContext(), keywordSeparator);
-        } catch (ParseException exception) {
-            // this should never happen, because the constructor obviously succeeded in creating _this_ instance!
-            LOGGER.error("Internal error in KeywordGroup.deepCopy(). "
-                    + "Please report this on https://github.com/JabRef/jabref/issues", exception);
-            return null;
-        }
+        return new KeywordGroup(getName(), searchField, searchExpression,
+                caseSensitive, regExp, getContext(), keywordSeparator);
     }
 
     public boolean isCaseSensitive() {

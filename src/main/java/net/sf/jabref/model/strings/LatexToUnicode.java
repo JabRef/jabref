@@ -1,12 +1,22 @@
 package net.sf.jabref.model.strings;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class LatexToUnicode {
 
     private static final Map<String, String> CHARS = HTMLUnicodeConversionMaps.LATEX_UNICODE_CONVERSION_MAP;
     private static final Map<String, String> ACCENTS = HTMLUnicodeConversionMaps.UNICODE_ESCAPED_ACCENTS;
 
+    private static final Pattern AMP_LATEX = Pattern.compile("&|\\\\&");
+    private static final Pattern P_LATEX = Pattern.compile("[\\n]{1,}");
+    private static final Pattern DOLLAR_LATEX = Pattern.compile("\\\\\\$");
+    private static final Pattern DOLLARS_LATEX = Pattern.compile("\\$([^\\$]*)\\$");
+
+    private static final Pattern AMP = Pattern.compile("\\&amp;");
+    private static final Pattern P = Pattern.compile("<p>");
+    private static final Pattern DOLLAR = Pattern.compile("\\&dollar;");
+    private static final Pattern TILDE = Pattern.compile("~");
 
     public String format(String inField) {
         if (inField.isEmpty()) {
@@ -14,8 +24,10 @@ public class LatexToUnicode {
         }
         int i;
         // TODO: document what does this do
-        String field = inField.replaceAll("&|\\\\&", "&amp;").replaceAll("[\\n]{1,}", "<p>").replace("\\$", "&dollar;") // Replace \$ with &dollar;
-                .replaceAll("\\$([^\\$]*)\\$", "\\{$1\\}");
+        String field = AMP_LATEX.matcher(inField).replaceAll("&amp;");
+        field = P_LATEX.matcher(field).replaceAll("<p>");
+        field = DOLLAR_LATEX.matcher(field).replaceAll("&dollar;");
+        field = DOLLARS_LATEX.matcher(field).replaceAll("\\{$1\\}");
 
         StringBuilder sb = new StringBuilder();
         StringBuilder currentCommand = null;
@@ -187,8 +199,11 @@ public class LatexToUnicode {
             }
         }
 
-        return sb.toString().replace("&amp;", "&").replace("<p>", "\n").replace("&dollar;", "$").replace("~",
-                "\u00A0");
+        String result = AMP.matcher(sb.toString()).replaceAll("&");
+        result = P.matcher(result).replaceAll("\n");
+        result = DOLLAR.matcher(result).replaceAll("\\$");
+        result = TILDE.matcher(result).replaceAll("\u00A0");
+        return result;
 
     }
 }

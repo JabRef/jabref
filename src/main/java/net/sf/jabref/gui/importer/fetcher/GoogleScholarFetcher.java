@@ -13,6 +13,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
@@ -75,16 +76,20 @@ public class GoogleScholarFetcher implements PreviewEntryFetcher {
         stopFetching = false;
         try {
             Map<String, JLabel> citations = getCitations(query);
-            for (Map.Entry<String, JLabel> linkEntry : citations.entrySet()) {
-                preview.addEntry(linkEntry.getKey(), linkEntry.getValue());
+            if (!citations.isEmpty()) {
+                for (Map.Entry<String, JLabel> linkEntry : citations.entrySet()) {
+                    preview.addEntry(linkEntry.getKey(), linkEntry.getValue());
+                }
+                return true;
             }
 
-            return true;
+            status.showMessage(Localization.lang("No entries found for the search string '%0'", query),
+                    Localization.lang("Search %0", getTitle()), JOptionPane.INFORMATION_MESSAGE);
         } catch (IOException e) {
-            LOGGER.warn("Error fetching from Google Scholar", e);
-            status.showMessage(Localization.lang("Error while fetching from %0", "Google Scholar"));
-            return false;
+            LOGGER.error("Error while fetching from " + getTitle(), e);
+            preview.showErrorMessage(this.getTitle(), e.getLocalizedMessage());
         }
+        return false;
     }
 
     @Override

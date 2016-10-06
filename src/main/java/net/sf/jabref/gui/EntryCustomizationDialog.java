@@ -379,9 +379,6 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
     private void updateTypesForEntries(String typeName) {
         for (BasePanel bp : frame.getBasePanelList()) {
 
-            // Invalidate associated cached entry editor
-            bp.getEntryEditors().remove(typeName);
-
             for (BibEntry entry : bp.getDatabase().getEntries()) {
                 EntryTypes.getType(entry.getType(), bibDatabaseMode).ifPresent(entry::setType);
             }

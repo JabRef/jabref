@@ -1,6 +1,10 @@
-package net.sf.jabref.model;
+package net.sf.jabref.logic.importer;
 
 public class ParseException extends Exception {
+
+    public ParseException(Throwable cause) {
+        super(cause);
+    }
 
     public ParseException(String message, Throwable cause) {
         super(message, cause);

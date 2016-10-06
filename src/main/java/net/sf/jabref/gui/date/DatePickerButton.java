@@ -47,9 +47,12 @@ public class DatePickerButton implements ActionListener {
                         .fromTimeStampFormat(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT))
                         .getDateAt(date));
             }
-            // Set focus to editor component after changing its text:
-            editor.getTextComponent().requestFocus();
+        } else {
+            // in this case the user selected "none" in the date picker, so we just clear the field
+            editor.setText("");
         }
+        // Set focus to editor component after changing its text:
+        editor.getTextComponent().requestFocus();
     }
 
     public JComponent getDatePicker() {

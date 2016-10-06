@@ -12,17 +12,17 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.DatabaseBibtexKeyPattern;
 import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexString;
@@ -1399,7 +1399,7 @@ public class BibtexParserTest {
                         + "@comment{jabref-meta: saveActions:enabled;title[lower_case]}")
                 );
 
-        FieldFormatterCleanups saveActions = FieldFormatterCleanups.fromMetaData(parserResult.getMetaData()).get();
+        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
 
         assertTrue(saveActions.isEnabled());
         assertEquals(Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())),
@@ -1412,7 +1412,7 @@ public class BibtexParserTest {
 
         ParserResult parserResult = parser.parse(
                 new StringReader("@comment{jabref-meta: saveActions:enabled;title[lower_case]}"));
-        FieldFormatterCleanups saveActions = FieldFormatterCleanups.fromMetaData(parserResult.getMetaData()).get();
+        FieldFormatterCleanups saveActions = parserResult.getMetaData().getSaveActions().get();
 
         assertTrue(saveActions.isEnabled());
         assertEquals(Collections.singletonList(new FieldFormatterCleanup("title", new LowerCaseFormatter())),
@@ -1456,7 +1456,7 @@ public class BibtexParserTest {
                         + "@comment{jabref-meta: keypatterndefault:test;}"), importFormatPreferences);
 
         GlobalBibtexKeyPattern pattern = JabRefPreferences.getInstance().getKeyPattern();
-        AbstractBibtexKeyPattern bibtexKeyPattern = result.getMetaData().getBibtexKeyPattern(pattern);
+        AbstractBibtexKeyPattern bibtexKeyPattern = result.getMetaData().getCiteKeyPattern(pattern);
 
         AbstractBibtexKeyPattern expectedPattern = new DatabaseBibtexKeyPattern(pattern);
         expectedPattern.setDefaultValue("test");
@@ -1712,10 +1712,10 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void parseEmptyPreambleLeadsToEmptyString() throws IOException {
+    public void parseEmptyPreambleLeadsToEmpty() throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader("@preamble{}"), importFormatPreferences);
         assertFalse(result.hasWarnings());
-        assertEquals(Optional.of(""), result.getDatabase().getPreamble());
+        assertEquals(Optional.empty(), result.getDatabase().getPreamble());
     }
 
     @Test
