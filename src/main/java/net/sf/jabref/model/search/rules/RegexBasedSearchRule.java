@@ -6,14 +6,11 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.strings.LatexToUnicode;
 
 /**
  * Search rule for regex-based search.
  */
 public class RegexBasedSearchRule implements SearchRule {
-
-    private static final LatexToUnicode LATEX_TO_UNICODE_FORMATTER = new LatexToUnicode();
 
     private final boolean caseSensitive;
 
