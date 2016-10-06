@@ -2,8 +2,12 @@ package net.sf.jabref.logic.importer.fileformat;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -19,6 +23,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import net.sf.jabref.logic.importer.Importer;
+import net.sf.jabref.logic.importer.ParseException;
+import net.sf.jabref.logic.importer.Parser;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.medline.Abstract;
 import net.sf.jabref.logic.importer.fileformat.medline.AbstractText;
@@ -80,7 +86,7 @@ import org.apache.commons.logging.LogFactory;
  * check here for details on the format
  * https://www.nlm.nih.gov/bsd/licensee/elements_descriptions.html
  */
-public class MedlineImporter extends Importer {
+public class MedlineImporter extends Importer implements Parser {
 
     private static final Log LOGGER = LogFactory.getLog(MedlineImporter.class);
     private static final String KEYWORD_SEPARATOR = "; ";
@@ -662,4 +668,15 @@ public class MedlineImporter extends Importer {
         return startPage + "--" + endPage;
     }
 
+    @Override
+    public List<BibEntry> parseEntries(InputStream inputStream) throws ParseException {
+        try {
+            return importDatabase(
+                    new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8))).getDatabase().getEntries();
+
+        } catch (IOException e) {
+            LOGGER.error(e.getLocalizedMessage(), e);
+        }
+        return Collections.emptyList();
+    }
 }
