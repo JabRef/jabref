@@ -3,6 +3,7 @@ package net.sf.jabref.logic.importer.fetcher;
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.HttpCookie;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -21,12 +22,14 @@ import net.sf.jabref.logic.importer.ImportFormatPreferences;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.SearchBasedFetcher;
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
+import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.net.URLDownload;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.http.client.utils.URIBuilder;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
@@ -39,8 +42,8 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
 
     private static final Pattern LINK_TO_BIB_PATTERN = Pattern.compile("(https:\\/\\/scholar.googleusercontent.com\\/scholar.bib[^\"]*)");
 
-    private static final String BASIC_SEARCH_URL = "https://scholar.google.com/scholar?hl=en&btnG=Search&oe=utf-8&q=%s";
-    private static final String SEARCH_IN_TITLE_URL = "https://scholar.google.com//scholar?as_q=&as_epq=%s&as_occt=title";
+    private static final String BASIC_SEARCH_URL = "https://scholar.google.com/scholar?";
+    private static final String SEARCH_IN_TITLE_URL = "https://scholar.google.com//scholar?";
 
     private static final int NUM_RESULTS = 10;
 
@@ -53,7 +56,7 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
     }
 
     @Override
-    public Optional<URL> findFullText(BibEntry entry) throws IOException {
+    public Optional<URL> findFullText(BibEntry entry) throws IOException, FetcherException {
         Objects.requireNonNull(entry);
         Optional<URL> pdfLink = Optional.empty();
 
@@ -62,28 +65,34 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
             return pdfLink;
         }
 
-        String url = String.format(SEARCH_IN_TITLE_URL,
-                URLEncoder.encode(entry.getField(FieldName.TITLE).orElse(null), StandardCharsets.UTF_8.name()));
+        try {
+            URIBuilder uriBuilder = new URIBuilder(SEARCH_IN_TITLE_URL);
+            uriBuilder.addParameter("as_q", "");
+            uriBuilder.addParameter("as_epq", entry.getField(FieldName.TITLE).orElse(null));
+            uriBuilder.addParameter("as_occt", "title");
 
-        Document doc = Jsoup.connect(url)
-                .userAgent("Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0") // don't identify as a crawler
-                .get();
-        // Check results for PDF link
-        // TODO: link always on first result or none?
-        for (int i = 0; i < NUM_RESULTS; i++) {
-            Elements link = doc.select(String.format("#gs_ggsW%s a", i));
+            Document doc = Jsoup.connect(uriBuilder.toString()).userAgent(
+                    "Mozilla/5.0 (Windows NT 5.1; rv:31.0) Gecko/20100101 Firefox/31.0") // don't identify as a crawler
+                    .get();
+            // Check results for PDF link
+            // TODO: link always on first result or none?
+            for (int i = 0; i < NUM_RESULTS; i++) {
+                Elements link = doc.select(String.format("#gs_ggsW%s a", i));
 
-            if (link.first() != null) {
-                String s = link.first().attr("href");
-                // link present?
-                if (!"".equals(s)) {
-                    // TODO: check title inside pdf + length?
-                    // TODO: report error function needed?! query -> result
-                    LOGGER.info("Fulltext PDF found @ Google: " + s);
-                    pdfLink = Optional.of(new URL(s));
-                    break;
+                if (link.first() != null) {
+                    String s = link.first().attr("href");
+                    // link present?
+                    if (!"".equals(s)) {
+                        // TODO: check title inside pdf + length?
+                        // TODO: report error function needed?! query -> result
+                        LOGGER.info("Fulltext PDF found @ Google: " + s);
+                        pdfLink = Optional.of(new URL(s));
+                        break;
+                    }
                 }
             }
+        } catch (URISyntaxException e) {
+            throw new FetcherException("Building URI failed.", e);
         }
 
         return pdfLink;
@@ -103,21 +112,23 @@ public class GoogleScholar implements FulltextFetcher, SearchBasedFetcher {
     public List<BibEntry> performSearch(String query) throws FetcherException {
         try {
             obtainAndModifyCookie();
-
             List<BibEntry> foundEntries = new ArrayList<>(10);
 
-            String queryURL = String.format(BASIC_SEARCH_URL, URLEncoder.encode(query, StandardCharsets.UTF_8.name()));
-            addHitsFromQuery(foundEntries, queryURL);
-            String content;
+            URIBuilder uriBuilder = new URIBuilder(BASIC_SEARCH_URL);
+            uriBuilder.addParameter("hl", "en");
+            uriBuilder.addParameter("btnG", "Search");
+            uriBuilder.addParameter("q", query);
+
+            addHitsFromQuery(foundEntries, uriBuilder.toString());
 
             if(foundEntries.size()==10) {
-                String secondPage = queryURL+"&start=10";
-                addHitsFromQuery(foundEntries, secondPage);
+                uriBuilder.addParameter("start", "10");
+                addHitsFromQuery(foundEntries, uriBuilder.toString());
             }
 
             return foundEntries;
-        } catch (IOException e) {
-            throw new FetcherException("Fetching entries from Google Scholar failed: ", e);
+        } catch (IOException | URISyntaxException e) {
+            throw new FetcherException("Error while fetching from "+getName(), e);
         }
     }
 

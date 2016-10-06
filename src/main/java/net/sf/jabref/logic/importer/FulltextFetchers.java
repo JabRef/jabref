@@ -62,7 +62,7 @@ public class FulltextFetchers {
                 if (result.isPresent() && MimeTypeDetector.isPdfContentType(result.get().toString())) {
                     return result;
                 }
-            } catch (IOException e) {
+            } catch (IOException | FetcherException e) {
                 LOGGER.debug("Failed to find fulltext PDF at given URL", e);
             }
         }

@@ -37,18 +37,18 @@ public class GoogleScholarTest {
     }
 
     @Test(expected = NullPointerException.class)
-    public void rejectNullParameter() throws IOException {
+    public void rejectNullParameter() throws IOException, FetcherException {
         finder.findFullText(null);
         Assert.fail();
     }
 
     @Test
-    public void requiresEntryTitle() throws IOException {
+    public void requiresEntryTitle() throws IOException, FetcherException {
         Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test
-    public void linkFound() throws IOException {
+    public void linkFound() throws IOException, FetcherException {
         // CI server is blocked by Google
         Assume.assumeFalse(DevEnvironment.isCIServer());
 
@@ -61,7 +61,7 @@ public class GoogleScholarTest {
     }
 
     @Test
-    public void noLinkFound() throws IOException {
+    public void noLinkFound() throws IOException, FetcherException {
         // CI server is blocked by Google
         Assume.assumeFalse(DevEnvironment.isCIServer());
 
