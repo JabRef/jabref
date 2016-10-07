@@ -112,6 +112,7 @@ import net.sf.jabref.logic.util.io.FileBasedLock;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.logic.util.io.RegExpFileSearch;
 import net.sf.jabref.model.FieldChange;
+import net.sf.jabref.model.bibtexkeypattern.AbstractBibtexKeyPattern;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.DatabaseLocation;
@@ -434,29 +435,22 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // Run second, on a different thread:
             @Override
             public void run() {
-                BibEntry bes;
-
-                // First check if any entries have keys set already. If so, possibly remove
-                // them from consideration, or warn about overwriting keys.
-                // This is a partial clone of net.sf.jabref.gui.entryeditor.EntryEditor.GenerateKeyAction.actionPerformed(ActionEvent)
-                for (final Iterator<BibEntry> i = entries.iterator(); i.hasNext();) {
-                    bes = i.next();
-                    if (bes.hasCiteKey()) {
-                        if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
-                            // Remove the entry, because its key is already set:
+                if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
+                    for (final Iterator<BibEntry> i = entries.iterator(); i.hasNext();) {
+                        if (i.next().hasCiteKey()) {
                             i.remove();
-                        } else if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
-                            // Ask if the user wants to cancel the operation:
+                        }
+                    }
+                } else if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
+                    for (final BibEntry entry : entries) {
+                        if (entry.hasCiteKey()) {
                             CheckBoxMessage cbm = new CheckBoxMessage(
                                     Localization.lang("One or more keys will be overwritten. Continue?"),
                                     Localization.lang("Disable this confirmation dialog"), false);
                             final int answer = JOptionPane.showConfirmDialog(frame, cbm,
                                     Localization.lang("Overwrite keys"), JOptionPane.YES_NO_OPTION);
-                            if (cbm.isSelected()) {
-                                Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, false);
-                            }
+                            Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !cbm.isSelected());
                             if (answer == JOptionPane.NO_OPTION) {
-                                // Ok, break off the operation.
                                 canceled = true;
                                 return;
                             }
@@ -467,32 +461,22 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                 }
 
-                Map<BibEntry, String> oldvals = new HashMap<>();
-                // Iterate again, removing already set keys. This is skipped if overwriting
-                // is disabled, since all entries with keys set will have been removed.
-                if (!Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
-                    for (BibEntry entry : entries) {
-                        bes = entry;
-                        // Store the old value:
-                        oldvals.put(bes, bes.getCiteKeyOptional().orElse(null));
-                        bes.clearCiteKey();
+                final NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
+                AbstractBibtexKeyPattern citeKeyPattern = bibDatabaseContext.getMetaData()
+                        .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern());
+                for (BibEntry entry : entries) {
+                    String oldCiteKey = entry.getCiteKeyOptional().orElse("");
+                    BibtexKeyPatternUtil.makeLabel(citeKeyPattern, bibDatabaseContext.getDatabase(),
+                            entry, Globals.prefs.getBibtexKeyPatternPreferences());
+                    String newCiteKey = entry.getCiteKeyOptional().orElse("");
+                    if (!oldCiteKey.equals(newCiteKey)) {
+                        ce.addEdit(new UndoableKeyChange(entry, oldCiteKey, newCiteKey));
                     }
                 }
-
-                final NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
-
-                // Finally, set the new keys:
-                for (BibEntry entry : entries) {
-                    bes = entry;
-                    BibtexKeyPatternUtil.makeLabel(bibDatabaseContext.getMetaData()
-                            .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
-                            bibDatabaseContext.getDatabase(),
-                            bes, Globals.prefs.getBibtexKeyPatternPreferences());
-                    ce.addEdit(new UndoableKeyChange(bibDatabaseContext.getDatabase(), bes, oldvals.get(bes),
-                            bes.getCiteKeyOptional().orElse(null)));
-                }
                 ce.end();
-                getUndoManager().addEdit(ce);
+                if (ce.hasEdits()) {
+                    getUndoManager().addEdit(ce);
+                }
             }
 
             // Run third, on EDT:
@@ -1903,7 +1887,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     public void autoGenerateKeysBeforeSaving() {
         if (Globals.prefs.getBoolean(JabRefPreferences.GENERATE_KEYS_BEFORE_SAVING)) {
             NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
-            boolean any = false;
 
             for (BibEntry bes : bibDatabaseContext.getDatabase().getEntries()) {
                 Optional<String> oldKey = bes.getCiteKeyOptional();
@@ -1912,13 +1895,12 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                             .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
                             bibDatabaseContext.getDatabase(),
                             bes, Globals.prefs.getBibtexKeyPatternPreferences());
-                    ce.addEdit(new UndoableKeyChange(bibDatabaseContext.getDatabase(), bes, null,
-                            bes.getCiteKeyOptional().get())); // Cite key is set here
-                    any = true;
+                    ce.addEdit(new UndoableKeyChange(bes, oldKey.orElse(""), bes.getCiteKeyOptional().get()));
                 }
             }
+
             // Store undo information, if any:
-            if (any) {
+            if (ce.hasEdits()) {
                 ce.end();
                 getUndoManager().addEdit(ce);
             }

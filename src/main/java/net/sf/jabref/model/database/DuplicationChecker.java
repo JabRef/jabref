@@ -2,62 +2,43 @@ package net.sf.jabref.model.database;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import net.sf.jabref.model.database.event.EntryAddedEvent;
+import net.sf.jabref.model.database.event.EntryRemovedEvent;
+import net.sf.jabref.model.entry.BibEntry;
+import net.sf.jabref.model.entry.event.FieldChangedEvent;
+
+import com.google.common.eventbus.Subscribe;
 
 /**
  * Determines which bibtex cite keys are duplicates in a single {@link BibDatabase}.
  */
-class DuplicationChecker {
+public class DuplicationChecker {
 
-    private static final Log LOGGER = LogFactory.getLog(DuplicationChecker.class);
-
-    // use a map instead of a set since i need to know how many of each key is in there
+    /** use a map instead of a set since I need to know how many of each key is in there */
     private final Map<String, Integer> allKeys = new HashMap<>();
 
-    /**
-     * Usage:
-     * <br>
-     * isDuplicate=checkForDuplicateKeyAndAdd( null, b.getKey() , issueDuplicateWarning);
-     *
-     * If the newkey already exists and is not the same as oldkey it will give a warning
-     * else it will add the newkey to the to set and remove the oldkey
-     *
-     * @return true, if there is a duplicate key, else false
-     */
-    public boolean checkForDuplicateKeyAndAdd(String oldKey, String newKey) {
 
-        boolean duplicate = false;
-        if (oldKey == null) { // No old key
-            duplicate = addKeyToSet(newKey);
-        } else {
-            if (oldKey.equals(newKey)) {// were OK because the user did not change keys
-                duplicate = false;
-            } else {
-                removeKeyFromSet(oldKey); // Get rid of old key
-                if (newKey != null) { // Add new key if any
-                    duplicate = addKeyToSet(newKey);
-                }
-            }
-        }
-        if (duplicate) {
-            LOGGER.warn("Warning there is a duplicate key: " + newKey);
-        }
-        return duplicate;
+    /**
+     * Checks if there is more than one occurrence of this key
+     */
+    public boolean isDuplicateExisting(String citeKey) {
+        return getNumberOfKeyOccurrences(citeKey) > 1;
+    }
+
+    /**
+     * Checks if there is more than one occurrence of this key
+     */
+    public boolean isDuplicateExisting(Optional<String> citeKey) {
+        return isDuplicateExisting(citeKey.orElse(""));
     }
 
     /**
      * Returns the number of occurrences of the given key in this database.
      */
-    public int getNumberOfKeyOccurrences(String key) {
-        Integer numberOfOccurrences = allKeys.get(key);
-        if (numberOfOccurrences == null) {
-            return 0;
-        } else {
-            return numberOfOccurrences;
-        }
-
+    public int getNumberOfKeyOccurrences(String citeKey) {
+        return allKeys.getOrDefault(citeKey, 0);
     }
 
     /**
@@ -74,19 +55,14 @@ class DuplicationChecker {
      * Thus, I need a way to count the number of keys of each type.
      * Solution: hashmap=>int (increment each time at add and decrement each time at remove)
      */
-    protected boolean addKeyToSet(String key) {
-        if ((key == null) || key.isEmpty()) {
-            return false;//don't put empty key
+    private boolean addKeyToSet(String key) {
+        if (key == null || key.isEmpty()) {
+            return false;
         }
-        boolean exists = false;
-        if (allKeys.containsKey(key)) {
-            // warning
-            exists = true;
-            allKeys.put(key, allKeys.get(key) + 1);
-        } else {
-            allKeys.put(key, 1);
-        }
-        return exists;
+
+        int numberOfKeyOccurrences = getNumberOfKeyOccurrences(key);
+        allKeys.put(key, numberOfKeyOccurrences + 1);
+        return numberOfKeyOccurrences != 0;
     }
 
     /**
@@ -96,17 +72,35 @@ class DuplicationChecker {
      * <br>
      * Special case: If a null or empty key is passed, it is not counted and thus not removed.
      */
-    protected void removeKeyFromSet(String key) {
-        if ((key == null) || key.isEmpty()) {
+    private void removeKeyFromSet(String key) {
+        if (key == null || key.isEmpty()) {
             return;
         }
-        if (allKeys.containsKey(key)) {
-            Integer tI = allKeys.get(key);
-            if (tI == 1) {
-                allKeys.remove(key);
-            } else {
-                allKeys.put(key, tI - 1);
-            }
+
+        int numberOfKeyOccurrences = getNumberOfKeyOccurrences(key);
+        if (numberOfKeyOccurrences > 1) {
+            allKeys.put(key, numberOfKeyOccurrences - 1);
+        } else {
+            allKeys.remove(key);
         }
     }
+
+    @Subscribe
+    public void listen(FieldChangedEvent fieldChangedEvent) {
+        if (fieldChangedEvent.getFieldName().equals(BibEntry.KEY_FIELD)) {
+            removeKeyFromSet(fieldChangedEvent.getOldValue());
+            addKeyToSet(fieldChangedEvent.getNewValue());
+        }
+    }
+
+    @Subscribe
+    public void listen(EntryRemovedEvent entryRemovedEvent) {
+        removeKeyFromSet(entryRemovedEvent.getBibEntry().getCiteKeyOptional().orElse(null));
+    }
+
+    @Subscribe
+    public void listen(EntryAddedEvent entryAddedEvent) {
+        addKeyToSet(entryAddedEvent.getBibEntry().getCiteKeyOptional().orElse(null));
+    }
+
 }

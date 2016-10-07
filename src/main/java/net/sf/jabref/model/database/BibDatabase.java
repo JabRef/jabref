@@ -65,6 +65,7 @@ public class BibDatabase {
 
 
     public BibDatabase() {
+        this.eventBus.register(duplicationChecker);
         this.registerListener(new KeyChangeListener(this));
     }
 
@@ -181,7 +182,7 @@ public class BibDatabase {
         entry.registerListener(this);
 
         eventBus.post(new EntryAddedEvent(entry, eventSource));
-        return duplicationChecker.checkForDuplicateKeyAndAdd(null, entry.getCiteKey());
+        return duplicationChecker.isDuplicateExisting(entry.getCiteKeyOptional());
     }
 
     /**
@@ -206,29 +207,8 @@ public class BibDatabase {
         boolean anyRemoved = entries.removeIf(entry -> entry.getId().equals(toBeDeleted.getId()));
         if (anyRemoved) {
             internalIDs.remove(toBeDeleted.getId());
-            toBeDeleted.getCiteKeyOptional().ifPresent(duplicationChecker::removeKeyFromSet);
             eventBus.post(new EntryRemovedEvent(toBeDeleted, eventSource));
         }
-    }
-
-    public int getNumberOfKeyOccurrences(String key) {
-        return duplicationChecker.getNumberOfKeyOccurrences(key);
-    }
-
-    /**
-     * Sets the given key to the given entry.
-     * If the key is null, the entry field will be cleared.
-     *
-     * @return true, if the entry contains the key, false if not
-     */
-    public synchronized boolean setCiteKeyForEntry(BibEntry entry, String key) {
-        String oldKey = entry.getCiteKey();
-        if (key == null) {
-            entry.clearCiteKey();
-        } else {
-            entry.setCiteKey(key);
-        }
-        return duplicationChecker.checkForDuplicateKeyAndAdd(oldKey, key);
     }
 
     /**
@@ -603,4 +583,9 @@ public class BibDatabase {
     public Optional<BibEntry> getReferencedEntry(BibEntry entry) {
         return entry.getField(FieldName.CROSSREF).flatMap(this::getEntryByKey);
     }
+
+    public DuplicationChecker getDuplicationChecker() {
+        return duplicationChecker;
+    }
+
 }

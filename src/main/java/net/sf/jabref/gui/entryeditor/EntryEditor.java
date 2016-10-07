@@ -781,9 +781,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
             boolean duplicateWarning = false;
             boolean emptyWarning = (newKey == null) || newKey.isEmpty();
 
-            if (panel.getDatabase().setCiteKeyForEntry(entry, newKey)) {
-                duplicateWarning = true;
-            }
+            entry.setCiteKey(newKey);
+            duplicateWarning = panel.getDatabase().getDuplicationChecker().isDuplicateExisting(newKey);
 
             // First, remove fields that the user has removed.
             for (Entry<String, String> field : entry.getFieldMap().entrySet()) {
@@ -1104,11 +1103,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     return;
                 }
 
-                boolean isDuplicate = panel.getDatabase().setCiteKeyForEntry(entry, newValue);
+                entry.setCiteKey(newValue);
 
                 if (newValue == null) {
                     warnEmptyBibtexkey();
                 } else {
+                    boolean isDuplicate = panel.getDatabase().getDuplicationChecker().isDuplicateExisting(newValue);
                     if (isDuplicate) {
                         warnDuplicateBibtexkey();
                     } else {
@@ -1117,7 +1117,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
 
                 // Add an UndoableKeyChange to the baseframe's undoManager.
-                UndoableKeyChange undoableKeyChange = new UndoableKeyChange(panel.getDatabase(), entry, oldValue, newValue);
+                UndoableKeyChange undoableKeyChange = new UndoableKeyChange(entry, oldValue, newValue);
                 if (updateTimeStampIsSet()) {
                     NamedCompound ce = new NamedCompound(undoableKeyChange.getPresentationName());
                     ce.addEdit(undoableKeyChange);
@@ -1337,7 +1337,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             // Store undo information:
             panel.getUndoManager().addEdit(
-                    new UndoableKeyChange(panel.getDatabase(), entry, oldValue.orElse(null),
+                    new UndoableKeyChange(entry, oldValue.orElse(null),
                             entry.getCiteKeyOptional().get())); // Cite key always set here
 
             // here we update the field

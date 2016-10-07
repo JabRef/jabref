@@ -719,7 +719,7 @@ public class OpenOfficePanel extends AbstractWorker {
                             prefs);
                     // Add undo change
                     undoCompound.addEdit(
-                            new UndoableKeyChange(panel.getDatabase(), entry, null, entry.getCiteKeyOptional().get()));
+                            new UndoableKeyChange(entry, null, entry.getCiteKeyOptional().get()));
                 }
             }
             undoCompound.end();
