@@ -4,6 +4,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
+import net.sf.jabref.logic.formatter.bibtexfields.RemoveBracesFormatter;
 import net.sf.jabref.logic.util.DOI;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
@@ -26,6 +27,7 @@ import org.json.JSONObject;
  */
 public class CrossRef {
     private static final Log LOGGER = LogFactory.getLog(CrossRef.class);
+    private static final RemoveBracesFormatter REMOVE_BRACES_FORMATTER = new RemoveBracesFormatter();
 
     private static final String API_URL = "http://api.crossref.org";
     private static final Levenshtein METRIC_DISTANCE = new Levenshtein();
@@ -83,7 +85,7 @@ public class CrossRef {
     }
 
     private static boolean checkValidity(BibEntry entry, JSONArray result) {
-        final String entryTitle = entry.getLatexFreeField(FieldName.TITLE).orElse("");
+        final String entryTitle = REMOVE_BRACES_FORMATTER.format(entry.getLatexFreeField(FieldName.TITLE).orElse(""));
 
         // currently only title-based
         // title: [ "How the Mind Hurts and Heals the Body." ]
