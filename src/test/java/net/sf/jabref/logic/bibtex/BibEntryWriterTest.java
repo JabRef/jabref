@@ -73,7 +73,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry), importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -97,7 +97,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry), importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -121,7 +121,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry), importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -157,7 +157,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry), importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -194,7 +194,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = BibtexParser.parse(new StringReader(expected), importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(expected));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -231,7 +231,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry), importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -264,7 +264,7 @@ public class BibEntryWriterTest {
 
     private String testSingleWrite(String bibtexEntry) throws IOException {
         // read in bibtex string
-        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry), importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -288,7 +288,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry), importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -317,7 +317,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry), importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -391,7 +391,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry), importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 
@@ -416,7 +416,7 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         // read in bibtex string
-        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry), importFormatPreferences);
+        ParserResult result = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexEntry));
         Collection<BibEntry> entries = result.getDatabase().getEntries();
         BibEntry entry = entries.iterator().next();
 

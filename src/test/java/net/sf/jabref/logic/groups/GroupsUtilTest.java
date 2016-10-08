@@ -28,8 +28,7 @@ public class GroupsUtilTest {
         try (BufferedReader fr = Files.newBufferedReader(Paths.get("src/test/resources/testbib/testjabref.bib"),
                 StandardCharsets.UTF_8)) {
 
-            ParserResult result = BibtexParser.parse(fr,
-                    JabRefPreferences.getInstance().getImportFormatPreferences());
+            ParserResult result = BibtexParser.parse(fr, JabRefPreferences.getInstance().getImportFormatPreferences());
 
             BibDatabase db = result.getDatabase();
 

@@ -44,7 +44,7 @@ public class LayoutTest {
 
     public static BibEntry bibtexString2BibtexEntry(String s) throws IOException {
         ParserResult result = BibtexParser.parse(new StringReader(s),
-JabRefPreferences.getInstance().getImportFormatPreferences());
+                JabRefPreferences.getInstance().getImportFormatPreferences());
         Collection<BibEntry> c = result.getDatabase().getEntries();
         Assert.assertEquals(1, c.size());
         return c.iterator().next();
