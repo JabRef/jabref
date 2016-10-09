@@ -34,15 +34,11 @@ public class AutosaveManager {
     private final EventBus eventBus;
 
 
-    public AutosaveManager(BibDatabaseContext bibDatabaseContext) {
+    private AutosaveManager(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.workerQueue = new ArrayBlockingQueue<>(1);
         this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, workerQueue);
         this.eventBus = new EventBus();
-
-        bibDatabaseContext.getDatabase().registerListener(this);
-        bibDatabaseContext.getMetaData().registerListener(this);
-        runningInstances.add(this);
     }
 
     @Subscribe
@@ -60,6 +56,19 @@ public class AutosaveManager {
         bibDatabaseContext.getDatabase().unregisterListener(this);
         bibDatabaseContext.getMetaData().unregisterListener(this);
         executor.shutdown();
+    }
+
+    /**
+     * Starts the Autosaver which is associated with the given {@link BibDatabaseContext}.
+     *
+     * @param bibDatabaseContext Associated {@link BibDatabaseContext}
+     */
+    public static AutosaveManager start(BibDatabaseContext bibDatabaseContext) {
+        AutosaveManager autosaver = new AutosaveManager(bibDatabaseContext);
+        bibDatabaseContext.getDatabase().registerListener(autosaver);
+        bibDatabaseContext.getMetaData().registerListener(autosaver);
+        runningInstances.add(autosaver);
+        return autosaver;
     }
 
     /**

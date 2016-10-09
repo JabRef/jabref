@@ -1694,7 +1694,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         BibDatabaseContext context = basePanel.getBibDatabaseContext();
 
         if (isAutosaveEnabled(context) && context.getDatabaseFile().isPresent()) {
-            new AutosaveManager(basePanel.getDatabaseContext()).registerListener(new AutosaveUIManager(basePanel));
+            AutosaveManager autosaver = AutosaveManager.start(context);
+            autosaver.registerListener(new AutosaveUIManager(basePanel));
         }
     }
 

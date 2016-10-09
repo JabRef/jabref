@@ -341,7 +341,8 @@ public class SaveDatabaseAction extends AbstractWorker {
         }
 
         if (isAutosaveEnabled(context) && context.getDatabaseFile().isPresent()) {
-            new AutosaveManager(context).registerListener(new AutosaveUIManager(panel));
+            AutosaveManager autosaver = AutosaveManager.start(context);
+            autosaver.registerListener(new AutosaveUIManager(panel));
         }
 
         context.getDatabaseFile().ifPresent(presentFile -> frame.getFileHistory().newFile(presentFile.getPath()));
