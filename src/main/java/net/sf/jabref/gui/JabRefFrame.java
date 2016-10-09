@@ -60,7 +60,7 @@ import javax.swing.WindowConstants;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
-import net.sf.jabref.autosave.Autosaver;
+import net.sf.jabref.autosave.AutosaveManager;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.AutoLinkFilesAction;
 import net.sf.jabref.gui.actions.ErrorConsoleAction;
@@ -75,7 +75,7 @@ import net.sf.jabref.gui.actions.OpenBrowserAction;
 import net.sf.jabref.gui.actions.OpenSharedDatabaseAction;
 import net.sf.jabref.gui.actions.SearchForUpdateAction;
 import net.sf.jabref.gui.actions.SortTabsAction;
-import net.sf.jabref.gui.autosave.AutoSaveUIManager;
+import net.sf.jabref.gui.autosave.AutosaveUIManager;
 import net.sf.jabref.gui.bibtexkeypattern.BibtexKeyPatternDialog;
 import net.sf.jabref.gui.dbproperties.DatabasePropertiesDialog;
 import net.sf.jabref.gui.exporter.ExportAction;
@@ -868,7 +868,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     context.getDBMSSynchronizer().closeSharedDatabase();
                     context.clearDBMSSynchronizer();
                 }
-                Autosaver.shutdown(context);
+                AutosaveManager.shutdown(context);
                 context.getDatabaseFile().map(File::getAbsolutePath).ifPresent(filenames::add);
             }
         }
@@ -1694,7 +1694,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         BibDatabaseContext context = basePanel.getBibDatabaseContext();
 
         if (isAutosaveEnabled(context) && context.getDatabaseFile().isPresent()) {
-            new Autosaver(basePanel.getDatabaseContext()).registerListener(new AutoSaveUIManager(basePanel));
+            new AutosaveManager(basePanel.getDatabaseContext()).registerListener(new AutosaveUIManager(basePanel));
         }
     }
 
@@ -2218,7 +2218,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         } else {
             removeTab(panel);
         }
-        Autosaver.shutdown(context);
+        AutosaveManager.shutdown(context);
     }
 
     // Ask if the user really wants to close, if the base has not been saved

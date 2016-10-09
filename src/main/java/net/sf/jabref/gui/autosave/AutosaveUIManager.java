@@ -12,13 +12,13 @@ import org.apache.commons.logging.LogFactory;
  * This class has an abstract UI role as it listens for an {@link AutosaveEvent}
  * and saves the bib file associated with the given {@link BasePanel}.
  */
-public class AutoSaveUIManager {
+public class AutosaveUIManager {
 
-    private static final Log LOGGER = LogFactory.getLog(AutoSaveUIManager.class);
+    private static final Log LOGGER = LogFactory.getLog(AutosaveUIManager.class);
     private final BasePanel panel;
 
 
-    public AutoSaveUIManager(BasePanel panel) {
+    public AutosaveUIManager(BasePanel panel) {
         this.panel = panel;
     }
 

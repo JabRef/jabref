@@ -22,11 +22,11 @@ import org.apache.commons.logging.LogFactory;
  * Saves the given {@link BibDatabaseContext} on every {@link BibDatabaseContextChangedEvent} by posting a new {@link AutosaveEvent}.
  * An intelligent {@link ExecutorService} with a {@link BlockingQueue} prevents a high load while saving and rejects all redundant save tasks.
  */
-public class Autosaver {
+public class AutosaveManager {
 
-    private static final Log LOGGER = LogFactory.getLog(Autosaver.class);
+    private static final Log LOGGER = LogFactory.getLog(AutosaveManager.class);
 
-    private static Set<Autosaver> runningInstances = new HashSet<>();
+    private static Set<AutosaveManager> runningInstances = new HashSet<>();
 
     private final BibDatabaseContext bibDatabaseContext;
     private final BlockingQueue<Runnable> workerQueue;
@@ -34,7 +34,7 @@ public class Autosaver {
     private final EventBus eventBus;
 
 
-    public Autosaver(BibDatabaseContext bibDatabaseContext) {
+    public AutosaveManager(BibDatabaseContext bibDatabaseContext) {
         this.bibDatabaseContext = bibDatabaseContext;
         this.workerQueue = new ArrayBlockingQueue<>(1);
         this.executor = new ThreadPoolExecutor(1, 1, 0, TimeUnit.SECONDS, workerQueue);
@@ -68,7 +68,7 @@ public class Autosaver {
      * @param bibDatabaseContext Associated {@link BibDatabaseContext}
      */
     public static void shutdown(BibDatabaseContext bibDatabaseContext) {
-        for (Autosaver autosaver : runningInstances) {
+        for (AutosaveManager autosaver : runningInstances) {
             if (autosaver.bibDatabaseContext == bibDatabaseContext) {
                 autosaver.shutdown();
             }
