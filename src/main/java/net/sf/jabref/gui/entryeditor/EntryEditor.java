@@ -1005,18 +1005,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
         @Override
         public void stateChanged(ChangeEvent event) {
             // We tell the editor tab to update all its fields.
-            //  This makes sure they are updated even if the tab we
-            // just left contained one
-            // or more of the same fields as this one:
-            panel.runCommand(Actions.SAVE);
-            if (lastFieldAccepted) {
-                SwingUtilities.invokeLater(() -> {
-                    Object activeTab = tabs.get(tabbed.getSelectedIndex());
-                    if (activeTab instanceof EntryEditorTab) {
-                        ((EntryEditorTab) activeTab).updateAll();
-                        activateVisible();
-                    }
-                });
+            Object activeTab = tabs.get(tabbed.getSelectedIndex());
+            if (activeTab instanceof EntryEditorTab) {
+                panel.runCommand(Actions.SAVE);
             }
         }
     }

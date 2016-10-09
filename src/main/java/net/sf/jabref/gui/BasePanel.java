@@ -1634,8 +1634,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     }
 
     /**
-     * Get an entry editor ready to edit the given entry. If an appropriate editor is already cached, it will be updated
-     * and returned.
+     * Get an entry editor ready to edit the given entry.
      *
      * @param entry The entry to be edited.
      * @return A suitable entry editor.
@@ -1646,7 +1645,6 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         // We must instantiate a new editor. First make sure the old one
         // stores its last edit:
         this.runCommand(Actions.SAVE);
-        storeCurrentEdit();
         // Then start the new one:
         entryEditor = new EntryEditor(frame, BasePanel.this, entry);
 
