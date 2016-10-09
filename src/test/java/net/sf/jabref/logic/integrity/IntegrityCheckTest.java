@@ -94,6 +94,35 @@ public class IntegrityCheckTest {
     }
 
     @Test
+    public void testMonthChecks() {
+        assertCorrect(withMode(createContext("month", "#mar#"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("month", "#dec#"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("month", "#bla#"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("month", "Dec"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("month", "December"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("month", "Lorem"), BibDatabaseMode.BIBTEX));
+        assertWrong(withMode(createContext("month", "10"), BibDatabaseMode.BIBTEX));
+        assertCorrect(withMode(createContext("month", "1"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("month", "10"), BibDatabaseMode.BIBLATEX));
+        assertCorrect(withMode(createContext("month", "#jan#"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("month", "jan"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("month", "january"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("month", "January"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("month", "Lorem"), BibDatabaseMode.BIBLATEX));
+    }
+
+    @Test
+    public void testJournaltitleChecks() {
+        assertCorrect(withMode(createContext("journaltitle", "A journal"), BibDatabaseMode.BIBLATEX));
+        assertWrong(withMode(createContext("journaltitle", "A journal"), BibDatabaseMode.BIBTEX));
+    }
+
+    @Test
+    public void testBibtexkeyChecks() {
+        assertCorrect(createContext("bibtexkey", "Knuth2014"));
+    }
+
+    @Test
     public void testBracketChecks() {
         assertCorrect(createContext("title", "x"));
         assertCorrect(createContext("title", "{x}"));
@@ -262,7 +291,7 @@ public class IntegrityCheckTest {
         entry.setField(field, value);
         entry.setType(type);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntryWithDuplicationCheck(entry);
+        bibDatabase.insertEntry(entry);
         return new BibDatabaseContext(bibDatabase, new Defaults());
     }
 
@@ -270,7 +299,7 @@ public class IntegrityCheckTest {
         BibEntry entry = new BibEntry();
         entry.setField(field, value);
         BibDatabase bibDatabase = new BibDatabase();
-        bibDatabase.insertEntryWithDuplicationCheck(entry);
+        bibDatabase.insertEntry(entry);
         return new BibDatabaseContext(bibDatabase, metaData, new Defaults());
     }
 

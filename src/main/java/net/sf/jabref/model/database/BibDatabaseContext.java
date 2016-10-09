@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Optional;
 
 import net.sf.jabref.model.Defaults;
+import net.sf.jabref.model.bibtexkeypattern.GlobalBibtexKeyPattern;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.metadata.FileDirectoryPreferences;
 import net.sf.jabref.model.metadata.MetaData;
@@ -23,7 +24,7 @@ import net.sf.jabref.shared.DBMSSynchronizer;
 public class BibDatabaseContext {
 
     private final BibDatabase database;
-    private final MetaData metaData;
+    private MetaData metaData;
     private final Defaults defaults;
     /** The file where this database was last saved to. */
     private File file;
@@ -67,10 +68,11 @@ public class BibDatabaseContext {
         this(database, metaData, file, new Defaults());
     }
 
-    public BibDatabaseContext(Defaults defaults, DatabaseLocation location, String keywordSeparator) {
+    public BibDatabaseContext(Defaults defaults, DatabaseLocation location, Character keywordSeparator,
+            GlobalBibtexKeyPattern globalCiteKeyPattern) {
         this(new BibDatabase(), new MetaData(), defaults);
         if (location == DatabaseLocation.SHARED) {
-            convertToSharedDatabase(keywordSeparator);
+            convertToSharedDatabase(keywordSeparator, globalCiteKeyPattern);
         }
     }
 
@@ -112,6 +114,10 @@ public class BibDatabaseContext {
 
     public MetaData getMetaData() {
         return metaData;
+    }
+
+    public void setMetaData(MetaData metaData) {
+        this.metaData = Objects.requireNonNull(metaData);
     }
 
     public boolean isBiblatexMode() {
@@ -202,17 +208,20 @@ public class BibDatabaseContext {
         return dir;
     }
 
-    public DBMSSynchronizer getDBSynchronizer() {
+    public DBMSSynchronizer getDBMSSynchronizer() {
         return this.dbmsSynchronizer;
+    }
+
+    public void clearDBMSSynchronizer() {
+        this.dbmsSynchronizer = null;
     }
 
     public DatabaseLocation getLocation() {
         return this.location;
     }
 
-    public void convertToSharedDatabase(String keywordSeparator) {
-
-        this.dbmsSynchronizer = new DBMSSynchronizer(this, keywordSeparator);
+    public void convertToSharedDatabase(Character keywordSeparator, GlobalBibtexKeyPattern globalCiteKeyPattern) {
+        this.dbmsSynchronizer = new DBMSSynchronizer(this, keywordSeparator, globalCiteKeyPattern);
         this.database.registerListener(dbmsSynchronizer);
         this.metaData.registerListener(dbmsSynchronizer);
 
@@ -220,7 +229,6 @@ public class BibDatabaseContext {
     }
 
     public void convertToLocalDatabase() {
-
         if ((this.location == DatabaseLocation.SHARED)) {
             this.database.unregisterListener(dbmsSynchronizer);
             this.metaData.unregisterListener(dbmsSynchronizer);

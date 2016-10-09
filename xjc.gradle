@@ -9,8 +9,10 @@ dependencies {
 task xjc {
     inputs.dir "src/main/resources/xjc/medline/"
     inputs.dir "src/main/resources/xjc/bibtexml/"
+    inputs.dir "src/main/resources/xjc/mods/"
     outputs.dir "src/main/gen/net/sf/jabref/logic/importer/fileformat/medline"
     outputs.dir "src/main/gen/net/sf/jabref/logic/importer/fileformat/bibtexml"
+    outputs.dir "src/main/gen/net/sf/jabref/logic/importer/fileformat/mods"
 
     ant.taskdef(name: 'xjc', classname: 'com.sun.tools.xjc.XJCTask', classpath: configurations.xjc.asPath)
 
@@ -20,6 +22,11 @@ task xjc {
         }
         ant.xjc(destdir: 'src/main/gen/', package: 'net.sf.jabref.logic.importer.fileformat.bibtexml') {
             schema(dir: 'src/main/resources/xjc/bibtexml', includes: 'bibtexml.xsd')
+        }
+        ant.xjc(destdir: 'src/main/gen/', package: 'net.sf.jabref.logic.importer.fileformat.mods') {
+            arg(value: '-npa') //don't create package-info.java because it was manually added in src/main/java to ensure the namespace prefix mapping
+            schema(dir: 'src/main/resources/xjc/mods', includes: 'mods-3-6.xsd')
+            binding(dir: 'src/main/resources/xjc/mods', includes: 'mods-binding.xjb')
         }
     }
 }

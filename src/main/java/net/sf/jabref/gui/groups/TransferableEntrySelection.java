@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 import net.sf.jabref.model.entry.BibEntry;
 
-class TransferableEntrySelection implements Transferable {
+public class TransferableEntrySelection implements Transferable {
 
     public static final DataFlavor FLAVOR_INTERNAL;
     private static final DataFlavor FLAVOR_EXTERNAL;

@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fetcher.DoiFetcher;
 import net.sf.jabref.logic.l10n.Localization;
@@ -37,7 +38,7 @@ import org.apache.pdfbox.util.PDFTextStripper;
  * <p>
  * Integrating XMP support is future work
  */
-public class PdfContentImporter extends ImportFormat {
+public class PdfContentImporter extends Importer {
 
     private static final Pattern YEAR_EXTRACT_PATTERN = Pattern.compile("\\d{4}");
 
@@ -209,7 +210,7 @@ public class PdfContentImporter extends ImportFormat {
             if (doi.isPresent()) {
                 ParserResult parserResult = new ParserResult(result);
                 Optional<BibEntry> entry = new DoiFetcher(importFormatPreferences).performSearchById(doi.get().getDOI());
-                entry.ifPresent(parserResult.getDatabase()::insertEntryWithDuplicationCheck);
+                entry.ifPresent(parserResult.getDatabase()::insertEntry);
                 return parserResult;
             }
 
@@ -585,7 +586,7 @@ public class PdfContentImporter extends ImportFormat {
     }
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "PDFcontent";
     }
 

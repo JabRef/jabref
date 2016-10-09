@@ -2,8 +2,7 @@ package net.sf.jabref.gui.externalfiles;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
@@ -291,7 +290,7 @@ public class DroppedFileHandler {
 
                 aXmpEntriesInFile.setId(IdGenerator.next());
                 edits.addEdit(new UndoableInsertEntry(panel.getDatabase(), aXmpEntriesInFile, panel));
-                panel.getDatabase().insertEntryWithDuplicationCheck(aXmpEntriesInFile);
+                panel.getDatabase().insertEntry(aXmpEntriesInFile);
                 doLink(aXmpEntriesInFile, fileType, destFilename, true, edits);
 
             }
@@ -344,7 +343,8 @@ public class DroppedFileHandler {
 
         // Determine which name to suggest:
         String targetName = FileUtil.createFileNameFromPattern(database, entry,
-                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN), layoutPrefs);
+                Globals.prefs.get(JabRefPreferences.IMPORT_FILENAMEPATTERN),
+                Globals.prefs.getLayoutFormatterPreferences(Globals.journalAbbreviationLoader));
 
         String targetDirName = FileUtil.createFileNameFromPattern(database, entry,
                 Globals.prefs.get(JabRefPreferences.IMPORT_FILEDIRPATTERN), layoutPrefs);

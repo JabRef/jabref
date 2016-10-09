@@ -6,6 +6,7 @@ import java.util.Objects;
 
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.model.FieldChange;
+import net.sf.jabref.model.cleanup.CleanupJob;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.metadata.FileDirectoryPreferences;

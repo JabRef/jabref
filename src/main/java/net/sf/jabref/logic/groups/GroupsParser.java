@@ -2,10 +2,9 @@ package net.sf.jabref.logic.groups;
 
 import java.util.List;
 
+import net.sf.jabref.logic.importer.ParseException;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.strings.QuotedStringTokenizer;
-import net.sf.jabref.logic.util.strings.StringUtil;
-import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.groups.AbstractGroup;
 import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.ExplicitGroup;
@@ -13,44 +12,51 @@ import net.sf.jabref.model.groups.GroupHierarchyType;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.groups.KeywordGroup;
 import net.sf.jabref.model.groups.SearchGroup;
+import net.sf.jabref.model.strings.StringUtil;
 
 /**
  * Converts string representation of groups to a parsed {@link GroupTreeNode}.
  */
 public class GroupsParser {
 
-    public static GroupTreeNode importGroups(List<String> orderedData, String keywordSeparator)
+    public static GroupTreeNode importGroups(List<String> orderedData, Character keywordSeparator)
             throws ParseException {
-        GroupTreeNode cursor = null;
-        GroupTreeNode root = null;
-        for (String string : orderedData) {
-            // This allows to read databases that have been modified by, e.g., BibDesk
-            string = string.trim();
-            if (string.isEmpty()) {
-                continue;
-            }
-
-            int spaceIndex = string.indexOf(' ');
-            if (spaceIndex <= 0) {
-                throw new ParseException("Expected \"" + string + "\" to contain whitespace");
-            }
-            int level = Integer.parseInt(string.substring(0, spaceIndex));
-            AbstractGroup group = GroupsParser.fromString(string.substring(spaceIndex + 1), keywordSeparator);
-            GroupTreeNode newNode = GroupTreeNode.fromGroup(group);
-            if (cursor == null) {
-                // create new root
-                cursor = newNode;
-                root = cursor;
-            } else {
-                // insert at desired location
-                while (level <= cursor.getLevel()) {
-                    cursor = cursor.getParent().get();
+        try {
+            GroupTreeNode cursor = null;
+            GroupTreeNode root = null;
+            for (String string : orderedData) {
+                // This allows to read databases that have been modified by, e.g., BibDesk
+                string = string.trim();
+                if (string.isEmpty()) {
+                    continue;
                 }
-                cursor.addChild(newNode);
-                cursor = newNode;
+
+                int spaceIndex = string.indexOf(' ');
+                if (spaceIndex <= 0) {
+                    throw new ParseException("Expected \"" + string + "\" to contain whitespace");
+                }
+                int level = Integer.parseInt(string.substring(0, spaceIndex));
+                AbstractGroup group = GroupsParser.fromString(string.substring(spaceIndex + 1), keywordSeparator);
+                GroupTreeNode newNode = GroupTreeNode.fromGroup(group);
+                if (cursor == null) {
+                    // create new root
+                    cursor = newNode;
+                    root = cursor;
+                } else {
+                    // insert at desired location
+                    while (level <= cursor.getLevel()) {
+                        cursor = cursor.getParent().get();
+                    }
+                    cursor.addChild(newNode);
+                    cursor = newNode;
+                }
             }
+            return root;
+        } catch (ParseException e) {
+            throw new ParseException(Localization
+                    .lang("Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."),
+                    e);
         }
-        return root;
     }
 
     /**
@@ -61,7 +67,7 @@ public class GroupsParser {
      * @throws ParseException If an error occurred and a group could not be created,
      *                        e.g. due to a malformed regular expression.
      */
-    public static AbstractGroup fromString(String s, String keywordSeparator)
+    public static AbstractGroup fromString(String s, Character keywordSeparator)
             throws ParseException {
         if (s.startsWith(KeywordGroup.ID)) {
             return GroupsParser.keywordGroupFromString(s, keywordSeparator);
@@ -84,7 +90,7 @@ public class GroupsParser {
      * @param s The String representation obtained from
      *          KeywordGroup.toString()
      */
-    public static AbstractGroup keywordGroupFromString(String s, String keywordSeparator) throws ParseException {
+    public static AbstractGroup keywordGroupFromString(String s, Character keywordSeparator) throws ParseException {
         if (!s.startsWith(KeywordGroup.ID)) {
             throw new IllegalArgumentException("KeywordGroup cannot be created from \"" + s + "\".");
         }
@@ -103,7 +109,7 @@ public class GroupsParser {
                 GroupHierarchyType.getByNumber(context), keywordSeparator);
     }
 
-    public static ExplicitGroup explicitGroupFromString(String s, String keywordSeparator) throws ParseException {
+    public static ExplicitGroup explicitGroupFromString(String s, Character keywordSeparator) throws ParseException {
         if (!s.startsWith(ExplicitGroup.ID)) {
             throw new IllegalArgumentException("ExplicitGroup cannot be created from \"" + s + "\".");
         }

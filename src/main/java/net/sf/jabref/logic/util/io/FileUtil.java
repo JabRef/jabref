@@ -112,26 +112,39 @@ public class FileUtil {
     /**
      * Copies a file.
      *
-     * @param source         File Source file
-     * @param dest           File Destination file
-     * @param replaceExisting boolean Determines whether an existing File is replaced or not
-     * @return boolean Whether the copy succeeded, or was skipped, because the file already exists
+     * @param pathToSourceFile      Path Source file
+     * @param pathToDestinationFile Path Destination file
+     * @param replaceExisting       boolean Determines whether the copy goes on even if the file exists.
+     * @return boolean Whether the copy succeeded, or was stopped due to the file already existing.
      * @throws IOException
      */
-    public static boolean copyFile(Path source, Path dest, boolean replaceExisting) throws IOException {
-        if (replaceExisting) {
-            return Files.copy(source, dest, StandardCopyOption.REPLACE_EXISTING) != null;
+    public static boolean copyFile(Path pathToSourceFile, Path pathToDestinationFile, boolean replaceExisting) {
+        // Check if the file already exists.
+        if (!Files.exists(pathToSourceFile)) {
+            LOGGER.error("Path to the source file doesn't exist.");
+            return false;
         }
-        return false;
+        if (Files.exists(pathToDestinationFile) && !replaceExisting) {
+            LOGGER.error("Path to the destination file is not exists and the file shouldn't be replace.");
+            return false;
+        }
+        try {
+            return Files.copy(pathToSourceFile, pathToDestinationFile, StandardCopyOption.REPLACE_EXISTING) != null;
+        } catch (IOException e) {
+            LOGGER.error("Copying Files failed.", e);
+            return false;
+        }
     }
 
     /**
-     * Renames a given file and replaces it if it exists
-     * @param fileName The source filename to rename
-     * @param destFilename The target fileName
-     * @return True if the rename was succesful, false if an exception occured
+     * Renames a given file
+     *
+     * @param fromFile The source filename to rename
+     * @param toFile   The target fileName
+     * @return True if the rename was successful, false if an exception occurred
      */
-    public static boolean renameFile(String fileName, String destFilename) {
+    public static boolean renameFile(String fromFile, String toFile) {
+
         try {
             Path src = Paths.get(fileName);
             return Files.move(src, src.resolveSibling(destFilename), StandardCopyOption.REPLACE_EXISTING) != null;

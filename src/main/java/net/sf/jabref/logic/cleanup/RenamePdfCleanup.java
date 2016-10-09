@@ -14,6 +14,7 @@ import net.sf.jabref.logic.TypedBibEntry;
 import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.FieldChange;
+import net.sf.jabref.model.cleanup.CleanupJob;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.ParsedFileField;
@@ -116,8 +117,7 @@ public class RenamePdfCleanup implements CleanupJob {
                 LOGGER.error("Could no create target necessary target directoires for renaming", e);
             }
             //do rename
-            boolean renameSuccessful = FileUtil.renameFile(expandedOldFilePath, newPath.toString());
-
+            boolean renameSuccessful = FileUtil.renameFile(expandedOldFilePath, newPath);
             if (renameSuccessful) {
                 changed = true;
 

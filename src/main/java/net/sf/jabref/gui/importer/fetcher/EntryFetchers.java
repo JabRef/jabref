@@ -22,7 +22,6 @@ public class EntryFetchers {
     private final List<EntryFetcher> entryFetchers = new LinkedList<>();
 
     public EntryFetchers(JournalAbbreviationLoader abbreviationLoader) {
-        entryFetchers.add(new ADSFetcher());
         entryFetchers.add(new CiteSeerXFetcher());
         entryFetchers.add(new DBLPFetcher());
         entryFetchers.add(new IEEEXploreFetcher(abbreviationLoader));
@@ -35,7 +34,7 @@ public class EntryFetchers {
         entryFetchers.add(new DOAJFetcher());
         entryFetchers.add(new SpringerFetcher());
 
-        entryFetchers.add(new SearchBasedEntryFetcher(new ArXiv()));
+        entryFetchers.add(new SearchBasedEntryFetcher(new ArXiv(Globals.prefs.getImportFormatPreferences())));
         entryFetchers.add(new SearchBasedEntryFetcher(new GvkFetcher()));
         entryFetchers.add(
                 new SearchBasedEntryFetcher(new AstrophysicsDataSystem(Globals.prefs.getImportFormatPreferences())));
@@ -49,6 +48,7 @@ public class EntryFetchers {
 
     public static ArrayList<IdBasedFetcher> getIdFetchers() {
         ArrayList<IdBasedFetcher> list = new ArrayList<>();
+        list.add(new AstrophysicsDataSystem(Globals.prefs.getImportFormatPreferences()));
         list.add(new IsbnFetcher(Globals.prefs.getImportFormatPreferences()));
         list.add(new DiVA(Globals.prefs.getImportFormatPreferences()));
         list.add(new DoiFetcher(Globals.prefs.getImportFormatPreferences()));

@@ -4,16 +4,18 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
+import net.sf.jabref.logic.cleanup.Cleanups;
 import net.sf.jabref.logic.groups.GroupsParser;
-import net.sf.jabref.logic.l10n.Localization;
-import net.sf.jabref.model.ParseException;
+import net.sf.jabref.logic.importer.ParseException;
+import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.metadata.MetaData;
+import net.sf.jabref.model.metadata.SaveOrderConfig;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,45 +24,100 @@ public class MetaDataParser {
 
     private static final Log LOGGER = LogFactory.getLog(MetaDataParser.class);
 
-    public static MetaData parse(Map<String, String> data, String keywordSeparator) throws ParseException {
+    public static MetaData parse(Map<String, String> data, Character keywordSeparator) throws ParseException {
         MetaData metaData = new MetaData();
-        metaData.setParsedData(getParsedData(data, keywordSeparator, metaData));
+
+        List<String> defaultCiteKeyPattern = new ArrayList<>();
+        Map<String, List<String>> nonDefaultCiteKeyPatterns = new HashMap<>();
+
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            List<String> value = getAsList(entry.getValue());
+
+            if (entry.getKey().startsWith("selector_")) {
+                // Ignore old content selector metadata
+                continue;
+            }
+            if (entry.getKey().startsWith(MetaData.PREFIX_KEYPATTERN)) {
+                String entryType = entry.getKey().substring(MetaData.PREFIX_KEYPATTERN.length());
+                nonDefaultCiteKeyPatterns.put(entryType, Collections.singletonList(getSingleItem(value)));
+                continue;
+            }
+            if (entry.getKey().startsWith(MetaData.FILE_DIRECTORY + '-')) {
+                // The user name comes directly after "FILE_DIRECTORY-"
+                String user = entry.getKey().substring(MetaData.FILE_DIRECTORY.length() + 1);
+                metaData.setUserFileDirectory(user, getSingleItem(value));
+                continue;
+            }
+
+            switch (entry.getKey()) {
+            case MetaData.GROUPSTREE:
+                metaData.setGroups(GroupsParser.importGroups(value, keywordSeparator));
+                break;
+            case MetaData.SAVE_ACTIONS:
+                metaData.setSaveActions(Cleanups.parse(value));
+                break;
+            case MetaData.DATABASE_TYPE:
+                metaData.setMode(BibDatabaseMode.parse(getSingleItem(value)));
+                break;
+            case MetaData.KEYPATTERNDEFAULT:
+                defaultCiteKeyPattern = Collections.singletonList(getSingleItem(value));
+                break;
+            case MetaData.PROTECTED_FLAG_META:
+                if (Boolean.parseBoolean(getSingleItem(value))) {
+                    metaData.markAsProtected();
+                } else {
+                    metaData.markAsNotProtected();
+                }
+                break;
+            case MetaData.FILE_DIRECTORY:
+                metaData.setDefaultFileDirectory(getSingleItem(value));
+                break;
+            case MetaData.SAVE_ORDER_CONFIG:
+                metaData.setSaveOrderConfig(SaveOrderConfig.parse(value));
+                break;
+            case "groupsversion":
+            case "groups":
+                // These keys were used in previous JabRef versions, we will not support them anymore -> ignored
+                break;
+
+            }
+        }
+        if (!defaultCiteKeyPattern.isEmpty() || !nonDefaultCiteKeyPatterns.isEmpty()) {
+            metaData.setCiteKeyPattern(defaultCiteKeyPattern, nonDefaultCiteKeyPatterns);
+        }
+
         return metaData;
     }
 
-    public static Map<String, List<String>> getParsedData(Map<String, String> inData, String keywordSeparator,
-            MetaData metaData)
-            throws ParseException {
-        final Map<String, List<String>> newMetaData = new HashMap<>();
-        for (Map.Entry<String, String> entry : inData.entrySet()) {
-            StringReader data = new StringReader(entry.getValue());
-            List<String> orderedData = new ArrayList<>();
-            // We must allow for ; and \ in escape sequences.
-            try {
-                Optional<String> unit;
-                while ((unit = getNextUnit(data)).isPresent()) {
-                    orderedData.add(unit.get());
-                }
-            } catch (IOException ex) {
-                LOGGER.error("Weird error while parsing meta data.", ex);
-            }
-            if (MetaData.GROUPSTREE.equals(entry.getKey())) {
-                try {
-                    metaData.setGroups(GroupsParser.importGroups(orderedData, keywordSeparator));
-                // the keys "groupsversion" and "groups" were used in JabRef versions around 1.3, we will not support them anymore
-                } catch (ParseException e) {
-                    throw new ParseException(
-                            Localization
-                                    .lang("Group tree could not be parsed. If you save the BibTeX database, all groups will be lost."),
-                            e);
-                }
-            } else if (MetaData.SAVE_ACTIONS.equals(entry.getKey())) {
-                newMetaData.put(MetaData.SAVE_ACTIONS, FieldFormatterCleanups.parse(orderedData).getAsStringList()); // Without MetaDataChangedEvent
-            } else {
-                newMetaData.put(entry.getKey(), orderedData);
-            }
+    /**
+     * Returns the first item in the list.
+     * If the specified list does not contain exactly one item, then a {@link ParseException} will be thrown.
+     * @param value
+     * @return
+     */
+    private static String getSingleItem(List<String> value) throws ParseException {
+        if (value.size() == 1) {
+            return value.get(0);
+        } else {
+            throw new ParseException("Expected a single item but received " + value.toString());
         }
-        return newMetaData;
+    }
+
+    private static List<String> getAsList(String value) throws ParseException {
+        StringReader valueReader = new StringReader(value);
+        List<String> orderedValue = new ArrayList<>();
+
+        // We must allow for ; and \ in escape sequences.
+        try {
+            Optional<String> unit;
+            while ((unit = getNextUnit(valueReader)).isPresent()) {
+                orderedValue.add(unit.get());
+            }
+        } catch (IOException ex) {
+            LOGGER.error("Weird error while parsing meta data.", ex);
+            throw new ParseException("Weird error while parsing meta data.", ex);
+        }
+        return orderedValue;
     }
 
     /**

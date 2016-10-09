@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.AuthorList;
@@ -19,7 +20,7 @@ import net.sf.jabref.model.entry.IdGenerator;
 /**
  * Imports an Ovid file.
  */
-public class OvidImporter extends ImportFormat {
+public class OvidImporter extends Importer {
 
     private static final Pattern OVID_SOURCE_PATTERN = Pattern
             .compile("Source ([ \\w&\\-,:]+)\\.[ ]+([0-9]+)\\(([\\w\\-]+)\\):([0-9]+\\-?[0-9]+?)\\,.*([0-9][0-9][0-9][0-9])");
@@ -42,7 +43,7 @@ public class OvidImporter extends ImportFormat {
     private static final int MAX_ITEMS = 50;
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "Ovid";
     }
 
@@ -162,11 +163,11 @@ public class OvidImporter extends ImportFormat {
 
                 } else if ("Publication Type".equals(fieldName)) {
                     if (content.contains("Book")) {
-                        h.put("entrytype", "book");
+                        h.put(BibEntry.TYPE_HEADER, "book");
                     } else if (content.contains("Journal")) {
-                        h.put("entrytype", "article");
+                        h.put(BibEntry.TYPE_HEADER, "article");
                     } else if (content.contains("Conference Paper")) {
-                        h.put("entrytype", "inproceedings");
+                        h.put(BibEntry.TYPE_HEADER, "inproceedings");
                     }
                 } else if (fieldName.startsWith("Language")) {
                     h.put(FieldName.LANGUAGE, content);
@@ -199,8 +200,8 @@ public class OvidImporter extends ImportFormat {
             }
 
             // Set the entrytype properly:
-            String entryType = h.containsKey("entrytype") ? h.get("entrytype") : BibEntry.DEFAULT_TYPE;
-            h.remove("entrytype");
+            String entryType = h.containsKey(BibEntry.TYPE_HEADER) ? h.get(BibEntry.TYPE_HEADER) : BibEntry.DEFAULT_TYPE;
+            h.remove(BibEntry.TYPE_HEADER);
             if ("book".equals(entryType) && h.containsKey("chaptertitle")) {
                 // This means we have an "incollection" entry.
                 entryType = "incollection";

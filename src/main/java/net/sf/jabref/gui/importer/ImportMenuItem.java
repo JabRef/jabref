@@ -20,8 +20,8 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.importer.ImportFormatReader;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
-import net.sf.jabref.logic.importer.fileformat.ImportFormat;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.UpdateField;
 import net.sf.jabref.model.database.BibDatabase;
@@ -37,15 +37,15 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
     private final JabRefFrame frame;
     private final boolean openInNew;
-    private final ImportFormat importer;
+    private final Importer importer;
     private IOException importError;
 
     public ImportMenuItem(JabRefFrame frame, boolean openInNew) {
         this(frame, openInNew, null);
     }
 
-    public ImportMenuItem(JabRefFrame frame, boolean openInNew, ImportFormat importer) {
-        super(importer == null ? Localization.lang("Autodetect format") : importer.getFormatName());
+    public ImportMenuItem(JabRefFrame frame, boolean openInNew, Importer importer) {
+        super(importer == null ? Localization.lang("Autodetect format") : importer.getName());
         this.importer = importer;
         this.frame = frame;
         this.openInNew = openInNew;
@@ -113,10 +113,10 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                         // This import method never throws an IOException:
                         imports.add(Globals.IMPORT_FORMAT_READER.importUnknownFormat(filename));
                     } else {
-                        frame.output(Localization.lang("Importing in %0 format", importer.getFormatName()) + "...");
+                        frame.output(Localization.lang("Importing in %0 format", importer.getName()) + "...");
                         // Specific importer:
                         ParserResult pr = importer.importDatabase(file, Globals.prefs.getDefaultEncoding());
-                        imports.add(new ImportFormatReader.UnknownFormatImport(importer.getFormatName(), pr));
+                        imports.add(new ImportFormatReader.UnknownFormatImport(importer.getName(), pr));
                     }
                 } catch (IOException e) {
                     // This indicates that a specific importer was specified, and that
@@ -206,7 +206,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
 
                 // Merge entries:
                 for (BibEntry entry : pr.getDatabase().getEntries()) {
-                    database.insertEntryWithDuplicationCheck(entry);
+                    database.insertEntry(entry);
                 }
 
                 // Merge strings:
@@ -233,7 +233,7 @@ public class ImportMenuItem extends JMenuItem implements ActionListener {
                     if (markEntries) {
                         EntryMarker.markEntry(entry, EntryMarker.IMPORT_MARK_LEVEL, false, new NamedCompound(""));
                     }
-                    database.insertEntryWithDuplicationCheck(entry);
+                    database.insertEntry(entry);
                 }
             }
         }

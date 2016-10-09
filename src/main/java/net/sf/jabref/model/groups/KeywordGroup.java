@@ -8,10 +8,8 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import net.sf.jabref.model.FieldChange;
-import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryUtil;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -29,7 +27,7 @@ public class KeywordGroup extends AbstractGroup {
     private final boolean regExp;
     private Pattern pattern;
     private final List<String> searchWords;
-    protected final String keywordSeparator;
+    protected final Character keywordSeparator;
 
     private static final Log LOGGER = LogFactory.getLog(KeywordGroup.class);
 
@@ -39,7 +37,7 @@ public class KeywordGroup extends AbstractGroup {
      */
     public KeywordGroup(String name, String searchField,
                         String searchExpression, boolean caseSensitive, boolean regExp,
-            GroupHierarchyType context, String keywordSeparator) throws ParseException {
+                        GroupHierarchyType context, Character keywordSeparator) {
         super(name, context);
         this.searchField = searchField;
         this.searchExpression = searchExpression;
@@ -49,15 +47,15 @@ public class KeywordGroup extends AbstractGroup {
             compilePattern();
         }
         this.keywordSeparator = keywordSeparator;
-        this.searchWords = EntryUtil.getStringAsWords(searchExpression);
+        this.searchWords = StringUtil.getStringAsWords(searchExpression);
     }
 
-    private void compilePattern() throws ParseException {
+    private void compilePattern() throws IllegalArgumentException {
         try {
             pattern = caseSensitive ? Pattern.compile("\\b" + searchExpression + "\\b") : Pattern.compile(
                     "\\b" + searchExpression + "\\b", Pattern.CASE_INSENSITIVE);
         } catch (PatternSyntaxException exception) {
-            throw new ParseException("Syntax error in regular-expression pattern: " + searchExpression);
+            throw new IllegalArgumentException("Syntax error in regular-expression pattern: " + searchExpression);
         }
     }
 
@@ -67,13 +65,13 @@ public class KeywordGroup extends AbstractGroup {
      */
     @Override
     public String toString() {
-        return KeywordGroup.ID + ModelStringUtil.quote(getName(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) +
+        return KeywordGroup.ID + StringUtil.quote(getName(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) +
                 AbstractGroup.SEPARATOR
                 + getContext().ordinal() + AbstractGroup.SEPARATOR
-                + ModelStringUtil.quote(searchField, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
-                + ModelStringUtil.quote(searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
-                + AbstractGroup.SEPARATOR + ModelStringUtil.booleanToBinaryString(caseSensitive) + AbstractGroup.SEPARATOR
-                + ModelStringUtil.booleanToBinaryString(regExp) + AbstractGroup.SEPARATOR;
+                + StringUtil.quote(searchField, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR) + AbstractGroup.SEPARATOR
+                + StringUtil.quote(searchExpression, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)
+                + AbstractGroup.SEPARATOR + StringUtil.booleanToBinaryString(caseSensitive) + AbstractGroup.SEPARATOR
+                + StringUtil.booleanToBinaryString(regExp) + AbstractGroup.SEPARATOR;
     }
 
     @Override
@@ -240,14 +238,14 @@ public class KeywordGroup extends AbstractGroup {
                 // reduce spaces at i to 1
                 j = i;
                 k = i;
-                while (((j - 1) >= 0) && (keywordSeparator.indexOf(haystack.charAt(j - 1)) >= 0)) {
+                while (((j - 1) >= 0) && (keywordSeparator.toString().indexOf(haystack.charAt(j - 1)) >= 0)) {
                     --j;
                 }
-                while ((k < haystack.length()) && (keywordSeparator.indexOf(haystack.charAt(k)) >= 0)) {
+                while ((k < haystack.length()) && (keywordSeparator.toString().indexOf(haystack.charAt(k)) >= 0)) {
                     ++k;
                 }
-                sbOrig.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? keywordSeparator : "");
-                sbLower.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? keywordSeparator : "");
+                sbOrig.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? keywordSeparator.toString() : "");
+                sbLower.replace(j, k, (j >= 0) && (k < sbOrig.length()) ? keywordSeparator.toString() : "");
             }
 
             String result = sbOrig.toString().trim();
@@ -261,15 +259,8 @@ public class KeywordGroup extends AbstractGroup {
 
     @Override
     public AbstractGroup deepCopy() {
-        try {
-            return new KeywordGroup(getName(), searchField, searchExpression,
-                    caseSensitive, regExp, getContext(), keywordSeparator);
-        } catch (ParseException exception) {
-            // this should never happen, because the constructor obviously succeeded in creating _this_ instance!
-            LOGGER.error("Internal error in KeywordGroup.deepCopy(). "
-                    + "Please report this on https://github.com/JabRef/jabref/issues", exception);
-            return null;
-        }
+        return new KeywordGroup(getName(), searchField, searchExpression,
+                caseSensitive, regExp, getContext(), keywordSeparator);
     }
 
     public boolean isCaseSensitive() {

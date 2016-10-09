@@ -6,9 +6,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
-import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.entry.FieldName;
-import net.sf.jabref.model.util.ModelStringUtil;
+import net.sf.jabref.model.strings.StringUtil;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -27,8 +26,7 @@ public class ExplicitGroup extends KeywordGroup {
     private static final Log LOGGER = LogFactory.getLog(ExplicitGroup.class);
 
 
-    public ExplicitGroup(String name, GroupHierarchyType context, String keywordSeparator)
-            throws ParseException {
+    public ExplicitGroup(String name, GroupHierarchyType context, Character keywordSeparator) {
         super(name, FieldName.GROUPS, name, true, false, context, keywordSeparator);
     }
 
@@ -38,16 +36,9 @@ public class ExplicitGroup extends KeywordGroup {
 
     @Override
     public AbstractGroup deepCopy() {
-        try {
-            ExplicitGroup copy = new ExplicitGroup(getName(), getContext(), keywordSeparator);
-            copy.legacyEntryKeys.addAll(legacyEntryKeys);
-            return copy;
-        } catch (ParseException exception) {
-            // this should never happen, because the constructor obviously succeeded in creating _this_ instance!
-            LOGGER.error("Internal error in ExplicitGroup.deepCopy(). "
-                    + "Please report this on https://github.com/JabRef/jabref/issues", exception);
-            return null;
-        }
+        ExplicitGroup copy = new ExplicitGroup(getName(), getContext(), keywordSeparator);
+        copy.legacyEntryKeys.addAll(legacyEntryKeys);
+        return copy;
     }
 
     @Override
@@ -70,7 +61,7 @@ public class ExplicitGroup extends KeywordGroup {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(ExplicitGroup.ID).append(
-                ModelStringUtil.quote(getName(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).
+                StringUtil.quote(getName(), AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).
                 append(AbstractGroup.SEPARATOR).append(getContext().ordinal()).append(AbstractGroup.SEPARATOR);
 
         // write legacy entry keys in well-defined order for CVS compatibility
@@ -78,7 +69,7 @@ public class ExplicitGroup extends KeywordGroup {
         sortedKeys.addAll(legacyEntryKeys);
 
         for (String sortedKey : sortedKeys) {
-            sb.append(ModelStringUtil.quote(sortedKey, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(
+            sb.append(StringUtil.quote(sortedKey, AbstractGroup.SEPARATOR, AbstractGroup.QUOTE_CHAR)).append(
                     AbstractGroup.SEPARATOR);
         }
         return sb.toString();

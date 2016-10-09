@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<file xmlns="http://bibtexml.sf.net/">
+    <entry id="Mustermann2016">
+        <manual>
+            <author>Max Mustermann</author>
+            <title>How to install Java</title>
+            <organization>Java Users</organization>
+            <address>Stuttgart</address>
+            <month>February</month>
+            <year>2016</year>
+            <keywords>java</keywords>
+        </manual>
+    </entry>
+</file>

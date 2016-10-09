@@ -1,7 +1,7 @@
 package net.sf.jabref.logic.formatter.bibtexfields;
 
-import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.cleanup.Formatter;
 
 public class LatexCleanupFormatter implements Formatter {
 
