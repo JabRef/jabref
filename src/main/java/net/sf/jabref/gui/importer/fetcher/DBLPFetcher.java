@@ -32,7 +32,7 @@ public class DBLPFetcher implements EntryFetcher {
 
     private volatile boolean shouldContinue;
     private String query;
-    private final DBLPHelper helper = new DBLPHelper(Globals.prefs.getImportFormatPreferences());
+    private final DBLPHelper helper = new DBLPHelper();
 
 
     @Override
