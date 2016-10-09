@@ -2,7 +2,8 @@ package net.sf.jabref.gui.externalfiles;
 
 import java.io.File;
 import java.io.IOException;
-
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
@@ -497,7 +498,7 @@ public class DroppedFileHandler {
             // TODO Auto-generated catch block
             LOGGER.error("Problem creating target direcotires", e);
         }
-        if (FileUtil.renameFile(fromFile.toString(), destFile.toString())) {
+        if (FileUtil.renameFile(fromFile, destFile)) {
             return true;
         } else {
             JOptionPane.showMessageDialog(frame,

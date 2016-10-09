@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -143,11 +142,11 @@ public class FileUtil {
      * @param toFile   The target fileName
      * @return True if the rename was successful, false if an exception occurred
      */
-    public static boolean renameFile(String fromFile, String toFile) {
+    public static boolean renameFile(Path fromFile, Path toFile) {
 
         try {
-            Path src = Paths.get(fileName);
-            return Files.move(src, src.resolveSibling(destFilename), StandardCopyOption.REPLACE_EXISTING) != null;
+
+            return Files.move(fromFile, fromFile.resolveSibling(toFile), StandardCopyOption.REPLACE_EXISTING) != null;
         } catch (IOException e) {
             LOGGER.error("Renaming Files failed", e);
             return false;

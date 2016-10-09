@@ -236,44 +236,45 @@ public class FileUtilTest {
 
     @Test (expected = NullPointerException.class)
     public void testRenameFileWithFromFileExistAndToFileIsNull() {
-        FileUtil.renameFile(existingTestFile.toString(),null);
+        FileUtil.renameFile(existingTestFile, null);
     }
 
     @Test (expected = NullPointerException.class)
     public void testRenameFileWithFromFileIsNullAndToFileExist() {
-        FileUtil.renameFile(null, existingTestFile.toString());
+        FileUtil.renameFile(null, existingTestFile);
     }
 
     @Test
     public void testRenameFileWithFromFileNotExistAndToFileNotExist(){
-        assertFalse(FileUtil.renameFile(nonExistingTestPath.toString(), nonExistingTestPath.toString()));
+        assertFalse(FileUtil.renameFile(nonExistingTestPath, nonExistingTestPath));
     }
 
     @Test
     public void testRenameFileWithFromFileNotExistAndToFileExist(){
-        assertFalse(FileUtil.renameFile(nonExistingTestPath.toString(), existingTestFile.toString()));
+        assertFalse(FileUtil.renameFile(nonExistingTestPath, existingTestFile));
     }
 
     @Test
     public void testRenameFileWithFromFileExistAndToFileNotExist(){
-        assertTrue(FileUtil.renameFile(existingTestFile.toString(), nonExistingTestPath.toString()));
+        assertTrue(FileUtil.renameFile(existingTestFile, nonExistingTestPath));
     }
 
     @Test
     public void testRenameFileWithFromFileExistAndToFileExist(){
-        assertTrue(FileUtil.renameFile(existingTestFile.toString(), existingTestFile.toString()));
+        assertTrue(FileUtil.renameFile(existingTestFile, existingTestFile));
     }
 
     @Test
     public void testRenameFileWithFromFileExistAndOtherToFileExist(){
-        assertFalse(FileUtil.renameFile(existingTestFile.toString(), otherExistingTestFile.toString()));
+        assertFalse(FileUtil.renameFile(existingTestFile, otherExistingTestFile));
     }
 
     @Test
-    public void testRenameFileSuccessful () throws IOException {
-        String temp = otherTemporaryFolder.toString();
+    public void testRenameFileSuccessful() {
+        Path temp = Paths.get(otherTemporaryFolder.toString());
+
         System.out.println(temp);
-        FileUtil.renameFile(existingTestFile.toString(), temp);
+        FileUtil.renameFile(existingTestFile, temp);
         assertFalse(Files.exists(existingTestFile));
     }
 
