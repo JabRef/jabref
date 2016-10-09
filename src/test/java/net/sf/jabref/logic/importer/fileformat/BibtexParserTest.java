@@ -66,9 +66,9 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void fromStringRecognizesEntry() throws IOException {
+    public void fromStringRecognizesEntry() throws ParseException {
         List<BibEntry> parsed = new BibtexParser(importFormatPreferences)
-                .parse(new StringReader("@article{test,author={Ed von Test}}")).getDatabase().getEntries();
+                .parseEntries(new StringReader("@article{test,author={Ed von Test}}"));
 
         BibEntry expected = new BibEntry();
         expected.setType("article");
@@ -78,23 +78,22 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void fromStringReturnsEmptyListFromEmptyString() throws IOException {
-        Collection<BibEntry> parsed = new BibtexParser(importFormatPreferences).parse(new StringReader(""))
-                .getDatabase().getEntries();
+    public void fromStringReturnsEmptyListFromEmptyString() throws ParseException {
+        Collection<BibEntry> parsed = new BibtexParser(importFormatPreferences).parseEntries(new StringReader(""));
         assertNotNull(parsed);
         assertEquals(Collections.emptyList(), parsed);
     }
 
     @Test
-    public void fromStringReturnsEmptyListIfNoEntryRecognized() throws IOException {
+    public void fromStringReturnsEmptyListIfNoEntryRecognized() throws ParseException {
         Collection<BibEntry> parsed = new BibtexParser(importFormatPreferences)
-                .parse(new StringReader("@@article@@{{{{{{}")).getDatabase().getEntries();
+                .parseEntries(new StringReader("@@article@@{{{{{{}"));
         assertNotNull(parsed);
         assertEquals(Collections.emptyList(), parsed);
     }
 
     @Test
-    public void singleFromStringRecognizesEntry() throws IOException {
+    public void singleFromStringRecognizesEntry() throws ParseException {
         Optional<BibEntry> parsed = BibtexParser.singleFromString(
                 "@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n",
                 importFormatPreferences);
@@ -108,7 +107,7 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void singleFromStringRecognizesEntryInMultiple() throws IOException {
+    public void singleFromStringRecognizesEntryInMultiple() throws ParseException {
         Optional<BibEntry> parsed = BibtexParser.singleFromString(
                 "@article{canh05," + "  author = {Crowston, K. and Annabi, H.},\n" + "  title = {Title A}}\n"
                         + "@inProceedings{foo," + "  author={Norton Bar}}",
@@ -119,13 +118,13 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void singleFromStringReturnsEmptyFromEmptyString() throws IOException {
+    public void singleFromStringReturnsEmptyFromEmptyString() throws ParseException {
         Optional<BibEntry> parsed = BibtexParser.singleFromString("", importFormatPreferences);
         assertEquals(Optional.empty(), parsed);
     }
 
     @Test
-    public void singleFromStringReturnsEmptyIfNoEntryRecognized() throws IOException {
+    public void singleFromStringReturnsEmptyIfNoEntryRecognized() throws ParseException {
         Optional<BibEntry> parsed = BibtexParser.singleFromString("@@article@@{{{{{{}", importFormatPreferences);
         assertEquals(Optional.empty(), parsed);
     }

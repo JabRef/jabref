@@ -115,11 +115,11 @@ public class BibtexParser implements Parser {
      *
      * @param bibtexString
      * @return An Optional<BibEntry>. Optional.empty() if non was found or an error occurred.
+     * @throws ParseException
      */
     public static Optional<BibEntry> singleFromString(String bibtexString,
-            ImportFormatPreferences importFormatPreferences) throws IOException {
-        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexString))
-                .getDatabase().getEntries();
+            ImportFormatPreferences importFormatPreferences) throws ParseException {
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parseEntries(bibtexString);
         if ((entries == null) || entries.isEmpty()) {
             return Optional.empty();
         }

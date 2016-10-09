@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.importer;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import net.sf.jabref.logic.importer.fileformat.BibtexParser;
@@ -22,7 +21,7 @@ public class ParsedBibEntryTests {
     }
 
     @Test
-    public void testGetPublicationDate() throws IOException {
+    public void testGetPublicationDate() throws ParseException {
 
         Assert.assertEquals(Optional.of("2003-02"),
                 (BibtexParser.singleFromString("@ARTICLE{HipKro03, year = {2003}, month = #FEB# }",
