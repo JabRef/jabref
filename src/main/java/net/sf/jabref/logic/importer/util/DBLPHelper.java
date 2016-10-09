@@ -1,5 +1,6 @@
 package net.sf.jabref.logic.importer.util;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,7 +58,7 @@ public class DBLPHelper {
      *            page as String
      * @return list of BibEntry
      */
-    public List<BibEntry> getBibTexFromPage(final String page) {
+    public List<BibEntry> getBibTexFromPage(final String page) throws IOException {
         final List<BibEntry> bibtexList = new ArrayList<>();
 
         String tmpStr = page;

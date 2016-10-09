@@ -84,6 +84,7 @@ public class BibtexParser implements Parser {
      * @throws IOException
      * @deprecated inline this method
      */
+    @Deprecated
     public static ParserResult parse(Reader in, ImportFormatPreferences importFormatPreferences) throws IOException {
         return new BibtexParser(importFormatPreferences).parse(in);
     }
@@ -116,8 +117,9 @@ public class BibtexParser implements Parser {
      * @return An Optional<BibEntry>. Optional.empty() if non was found or an error occurred.
      */
     public static Optional<BibEntry> singleFromString(String bibtexString,
-            ImportFormatPreferences importFormatPreferences) {
-        Collection<BibEntry> entries = BibtexParser.fromString(bibtexString, importFormatPreferences);
+            ImportFormatPreferences importFormatPreferences) throws IOException {
+        Collection<BibEntry> entries = new BibtexParser(importFormatPreferences).parse(new StringReader(bibtexString))
+                .getDatabase().getEntries();
         if ((entries == null) || entries.isEmpty()) {
             return Optional.empty();
         }

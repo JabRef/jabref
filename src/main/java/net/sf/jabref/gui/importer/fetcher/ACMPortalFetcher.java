@@ -313,7 +313,8 @@ public class ACMPortalFetcher implements PreviewEntryFetcher {
             Collection<BibEntry> items = null;
             try (BufferedReader in = new BufferedReader(
                     new InputStreamReader(connection.getInputStream(), StandardCharsets.UTF_8))) {
-                items = BibtexParser.parse(in, Globals.prefs.getImportFormatPreferences()).getDatabase().getEntries();
+                items = new BibtexParser(Globals.prefs.getImportFormatPreferences()).parse(in).getDatabase()
+                        .getEntries();
             } catch (IOException e) {
                 LOGGER.info("Download of BibTeX information from ACM Portal failed.", e);
             }

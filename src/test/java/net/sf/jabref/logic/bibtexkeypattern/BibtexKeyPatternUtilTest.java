@@ -1,5 +1,6 @@
 package net.sf.jabref.logic.bibtexkeypattern;
 
+import java.io.IOException;
 import java.util.Optional;
 
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
@@ -48,7 +49,7 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testAndInAuthorName() {
+    public void testAndInAuthorName() throws IOException {
         Optional<BibEntry> entry0 = BibtexParser.singleFromString("@ARTICLE{kohn, author={Simon Holland}}",
                 importFormatPreferences);
         assertEquals("Holland",
@@ -57,7 +58,7 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testAndAuthorNames() {
+    public void testAndAuthorNames() throws IOException {
         String bibtexString = "@ARTICLE{whatevery, author={Mari D. Herland and Mona-Iren Hauge and Ingeborg M. Helgeland}}";
         Optional<BibEntry> entry = BibtexParser.singleFromString(bibtexString, importFormatPreferences);
         assertEquals("HerlandHaugeHelgeland",
@@ -66,7 +67,7 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testSpecialLatexCharacterInAuthorName() {
+    public void testSpecialLatexCharacterInAuthorName() throws IOException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={Simon Popovi\\v{c}ov\\'{a}}}", importFormatPreferences);
         assertEquals("Popovicova",
@@ -79,7 +80,7 @@ public class BibtexKeyPatternUtilTest {
      * Ć ć É é Í í Ĺ ĺ Ń ń Ó ó Ŕ ŕ Ś ś Ú ú Ý ý Ź ź
      */
     @Test
-    public void testMakeLabelAndCheckLegalKeys() {
+    public void testMakeLabelAndCheckLegalKeys() throws IOException {
 
         Optional<BibEntry> entry0 = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={Andreas Köning}, year={2000}}", importFormatPreferences);
@@ -158,7 +159,7 @@ public class BibtexKeyPatternUtilTest {
      * Test the Labelmaker and with accent grave Chars to test: "ÀÈÌÒÙ";
      */
     @Test
-    public void testMakeLabelAndCheckLegalKeysAccentGrave() {
+    public void testMakeLabelAndCheckLegalKeysAccentGrave() throws IOException {
         Optional<BibEntry> entry0 = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={Andreas Àöning}, year={2000}}", importFormatPreferences);
         assertEquals("Aoen",
@@ -271,7 +272,7 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testUniversity() {
+    public void testUniversity() throws IOException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University}}}", importFormatPreferences);
         assertEquals("UniLinkoeping",
@@ -280,7 +281,7 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testDepartment() {
+    public void testDepartment() throws IOException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, Department of Electrical Engineering}}}",
                 importFormatPreferences);
@@ -290,7 +291,7 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testSchool() {
+    public void testSchool() throws IOException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Link{\\\"{o}}ping University, School of Computer Engineering}}}",
                 importFormatPreferences);
@@ -300,7 +301,7 @@ public class BibtexKeyPatternUtilTest {
     }
 
     @Test
-    public void testInstituteOfTechnology() {
+    public void testInstituteOfTechnology() throws IOException {
         Optional<BibEntry> entry = BibtexParser.singleFromString(
                 "@ARTICLE{kohn, author={{Massachusetts Institute of Technology}}}", importFormatPreferences);
         assertEquals("MIT",
