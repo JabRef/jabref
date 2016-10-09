@@ -9,7 +9,6 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -87,25 +86,6 @@ public class BibtexParser implements Parser {
     @Deprecated
     public static ParserResult parse(Reader in, ImportFormatPreferences importFormatPreferences) throws IOException {
         return new BibtexParser(importFormatPreferences).parse(in);
-    }
-
-    /**
-     * Parses BibtexEntries from the given string and returns the collection of all entries found.
-     *
-     * @param bibtexString
-     * @return Returns returns an empty collection if no entries where found or if an error occurred.
-     * @deprecated use parseEntries
-     */
-    @Deprecated
-    public static List<BibEntry> fromString(String bibtexString, ImportFormatPreferences importFormatPreferences) {
-        BibtexParser parser = new BibtexParser(importFormatPreferences);
-
-        try {
-            return parser.parseEntries(bibtexString);
-        } catch (Exception e) {
-            LOGGER.warn("BibtexParser.fromString(String): " + e.getMessage(), e);
-            return Collections.emptyList();
-        }
     }
 
     /**

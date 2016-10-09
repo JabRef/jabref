@@ -68,7 +68,7 @@ public class BibtexParserTest {
     @Test
     public void fromStringRecognizesEntry() throws ParseException {
         List<BibEntry> parsed = new BibtexParser(importFormatPreferences)
-                .parseEntries(new StringReader("@article{test,author={Ed von Test}}"));
+                .parseEntries("@article{test,author={Ed von Test}}");
 
         BibEntry expected = new BibEntry();
         expected.setType("article");
@@ -79,7 +79,7 @@ public class BibtexParserTest {
 
     @Test
     public void fromStringReturnsEmptyListFromEmptyString() throws ParseException {
-        Collection<BibEntry> parsed = new BibtexParser(importFormatPreferences).parseEntries(new StringReader(""));
+        Collection<BibEntry> parsed = new BibtexParser(importFormatPreferences).parseEntries("");
         assertNotNull(parsed);
         assertEquals(Collections.emptyList(), parsed);
     }
@@ -87,7 +87,7 @@ public class BibtexParserTest {
     @Test
     public void fromStringReturnsEmptyListIfNoEntryRecognized() throws ParseException {
         Collection<BibEntry> parsed = new BibtexParser(importFormatPreferences)
-                .parseEntries(new StringReader("@@article@@{{{{{{}"));
+                .parseEntries("@@article@@{{{{{{}");
         assertNotNull(parsed);
         assertEquals(Collections.emptyList(), parsed);
     }
@@ -1579,9 +1579,9 @@ public class BibtexParserTest {
     }
 
     @Test
-    public void preserveEncodingPrefixInsideEntry() {
-        List<BibEntry> parsed = BibtexParser
-                .fromString("@article{test,author={" + SavePreferences.ENCODING_PREFIX + "}}", importFormatPreferences);
+    public void preserveEncodingPrefixInsideEntry() throws ParseException {
+        List<BibEntry> parsed = new BibtexParser(importFormatPreferences)
+                .parseEntries("@article{test,author={" + SavePreferences.ENCODING_PREFIX + "}}");
 
         BibEntry expected = new BibEntry();
         expected.setType("article");
