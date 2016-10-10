@@ -1,17 +1,20 @@
 package net.sf.jabref.gui.externalfiles;
 
+import java.awt.BorderLayout;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
+import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -239,8 +242,19 @@ public class DroppedFileHandler {
                 Localization.lang("The PDF contains one or several BibTeX-records.")
                         + "\n"
                         + Localization.lang("Do you want to import these as new entries into the current database?"));
+        JPanel entriesPanel = new JPanel();
+        entriesPanel.setLayout(new BoxLayout(entriesPanel, BoxLayout.Y_AXIS));
+        xmpEntriesInFile.forEach(entry -> {
+            JTextArea entryArea = new JTextArea(entry.toString());
+            entryArea.setEditable(false);
+            entriesPanel.add(entryArea);
+        });
 
-        int reply = JOptionPane.showConfirmDialog(frame, confirmationMessage,
+        JPanel contentPanel = new JPanel(new BorderLayout());
+        contentPanel.add(confirmationMessage, BorderLayout.NORTH);
+        contentPanel.add(entriesPanel, BorderLayout.CENTER);
+
+        int reply = JOptionPane.showConfirmDialog(frame, contentPanel,
                 Localization.lang("XMP-metadata found in PDF: %0", fileName), JOptionPane.YES_NO_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE);
 
