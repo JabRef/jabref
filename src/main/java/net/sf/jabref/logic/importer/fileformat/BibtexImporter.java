@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import net.sf.jabref.logic.exporter.SavePreferences;
 import net.sf.jabref.logic.importer.ImportFormatPreferences;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 
@@ -18,7 +19,7 @@ import net.sf.jabref.logic.util.FileExtensions;
  * It is NOT intended to import a BIB file. This is done via the option action, which treats the metadata fields
  * The metadata is not required to be read here, as this class is NOT called at --import
  */
-public class BibtexImporter extends ImportFormat {
+public class BibtexImporter extends Importer {
 
     // Signature written at the top of the .bib file in earlier versions.
     private static final String SIGNATURE = "This file was created with JabRef";
@@ -72,7 +73,7 @@ public class BibtexImporter extends ImportFormat {
     }
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "BibTeX";
     }
 

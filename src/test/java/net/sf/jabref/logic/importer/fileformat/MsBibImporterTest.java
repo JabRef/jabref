@@ -61,7 +61,7 @@ public class MsBibImporterTest {
     @Test
     public final void testGetFormatName() {
         MsBibImporter testImporter = new MsBibImporter();
-        assertEquals("MSBib", testImporter.getFormatName());
+        assertEquals("MSBib", testImporter.getName());
     }
 
     @Test
