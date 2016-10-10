@@ -59,6 +59,8 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Improve language quality of the German translation of shared database
 - Change "Recent files" to "Recent databases" to keep the file menu consistent
 - Customized importer files need to be slightly changed since the class `ImportFormat` was renamed to `Importer`
+- Entryfields can now be hidden (related to issue https://github.com/JabRef/jabref/pull/1883)
+
 
 ### Fixed
 - Fixed [#2092](https://github.com/JabRef/jabref/issues/2092): "None"-button in date picker clears the date field

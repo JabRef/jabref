@@ -31,6 +31,8 @@ import net.sf.jabref.gui.fieldeditors.EntryLinkListEditor;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
 import net.sf.jabref.gui.fieldeditors.FileListEditor;
 import net.sf.jabref.gui.fieldeditors.TextArea;
+import net.sf.jabref.gui.fieldeditors.TextAreaForHiddenField;
+import net.sf.jabref.gui.fieldeditors.TextAreaForVisibleField;
 import net.sf.jabref.gui.fieldeditors.TextField;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.util.GUIUtil;
@@ -128,6 +130,9 @@ class EntryEditorTab {
         DefaultFormBuilder builder = new DefaultFormBuilder
                 (new FormLayout(colSpec, rowSpec), panel);
 
+        TextAreaForVisibleField textAreaForVisibleField = null;
+        TextAreaForHiddenField textAreaForHiddenField;
+
         // BibTex edit fields are defined here
         for (int i = 0; i < fields.size(); i++) {
             String field = fields.get(i);
@@ -151,8 +156,19 @@ class EntryEditorTab {
                         false);
                 defaultHeight = 0;
             } else {
-                fieldEditor = new TextArea(field, null);
-                bPanel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener((TextArea) fieldEditor);
+                if (isHiddenField(field)) {
+                    textAreaForHiddenField = new TextAreaForHiddenField(field);
+                    // the assumption is that each hidden field appears after its visible twin
+                    // i.e., visible, hidden, visible, hidden, ...
+                    textAreaForHiddenField.setTwin(textAreaForVisibleField);
+                    textAreaForVisibleField.setTwin(textAreaForHiddenField);
+                    fieldEditor = textAreaForHiddenField;
+                } else {
+                    textAreaForVisibleField = new TextAreaForVisibleField(field);
+                    fieldEditor = textAreaForVisibleField;
+                }
+                bPanel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable()
+                        .addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
             }
 
@@ -181,7 +197,14 @@ class EntryEditorTab {
                 builder.append(fieldEditor.getPane());
                 JPanel pan = new JPanel();
                 pan.setLayout(new BorderLayout());
+
                 pan.add(extra.get(), BorderLayout.NORTH);
+                // Hidden field extra components should not be enabled as they only work on the visible field
+                if (fieldEditor instanceof TextAreaForVisibleField) {
+                    ((TextAreaForVisibleField) fieldEditor).setExtra(pan);
+                } else if (fieldEditor instanceof TextAreaForHiddenField) {
+                    ((TextAreaForHiddenField) fieldEditor).setExtra(pan);
+                }
                 builder.append(pan);
             } else {
                 builder.append(fieldEditor.getPane(), 3);
@@ -196,7 +219,6 @@ class EntryEditorTab {
             final TextField textField = new TextField(BibEntry.KEY_FIELD,
                     parent.getEntry().getCiteKeyOptional().orElse(""), true);
             setupJTextComponent(textField, null);
-
             editors.put(BibEntry.KEY_FIELD, textField);
             /*
              * If the key field is the only field, we should have only one
@@ -211,6 +233,9 @@ class EntryEditorTab {
         }
     }
 
+    private boolean isHiddenField(String field) {
+        return field.startsWith("_");
+    }
 
     private BibEntry getEntry() {
         return entry;
@@ -285,9 +310,36 @@ class EntryEditorTab {
         try {
             updating = true;
             for (FieldEditor editor : editors.values()) {
-                String toSet = entry.getField(editor.getFieldName()).orElse("");
-                if (!toSet.equals(editor.getText())) {
-                    editor.setText(toSet);
+                String fieldName = editor.getFieldName();
+
+                boolean displayableFieldValueExists;
+                boolean hiddenFieldValueExists;
+                if (isHiddenField(fieldName)) {
+                    displayableFieldValueExists = !entry.getField(fieldName.substring(1)).orElse("").isEmpty();
+                    hiddenFieldValueExists = !entry.getField(fieldName).orElse("").isEmpty();
+                } else {
+                    displayableFieldValueExists = !entry.getField(fieldName).orElse("").isEmpty();
+                    hiddenFieldValueExists = !entry.getField("_" + fieldName).orElse("").isEmpty();
+                }
+
+                boolean currentFieldEditorIsVisibleFieldEditor = !isHiddenField(fieldName);
+                boolean isVisible;
+                if (currentFieldEditorIsVisibleFieldEditor) {
+                    // do not display if hidden field value exists (because other editor is shown)
+                    // But display it if a value is set or no hidden field value exists
+                    isVisible = !hiddenFieldValueExists || displayableFieldValueExists;
+                } else {
+                    isVisible = hiddenFieldValueExists;
+                }
+
+                if (isVisible) {
+                    String toSet = entry.getField(fieldName).orElse("");
+                    if (!toSet.equals(editor.getText())) {
+                        editor.setText(toSet);
+                    }
+                    editor.setVisible(true);
+                } else {
+                    editor.setVisible(false);
                 }
             }
             this.entry = entry;

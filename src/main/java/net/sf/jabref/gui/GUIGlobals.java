@@ -42,6 +42,7 @@ public class GUIGlobals {
     static final Color ACTIVE_TABBED_COLOR = ENTRY_EDITOR_LABEL_COLOR.darker(); // active Database (JTabbedPane)
     static final Color INACTIVE_TABBED_COLOR = Color.black; // inactive Database
     public static Color editorTextColor;
+    public static Color textAreaLabelForHiddenFieldColor = new Color(255, 102, 102);
     public static Color validFieldBackgroundColor;
     public static Color activeBackgroundColor;
     public static Color invalidFieldBackgroundColor;

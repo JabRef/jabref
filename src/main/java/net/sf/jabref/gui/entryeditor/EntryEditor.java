@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
@@ -25,6 +27,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -225,9 +228,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
         tabbed.removeAll();
         tabs.clear();
 
-        EntryType type = EntryTypes.getTypeOrDefault(entry.getType(),
-                this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
-
+        EntryType type = EntryTypes.getTypeOrDefault(entry.getType(), this.frame.getCurrentBasePanel().getBibDatabaseContext().getMode());
         // required fields
         addRequiredTab(type);
 
@@ -288,15 +289,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
             }
         }
-
-        // other fields
-        List<String> displayedFields = type.getAllFields().stream().map(String::toLowerCase)
-                .collect(Collectors.toList());
+        // other fields also do not contain hidden fields
+        Set<String> displayedFields = Stream
+                .concat(type.getAllFields().stream(), Globals.prefs.getCustomTabFieldNames().stream())
+                .map(String::toLowerCase).flatMap(f -> Stream.of(f, "_" + f)).collect(Collectors.toSet());
         List<String> otherFields = entry.getFieldNames().stream().map(String::toLowerCase)
                 .filter(f -> !displayedFields.contains(f)).collect(Collectors.toList());
-        if (!usedOptionalFieldsDeprecated.isEmpty()) {
-            otherFields.removeAll(usedOptionalFieldsDeprecated);
-        }
         otherFields.remove(BibEntry.KEY_FIELD);
         otherFields.removeAll(Globals.prefs.getCustomTabFieldNames());
 
@@ -305,22 +303,52 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
 
         // general fields from preferences
-        addGeneralTabs();
+        addGeneralTab();
+        // abstract and review fields from preferences
+        addAbstractReviewTabs();
         // source tab
         addSourceTab();
     }
 
-    private void addGeneralTabs() {
+    private void addAbstractReviewTabs() {
         EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
-        for (int i = 0; i < tabList.getTabCount(); i++) {
-            EntryEditorTab newTab = new EntryEditorTab(frame, panel, tabList.getTabFields(i), this, false,
-                    false, tabList.getTabName(i));
+        //i starts with 1 because 0 is the GeneralTab which has its own method
+        for (int i = 1; i < tabList.getTabCount(); i++) {
+            List<String> tabFields = addFieldAndHiddenField(tabList.getTabFields(i));
+
+            EntryEditorTab newTab = new EntryEditorTab(frame, panel, tabFields, this, true, false,
+                    tabList.getTabName(i));
             if (newTab.fileListEditor != null) {
                 fileListEditor = newTab.fileListEditor;
             }
             tabbed.addTab(tabList.getTabName(i), newTab.getPane());
             tabs.add(newTab);
         }
+    }
+
+    private void addGeneralTab() {
+        EntryEditorTabList tabList = Globals.prefs.getEntryEditorTabList();
+        List<String> allGeneralFields = new ArrayList<>();
+
+        for (String fieldName : tabList.getTabFields(0)) {
+            Set<FieldProperty> fieldProperties = InternalBibtexFields.getFieldProperties(fieldName);
+            if (Collections.disjoint(fieldProperties, Arrays.asList(FieldProperty.FILE_EDITOR,
+                    FieldProperty.SINGLE_ENTRY_LINK, FieldProperty.MULTIPLE_ENTRY_LINK))) {
+                // hidden editors only exist for "normal" fields, not for files and links
+                allGeneralFields.add(fieldName);
+                allGeneralFields.add("_" + fieldName);
+            } else {
+                allGeneralFields.add(fieldName);
+            }
+        }
+        EntryEditorTab generalTab = new EntryEditorTab(frame, panel, allGeneralFields, this, true, false,
+                tabList.getTabName(0));
+
+        if (generalTab.fileListEditor != null) {
+            fileListEditor = generalTab.fileListEditor;
+        }
+        tabbed.addTab(tabList.getTabName(0), generalTab.getPane());
+        tabs.add(generalTab);
     }
 
     private void addSourceTab() {
@@ -346,8 +374,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
     private List<String> addRequiredTab(EntryType type) {
         List<String> requiredFields = type.getRequiredFieldsFlat();
+        List<String> allRequiredFields = addFieldAndHiddenField(requiredFields);
 
-        EntryEditorTab requiredPanel = new EntryEditorTab(frame, panel, requiredFields, this, true, false, Localization.lang("Required fields"));
+        EntryEditorTab requiredPanel = new EntryEditorTab(frame, panel, allRequiredFields, this, true, false,
+                Localization.lang("Required fields"));
+
         if (requiredPanel.fileListEditor != null) {
             fileListEditor = requiredPanel.fileListEditor;
         }
@@ -358,8 +389,11 @@ public class EntryEditor extends JPanel implements EntryContainer {
     }
 
     private void addOptionalTab(EntryType type) {
-        EntryEditorTab optionalPanel = new EntryEditorTab(frame, panel, type.getPrimaryOptionalFields(), this,
-                false, true, Localization.lang("Optional fields"));
+        List<String> optionalFields = type.getPrimaryOptionalFields();
+        List<String> allOptionalFields = addFieldAndHiddenField(optionalFields);
+
+        EntryEditorTab optionalPanel = new EntryEditorTab(frame, panel, allOptionalFields, this, true, false,
+                Localization.lang("Optional fields"));
 
         if (optionalPanel.fileListEditor != null) {
             fileListEditor = optionalPanel.fileListEditor;
@@ -367,6 +401,18 @@ public class EntryEditor extends JPanel implements EntryContainer {
         tabbed.addTab(Localization.lang("Optional fields"), IconTheme.JabRefIcon.OPTIONAL.getSmallIcon(), optionalPanel
                 .getPane(), Localization.lang("Show optional fields"));
         tabs.add(optionalPanel);
+    }
+
+    /**
+     * build a list of all required fields, where each required field is followed by the hidden counter part
+     */
+    public static List<String> addFieldAndHiddenField(List<String> list) {
+        List<String> returnList = new ArrayList<>();
+        for (String fieldName : list) {
+            returnList.add(fieldName);
+            returnList.add("_" + fieldName);
+        }
+        return returnList;
     }
 
     public String getDisplayedBibEntryType() {
@@ -485,7 +531,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * @return Component to show, or null if none.
      */
     public Optional<JComponent> getExtra(final FieldEditor editor) {
-        final String fieldName = editor.getFieldName();
+        String fieldName = editor.getFieldName();
+        // Also get extra components for hidden fields
+        fieldName = fieldName.startsWith("_") ? fieldName.substring(1) : fieldName;
 
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
 

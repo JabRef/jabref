@@ -14,13 +14,18 @@ import net.sf.jabref.gui.ClipBoardManager;
 import net.sf.jabref.gui.actions.CopyAction;
 import net.sf.jabref.gui.actions.CopyDoiUrlAction;
 import net.sf.jabref.gui.actions.PasteAction;
+import net.sf.jabref.gui.actions.textarea.HideFieldAction;
+import net.sf.jabref.gui.actions.textarea.ShowFieldAction;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
+import net.sf.jabref.gui.fieldeditors.TextAreaForHiddenField;
+import net.sf.jabref.gui.fieldeditors.TextAreaForVisibleField;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeNamesFormatter;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.strings.StringUtil;
 
 public class FieldTextMenu implements MouseListener {
+
     private final FieldEditor field;
     private final JPopupMenu inputMenu = new JPopupMenu();
     private final CopyAction copyAction;
@@ -33,7 +38,7 @@ public class FieldTextMenu implements MouseListener {
 
 
     public FieldTextMenu(FieldEditor fieldComponent) {
-        field = fieldComponent;
+        this.field = fieldComponent;
         copyAction = new CopyAction((JTextComponent) field);
         pasteAction = new PasteAction((JTextComponent) field);
         CopyDoiUrlAction copyDoiAction = new CopyDoiUrlAction((JTextComponent) field);
@@ -106,26 +111,33 @@ public class FieldTextMenu implements MouseListener {
     private void initMenu() {
         inputMenu.add(pasteAction);
         inputMenu.add(copyAction);
-        if (field.getTextComponent() instanceof JTextComponent) {
-            inputMenu.add(doiMenuItem);
+        if (field instanceof TextAreaForVisibleField) {
+            inputMenu.add(new HideFieldAction((TextAreaForVisibleField) field));
+        } else if (field instanceof TextAreaForHiddenField) {
+            inputMenu.add(new ShowFieldAction((TextAreaForHiddenField) field));
         }
-        inputMenu.addSeparator();
-        inputMenu.add(new ReplaceAction());
-
         if (field.getTextComponent() instanceof JTextComponent) {
-            inputMenu.add(new CaseChangeMenu((JTextComponent) field.getTextComponent()));
-            inputMenu.add(new ConversionMenu((JTextComponent) field.getTextComponent()));
+                inputMenu.add(doiMenuItem);
+            }
             inputMenu.addSeparator();
-            protectedTermsMenu = new ProtectedTermsMenu((JTextComponent) field.getTextComponent());
-            inputMenu.add(protectedTermsMenu);
+            inputMenu.add(new ReplaceAction());
+
+            if (field.getTextComponent() instanceof JTextComponent) {
+                inputMenu.add(new CaseChangeMenu((JTextComponent) field.getTextComponent()));
+                inputMenu.add(new ConversionMenu((JTextComponent) field.getTextComponent()));
+                inputMenu.addSeparator();
+                protectedTermsMenu = new ProtectedTermsMenu((JTextComponent) field.getTextComponent());
+                inputMenu.add(protectedTermsMenu);
         }
     }
 
     @SuppressWarnings("serial")
     class ReplaceAction extends AbstractAction {
+
         public ReplaceAction() {
             putValue(Action.NAME, Localization.lang("Normalize to BibTeX name format"));
-            putValue(Action.SHORT_DESCRIPTION, Localization.lang("If possible, normalize this list of names to conform to standard BibTeX name formatting"));
+            putValue(Action.SHORT_DESCRIPTION, Localization
+                    .lang("If possible, normalize this list of names to conform to standard BibTeX name formatting"));
         }
 
         @Override
