@@ -212,9 +212,6 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             } catch (IOException ex) {
                 LOGGER.error("Error loading database " + fileToLoad, ex);
                 result = ParserResult.getNullResult();
-            }
-
-            if (result.isNullResult()) {
                 JOptionPane.showMessageDialog(null, Localization.lang("Error opening file") + " '" + fileName + "'",
                         Localization.lang("Error"), JOptionPane.ERROR_MESSAGE);
             }

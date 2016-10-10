@@ -252,6 +252,9 @@ class FileTab extends JPanel implements PrefsTab {
         if (!nonWrappableFields.getText().trim().equals(prefs.get(JabRefPreferences.NON_WRAPPABLE_FIELDS))) {
             prefs.put(JabRefPreferences.NON_WRAPPABLE_FIELDS, nonWrappableFields.getText());
         }
+
+        prefs.putBoolean(JabRefPreferences.LOCAL_AUTO_SAVE, localAutoSave.isSelected());
+        prefs.putBoolean(JabRefPreferences.SHARED_AUTO_SAVE, sharedAutoSave.isSelected());
     }
 
     @Override

@@ -212,7 +212,9 @@ public class MetaData {
         setEncoding(encoding, true);
     }
 
-    // The parameter postChanges has been introduced to avoid event loops while saving a database
+    /**
+     * This Method (with additional parameter) has been introduced to avoid event loops while saving a database.
+     */
     public void setEncoding(Charset encoding, boolean postChanges) {
         this.encoding = Objects.requireNonNull(encoding);
         if (postChanges) {
