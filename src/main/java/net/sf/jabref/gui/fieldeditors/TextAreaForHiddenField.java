@@ -2,12 +2,15 @@ package net.sf.jabref.gui.fieldeditors;
 
 import java.util.Objects;
 
+import javax.swing.JComponent;
+
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.model.entry.FieldName;
 
 public class TextAreaForHiddenField extends TextArea {
 
     private TextAreaForVisibleField twin;
+    private JComponent extra = null;
 
 
     public TextAreaForHiddenField(String fieldName) {
@@ -24,4 +27,15 @@ public class TextAreaForHiddenField extends TextArea {
         this.twin = Objects.requireNonNull(twin);
     }
 
+    @Override
+    public void setVisible(boolean isVisible) {
+        super.setVisible(isVisible);
+        if (extra != null) {
+            extra.setVisible(isVisible);
+        }
+    }
+
+    public void setExtra(JComponent extra) {
+        this.extra = extra;
+    }
 }

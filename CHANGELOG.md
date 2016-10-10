@@ -58,6 +58,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Generalize German translation of database into "Datenbank"
 - Improve language quality of the German translation of shared database
 - Change "Recent files" to "Recent databases" to keep the file menu consistent
+- Customized importer files need to be slightly changed since the class `ImportFormat` was renamed to `Importer`
 - Entryfields can now be hidden (related to issue https://github.com/JabRef/jabref/pull/1883)
 
 

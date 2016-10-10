@@ -199,6 +199,12 @@ class EntryEditorTab {
                 pan.setLayout(new BorderLayout());
 
                 pan.add(extra.get(), BorderLayout.NORTH);
+                // Hidden field extra components should not be enabled as they only work on the visible field
+                if (fieldEditor instanceof TextAreaForVisibleField) {
+                    ((TextAreaForVisibleField) fieldEditor).setExtra(pan);
+                } else if (fieldEditor instanceof TextAreaForHiddenField) {
+                    ((TextAreaForHiddenField) fieldEditor).setExtra(pan);
+                }
                 builder.append(pan);
             } else {
                 builder.append(fieldEditor.getPane(), 3);

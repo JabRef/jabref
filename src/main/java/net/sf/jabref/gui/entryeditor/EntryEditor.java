@@ -531,7 +531,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
      * @return Component to show, or null if none.
      */
     public Optional<JComponent> getExtra(final FieldEditor editor) {
-        final String fieldName = editor.getFieldName();
+        String fieldName = editor.getFieldName();
+        // Also get extra components for hidden fields
+        fieldName = fieldName.startsWith("_") ? fieldName.substring(1) : fieldName;
 
         final Set<FieldProperty> fieldExtras = InternalBibtexFields.getFieldProperties(fieldName);
 
