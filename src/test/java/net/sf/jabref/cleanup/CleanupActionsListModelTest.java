@@ -9,9 +9,10 @@ import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 
 import net.sf.jabref.gui.cleanup.CleanupActionsListModel;
-import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
-import net.sf.jabref.logic.exporter.FieldFormatterCleanups;
+import net.sf.jabref.logic.cleanup.Cleanups;
 import net.sf.jabref.logic.formatter.bibtexfields.ClearFormatter;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -51,7 +52,7 @@ public class CleanupActionsListModelTest {
     }
 
     public List<FieldFormatterCleanup> getDefaultFieldFormatterCleanups() {
-        FieldFormatterCleanups formatters = FieldFormatterCleanups.DEFAULT_SAVE_ACTIONS;
+        FieldFormatterCleanups formatters = Cleanups.DEFAULT_SAVE_ACTIONS;
         //new ArrayList because configured actions is an unmodifiable collection
         return new ArrayList<>(formatters.getConfiguredActions());
     }

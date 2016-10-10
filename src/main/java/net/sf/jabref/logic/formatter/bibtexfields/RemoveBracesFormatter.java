@@ -2,8 +2,8 @@ package net.sf.jabref.logic.formatter.bibtexfields;
 
 import java.util.Objects;
 
-import net.sf.jabref.logic.formatter.Formatter;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.cleanup.Formatter;
 
 /**
  * Removes all matching braces around the string.

@@ -16,6 +16,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
@@ -57,7 +58,6 @@ public class OAI2Fetcher implements EntryFetcher {
     private final String oai2PrefixIdentifier;
     private final String oai2ArchiveName;
     private boolean shouldContinue = true;
-    private OutputPrinter status;
     private long waitTime = -1;
     private Date lastCall;
 
@@ -158,7 +158,7 @@ public class OAI2Fetcher implements EntryFetcher {
      *            The OAI2 key to fetch from ArXiv.
      * @return The imported BibEntry or null if none.
      */
-    public BibEntry importOai2Entry(String key) {
+    protected BibEntry importOai2Entry(String key) throws IOException, SAXException {
         /**
          * Fix for problem reported in mailing-list:
          *   https://sourceforge.net/forum/message.php?msg_id=4087158
@@ -166,53 +166,36 @@ public class OAI2Fetcher implements EntryFetcher {
         String fixedKey = OAI2Fetcher.fixKey(key);
 
         String url = constructUrl(fixedKey);
-        try {
-            URL oai2Url = new URL(url);
-            HttpURLConnection oai2Connection = (HttpURLConnection) oai2Url.openConnection();
-            oai2Connection.setRequestProperty("User-Agent", "JabRef");
+        URL oai2Url = new URL(url);
+        HttpURLConnection oai2Connection = (HttpURLConnection) oai2Url.openConnection();
+        oai2Connection.setRequestProperty("User-Agent", "JabRef");
 
-            /* create an empty BibEntry and set the oai2identifier field */
-            BibEntry be = new BibEntry(IdGenerator.next(), "article");
-            be.setField(OAI2Fetcher.OAI2_IDENTIFIER_FIELD, fixedKey);
-            DefaultHandler handlerBase = new OAI2Handler(be);
+        /* create an empty BibEntry and set the oai2identifier field */
+        BibEntry entry = new BibEntry(IdGenerator.next(), "article");
+        entry.setField(OAI2Fetcher.OAI2_IDENTIFIER_FIELD, fixedKey);
+        DefaultHandler handlerBase = new OAI2Handler(entry);
 
-            try (InputStream inputStream = oai2Connection.getInputStream()) {
+        try (InputStream inputStream = oai2Connection.getInputStream()) {
+            /* parse the result */
+            saxParser.parse(inputStream, handlerBase);
 
-                /* parse the result */
-                saxParser.parse(inputStream, handlerBase);
+            /* Correct line breaks and spacing */
+            for (String name : entry.getFieldNames()) {
+                entry.getField(name)
+                        .ifPresent(content -> entry.setField(name, OAI2Handler.correctLineBreaks(content)));
+            }
 
-                /* Correct line breaks and spacing */
-                for (String name : be.getFieldNames()) {
-                    be.getField(name)
-                            .ifPresent(content -> be.setField(name, OAI2Handler.correctLineBreaks(content)));
-                }
+            if (fixedKey.matches("\\d\\d\\d\\d\\..*")) {
+                entry.setField(FieldName.YEAR, "20" + fixedKey.substring(0, 2));
 
-                if (fixedKey.matches("\\d\\d\\d\\d\\..*")) {
-                    be.setField(FieldName.YEAR, "20" + fixedKey.substring(0, 2));
-
-                    int monthNumber = Integer.parseInt(fixedKey.substring(2, 4));
-                    MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
-                    if (month.isValid()) {
-                        be.setField(FieldName.MONTH, month.bibtexFormat);
-                    }
+                int monthNumber = Integer.parseInt(fixedKey.substring(2, 4));
+                MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
+                if (month.isValid()) {
+                    entry.setField(FieldName.MONTH, month.bibtexFormat);
                 }
             }
-            return be;
-        } catch (IOException e) {
-            status.showMessage(Localization.lang("An exception occurred while accessing '%0'", url) + "\n\n" + e,
-                    getTitle(), JOptionPane.ERROR_MESSAGE);
-        } catch (SAXException e) {
-            status.showMessage(
-                    Localization.lang("A SAX exception occurred while parsing '%0':", url) + "\n\n" + e.getMessage(),
-                    getTitle(), JOptionPane.ERROR_MESSAGE);
-        } catch (RuntimeException e) {
-            status.showMessage(
-                    Localization.lang("Error while fetching from %0", "OAI2 source (" + url + "):") + "\n\n"
-                            + e.getMessage() + "\n\n" + Localization
-                                    .lang("Note: A full text search is currently not supported for %0", getTitle()),
-                    getTitle(), JOptionPane.ERROR_MESSAGE);
         }
-        return null;
+        return entry;
     }
 
     @Override
@@ -232,10 +215,7 @@ public class OAI2Fetcher implements EntryFetcher {
     }
 
     @Override
-    public boolean processQuery(String query, ImportInspector dialog, OutputPrinter statusOP) {
-
-        status = statusOP;
-
+    public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
         try {
             shouldContinue = true;
 
@@ -268,7 +248,16 @@ public class OAI2Fetcher implements EntryFetcher {
                 }
 
                 /* query the archive and load the results into the BibEntry */
-                BibEntry be = importOai2Entry(key);
+                BibEntry be = null;
+                try {
+                    be = importOai2Entry(key);
+                } catch (SAXException e) {
+                    String url = constructUrl(OAI2Fetcher.fixKey(key));
+                    LOGGER.error("Error while fetching from " + getTitle(), e);
+                    ((ImportInspectionDialog)dialog).showMessage(Localization.lang("Error while fetching from %0", getTitle()) +"\n"+
+                                    Localization.lang("A SAX exception occurred while parsing '%0':", url),
+                            Localization.lang("Search %0", getTitle()), JOptionPane.ERROR_MESSAGE);
+                }
 
                 if (shouldWait()) {
                     lastCall = new Date();
@@ -284,10 +273,10 @@ public class OAI2Fetcher implements EntryFetcher {
             }
 
             return true;
-        } catch (Exception e) {
-            status.setStatus(Localization.lang("Error while fetching from %0", "OAI2"));
-            LOGGER.error("Error while fetching from OAI2", e);
-        }
+        } catch (IOException | InterruptedException e) {
+            LOGGER.error("Error while fetching from " + getTitle(), e);
+            ((ImportInspectionDialog)dialog).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
+    }
         return false;
     }
 

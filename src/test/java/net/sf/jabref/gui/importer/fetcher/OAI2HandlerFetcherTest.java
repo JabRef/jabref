@@ -119,7 +119,7 @@ public class OAI2HandlerFetcherTest {
 
     @Test
     @Ignore
-    public void testOnline() throws InterruptedException {
+    public void testOnline() throws InterruptedException, IOException, SAXException {
 
         {
             OAI2Fetcher fetcher = new OAI2Fetcher();

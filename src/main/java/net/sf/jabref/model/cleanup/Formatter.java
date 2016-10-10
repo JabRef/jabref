@@ -1,4 +1,4 @@
-package net.sf.jabref.logic.formatter;
+package net.sf.jabref.model.cleanup;
 
 /**
  * The Formatter is used for a Filter design-pattern. Implementing classes have to accept a String and returned a

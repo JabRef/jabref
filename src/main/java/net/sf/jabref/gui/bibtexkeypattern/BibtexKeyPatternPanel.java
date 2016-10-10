@@ -246,7 +246,7 @@ public class BibtexKeyPatternPanel extends JPanel {
             setValue(entry.getValue(), entry.getKey(), keyPattern);
         }
 
-        if (keyPattern.getDefaultValue() == null) {
+        if (keyPattern.getDefaultValue() == null || keyPattern.getDefaultValue().isEmpty()) {
             defaultPat.setText("");
         } else {
             defaultPat.setText(keyPattern.getDefaultValue().get(0));

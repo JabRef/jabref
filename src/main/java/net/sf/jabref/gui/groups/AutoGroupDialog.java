@@ -29,7 +29,6 @@ import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.undo.NamedCompound;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.format.LatexToUnicodeFormatter;
-import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.groups.ExplicitGroup;
 import net.sf.jabref.model.groups.GroupHierarchyType;
@@ -121,7 +120,7 @@ class AutoGroupDialog extends JDialog implements CaretListener {
                 frame.output(Localization.lang("Created groups."));
                 ce.end();
                 panel.getUndoManager().addEdit(ce);
-            } catch (ParseException exception) {
+            } catch (IllegalArgumentException exception) {
                 frame.showMessage(exception.getLocalizedMessage());
             }
         };

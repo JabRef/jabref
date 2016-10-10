@@ -5,11 +5,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import net.sf.jabref.logic.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.logic.cleanup.Cleanups;
 import net.sf.jabref.logic.formatter.IdentityFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizeDateFormatter;
 import net.sf.jabref.logic.formatter.bibtexfields.NormalizePagesFormatter;
 import net.sf.jabref.logic.formatter.casechanger.LowerCaseFormatter;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanup;
+import net.sf.jabref.model.cleanup.FieldFormatterCleanups;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.BibtexEntryTypes;
 
@@ -41,7 +43,7 @@ public class FieldFormatterCleanupsTest {
     @Test
     public void checkSimpleUseCase() {
 
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[identity]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, Cleanups.parse("title[identity]"));
 
         FieldFormatterCleanup identityInTitle = new FieldFormatterCleanup("title", new IdentityFormatter());
         assertEquals(Collections.singletonList(identityInTitle), actions.getConfiguredActions());
@@ -54,7 +56,7 @@ public class FieldFormatterCleanupsTest {
     @Test
     public void invalidSaveActionSting() {
 
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, Cleanups.parse("title"));
 
         assertEquals(Collections.emptyList(), actions.getConfiguredActions());
 
@@ -66,7 +68,7 @@ public class FieldFormatterCleanupsTest {
     @Test
     public void checkLowerCaseSaveAction() {
 
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[lower_case]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, Cleanups.parse("title[lower_case]"));
 
         FieldFormatterCleanup lowerCaseTitle = new FieldFormatterCleanup("title", new LowerCaseFormatter());
         assertEquals(Collections.singletonList(lowerCaseTitle), actions.getConfiguredActions());
@@ -78,7 +80,7 @@ public class FieldFormatterCleanupsTest {
 
     @Test
     public void checkTwoSaveActionsForOneField() {
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[lower_case,identity]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, Cleanups.parse("title[lower_case,identity]"));
 
         FieldFormatterCleanup lowerCaseTitle = new FieldFormatterCleanup("title", new LowerCaseFormatter());
         FieldFormatterCleanup identityInTitle = new FieldFormatterCleanup("title", new IdentityFormatter());
@@ -92,7 +94,7 @@ public class FieldFormatterCleanupsTest {
     @Test
     public void checkThreeSaveActionsForOneField() {
 
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "title[lower_case,identity,normalize_date]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, Cleanups.parse("title[lower_case,identity,normalize_date]"));
 
         FieldFormatterCleanup lowerCaseTitle = new FieldFormatterCleanup("title", new LowerCaseFormatter());
         FieldFormatterCleanup identityInTitle = new FieldFormatterCleanup("title", new IdentityFormatter());
@@ -107,7 +109,7 @@ public class FieldFormatterCleanupsTest {
     @Test
     public void checkMultipleSaveActions() {
 
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "pages[normalize_page_numbers]title[lower_case]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, Cleanups.parse("pages[normalize_page_numbers]title[lower_case]"));
         List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();
 
         FieldFormatterCleanup normalizePages = new FieldFormatterCleanup("pages", new NormalizePagesFormatter());
@@ -124,7 +126,7 @@ public class FieldFormatterCleanupsTest {
     public void checkMultipleSaveActionsWithMultipleFormatters() {
 
         FieldFormatterCleanups actions = new FieldFormatterCleanups(true,
-                "pages[normalize_page_numbers,normalize_date]title[lower_case]");
+                Cleanups.parse("pages[normalize_page_numbers,normalize_date]title[lower_case]"));
         List<FieldFormatterCleanup> formatterCleanups = actions.getConfiguredActions();
 
         FieldFormatterCleanup normalizePages = new FieldFormatterCleanup("pages", new NormalizePagesFormatter());
@@ -140,7 +142,7 @@ public class FieldFormatterCleanupsTest {
 
     @Test
     public void clearFormatterRemovesField() {
-        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, "mont[clear]");
+        FieldFormatterCleanups actions = new FieldFormatterCleanups(true, Cleanups.parse("mont[clear]"));
         actions.applySaveActions(entry);
 
         assertEquals(Optional.empty(), entry.getField("mont"));

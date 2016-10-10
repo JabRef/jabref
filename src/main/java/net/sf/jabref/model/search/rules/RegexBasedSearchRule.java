@@ -6,14 +6,11 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.strings.LatexToUnicode;
 
 /**
  * Search rule for regex-based search.
  */
 public class RegexBasedSearchRule implements SearchRule {
-
-    private static final LatexToUnicode LATEX_TO_UNICODE_FORMATTER = new LatexToUnicode();
 
     private final boolean caseSensitive;
 
@@ -53,8 +50,7 @@ public class RegexBasedSearchRule implements SearchRule {
         for (String field : bibEntry.getFieldNames()) {
             Optional<String> fieldOptional = bibEntry.getField(field);
             if (fieldOptional.isPresent()) {
-                String fieldContent = RegexBasedSearchRule.LATEX_TO_UNICODE_FORMATTER.format(fieldOptional.get());
-                String fieldContentNoBrackets = RegexBasedSearchRule.LATEX_TO_UNICODE_FORMATTER.format(fieldContent);
+                String fieldContentNoBrackets = bibEntry.getLatexFreeField(field).get();
                 Matcher m = pattern.matcher(fieldContentNoBrackets);
                 if (m.find()) {
                     return true;

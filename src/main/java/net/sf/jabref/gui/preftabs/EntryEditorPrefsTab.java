@@ -13,7 +13,6 @@ import javax.swing.JSpinner;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
 
-import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.keyboard.EmacsKeyBindings;
 import net.sf.jabref.logic.autocompleter.AutoCompleteFirstNameMode;
@@ -249,18 +248,6 @@ class EntryEditorPrefsTab extends JPanel implements PrefsTab {
             autoCompletePreferences.setFirstnameMode(AutoCompleteFirstNameMode.ONLY_FULL);
         } else {
             autoCompletePreferences.setFirstnameMode(AutoCompleteFirstNameMode.BOTH);
-        }
-
-        // We need to remove all entry editors from cache if the source panel setting
-        // or the autocompletion settings have been changed:
-        if ((oldAutoComplete != autoComplete.isSelected())
-                || !oldAutoCompFields.equals(autoCompFields.getText()) ||
-                (oldAutoCompFF != autoCompFF.isSelected()) || (oldAutoCompLF != autoCompLF.isSelected()) ||
-                (oldAutoCompFModeAbbr != firstNameModeAbbr.isSelected()) ||
-                (oldAutoCompFModeFull != firstNameModeFull.isSelected())) {
-            for (BasePanel panel : frame.getBasePanelList()) {
-                panel.getEntryEditors().clear();
-            }
         }
     }
 
