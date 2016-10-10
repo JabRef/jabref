@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -436,27 +435,18 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             @Override
             public void run() {
                 if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
-                    for (final Iterator<BibEntry> i = entries.iterator(); i.hasNext();) {
-                        if (i.next().hasCiteKey()) {
-                            i.remove();
-                        }
-                    }
+                    entries.removeIf(BibEntry::hasCiteKey);
                 } else if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
-                    for (final BibEntry entry : entries) {
-                        if (entry.hasCiteKey()) {
-                            CheckBoxMessage cbm = new CheckBoxMessage(
-                                    Localization.lang("One or more keys will be overwritten. Continue?"),
-                                    Localization.lang("Disable this confirmation dialog"), false);
-                            final int answer = JOptionPane.showConfirmDialog(frame, cbm,
-                                    Localization.lang("Overwrite keys"), JOptionPane.YES_NO_OPTION);
-                            Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !cbm.isSelected());
-                            if (answer == JOptionPane.NO_OPTION) {
-                                canceled = true;
-                                return;
-                            }
-                            // No need to check more entries, because the user has already confirmed
-                            // that it's ok to overwrite keys:
-                            break;
+                    if (entries.parallelStream().anyMatch(BibEntry::hasCiteKey)) {
+                        CheckBoxMessage cbm = new CheckBoxMessage(
+                                Localization.lang("One or more keys will be overwritten. Continue?"),
+                                Localization.lang("Disable this confirmation dialog"), false);
+                        final int answer = JOptionPane.showConfirmDialog(frame, cbm,
+                                Localization.lang("Overwrite keys"), JOptionPane.YES_NO_OPTION);
+                        Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !cbm.isSelected());
+                        if (answer == JOptionPane.NO_OPTION) {
+                            canceled = true;
+                            return;
                         }
                     }
                 }

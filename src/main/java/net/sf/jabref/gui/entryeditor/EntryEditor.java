@@ -778,11 +778,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
             BibEntry newEntry = database.getEntries().get(0);
             String newKey = newEntry.getCiteKeyOptional().orElse(null);
             boolean entryChanged = false;
-            boolean duplicateWarning = false;
             boolean emptyWarning = (newKey == null) || newKey.isEmpty();
 
             entry.setCiteKey(newKey);
-            duplicateWarning = panel.getDatabase().getDuplicationChecker().isDuplicateExisting(newKey);
 
             // First, remove fields that the user has removed.
             for (Entry<String, String> field : entry.getFieldMap().entrySet()) {
@@ -827,7 +825,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             panel.getUndoManager().addEdit(compound);
 
-            if (duplicateWarning) {
+            if (panel.getDatabase().getDuplicationChecker().isDuplicateCiteKeyExisting(entry)) {
                 warnDuplicateBibtexkey();
             } else if (emptyWarning) {
                 warnEmptyBibtexkey();
@@ -1108,7 +1106,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 if (newValue == null) {
                     warnEmptyBibtexkey();
                 } else {
-                    boolean isDuplicate = panel.getDatabase().getDuplicationChecker().isDuplicateExisting(newValue);
+                    boolean isDuplicate = panel.getDatabase().getDuplicationChecker().isDuplicateCiteKeyExisting(entry);
                     if (isDuplicate) {
                         warnDuplicateBibtexkey();
                     } else {

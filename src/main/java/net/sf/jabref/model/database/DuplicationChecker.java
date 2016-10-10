@@ -2,7 +2,6 @@ package net.sf.jabref.model.database;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import net.sf.jabref.model.database.event.EntryAddedEvent;
 import net.sf.jabref.model.database.event.EntryRemovedEvent;
@@ -23,15 +22,15 @@ public class DuplicationChecker {
     /**
      * Checks if there is more than one occurrence of this key
      */
-    public boolean isDuplicateExisting(String citeKey) {
+    public boolean isDuplicateCiteKeyExisting(String citeKey) {
         return getNumberOfKeyOccurrences(citeKey) > 1;
     }
 
     /**
-     * Checks if there is more than one occurrence of this key
+     * Checks if there is more than one occurrence of the cite key
      */
-    public boolean isDuplicateExisting(Optional<String> citeKey) {
-        return isDuplicateExisting(citeKey.orElse(""));
+    public boolean isDuplicateCiteKeyExisting(BibEntry entry) {
+        return isDuplicateCiteKeyExisting(entry.getCiteKeyOptional().orElse(null));
     }
 
     /**
