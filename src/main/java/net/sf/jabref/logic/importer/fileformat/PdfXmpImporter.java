@@ -6,6 +6,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.Objects;
 
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
@@ -13,9 +14,9 @@ import net.sf.jabref.logic.xmp.XMPPreferences;
 import net.sf.jabref.logic.xmp.XMPUtil;
 
 /**
- * Wraps the XMPUtility function to be used as an ImportFormat.
+ * Wraps the XMPUtility function to be used as an Importer.
  */
-public class PdfXmpImporter extends ImportFormat {
+public class PdfXmpImporter extends Importer {
 
     private final XMPPreferences xmpPreferences;
 
@@ -25,7 +26,7 @@ public class PdfXmpImporter extends ImportFormat {
     }
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return Localization.lang("XMP-annotated PDF");
     }
 
@@ -53,7 +54,7 @@ public class PdfXmpImporter extends ImportFormat {
     }
 
     @Override
-    protected boolean isRecognizedFormat(BufferedReader reader) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
         Objects.requireNonNull(reader);
         throw new UnsupportedOperationException(
                 "PdfXmpImporter does not support isRecognizedFormat(BufferedReader reader)."
@@ -77,7 +78,7 @@ public class PdfXmpImporter extends ImportFormat {
 
     @Override
     public String getDescription() {
-        return "Wraps the XMPUtility function to be used as an ImportFormat.";
+        return "Wraps the XMPUtility function to be used as an Importer.";
     }
 
 }

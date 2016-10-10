@@ -11,6 +11,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.sf.jabref.logic.formatter.casechanger.TitleCaseFormatter;
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.model.entry.BibEntry;
@@ -34,7 +35,7 @@ import net.sf.jabref.model.entry.MonthUtil;
  * <li>Deal with capitalization correctly</li>
  * </ul>
  */
-public class IsiImporter extends ImportFormat {
+public class IsiImporter extends Importer {
 
     private static final Pattern SUB_SUP_PATTERN = Pattern.compile("/(sub|sup)\\s+(.*?)\\s*/");
 
@@ -44,7 +45,7 @@ public class IsiImporter extends ImportFormat {
 
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "ISI";
     }
 

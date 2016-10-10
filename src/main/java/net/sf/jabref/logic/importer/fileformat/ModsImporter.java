@@ -16,6 +16,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.importer.fileformat.mods.AbstractDefinition;
 import net.sf.jabref.logic.importer.fileformat.mods.DateDefinition;
@@ -56,13 +57,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- *
  * Importer for the MODS format.<br>
  * More details about the format can be found here <a href="http://www.loc.gov/standards/mods/">http://www.loc.gov/standards/mods/</a>. <br>
  * The newest xml schema can also be found here <a href="www.loc.gov/standards/mods/mods-schemas.html.">www.loc.gov/standards/mods/mods-schemas.html.</a>.
- *
  */
-public class ModsImporter extends ImportFormat {
+public class ModsImporter extends Importer {
 
     private static final Log LOGGER = LogFactory.getLog(ModsImporter.class);
     private static final String KEYWORD_SEPARATOR = JabRefPreferences.getInstance().getImportFormatPreferences()
@@ -73,7 +72,7 @@ public class ModsImporter extends ImportFormat {
 
 
     @Override
-    protected boolean isRecognizedFormat(BufferedReader input) throws IOException {
+    public boolean isRecognizedFormat(BufferedReader input) throws IOException {
         return input.lines().anyMatch(line -> MODS_PATTERN.matcher(line).find());
     }
 
@@ -187,7 +186,7 @@ public class ModsImporter extends ImportFormat {
         }
 
         //The element subject can appear more than one time, that's why the keywords has to be put out of the for loop
-        putIfListIsNotEmpty(fields, keywords, FieldName.KEYWORDS, KEYWORD_SEPARATOR.toString());
+        putIfListIsNotEmpty(fields, keywords, FieldName.KEYWORDS, KEYWORD_SEPARATOR);
         //same goes for authors and notes
         putIfListIsNotEmpty(fields, authors, FieldName.AUTHOR, " and ");
         putIfListIsNotEmpty(fields, notes, FieldName.NOTE, ", ");
@@ -217,7 +216,7 @@ public class ModsImporter extends ImportFormat {
     }
 
     private void parseTopic(Map<String, String> fields, List<JAXBElement<?>> topicOrGeographicOrTemporal,
-            List<String> keywords) {
+                            List<String> keywords) {
         for (JAXBElement<?> jaxbElement : topicOrGeographicOrTemporal) {
             Object value = jaxbElement.getValue();
             String elementName = jaxbElement.getName().getLocalPart();
@@ -236,9 +235,9 @@ public class ModsImporter extends ImportFormat {
      * If the element can not be cast to the given class, then an empty optional will be returned.
      *
      * @param groupElement The element that should be cast
-     * @param clazz The class to which groupElement should be cast
+     * @param clazz        The class to which groupElement should be cast
      * @return An Optional, that contains the groupElement as instance of clazz, if groupElement can be cast to clazz.
-     *         An empty Optional, if groupElement can not be cast to clazz
+     * An empty Optional, if groupElement can not be cast to clazz
      */
     private <T> Optional<T> getElement(Object groupElement, Class<T> clazz) {
         if (clazz.isAssignableFrom(groupElement.getClass())) {
@@ -248,7 +247,7 @@ public class ModsImporter extends ImportFormat {
     }
 
     private void parseGeographicInformation(Map<String, String> fields,
-            HierarchicalGeographicDefinition hierarchichalGeographic) {
+                                            HierarchicalGeographicDefinition hierarchichalGeographic) {
         List<JAXBElement<? extends StringPlusLanguage>> areaOrContinentOrCountry = hierarchichalGeographic
                 .getExtraTerrestrialAreaOrContinentOrCountry();
         for (JAXBElement<? extends StringPlusLanguage> element : areaOrContinentOrCountry) {
@@ -369,7 +368,7 @@ public class ModsImporter extends ImportFormat {
     }
 
     private void putPublisherOrEdition(Map<String, String> fields, String elementName,
-            StringPlusLanguagePlusSupplied pubOrEd) {
+                                       StringPlusLanguagePlusSupplied pubOrEd) {
         if ("publisher".equals(elementName)) {
             putIfValueNotNull(fields, FieldName.PUBLISHER, pubOrEd.getValue());
         } else if ("edition".equals(elementName)) {
@@ -462,7 +461,7 @@ public class ModsImporter extends ImportFormat {
     }
 
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "MODS";
     }
 
