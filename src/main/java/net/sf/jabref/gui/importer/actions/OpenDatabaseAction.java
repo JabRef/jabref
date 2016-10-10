@@ -19,11 +19,13 @@ import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
+import net.sf.jabref.autosave.BackupManager;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialog;
 import net.sf.jabref.gui.IconTheme;
 import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.actions.MnemonicAwareAction;
+import net.sf.jabref.gui.autosave.BackupUIManager;
 import net.sf.jabref.gui.importer.ParserResultWarningDialog;
 import net.sf.jabref.gui.keyboard.KeyBinding;
 import net.sf.jabref.gui.shared.SharedDatabaseUIManager;
@@ -198,6 +200,10 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
                     return;
                 }
 
+            }
+
+            if (BackupManager.checkForBackupFile(fileToLoad.toPath())) {
+                BackupUIManager.showRestoreBackupDialog(fileToLoad.toPath());
             }
 
             ParserResult result;

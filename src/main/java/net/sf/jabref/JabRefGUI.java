@@ -16,9 +16,11 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.plaf.FontUIResource;
 
+import net.sf.jabref.autosave.BackupManager;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.GUIGlobals;
 import net.sf.jabref.gui.JabRefFrame;
+import net.sf.jabref.gui.autosave.BackupUIManager;
 import net.sf.jabref.gui.importer.ParserResultWarningDialog;
 import net.sf.jabref.gui.importer.actions.OpenDatabaseAction;
 import net.sf.jabref.gui.shared.SharedDatabaseUIManager;
@@ -200,6 +202,10 @@ public class JabRefGUI {
             // Already parsed via command line parameter, e.g., "jabref.jar somefile.bib"
             if (isLoaded(dbFile) || !dbFile.exists()) {
                 continue;
+            }
+
+            if (BackupManager.checkForBackupFile(dbFile.toPath())) {
+                BackupUIManager.showRestoreBackupDialog(dbFile.toPath());
             }
 
             ParserResult parsedDatabase = OpenDatabase.loadDatabase(fileName,

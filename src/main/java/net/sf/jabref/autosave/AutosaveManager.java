@@ -80,6 +80,7 @@ public class AutosaveManager {
         for (AutosaveManager autosaver : runningInstances) {
             if (autosaver.bibDatabaseContext == bibDatabaseContext) {
                 autosaver.shutdown();
+                runningInstances.remove(autosaver);
             }
         }
     }

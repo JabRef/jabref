@@ -61,6 +61,7 @@ import javax.swing.WindowConstants;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.autosave.AutosaveManager;
+import net.sf.jabref.autosave.BackupManager;
 import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.AutoLinkFilesAction;
 import net.sf.jabref.gui.actions.ErrorConsoleAction;
@@ -869,6 +870,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                     context.clearDBMSSynchronizer();
                 }
                 AutosaveManager.shutdown(context);
+                BackupManager.shutdown(context);
                 context.getDatabaseFile().map(File::getAbsolutePath).ifPresent(filenames::add);
             }
         }
@@ -1693,23 +1695,31 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         BibDatabaseContext context = basePanel.getBibDatabaseContext();
 
-        if (isAutosaveEnabled(context) && context.getDatabaseFile().isPresent()) {
+        if (readyForAutosave(context)) {
             AutosaveManager autosaver = AutosaveManager.start(context);
             autosaver.registerListener(new AutosaveUIManager(basePanel));
+        }
+
+        if (readyForBackup(context)) {
+            BackupManager.start(context);
         }
     }
 
     public BasePanel addTab(BibDatabaseContext databaseContext, boolean raisePanel) {
         Objects.requireNonNull(databaseContext);
-
         BasePanel bp = new BasePanel(JabRefFrame.this, databaseContext);
         addTab(bp, raisePanel);
         return bp;
     }
 
-    private boolean isAutosaveEnabled(BibDatabaseContext context) {
-        return ((context.getLocation() == DatabaseLocation.SHARED) && Globals.prefs.getBoolean(JabRefPreferences.SHARED_AUTO_SAVE)) ||
-                ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE));
+    private boolean readyForAutosave(BibDatabaseContext context) {
+        return (((context.getLocation() == DatabaseLocation.SHARED) && Globals.prefs.getBoolean(JabRefPreferences.SHARED_AUTO_SAVE)) ||
+                ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE))) &&
+                context.getDatabaseFile().isPresent();
+    }
+
+    private boolean readyForBackup(BibDatabaseContext context) {
+        return context.getLocation() == DatabaseLocation.LOCAL && context.getDatabaseFile().isPresent();
     }
 
     /**
@@ -2220,6 +2230,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             removeTab(panel);
         }
         AutosaveManager.shutdown(context);
+        BackupManager.shutdown(context);
     }
 
     // Ask if the user really wants to close, if the base has not been saved

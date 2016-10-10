@@ -16,6 +16,7 @@ import javax.swing.SwingUtilities;
 import net.sf.jabref.Globals;
 import net.sf.jabref.JabRefExecutorService;
 import net.sf.jabref.autosave.AutosaveManager;
+import net.sf.jabref.autosave.BackupManager;
 import net.sf.jabref.collab.ChangeScanner;
 import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.FileDialog;
@@ -340,18 +341,27 @@ public class SaveDatabaseAction extends AbstractWorker {
             LOGGER.error("Problem registering file change notifications", ex);
         }
 
-        if (isAutosaveEnabled(context) && context.getDatabaseFile().isPresent()) {
+        if (readyForAutosave(context)) {
             AutosaveManager autosaver = AutosaveManager.start(context);
             autosaver.registerListener(new AutosaveUIManager(panel));
+        }
+
+        if (readyForBackup(context)) {
+            BackupManager.start(context);
         }
 
         context.getDatabaseFile().ifPresent(presentFile -> frame.getFileHistory().newFile(presentFile.getPath()));
         frame.updateEnabledState();
     }
 
-    private boolean isAutosaveEnabled(BibDatabaseContext context) {
-        return ((context.getLocation() == DatabaseLocation.SHARED) && Globals.prefs.getBoolean(JabRefPreferences.SHARED_AUTO_SAVE)) ||
-                ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE));
+    private boolean readyForAutosave(BibDatabaseContext context) {
+        return (((context.getLocation() == DatabaseLocation.SHARED) && Globals.prefs.getBoolean(JabRefPreferences.SHARED_AUTO_SAVE)) ||
+                ((context.getLocation() == DatabaseLocation.LOCAL) && Globals.prefs.getBoolean(JabRefPreferences.LOCAL_AUTO_SAVE))) &&
+                context.getDatabaseFile().isPresent();
+    }
+
+    private boolean readyForBackup(BibDatabaseContext context) {
+        return context.getLocation() == DatabaseLocation.LOCAL && context.getDatabaseFile().isPresent();
     }
 
     /**

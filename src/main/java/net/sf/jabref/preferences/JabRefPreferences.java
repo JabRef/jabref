@@ -777,7 +777,7 @@ public class JabRefPreferences {
         defaults.put(AUTOLINK_EXACT_KEY_ONLY, Boolean.FALSE);
         defaults.put(NUMERIC_FIELDS, "mittnum;author");
         defaults.put(RUN_AUTOMATIC_FILE_SEARCH, Boolean.FALSE);
-        defaults.put(LOCAL_AUTO_SAVE, Boolean.TRUE);
+        defaults.put(LOCAL_AUTO_SAVE, Boolean.FALSE);
         defaults.put(SHARED_AUTO_SAVE, Boolean.TRUE);
         defaults.put(ENFORCE_LEGAL_BIBTEX_KEY, Boolean.TRUE);
         // Curly brackets ({}) are the default delimiters, not quotes (") as these cause trouble when they appear within the field value:
