@@ -62,6 +62,7 @@ public class PreferencesDialog extends JDialog {
     private final JButton showPreferences = new JButton(Localization.lang("Show preferences"));
 
     private final JButton resetPreferences = new JButton(Localization.lang("Reset preferences"));
+    private  Optional<Path> lastExportedPath;
 
 
     public PreferencesDialog(JabRefFrame parent) {
@@ -160,6 +161,7 @@ public class PreferencesDialog extends JDialog {
 
             path.ifPresent(exportFile -> {
                 try {
+                    lastExportedPath = path;
                     prefs.exportPreferences(exportFile.toString());
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
@@ -171,7 +173,12 @@ public class PreferencesDialog extends JDialog {
 
         importPreferences.setToolTipText(Localization.lang("Import preferences from file"));
         importPreferences.addActionListener(e -> {
-            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.XML);
+            FileDialog dialog;
+            if(lastExportedPath.isPresent()) {
+                dialog = new FileDialog(frame, lastExportedPath.get().toString()).withExtension(FileExtensions.XML);
+            } else {
+                dialog = new FileDialog(frame).withExtension(FileExtensions.XML);
+            }
             dialog.setDefaultExtension(FileExtensions.XML);
             Optional<Path> fileName = dialog.showDialogAndGetSelectedFile();
 
