@@ -7,7 +7,6 @@ import java.lang.reflect.InvocationTargetException;
 import javax.swing.AbstractAction;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.text.Document;
 import javax.swing.undo.CannotRedoException;
@@ -20,6 +19,7 @@ import net.sf.jabref.gui.actions.Actions;
 import net.sf.jabref.gui.actions.PasteAction;
 import net.sf.jabref.gui.autocompleter.AutoCompleteListener;
 import net.sf.jabref.gui.fieldeditors.contextmenu.FieldTextMenu;
+import net.sf.jabref.gui.util.component.JTextFieldWithUnfocusedText;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -28,7 +28,7 @@ import org.apache.commons.logging.LogFactory;
  * An implementation of the FieldEditor backed by a JTextField. Used for single-line input, only BibTex key at the
  * moment?!
  */
-public class TextField extends JTextField implements FieldEditor {
+public class TextField extends JTextFieldWithUnfocusedText implements FieldEditor {
 
     private static final Log LOGGER = LogFactory.getLog(TextField.class);
 
@@ -39,7 +39,11 @@ public class TextField extends JTextField implements FieldEditor {
 
 
     public TextField(String fieldName, String content, boolean changeColorOnFocus) {
-        super(content);
+        this(fieldName, content, changeColorOnFocus, "");
+    }
+
+    public TextField(String fieldName, String content, boolean changeColorOnFocus, String title) {
+        super(content, title);
 
         setupPasteListener();
         setupUndoRedo();

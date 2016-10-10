@@ -6,7 +6,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.swing.AbstractAction;
-import javax.swing.JTextArea;
 import javax.swing.KeyStroke;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.DefaultHighlighter;
@@ -26,7 +25,7 @@ import net.sf.jabref.preferences.JabRefPreferences;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-public class JTextAreaWithHighlighting extends JTextArea implements SearchQueryHighlightListener {
+public class JTextAreaWithHighlighting extends JTextAreaWithUnfocusedText implements SearchQueryHighlightListener {
 
     private static final Log LOGGER = LogFactory.getLog(JTextAreaWithHighlighting.class);
 
@@ -35,13 +34,15 @@ public class JTextAreaWithHighlighting extends JTextArea implements SearchQueryH
     private UndoManager undo;
 
     public JTextAreaWithHighlighting() {
-        super();
-        setupUndoRedo();
-        setupPasteListener();
+        this(null);
     }
 
-    JTextAreaWithHighlighting(String text) {
-        super(text);
+    public JTextAreaWithHighlighting(String text) {
+        this(text, "");
+    }
+
+    public JTextAreaWithHighlighting(String text, String title) {
+        super(text, title);
         setupUndoRedo();
         setupPasteListener();
     }
