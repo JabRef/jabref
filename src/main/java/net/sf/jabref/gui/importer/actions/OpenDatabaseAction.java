@@ -203,7 +203,7 @@ public class OpenDatabaseAction extends MnemonicAwareAction {
             }
 
             if (BackupManager.checkForBackupFile(fileToLoad.toPath())) {
-                BackupUIManager.showRestoreBackupDialog(fileToLoad.toPath());
+                BackupUIManager.showRestoreBackupDialog(frame, fileToLoad.toPath());
             }
 
             ParserResult result;

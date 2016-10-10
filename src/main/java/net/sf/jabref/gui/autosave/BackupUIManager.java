@@ -2,6 +2,7 @@ package net.sf.jabref.gui.autosave;
 
 import java.nio.file.Path;
 
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 
 import net.sf.jabref.autosave.BackupManager;
@@ -12,8 +13,8 @@ import net.sf.jabref.logic.l10n.Localization;
  */
 public class BackupUIManager {
 
-    public static void showRestoreBackupDialog(Path originalPath) {
-        int answer = JOptionPane.showConfirmDialog(null,
+    public static void showRestoreBackupDialog(JFrame frame, Path originalPath) {
+        int answer = JOptionPane.showConfirmDialog(frame,
                 new StringBuilder()
                     .append(Localization.lang("A backup file for '%0' was found.", originalPath.getFileName().toString()))
                     .append("\n")
