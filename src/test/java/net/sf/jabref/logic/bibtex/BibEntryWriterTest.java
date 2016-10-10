@@ -3,6 +3,7 @@ package net.sf.jabref.logic.bibtex;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Set;
 
@@ -59,6 +60,50 @@ public class BibEntryWriterTest {
         // @formatter:on
 
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void roundTripTestOtherType() throws IOException, URISyntaxException {
+        String bibtexEntry = "@Other{test," + OS.NEWLINE +
+                "  Comment                  = {testentry}" + OS.NEWLINE +
+                "}";
+
+        // read in bibtex string
+        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry), importFormatPreferences);
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        String resourceName = "/testbib/othertype.bib";
+        BibEntryAssert.assertEquals(BibEntryWriter.class, resourceName, entry);
+
+        //write out bibtex string
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+        String actual = stringWriter.toString();
+
+        assertEquals(bibtexEntry, actual);
+    }
+
+    @Test
+    public void roundTripTestReallyunknownType() throws IOException, URISyntaxException {
+        String bibtexEntry = "@ReallyUnknownType{test," + OS.NEWLINE +
+                "  Comment                  = {testentry}" + OS.NEWLINE +
+                "}";
+
+        // read in bibtex string
+        ParserResult result = BibtexParser.parse(new StringReader(bibtexEntry), importFormatPreferences);
+        Collection<BibEntry> entries = result.getDatabase().getEntries();
+        BibEntry entry = entries.iterator().next();
+
+        String resourceName = "/testbib/reallyunknowntype.bib";
+        BibEntryAssert.assertEquals(BibEntryWriter.class, resourceName, entry);
+
+        //write out bibtex string
+        StringWriter stringWriter = new StringWriter();
+        writer.write(entry, stringWriter, BibDatabaseMode.BIBTEX);
+        String actual = stringWriter.toString();
+
+        assertEquals(bibtexEntry, actual);
     }
 
     @Test
