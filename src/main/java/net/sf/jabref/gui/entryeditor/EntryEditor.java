@@ -1034,7 +1034,10 @@ public class EntryEditor extends JPanel implements EntryContainer {
             SwingUtilities.invokeLater(() -> {
                 Object activeTab = tabs.get(tabbed.getSelectedIndex());
                 if (activeTab instanceof FileAnnotationTab && !((FileAnnotationTab) activeTab).isInitialized()) {
-                    FileAnnotationTab.initializeTab((FileAnnotationTab) activeTab);
+                    //Initialize by getting notes from cache if they are cached
+                    FileAnnotationTab.initializeTab((FileAnnotationTab) activeTab,
+                            panel.getAnnotationCache().getFromCache(Optional.of(entry)));
+                    panel.getAnnotationCache().addToCache(entry, ((FileAnnotationTab) activeTab).getAllNotes());
                 }
 
                 if (activeTab instanceof EntryEditorTab) {

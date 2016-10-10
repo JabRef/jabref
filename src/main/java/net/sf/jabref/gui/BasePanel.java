@@ -105,6 +105,7 @@ import net.sf.jabref.logic.l10n.Encodings;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.layout.Layout;
 import net.sf.jabref.logic.layout.LayoutHelper;
+import net.sf.jabref.logic.pdf.FileAnnotationCache;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.UpdateField;
@@ -155,6 +156,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
     private final MainTableDataModel tableModel;
 
     private final CitationStyleCache citationStyleCache;
+    private final FileAnnotationCache annotationCache;
 
     // To contain instantiated entry editors. This is to save time
     // As most enums, this must not be null
@@ -223,6 +225,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
         this.tableModel = new MainTableDataModel(getBibDatabaseContext());
 
         citationStyleCache = new CitationStyleCache(bibDatabaseContext);
+        annotationCache = new FileAnnotationCache(bibDatabaseContext);
 
         setupMainPanel();
 
@@ -2412,6 +2415,10 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
     public CitationStyleCache getCitationStyleCache() {
         return citationStyleCache;
+    }
+
+    public FileAnnotationCache getAnnotationCache() {
+        return annotationCache;
     }
 
     public PreviewPanel getPreviewPanel() {

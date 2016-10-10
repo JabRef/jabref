@@ -4,10 +4,11 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
 import java.util.stream.Collectors;
@@ -35,7 +36,6 @@ import net.sf.jabref.gui.desktop.os.Linux;
 import net.sf.jabref.gui.desktop.os.NativeDesktop;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.pdf.PdfAnnotationImporterImpl;
-import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FileField;
 import net.sf.jabref.model.entry.ParsedFileField;
@@ -78,7 +78,7 @@ public class FileAnnotationTab extends JPanel {
 
     private boolean isInitialized;
 
-    private List<List<FileAnnotation>> allNotes = new ArrayList<>();
+    private Map<String, List<FileAnnotation>> allNotes = new HashMap<>();
 
 
     public FileAnnotationTab(EntryEditor parent, BasePanel basePanel, JTabbedPane tabbed) {
@@ -91,12 +91,12 @@ public class FileAnnotationTab extends JPanel {
 
     }
 
-    public static FileAnnotationTab initializeTab(FileAnnotationTab tab){
+    public static FileAnnotationTab initializeTab(FileAnnotationTab tab, Optional<Map<String, List<FileAnnotation>>> notes){
 
         if(!tab.isInitialized) {
             
             try {
-                tab.addComments();
+                tab.addComments(notes);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -114,7 +114,7 @@ public class FileAnnotationTab extends JPanel {
      * shows those from the first file in the comments tab
      * @throws IOException
      */
-    public void addComments() throws IOException {
+    public void addComments(Optional<Map<String, List<FileAnnotation>>> notes) throws IOException {
         Optional<String> field = parent.getEntry().getField(FieldName.FILE);
         if (field.isPresent()) {
             if (!commentList.getModel().equals(listModel)) {
@@ -125,32 +125,26 @@ public class FileAnnotationTab extends JPanel {
 
             PdfAnnotationImporterImpl annotationImporter;
 
-            //check which attached file is selected in the combo box
-            int indexSelectedByComboBox;
-            if (fileNameComboBox.getItemCount() == 0) {
-                indexSelectedByComboBox = 0;
+            if(notes.isPresent()) {
+                allNotes = notes.get();
             } else {
-                indexSelectedByComboBox = fileNameComboBox.getSelectedIndex();
-            }
-
-            ArrayList<BibEntry> entries = new ArrayList<>();
-            entries.add(parent.getEntry());
-
-            annotationImporter = new PdfAnnotationImporterImpl();
-            //import notes if the selected file is a pdf
-            getFilteredFileList().forEach(parsedFileField -> allNotes.add(
-                    annotationImporter.importAnnotations(parsedFileField.getLink(), basePanel.getDatabaseContext())));
-            updateShownAnnotations(allNotes.get(indexSelectedByComboBox));
-            //select the first annotation or remove the whole tab when no annotations are present
-            if(listModel.isEmpty()) {
-                tabbed.remove(this);
-            } else if(commentList.isSelectionEmpty()){
-                commentList.setSelectedIndex(0);
+                annotationImporter = new PdfAnnotationImporterImpl();
+                //import notes if the selected file is a pdf
+                getFilteredFileList().forEach(parsedFileField -> allNotes.put(
+                        parsedFileField.getLink(),
+                        annotationImporter.importAnnotations(parsedFileField.getLink(), basePanel.getDatabaseContext())));
             }
             //set up the comboBox for representing the selected file
             fileNameComboBox.removeAllItems();
             getFilteredFileList()
                     .forEach(((parsedField) -> fileNameComboBox.addItem(parsedField.getLink())));
+            //show the annotations attached to the selected file
+            updateShownAnnotations(allNotes.get(fileNameComboBox.getSelectedItem() == null ?
+                    fileNameComboBox.getItemAt(0).toString() : fileNameComboBox.getSelectedItem().toString()));
+            //select the first annotation
+            if(commentList.isSelectionEmpty()){
+                commentList.setSelectedIndex(0);
+            }
         }
     }
 
@@ -199,7 +193,7 @@ public class FileAnnotationTab extends JPanel {
         getFilteredFileList().stream().filter(parsedFileField -> parsedFileField.getLink().toLowerCase().endsWith(".pdf") )
                 .forEach(((parsedField) -> fileNameComboBox.addItem(parsedField.getLink())));
         fileNameComboBox.setSelectedIndex(indexSelectedByComboBox);
-        updateShownAnnotations(allNotes.get(indexSelectedByComboBox));
+        updateShownAnnotations(allNotes.get(fileNameComboBox.getSelectedItem().toString()));
     }
 
     private void setUpPdfCommentsPanel() {
@@ -302,7 +296,7 @@ public class FileAnnotationTab extends JPanel {
             NativeDesktop desktop = JabRefDesktop.getNativeDesktop();
 
             String pageNo = "1";
-            if( commentList.getSelectedValue().getPage() != 0) {
+            if( null != commentList.getSelectedValue() && commentList.getSelectedValue().getPage() != 0) {
                 pageNo =  String.valueOf(commentList.getSelectedValue().getPage());
             }
             String pathToFile = fileNameComboBox.getSelectedItem().toString();
@@ -417,5 +411,9 @@ public class FileAnnotationTab extends JPanel {
 
     public boolean isInitialized() {
         return isInitialized;
+    }
+
+    public Map<String, List<FileAnnotation>> getAllNotes() {
+        return allNotes;
     }
 }
