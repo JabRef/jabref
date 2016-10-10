@@ -11,7 +11,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.mockito.Mockito.mock;
@@ -92,7 +91,6 @@ public class LayoutEntryTest {
      * @throws Exception
      */
     @Test
-    @Ignore
     public void testNoHighlighting() throws IOException {
         // say that this bibtex object was found
         mBTE.setSearchHit(true);

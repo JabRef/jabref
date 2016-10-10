@@ -10,6 +10,7 @@ import net.sf.jabref.logic.importer.IdBasedFetcher;
 import net.sf.jabref.logic.importer.fetcher.ArXiv;
 import net.sf.jabref.logic.importer.fetcher.AstrophysicsDataSystem;
 import net.sf.jabref.logic.importer.fetcher.DiVA;
+import net.sf.jabref.logic.importer.fetcher.DoiFetcher;
 import net.sf.jabref.logic.importer.fetcher.GvkFetcher;
 import net.sf.jabref.logic.importer.fetcher.IsbnFetcher;
 import net.sf.jabref.logic.importer.fetcher.MathSciNet;
@@ -21,10 +22,8 @@ public class EntryFetchers {
     private final List<EntryFetcher> entryFetchers = new LinkedList<>();
 
     public EntryFetchers(JournalAbbreviationLoader abbreviationLoader) {
-        entryFetchers.add(new ADSFetcher());
         entryFetchers.add(new CiteSeerXFetcher());
         entryFetchers.add(new DBLPFetcher());
-        entryFetchers.add(new DOItoBibTeXFetcher());
         entryFetchers.add(new IEEEXploreFetcher(abbreviationLoader));
         entryFetchers.add(new INSPIREFetcher());
         entryFetchers.add(new MedlineFetcher());
@@ -35,7 +34,7 @@ public class EntryFetchers {
         entryFetchers.add(new DOAJFetcher());
         entryFetchers.add(new SpringerFetcher());
 
-        entryFetchers.add(new SearchBasedEntryFetcher(new ArXiv()));
+        entryFetchers.add(new SearchBasedEntryFetcher(new ArXiv(Globals.prefs.getImportFormatPreferences())));
         entryFetchers.add(new SearchBasedEntryFetcher(new GvkFetcher()));
         entryFetchers.add(
                 new SearchBasedEntryFetcher(new AstrophysicsDataSystem(Globals.prefs.getImportFormatPreferences())));
@@ -49,8 +48,10 @@ public class EntryFetchers {
 
     public static ArrayList<IdBasedFetcher> getIdFetchers() {
         ArrayList<IdBasedFetcher> list = new ArrayList<>();
+        list.add(new AstrophysicsDataSystem(Globals.prefs.getImportFormatPreferences()));
         list.add(new IsbnFetcher(Globals.prefs.getImportFormatPreferences()));
         list.add(new DiVA(Globals.prefs.getImportFormatPreferences()));
+        list.add(new DoiFetcher(Globals.prefs.getImportFormatPreferences()));
         list.sort((fetcher1, fetcher2) -> fetcher1.getName().compareTo(fetcher2.getName()));
         return list;
     }

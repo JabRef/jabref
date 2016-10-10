@@ -10,7 +10,6 @@ import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.fieldeditors.FieldEditor;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.logic.util.date.EasyDateFormat;
 import net.sf.jabref.preferences.JabRefPreferences;
 
@@ -48,9 +47,12 @@ public class DatePickerButton implements ActionListener {
                         .fromTimeStampFormat(Globals.prefs.get(JabRefPreferences.TIME_STAMP_FORMAT))
                         .getDateAt(date));
             }
-            // Set focus to editor component after changing its text:
-            new FocusRequester(editor.getTextComponent());
+        } else {
+            // in this case the user selected "none" in the date picker, so we just clear the field
+            editor.setText("");
         }
+        // Set focus to editor component after changing its text:
+        editor.getTextComponent().requestFocus();
     }
 
     public JComponent getDatePicker() {

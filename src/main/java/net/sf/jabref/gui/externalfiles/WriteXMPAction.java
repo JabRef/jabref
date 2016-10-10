@@ -28,7 +28,6 @@ import net.sf.jabref.gui.BasePanel;
 import net.sf.jabref.gui.filelist.FileListEntry;
 import net.sf.jabref.gui.filelist.FileListTableModel;
 import net.sf.jabref.gui.keyboard.KeyBinding;
-import net.sf.jabref.gui.util.FocusRequester;
 import net.sf.jabref.gui.worker.AbstractWorker;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.io.FileUtil;
@@ -281,7 +280,7 @@ public class WriteXMPAction extends AbstractWorker {
             okButton.setEnabled(false);
             cancelButton.setEnabled(true);
 
-            new FocusRequester(okButton);
+            okButton.requestFocus();
 
             optDiag.setVisible(true);
         }

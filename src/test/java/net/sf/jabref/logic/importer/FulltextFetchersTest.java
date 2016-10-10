@@ -9,7 +9,6 @@ import net.sf.jabref.model.entry.BibEntry;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -27,7 +26,6 @@ public class FulltextFetchersTest {
         entry = null;
     }
 
-    @Ignore
     @Test
     public void acceptPdfUrls() throws MalformedURLException {
         URL pdfUrl = new URL("http://docs.oasis-open.org/wsbpel/2.0/OS/wsbpel-v2.0-OS.pdf");
@@ -37,7 +35,6 @@ public class FulltextFetchersTest {
         assertEquals(Optional.of(pdfUrl), fetcher.findFullTextPDF(entry));
     }
 
-    @Ignore // Fails on travis
     @Test
     public void rejectNonPdfUrls() throws MalformedURLException {
         URL pdfUrl = new URL("https://github.com/JabRef/jabref/blob/master/README.md");

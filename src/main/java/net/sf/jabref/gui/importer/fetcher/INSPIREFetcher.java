@@ -7,13 +7,12 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
@@ -100,25 +99,18 @@ public class INSPIREFetcher implements EntryFetcher {
      * @param key The OAI2 key to fetch from ArXiv.
      * @return The imported BibEntry or null if none.
      */
-    private BibDatabase importInspireEntries(String key, OutputPrinter frame) {
+    private BibDatabase importInspireEntries(String key, OutputPrinter frame) throws IOException {
         String url = constructUrl(key);
-        try {
-            HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
-            conn.setRequestProperty("User-Agent", "JabRef");
-            InputStream inputStream = conn.getInputStream();
+        HttpURLConnection conn = (HttpURLConnection) new URL(url).openConnection();
+        conn.setRequestProperty("User-Agent", "JabRef");
+        InputStream inputStream = conn.getInputStream();
 
-            try (INSPIREBibtexFilterReader reader = new INSPIREBibtexFilterReader(
-                    new InputStreamReader(inputStream, Charset.forName("UTF-8")))) {
+        try (INSPIREBibtexFilterReader reader = new INSPIREBibtexFilterReader(
+                new InputStreamReader(inputStream, StandardCharsets.UTF_8))) {
 
-                ParserResult pr = BibtexParser.parse(reader, Globals.prefs.getImportFormatPreferences());
-
-                return pr.getDatabase();
-            }
-        } catch (RuntimeException | IOException e) {
-            frame.showMessage(Localization.lang("An exception occurred while accessing '%0'", url) + "\n\n" + e,
-                    getTitle(), JOptionPane.ERROR_MESSAGE);
+            ParserResult pr = BibtexParser.parse(reader, Globals.prefs.getImportFormatPreferences());
+            return pr.getDatabase();
         }
-        return null;
     }
 
 
@@ -150,24 +142,20 @@ public class INSPIREFetcher implements EntryFetcher {
      * @see java.lang.Runnable
      */
     @Override
-    public boolean processQuery(String query, ImportInspector dialog, OutputPrinter frame) {
+    public boolean processQuery(String query, ImportInspector dialog, OutputPrinter status) {
         try {
-            frame.setStatus(Localization.lang("Fetching entries from Inspire"));
+            status.setStatus(Localization.lang("Fetching entries from Inspire"));
             /* query the archive and load the results into the BibEntry */
-            BibDatabase bd = importInspireEntries(query, frame);
+            BibDatabase bd = importInspireEntries(query, status);
 
-            frame.setStatus(Localization.lang("Adding fetched entries"));
+            status.setStatus(Localization.lang("Adding fetched entries"));
             /* add the entry to the inspection dialog */
-            if (bd == null) {
-                LOGGER.warn("Error while fetching from Inspire");
-            } else {
-                bd.getEntries().forEach(dialog::addEntry);
-            }
-            /* inform the inspection dialog, that we're done */
+            bd.getEntries().forEach(dialog::addEntry);
+            return true;
         } catch (Exception e) {
-            frame.showMessage(Localization.lang("Error while fetching from %0", "Inspire") + ": " + e.getMessage());
-            LOGGER.warn("Error while fetching from Inspire", e);
+            LOGGER.error("Error while fetching from " + getTitle(), e);
+            ((ImportInspectionDialog)dialog).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
         }
-        return true;
+        return false;
     }
 }

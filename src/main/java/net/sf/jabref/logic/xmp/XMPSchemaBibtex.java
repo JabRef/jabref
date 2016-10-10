@@ -281,23 +281,23 @@ public class XMPSchemaBibtex extends XMPSchema {
         }
 
         for (String field : fields) {
-            String value = entry.getResolvedFieldOrAlias(field, database).orElse("");
+            String value = BibDatabase.getResolvedField(field, entry, database).orElse("");
             if (InternalBibtexFields.getFieldProperties(field).contains(FieldProperty.PERSON_NAMES)) {
                 setPersonList(field, value);
             } else {
                 setTextProperty(field, value);
             }
         }
-        setTextProperty("entrytype", entry.getType());
+        setTextProperty(BibEntry.TYPE_HEADER, entry.getType());
     }
 
     public BibEntry getBibtexEntry() {
-        String type = getTextProperty("entrytype");
+        String type = getTextProperty(BibEntry.TYPE_HEADER);
         BibEntry e = new BibEntry(IdGenerator.next(), type);
 
         // Get Text Properties
         Map<String, String> text = XMPSchemaBibtex.getAllProperties(this, "bibtex");
-        text.remove("entrytype");
+        text.remove(BibEntry.TYPE_HEADER);
         e.setField(text);
         return e;
     }

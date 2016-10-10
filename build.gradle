@@ -51,6 +51,9 @@ install4j {
 
 repositories {
     jcenter()
+    maven {
+        url 'https://oss.sonatype.org/content/groups/public'
+    }
 }
 
 configurations {
@@ -94,10 +97,10 @@ dependencies {
     antlr4 'org.antlr:antlr4:4.5.3'
     compile 'org.antlr:antlr4-runtime:4.5.3'
 
-    // VersionEye states that 6.0.3 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
+    // VersionEye states that 6.0.4 is the most recent version, but http://dev.mysql.com/downloads/connector/j/ shows that as "Development Release"
     compile 'mysql:mysql-connector-java:5.1.39'
 
-    compile 'org.postgresql:postgresql:9.4.1209'
+    compile 'com.impossibl.pgjdbc-ng:pgjdbc-ng:0.6'
 
     compile 'net.java.dev.glazedlists:glazedlists_java15:1.9.1'
     compile fileTree(dir: 'lib', includes: ['*.jar'])
@@ -110,7 +113,7 @@ dependencies {
 
     compile 'org.jsoup:jsoup:1.9.2'
     compile 'com.mashape.unirest:unirest-java:1.4.9'
-    compile 'info.debatty:java-string-similarity:0.17'
+    compile 'info.debatty:java-string-similarity:0.18'
 
     compile 'org.apache.logging.log4j:log4j-jcl:2.6.2'
     compile 'org.apache.logging.log4j:log4j-api:2.6.2'
@@ -118,16 +121,24 @@ dependencies {
     compile 'org.xmlunit:xmlunit-core:2.2.1'
     compile 'org.xmlunit:xmlunit-matchers:2.2.1'
 
+    // need to use snapshots as the stable version is from 2013 and doesn't support v1.0.1 CitationStyles
+    compile 'org.citationstyles:styles:1.0.1-SNAPSHOT'
+    compile 'org.citationstyles:locales:1.0.1-SNAPSHOT'
+    compile 'de.undercouch:citeproc-java:0.6'
+    // in Java 8 Rhino was replaced by Nashorn, but 'de.undercouch:citeproc-java:0.6' depends on Rhino
+    compile 'org.mozilla:rhino:1.7.7.1'
+
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'
-    testCompile 'com.github.tomakehurst:wiremock:2.1.11'
+    testCompile 'com.github.tomakehurst:wiremock:2.1.12'
     testCompile 'org.assertj:assertj-swing-junit:3.4.0'
 }
 
 sourceSets {
     main {
         java {
-            srcDirs = ["src/main/java", "src/main/gen"]
+            // remove "src/oracleMock" if ojdbc.jar is available
+            srcDirs = ["src/main/java", "src/main/gen", "src/oracleMock"]
         }
     }
     databaseTest {

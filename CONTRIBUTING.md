@@ -42,8 +42,7 @@ More information on this can be found via `man git-shortlog`.
 Please, **do not add yourself at `@authors`**.
 The contribution information is tracked via the version control system.
 
-We are currently in transition from [GPL](https://tldrlegal.com/license/gnu-general-public-license-v2) to the [MIT license](https://tldrlegal.com/license/mit-license).
-Thus, all your contributions are considered being made under MIT license.
+Your contribution is considered being made under [MIT license](https://tldrlegal.com/license/mit-license).
 
 
 ### Write a good commit message
@@ -85,7 +84,7 @@ because <additional rationale>.
 Add new Localization.lang("KEY") to Java file.
 Tests fail. In the test output a snippet is generated which must be added to the English translation file. There is also a snippet generated for the non-English files, but this is irrelevant.
 Add snippet to English translation file located at `src/main/resources/l10n/JabRef_en.properties`
-With `gradlew generateMissingTranslationKeys` the "KEY" is added to the other translation files as well.
+With `gradlew localizationUpdate` the "KEY" is added to the other translation files as well.
 Tests are green again.
 
 You can also directly run the specific test in your IDE. The test "LocalizationConsistencyTest" is placed under `src/test/java/net.sf.jabref.logic.l10n/LocalizationConsistencyTest.java`

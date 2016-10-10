@@ -45,7 +45,7 @@ public class BibTeXMLImporterTest {
 
     @Test
     public void testGetFormatName() {
-        assertEquals("BibTeXML", importer.getFormatName());
+        assertEquals("BibTeXML", importer.getName());
     }
 
     @Test

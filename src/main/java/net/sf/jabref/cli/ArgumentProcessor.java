@@ -39,13 +39,13 @@ import net.sf.jabref.logic.logging.JabRefLogger;
 import net.sf.jabref.logic.search.DatabaseSearcher;
 import net.sf.jabref.logic.search.SearchQuery;
 import net.sf.jabref.logic.util.OS;
-import net.sf.jabref.logic.util.strings.StringUtil;
 import net.sf.jabref.model.Defaults;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.metadata.MetaData;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 import net.sf.jabref.preferences.SearchPreferences;
 import net.sf.jabref.shared.prefs.SharedDatabasePreferences;
@@ -452,7 +452,9 @@ public class ArgumentProcessor {
                 LOGGER.info(Localization.lang("Regenerating BibTeX keys according to metadata"));
                 for (BibEntry entry : database.getEntries()) {
                     // try to make a new label
-                    BibtexKeyPatternUtil.makeLabel(metaData, database, entry,
+                    BibtexKeyPatternUtil.makeLabel(
+                            metaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                            database, entry,
                             Globals.prefs.getBibtexKeyPatternPreferences());
                 }
             } else {

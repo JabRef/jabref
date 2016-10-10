@@ -12,6 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
@@ -95,8 +96,7 @@ public class ScienceDirectFetcher implements EntryFetcher {
 
         } catch (IOException e) {
             LOGGER.warn("Communcation problems", e);
-            status.showMessage(
-                    Localization.lang("Error while fetching from %0", SCIENCE_DIRECT) + ": " + e.getMessage());
+            ((ImportInspectionDialog)dialog).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
         }
         return false;
     }

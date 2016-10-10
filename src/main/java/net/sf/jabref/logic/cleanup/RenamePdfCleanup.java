@@ -12,6 +12,7 @@ import net.sf.jabref.logic.layout.LayoutFormatterPreferences;
 import net.sf.jabref.logic.util.OS;
 import net.sf.jabref.logic.util.io.FileUtil;
 import net.sf.jabref.model.FieldChange;
+import net.sf.jabref.model.cleanup.CleanupJob;
 import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.entry.BibEntry;
 import net.sf.jabref.model.entry.ParsedFileField;
@@ -84,7 +85,6 @@ public class RenamePdfCleanup implements CleanupJob {
 
             //do rename
             boolean renameSuccessful = FileUtil.renameFile(expandedOldFilePath, newPath);
-
             if (renameSuccessful) {
                 changed = true;
 

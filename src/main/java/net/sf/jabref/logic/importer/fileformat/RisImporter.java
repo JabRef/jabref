@@ -5,9 +5,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
+import net.sf.jabref.logic.importer.Importer;
 import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.OS;
@@ -22,12 +25,13 @@ import net.sf.jabref.model.entry.MonthUtil;
  * Several Biblioscape field types are ignored. Others are only included in the BibTeX
  * field "comment".
  */
-public class RisImporter extends ImportFormat {
+public class RisImporter extends Importer {
 
     private static final Pattern RECOGNIZED_FORMAT_PATTERN = Pattern.compile("TY  - .*");
 
+
     @Override
-    public String getFormatName() {
+    public String getName() {
         return "RIS";
     }
 
@@ -43,28 +47,19 @@ public class RisImporter extends ImportFormat {
 
     @Override
     public boolean isRecognizedFormat(BufferedReader reader) throws IOException {
-        // Our strategy is to look for the "AU  - *" line.
-        String str;
-        while ((str = reader.readLine()) != null) {
-            if (RECOGNIZED_FORMAT_PATTERN.matcher(str).find()) {
-                return true;
-            }
-        }
-        return false;
+        // Our strategy is to look for the "TY  - *" line.
+        return reader.lines().anyMatch(line -> RECOGNIZED_FORMAT_PATTERN.matcher(line).find());
     }
 
     @Override
     public ParserResult importDatabase(BufferedReader reader) throws IOException {
         List<BibEntry> bibitems = new ArrayList<>();
-        StringBuilder sb = new StringBuilder();
 
-        String line;
-        while ((line = reader.readLine()) != null) {
-            sb.append(line);
-            sb.append('\n');
-        }
+        //use optional here, so that no exception will be thrown if the file is empty
+        Optional<String> OptionalLines = reader.lines().reduce((line, nextline) -> line + "\n" + nextline);
+        String linesAsString = OptionalLines.isPresent() ? OptionalLines.get() : "";
 
-        String[] entries = sb.toString().replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
+        String[] entries = linesAsString.replace("\u2013", "-").replace("\u2014", "--").replace("\u2015", "--")
                 .split("ER  -.*\\n");
 
         for (String entry1 : entries) {
@@ -75,21 +70,20 @@ public class RisImporter extends ImportFormat {
             String startPage = "";
             String endPage = "";
             String comment = "";
-            Map<String, String> hm = new HashMap<>();
+            Map<String, String> fields = new HashMap<>();
 
-            String[] fields = entry1.split("\n");
+            String[] lines = entry1.split("\n");
 
-            for (int j = 0; j < fields.length; j++) {
-                StringBuilder current = new StringBuilder(fields[j]);
+            for (int j = 0; j < lines.length; j++) {
+                StringBuilder current = new StringBuilder(lines[j]);
                 boolean done = false;
-                while (!done && (j < (fields.length - 1))) {
-                    if ((fields[j + 1].length() >= 6) && !"  - ".equals(fields[j + 1].substring(2, 6))) {
-                        if ((current.length() > 0)
-                                && !Character.isWhitespace(current.charAt(current.length() - 1))
-                                && !Character.isWhitespace(fields[j + 1].charAt(0))) {
+                while (!done && (j < (lines.length - 1))) {
+                    if ((lines[j + 1].length() >= 6) && !"  - ".equals(lines[j + 1].substring(2, 6))) {
+                        if ((current.length() > 0) && !Character.isWhitespace(current.charAt(current.length() - 1))
+                                && !Character.isWhitespace(lines[j + 1].charAt(0))) {
                             current.append(' ');
                         }
-                        current.append(fields[j + 1]);
+                        current.append(lines[j + 1]);
                         j++;
                     } else {
                         done = true;
@@ -99,166 +93,170 @@ public class RisImporter extends ImportFormat {
                 if (entry.length() < 6) {
                     continue;
                 } else {
-                    String lab = entry.substring(0, 2);
-                    String val = entry.substring(6).trim();
-                    if ("TY".equals(lab)) {
-                        if ("BOOK".equals(val)) {
+                    String tag = entry.substring(0, 2);
+                    String value = entry.substring(6).trim();
+                    if ("TY".equals(tag)) {
+                        if ("BOOK".equals(value)) {
                             type = "book";
-                        } else if ("JOUR".equals(val) || "MGZN".equals(val)) {
+                        } else if ("JOUR".equals(value) || "MGZN".equals(value)) {
                             type = "article";
-                        } else if ("THES".equals(val)) {
+                        } else if ("THES".equals(value)) {
                             type = "phdthesis";
-                        } else if ("UNPB".equals(val)) {
+                        } else if ("UNPB".equals(value)) {
                             type = "unpublished";
-                        } else if ("RPRT".equals(val)) {
+                        } else if ("RPRT".equals(value)) {
                             type = "techreport";
-                        } else if ("CONF".equals(val)) {
+                        } else if ("CONF".equals(value)) {
                             type = "inproceedings";
-                        } else if ("CHAP".equals(val)) {
+                        } else if ("CHAP".equals(value)) {
                             type = "incollection";//"inbook";
+                        } else if ("PAT".equals(value)) {
+                            type = "patent";
                         } else {
                             type = "other";
                         }
-                    } else if ("T1".equals(lab) || "TI".equals(lab)) {
-                        String oldVal = hm.get(FieldName.TITLE);
+                    } else if ("T1".equals(tag) || "TI".equals(tag)) {
+                        String oldVal = fields.get(FieldName.TITLE);
                         if (oldVal == null) {
-                            hm.put(FieldName.TITLE, val);
+                            fields.put(FieldName.TITLE, value);
                         } else {
                             if (oldVal.endsWith(":") || oldVal.endsWith(".") || oldVal.endsWith("?")) {
-                                hm.put(FieldName.TITLE, oldVal + " " + val);
+                                fields.put(FieldName.TITLE, oldVal + " " + value);
                             } else {
-                                hm.put(FieldName.TITLE, oldVal + ": " + val);
+                                fields.put(FieldName.TITLE, oldVal + ": " + value);
                             }
                         }
-                        hm.put(FieldName.TITLE, hm.get(FieldName.TITLE).replaceAll("\\s+", " ")); // Normalize whitespaces
-                    } else if ("T2".equals(lab) || "BT".equals(lab)) {
-                        hm.put(FieldName.BOOKTITLE, val);
-                    } else if ("T3".equals(lab)) {
-                        hm.put(FieldName.SERIES, val);
-                    } else if ("AU".equals(lab) || "A1".equals(lab)) {
+                        fields.put(FieldName.TITLE, fields.get(FieldName.TITLE).replaceAll("\\s+", " ")); // Normalize whitespaces
+                    } else if ("BT".equals(tag)) {
+                        fields.put(FieldName.BOOKTITLE, value);
+                    } else if ("T2".equals(tag) || "JO".equals(tag)) {
+                        fields.put(FieldName.JOURNAL, value);
+                    } else if ("T3".equals(tag)) {
+                        fields.put(FieldName.SERIES, value);
+                    } else if ("AU".equals(tag) || "A1".equals(tag)) {
                         if ("".equals(author)) {
-                            author = val;
+                            author = value;
                         } else {
-                            author += " and " + val;
+                            author += " and " + value;
                         }
-                    } else if ("A2".equals(lab)) {
-                        if ("".equals(editor)) {
-                            editor = val;
+                    } else if ("A2".equals(tag) || "A3".equals(tag) || "A4".equals(tag)) {
+                        if (editor.isEmpty()) {
+                            editor = value;
                         } else {
-                            editor += " and " + val;
+                            editor += " and " + value;
                         }
-                    } else if ("JA".equals(lab) || "JF".equals(lab) || "JO".equals(lab)) {
+                    } else if ("JA".equals(tag) || "JF".equals(tag)) {
                         if ("inproceedings".equals(type)) {
-                            hm.put(FieldName.BOOKTITLE, val);
+                            fields.put(FieldName.BOOKTITLE, value);
                         } else {
-                            hm.put(FieldName.JOURNAL, val);
+                            fields.put(FieldName.JOURNAL, value);
                         }
-                    } else if ("SP".equals(lab)) {
-                        startPage = val;
-                    } else if ("PB".equals(lab)) {
+                    } else if ("LA".equals(tag)) {
+                        fields.put(FieldName.LANGUAGE, value);
+                    } else if ("CA".equals(tag)) {
+                        fields.put("caption", value);
+                    } else if ("DB".equals(tag)) {
+                        fields.put("database", value);
+                    } else if ("IS".equals(tag)) {
+                        fields.put(FieldName.NUMBER, value);
+                    } else if ("SP".equals(tag)) {
+                        startPage = value;
+                    } else if ("PB".equals(tag)) {
                         if ("phdthesis".equals(type)) {
-                            hm.put(FieldName.SCHOOL, val);
+                            fields.put(FieldName.SCHOOL, value);
                         } else {
-                            hm.put(FieldName.PUBLISHER, val);
+                            fields.put(FieldName.PUBLISHER, value);
                         }
-                    } else if ("AD".equals(lab) || "CY".equals(lab)) {
-                        hm.put(FieldName.ADDRESS, val);
-                    } else if ("EP".equals(lab)) {
-                        endPage = val;
+                    } else if ("AD".equals(tag) || "CY".equals(tag)) {
+                        fields.put(FieldName.ADDRESS, value);
+                    } else if ("EP".equals(tag)) {
+                        endPage = value;
                         if (!endPage.isEmpty()) {
                             endPage = "--" + endPage;
                         }
-                    } else if ("SN".equals(lab)) {
-                        hm.put(FieldName.ISSN, val);
-                    } else if ("VL".equals(lab)) {
-                        hm.put(FieldName.VOLUME, val);
-                    } else if ("IS".equals(lab)) {
-                        hm.put(FieldName.NUMBER, val);
-                    } else if ("N2".equals(lab) || "AB".equals(lab)) {
-                        String oldAb = hm.get(FieldName.ABSTRACT);
+                    } else if ("ET".equals(tag)) {
+                        fields.put(FieldName.EDITION, value);
+                    } else if ("SN".equals(tag)) {
+                        fields.put(FieldName.ISSN, value);
+                    } else if ("VL".equals(tag)) {
+                        fields.put(FieldName.VOLUME, value);
+                    } else if ("N2".equals(tag) || "AB".equals(tag)) {
+                        String oldAb = fields.get(FieldName.ABSTRACT);
                         if (oldAb == null) {
-                            hm.put(FieldName.ABSTRACT, val);
+                            fields.put(FieldName.ABSTRACT, value);
                         } else {
-                            hm.put(FieldName.ABSTRACT, oldAb + OS.NEWLINE + val);
+                            fields.put(FieldName.ABSTRACT, oldAb + OS.NEWLINE + value);
                         }
-                    } else if ("UR".equals(lab)) {
-                        hm.put(FieldName.URL, val);
-                    } else if (("Y1".equals(lab) || "PY".equals(lab)) && (val.length() >= 4)) {
-                        String[] parts = val.split("/");
-                        hm.put(FieldName.YEAR, parts[0]);
+                    } else if ("UR".equals(tag)) {
+                        fields.put(FieldName.URL, value);
+                    } else if (("Y1".equals(tag) || "PY".equals(tag) || "DA".equals(tag)) && (value.length() >= 4)) {
+                        fields.put(FieldName.YEAR, value.substring(0, 4));
+                        String[] parts = value.split("/");
                         if ((parts.length > 1) && !parts[1].isEmpty()) {
                             try {
-
                                 int monthNumber = Integer.parseInt(parts[1]);
                                 MonthUtil.Month month = MonthUtil.getMonthByNumber(monthNumber);
                                 if (month.isValid()) {
-                                    hm.put(FieldName.MONTH, month.bibtexFormat);
+                                    fields.put(FieldName.MONTH, month.bibtexFormat);
                                 }
                             } catch (NumberFormatException ex) {
                                 // The month part is unparseable, so we ignore it.
                             }
                         }
-                    } else if ("KW".equals(lab)) {
-                        if (hm.containsKey(FieldName.KEYWORDS)) {
-                            String kw = hm.get(FieldName.KEYWORDS);
-                            hm.put(FieldName.KEYWORDS, kw + ", " + val);
+                    } else if ("KW".equals(tag)) {
+                        if (fields.containsKey(FieldName.KEYWORDS)) {
+                            String kw = fields.get(FieldName.KEYWORDS);
+                            fields.put(FieldName.KEYWORDS, kw + ", " + value);
                         } else {
-                            hm.put(FieldName.KEYWORDS, val);
+                            fields.put(FieldName.KEYWORDS, value);
                         }
-                    } else if ("U1".equals(lab) || "U2".equals(lab) || "N1".equals(lab)) {
+                    } else if ("U1".equals(tag) || "U2".equals(tag) || "N1".equals(tag)) {
                         if (!comment.isEmpty()) {
                             comment = comment + " ";
                         }
-                        comment = comment + val;
+                        comment = comment + value;
                     }
                     // Added ID import 2005.12.01, Morten Alver:
-                    else if ("ID".equals(lab)) {
-                        hm.put("refid", val);
-                    } else if ("M3".equals(lab)) {
-                        String doi = val;
-                        if (doi.startsWith("doi:")) {
-                            doi = doi.replaceAll("(?i)doi:", "").trim();
-                            hm.put(FieldName.DOI, doi);
-                        }
+                    else if ("ID".equals(tag)) {
+                        fields.put("refid", value);
+                    } else if ("M3".equals(tag) || "DO".equals(tag)) {
+                        addDoi(fields, value);
                     }
                 }
                 // fix authors
                 if (!author.isEmpty()) {
                     author = AuthorList.fixAuthorLastNameFirst(author);
-                    hm.put(FieldName.AUTHOR, author);
+                    fields.put(FieldName.AUTHOR, author);
                 }
                 if (!editor.isEmpty()) {
                     editor = AuthorList.fixAuthorLastNameFirst(editor);
-                    hm.put(FieldName.EDITOR, editor);
+                    fields.put(FieldName.EDITOR, editor);
                 }
                 if (!comment.isEmpty()) {
-                    hm.put("comment", comment);
+                    fields.put("comment", comment);
                 }
 
-                hm.put(FieldName.PAGES, startPage + endPage);
+                fields.put(FieldName.PAGES, startPage + endPage);
             }
             BibEntry b = new BibEntry(DEFAULT_BIBTEXENTRY_ID, type); // id assumes an existing database so don't
 
             // Remove empty fields:
-            List<String> toRemove = new ArrayList<>();
-            for (Map.Entry<String, String> key : hm.entrySet()) {
-                String content = key.getValue();
-                if ((content == null) || content.trim().isEmpty()) {
-                    toRemove.add(key.getKey());
-                }
-            }
-            for (String aToRemove : toRemove) {
-                hm.remove(aToRemove);
-
-            }
+            fields.entrySet().removeIf(key -> (key.getValue() == null) || key.getValue().trim().isEmpty());
 
             // create one here
-            b.setField(hm);
+            b.setField(fields);
             bibitems.add(b);
 
         }
-
         return new ParserResult(bibitems);
 
+    }
+
+    private void addDoi(Map<String, String> hm, String val) {
+        String doi = val.toLowerCase(Locale.ENGLISH);
+        if (doi.startsWith("doi:")) {
+            doi = doi.replaceAll("(?i)doi:", "").trim();
+            hm.put(FieldName.DOI, doi);
+        }
     }
 }

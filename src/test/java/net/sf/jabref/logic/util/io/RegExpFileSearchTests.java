@@ -1,7 +1,6 @@
 package net.sf.jabref.logic.util.io;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +22,7 @@ public class RegExpFileSearchTests {
     private BibEntry entry;
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() {
 
         entry = new BibEntry();
         entry.setType(BibtexEntryTypes.ARTICLE);
@@ -59,7 +58,7 @@ public class RegExpFileSearchTests {
 
         //when
         Map<BibEntry, List<File>> result = RegExpFileSearch.findFilesForSet(entries, extensions, dirs,
-                "**/[bibtexkey].*\\\\.[extension]");
+                "**/[bibtexkey].*\\\\.[extension]", ',');
 
         //then
         assertEquals(1, result.keySet().size());
@@ -68,44 +67,53 @@ public class RegExpFileSearchTests {
     @Test
     public void testFieldAndFormat() {
         assertEquals("Eric von Hippel and Georg von Krogh",
-                RegExpFileSearch.getFieldAndFormat("[author]", entry, database));
+                RegExpFileSearch.getFieldAndFormat("[author]", entry, database, ','));
 
         assertEquals("Eric von Hippel and Georg von Krogh",
-                RegExpFileSearch.getFieldAndFormat("author", entry, database));
+                RegExpFileSearch.getFieldAndFormat("author", entry, database, ','));
 
-        assertEquals("", RegExpFileSearch.getFieldAndFormat("[unknownkey]", entry, database));
+        assertEquals("", RegExpFileSearch.getFieldAndFormat("[unknownkey]", entry, database,
+                ','));
 
-        assertEquals("", RegExpFileSearch.getFieldAndFormat("[:]", entry, database));
+        assertEquals("", RegExpFileSearch.getFieldAndFormat("[:]", entry, database, ','));
 
-        assertEquals("", RegExpFileSearch.getFieldAndFormat("[:lower]", entry, database));
+        assertEquals("", RegExpFileSearch.getFieldAndFormat("[:lower]", entry, database,
+                ','));
 
         assertEquals("eric von hippel and georg von krogh",
-                RegExpFileSearch.getFieldAndFormat("[author:lower]", entry, database));
+                RegExpFileSearch.getFieldAndFormat("[author:lower]", entry, database,
+                        ','));
 
-        assertEquals("HipKro03", RegExpFileSearch.getFieldAndFormat("[bibtexkey]", entry, database));
+        assertEquals("HipKro03", RegExpFileSearch.getFieldAndFormat("[bibtexkey]", entry, database,
+                ','));
 
-        assertEquals("HipKro03", RegExpFileSearch.getFieldAndFormat("[bibtexkey:]", entry, database));
+        assertEquals("HipKro03", RegExpFileSearch.getFieldAndFormat("[bibtexkey:]", entry, database,
+                ','));
     }
 
     @Test
     public void testExpandBrackets() {
 
-        assertEquals("", RegExpFileSearch.expandBrackets("", entry, database));
+        assertEquals("", RegExpFileSearch.expandBrackets("", entry, database, ','));
 
-        assertEquals("dropped", RegExpFileSearch.expandBrackets("drop[unknownkey]ped", entry, database));
+        assertEquals("dropped", RegExpFileSearch.expandBrackets("drop[unknownkey]ped", entry, database,
+                ','));
 
         assertEquals("Eric von Hippel and Georg von Krogh",
-                RegExpFileSearch.expandBrackets("[author]", entry, database));
+                RegExpFileSearch.expandBrackets("[author]", entry, database, ','));
 
         assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
-                RegExpFileSearch.expandBrackets("[author] are two famous authors.", entry, database));
+                RegExpFileSearch.expandBrackets("[author] are two famous authors.", entry, database,
+                        ','));
 
         assertEquals("Eric von Hippel and Georg von Krogh are two famous authors.",
-                RegExpFileSearch.expandBrackets("[author] are two famous authors.", entry, database));
+                RegExpFileSearch.expandBrackets("[author] are two famous authors.", entry, database,
+                        ','));
 
         assertEquals(
                 "Eric von Hippel and Georg von Krogh have published Open Source Software and the \"Private-Collective\" Innovation Model: Issues for Organization Science in Organization Science.",
-                RegExpFileSearch.expandBrackets("[author] have published [title] in [journal].", entry, database));
+                RegExpFileSearch.expandBrackets("[author] have published [title] in [journal].", entry, database,
+                        ','));
     }
 
 }

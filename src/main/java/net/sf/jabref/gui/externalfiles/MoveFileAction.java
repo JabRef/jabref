@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -144,7 +145,7 @@ public class MoveFileAction extends AbstractAction {
                 try {
                     boolean success = file.renameTo(newFile);
                     if (!success) {
-                        success = FileUtil.copyFile(file, newFile, true);
+                        success = FileUtil.copyFile(Paths.get(file.toURI()), Paths.get(newFile.toURI()), true);
                     }
                     if (success) {
                         // Remove the original file:

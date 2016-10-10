@@ -49,3 +49,6 @@ bin/
 jabref.xml
 install4j6/
 *.sonargraph
+
+# ignore the generated markdown file if the user forgets to delete it
+status.md

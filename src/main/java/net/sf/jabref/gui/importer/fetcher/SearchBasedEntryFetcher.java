@@ -5,6 +5,7 @@ import java.util.Objects;
 
 import javax.swing.JPanel;
 
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.FetcherException;
 import net.sf.jabref.logic.importer.ImportInspector;
@@ -37,8 +38,8 @@ public class SearchBasedEntryFetcher implements EntryFetcher{
             matches.forEach(inspector::addEntry);
             return !matches.isEmpty();
         } catch (FetcherException e) {
-            status.setStatus(Localization.lang("Error while fetching from %0", fetcher.getName()));
-            LOGGER.error("Error while fetching from" + fetcher.getName(), e);
+            LOGGER.error("Error while fetching from " + getTitle(), e);
+            ((ImportInspectionDialog)inspector).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
         }
 
         return false;

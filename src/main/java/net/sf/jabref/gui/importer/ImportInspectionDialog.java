@@ -91,7 +91,6 @@ import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.database.BibDatabaseMode;
 import net.sf.jabref.model.entry.AuthorList;
 import net.sf.jabref.model.entry.BibEntry;
-import net.sf.jabref.model.entry.EntryUtil;
 import net.sf.jabref.model.entry.FieldName;
 import net.sf.jabref.model.entry.FieldProperty;
 import net.sf.jabref.model.entry.IdGenerator;
@@ -100,6 +99,7 @@ import net.sf.jabref.model.groups.AllEntriesGroup;
 import net.sf.jabref.model.groups.EntriesGroupChange;
 import net.sf.jabref.model.groups.GroupTreeNode;
 import net.sf.jabref.model.metadata.MetaData;
+import net.sf.jabref.model.strings.StringUtil;
 import net.sf.jabref.preferences.JabRefPreferences;
 
 import ca.odell.glazedlists.BasicEventList;
@@ -199,7 +199,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
         this.undoName = undoName;
         this.newDatabase = newDatabase;
         setIconImage(new ImageIcon(IconTheme.getIconUrl("jabrefIcon48")).getImage());
-        preview = new PreviewPanel(null, bibDatabaseContext, Globals.prefs.get(JabRefPreferences.PREVIEW_0));
+        preview = new PreviewPanel(panel, bibDatabaseContext);
 
         duplLabel.setToolTipText(Localization.lang("Possible duplicate of existing entry. Click to resolve."));
 
@@ -459,10 +459,12 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
 
             entry.setId(IdGenerator.next());
             // Add the entry to the database we are working with:
-            database.insertEntryWithDuplicationCheck(entry);
+            database.insertEntry(entry);
 
             // Generate a unique key:
-            BibtexKeyPatternUtil.makeLabel(localMetaData, database, entry,
+            BibtexKeyPatternUtil.makeLabel(
+                    localMetaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                    database, entry,
                     Globals.prefs.getBibtexKeyPatternPreferences());
             // Remove the entry from the database again, since we only added it in
             // order to
@@ -502,9 +504,11 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
             for (BibEntry entry : entries) {
 
                 entry.setId(IdGenerator.next());
-                database.insertEntryWithDuplicationCheck(entry);
+                database.insertEntry(entry);
 
-                BibtexKeyPatternUtil.makeLabel(localMetaData, database, entry,
+                BibtexKeyPatternUtil.makeLabel(
+                        localMetaData.getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern()),
+                        database, entry,
                         Globals.prefs.getBibtexKeyPatternPreferences());
                 // Add the generated key to our list:   -- TODO: Why??
                 keys.add(entry.getCiteKeyOptional());
@@ -736,7 +740,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 }
 
                 entry.setId(IdGenerator.next());
-                panel.getDatabase().insertEntryWithDuplicationCheck(entry);
+                panel.getDatabase().insertEntry(entry);
                 ce.addEdit(new UndoableInsertEntry(panel.getDatabase(), entry, panel));
 
             }
@@ -1409,7 +1413,7 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
                 return Localization.lang("Keep");
             }
             if (i >= PAD) {
-                return EntryUtil.capitalizeFirst(INSPECTION_FIELDS.get(i - PAD));
+                return StringUtil.capitalizeFirst(INSPECTION_FIELDS.get(i - PAD));
             }
             return "";
         }
@@ -1470,6 +1474,16 @@ public class ImportInspectionDialog extends JDialog implements ImportInspector, 
     @Override
     public void showMessage(String message) {
         JOptionPane.showMessageDialog(this, message);
+    }
+
+    /**
+     * Displays a dialog which tells the user that an error occurred while fetching entries
+     */
+    public void showErrorMessage(String fetcherTitle, String localizedException) {
+        showMessage(Localization.lang("Error while fetching from %0", fetcherTitle) + "\n" +
+                        Localization.lang("Please try again later and/or check your network connection.") + "\n" +
+                        localizedException,
+                Localization.lang("Search %0", fetcherTitle), JOptionPane.ERROR_MESSAGE);
     }
 
     public JabRefFrame getFrame() {

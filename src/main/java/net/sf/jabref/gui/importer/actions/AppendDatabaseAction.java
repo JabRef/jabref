@@ -22,7 +22,6 @@ import net.sf.jabref.logic.importer.ParserResult;
 import net.sf.jabref.logic.l10n.Localization;
 import net.sf.jabref.logic.util.FileExtensions;
 import net.sf.jabref.logic.util.UpdateField;
-import net.sf.jabref.model.ParseException;
 import net.sf.jabref.model.database.BibDatabase;
 import net.sf.jabref.model.database.KeyCollisionException;
 import net.sf.jabref.model.entry.BibEntry;
@@ -71,13 +70,12 @@ public class AppendDatabaseAction implements BaseAction {
             // Run the actual open in a thread to prevent the program
             // locking until the file is loaded.
             JabRefExecutorService.INSTANCE.execute(
-                    () -> openIt(md.importEntries(), md.importStrings(), md.importGroups(), md.importSelectorWords()));
+                    () -> openIt(md.importEntries(), md.importStrings(), md.importGroups()));
         }
 
     }
 
-    private void openIt(boolean importEntries, boolean importStrings, boolean importGroups,
-            boolean importSelectorWords) {
+    private void openIt(boolean importEntries, boolean importStrings, boolean importGroups) {
         if (filesToOpen.isEmpty()) {
             return;
         }
@@ -87,8 +85,7 @@ public class AppendDatabaseAction implements BaseAction {
                 // Should this be done _after_ we know it was successfully opened?
                 ParserResult pr = OpenDatabase.loadDatabase(file,
                         Globals.prefs.getImportFormatPreferences());
-                AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings,
-                        importGroups, importSelectorWords);
+                AppendDatabaseAction.mergeFromBibtex(frame, panel, pr, importEntries, importStrings, importGroups);
                 panel.output(Localization.lang("Imported from database") + " '" + file.getPath() + "'");
             } catch (IOException | KeyCollisionException ex) {
                 LOGGER.warn("Could not open database", ex);
@@ -99,7 +96,7 @@ public class AppendDatabaseAction implements BaseAction {
     }
 
     private static void mergeFromBibtex(JabRefFrame frame, BasePanel panel, ParserResult pr, boolean importEntries,
-            boolean importStrings, boolean importGroups, boolean importSelectorWords) throws KeyCollisionException {
+            boolean importStrings, boolean importGroups) throws KeyCollisionException {
 
         BibDatabase fromDatabase = pr.getDatabase();
         List<BibEntry> appendedEntries = new ArrayList<>();
@@ -118,7 +115,7 @@ public class AppendDatabaseAction implements BaseAction {
                 be.setId(IdGenerator.next());
                 UpdateField.setAutomaticFields(be, overwriteOwner, overwriteTimeStamp,
                         Globals.prefs.getUpdateFieldPreferences());
-                database.insertEntryWithDuplicationCheck(be);
+                database.insertEntry(be);
                 appendedEntries.add(be);
                 originalEntries.add(originalEntry);
                 ce.addEdit(new UndoableInsertEntry(database, be, panel));
@@ -141,10 +138,10 @@ public class AppendDatabaseAction implements BaseAction {
                     // create a dummy group
                     try {
                         ExplicitGroup group = new ExplicitGroup("Imported", GroupHierarchyType.INDEPENDENT,
-                                Globals.prefs.get(JabRefPreferences.KEYWORD_SEPARATOR));
+                                Globals.prefs.getKeywordDelimiter());
                         newGroups.setGroup(group);
                         group.add(appendedEntries);
-                    } catch (ParseException e) {
+                    } catch (IllegalArgumentException e) {
                         LOGGER.error(e);
                     }
                 }
@@ -154,14 +151,6 @@ public class AppendDatabaseAction implements BaseAction {
                 // required here
                 frame.getGroupSelector().addGroups(newGroups, ce);
             });
-        }
-
-        if (importSelectorWords) {
-            for (String s : meta) {
-                if (s.startsWith(MetaData.SELECTOR_META_PREFIX)) {
-                    panel.getBibDatabaseContext().getMetaData().putData(s, meta.getData(s));
-                }
-            }
         }
 
         ce.end();

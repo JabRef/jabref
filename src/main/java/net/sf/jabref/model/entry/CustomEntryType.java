@@ -9,6 +9,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import net.sf.jabref.model.strings.StringUtil;
+
 /**
  * This class is used to represent customized entry types.
  */
@@ -21,14 +23,14 @@ public class CustomEntryType implements EntryType {
     private final List<String> primaryOptional;
 
     public CustomEntryType(String name, List<String> required, List<String> primaryOptional, List<String> secondaryOptional) {
-        this.name = EntryUtil.capitalizeFirst(name);
+        this.name = StringUtil.capitalizeFirst(name);
         this.primaryOptional = primaryOptional;
         this.required = required;
         this.optional = Stream.concat(primaryOptional.stream(), secondaryOptional.stream()).collect(Collectors.toList());
     }
 
     public CustomEntryType(String name, List<String> required, List<String> optional) {
-        this.name = EntryUtil.capitalizeFirst(name);
+        this.name = StringUtil.capitalizeFirst(name);
         this.required = required;
         this.optional = optional;
         this.primaryOptional = optional;

@@ -9,6 +9,7 @@ import java.util.List;
 import javax.swing.JPanel;
 
 import net.sf.jabref.Globals;
+import net.sf.jabref.gui.importer.ImportInspectionDialog;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.importer.ImportInspector;
 import net.sf.jabref.logic.importer.OutputPrinter;
@@ -40,12 +41,9 @@ public class DBLPFetcher implements EntryFetcher {
     }
 
     @Override
-    public boolean processQuery(String newQuery, ImportInspector inspector,
-            OutputPrinter status) {
+    public boolean processQuery(String newQuery, ImportInspector inspector, OutputPrinter status) {
 
         final HashMap<String, Boolean> bibentryKnown = new HashMap<>();
-
-        boolean res = false;
         this.query = newQuery;
 
         shouldContinue = true;
@@ -122,20 +120,16 @@ public class DBLPFetcher implements EntryFetcher {
                 inspector.setProgress(count, bibtexUrlList.size());
                 count++;
             }
-
-
-            // everything went smooth
-            res = true;
+            return true;
 
         } catch (IOException e) {
-            LOGGER.warn("Communcation problems", e);
-            status.showMessage(e.getMessage());
+            LOGGER.error("Error while fetching from " + getTitle(), e);
+            ((ImportInspectionDialog)inspector).showErrorMessage(this.getTitle(), e.getLocalizedMessage());
         } finally {
             // Restore the threshold
             DuplicateCheck.duplicateThreshold = saveThreshold;
         }
-
-        return res;
+        return false;
     }
 
     private String makeSearchURL() {
