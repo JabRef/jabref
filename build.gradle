@@ -16,8 +16,6 @@ buildscript {
 plugins {
     id "com.install4j.gradle" version "6.1.2"
     id 'com.github.johnrengelman.shadow' version '1.2.3'
-    // TODO replaced by spotless plugin, needs to be updated
-    id "com.github.youribonnaffe.gradle.format" version "1.5"
     // If this is updated to 0.0.9, check configurations.errorprone
     id "net.ltgt.errorprone" version "0.0.8"
     id 'me.champeau.gradle.jmh' version '0.3.0'
@@ -275,13 +273,6 @@ jacocoTestReport {
         xml.enabled = true // coveralls plugin depends on xml format report
         html.enabled = true
     }
-}
-
-// enables `gradlew format`. Currently `LabelPatternUtil.java` is destroyed. Use with care!
-format {
-    configurationFile = file('ide-settings/formatter_settings.xml')
-    // default: reformat main and test
-    //files = sourceSets.main.java
 }
 
 shadowJar {
