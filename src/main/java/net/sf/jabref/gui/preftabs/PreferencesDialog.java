@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.prefs.BackingStoreException;
 
@@ -42,6 +43,7 @@ import com.jgoodies.forms.builder.ButtonBarBuilder;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+
 /**
  * Preferences dialog. Contains a TabbedPane, and tabs will be defined in
  * separate classes. Tabs MUST implement the PrefsTab interface, since this
@@ -62,7 +64,7 @@ public class PreferencesDialog extends JDialog {
     private final JButton showPreferences = new JButton(Localization.lang("Show preferences"));
 
     private final JButton resetPreferences = new JButton(Localization.lang("Reset preferences"));
-    private  Optional<Path> lastExportedPath;
+    private Path lastExportedPath;
 
 
     public PreferencesDialog(JabRefFrame parent) {
@@ -154,28 +156,13 @@ public class PreferencesDialog extends JDialog {
 
         // Import and export actions:
         exportPreferences.setToolTipText(Localization.lang("Export preferences to file"));
-        exportPreferences.addActionListener(e -> {
-            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.XML);
-            dialog.setDefaultExtension(FileExtensions.XML);
-            Optional<Path> path = dialog.saveNewFile();
-
-            path.ifPresent(exportFile -> {
-                try {
-                    lastExportedPath = path;
-                    prefs.exportPreferences(exportFile.toString());
-                } catch (JabRefException ex) {
-                    LOGGER.warn(ex.getMessage(), ex);
-                    JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
-                            Localization.lang("Export preferences"), JOptionPane.ERROR_MESSAGE);
-                }
-            });
-        });
+        exportPreferences.addActionListener(new ExportAction());
 
         importPreferences.setToolTipText(Localization.lang("Import preferences from file"));
         importPreferences.addActionListener(e -> {
             FileDialog dialog;
-            if(lastExportedPath.isPresent()) {
-                dialog = new FileDialog(frame, lastExportedPath.get().toString()).withExtension(FileExtensions.XML);
+            if(Objects.nonNull(lastExportedPath)) {
+                dialog = new FileDialog(frame, lastExportedPath.toString()).withExtension(FileExtensions.XML);
             } else {
                 dialog = new FileDialog(frame).withExtension(FileExtensions.XML);
             }
@@ -189,6 +176,7 @@ public class PreferencesDialog extends JDialog {
                     JOptionPane.showMessageDialog(PreferencesDialog.this,
                             Localization.lang("You must restart JabRef for this to come into effect."),
                             Localization.lang("Import preferences"), JOptionPane.WARNING_MESSAGE);
+                    this.dispose();
                 } catch (JabRefException ex) {
                     LOGGER.warn(ex.getMessage(), ex);
                     JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
@@ -198,7 +186,7 @@ public class PreferencesDialog extends JDialog {
         });
 
         showPreferences.addActionListener(
-                e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(Globals.prefs), frame).setVisible(true));
+                e -> new PreferencesFilterDialog(new JabRefPreferencesFilter(prefs), frame).setVisible(true));
         resetPreferences.addActionListener(e -> {
             if (JOptionPane.showConfirmDialog(PreferencesDialog.this,
                     Localization.lang("Are you sure you want to reset all settings to default values?"),
@@ -236,6 +224,28 @@ public class PreferencesDialog extends JDialog {
         Globals.prefs.updateEntryEditorTabList();
     }
 
+    private void storeAllSettings(){
+        // First check that all tabs are ready to close:
+        Component[] preferenceTabs = main.getComponents();
+        for (Component tab: preferenceTabs) {
+            if (!((PrefsTab) tab).validateSettings()) {
+                return; // If not, break off.
+            }
+        }
+        // Then store settings and close:
+        for (Component tab: preferenceTabs) {
+            ((PrefsTab) tab).storeSettings();
+        }
+        Globals.prefs.flush();
+
+        setVisible(false);
+        MainTable.updateRenderers();
+        GUIGlobals.updateEntryEditorColors();
+        frame.setupAllTables();
+        frame.getGroupSelector().revalidateGroups(); // icons may have changed
+        frame.output(Localization.lang("Preferences recorded."));
+    }
+
 
     class OkAction extends AbstractAction {
 
@@ -245,27 +255,33 @@ public class PreferencesDialog extends JDialog {
 
         @Override
         public void actionPerformed(ActionEvent e) {
+            storeAllSettings();
+        }
+    }
 
-            // First check that all tabs are ready to close:
-            int count = main.getComponentCount();
-            Component[] comps = main.getComponents();
-            for (int i = 0; i < count; i++) {
-                if (!((PrefsTab) comps[i]).validateSettings()) {
-                    return; // If not, break off.
+    class ExportAction extends AbstractAction {
+
+        public ExportAction() {
+            super("Export");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            FileDialog dialog = new FileDialog(frame).withExtension(FileExtensions.XML);
+            dialog.setDefaultExtension(FileExtensions.XML);
+            Optional<Path> path = dialog.saveNewFile();
+
+            path.ifPresent(exportFile -> {
+                try {
+                    storeAllSettings();
+                    Globals.prefs.exportPreferences(exportFile.toString());
+                    lastExportedPath = exportFile;
+                } catch (JabRefException ex) {
+                    LOGGER.warn(ex.getMessage(), ex);
+                    JOptionPane.showMessageDialog(PreferencesDialog.this, ex.getLocalizedMessage(),
+                            Localization.lang("Export preferences"), JOptionPane.WARNING_MESSAGE);
                 }
-            }
-            // Then store settings and close:
-            for (int i = 0; i < count; i++) {
-                ((PrefsTab) comps[i]).storeSettings();
-            }
-            Globals.prefs.flush();
-
-            setVisible(false);
-            MainTable.updateRenderers();
-            GUIGlobals.updateEntryEditorColors();
-            frame.setupAllTables();
-            frame.getGroupSelector().revalidateGroups(); // icons may have changed
-            frame.output(Localization.lang("Preferences recorded."));
+            });
         }
     }
 
