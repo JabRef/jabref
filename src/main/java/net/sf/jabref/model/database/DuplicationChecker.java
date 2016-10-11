@@ -2,6 +2,7 @@ package net.sf.jabref.model.database;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import net.sf.jabref.model.database.event.EntryAddedEvent;
 import net.sf.jabref.model.database.event.EntryRemovedEvent;
@@ -94,12 +95,18 @@ public class DuplicationChecker {
 
     @Subscribe
     public void listen(EntryRemovedEvent entryRemovedEvent) {
-        removeKeyFromSet(entryRemovedEvent.getBibEntry().getCiteKeyOptional().orElse(null));
+        Optional<String> citeKey = entryRemovedEvent.getBibEntry().getCiteKeyOptional();
+        if (citeKey.isPresent()) {
+            removeKeyFromSet(citeKey.get());
+        }
     }
 
     @Subscribe
     public void listen(EntryAddedEvent entryAddedEvent) {
-        addKeyToSet(entryAddedEvent.getBibEntry().getCiteKeyOptional().orElse(null));
+        Optional<String> citekey = entryAddedEvent.getBibEntry().getCiteKeyOptional();
+        if (citekey.isPresent()) {
+            addKeyToSet(citekey.get());
+        }
     }
 
 }
