@@ -79,7 +79,7 @@ public class RightClickMenu extends JPopupMenu implements PopupMenuListener {
         add(new GeneralAction(Actions.CUT, Localization.lang("Cut"), IconTheme.JabRefIcon.CUT.getSmallIcon(), KeyBinding.CUT));
         add(new GeneralAction(Actions.DELETE, Localization.lang("Delete"), IconTheme.JabRefIcon.DELETE_ENTRY.getSmallIcon(), KeyBinding.DELETE_ENTRY));
         GeneralAction printPreviewAction = new GeneralAction(Actions.PRINT_PREVIEW, Localization.lang("Print entry preview"), IconTheme.JabRefIcon.PRINTED.getSmallIcon());
-        printPreviewAction.setEnabled(multiple);
+        printPreviewAction.setEnabled(!multiple);
         add(printPreviewAction);
 
         addSeparator();
