@@ -50,7 +50,7 @@ public class DoiResolutionTest {
     @Test
     public void notReturnAnythingWhenMultipleLinksAreFound() throws IOException {
         entry.setField("doi", "10.1051/0004-6361/201527330; 10.1051/0004-6361/20152711233");
-        Assert.assertFalse(finder.findFullText(entry).isPresent());
+        Assert.assertEquals(Optional.empty(), finder.findFullText(entry));
     }
 
     @Test
