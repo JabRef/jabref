@@ -1390,9 +1390,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                 // need to close these here, b/c this action overshadows the responsible actions when the main table is selected
                 switch (mode) {
                     case SHOWING_NOTHING:
-                        frame.getGlobalSearchBar().setSearchTerm("", true);
-                        mainTable.requestFocus();
-                        SwingUtilities.invokeLater(() -> mainTable.ensureVisible(mainTable.getSelectedRow()));
+                        frame.getGlobalSearchBar().endSearch();
                         break;
                     case SHOWING_PREVIEW:
                         getPreviewPanel().close();
