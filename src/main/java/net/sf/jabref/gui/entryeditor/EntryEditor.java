@@ -380,8 +380,8 @@ public class EntryEditor extends JPanel implements EntryContainer {
         Optional<String> field = entry.getField(FieldName.FILE);
         if (field.isPresent()) {
             fileAnnotationTab = new FileAnnotationTab(this, panel, tabbed);
-            tabbed.addTab(Localization.lang("File_annotations"), IconTheme.JabRefIcon.COMMENT.getSmallIcon(), fileAnnotationTab,
-                    Localization.lang("Show_File_annotations"));
+            tabbed.addTab(Localization.lang("File annotations"), IconTheme.JabRefIcon.COMMENT.getSmallIcon(), fileAnnotationTab,
+                    Localization.lang("Show file annotations"));
             tabs.add(fileAnnotationTab);
         }
 

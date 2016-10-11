@@ -68,7 +68,7 @@ public class FileAnnotationTab extends JPanel {
     private final JScrollPane commentTxtScrollPane = new JScrollPane();
     private final JScrollPane highlightScrollPane = new JScrollPane();
     private final JButton copyToClipboardButton = new JButton();
-    private final JButton openPdfButton = new JButton();
+    private final JButton openFileButton = new JButton();
     DefaultListModel<FileAnnotation> listModel;
 
     private final EntryEditor parent;
@@ -263,15 +263,15 @@ public class FileAnnotationTab extends JPanel {
 
         buttonConstraints.gridy = 10;
         buttonConstraints.gridx = 10;
-        openPdfButton.setText(Localization.lang("Open file"));
-        openPdfButton.addActionListener(e -> openPdf());
+        openFileButton.setText(Localization.lang("Open file"));
+        openFileButton.addActionListener(e -> openPdf());
         copyToClipboardButton.setText(Localization.lang("Copy to clipboard"));
         copyToClipboardButton.addActionListener(e -> copyToClipboard());
 
         buttonPanel.add(copyToClipboardButton, buttonConstraints);
 
         buttonConstraints.gridx = 1;
-        buttonPanel.add(openPdfButton, buttonConstraints);
+        buttonPanel.add(openFileButton, buttonConstraints);
 
         return buttonPanel;
     }
