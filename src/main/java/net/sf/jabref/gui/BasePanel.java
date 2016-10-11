@@ -434,8 +434,11 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
             // Run second, on a different thread:
             @Override
             public void run() {
+                // We don't want to generate keys for entries which already have one thus remove the entries
                 if (Globals.prefs.getBoolean(JabRefPreferences.AVOID_OVERWRITING_KEY)) {
                     entries.removeIf(BibEntry::hasCiteKey);
+
+                // if we're going to override some cite keys warn the user about it
                 } else if (Globals.prefs.getBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY)) {
                     if (entries.parallelStream().anyMatch(BibEntry::hasCiteKey)) {
                         CheckBoxMessage cbm = new CheckBoxMessage(
@@ -444,6 +447,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                         final int answer = JOptionPane.showConfirmDialog(frame, cbm,
                                 Localization.lang("Overwrite keys"), JOptionPane.YES_NO_OPTION);
                         Globals.prefs.putBoolean(JabRefPreferences.WARN_BEFORE_OVERWRITING_KEY, !cbm.isSelected());
+
+                        // The user doesn't want to overide cite keys
                         if (answer == JOptionPane.NO_OPTION) {
                             canceled = true;
                             return;
@@ -451,6 +456,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                 }
 
+                // generate the new cite keys for each entry
                 final NamedCompound ce = new NamedCompound(Localization.lang("Autogenerate BibTeX keys"));
                 AbstractBibtexKeyPattern citeKeyPattern = bibDatabaseContext.getMetaData()
                         .getCiteKeyPattern(Globals.prefs.getBibtexKeyPatternPreferences().getKeyPattern());
@@ -464,6 +470,8 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
                     }
                 }
                 ce.end();
+
+                // register the undo event only if new cite keys were generated
                 if (ce.hasEdits()) {
                     getUndoManager().addEdit(ce);
                 }
