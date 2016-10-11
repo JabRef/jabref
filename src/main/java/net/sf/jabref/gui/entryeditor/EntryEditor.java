@@ -826,12 +826,9 @@ public class EntryEditor extends JPanel implements EntryContainer {
             BibEntry newEntry = database.getEntries().get(0);
             String newKey = newEntry.getCiteKeyOptional().orElse(null);
             boolean entryChanged = false;
-            boolean duplicateWarning = false;
             boolean emptyWarning = (newKey == null) || newKey.isEmpty();
 
-            if (panel.getDatabase().setCiteKeyForEntry(entry, newKey)) {
-                duplicateWarning = true;
-            }
+            entry.setCiteKey(newKey);
 
             // First, remove fields that the user has removed.
             for (Entry<String, String> field : entry.getFieldMap().entrySet()) {
@@ -876,7 +873,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             panel.getUndoManager().addEdit(compound);
 
-            if (duplicateWarning) {
+            if (panel.getDatabase().getDuplicationChecker().isDuplicateCiteKeyExisting(entry)) {
                 warnDuplicateBibtexkey();
             } else if (emptyWarning) {
                 warnEmptyBibtexkey();
@@ -1092,6 +1089,17 @@ public class EntryEditor extends JPanel implements EntryContainer {
         }
     }
 
+    public void close() {
+        if (tabbed.getSelectedComponent() == srcPanel) {
+            updateField(source);
+            if (lastSourceAccepted) {
+                panel.entryEditorClosing(EntryEditor.this);
+            }
+        } else {
+            panel.entryEditorClosing(EntryEditor.this);
+        }
+    }
+
     class CloseAction extends AbstractAction {
         public CloseAction() {
             super(Localization.lang("Close window"), IconTheme.JabRefIcon.CLOSE.getSmallIcon());
@@ -1100,14 +1108,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (tabbed.getSelectedComponent() == srcPanel) {
-                updateField(source);
-                if (lastSourceAccepted) {
-                    panel.entryEditorClosing(EntryEditor.this);
-                }
-            } else {
-                panel.entryEditorClosing(EntryEditor.this);
-            }
+            close();
         }
     }
 
@@ -1152,11 +1153,12 @@ public class EntryEditor extends JPanel implements EntryContainer {
                     return;
                 }
 
-                boolean isDuplicate = panel.getDatabase().setCiteKeyForEntry(entry, newValue);
+                entry.setCiteKey(newValue);
 
                 if (newValue == null) {
                     warnEmptyBibtexkey();
                 } else {
+                    boolean isDuplicate = panel.getDatabase().getDuplicationChecker().isDuplicateCiteKeyExisting(entry);
                     if (isDuplicate) {
                         warnDuplicateBibtexkey();
                     } else {
@@ -1165,7 +1167,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
                 }
 
                 // Add an UndoableKeyChange to the baseframe's undoManager.
-                UndoableKeyChange undoableKeyChange = new UndoableKeyChange(panel.getDatabase(), entry, oldValue, newValue);
+                UndoableKeyChange undoableKeyChange = new UndoableKeyChange(entry, oldValue, newValue);
                 if (updateTimeStampIsSet()) {
                     NamedCompound ce = new NamedCompound(undoableKeyChange.getPresentationName());
                     ce.addEdit(undoableKeyChange);
@@ -1385,7 +1387,7 @@ public class EntryEditor extends JPanel implements EntryContainer {
 
             // Store undo information:
             panel.getUndoManager().addEdit(
-                    new UndoableKeyChange(panel.getDatabase(), entry, oldValue.orElse(null),
+                    new UndoableKeyChange(entry, oldValue.orElse(null),
                             entry.getCiteKeyOptional().get())); // Cite key always set here
 
             // here we update the field

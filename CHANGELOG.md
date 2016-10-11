@@ -22,6 +22,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 
 ### Changed
 - Source tab in the entry editor displays "BibLaTeX Source" when using biblatex mode
+- [koppor#171](https://github.com/koppor/jabref/issues/171): Add Shortcuts to context menu
 - Add session restoring functionality for shared database. Related to [#1703](https://github.com/JabRef/jabref/issues/1703)
 - Implementation of LiveUpdate for PostgreSQL & Oracle systems. Related to [#970](https://github.com/JabRef/jabref/issues/970).
 - [koppor#31](https://github.com/koppor/jabref/issues/31): Number column in the main table is always Left aligned
@@ -70,6 +71,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Customized importer files need to be slightly changed since the class `ImportFormat` was renamed to `Importer`
 
 ### Fixed
+- Fixed [#2089](https://github.com/JabRef/jabref/issues/2089): Fixed faulty cite key generation
 - Fixed [#2092](https://github.com/JabRef/jabref/issues/2092): "None"-button in date picker clears the date field
 - Fixed [#1993](https://github.com/JabRef/jabref/issues/1993): Various optimizations regarding search performance
 - Fixed [koppor#160](https://github.com/koppor/jabref/issues/160): Tooltips now working in the main table
