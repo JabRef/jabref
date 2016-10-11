@@ -71,7 +71,7 @@ public class PrrvDialogView extends FXMLView {
         vis.addGraph(GROUP, graph);
 
         // -- 4. the renderers and renderer factory ---------------------------
-        // Different sharerenderer for intern and external nodes
+        // Different shaperenderer for intern and external nodes
         ShapeRenderer intern = new ShapeRenderer();
         intern.setFillMode(ShapeRenderer.GRADIENT_SPHERE);
         ShapeRenderer external = new ShapeRenderer();
@@ -96,29 +96,24 @@ public class PrrvDialogView extends FXMLView {
         NodeDegreeSizeAction size = new NodeDegreeSizeAction(NODES);
         nodeActions.add(size);
 
-        // Color paletts
+        // Color palettes
         int[] internPalette = new int[]{
-                ColorLib.rgb(255, 247, 243),
-                ColorLib.rgb(253, 224, 221),
-                ColorLib.rgb(252, 197, 192),
-                ColorLib.rgb(250, 159, 181),
-                ColorLib.rgb(247, 104, 161),
-                ColorLib.rgb(221, 52, 151),
-                ColorLib.rgb(174, 1, 126),
-                ColorLib.rgb(122, 1, 119),
-                ColorLib.rgb(73, 0, 106)
+                ColorLib.rgb(158,0,0),
+                ColorLib.rgb(210,0,0),
+                ColorLib.rgb(222,3,1),
+                ColorLib.rgb(254,89,0),
+                ColorLib.rgb(255,137,1),
+                ColorLib.rgb(255,183,1),
+                ColorLib.rgb(251,206,1),
+                ColorLib.rgb(255,255,105)
         };
 
         int[] externalPalette = new int[] {
-                ColorLib.rgb(255,247,251),
-                ColorLib.rgb(236,226,240),
-                ColorLib.rgb(208,209,230),
-                ColorLib.rgb(166,189,219),
-                ColorLib.rgb(103,169,207),
-                ColorLib.rgb(54,144,192),
-                ColorLib.rgb(2,129,138),
-                ColorLib.rgb(1,108,89),
-                ColorLib.rgb(1,70,54)};
+                ColorLib.rgb(30, 144, 255),
+                ColorLib.rgb(28, 134, 238),
+                ColorLib.rgb(24, 116, 205),
+                ColorLib.rgb(16, 78, 139)
+        };
 
         // Apply colors to the predicates
         ColorAction nStroke = new ColorAction("graph.nodes", VisualItem.STROKECOLOR);
