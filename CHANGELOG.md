@@ -59,7 +59,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Improve language quality of the German translation of shared database
 - Change "Recent files" to "Recent databases" to keep the file menu consistent
 - Customized importer files need to be slightly changed since the class `ImportFormat` was renamed to `Importer`
-- [koppor#5](https://github.com/koppor/jabref/issues/5) When entries are found while dropping a pdf with xmp meta data to the "File" field the found entries will be displayed in the information dialog
+- [koppor#5](https://github.com/koppor/jabref/issues/5) When entries are found while dropping a pdf with xmp meta data the found entries will be displayed in the import dialog
 
 ### Fixed
 - Fixed [#2092](https://github.com/JabRef/jabref/issues/2092): "None"-button in date picker clears the date field
