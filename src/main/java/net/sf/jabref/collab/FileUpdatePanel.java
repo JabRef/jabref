@@ -17,6 +17,8 @@ import net.sf.jabref.gui.SidePaneComponent;
 import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.logic.l10n.Localization;
 
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 public class FileUpdatePanel extends SidePaneComponent implements ActionListener, ChangeScanner.DisplayResultCallback {
 
     public static final String NAME = "fileUpdate";
@@ -75,6 +77,11 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
     @Override
     public int getRescalingWeight() {
         return 0;
+    }
+
+    @Override
+    public ToggleAction getToggleAction() {
+        throw new NotImplementedException();
     }
 
     /**

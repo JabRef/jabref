@@ -725,7 +725,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         if (panel != null) {// panel may be null if no file is open any more
             panel.getMainTable().getTableModel().updateGroupingState(MainTableDataModel.DisplayOption.DISABLED);
         }
-        getAction().setSelected(false);
+        getToggleAction().setSelected(false);
     }
 
     private void setGroups(GroupTreeNode groupsRoot) {
@@ -1282,7 +1282,8 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
         groupsTree.grabFocus();
     }
 
-    public ToggleAction getAction() {
+    @Override
+    public ToggleAction getToggleAction() {
         return toggleAction;
     }
 

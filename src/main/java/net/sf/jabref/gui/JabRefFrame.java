@@ -650,9 +650,9 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
             currentBasePanel.getPreviewPanel().updateLayout();
 
-            groupSelector.getAction().setSelected(sidePaneManager.isComponentVisible(GroupSelector.NAME));
+            groupSelector.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GroupSelector.NAME));
             previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
-            generalFetcher.getAction().setSelected(sidePaneManager.isComponentVisible(GeneralFetcher.NAME));
+            generalFetcher.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GeneralFetcher.NAME));
             openOfficePanel.getAction().setSelected(sidePaneManager.isComponentVisible(OpenOfficePanel.NAME));
             Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
             setWindowTitle();
@@ -1225,14 +1225,14 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         search.add(normalSearch);
         search.add(replaceAll);
         search.addSeparator();
-        search.add(new JCheckBoxMenuItem(generalFetcher.getAction()));
+        search.add(new JCheckBoxMenuItem(generalFetcher.getToggleAction()));
         if (prefs.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
             sidePaneManager.register(generalFetcher);
             sidePaneManager.show(GeneralFetcher.NAME);
         }
         mb.add(search);
 
-        groups.add(new JCheckBoxMenuItem(groupSelector.getAction()));
+        groups.add(new JCheckBoxMenuItem(groupSelector.getToggleAction()));
         groups.addSeparator();
         groups.add(addToGroup);
         groups.add(removeFromGroup);
@@ -1272,8 +1272,8 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         view.add(decreseFontSize);
         view.addSeparator();
         view.add(new JCheckBoxMenuItem(toggleToolbar));
-        view.add(new JCheckBoxMenuItem(enableToggle(generalFetcher.getAction())));
-        view.add(new JCheckBoxMenuItem(groupSelector.getAction()));
+        view.add(new JCheckBoxMenuItem(enableToggle(generalFetcher.getToggleAction())));
+        view.add(new JCheckBoxMenuItem(groupSelector.getToggleAction()));
         view.add(new JCheckBoxMenuItem(togglePreview));
         view.add(getNextPreviewStyleAction());
         view.add(getPreviousPreviewStyleAction());
@@ -1472,12 +1472,12 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         }
         tlb.addSeparator();
 
-        tlb.addJToggleButton(new JToggleButton(generalFetcher.getAction()));
+        tlb.addJToggleButton(new JToggleButton(generalFetcher.getToggleAction()));
 
         previewToggle = new JToggleButton(togglePreview);
         tlb.addJToggleButton(previewToggle);
 
-        tlb.addJToggleButton(new JToggleButton(groupSelector.getAction()));
+        tlb.addJToggleButton(new JToggleButton(groupSelector.getToggleAction()));
 
         tlb.addSeparator();
 
@@ -1504,7 +1504,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         openDatabaseOnlyActions.addAll(Arrays.asList(mergeDatabaseAction, newSubDatabaseAction, save, globalSearch,
                 saveAs, saveSelectedAs, saveSelectedAsPlain, editModeAction, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
                 unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, copyKeyAndLink, editPreamble, editStrings,
-                groupSelector.getAction(), makeKeyAction, normalSearch, generalFetcher.getAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
+                groupSelector.getToggleAction(), makeKeyAction, normalSearch, generalFetcher.getToggleAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
                 sendAsEmail, downloadFullText, writeXmpAction, openOfficePanel.getAction(), findUnlinkedFiles, addToGroup, removeFromGroup,
                 moveToGroup, autoLinkFile, resolveDuplicateKeys, openUrl, openFolder, openFile, togglePreview,
                 dupliCheck, autoSetFile, newEntryAction, newSpec, customizeAction, plainTextImport, getMassSetField(), getManageKeywords(),

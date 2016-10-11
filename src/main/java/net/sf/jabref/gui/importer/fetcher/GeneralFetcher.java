@@ -157,7 +157,8 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
         return tf;
     }
 
-    public ToggleAction getAction() {
+    @Override
+    public ToggleAction getToggleAction() {
         return action;
     }
 
@@ -232,7 +233,7 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     @Override
     public void componentClosing() {
         super.componentClosing();
-        getAction().setSelected(false);
+        getToggleAction().setSelected(false);
         Globals.prefs.putBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE, Boolean.FALSE);
     }
 

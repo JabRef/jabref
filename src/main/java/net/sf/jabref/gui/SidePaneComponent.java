@@ -108,6 +108,11 @@ public abstract class SidePaneComponent extends JXTitledPanel {
      */
     public abstract int getRescalingWeight();
 
+    /**
+     * @return the action which toggles this {@link SidePaneComponent}
+     */
+    public abstract ToggleAction getToggleAction();
+
 
     public class ToggleAction extends AbstractAction {
 

@@ -825,6 +825,7 @@ public class OpenOfficePanel extends AbstractWorker {
             return 0;
         }
 
+        @Override
         public ToggleAction getToggleAction() {
             return toggleAction;
         }
