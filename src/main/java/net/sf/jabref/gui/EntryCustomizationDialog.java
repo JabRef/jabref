@@ -380,13 +380,10 @@ public class EntryCustomizationDialog extends JDialog implements ListSelectionLi
      */
     private void updateTypesForEntries() {
         for (BasePanel bp : frame.getBasePanelList()) {
-
             for (BibEntry entry : bp.getDatabase().getEntries()) {
-                // Please explain what this line, and therefore the whole method, is doing (if it is doing something)
                 EntryTypes.getType(entry.getType(), bibDatabaseMode).ifPresent(entry::setType);
             }
         }
-
     }
 
     private void updateTables() {
