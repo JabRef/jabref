@@ -69,6 +69,7 @@ public class FileAnnotationTab extends JPanel {
     private final JScrollPane highlightScrollPane = new JScrollPane();
     private final JButton copyToClipboardButton = new JButton();
     private final JButton openFileButton = new JButton();
+    private final JButton reloadAnnotationsButton = new JButton();
     DefaultListModel<FileAnnotation> listModel;
 
     private final EntryEditor parent;
@@ -225,7 +226,7 @@ public class FileAnnotationTab extends JPanel {
                 .add(commentTxtScrollPane).xywh(3,9, 1, 2)
                 .add(highlightTxtLabel).xy(1, 11, "left, top")
                 .add(highlightScrollPane).xywh(3, 11, 1, 2)
-                .add(this.setUpButtons()).xy(3, 13)
+                .add(this.setUpButtons()).xyw(1, 13, 3)
                 .build();
 
         fileNameScrollPane.setViewportView(fileNameComboBox);
@@ -260,18 +261,22 @@ public class FileAnnotationTab extends JPanel {
     private JPanel setUpButtons(){
         JPanel buttonPanel = new JPanel(new GridBagLayout());
         GridBagConstraints buttonConstraints = new GridBagConstraints();
-
-        buttonConstraints.gridy = 10;
-        buttonConstraints.gridx = 10;
         openFileButton.setText(Localization.lang("Open file"));
         openFileButton.addActionListener(e -> openPdf());
         copyToClipboardButton.setText(Localization.lang("Copy to clipboard"));
         copyToClipboardButton.addActionListener(e -> copyToClipboard());
+        reloadAnnotationsButton.setText(Localization.lang("Reload annotations"));
+        reloadAnnotationsButton.addActionListener(e -> reloadAnnotations());
+
+        buttonConstraints.gridy = 10;
+        buttonConstraints.gridx = 3;
 
         buttonPanel.add(copyToClipboardButton, buttonConstraints);
 
-        buttonConstraints.gridx = 1;
+        buttonConstraints.gridx = 2;
         buttonPanel.add(openFileButton, buttonConstraints);
+        buttonConstraints.gridx = 1;
+        buttonPanel.add(reloadAnnotationsButton, buttonConstraints);
 
         return buttonPanel;
     }
@@ -314,6 +319,13 @@ public class FileAnnotationTab extends JPanel {
             e.printStackTrace();
         }
 
+    }
+
+    private void reloadAnnotations() {
+        isInitialized = false;
+        Arrays.stream(this.getComponents()).forEach(component -> this.remove(component));
+        initializeTab(this, Optional.empty());
+        this.repaint();
     }
 
     /**
