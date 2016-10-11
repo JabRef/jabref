@@ -101,17 +101,11 @@ public class ReferenceRelationship {
 
                 }
             }
-
-            // create nodestore, assigning node
-            //Graphml nodestore = new Graphml();
-            //nodestore.getGraph().setNodeList(entryNodeList);
-            //nodestore.getGraph().setEdgeList(currentEdgeList);
-
         }
     }
 
     /**
-     * Creates an edge for JAXB context and graph reader
+     * Creates an edge
      * @param sourceID start of the edge
      * @param targetID end of the edge
      */

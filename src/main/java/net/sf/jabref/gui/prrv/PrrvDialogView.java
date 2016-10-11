@@ -30,6 +30,9 @@ import prefux.util.ColorLib;
 import prefux.util.PrefuseLib;
 import prefux.visual.VisualItem;
 
+/**
+ * @author Daniel Brühl
+ */
 public class PrrvDialogView extends FXMLView {
     private static final double WIDTH = 900;
     private static final double HEIGHT = 750;
