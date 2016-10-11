@@ -45,9 +45,6 @@ public class PrrvDialogView extends FXMLView {
         root.getStyleClass().add("display");
         primaryStage.show();
 
-
-        // -- New Table for graph
-
         // Create tables for node and edge data, and configure their columns.
         Table nodeData = new Table();
         Table edgeData = new Table();
@@ -61,68 +58,68 @@ public class PrrvDialogView extends FXMLView {
         edgeData.addColumn(Graph.DEFAULT_TARGET_KEY, int.class);
 
         // -- 2. load the data ------------------------------------------------
-        // -- New graph
-        // Create Graph backed by those tables.  Note that I'm
-        // creating a directed graph here also.
+        // Create Graph backed by those tables.  Note that I'm creating a directed graph here also.
         Graph graph = new Graph(nodeData, edgeData, true);
         ReferenceRelationship rr = new ReferenceRelationship();
         rr.parseBibTexForReferences(graph);
-
-        //File file = new File("./nodestore-jaxb.xml");
-        //graph = new GraphMLReader().readGraph(file);
-
-        // TODO ZOOM auf x/y von biggest node
-        // TODO UTF8 Zeichen vollständig vergleichen können
-        // TODO Haken für external nodes
-        // TODO Message für ; syntax
-        // TODO Arrowhead einfügen
-
 
         // -- 3. the visualization --------------------------------------------
         Visualization vis = new Visualization();
         vis.addGraph(GROUP, graph);
 
-
         // -- 4. the renderers and renderer factory ---------------------------
-        //ShapeRenderer sr = new ShapeRenderer();
-        //sr.setFillMode(ShapeRenderer.GRADIENT_SPHERE);
-        //sr.setBaseSize(20);
+        // Different sharerenderer for intern and external nodes
         ShapeRenderer intern = new ShapeRenderer();
         intern.setFillMode(ShapeRenderer.GRADIENT_SPHERE);
         ShapeRenderer external = new ShapeRenderer();
         external.setFillMode(ShapeRenderer.GRADIENT_SPHERE);
-
+        // Separate predicates for intern and external nodes
         DefaultRendererFactory rfa = new DefaultRendererFactory();
-        //Predicate exp = ExpressionParser.predicate("ISNODE()");
         Predicate internExp = ExpressionParser.predicate("location='I'");
         Predicate externalExp = ExpressionParser.predicate("location='E'");
-        //rfa.add(exp, sr);
         rfa.add(internExp, intern);
         rfa.add(externalExp, external);
-        //rfa.setDefaultEdgeRenderer(sr);
         vis.setRendererFactory(rfa);
 
         // -- 5. the processing actions ---------------------------------------
+        // Apply layout
         ActionList layout = new ActionList(Activity.INFINITY);
         layout.add(new ForceDirectedLayout("graph"));
         layout.add(new RepaintAction());
         vis.putAction("layout", layout);
-
+        // Nodes are big as their in/output count of edges
         ActionList nodeActions = new ActionList();
         final String NODES = PrefuseLib.getGroupName(GROUP, Graph.NODES);
         NodeDegreeSizeAction size = new NodeDegreeSizeAction(NODES);
         nodeActions.add(size);
 
+        // Color paletts
         int[] internPalette = new int[]{
-                ColorLib.rgb(1, 70, 54)
+                ColorLib.rgb(255, 247, 243),
+                ColorLib.rgb(253, 224, 221),
+                ColorLib.rgb(252, 197, 192),
+                ColorLib.rgb(250, 159, 181),
+                ColorLib.rgb(247, 104, 161),
+                ColorLib.rgb(221, 52, 151),
+                ColorLib.rgb(174, 1, 126),
+                ColorLib.rgb(122, 1, 119),
+                ColorLib.rgb(73, 0, 106)
         };
 
-        int[] externalPalette = new int[] { ColorLib.rgb(122, 1, 119)};
+        int[] externalPalette = new int[] {
+                ColorLib.rgb(255,247,251),
+                ColorLib.rgb(236,226,240),
+                ColorLib.rgb(208,209,230),
+                ColorLib.rgb(166,189,219),
+                ColorLib.rgb(103,169,207),
+                ColorLib.rgb(54,144,192),
+                ColorLib.rgb(2,129,138),
+                ColorLib.rgb(1,108,89),
+                ColorLib.rgb(1,70,54)};
 
+        // Apply colors to the predicates
         ColorAction nStroke = new ColorAction("graph.nodes", VisualItem.STROKECOLOR);
         nStroke.setDefaultColor(ColorLib.gray(100));
-        //DataColorAction dataColor = new DataColorAction(NODES, exp, "referenceCount",
-          //      Constants.NUMERICAL, VisualItem.FILLCOLOR, colorPalette);
         DataColorAction colorI = new DataColorAction(NODES, internExp, "referenceCount",
                 Constants.NUMERICAL, VisualItem.FILLCOLOR, internPalette);
         DataColorAction colorE = new DataColorAction(NODES, externalExp, "referenceCount",
@@ -137,9 +134,6 @@ public class PrrvDialogView extends FXMLView {
         color.add(colorE);
         color.add(edges);
         color.add(arrow);
-
-        //nodeActions.add();
-
         vis.putAction("nodes", nodeActions);
         vis.putAction("color", color);
 
@@ -155,7 +149,7 @@ public class PrrvDialogView extends FXMLView {
         vis.run("layout");
 
 
-
+        // Throw if no references are found
         // FXAlert prrvDialog = new FXAlert(AlertType.INFORMATION, Localization.lang("Paper Reference Relationship Visualization"));
         //prrvDialog.setDialogPane((DialogPane) this.getView());
         //prrvDialog.show();

@@ -120,10 +120,12 @@ public class ReferenceRelationship {
     }
 
     /**
-     * Creates a node for for JAXB context and graph reader with necessary attributes
-     * @param ID
-     * @param title
+     * Creates a node with necessary attributes
+     * @param ID unique value
+     * @param title should be unique
      * @param referenceCount
+     * @param location
+     * @param graph
      * @return node
      */
     private prefux.data.Node createNode(int ID, String title, int referenceCount, String location, Graph graph) {
