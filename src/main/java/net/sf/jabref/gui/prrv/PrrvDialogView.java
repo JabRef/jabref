@@ -52,9 +52,10 @@ public class PrrvDialogView extends FXMLView {
         Table nodeData = new Table();
         Table edgeData = new Table();
 
-        nodeData.addColumn("title", String.class);
         nodeData.addColumn("id", int.class);
+        nodeData.addColumn("title", String.class);
         nodeData.addColumn("referenceCount", int.class);
+        nodeData.addColumn("location", String.class);
 
         edgeData.addColumn(Graph.DEFAULT_SOURCE_KEY, int.class);
         edgeData.addColumn(Graph.DEFAULT_TARGET_KEY, int.class);
@@ -71,6 +72,10 @@ public class PrrvDialogView extends FXMLView {
         //graph = new GraphMLReader().readGraph(file);
 
         // TODO ZOOM auf x/y von biggest node
+        // TODO UTF8 Zeichen vollständig vergleichen können
+        // TODO Haken für external nodes
+        // TODO Message für ; syntax
+        // TODO Arrowhead einfügen
 
 
         // -- 3. the visualization --------------------------------------------
@@ -79,13 +84,21 @@ public class PrrvDialogView extends FXMLView {
 
 
         // -- 4. the renderers and renderer factory ---------------------------
-        ShapeRenderer sr = new ShapeRenderer();
-        sr.setFillMode(ShapeRenderer.GRADIENT_SPHERE);
+        //ShapeRenderer sr = new ShapeRenderer();
+        //sr.setFillMode(ShapeRenderer.GRADIENT_SPHERE);
         //sr.setBaseSize(20);
+        ShapeRenderer intern = new ShapeRenderer();
+        intern.setFillMode(ShapeRenderer.GRADIENT_SPHERE);
+        ShapeRenderer external = new ShapeRenderer();
+        external.setFillMode(ShapeRenderer.GRADIENT_SPHERE);
 
         DefaultRendererFactory rfa = new DefaultRendererFactory();
-        Predicate exp = ExpressionParser.predicate("ISNODE()");
-        rfa.add(exp, sr);
+        //Predicate exp = ExpressionParser.predicate("ISNODE()");
+        Predicate internExp = ExpressionParser.predicate("location='I'");
+        Predicate externalExp = ExpressionParser.predicate("location='E'");
+        //rfa.add(exp, sr);
+        rfa.add(internExp, intern);
+        rfa.add(externalExp, external);
         //rfa.setDefaultEdgeRenderer(sr);
         vis.setRendererFactory(rfa);
 
@@ -100,33 +113,28 @@ public class PrrvDialogView extends FXMLView {
         NodeDegreeSizeAction size = new NodeDegreeSizeAction(NODES);
         nodeActions.add(size);
 
-        // vis.setValue(NODES, exp, VisualItem.SHAPE, new Integer(Constants.SHAPE_ELLIPSE) );
-
-        int[] colorPalette = new int[]{
-                ColorLib.rgb(1, 70, 54),
-                ColorLib.rgb(1, 108, 89),
-                ColorLib.rgb(2, 129, 138),
-                ColorLib.rgb(54, 144, 192),
-                ColorLib.rgb(103, 169, 207),
-                ColorLib.rgb(166, 189, 219),
-                ColorLib.rgb(208, 209, 230),
-                ColorLib.rgb(236, 226, 240),
-                ColorLib.rgb(255, 247, 251)
+        int[] internPalette = new int[]{
+                ColorLib.rgb(1, 70, 54)
         };
+
+        int[] externalPalette = new int[] { ColorLib.rgb(122, 1, 119)};
 
         ColorAction nStroke = new ColorAction("graph.nodes", VisualItem.STROKECOLOR);
         nStroke.setDefaultColor(ColorLib.gray(100));
         //DataColorAction dataColor = new DataColorAction(NODES, exp, "referenceCount",
           //      Constants.NUMERICAL, VisualItem.FILLCOLOR, colorPalette);
-            DataColorAction nFill = new DataColorAction("graph.nodes", "referenceCount",
-                  Constants.NUMERICAL, VisualItem.FILLCOLOR, colorPalette);
+        DataColorAction colorI = new DataColorAction(NODES, internExp, "referenceCount",
+                Constants.NUMERICAL, VisualItem.FILLCOLOR, internPalette);
+        DataColorAction colorE = new DataColorAction(NODES, externalExp, "referenceCount",
+                Constants.NUMERICAL, VisualItem.FILLCOLOR, externalPalette);
         ColorAction edges = new ColorAction("graph.edges",
                 VisualItem.STROKECOLOR, ColorLib.gray(255));
         ColorAction arrow = new ColorAction("graph.edges",
                VisualItem.FILLCOLOR, ColorLib.gray(200));
         ActionList color = new ActionList();
         color.add(nStroke);
-        color.add(nFill);
+        color.add(colorI);
+        color.add(colorE);
         color.add(edges);
         color.add(arrow);
 
@@ -139,11 +147,14 @@ public class PrrvDialogView extends FXMLView {
         FxDisplay display = new FxDisplay(vis);
         display.addControlListener(new DragControl());
         root.setCenter(display);
+        // Setup zoom box
+        root.setBottom(buildControlPanel(display));
         // -- 7. launch the visualization -------------------------------------
-
         vis.run("nodes");
         vis.run("color");
         vis.run("layout");
+
+
 
         // FXAlert prrvDialog = new FXAlert(AlertType.INFORMATION, Localization.lang("Paper Reference Relationship Visualization"));
         //prrvDialog.setDialogPane((DialogPane) this.getView());
