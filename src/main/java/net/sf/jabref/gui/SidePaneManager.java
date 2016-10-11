@@ -1,6 +1,5 @@
 package net.sf.jabref.gui;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -31,7 +30,7 @@ public class SidePaneManager {
 
     private final SidePane sidep;
 
-    private final Map<String, SidePaneComponent> components = new LinkedHashMap<>();
+    private final Map<Class<? extends SidePaneComponent>, SidePaneComponent> components = new LinkedHashMap<>();
 
     private final List<SidePaneComponent> visible = new LinkedList<>();
 
@@ -53,29 +52,27 @@ public class SidePaneManager {
         return sidep;
     }
 
-    public synchronized boolean hasComponent(String name) {
-        return components.containsKey(name);
+    public synchronized <T extends SidePaneComponent> boolean hasComponent(Class<T> sidePaneComponent) {
+        return components.containsKey(sidePaneComponent);
     }
 
-    public synchronized boolean isComponentVisible(String name) {
-        SidePaneComponent sidePaneComponent = components.get(name);
-        if (sidePaneComponent == null) {
+    public synchronized <T extends SidePaneComponent> boolean isComponentVisible(Class<T> sidePaneComponent) {
+        SidePaneComponent component = components.get(sidePaneComponent);
+        if (component == null) {
             return false;
         } else {
-            return visible.contains(sidePaneComponent);
+            return visible.contains(component);
         }
     }
 
     /**
      * If panel is visible it will be hidden and the other way around
-     *
-     * @param name name of the panel
      */
-    public synchronized void toggle(String name) {
-        if (isComponentVisible(name)) {
-            hide(name);
+    public synchronized <T extends SidePaneComponent> void toggle(Class<T> sidePaneComponent) {
+        if (isComponentVisible(sidePaneComponent)) {
+            hide(sidePaneComponent);
         } else {
-            show(name);
+            show(sidePaneComponent);
         }
     }
 
@@ -83,33 +80,31 @@ public class SidePaneManager {
      * If panel is hidden it will be shown and focused
      * If panel is visible but not focused it will be focused
      * If panel is visible and focused it will be hidden
-     *
-     * @param name name of the panel
      */
-    public synchronized void toggleThreeWay(String name){
-        boolean isPanelFocused = Globals.getFocusListener().getFocused() == components.get(name);
-        if (isComponentVisible(name) && isPanelFocused) {
-            hide(name);
-        } else {
-            show(name);
-        }
-    }
-
-    public synchronized void show(String name) {
-        SidePaneComponent sidePaneComponent = components.get(name);
-        if (sidePaneComponent == null) {
-            LOGGER.warn("Side pane component '" + name + "' unknown.");
+    public synchronized <T extends SidePaneComponent> void toggleThreeWay(Class<T> sidePaneComponent) {
+        boolean isPanelFocused = Globals.getFocusListener().getFocused() == components.get(sidePaneComponent);
+        if (isComponentVisible(sidePaneComponent) && isPanelFocused) {
+            hide(sidePaneComponent);
         } else {
             show(sidePaneComponent);
         }
     }
 
-    public synchronized void hide(String name) {
-        SidePaneComponent sidePaneComponent = components.get(name);
-        if (sidePaneComponent == null) {
-            LOGGER.warn("Side pane component '" + name + "' unknown.");
+    public synchronized <T extends SidePaneComponent> void show(Class<T> sidePaneComponent) {
+        SidePaneComponent component = components.get(sidePaneComponent);
+        if (component == null) {
+            LOGGER.warn("Side pane component '" + sidePaneComponent + "' unknown.");
         } else {
-            hideComponent(sidePaneComponent);
+            show(component);
+        }
+    }
+
+    public synchronized <T extends SidePaneComponent> void hide(Class<T> sidePaneComponent) {
+        SidePaneComponent component = components.get(sidePaneComponent);
+        if (component == null) {
+            LOGGER.warn("Side pane component '" + sidePaneComponent + "' unknown.");
+        } else {
+            hideComponent(component);
             if (frame.getCurrentBasePanel() != null) {
                 MainTable mainTable = frame.getCurrentBasePanel().getMainTable();
                 mainTable.setSelected(mainTable.getSelectedRow());
@@ -119,7 +114,7 @@ public class SidePaneManager {
     }
 
     public synchronized void register(SidePaneComponent comp) {
-        components.put(comp.getSidePaneName(), comp);
+        components.put(comp.getClass(), comp);
     }
 
     private synchronized void show(SidePaneComponent component) {
@@ -137,8 +132,8 @@ public class SidePaneManager {
         component.grabFocus();
     }
 
-    public synchronized SidePaneComponent getComponent(String name) {
-        return components.get(name);
+    public synchronized <T extends SidePaneComponent> SidePaneComponent getComponent(Class<T> sidePaneComponent) {
+        return components.get(sidePaneComponent);
     }
 
     public synchronized void hideComponent(SidePaneComponent comp) {
@@ -149,30 +144,36 @@ public class SidePaneManager {
         }
     }
 
-    public synchronized void hideComponent(String name) {
-        SidePaneComponent comp = components.get(name);
-        if (comp == null) {
+    public synchronized <T extends SidePaneComponent> void hideComponent(Class<T> sidePaneComponent) {
+        SidePaneComponent component = components.get(sidePaneComponent);
+        if (component == null) {
             return;
         }
-        if (visible.contains(comp)) {
-            comp.componentClosing();
-            visible.remove(comp);
+        if (visible.contains(component)) {
+            component.componentClosing();
+            visible.remove(component);
             updateView();
         }
     }
 
-    private static Map<String, Integer> getPreferredPositions() {
-        Map<String, Integer> preferredPositions = new HashMap<>();
+    private static Map<Class<? extends SidePaneComponent>, Integer> getPreferredPositions() {
+        Map<Class<? extends SidePaneComponent>, Integer> preferredPositions = new HashMap<>();
 
         List<String> componentNames = Globals.prefs.getStringList(JabRefPreferences.SIDE_PANE_COMPONENT_NAMES);
         List<String> componentPositions = Globals.prefs
                 .getStringList(JabRefPreferences.SIDE_PANE_COMPONENT_PREFERRED_POSITIONS);
 
         for (int i = 0; i < componentNames.size(); ++i) {
+            String componentName = componentNames.get(i);
             try {
-                preferredPositions.put(componentNames.get(i), Integer.parseInt(componentPositions.get(i)));
+                Class<? extends SidePaneComponent> componentClass = (Class<? extends SidePaneComponent>) Class.forName(componentName);
+                preferredPositions.put(componentClass, Integer.parseInt(componentPositions.get(i)));
+            } catch (ClassNotFoundException e) {
+                LOGGER.error("Following side pane could not be found: " + componentName, e);
+            } catch (ClassCastException e) {
+                LOGGER.error("Following Class is no side pane: '" + componentName, e);
             } catch (NumberFormatException e) {
-                LOGGER.info("Invalid number format for side pane component '" + componentNames.get(i) + "'.", e);
+                LOGGER.info("Invalid number format for side pane component '" + componentName + "'.", e);
             }
         }
 
@@ -180,17 +181,20 @@ public class SidePaneManager {
     }
 
     private void updatePreferredPositions() {
-        Map<String, Integer> preferredPositions = getPreferredPositions();
+        Map<Class<? extends SidePaneComponent>, Integer> preferredPositions = getPreferredPositions();
 
         // Update the preferred positions of all visible components
         int index = 0;
         for (SidePaneComponent comp : visible) {
-            preferredPositions.put(comp.getSidePaneName(), index);
+            preferredPositions.put(comp.getClass(), index);
             index++;
         }
 
         // Split the map into a pair of parallel String lists suitable for storage
-        List<String> tmpComponentNames = new ArrayList<>(preferredPositions.keySet());
+        List<String> tmpComponentNames = preferredPositions.keySet().parallelStream()
+                .map(Class::getName)
+                .collect(Collectors.toList());
+
         List<String> componentPositions = preferredPositions.values().stream().map(Object::toString)
                 .collect(Collectors.toList());
 
@@ -199,10 +203,12 @@ public class SidePaneManager {
     }
 
 
-    // Helper class for sorting visible components based on their preferred position
+    /**
+     * Helper class for sorting visible components based on their preferred position
+     */
     private class PreferredIndexSort implements Comparator<SidePaneComponent> {
 
-        private final Map<String, Integer> preferredPositions;
+        private final Map<Class<? extends SidePaneComponent>, Integer> preferredPositions;
 
 
         public PreferredIndexSort() {
@@ -211,8 +217,8 @@ public class SidePaneManager {
 
         @Override
         public int compare(SidePaneComponent comp1, SidePaneComponent comp2) {
-            int pos1 = preferredPositions.getOrDefault(comp1.getSidePaneName(), 0);
-            int pos2 = preferredPositions.getOrDefault(comp2.getSidePaneName(), 0);
+            int pos1 = preferredPositions.getOrDefault(comp1.getClass(), 0);
+            int pos2 = preferredPositions.getOrDefault(comp2.getClass(), 0);
             return Integer.valueOf(pos1).compareTo(pos2);
         }
     }
@@ -246,8 +252,8 @@ public class SidePaneManager {
         }
     }
 
-    public synchronized void unregisterComponent(String name) {
-        components.remove(name);
+    public synchronized <T extends SidePaneComponent> void unregisterComponent(Class<T> sidePaneComponent) {
+        components.remove(sidePaneComponent);
     }
 
     /**
@@ -256,10 +262,9 @@ public class SidePaneManager {
      *
      * @param panel
      */
-
     private synchronized void setActiveBasePanel(BasePanel panel) {
-        for (Map.Entry<String, SidePaneComponent> stringSidePaneComponentEntry : components.entrySet()) {
-            stringSidePaneComponentEntry.getValue().setActiveBasePanel(panel);
+        for (SidePaneComponent component : components.values()) {
+            component.setActiveBasePanel(panel);
         }
     }
 

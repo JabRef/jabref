@@ -80,8 +80,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class OpenOfficePanel extends AbstractWorker {
 
-    public static final String NAME = "OpenOffice/LibreOffice";
-
     private static final Log LOGGER = LogFactory.getLog(OpenOfficePanel.class);
 
     private OOPanel sidePane;
@@ -787,7 +785,7 @@ public class OpenOfficePanel extends AbstractWorker {
     }
 
 
-    private class OOPanel extends SidePaneComponent {
+    public class OOPanel extends SidePaneComponent {
 
         private final ToggleAction toggleAction;
 
@@ -796,7 +794,7 @@ public class OpenOfficePanel extends AbstractWorker {
             super(sidePaneManager, icon, title);
             sidePaneManager.register(this);
             if (preferences.showPanel()) {
-                manager.show(NAME);
+                manager.show(OOPanel.class);
             }
 
             toggleAction = new ToggleAction(Localization.lang("OpenOffice/LibreOffice connection"),
@@ -813,11 +811,6 @@ public class OpenOfficePanel extends AbstractWorker {
         @Override
         public void componentOpening() {
             preferences.setShowPanel(true);
-        }
-
-        @Override
-        public String getSidePaneName() {
-            return NAME;
         }
 
         @Override

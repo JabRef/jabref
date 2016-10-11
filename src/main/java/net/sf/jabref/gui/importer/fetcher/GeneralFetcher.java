@@ -36,8 +36,6 @@ import net.sf.jabref.preferences.JabRefPreferences;
 
 public class GeneralFetcher extends SidePaneComponent implements ActionListener {
 
-    public static final String NAME = "fetcher";
-
     private final JTextField tf = new JTextField();
 
     private final CardLayout optionsCards = new CardLayout();
@@ -241,11 +239,6 @@ public class GeneralFetcher extends SidePaneComponent implements ActionListener 
     public void componentOpening() {
         super.componentOpening();
         Globals.prefs.putBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE, Boolean.TRUE);
-    }
-
-    @Override
-    public String getSidePaneName() {
-        return NAME;
     }
 
     @Override

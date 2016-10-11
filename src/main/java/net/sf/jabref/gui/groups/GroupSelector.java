@@ -79,8 +79,6 @@ import org.apache.commons.logging.LogFactory;
  */
 public class GroupSelector extends SidePaneComponent implements TreeSelectionListener {
 
-    public static final String NAME = "groups";
-
     private static final Log LOGGER = LogFactory.getLog(GroupSelector.class);
 
     private final GroupsTree groupsTree;
@@ -711,11 +709,6 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     }
 
     @Override
-    public String getSidePaneName() {
-        return NAME;
-    }
-
-    @Override
     public int getRescalingWeight() {
         return 1;
     }
@@ -1219,7 +1212,7 @@ public class GroupSelector extends SidePaneComponent implements TreeSelectionLis
     public void setActiveBasePanel(BasePanel panel) {
         super.setActiveBasePanel(panel);
         if (panel == null) { // hide groups
-            frame.getSidePaneManager().hide(NAME);
+            frame.getSidePaneManager().hide(GroupSelector.class);
             return;
         }
         MetaData metaData = panel.getBibDatabaseContext().getMetaData();

@@ -382,7 +382,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                         scanner.displayResult(resolved -> {
                             if (resolved) {
                                 panel.setUpdatedExternally(false);
-                                SwingUtilities.invokeLater(() -> panel.getSidePaneManager().hide(FileUpdatePanel.NAME));
+                                SwingUtilities.invokeLater(() -> panel.getSidePaneManager().hide(FileUpdatePanel.class));
                             } else {
                                 canceled = true;
                             }
@@ -400,7 +400,7 @@ public class SaveDatabaseAction extends AbstractWorker {
                     canceled = true;
                 } else {
                     panel.setUpdatedExternally(false);
-                    panel.getSidePaneManager().hide(FileUpdatePanel.NAME);
+                    panel.getSidePaneManager().hide(FileUpdatePanel.class);
                 }
             }
         }

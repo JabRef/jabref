@@ -650,10 +650,10 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
             currentBasePanel.getPreviewPanel().updateLayout();
 
-            groupSelector.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GroupSelector.NAME));
+            groupSelector.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GroupSelector.class));
             previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
-            generalFetcher.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GeneralFetcher.NAME));
-            openOfficePanel.getAction().setSelected(sidePaneManager.isComponentVisible(OpenOfficePanel.NAME));
+            generalFetcher.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GeneralFetcher.class));
+            openOfficePanel.getAction().setSelected(sidePaneManager.isComponentVisible(OpenOfficePanel.OOPanel.class));
             Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
             setWindowTitle();
             editModeAction.initName();
@@ -1228,7 +1228,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
         search.add(new JCheckBoxMenuItem(generalFetcher.getToggleAction()));
         if (prefs.getBoolean(JabRefPreferences.WEB_SEARCH_VISIBLE)) {
             sidePaneManager.register(generalFetcher);
-            sidePaneManager.show(GeneralFetcher.NAME);
+            sidePaneManager.show(GeneralFetcher.class);
         }
         mb.add(search);
 

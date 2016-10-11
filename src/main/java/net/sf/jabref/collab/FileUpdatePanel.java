@@ -21,8 +21,6 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class FileUpdatePanel extends SidePaneComponent implements ActionListener, ChangeScanner.DisplayResultCallback {
 
-    public static final String NAME = "fileUpdate";
-
     private final SidePaneManager manager;
 
     private final ChangeScanner scanner;
@@ -66,12 +64,7 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
      */
     @Override
     public void componentClosing() {
-        manager.unregisterComponent(FileUpdatePanel.NAME);
-    }
-
-    @Override
-    public String getSidePaneName() {
-        return NAME;
+        manager.unregisterComponent(FileUpdatePanel.class);
     }
 
     @Override

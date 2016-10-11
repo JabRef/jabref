@@ -100,8 +100,6 @@ public abstract class SidePaneComponent extends JXTitledPanel {
         return getPreferredSize();
     }
 
-    public abstract String getSidePaneName();
-
     /**
      * Specifies how to distribute extra vertical space between side pane components.
      * 0: fixed height, 1: fill the remaining space
@@ -131,17 +129,17 @@ public abstract class SidePaneComponent extends JXTitledPanel {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (!manager.hasComponent(getSidePaneName())) {
+            if (!manager.hasComponent(SidePaneComponent.this.getClass())) {
                 manager.register(SidePaneComponent.this);
             }
 
             // if clicked by mouse just toggle
             if ((e.getModifiers() & InputEvent.BUTTON1_MASK) != 0) {
-                manager.toggle(getSidePaneName());
+                manager.toggle(SidePaneComponent.this.getClass());
             } else {
-                manager.toggleThreeWay(getSidePaneName());
+                manager.toggleThreeWay(SidePaneComponent.this.getClass());
             }
-            putValue(Action.SELECTED_KEY, manager.isComponentVisible(getSidePaneName()));
+            putValue(Action.SELECTED_KEY, manager.isComponentVisible(SidePaneComponent.this.getClass()));
         }
 
         public void setSelected(boolean selected){
