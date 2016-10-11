@@ -82,7 +82,7 @@ public class OpenOfficePanel extends AbstractWorker {
 
     private static final Log LOGGER = LogFactory.getLog(OpenOfficePanel.class);
 
-    private OOPanel sidePane;
+    private OpenOfficeSidePanel sidePane;
     private JDialog diag;
     private final JButton connect;
     private final JButton manualConnect;
@@ -110,8 +110,6 @@ public class OpenOfficePanel extends AbstractWorker {
     private final OpenOfficePreferences preferences;
     private final StyleLoader loader;
 
-    private static OpenOfficePanel instance;
-
 
     public OpenOfficePanel(JabRefFrame jabRefFrame, SidePaneManager spManager) {
         Icon connectImage = IconTheme.JabRefIcon.CONNECT_OPEN_OFFICE.getSmallIcon();
@@ -135,7 +133,7 @@ public class OpenOfficePanel extends AbstractWorker {
                 Globals.prefs.getDefaultEncoding());
 
         this.frame = jabRefFrame;
-        sidePane = new OOPanel(spManager, IconTheme.getImage("openoffice"), "OpenOffice/LibreOffice");
+        sidePane = new OpenOfficeSidePanel(spManager, IconTheme.getImage("openoffice"), "OpenOffice/LibreOffice", preferences);
         initPanel();
         spManager.register(sidePane);
     }
@@ -780,49 +778,8 @@ public class OpenOfficePanel extends AbstractWorker {
         menu.show(settingsB, 0, settingsB.getHeight());
     }
 
-    public SidePaneComponent.ToggleAction getAction() {
+    public SidePaneComponent.ToggleAction getToggleAction() {
         return sidePane.getToggleAction();
-    }
-
-
-    public class OOPanel extends SidePaneComponent {
-
-        private final ToggleAction toggleAction;
-
-
-        public OOPanel(SidePaneManager sidePaneManager, Icon icon, String title) {
-            super(sidePaneManager, icon, title);
-            sidePaneManager.register(this);
-            if (preferences.showPanel()) {
-                manager.show(OOPanel.class);
-            }
-
-            toggleAction = new ToggleAction(Localization.lang("OpenOffice/LibreOffice connection"),
-                    Localization.lang("OpenOffice/LibreOffice connection"),
-                    Globals.getKeyPrefs().getKey(KeyBinding.OPEN_OPEN_OFFICE_LIBRE_OFFICE_CONNECTION),
-                    icon);
-        }
-
-        @Override
-        public void componentClosing() {
-            preferences.setShowPanel(false);
-        }
-
-        @Override
-        public void componentOpening() {
-            preferences.setShowPanel(true);
-        }
-
-        @Override
-        public int getRescalingWeight() {
-            return 0;
-        }
-
-        @Override
-        public ToggleAction getToggleAction() {
-            return toggleAction;
-        }
-
     }
 
 }

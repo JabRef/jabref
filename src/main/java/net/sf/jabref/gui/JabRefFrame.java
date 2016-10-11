@@ -653,7 +653,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
             groupSelector.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GroupSelector.class));
             previewToggle.setSelected(Globals.prefs.getPreviewPreferences().isPreviewPanelEnabled());
             generalFetcher.getToggleAction().setSelected(sidePaneManager.isComponentVisible(GeneralFetcher.class));
-            openOfficePanel.getAction().setSelected(sidePaneManager.isComponentVisible(OpenOfficePanel.OOPanel.class));
+            openOfficePanel.getToggleAction().setSelected(sidePaneManager.isComponentVisible(OpenOfficePanel.OOPanel.class));
             Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
             setWindowTitle();
             editModeAction.initName();
@@ -1314,7 +1314,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
 
         tools.add(newSubDatabaseAction);
         tools.add(writeXmpAction);
-        tools.add(new JCheckBoxMenuItem(openOfficePanel.getAction()));
+        tools.add(new JCheckBoxMenuItem(openOfficePanel.getToggleAction()));
         tools.add(pushExternalButton.getMenuAction());
         tools.addSeparator();
         tools.add(openFolder);
@@ -1505,7 +1505,7 @@ public class JabRefFrame extends JFrame implements OutputPrinter {
                 saveAs, saveSelectedAs, saveSelectedAsPlain, editModeAction, undo, redo, cut, deleteEntry, copy, paste, mark, markSpecific, unmark,
                 unmarkAll, rankSubMenu, editEntry, selectAll, copyKey, copyCiteKey, copyKeyAndTitle, copyKeyAndLink, editPreamble, editStrings,
                 groupSelector.getToggleAction(), makeKeyAction, normalSearch, generalFetcher.getToggleAction(), mergeEntries, cleanupEntries, exportToClipboard, replaceAll,
-                sendAsEmail, downloadFullText, writeXmpAction, openOfficePanel.getAction(), findUnlinkedFiles, addToGroup, removeFromGroup,
+                sendAsEmail, downloadFullText, writeXmpAction, openOfficePanel.getToggleAction(), findUnlinkedFiles, addToGroup, removeFromGroup,
                 moveToGroup, autoLinkFile, resolveDuplicateKeys, openUrl, openFolder, openFile, togglePreview,
                 dupliCheck, autoSetFile, newEntryAction, newSpec, customizeAction, plainTextImport, getMassSetField(), getManageKeywords(),
                 pushExternalButton.getMenuAction(), closeDatabaseAction, getNextPreviewStyleAction(), getPreviousPreviewStyleAction(), checkIntegrity,
