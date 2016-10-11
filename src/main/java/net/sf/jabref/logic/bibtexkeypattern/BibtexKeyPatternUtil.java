@@ -442,27 +442,19 @@ public class BibtexKeyPatternUtil {
             entry.setCiteKey(key);
         } else {
             // The key is already in use, so we must modify it.
-            int number = 0;
-            if (!alwaysAddLetter && !firstLetterA) {
-                number = 1;
-            }
+            int number = !alwaysAddLetter && !firstLetterA ? 1 : 0;
+            String moddedKey;
 
-            String moddedKey = key + getAddition(number);
-            occurrences = database.getDuplicationChecker().getNumberOfKeyOccurrences(moddedKey);
-
-            if (Objects.equals(oldKey, moddedKey)) {
-                occurrences--;
-            }
-
-            while (occurrences > 0) {
-                number++;
+            do {
                 moddedKey = key + getAddition(number);
+                number++;
 
                 occurrences = database.getDuplicationChecker().getNumberOfKeyOccurrences(moddedKey);
+                // only happens if #getAddition() is buggy
                 if (Objects.equals(oldKey, moddedKey)) {
                     occurrences--;
                 }
-            }
+            } while (occurrences > 0);
 
             entry.setCiteKey(moddedKey);
         }
