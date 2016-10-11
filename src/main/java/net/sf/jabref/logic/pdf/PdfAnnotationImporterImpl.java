@@ -1,6 +1,5 @@
 package net.sf.jabref.logic.pdf;
 
-import java.awt.geom.Rectangle2D;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,6 +10,7 @@ import net.sf.jabref.model.database.BibDatabaseContext;
 import net.sf.jabref.model.pdf.FileAnnotation;
 import net.sf.jabref.preferences.JabRefPreferences;
 
+import net.sf.pdfboxbridge.AwtRectangleBridge;
 import org.apache.pdfbox.cos.COSArray;
 import org.apache.pdfbox.cos.COSFloat;
 import org.apache.pdfbox.cos.COSName;
@@ -93,8 +93,10 @@ public class PdfAnnotationImporterImpl implements AnnotationImporterInterface {
                             PDRectangle pageSize = page.getMediaBox();
                             uly = pageSize.getHeight() - uly;
 
-                            Rectangle2D.Float rectangle = new Rectangle2D.Float(ulx, uly, width, height);
-                            stripperByArea.addRegion("highlightedRegion", rectangle);
+                            PDRectangle rectangle = new PDRectangle(width, height);
+                            rectangle.move(upperLeftX.floatValue(), upperLeftY.floatValue());
+                            stripperByArea.addRegion("highlightedRegion",
+                                    AwtRectangleBridge.PDFBoxRectangleToAwtRectangle2DFloat(ulx, uly, width, height));
                             stripperByArea.extractRegions(page);
                             String highlightedTextInLine = stripperByArea.getTextForRegion("highlightedRegion");
 
