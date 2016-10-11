@@ -55,14 +55,12 @@ public class DuplicationChecker {
      * Thus, I need a way to count the number of keys of each type.
      * Solution: hashmap=>int (increment each time at add and decrement each time at remove)
      */
-    private boolean addKeyToSet(String key) {
+    private void addKeyToSet(String key) {
         if (key == null || key.isEmpty()) {
-            return false;
+            return;
         }
 
-        int numberOfKeyOccurrences = getNumberOfKeyOccurrences(key);
-        allKeys.put(key, numberOfKeyOccurrences + 1);
-        return numberOfKeyOccurrences != 0;
+        allKeys.put(key, getNumberOfKeyOccurrences(key) + 1);
     }
 
     /**
