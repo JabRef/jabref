@@ -36,6 +36,8 @@ import net.sf.jabref.gui.JabRefFrame;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.logic.help.HelpFile;
 import net.sf.jabref.logic.l10n.Localization;
+import net.sf.jabref.model.database.BibDatabaseContext;
+import net.sf.jabref.model.database.DatabaseLocation;
 import net.sf.jabref.shared.DBMSConnection;
 import net.sf.jabref.shared.DBMSConnectionProperties;
 import net.sf.jabref.shared.DBMSType;
@@ -383,13 +385,11 @@ public class OpenSharedDatabaseDialog extends JDialog {
      */
     private boolean isSharedDatabaseAlreadyPresent() {
         List<BasePanel> panels = JabRefGUI.getMainFrame().getBasePanelList();
-        for (BasePanel panel : panels) {
-            DBMSConnectionProperties dbmsConnectionProperties = panel.getBibDatabaseContext().getDBMSSynchronizer()
-                    .getDBProcessor().getDBMSConnectionProperties();
-            if (this.connectionProperties.equals(dbmsConnectionProperties)) {
-                return true;
-            }
-        }
-        return false;
+        return panels.parallelStream().anyMatch(panel -> {
+            BibDatabaseContext context = panel.getBibDatabaseContext();
+            return ((context.getLocation() == DatabaseLocation.SHARED) &&
+                    this.connectionProperties.equals(context.getDBMSSynchronizer()
+                    .getDBProcessor().getDBMSConnectionProperties()));
+        });
     }
 }
