@@ -17,8 +17,6 @@ import net.sf.jabref.gui.SidePaneComponent;
 import net.sf.jabref.gui.SidePaneManager;
 import net.sf.jabref.logic.l10n.Localization;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
 public class FileUpdatePanel extends SidePaneComponent implements ActionListener, ChangeScanner.DisplayResultCallback {
 
     private final SidePaneManager manager;
@@ -74,7 +72,7 @@ public class FileUpdatePanel extends SidePaneComponent implements ActionListener
 
     @Override
     public ToggleAction getToggleAction() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     /**
