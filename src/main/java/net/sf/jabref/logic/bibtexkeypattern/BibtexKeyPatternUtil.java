@@ -429,7 +429,7 @@ public class BibtexKeyPatternUtil {
         }
 
         String oldKey = entry.getCiteKeyOptional().orElse(null);
-        int occurrences = database.getNumberOfKeyOccurrences(key);
+        int occurrences = database.getDuplicationChecker().getNumberOfKeyOccurrences(key);
 
         if (Objects.equals(oldKey, key)) {
             occurrences--; // No change, so we can accept one dupe.
@@ -439,48 +439,24 @@ public class BibtexKeyPatternUtil {
         boolean firstLetterA = bibtexKeyPatternPreferences.isFirstLetterA();
 
         if (!alwaysAddLetter && (occurrences == 0)) {
-            // No dupes found, so we can just go ahead.
-            if (!key.equals(oldKey)) {
-                if (database.containsEntryWithId(entry.getId())) {
-                    database.setCiteKeyForEntry(entry, key);
-                } else {
-                    // entry does not (yet) exist in the database, just update the entry
-                    entry.setCiteKey(key);
-                }
-            }
-
+            entry.setCiteKey(key);
         } else {
             // The key is already in use, so we must modify it.
-            int number = 0;
-            if (!alwaysAddLetter && !firstLetterA) {
-                number = 1;
-            }
+            int number = !alwaysAddLetter && !firstLetterA ? 1 : 0;
+            String moddedKey;
 
-            String moddedKey = key + getAddition(number);
-            occurrences = database.getNumberOfKeyOccurrences(moddedKey);
-
-            if (Objects.equals(oldKey, moddedKey)) {
-                occurrences--;
-            }
-
-            while (occurrences > 0) {
-                number++;
+            do {
                 moddedKey = key + getAddition(number);
+                number++;
 
-                occurrences = database.getNumberOfKeyOccurrences(moddedKey);
+                occurrences = database.getDuplicationChecker().getNumberOfKeyOccurrences(moddedKey);
+                // only happens if #getAddition() is buggy
                 if (Objects.equals(oldKey, moddedKey)) {
                     occurrences--;
                 }
-            }
+            } while (occurrences > 0);
 
-            if (!moddedKey.equals(oldKey)) {
-                if (database.containsEntryWithId(entry.getId())) {
-                    database.setCiteKeyForEntry(entry, moddedKey);
-                } else {
-                    // entry does not (yet) exist in the database, just update the entry
-                    entry.setCiteKey(moddedKey);
-                }
-            }
+            entry.setCiteKey(moddedKey);
         }
     }
 

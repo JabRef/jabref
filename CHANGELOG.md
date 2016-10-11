@@ -61,6 +61,7 @@ We refer to [GitHub issues](https://github.com/JabRef/jabref/issues) by using `#
 - Customized importer files need to be slightly changed since the class `ImportFormat` was renamed to `Importer`
 
 ### Fixed
+- Fixed [#2089](https://github.com/JabRef/jabref/issues/2089): Fixed faulty cite key generation
 - Fixed [#2092](https://github.com/JabRef/jabref/issues/2092): "None"-button in date picker clears the date field
 - Fixed [#1993](https://github.com/JabRef/jabref/issues/1993): Various optimizations regarding search performance
 - Fixed [koppor#160](https://github.com/koppor/jabref/issues/160): Tooltips now working in the main table
