@@ -1301,6 +1301,7 @@ public class BasePanel extends JPanel implements ClipboardOwner, FileUpdateListe
 
         @Subscribe
         public void listen(EntryRemovedEvent removedEntryEvent) {
+            // IMO only used to update the status (found X entries)
             frame.getGlobalSearchBar().performSearch();
         }
     }
