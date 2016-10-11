@@ -153,7 +153,11 @@ class EntryEditorTab {
                         false);
                 defaultHeight = 0;
             } else {
-                String prompt = (field.equals(FieldName.AUTHOR)) ? Localization.lang("Firstname Lastname and Firstname and Lastname and others") : "";
+                String prompt = "";
+                if (field.equals(FieldName.AUTHOR) || field.equals(FieldName.EDITOR)) {
+                     prompt = Localization.lang("Firstname Lastname and Firstname Lastname") + " and others";
+                }
+
                 fieldEditor = new TextArea(field, null, prompt);
                 bPanel.frame().getGlobalSearchBar().getSearchQueryHighlightObservable().addSearchListener((TextArea) fieldEditor);
                 defaultHeight = fieldEditor.getPane().getPreferredSize().height;
