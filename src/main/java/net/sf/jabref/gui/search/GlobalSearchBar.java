@@ -16,6 +16,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JToggleButton;
 import javax.swing.JToolBar;
+import javax.swing.SwingUtilities;
 
 import net.sf.jabref.Globals;
 import net.sf.jabref.gui.BasePanel;
@@ -26,6 +27,7 @@ import net.sf.jabref.gui.OSXCompatibleToolbar;
 import net.sf.jabref.gui.autocompleter.AutoCompleteSupport;
 import net.sf.jabref.gui.help.HelpAction;
 import net.sf.jabref.gui.keyboard.KeyBinding;
+import net.sf.jabref.gui.maintable.MainTable;
 import net.sf.jabref.gui.maintable.MainTableDataModel;
 import net.sf.jabref.gui.util.component.JTextFieldWithPlaceholder;
 import net.sf.jabref.logic.autocompleter.AutoCompleter;
@@ -136,7 +138,11 @@ public class GlobalSearchBar extends JPanel {
         searchField.getActionMap().put(endSearch, new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                endSearch();
+                if (autoCompleteSupport.isVisible()) {
+                    autoCompleteSupport.setVisible(false);
+                } else {
+                    endSearch();
+                }
             }
         });
 
@@ -249,12 +255,14 @@ public class GlobalSearchBar extends JPanel {
         searchModeButton.setToolTipText(searchDisplayMode.getToolTipText());
     }
 
-    private void endSearch() {
+    public void endSearch() {
         BasePanel currentBasePanel = frame.getCurrentBasePanel();
         if (currentBasePanel != null) {
             clearSearch(currentBasePanel);
-            Globals.getFocusListener().setFocused(currentBasePanel.getMainTable());
-            currentBasePanel.getMainTable().requestFocus();
+            MainTable mainTable = frame.getCurrentBasePanel().getMainTable();
+            Globals.getFocusListener().setFocused(mainTable);
+            mainTable.requestFocus();
+            SwingUtilities.invokeLater(() -> mainTable.ensureVisible(mainTable.getSelectedRow()));
         }
     }
 
@@ -264,6 +272,7 @@ public class GlobalSearchBar extends JPanel {
     public void focus() {
         if (!searchField.hasFocus()) {
             searchField.requestFocus();
+            searchField.selectAll();
         }
     }
 
